@@ -85,7 +85,7 @@ class Histogram
 				      *
 				      * The histograms will be arranged such
 				      * that the computed intervals of the
-				      * @p{values[i][j]} form the x-range,
+				      * <tt>values[i][j]</tt> form the x-range,
 				      * and the number of values in each
 				      * interval will be the y-range (for
 				      * 2d plots) or the z-range (for 3d
@@ -97,7 +97,7 @@ class Histogram
 				      * the @p y_values are ignored.
 				      *
 				      * If you give only one data set, i.e.
-				      * @p{values.size()==1}, then the
+				      * <tt>values.size()==1</tt>, then the
 				      * resulting histogram will be a 2d
 				      * one.
 				      *
@@ -233,8 +233,8 @@ class Histogram
 				      * logarithmic case interval spacing
 				      * scheme.
 				      *
-				      * Return @p true, if (@p{n1<n2},
-				      * and (@p{n1>0} or @p{n2<0})), or
+				      * Return @p true, if (<tt>n1<n2</tt>,
+				      * and (<tt>n1>0</tt> or <tt>n2<0</tt>)), or
 				      * (n2<n1 and n1>0 and n2<=0). This
 				      * in effect sorts all negativ
 				      * numbers to be larger than the

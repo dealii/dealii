@@ -172,8 +172,8 @@ template <typename number> class Vector;
  * class. The former must provide @p vmult, @p Tvmult, and
  * @p residual member function that operate on the vector type (the
  * second template argument). The latter template parameter must
- * provide access to indivual elements through @p{operator()},
- * assignment through @p{operator=}.
+ * provide access to indivual elements through <tt>operator()</tt>,
+ * assignment through <tt>operator=</tt>.
  *
  *
  * @sect3{Thread-safety}
@@ -273,7 +273,7 @@ class FilteredMatrix : public Subscriptor
 				      * @p std::vector of
 				      * IndexValuePair objects,
 				      * but also a
-				      * @p{std::map<unsigned,value_type>}.
+				      * <tt>std::map<unsigned,value_type></tt>.
 				      *
 				      * It is an error if the argument
 				      * contains an entry for a degree
@@ -283,7 +283,7 @@ class FilteredMatrix : public Subscriptor
 				      * assumed that the list of
 				      * constraints is sorted. If the
 				      * input argument is a
-				      * @p{std::map<unsigned,value_type>},
+				      * <tt>std::map<unsigned,value_type></tt>,
 				      * this is automatically the
 				      * case.
 				      *
@@ -400,9 +400,9 @@ class FilteredMatrix : public Subscriptor
 
 				     /**
 				      * Compute the residual of an
-				      * equation @p{Mx=b}, where the
+				      * equation <tt>Mx=b</tt>, where the
 				      * residual is defined to be
-				      * @p{r=b-Mx} with @p x
+				      * <tt>r=b-Mx</tt> with @p x
 				      * typically being an approximate
 				      * of the true solution of the
 				      * equation. Write the residual

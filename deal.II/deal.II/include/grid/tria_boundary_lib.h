@@ -31,7 +31,7 @@
  *
  *   This class is derived from StraightBoundary rather than from
  *   Boundary, which would seem natural, since this way we can use the
- *   StraightBoundary@p{<dim>::in_between(neighbors)} function.
+ *   StraightBoundary<tt><dim>::in_between(neighbors)</tt> function.
  *
  *   @author Guido Kanschat, 2001
  */
@@ -79,8 +79,8 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * and the documentation of the
 				      * base class.
 				      *
-				      * Only implemented for @p{dim=3}
-				      * and for @p{points.size()==1}.
+				      * Only implemented for <tt>dim=3</tt>
+				      * and for <tt>points.size()==1</tt>.
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
@@ -151,7 +151,7 @@ class CylinderBoundary : public StraightBoundary<dim>
  *
  *   This class is derived from StraightBoundary rather than from
  *   Boundary, which would seem natural, since this way we can use the
- *   StraightBoundary@p{<dim>::in_between(neighbors)} function.
+ *   StraightBoundary<tt><dim>::in_between(neighbors)</tt> function.
  *
  *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
@@ -200,8 +200,8 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * and the documentation of the
 				      * base class.
 				      *
-				      * Only implemented for @p{dim=3}
-				      * and for @p{points.size()==1}.
+				      * Only implemented for <tt>dim=3</tt>
+				      * and for <tt>points.size()==1</tt>.
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
@@ -312,7 +312,7 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
 			   const double     radius = 1.0);
 
 				     /**
-				      * Check if on the line @p{x==0},
+				      * Check if on the line <tt>x==0</tt>,
 				      * otherwise pass to the base
 				      * class.
 				      */
@@ -320,7 +320,7 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
 
 				     /**
-				      * Check if on the line @p{x==0},
+				      * Check if on the line <tt>x==0</tt>,
 				      * otherwise pass to the base
 				      * class.
 				      */
@@ -346,8 +346,8 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
 				      * and the documentation of the
 				      * base class.
 				      *
-				      * Only implemented for @p{dim=3}
-				      * and for @p{points.size()==1}.
+				      * Only implemented for <tt>dim=3</tt>
+				      * and for <tt>points.size()==1</tt>.
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
@@ -450,8 +450,8 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 				      * and the documentation of the
 				      * base class.
 				      *
-				      * Only implemented for @p{dim=3}
-				      * and for @p{points.size()==1}.
+				      * Only implemented for <tt>dim=3</tt>
+				      * and for <tt>points.size()==1</tt>.
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,

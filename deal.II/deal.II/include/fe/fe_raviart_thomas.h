@@ -148,7 +148,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p{FE_RaviartThomas<dim>(degree)}, with
+				      * <tt>FE_RaviartThomas<dim>(degree)</tt>, with
 				      * @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
@@ -214,7 +214,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * finite element to the present
 				      * one. The size of the matrix is
 				      * then @p dofs_per_cell times
-				      * @p{source.dofs_per_cell}.
+				      * <tt>source.dofs_per_cell</tt>.
 				      *
 				      * These matrices are only
 				      * available if the source
@@ -239,7 +239,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				     /**
 				      * Access to base element
 				      * objects. Since this element is
-				      * atomic, @p{base_element(0)} is
+				      * atomic, <tt>base_element(0)</tt> is
 				      * @p this, and all other
 				      * indices throw an error.
 				      */
@@ -250,7 +250,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
                                       * Multiplicity of base element
                                       * @p index. Since this is an
                                       * atomic element,
-                                      * @p{element_multiplicity(0)}
+                                      * <tt>element_multiplicity(0)</tt>
                                       * returns one, and all other
                                       * indices will throw an error.
                                       */

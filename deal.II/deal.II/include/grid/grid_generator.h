@@ -177,7 +177,7 @@ class GridGenerator
 				      * @p repetitions cells. Thus,
 				      * the number of cells filling
 				      * the given volume is
-				      * @p{repetitions^d}.
+				      * <tt>repetitions^d</tt>.
 				      */
     template <int dim>
     static void subdivided_hyper_cube (Triangulation<dim> &tria,
@@ -219,7 +219,7 @@ class GridGenerator
 				      * diagonally opposite corner
 				      * points @p p1 and @p p2. In
 				      * dimension @p i,
-				      * @p{repetitions[i]} cells are
+				      * <tt>repetitions[i]</tt> cells are
 				      * generated.
 				      * 
 				      * To get cells with an aspect
@@ -354,8 +354,8 @@ class GridGenerator
 				     /**
 				      * Create a cylinder around the
 				      * x-axis.  The cylinder extends
-				      * from @p{x=-half_length} to
-				      * @p{x=+half_length} and its
+				      * from <tt>x=-half_length</tt> to
+				      * <tt>x=+half_length</tt> and its
 				      * projection into the
 				      * @p yz-plane is a circle of
 				      * radius @p radius.
@@ -396,7 +396,7 @@ class GridGenerator
 				      * Initialize the given
 				      * triangulation with a hyper-L
 				      * consisting of exactly
-				      * @p{2^dim-1} cells. See the
+				      * <tt>2^dim-1</tt> cells. See the
 				      * general documentation for a
 				      * description of the
 				      * L-region. The limits default
@@ -436,8 +436,8 @@ class GridGenerator
 				      * Initialize the given
 				      * Triangulation with a hypercube
 				      * with a slit. The slit goes
-				      * from @p{(x=0,y=-1)} to
-				      * @p{(0,0)} in 2d.
+				      * from <tt>(x=0,y=-1)</tt> to
+				      * <tt>(0,0)</tt> in 2d.
 				      *
 				      * The triangulation needs to be
 				      * void upon calling this

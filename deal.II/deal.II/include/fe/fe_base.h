@@ -435,8 +435,8 @@ class FiniteElementBase : public Subscriptor,
 					  * approximate second
 					  * derivatives.
 					  *
-					  * The ordering is @p{p+hx},
-					  * @p{p+hy}, @p{p+hz},
+					  * The ordering is <tt>p+hx</tt>,
+					  * <tt>p+hy</tt>, <tt>p+hz</tt>,
 					  * @p p-hx, @p p-hy,
 					  * @p p-hz, where unused
 					  * entries in lower dimensions
@@ -473,7 +473,7 @@ class FiniteElementBase : public Subscriptor,
 				      * brackets, and the polynomial
 				      * degree and whatever else is
 				      * necessary in parentheses. For
-				      * example, @p{FE_Q<2>(3)} is the
+				      * example, <tt>FE_Q<2>(3)</tt> is the
 				      * value returned for a cubic
 				      * element in 2d.
 				      *
@@ -689,7 +689,7 @@ class FiniteElementBase : public Subscriptor,
 				      * concatenation, not the sum of
 				      * the cell matrices
 				      * @p P_i. That is, if the same
-				      * non-zero entry @p{j,k} exists
+				      * non-zero entry <tt>j,k</tt> exists
 				      * in in two different child
 				      * matrices @p P_i, the value
 				      * should be the same in both
@@ -747,7 +747,7 @@ class FiniteElementBase : public Subscriptor,
                                       * and they are not implemented. This
                                       * function could be used to check
                                       * whether a call to
-                                      * @p{get_prolongation_matrix()} will
+                                      * <tt>get_prolongation_matrix()</tt> will
                                       * succeed; however, one then still needs
                                       * to cope with the lack of information
                                       * this just expresses.
@@ -808,7 +808,7 @@ class FiniteElementBase : public Subscriptor,
                                       * node constraints and they are
                                       * not implemented. This function
                                       * could be used to check whether
-                                      * a call to @p{constraints()}
+                                      * a call to <tt>constraints()</tt>
                                       * will succeed; however, one
                                       * then still needs to cope with
                                       * the lack of information this
@@ -822,7 +822,7 @@ class FiniteElementBase : public Subscriptor,
 				      * finite element to the present
 				      * one. The size of the matrix is
 				      * then @p dofs_per_cell times
-				      * @p{source.dofs_per_cell}.
+				      * <tt>source.dofs_per_cell</tt>.
 				      *
 				      * Derived elements will have to
 				      * implement this function. They
@@ -1032,7 +1032,7 @@ class FiniteElementBase : public Subscriptor,
 				      * element.  The order of points
 				      * in the array matches that
 				      * returned by the
-				      * @p{cell->get_dof_indices}
+				      * <tt>cell->get_dof_indices</tt>
 				      * function.
 				      *
 				      * See the class documentation
@@ -1150,7 +1150,7 @@ class FiniteElementBase : public Subscriptor,
 				      * (@p dofs_per_face). The order
 				      * of points in the array matches
 				      * that returned by the
-				      * @p{cell->get_dof_indices}
+				      * <tt>cell->get_dof_indices</tt>
 				      * function.
 				      *
 				      * See the class documentation
@@ -1204,7 +1204,7 @@ class FiniteElementBase : public Subscriptor,
 				      * that case, the component with
 				      * the single zero is also the
 				      * first element of what
-				      * @p{system_to_component_index(i)}
+				      * <tt>system_to_component_index(i)</tt>
 				      * returns.
 				      *
 				      * Only for those
@@ -1256,7 +1256,7 @@ class FiniteElementBase : public Subscriptor,
 				      * The result of the function is
 				      * @p true if and only if the
 				      * result of
-				      * @p{n_nonzero_components(i)} is
+				      * <tt>n_nonzero_components(i)</tt> is
 				      * equal to one.
 				      */
     bool
@@ -1364,7 +1364,7 @@ class FiniteElementBase : public Subscriptor,
 
     				     /**
 				      * Array of embedding matrices. See
-				      * @p{get_prolongation_matrix()} above.
+				      * <tt>get_prolongation_matrix()</tt> above.
 				      *
 				      * Matrices in this array are
 				      * automatically initialized to

@@ -52,7 +52,7 @@ class FETools
 				      * function to a @p fe2-function on
 				      * each cell. The interpolation_matrix
 				      * needs to be of size
-				      * @p{(fe2.dofs_per_cell, fe1.dofs_per_cell)}.
+				      * <tt>(fe2.dofs_per_cell, fe1.dofs_per_cell)</tt>.
 				      *
 				      * Note, that if the finite element
 				      * space @p fe1 is a subset of
@@ -73,7 +73,7 @@ class FETools
 				      * @p fe1-function on
 				      * each cell. The interpolation_matrix
 				      * needs to be of size
-				      * @p{(fe1.dofs_per_cell, fe1.dofs_per_cell)}.
+				      * <tt>(fe1.dofs_per_cell, fe1.dofs_per_cell)</tt>.
 				      *
 				      * Note, that this function only
 				      * makes sense if the finite element
@@ -93,7 +93,7 @@ class FETools
 				      * back interpolation matrix.
 				      * The @p difference_matrix
 				      * needs to be of size
-				      * @p{(fe1.dofs_per_cell, fe1.dofs_per_cell)}.
+				      * <tt>(fe1.dofs_per_cell, fe1.dofs_per_cell)</tt>.
 				      *
 				      * This function gives
 				      * the matrix that transforms a
@@ -525,7 +525,7 @@ class FETools
 				      * space dimension in the form of
 				      * a template argument after the
 				      * name of the class (for example
-				      * @p{FE_Q<2>}, you can omit the
+				      * <tt>FE_Q<2></tt>, you can omit the
 				      * dimension argument altogether,
 				      * or replace it with the string
 				      * <tt>@<dim@></tt>. The reason

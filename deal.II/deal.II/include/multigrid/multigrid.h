@@ -63,7 +63,7 @@
  * @code
  *   void COARSE::operator() (VECTOR& x, const VECTOR& b)
  * @endcode
- * returning the solution to the system @p{Ax=b} on the coarsest level
+ * returning the solution to the system <tt>Ax=b</tt> on the coarsest level
  * in <i>x</i>.
  * 
  * @author Guido Kanschat, 1999 - 2004
@@ -124,10 +124,10 @@ class Multigrid : public Subscriptor
 				      * the outer defect correction
 				      * scheme (usually performed by
 				      * PreconditionMG). After
-				      * execution of @p{vcycle()}, the
+				      * execution of <tt>vcycle()</tt>, the
 				      * result is in the vector
 				      * @p solution. See
-				      * @p{copy_*_mg} in class
+				      * <tt>copy_*_mg</tt> in class
 				      * @p MGTools if you want to use
 				      * these vectors yourself.
 				      *
@@ -245,9 +245,9 @@ class Multigrid : public Subscriptor
  * and provide the standard interface for LAC iterative methods.
  *
  * The template parameter class @p MG is required to inherit @p MGBase.
- * Furthermore, it needs functions @p{void copy_to_mg(const VECTOR&)}
+ * Furthermore, it needs functions <tt>void copy_to_mg(const VECTOR&)</tt>
  * to store @p src in the right hand side of the multi-level method and
- * @p{void copy_from_mg(VECTOR&)} to store the result of the v-cycle in @p dst.
+ * <tt>void copy_from_mg(VECTOR&)</tt> to store the result of the v-cycle in @p dst.
  *
  * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */

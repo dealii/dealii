@@ -74,7 +74,7 @@ namespace PETScWrappers
  * created. The functions assume that the matrix is initialized with a
  * sparsity pattern (SparsityPattern) corresponding to the given degree
  * of freedom handler, i.e. the sparsity structure is already as needed.
- * You can do this by calling the DoFHandler@p{<dim>::make_sparsity_pattern}
+ * You can do this by calling the DoFHandler<tt><dim>::make_sparsity_pattern</tt>
  * function.
  *
  * Furthermore it is assumed that no relevant data is in the matrix. All
@@ -95,7 +95,7 @@ namespace PETScWrappers
  *
  * If you want to use boundary conditions with the matrices generated
  * by the functions of this class, you have to use a function like
- * @p{ProblemBase<>::apply_dirichlet_bc} to matrix and right hand
+ * <tt>ProblemBase<>::apply_dirichlet_bc</tt> to matrix and right hand
  * side.
  *
  *
@@ -147,7 +147,7 @@ namespace PETScWrappers
  * FunctioMap@p ::FunctionMap passed to the function (i.e. if
  * you want to set up the mass matrix for the parts of the boundary
  * with indicators zero and 2, you pass the function a map of
- * @p{unsigned char}s as parameter @p boundary_functions containing
+ * <tt>unsigned char</tt>s as parameter @p boundary_functions containing
  * the keys zero and 2). The $\phi_i$ are the basis functions which
  * have at least part of their support on $\Gamma$. The mapping
  * @p dof_to_boundary_mapping required by this function maps global
@@ -403,7 +403,7 @@ class MatrixCreator
 				      * pairs of DoF handler cell
 				      * iterators. This type works
 				      * just like a
-				      * @p{std::pair<iterator,iterator>}
+				      * <tt>std::pair<iterator,iterator></tt>
 				      * but is templatized on the
 				      * space dimension.
 				      */
@@ -619,17 +619,17 @@ class MatrixCreator
  * we can't eliminate the column without searching all rows, which
  * would be too expensive (if @p N be the number of rows, and @p m the
  * number of nonzero elements per row, then eliminating one column is
- * an @p{O(N*log(m))} operation, since searching in each row takes
- * @p{log(m)} operations). If your sparsity pattern is symmetric, but
+ * an <tt>O(N*log(m))</tt> operation, since searching in each row takes
+ * <tt>log(m)</tt> operations). If your sparsity pattern is symmetric, but
  * your matrix is not, then you might specify @p false as well. If your
  * sparsity pattern and matrix are both symmetric, you might want to
  * specify @p true (the complexity of eliminating one row is then
- * @p{O(m*log(m))}, since we only have to search @p m rows for the
+ * <tt>O(m*log(m))</tt>, since we only have to search @p m rows for the
  * respective element of the column). Given the fact that @p m is
  * roughly constant, irrespective of the discretization, and that the
- * number of boundary nodes is @p{sqrt(N)} in 2d, the algorithm for
- * symmetric sparsity patterns is @p{O(sqrt(N)*m*log(m))}, while it
- * would be @p{O(N*sqrt(N)*log(m))} for the general case; the latter
+ * number of boundary nodes is <tt>sqrt(N)</tt> in 2d, the algorithm for
+ * symmetric sparsity patterns is <tt>O(sqrt(N)*m*log(m))</tt>, while it
+ * would be <tt>O(N*sqrt(N)*log(m))</tt> for the general case; the latter
  * is too expensive to be performed.
  *
  * It seems as if we had to make clear not to overwrite the lines of

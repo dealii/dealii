@@ -49,7 +49,7 @@ template <int dim> class FESubfaceValues;
  *  the conormal derivative $a\frac{du}{dn} = g$.
  *
  *  The error estimator returns a vector of estimated errors per cell which
- *  can be used to feed the Triangulation@p{<dim>::refine_*} functions. This
+ *  can be used to feed the Triangulation<tt><dim>::refine_*</tt> functions. This
  *  vector contains elements of data type @p float, rather than @p double,
  *  since accuracy is not so important here, and since this can save rather
  *  a lot of memory, when using many cells.
@@ -249,7 +249,7 @@ class KellyErrorEstimator
 				      * The estimator supports
 				      * multithreading and splits the
 				      * cells to
-				      * @p{multithread_info.n_default_threads}
+				      * <tt>multithread_info.n_default_threads</tt>
 				      * (default) threads. The number
 				      * of threads to be used in
 				      * multithreaded mode can be set
@@ -502,7 +502,7 @@ class KellyErrorEstimator
 					  * on one cell
 					  *
 					  * Let psi be a short name
-					  * for @p{a grad u_h}, where
+					  * for <tt>a grad u_h</tt>, where
 					  * the third index be the
 					  * component of the finite
 					  * element, and the second
@@ -562,7 +562,7 @@ class KellyErrorEstimator
 				      * Computates the error on all cells
 				      * of the domain with the number n,
 				      * satisfying
-				      * @p{n=this_thread (mod n_threads)}
+				      * <tt>n=this_thread (mod n_threads)</tt>
 				      * This enumeration is chosen to
 				      * generate a random distribution
 				      * of all cells.
@@ -719,7 +719,7 @@ class KellyErrorEstimator<1>
 				      *
 				      * The estimator supports multithreading
 				      * and splits the cells to
-				      * @p{multithread_info.n_default_threads}
+				      * <tt>multithread_info.n_default_threads</tt>
 				      * (default) threads. The number of
 				      * threads to be used in multithreaded
 				      * mode can be set with the last
@@ -745,7 +745,7 @@ class KellyErrorEstimator<1>
 				     /**
 				      * Calls the @p estimate
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<1>()}.
+				      * <tt>mapping=MappingQ1<1>()</tt>.
 				      */    
     template <typename InputVector>
     static void estimate (const DoFHandler<1>   &dof,
@@ -800,7 +800,7 @@ class KellyErrorEstimator<1>
 				     /**
 				      * Calls the @p estimate
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<1>()}.
+				      * <tt>mapping=MappingQ1<1>()</tt>.
 				      */
     template <typename InputVector>
     static void estimate (const DoFHandler<1>       &dof,

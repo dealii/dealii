@@ -269,15 +269,15 @@ class TriaRawIterator :
 				     /**
 				      *  Dereferencing operator, returns a
 				      *  reference to an accessor.
-				      *  Usage is thus like @p{(*i).index ();}
+				      *  Usage is thus like <tt>(*i).index ();</tt>
 				      *
 				      *  This function has to be specialized
 				      *  explicitly for the different
 				      *  @p Pointees, to allow an
-				      *  @p{iterator<1,TriangulationLevel<1>::LinesData>}
-				      *  to point to @p{tria->lines.lines[index]} while
+				      *  <tt>iterator<1,TriangulationLevel<1>::LinesData></tt>
+				      *  to point to <tt>tria->lines.lines[index]</tt> while
 				      *  for one dimension higher it has
-				      *  to point to @p{tria->quads.quads[index]}.
+				      *  to point to <tt>tria->quads.quads[index]</tt>.
 				      *
 				      *  You must not dereference invalid or
 				      *  past the end iterators.
@@ -293,7 +293,7 @@ class TriaRawIterator :
 				     /**
 				      *  Dereferencing operator, returns a
 				      *  reference of the cell pointed to.
-				      *  Usage is thus like @p{i->index ();}
+				      *  Usage is thus like <tt>i->index ();</tt>
 				      *
 				      *  There is a @p const and a non-@p const
 				      *  version.
@@ -344,10 +344,10 @@ class TriaRawIterator :
 				     /**@name Advancement of iterators*/
 				     /*@{*/
 				     /**
-				      *  Prefix @p{++} operator: @p{++i}. This
+				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
 				      *  operator advances the iterator to
 				      *  the next element and returns
-				      *  a reference to @p{*this}.
+				      *  a reference to <tt>*this</tt>.
 				      *
 				      *  The next element is next on this
 				      *  level if there are more. If the
@@ -358,7 +358,7 @@ class TriaRawIterator :
     TriaRawIterator & operator ++ ();
     
 				     /**
-				      *  Postfix @p{++} operator: @p{i++}. This
+				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
 				      *  operator advances the iterator to
 				      *  the next element, but
 				      *  returns an iterator to the element
@@ -367,10 +367,10 @@ class TriaRawIterator :
 				      *  operation and since an
 				      *  @p iterator is quite a large
 				      *  object for a pointer, use the
-				      *  prefix operator @p{++i} whenever
+				      *  prefix operator <tt>++i</tt> whenever
 				      *  possible, especially in the head
 				      *  of for loops
-				      *  (@p{for (; i!=end; ++i)}) since there
+				      *  (<tt>for (; i!=end; ++i)</tt>) since there
 				      *  you normally never need the
 				      *  returned value.
 				      */
@@ -380,10 +380,10 @@ class TriaRawIterator :
 				      *  Prefix @p -- operator: @p --i. This
 				      *  operator advances the iterator to
 				      *  the previous element and returns
-				      *  a reference to @p{*this}.
+				      *  a reference to <tt>*this</tt>.
 				      *
 				      *  The previous element is previous on
-				      *  this level if @p{index>0}. If the
+				      *  this level if <tt>index>0</tt>. If the
 				      *  present element is the first on
 				      *  this level, the last on the
 				      *  previous level is accessed.
@@ -403,7 +403,7 @@ class TriaRawIterator :
 				      *  prefix operator @p --i whenever
 				      *  possible, especially in the head
 				      *  of for loops
-				      *  (@p{for (; i!=end; --i)}) since there
+				      *  (<tt>for (; i!=end; --i)</tt>) since there
 				      *  you normally never need the
 				      *  returned value.
 				      */
@@ -417,7 +417,7 @@ class TriaRawIterator :
 
 				     /**
 				      * Print the iterator to @p out. The
-				      * format is like @p{level.index}.
+				      * format is like <tt>level.index</tt>.
 				      */
     void print (std::ostream &out) const;
 
@@ -598,15 +598,15 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				     /**@name Advancement of iterators*/
 				     /*@{*/
 				     /**
-				      *  Prefix @p{++} operator: @p{++i}. This
+				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
 				      *  operator advances the iterator to
 				      *  the next used element and returns
-				      *  a reference to @p{*this}.
+				      *  a reference to <tt>*this</tt>.
 				      */
     TriaIterator<dim,Accessor> & operator ++ ();
 
 				     /**
-				      *  Postfix @p{++} operator: @p{i++}. This
+				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
 				      *  operator advances the iterator to
 				      *  the next used element, but
 				      *  returns an iterator to the element
@@ -615,10 +615,10 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  operation and since an
 				      *  @p active_iterator is quite a large
 				      *  object for a pointer, use the
-				      *  prefix operator @p{++i} whenever
+				      *  prefix operator <tt>++i</tt> whenever
 				      *  possible, especially in the head
 				      *  of for loops
-				      *  (@p{for (; i!=end; ++i)}) since there
+				      *  (<tt>for (; i!=end; ++i)</tt>) since there
 				      *  you normally never need the
 				      *  returned value.
 				      */
@@ -628,7 +628,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  Prefix @p -- operator: @p --i. This
 				      *  operator advances the iterator to
 				      *  the previous used element and returns
-				      *  a reference to @p{*this}.
+				      *  a reference to <tt>*this</tt>.
 				      */
     TriaIterator<dim,Accessor> & operator -- ();
 
@@ -734,7 +734,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      * raw iterators. Since usual iterators
 				      * are also raw iterators, this constructor
 				      * works also for parameters of type
-				      * @p{TriaIterator<dim,OtherAccessor>}.
+				      * <tt>TriaIterator<dim,OtherAccessor></tt>.
 				      */
     template <typename OtherAccessor>
     TriaActiveIterator (const TriaRawIterator<dim,OtherAccessor> &i);
@@ -764,17 +764,17 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
     operator = (const TriaIterator<dim,Accessor> &);
 
 				     /**
-				      *  Prefix @p{++} operator: @p{++i}. This
+				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
 				      *  operator advances the iterator to
 				      *  the next active element and returns
-				      *  a reference to @p{*this}.
+				      *  a reference to <tt>*this</tt>.
 				      */
     TriaActiveIterator<dim,Accessor> & operator ++ ();
 
 				     /**@name Advancement of iterators*/
 				     /*@{*/
 				     /**
-				      *  Postfix @p{++} operator: @p{i++}. This
+				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
 				      *  operator advances the iterator to
 				      *  the next active element, but
 				      *  returns an iterator to the element
@@ -783,10 +783,10 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  operation and since an
 				      *  @p active_iterator is quite a large
 				      *  object for a pointer, use the
-				      *  prefix operator @p{++i} whenever
+				      *  prefix operator <tt>++i</tt> whenever
 				      *  possible, especially in the head
 				      *  of for loops
-				      *  (@p{for (; i!=end; ++i)}) since there
+				      *  (<tt>for (; i!=end; ++i)</tt>) since there
 				      *  you normally never need the
 				      *  returned value.
 				      */
@@ -796,7 +796,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  Prefix @p -- operator: @p --i. This
 				      *  operator advances the iterator to
 				      *  the previous active element and
-				      *  returns a reference to @p{*this}.
+				      *  returns a reference to <tt>*this</tt>.
 				      */
     TriaActiveIterator<dim,Accessor> & operator -- ();
 
@@ -1017,7 +1017,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 
 /**
  * Print the address to which this iterator points to @p out. The
- * address is given by the pair @p{(level,index)}, where @p index is
+ * address is given by the pair <tt>(level,index)</tt>, where @p index is
  * an index relative to the level in which the object is that is
  * pointed to.
  *
@@ -1036,7 +1036,7 @@ std::ostream & operator << (std::ostream                        &out,
 
 /**
  * Print the address to which this iterator points to @p out. The
- * address is given by the pair @p{(level,index)}, where @p index is
+ * address is given by the pair <tt>(level,index)</tt>, where @p index is
  * an index relative to the level in which the object is that is
  * pointed to.
  *
@@ -1055,7 +1055,7 @@ std::ostream & operator << (std::ostream                     &out,
 
 /**
  * Print the address to which this iterator points to @p out. The
- * address is given by the pair @p{(level,index)}, where @p index is
+ * address is given by the pair <tt>(level,index)</tt>, where @p index is
  * an index relative to the level in which the object is that is
  * pointed to.
  *

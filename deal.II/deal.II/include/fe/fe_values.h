@@ -203,7 +203,7 @@ class FEValuesData
 				      * follows: we allocate one row
 				      * for each non-zero component as
 				      * indicated by the
-				      * @p{FiniteElement::get_nonzero_components()}
+				      * <tt>FiniteElement::get_nonzero_components()</tt>
 				      * function, and the rows are in
 				      * ascending order exactly those
 				      * non-zero components.
@@ -283,7 +283,7 @@ class FEValuesData
  *    and you have to walk over all (or only the non-zero) components of
  *    the shape function using this set of functions.
  *   
- *  <li> @p get_function_values, @p get_function_grads, @p{...}:
+ *  <li> @p get_function_values, @p get_function_grads, <tt>...</tt>:
  *    Compute a finite element function or its derivative
  *    in quadrature points.
  *
@@ -456,8 +456,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * correct size. 
 				      *
 				      * The actual data type of the input
-				      * vector may be either a @p{Vector<T>},
-				      * @p{BlockVector<T>}, or one of the
+				      * vector may be either a <tt>Vector<T></tt>,
+				      * <tt>BlockVector<T></tt>, or one of the
 				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
@@ -480,8 +480,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * elements.
 				      *
 				      * The actual data type of the input
-				      * vector may be either a @p{Vector<T>},
-				      * @p{BlockVector<T>}, or one of the
+				      * vector may be either a <tt>Vector<T></tt>,
+				      * <tt>BlockVector<T></tt>, or one of the
 				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
@@ -577,8 +577,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * right size.
 				      *
 				      * The actual data type of the input
-				      * vector may be either a @p{Vector<T>},
-				      * @p{BlockVector<T>}, or one of the
+				      * vector may be either a <tt>Vector<T></tt>,
+				      * <tt>BlockVector<T></tt>, or one of the
 				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
@@ -616,8 +616,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * elements.
 				      *
 				      * The actual data type of the input
-				      * vector may be either a @p{Vector<T>},
-				      * @p{BlockVector<T>}, or one of the
+				      * vector may be either a <tt>Vector<T></tt>,
+				      * <tt>BlockVector<T></tt>, or one of the
 				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
@@ -721,8 +721,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * function.
 				      * 
 				      * The actual data type of the input
-				      * vector may be either a @p{Vector<T>},
-				      * @p{BlockVector<T>}, or one of the
+				      * vector may be either a <tt>Vector<T></tt>,
+				      * <tt>BlockVector<T></tt>, or one of the
 				      * PETSc vector wrapper classes..It
 				      * represents a global vector of
 				      * DoF values associated with the
@@ -759,8 +759,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * vector-valued finite elements.
 				      *
 				      * The actual data type of the input
-				      * vector may be either a @p{Vector<T>},
-				      * @p{BlockVector<T>}, or one of the
+				      * vector may be either a <tt>Vector<T></tt>,
+				      * <tt>BlockVector<T></tt>, or one of the
 				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
@@ -878,7 +878,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Store the cell selected last time
 				      * the @p reinit function was called
 				      * to make access
-				      * to the @p{get_function_*} functions
+				      * to the <tt>get_function_*</tt> functions
 				      * safer.
 				      */
     typename DoFHandler<dim>::cell_iterator present_cell;
@@ -1032,9 +1032,9 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * of faces or subfaces that this object
 				      * is to store. The actual number depends
 				      * on the derived class, for
-				      * @p FEFaceValues it is @p{2*dim}, while for
+				      * @p FEFaceValues it is <tt>2*dim</tt>, while for
 				      * the @p FESubfaceValues class it is
-				      * @p{2*dim*(1<<(dim-1))}, i.e. the number
+				      * <tt>2*dim*(1<<(dim-1))</tt>, i.e. the number
 				      * of faces times the number of subfaces
 				      * per face.
 				      */
@@ -1068,7 +1068,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * cheaper to compute the
 				      * boundary form immediately, use
 				      * this value to integrate
-				      * @p{n.ds}.
+				      * <tt>n.ds</tt>.
 				      */
     const Tensor<1,dim> & boundary_form (const unsigned int i) const;
     

@@ -165,11 +165,11 @@ namespace PETScWrappers
                                           * 
                                           * The constructor is made explicit
                                           * to avoid accidents like this:
-                                          * @p{v=0;}. Presumably, the user
+                                          * <tt>v=0;</tt>. Presumably, the user
                                           * wants to set every element of the
                                           * vector to zero, but instead, what
                                           * happens is this call:
-                                          * @p{v=Vector<number>(0);}, i.e. the
+                                          * <tt>v=Vector<number>(0);</tt>, i.e. the
                                           * vector is replaced by one of
                                           * length zero.
                                           */

@@ -604,7 +604,7 @@ class DoFRenumbering
 				      * function.
 				      *
 				      * The algorithm is stable, i.e. if
-                                      * two dofs i,j have @p{i<j} and belong
+                                      * two dofs i,j have <tt>i<j</tt> and belong
                                       * to the same subdomain, then they
                                       * will be in this order also after
                                       * reordering.

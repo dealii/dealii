@@ -91,10 +91,10 @@
  * constitute a triangulation; it only becomes one after @p restore is first
  * called. Note also that the @p execute_coarsening_and_refinement stores
  * all necessary flags for later reconstruction using the @p restore function.
- * Triangulation@p{<dim>::clear ()} resets the underlying triangulation to a
+ * Triangulation<tt><dim>::clear ()</tt> resets the underlying triangulation to a
  * virgin state, but does not affect the stored refinement flags needed for
  * later reconstruction and does also not touch the coarse grid which is
- * used withing @p{restore()}.
+ * used withing <tt>restore()</tt>.
  *
  * @author Wolfgang Bangerth, 1999
  */
@@ -156,11 +156,11 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * underlying triangulation is
 				      * not empty, i.e. it will only
 				      * succeed if this object is
-				      * newly created or @p{clear()}
+				      * newly created or <tt>clear()</tt>
 				      * was called on it before.
 				      *
 				      * Repeatedly calls the
-				      * @p{restore(unsigned int)}
+				      * <tt>restore(unsigned int)</tt>
 				      * function in a loop over all
 				      * refinement steps.
 				      */
@@ -178,7 +178,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * is in just the state it were
 				      * if restore would have been
 				      * called from
-				      * @p{step=0...step_no-1} before.
+				      * <tt>step=0...step_no-1</tt> before.
 				      */
     void restore (const unsigned int step_no);
 
@@ -227,7 +227,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				     /**
 				      * Reads all refine and coarsen flags
 				      * that previously were written by
-				      * @p{write_flags(...)}. This is especially
+				      * <tt>write_flags(...)</tt>. This is especially
 				      * useful for rebuilding the triangulation
 				      * after the end or breakdown of a program
 				      * and its restart.

@@ -79,7 +79,7 @@ class SubCellData;
  * found in the AVS Explorer manual (see @url{http://www.avs.com}).
  * The @p UCD format can be read by the @p read_ucd function.
  *
- * <li> @p{DB mesh} format: this format is used by the @p BAMG mesh
+ * <li> <tt>DB mesh</tt> format: this format is used by the @p BAMG mesh
  * generator (see
  * @url{http://www-rocq.inria.fr/gamma/cdrom/www/bamg/eng.htm}. The
  * documentation of the format in the @p BAMG manual is very
@@ -121,16 +121,16 @@ class SubCellData;
  *   |   |   |
  *   0---1---2
  * @endverbatim
- * may be characterised by the vertex numbers @p{(0 1 4 3)} and
- * @p{(1 2 5 4)}, since the middle line would get the direction @p{1->4}
- * when viewed from both cells.  The numbering @p{(0 1 4 3)} and
- * @p{(5 4 1 2)} would not be allowed, since the left quad would give the
- * common line the direction @p{1->4}, while the right one would want
- * to use @p{4->1}, leading to an ambiguity. The Triangulation
+ * may be characterised by the vertex numbers <tt>(0 1 4 3)</tt> and
+ * <tt>(1 2 5 4)</tt>, since the middle line would get the direction <tt>1->4</tt>
+ * when viewed from both cells.  The numbering <tt>(0 1 4 3)</tt> and
+ * <tt>(5 4 1 2)</tt> would not be allowed, since the left quad would give the
+ * common line the direction <tt>1->4</tt>, while the right one would want
+ * to use <tt>4->1</tt>, leading to an ambiguity. The Triangulation
  * object is capable of detecting this special case, which can be
  * eliminated by rotating the indices of the right quad by
  * two. However, it would not know what to do if you gave the vertex
- * indices @p{(4 1 2 5)}, since then it would have to rotate by one
+ * indices <tt>(4 1 2 5)</tt>, since then it would have to rotate by one
  * element or three, the decision which to take is not yet
  * implemented.
  *
@@ -140,7 +140,7 @@ class SubCellData;
  * dimensions, where faces and lines have orientations that need to be
  * taken care of.
  *
- * For this reason, the @p{read_*} functions of this class that read
+ * For this reason, the <tt>read_*</tt> functions of this class that read
  * in grids in various input formats call the GridReordering
  * class to bring the order of vertices that define the cells into an
  * ordering that satisfies the requiremenets of the
@@ -242,7 +242,7 @@ class GridIn
 				     /**
 				      * Skip lines of comment that
 				      * start with the indicated
-				      * character (e.g. @p{#})
+				      * character (e.g. <tt>#</tt>)
 				      * following the point where the
 				      * given input stream presently
 				      * is. After the call to this
@@ -260,7 +260,7 @@ class GridIn
 				      * Remove vertices that are not
 				      * referenced by any of the
 				      * cells. This function is called
-				      * by all @p{read_*} functions to
+				      * by all <tt>read_*</tt> functions to
 				      * eliminate vertices that are
 				      * listed in the input files but
 				      * are not used by the cells in
@@ -274,7 +274,7 @@ class GridIn
 				      * they might be lengthy.
 				      *
 				      * This function is called by all
-				      * @p{read_*} functions as the
+				      * <tt>read_*</tt> functions as the
 				      * triangulation class requires
 				      * them to be called with used
 				      * vertices only. This is so,
@@ -290,7 +290,7 @@ class GridIn
 				     /**
 				      * This function can write the
 				      * raw cell data objects created
-				      * by the @p{read_*} functions in
+				      * by the <tt>read_*</tt> functions in
 				      * Gnuplot format to a
 				      * stream. This is sometimes
 				      * handy if one would like to see

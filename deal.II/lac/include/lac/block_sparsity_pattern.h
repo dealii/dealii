@@ -48,12 +48,12 @@ class CompressedBlockSparsityPattern;
  * mostly, the matrices have different properties and you will want to
  * work on the blocks making up the matrix rather than the whole
  * matrix. You can access the different blocks using the
- * @p{block(row,col)} function.
+ * <tt>block(row,col)</tt> function.
  *
  * Attention: this object is not automatically notified if the size of
  * one of its subobjects' size is changed. After you initialize the
  * sizes of the subobjects, you will therefore have to call the
- * @p{collect_sizes()} function of this class! Note that, of course, all
+ * <tt>collect_sizes()</tt> function of this class! Note that, of course, all
  * sub-matrices in a (block-)row have to have the same number of rows, and
  * that all sub-matrices in a (block-)column have to have the same number of
  * columns.
@@ -264,7 +264,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * bad happens.
 				      *
 				      * This function simply finds out
-				      * to which block @p{(i,j)} belongs
+				      * to which block <tt>(i,j)</tt> belongs
 				      * and then relays to that block.
 				      */
     void add (const unsigned int i, const unsigned int j);
@@ -571,7 +571,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
 {
 				   // if you get an error here, are
 				   // you sure you called
-				   // @p{collect_sizes()} before?
+				   // <tt>collect_sizes()</tt> before?
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
     col_index = column_indices.global_to_local (j);
@@ -589,7 +589,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::exists (const unsigned int i,
 {
 				   // if you get an error here, are
 				   // you sure you called
-				   // @p{collect_sizes()} before?
+				   // <tt>collect_sizes()</tt> before?
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
     col_index = column_indices.global_to_local (j);

@@ -126,7 +126,7 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
 				      * different levels to zero in the given
 				      * data vector @p u.
 				      *
-				      * Since the coarsest level (@p{level==0})
+				      * Since the coarsest level (<tt>level==0</tt>)
 				      * has no interior boundaries, this
 				      * function does nothing in this case.
 				      */
@@ -193,8 +193,8 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
  * this case, the multigrid method must be used only with the vector
  * associated to that single block.
  *
- * The library contains instantiation for @p{SparseMatrix<.>} and
- * @p{Vector<.>}, where the template arguments are all combinations of
+ * The library contains instantiation for <tt>SparseMatrix<.></tt> and
+ * <tt>Vector<.></tt>, where the template arguments are all combinations of
  * @p float and @p double. Additional instantiations may be created
  * by including the file mg_smoother.templates.h.
  * 
@@ -219,9 +219,9 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 				      * Initialize for matrices. The
 				      * parameter @p matrices can be
 				      * any object having functions
-				      * @p{get_minlevel()} and
-				      * @p{get_maxlevel()} as well as
-				      * an @p{operator[]} returning a
+				      * <tt>get_minlevel()</tt> and
+				      * <tt>get_maxlevel()</tt> as well as
+				      * an <tt>operator[]</tt> returning a
 				      * reference to @p MATRIX. This
 				      * function stores pointers to
 				      * the level matrices and
@@ -244,9 +244,9 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 				      * of matrices. The parameter
 				      * @p matrices can be any object
 				      * having functions
-				      * @p{get_minlevel()} and
-				      * @p{get_maxlevel()} as well as
-				      * an @p{operator[]} returning a
+				      * <tt>get_minlevel()</tt> and
+				      * <tt>get_maxlevel()</tt> as well as
+				      * an <tt>operator[]</tt> returning a
 				      * reference to a block matrix
 				      * where each block is of type
 				      * @p MATRIX. Of this block

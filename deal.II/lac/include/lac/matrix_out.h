@@ -182,7 +182,7 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * size of the matrix, for which
 				      * we assume that the matrix type
 				      * offers member functions
-				      * @p{m()} and @p{n()}, which
+				      * <tt>m()</tt> and <tt>n()</tt>, which
 				      * return the number of rows and
 				      * columns, respectively.
 				      */
@@ -272,7 +272,7 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * for which no specialization of
 				      * this function was declared
 				      * above. This will call
-				      * @p{operator()} on the matrix.
+				      * <tt>operator()</tt> on the matrix.
 				      */
     template <class Matrix>
     static double get_element (const Matrix       &matrix,
@@ -281,7 +281,7 @@ class MatrixOut : public DataOutInterface<2,2>
 
 				     /**
 				      * Get the value of the matrix at
-				      * gridpoint @p{(i,j)}. Depending
+				      * gridpoint <tt>(i,j)</tt>. Depending
 				      * on the given flags, this can
 				      * mean different things, for
 				      * example if only absolute

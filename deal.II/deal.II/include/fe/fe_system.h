@@ -39,17 +39,17 @@
  * subobject. For example, for a element of three components in one
  * space dimension, the first two components being cubic lagrange
  * elements and the third being a quadratic lagrange element, the
- * ordering for the system @p{s=(u,v,p)} is:
+ * ordering for the system <tt>s=(u,v,p)</tt> is:
  *
  * <ul>
- * <li> First vertex: @p{u0, v0, p0 = s0, s1, s2}
- * <li> Second vertex: @p{u1, v1, p1 = s3, s4, s5}
+ * <li> First vertex: <tt>u0, v0, p0 = s0, s1, s2</tt>
+ * <li> Second vertex: <tt>u1, v1, p1 = s3, s4, s5</tt>
  * <li> First component on the line:
- *   @p{u2, u3 = s4, s5}
+ *   <tt>u2, u3 = s4, s5</tt>
  * <li> Second component on the line:
- *   @p{v2, v3 = s6, s7}.
+ *   <tt>v2, v3 = s6, s7</tt>.
  * <li> Third component on the line:
- *   @p{p2 = s8}.
+ *   <tt>p2 = s8</tt>.
  * </ul>
  * Do not rely on this numbering in your application as these
  * internals might change in future. Rather use the functions
@@ -130,7 +130,7 @@ class FESystem : public FiniteElement<dim>
 				      * @p name1...@p nameN returned
 				      * by the basis elements. From
 				      * these, we create a sequence
-				      * @p{FESystem<dim>[name1^m1-name2^m2-...-nameN^mN]},
+				      * <tt>FESystem<dim>[name1^m1-name2^m2-...-nameN^mN]</tt>,
 				      * where @p mi are the
 				      * multiplicities of the basis
 				      * elements. If a multiplicity is
@@ -301,7 +301,7 @@ class FESystem : public FiniteElement<dim>
 				      * finite element to the present
 				      * one. The size of the matrix is
 				      * then @p dofs_per_cell times
-				      * @p{source.dofs_per_cell}.
+				      * <tt>source.dofs_per_cell</tt>.
 				      *
 				      * These matrices are available
 				      * if source and destination
@@ -443,7 +443,7 @@ class FESystem : public FiniteElement<dim>
 				      * Passes on control to
 				      * @p compute_fill that does the
 				      * work for all three
-				      * @p{fill_fe*_values}
+				      * <tt>fill_fe*_values</tt>
 				      * functions.
 				      */
     virtual void
@@ -462,7 +462,7 @@ class FESystem : public FiniteElement<dim>
 				      * Passes on control to
 				      * @p compute_fill that does the
 				      * work for all three
-				      * @p{fill_fe*_values} functions.
+				      * <tt>fill_fe*_values</tt> functions.
 				      */    
     virtual void
     fill_fe_face_values (const Mapping<dim>                   &mapping,
@@ -481,7 +481,7 @@ class FESystem : public FiniteElement<dim>
 				      * Passes on control to
 				      * @p compute_fill that does the
 				      * work for all three
-				      * @p{fill_fe*_values} functions.
+				      * <tt>fill_fe*_values</tt> functions.
 				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim>                   &mapping,
@@ -496,25 +496,25 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Do the work for the three
-				      * @p{fill_fe*_values} functions.
+				      * <tt>fill_fe*_values</tt> functions.
 				      * 
 				      * Calls (among other things)
-				      * @p{fill_fe_([sub]face)_values}
+				      * <tt>fill_fe_([sub]face)_values</tt>
 				      * of the base elements. Calls
 				      * @p fill_fe_values if
-				      * @p{face_no==invalid_face_no}
+				      * <tt>face_no==invalid_face_no</tt>
 				      * and
-				      * @p{sub_no==invalid_face_no};
+				      * <tt>sub_no==invalid_face_no</tt>;
 				      * calls @p fill_fe_face_values
 				      * if
-				      * @p{face_no==invalid_face_no}
+				      * <tt>face_no==invalid_face_no</tt>
 				      * and
-				      * @p{sub_no!=invalid_face_no};
+				      * <tt>sub_no!=invalid_face_no</tt>;
 				      * and calls
 				      * @p fill_fe_subface_values if
-				      * @p{face_no!=invalid_face_no}
+				      * <tt>face_no!=invalid_face_no</tt>
 				      * and
-				      * @p{sub_no!=invalid_face_no}.
+				      * <tt>sub_no!=invalid_face_no</tt>.
 				      */
     template <int dim_1>
     void compute_fill (const Mapping<dim>                   &mapping,
@@ -813,10 +813,10 @@ class FESystem : public FiniteElement<dim>
 					 /**
 					  * Deletes the
 					  * @p FEValuesData the
-					  * @p{fe_datas[base_no]}
+					  * <tt>fe_datas[base_no]</tt>
 					  * pointer is pointing
 					  * to. Sets
-					  * @p{fe_datas[base_no]} to
+					  * <tt>fe_datas[base_no]</tt> to
 					  * zero.
 					  *
 					  * This function is used to

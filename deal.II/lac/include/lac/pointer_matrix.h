@@ -92,7 +92,7 @@ public:
 				    * Constructor.  The pointer in the
 				    * argument is stored in this
 				    * class. As usual, the lifetime of
-				    * @p{*M} must be longer than the
+				    * <tt>*M</tt> must be longer than the
 				    * one of the @p PointerMatrix.
 				    *
 				    * If @p M is zero, no matrix is stored.

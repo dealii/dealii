@@ -30,7 +30,7 @@ template <int dim> class TensorProductPolynomials;
  * equidistant (on the unit cell) support points.
  *
  * For more details about Qp-mappings, see the `mapping' report at
- * @p{deal.II/doc/reports/mapping_q/index.html} in the `Reports'
+ * <tt>deal.II/doc/reports/mapping_q/index.html</tt> in the `Reports'
  * section of `Documentation'.
  *
  * @author Ralf Hartmann, Guido Kanschat 2000, 2001
@@ -160,7 +160,7 @@ class MappingQ : public MappingQ1<dim>
 
 					 /**
 					  * Flag that is set by the
-					  * @p{fill_fe_[[sub]face]_values}
+					  * <tt>fill_fe_[[sub]face]_values</tt>
 					  * function.
 					  *
 					  * If this flag is @p true
@@ -220,7 +220,7 @@ class MappingQ : public MappingQ1<dim>
 			    typename std::vector<Point<dim> >        &normal_vectors) const ;
 
 				     /**
-				      * For @p{dim=2,3}. Append the
+				      * For <tt>dim=2,3</tt>. Append the
 				      * support points of all shape
 				      * functions located on bounding
 				      * lines to the vector
@@ -230,7 +230,7 @@ class MappingQ : public MappingQ1<dim>
 				      *
 				      * Needed by the
 				      * @p compute_support_points_laplace
-				      * function . For @p{dim=1} this
+				      * function . For <tt>dim=1</tt> this
 				      * function is empty.
 				      *
 				      * This function is made virtual
@@ -247,7 +247,7 @@ class MappingQ : public MappingQ1<dim>
 			     std::vector<Point<dim> > &a) const;
 
 				     /**
-				      * For @p{dim=3}. Append the
+				      * For <tt>dim=3</tt>. Append the
 				      * support points of all shape
 				      * functions located on bounding
 				      * faces (quads in 3d) to the
@@ -257,8 +257,8 @@ class MappingQ : public MappingQ1<dim>
 				      *
 				      * Needed by the
 				      * @p compute_support_points_laplace
-				      * function. For @p{dim=1} and
-				      * @p{dim=2} this function is
+				      * function. For <tt>dim=1</tt> and
+				      * <tt>dim=2</tt> this function is
 				      * empty.
 				      *
 				      * This function is made virtual
@@ -313,14 +313,14 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * This function is needed by the
-				      * constructor of @p{MappingQ<dim>}
-				      * for @p{dim=} 2 and 3.
+				      * constructor of <tt>MappingQ<dim></tt>
+				      * for <tt>dim=</tt> 2 and 3.
 				      *
-				      * For @p{degree<4} this function
+				      * For <tt>degree<4</tt> this function
 				      * sets the
 				      * @p laplace_on_quad_vector to
 				      * the hardcoded data. For
-				      * @p{degree>=4} and MappingQ<2>
+				      * <tt>degree>=4</tt> and MappingQ<2>
 				      * this vector is computed.
 				      *
 				      * For the definition of the
@@ -333,13 +333,13 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * This function is needed by the
-				      * constructor of @p{MappingQ<3>}.
+				      * constructor of <tt>MappingQ<3></tt>.
 				      *
-				      * For @p{degree==2} this function
+				      * For <tt>degree==2</tt> this function
 				      * sets the
 				      * @p laplace_on_hex_vector to
 				      * the hardcoded data. For
-				      * @p{degree>2} this vector is
+				      * <tt>degree>2</tt> this vector is
 				      * computed.
 				      *
 				      * For the definition of the
@@ -351,15 +351,15 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * Computes the
-				      * @p{laplace_on_quad(hex)_vector}.
+				      * <tt>laplace_on_quad(hex)_vector</tt>.
 				      *
 				      * Called by the
-				      * @p{set_laplace_on_quad(hex)_vector}
+				      * <tt>set_laplace_on_quad(hex)_vector</tt>
 				      * functions if the data is not
 				      * yet hardcoded.
 				      *
 				      * For the definition of the
-				      * @p{laplace_on_quad(hex)_vector}
+				      * <tt>laplace_on_quad(hex)_vector</tt>
 				      * please refer to equation (8)
 				      * of the `mapping' report.
 				      */
@@ -367,7 +367,7 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Takes a
-				      * @p{laplace_on_hex(quad)_vector}
+				      * <tt>laplace_on_hex(quad)_vector</tt>
 				      * and applies it to the vector
 				      * @p a to compute the inner
 				      * support points as a linear
@@ -415,7 +415,7 @@ class MappingQ : public MappingQ1<dim>
 				     /**
 				      * Needed by the
 				      * @p laplace_on_quad function
-				      * (for @p{dim==2}). Filled by the
+				      * (for <tt>dim==2</tt>). Filled by the
 				      * constructor.
 				      *
 				      * Sizes:
@@ -437,7 +437,7 @@ class MappingQ : public MappingQ1<dim>
 				     /**
 				      * Needed by the
 				      * @p laplace_on_hex function
-				      * (for @p{dim==3}). Filled by the
+				      * (for <tt>dim==3</tt>). Filled by the
 				      * constructor.
 				      *
 				      * For the definition of this

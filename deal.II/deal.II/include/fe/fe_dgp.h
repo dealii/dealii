@@ -46,7 +46,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p{FE_DGP<dim>(degree)}, with
+				      * <tt>FE_DGP<dim>(degree)</tt>, with
 				      * @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
@@ -90,7 +90,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * constraint and embedding
 				      * matrices. The definition of
 				      * the various static fields are
-				      * in the files @p{fe_dgp_[123]d.cc}
+				      * in the files <tt>fe_dgp_[123]d.cc</tt>
 				      * in the source directory.
 				      */
     struct Matrices

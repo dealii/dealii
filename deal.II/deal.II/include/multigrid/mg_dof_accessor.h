@@ -109,11 +109,11 @@ class MGDoFAccessor {
 /**
  * This is a switch class which only declares a @p typdef. It is meant to
  * determine which class a @p MGDoFObjectAccessor class is to be derived
- * from. By default, @p{MGDoFObjectAccessor<celldim,dim>} derives from
- * the @p typedef in the general @p{MGDoFObjectAccessor_Inheritance<celldim,dim>}
- * class, which is @p{DoFObjectAccessor<celldim,dim>},
- * but if @p{celldim==dim}, then the specialization @p{MGDoFObjectAccessor_Inheritance<dim,dim>}
- * is used which declares its local type to be @p{DoFCellAccessor<dim>}. Therefore,
+ * from. By default, <tt>MGDoFObjectAccessor<celldim,dim></tt> derives from
+ * the @p typedef in the general <tt>MGDoFObjectAccessor_Inheritance<celldim,dim></tt>
+ * class, which is <tt>DoFObjectAccessor<celldim,dim></tt>,
+ * but if <tt>celldim==dim</tt>, then the specialization <tt>MGDoFObjectAccessor_Inheritance<dim,dim></tt>
+ * is used which declares its local type to be <tt>DoFCellAccessor<dim></tt>. Therefore,
  * the inheritance is automatically chosen to be from @p DoFCellAccessor if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
@@ -135,11 +135,11 @@ class MGDoFObjectAccessor_Inheritance
 /**
  * This is a switch class which only declares a @p typdef. It is meant to
  * determine which class a @p DoFObjectAccessor class is to be derived
- * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
- * the @p typedef in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
- * class, which is @p{TriaObjectAccessor<celldim,dim>},
- * but if @p{celldim==dim}, then the specialization @p{TriaObjectAccessor<dim,dim>}
- * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
+ * from. By default, <tt>DoFObjectAccessor<celldim,dim></tt> derives from
+ * the @p typedef in the general <tt>DoFObjectAccessor_Inheritance<celldim,dim></tt>
+ * class, which is <tt>TriaObjectAccessor<celldim,dim></tt>,
+ * but if <tt>celldim==dim</tt>, then the specialization <tt>TriaObjectAccessor<dim,dim></tt>
+ * is used which declares its local type to be <tt>CellAccessor<dim></tt>. Therefore,
  * the inheritance is automatically chosen to be from @p CellAccessor if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
@@ -219,9 +219,9 @@ class MGDoFObjectAccessor<0, dim>
  * 
  * @sect3{Notes about the class hierarchy structure}
  *
- * Inheritance from @p{MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass} yields
- * inheritance from @p{DoFCellAccessor<1>} if @p{dim==1} and from
- * @p{TriaObjectAccessor<1,dim>} for all other @p dim values. Thus, an object
+ * Inheritance from <tt>MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass</tt> yields
+ * inheritance from <tt>DoFCellAccessor<1></tt> if <tt>dim==1</tt> and from
+ * <tt>TriaObjectAccessor<1,dim></tt> for all other @p dim values. Thus, an object
  * of this class shares all features of cells in one dimension, but behaves
  * like an ordinary line in all other cases.
  *
@@ -248,7 +248,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
     				     /**
 				      * Constructor. The @p local_data
 				      * argument is assumed to be a pointer
-				      * to a @p{MGDoFHandler<dim>} object.
+				      * to a <tt>MGDoFHandler<dim></tt> object.
 				      */
     MGDoFObjectAccessor (const Triangulation<dim> *tria,
 			 const int                 level,
@@ -597,13 +597,13 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
- * @p{DoFObjectAccessor<1, 1>} and @p{DoFObjectAccessor<2, 2>} for the space dimension
+ * <tt>DoFObjectAccessor<1, 1></tt> and <tt>DoFObjectAccessor<2, 2></tt> for the space dimension
  * one and two, respectively, this class only collects the pieces
- * together by deriving from the appropriate @p{DoF*Accessor} and the
- * right @p{CellAccessor<dim>} and finally adding two functions which give
+ * together by deriving from the appropriate <tt>DoF*Accessor</tt> and the
+ * right <tt>CellAccessor<dim></tt> and finally adding two functions which give
  * access to the neighbors and children as @p DoFCellAccessor objects
  * rather than @p CellAccessor objects (the latter function was inherited
- * from the @p{CellAccessor<dim>} class).
+ * from the <tt>CellAccessor<dim></tt> class).
  *
  * @author Wolfgang Bangerth, 1998
  */

@@ -61,7 +61,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * finite element to the present
 				      * one. The size of the matrix is
 				      * then @p dofs_per_cell times
-				      * @p{source.dofs_per_cell}.
+				      * <tt>source.dofs_per_cell</tt>.
 				      *
 				      * These matrices are only
 				      * available if the source
@@ -112,7 +112,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * constraint and embedding
 				      * matrices. The definition of
 				      * the various static fields are
-				      * in the files @p{fe_dgq_[123]d.cc}
+				      * in the files <tt>fe_dgq_[123]d.cc</tt>
 				      * in the source directory.
 				      */
     struct Matrices

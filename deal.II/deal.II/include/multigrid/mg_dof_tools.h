@@ -49,7 +49,7 @@ class MGTools
 				      * creating the actual matrix
 				      * you have to compress the
 				      * matrix yourself, using
-				      * @p{SparseMatrixStruct::compress()}.
+				      * <tt>SparseMatrixStruct::compress()</tt>.
 				      *
 				      * There is no need to consider
 				      * hanging nodes here, since only
@@ -122,7 +122,7 @@ class MGTools
 				      * for each level a vector
 				      * containing the number of dofs
 				      * for each component (access is
-				      * @p{result[level][component]}).
+				      * <tt>result[level][component]</tt>).
 				      */
     template <int dim>
       static void count_dofs_per_component (const MGDoFHandler<dim>& mg_dof,

@@ -172,12 +172,12 @@ class DoFDimensionInfo<3>
  * is described in the DoFLevel class documentation.
  *
  * Finally it offers a starting point for the assemblage of the matrices
- * by offering @p{begin()} and @p{end()} functions which return iterators
+ * by offering <tt>begin()</tt> and <tt>end()</tt> functions which return iterators
  * to walk on the DoF structures as well as the triangulation data.
  * These iterators work much like those described in the documentation
  * of the Triangulation class and of the iterator classes themselved,
  * but offer more functionality than pure triangulation iterators. The
- * order in which dof iterators are presented by the @p{++} and @p -- operators
+ * order in which dof iterators are presented by the <tt>++</tt> and @p -- operators
  * is the same as that for the alike triangulation iterators.
  *
  * This class also provides functions to create the sparsity patterns of
@@ -187,7 +187,7 @@ class DoFDimensionInfo<3>
  * @sect3{Distribution of indices for degrees of freedom}
  *
  * The degrees of freedom (`dofs') are distributed on the given triangulation
- * by the function @p{distribute_dofs()}. It gets passed a finite element object
+ * by the function <tt>distribute_dofs()</tt>. It gets passed a finite element object
  * describing how many degrees of freedom are located on vertices, lines, etc.
  * It traverses the triangulation cell by cell and numbers the dofs of that
  * cell if not yet numbered. For non-multigrid algorithms, only active cells
@@ -212,7 +212,7 @@ class DoFDimensionInfo<3>
  * schemes like the Cuthill-McKey scheme. Basically, the function sets
  * up an array in which for each degree of freedom the index is stored
  * which is to be assigned by the renumbering. Using this array, the
- * @p{renumber_dofs(vector<unsigned int>)} function is called, which actually
+ * <tt>renumber_dofs(vector<unsigned int>)</tt> function is called, which actually
  * does the change from old DoF indices to the ones given in the
  * array. In some cases, however, a user may want to compute her own
  * renumbering order; in this case, allocate an array with one element
@@ -220,7 +220,7 @@ class DoFDimensionInfo<3>
  * respective degree of freedom shall be assigned. This number may,
  * for example, be obtained by sorting the support points of the
  * degrees of freedom in downwind direction.  Then call the
- * @p{renumber_dofs(vector<unsigned int>)} with the array, which converts old
+ * <tt>renumber_dofs(vector<unsigned int>)</tt> with the array, which converts old
  * into new degree of freedom indices.
  *
  *
@@ -434,7 +434,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     cell_iterator        end (const unsigned int level) const;
     
@@ -442,7 +442,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_cell_iterator    end_raw (const unsigned int level) const;
 
@@ -450,7 +450,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an active iterator which is the
 				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     active_cell_iterator end_active (const unsigned int level) const;
 
@@ -559,7 +559,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     face_iterator        end_face (const unsigned int level) const;
     
@@ -567,7 +567,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_face_iterator    end_raw_face (const unsigned int level) const;
 
@@ -575,7 +575,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an active iterator which is the
 				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     active_face_iterator end_active_face (const unsigned int level) const;
 
@@ -673,7 +673,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     line_iterator        end_line (const unsigned int level) const;
     
@@ -681,7 +681,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_line_iterator    end_raw_line (const unsigned int level) const;
 
@@ -689,7 +689,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an active iterator which is the
 				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     active_line_iterator end_active_line (const unsigned int level) const;
 
@@ -770,7 +770,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     quad_iterator        end_quad (const unsigned int level) const;
     
@@ -778,7 +778,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_quad_iterator    end_raw_quad (const unsigned int level) const;
 
@@ -786,7 +786,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an active iterator which is the
 				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
@@ -871,7 +871,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     hex_iterator        end_hex (const unsigned int level) const;
     
@@ -879,7 +879,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_hex_iterator    end_raw_hex (const unsigned int level) const;
 
@@ -887,7 +887,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Return an active iterator which is the
 				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     active_hex_iterator end_active_hex (const unsigned int level) const;
 
@@ -1061,7 +1061,7 @@ class DoFHandler  :  public Subscriptor,
 				      * the DoF handler, we subscribe to
 				      * the finite element object. To unlock
 				      * the FE before the end of the lifetime
-				      * of this DoF handler, use the @p{clear()}
+				      * of this DoF handler, use the <tt>clear()</tt>
 				      * function (this clears all data of
 				      * this object as well, though).
 				      */
@@ -1093,7 +1093,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      * Reserve enough space in the 
-				      * @p{levels[]} objects to store the
+				      * <tt>levels[]</tt> objects to store the
 				      * numbers of the degrees of freedom
 				      * needed for the given element. The
 				      * given element is that one which
@@ -1127,7 +1127,7 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Analogous to the
-				      * @p{levels[]} tree of the Triangulation
+				      * <tt>levels[]</tt> tree of the Triangulation
 				      * objects.
 				      */
     std::vector<DoFLevel<dim>*>    levels;

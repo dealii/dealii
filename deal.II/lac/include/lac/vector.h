@@ -69,8 +69,8 @@ class Vector
 				     /**
 				      * Declare standard types used in all
 				      * containers. These types parallel
-				      * those in the @p{C++} standard libraries
-				      * @p{vector<...>} class.
+				      * those in the <tt>C++</tt> standard libraries
+				      * <tt>vector<...></tt> class.
 				      */
     typedef Number            value_type;
     typedef value_type       *pointer;
@@ -158,7 +158,7 @@ class Vector
 				      * The constructor is made
 				      * explicit to avoid accidents
 				      * like this:
-				      * @p{v=0;}. Presumably, the user
+				      * <tt>v=0;</tt>. Presumably, the user
 				      * wants to set every element of
 				      * the vector to zero, but
 				      * instead, what happens is this
@@ -211,10 +211,10 @@ class Vector
 
     				     /**
 				      * Set all entries to zero. Equivalent to
-				      * @p{v = 0}, but more obvious and
+				      * <tt>v = 0</tt>, but more obvious and
 				      * faster.  Note that this function does
 				      * not change the size of the vector,
-				      * unlike the STL's @p{vector<>::clear}
+				      * unlike the STL's <tt>vector<>::clear</tt>
 				      * function.
 				      */
     void clear ();    
@@ -225,12 +225,12 @@ class Vector
 				      * vector remains unchanged if possible,
 				      * to make things faster; this may waste
 				      * some memory, so keep this in mind.
-				      * However, if @p{N==0} all memory is
+				      * However, if <tt>N==0</tt> all memory is
 				      * freed, i.e. if you want to resize the
 				      * vector and release the memory not
 				      * needed, you have to first call
-				      * @p{reinit(0)} and then
-				      * @p{reinit(N)}. This cited behaviour is
+				      * <tt>reinit(0)</tt> and then
+				      * <tt>reinit(N)</tt>. This cited behaviour is
 				      * analogous to that of the STL
 				      * containers.
 				      *
@@ -249,7 +249,7 @@ class Vector
 				      *
 				      * The elements of @p V are not copied,
 				      * i.e.  this function is the same as
-				      * calling @p{reinit (V.size(), fast)}.
+				      * calling <tt>reinit (V.size(), fast)</tt>.
 				      */
     template <typename Number2>
     void reinit (const Vector<Number2> &V,
@@ -274,8 +274,8 @@ class Vector
 				      * the @p swap function of all C++
 				      * standard containers. Also,
 				      * there is a global function
-				      * @p{swap(u,v)} that simply calls
-				      * @p{u.swap(v)}, again in analogy
+				      * <tt>swap(u,v)</tt> that simply calls
+				      * <tt>u.swap(v)</tt>, again in analogy
 				      * to standard functions.
 				      */
     void swap (Vector<Number> &v);
@@ -431,7 +431,7 @@ class Vector
     
 				     /**
 				      * Make the @p Vector class a bit like the
-				      * @p{vector<>} class of the C++ standard
+				      * <tt>vector<></tt> class of the C++ standard
 				      * library by returning iterators to
 				      * the start and end of the elements of this
 				      * vector.
@@ -502,19 +502,19 @@ class Vector
     
 				     /**
 				      * Simple vector addition, equal to the
-				      * @p{operator +=}.
+				      * <tt>operator +=</tt>.
 				      */
     void add (const Vector<Number> &V);
     
 				     /**
 				      * Simple addition of a multiple of a
-				      * vector, i.e. @p{*this += a*V}.
+				      * vector, i.e. <tt>*this += a*V</tt>.
 				      */
     void add (const Number a, const Vector<Number> &V);
     
 				     /**
 				      * Multiple addition of scaled vectors,
-				      * i.e. @p{*this += a*V+b*W}.
+				      * i.e. <tt>*this += a*V+b*W</tt>.
 				      */
     void add (const Number a, const Vector<Number> &V,
 	      const Number b, const Vector<Number> &W);
@@ -522,14 +522,14 @@ class Vector
 				     /**
 				      * Scaling and simple vector addition,
 				      * i.e.
-				      * @p{*this = s*(*this)+V}.
+				      * <tt>*this = s*(*this)+V</tt>.
 				      */
     void sadd (const Number          s,
                const Vector<Number> &V);
     
 				     /**
 				      * Scaling and simple addition, i.e.
-				      * @p{*this = s*(*this)+a*V}.
+				      * <tt>*this = s*(*this)+a*V</tt>.
 				      */
     void sadd (const Number          s,
                const Number          a,
@@ -546,7 +546,7 @@ class Vector
     
 				     /**
 				      * Scaling and multiple addition.
-				      * @p{*this = s*(*this)+a*V + b*W + c*X}.
+				      * <tt>*this = s*(*this)+a*V + b*W + c*X</tt>.
 				      */
     void sadd (const Number          s,
                const Number          a,
@@ -563,8 +563,8 @@ class Vector
 				      * This function is deprecated
 				      * and will be removed in a
 				      * future version. Use
-				      * @p{operator *=} and
-				      * @p{operator /=} instead.
+				      * <tt>operator *=</tt> and
+				      * <tt>operator /=</tt> instead.
 				      */
     void scale (const Number factor);
 
@@ -596,13 +596,13 @@ class Vector
     void scale (const Vector<Number2> &scaling_factors);
     
 				     /**
-				      * Assignment @p{*this = a*V}.
+				      * Assignment <tt>*this = a*V</tt>.
 				      */
     template <typename Number2>
     void equ (const Number a, const Vector<Number2>& V);
     
 				     /**
-				      * Assignment @p{*this = a*V + b*W}.
+				      * Assignment <tt>*this = a*V + b*W</tt>.
 				      */
     void equ (const Number a, const Vector<Number>& V,
 	      const Number b, const Vector<Number>& W);
@@ -610,7 +610,7 @@ class Vector
 				     /**
 				      * Compute the elementwise ratio of the
 				      * two given vectors, that is let
-				      * @p{this[i] = a[i]/b[i]}. This is
+				      * <tt>this[i] = a[i]/b[i]</tt>. This is
 				      * useful for example if you want to
 				      * compute the cellwise ratio of true to
 				      * estimated error.
@@ -618,7 +618,7 @@ class Vector
 				      * This vector is appropriately
 				      * scaled to hold the result.
 				      *
-				      * If any of the @p{b[i]} is
+				      * If any of the <tt>b[i]</tt> is
 				      * zero, the result is
 				      * undefined. No attempt is made
 				      * to catch such situations.
@@ -707,7 +707,7 @@ class Vector
 				      * Dimension. Actual number of
 				      * components contained in the
 				      * vector.  Get this number by
-				      * calling @p{size()}.
+				      * calling <tt>size()</tt>.
 				      */
     unsigned int dim;
 

@@ -306,7 +306,7 @@ namespace GridOutFlags
 					*
 					* The format of the cell
 					* number written is
-					* @p{level.index}, or simply
+					* <tt>level.index</tt>, or simply
 					* @p index, depending on the
 					* value of the following flag.
 					*/
@@ -317,7 +317,7 @@ namespace GridOutFlags
 					* flag, then the value of this
 					* flag determines whether the
 					* format shall be
-					* @p{level.index}, or simply
+					* <tt>level.index</tt>, or simply
 					* @p index. If @p true, the
 					* first format is
 					* taken. Default is @p true.
@@ -482,7 +482,7 @@ namespace GridOutFlags
  * with actual data vectors and that no DoFHandler object is needed to
  * write the pure geometrical information involved here.
  *
- * Available output formats can be found in the functions with names @p{write_...}
+ * Available output formats can be found in the functions with names <tt>write_...</tt>
  *
  * @sect3{Usage}
  * Usage is simple: either you use the direct form
@@ -498,11 +498,11 @@ namespace GridOutFlags
  *   ofstream output_file("some_filename" + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
  * @endverbatim
- * The function @p{get_output_format_names()} provides a list of possible names of
+ * The function <tt>get_output_format_names()</tt> provides a list of possible names of
  * output formats in a string that is understandable by the ParameterHandler class.
  *
  * Note that here, we have created an unnamed object of type GridOut and called
- * one of its @p{write_*} functions. This looks like as if the respective function
+ * one of its <tt>write_*</tt> functions. This looks like as if the respective function
  * could really be made @p static. This was not done in order to allow for
  * parameters to be passed to the different output functions in a way compatible
  * with the scheme of allowing the right output format to be selected at run-time
@@ -533,7 +533,7 @@ namespace GridOutFlags
  * The respective output function then use the so-set flags. By default, they
  * are set to reasonable values as described above and in the documentation
  * of the different flags structures. Resetting the flags can
- * be done by calling @p{grid_out.set_flags (GridOutFlags::Ucd());}, since the
+ * be done by calling <tt>grid_out.set_flags (GridOutFlags::Ucd());</tt>, since the
  * default constructor of each of the flags structures sets the parameters
  * to their initial values.
  *
@@ -666,7 +666,7 @@ class GridOut
 				      * explicitly. This is useful,
 				      * if you want to re-read the
 				      * grid later on, since
-				      * @p{deal.II} sets the boundary
+				      * <tt>deal.II</tt> sets the boundary
 				      * indicator to zero by default;
 				      * therefore, to obtain the
 				      * same triangulation as before,
@@ -788,7 +788,7 @@ class GridOut
 				      * Write data and grid to @p out according
 				      * to the given data format. This function
 				      * simply calls the appropriate
-				      * @p{write_*} function.
+				      * <tt>write_*</tt> function.
 				      */
     template <int dim>
     void write (const Triangulation<dim> &tria,
@@ -841,10 +841,10 @@ class GridOut
 				      * usually has. At present the following
 				      * formats are defined:
 				      * <ul>
-				      * <li> @p OpenDX: @p{.dx}
-				      * <li> @p gnuplot: @p{.gnuplot}
-				      * <li> @p ucd: @p{.inp}
-				      * <li> @p eps: @p{.eps}.
+				      * <li> @p OpenDX: <tt>.dx</tt>
+				      * <li> @p gnuplot: <tt>.gnuplot</tt>
+				      * <li> @p ucd: <tt>.inp</tt>
+				      * <li> @p eps: <tt>.eps</tt>.
 				      * </ul>
 				      *
 				      * Since this function does not need data
@@ -872,14 +872,14 @@ class GridOut
 				      * To get a list of presently available
 				      * format names, e.g. to give it to the
 				      * ParameterHandler class, use the
-				      * function @p{get_output_format_names ()}.
+				      * function <tt>get_output_format_names ()</tt>.
 				      */
     static OutputFormat parse_output_format (const std::string &format_name);
 
 				     /**
 				      * Return a list of implemented output
 				      * formats. The different names are
-				      * separated by vertical bar signs (@p{`|'})
+				      * separated by vertical bar signs (<tt>`|'</tt>)
 				      * as used by the ParameterHandler
 				      * classes.
 				      */
@@ -962,13 +962,13 @@ class GridOut
 				      * This function unfortunately can not
 				      * be included in the regular @p write_ucd
 				      * function, since it needs special
-				      * treatment for the case @p{dim==1}, in
+				      * treatment for the case <tt>dim==1</tt>, in
 				      * which case the face iterators are
-				      * @p{void*}'s and lack the member functions
+				      * <tt>void*</tt>'s and lack the member functions
 				      * which are called. We would not actually
 				      * call these functions, but the compiler
 				      * would complain anyway when compiling
-				      * the function for @p{dim==1}. Bad luck.
+				      * the function for <tt>dim==1</tt>. Bad luck.
 				      */
     template <int dim>
     void write_ucd_faces (const Triangulation<dim> &tria,
@@ -989,7 +989,7 @@ class GridOut
 				      * triangulation which have a boundary
 				      * indicator not equal to zero. Only
 				      * these faces are explicitly printed
-				      * in the @p{write_*} functions;
+				      * in the <tt>write_*</tt> functions;
 				      * all faces with indicator 255 are
 				      * interior ones and an indicator with
 				      * value zero for faces at the boundary

@@ -150,11 +150,11 @@ class DoFAccessor
 /**
  * This is a switch class which only declares a @p typedef. It is meant to
  * determine which class a DoFObjectAccessor class is to be derived
- * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
- * the @p typedef in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
- * class, which is @p{TriaObjectAccessor<celldim,dim>},
- * but if @p{celldim==dim}, then the specialization @p{DoFObjectAccessor_Inheritance<dim,dim>}
- * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
+ * from. By default, <tt>DoFObjectAccessor<celldim,dim></tt> derives from
+ * the @p typedef in the general <tt>DoFObjectAccessor_Inheritance<celldim,dim></tt>
+ * class, which is <tt>TriaObjectAccessor<celldim,dim></tt>,
+ * but if <tt>celldim==dim</tt>, then the specialization <tt>DoFObjectAccessor_Inheritance<dim,dim></tt>
+ * is used which declares its local type to be <tt>CellAccessor<dim></tt>. Therefore,
  * the inheritance is automatically chosen to be from CellAccessor if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
@@ -176,11 +176,11 @@ class DoFObjectAccessor_Inheritance
 /**
  * This is a switch class which only declares a @p typedef. It is meant to
  * determine which class a DoFObjectAccessor class is to be derived
- * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
- * the @p typedef in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
- * class, which is @p{TriaObjectAccessor<celldim,dim>},
- * but if @p{celldim==dim}, then the specialization @p{DoFObjectAccessor_Inheritance<dim,dim>}
- * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
+ * from. By default, <tt>DoFObjectAccessor<celldim,dim></tt> derives from
+ * the @p typedef in the general <tt>DoFObjectAccessor_Inheritance<celldim,dim></tt>
+ * class, which is <tt>TriaObjectAccessor<celldim,dim></tt>,
+ * but if <tt>celldim==dim</tt>, then the specialization <tt>DoFObjectAccessor_Inheritance<dim,dim></tt>
+ * is used which declares its local type to be <tt>CellAccessor<dim></tt>. Therefore,
  * the inheritance is automatically chosen to be from CellAccessor if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
@@ -327,9 +327,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * active cells.
 				      *
 				      * The input vector may be either a
-				      * @p{Vector<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * <tt>Vector<float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -365,9 +365,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * to this function.
 				      *
 				      * The output vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -426,7 +426,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				     /**
 				      * This function does much the same as
 				      * the
-				      * @p{distribute_local_to_global(Vector,Vector)}
+				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -490,9 +490,9 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
  * 
  * @sect3{Notes about the class hierarchy structure}
  *
- * Inheritance from @p{DoFObjectAccessor_Inheritance<1,dim>::BaseClass} yields
- * inheritance from @p{CellAccessor<1>} if @p{dim==1} and from
- * @p{TriaObjectAccessor<1,dim>} for all other @p dim values. Thus, an object
+ * Inheritance from <tt>DoFObjectAccessor_Inheritance<1,dim>::BaseClass</tt> yields
+ * inheritance from <tt>CellAccessor<1></tt> if <tt>dim==1</tt> and from
+ * <tt>TriaObjectAccessor<1,dim></tt> for all other @p dim values. Thus, an object
  * of this class shares all features of cells in one dimension, but behaves
  * like an ordinary line in all other cases.
  *
@@ -585,9 +585,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -622,9 +622,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -667,7 +667,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				     /**
 				      * This function does much the same as
 				      * the
-				      * @p{distribute_local_to_global(Vector,Vector)}
+				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -779,9 +779,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -816,9 +816,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -869,7 +869,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				     /**
 				      * This function does much the same as
 				      * the
-				      * @p{distribute_local_to_global(Vector,Vector)}
+				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -981,9 +981,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -1018,9 +1018,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure
@@ -1079,7 +1079,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				     /**
 				      * This function does much the same as
 				      * the
-				      * @p{distribute_local_to_global(Vector,Vector)}
+				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -1102,15 +1102,15 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
- * @p{DoFObjectAccessor<1, 1>} and @p{DoFObjectAccessor<2, 2>} for the space dimension
+ * <tt>DoFObjectAccessor<1, 1></tt> and <tt>DoFObjectAccessor<2, 2></tt> for the space dimension
  * one and two, respectively, this class only collects the pieces
- * together by deriving from the appropriate @p{DoF*Accessor} and the
- * right @p{CellAccessor<dim>} and finally adding two functions which give
+ * together by deriving from the appropriate <tt>DoF*Accessor</tt> and the
+ * right <tt>CellAccessor<dim></tt> and finally adding two functions which give
  * access to the neighbors and children as DoFCellAccessor objects
  * rather than CellAccessor objects (the latter function was inherited
- * from the @p{CellAccessor<dim>} class).
+ * from the <tt>CellAccessor<dim></tt> class).
  *
- * Note that since for the class we derive from, i.e. @p{DoFObjectAccessor<dim,dim>},
+ * Note that since for the class we derive from, i.e. <tt>DoFObjectAccessor<dim,dim></tt>,
  * the two template parameters are equal, the base class is actually derived from
  * CellAccessor, which makes the functions of this class available to the
  * DoFCellAccessor class as well.
@@ -1329,9 +1329,9 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * objects.
 				      *
 				      * The output vector may be either a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>}, or a
-				      * BlockVector@p{<double>}, or a
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>, or a
+				      * BlockVector<tt><double></tt>, or a
 				      * PETSc vector if deal.II is compiled to
 				      * support PETSc. It is in the
 				      * responsibility of the caller to assure

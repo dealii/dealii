@@ -83,7 +83,7 @@ class Boundary : public Subscriptor
 				      * the normals at the vertices of
 				      * a face of a cell. Thus, there
 				      * are
-				      * @p{GeometryInfo<dim>::vertices_per_face}
+				      * <tt>GeometryInfo<dim>::vertices_per_face</tt>
 				      * normal vectors, that define
 				      * the tangent spaces of the
 				      * boundary at the vertices. Note
@@ -140,8 +140,8 @@ class Boundary : public Subscriptor
 				      * given @p quad are refined, so
 				      * you may want to use the
 				      * information provided by
-				      * @p{quad->line(i)->child(j)},
-				      * @p{i=0...3}, @p{j=0,1}.
+				      * <tt>quad->line(i)->child(j)</tt>,
+				      * <tt>i=0...3</tt>, <tt>j=0,1</tt>.
 				      *
 				      * Because in 2D, this function
 				      * is not needed, it is not made
@@ -191,15 +191,15 @@ class Boundary : public Subscriptor
 				      * vector @p points. It is
 				      * required that this number is a
 				      * square of another integer,
-				      * i.e. @p{n=points.size()=m*m}. It
+				      * i.e. <tt>n=points.size()=m*m</tt>. It
 				      * is the task of the derived
 				      * classes to arrange the points
 				      * such they split the quad into
-				      * @p{(m+1)(m+1)} approximately
+				      * <tt>(m+1)(m+1)</tt> approximately
 				      * equal-sized subquads.
 				      *
 				      * This function is called by the
-				      * @p{MappingQ<3>} class. This
+				      * <tt>MappingQ<3></tt> class. This
 				      * happens each face quad of
 				      * cells in 3d that has got at
 				      * least one boundary face quad.
@@ -320,7 +320,7 @@ class StraightBoundary : public Boundary<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
 				     /**
-				      * Gives @p{n=points.size()}
+				      * Gives <tt>n=points.size()</tt>
 				      * points that splits the
 				      * p{StraightBoundary} line into
 				      * p{n+1} partitions of equal
@@ -336,10 +336,10 @@ class StraightBoundary : public Boundary<dim>
 				     std::vector<Point<dim> > &points) const;
 
 				     /**
-				      * Gives @p{n=points.size()=m*m}
+				      * Gives <tt>n=points.size()=m*m</tt>
 				      * points that splits the
 				      * p{StraightBoundary} quad into
-				      * @p{(m+1)(m+1)} subquads of equal
+				      * <tt>(m+1)(m+1)</tt> subquads of equal
 				      * size.
 				      *
 				      * Refer to the general

@@ -59,7 +59,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p{FE_DGPNonparametric<dim>(degree)},
+				      * <tt>FE_DGPNonparametric<dim>(degree)</tt>,
 				      * with @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
@@ -188,7 +188,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				     /**
 				      * Access to base element
 				      * objects. Since this element is
-				      * scalar, @p{base_element(0)} is
+				      * scalar, <tt>base_element(0)</tt> is
 				      * @p this, and all other
 				      * indices throw an error.
 				      */
@@ -199,7 +199,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
                                       * Multiplicity of base element
                                       * @p index. Since this is a
                                       * scalar element,
-                                      * @p{element_multiplicity(0)}
+                                      * <tt>element_multiplicity(0)</tt>
                                       * returns one, and all other
                                       * indices will throw an error.
                                       */
@@ -242,7 +242,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * constraint and embedding
 				      * matrices. The definition of
 				      * the various static fields are
-				      * in the files @p{fe_dgp_[123]d.cc}
+				      * in the files <tt>fe_dgp_[123]d.cc</tt>
 				      * in the source directory.
 				      */
     struct Matrices

@@ -54,11 +54,11 @@
  * condition number of @p T is a good estimate for the one of @p PA.
  *
  * With the coefficients @p alpha and @p beta written to the log
- * file if @p{AdditionalData::log_coefficients = true}, the matrix
+ * file if <tt>AdditionalData::log_coefficients = true</tt>, the matrix
  * @p T_m after @p m steps is the tri-diagonal matrix with diagonal
- * elements @p{1/alpha_0}, @p{1/alpha_1 + beta_0/alpha_0}, ...,
- * @p{1/alpha_{m-1}+beta_{m-2}/alpha_{m-2}} and off-diagonal elements
- * @p{sqrt(beta_0)/alpha_0}, ..., @p{sqrt(beta_{m-2})/alpha_{m-2}}.
+ * elements <tt>1/alpha_0</tt>, <tt>1/alpha_1 + beta_0/alpha_0</tt>, ...,
+ * <tt>1/alpha_{m-1</tt>+beta_{m-2}/alpha_{m-2}} and off-diagonal elements
+ * <tt>sqrt(beta_0)/alpha_0</tt>, ..., <tt>sqrt(beta_{m-2</tt>)/alpha_{m-2}}.
  * The eigenvalues of this matrix can be computed by postprocessing.
  *
  * This version of CG is taken from Braess: "Finite Elements". It

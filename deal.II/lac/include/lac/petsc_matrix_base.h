@@ -368,7 +368,7 @@ namespace PETScWrappers
                                         * does not transmit this information.
                                         *
                                         * This function is therefore exactly
-                                        * equivalent to the @p{el()} function.
+                                        * equivalent to the <tt>el()</tt> function.
                                         */
       PetscScalar operator () (const unsigned int i,
                                const unsigned int j) const;

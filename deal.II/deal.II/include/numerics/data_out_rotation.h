@@ -108,7 +108,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 				      * mode. The default number of
 				      * threads to be used to build
 				      * the patches is set to
-				      * @p{multithread_info.n_default_threads}.
+				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
     virtual void build_patches (const unsigned int n_patches_per_circle,
 				const unsigned int n_subdivisions = 1,
@@ -130,7 +130,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 				      * Return the next cell after @p cell which
 				      * we want output for.
 				      * If there are no more cells,
-				      * @p{dofs->end()} shall be returned.
+				      * <tt>dofs->end()</tt> shall be returned.
 				      *
 				      * The default
 				      * implementation returns the next

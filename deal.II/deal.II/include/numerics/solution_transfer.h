@@ -112,17 +112,17 @@
  * @endverbatim
  *
  * Multiple calls to the function 
- * @p{interpolate (const Vector<number> &in, Vector<number> &out)}
+ * <tt>interpolate (const Vector<number> &in, Vector<number> &out)</tt>
  * are NOT allowed. Interpolating several functions can be performed in one step
  * by using 
- * @p{void interpolate (const vector<Vector<number> >&all_in, vector<Vector<number> >&all_out) const},
+ * <tt>void interpolate (const vector<Vector<number> >&all_in, vector<Vector<number> >&all_out) const</tt>,
  * and using the respective @p prepare_for_coarsening_and_refinement function 
  * taking several vectors as input before actually refining and coarsening the
  * triangulation (see there).
  * </ul>
  *
  * For deleting all stored data in @p SolutionTransfer and reinitializing it
- * use the @p{clear()} function.
+ * use the <tt>clear()</tt> function.
  *
  * Note that the @p user_pointer of some cells are used. 
  * Be sure that you don't need them otherwise.
@@ -138,21 +138,21 @@
  * solution vector on the current (original) grid.
  * Each entry of this vector belongs to one of the
  * DoFs of the discretisation. If we now refine the grid then the calling of
- * DoFHandler@p{::distribute_dofs(...)} will change at least some of the
+ * DoFHandler<tt>::distribute_dofs(...)</tt> will change at least some of the
  * DoF indices. Hence we need to store the DoF indices of all active cells
  * before the refinement. The @p user_pointer of each active cell
  * is used to point to the vector of these DoF indices of that cell, all other
  * @p user_pointers are cleared. All this is
- * done by @p{prepare_for_pure_refinement()}.
+ * done by <tt>prepare_for_pure_refinement()</tt>.
  *
- * In the function @p{refine_interpolate(in,out)} and on each cell where the
+ * In the function <tt>refine_interpolate(in,out)</tt> and on each cell where the
  * @p user_pointer is set (i.e. the cells that were active in the original grid)
  * we can now access the local values of the solution vector @p in
  * on that cell by using the stored DoF indices. These local values are
  * interpolated and set into the vector @p out that is at the end the
  * discrete function @p in interpolated on the refined mesh.
  *
- * The @p{refine_interpolate(in,out)} function can be called multiply for
+ * The <tt>refine_interpolate(in,out)</tt> function can be called multiply for
  * arbitrary many discrete functions (solution vectors) on the original grid. 
  *
  * <li> Solution transfer while coarsening and refinement. After 
@@ -171,33 +171,33 @@
  * Additionally the DoF indices of the cells
  * that will not be coarsened need to be stored according to the solution
  * transfer while pure refinement (cf there). All this is performed by
- * @p{prepare_for_coarsening_and_refinement(all_in)} where the 
- * @p{vector<Vector<number> >vector all_in} includes
+ * <tt>prepare_for_coarsening_and_refinement(all_in)</tt> where the 
+ * <tt>vector<Vector<number> >vector all_in</tt> includes
  * all discrete functions to be interpolated onto the new grid.
  *
- * As we need two different kinds of pointers (@p{vector<unsigned int> *} for the Dof
- * indices and @p{vector<Vector<number> > *} for the interpolated DoF values)
+ * As we need two different kinds of pointers (<tt>vector<unsigned int> *</tt> for the Dof
+ * indices and <tt>vector<Vector<number> > *</tt> for the interpolated DoF values)
  * we use the @p Pointerstruct that includes both of these pointers and
  * the @p user_pointer of each cell points to these @p Pointerstructs. 
  * On each cell only one of the two different pointers is used at one time 
  * hence we could use the
- * @p{void * user_pointer} as @p{vector<unsigned int> *} at one time and as 
- * @p{vector<Vector<number> > *} at the other but using this @p Pointerstruct
+ * <tt>void * user_pointer</tt> as <tt>vector<unsigned int> *</tt> at one time and as 
+ * <tt>vector<Vector<number> > *</tt> at the other but using this @p Pointerstruct
  * in between makes the use of these pointers more safe and gives better
  * possibility to expand their usage.
  * 
- * In @p{interpolate(all_in, all_out)} the refined cells are treated according
+ * In <tt>interpolate(all_in, all_out)</tt> the refined cells are treated according
  * to the solution transfer while pure refinement. Additionally, on each
  * cell that is coarsened (hence previously was a father cell), 
  * the values of the discrete
  * functions in @p all_out are set to the stored local interpolated values 
  * that are accessible due to the 'vector<Vector<number> > *' pointer in 
  * @p Pointerstruct that is pointed to by the @p user_pointer of that cell.
- * It is clear that @p{interpolate(all_in, all_out)} only can be called with
- * the @p{vector<Vector<number> > all_in} that previously was the parameter
- * of the @p{prepare_for_coarsening_and_refinement(all_in)} function. Hence 
- * @p{interpolate(all_in, all_out)} can (in contrast to 
- * @p{refine_interpolate(in, out)}) only be called once.
+ * It is clear that <tt>interpolate(all_in, all_out)</tt> only can be called with
+ * the <tt>vector<Vector<number> > all_in</tt> that previously was the parameter
+ * of the <tt>prepare_for_coarsening_and_refinement(all_in)</tt> function. Hence 
+ * <tt>interpolate(all_in, all_out)</tt> can (in contrast to 
+ * <tt>refine_interpolate(in, out)</tt>) only be called once.
  * </ul>
  *
  * @author Ralf Hartmann, 1999
@@ -262,8 +262,8 @@ class SolutionTransfer
 				      * refinement, to the function @p out
 				      * which then is a vector on the refined grid.
 				      * It assumes the vectors having the
-				      * right sizes (i.e. @p{in.size()==n_dofs_old},
-				      * @p{out.size()==n_dofs_refined})
+				      * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
+				      * <tt>out.size()==n_dofs_refined</tt>)
        				      *
 				      * Calling this function is allowed only
 				      * if @p prepare_for_pure_refinement is called
@@ -277,7 +277,7 @@ class SolutionTransfer
 			     Vector<number> &out) const;
     
 				     /**
-				      * Same as @p{interpolate(in,out)}
+				      * Same as <tt>interpolate(in,out)</tt>
 				      * but it interpolates
 				      * just 'in-place'. Therefore @p vec will be
 				      * reinitialized to the new needed vector
@@ -293,7 +293,7 @@ class SolutionTransfer
 				      * It assumes the vectors in @p all_in
 				      * denote the same vectors
 				      * as in @p all_in as parameter of
-				      * @p{prepare_for_refinement_and_coarsening(all_in)}.
+				      * <tt>prepare_for_refinement_and_coarsening(all_in)</tt>.
 				      * However, there is no way of verifying
 				      * this internally, so be careful here.
 				      *
@@ -326,14 +326,14 @@ class SolutionTransfer
 				      * Same as the previous function.
 				      * It interpolates only one function.
 				      * It assumes the vectors having the
-				      * right sizes (i.e. @p{in.size()==n_dofs_old},
-				      * @p{out.size()==n_dofs_refined})
+				      * right sizes (i.e. <tt>in.size()==n_dofs_old</tt>,
+				      * <tt>out.size()==n_dofs_refined</tt>)
 				      * 
 				      * Multiple calling of this function is
 				      * NOT allowed. Interpolating
 				      * several functions can be performed
 				      * in one step by using
-				      * @p{interpolate (all_in, all_out)}
+				      * <tt>interpolate (all_in, all_out)</tt>
 				      */
     void interpolate (const Vector<number> &in,
 		      Vector<number>       &out) const;
@@ -436,9 +436,9 @@ class SolutionTransfer
 				      * data need to be packetized in a structure.
 				      * Note that in our case on each cell
 				      * either the
-				      * @p{vector<unsigned int> indices} (if the cell
+				      * <tt>vector<unsigned int> indices</tt> (if the cell
 				      * will be refined) or the
-				      * @p{vector<double> dof_values} (if the
+				      * <tt>vector<double> dof_values</tt> (if the
 				      * children of this cell will be deleted)
 				      * is needed, hence one @p user_pointer should
 				      * be sufficient, but to allow some errorchecks
@@ -457,7 +457,7 @@ class SolutionTransfer
 				      * Vector of all @p Pointerstructs (cf. there).
 				      * It makes it
 				      * easier to delete all these structs
-				      * (without going over all @p{cell->user_pointer})
+				      * (without going over all <tt>cell->user_pointer</tt>)
 				      * after they are not used any more, and
 				      * collecting all these structures in a vector
 				      * helps avoiding fraqmentation of the memory.

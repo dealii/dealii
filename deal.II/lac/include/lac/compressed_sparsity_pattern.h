@@ -131,7 +131,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * if yo want to use the STL data types
 				      * on classes like this, e.g. to write
 				      * such statements like
-				      * @p{v.push_back (CompressedSparsityPattern());},
+				      * <tt>v.push_back (CompressedSparsityPattern());</tt>,
 				      * with @p v a vector of @p CompressedSparsityPattern
 				      * objects.
 				      *
@@ -246,7 +246,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * and which can be used to plot the
 				      * sparsity pattern in a graphical
 				      * way. The format consists of pairs
-				      * @p{i j} of nonzero elements, each
+				      * <tt>i j</tt> of nonzero elements, each
 				      * representing one entry of this
 				      * matrix, one per line of the output
 				      * file. Indices are counted from
@@ -255,7 +255,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * way as matrices are displayed, we
 				      * print the negative of the column
 				      * index, which means that the
-				      * @p{(0,0)} element is in the top left
+				      * <tt>(0,0)</tt> element is in the top left
 				      * rather than in the bottom left
 				      * corner.
 				      *

@@ -61,7 +61,7 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				      * finite element to the present
 				      * one. The size of the matrix is
 				      * then @p dofs_per_cell times
-				      * @p{source.dofs_per_cell}.
+				      * <tt>source.dofs_per_cell</tt>.
 				      *
 				      * These matrices are only
 				      * available if the source

@@ -72,11 +72,11 @@ template <int>      class FEValuesBase;
  * components ("x-displacement" and "y-displacement") while the error estimator
  * probably is a vector holding cell data. When attaching a data vector, you have
  * to give a name to each component of the vector, which is done through an object
- * of type @p{vector<string>} as second argument; if only one component is in the
+ * of type <tt>vector<string></tt> as second argument; if only one component is in the
  * vector, for example if we are adding cell data as in the second case, or if
  * the finite element used by the DoFHandler has only one component, then you
  * can use the second @p add_data_vector function which takes a @p string instead
- * of the @p{vector<string>}.
+ * of the <tt>vector<string></tt>.
  *
  * You should note that this class does not copy the vector given to it through
  * the @p add_data_vector functions, for memory consumption reasons. It only
@@ -101,7 +101,7 @@ template <int>      class FEValuesBase;
  * functions to ease programming with run-time determinable output formats
  * (i.e. you need not use a fixed format by calling @p write_xxx in the above
  * example, but you can select it by a run-time parameter without having
- * to write the @p{if () ... else ...} clauses yourself), and also functions
+ * to write the <tt>if () ... else ...</tt> clauses yourself), and also functions
  * and classes offering ways to control the appearance of the output by
  * setting flags for each output format.
  * 
@@ -212,7 +212,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * stored, so you have to make
 				      * sure the vector exists at that
 				      * address at least as long as
-				      * you call the @p{write_*}
+				      * you call the <tt>write_*</tt>
 				      * functions.
 				      *
 				      * It is assumed that the vector
@@ -751,7 +751,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * and so on.
  *
  * Note that after having called @p build_patches once, you can call one or
- * more of the @p{write_*} functions of the base classes. You can therefore
+ * more of the <tt>write_*</tt> functions of the base classes. You can therefore
  * output the same data in more than one format without having to rebuild
  * the patches.
  *
@@ -811,7 +811,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * mode. The default number of
 				      * threads to be used to build
 				      * the patches is set to
-				      * @p{multithread_info.n_default_threads}.
+				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
     virtual void build_patches (const unsigned int n_subdivisions = 1,
 				const unsigned int n_threads      = multithread_info.n_default_threads);
@@ -831,7 +831,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * Return the next cell after
 				      * @p cell which we want output
 				      * for.  If there are no more
-				      * cells, @p{dofs->end()} shall
+				      * cells, <tt>dofs->end()</tt> shall
 				      * be returned.
 				      *
 				      * The default implementation
@@ -869,7 +869,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      *
 				      * The @p index_to_patch_map is
 				      * an array that stores for index
-				      * @p{[i][j]} the number of the
+				      * <tt>[i][j]</tt> the number of the
 				      * patch that associated with the
 				      * cell with index @p j on level
 				      * @p i. This information is set

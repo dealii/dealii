@@ -49,7 +49,7 @@
  * In many cases, the shift vector will also be the solution vector of
  * the problem under investigation. If this is not the case (i.e. the
  * number of components of the solution variable is not equal to the
- * space dimension, e.g. for scalar problems in @p{dim>1} where the
+ * space dimension, e.g. for scalar problems in <tt>dim>1</tt> where the
  * Eulerian coordinates only give a background field) or for coupled
  * problems where more variables are computed than just the flow
  * field), then a different DoFHandler has to be set up on the
@@ -79,7 +79,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 
 				     /**
 				      * Constructor. It takes a
-				      * @p{Vector<double> &} as its
+				      * <tt>Vector<double> &</tt> as its
 				      * first argument to specify the
 				      * transformation of the whole
 				      * problem from the reference to
@@ -96,7 +96,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      * of a nonlinear problem.
 				      * Alternatively, the @p Vector
 				      * can be initialized by
-				      * @p{DoFObjectAccessor::set_dof_values()}.
+				      * <tt>DoFObjectAccessor::set_dof_values()</tt>.
 				      */
     MappingQ1Eulerian (const Vector<double>  &euler_transform_vectors,
                        const DoFHandler<dim> &shiftmap_dof_handler);

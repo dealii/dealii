@@ -43,19 +43,19 @@
  * is listed in the following:
  *
  * <ul>
- * <li> @p{dim==1}
+ * <li> <tt>dim==1</tt>
  *   <ul>
  *   <li> the @p interface_constraints are not needed
  *   <li> the @p prolongation matrices up to degree 4, and
  *   <li> the @p restriction matrices up to degree 4.
  *   </ul>
- * <li> @p{dim==2}
+ * <li> <tt>dim==2</tt>
  *   <ul>
  *   <li> the @p interface_constraints up to degree 4,
  *   <li> the @p prolongation matrices up to degree 3, and
  *   <li> the @p restriction matrices up to degree 4.
  *   </ul>
- * <li> @p{dim==3}
+ * <li> <tt>dim==3</tt>
  *   <ul>
  *   <li> the @p interface_constraints up to degree 2,
  *   <li> the @p prolongation matrices up to degree 2, and
@@ -106,14 +106,14 @@
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
  *   <ul>
- *   <li> Index 0: @p{[0, 0, 0]};
- *   <li> Index 1: @p{[1, 0, 0]};
- *   <li> Index 2: @p{[1, 0, 1]};
- *   <li> Index 3: @p{[0, 0, 1]};
- *   <li> Index 4: @p{[0, 1, 0]};
- *   <li> Index 5: @p{[1, 1, 0]};
- *   <li> Index 6: @p{[1, 1, 1]};
- *   <li> Index 7: @p{[0, 1, 1]};
+ *   <li> Index 0: <tt>[0, 0, 0]</tt>;
+ *   <li> Index 1: <tt>[1, 0, 0]</tt>;
+ *   <li> Index 2: <tt>[1, 0, 1]</tt>;
+ *   <li> Index 3: <tt>[0, 0, 1]</tt>;
+ *   <li> Index 4: <tt>[0, 1, 0]</tt>;
+ *   <li> Index 5: <tt>[1, 1, 0]</tt>;
+ *   <li> Index 6: <tt>[1, 1, 1]</tt>;
+ *   <li> Index 7: <tt>[0, 1, 1]</tt>;
  *   </ul>
  * </ul>
  * @sect4{Q2 elements}
@@ -161,33 +161,33 @@
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
  *   <ul>
- *   <li> Index 0: @p{[0, 0, 0]};
- *   <li> Index 1: @p{[1, 0, 0]};
- *   <li> Index 2: @p{[1, 0, 1]};
- *   <li> Index 3: @p{[0, 0, 1]};
- *   <li> Index 4: @p{[0, 1, 0]};
- *   <li> Index 5: @p{[1, 1, 0]};
- *   <li> Index 6: @p{[1, 1, 1]};
- *   <li> Index 7: @p{[0, 1, 1]};
- *   <li> Index 8: @p{[1/2, 0, 0]};
- *   <li> Index 9: @p{[1, 0, 1/2]};
- *   <li> Index 10: @p{[1/2, 0, 1]};
- *   <li> Index 11: @p{[0, 0, 1/2]};
- *   <li> Index 12: @p{[1/2, 1, 0]};
- *   <li> Index 13: @p{[1, 1, 1/2]};
- *   <li> Index 14: @p{[1/2, 1, 1]};
- *   <li> Index 15: @p{[0, 1, 1/2]};
- *   <li> Index 16: @p{[0, 1/2, 0]};
- *   <li> Index 17: @p{[1, 1/2, 0]};
- *   <li> Index 18: @p{[1, 1/2, 1]};
- *   <li> Index 19: @p{[0, 1/2, 1]};
- *   <li> Index 20: @p{[1/2, 0, 1/2]};
- *   <li> Index 21: @p{[1/2, 1, 1/2]};
- *   <li> Index 22: @p{[1/2, 1/2, 0]};
- *   <li> Index 23: @p{[1, 1/2, 1/2]};
- *   <li> Index 24: @p{[1/2, 1/2, 1]};
- *   <li> Index 25: @p{[0, 1/2, 1/2]};
- *   <li> Index 26: @p{[1/2, 1/2, 1/2]}; 
+ *   <li> Index 0: <tt>[0, 0, 0]</tt>;
+ *   <li> Index 1: <tt>[1, 0, 0]</tt>;
+ *   <li> Index 2: <tt>[1, 0, 1]</tt>;
+ *   <li> Index 3: <tt>[0, 0, 1]</tt>;
+ *   <li> Index 4: <tt>[0, 1, 0]</tt>;
+ *   <li> Index 5: <tt>[1, 1, 0]</tt>;
+ *   <li> Index 6: <tt>[1, 1, 1]</tt>;
+ *   <li> Index 7: <tt>[0, 1, 1]</tt>;
+ *   <li> Index 8: <tt>[1/2, 0, 0]</tt>;
+ *   <li> Index 9: <tt>[1, 0, 1/2]</tt>;
+ *   <li> Index 10: <tt>[1/2, 0, 1]</tt>;
+ *   <li> Index 11: <tt>[0, 0, 1/2]</tt>;
+ *   <li> Index 12: <tt>[1/2, 1, 0]</tt>;
+ *   <li> Index 13: <tt>[1, 1, 1/2]</tt>;
+ *   <li> Index 14: <tt>[1/2, 1, 1]</tt>;
+ *   <li> Index 15: <tt>[0, 1, 1/2]</tt>;
+ *   <li> Index 16: <tt>[0, 1/2, 0]</tt>;
+ *   <li> Index 17: <tt>[1, 1/2, 0]</tt>;
+ *   <li> Index 18: <tt>[1, 1/2, 1]</tt>;
+ *   <li> Index 19: <tt>[0, 1/2, 1]</tt>;
+ *   <li> Index 20: <tt>[1/2, 0, 1/2]</tt>;
+ *   <li> Index 21: <tt>[1/2, 1, 1/2]</tt>;
+ *   <li> Index 22: <tt>[1/2, 1/2, 0]</tt>;
+ *   <li> Index 23: <tt>[1, 1/2, 1/2]</tt>;
+ *   <li> Index 24: <tt>[1/2, 1/2, 1]</tt>;
+ *   <li> Index 25: <tt>[0, 1/2, 1/2]</tt>;
+ *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>; 
  *   </ul>
  * </ul>
  * @sect4{Q3 elements}
@@ -249,7 +249,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p{FE_Q<dim>(degree)}, with
+				      * <tt>FE_Q<dim>(degree)</tt>, with
 				      * @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
@@ -262,7 +262,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * finite element to the present
 				      * one. The size of the matrix is
 				      * then @p dofs_per_cell times
-				      * @p{source.dofs_per_cell}.
+				      * <tt>source.dofs_per_cell</tt>.
 				      *
 				      * These matrices are only
 				      * available if the source
@@ -312,7 +312,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * constraint and embedding
 				      * matrices. The definition of
 				      * the various static fields are
-				      * in the files @p{fe_q_[123]d.cc}
+				      * in the files <tt>fe_q_[123]d.cc</tt>
 				      * in the source directory.
 				      */
     struct Matrices

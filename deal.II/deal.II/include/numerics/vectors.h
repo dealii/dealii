@@ -153,7 +153,7 @@ class ConstraintMatrix;
  * <li> Creation of right hand side vectors:
  *   The @p create_right_hand_side function computes the vector
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
- *   MatrixCreator@p{::create_*} functions which take a right hand side do,
+ *   MatrixCreator<tt>::create_*</tt> functions which take a right hand side do,
  *   but without assembling a matrix.
  *
  * <li> Creation of boundary right hand side vectors: The
@@ -170,7 +170,7 @@ class ConstraintMatrix;
  *   of boundary nodes and their values. You can get such a list by interpolation
  *   of a boundary function using the @p interpolate_boundary_values function.
  *   To use it, you have to
- *   specify a list of pairs of boundary indicators (of type @p{unsigned char};
+ *   specify a list of pairs of boundary indicators (of type <tt>unsigned char</tt>;
  *   see the section in the documentation of the Triangulation class for more
  *   details) and the according functions denoting the dirichlet boundary values
  *   of the nodes on boundary faces with this boundary indicator.
@@ -227,7 +227,7 @@ class ConstraintMatrix;
  *   The result is stored in a vector (named @p difference), where each entry
  *   equals the given norm of the difference on a cell. The order of entries
  *   is the same as a @p cell_iterator takes when started with @p begin_active and
- *   promoted with the @p{++} operator.
+ *   promoted with the <tt>++</tt> operator.
  * 
  *   You can use the @p distribute_cell_to_dof_vector function of the
  *   DoFHandler class to convert cell based data to a data
@@ -268,17 +268,17 @@ class ConstraintMatrix;
  * 
  *   To get the global <i>L<sup>1</sup></i> error, you have to sum up the
  *   entries in @p difference, e.g. using
- *   Vector@p{<double>::l1_norm} function.  For the global <i>L<sup>2</sup></i>
+ *   Vector<tt><double>::l1_norm</tt> function.  For the global <i>L<sup>2</sup></i>
  *   difference, you have to sum up the squares of the entries and
  *   take the root of the sum, e.g. using
- *   Vector@p{<double>::l2_norm}.  These two operations
+ *   Vector<tt><double>::l2_norm</tt>.  These two operations
  *   represent the $l_1$ and $l_2$ norms of the vectors, but you need
  *   not take the absolute value of each entry, since the cellwise
  *   norms are already positive.
  *  
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
- *   using the Vector@p{<double>::linfty_norm} function.
+ *   using the Vector<tt><double>::linfty_norm</tt> function.
  *
  *   For the global <i>H<sup>1</sup></i> norm and seminorm, the same rule applies as for the
  *   <i>L<sup>2</sup></i> norm: compute the $l_2$ norm of the cell error vector.
@@ -374,7 +374,7 @@ class VectorTools
 				      * @p dof.
 				      *
 				      * Note that you may have to call
-				      * @p{hanging_nodes.distribute(vec)}
+				      * <tt>hanging_nodes.distribute(vec)</tt>
 				      * with the hanging nodes from
 				      * space @p dof afterwards, to
 				      * make the result continuous
@@ -414,7 +414,7 @@ class VectorTools
 				      * are neglected so far.
 				      *
 				      * Note that you may have to call
-				      * @p{hanging_nodes.distribute(data_2)}
+				      * <tt>hanging_nodes.distribute(data_2)</tt>
 				      * with the hanging nodes from
 				      * space @p dof_2 afterwards, to
 				      * make the result continuous
@@ -494,7 +494,7 @@ class VectorTools
 				     /**
 				      * Calls the @p project
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void project (const DoFHandler<dim>    &dof,
@@ -525,7 +525,7 @@ class VectorTools
 				     /**
 				      * Calls the @p create_right_hand_side
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void create_right_hand_side (const DoFHandler<dim> &dof,
@@ -569,7 +569,7 @@ class VectorTools
 				      * Calls the
 				      * @p create_boundary_right_hand_side
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void create_boundary_right_hand_side (const DoFHandler<dim>   &dof,
@@ -700,7 +700,7 @@ class VectorTools
 				      * Calls the other
 				      * @p interpolate_boundary_values
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
@@ -713,7 +713,7 @@ class VectorTools
 				      * Calls the other
 				      * @p interpolate_boundary_values
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
@@ -765,7 +765,7 @@ class VectorTools
 				     /**
 				      * Calls the @p project_boundary_values
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim>
     static void project_boundary_values (const DoFHandler<dim>    &dof,
@@ -832,7 +832,7 @@ class VectorTools
 				     /**
 				      * Calls the @p integrate_difference
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, class InVector, class OutVector>
     static void integrate_difference (const DoFHandler<dim> &dof,
@@ -929,7 +929,7 @@ class VectorTools
 				     /**
 				      * Calls the @p compute_mean_value
 				      * function, see above, with
-				      * @p{mapping=MappingQ1@<dim@>()}.
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, class InVector>
     static double compute_mean_value (const DoFHandler<dim> &dof,

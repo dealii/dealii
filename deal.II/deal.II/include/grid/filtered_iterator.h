@@ -199,8 +199,8 @@ namespace IteratorFilters
  *
  * The object that represent the condition an iterator has to satisfy
  * only have to provide an interface that allows to call the
- * evaluation operator, i.e. @p{operator()}. This includes function
- * pointers as well as classes that implement an @p{operator ()}.
+ * evaluation operator, i.e. <tt>operator()</tt>. This includes function
+ * pointers as well as classes that implement an <tt>operator ()</tt>.
  *
  * An example of a simple valid predicate is the following: given the function
  * @verbatim
@@ -263,7 +263,7 @@ namespace IteratorFilters
  *       const unsigned int subdomain_id;
  *   };
  * @endverbatim
- * Objects like @p{SubdomainEqualTo(3)} can then be used as predicates.
+ * Objects like <tt>SubdomainEqualTo(3)</tt> can then be used as predicates.
  *
  * Since whenever a predicate is evaluated it is checked that the
  * iterator checked is actually valid (i.e. not past the end), no
@@ -292,8 +292,8 @@ namespace IteratorFilters
  * however, a value is given to the constructor, that value has either
  * to be past the end, or has to satisfy the predicate. For example,
  * if the predicate only evaluates to true if the level of an object
- * is equal to three, then @p{tria.begin_active(3)} would be a valid
- * choice while @p{tria.begin()} would not since the latter also
+ * is equal to three, then <tt>tria.begin_active(3)</tt> would be a valid
+ * choice while <tt>tria.begin()</tt> would not since the latter also
  * returns iterators to non-active cells which always start at level
  * 0.
  *
@@ -305,7 +305,7 @@ namespace IteratorFilters
  * assign the next or last previous iterator that satisfies the
  * predicate, i.e. they follow the list of iterators in either
  * direction until they find a matching one (or the past-the-end
- * iterator). Like the @p{operator=} they return the resulting value
+ * iterator). Like the <tt>operator=</tt> they return the resulting value
  * of the filtered iterator.
  *
  *
@@ -357,7 +357,7 @@ namespace IteratorFilters
  * Since comparison between filtered and unfiltered iterators is
  * defined, we could as well have let the @p endc variable in the
  * last example be of type
- * @p{Triangulation<dim>::active_cell_iterator} since it is unchanged
+ * <tt>Triangulation<dim>::active_cell_iterator</tt> since it is unchanged
  * and its value does not depend on the filter.
  *
  * @author Wolfgang Bangerth, 2002

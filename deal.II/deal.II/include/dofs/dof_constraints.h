@@ -566,9 +566,9 @@ class ConstraintMatrix : public Subscriptor
 				      * @p condensed be zero.
 				      *
 				      * The @p VectorType may be a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>},
-				      * BlockVector@p{<...>}, a PETSc
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>,
+				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -579,9 +579,9 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Condense the given vector
 				      * in-place. The @p VectorType may be a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>},
-				      * BlockVector@p{<...>}, a PETSc
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>,
+				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -603,9 +603,9 @@ class ConstraintMatrix : public Subscriptor
 				      * @p condense.
 				      *
 				      * The @p VectorType may be a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>},
-				      * BlockVector@p{<...>}, a PETSc
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>,
+				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -616,9 +616,9 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Re-distribute the elements of the
 				      * vector in-place. The @p VectorType
-				      * may be a Vector@p{<float>},
-				      * Vector@p{<double>},
-				      * BlockVector@p{<...>}, a PETSc
+				      * may be a Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>,
+				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -629,9 +629,9 @@ class ConstraintMatrix : public Subscriptor
 				      * Delete hanging nodes in a vector.
 				      * Sets all hanging node values to
 				      * zero. The @p VectorType may be a
-				      * Vector@p{<float>},
-				      * Vector@p{<double>},
-				      * BlockVector@p{<...>}, a PETSc
+				      * Vector<tt><float></tt>,
+				      * Vector<tt><double></tt>,
+				      * BlockVector<tt><...></tt>, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -750,7 +750,7 @@ class ConstraintMatrix : public Subscriptor
 				      * This function writes out all entries
 				      * in the constraint matrix lines with
 				      * their value in the form
-				      * @p{row col : value}. Unconstrained lines
+				      * <tt>row col : value</tt>. Unconstrained lines
 				      * containing only one identity entry are
 				      * not stored in this object and are not
 				      * printed.
@@ -891,7 +891,7 @@ class ConstraintMatrix : public Subscriptor
 				      * at the end, so the order is
 				      * unspecified after all entries are
 				      * inserted. Sorting of the entries takes
-				      * place when calling the @p{close()} function.
+				      * place when calling the <tt>close()</tt> function.
 				      *
 				      * We could, instead of using a vector, use
 				      * an associative array, like a map to

@@ -96,8 +96,8 @@ struct GeometryInfo
 				      * List of numbers which
 				      * denotes which face is opposite
 				      * to a given face. In 1d, this
-				      * list is @p{{1,0}}, in 2d @p{{2, 3, 0, 1}},
-				      * in 3d @p{{1, 0, 4, 5, 2, 3}}.
+				      * list is <tt>{1,0</tt>}, in 2d <tt>{2, 3, 0, 1</tt>},
+				      * in 3d <tt>{1, 0, 4, 5, 2, 3</tt>}.
 				      */
     static const unsigned int opposite_face[faces_per_cell];
     
@@ -108,7 +108,7 @@ struct GeometryInfo
 				      * written in OpenDX format, each
 				      * entry in this field contains
 				      * the number of a vertex in
-				      * @p{deal.II} that corresponds
+				      * <tt>deal.II</tt> that corresponds
 				      * to the DX numbering at this
 				      * location.
 				      *
@@ -174,12 +174,12 @@ struct GeometryInfo
 				      * what you want. You can inquire
 				      * about the face orientation
 				      * using the
-				      * @p{cell->face_orientation}
+				      * <tt>cell->face_orientation</tt>
 				      * function, and the function to
 				      * ask for a neighbor's cell
 				      * behind a given face and
 				      * subface is
-				      * @p{cell->neighbor_child_on_subface}.
+				      * <tt>cell->neighbor_child_on_subface</tt>.
 				      * The latter function, in
 				      * contrast to the present one,
 				      * also takes into account the
@@ -203,7 +203,7 @@ struct GeometryInfo
     static Point<dimension> unit_cell_vertex (const unsigned int vertex);
 
 				     /**
-				      * Report, for @p{vertex=0,1} the
+				      * Report, for <tt>vertex=0,1</tt> the
 				      * indices of the two vertices
 				      * adjacent to the line with
 				      * index @p line among the lines
@@ -239,7 +239,7 @@ struct GeometryInfo
 				      * children, return any one of
 				      * their indices. The result is
 				      * always less than
-				      * @p{GeometryInfo<dimension>::children_per_cell}.
+				      * <tt>GeometryInfo<dimension>::children_per_cell</tt>.
 				      *
 				      * The order of child cells is
 				      * described the documentation of
@@ -348,8 +348,8 @@ struct GeometryInfo<0>
 				      * dimension, we provide a useless
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
-				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p i is an @p{unsigned int}.
+				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
+				      * at least if @p i is an <tt>unsigned int</tt>.
 				      */
     static const unsigned int vertices_per_face = 0;
 
@@ -434,8 +434,8 @@ struct GeometryInfo<1>
 				      * dimension, we provide a useless
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
-				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p i is an @p{unsigned int}.
+				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
+				      * at least if @p i is an <tt>unsigned int</tt>.
 				      */
     static const unsigned int vertices_per_face = 1;
 
@@ -470,8 +470,8 @@ struct GeometryInfo<1>
 				      * List of numbers which
 				      * denotes which face is opposite
 				      * to a given face. In 1d, this
-				      * list is @p{{1,0}}, in 2d @p{{2, 3, 0, 1}},
-				      * in 3d @p{{1, 0, 4, 5, 2, 3}}.
+				      * list is <tt>{1,0</tt>}, in 2d <tt>{2, 3, 0, 1</tt>},
+				      * in 3d <tt>{1, 0, 4, 5, 2, 3</tt>}.
 				      */
     static const unsigned int opposite_face[faces_per_cell];
     
@@ -482,7 +482,7 @@ struct GeometryInfo<1>
 				      * written in OpenDX format, each
 				      * entry in this field contains
 				      * the number of a vertex in
-				      * @p{deal.II} that corresponds
+				      * <tt>deal.II</tt> that corresponds
 				      * to the DX numbering at this
 				      * location.
 				      *
@@ -549,12 +549,12 @@ struct GeometryInfo<1>
 				      * you want. You can inquire
 				      * about the face orientation
 				      * using the
-				      * @p{cell->face_orientation}
+				      * <tt>cell->face_orientation</tt>
 				      * function, and the function to
 				      * ask for a neighbor's cell
 				      * behind a given face and
 				      * subface is
-				      * @p{cell->neighbor_child_on_subface}.
+				      * <tt>cell->neighbor_child_on_subface</tt>.
 				      * The latter function, in
 				      * contrast to the present one,
 				      * also takes into account the
@@ -578,7 +578,7 @@ struct GeometryInfo<1>
     static Point<1> unit_cell_vertex (const unsigned int vertex);
 
 				     /**
-				      * Report, for @p{vertex=0,1} the
+				      * Report, for <tt>vertex=0,1</tt> the
 				      * indices of the two vertices
 				      * adjacent to the line with
 				      * index @p line among the lines
@@ -614,7 +614,7 @@ struct GeometryInfo<1>
 				      * children, return any one of
 				      * their indices. The result is
 				      * always less than
-				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      * <tt>GeometryInfo<dim>::children_per_cell</tt>.
 				      *
 				      * The order of child cells is
 				      * described the documentation of
@@ -719,8 +719,8 @@ struct GeometryInfo<2>
 				      * dimension, we provide a useless
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
-				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p i is an @p{unsigned int}.
+				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
+				      * at least if @p i is an <tt>unsigned int</tt>.
 				      */
     static const unsigned int vertices_per_face = 2;
 
@@ -755,8 +755,8 @@ struct GeometryInfo<2>
 				      * List of numbers which
 				      * denotes which face is opposite
 				      * to a given face. In 1d, this
-				      * list is @p{{1,0}}, in 2d @p{{2, 3, 0, 1}},
-				      * in 3d @p{{1, 0, 4, 5, 2, 3}}.
+				      * list is <tt>{1,0</tt>}, in 2d <tt>{2, 3, 0, 1</tt>},
+				      * in 3d <tt>{1, 0, 4, 5, 2, 3</tt>}.
 				      */
     static const unsigned int opposite_face[faces_per_cell];
     
@@ -766,7 +766,7 @@ struct GeometryInfo<2>
 				      * written in OpenDX format, each
 				      * entry in this field contains
 				      * the number of a vertex in
-				      * @p{deal.II} that corresponds
+				      * <tt>deal.II</tt> that corresponds
 				      * to the DX numbering at this
 				      * location.
 				      *
@@ -833,12 +833,12 @@ struct GeometryInfo<2>
 				      * you want. You can inquire
 				      * about the face orientation
 				      * using the
-				      * @p{cell->face_orientation}
+				      * <tt>cell->face_orientation</tt>
 				      * function, and the function to
 				      * ask for a neighbor's cell
 				      * behind a given face and
 				      * subface is
-				      * @p{cell->neighbor_child_on_subface}.
+				      * <tt>cell->neighbor_child_on_subface</tt>.
 				      * The latter function, in
 				      * contrast to the present one,
 				      * also takes into account the
@@ -863,7 +863,7 @@ struct GeometryInfo<2>
     static Point<2> unit_cell_vertex (const unsigned int i);
 
 				     /**
-				      * Report, for @p{vertex=0,1} the
+				      * Report, for <tt>vertex=0,1</tt> the
 				      * indices of the two vertices
 				      * adjacent to the line with
 				      * index @p line among the lines
@@ -899,7 +899,7 @@ struct GeometryInfo<2>
 				      * children, return any one of
 				      * their indices. The result is
 				      * always less than
-				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      * <tt>GeometryInfo<dim>::children_per_cell</tt>.
 				      *
 				      * The order of child cells is
 				      * described the documentation of
@@ -1005,8 +1005,8 @@ struct GeometryInfo<3>
 				      * dimension, we provide a useless
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
-				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p i is an @p{unsigned int}.
+				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
+				      * at least if @p i is an <tt>unsigned int</tt>.
 				      */
     static const unsigned int vertices_per_face = 4;
 
@@ -1041,8 +1041,8 @@ struct GeometryInfo<3>
 				      * List of numbers which
 				      * denotes which face is opposite
 				      * to a given face. In 1d, this
-				      * list is @p{{1,0}}, in 2d @p{{2, 3, 0, 1}},
-				      * in 3d @p{{1, 0, 4, 5, 2, 3}}.
+				      * list is <tt>{1,0</tt>}, in 2d <tt>{2, 3, 0, 1</tt>},
+				      * in 3d <tt>{1, 0, 4, 5, 2, 3</tt>}.
 				      */
     static const unsigned int opposite_face[faces_per_cell];
     
@@ -1052,7 +1052,7 @@ struct GeometryInfo<3>
 				      * written in OpenDX format, each
 				      * entry in this field contains
 				      * the number of a vertex in
-				      * @p{deal.II} that corresponds
+				      * <tt>deal.II</tt> that corresponds
 				      * to the DX numbering at this
 				      * location.
 				      *
@@ -1119,12 +1119,12 @@ struct GeometryInfo<3>
 				      * you want. You can inquire
 				      * about the face orientation
 				      * using the
-				      * @p{cell->face_orientation}
+				      * <tt>cell->face_orientation</tt>
 				      * function, and the function to
 				      * ask for a neighbor's cell
 				      * behind a given face and
 				      * subface is
-				      * @p{cell->neighbor_child_on_subface}.
+				      * <tt>cell->neighbor_child_on_subface</tt>.
 				      * The latter function, in contrast
 				      * to the present one, also takes
 				      * into account the actual
@@ -1146,7 +1146,7 @@ struct GeometryInfo<3>
     static Point<3> unit_cell_vertex (const unsigned int i);
 
 				     /**
-				      * Report, for @p{vertex=0,1} the
+				      * Report, for <tt>vertex=0,1</tt> the
 				      * indices of the two vertices
 				      * adjacent to the line with
 				      * index @p line among the lines
@@ -1182,7 +1182,7 @@ struct GeometryInfo<3>
 				      * children, return any one of
 				      * their indices. The result is
 				      * always less than
-				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      * <tt>GeometryInfo<dim>::children_per_cell</tt>.
 				      *
 				      * The order of child cells is
 				      * described the documentation of
@@ -1292,8 +1292,8 @@ struct GeometryInfo<4>
 				      * dimension, we provide a useless
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
-				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p i is an @p{unsigned int}.
+				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
+				      * at least if @p i is an <tt>unsigned int</tt>.
 				      */
     static const unsigned int vertices_per_face = 8;
 

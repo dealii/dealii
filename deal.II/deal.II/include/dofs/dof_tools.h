@@ -183,11 +183,11 @@ class DoFTools
 				      * of hanging nodes.  They have
 				      * to be taken care of by a call
 				      * to
-				      * ConstraintMatrix@p{::condense()}
+				      * ConstraintMatrix<tt>::condense()</tt>
 				      * afterwards.
 				      *
 				      * Remember using
-				      * SparsityPattern@p{::compress()}
+				      * SparsityPattern<tt>::compress()</tt>
 				      * after generating the pattern.
 				      *
 				      * The actual type of the
@@ -316,14 +316,14 @@ class DoFTools
 				      * nodes.  The sparsity pattern
 				      * is not compressed, since if
 				      * you want to call
-				      * ConstraintMatrix@p{::condense(1)}
+				      * ConstraintMatrix<tt>::condense(1)</tt>
 				      * afterwards, new entries have
 				      * to be added. However, if you
 				      * don't want to call
-				      * ConstraintMatrix@p{::condense(1)},
+				      * ConstraintMatrix<tt>::condense(1)</tt>,
 				      * you have to compress the
 				      * matrix yourself, using
-				      * SparsityPattern@p{::compress()}.
+				      * SparsityPattern<tt>::compress()</tt>.
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
@@ -571,7 +571,7 @@ class DoFTools
 				      * It is assumed that the output
 				      * vector @p dof_data already
 				      * has the right size,
-				      * i.e. @p{n_dofs()} elements.
+				      * i.e. <tt>n_dofs()</tt> elements.
 				      *
 				      * This function cannot be used
 				      * if the finite element in use
@@ -612,7 +612,7 @@ class DoFTools
 				      * in the finite element used by
 				      * @p dof. The size of
 				      * @p selected_dofs shall equal
-				      * @p{dof_handler.n_dofs()}. Previous
+				      * <tt>dof_handler.n_dofs()</tt>. Previous
 				      * contents of this array or
 				      * overwritten.
 				      *
@@ -686,7 +686,7 @@ class DoFTools
 				      * element used by @p dof. The
 				      * size of @p selected_dofs shall
 				      * equal
-				      * @p{dof_handler.n_dofs()}. Previous
+				      * <tt>dof_handler.n_dofs()</tt>. Previous
 				      * contents of this array or
 				      * overwritten.
 				      *
@@ -726,7 +726,7 @@ class DoFTools
 				      *
 				      * The size of @p selected_dofs
 				      * shall equal
-				      * @p{dof_handler.n_dofs()}. Previous
+				      * <tt>dof_handler.n_dofs()</tt>. Previous
 				      * contents of this array or
 				      * overwritten.
 				      */
@@ -777,7 +777,7 @@ class DoFTools
                                      /**
                                       * For each DoF, return in the output
                                       * array to which subdomain (as given by
-                                      * the @p{cell->subdomain_id()} function)
+                                      * the <tt>cell->subdomain_id()</tt> function)
                                       * it belongs. The output array is
                                       * supposed to have the right size
                                       * already when calling this function.
@@ -1169,7 +1169,7 @@ class DoFTools
 				      * of freedom indices to the
 				      * index of that degree of
 				      * freedom on the boundary. After
-				      * this operation, @p{mapping[dof]}
+				      * this operation, <tt>mapping[dof]</tt>
 				      * gives the index of the
 				      * degree of freedom with global
 				      * number @p dof in the list of
@@ -1177,7 +1177,7 @@ class DoFTools
 				      * boundary.  If the degree of
 				      * freedom requested is not on
 				      * the boundary, the value of
-				      * @p{mapping[dof]} is
+				      * <tt>mapping[dof]</tt> is
 				      * @p invalid_dof_index. This
 				      * function is mainly used when
 				      * setting up matrices and

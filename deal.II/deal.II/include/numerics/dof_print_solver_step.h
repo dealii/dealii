@@ -44,7 +44,7 @@
  * Objects of this class are provided with a solver class through a
  * template argument, and with a file name (as a string), with which a
  * new file is constructed in each iteration (named
- * @p{basename.[step].[suffix]}) and into which the solution is
+ * <tt>basename.[step].[suffix]</tt>) and into which the solution is
  * written as a finite element field using the DataOut class.
  * Please note that this class may produce enormous amounts of data!
  *
@@ -62,7 +62,7 @@ class DoFPrintSolverStep : public SOLVER
 				      * finite element function.
 				      *
 				      * One output file with the name
-				      * @p{basename.[step].[suffix]}
+				      * <tt>basename.[step].[suffix]</tt>
 				      * will be produced for each
 				      * iteration step.
 				      */

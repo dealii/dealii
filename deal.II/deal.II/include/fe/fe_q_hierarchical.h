@@ -28,7 +28,7 @@ template <int dim> class MappingQ;
  * finite element space of continuous, piecewise polynomials of degree
  * @p p. This class is realized using tensor product polynomials
  * based on a hierarchical basis @p Hierarchical of the interval 
- * @p{[0,1]} which is suitable for building an @p hp tensor product 
+ * <tt>[0,1]</tt> which is suitable for building an @p hp tensor product 
  * finite element, if we assume that each element has a single degree.
  * 
  * There are not many differences between @p FE_Q_Hierarchical and 
@@ -39,7 +39,7 @@ template <int dim> class MappingQ;
  * useful if one wants to make calculations using the hierarchical
  * nature of these shape functions.
  *
- * The unit support points now are reduced to @p 0, @p 1, and @p{0.5} in 
+ * The unit support points now are reduced to @p 0, @p 1, and <tt>0.5</tt> in 
  * one dimension, and tensor products in higher dimensions. Thus, various 
  * interpolation functions will only work correctly for the linear case. 
  * Future work will involve writing projection--interpolation operators
@@ -101,14 +101,14 @@ template <int dim> class MappingQ;
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
  *   <ul>
- *   <li> Index 0: @p{[0, 0, 0]};
- *   <li> Index 1: @p{[1, 0, 0]};
- *   <li> Index 2: @p{[1, 0, 1]};
- *   <li> Index 3: @p{[0, 0, 1]};
- *   <li> Index 4: @p{[0, 1, 0]};
- *   <li> Index 5: @p{[1, 1, 0]};
- *   <li> Index 6: @p{[1, 1, 1]};
- *   <li> Index 7: @p{[0, 1, 1]};
+ *   <li> Index 0: <tt>[0, 0, 0]</tt>;
+ *   <li> Index 1: <tt>[1, 0, 0]</tt>;
+ *   <li> Index 2: <tt>[1, 0, 1]</tt>;
+ *   <li> Index 3: <tt>[0, 0, 1]</tt>;
+ *   <li> Index 4: <tt>[0, 1, 0]</tt>;
+ *   <li> Index 5: <tt>[1, 1, 0]</tt>;
+ *   <li> Index 6: <tt>[1, 1, 1]</tt>;
+ *   <li> Index 7: <tt>[0, 1, 1]</tt>;
  *   </ul>
  * </ul>
  * @sect4{Q2 elements}
@@ -156,33 +156,33 @@ template <int dim> class MappingQ;
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
  *   <ul>
- *   <li> Index 0: @p{[0, 0, 0]};
- *   <li> Index 1: @p{[1, 0, 0]};
- *   <li> Index 2: @p{[1, 0, 1]};
- *   <li> Index 3: @p{[0, 0, 1]};
- *   <li> Index 4: @p{[0, 1, 0]};
- *   <li> Index 5: @p{[1, 1, 0]};
- *   <li> Index 6: @p{[1, 1, 1]};
- *   <li> Index 7: @p{[0, 1, 1]};
- *   <li> Index 8: @p{[1/2, 0, 0]};
- *   <li> Index 9: @p{[1, 0, 1/2]};
- *   <li> Index 10: @p{[1/2, 0, 1]};
- *   <li> Index 11: @p{[0, 0, 1/2]};
- *   <li> Index 12: @p{[1/2, 1, 0]};
- *   <li> Index 13: @p{[1, 1, 1/2]};
- *   <li> Index 14: @p{[1/2, 1, 1]};
- *   <li> Index 15: @p{[0, 1, 1/2]};
- *   <li> Index 16: @p{[0, 1/2, 0]};
- *   <li> Index 17: @p{[1, 1/2, 0]};
- *   <li> Index 18: @p{[1, 1/2, 1]};
- *   <li> Index 19: @p{[0, 1/2, 1]};
- *   <li> Index 20: @p{[1/2, 0, 1/2]};
- *   <li> Index 21: @p{[1/2, 1, 1/2]};
- *   <li> Index 22: @p{[1/2, 1/2, 0]};
- *   <li> Index 23: @p{[1, 1/2, 1/2]};
- *   <li> Index 24: @p{[1/2, 1/2, 1]};
- *   <li> Index 25: @p{[0, 1/2, 1/2]};
- *   <li> Index 26: @p{[1/2, 1/2, 1/2]}; 
+ *   <li> Index 0: <tt>[0, 0, 0]</tt>;
+ *   <li> Index 1: <tt>[1, 0, 0]</tt>;
+ *   <li> Index 2: <tt>[1, 0, 1]</tt>;
+ *   <li> Index 3: <tt>[0, 0, 1]</tt>;
+ *   <li> Index 4: <tt>[0, 1, 0]</tt>;
+ *   <li> Index 5: <tt>[1, 1, 0]</tt>;
+ *   <li> Index 6: <tt>[1, 1, 1]</tt>;
+ *   <li> Index 7: <tt>[0, 1, 1]</tt>;
+ *   <li> Index 8: <tt>[1/2, 0, 0]</tt>;
+ *   <li> Index 9: <tt>[1, 0, 1/2]</tt>;
+ *   <li> Index 10: <tt>[1/2, 0, 1]</tt>;
+ *   <li> Index 11: <tt>[0, 0, 1/2]</tt>;
+ *   <li> Index 12: <tt>[1/2, 1, 0]</tt>;
+ *   <li> Index 13: <tt>[1, 1, 1/2]</tt>;
+ *   <li> Index 14: <tt>[1/2, 1, 1]</tt>;
+ *   <li> Index 15: <tt>[0, 1, 1/2]</tt>;
+ *   <li> Index 16: <tt>[0, 1/2, 0]</tt>;
+ *   <li> Index 17: <tt>[1, 1/2, 0]</tt>;
+ *   <li> Index 18: <tt>[1, 1/2, 1]</tt>;
+ *   <li> Index 19: <tt>[0, 1/2, 1]</tt>;
+ *   <li> Index 20: <tt>[1/2, 0, 1/2]</tt>;
+ *   <li> Index 21: <tt>[1/2, 1, 1/2]</tt>;
+ *   <li> Index 22: <tt>[1/2, 1/2, 0]</tt>;
+ *   <li> Index 23: <tt>[1, 1/2, 1/2]</tt>;
+ *   <li> Index 24: <tt>[1/2, 1/2, 1]</tt>;
+ *   <li> Index 25: <tt>[0, 1/2, 1/2]</tt>;
+ *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>; 
  *   </ul>
  * </ul>
  * @sect4{Q3 elements}
@@ -244,7 +244,7 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p{FE_Q_Hierarchical<dim>(degree)},
+				      * <tt>FE_Q_Hierarchical<dim>(degree)</tt>,
 				      * with @p dim and @p degree
 				      * replaced by appropriate
 				      * values.

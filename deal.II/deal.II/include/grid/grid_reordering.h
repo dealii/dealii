@@ -58,12 +58,12 @@
  *   |   |   |
  *   0---1---2
  * @endverbatim
- * may be characterised by the vertex numbers @p{(0 1 4 3)} and
- * @p{(1 2 5 4)}, since the middle line would get the direction @p{1->4}
- * when viewed from both cells.  The numbering @p{(0 1 4 3)} and
- * @p{(5 4 1 2)} would not be allowed, since the left quad would give the
- * common line the direction @p{1->4}, while the right one would want
- * to use @p{4->1}, leading to an ambiguity.
+ * may be characterised by the vertex numbers <tt>(0 1 4 3)</tt> and
+ * <tt>(1 2 5 4)</tt>, since the middle line would get the direction <tt>1->4</tt>
+ * when viewed from both cells.  The numbering <tt>(0 1 4 3)</tt> and
+ * <tt>(5 4 1 2)</tt> would not be allowed, since the left quad would give the
+ * common line the direction <tt>1->4</tt>, while the right one would want
+ * to use <tt>4->1</tt>, leading to an ambiguity.
  *
  * As a sidenote, we remark that if one adopts the idea that having
  * directions of faces is useful, then the orientation of the four
@@ -159,8 +159,8 @@
  *   ^   ^    \ |
  *   0->-1------2
  * @endverbatim
- * (This could for example be done by using the indices @p{(0 1 4 3)}, @p{(3 4 7 6)},
- * @p{(6 7 10 9)} for the three cells). Now, you will not find a way of giving
+ * (This could for example be done by using the indices <tt>(0 1 4 3)</tt>, <tt>(3 4 7 6)</tt>,
+ * <tt>(6 7 10 9)</tt> for the three cells). Now, you will not find a way of giving
  * indices for the right cells, without introducing either ambiguity for
  * one line or other, or without violating that within each cells, there must be
  * one vertex from which both lines are directed away and the opposite one to
@@ -168,7 +168,7 @@
  *
  * The solution in this case is to renumber one of the three left cells, e.g.
  * by reverting the sense of the line between vertices 7 and 10 by numbering
- * the top left cell by @p{(9 6 7 10)}:
+ * the top left cell by <tt>(9 6 7 10)</tt>:
  * @verbatim
  *   9->-10-----11
  *   v   v    / |
@@ -192,7 +192,7 @@
  * @endverbatim
  * Then we run into the same problem as above if we order the cells at
  * the left uniformly, thus forcing us to revert the ordering of one
- * cell (the one which we could order as @p{(9 6 7 10)}
+ * cell (the one which we could order as <tt>(9 6 7 10)</tt>
  * above). However, since opposite lines have to have the same
  * direction, this in turn would force us to rotate the cell left of
  * it, and then the one left to that, and so on until we reach the
@@ -211,7 +211,7 @@
  * @endverbatim
  * We have here only indicated the numbers of the vertices that are
  * relevant. Assume that the user had given the cells 0 and 1 by the
- * vertex indices @p{0 1 2 3} and @p{6 7 4 5}. Then, if we follow this
+ * vertex indices <tt>0 1 2 3</tt> and <tt>6 7 4 5</tt>. Then, if we follow this
  * orientation, the grid after creating the lines for these two cells
  * would look like this:
  * @verbatim
@@ -258,9 +258,9 @@
  * where node N has as many children as there are possible
  * orientations of node N+1 (in two space dimensions, there are four
  * orientations in which each cell can be constructed from its four
- * vertices; for example, if the vertex indicaes are @p{(0 1 2 3)},
- * then the four possibilities would be @p{(0 1 2 3)}, @p{(1 2 3 0)},
- * @p{(2 3 0 1)}, and @p{(3 0 1 2)}). When adding one cell after the
+ * vertices; for example, if the vertex indicaes are <tt>(0 1 2 3)</tt>,
+ * then the four possibilities would be <tt>(0 1 2 3)</tt>, <tt>(1 2 3 0)</tt>,
+ * <tt>(2 3 0 1)</tt>, and <tt>(3 0 1 2)</tt>). When adding one cell after the
  * other, we traverse this tree in a depth-first (pre-order)
  * fashion. When we encounter that one path from the root (cell 0) to
  * a leaf (the last cell) is not allowed (i.e. that the orientations
@@ -278,7 +278,7 @@
  * stop following all paths below this point and track back
  * immediately.
  *
- * Nevertheless, it is already obvious that the tree has @p{4**N}
+ * Nevertheless, it is already obvious that the tree has <tt>4**N</tt>
  * leaves in two space dimensions, since each of the N cells can be
  * added in four orientations. Most of these nodes can be discarded
  * rapidly, since firstly the orientation of the first cell is
@@ -286,7 +286,7 @@
  * that has already been added, then there are already only two
  * possible orientations left, so the total number of checks we have
  * to make until we find a valid way is significantly smaller than
- * @p{4**N}. However, the algorithm is still exponential in time and
+ * <tt>4**N</tt>. However, the algorithm is still exponential in time and
  * linear in memory (we only have to store the information for the
  * present path in form of a stack of orientations of cells that have
  * already been added).
@@ -502,8 +502,8 @@
  * 0-----1-----2-----3
  * @endverbatim
  * Note that there is a hole in the middle. Assume now that the user
- * described the first cell 0 by the vertex numbers @p{2 3 7 6}, and
- * cell 5 by @p{15 14 10 11}, and assume that cells 1, 2, 3, and 4 are
+ * described the first cell 0 by the vertex numbers <tt>2 3 7 6</tt>, and
+ * cell 5 by <tt>15 14 10 11</tt>, and assume that cells 1, 2, 3, and 4 are
  * numbered such that 5 can be added in initial rotation. All other
  * cells are numbered in the usual way, i.e. starting at the bottom
  * left and counting counterclockwise. Given this description of
@@ -583,7 +583,7 @@
  * smaller (for example by one order of magnitude) than the time
  * needed to read the data from a file, and also to actually generate
  * the triangulation from this data using the
- * Triangulation@p{<dim>::create_triangulation} function.
+ * Triangulation<tt><dim>::create_triangulation</tt> function.
  *
  * @author Wolfgang Bangerth, 2000, Michael Anderson 2003
  */

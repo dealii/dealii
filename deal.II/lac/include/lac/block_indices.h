@@ -44,7 +44,7 @@ class BlockIndices
 				     /**
 				      * Constructor. Initialize the
 				      * number of entries in each
-				      * block @p i as @p{n[i]}. The
+				      * block @p i as <tt>n[i]</tt>. The
 				      * number of blocks will be the
 				      * size of the vector
 				      */
@@ -65,7 +65,7 @@ class BlockIndices
 				      * of blocks will be adjusted to
 				      * the size of @p n and the size
 				      * of block @p i is set to
-				      * @p{n[i]}.
+				      * <tt>n[i]</tt>.
 				      */
     inline void reinit (const std::vector<unsigned int> &n);
     

@@ -513,7 +513,7 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 					 // now we know that block @p i
 					 // wants to write to DoF @p j
 					 // as often as
-					 // @p{access_count[i][j]}
+					 // <tt>access_count[i][j]</tt>
 					 // times. Let @p j be allotted
 					 // to the block which
 					 // accesses it most often.

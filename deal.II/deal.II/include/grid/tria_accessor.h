@@ -142,7 +142,7 @@ class TriaAccessor
 				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  @p{iterator a,b;  *a=*b;}. Since
+				      *  <tt>iterator a,b;  *a=*b;</tt>. Since
 				      *  the meaning is to copy the object
 				      *  pointed to by @p b to the object
 				      *  pointed to by @p a and since
@@ -338,7 +338,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				     /**
 				      * Copy the data of a line. Only
 				      * implemented for
-				      * @p{celldim==1}.
+				      * <tt>celldim==1</tt>.
 				      */
 
     void set (const Line&) const;
@@ -346,14 +346,14 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				     /**
 				      * Copy the data of the given
 				      * quad. Only implemented for
-				      * @p{celldim==2}.
+				      * <tt>celldim==2</tt>.
 				      */
     void set (const Quad&) const;
     
 				     /**
 				      * Copy the data of the given
 				      * hex. Only implemented for
-				      * @p{celldim==3}.
+				      * <tt>celldim==3</tt>.
 				      */
     void set (const Hexahedron&) const;
     
@@ -385,7 +385,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  Pointer to the @p ith line
 				      *  bounding this object.
 				      *
-				      * Implemented only for @p{celldim>1}.
+				      * Implemented only for <tt>celldim>1</tt>.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     line (const unsigned int i) const;
@@ -396,7 +396,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * the same as that of the
 				      * object.
 				      *
-				      * Implemented only for @p{celldim>1}.
+				      * Implemented only for <tt>celldim>1</tt>.
 				      */
     unsigned int line_index (const unsigned int i) const;
     
@@ -404,7 +404,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  Pointer to the @p ith quad
 				      *  bounding this object.
 				      *
-				      * Implemented only for @p{celldim>2}.
+				      * Implemented only for <tt>celldim>2</tt>.
 				      */
     TriaIterator<dim,TriaObjectAccessor<2, dim> >
     quad (const unsigned int i) const;
@@ -414,7 +414,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * quad. The level is naturally
 				      * the same as that of the object.
 				      *
-				      * Implemented only for @p{celldim>2}.
+				      * Implemented only for <tt>celldim>2</tt>.
 				      */
     unsigned int quad_index (const unsigned int i) const;
 
@@ -502,7 +502,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * style cast operator to
 				      * maintain a minimum of
 				      * typesafety, e.g.
-				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
+				      * <tt>A *a=static_cast<A*>(cell->user_pointer());</tt>.
 				      */
     void * user_pointer () const;
 
@@ -613,14 +613,14 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * dimension less than the
 				      * dimension of a cell, this
 				      * function issues an error if
-				      * @p{dim<4}.
+				      * <tt>dim<4</tt>.
 				      */
     unsigned char boundary_indicator () const;
 
 				     /**
 				      * Set the boundary indicator.
 				      * The same applies as for the
-				      * @p{boundary_indicator()}
+				      * <tt>boundary_indicator()</tt>
 				      * function.
 				      *
 				      * Caution: Never set the
@@ -645,8 +645,8 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * the interior of the
 				      * domain. Obviously, the use of
 				      * this function is only possible
-				      * for @p{dim>celldim}; however,
-				      * for @p{dim==celldim}, an
+				      * for <tt>dim>celldim</tt>; however,
+				      * for <tt>dim==celldim</tt>, an
 				      * object is a cell and the
 				      * CellAccessor class
 				      * offers another possibility to
@@ -744,7 +744,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  @p{iterator a,b;  *a=*b;}. Since
+				      *  <tt>iterator a,b;  *a=*b;</tt>. Since
 				      *  the meaning is to copy the object
 				      *  pointed to by @p b to the object
 				      *  pointed to by @p a and since
@@ -783,7 +783,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *
 				      *  The previous element is
 				      *  previous on this level if
-				      *  @p{index>0}. If the present
+				      *  <tt>index>0</tt>. If the present
 				      *  element is the first on this
 				      *  level, the last on the
 				      *  previous level is accessed.
@@ -866,7 +866,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      *  Return the index of vertex
-				      *  @p{i=0,1} of a line.
+				      *  <tt>i=0,1</tt> of a line.
 				      *
 				      *  Note that the returned value is only
 				      *  the index of the geometrical
@@ -1006,7 +1006,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * style cast operator to
 				      * maintain a minimum of
 				      * typesafety, e.g.
-				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
+				      * <tt>A *a=static_cast<A*>(cell->user_pointer());</tt>.
 				      */
     void * user_pointer () const;
     
@@ -1074,7 +1074,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * structures with a dimension
 				      * less than the dimension of a
 				      * cell, this function issues an
-				      * error if @p{dim<2}.
+				      * error if <tt>dim<2</tt>.
 				      *
 				      * If the return value is 255,
 				      * then this line is in the
@@ -1086,7 +1086,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * Set the boundary indicator of
 				      * this line.  The same applies
 				      * as for the
-				      * @p{boundary_indicator()}
+				      * <tt>boundary_indicator()</tt>
 				      * function.
 				      *
 				      * You should be careful with
@@ -1111,8 +1111,8 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * field, which is always 255 if
 				      * the line is in the interior of
 				      * the domain. Obviously, this is
-				      * only possible for @p{dim>1};
-				      * however, for @p{dim==1}, a
+				      * only possible for <tt>dim>1</tt>;
+				      * however, for <tt>dim==1</tt>, a
 				      * line is a cell and the
 				      * CellAccessor class
 				      * offers another possibility to
@@ -1216,7 +1216,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  @p{iterator a,b;  *a=*b;}. Since
+				      *  <tt>iterator a,b;  *a=*b;</tt>. Since
 				      *  the meaning is to copy the object
 				      *  pointed to by @p b to the object
 				      *  pointed to by @p a and since
@@ -1257,7 +1257,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *
 				      *  The previous element is
 				      *  previous on this level if
-				      *  @p{index>0}. If the present
+				      *  <tt>index>0</tt>. If the present
 				      *  element is the first on this
 				      *  level, the last on the
 				      *  previous level is accessed.
@@ -1275,7 +1275,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 
 /**
  *   Accessor to dereference the data of quads. This accessor is used
- *   to point to quads in @p dim space dimensions (only @p{dim>=2}
+ *   to point to quads in @p dim space dimensions (only <tt>dim>=2</tt>
  *   seems reasonable to me). There is a derived class for quads in
  *   two space dimension, in which case a quad is also a cell and thus
  *   has much more functionality than in other dimensions.
@@ -1437,7 +1437,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * style cast operator to
 				      * maintain a minimum of
 				      * typesafety, e.g.
-				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
+				      * <tt>A *a=static_cast<A*>(cell->user_pointer());</tt>.
 				      */
     void * user_pointer () const;
 
@@ -1543,7 +1543,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * structures with a dimension
 				      * less than the dimension of a
 				      * cell, this function issues an
-				      * error if @p{dim<3}.
+				      * error if <tt>dim<3</tt>.
 				      *
 				      * If the return value is 255,
 				      * then this quad is in the
@@ -1555,7 +1555,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * Set the boundary indicator of
 				      * this quad.  The same applies
 				      * as for the
-				      * @p{boundary_indicator()}
+				      * <tt>boundary_indicator()</tt>
 				      * function.
 				      *
 				      * You should be careful with
@@ -1581,8 +1581,8 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * the quad is in the interior of
 				      * the domain. Obviously, this
 				      * function is only useful for
-				      * @p{dim>2}; however, for
-				      * @p{dim==2}, a quad is a cell
+				      * <tt>dim>2</tt>; however, for
+				      * <tt>dim==2</tt>, a quad is a cell
 				      * and the CellAccessor
 				      * class offers another
 				      * possibility to determine
@@ -1752,7 +1752,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *
 				      *  The previous element is
 				      *  previous on this level if
-				      *  @p{index>0}. If the present
+				      *  <tt>index>0</tt>. If the present
 				      *  element is the first on this
 				      *  level, the last on the
 				      *  previous level is accessed.
@@ -1771,7 +1771,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 /**
  *   Accessor to dereference the data of hexahedra. This accessor is
  *   used to point to hexs in @p dim space dimensions (only
- *   @p{dim>=3} seems reasonable to me). There is a derived class for
+ *   <tt>dim>=3</tt> seems reasonable to me). There is a derived class for
  *   hexs in three space dimension, in which case a hex is also a cell
  *   and thus has much more functionality than in other dimensions.
  *
@@ -1947,7 +1947,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * style cast operator to
 				      * maintain a minimum of
 				      * typesafety, e.g.
-				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
+				      * <tt>A *a=static_cast<A*>(cell->user_pointer());</tt>.
 				      */
     void * user_pointer () const;
 
@@ -2054,7 +2054,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * structures with a dimension
 				      * less than the dimension of a
 				      * cell, this function issues an
-				      * error if @p{dim<4}.
+				      * error if <tt>dim<4</tt>.
 				      *
 				      * If the return value is 255,
 				      * then this line is in the
@@ -2066,7 +2066,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * Set the boundary indicator of
 				      * this hex.  The same applies as
 				      * for the
-				      * @p{boundary_indicator()}
+				      * <tt>boundary_indicator()</tt>
 				      * function.
 				      *
 				      * You should be careful with
@@ -2092,8 +2092,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * the hex is in the interior of
 				      * the domain. Obviously, the use
 				      * of this function is only
-				      * possible for @p{dim>3};
-				      * however, for @p{dim==3}, a hex
+				      * possible for <tt>dim>3</tt>;
+				      * however, for <tt>dim==3</tt>, a hex
 				      * is a cell and the
 				      * CellAccessor class
 				      * offers another possibility to
@@ -2226,7 +2226,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  @p{iterator a,b;  *a=*b;}. Since
+				      *  <tt>iterator a,b;  *a=*b;</tt>. Since
 				      *  the meaning is to copy the
 				      *  object pointed to by @p b to
 				      *  the object pointed to by
@@ -2267,7 +2267,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *
 				      *  The previous element is
 				      *  previous on this level if
-				      *  @p{index>0}. If the present
+				      *  <tt>index>0</tt>. If the present
 				      *  element is the first on this
 				      *  level, the last on the
 				      *  previous level is accessed.
@@ -2352,10 +2352,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				     /**
 				      * Return the how-many'th
 				      * neighbor this cell is of
-				      * @p{cell->neighbor(neighbor)},
+				      * <tt>cell->neighbor(neighbor)</tt>,
 				      * i.e. return the number @p n
 				      * such that
-				      * @p{cell->neighbor(neighbor)->neighbor(n)==cell}. This
+				      * <tt>cell->neighbor(neighbor)->neighbor(n)==cell</tt>. This
 				      * function is the right one if
 				      * you want to know how to get
 				      * back from a neighbor to the
@@ -2365,9 +2365,9 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * only useful if the neighbor is
 				      * not on a coarser level than
 				      * the present cell
-				      * (i.e. @p{cell->neighbor(neighbor)->level()}
+				      * (i.e. <tt>cell->neighbor(neighbor)->level()</tt>
 				      * needs to be equal to
-				      * @p{cell->level()}. Use the
+				      * <tt>cell->level()</tt>. Use the
 				      * @p neighbor_of_coarser_neighbor
 				      * function in that case.
 				      */
@@ -2382,10 +2382,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * pair of numbers, face_no and
 				      * subface_no, with the following
 				      * property:
-				      * @p{cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)}.
+				      * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.
 				      *
 				      * This function is impossible
-				      * for @p{dim==1}.
+				      * for <tt>dim==1</tt>.
 				      */
     std::pair<unsigned int, unsigned int>
     neighbor_of_coarser_neighbor (const unsigned int neighbor) const;

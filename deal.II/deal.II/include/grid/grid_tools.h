@@ -78,11 +78,11 @@ class GridTools
 				      * function-like syntax, i.e. the
 				      * predicate is either an object
 				      * of a type that has an
-				      * @p{operator()}, or it is a
+				      * <tt>operator()</tt>, or it is a
 				      * pointer to the function. In
 				      * either case, argument and
 				      * return value have to be of
-				      * type @p{Point<dim>}.
+				      * type <tt>Point<dim></tt>.
 				      */
     template <int dim, typename Predicate>
     static
@@ -163,7 +163,7 @@ class GridTools
                                       * cell on the coarse grid, and
                                       * then recursively checking its
                                       * sibling cells. The complexity
-                                      * is thus @p{O(M+log N)} where
+                                      * is thus <tt>O(M+log N)</tt> where
                                       * @p M is the number of coarse
                                       * grid cells, and @p N the
                                       * total number of cells.
@@ -243,7 +243,7 @@ class GridTools
                                       * values between zero and
                                       * @p n_partitions-1. You can access the
                                       * subdomain id of a cell by using
-                                      * @p{cell->subdomain_id()}.
+                                      * <tt>cell->subdomain_id()</tt>.
                                       *
                                       * This function will generate an error
                                       * if METIS is not installed unless
@@ -262,7 +262,7 @@ class GridTools
                                      /**
                                       * For each active cell, return in the
                                       * output array to which subdomain (as
-                                      * given by the @p{cell->subdomain_id()}
+                                      * given by the <tt>cell->subdomain_id()</tt>
                                       * function) it belongs. The output array
                                       * is supposed to have the right size
                                       * already when calling this function.

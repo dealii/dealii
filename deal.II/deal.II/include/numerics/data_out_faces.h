@@ -97,7 +97,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * mode. The default number of
 				      * threads to be used to build
 				      * the patches is set to
-				      * @p{multithread_info.n_default_threads}.
+				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
     virtual void
     build_patches (const unsigned int n_subdivisions = 1,
@@ -109,7 +109,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * generate output for. The usual
 				      * way would, of course, be to
 				      * use an object of type
-				      * DoFHandler@p{<dim>::fec_iterator},
+				      * DoFHandler<tt><dim>::fec_iterator</tt>,
 				      * but since we have to describe
 				      * faces to objects of type
 				      * FEValues, we can only
@@ -137,7 +137,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * Return the next face after
 				      * @p face which we want output
 				      * for.  If there are no more
-				      * face, @p{dofs->end()} shall be
+				      * face, <tt>dofs->end()</tt> shall be
 				      * returned as the first
 				      * component of the return value.
 				      *

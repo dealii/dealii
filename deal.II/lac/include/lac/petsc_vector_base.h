@@ -206,8 +206,8 @@ namespace PETScWrappers
                                        /**
                                         * Declare some of the standard types
                                         * used in all containers. These types
-                                        * parallel those in the @p{C++}
-                                        * standard libraries @p{vector<...>}
+                                        * parallel those in the <tt>C++</tt>
+                                        * standard libraries <tt>vector<...></tt>
                                         * class.
                                         */
       typedef PetscScalar       value_type;
@@ -245,11 +245,11 @@ namespace PETScWrappers
 
                                        /**
                                         * Set all entries to zero. Equivalent
-                                        * to @p{v = 0}, but more obvious and
+                                        * to <tt>v = 0</tt>, but more obvious and
                                         * faster.  Note that this function
                                         * does not change the size of the
                                         * vector, unlike the STL's
-                                        * @p{vector<>::clear} function.
+                                        * <tt>vector<>::clear</tt> function.
                                         */
       void clear ();    
       
@@ -430,19 +430,19 @@ namespace PETScWrappers
     
                                        /**
                                         * Simple vector addition, equal to the
-                                        * @p{operator +=}.
+                                        * <tt>operator +=</tt>.
                                         */
       void add (const VectorBase &V);
     
                                        /**
                                         * Simple addition of a multiple of a
-                                        * vector, i.e. @p{*this += a*V}.
+                                        * vector, i.e. <tt>*this += a*V</tt>.
                                         */
       void add (const PetscScalar a, const VectorBase &V);
     
                                        /**
                                         * Multiple addition of scaled vectors,
-                                        * i.e. @p{*this += a*V+b*W}.
+                                        * i.e. <tt>*this += a*V+b*W</tt>.
                                         */
       void add (const PetscScalar a, const VectorBase &V,
                 const PetscScalar b, const VectorBase &W);
@@ -450,14 +450,14 @@ namespace PETScWrappers
                                        /**
                                         * Scaling and simple vector addition,
                                         * i.e.
-                                        * @p{*this = s*(*this)+V}.
+                                        * <tt>*this = s*(*this)+V</tt>.
                                         */
       void sadd (const PetscScalar s,
                  const VectorBase     &V);
     
                                        /**
                                         * Scaling and simple addition, i.e.
-                                        * @p{*this = s*(*this)+a*V}.
+                                        * <tt>*this = s*(*this)+a*V</tt>.
                                         */
       void sadd (const PetscScalar s,
                  const PetscScalar a,
@@ -474,7 +474,7 @@ namespace PETScWrappers
     
                                        /**
                                         * Scaling and multiple addition.
-                                        * @p{*this = s*(*this)+a*V + b*W + c*X}.
+                                        * <tt>*this = s*(*this)+a*V + b*W + c*X</tt>.
                                         */
       void sadd (const PetscScalar s,
                  const PetscScalar a,
@@ -496,12 +496,12 @@ namespace PETScWrappers
       void scale (const VectorBase &scaling_factors);
     
                                        /**
-                                        * Assignment @p{*this = a*V}.
+                                        * Assignment <tt>*this = a*V</tt>.
                                         */
       void equ (const PetscScalar a, const VectorBase &V);
     
                                        /**
-                                        * Assignment @p{*this = a*V + b*W}.
+                                        * Assignment <tt>*this = a*V + b*W</tt>.
                                         */
       void equ (const PetscScalar a, const VectorBase &V,
                 const PetscScalar b, const VectorBase &W);
@@ -509,7 +509,7 @@ namespace PETScWrappers
                                        /**
                                         * Compute the elementwise ratio of the
                                         * two given vectors, that is let
-                                        * @p{this[i] = a[i]/b[i]}. This is
+                                        * <tt>this[i] = a[i]/b[i]</tt>. This is
                                         * useful for example if you want to
                                         * compute the cellwise ratio of true to
                                         * estimated error.
@@ -517,7 +517,7 @@ namespace PETScWrappers
                                         * This vector is appropriately
                                         * scaled to hold the result.
                                         *
-                                        * If any of the @p{b[i]} is
+                                        * If any of the <tt>b[i]</tt> is
                                         * zero, the result is
                                         * undefined. No attempt is made
                                         * to catch such situations.
@@ -563,8 +563,8 @@ namespace PETScWrappers
                                         * the @p swap function of all C++
                                         * standard containers. Also,
                                         * there is a global function
-                                        * @p{swap(u,v)} that simply calls
-                                        * @p{u.swap(v)}, again in analogy
+                                        * <tt>swap(u,v)</tt> that simply calls
+                                        * <tt>u.swap(v)</tt>, again in analogy
                                         * to standard functions.
                                         */
       void swap (VectorBase &v);

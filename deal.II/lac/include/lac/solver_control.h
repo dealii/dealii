@@ -27,7 +27,7 @@ class ParameterHandler;
  * Control class for iterative solvers.
  *
  * Used by iterative methods to determine whether the iteration should
- * be continued. To this respect, the virtual function @p{check()} is
+ * be continued. To this respect, the virtual function <tt>check()</tt> is
  * called in each iteration with the current iteration step and the
  * value indicating convergence (usually the residual).
  *
@@ -35,7 +35,7 @@ class ParameterHandler;
  * @p last_step can be used to obtain information about the final state
  * of the iteration.
  *
- * @p{check()} can be replaced in derived classes to allow for more
+ * <tt>check()</tt> can be replaced in derived classes to allow for more
  * sophisticated tests.
  *
  *
@@ -46,7 +46,7 @@ class ParameterHandler;
  *
  * The possible values of State are
  * <ul>
- * <li> @p{iterate = 0}: continue the iteration.
+ * <li> <tt>iterate = 0</tt>: continue the iteration.
  * <li> @p success: the goal is reached, the iterative method can terminate
  *       successfully.
  * <li> @p failure: the iterative method should stop because convergence 
@@ -185,15 +185,15 @@ class SolverControl : public Subscriptor
 				      * scripts checks for this and
 				      * sets the flag @p HAVE_ISNAN
 				      * in the file
-				      * @p{Make.global_options} if
+				      * <tt>Make.global_options</tt> if
 				      * this function was found.
 				      *
-				      * @p{check()} additionally
+				      * <tt>check()</tt> additionally
 				      * preserves @p step and
 				      * @p check_value. These
 				      * values are accessible by
-				      * @p{last_value()} and
-				      * @p{last_step()}.
+				      * <tt>last_value()</tt> and
+				      * <tt>last_step()</tt>.
 				      *
 				      * Derived classes may overload
 				      * this function, e.g. to log the
@@ -235,8 +235,8 @@ class SolverControl : public Subscriptor
 				      * Enables the failure
 				      * check. Solving is stopped with
 				      * @p ReturnState @p failure if
-				      * @p{residual>failure_residual} with
-				      * @p{failure_residual:=rel_failure_residual*first_residual}.
+				      * <tt>residual>failure_residual</tt> with
+				      * <tt>failure_residual:=rel_failure_residual*first_residual</tt>.
 				      */
     void set_failure_criterion (const double rel_failure_residual);
 
@@ -408,7 +408,7 @@ class ReductionControl : public SolverControl
 				      * of an iteration.  This function
 				      * calls the one in the base
 				      * class, but sets the tolerance
-				      * to @p{reduction * initial value}
+				      * to <tt>reduction * initial value</tt>
 				      * upon the first iteration.
 				      */
     virtual State check (const unsigned int step,

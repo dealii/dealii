@@ -31,7 +31,7 @@ template <class number> class SparseMatrix;
  * the name of the preconditioning and the damping parameter 
  * @p omega of the preconditioning and the @p use_matrix function takes
  * the matrix that is used
- * by the matrix-builtin precondition functions. Each time, the @p{operator()} function
+ * by the matrix-builtin precondition functions. Each time, the <tt>operator()</tt> function
  * is called, this preselected preconditioner, this matrix and
  * this @p omega is used
  * for the preconditioning. This class is designed for being used as
@@ -110,7 +110,7 @@ class PreconditionSelector : public Subscriptor
 				      * Takes the matrix that is needed
 				      * for preconditionings that involves a
 				      * matrix. e.g. for @p precondition_jacobi,
-				      * @p{~_sor}, @p{~_ssor}.
+				      * <tt>~_sor</tt>, <tt>~_ssor</tt>.
 				      */
     void use_matrix(const Matrix &M);
 

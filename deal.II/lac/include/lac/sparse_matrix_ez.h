@@ -258,14 +258,14 @@ class SparseMatrixEZ : public Subscriptor
                                          /**
                                           * Prefix increment. This
                                           * always returns a valid
-                                          * entry or @p{end()}.
+                                          * entry or <tt>end()</tt>.
                                           */
 	const_iterator& operator++ ();
 
                                          /**
                                           * Postfix increment. This
                                           * always returns a valid
-                                          * entry or @p{end()}.
+                                          * entry or <tt>end()</tt>.
                                           */
 	const_iterator& operator++ (int);
 
@@ -287,7 +287,7 @@ class SparseMatrixEZ : public Subscriptor
                                           */
 	bool operator == (const const_iterator&) const;
                                          /**
-                                          * Inverse of @p{==}.
+                                          * Inverse of <tt>==</tt>.
                                           */
 	bool operator != (const const_iterator&) const;
 
@@ -440,7 +440,7 @@ class SparseMatrixEZ : public Subscriptor
     unsigned int n () const;
 
 				     /**
-				      * Set the element @p{(i,j)} to
+				      * Set the element <tt>(i,j)</tt> to
 				      * @p value. Allocates the entry,
 				      * if it does not exist and
 				      * @p value is non-zero.
@@ -450,7 +450,7 @@ class SparseMatrixEZ : public Subscriptor
     
 				     /**
 				      * Add @p value to the element
-				      * @p{(i,j)}. Allocates the entry
+				      * <tt>(i,j)</tt>. Allocates the entry
 				      * if it does not exist. Filters
 				      * out zeroes automatically.
 				      */
@@ -496,7 +496,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * cheaper. Since this operation
 				      * is notheless not for free, we
 				      * do not make it available
-				      * through @p{operator =}, since
+				      * through <tt>operator =</tt>, since
 				      * this may lead to unwanted
 				      * usage, e.g. in copy arguments
 				      * to functions, which should
@@ -532,7 +532,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * cited function is that the
 				      * objects which the inner
 				      * iterator points to need to be
-				      * of type @p{std::pair<unsigned int, value},
+				      * of type <tt>std::pair<unsigned int, value</tt>,
 				      * where @p value
 				      * needs to be convertible to the
 				      * element type of this class, as
@@ -614,7 +614,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * error if the matrix is not square.
 				      *
 				      * This function is considerably
-				      * faster than the @p{operator()},
+				      * faster than the <tt>operator()</tt>,
 				      * since for square matrices, the
 				      * diagonal entry is always the
 				      * first to be stored in each row
@@ -790,7 +790,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * @p B has a @p const_iterator
 				      * traversing all matrix entries
 				      * and that @p A has a function
-				      * @p{el(i,j)} for access to a
+				      * <tt>el(i,j)</tt> for access to a
 				      * specific entry.
 				      */
     template <class MATRIXA, class MATRIXB>
@@ -813,7 +813,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * STL-like iterator with the
 				      * first entry of row @p r. If
 				      * this row is empty, the result
-				      * is @p{end(r)}, which does NOT
+				      * is <tt>end(r)</tt>, which does NOT
 				      * point into row @p r..
 				      */
     const_iterator begin (const unsigned int r) const;
@@ -821,7 +821,7 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * Final iterator of row
 				      * @p r. The result may be
-				      * different from @p{end()}!
+				      * different from <tt>end()</tt>!
 				      */
     const_iterator end (const unsigned int r) const;
     
@@ -842,7 +842,7 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * Print the matrix to the given
 				      * stream, using the format
-				      * @p{(line,col) value}, i.e. one
+				      * <tt>(line,col) value</tt>, i.e. one
 				      * nonzero entry of the matrix
 				      * per line.
 				      */
@@ -1014,7 +1014,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * Version of @p vmult which only
 				      * performs its actions on the
 				      * region defined by
-				      * @p{[begin_row,end_row)}. This
+				      * <tt>[begin_row,end_row)</tt>. This
 				      * function is called by @p vmult
 				      * in the case of enabled
 				      * multithreading.
@@ -1030,7 +1030,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * @p matrix_norm_square which
 				      * only performs its actions on
 				      * the region defined by
-				      * @p{[begin_row,end_row)}. This
+				      * <tt>[begin_row,end_row)</tt>. This
 				      * function is called by
 				      * @p matrix_norm_square in the
 				      * case of enabled
@@ -1047,7 +1047,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * @p matrix_scalar_product which
 				      * only performs its actions on
 				      * the region defined by
-				      * @p{[begin_row,end_row)}. This
+				      * <tt>[begin_row,end_row)</tt>. This
 				      * function is called by
 				      * @p matrix_scalar_product in the
 				      * case of enabled

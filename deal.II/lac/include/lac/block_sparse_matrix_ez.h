@@ -195,7 +195,7 @@ class BlockSparseMatrixEZ : public Subscriptor
     unsigned int n () const;
 
 				     /**
-				      * Set the element @p{(i,j)} to
+				      * Set the element <tt>(i,j)</tt> to
 				      * @p value.  Throws an error if
 				      * the entry does not
 				      * exist. Still, it is allowed to
@@ -208,7 +208,7 @@ class BlockSparseMatrixEZ : public Subscriptor
     
 				     /**
 				      * Add @p value to the element
-				      * @p{(i,j)}.  Throws an error if
+				      * <tt>(i,j)</tt>.  Throws an error if
 				      * the entry does not
 				      * exist. Still, it is allowed to
 				      * store zero values in

@@ -35,7 +35,7 @@ class PreconditionBlockJacobi;
 /**
  * Base class for @p PreconditionBlockJacobi,
  * @p PreconditionBlockSOR, ...  This class assumes the
- * @p{SparseMatrix<number>} consisting of invertible blocks of
+ * <tt>SparseMatrix<number></tt> consisting of invertible blocks of
  * @p blocksize on the diagonal and provides the inversion of the
  * diagonal blocks of the matrix. NOT only block diagonal matrices are
  * allowed but all matrices of arbitrary structure with the minimal
@@ -60,11 +60,11 @@ class PreconditionBlockJacobi;
  * The first template parameter denotes the type of number
  * representation in the sparse matrix, the second denotes the type of
  * number representation in which the inverted diagonal block matrices
- * are stored within this class by @p{invert_diagblocks()}. If you
+ * are stored within this class by <tt>invert_diagblocks()</tt>. If you
  * don't want to use the block inversion as an exact solver, but
  * rather as a preconditioner, you may probably want to store the
  * inverted blocks with less accuracy than the original matrix; for
- * example, @p{number==double, inverse_type=float} might be a viable
+ * example, <tt>number==double, inverse_type=float</tt> might be a viable
  * choice.
  *
  *
@@ -221,7 +221,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * It is not allowed to call this
 				      * function twice (will produce
 				      * an error) before a call of
-				      * @p{clear(...)}  because at the
+				      * <tt>clear(...)</tt>  because at the
 				      * second time there already
 				      * exist the inverse matrices.
 				      *
@@ -349,11 +349,11 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Storage of the inverse
 				      * matrices of the diagonal
 				      * blocks matrices as
-				      * @p{FullMatrix<inverse_type>}
+				      * <tt>FullMatrix<inverse_type></tt>
 				      * matrices. Using
-				      * @p{inverse_type=float} saves
+				      * <tt>inverse_type=float</tt> saves
 				      * memory in comparison with
-				      * @p{inverse_type=double}.
+				      * <tt>inverse_type=double</tt>.
 				      */
     std::vector<FullMatrix<inverse_type> > var_inverse;
 
@@ -500,7 +500,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
                                           */
 	bool operator == (const const_iterator&) const;
                                          /**
-                                          * Inverse of @p{==}.
+                                          * Inverse of <tt>==</tt>.
                                           */
 	bool operator != (const const_iterator&) const;
 

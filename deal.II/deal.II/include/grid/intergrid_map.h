@@ -24,7 +24,7 @@
  * This class provides a map between two grids which are derived from
  * the same coarse grid. For each cell iterator of the source map, it provides
  * the respective cell iterator on the destination map, through its
- * @p{operator []}.
+ * <tt>operator []</tt>.
  *
  * Usually, the two grids will be refined differently. Then, the value
  * returned for an iterator on the source grid will be either:
@@ -69,7 +69,7 @@
  * offering iterator functions and some minor additional requirements is
  * simple.
  *
- * Note that this class could in principle be based on the C++ @p{map<Key,Value>}
+ * Note that this class could in principle be based on the C++ <tt>map<Key,Value></tt>
  * data type. Instead, it uses another data format which is more effective both
  * in terms of computing time for access as well as with regard to memory
  * consumpion.
@@ -103,7 +103,7 @@
  * @endverbatim
  *
  * Note that the template parameters to this class have to be given as
- * @p{InterGridMap<DoFHandler,2>}, i.e. the dimension is given explicitly and
+ * <tt>InterGridMap<DoFHandler,2></tt>, i.e. the dimension is given explicitly and
  * no dimension is attributed to the first parameter, which here is
  * DoFHandler (and could equally well be Triangulation or MGDoFHandler).
  *

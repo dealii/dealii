@@ -114,7 +114,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Access to base element
 				      * objects. If the element is
 				      * scalar, then
-				      * @p{base_element(0)} is
+				      * <tt>base_element(0)</tt> is
 				      * @p this.
 				      */
     virtual
@@ -192,7 +192,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * @p update_each compute which
 				      * values must really be
 				      * computed. Then, the
-				      * @p{fill_*_values} functions
+				      * <tt>fill_*_values</tt> functions
 				      * are called with the result of
 				      * these.
 				      *

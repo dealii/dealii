@@ -26,7 +26,7 @@
  *   A quad itself has one index, as far as the topological part handled in
  *   the triangulation is concerned: the index in the level
  *   it belongs to. The level index is implicitly given by the position
- *   in the @p{quads.quads} list attached to the information of each level
+ *   in the <tt>quads.quads</tt> list attached to the information of each level
  *   of the triangulation.
  *
  *   @author Wolfgang Bangerth, 1998

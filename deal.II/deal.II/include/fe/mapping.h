@@ -42,11 +42,11 @@ template <int dim> class FESubfaceValues;
  * FEValues. Usage of the class is as follows: first, call the
  * functions @p update_once and @p update_each with the update
  * flags you need. This includes the flags needed by the
- * FiniteElement. Then call @p{get_*_data} and with the or'd
+ * FiniteElement. Then call <tt>get_*_data</tt> and with the or'd
  * results.  This will initialize and return some internal data
- * structures.  On the first cell, call @p{fill_fe_*_values} with the
+ * structures.  On the first cell, call <tt>fill_fe_*_values</tt> with the
  * result of @p update_once. Finally, on each cell, use
- * @p{fill_fe_*_values} with the result of @p update_each to compute
+ * <tt>fill_fe_*_values</tt> with the result of @p update_each to compute
  * values for a special cell.
  *
  * A hint to implementators: no function except the two functions
@@ -165,11 +165,11 @@ class Mapping : public Subscriptor
 	UpdateFlags          update_each;
 
 					 /**
-					  * If @p{first_cell==true}
+					  * If <tt>first_cell==true</tt>
 					  * this function returns
 					  * @p update_flags,
-					  * i.e. @p{update_once|update_each}.
-					  * If @p{first_cell==false}
+					  * i.e. <tt>update_once|update_each</tt>.
+					  * If <tt>first_cell==false</tt>
 					  * it returns
 					  * @p update_each.
 					  */
@@ -518,8 +518,8 @@ class Mapping : public Subscriptor
 
 				     /**
 				      * Give class @p FEValues access
-				      * to the private @p{get_...data}
-				      * and @p{fill_fe_...values}
+				      * to the private <tt>get_...data</tt>
+				      * and <tt>fill_fe_...values</tt>
 				      * functions.
 				      */
   friend class FEValues<dim>;

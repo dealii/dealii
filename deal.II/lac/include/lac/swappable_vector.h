@@ -76,7 +76,7 @@ class SwappableVector : public Vector<number>
 				      * about that. In particular do
 				      * not take over ownership of any
 				      * files that @p v might own (as,
-				      * for example, @p{C++}'s
+				      * for example, <tt>C++</tt>'s
 				      * @p auto_ptr objects would do).
 				      */
     SwappableVector (const SwappableVector &v);

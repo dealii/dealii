@@ -328,7 +328,7 @@ class MappingQ1 : public Mapping<dim>
 	
 					 /**
 					  * Default value of this flag
-					  * is @p true. If @p{*this}
+					  * is @p true. If <tt>*this</tt>
 					  * is an object of a derived
 					  * class, this flag is set to
 					  * @p false.
@@ -418,7 +418,7 @@ class MappingQ1 : public Mapping<dim>
 				      * this class or that of the
 				      * derived class, depending on
 				      * whether
-				      * @p{data.is_mapping_q1_data}
+				      * <tt>data.is_mapping_q1_data</tt>
 				      * equals @p true or @p false.
 				      */
     void compute_shapes (const std::vector<Point<dim> > &unit_points,
@@ -456,7 +456,7 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Do the computation for the
-				      * @p{fill_*} functions.
+				      * <tt>fill_*</tt> functions.
 				      */
     void compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
 		       const unsigned int      npts,
@@ -466,7 +466,7 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Do the computation for the
-				      * @p{fill_*} functions.
+				      * <tt>fill_*</tt> functions.
 				      */
     void compute_fill_face (const typename DoFHandler<dim>::cell_iterator &cell,
 			    const unsigned int      face_no,

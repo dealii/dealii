@@ -168,7 +168,7 @@ namespace internal
  * computed by the GMRes method but need to be computed in addition. This
  * (especially for the left preconditioned GMRes) might lead to a significant
  * loss in the solver performance. Therefore, the user should set
- * @p{use_default_residual=false} only for debugging/testing purposes.
+ * <tt>use_default_residual=false</tt> only for debugging/testing purposes.
  *
  * For the requirements on matrices and vectors in order to work with
  * this class, see the documentation of the Solver base class.
@@ -293,7 +293,7 @@ class SolverGMRES : public Solver<VECTOR>
  * Krylov space method inside the preconditioner.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total
- * of @p{2*AdditionalData::max_basis_size+1} auxiliary vectors.
+ * of <tt>2*AdditionalData::max_basis_size+1</tt> auxiliary vectors.
  *
  * Caveat: documentation of this class is not up to date. There are
  * also a few parameters of GMRES we would like to introduce here.

@@ -30,13 +30,13 @@ template <class T> class Vector;
  *   This class provides several function that flag certain cells for
  *   coarsening or refinement based on a vector of ``error''
  *   indicators and some selection algorithm.  The central function is
- *   @p{refine (const Vector &criterion, const double threshold)}:
+ *   <tt>refine (const Vector &criterion, const double threshold)</tt>:
  *   it takes a vector of values, one per active cell,
  *   which denote the criterion according to which the triangulation
  *   is to be refined. It marks all cells for which the criterion is
  *   greater than the threshold being given as the second
  *   argument. Analogously,
- *   @p{coarsen (const Vector &criterion, const double threshold)}
+ *   <tt>coarsen (const Vector &criterion, const double threshold)</tt>
  *   flags those cells for
  *   coarsening for which the criterion is less than the threshold.
  *
@@ -47,7 +47,7 @@ template <class T> class Vector;
  *     above and two values between zero and one denoting the fractions of cells to
  *     be refined and coarsened. For this purpose, it sorts the criteria per cell
  *     and takes the threshold to be the one belonging to the cell with the
- *     @p{fraction times n_active_cells} highest criterion. For example, if
+ *     <tt>fraction times n_active_cells</tt> highest criterion. For example, if
  *     the fraction is $0.3$, the threshold is computed to a value such that
  *     30 per cent of cells have a criterion higher than the threshold and are
  *     thus flagged for refinement. The flagging for refinement is done through
@@ -57,9 +57,9 @@ template <class T> class Vector;
  *     value, in the example above the criterion of the cell which is at
  *     30 per cent in the sorted list of cells. The order of cells with higher
  *     and of those with lower criteria is irrelevant. Getting this value is
- *     accomplished by the @p nth_element function of the @p{C++} standard
+ *     accomplished by the @p nth_element function of the <tt>C++</tt> standard
  *     library, which takes only linear time in the number of elements, rather
- *     than @p{N log N} for sorting all values.
+ *     than <tt>N log N</tt> for sorting all values.
  *
  *     A typical value for the fraction of cells to be refined is 0.3.
  *     However, for singular functions or singular error functionals, you may
@@ -215,7 +215,7 @@ class GridRefinement
 				      * refinement, call
 				      * @p execute_coarsening_and_refinement.
 				      *
-				      * @p{*_fraction} shall be a
+				      * <tt>*_fraction</tt> shall be a
 				      * values between zero and one.
 				      *
 				      * Refer to the general doc of

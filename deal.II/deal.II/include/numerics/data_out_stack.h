@@ -171,7 +171,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * component and therefore more than one
 				      * name needs to be given. However, you
 				      * can also call this function with a
-				      * @p{vector<string>} containing only one
+				      * <tt>vector<string></tt> containing only one
 				      * element if the finite element has
 				      * only one component.
 				      */
@@ -218,7 +218,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * component and therefore more than one
 				      * name needs to be given. However, you
 				      * can also call this function with a
-				      * @p{vector<string>} containing only one
+				      * <tt>vector<string></tt> containing only one
 				      * element if the finite element has
 				      * only one component.
 				      *

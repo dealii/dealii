@@ -83,17 +83,17 @@ class TriangulationLevel<0>
 				      *  are stored in the fields following
 				      *  $i*(2*real_space_dimension)$, e.g. in
 				      *  one spatial dimension, the neighbors
-				      *  of cell 0 are stored in @p{neighbors[0]}
-				      *  and @p{neighbors[1]}, the neighbors of
-				      *  cell 1 are stored in @p{neighbors[2]}
-				      *  and @p{neighbors[3]}, and so on.
+				      *  of cell 0 are stored in <tt>neighbors[0]</tt>
+				      *  and <tt>neighbors[1]</tt>, the neighbors of
+				      *  cell 1 are stored in <tt>neighbors[2]</tt>
+				      *  and <tt>neighbors[3]</tt>, and so on.
 				      *
-				      *  In neighbors, @p{neighbors[i].first} is
-				      *  the level, while @p{neighbors[i].first}
+				      *  In neighbors, <tt>neighbors[i].first</tt> is
+				      *  the level, while <tt>neighbors[i].first</tt>
 				      *  is the index of the neighbor.
 				      *
 				      *  If a neighbor does not exist (cell is
-				      *  at the boundary), @p{level=index=-1}
+				      *  at the boundary), <tt>level=index=-1</tt>
 				      *  is set.
 				      *
 				      *  <em>Conventions:</em> The
@@ -146,8 +146,8 @@ class TriangulationLevel<0>
 				      *  level, you have to give to total number
 				      *  of cells, not only the number of newly
 				      *  to accomodate ones, like in the
-				      *  @p{TriangulationLevel<N>::reserve_space}
-				      *  functions, with @p{N>0}.
+				      *  <tt>TriangulationLevel<N>::reserve_space</tt>
+				      *  functions, with <tt>N>0</tt>.
 				      *
 				      *  Since the
 				      *  number of neighbors per cell depends
@@ -239,7 +239,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  stored in this list. A line is
 					  *  called active if it has no
 					  *  children. The function
-					  *  TriaIterator@p{::active()}
+					  *  TriaIterator<tt>::active()</tt>
 					  *  tests for this.
 					  */
 	std::vector<int>  children;
@@ -267,7 +267,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  already been processed.
 					  *
 					  *  You can clear all used flags using
-					  *  Triangulation@p{::clear_user_flags()}.
+					  *  Triangulation<tt>::clear_user_flags()</tt>.
 					  */
 	std::vector<bool> user_flags;
 
@@ -313,7 +313,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 				      *  Assert that enough space is allocated
 				      *  to accomodate @p new_lines new lines.
 				      *  This function does not only call
-				      *  @p{vector::reserve()}, but does really
+				      *  <tt>vector::reserve()</tt>, but does really
 				      *  append the needed elements.
 				      *  There are pendants for higher
 				      *  dimensions, which you have to call
@@ -369,7 +369,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *
 				      *  It is fully analogous to the
 				      *  @ref{TriangulationLevel<1>::LinesData} structure inherited from
-				      *  Triangulation@p{<1>}.
+				      *  Triangulation<tt><1></tt>.
 				      */
     struct QuadsData
     {
@@ -606,7 +606,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
                                           * a @p false value.
                                           *
                                           * In effect, this field has
-                                          * @p{6*n_cells} elements,
+                                          * <tt>6*n_cells</tt> elements,
                                           * being the number of cells
                                           * times the six faces each
                                           * has.

@@ -99,7 +99,7 @@ class SolverControl;
  * @endverbatim
  *
  * In addition, for some solvers there has to be a global function
- * @p{swap(VECTOR &a, VECTOR &b)} that exchanges the values of the two vectors.
+ * <tt>swap(VECTOR &a, VECTOR &b)</tt> that exchanges the values of the two vectors.
  *
  * The preconditioners used must have the same interface as matrices,
  * i.e. in particular they have to provide a member function @p vmult
@@ -111,7 +111,7 @@ class SolverControl;
  * Several solvers need additional data, like the damping parameter @p omega
  * of the @p SolverRichardson class or the maximum number of temporary
  * vectors of the @p SolverGMRES.  To have a standardized constructor for
- * each solver class the @p{struct AdditionalData} has been introduced to each
+ * each solver class the <tt>struct AdditionalData</tt> has been introduced to each
  * solver class. Some solvers need no additional data, like @p SolverCG or
  * @p SolverBicgstab. For these solvers the struct @p AdditionalData is
  * empty and calling the constructor may be done without giving the additional

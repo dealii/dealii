@@ -50,7 +50,7 @@
  * The algorithm is taken from the Master thesis of Astrid Batterman
  * with some changes.
  * The full text can be found at
- * @p{http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html}
+ * <tt>http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html</tt>
  *
  * @author Thomas Richter, 2000
  */

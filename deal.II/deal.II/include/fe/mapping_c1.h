@@ -52,7 +52,7 @@ class MappingC1 : public MappingQ<dim>
 
   protected:
 				     /**
-				      * For @p{dim=2,3}. Append the
+				      * For <tt>dim=2,3</tt>. Append the
 				      * support points of all shape
 				      * functions located on bounding
 				      * lines to the vector
@@ -61,8 +61,8 @@ class MappingC1 : public MappingQ<dim>
 				      * included.
 				      *
 				      * Needed by the
-				      * @p{compute_support_points_simple(laplace)}
-				      * functions. For @p{dim=1} this
+				      * <tt>compute_support_points_simple(laplace)</tt>
+				      * functions. For <tt>dim=1</tt> this
 				      * function is empty.
 				      *
 				      * This function chooses the
@@ -78,7 +78,7 @@ class MappingC1 : public MappingQ<dim>
 			     std::vector<Point<dim> > &a) const;
 
 				     /**
-				      * For @p{dim=3}. Append the
+				      * For <tt>dim=3</tt>. Append the
 				      * support points of all shape
 				      * functions located on bounding
 				      * faces (quads in 3d) to the
@@ -88,7 +88,7 @@ class MappingC1 : public MappingQ<dim>
 				      *
 				      * Needed by the
 				      * @p compute_support_points_laplace
-				      * function. For @p{dim=1} and 2
+				      * function. For <tt>dim=1</tt> and 2
 				      * this function is empty.
 				      *
 				      * This function chooses the

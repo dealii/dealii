@@ -140,7 +140,7 @@ template <int dim> class Triangulation;
  * management, data reload and storage into one set of functions and
  * computations into another.
  *
- * In the example above, possible actions might be: timestep @p{n+1} rebuilds
+ * In the example above, possible actions might be: timestep <tt>n+1</tt> rebuilds
  * the computational grid (there is a specialized class which can do this
  * for you); timestep @p n builds matrices sets solution vectors to the right
  * size, maybe using an initial guess; then it does the computations; then
@@ -271,7 +271,7 @@ template <int dim> class Triangulation;
  * to be run.
  *
  * Using function pointers through the @p mem_fun functions provided by
- * the @p{C++} standard library, it is possible to do neat tricks, like
+ * the <tt>C++</tt> standard library, it is possible to do neat tricks, like
  * the following, also taken from the wave program, in this case from
  * the function @p refine_grids:
  * @verbatim
@@ -297,7 +297,7 @@ template <int dim> class Triangulation;
  * to provide a better understanding of the internals of this class. For
  * brevity we have omitted the parts that deal with backward running loops
  * as well as the checks whether wake-up and sleep operations act on timesteps
- * outside @p{0..n_timesteps-1}.
+ * outside <tt>0..n_timesteps-1</tt>.
  * @verbatim
  *   template <typename InitFunctionObject, typename LoopFunctionObject>
  *   void TimeDependent::do_loop (InitFunctionObject      init_function,
@@ -442,7 +442,7 @@ class TimeDependent
 				     /**
 				      * Destructor. This will delete the
 				      * objects pointed to by the pointers
-				      * given to the @p{insert_*} and
+				      * given to the <tt>insert_*</tt> and
 				      * @p add_timestep functions, i.e.
 				      * it will delete the objects doing
 				      * the computations on each time step.
@@ -593,7 +593,7 @@ class TimeDependent
 				      *
 				      * Instead of using the above form, you can
 				      * equally well use
-				      * @p{bind2nd(mem_fun1(&X::unary_function), arg)} 
+				      * <tt>bind2nd(mem_fun1(&X::unary_function), arg)</tt> 
 				      * which lets the @p do_loop
 				      * function call teh given function with
 				      * the specified parameter. Note that you
@@ -733,7 +733,7 @@ class TimeDependent
   private:
 
 				     /**
-				      * Do the work of @p{end_sweep()}
+				      * Do the work of <tt>end_sweep()</tt>
 				      * for some timesteps only. This
 				      * is useful in multithread mode.
 				      */
@@ -1052,7 +1052,7 @@ class TimeStepBase : public Subscriptor
 				      * problem is actual, or any of
 				      * the other actions
 				      * specified. This variable is
-				      * set by the @p{init_for_*}
+				      * set by the <tt>init_for_*</tt>
 				      * functions.
 				      */
     unsigned int next_action;
@@ -1297,9 +1297,9 @@ namespace TimeStepBase_Tria_Flags
  *   worth while to reduce the requirements upon grids if the have few cells.
  *   The present variable stores a list of cell numbers along with some values
  *   which tell us that the cell number corridor should be enlarged by a
- *   certain factor. For example, if this list was @p{((100 5) (200 3) (500 2))},
+ *   certain factor. For example, if this list was <tt>((100 5) (200 3) (500 2))</tt>,
  *   this would mean that for grids with a cell number below 100, the
- *   @p{cell_number_corridor_*} variables are to be multiplied by 5 before they
+ *   <tt>cell_number_corridor_*</tt> variables are to be multiplied by 5 before they
  *   are applied, for cell numbers below 200 they are to be multiplied by 3,
  *   and so on.
  *
@@ -1660,7 +1660,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * destroy it in the @p sleep function.
 				      * It does so also the first time we
 				      * hit this function and @p wakeup_level
-				      * equals @p{flags.wakeup_level_to_build_grid},
+				      * equals <tt>flags.wakeup_level_to_build_grid</tt>,
 				      * independently of the value of the
 				      * mentioned flag. (Actually, it does so
 				      * whenever the triangulation pointer

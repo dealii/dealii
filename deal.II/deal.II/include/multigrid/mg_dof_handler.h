@@ -350,7 +350,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     cell_iterator        end (const unsigned int level) const;
     
@@ -359,7 +359,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_cell_iterator    end_raw (const unsigned int level) const;
 
@@ -368,7 +368,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * which is the first iterator
 				      * not on level. If @p level is
 				      * the last level, then this
-				      * returns @p{end()}.
+				      * returns <tt>end()</tt>.
 				      */
     active_cell_iterator end_active (const unsigned int level) const;
 
@@ -494,7 +494,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     face_iterator        end_face (const unsigned int level) const;
     
@@ -503,7 +503,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_face_iterator    end_raw_face (const unsigned int level) const;
 
@@ -512,7 +512,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * which is the first iterator
 				      * not on level. If @p level is
 				      * the last level, then this
-				      * returns @p{end()}.
+				      * returns <tt>end()</tt>.
 				      */
     active_face_iterator end_active_face (const unsigned int level) const;
 
@@ -622,7 +622,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     line_iterator        end_line (const unsigned int level) const;
     
@@ -631,7 +631,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_line_iterator    end_raw_line (const unsigned int level) const;
 
@@ -640,7 +640,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * which is the first iterator
 				      * not on level. If @p level is
 				      * the last level, then this
-				      * returns @p{end()}.
+				      * returns <tt>end()</tt>.
 				      */
     active_line_iterator end_active_line (const unsigned int level) const;
 
@@ -726,7 +726,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     quad_iterator        end_quad (const unsigned int level) const;
     
@@ -735,7 +735,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_quad_iterator    end_raw_quad (const unsigned int level) const;
 
@@ -744,7 +744,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * which is the first iterator
 				      * not on level. If @p level is
 				      * the last level, then this
-				      * returns @p{end()}.
+				      * returns <tt>end()</tt>.
 				      */
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
@@ -830,7 +830,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     hex_iterator        end_hex (const unsigned int level) const;
     
@@ -839,7 +839,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * the first iterator not on
 				      * level. If @p level is the
 				      * last level, then this returns
-				      * @p{end()}.
+				      * <tt>end()</tt>.
 				      */
     raw_hex_iterator    end_raw_hex (const unsigned int level) const;
 
@@ -848,7 +848,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * which is the first iterator
 				      * not on level. If @p level is
 				      * the last level, then this
-				      * returns @p{end()}.
+				      * returns <tt>end()</tt>.
 				      */
     active_hex_iterator end_active_hex (const unsigned int level) const;
 

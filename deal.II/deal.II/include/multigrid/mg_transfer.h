@@ -90,7 +90,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * Copies data from active
 				      * portions of an MGVector into
 				      * the respective positions of a
-				      * @p{Vector<number>}. In order to
+				      * <tt>Vector<number></tt>. In order to
 				      * keep the result consistent,
 				      * constrained degrees of freedom
 				      * are set to zero.
@@ -176,8 +176,8 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * functions of @p copy_to_mg,
 				      * where the 1d function takes an
 				      * argument of type
-				      * @p{is_1d<true>} and the other
-				      * one of type @p{is_1d<false>}.
+				      * <tt>is_1d<true></tt> and the other
+				      * one of type <tt>is_1d<false></tt>.
 				      */
     template <bool> struct is_1d {};
     
@@ -505,8 +505,8 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * functions of @p copy_to_mg,
 				      * where the 1d function takes an
 				      * argument of type
-				      * @p{is_1d<true>} and the other
-				      * one of type @p{is_1d<false>}.
+				      * <tt>is_1d<true></tt> and the other
+				      * one of type <tt>is_1d<false></tt>.
 				      */
     template <bool> struct is_1d {};
 

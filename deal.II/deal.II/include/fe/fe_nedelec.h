@@ -30,7 +30,7 @@ template <int dim> class MappingQ;
  *
  * The constructor of this class takes the degree @p p of this finite
  * element. However, presently, only lowest order elements
- * (i.e. @p{p==1}) are implemented. For a general overview of this
+ * (i.e. <tt>p==1</tt>) are implemented. For a general overview of this
  * element and its properties, see the report by Anna Schneebeli that
  * is linked from the general documentation page of the library.
  *
@@ -192,7 +192,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p{FE_Nedelec<dim>(degree)}, with
+				      * <tt>FE_Nedelec<dim>(degree)</tt>, with
 				      * @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
@@ -263,7 +263,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				     /**
 				      * Access to base element
 				      * objects. Since this element is
-				      * atomic, @p{base_element(0)} is
+				      * atomic, <tt>base_element(0)</tt> is
 				      * @p this, and all other
 				      * indices throw an error.
 				      */
@@ -274,7 +274,7 @@ class FE_Nedelec : public FiniteElement<dim>
                                       * Multiplicity of base element
                                       * @p index. Since this is an
                                       * atomic element,
-                                      * @p{element_multiplicity(0)}
+                                      * <tt>element_multiplicity(0)</tt>
                                       * returns one, and all other
                                       * indices will throw an error.
                                       */
@@ -320,7 +320,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * constraint and embedding
 				      * matrices. The definition of
 				      * the various static fields are
-				      * in the files @p{fe_nedelec_[23]d.cc}
+				      * in the files <tt>fe_nedelec_[23]d.cc</tt>
 				      * in the source directory.
 				      */
     struct Matrices

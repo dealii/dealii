@@ -42,12 +42,12 @@ template <typename> class Vector;
  * Block matrix composed of different single matrices.
  *
  * Given a set of arbitrary matrices @p A_i, this class implements a
- * block matrix with block entries of the form @p{M_{jk} = s_{jk}A_i}.
+ * block matrix with block entries of the form <tt>M_{jk</tt> = s_{jk}A_i}.
  * Each @p A_i may be used several times with different prefix.
  *
  * Non-zero entries are registered by the function @p enter, zero
  * entries are not stored at all. Using @p enter with the same
- * location @p{(i,j)} several times will add the corresponding
+ * location <tt>(i,j)</tt> several times will add the corresponding
  * matrices in matrix-vector multiplications.
  *
  * @sect3{Requirements}
@@ -55,7 +55,7 @@ template <typename> class Vector;
  * The template argument @p MATRIX is a class providing the the
  * matrix-vector multiplication functions @p vmult etc. defined in
  * this class, but with arguments of type @p VECTOR instead of
- * @p{BlockVector<VECTOR>}. SparseMatrix is a possible entry
+ * <tt>BlockVector<VECTOR></tt>. SparseMatrix is a possible entry
  * type.
  *
  * @author Guido Kanschat, 2000, 2001

@@ -58,8 +58,8 @@ template <typename number> class SparseBlockVanka;
  * by the degree of freedom itself and all other values coupling immediately,
  * i.e. the set of degrees of freedom considered for the local system of
  * equations for degree of freedom @p i is @p i itself and all @p j such that
- * the element @p{(i,j)} is a nonzero entry in the sparse matrix under 
- * consideration. The elements @p{(j,i)} are not considered. We now pick all
+ * the element <tt>(i,j)</tt> is a nonzero entry in the sparse matrix under 
+ * consideration. The elements <tt>(j,i)</tt> are not considered. We now pick all
  * matrix entries from rows and columns out of the set of degrees of freedom
  * just described out of the global matrix and put it into a local matrix,
  * which is subsequently inverted. This system may be of different size for
@@ -189,7 +189,7 @@ class SparseVanka
 				      * multithreaded mode. By
 				      * default, this variable is set
 				      * to the value of
-				      * @p{multithread_info.n_default_threads}.
+				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
     SparseVanka(const SparseMatrix<number> &M,
 		const std::vector<bool>    &selected,
@@ -260,7 +260,7 @@ class SparseVanka
 				      * degrees of freedom. This is
 				      * then equivalent to calling the
 				      * function with a
-				      * @p{vector<bool>(n_dofs,true)}.
+				      * <tt>vector<bool>(n_dofs,true)</tt>.
 				      *
 				      * The @p vmult of this class
 				      * of course calls this function
@@ -320,9 +320,9 @@ class SparseVanka
 				     /**
 				      * Compute the inverses at
 				      * positions in the range
-				      * @p{[begin,end)}. In
+				      * <tt>[begin,end)</tt>. In
 				      * non-multithreaded mode,
-				      * @p{compute_inverses()} calls
+				      * <tt>compute_inverses()</tt> calls
 				      * this function with the whole
 				      * range, but in multithreaded
 				      * mode, several copies of this
@@ -359,7 +359,7 @@ class SparseVanka
                                       * members as member functions of
                                       * other objects of the type of
                                       * this base class (i.e. like
-                                      * @p{x.f()}, where @p x is an
+                                      * <tt>x.f()</tt>, where @p x is an
                                       * object of the base class, and
                                       * @p f one of it's non-public
                                       * member functions).
@@ -406,7 +406,7 @@ class SparseVanka
  * want to set the number of blocks equal to the number of processors
  * you have.
  *
- * Note that the parallelization is done if @p{deal.II} was configured
+ * Note that the parallelization is done if <tt>deal.II</tt> was configured
  * for multithread use and that the number of threads which is spawned
  * equals the number of blocks. This is reasonable since you will not
  * want to set the number of blocks unnecessarily large, since, as
@@ -431,12 +431,12 @@ class SparseVanka
  * a consecutive list of indices, as in the first alternative below,
  * or a nonconsecutive list of indices. Of course, we assume that the
  * intersection of each two blocks is empty and that the union of all
- * blocks equals the interval @p{[0,N)}, where @p N is the number of
+ * blocks equals the interval <tt>[0,N)</tt>, where @p N is the number of
  * degrees of freedom of the system of equations.
  *
  * <ul>
  * <li> @p index_intervals:
- *    Here, we chose the blocks to be intervals @p{[a_i,a_{i+1})},
+ *    Here, we chose the blocks to be intervals <tt>[a_i,a_{i+1</tt>)},
  *    i.e. consecutive degrees of freedom are usually also within the
  *    same block. This is a reasonable strategy, if the degrees of
  *    freedom have, for example, be re-numbered using the
@@ -495,7 +495,7 @@ class SparseVanka
  * each of which is solved using GMRES with Vanka as
  * preconditioner. The equation had approx. 850 degrees of
  * freedom. With the non-blocked version @p SparseVanka (or
- * @p SparseBlockVanka with @p{n_blocks==1}), the following numbers of
+ * @p SparseBlockVanka with <tt>n_blocks==1</tt>), the following numbers of
  * iterations is needed to solver the linear system in each nonlinear
  * step:
  * @verbatim
@@ -575,11 +575,11 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * In this field, we precompute
 				      * for each block which degrees
 				      * of freedom belong to it. Thus,
-				      * if @p{dof_masks[i][j]==true},
+				      * if <tt>dof_masks[i][j]==true</tt>,
 				      * then DoF @p j belongs to block
 				      * @p i. Of course, no other
-				      * @p{dof_masks[l][j]} may be
-				      * @p true for @p{l!=i}. This
+				      * <tt>dof_masks[l][j]</tt> may be
+				      * @p true for <tt>l!=i</tt>. This
 				      * computation is done in the
 				      * constructor, to avoid
 				      * recomputing each time the
