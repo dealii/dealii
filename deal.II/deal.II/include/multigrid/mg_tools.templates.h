@@ -177,7 +177,7 @@ MGTransferPrebuilt::copy_from_mg(const MGDoFHandler<dim>& mg_dof_handler,
     };
 
 				   // clear constrained nodes
-//TODO:  constraints->set_zero(dst);
+//TODO:[GK]  constraints->set_zero(dst);
 }
 
 template <int dim, class OutVector>
@@ -214,7 +214,7 @@ MGTransferPrebuilt::copy_from_mg_add(const MGDoFHandler<dim>& mg_dof_handler,
       global_cell.get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
-//TODO: Probably wrong for continuous elements
+//TODO:[GK] Probably wrong for continuous elements
 
 				       // copy level-wise data to
 				       // global vector
@@ -223,7 +223,7 @@ MGTransferPrebuilt::copy_from_mg_add(const MGDoFHandler<dim>& mg_dof_handler,
     };
 
 				   // clear constrained nodes
-//TODO:  constraints->set_zero(dst);
+//TODO:[GK]  constraints->set_zero(dst);
 }
 
 
@@ -406,7 +406,7 @@ MGTransferSelect::copy_from_mg(const MGDoFHandler<dim>& mg_dof_handler,
     };
 
 				   // clear constrained nodes
-//TODO:  constraints->set_zero(dst);
+//TODO:[GK]  constraints->set_zero(dst);
 }
 
 template <int dim, class OutVector>
@@ -453,7 +453,7 @@ MGTransferSelect::copy_from_mg_add(const MGDoFHandler<dim>& mg_dof_handler,
       global_cell.get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
-//TODO: Probably wrong for continuous elements
+//TODO:[GK] Probably wrong for continuous elements
 
 				       // copy level-wise data to
 				       // global vector
@@ -464,7 +464,7 @@ MGTransferSelect::copy_from_mg_add(const MGDoFHandler<dim>& mg_dof_handler,
     };
 
 				   // clear constrained nodes
-//TODO:  constraints->set_zero(dst);
+//TODO:[GK]  constraints->set_zero(dst);
 }
 
 
