@@ -1,4 +1,4 @@
-//----------------------------  block_matrix_array_01.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  block_matrix_array_01.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 // This tests the construction of a BlockMatrixArray and outputs the
@@ -26,7 +26,7 @@ int main ()
 {
   std::ofstream logfile("block_matrix_array_01.output");
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
 
   FullMatrix<double> A1(4,4);
   FullMatrix<double> A2(4,4);
