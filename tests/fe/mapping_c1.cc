@@ -33,7 +33,7 @@ int main ()
 				   // in the quality of the mesh, this
 				   // is ok
   Point<2> center;
-  HyperBallBoundary<2> circle(center, std::sqrt(2));
+  HyperBallBoundary<2> circle(center, std::sqrt(2.0));
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
   tria.set_boundary (0, circle);
