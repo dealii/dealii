@@ -22,6 +22,8 @@
   <li> <a href="#compiler">How do I change the compiler?</a>
   <li> <a href="#gcc296">I cannot compile <acronym>deal.II</acronym>
        with gcc version 2.96!</a>
+  <li> <a href="#windows">Can I use <acronym>deal.II</acronym> on a
+       Windows platform?</a>       
   <li> <a href="#triangles">Can I use/implement triangles/tetrahedra
        in <acronym>deal.II</acronym>?</a> 
   <li> <a href="#problem-types">Can I solve problem XXX with
@@ -61,6 +63,35 @@
   version 2.95, both of which work with <acronym>deal.II</acronym>.
   </p>
   
+  <h3><a name="windows">Can I use <acronym>deal.II</acronym> on a
+  Windows platform?</a></h3>
+
+  <p>
+  First the good news: yes, you can. Still, this answer needs to be
+  more specific. The configuration program for
+  <acronym>deal.II</acronym> expects a Unix-like environment. This is
+  provided by the <a href="http://www.cygwin.com/">cygwin
+  compiler</a>. People reported successful compilation with the
+  following combination of tools:
+  <ul>
+  <li> cygwin 1.3.9-1
+  <li> make 3.79.1-5
+  </ul>
+  Earlier versions caused trouble, still you should try the latest
+  versions first. A look into the <a
+  href="http://gaia.iwr.uni-heidelberg.de/~deal/mail/maillist.html">mail
+  archive</a> might be advisable in case of difficulties.
+  </p>
+
+  <h4>Other Windows compilers</h4>
+  <p>
+  Authomatic configuration requires a lot of Unix tools. We have not
+  heard of anybody trying to generate the necessary files to compile
+  with any of the genuine Windows compilers. And, we do not encourage
+  to change a lot of files to make this possible. Still, if you see a
+  simple and clean way to make <acronym>deal.II</acronym> work with
+  any other Windows compiler, get in contact!
+  </p>
 
   <h3><a name="triangles"></a>Can I use/implement
   triangles/tetrahedra in <acronym>deal.II</acronym>?</h3>
