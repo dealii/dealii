@@ -11,9 +11,6 @@
 //
 //----------------------------  parameter_handler.cc  ---------------------------
 
-
-//TODO:[WB] (compiler) replace s.c_str() by s when that is possible
-
 #include <base/parameter_handler.h>
 #include <base/logstream.h>
 #include <base/memory_consumption.h>
@@ -85,7 +82,7 @@ namespace Patterns
   bool Integer::match (const std::string &test_string) const
   {
 #ifdef HAVE_STD_STRINGSTREAM
-    std::istringstream str(test_string.c_str());
+    std::istringstream str(test_string);
 #else
     std::istrstream str(test_string.c_str());
 #endif
@@ -170,7 +167,7 @@ namespace Patterns
   bool Double::match (const std::string &test_string) const
   {
 #ifdef HAVE_STD_STRINGSTREAM
-    std::istringstream str(test_string.c_str());
+    std::istringstream str(test_string);
 #else
     std::istrstream str(test_string.c_str());
 #endif
