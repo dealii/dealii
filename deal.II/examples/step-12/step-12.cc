@@ -1410,7 +1410,7 @@ void DGMethod<dim>::assemble_system2 ()
 				 // correction. This, in combination
 				 // with a block SSOR preconditioner,
 				 // that uses the special block matrix
-				 // structur of system matrices
+				 // structure of system matrices
 				 // arising from DG
 				 // discretizations. The size of these
 				 // blocks are the number of DoFs per
@@ -1435,7 +1435,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				   // preconditioner,
   PreconditionBlockSSOR<SparseMatrix<double> > preconditioner;
 
-				   // we asigned the matrix to it and
+				   // we assigned the matrix to it and
 				   // set the right block size.
   preconditioner.initialize(system_matrix, fe.dofs_per_cell);
 
