@@ -52,9 +52,13 @@ double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
 //		    cos(2*3.1415926536*p(0)));
 	    return p(0)*p(0)*p(0)-3./2.*p(0)*p(0)-6*p(0)+3;
       case 2:
-	    return ((1-3.1415926536*3.1415926536) *
-		    cos(3.1415926536*p(0)) *
-		    cos(3.1415926536*p(1)));
+//	    return ((1-3.1415926536*3.1415926536) *
+//		    cos(3.1415926536*p(0)) *
+//		    cos(3.1415926536*p(1)));
+	    return (p(0)*p(0)*p(0)+p(1)*p(1)*p(1)
+		    - 3./2.*(p(0)*p(0)+p(1)*p(1))
+		    - 6*(p(0)+p(1))
+		    + 6);
       default:
 	    return 0;
     };
@@ -92,9 +96,9 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
       {
 	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
 	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
-			       fe_values.shape_grad(j,point) /*+
+			       fe_values.shape_grad(j,point) +
 			       fe_values.shape_value(i,point) *
-			       fe_values.shape_value(j,point)*/) *
+			       fe_values.shape_value(j,point)) *
 			      fe_values.JxW(point);
 	rhs[0](i) += fe_values.shape_value(i,point) *
 		     right_hand_side(fe_values.quadrature_point(point)) *
@@ -120,20 +124,54 @@ int main () {
 //  tria.create_hyper_ball(Point<2>(2,3),4);
 //  tria.set_boundary (&boundary);
   
-  tria.refine_global (1);
+/*  tria.refine_global (1);
   tria.begin_active()->set_refine_flag();
   tria.execute_refinement ();
+  tria.refine_global (3);
+*/
+
+  cout << "Making grid..." << endl;
   
+  const unsigned int dim=2;
+  tria.refine_global (1);
+	
+  Triangulation<dim>::active_cell_iterator cell, endc;
+  for (int i=0; i<8; ++i) 
+    {
+      int n_levels = tria.n_levels();
+      cell = tria.begin_active();
+      endc = tria.end();
+      
+      for (; cell!=endc; ++cell) 
+	{
+	  double r      = rand()*1.0/RAND_MAX,
+		 weight = 1.*
+			  (cell->level()*cell->level()) /
+			  (n_levels*n_levels);
+	  
+	  if (r <= 0.5*weight)
+	    cell->set_refine_flag ();
+	};
+      
+      tria.execute_refinement ();
+    };
+  tria.refine_global (1);
+  
+  cout << "Distributing dofs..." << endl; 
   dof.distribute_dofs (fe);
+
+  cout << "Assembling matrices..." << endl;
   problem.assemble (equation, quadrature, fe);
 
-				   
-//  problem.solve ();
+  cout << "Solving..." << endl;
+  problem.solve ();
 
+  cout << "Printing..." << endl;
   DataOut<2> out;
   ofstream gnuplot("gnuplot.out.5");
   problem.fill_data (out); 
   out.write_gnuplot (gnuplot);
+  gnuplot.close ();
   
   return 0;
 };

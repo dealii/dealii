@@ -7,6 +7,8 @@
 
 #include <lac/dsmatrix.h>
 #include <base/exceptions.h>
+#include <grid/dof_constraints.h>
+
 
 // forward declaration
 template <int dim> class Triangulation;
@@ -121,6 +123,12 @@ class ProblemBase {
 				      */
     dVector             solution;
 
+				     /**
+				      * List of constraints introduced by
+				      * hanging nodes.
+				      */
+    ConstraintMatrix    constraints;
+    
   friend class Assembler<dim>;
 };
 

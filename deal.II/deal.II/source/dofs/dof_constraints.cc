@@ -482,6 +482,8 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
 
 
 void ConstraintMatrix::condense (dVector &vec) const {
+  Assert (sorted == true, ExcMatrixNotClosed());
+  
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (unsigned int row=0; row<(unsigned int)vec.n(); ++row)
     if (row == (*next_constraint).line)
@@ -498,6 +500,75 @@ void ConstraintMatrix::condense (dVector &vec) const {
       };
 };
   
+
+
+
+void ConstraintMatrix::distribute (const dVector &condensed,
+				   dVector       &uncondensed) const {
+  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert ((unsigned int)condensed.n()+n_constraints() == (unsigned int)uncondensed.n(),
+	  ExcWrongDimension());
+  
+				   // store for each line of the new vector
+				   // its old line number before
+				   // distribution. If the shift is
+				   // -1, this line was condensed away
+  vector<int> old_line;
+
+  old_line.reserve (uncondensed.n());
+
+  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  unsigned int                           shift           = 0;
+  unsigned int n_rows = (unsigned int)uncondensed.n();
+  for (unsigned int row=0; row!=n_rows; ++row)
+    if (row == (*next_constraint).line)
+      {
+					 // this line is constrained
+	old_line.push_back (-1);
+					 // note that #lines# is ordered
+	++next_constraint;
+	++shift;
+      }
+    else
+      old_line.push_back (row-shift);
+
+ 
+  next_constraint = lines.begin();
+  for (unsigned int line=0; line<(unsigned int)uncondensed.n(); ++line) 
+    if (old_line[line] != -1)
+				       // line was not condensed away
+      uncondensed(line) = condensed(old_line[line]);
+    else
+      {
+					 // line was condensed away, create it newly
+					 // first set it to zero
+	uncondensed(line) = 0.;
+					 // then add the different contributions
+	for (unsigned int i=0; i<(*next_constraint).entries.size(); ++i)
+	  uncondensed(line) += (condensed(old_line[(*next_constraint).entries[i].first]) *
+				(*next_constraint).entries[i].second);
+	++next_constraint;
+      };
+};
+
+
+
+void ConstraintMatrix::distribute (dVector &vec) const {
+  Assert (sorted == true, ExcMatrixNotClosed());
+
+  vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+  for (; next_constraint != lines.end(); ++next_constraint) 
+    {
+				       // make entry in line next_constraint.line
+				       // first set it to zero
+      vec((*next_constraint).line) = 0.;
+				       // then add the different contributions
+      for (unsigned int i=0; i<(*next_constraint).entries.size(); ++i)
+	vec((*next_constraint).line) += (vec((*next_constraint).entries[i].first) *
+					 (*next_constraint).entries[i].second);
+    };
+};
+
 
 
 
