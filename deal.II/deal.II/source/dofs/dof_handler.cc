@@ -2553,12 +2553,21 @@ unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const {
 template <int dim>
 template <typename Number>
 void DoFHandler<dim>::distribute_cell_to_dof_vector (const Vector<Number> &cell_data,
-						     Vector<double>       &dof_data) const {
+						     Vector<double>       &dof_data,
+						     const unsigned int    component) const {
   Assert (cell_data.size()==tria->n_active_cells(),
 	  ExcWrongSize (cell_data.size(), tria->n_active_cells()));
+  Assert (dof_data.size()==n_dofs(), ExcWrongSize (dof_data.size(), n_dofs()));
+  Assert (component < selected_fe->n_components,
+	  ExcInvalidComponent(component, selected_fe->n_components));
 
-				   // assign the right size to the output vector
-  dof_data.reinit (n_dofs());
+				   // store a flag whether we should care
+				   // about different components. this is
+				   // just a simplification, we could ask
+				   // for this at every single place
+				   // equally well
+  const bool consider_components = (selected_fe->n_components != 1);
+  
 				   // count how often we have added a value
 				   // in the sum for each dof
   vector<unsigned char> touch_count (n_dofs(), 0);
@@ -2568,28 +2577,40 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const Vector<Number> &cell_
   unsigned int present_cell = 0;
   const unsigned int total_dofs = selected_fe->total_dofs;
   vector<int> dof_indices (total_dofs);
-  
+
   for (; cell!=endc; ++cell, ++present_cell) 
     {
       cell->get_dof_indices (dof_indices);
       for (unsigned int i=0; i<total_dofs; ++i)
-	{
-					   // sum up contribution of the
-					   // present_cell to this dof
-	  dof_data(dof_indices[i]) += cell_data(present_cell);
-					   // note that we added another
-					   // summand
-	  ++touch_count[dof_indices[i]];
-	};
+					 // consider this dof only if it
+					 // is the right component. if there
+					 // is only one component, short cut
+					 // the test
+	if (!consider_components ||
+	    (selected_fe->system_to_component_index(i).first == component))
+	  {
+					     // sum up contribution of the
+					     // present_cell to this dof
+	    dof_data(dof_indices[i]) += cell_data(present_cell);
+					     // note that we added another
+					     // summand
+	    ++touch_count[dof_indices[i]];
+	  };
     };
-
+  
 				   // compute the mean value on all the
 				   // dofs by dividing with the number
 				   // of summands.
   for (unsigned int i=0; i<n_dofs(); ++i)
     {
-      Assert (touch_count[i]!=0, ExcInternalError());
-      dof_data(i) /=  touch_count[i];
+				       // assert that each dof was used
+				       // at least once. this needs not be
+				       // the case if the vector has more than
+				       // one component
+      Assert (consider_components || (touch_count[i]!=0),
+	      ExcInternalError());
+      if (touch_count[i] != 0)
+	dof_data(i) /=  touch_count[i];
     };
 };
 

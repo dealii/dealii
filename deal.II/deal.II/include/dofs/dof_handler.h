@@ -722,10 +722,27 @@ class DoFHandler
 				      * The output vector, being a data
 				      * vector on the grid, always consists
 				      * of elements of type #double#.
+				      *
+				      * In case the finite element used by
+				      * this DoFHandler consists of more than
+				      * one component, you should give which
+				      * component in the output vector should
+				      * be used to store the finite element
+				      * field in; the default is zero (no other
+				      * value is allowed if the finite element
+				      * consists only of one component). All
+				      * other components of the vector remain
+				      * untouched, i.e. their contents are
+				      * not changed.
+				      *
+				      * It is assumed that the output vector
+				      * #dof_data# already has the right size,
+				      * i.e. #n_dofs()# elements.
 				      */
     template <typename Number>
     void distribute_cell_to_dof_vector (const Vector<Number> &cell_data,
-					Vector<double>       &dof_data) const;
+					Vector<double>       &dof_data,
+					const unsigned int    component = 0) const;
 
 				     /**
 				      * Create a mapping from degree of freedom
@@ -1425,7 +1442,16 @@ class DoFHandler
     DeclException2 (ExcInvalidMaskDimension,
 		    int, int,
 		    << "The dimension of the mask " << arg1 << " does not match"
-		    << " the number of components in the finite element object.");
+		    << " the number of components in the finite element object.");    
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidComponent,
+		    int, int,
+		    << "The component you gave (" << arg1 << ") "
+		    << "is invalid with respect to the number "
+		    << "of components in the finite element "
+		    << "(" << arg2 << ")");
     
   protected:
     
