@@ -713,7 +713,7 @@ template <int dim>
 std::vector<unsigned int>
 FE_Q<dim>::get_dpo_vector(const unsigned int deg)
 {
-  std::vector<unsigned int> dpo(dim+1, 1);
+  std::vector<unsigned int> dpo(dim+1, static_cast<unsigned int>(1));
   for (unsigned int i=1; i<dpo.size(); ++i)
     dpo[i]=dpo[i-1]*(deg-1);
   return dpo;
