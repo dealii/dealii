@@ -555,7 +555,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   string o_filename = prm.get ("Output file");
   ofstream gnuplot(o_filename.c_str());
   fill_data (out);
-  out.write_ucd (gnuplot);
+  out.write_gnuplot (gnuplot);
   gnuplot.close ();
 
 				   // release the lock of the DoF object to
