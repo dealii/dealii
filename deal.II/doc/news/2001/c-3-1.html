@@ -126,8 +126,24 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: There is now a new <code
+       class="class">AutoDerivativeFunction</code> class that
+       automatically computes the gradient of a function by employing
+       numerical difference quotients. This only, if the user function
+       does not provide the gradient function himself. This class can
+       replace the <code class="class">Function</code> class as base
+       class for user defined <code class="class">Function</code>
+       classes.
+       <br>
+       This new class can be used if the user only implements the
+       <code class="member">value</code> function but wants to call
+       also the <code class="member">gradient</code> functions.
+       <br>
+       (RH 2001/05/15)
+
+  <li> <p>
        New: The <code class="class">Quadrature</code> class now has a
-       conctructor that only accepts quadrature points and sets the
+       constructor that only accepts quadrature points and sets the
        weights to invalid values.
        <br>
        (GK 2001/04/26)
