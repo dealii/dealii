@@ -1,19 +1,14 @@
-// $Id$
+/*----------------------------   dfmatrix.h     ---------------------------*/
+/*      $Id$                 */
+#ifndef __dfmatrix_H
+#define __dfmatrix_H
+/*----------------------------   dfmatrix.h     ---------------------------*/
 
-#ifndef __lac_dfmatrix_h
-#define __lac_dfmatrix_h
 
-#ifndef __stdio_h
-#include <stdio.h>
-#endif
-#ifndef __lac_dvector_h
 #include <lac/dvector.h>
-#endif
-#ifndef __lac_ivector_h
 #include <lac/ivector.h>
-#endif
-
 #include <base/exceptions.h>
+#include <cstdio>
 
 
 
@@ -427,4 +422,11 @@ class dFMatrix
 		    << "This function is not implemented for the given"
 		    << " matrix dimension " << arg1);
 };
+
+
+
+
+/*----------------------------   dfmatrix.h     ---------------------------*/
+/* end of #ifndef __dfmatrix_H */
 #endif
+/*----------------------------   dfmatrix.h     ---------------------------*/
