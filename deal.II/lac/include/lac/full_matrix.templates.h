@@ -1357,7 +1357,8 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 				     const char         *zero_string,
 				     const double        denominator) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert ((val != 0) || (dim_range+dim_image==0),
+	  ExcInternalError());
   
 				   // set output format, but store old
 				   // state
