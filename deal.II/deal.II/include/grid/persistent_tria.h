@@ -10,6 +10,76 @@
 #include <vector>
 
 
+/**
+ * This class handles the history of a triangulation and can rebuild it after
+ * it was deleted some time before. Its main purpose is support for
+ * time-dependent problems where one frequently deletes a triangulation due
+ * to memory pressure and later wants to rebuild it; this class has all the
+ * information to rebuild it exactly as it was beforem including the mapping
+ * of cell numbers to the geometrical cells.
+ *
+ * Basically, this is a drop-in replacement for the triangulation. Since it
+ * is derived from the #Triangulation<dim># class, it shares all the
+ * functionality, but it overrides some virtual functions and adds some
+ * functions, too. The main change to the base class is that it overrides
+ * the #execute_coarsening_and_refinement# function, where the new version
+ * first stores all refinement and coarsening flags and only then calls the
+ * respective function of the base class. The stored flags may later be
+ * used to restore the grid just as it was before. Some other functions
+ * have been extended slightly as well, see their documentation for more
+ * information.
+ *
+ * \subsection{Usage}
+ * You can use objects of this class almost in the same way as objects of the
+ * #Triangulation# class. One of the few differences is that you can only
+ * construct such an object by giving a coarse grid to the constructor. The
+ * coarse grid will be used to base the triangulation on, and therefore the
+ * lifetime of the coarse grid has to be longer than the lifetime of the
+ * object of this class.
+ *
+ * Basically, usage looks like this:
+ * \begin{verbatim}
+ *   Triangulation<dim> coarse_grid;
+ *   ...                     // initialize coarse grid
+ *
+ *   PersistentTriangulation<dim> grid (coarse_grid);
+ *
+ *   for (...) 
+ *     {
+ *                           // restore grid from coarse grid
+ *                           // and stored refinement flags
+ *       grid.restore ();
+ *       ...                 // do something with the grid
+ *
+ *       ...                 // flag some cells for refinement
+ *                           // or coarsening
+ *       grid.execute_coarsening_and_refinement ();
+ *                           // actually refine grid and store
+ *                           // the flags
+ *
+ *       ...                 // so something more with the grid
+ *
+ *       grid.clear ();      // delete the grid, but keep the
+ *                           // refinement flags for later use
+ *                           // in grid.restore() above
+ *
+ *       ...                 // do something where the grid
+ *                           // is not needed anymore, e.g.
+ *                           // working with another grid
+ *     };
+ * \end{verbatim}
+ *
+ * Note that initially, the #PersistentTriangulation# object does not
+ * constitute a triangulation; it only becomes one after #restore# is first
+ * called. Note also that the #execute_coarsening_and_refinement# stores
+ * all necessary flags for later reconstruction using the #restore# function.
+ * #Triangulation<dim>::clear ()# resets the underlying triangulation to a
+ * virgin state, but does not affect the stored refinement flags needed for
+ * later reconstruction and does also not touch the coarse grid which is
+ * used withing #restore()#.
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
 template <int dim>
 class PersistentTriangulation : public Triangulation<dim> 
 {
@@ -52,7 +122,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * copied and the grid is stepwise
 				      * rebuilt using the saved flags.
 				      */
-    void restore_grid ();
+    void restore ();
 
 				     /**
 				      * Overload this function to use
