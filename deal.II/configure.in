@@ -22,9 +22,13 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
+
+dnl Versionnumbers
+
+DEAL_II_VERSION="`cat Version`"
 AC_REVISION($Revision$)
 AC_PREREQ(2.50)
-AC_INIT(deal.II, 3.5, dealii@dealii.org)
+AC_INIT(deal.II, $DEAL_II_VERSION, dealii@dealii.org)
 
 dnl Where the output config file is located
 AC_CONFIG_HEADER(base/include/base/config.h)
@@ -45,7 +49,6 @@ AC_SUBST(DEAL2_DIR)
 
 dnl    Set major and minor version numbers of the deal.II library,
 dnl    both as preprocessor variables and in Makefiles
-DEAL_II_VERSION="`cat Version`"
 DEAL_II_MAJOR=`cat Version | perl -pi -e 's/^(\d+)\..*/$1/;'`
 DEAL_II_MINOR=`cat Version | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
 AC_DEFINE_UNQUOTED(DEAL_II_MAJOR, $DEAL_II_MAJOR, 
