@@ -148,6 +148,14 @@ class FELinear : public FiniteElement<dim> {
 				     const unsigned int           subface_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;    
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+					const Boundary<dim> &boundary,
+					dFMatrix &local_mass_matrix) const;
 };
 
 
@@ -251,6 +259,14 @@ class FEQuadratic : public FiniteElement<dim> {
 				     const unsigned int           face_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;    
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+					const Boundary<dim> &boundary,
+					dFMatrix &local_mass_matrix) const;
 };
 
 
@@ -354,6 +370,14 @@ class FECubic : public FiniteElement<dim> {
 				     const unsigned int           face_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;    
+
+    				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+					const Boundary<dim> &boundary,
+					dFMatrix &local_mass_matrix) const;
 };
 
 

@@ -342,7 +342,7 @@ struct FiniteElementBase : public FiniteElementData<dim> {
  * implementation.
  *
  *
- * \subsection{Finite Elements in one dimension}
+ * \subsection{Finite elements in one dimension}
  *
  * Finite elements in one dimension need only set the #restriction# and
  * #prolongation# matrices in #FiniteElementBase<1>#. The constructor of
@@ -692,7 +692,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				     /**
 				      * Compute the off-points of the finite
 				      * element basis functions on the given
-				      * cell.
+				      * cell in real space.
 				      *
 				      * This function implements a subset of
 				      * the information delivered by the
@@ -836,6 +836,85 @@ class FiniteElement : public FiniteElementBase<dim> {
 				     vector<Point<dim> >         &normal_vectors) const =0;
 
 				     /**
+				      * Fill in the given matrix with the local
+				      * mass matrix. The mass matrix must be
+				      * exactly computed, not using a
+				      * quadrature, which may be done using
+				      * an equation object and an assembler,
+				      * as is done for the Laplace matrix
+				      * in the #MatrixTools# class for example.
+				      *
+				      * The exact integration is possible since
+				      * an exact representation for the Jacobi
+				      * determinant exists in all known cases of
+				      * iso- or subparametric mappings. For
+				      * example, usually the point in real
+				      * space $\vec x$ referring to the point
+				      * $\vec \xi$ on the unit cell is given
+				      * by $\vec x = \sum_i \vec p_i \phi_i(\vec \xi)$,
+				      * where the sum is over all basis functions
+				      * $\phi_i$ and $\vec p_i$ are the points
+				      * in real space where the basis function
+				      * $\phi_i$ is located. The Jacobi
+				      * determinant is the given by
+				      * $|det J| = |\frac{\partial\vec x}{\partial\vec\xi}$,
+				      * which can be evaluated in closed form.
+				      * The mass matrix then is given by
+				      * $m_{ij} = \int_{\hat K} \phi_i(\vec\xi)
+				      * \phi_j(\vec\xi) |det J| d\xi$, where
+				      * $\hat K$ is the unit cell. The integrand
+				      * obviously is a polynom and can thus
+				      * easily be integrated analytically, so
+				      * the computation of the local mass matrix
+				      * is reduced to the computation of a
+				      * weighted evaluation of a polynom in
+				      * the coordinates of the ansatz points
+				      * in real space (for linear mappings,
+				      * these are the corner points, for
+				      * quadratic mappings also the center of
+				      * mass and the edge and face centers).
+				      * For example, in one space dimension,
+				      * the Jacobi determinant simply is $h$,
+				      * the size of the cell, and the integral
+				      * over the two basis functions can easily
+				      * be calculated with a pen and a sheet of
+				      * paper. The actual computation on this
+				      * matrix then is simply a scaling of a
+				      * known and constant matrix by $h$.
+				      *
+				      * The functions which override this one
+				      * may make assumptions on the sign of
+				      * the determinant if stated in the
+				      * documentation, but should check for
+				      * them in debug mode. For that purpose,
+				      * an exception with the longish name
+				      * #ExcJacobiDeterminantHasWrongSign#
+				      * is declared.
+				      *
+				      * The function takes a #DoFHandler#
+				      * iterator, which provides a superset
+				      * of information to the geometrical
+				      * information needed for the computations.
+				      * The additional data should not be
+				      * used, however a #DoFHandler# iterator
+				      * was preferred over a #Triangulation#
+				      * iterator since this is what usually
+				      * is available in places where this
+				      * function is called.
+				      *
+				      * The cell matrix is assumed to be of
+				      * the right size already. Functions
+				      * of derived classes shall be implemented
+				      * in a way as to overwrite the previous
+				      * contents of the matrix, so it need not
+				      * be necessary to clear the matrix before
+				      * use with this function.
+				      */
+    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+					const Boundary<dim> &boundary, 
+					dFMatrix            &local_mass_matrix) const =0;
+    
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcPureFunctionCalled);
@@ -847,6 +926,10 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * Exception
 				      */
     DeclException0 (ExcBoundaryFaceUsed);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcJacobiDeterminantHasWrongSign);
 };
 
 
