@@ -1564,9 +1564,9 @@ namespace Data
 				   // this example is the square
 				   // [-1,1]^2 with the square
 				   // [-1/2,1/2]^2 as hole in it. We
-				   // create the coarse grid as 3
-				   // times 3 cells with the middle
-				   // one missing.
+				   // create the coarse grid as 4
+				   // times 4 cells with the middle
+				   // four ones missing.
 				   //
 				   // Of course, the example has an
 				   // extension to 3d, but since this
