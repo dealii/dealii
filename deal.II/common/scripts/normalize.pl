@@ -33,10 +33,7 @@ s/line <\d+> of file <.*\//file </;
 
 # Make small exponentials zero
 
-s/-?\d?\.\d+e-[123456789]\d+/0.00/g;
-
-# All doubles have two decimals
-#s/(\.\d\d)\d+/\1/g;
+#s/-?\d?\.\d+e-[123456789]\d+/0.00/g;
 
 # Zeroes are zero
 
@@ -44,5 +41,5 @@ s/-0\.00/0.00/g;
 
 # Residual values
 
-s/value.*//;
-s/with residual.*//;
+#s/value.*//;
+#s/with residual.*//;
