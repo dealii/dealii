@@ -124,6 +124,8 @@ int main()
   deallog << "vmult_add ok" << std::endl;
   deallog << "Tvmult ok" << std::endl;
   deallog << "Tvmult_add ok" << std::endl;
+  deallog.pop();
+  
   deallog << "Eigenvalues 5\t0" << std::endl;
   deallog << "Eigenvalues 1\t0" << std::endl;
   deallog << "Eigenvalues 5\t0" << std::endl;
