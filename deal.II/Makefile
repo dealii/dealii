@@ -18,16 +18,16 @@ help:
 MAKEOPTIONS = $(PAR)
 
 baseg:
-	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a
+	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) libg
 
 base:
-	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a lib.a
+	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) libg lib
 
 lacg: baseg
-	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a
+	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) libg
 
 lac: base
-	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a lib.a
+	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) libg lib
 
 1d: baseg lacg base lac
 	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 1d
