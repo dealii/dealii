@@ -23,7 +23,7 @@ help:
 	@echo "=                                                                      ="
 	@echo "=    all        : base, lac, 1d, 2d and 3d, contrib                    ="
 	@echo "=    debug      : baseg, lacg, 1dg, 2dg and 3dg, contrib               ="
-	@echo "=    optimized  : base, lac, 1d, 2d, and 3d optimized libraries only   ="
+	@echo "=    optimized  : baseo, laco, 1do, 2do and 3do, contrib               ="
 	@echo "=                                                                      ="
 	@echo "=    online-doc : generate the documentation in HTML format            ="
 	@echo "=    TODO       : create a \"TODO\" file from the source files           ="
