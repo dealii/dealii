@@ -14,7 +14,7 @@
 #define __deal2__vector2d_h
 
 #include <base/subscriptor.h>
-#include <vector>
+
 
 /**
  * Two-dimensional array of arbitrary data.
@@ -26,85 +26,87 @@
  * standard C++ classes. This, although array would have been
  * preferrable, since a vector should be element of a vector space.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001. Parts by Wolfgang Bangerth and others.
  */
 template<typename T>
 class vector2d : public Subscriptor
 {
   public:
-				   /**
-				    * Constructor for a quadratic
-				    * @p{rows} by @p{rows} array. The
-				    * standard constructor creates an
-				    * empty object.
-				    */
-  vector2d (const unsigned int rows = 0);
-
-				   /**
-				    * Constructor for a @p{rows} by
-				    * @p{cols} array.
-				    */
-  vector2d (const unsigned int rows,
-	    const unsigned int cols);
-
-				   /**
-				    * Copy-constructor for deep copy.
-				    */
-  vector2d (const vector2d&);
+				     /**
+				      * Constructor for a quadratic
+				      * @p{rows} by @p{rows} array. The
+				      * standard constructor creates an
+				      * empty object.
+				      */
+    vector2d (const unsigned int rows = 0);
+    
+				     /**
+				      * Constructor for a @p{rows} by
+				      * @p{cols} array.
+				      */
+    vector2d (const unsigned int rows,
+	      const unsigned int cols);
+    
+				     /**
+				      * Copy-constructor for deep copy.
+				      */
+    vector2d (const vector2d&);
  				     /**
 				      * Constructor initializing from
 				      * an array of data elements. The array
 				      * is arranged line by line. No
 				      * range checking is performed.
 				      */
-  vector2d (const unsigned int rows,
-	    const unsigned int cols,
-	    const T* entries);
-
-				   /**
-				    * Assignment operator.
-				    * Copy all elements of @p{src}
-				    * into the matrix. The size is
-				    * adjusted if needed.
-				    *
-				    * We can't use the other, templatized
-				    * version since if we don't declare
-				    * this one, the compiler will happily
-				    * generate a predefined copy
-				    * operator which is not what we want.
-				    */
+    vector2d (const unsigned int rows,
+	      const unsigned int cols,
+	      const T* entries);
+    
+				     /**
+				      * Assignment operator.
+				      * Copy all elements of @p{src}
+				      * into the matrix. The size is
+				      * adjusted if needed.
+				      *
+				      * We can't use the other, templatized
+				      * version since if we don't declare
+				      * this one, the compiler will happily
+				      * generate a predefined copy
+				      * operator which is not what we want.
+				      */
     vector2d<T>& operator = (const vector2d<T>& src);
-
-				   /**
-				    * Destructor. Free allocated memory.
-				    */
-  ~vector2d ();
-  
-				   /**
-				    * Assignment operator.
-				    * Copy all elements of @p{src}
-				    * into the array. The size is
-				    * adjusted if needed.
-				    *
-				    * This function requires that the
-				    * type @p{T2} is convertible to
-				    * @p{T}.
-				    */
-  template<typename T2>
-    vector2d<T>& operator = (const vector2d<T2>& src);
-  
-				   /**
-				    * Set dimension to $m\times n$ and
-				    * allocate memory if necessary. Forget
-				    * the previous content of the array.
-				    */
+    
+				     /**
+				      * Destructor. Free allocated memory.
+				      */
+    ~vector2d ();
+    
+				     /**
+				      * Assignment operator.
+				      * Copy all elements of @p{src}
+				      * into the array. The size is
+				      * adjusted if needed.
+				      *
+				      * This function requires that the
+				      * type @p{T2} is convertible to
+				      * @p{T}.
+				      */
+    template<typename T2>
+    vector2d<T>& operator = (const vector2d<T2> &src);
+    
+				     /**
+				      * Set dimension to $m\times n$
+				      * and allocate memory if
+				      * necessary. Forget the previous
+				      * content of the array.
+				      */
     void reinit (const unsigned int m,
 		 const unsigned int n);
     
 				     /**
-				      * Set dimension to $n\times n$ and
-				      * allocate memory if necessary. Forget
-				      * the previous content of the array.
+				      * Set dimension to $n\times n$
+				      * and allocate memory if
+				      * necessary. Forget the previous
+				      * content of the array.
 				      */
     void reinit (const unsigned int n);
 
@@ -116,7 +118,7 @@ class vector2d : public Subscriptor
 				      * array will be zero.
 				      */
     template <class T2>
-      void reinit (const vector2d<T2>&);
+    void reinit (const vector2d<T2> &shape);
     
 				     /**
 				      * Number of rows.
@@ -150,12 +152,13 @@ class vector2d : public Subscriptor
     void clear ();
     
                                      /**
-				      * Fill array with an array of elements.
-				      * The array is arranged line by line. No
+				      * Fill array with an array of
+				      * elements.  The array is
+				      * arranged line by line. No
 				      * range checking is performed.
 				      */
     template<typename T2>
-      void fill (const T2* entries);
+    void fill (const T2 *entries);
     
 				     /**
 				      * Determine an estimate for the
@@ -165,26 +168,27 @@ class vector2d : public Subscriptor
     unsigned int memory_consumption () const;
 
   protected:
-				   /**
-				    * Return a read-write reference to the
-				    * element @p{(i,j)}.
-				    *
-				    * This function does no bounds
-				    * checking and is only to be used
-				    * internally and in functions
-				    * already checked.
-				    */
-  T & el (const unsigned int i, const unsigned int j);
+				     /**
+				      * Return a read-write reference
+				      * to the element @p{(i,j)}.
+				      *
+				      * This function does no bounds
+				      * checking and is only to be
+				      * used internally and in
+				      * functions already checked.
+				      */
+    T & el (const unsigned int i, const unsigned int j);
   
-				   /**
-				    * Return the value of the element @p{(i,j)}.
-				    *
-				    * This function does no bounds checking
-				    * and is only to be used
-				    * internally and in functions
-				    * already checked.
-				    */
-  T el (const unsigned int i, const unsigned int j) const;    
+				     /**
+				      * Return the value of the
+				      * element @p{(i,j)}.
+				      *
+				      * This function does no bounds
+				      * checking and is only to be
+				      * used internally and in
+				      * functions already checked.
+				      */
+    T el (const unsigned int i, const unsigned int j) const;    
   
 				     /**
 				      * Direct read-only access to
@@ -200,8 +204,14 @@ class vector2d : public Subscriptor
 				      * Component-array.
 				      */
     T* val;
+    
 				     /**
-				      * Size of array.
+				      * Size of array. This may be
+				      * larger than the number of
+				      * actually used elements, since
+				      * we don't shrink the array upon
+				      * calls to @p{reinit} unless the
+				      * new size is zero.
 				      */
     unsigned int val_size;    
     
@@ -217,6 +227,8 @@ class vector2d : public Subscriptor
 };
 
 
+/* --------------------- Template and inline functions ---------------- */
+
 template <typename T>
 inline
 vector2d<T>::~vector2d ()
@@ -224,6 +236,7 @@ vector2d<T>::~vector2d ()
   if (val != 0)
     delete[] val;
 };
+
 
 
 template <typename T>
@@ -236,6 +249,7 @@ vector2d<T>::clear ()
 };
 
 
+
 template <typename T>
 template <typename T2>
 inline
@@ -245,6 +259,7 @@ vector2d<T>::fill (const T2* entries)
   if (val_size != 0)
     std::copy (entries, entries+(num_rows*num_cols), val);
 }
+
 
 
 template <typename T>
@@ -292,12 +307,14 @@ vector2d<T>::reinit (const unsigned int mm,
 };
 
 
+
 template <typename T>
 void
 vector2d<T>::reinit (const unsigned int n)
 {
   reinit (n, n);
 };
+
 
 
 template <typename T>
@@ -307,6 +324,7 @@ vector2d<T>::reinit (const vector2d<T2> &B)
 {
   reinit (B.n_rows(), B.n_cols());
 };
+
 
 
 template <typename T>
@@ -319,6 +337,7 @@ vector2d<T>::vector2d (const unsigned int m,
 {
   reinit (m,n);
 };
+
 
 
 template <typename T>
@@ -349,6 +368,7 @@ vector2d<T>::vector2d (const unsigned int m,
 };
 
 
+
 template <typename T>
 vector2d<T>::vector2d (const vector2d &m) :
 		Subscriptor (),
@@ -364,6 +384,7 @@ vector2d<T>::vector2d (const vector2d &m) :
 };
 
 
+
 template <typename T>
 vector2d<T>&
 vector2d<T>::operator = (const vector2d<T>& m) 
@@ -375,6 +396,7 @@ vector2d<T>::operator = (const vector2d<T>& m)
   
   return *this;
 }
+
 
 
 template <typename T>
@@ -391,6 +413,7 @@ vector2d<T>::operator = (const vector2d<T2>& m)
 }
 
 
+
 template <class T>
 inline 
 unsigned int
@@ -401,6 +424,7 @@ vector2d<T>::n_rows () const
 }
 
 
+
 template <class T>
 inline 
 unsigned int
@@ -409,6 +433,8 @@ vector2d<T>::n_cols () const
   return num_cols;
   
 }
+
+
 
 template <typename T>
 inline T &
@@ -425,6 +451,7 @@ vector2d<T>::el (const unsigned int i, const unsigned int j) const
 {
   return val[i*n_cols()+j];
 };
+
 
 
 template <typename T>
@@ -448,6 +475,7 @@ vector2d<T>::operator() (const unsigned int i, const unsigned int j)
 };
 
 
+
 template <typename T>
 inline
 const T *
@@ -455,6 +483,7 @@ vector2d<T>::data () const
 {
   return val;
 }
+
 
 
 template <typename T>
