@@ -4,7 +4,7 @@
 
 all: deal.II examples
 
-clean: lib-clean source-clean examples-clean
+clean: source-clean examples-clean lib-clean 
 
 
 deal.II:
