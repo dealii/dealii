@@ -12,7 +12,7 @@
 //----------------------------  petsc_41.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::sadd(s, Vector) 
+// check PETScWrappers::Vector::sadd(s, Vector) 
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

@@ -12,7 +12,7 @@
 //----------------------------  petsc_47.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::equ (s,V,s,V)
+// check PETScWrappers::Vector::equ (s,V,s,V)
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

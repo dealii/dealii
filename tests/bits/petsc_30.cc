@@ -12,7 +12,7 @@
 //----------------------------  petsc_30.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::reinit(!fast)
+// check PETScWrappers::Vector::reinit(!fast)
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

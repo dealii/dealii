@@ -12,7 +12,7 @@
 //----------------------------  petsc_19.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::linfty_norm()
+// check PETScWrappers::Vector::linfty_norm()
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

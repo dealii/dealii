@@ -12,7 +12,7 @@
 //----------------------------  petsc_51.cc  ---------------------------
 
 
-// check copy constructor petsc_wrapper::Vector::Vector(Vector) 
+// check copy constructor PETScWrappers::Vector::Vector(Vector) 
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

@@ -12,7 +12,7 @@
 //----------------------------  petsc_23.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::operator*(Vector) on two vectors that are
+// check PETScWrappers::Vector::operator*(Vector) on two vectors that are
 // not orthogonal
 
 #include "../tests.h"

@@ -12,7 +12,7 @@
 //----------------------------  petsc_15.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::operator() in set/add-mode alternatingly, but
+// check PETScWrappers::Vector::operator() in set/add-mode alternatingly, but
 // writing to the same elements
 
 #include "../tests.h"

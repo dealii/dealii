@@ -12,7 +12,7 @@
 //----------------------------  petsc_33.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::lp_norm(3)
+// check PETScWrappers::Vector::lp_norm(3)
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

@@ -12,7 +12,7 @@
 //----------------------------  petsc_39.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::add(scalar, Vector) 
+// check PETScWrappers::Vector::add(scalar, Vector) 
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

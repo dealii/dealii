@@ -12,7 +12,7 @@
 //----------------------------  petsc_34.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::all_zero
+// check PETScWrappers::Vector::all_zero
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

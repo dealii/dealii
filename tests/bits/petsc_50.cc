@@ -12,7 +12,7 @@
 //----------------------------  petsc_50.cc  ---------------------------
 
 
-// check petsc_wrapper::copy_from<T> with T!=PetscScalar
+// check PETScWrappers::copy_from<T> with T!=PetscScalar
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>

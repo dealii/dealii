@@ -12,7 +12,7 @@
 //----------------------------  petsc_26.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::operator = (PetscScalar) with setting to a
+// check PETScWrappers::Vector::operator = (PetscScalar) with setting to a
 // nonzero value
 
 #include "../tests.h"

@@ -12,7 +12,7 @@
 //----------------------------  petsc_24.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::clear()
+// check PETScWrappers::Vector::clear()
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

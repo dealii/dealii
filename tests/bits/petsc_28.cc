@@ -12,7 +12,7 @@
 //----------------------------  petsc_28.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::operator = (Vector), except that we don't
+// check PETScWrappers::Vector::operator = (Vector), except that we don't
 // resize the vector to be copied to beforehand
 
 #include "../tests.h"

@@ -12,7 +12,7 @@
 //----------------------------  petsc_09.cc  ---------------------------
 
 
-// check petsc_wrapper::SparseMatrix::operator *=
+// check PETScWrappers::SparseMatrix::operator *=
 
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>    

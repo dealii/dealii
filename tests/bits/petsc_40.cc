@@ -12,7 +12,7 @@
 //----------------------------  petsc_40.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::add(s,V,s,V)
+// check PETScWrappers::Vector::add(s,V,s,V)
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    

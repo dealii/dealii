@@ -12,7 +12,7 @@
 //----------------------------  petsc_48.cc  ---------------------------
 
 
-// check petsc_wrapper::Vector::ratio
+// check PETScWrappers::Vector::ratio
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    
