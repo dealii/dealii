@@ -32,6 +32,21 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3 style="color:red">Incompatibilities</h3>
 
 <ol>
+  <li> <p> Changed: The <code class="class">FiniteElement</code> classes had a
+       function <code class="member">restrict</code> that returns the
+       restriction matrix from children to the mother cell. Unfortunately,
+       <code>restrict</code> has become a keyword in recent standards of the C
+       language, and some C++ compilers have picked this up. The function has
+       therefore been renamed <code
+       class="member">get_restriction_matrix</code>, which also better
+       reflects what it is actually doing. To keep consistent, we have also
+       rename the corresponding function <code
+       class="member">prolongate</code> to <code
+       class="member">get_prolongation_matrix</code>. 
+       <br>
+       (WB 2004/02/29)
+       </p>
+
   <li> <p>
        Fixed and changed: The <code
        class="class">SolutionTransfer</code><code
@@ -79,6 +94,20 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p> New: <acronym>deal.II</acronym> now comes with a complete set of
+       wrappers classes for PETSc vectors, matrices, linear solvers and
+       preconditioners. Many of the algorithms in deal.II have also been
+       updated to make use of these wrappers. All of this is only enabled if a
+       PETSc installation is detected. This either happens automatically in
+       <code>./configure</code>, or
+       by passing values to the switches <code>--with-petsc</code> and
+       <code>--with-petsc-arch</code> to configure path and architecture of an
+       existing PETSc installation. If these switches are not used, then
+       environment variables are searched for this information.
+       <br>
+       (WB 2004/03/01)
+       </p>
+
   <li> <p>
        Changed: The part of the boost library in the <tt>contrib</tt>
        directory is now updated to boost version 1-30.2. We include
@@ -298,12 +327,67 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
 
+  <li> <p> New: The <code class="class">Vector</code> and <code
+       class="class">BlockVector</code> classes now have member functions
+       <code class="member">is_non_negative</code> that check whether a vector
+       has no negative entries.
+       <br>
+       (WB 2004/02/29)
+       </p>
+
+  <li> <p> Fixed: The <code
+       class="class">SolverMinRes</code> class had a nasty bug where we were
+       inadvertantly copying vectors; this could also have led to a memory
+       corruption bug. This is now fixed.
+       <br>
+       (WB 2004/02/26)
+       </p>
+
+  <li> <p> New: There is now a function <code
+       class="class">FullMatrix::add_scaled</code>. It replaces the old
+       function <code class="class">FullMatrix::add</code> which did the same,
+       but had a name that was incompatible with respective functions in the
+       other matrix classes.
+       <br>
+       (WB 2004/02/23)
+       </p>
+
   <li> <p> New:<code class="class">FullMatrix</code> has new functions <code
        class="member">add</code> and ,<code
        class="member">Tadd</code>
        allowing to add to a selected block of the matrix.
        <br>
        (GK 2004/02/12)
+       </p>
+
+  <li> <p> New: The <code
+       class="class">Vector</code> class now has operators to compare for
+       equality and inequality.
+       <br>
+       (WB 2004/02/09)
+       </p>
+
+  <li> <p> New: The <code
+       class="member">SparseMatrix::operator()</code> generated an assertion
+       failure if the requested entry in the matrix isn't there. This has been
+       changed so that it actually throws an exception instead, also in
+       optimized mode.
+       <br>
+       (WB 2004/02/06)
+       </p>
+
+  <li> <p> New: There is now a function <code
+       class="member">SparseMatrix::frobenius_norm</code> that computes the
+       Frobenius norm of a sparse matrix.
+       <br>
+       (WB 2004/02/06)
+       </p>
+
+  <li> <p> Changed: In matrix-vector operations of the <code
+       class="class">Full/SparseMatrix</code> classes, source and destination
+       cannot be the same. We now also check that this is indeed the case.
+       <br>
+       (WB 2004/01/26)
        </p>
   
   <li> <p> Improved: Initialization routines of class <code
@@ -361,23 +445,46 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> Changed: The classes <code class="class">DataOut*</code> and <code
+       class="class">KellyErrorEstimator</code> have been generalized to take
+       more and different vector types as input parameters. In particular,
+       they now take normal and block vectors over doubles and floats, as well
+       as PETSc vectors if PETSc support is detected during configuration of
+       the library.
+       <br>
+       (WB 2004/03/01)
+       </p>
+
+  <li> <p> Changed: The template parameter of the functions in the <code
+       class="class">GridRefinement</code> class have been changed. Where they
+       previously denoted the type over which the <code
+       class="class">Vector</code> class is to be templated, they now mean the
+       actual vector class. Thus, they can be any other template class as long
+       as there are suitable operations defined over them. In addition,
+       the documentation stated that they must be vectors of floats; this
+       hasn't been true any more for quite a while already, and is duly
+       removed from the documentation.
+       <br>
+       (WB 2004/02/28)
+       </p>
 
   <li> <p>
-  New: The function
-  <class="class">FETools</code>::<class="member">project_dg</code> performs
-  <i>L<sup>2</sup></i>-projections between finite element spaces of different
-  degrees on the same mesh.
-  <br>
-  (GK 2003/11/28)
-  </p>
+       New: The function
+       <class="class">FETools</code>::<class="member">project_dg</code>
+       performs <i>L<sup>2</sup></i>-projections between finite element spaces
+       of different degrees on the same mesh.
+       <br>
+       (GK 2003/11/28)
+       </p>
 
   <li> <p>
-  Improved: <code class="class">FiniteElementData</code> has a function
-  <class="member">tensor_degree()</code>, returning the degree of the
-  polynomial space suitable for choosing a tensor product quadrature formula.
-  <br>
-  (GK 2003/11/28)
-  </p>
+       Improved: <code class="class">FiniteElementData</code> has a function
+       <class="member">tensor_degree()</code>, returning the degree of the
+       polynomial space suitable for choosing a tensor product quadrature
+       formula. 
+       <br>
+       (GK 2003/11/28)
+       </p>
 
   <li> <p>
        New: Long requested but never implemented before in the
