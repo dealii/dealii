@@ -2,13 +2,14 @@
 
 PROJECT_NAME = "deal.II library"
 
-INPUT    = headers/deal.II/ \
+INPUT    = headers/base/ headers/lac/ headers/deal.II/ \
+	../../base/include/base \
+	../../lac/include/lac \
 	../../deal.II/include/dofs \
 	../../deal.II/include/fe \
 	../../deal.II/include/grid \
 	../../deal.II/include/multigrid \
 	../../deal.II/include/numerics
-TAGFILES = base.tag=../base lac.tag=../lac
 
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II
