@@ -1810,7 +1810,8 @@ operator * (const SymmetricTensor<2,3> &s,
  *
  * This function does the same as a respective operator*, but it avoid
  * a temporary object (that the compiler can optimize away in many
- * cases, however).
+ * cases, however). This function mostly exists for compatibility
+ * purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1833,7 +1834,8 @@ double_contract (SymmetricTensor<2,1> &tmp,
  *
  * This function does the same as a respective operator*, but it avoid
  * a temporary object (that the compiler can optimize away in many
- * cases, however).
+ * cases, however). This function mostly exists for compatibility
+ * purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1856,7 +1858,8 @@ double_contract (SymmetricTensor<2,1> &tmp,
  *
  * This function does the same as a respective operator*, but it avoid
  * a temporary object (that the compiler can optimize away in many
- * cases, however).
+ * cases, however). This function mostly exists for compatibility
+ * purposes with the general tensor class.
  *
  * @related SymmetricTensor @author Wolfgang Bangerth, 2005
  */
@@ -1884,7 +1887,8 @@ double_contract (SymmetricTensor<2,2> &tmp,
  *
  * This function does the same as a respective operator*, but it avoid
  * a temporary object (that the compiler can optimize away in many
- * cases, however).
+ * cases, however). This function mostly exists for compatibility
+ * purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1913,7 +1917,8 @@ double_contract (SymmetricTensor<2,2> &tmp,
  *
  * This function does the same as a respective operator*, but it avoid
  * a temporary object (that the compiler can optimize away in many
- * cases, however).
+ * cases, however). This function mostly exists for compatibility
+ * purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1945,7 +1950,8 @@ double_contract (SymmetricTensor<2,3> &tmp,
  *
  * This function does the same as a respective operator*, but it avoid
  * a temporary object (that the compiler can optimize away in many
- * cases, however).
+ * cases, however). This function mostly exists for compatibility
+ * purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
