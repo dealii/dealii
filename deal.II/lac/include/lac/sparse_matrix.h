@@ -288,6 +288,18 @@ class SparseMatrixStruct : public Subscriptor
     unsigned int n_cols () const;
 
 				     /**
+				      * Number of entries in a specific row.
+				      */
+    unsigned int row_length(unsigned int row) const;
+
+				     /**
+				      * Access to column nuber field.
+				      * Return the column number of
+				      * the #index#th entry in #row#.
+				      */
+    unsigned int column_number(unsigned int row, unsigned int index) const;
+
+				     /**
 				      * Compute the bandwidth of the matrix
 				      * represented by this structure. The
 				      * bandwidth is the maximum of
@@ -318,9 +330,13 @@ class SparseMatrixStruct : public Subscriptor
     bool is_compressed () const;
     
 				     /**
-				      * This is kind of an expert mode: get
+				      * This is kind of an expert mode. Get
 				      * access to the rowstart array, but
 				      * readonly.
+				      *
+				      * Use of this function is highly
+				      * deprecated. Use #row_length#
+				      * and #column_number# instead.
 				      *
 				      * Though the return value is declared
 				      * #const#, you should be aware that it
@@ -336,14 +352,17 @@ class SparseMatrixStruct : public Subscriptor
 				      * If you change the layout yourself, you
 				      * should also rename this function to
 				      * avoid programs relying on outdated
-				      * information!
-				      */
+				      * information!  */
     const unsigned int * get_rowstart_indices () const;
 
 				     /**
 				      * This is kind of an expert mode: get
 				      * access to the colnums array, but
 				      * readonly.
+				      *
+				      * Use of this function is highly
+				      * deprecated. Use #row_length#
+				      * and #column_number# instead.
 				      *
 				      * Though the return value is declared
 				      * #const#, you should be aware that it
@@ -792,9 +811,21 @@ class SparseMatrix : public Subscriptor
 				      * reference. You're sure what you do?
 				      */
     number & diag_element (const unsigned int i);
+
+				     /**
+				      * Access to values in internal
+				      * mode.  Returns the value of
+				      * the #index#th entry in
+				      * #row#. Here, #index refers to
+				      * the internal representation of
+				      * the matrix, not the column. Be
+				      * sure to understand what you are
+				      * doing here.
+				      */
+    number raw_entry(unsigned int row, unsigned int index) const;
     
     				     /**
-				      * This is kind of an expert mode: get
+				      * This is for hackers. Get
 				      * access to the #i#th element of this
 				      * matrix. The elements are stored in
 				      * a consecutive way, refer to the
@@ -808,8 +839,7 @@ class SparseMatrix : public Subscriptor
 				      * If you change the layout yourself, you
 				      * should also rename this function to
 				      * avoid programs relying on outdated
-				      * information!
-				      */
+				      * information!  */
     number global_entry (const unsigned int i) const;
 
 				     /**
@@ -1126,38 +1156,66 @@ class SparseMatrix : public Subscriptor
 
 
 inline
-unsigned int SparseMatrixStruct::n_rows () const {
+unsigned int
+SparseMatrixStruct::n_rows () const
+{
   return rows;
 };
 
 
 
 inline
-unsigned int SparseMatrixStruct::n_cols () const {
+unsigned int
+SparseMatrixStruct::n_cols () const
+{
   return cols;
 };
 
 
 
 inline
-bool SparseMatrixStruct::is_compressed () const {
+bool
+SparseMatrixStruct::is_compressed () const
+{
   return compressed;
 };
 
 
 
 inline
-const unsigned int * SparseMatrixStruct::get_rowstart_indices () const {
+const unsigned int *
+SparseMatrixStruct::get_rowstart_indices () const
+{
   return rowstart;
 };
 
 
 
 inline
-const int * SparseMatrixStruct::get_column_numbers () const {
+const int *
+SparseMatrixStruct::get_column_numbers () const
+{
   return colnums;
 };
 
+
+inline
+unsigned int
+SparseMatrixStruct::row_length(unsigned int row) const
+{
+  Assert(row<rows, ExcIndexRange(row,0,rows));
+  return rowstart[row+1]-rowstart[row];
+}
+
+inline
+unsigned int
+SparseMatrixStruct::column_number(unsigned int row, unsigned int index) const
+{
+  Assert(row<rows, ExcIndexRange(row,0,rows));
+  Assert(index<row_length(row), ExcIndexRange(index,0,row_length(row)));
+
+  return colnums[rowstart[row]+index];
+}
 
 
 template <typename number>
@@ -1240,7 +1298,8 @@ number SparseMatrix<number>::diag_element (const unsigned int i) const {
 
 template <typename number>
 inline
-number & SparseMatrix<number>::diag_element (const unsigned int i) {
+number & SparseMatrix<number>::diag_element (const unsigned int i)
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
   Assert (i<max_len, ExcInvalidIndex1(i));
@@ -1250,6 +1309,18 @@ number & SparseMatrix<number>::diag_element (const unsigned int i) {
 				   // diagonal
   return val[cols->rowstart[i]];
 };
+
+
+template <typename number>
+inline
+number
+SparseMatrix<number>::raw_entry(unsigned int row, unsigned int index) const
+{
+  Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
+  Assert(index<cols->row_length(row), ExcIndexRange(index,0,cols->row_length(row)));
+
+  return val[cols->rowstart[row]+index];
+}
 
 
 
