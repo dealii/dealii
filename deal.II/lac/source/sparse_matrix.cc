@@ -164,6 +164,26 @@ SparseMatrixStruct::~SparseMatrixStruct ()
 
 
 
+SparseMatrixStruct &
+SparseMatrixStruct::opertor = (const SparseMatrixStruct &s)
+{
+  Assert (s.rowstart == 0, ExcInvalidConstructorCall());
+  Assert (s.colnums == 0, ExcInvalidConstructorCall());
+  Assert (s.rows == 0, ExcInvalidConstructorCall());
+  Assert (s.cols == 0, ExcInvalidConstructorCall());
+
+				   // no need to free existing arrays, since we
+				   // should never get here.
+  max_dim = 0;
+  max_vec_len = 0;
+  rowstart = 0;
+  colnums = 0;
+  
+  reinit (0,0,0);
+};
+
+
+
 
 void
 SparseMatrixStruct::reinit (const unsigned int m,

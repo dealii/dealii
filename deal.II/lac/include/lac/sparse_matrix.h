@@ -89,6 +89,14 @@ class SparseMatrixStruct : public Subscriptor
 			const unsigned int max_per_row);
 
 				     /**
+				      * Copy operator. For this the same holds
+				      * as for the copy constructor: it is
+				      * declared, defined and fine to be called,
+				      * but the latter only for empty objects.
+				      */
+    SparseMatrixStruct & operator = (const SparseMatrixStruct &);
+
+				     /**
 				      * Make a copy with extra off-diagonals.
 				      *
 				      * This constructs objects intended for
@@ -534,14 +542,6 @@ class SparseMatrixStruct : public Subscriptor
 				      * was called for this object.
 				      */
     bool compressed;
-
-				     /**
-				      * Copy operator. Declare but don't
-				      * define it and make it private above
-				      * that to avoid that anyone tries to
-				      * use this operator.
-				      */
-    SparseMatrixStruct & operator = (const SparseMatrixStruct &);
 
     
     template <typename number> friend class SparseMatrix;
