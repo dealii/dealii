@@ -67,7 +67,7 @@ struct FiniteElementData<1> {
 				   /**
 				    * Number of components.
 				    */
-  const unsigned int n_components;
+    const unsigned int n_components;
 
     				     /**
 				      * Default constructor. Constructs an element
@@ -226,7 +226,7 @@ struct FiniteElementData<2> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-struct FiniteElementBase :
+class FiniteElementBase :
   public Subscriptor,
   public FiniteElementData<dim>
 
@@ -293,6 +293,10 @@ struct FiniteElementBase :
   
 				     /**
 				      * Compute component and index from system index.
+				      *
+				      * Return value contains first
+				      * component and second index in
+				      * component.
 				      */
     pair<unsigned,unsigned> system_to_component_index (unsigned index) const; 
     
@@ -471,6 +475,11 @@ struct FiniteElementBase :
 				      * space dimension.
 				      */
     dFMatrix interface_constraints;
+
+				     /**
+				      * Map between linear dofs and component dofs.
+				      */
+    vector< pair<unsigned, unsigned> > system_to_component_table;
 };
 
 
@@ -1164,8 +1173,22 @@ class FiniteElement : public FiniteElementBase<dim> {
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
 };
 
+template <int dim>
+inline unsigned
+FiniteElementBase<dim>::component_to_system_index (unsigned component,
+						   unsigned component_index) const
+{
+  Assert(false, ExcNotImplemented());
+  return component_index;
+}
 
-
+template <int dim>  
+inline pair<unsigned,unsigned>
+FiniteElementBase<dim>::system_to_component_index (unsigned index) const
+{
+  Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
+  return system_to_component_table[index];
+}
 
 /*----------------------------   fe.h     ---------------------------*/
 /* end of #ifndef __fe_H */

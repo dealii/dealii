@@ -127,7 +127,6 @@ bool FiniteElementData<2>::operator== (const FiniteElementData<2> &f) const {
 
 /*------------------------------- FiniteElementBase ----------------------*/
 
-
 #if deal_II_dimension == 1
 
 template <>
@@ -142,6 +141,9 @@ FiniteElementBase<1>::FiniteElementBase (const FiniteElementData<1> &fe_data) :
     };
   interface_constraints.reinit (1,1);
   interface_constraints(0,0)=1.;
+
+  for (unsigned int j=0 ; j<total_dofs ; ++j)
+    system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
 };
 
 #endif
@@ -161,6 +163,8 @@ FiniteElementBase<2>::FiniteElementBase (const FiniteElementData<2> &fe_data) :
     };
   interface_constraints.reinit (dofs_per_vertex+2*dofs_per_line,
 				2*dofs_per_vertex+dofs_per_line);
+  for (unsigned int j=0 ; j<total_dofs ; ++j)
+    system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
 };
 
 #endif
@@ -215,28 +219,6 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 template <int dim>
 FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data) :
 		FiniteElementBase<dim> (fe_data) {};
-
-
-
-template <int dim>
-unsigned
-FiniteElementBase<dim>::component_to_system_index (unsigned component,
-						   unsigned component_index) const
-{
-  Assert(false, ExcInvalidIndex(component));
-  return component_index;
-}
-
-
-template <int dim>  
-pair<unsigned,unsigned>
-FiniteElementBase<dim>::system_to_component_index (unsigned index) const
-{
-  Assert(false, ExcInvalidIndex(index));
-  return pair<unsigned,unsigned>(0,0);
-}
-
-
 
 #if deal_II_dimension == 1
 

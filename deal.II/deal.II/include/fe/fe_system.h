@@ -1,12 +1,13 @@
 /*----------------------------   fe_lib.system.h     ---------------------------*/
 /*      $Id$                 */
-#ifndef __fe_system_H
-#define __fe_system_H
+#ifndef __deal_fe_system_H
+#define __deal_fe_system_H
 /*----------------------------   fe_lib.system.h     ---------------------------*/
 
 
 #include <fe/fe.h>
-
+#include <vector>
+#include <pair.h>
 
 /**
  * This class provides an interface to group several equal elements together
@@ -67,11 +68,10 @@
 template <int dim>
 class FESystem : public FiniteElement<dim>
 {
-				   /**
-				    * Copy constructor prohibited.
-				    */
-  FESystem(const FESystem<dim>&);
-  
+				     /**
+				      * Copy constructor prohibited.
+				      */
+    FESystem(const FESystem<dim>&);
 
   public:
 
@@ -303,55 +303,63 @@ class FESystem : public FiniteElement<dim>
 				     const unsigned int           face_no,
 				     const unsigned int           subface_no,
 				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const;    
+				     vector<Point<dim> >         &normal_vectors) const;
+
+				     /** 
+				      *Number of different composing
+				      * elements of this object.
+				      *
+				      * Since these objects can have
+				      * multiplicity and subobjects
+				      * themselves, this may be
+				      * smaller than the total number
+				      * of finite elements composed
+				      * into this structure.
+				      */
+    unsigned n_component_elements() const;
 
 				     /**
-				      * Number of subelements of this object.
-				      * Since these objects can have
-				      * subobjects themselves, this may be
-				      * smaller than the total number of finite
-				      * elements composed into this structure.
-				      * This is definitely not what you'd
-				      * usally intend, so don't do it!
+				      * How often is a composing element used.
+				      *
 				      */
-    const unsigned int n_sub_elements;
+    unsigned element_multiplicity(unsigned index) const;
 
-				   /**
-				    * Access to the single valued element.
-				    *
-				    * If you assemble your system
-				    * matrix, you usually will not
-				    * want to have an FEValues object
-				    * with a lot of equal entries. Ok,
-				    * so initialize your FEValues with
-				    * the #base_element# yuo get by
-				    * this function.
-				    *
-				    */
-  const FiniteElement<dim>& get_base_element() const;
+				     /**
+				      * Access to a composing element.
+				      *
+				      * If you assemble your system
+				      * matrix, you usually will not
+				      * want to have an FEValues object
+				      * with a lot of equal entries. Ok,
+				      * so initialize your FEValues with
+				      * the #base_element# you get by
+				      * this function. In a mixed
+				      * discretization, you can choose
+				      * the different base element types
+				      * by index.
+				      *
+				      */
+    const FiniteElement<dim>& base_element(unsigned index) const;
 
-				   /**
-				    * Calculate the actual position.
-				    *
-				    * For a given #component#
-				    * (e.g. u,v,w in the example
-				    * above) of the #base# function of
-				    * the #base_element#, return the
-				    * actual index in the local
-				    * degrees of freedom vector of the
-				    * system.
-				    *
-				    */
-  unsigned index(unsigned component, unsigned base) const;
-  
   private:
 
 				     /**
-				      * Pointer to an object of the underlying
-				      * finite element class. This object is
-				      * created by the constructor.
+				      * Pairs of multiplicity and element type.
 				      */
-    const FiniteElement<dim> *const base_element;
+    typedef pair<const FiniteElement<dim> *, unsigned > ElementPair;
+    
+				     /**
+				      * Pointer to underlying finite
+				      * element classes.
+				      *
+				      * This object contains a pointer
+				      * to each contributing element
+				      * of a mixed discretization and
+				      * its multiplicity. It is
+				      * created by the constructor and
+				      * constant afterwards.
+				      */
+    vector< ElementPair > base_elements;
 
     
 				     /**
@@ -365,12 +373,14 @@ class FESystem : public FiniteElement<dim>
 				      * transformation from unit to real
 				      * cell.
 				      */
-    static FiniteElementData<dim> multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
-							const unsigned int            N);
+    static FiniteElementData<dim>
+    multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
+			  const unsigned int            N);
     
 				     /**
 				      * This function is simply singled out of
-				      * the constructor; it sets up the
+				      * the constructor. It sets up the
+				      * index table for the system as well as
 				      * #restriction# and #prolongation#
 				      * matrices. Since the operation of this
 				      * function can be done without explicit
@@ -380,7 +390,7 @@ class FESystem : public FiniteElement<dim>
 				      * the general template definition in
 				      * the #.h# file.
 				      */
-    void initialize_matrices ();
+    void initialize();
 };
 
 
@@ -389,35 +399,45 @@ class FESystem : public FiniteElement<dim>
 
 /* ------------------------- template functions ------------------------- */
 
+template<int dim>
+inline unsigned
+FESystem<dim>::n_component_elements() const
+{
+  return base_elements.size();
+}
+
+
+template<int dim>
+inline unsigned
+FESystem<dim>::element_multiplicity(unsigned index) const
+{
+  return base_elements[index].second;
+}
+
+
 template <int dim>
 inline const FiniteElement<dim>&
-FESystem<dim>::get_base_element() const
+FESystem<dim>::base_element(unsigned index) const
 {
-  return *base_element;
+  return *base_elements[index].first;
 }
 
-template <int dim>
-inline unsigned
-FESystem<dim>::index(unsigned component, unsigned base) const
-{
-  return n_sub_elements * base + component;
-}
 
 template <int dim>
-template <typename FE>
+template <class FE>
 FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
 		FiniteElement (multiply_dof_numbers(fe, n_elements)),
-		n_sub_elements (n_elements),
-		base_element (new FE())
+		base_elements(1)
 {
-  base_element->subscribe ();
-  initialize_matrices ();
+  base_elements[0] = ElementPair(&fe, n_elements);
+  base_elements[0].first -> subscribe ();
+  initialize ();
 };
 
 
 
 
-/*----------------------------   fe_lib.system.h     ---------------------------*/
+/*----------------------------  fe_lib.system.h  ---------------------------*/
 /* end of #ifndef __fe_system_H */
 #endif
-/*----------------------------   fe_lib.system.h     ---------------------------*/
+/*----------------------------  fe_lib.system.h  ---------------------------*/

@@ -11,15 +11,56 @@
 template <int dim>
 FESystem<dim>::~FESystem ()
 {
-  base_element->unsubscribe ();
-  delete base_element;
+  for (unsigned i=0;i<base_elements.size();++i)
+    {
+      base_elements[i].first -> unsubscribe ();
+      delete base_elements[i].first;
+    }
 };
 
 
 
 template <int dim>
-void FESystem<dim>::initialize_matrices ()
+void FESystem<dim>::initialize ()
 {
+				   // Initialize index table
+				   // Multi-component base elements have to be thought of.
+				   // 1. Vertices
+  unsigned total_index = 0;
+  for(unsigned comp = 0; comp < n_component_elements() ; ++comp)
+    {
+      for (unsigned local_index = 0 ;
+	   local_index < base_element(comp).dofs_per_vertex ;
+	   ++local_index)
+	{
+	  system_to_component_table[total_index++] = pair<unsigned,unsigned>
+						   (comp, 0);
+	}
+    }
+				   // 2. Lines
+  for(unsigned comp = 0; comp < n_component_elements() ; ++comp)
+    {
+      for (unsigned local_index = 0 ;
+	   local_index < base_element(comp).dofs_per_vertex ;
+	   ++local_index)
+	{
+	  system_to_component_table[total_index++] = pair<unsigned,unsigned>
+						   (comp, 0);
+	}
+    }
+				   // 3. Quads
+  for(unsigned comp = 0; comp < n_component_elements() ; ++comp)
+    {
+      for (unsigned local_index = 0 ;
+	   local_index < base_element(comp).dofs_per_vertex ;
+	   ++local_index)
+	{
+	  system_to_component_table[total_index++] = pair<unsigned,unsigned>
+						   (comp, 0);
+	}
+    }
+  
+
 				   // distribute the matrices of the base
 				   // finite element to the matrices of
 				   // this object
@@ -67,7 +108,8 @@ FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe_data,
 template <>
 FiniteElementData<2>
 FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe_data,
-				   const unsigned int          N) {
+				   const unsigned int          N)
+{
   return FiniteElementData<2> (fe_data.dofs_per_vertex * N,
 			       fe_data.dofs_per_line * N,
 			       fe_data.dofs_per_quad * N,
@@ -79,12 +121,14 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe_data,
 
 
 
+/*
 template <int dim>
 double FESystem<dim>::shape_value (const unsigned int i,
-				   const Point<dim>  &p) const {
+				   const Point<dim>  &p) const
+{
   Assert((i<total_dofs), ExcInvalidIndex(i));
 
-  return base_element->shape_value (i / n_sub_elements, p);
+//  return base_element->shape_value (i / n_sub_elements, p);
 };
 
 
@@ -95,7 +139,7 @@ FESystem<dim>::shape_grad (const unsigned int  i,
 			   const Point<dim>   &p) const {
   Assert((i<total_dofs), ExcInvalidIndex(i));
 
-  return base_element->shape_grad (i / n_sub_elements, p);
+//  return base_element->shape_grad (i / n_sub_elements, p);
 };
 
 
@@ -106,7 +150,7 @@ FESystem<dim>::shape_grad_grad (const unsigned int  i,
 				const Point<dim>   &p) const {
   Assert((i<total_dofs), ExcInvalidIndex(i));
 
-  return base_element->shape_grad_grad (i / n_sub_elements, p);
+//  return base_element->shape_grad_grad (i / n_sub_elements, p);
 };
 
 
@@ -245,7 +289,7 @@ void FESystem<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &ce
   base_element->get_normal_vectors (cell, face_no, subface_no, unit_points, normal_vectors);
 };
 
-
+*/
 
 
 
