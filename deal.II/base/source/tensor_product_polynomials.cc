@@ -17,10 +17,22 @@
 
 
 
+template<typename number> static
+number power(number x, unsigned int y)
+{
+  number value=1;
+  for (unsigned int i=0; i<y; ++i)
+    value*=x;
+  return value;
+}
+
+
+
 template <int dim>
 TensorProductPolynomials<dim>::TensorProductPolynomials(
   const vector<SmartPointer<Polynomial> > &pols):
-		polynomials(pols)
+		polynomials(pols),
+		n_tensor_pols(power(polynomials.size(), dim))
 {}
 
 
@@ -36,7 +48,7 @@ void TensorProductPolynomials<dim>::compute(
   n_pols_to[0]=1;
   for (unsigned int i=0; i<dim; ++i)
     n_pols_to[i+1]=n_pols_to[i]*n_pols;
-  unsigned int n_tensor_pols=n_pols_to[dim];
+  Assert(n_pols_to[dim]==n_tensor_pols, ExcInternalError());
   
   Assert(values.size()==n_tensor_pols || values.size()==0,
 	 ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
@@ -123,6 +135,12 @@ void TensorProductPolynomials<dim>::compute(
 }
 
 
+template<int dim> inline
+unsigned int
+TensorProductPolynomials<dim>::n_tensor_product_polynomials() const
+{
+  return n_tensor_pols;
+}
 
   
 template class TensorProductPolynomials<1>;
