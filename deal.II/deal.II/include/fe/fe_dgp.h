@@ -16,6 +16,7 @@
 #include <base/config.h>
 #include <base/polynomial.h>
 #include <base/polynomial_space.h>
+#include <grid/geometry_info.h>
 #include <fe/fe.h>
 
 template <int dim> class PolynomialSpace;
