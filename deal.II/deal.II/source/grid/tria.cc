@@ -1093,53 +1093,63 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  for (unsigned int quad=0; quad<GeometryInfo<dim>::faces_per_cell; ++quad)
 	    adjacent_cells[face_iterator[quad]->index()].push_back (cell);
 
-          
+#ifdef DEBUG          
 					   // make some checks on the
 					   // lines and their
 					   // ordering; if the lines
 					   // are right, so are the
 					   // vertices
-					   // TODO: simplify this
-	  Assert (face_iterator[0]->line(face_orientation[0] ? 0 : 3) ==
-                  face_iterator[2]->line(face_orientation[2] ? 0 : 3),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[0]->line(face_orientation[0] ? 1 : 2) ==
-                  face_iterator[3]->line(face_orientation[3] ? 3 : 0),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[0]->line(face_orientation[0] ? 2 : 1) ==
-                  face_iterator[4]->line(face_orientation[4] ? 0 : 3),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[0]->line(face_orientation[0] ? 3 : 0) ==
-                  face_iterator[5]->line(face_orientation[5] ? 3 : 0),
-		  ExcInternalErrorOnCell(c));
 
-	  Assert (face_iterator[1]->line(face_orientation[1] ? 0 : 3) ==
-                  face_iterator[2]->line(face_orientation[2] ? 2 : 1),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[1]->line(face_orientation[1] ? 1 : 2) ==
-                  face_iterator[3]->line(face_orientation[3] ? 1 : 2),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[1]->line(face_orientation[1] ? 2 : 1) ==
-                  face_iterator[4]->line(face_orientation[4] ? 2 : 1),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[1]->line(face_orientation[1] ? 3 : 0) ==
-                  face_iterator[5]->line(face_orientation[5] ? 1 : 2),
-		  ExcInternalErrorOnCell(c));
+					   // first map all cell lines
+					   // to the two face lines
+					   // which should
+					   // coincide. all face lines
+					   // are included with a cell
+					   // line number (0-11)
+					   // key. At the end all keys
+					   // will be included twice
+					   // (for each of the two
+					   // coinciding lines once)
+	  std::multimap<unsigned int, std::pair<unsigned int, unsigned int> >
+	    cell_to_face_lines;
+	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_face; ++line)
+	      cell_to_face_lines.insert(
+		std::pair<unsigned int, std::pair<unsigned int, unsigned int> > (
+		  GeometryInfo<dim>::face_to_cell_lines(face,line),
+		  std::pair<unsigned int, unsigned int> (face,line)));
+	  std::multimap<unsigned int, std::pair<unsigned int, unsigned int> >::const_iterator
+	    map_iter=cell_to_face_lines.begin();
+	  
+	  for (; map_iter!=cell_to_face_lines.end(); ++map_iter)
+	    {
+	      const unsigned int cell_line=map_iter->first;
+	      const unsigned int face1=map_iter->second.first;
+	      const unsigned int line1=map_iter->second.second;
+	      ++map_iter;
+	      Assert(map_iter!=cell_to_face_lines.end(), ExcInternalErrorOnCell(c));
+	      Assert(map_iter->first==cell_line, ExcInternalErrorOnCell(c));
+	      const unsigned int face2=map_iter->second.first;
+	      const unsigned int line2=map_iter->second.second;
 
-	  Assert (face_iterator[2]->line(face_orientation[2] ? 1 : 2) ==
-                  face_iterator[3]->line(face_orientation[3] ? 0 : 3),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[3]->line(face_orientation[3] ? 2 : 1) ==
-                  face_iterator[4]->line(face_orientation[4] ? 1 : 2),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[4]->line(face_orientation[4] ? 3 : 0) ==
-                  face_iterator[5]->line(face_orientation[5] ? 2 : 1),
-		  ExcInternalErrorOnCell(c));
-	  Assert (face_iterator[5]->line(face_orientation[5] ? 0 : 3) ==
-                  face_iterator[2]->line(face_orientation[2] ? 3 : 0),
- 		  ExcInternalErrorOnCell(c));
-	};
-    };
+					       // check that the pair
+					       // of lines really
+					       // coincide. Take care
+					       // about the face
+					       // orientation; note,
+					       // that line_no in
+					       // standard face
+					       // orientation is
+					       // 3-line_no in
+					       // non-standard face
+					       // orientation
+	      Assert (face_iterator[face1]->line(face_orientation[face1] ? line1 : 3-line1) ==
+		      face_iterator[face2]->line(face_orientation[face2] ? line2 : 3-line2),
+		      ExcInternalErrorOnCell(c));
+	    }
+#endif
+	}
+    }
 
 
 				   /////////////////////////////////////////
