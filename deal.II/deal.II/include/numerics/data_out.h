@@ -385,6 +385,11 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * patches, the previous state is
                                       * overwritten, and the merged-in
                                       * patches are lost.
+                                      *
+                                      * This function will fail if
+                                      * either this or the other
+                                      * object did not yet set up any
+                                      * patches.
                                       */
     void merge_patches (const DataOut_DoFData &source);
     

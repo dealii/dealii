@@ -68,15 +68,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
-       Changed: The restriction that source and destination objects of
-       the <code class="member">DataOut_DoFData::merge_patches</code>
-       function need to be non-empty has been lifted. There was no
-       good reason for that anyway.
-       <br>
-       (WB 2002/06/30)
-       </p>
-
-  <li> <p> 
        Fixed: The <code class="member">FETools::extrapolate</code>
        function operates on patches of cells, but didn't check whether
        the grid is at least refined once everywhere. If this was not
