@@ -40,6 +40,7 @@
 #include <numerics/matrices.h>
 
 
+#ifdef HAVE_UMFPACK
 
 template <int dim>
 void test ()
@@ -106,6 +107,14 @@ void test ()
               ExcInternalError());
     }
 }
+
+#else
+
+template<int dim>
+void test()
+{}
+
+#endif
 
 
 int main ()
