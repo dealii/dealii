@@ -50,6 +50,50 @@ void Function<dim>::gradient_list (const vector<Point<dim> > &points,
 
 
 
+
+
+template <int dim>
+double ZeroFunction<dim>::operator () (const Point<dim> &) const {
+  return 0.;
+};
+
+
+
+template <int dim>
+void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
+				    vector<double>            &values) const {
+  Assert (values.size() == 0,
+	  ExcVectorNotEmpty());
+
+  values.reserve (points.size());
+  values.insert (values.begin(), points.size(), 0.);
+};
+
+
+
+template <int dim>
+Point<dim> ZeroFunction<dim>::gradient (const Point<dim> &) const {
+  return Point<dim>();
+};
+
+
+
+template <int dim>
+void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
+				       vector<Point<dim> >       &values) const {
+  Assert (values.size() == 0,
+	  ExcVectorNotEmpty());
+
+  values.reserve (points.size());
+  values.insert (values.begin(), points.size(), Point<dim>());
+};
+
+
+
+
 // explicit instantiations
 template class Function<1>;
 template class Function<2>;
+
+template class ZeroFunction<1>;
+template class ZeroFunction<2>;

@@ -170,11 +170,12 @@ int main () {
 
   cout << "Assembling matrices..." << endl;
   FEValues<2>::UpdateStruct update_flags;
-  update_flags.q_points = true;
-  update_flags.gradients = true;
-  update_flags.jacobians = true;
-  update_flags.JxW_values = true;
+  update_flags.q_points  = update_flags.gradients  = true;
+  update_flags.jacobians = update_flags.JxW_values = true;
+  
   ProblemBase<2>::DirichletBC dirichlet_bc;
+  ZeroFunction<2> zero;
+  dirichlet_bc[0] = &zero;
   problem.assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
 
   cout << "Solving..." << endl;

@@ -79,6 +79,50 @@ class Function {
 
 
 
+/**
+   Provide a function which always returns zero. Obviously, also the derivates
+   of this function are zero.
+
+   This function is of use when you want to implement homogeneous boundary
+   conditions.
+*/
+template <int dim>
+class ZeroFunction : public Function<dim> {
+  public:
+				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual double operator () (const Point<dim> &p) const;
+
+				     /**
+				      * Set #values# to the point values
+				      * of the function at the #points#.
+				      * It is assumed that #values# be
+				      * empty.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values) const;
+
+				     /**
+				      * Return the gradient of the function
+				      * at the given point.
+				      */
+    virtual Point<dim> gradient (const Point<dim> &p) const;
+
+				     /**
+				      * Set #gradients# to the gradients of
+				      * the function at the #points#.
+				      * It is assumed that #values# be
+				      * empty.
+				      */
+    virtual void gradient_list (const vector<Point<dim> > &points,
+				vector<Point<dim> >       &gradients) const;
+};
+
+
+
+
 /*----------------------------   function.h     ---------------------------*/
 /* end of #ifndef __function_H */
 #endif
