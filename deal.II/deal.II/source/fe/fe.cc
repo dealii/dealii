@@ -73,7 +73,7 @@ FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
 					 const unsigned int n_transform_funcs) :
 		FiniteElementData<1> (dofs_per_vertex,
 				      dofs_per_line,
-				      n_transform_functs)
+				      n_transform_funcs)
 {
   Assert (dofs_per_quad==0, ExcInternalError());
 
@@ -181,8 +181,8 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const bool         compute_ansatz_points,
 				       vector<Point<1> > &q_points,
 				       const bool         compute_q_points,
-				       const dFMatrix      &shape_values_transform,
-				       const vector<vector<Point<dim> > > &shape_grad_transform,
+				       const dFMatrix      &,
+				       const vector<vector<Point<1> > > &,
 				       const Boundary<1> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -200,6 +200,9 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
       if (compute_jacobians)
 	jacobians[i](0,0) = 1./h;
       if (compute_q_points)
+					 // assume a linear mapping from unit
+					 // to real space. overload this
+					 // function if you don't like that
 	q_points[i] = cell->vertex(0) + h*unit_points[i];
     };
 
@@ -258,9 +261,9 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 
 
 template <>
-void FiniteElement<1>::get_unit_ansatz_points (vector<Point<1> > &unit_points) const {
-  Assert (unit_points.size() == total_dofs,
-	  ExcWrongFieldDimension(unit_points.size(), total_dofs));
+void FiniteElement<1>::get_unit_ansatz_points (vector<Point<1> > &ansatz_points) const {
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
 				   // compute ansatz points. The first ones
 				   // belong to vertex one, the second ones
 				   // to vertex two, all following are

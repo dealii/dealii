@@ -122,10 +122,12 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 template <>
 void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 					     const vector<CellData<1> > &cells,
-					     const SubCellData          &) {
+					     const SubCellData &subcelldata) {
 				   // note: since no boundary information
 				   // can be given in one dimension, the
-				   // #subcelldata# field is ignored.
+				   // #subcelldata# field is ignored. (only
+				   // used for error checking, which is a
+				   // good idea in any case)
   
   const unsigned int dim=1;
   

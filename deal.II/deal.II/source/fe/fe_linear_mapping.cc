@@ -100,7 +100,7 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 					 vector<Point<1> > &q_points,
 					 const bool         compute_q_points,
 					 const dFMatrix      &shape_values_transform,
-					 const vector<vector<Point<dim> > > &shape_gradients_transform,
+					 const vector<vector<Point<1> > > &shape_gradients_transform,
 					 const Boundary<1> &boundary) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
@@ -205,10 +205,10 @@ void FELinearMapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterat
 
 template <>
 void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
-					   const unsigned int       face_no,
-					   const Boundary<2>       &,
-					   const vector<Point<1> > &unit_points,
-					   vector<Point<2> > &normal_vectors) const {
+					     const unsigned int       face_no,
+					     const Boundary<2>       &,
+					     const vector<Point<1> > &unit_points,
+					     vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == normal_vectors.size(),
@@ -237,10 +237,10 @@ void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator 
 
 template <>
 void FELinearMapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
-					   const unsigned int       face_no,
-					   const unsigned int,
-					   const vector<Point<1> > &unit_points,
-					   vector<Point<2> > &normal_vectors) const {
+					     const unsigned int       face_no,
+					     const unsigned int,
+					     const vector<Point<1> > &unit_points,
+					     vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
 				   // note, that in 2D the normal vectors to the

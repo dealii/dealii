@@ -91,7 +91,7 @@
   perl -pi -e 's/\[(\d+)\]\[(\d)\]/($1,$2)/g;' massmatrix_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' prolongation_1d
   perl -pi -e 's/.*= 0.0;\n//g;' prolongation_1d
-  perl -pi -e 's/(t\d+) =/const double $1/g;' massmatrix_1d
+  perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_1d
 */
 
 
@@ -428,14 +428,14 @@ void FEQuarticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator 
   const double h = cell->vertex(1)(0) - cell->vertex(0)(0);
   Assert (h>0, ExcJacobiDeterminantHasWrongSign());
 
-  const double t1 146.0/2835.0*h;
-  const double t2 29.0/5670.0*h;
-  const double t3 148.0/2835.0*h;
-  const double t4 29.0/945.0*h;
-  const double t5 4.0/405.0*h;
-  const double t6 128.0/405.0*h;
-  const double t7 64.0/945.0*h;
-  const double t8 128.0/2835.0*h;
+  const double t1 = 146.0/2835.0*h;
+  const double t2 = 29.0/5670.0*h;
+  const double t3 = 148.0/2835.0*h;
+  const double t4 = 29.0/945.0*h;
+  const double t5 = 4.0/405.0*h;
+  const double t6 = 128.0/405.0*h;
+  const double t7 = 64.0/945.0*h;
+  const double t8 = 128.0/2835.0*h;
   local_mass_matrix(0,0) = t1;
   local_mass_matrix(0,1) = -t2;
   local_mass_matrix(0,2) = t3;

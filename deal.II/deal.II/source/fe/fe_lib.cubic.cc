@@ -87,7 +87,7 @@
   perl -pi -e 's/grad_phi_polynom\[(\d)\] = (.*);/case $1: return Point<1>($2);/g;' shape_grad_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]/($1,$2)/g;' massmatrix_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' prolongation_1d
-  perl -pi -e 's/(t\d+) =/const double $1/g;' massmatrix_1d
+  perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_1d
 */
 
 
@@ -415,12 +415,12 @@ void FECubicSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &c
   const double h = cell->vertex(1)(0) - cell->vertex(0)(0);
   Assert (h>0, ExcJacobiDeterminantHasWrongSign());
 
-  const double t1 8.0/105.0*h;
-  const double t2 19.0/1680.0*h;
-  const double t3 33.0/560.0*h;
-  const double t4 3.0/140.0*h;
-  const double t5 27.0/70.0*h;
-  const double t6 27.0/560.0*h;
+  const double t1 = 8.0/105.0*h;
+  const double t2 = 19.0/1680.0*h;
+  const double t3 = 33.0/560.0*h;
+  const double t4 = 3.0/140.0*h;
+  const double t5 = 27.0/70.0*h;
+  const double t6 = 27.0/560.0*h;
   local_mass_matrix(0,0) = t1;
   local_mass_matrix(0,1) = t2;
   local_mass_matrix(0,2) = t3;

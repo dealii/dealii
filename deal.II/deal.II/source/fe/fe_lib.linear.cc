@@ -1,3 +1,4 @@
+
 /* $Id$ */
 
 #include <fe/fe_lib.h>
@@ -226,10 +227,10 @@ FELinear<2>::shape_value (const unsigned int i,
   Assert((i<total_dofs), ExcInvalidIndex(i));
   switch (i)
     {
-    case 0: return (1.-p(0)) * (1.-p(1));
-    case 1: return p(0) * (1.-p(1));
-    case 2: return p(0) * p(1);
-    case 3: return (1.-p(0)) * p(1);
+      case 0: return (1.-p(0)) * (1.-p(1));
+      case 1: return p(0) * (1.-p(1));
+      case 2: return p(0) * p(1);
+      case 3: return (1.-p(0)) * p(1);
     }
   return 0.;
 };
@@ -245,10 +246,10 @@ FELinear<2>::shape_grad (const unsigned int i,
   Assert((i<total_dofs), ExcInvalidIndex(i));
   switch (i)
     {
-    case 0: return Point<2> (p(1)-1., p(0)-1.);
-    case 1: return Point<2> (1.-p(1), -p(0));
-    case 2: return Point<2> (p(1), p(0));
-    case 3: return Point<2> (-p(1), 1.-p(0));
+      case 0: return Point<2> (p(1)-1., p(0)-1.);
+      case 1: return Point<2> (1.-p(1), -p(0));
+      case 2: return Point<2> (p(1), p(0));
+      case 3: return Point<2> (-p(1), 1.-p(0));
     }
   return Point<2> ();
 };
@@ -344,17 +345,20 @@ void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cel
   local_mass_matrix(0,2) = t15;
   local_mass_matrix(0,3) = t16;
   local_mass_matrix(1,0) = t14;
-  local_mass_matrix(1,1) = t2/12-t3/12-t4/36-t12/18+t5/12+t6/36+t7/36-t8/12-t9/36+t13/18;
+  local_mass_matrix(1,1) = t2/12-t3/12-t4/36-t12/18+t5/12+t6/36+
+			   t7/36-t8/12-t9/36+t13/18;
   local_mass_matrix(1,2) = t18;
   local_mass_matrix(1,3) = t15;
   local_mass_matrix(2,0) = t15;
   local_mass_matrix(2,1) = t18;
-  local_mass_matrix(2,2) = -t1/18+t2/12+t5/36-t3/36+t6/12-t9/12+t10/18-t4/36+t7/36-t8/12;
+  local_mass_matrix(2,2) = -t1/18+t2/12+t5/36-t3/36+t6/12-t9/12+
+			   t10/18-t4/36+t7/36-t8/12;
   local_mass_matrix(2,3) = t20;
   local_mass_matrix(3,0) = t16;
   local_mass_matrix(3,1) = t15;
   local_mass_matrix(3,2) = t20;
-  local_mass_matrix(3,3) = t12/18+t2/36+t5/36-t3/36+t6/12-t9/12-t13/18-t4/12+t7/12-t8/36;
+  local_mass_matrix(3,3) = t12/18+t2/36+t5/36-t3/36+t6/12-t9/12-
+			   t13/18-t4/12+t7/12-t8/36;
 };
 
 
