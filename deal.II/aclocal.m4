@@ -320,7 +320,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   
       sun_workshop | sun_forte)
           CXXFLAGSG="$CXXFLAGS -DDEBUG"
-          CXXFLAGSO="$CXXFLAGS -fast"
+          CXXFLAGSO="$CXXFLAGS"
           CXXFLAGSPIC="-KPIC"
           ;;
   
