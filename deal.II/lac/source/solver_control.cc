@@ -110,6 +110,14 @@ SolverControl::check (const unsigned int step,
 	deallog << "Starting value " << check_value << std::endl;
     }
 
+  if (check_value <= tol)
+    {
+      if (m_log_result)
+	deallog << "Convergence step " << step
+		<< " value " << check_value << std::endl;
+      lcheck = success;
+      return success;
+    }
   
   if ((step >= maxsteps) ||
 #ifdef HAVE_ISNAN
@@ -131,14 +139,6 @@ SolverControl::check (const unsigned int step,
       return failure;
     }
 
-  if (check_value <= tol)
-    {
-      if (m_log_result)
-	deallog << "Convergence step " << step
-		<< " value " << check_value << std::endl;
-      lcheck = success;
-      return success;
-    }
   lcheck = iterate;
   return iterate;
 }
