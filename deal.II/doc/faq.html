@@ -53,14 +53,18 @@
 
   <p>
   You can't, this version of gcc simply does not work with
-  <acronym>deal.II</acronym>. Also note that version 2.96 is not an
-  officially released version of gcc, but something that RedHat hacked
-  together from the gcc sources. Simply use either gcc 2.95.2 or 3.X.
+  <acronym>deal.II</acronym>. gcc 2.96 was created by RedHat from a
+  snapshot somewhere between 2.95 and 3.0; it contained a large number
+  of compiler bugs, which have partly been fixed, but too many remain
+  as that we were able to make the library work with this
+  compiler. Also note that version 2.96 is not an 
+  officially released version of gcc. Simply use either gcc 2.95.2 or
+  3.X.
   </p>
 
   <p>
-  RedHat provides updates to gcc version 3.0, and downgrades to gcc
-  version 2.95, both of which work with <acronym>deal.II</acronym>.
+  RedHat provides updates to gcc version 3.0 or later, and downgrades
+  to gcc version 2.95, all of which work with <acronym>deal.II</acronym>.
   </p>
   
   <h3><a name="windows">Can I use <acronym>deal.II</acronym> on a
