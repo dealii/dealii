@@ -125,15 +125,15 @@ PolynomialSpace<dim>::output_indices(std::ostream &out) const
 
 template <int dim>
 void
-PolynomialSpace<dim>::set_polynomial_ordering(
-  const std::vector<unsigned int> &imap)
+PolynomialSpace<dim>::set_renumbering(
+  const std::vector<unsigned int> &renumber)
 {
-  Assert(imap.size()==index_map.size(),
-	 ExcDimensionMismatch(imap.size(), index_map.size()));
+  Assert(renumber.size()==index_map.size(),
+	 ExcDimensionMismatch(renumber.size(), index_map.size()));
 
-  index_map=imap;
+  index_map=renumber;
   for (unsigned int i=0; i<index_map.size(); ++i)
-    reverse_index_map[index_map[i]]=i;
+    index_map_inverse[index_map[i]]=i;
 }
 
 
@@ -275,7 +275,7 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
       for (unsigned int iz=0;iz<((dim>2) ? n_1d : 1);++iz)
 	for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
 	  for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
-	    values[reverse_index_map[k++]] =
+	    values[index_map_inverse[k++]] =
 	      v[0][ix][0]
 	      * ((dim>1) ? v[1][iy][0] : 1.)
 	      * ((dim>2) ? v[2][iz][0] : 1.);
@@ -289,7 +289,7 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
 	for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
 	  for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
 	    {
-	      const unsigned int k2=reverse_index_map[k++];
+	      const unsigned int k2=index_map_inverse[k++];
 	      for (unsigned int d=0;d<dim;++d)
 		grads[k2][d] = v[0][ix][(d==0) ? 1 : 0]
                   * ((dim>1) ? v[1][iy][(d==1) ? 1 : 0] : 1.)
@@ -305,7 +305,7 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
 	for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
 	  for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
 	    {
-	      const unsigned int k2=reverse_index_map[k++];
+	      const unsigned int k2=index_map_inverse[k++];
 	      for (unsigned int d1=0; d1<dim; ++d1)
 		for (unsigned int d2=0; d2<dim; ++d2)
 		  {

@@ -31,16 +31,16 @@
  * Given a vector of <i>n</i> one-dimensional polynomials
  * <i>P<sub>0</sub></i> to <i>P<sub>n</sub></i>, where
  * <i>P<sub>i</sub></i> has degree <i>i</i>, this class generates all
- * multi-dimensional polynomials of the form <i>
+ * dim-dimensional polynomials of the form <i>
  * P<sub>ijk</sub>(x,y,z) =
  * P<sub>i</sub>(x)P<sub>j</sub>(y)P<sub>k</sub>(z)</i>, where the sum
  * of <i>i</i>, <i>j</i> and <i>k</i> is less than or equal <i>n</i>.
  *
  * The @ref{output_indices} function prints the ordering of the
- * polynomials, i.e. for each multi-dimensional polynomial in the
+ * polynomials, i.e. for each dim-dimensional polynomial in the
  * polynomial space it gives the indices i,j,k of the one-dimensional
  * polynomials in x,y and z direction. The ordering of the
- * multi-dimensional polynomials can be changed by using the
+ * dim-dimensional polynomials can be changed by using the
  * @p{set_polynomial_ordering} function.
  *
  * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003, Ralf Hartmann 2004
@@ -78,7 +78,7 @@ class PolynomialSpace
 				      * <tt>index_map.size()==n()</tt>. Stores
 				      * a copy of <tt>index_map</tt>.
 				      */
-    void set_polynomial_ordering(const std::vector<unsigned int> &index_map);
+    void set_renumbering(const std::vector<unsigned int> &index_map);
     
 				     /**
 				      * Computes the value and the
@@ -213,7 +213,7 @@ class PolynomialSpace
 				      * Index map for reordering the
 				      * polynomials.
 				      */
-    std::vector<unsigned int> reverse_index_map;
+    std::vector<unsigned int> index_map_inverse;
     
 				     /**
 				      * Static function used in the
@@ -248,16 +248,16 @@ PolynomialSpace<dim>::PolynomialSpace (const std::vector<Pol> &pols)
 		polynomials (pols.begin(), pols.end()),
 		n_pols (compute_n_pols(polynomials.size())),
 		index_map(n_pols),
-		reverse_index_map(n_pols)
+		index_map_inverse(n_pols)
 {
 				   // per default set this index map
 				   // to identity. This map can be
 				   // changed by the user through the
-				   // set_polynomial_ordering function
+				   // set_renumbering function
   for (unsigned int i=0; i<n_pols; ++i)
     {
       index_map[i]=i;
-      reverse_index_map[i]=i;
+      index_map_inverse[i]=i;
     }
 }
 

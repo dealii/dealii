@@ -22,7 +22,7 @@ PolynomialsP<dim>::PolynomialsP (const unsigned int p)
 {
   std::vector<unsigned int> index_map(this->n());
   create_polynomial_ordering(index_map);
-  this->set_polynomial_ordering(index_map);
+  this->set_renumbering(index_map);
 }
 
 
