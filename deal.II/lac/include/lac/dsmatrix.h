@@ -329,15 +329,24 @@ class dSMatrix
 				      * matrix elements which are explicitely
 				      * set to zero are displayed as such.
 				      *
-				      * Each entry is printed as a six character
-				      * wide field, with one space following.
+				      * Each entry is printed in scientific
+				      * format, with one pre-comma digit and
+				      * the number of digits given by
+				      * #precision# after the comma, with one
+				      * space following.
+				      * The precision defaults to four, which
+				      * suffices for most cases. The precision
+				      * and output format are {\it not}
+				      * properly reset to the old values
+				      * when the function exits.
 				      *
 				      * You should be aware that this function
 				      * may produce {\bf large} amounts of
 				      * output if applied to a large matrix!
 				      * Be careful with it.
 				      */
-    void print_formatted (ostream &out) const;
+    void print_formatted (ostream &out,
+			  const unsigned int presicion=3) const;
     
 				     /**
 				      * Exception

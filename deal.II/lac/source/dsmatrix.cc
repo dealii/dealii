@@ -628,14 +628,20 @@ void dSMatrix::print (ostream &out) const {
 
 
 
-void dSMatrix::print_formatted (ostream &out) const {
+void dSMatrix::print_formatted (ostream &out, const unsigned int precision) const {
+  out.precision (precision);
+  out.setf (ios::scientific, ios::floatfield);   // set output format
+  
   for (unsigned int i=0; i<m(); ++i) 
     {
       for (unsigned int j=0; j<n(); ++j)
 	if ((*cols)(i,j) != -1)
-	  out << setw(6) << val[cols->operator()(i,j)] << " ";
+	  out << setw(precision+7)
+	      << val[cols->operator()(i,j)] << ' ';
 	else
-	  out << "       ";
+	  out << setw(precision+8) << " ";
       out << endl;
     };
+
+  out.setf (0, ios::floatfield);                 // reset output format
 };
