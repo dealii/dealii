@@ -786,6 +786,20 @@ namespace StandardExceptions
 				    */
   DeclException1 (ExcMessage, char*,
 		  << arg1);
+
+				   /**
+				    * Exception used when running into
+				    * functions that are only supported
+				    * in a backward compatibility mode.
+				    */
+  DeclException1 (ExcCompatibility,
+		  char*,
+		  << "You are using a backward compatibility feature\n"
+		  << "that you have disabled during configuration of\n"
+		  << "the library by the --disable-compat="
+		  << arg1 << " switch. You should either use an\n"
+		  << "alternative function, or configure again without\n"
+		  << "this switch and recompile the library.");
 };
 
 
