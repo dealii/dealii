@@ -227,15 +227,15 @@ void ElasticProblem<dim>::setup_system ()
                         local_dofs,
                         dof_handler.max_couplings_between_dofs());
 
-  solution.reinit (dof_handler.n_dofs(), local_dofs, mpi_communicator);
-  system_rhs.reinit (dof_handler.n_dofs(), local_dofs, mpi_communicator);
+  solution.reinit (mpi_communicator, dof_handler.n_dofs(), local_dofs);
+  system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), local_dofs);
 }
 
 
 template <int dim>
 void ElasticProblem<dim>::assemble_system () 
 {
-                                   // move to front
+                                   // xxx move to front
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -270,84 +270,86 @@ void ElasticProblem<dim>::assemble_system ()
   typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
-    {
-      cell_matrix.clear ();
-      cell_rhs.clear ();
+                                     // xxx
+    if (cell->subdomain_id() == this_partition)
+      {
+        cell_matrix.clear ();
+        cell_rhs.clear ();
 
-      fe_values.reinit (cell);
+        fe_values.reinit (cell);
       
-      lambda.value_list (fe_values.get_quadrature_points(), lambda_values);
-      mu.value_list     (fe_values.get_quadrature_points(), mu_values);
+        lambda.value_list (fe_values.get_quadrature_points(), lambda_values);
+        mu.value_list     (fe_values.get_quadrature_points(), mu_values);
 
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  const unsigned int 
-	    component_i = fe.system_to_component_index(i).first;
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            const unsigned int 
+              component_i = fe.system_to_component_index(i).first;
 	  
-	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
-	    {
-	      const unsigned int 
-		component_j = fe.system_to_component_index(j).first;
+            for (unsigned int j=0; j<dofs_per_cell; ++j) 
+              {
+                const unsigned int 
+                  component_j = fe.system_to_component_index(j).first;
 	      
-	      for (unsigned int q_point=0; q_point<n_q_points;
-		   ++q_point)
-		{
-		  cell_matrix(i,j) 
-		    += 
-		    (
-		      (fe_values.shape_grad(i,q_point)[component_i] *
-		       fe_values.shape_grad(j,q_point)[component_j] *
-		       lambda_values[q_point])
-		      +
-		      (fe_values.shape_grad(i,q_point)[component_j] *
-		       fe_values.shape_grad(j,q_point)[component_i] *
-		       mu_values[q_point])
-		      +
-		      ((component_i == component_j) ?
-		       (fe_values.shape_grad(i,q_point) *
-			fe_values.shape_grad(j,q_point) *
-			mu_values[q_point])  :
-		       0)
-		    )
-		    *
-		    fe_values.JxW(q_point);
-		};
-	    };
-	};
+                for (unsigned int q_point=0; q_point<n_q_points;
+                     ++q_point)
+                  {
+                    cell_matrix(i,j) 
+                      += 
+                      (
+                        (fe_values.shape_grad(i,q_point)[component_i] *
+                         fe_values.shape_grad(j,q_point)[component_j] *
+                         lambda_values[q_point])
+                        +
+                        (fe_values.shape_grad(i,q_point)[component_j] *
+                         fe_values.shape_grad(j,q_point)[component_i] *
+                         mu_values[q_point])
+                        +
+                        ((component_i == component_j) ?
+                         (fe_values.shape_grad(i,q_point) *
+                          fe_values.shape_grad(j,q_point) *
+                          mu_values[q_point])  :
+                         0)
+                        )
+                      *
+                      fe_values.JxW(q_point);
+                  };
+              };
+          };
 
-      right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
-					 rhs_values);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  const unsigned int 
-	    component_i = fe.system_to_component_index(i).first;
+        right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
+                                           rhs_values);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            const unsigned int 
+              component_i = fe.system_to_component_index(i).first;
 	  
-	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	    cell_rhs(i) += fe_values.shape_value(i,q_point) *
-			   rhs_values[q_point](component_i) *
-			   fe_values.JxW(q_point);
-	};
+            for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+              cell_rhs(i) += fe_values.shape_value(i,q_point) *
+                             rhs_values[q_point](component_i) *
+                             fe_values.JxW(q_point);
+          };
 
-      cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices (local_dof_indices);
 
-                                       //xxx
-      MatrixTools::local_apply_boundary_values (boundary_values,
-                                                local_dof_indices,
-                                                cell_matrix,
-                                                cell_rhs,
-                                                false);
+                                         //xxx
+        MatrixTools::local_apply_boundary_values (boundary_values,
+                                                  local_dof_indices,
+                                                  cell_matrix,
+                                                  cell_rhs,
+                                                  false);
 
-                                       // xxx
-      hanging_node_constraints
-        .distribute_local_to_global (cell_matrix,
-                                     local_dof_indices,
-                                     system_matrix);
+                                         // xxx
+        hanging_node_constraints
+          .distribute_local_to_global (cell_matrix,
+                                       local_dof_indices,
+                                       system_matrix);
 
-      hanging_node_constraints
-        .distribute_local_to_global (cell_rhs,
-                                     local_dof_indices,
-                                     system_rhs);
-    }
+        hanging_node_constraints
+          .distribute_local_to_global (cell_rhs,
+                                       local_dof_indices,
+                                       system_rhs);
+      }
 
                                    //xxx no condense necessary, no apply_b_v
                                    //either
@@ -365,14 +367,19 @@ void ElasticProblem<dim>::solve ()
 {
                                    // xxx
   SolverControl           solver_control (1000, 1e-10);
-  PETScWrappers::SolverCG cg (solver_control);
+  PETScWrappers::SolverCG cg (solver_control,
+                              mpi_communicator);
 
-  PETScWrappers::PreconditionSSOR preconditioner(system_matrix, 1.2);
-
+  PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
+  
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
-
   hanging_node_constraints.distribute (solution);
+
+  if (this_partition == 0)
+    std::cout << "   Solver converged in "
+              << solver_control.last_step()
+              << " iterations." << std::endl;
 }
 
 
@@ -460,7 +467,7 @@ void ElasticProblem<dim>::run ()
       if (cycle == 0)
 	{
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
-	  triangulation.refine_global (2);
+	  triangulation.refine_global (4);
 
                                            // xxx
           GridTools::partition_triangulation (n_partitions, triangulation);
@@ -478,9 +485,17 @@ void ElasticProblem<dim>::run ()
 
                                        // xxx
       if (this_partition == 0)
-        std::cout << "   Number of degrees of freedom: "
-                  << dof_handler.n_dofs()
-                  << std::endl;
+        {
+          std::cout << "   Number of degrees of freedom: "
+                    << dof_handler.n_dofs()
+                    << " (by partition:";
+          for (unsigned int partition=0; partition<n_partitions; ++partition)
+            std::cout << (partition==0 ? ' ' : '+')
+                      << (DoFTools::
+                          count_dofs_with_subdomain_association (dof_handler,
+                                                                 partition));
+          std::cout << ")" << std::endl;
+        }
       
       assemble_system ();
       solve ();
@@ -499,7 +514,7 @@ int main (int argc, char **argv)
 
                                        // xxx localize scope
       {
-        ElasticProblem<2> elastic_problem_2d;
+        ElasticProblem<3> elastic_problem_2d;
         elastic_problem_2d.run ();
       }
 
