@@ -21,7 +21,7 @@ h-files  = $(wildcard ../include/*/*.h)
 # don't care about different directories
 tmp1     = $(notdir $(cc-files))
 o-files  = $(addprefix ../lib/o/,  $(tmp1:.cc=.o) )
-go-files = $(addprefix ../lib/go/, $(tmp2:.cc=.go))
+go-files = $(addprefix ../lib/go/, $(tmp1:.cc=.go))
 
 
 deal_II_dimension=2
@@ -61,6 +61,8 @@ endif
 all: ../lib/libdeal_II.g.a ../lib/libdeal_II.a
 
 ../lib/libdeal_II.g.a: $(go-files)
+	@echo ============================ Second compiler run
+	-@$(CXX) $(CXXFLAGS) -o second-run $(go-files)
 	@echo ============================ Updating library:   $@
 	@ar ruv $@ $(go-files)
 
