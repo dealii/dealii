@@ -60,8 +60,8 @@ enum NormType {
  *   created the value of the function given as argument. This is identical
  *   to saying that the resulting finite element function (which is isomorphic
  *   to the output vector) has exact function values in all off-points of
- *   ansatz functions. The off-point of an ansatz function is the point where
- *   it assumes its nominal value, e.g. for linear ansatz functions the
+ *   trial functions. The off-point of an trial function is the point where
+ *   it assumes its nominal value, e.g. for linear trial functions the
  *   off-points are th corners of an element. This function therefore relies
  *   on the assumption that a finite element is used for which the degrees
  *   of freedom are function values (Lagrange elements) rather than gradients,
@@ -70,7 +70,7 @@ enum NormType {
  *
  *   It seems inevitable that some values of the vector to be created are set
  *   twice or even more than that. The reason is that we have to loop over
- *   all cells and get the function values for each of the ansatz functions
+ *   all cells and get the function values for each of the trial functions
  *   located thereon. This applies also to the functions located on faces and
  *   corners which we thus visit more than once. While setting the value
  *   in the vector is not an expensive operation, the evaluation of the
@@ -267,7 +267,7 @@ class VectorTools {
 
 				     /**
 				      * Compute the interpolation of
-				      * #function# at the ansatz points to
+				      * #function# at the support points to
 				      * the finite element space.
 				      *
 				      * See the general documentation of this
@@ -279,6 +279,24 @@ class VectorTools {
 			     const Function<dim>      &function,
 			     dVector                  &vec);
 
+				   /**
+				    * Interpolate different finite element
+				    * spaces. The interpolation is
+				    * executed from the higher order
+				    * space represented by #high# to
+				    the lower order space
+				    #low#. The interpolation on each
+				    cell is represented by the matrix
+				    #transfer#. Curved boundaries are
+				    neglected so far.
+				   */
+  static void interpolate(const DoFHandler<dim>    &high_dof,
+			  const DoFHandler<dim>    &low_dof,
+			  const dFMatrix& transfer,
+			  const dVector& high,
+			  dVector& low);
+  
+			  
 				     /**
 				      * Compute the projection of
 				      * #function# to the finite element space.

@@ -139,7 +139,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
   Assert (rhs.size() != 0, ExcInternalError());
-  Assert (dof.get_selected_fe() == fe, ExcInternalError());
+  Assert (dof.get_fe() == fe, ExcInternalError());
   Assert (dof_to_boundary_mapping.size() == dof.n_dofs(), ExcInternalError());
   Assert (*max_element(dof_to_boundary_mapping.begin(),dof_to_boundary_mapping.end()) ==
 	  (signed int)matrix.n()-1,

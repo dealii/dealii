@@ -8,9 +8,7 @@
 #include <vector>
 #include <map>
 #include <base/exceptions.h>
-
-
-
+#include <base/smartpointer.h>
 
 template <int dim> class TriaAccessor;
 template <int dim> class LineAccessor;
@@ -481,7 +479,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     DoFHandler (Triangulation<dim> *tria);
 
 				     /**
-				      * Destructor
+				      * Destructor.
 				      */
     virtual ~DoFHandler ();
     
@@ -1244,7 +1242,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * function is inline, so it should
 				      * be reasonably fast.
 				      */
-    const FiniteElementBase<dim> & get_selected_fe () const;
+    const FiniteElementBase<dim> & get_fe () const;
 
 				     /**
 				      * Return a constant reference to the
@@ -1326,7 +1324,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * dofs per line, but also restriction
 				      * and prolongation matrices, etc.
 				      */
-    const FiniteElementBase<dim>   *selected_fe;
+    SmartPointer<const FiniteElementBase<dim> > selected_fe;
 
   private:
 				     /**
@@ -1425,7 +1423,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 
 template <int dim>
 inline
-const FiniteElementBase<dim> & DoFHandler<dim>::get_selected_fe () const {
+const FiniteElementBase<dim> & DoFHandler<dim>::get_fe () const {
   return *selected_fe;
 };
 

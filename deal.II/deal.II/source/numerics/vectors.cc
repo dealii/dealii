@@ -70,10 +70,19 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 };
 
 
+template <int dim> void
+VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
+			 const DoFHandler<dim>    &low_dof,
+			 const dFMatrix           &transfer,
+			 const dVector            &high,
+			 dVector                  &low)
+{
+  
+}
 
 #if deal_II_dimension == 1
 
-template <>
+
 void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const ConstraintMatrix &,
 			      const FiniteElement<1> &,
@@ -353,7 +362,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     const FiniteElement<dim> &fe,
 					     const NormType           &norm,
 					     const Boundary<dim>      &boundary) {
-  Assert (fe == dof.get_selected_fe(), ExcInvalidFE());
+  Assert (fe == dof.get_fe(), ExcInvalidFE());
   
   difference.reinit (dof.get_tria().n_active_cells());
   

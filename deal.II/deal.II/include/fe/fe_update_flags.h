@@ -45,15 +45,15 @@ enum UpdateFlags {
       update_JxW_values = 8,
 				       /**
 					* Compute the points on the real cell
-					* on which the ansatz functions are
+					* on which the trial functions are
 					* located.
 					*
 					* Giving this flag to the
 					* #FESubfaceValues# class will result
-					* in an error, since ansatz points are
+					* in an error, since support points are
 					* not useful in that case.
 					*/
-      update_ansatz_points = 16,
+      update_support_points = 16,
 				       /**
 				        * Update the outward normal vectors
 				        * to the face relative to this cell.

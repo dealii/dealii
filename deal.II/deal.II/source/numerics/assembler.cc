@@ -75,8 +75,8 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 			   const int           index,
 			   const AssemblerData<dim> *local_data) :
 		DoFCellAccessor<dim> (tria,level,index, &local_data->dof),
-		cell_matrix (dof_handler->get_selected_fe().total_dofs),
-		cell_vector (dVector(dof_handler->get_selected_fe().total_dofs)),
+		cell_matrix (dof_handler->get_fe().total_dofs),
+		cell_vector (dVector(dof_handler->get_fe().total_dofs)),
 		assemble_matrix (local_data->assemble_matrix),
 		assemble_rhs (local_data->assemble_rhs),
 		matrix(local_data->matrix),
@@ -91,7 +91,7 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 	  ExcInvalidData());
   Assert (!assemble_matrix || (matrix.n() == dof_handler->n_dofs()),
 	  ExcInvalidData());
-  Assert (((AssemblerData<dim>*)local_data)->fe == dof_handler->get_selected_fe(),
+  Assert (((AssemblerData<dim>*)local_data)->fe == dof_handler->get_fe(),
 	  ExcInvalidData());
   Assert (!assemble_rhs || (rhs_vector.size()==dof_handler->n_dofs()),
 	  ExcInvalidData());
@@ -107,7 +107,7 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 						    present_index,
 						    dof_handler),
 		    boundary);
-  const unsigned int n_dofs = dof_handler->get_selected_fe().total_dofs;
+  const unsigned int n_dofs = dof_handler->get_fe().total_dofs;
 
   if (assemble_matrix)
     cell_matrix.clear ();

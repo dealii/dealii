@@ -17,7 +17,7 @@
 
 template <int dim>
 FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
-				 const unsigned int n_ansatz_points,
+				 const unsigned int n_support_points,
 				 const unsigned int n_dofs,
 				 const unsigned int n_transform_functions,
 				 const unsigned int n_values_arrays,
@@ -30,7 +30,7 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 		weights (n_q_points, 0),
 		JxW_values (n_q_points, 0),
 		quadrature_points (n_q_points, Point<dim>()),
-		ansatz_points (n_ansatz_points, Point<dim>()),
+		support_points (n_support_points, Point<dim>()),
 		jacobi_matrices (n_q_points, dFMatrix(dim,dim)),
 		shape_values_transform (n_values_arrays,
 					dFMatrix(n_transform_functions,
@@ -72,7 +72,7 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 				   // initialize with zero
   fill_n (values.begin(), n_quadrature_points, 0);
 
-				   // add up contributions of ansatz
+				   // add up contributions of trial
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
@@ -111,7 +111,7 @@ void FEValuesBase<dim>::get_function_grads (const dVector       &fe_function,
 				   // initialize with zero
   fill_n (gradients.begin(), n_quadrature_points, Point<dim>());
 
-				   // add up contributions of ansatz
+				   // add up contributions of trial
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
@@ -132,11 +132,11 @@ const Point<dim> & FEValuesBase<dim>::quadrature_point (const unsigned int i) co
 
 
 template <int dim>
-const Point<dim> & FEValuesBase<dim>::ansatz_point (const unsigned int i) const {
-  Assert (i<ansatz_points.size(), ExcInvalidIndex(i, ansatz_points.size()));
-  Assert (update_flags & update_ansatz_points, ExcAccessToUninitializedField());
+const Point<dim> & FEValuesBase<dim>::support_point (const unsigned int i) const {
+  Assert (i<support_points.size(), ExcInvalidIndex(i, support_points.size()));
+  Assert (update_flags & update_support_points, ExcAccessToUninitializedField());
   
-  return ansatz_points[i];
+  return support_points[i];
 };
 
 
@@ -210,15 +210,15 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
       (update_flags & update_JxW_values)||
       (update_flags & update_q_points)  ||
       (update_flags & update_gradients) ||
-      (update_flags & update_ansatz_points))
+      (update_flags & update_support_points))
     fe->fill_fe_values (cell,
 		       unit_quadrature_points,
 		       jacobi_matrices,
 		       update_flags & (update_jacobians  |
 				       update_JxW_values |
 				       update_gradients),
-		       ansatz_points,
-		       update_flags & update_ansatz_points,
+		       support_points,
+		       update_flags & update_support_points,
 		       quadrature_points,
 		       update_flags & update_q_points,
 		       shape_values_transform[0], unit_shape_gradients_transform,
@@ -262,13 +262,13 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 
 template <int dim>
 FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
-					 const unsigned int n_ansatz_points,
+					 const unsigned int n_support_points,
 					 const unsigned int n_dofs,
 					 const unsigned int n_transform_functions,
 					 const unsigned int n_faces_or_subfaces,
 					 const UpdateFlags update_flags) :
 		FEValuesBase<dim> (n_q_points,
-				   n_ansatz_points,
+				   n_support_points,
 				   n_dofs,
 				   n_transform_functions,
 				   n_faces_or_subfaces,
@@ -363,7 +363,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       (update_flags & update_JxW_values)||
       (update_flags & update_q_points)  ||
       (update_flags & update_gradients) ||
-      (update_flags & update_ansatz_points) ||
+      (update_flags & update_support_points) ||
       (update_flags & update_JxW_values))
     fe->fill_fe_face_values (cell,
 			    face_no,
@@ -373,8 +373,8 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 			    update_flags & (update_jacobians |
 					    update_gradients |
 					    update_JxW_values),
-			    ansatz_points,
-			    update_flags & update_ansatz_points,
+			    support_points,
+			    update_flags & update_support_points,
 			    quadrature_points,
 			    update_flags & update_q_points,
 			    face_jacobi_determinants,
@@ -435,7 +435,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       update_flags),
 		fe(&fe)
 {
-  Assert ((update_flags & update_ansatz_points) == false,
+  Assert ((update_flags & update_support_points) == false,
 	  ExcInvalidUpdateFlag());
   
   unit_face_quadrature_points = quadrature.get_quad_points();

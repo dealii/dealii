@@ -25,15 +25,12 @@
 template <int dim>
 DoFHandler<dim>::DoFHandler (Triangulation<dim> *tria) :
 		tria(tria),
-		selected_fe (0),
 		used_dofs (0) {};
 
 
 template <int dim>
-DoFHandler<dim>::~DoFHandler () {
-  if (selected_fe != 0)
-    delete selected_fe;
-};
+DoFHandler<dim>::~DoFHandler ()
+{}
 
 
 
@@ -885,11 +882,11 @@ const Triangulation<dim> & DoFHandler<dim>::get_tria () const {
 
 
 template <int dim>
-void DoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &fe) {
+void DoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &ff) {
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
-  if (selected_fe != 0) delete selected_fe;
-  selected_fe = new FiniteElementBase<dim>(fe);
+  selected_fe = &ff;
+  
   reserve_space ();
 
 				   // clear user flags because we will

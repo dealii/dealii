@@ -37,12 +37,12 @@ int MGDoFLineAccessor<dim,BaseClass>::mg_dof_index (const unsigned int i) const 
   Assert (mg_dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (i<dof_handler->get_selected_fe().dofs_per_line,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_line));
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (i<dof_handler->get_fe().dofs_per_line,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_line));
 
   return mg_dof_handler->mg_levels[present_level]
-    ->line_dofs[present_index*dof_handler->get_selected_fe().dofs_per_line+i];
+    ->line_dofs[present_index*dof_handler->get_fe().dofs_per_line+i];
 };
 
 
@@ -56,12 +56,12 @@ void MGDoFLineAccessor<dim,BaseClass>::set_mg_dof_index (const unsigned int i,
   Assert (mg_dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (i<dof_handler->get_selected_fe().dofs_per_line,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_line));
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (i<dof_handler->get_fe().dofs_per_line,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_line));
 
   mg_dof_handler->mg_levels[present_level]
-    ->line_dofs[present_index*dof_handler->get_selected_fe().dofs_per_line+i] = index;
+    ->line_dofs[present_index*dof_handler->get_fe().dofs_per_line+i] = index;
 };
 
 
@@ -72,13 +72,13 @@ int MGDoFLineAccessor<dim,BaseClass>::mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (vertex<2, ExcInvalidIndex (i,0,2));
-  Assert (i<dof_handler->get_selected_fe().dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_vertex));
+  Assert (i<dof_handler->get_fe().dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_vertex));
 
   return (mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
-	  .get_index (present_level, i, dof_handler->get_selected_fe().dofs_per_vertex));
+	  .get_index (present_level, i, dof_handler->get_fe().dofs_per_vertex));
 };
 
 
@@ -89,13 +89,13 @@ void MGDoFLineAccessor<dim,BaseClass>::set_mg_vertex_dof_index (const unsigned i
 								const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (vertex<2, ExcInvalidIndex (i,0,2));
-  Assert (i<dof_handler->get_selected_fe().dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_vertex));
+  Assert (i<dof_handler->get_fe().dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_vertex));
 
   mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
-    .set_index (present_level, i, dof_handler->get_selected_fe().dofs_per_vertex, index);
+    .set_index (present_level, i, dof_handler->get_fe().dofs_per_vertex, index);
 };
 
 
@@ -105,13 +105,13 @@ void
 MGDoFLineAccessor<dim,BaseClass>::get_mg_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_indices.size() == (2*dof_handler->get_selected_fe().dofs_per_vertex +
-				 dof_handler->get_selected_fe().dofs_per_line),
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == (2*dof_handler->get_fe().dofs_per_vertex +
+				 dof_handler->get_fe().dofs_per_line),
 	  ExcVectorDoesNotMatch());
 
-  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
   vector<int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -168,12 +168,12 @@ int MGDoFQuadAccessor<dim,BaseClass>::mg_dof_index (const unsigned int i) const 
   Assert (mg_dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (i<dof_handler->get_selected_fe().dofs_per_quad,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_quad));
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (i<dof_handler->get_fe().dofs_per_quad,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_quad));
 
   return mg_dof_handler->mg_levels[present_level]
-    ->quad_dofs[present_index*dof_handler->get_selected_fe().dofs_per_quad+i];
+    ->quad_dofs[present_index*dof_handler->get_fe().dofs_per_quad+i];
 };
 
 
@@ -185,12 +185,12 @@ void MGDoFQuadAccessor<dim,BaseClass>::set_mg_dof_index (const unsigned int i,
   Assert (mg_dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (i<dof_handler->get_selected_fe().dofs_per_quad,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_quad));
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (i<dof_handler->get_fe().dofs_per_quad,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_quad));
 
   mg_dof_handler->mg_levels[present_level]
-    ->quad_dofs[present_index*dof_handler->get_selected_fe().dofs_per_quad+i] = index;
+    ->quad_dofs[present_index*dof_handler->get_fe().dofs_per_quad+i] = index;
 };
 
 
@@ -201,13 +201,13 @@ int MGDoFQuadAccessor<dim,BaseClass>::mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (vertex<4, ExcInvalidIndex (i,0,4));
-  Assert (i<dof_handler->get_selected_fe().dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_vertex));
+  Assert (i<dof_handler->get_fe().dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_vertex));
   
   return (mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
-	  .get_index (present_level, i, dof_handler->get_selected_fe().dofs_per_vertex));
+	  .get_index (present_level, i, dof_handler->get_fe().dofs_per_vertex));
 };
 
 
@@ -218,13 +218,13 @@ void MGDoFQuadAccessor<dim,BaseClass>::set_mg_vertex_dof_index (const unsigned i
 								const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (vertex<4, ExcInvalidIndex (i,0,4));
-  Assert (i<dof_handler->get_selected_fe().dofs_per_vertex,
-	  ExcInvalidIndex (i, 0, dof_handler->get_selected_fe().dofs_per_vertex));
+  Assert (i<dof_handler->get_fe().dofs_per_vertex,
+	  ExcInvalidIndex (i, 0, dof_handler->get_fe().dofs_per_vertex));
 
   mg_dof_handler->mg_vertex_dofs[vertex_index(vertex)]
-    .set_index (present_level, i, dof_handler->get_selected_fe().dofs_per_vertex, index);
+    .set_index (present_level, i, dof_handler->get_fe().dofs_per_vertex, index);
 };
 
 
@@ -234,15 +234,15 @@ void
 MGDoFQuadAccessor<dim,BaseClass>::get_mg_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_indices.size() == (4*dof_handler->get_selected_fe().dofs_per_vertex +
-				 4*dof_handler->get_selected_fe().dofs_per_line +
-				 dof_handler->get_selected_fe().dofs_per_quad),
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_indices.size() == (4*dof_handler->get_fe().dofs_per_vertex +
+				 4*dof_handler->get_fe().dofs_per_line +
+				 dof_handler->get_fe().dofs_per_quad),
 	  ExcVectorDoesNotMatch());
 
-  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_selected_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
   vector<int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -353,14 +353,14 @@ MGDoFCellAccessor<1>::get_mg_dof_values (const dVector &values,
 					 dVector       &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
 
-  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
   vector<double>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -389,15 +389,15 @@ MGDoFCellAccessor<2>::get_mg_dof_values (const dVector &values,
 					 dVector       &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
 
-  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_selected_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
   vector<double>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)

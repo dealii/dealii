@@ -224,7 +224,7 @@ void DataOut<dim>::clear_data_vectors () {
 template <int dim>
 void DataOut<dim>::write_ucd (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
-  Assert (dofs->get_selected_fe().dofs_per_vertex==1,
+  Assert (dofs->get_fe().dofs_per_vertex==1,
 	  ExcIncorrectDofsPerVertex());
   Assert ((1<=dim) && (dim<=3), ExcNotImplemented());
   
@@ -463,7 +463,7 @@ void DataOut<dim>::write_gnuplot (ostream &out) const {
   Assert ((1<=dim) && (dim<=3), ExcNotImplemented());
 
   if (dim==1)
-    Assert (dofs->get_selected_fe().dofs_per_vertex==1,
+    Assert (dofs->get_fe().dofs_per_vertex==1,
 	    ExcIncorrectDofsPerVertex());
 
   				   // write preamble

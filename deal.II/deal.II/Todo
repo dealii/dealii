@@ -162,11 +162,13 @@ Why are there all these unsafe casts from VectorBase to dVector
 
 Use unsigned integers for the colnums array in dSMatrixStruct. This
   would enhance safety since colnum=-1 would no longer point to a
-  valid address.
+  valid address. How do you mark non-used columns? (gk)
 
 Let dSMatrixStruct::compress free the memory of colnums which is
   no longer needed.
 
-FeValues: Replace 'ansatz', add flexibility for update flags and put
-the element into the constructor
+FeValues: add flexibility for update flags
 
+Remove all fe& in vectors.h
+
+Collection of transfer matrices: how to design?
