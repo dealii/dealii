@@ -47,6 +47,15 @@ class FEQ1Mapping : public FiniteElement<dim>
 		 const unsigned int  n_components,
 		 const vector<bool> &restriction_is_additive_flags);
 
+				     /**
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns @p{p_real}.
+				      */
+    virtual Point<dim> transform_unit_to_real_cell (const DoFHandler<dim>::cell_iterator cell,
+						    const Point<dim> &p) const;
+    
     				     /**
 				      * Return the value of the @p{i}th shape
 				      * function at point @p{p} on the unit cell.

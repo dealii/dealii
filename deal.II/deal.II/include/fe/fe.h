@@ -194,7 +194,7 @@ class FiniteElementData
     unsigned int n_components () const;
 
     				     /**
-				      * Return the @p{transform_functions}.
+				      * Return the value of @p{transform_functions}.
 				      */
     unsigned int n_transform_functions () const;
 
@@ -1077,6 +1077,15 @@ class FiniteElement : public FiniteElementBase<dim>
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const = 0;
 
+				     /**
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns @p{p_real}.
+				      */
+    virtual Point<dim> transform_unit_to_real_cell (const DoFHandler<dim>::cell_iterator cell,
+						    const Point<dim> &p) const = 0;
+    
 				     /**
 				      * Return the value of the
 				      * @p{i}th shape function of the

@@ -532,6 +532,18 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*c
 
 
 template <int dim>
+Point<dim> FEQ1Mapping<dim>::transform_unit_to_real_cell (
+  const DoFHandler<dim>::cell_iterator cell,
+  const Point<dim> &p) const
+{
+  Point<dim> p_real;
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    p_real+=cell->vertex(i) * shape_value_transform (i, p);
+  return p_real;
+}
+
+
+template <int dim>
 void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				       const vector<Point<dim> >            &unit_points,
 				       vector<Tensor<2,dim> >               &jacobians,

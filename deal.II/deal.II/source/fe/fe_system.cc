@@ -13,6 +13,9 @@
 
 
 #include <fe/fe_system.h>
+#include <grid/tria_iterator.h>
+#include <dofs/dof_accessor.h>
+
 
 
 template <int dim>
@@ -918,6 +921,15 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 	};
     };
   Assert (component == n_components(), ExcInternalError());
+};
+
+
+template <int dim>
+Point<dim> FESystem<dim>::transform_unit_to_real_cell (
+  const DoFHandler<dim>::cell_iterator cell,
+  const Point<dim> &p) const
+{
+  return base_elements[0].first->transform_unit_to_real_cell(cell, p);
 };
 
 

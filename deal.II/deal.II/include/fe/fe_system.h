@@ -252,6 +252,22 @@ class FESystem : public FiniteElement<dim>
 					FullMatrix<double> &local_mass_matrix) const;
 
 				     /**
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns
+				      * @p{p_real}. As the
+				      * transformation mapping of each
+				      * @p{FiniteElement} of this
+				      * @p{FESystem} should be the
+				      * same, this function just calls
+				      * the @p{transform} function of
+				      * @p{base_element(0)}.
+				      */
+    virtual Point<dim> transform_unit_to_real_cell (const DoFHandler<dim>::cell_iterator cell,
+						    const Point<dim> &p) const;
+
+				     /**
 				      * Return the value of the @p{i}th shape
 				      * function of the transformation mapping
 				      * from unit cell to real cell. Since
