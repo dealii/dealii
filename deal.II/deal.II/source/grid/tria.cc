@@ -1047,7 +1047,7 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   /////////////////////////////////
 				   // now for some sanity-checks:
 				   //
-				   // check the every vertex has at
+				   // check that every vertex has at
 				   // least two adjacent lines
   if (true) 
     {
