@@ -23,22 +23,20 @@
 #include <vector>
 
 
-/*! @addtogroup LAC
- *@{
- */
-
 /**
- * Memory management for vectors. This class is used by all
- * iterative methods to allocate space for auxilliary
- * vectors. This class is used to avoid interaction with the
- * operating system whenever a vector is needed. Especially, when
- * an iterative method is invoked as part of an outer iteration,
- * this would lead to runtime overhead and memory fragmentation.
+ * Memory management base class for vectors. This is an abstract base
+ * class used by all iterative methods to allocate space for
+ * auxilliary vectors. An object of a derived class with an actual
+ * implementation of the memory management must be created by the
+ * application program to be used in iterative methods.
  *
- * Classes derived from this class implement a more or less
- * sophisticated management of vectors. One of these has to be
- * applied by the user according to his needs.
- */
+ * The purpose of this class is avoiding interaction with the
+ * operating system whenever a vector is needed. Especially, when an
+ * iterative method is invoked as part of an outer iteration, this
+ * would lead to runtime overhead and memory fragmentation.
+ *
+ * @author Guido Kanschat, 1998-2003
+*/
 template<class Vector = ::Vector<double> >
 class VectorMemory : public Subscriptor
 {
@@ -179,8 +177,6 @@ class GrowingVectorMemory : public VectorMemory<Vector>
     Threads::ThreadMutex mutex;
 };
 
-
-/*@}*/
 /* --------------------- inline functions ---------------------- */
 
 
