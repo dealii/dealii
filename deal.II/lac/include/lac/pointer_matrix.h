@@ -145,6 +145,26 @@ private:
   SmartPointer<const MATRIX> m;
 };
 
+
+/**
+ * This function helps you creating a PointerMatrixBase object if you
+ * do not want to provide the full template arguments of
+ * PointerMatrix.
+ *
+ * The result is a PointerMatrixBase* pointing to <tt>matrix</tt>. The
+ * <TT>VECTOR</tt> argument is a dummy just used to determine the
+ * template arguments.
+ *
+ * @relates PointerMatrixBase
+ */
+template <class MATRIX, class VECTOR>
+inline
+PointerMatrixBase<VECTOR>*
+new_pointer_matrix_base(MATRIX& matrix, const VECTOR&)
+{
+  return new PointerMatrix<MATRIX, VECTOR>(&matrix);
+}
+
 /*@}*/
 //----------------------------------------------------------------------//
 
