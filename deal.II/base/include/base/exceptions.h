@@ -27,7 +27,8 @@
 				  */
 class ExceptionBase {
   public:
-    ExceptionBase () {};
+    ExceptionBase () :
+		    file(""), line(0), function(""), cond(""), exc("")  {};
 				     /**
 				      *  The constructor takes the file in which the
 				      *  error happened, the line and the violated
@@ -38,6 +39,29 @@ class ExceptionBase {
 		   const char* c, const char *e) :
 		    file(f), line(l), function(func), cond(c), exc(e) {};
 
+				     /**
+				      * Copy constructor; don't know why, but
+				      * gcc 2.8 likes to see this one, so we
+				      * put it here.
+				      */
+    ExceptionBase (const ExceptionBase &e) :
+		    file(e.file), line(e.line), function(e.function),
+		    cond(e.cond), exc(e.exc) {};
+
+				     /**
+				      * Copy operator; don't know why, but
+				      * gcc 2.8 likes to see this one, so we
+				      * put it here.
+				      */
+    ExceptionBase & operator = (const ExceptionBase &e) {
+      file = e.file;
+      line = e.line;
+      function = e.function;
+      cond = e.cond;
+      exc = e.exc;
+      return *this;
+    };
+    
 				     /**
 				      *  Set the file name and line of where the
 				      *  exception appeared as well as the violated
@@ -105,10 +129,10 @@ void __IssueError (const char *file,
 		   int         line,
 		   const char *function,
 		   const char *cond,
-		   const char *exc,
+		   const char *exc_name,
 		   exc         e) {
 				   // Fill the fields of the exception object
-      e.SetFields (file, line, function, cond, exc);
+      e.SetFields (file, line, function, cond, exc_name);
       cerr << "--------------------------------------------------------"
 	   << endl;
 				       // print out general data
