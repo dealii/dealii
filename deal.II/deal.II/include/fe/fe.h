@@ -401,8 +401,12 @@ class FiniteElementBase : public Subscriptor,
 				      * the face, but the solutions are
 				      * discontinuous there nevertheless, such
 				      * that interpolation is not possible here.
-				      *
-				      * FINAL SOLUTION? NOT YET MADE UP!
+				      * 
+				      * At least for the first case, the flags
+				      * #restriction_is_additive# was introduced,
+				      * see there for more information. For the
+				      * latter case, NO SOLUTION HAS BEEN MADE
+				      * UP YET.
 				      *
 				      * To compute the interpolation of a
 				      * finite element field to a cell, you
