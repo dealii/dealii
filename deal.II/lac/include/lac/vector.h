@@ -381,6 +381,33 @@ class Vector {
 				      * Print to given stream, one element per line.
 				      */
     void print (ostream &) const;
+
+				     /**
+				      * Write the vector en bloc to a file. This
+				      * is done in a binary mode, so the output
+				      * is neither readable by humans nor 
+				      * (probably) by other computers using
+				      * a different operating system of number
+				      * format.
+				      */
+    void block_write (ostream &out) const;
+
+				     /**
+				      * Read a vector en block from a file. This
+				      * is done using the inverse operations to
+				      * the above function, so it is reasonably
+				      * fast because the bitstream is not
+				      * interpreted.
+				      *
+				      * The vector is resized if necessary.
+				      *
+				      * A primitive form of error checking is
+				      * performed which will recognize the
+				      * bluntest attempts to interpret some
+				      * data as a vector stored bitwise to a
+				      * file, but not more.
+				      */
+    void block_read (istream &in);
 				     //@}
 
 				     /**

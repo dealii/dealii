@@ -554,3 +554,41 @@ void Vector<Number>::print (ostream &out) const {
 
 
 
+template <typename Number>
+void Vector<Number>::block_write (ostream &out) const {
+  AssertThrow (out, ExcIO());
+    
+  out << size() << endl << '[';
+  out.write (reinterpret_cast<const char*>(begin()),
+	     reinterpret_cast<const char*>(end())
+	     - reinterpret_cast<const char*>(begin()));
+  out << ']';
+  
+  AssertThrow (out, ExcIO());
+};
+
+
+
+template <typename Number>
+void Vector<Number>::block_read (istream &in) {
+  AssertThrow (in, ExcIO());
+
+  unsigned int sz;
+  in >> sz;
+				   // fast initialization, since the
+				   // data elements are overwritten anyway
+  reinit (sz, true);     
+
+  char c;
+  in >> c;
+  AssertThrow (c=='[', ExcIO());
+  
+  in.read (reinterpret_cast<void*>(begin()),
+	   reinterpret_cast<const char*>(end())
+	   - reinterpret_cast<const char*>(begin()));
+  
+  in >> c;
+  AssertThrow (c==']', ExcIO());
+  AssertThrow (in, ExcIO());
+};
+
