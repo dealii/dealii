@@ -54,7 +54,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 	};
 
 
-// write preamble
+				   // write preamble
   if (ucd_flags.write_preamble)
     {
 				       // block this to have local
@@ -147,6 +147,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 };
 
 
+
 #if deal_II_dimension == 1
 
 template <>
@@ -156,6 +157,7 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
 };
 
 #endif
+
 
 
 template <int dim>
@@ -174,6 +176,7 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
 };
 
 
+
 #if deal_II_dimension == 1
 
 template <>
@@ -185,6 +188,7 @@ void GridOut::write_ucd_faces (const Triangulation<1> &,
 };
 
 #endif
+
 
 
 template <int dim>
@@ -217,6 +221,7 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 	++index;
       };	  
 };
+
 
 
 template <int dim>
@@ -336,6 +341,8 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
   AssertThrow (out, ExcIO());
 };
 
+
+
 struct LineEntry
 {
     Point<2> first;
@@ -346,6 +353,8 @@ struct LineEntry
 		    first(f), second(s), colorize(c)
       {}
 };
+
+
 
 template <int dim>
 void GridOut::write_eps (const Triangulation<dim> &tria,
@@ -479,7 +488,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
     };
 
 
-// find out minimum and maximum x and
+				   // find out minimum and maximum x and
 				   // y coordinates to compute offsets
 				   // and scaling factors
   double x_min = tria.begin_active_line()->vertex(0)(0);
@@ -514,7 +523,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 			 y_min - y_max));
 
 
-// now write preamble
+				   // now write preamble
   if (true) 
     {
 				       // block this to have local
@@ -574,6 +583,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 };
 
 
+
 template <int dim>
 void GridOut::write (const Triangulation<dim> &tria,
 		     ostream                  &out,
@@ -598,6 +608,9 @@ void GridOut::write (const Triangulation<dim> &tria,
 };
 
 
+
 // explicit instantiations. note that write instantiates all the other
 // functions as needed
-template void GridOut::write (const Triangulation<deal_II_dimension> &, ostream &, OutputFormat);
+template void GridOut::write (const Triangulation<deal_II_dimension> &,
+			      ostream &,
+			      OutputFormat);
