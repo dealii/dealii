@@ -27,7 +27,7 @@ debug-mode = on
 # shall be deleted when calling `make clean'. Object and backup files,
 # executables and the like are removed anyway. Here, we give a list of
 # files in the various output formats that deal.II supports.
-clean-up-files = *gmv *gnuplot *gpl *eps *pov
+clean-up-files = *gmv *gnuplot *gpl *eps *pov */*inp
 
 
 
