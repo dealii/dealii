@@ -430,6 +430,12 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
     };
 
 				     /**
+				      * Abbreviate the somewhat lengthy
+				      * name for the @p{Patch} class.
+				      */
+    typedef DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
+
+				     /**
 				      * Pointer to the dof handler object.
 				      */
     SmartPointer<const DoFHandler<dof_handler_dim> > dofs;
@@ -453,7 +459,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * in the output routines of the base
 				      * classes.
 				      */
-    typename std::vector<typename DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
+    typename std::vector<Patch> patches;
 
 				     /**
 				      * Function by which the base
@@ -461,7 +467,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * what patches they shall write
 				      * to a file.
 				      */
-    virtual const typename std::vector<typename DataOutBase::Patch<patch_dim,patch_space_dim> > &
+    virtual const typename std::vector<Patch> &
     get_patches () const;
 
 				     /**

@@ -204,7 +204,7 @@ void DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_data_vect
   cell_data.erase (cell_data.begin(), cell_data.end());
 
 				   // delete patches
-  std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
+  std::vector<Patch> dummy;
   patches.swap (dummy);
 }
 
@@ -243,9 +243,10 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear ()
     };
 
 				   // delete patches
-  std::vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
+  std::vector<Patch> dummy;
   patches.swap (dummy);
 }
+
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
