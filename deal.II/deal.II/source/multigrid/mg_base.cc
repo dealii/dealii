@@ -100,7 +100,9 @@ MGBase::level_mgstep(const unsigned int        level,
   level_vmult(level, t, solution[level], defect[level]);
 
 				   // make t rhs of lower level
-  transfer->restrict(level, defect[level-1], t);
+//TODO: this function adds the restricted t to defect[level-1].
+//TODO: why don't we have to clear it before?  
+  transfer->restrict_and_add (level, defect[level-1], t);
   
 				   // do recursion
   level_mgstep(level-1, pre_smooth, post_smooth, coarse_grid_solver);
