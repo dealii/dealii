@@ -1,104 +1,282 @@
-# $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998
-
-# use debug mode by default for all testcases
-debug-mode = on
-
-###############################################################################
-# Internals
+############################################################
+# Directory with the DEAL distribution
+############################################################
 
 D = ../..
 
-include ../../common/Make.global_options
+
+############################################################
+# Include general settings for including DEAL libraries
+############################################################
+
+include $D/common/Make.global_options
 
 
+############################################################
+# Set debug-mode as a default
+############################################################
+
+debug-mode = on
 
 
-# get lists of files we need
-cc-files    = $(shell echo *.cc)
-lib-h-files = $(shell echo ../../deal_II/include/*/*.h) \
-              $(shell echo ../../lac/include/*/*.h) \
-              $(shell echo ../../base/include/*/*.h)
-executables = $(cc-files:.cc=.testcase)
-output-files= $(cc-files:.cc=.output)
+############################################################
+# Define library names
+############################################################
 
-# list of libraries needed to link with
-libs.g   = $D/lac/lib/liblac.g.a $D/base/lib/libbase.g.a
-libs     = $D/lac/lib/liblac.a   $D/base/lib/libbase.a
+libs   = -ldeal_II_2d -llac -lbase
+libs.g = -ldeal_II_2d.g -llac.g -lbase.g
 
+############################################################
+# Select compiler flags according to debug-mode
+############################################################
 
-# check whether we use debug mode or not
 ifeq ($(debug-mode),on)
 libraries = $(libs.g)
-flags     = $(CXXFLAGS.g) -L$D/deal.II/lib
-lib-tag   = "deal_II_libraries.g="
+libdeal3d = -ldeal_II_3d.g
+libdeal1d = -ldeal_II_1d.g
+flags     = $(CXXFLAGS.g) $(CXXFLAGS)
 endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-flags     = $(CXXFLAGS.o) -L$D/deal.II/lib
-lib-tag   = "deal_II_libraries="
+libdeal3d = -ldeal_II_3d
+libdeal1d = -ldeal_II_1d
+flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
-%.go : %.cc Makefile
-	@echo =====debug========= $<
-	@$(CXX) $(flags) -c $< -o $@
-%.o : %.cc Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(flags) -c $< -o $@
+all: grid_test.check dof_test.check fe_tables.check gradients.check \
+     constraints.check mg.check mglocal.check wave-test-3.check second_derivatives.check
+
+exe: $(all:.check=.testcase) benchmark
+run: $(all:.check=.output)
+############################################################
+# Typical block for building a running program
+#
+# 1. provide a list of source files in ...-cc-files
+#
+# 2. generate the list of object files according to debug-mode
+#
+# 3. make executable
+#
+# 4. Explicit dependencies of object files (will be automatic soon)
+#
+############################################################
+
+template-cc-files = template.cc 
+
+ifeq ($(debug-mode),on)
+template-o-files = $(template-cc-files:.cc=.go)
+else
+template-o-files = $(template-cc-files:.cc=.o)
+endif
+
+template.testcase: $(template-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+constraints-cc-files = constraints.cc 
+
+ifeq ($(debug-mode),on)
+constraints-o-files = $(constraints-cc-files:.cc=.go)
+else
+constraints-o-files = $(constraints-cc-files:.cc=.o)
+endif
+
+constraints.testcase: $(constraints-o-files) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+dof_test-cc-files = dof_test.cc 
+
+ifeq ($(debug-mode),on)
+dof_test-o-files = $(dof_test-cc-files:.cc=.go)
+else
+dof_test-o-files = $(dof_test-cc-files:.cc=.o)
+endif
+
+dof_test.testcase: $(dof_test-o-files) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+fe_tables-cc-files = fe_tables.cc 
+
+ifeq ($(debug-mode),on)
+fe_tables-o-files = $(fe_tables-cc-files:.cc=.go)
+else
+fe_tables-o-files = $(fe_tables-cc-files:.cc=.o)
+endif
+
+fe_tables.testcase: $(fe_tables-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+gradients-cc-files = gradients.cc 
+
+ifeq ($(debug-mode),on)
+gradients-o-files = $(gradients-cc-files:.cc=.go)
+else
+gradients-o-files = $(gradients-cc-files:.cc=.o)
+endif
+
+gradients.testcase: $(gradients-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+grid_test-cc-files = grid_test.cc 
+
+ifeq ($(debug-mode),on)
+grid_test-o-files = $(grid_test-cc-files:.cc=.go)
+else
+grid_test-o-files = $(grid_test-cc-files:.cc=.o)
+endif
+
+grid_test.testcase: $(grid_test-o-files) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+second_derivatives-cc-files = second_derivatives.cc 
+
+ifeq ($(debug-mode),on)
+second_derivatives-o-files = $(second_derivatives-cc-files:.cc=.go)
+else
+second_derivatives-o-files = $(second_derivatives-cc-files:.cc=.o)
+endif
+
+second_derivatives.testcase: $(second_derivatives-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+wave-test-3-cc-files = wave-test-3.cc 
+
+ifeq ($(debug-mode),on)
+wave-test-3-o-files = $(wave-test-3-cc-files:.cc=.go)
+else
+wave-test-3-o-files = $(wave-test-3-cc-files:.cc=.o)
+endif
+
+wave-test-3.testcase: $(wave-test-3-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+
+mglocal-cc-files = mglocal.cc
+
+ifeq ($(debug-mode),on)
+mglocal-o-files = $(mglocal-cc-files:.cc=.go)
+else
+mglocal-o-files = $(mglocal-cc-files:.cc=.o)
+endif
+
+mglocal.testcase: $(mglocal-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
 
 
 
-# rule to make executables
-%.testcase: %.cc $(libraries)
-	@echo ============================ Compiling Testcase:   $<
-	@$(CXX) $(flags) $< -o $@ $(shell grep $(lib-tag) $< | perl -pe 's/.*=//;') $(libraries)
+############################################################
+
+
+mg-cc-files = mg.cc 
+
+ifeq ($(debug-mode),on)
+mg-o-files = $(mg-cc-files:.cc=.go)
+else
+mg-o-files = $(mg-cc-files:.cc=.o)
+endif
+
+mg.testcase: $(mg-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
 
 
 
-
-#################################### Here comes the interesting part
-
-# make a rule for each executable
-targets = $(addsuffix .target, $(executables))
-
-# define the action of the targets: execute it. do so by re-getting
-# the right filename by dropping the suffix added for the make-rule
-%.target : %
-	@echo ============================ Executing Testcase:   $<
-	@./$< > $(subst testcase,output,$<)
-	@diff $(subst testcase,output,$<) $(subst testcase,expect,$<)
-
-# this is the main target
-# make dependence so that it first wants to compile all files then
-# execute them
-check: $(executables) $(targets)
+############################################################
+# Continue with other targets if needed
+############################################################
 
 
+benchmark-cc-files = benchmark.cc
+
+ifeq ($(debug-mode),on)
+benchmark-o-files = $(benchmark-cc-files:.cc=.go)
+else
+benchmark-o-files = $(benchmark-cc-files:.cc=.o)
+endif
+
+benchmark.testcase: $(benchmark-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+############################################################
+# Continue with other targets if needed
+############################################################
+
+
+target1-cc-files = t1.cc t2.cc t3.cc
+
+ifeq ($(debug-mode),on)
+target1-o-files = $(target1-cc-files:.cc=.go)
+else
+target1-o-files = $(target1-cc-files:.cc=.o)
+endif
+
+target1: $(target1-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+# Postprocessing
+############################################################
+
+%.output:%.testcase
+	@echo =====Running======= $<
+	@$<
+	@perl -pi -e 's/JobId.*//;s/value.*//;' $@
+
+%.check:%.output
+	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
+############################################################
+# Cleanup targets
+############################################################
 
 clean:
-	-rm -f *.o *.go *~ Make.depend Makefile.dep $(executables) $(output-files) tmp/*
+	rm -f Make.depend *.o *.go *.output
 
+veryclean: clean
+	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
 
+############################################################
+# Automatic generation of dependencies
+############################################################
 
-.PHONY: check clean
+all-cc-files = $(shell echo *.cc)
 
+Make.depend: $(all-cc-files)
+	@echo =====Dependencies== Make.depend
+	@$(CXX) $(flags) $^ -M > $@
+	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 
-#Rule to generate the dependency file. This file is
-#automagically remade whenever needed, i.e. whenever
-#one of the cc-/h-files changed. Make detects whether
-#to remake this file upon inclusion at the bottom
-#of this file.
-#
-#use perl to generate rules for the .go files as well
-#as to make rules not for tria.o and the like, but
-#rather for libnumerics.a(tria.o)
-Makefile.dep: $(cc-files) $(h-files) $(lib-h-files) Makefile
-	@echo ============================ Remaking Makefile
-	@perl ../../common/scripts/Make_dep.pl ./Obj $(INCLUDE) $(cc-files) | \
-		perl -pi -e 's?^./Obj.a\((.*)\.o\):?$$1.testcase:?g;'   \
-		> Makefile.dep
-
-
-include Makefile.dep
-
+include Make.depend

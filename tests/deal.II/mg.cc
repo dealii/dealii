@@ -6,6 +6,7 @@
 
 #include <base/function.h>
 #include <base/quadrature_lib.h>
+#include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/sparsematrix.h>
 #include <lac/solver_cg.h>
@@ -52,6 +53,10 @@ class MGSmootherLAC : public MGSmootherBase
 
 int main()
 {
+  ofstream logfile("mg.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
   Helmholtz equation;
   RHSFunction<2> rhs;
   QGauss5<2> quadrature;

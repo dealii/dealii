@@ -15,10 +15,14 @@
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <basic/grid_out.h>
+#include <base/logstream.h>
 #include <cmath>
 #include <cstdlib>
 
+#include <fstream>
+#include <strstream>
 
+ofstream logfile("grid_test.output");
 
 // 1: continuous refinement of the unit square always in the middle
 // 2: refinement of the circle at the boundary
@@ -165,14 +169,19 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 template <int dim>
 void test (const int test_case)
 {
-  cout << "Running testcase " << test_case
-       << " in " << dim << " dimensions." << endl;
+  char testname[100];
+  ostrstream namestream(testname, 100);
+  namestream << "Test" << test_case << ".dim" << dim;
+  
+  deallog.push(testname);
+  deallog << "Start" << endl;
+  
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   
   if ((dim==1) && ((test_case==2) || (test_case==3)))
     {
-      cout << "Impossible for this dimension." << endl;
+      deallog << "Impossible for this dimension." << endl;
       return;
     };
 
@@ -250,17 +259,22 @@ void test (const int test_case)
     };
   
   
-  GridOut().write_gnuplot (tria, cout);
+  GridOut().write_gnuplot (tria, logfile);
     
-  cout << "     Total number of cells        = " << tria.n_cells() << endl
+  deallog << "     Total number of cells        = " << tria.n_cells() << endl
        << "     Total number of active cells = " << tria.n_active_cells() << endl;
+
+  deallog.pop();
 };
 
 
 
-int main () {
+int main ()
+{
+  deallog.attach(logfile);
+  deallog.depth_console(0);
 				   // limit output a bit
-  cout.precision (4);
+  logfile.precision (4);
   
   for (unsigned int i=1; i<=3; ++i)
     test<2> (i);

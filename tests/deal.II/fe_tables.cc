@@ -17,6 +17,8 @@
 #include <grid/dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <iomanip>
+#include <fstream>
+
 #include <base/logstream.h>
 
 #define TEST_ELEMENT(e) { deallog.push(#e); e el;\
@@ -37,15 +39,15 @@ print_fe_statistics(const FiniteElement<dim>& fe)
   DoFHandler<dim> dof(&tr);
   dof.distribute_dofs(fe);
   StraightBoundary<dim> boundary;
-//  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face();
 
   vector<Point<dim> > unit_points(fe.dofs_per_cell);
   vector<Point<dim> > support_points(fe.dofs_per_cell);
   vector<Point<dim> > face_support_points(fe.dofs_per_face);
 
-//  fe.get_unit_support_points(unit_points);
-//  fe.get_support_points(cell, boundary, support_points);
+  fe.get_unit_support_points(unit_points);
+  fe.get_support_points(cell, support_points);
   fe.get_face_support_points(face, face_support_points);
   
   deallog << "dofs_per_cell" << " " << fe.dofs_per_cell;
@@ -78,7 +80,12 @@ print_fe_statistics(const FiniteElement<dim>& fe)
 
 int main()
 {
+  ofstream logfile("fe_tables.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
 
+  logfile.precision(4);
+  
   deallog.push("GeometryInfo");
 
   deallog.push("1D");

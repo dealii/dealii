@@ -1,0 +1,6 @@
+
+DEAL::Testing transformation of gradients of shape function:
+DEAL::  Shape function 0: OK
+DEAL::  Shape function 1: OK
+DEAL::  Shape function 2: OK
+DEAL::  Shape function 3: OK

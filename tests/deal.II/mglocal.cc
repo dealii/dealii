@@ -6,6 +6,7 @@
 
 #include <base/function.h>
 #include <base/quadrature_lib.h>
+#include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/sparsematrix.h>
 #include <lac/solver_cg.h>
@@ -59,6 +60,10 @@ extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 
 int main()
 {
+  ofstream logfile("mglocal.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
   Helmholtz equation;
   RHSFunction<2> rhs;
   QGauss5<2> quadrature;

@@ -14,11 +14,17 @@
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
 #include <lac/vector.h>
+#include <base/logstream.h>
+
+#include <fstream>
 
 
+int main ()
+{
+  ofstream logfile("second_derivatives.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
 
-
-int main () {
   Triangulation<2> tria;
   GridGenerator::hyper_cube (tria,0,1);
 
@@ -33,8 +39,7 @@ int main () {
   
   Vector<double> val(4);
 
-  cout << "------------------------------------------------------------" << endl
-       << "Testing transformation of 2nd derivatives of shape function:" << endl;
+  deallog << "Testing transformation of 2nd derivatives of shape function:" << endl;
   
 				   // test for each of the four
 				   // shape functions. first loop:
@@ -42,8 +47,7 @@ int main () {
 				   // one vertex moved
   for (unsigned int loop=0; loop<2; ++loop)
     {
-      cout << "Test loop: " << loop << endl
-	   << "-----------" << endl;
+      deallog << "Test loop: " << loop << endl;
 	  
       				   // move one vertex of the only cell
       if (loop==1)
@@ -58,12 +62,12 @@ int main () {
 	  vector<Tensor<2,2> > derivs(4);
 	  fevalues.get_function_2nd_derivatives (val, derivs);
 	  
-	  cout << "Vertex " << vertex << ": " << endl;
+	  deallog << "Vertex " << vertex << ": " << endl;
 	  for (unsigned int point=0; point<4; ++point)
 	    for (unsigned int component=0; component<2; ++component)
-	      cout << derivs[point][component] << endl;
+	      deallog << derivs[point][component] << endl;
 	  
-	  cout << endl;
+	  deallog << endl;
 	};
     };
 };

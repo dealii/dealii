@@ -1,0 +1,373 @@
+
+DEAL:GeometryInfo:1D:: vertices: 2 lines: 1 quads: 0 hexes: 0
+DEAL:GeometryInfo:2D:: vertices: 4 lines: 4 quads: 1 hexes: 0
+DEAL:GeometryInfo:3D:: vertices: 8 lines: 12 quads: 6 hexes: 1
+DEAL:GeometryInfo:4D:: vertices: 16 lines: 32 quads: 24 hexes: 8
+DEAL:FEDG_Q0<2>::dofs_per_cell 1: vertex 0  line 0  quad 1
+DEAL:FEDG_Q0<2>::n_transform_fct 4
+DEAL:FEDG_Q0<2>::n_components 1
+DEAL:FEDG_Q0<2>:components::Index 0 (0,0) -> 0 support 0 0 unit: 0.5 0.5
+
+DEAL:FEDG_Q1<2>::dofs_per_cell 4: vertex 0  line 0  quad 4
+DEAL:FEDG_Q1<2>::n_transform_fct 4
+DEAL:FEDG_Q1<2>::n_components 1
+DEAL:FEDG_Q1<2>:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEDG_Q1<2>:components::Index 1 (0,1) -> 1 support 1 -1 unit: 1 0
+DEAL:FEDG_Q1<2>:components::Index 2 (0,2) -> 2 support 1 1 unit: 1 1
+DEAL:FEDG_Q1<2>:components::Index 3 (0,3) -> 3 support -1 1 unit: 0 1
+
+DEAL:FEQ1<2>::dofs_per_cell 4: vertex 1  line 0  quad 0
+DEAL:FEQ1<2>::n_transform_fct 4
+DEAL:FEQ1<2>::n_components 1
+DEAL:FEQ1<2>:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ1<2>:components::Index 1 (0,1) -> 1 support 1 -1 unit: 1 0
+DEAL:FEQ1<2>:components::Index 2 (0,2) -> 2 support 1 1 unit: 1 1
+DEAL:FEQ1<2>:components::Index 3 (0,3) -> 3 support -1 1 unit: 0 1
+DEAL:FEQ1<2>:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ1<2>:components::FaceIndex 1 (0,1) -> 1 support 1 -1
+
+DEAL:FEQ2<2>::dofs_per_cell 9: vertex 1  line 1  quad 1
+DEAL:FEQ2<2>::n_transform_fct 4
+DEAL:FEQ2<2>::n_components 1
+DEAL:FEQ2<2>:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>:components::Index 1 (0,1) -> 1 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>:components::Index 2 (0,2) -> 2 support 1 1 unit: 1 1
+DEAL:FEQ2<2>:components::Index 3 (0,3) -> 3 support -1 1 unit: 0 1
+DEAL:FEQ2<2>:components::Index 4 (0,4) -> 4 support 0 -1 unit: 0.5 0
+DEAL:FEQ2<2>:components::Index 5 (0,5) -> 5 support 1 0 unit: 1 0.5
+DEAL:FEQ2<2>:components::Index 6 (0,6) -> 6 support 0 1 unit: 0.5 1
+DEAL:FEQ2<2>:components::Index 7 (0,7) -> 7 support -1 0 unit: 0 0.5
+DEAL:FEQ2<2>:components::Index 8 (0,8) -> 8 support 0 0 unit: 0.5 0.5
+DEAL:FEQ2<2>:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ2<2>:components::FaceIndex 1 (0,1) -> 1 support 1 -1
+DEAL:FEQ2<2>:components::FaceIndex 2 (0,2) -> 2 support 0 -1
+
+DEAL:FEQ3<2>::dofs_per_cell 16: vertex 1  line 2  quad 4
+DEAL:FEQ3<2>::n_transform_fct 4
+DEAL:FEQ3<2>::n_components 1
+DEAL:FEQ3<2>:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>:components::Index 1 (0,1) -> 1 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>:components::Index 2 (0,2) -> 2 support 1 1 unit: 1 1
+DEAL:FEQ3<2>:components::Index 3 (0,3) -> 3 support -1 1 unit: 0 1
+DEAL:FEQ3<2>:components::Index 4 (0,4) -> 4 support -0.3333 -1 unit: 0.3333 0
+DEAL:FEQ3<2>:components::Index 5 (0,5) -> 5 support 0.3333 -1 unit: 0.6667 0
+DEAL:FEQ3<2>:components::Index 6 (0,6) -> 6 support 1 -0.3333 unit: 1 0.3333
+DEAL:FEQ3<2>:components::Index 7 (0,7) -> 7 support 1 0.3333 unit: 1 0.6667
+DEAL:FEQ3<2>:components::Index 8 (0,8) -> 8 support -0.3333 1 unit: 0.3333 1
+DEAL:FEQ3<2>:components::Index 9 (0,9) -> 9 support 0.3333 1 unit: 0.6667 1
+DEAL:FEQ3<2>:components::Index 10 (0,10) -> 10 support -1 -0.3333 unit: 0 0.3333
+DEAL:FEQ3<2>:components::Index 11 (0,11) -> 11 support -1 0.3333 unit: 0 0.6667
+DEAL:FEQ3<2>:components::Index 12 (0,12) -> 12 support -0.3333 -0.3333 unit: 0.3333 0.3333
+DEAL:FEQ3<2>:components::Index 13 (0,13) -> 13 support 0.3333 -0.3333 unit: 0.6667 0.3333
+DEAL:FEQ3<2>:components::Index 14 (0,14) -> 14 support 0.3333 0.3333 unit: 0.6667 0.6667
+DEAL:FEQ3<2>:components::Index 15 (0,15) -> 15 support -0.3333 0.3333 unit: 0.3333 0.6667
+DEAL:FEQ3<2>:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ3<2>:components::FaceIndex 1 (0,1) -> 1 support 1 -1
+DEAL:FEQ3<2>:components::FaceIndex 2 (0,2) -> 2 support -0.3333 -1
+DEAL:FEQ3<2>:components::FaceIndex 3 (0,3) -> 3 support 0.3333 -1
+
+DEAL:FEQ4<2>::dofs_per_cell 25: vertex 1  line 3  quad 9
+DEAL:FEQ4<2>::n_transform_fct 4
+DEAL:FEQ4<2>::n_components 1
+DEAL:FEQ4<2>:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ4<2>:components::Index 1 (0,1) -> 1 support 1 -1 unit: 1 0
+DEAL:FEQ4<2>:components::Index 2 (0,2) -> 2 support 1 1 unit: 1 1
+DEAL:FEQ4<2>:components::Index 3 (0,3) -> 3 support -1 1 unit: 0 1
+DEAL:FEQ4<2>:components::Index 4 (0,4) -> 4 support -0.5 -1 unit: 0.25 0
+DEAL:FEQ4<2>:components::Index 5 (0,5) -> 5 support 0 -1 unit: 0.5 0
+DEAL:FEQ4<2>:components::Index 6 (0,6) -> 6 support 0.5 -1 unit: 0.75 0
+DEAL:FEQ4<2>:components::Index 7 (0,7) -> 7 support 1 -0.5 unit: 1 0.25
+DEAL:FEQ4<2>:components::Index 8 (0,8) -> 8 support 1 0 unit: 1 0.5
+DEAL:FEQ4<2>:components::Index 9 (0,9) -> 9 support 1 0.5 unit: 1 0.75
+DEAL:FEQ4<2>:components::Index 10 (0,10) -> 10 support -0.5 1 unit: 0.25 1
+DEAL:FEQ4<2>:components::Index 11 (0,11) -> 11 support 0 1 unit: 0.5 1
+DEAL:FEQ4<2>:components::Index 12 (0,12) -> 12 support 0.5 1 unit: 0.75 1
+DEAL:FEQ4<2>:components::Index 13 (0,13) -> 13 support -1 -0.5 unit: 0 0.25
+DEAL:FEQ4<2>:components::Index 14 (0,14) -> 14 support -1 0 unit: 0 0.5
+DEAL:FEQ4<2>:components::Index 15 (0,15) -> 15 support -1 0.5 unit: 0 0.75
+DEAL:FEQ4<2>:components::Index 16 (0,16) -> 16 support -0.5 -0.5 unit: 0.25 0.25
+DEAL:FEQ4<2>:components::Index 17 (0,17) -> 17 support 0.5 -0.5 unit: 0.75 0.25
+DEAL:FEQ4<2>:components::Index 18 (0,18) -> 18 support 0.5 0.5 unit: 0.75 0.75
+DEAL:FEQ4<2>:components::Index 19 (0,19) -> 19 support -0.5 0.5 unit: 0.25 0.75
+DEAL:FEQ4<2>:components::Index 20 (0,20) -> 20 support 0 -0.5 unit: 0.5 0.25
+DEAL:FEQ4<2>:components::Index 21 (0,21) -> 21 support 0.5 0 unit: 0.75 0.5
+DEAL:FEQ4<2>:components::Index 22 (0,22) -> 22 support 0 0.5 unit: 0.5 0.75
+DEAL:FEQ4<2>:components::Index 23 (0,23) -> 23 support -0.5 0 unit: 0.25 0.5
+DEAL:FEQ4<2>:components::Index 24 (0,24) -> 24 support 0 0 unit: 0.5 0.5
+DEAL:FEQ4<2>:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ4<2>:components::FaceIndex 1 (0,1) -> 1 support 1 -1
+DEAL:FEQ4<2>:components::FaceIndex 2 (0,2) -> 2 support -0.5 -1
+DEAL:FEQ4<2>:components::FaceIndex 3 (0,3) -> 3 support 0 -1
+DEAL:FEQ4<2>:components::FaceIndex 4 (0,4) -> 4 support 0.5 -1
+
+DEAL:FEQ1<2>x3::dofs_per_cell 12: vertex 3  line 0  quad 0
+DEAL:FEQ1<2>x3::n_transform_fct 4
+DEAL:FEQ1<2>x3::n_components 3
+DEAL:FEQ1<2>x3:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ1<2>x3:components::Index 1 (1,0) -> 1 support -1 -1 unit: 0 0
+DEAL:FEQ1<2>x3:components::Index 2 (2,0) -> 2 support -1 -1 unit: 0 0
+DEAL:FEQ1<2>x3:components::Index 3 (0,1) -> 3 support 1 -1 unit: 1 0
+DEAL:FEQ1<2>x3:components::Index 4 (1,1) -> 4 support 1 -1 unit: 1 0
+DEAL:FEQ1<2>x3:components::Index 5 (2,1) -> 5 support 1 -1 unit: 1 0
+DEAL:FEQ1<2>x3:components::Index 6 (0,2) -> 6 support 1 1 unit: 1 1
+DEAL:FEQ1<2>x3:components::Index 7 (1,2) -> 7 support 1 1 unit: 1 1
+DEAL:FEQ1<2>x3:components::Index 8 (2,2) -> 8 support 1 1 unit: 1 1
+DEAL:FEQ1<2>x3:components::Index 9 (0,3) -> 9 support -1 1 unit: 0 1
+DEAL:FEQ1<2>x3:components::Index 10 (1,3) -> 10 support -1 1 unit: 0 1
+DEAL:FEQ1<2>x3:components::Index 11 (2,3) -> 11 support -1 1 unit: 0 1
+DEAL:FEQ1<2>x3:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ1<2>x3:components::FaceIndex 1 (1,0) -> 1 support -1 -1
+DEAL:FEQ1<2>x3:components::FaceIndex 2 (2,0) -> 2 support -1 -1
+DEAL:FEQ1<2>x3:components::FaceIndex 3 (0,1) -> 3 support 1 -1
+DEAL:FEQ1<2>x3:components::FaceIndex 4 (1,1) -> 4 support 1 -1
+DEAL:FEQ1<2>x3:components::FaceIndex 5 (2,1) -> 5 support 1 -1
+
+DEAL:FEQ2<2>x3::dofs_per_cell 27: vertex 3  line 3  quad 3
+DEAL:FEQ2<2>x3::n_transform_fct 4
+DEAL:FEQ2<2>x3::n_components 3
+DEAL:FEQ2<2>x3:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>x3:components::Index 1 (1,0) -> 1 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>x3:components::Index 2 (2,0) -> 2 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>x3:components::Index 3 (0,1) -> 3 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>x3:components::Index 4 (1,1) -> 4 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>x3:components::Index 5 (2,1) -> 5 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>x3:components::Index 6 (0,2) -> 6 support 1 1 unit: 1 1
+DEAL:FEQ2<2>x3:components::Index 7 (1,2) -> 7 support 1 1 unit: 1 1
+DEAL:FEQ2<2>x3:components::Index 8 (2,2) -> 8 support 1 1 unit: 1 1
+DEAL:FEQ2<2>x3:components::Index 9 (0,3) -> 9 support -1 1 unit: 0 1
+DEAL:FEQ2<2>x3:components::Index 10 (1,3) -> 10 support -1 1 unit: 0 1
+DEAL:FEQ2<2>x3:components::Index 11 (2,3) -> 11 support -1 1 unit: 0 1
+DEAL:FEQ2<2>x3:components::Index 12 (0,4) -> 12 support 0 -1 unit: 0.5 0
+DEAL:FEQ2<2>x3:components::Index 13 (1,4) -> 13 support 0 -1 unit: 0.5 0
+DEAL:FEQ2<2>x3:components::Index 14 (2,4) -> 14 support 0 -1 unit: 0.5 0
+DEAL:FEQ2<2>x3:components::Index 15 (0,5) -> 15 support 1 0 unit: 1 0.5
+DEAL:FEQ2<2>x3:components::Index 16 (1,5) -> 16 support 1 0 unit: 1 0.5
+DEAL:FEQ2<2>x3:components::Index 17 (2,5) -> 17 support 1 0 unit: 1 0.5
+DEAL:FEQ2<2>x3:components::Index 18 (0,6) -> 18 support 0 1 unit: 0.5 1
+DEAL:FEQ2<2>x3:components::Index 19 (1,6) -> 19 support 0 1 unit: 0.5 1
+DEAL:FEQ2<2>x3:components::Index 20 (2,6) -> 20 support 0 1 unit: 0.5 1
+DEAL:FEQ2<2>x3:components::Index 21 (0,7) -> 21 support -1 0 unit: 0 0.5
+DEAL:FEQ2<2>x3:components::Index 22 (1,7) -> 22 support -1 0 unit: 0 0.5
+DEAL:FEQ2<2>x3:components::Index 23 (2,7) -> 23 support -1 0 unit: 0 0.5
+DEAL:FEQ2<2>x3:components::Index 24 (0,8) -> 24 support 0 0 unit: 0.5 0.5
+DEAL:FEQ2<2>x3:components::Index 25 (1,8) -> 25 support 0 0 unit: 0.5 0.5
+DEAL:FEQ2<2>x3:components::Index 26 (2,8) -> 26 support 0 0 unit: 0.5 0.5
+DEAL:FEQ2<2>x3:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 1 (1,0) -> 1 support -1 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 2 (2,0) -> 2 support -1 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 3 (0,1) -> 3 support 1 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 4 (1,1) -> 4 support 1 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 5 (2,1) -> 5 support 1 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 6 (0,2) -> 6 support 0 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 7 (1,2) -> 7 support 0 -1
+DEAL:FEQ2<2>x3:components::FaceIndex 8 (2,2) -> 8 support 0 -1
+
+DEAL:FEQ3<2>x3::dofs_per_cell 48: vertex 3  line 6  quad 12
+DEAL:FEQ3<2>x3::n_transform_fct 4
+DEAL:FEQ3<2>x3::n_components 3
+DEAL:FEQ3<2>x3:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3:components::Index 1 (1,0) -> 1 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3:components::Index 2 (2,0) -> 2 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3:components::Index 3 (0,1) -> 3 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3:components::Index 4 (1,1) -> 4 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3:components::Index 5 (2,1) -> 5 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3:components::Index 6 (0,2) -> 6 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3:components::Index 7 (1,2) -> 7 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3:components::Index 8 (2,2) -> 8 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3:components::Index 9 (0,3) -> 9 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3:components::Index 10 (1,3) -> 10 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3:components::Index 11 (2,3) -> 11 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3:components::Index 12 (0,4) -> 12 support -0.3333 -1 unit: 0.3333 0
+DEAL:FEQ3<2>x3:components::Index 13 (0,5) -> 13 support 0.3333 -1 unit: 0.6667 0
+DEAL:FEQ3<2>x3:components::Index 14 (1,4) -> 14 support -0.3333 -1 unit: 0.3333 0
+DEAL:FEQ3<2>x3:components::Index 15 (1,5) -> 15 support 0.3333 -1 unit: 0.6667 0
+DEAL:FEQ3<2>x3:components::Index 16 (2,4) -> 16 support -0.3333 -1 unit: 0.3333 0
+DEAL:FEQ3<2>x3:components::Index 17 (2,5) -> 17 support 0.3333 -1 unit: 0.6667 0
+DEAL:FEQ3<2>x3:components::Index 18 (0,6) -> 18 support 1 -0.3333 unit: 1 0.3333
+DEAL:FEQ3<2>x3:components::Index 19 (0,7) -> 19 support 1 0.3333 unit: 1 0.6667
+DEAL:FEQ3<2>x3:components::Index 20 (1,6) -> 20 support 1 -0.3333 unit: 1 0.3333
+DEAL:FEQ3<2>x3:components::Index 21 (1,7) -> 21 support 1 0.3333 unit: 1 0.6667
+DEAL:FEQ3<2>x3:components::Index 22 (2,6) -> 22 support 1 -0.3333 unit: 1 0.3333
+DEAL:FEQ3<2>x3:components::Index 23 (2,7) -> 23 support 1 0.3333 unit: 1 0.6667
+DEAL:FEQ3<2>x3:components::Index 24 (0,8) -> 24 support -0.3333 1 unit: 0.3333 1
+DEAL:FEQ3<2>x3:components::Index 25 (0,9) -> 25 support 0.3333 1 unit: 0.6667 1
+DEAL:FEQ3<2>x3:components::Index 26 (1,8) -> 26 support -0.3333 1 unit: 0.3333 1
+DEAL:FEQ3<2>x3:components::Index 27 (1,9) -> 27 support 0.3333 1 unit: 0.6667 1
+DEAL:FEQ3<2>x3:components::Index 28 (2,8) -> 28 support -0.3333 1 unit: 0.3333 1
+DEAL:FEQ3<2>x3:components::Index 29 (2,9) -> 29 support 0.3333 1 unit: 0.6667 1
+DEAL:FEQ3<2>x3:components::Index 30 (0,10) -> 30 support -1 -0.3333 unit: 0 0.3333
+DEAL:FEQ3<2>x3:components::Index 31 (0,11) -> 31 support -1 0.3333 unit: 0 0.6667
+DEAL:FEQ3<2>x3:components::Index 32 (1,10) -> 32 support -1 -0.3333 unit: 0 0.3333
+DEAL:FEQ3<2>x3:components::Index 33 (1,11) -> 33 support -1 0.3333 unit: 0 0.6667
+DEAL:FEQ3<2>x3:components::Index 34 (2,10) -> 34 support -1 -0.3333 unit: 0 0.3333
+DEAL:FEQ3<2>x3:components::Index 35 (2,11) -> 35 support -1 0.3333 unit: 0 0.6667
+DEAL:FEQ3<2>x3:components::Index 36 (0,12) -> 36 support -0.3333 -0.3333 unit: 0.3333 0.3333
+DEAL:FEQ3<2>x3:components::Index 37 (0,13) -> 37 support 0.3333 -0.3333 unit: 0.6667 0.3333
+DEAL:FEQ3<2>x3:components::Index 38 (0,14) -> 38 support 0.3333 0.3333 unit: 0.6667 0.6667
+DEAL:FEQ3<2>x3:components::Index 39 (0,15) -> 39 support -0.3333 0.3333 unit: 0.3333 0.6667
+DEAL:FEQ3<2>x3:components::Index 40 (1,12) -> 40 support -0.3333 -0.3333 unit: 0.3333 0.3333
+DEAL:FEQ3<2>x3:components::Index 41 (1,13) -> 41 support 0.3333 -0.3333 unit: 0.6667 0.3333
+DEAL:FEQ3<2>x3:components::Index 42 (1,14) -> 42 support 0.3333 0.3333 unit: 0.6667 0.6667
+DEAL:FEQ3<2>x3:components::Index 43 (1,15) -> 43 support -0.3333 0.3333 unit: 0.3333 0.6667
+DEAL:FEQ3<2>x3:components::Index 44 (2,12) -> 44 support -0.3333 -0.3333 unit: 0.3333 0.3333
+DEAL:FEQ3<2>x3:components::Index 45 (2,13) -> 45 support 0.3333 -0.3333 unit: 0.6667 0.3333
+DEAL:FEQ3<2>x3:components::Index 46 (2,14) -> 46 support 0.3333 0.3333 unit: 0.6667 0.6667
+DEAL:FEQ3<2>x3:components::Index 47 (2,15) -> 47 support -0.3333 0.3333 unit: 0.3333 0.6667
+DEAL:FEQ3<2>x3:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 1 (1,0) -> 1 support -1 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 2 (2,0) -> 2 support -1 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 3 (0,1) -> 3 support 1 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 4 (1,1) -> 4 support 1 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 5 (2,1) -> 5 support 1 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 6 (0,2) -> 6 support -0.3333 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 7 (0,3) -> 7 support 0.3333 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 8 (1,2) -> 8 support -0.3333 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 9 (1,3) -> 9 support 0.3333 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 10 (2,2) -> 10 support -0.3333 -1
+DEAL:FEQ3<2>x3:components::FaceIndex 11 (2,3) -> 11 support 0.3333 -1
+
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1::dofs_per_cell 5: vertex 1  line 0  quad 1
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1::n_transform_fct 4
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1::n_components 2
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1:components::Index 1 (0,1) -> 1 support 1 -1 unit: 1 0
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1:components::Index 2 (0,2) -> 2 support 1 1 unit: 1 1
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1:components::Index 3 (0,3) -> 3 support -1 1 unit: 0 1
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1:components::Index 4 (1,0) -> 4 support 0 0 unit: 0.5 0.5
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ1<2>x1-FEDG_Q0<2>x1:components::FaceIndex 1 (0,1) -> 1 support 1 -1
+
+DEAL:FEQ2<2>x3-FEQ1<2>x1::dofs_per_cell 31: vertex 4  line 3  quad 3
+DEAL:FEQ2<2>x3-FEQ1<2>x1::n_transform_fct 4
+DEAL:FEQ2<2>x3-FEQ1<2>x1::n_components 4
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 1 (1,0) -> 1 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 2 (2,0) -> 2 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 3 (3,0) -> 3 support -1 -1 unit: 0 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 4 (0,1) -> 4 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 5 (1,1) -> 5 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 6 (2,1) -> 6 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 7 (3,1) -> 7 support 1 -1 unit: 1 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 8 (0,2) -> 8 support 1 1 unit: 1 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 9 (1,2) -> 9 support 1 1 unit: 1 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 10 (2,2) -> 10 support 1 1 unit: 1 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 11 (3,2) -> 11 support 1 1 unit: 1 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 12 (0,3) -> 12 support -1 1 unit: 0 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 13 (1,3) -> 13 support -1 1 unit: 0 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 14 (2,3) -> 14 support -1 1 unit: 0 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 15 (3,3) -> 15 support -1 1 unit: 0 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 16 (0,4) -> 16 support 0 -1 unit: 0.5 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 17 (1,4) -> 17 support 0 -1 unit: 0.5 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 18 (2,4) -> 18 support 0 -1 unit: 0.5 0
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 19 (0,5) -> 19 support 1 0 unit: 1 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 20 (1,5) -> 20 support 1 0 unit: 1 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 21 (2,5) -> 21 support 1 0 unit: 1 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 22 (0,6) -> 22 support 0 1 unit: 0.5 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 23 (1,6) -> 23 support 0 1 unit: 0.5 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 24 (2,6) -> 24 support 0 1 unit: 0.5 1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 25 (0,7) -> 25 support -1 0 unit: 0 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 26 (1,7) -> 26 support -1 0 unit: 0 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 27 (2,7) -> 27 support -1 0 unit: 0 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 28 (0,8) -> 28 support 0 0 unit: 0.5 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 29 (1,8) -> 29 support 0 0 unit: 0.5 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::Index 30 (2,8) -> 30 support 0 0 unit: 0.5 0.5
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 1 (1,0) -> 1 support -1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 2 (2,0) -> 2 support -1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 3 (3,0) -> 3 support -1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 4 (0,1) -> 4 support 1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 5 (1,1) -> 5 support 1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 6 (2,1) -> 6 support 1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 7 (3,1) -> 7 support 1 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 8 (0,2) -> 8 support 0 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 9 (1,2) -> 9 support 0 -1
+DEAL:FEQ2<2>x3-FEQ1<2>x1:components::FaceIndex 10 (2,2) -> 10 support 0 -1
+
+DEAL:FEQ3<2>x3-FEQ2<2>x2::dofs_per_cell 66: vertex 5  line 8  quad 14
+DEAL:FEQ3<2>x3-FEQ2<2>x2::n_transform_fct 4
+DEAL:FEQ3<2>x3-FEQ2<2>x2::n_components 5
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 0 (0,0) -> 0 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 1 (1,0) -> 1 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 2 (2,0) -> 2 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 3 (3,0) -> 3 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 4 (4,0) -> 4 support -1 -1 unit: 0 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 5 (0,1) -> 5 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 6 (1,1) -> 6 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 7 (2,1) -> 7 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 8 (3,1) -> 8 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 9 (4,1) -> 9 support 1 -1 unit: 1 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 10 (0,2) -> 10 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 11 (1,2) -> 11 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 12 (2,2) -> 12 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 13 (3,2) -> 13 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 14 (4,2) -> 14 support 1 1 unit: 1 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 15 (0,3) -> 15 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 16 (1,3) -> 16 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 17 (2,3) -> 17 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 18 (3,3) -> 18 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 19 (4,3) -> 19 support -1 1 unit: 0 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 20 (0,4) -> 20 support -0.3333 -1 unit: 0.3333 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 21 (0,5) -> 21 support 0.3333 -1 unit: 0.6667 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 22 (1,4) -> 22 support -0.3333 -1 unit: 0.3333 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 23 (1,5) -> 23 support 0.3333 -1 unit: 0.6667 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 24 (2,4) -> 24 support -0.3333 -1 unit: 0.3333 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 25 (2,5) -> 25 support 0.3333 -1 unit: 0.6667 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 26 (3,4) -> 26 support 0 -1 unit: 0.5 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 27 (4,4) -> 27 support 0 -1 unit: 0.5 0
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 28 (0,6) -> 28 support 1 -0.3333 unit: 1 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 29 (0,7) -> 29 support 1 0.3333 unit: 1 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 30 (1,6) -> 30 support 1 -0.3333 unit: 1 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 31 (1,7) -> 31 support 1 0.3333 unit: 1 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 32 (2,6) -> 32 support 1 -0.3333 unit: 1 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 33 (2,7) -> 33 support 1 0.3333 unit: 1 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 34 (3,5) -> 34 support 1 0 unit: 1 0.5
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 35 (4,5) -> 35 support 1 0 unit: 1 0.5
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 36 (0,8) -> 36 support -0.3333 1 unit: 0.3333 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 37 (0,9) -> 37 support 0.3333 1 unit: 0.6667 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 38 (1,8) -> 38 support -0.3333 1 unit: 0.3333 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 39 (1,9) -> 39 support 0.3333 1 unit: 0.6667 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 40 (2,8) -> 40 support -0.3333 1 unit: 0.3333 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 41 (2,9) -> 41 support 0.3333 1 unit: 0.6667 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 42 (3,6) -> 42 support 0 1 unit: 0.5 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 43 (4,6) -> 43 support 0 1 unit: 0.5 1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 44 (0,10) -> 44 support -1 -0.3333 unit: 0 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 45 (0,11) -> 45 support -1 0.3333 unit: 0 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 46 (1,10) -> 46 support -1 -0.3333 unit: 0 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 47 (1,11) -> 47 support -1 0.3333 unit: 0 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 48 (2,10) -> 48 support -1 -0.3333 unit: 0 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 49 (2,11) -> 49 support -1 0.3333 unit: 0 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 50 (3,7) -> 50 support -1 0 unit: 0 0.5
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 51 (4,7) -> 51 support -1 0 unit: 0 0.5
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 52 (0,12) -> 52 support -0.3333 -0.3333 unit: 0.3333 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 53 (0,13) -> 53 support 0.3333 -0.3333 unit: 0.6667 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 54 (0,14) -> 54 support 0.3333 0.3333 unit: 0.6667 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 55 (0,15) -> 55 support -0.3333 0.3333 unit: 0.3333 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 56 (1,12) -> 56 support -0.3333 -0.3333 unit: 0.3333 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 57 (1,13) -> 57 support 0.3333 -0.3333 unit: 0.6667 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 58 (1,14) -> 58 support 0.3333 0.3333 unit: 0.6667 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 59 (1,15) -> 59 support -0.3333 0.3333 unit: 0.3333 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 60 (2,12) -> 60 support -0.3333 -0.3333 unit: 0.3333 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 61 (2,13) -> 61 support 0.3333 -0.3333 unit: 0.6667 0.3333
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 62 (2,14) -> 62 support 0.3333 0.3333 unit: 0.6667 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 63 (2,15) -> 63 support -0.3333 0.3333 unit: 0.3333 0.6667
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 64 (3,8) -> 64 support 0 0 unit: 0.5 0.5
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::Index 65 (4,8) -> 65 support 0 0 unit: 0.5 0.5
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 0 (0,0) -> 0 support -1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 1 (1,0) -> 1 support -1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 2 (2,0) -> 2 support -1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 3 (3,0) -> 3 support -1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 4 (4,0) -> 4 support -1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 5 (0,1) -> 5 support 1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 6 (1,1) -> 6 support 1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 7 (2,1) -> 7 support 1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 8 (3,1) -> 8 support 1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 9 (4,1) -> 9 support 1 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 10 (0,2) -> 10 support -0.3333 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 11 (0,3) -> 11 support 0.3333 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 12 (1,2) -> 12 support -0.3333 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 13 (1,3) -> 13 support 0.3333 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 14 (2,2) -> 14 support -0.3333 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 15 (2,3) -> 15 support 0.3333 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 16 (3,2) -> 16 support 0 -1
+DEAL:FEQ3<2>x3-FEQ2<2>x2:components::FaceIndex 17 (4,2) -> 17 support 0 -1
+

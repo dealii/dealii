@@ -17,19 +17,18 @@
 #include <grid/dof_constraints.h>
 #include <numerics/dof_renumbering.h>
 #include <basic/dof_tools.h>
+#include <base/logstream.h>
 
 #include <cmath>
 #include <cstdlib>
-
+#include <fstream>
 
 
 // 1: continuous refinement of the unit square always in the middle
 // 2: refinement of the circle at the boundary
 // 2: refinement of a wiggled area at the boundary
 
-
-
-
+ofstream logfile("dof_test.output");
 
 
 template <int dim>
@@ -222,11 +221,11 @@ void TestCases<dim>::create_new ()
 template <int dim>
 void TestCases<dim>::run (const unsigned int test_case)
 {
-  cout << "Dimension = " << dim
+  deallog << "Dimension = " << dim
        << ", Test case = " << test_case << endl
        << endl;
   
-  cout << "    Making grid..." << endl;  
+  deallog << "    Making grid..." << endl;  
   
   switch (test_case) 
     {
@@ -292,11 +291,11 @@ void TestCases<dim>::run (const unsigned int test_case)
     };
 
 
-  cout << "    Distributing degrees of freedom..." << endl;
+  deallog << "    Distributing degrees of freedom..." << endl;
   FEQ1<dim> fe;
   dof->distribute_dofs (fe);
 
-  cout << "    Renumbering degrees of freedom..." << endl;
+  deallog << "    Renumbering degrees of freedom..." << endl;
   DoFRenumbering::Cuthill_McKee (*dof);
     
   SparseMatrixStruct sparsity (dof->n_dofs(),
@@ -306,23 +305,23 @@ void TestCases<dim>::run (const unsigned int test_case)
   DoFTools::make_sparsity_pattern (*dof, sparsity);
   int unconstrained_bandwidth = sparsity.bandwidth();
 
-  cout << "    Writing sparsity pattern..." << endl;
-  sparsity.print_gnuplot (cout);
+  deallog << "    Writing sparsity pattern..." << endl;
+  sparsity.print_gnuplot (logfile);
 
 
   
 				   // computing constraints
-  cout << "    Computing constraints..." << endl;
+  deallog << "    Computing constraints..." << endl;
   ConstraintMatrix constraints;
   dof->make_hanging_node_constraints (constraints);
   constraints.close ();
   constraints.condense (sparsity);
   
-  cout << "    Writing condensed sparsity pattern..." << endl;
-  sparsity.print_gnuplot (cout);
+  deallog << "    Writing condensed sparsity pattern..." << endl;
+  sparsity.print_gnuplot (logfile);
 
 
-  cout << endl
+  deallog << endl
        << "    Total number of cells         = " << tria->n_cells() << endl
        << "    Total number of active cells  = " << tria->n_active_cells() << endl
        << "    Number of DoFs                = " << dof->n_dofs() << endl
@@ -338,7 +337,11 @@ void TestCases<dim>::run (const unsigned int test_case)
 
 
 
-int main () {
+int main ()
+{
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
   for (unsigned int test_case=1; test_case<=3; ++test_case)
     {
       TestCases<2> tests;

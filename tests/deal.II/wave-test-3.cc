@@ -9,10 +9,12 @@
 #include <numerics/time-dependent.h>
 #include <grid/dof.h>
 #include <basic/dof_tools.h>
+#include <base/logstream.h>
 
-#include <iostream>
+#include <fstream>
 #include <string>
 
+ofstream logfile("wave-test-3.output");
 
 class UserMatrix;
 class SweepInfo;
@@ -3369,7 +3371,7 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
     };
   
   
-  cout << "Sweep " << setw(2) << sweep_no << ':' << endl
+  deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
        << "---------" << endl;
 
   for (typename list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
@@ -3389,14 +3391,14 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
     };
   
   solve_primal_problem ();
-  cout << endl;
+  deallog << endl;
 
   if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
       &&
       (sweep_no >= parameters.initial_energy_estimator_sweeps))
     {
       solve_dual_problem ();
-      cout << endl;
+      deallog << endl;
     };
   
   postprocess ();
@@ -3404,7 +3406,7 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
   if (parameters.write_stacked_data)
     write_stacked_data (*sweep_data.data_out_stack);
 
-  cout << endl;
+  deallog << endl;
   
   if (sweep_no != parameters.number_of_sweeps-1)
     refine_grids ();
@@ -3413,7 +3415,7 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
 
   end_sweep ();
   
-  cout << endl << endl;
+  deallog << endl << endl;
 };
 
 
@@ -3422,7 +3424,7 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
 template <int dim>
 void TimestepManager<dim>::refine_grids () 
 {
-  cout << "  Collecting refinement data: " << endl;
+  deallog << "  Collecting refinement data: " << endl;
 
   
   const unsigned int n_timesteps = timesteps.size();
@@ -3445,7 +3447,7 @@ void TimestepManager<dim>::refine_grids ()
 
   if (parameters.produce_error_statistics)
     {
-      cout << "    Generating error statistics " << flush;
+      deallog << "    Generating error statistics " << flush;
 
       vector<double> time_values (timesteps.size());
       for (unsigned int i=0; i<timesteps.size(); ++i)
@@ -3456,9 +3458,9 @@ void TimestepManager<dim>::refine_grids ()
 				 time_values,
 				 parameters.error_statistic_intervals,
 				 Histogram::parse_interval_spacing(parameters.error_statistics_scaling));
-      error_statistics.write_gnuplot (cout);
+      error_statistics.write_gnuplot (logfile);
 
-      cout << endl;
+      deallog << endl;
     };
 
 
@@ -3515,36 +3517,36 @@ void TimestepManager<dim>::refine_grids ()
       if (bottom_threshold==top_threshold)
 	  bottom_threshold = 0.999*top_threshold;
 
-      cout << "    " << all_indicators.size()
+      deallog << "    " << all_indicators.size()
 	   << " cells in total."
 	   << endl;
-      cout << "    Thresholds are [" << bottom_threshold << "," << top_threshold << "]"
+      deallog << "    Thresholds are [" << bottom_threshold << "," << top_threshold << "]"
 	   << " out of ["
 	   << *min_element(all_indicators.begin(),all_indicators.end())
 	   << ','
 	   << *max_element(all_indicators.begin(),all_indicators.end())
 	   << "]. "
 	   << endl;
-      cout << "    Expecting "
+      deallog << "    Expecting "
 	   << (all_indicators.size() +
 	       (q-partial_sums.begin())*(GeometryInfo<dim>::children_per_cell-1) -
 	       (partial_sums.end() - p)/(GeometryInfo<dim>::children_per_cell-1))
 	   << " cells in next sweep."
 	   << endl;
-      cout << "    Now refining..." << flush;
+      deallog << "    Now refining..." << flush;
       do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
 	       bind2nd (mem_fun1 (&TimeStepBase_Wave<dim>::refine_grid),
 			TimeStepBase_Tria<dim>::RefinementData (top_threshold,
 								bottom_threshold)),
 	       TimeDependent::TimeSteppingData (0,1),
 	       TimeDependent::forward);
-      cout << endl;
+      deallog << endl;
     }
 
   else
 				     // refine each time step individually
     {
-      cout << "    Refining each time step separately." << endl;
+      deallog << "    Refining each time step separately." << endl;
       
       for (unsigned int timestep=0; timestep<timesteps.size(); ++timestep)
 	static_cast<TimeStepBase_Tria<dim>*>(timesteps[timestep])->init_for_refinement();
@@ -3606,7 +3608,7 @@ void TimestepManager<dim>::refine_grids ()
 	static_cast<TimeStepBase_Tria<dim>*>(timesteps.back())->sleep(1);
 
 
-      cout << "    Got " << total_number_of_cells << " presently, expecting "
+      deallog << "    Got " << total_number_of_cells << " presently, expecting "
 	   << total_expected_cells << " for next sweep." << endl;
     };
 };
@@ -3620,43 +3622,42 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
 				   // write statistics
   if (true)
     {
-      cout << "    Writing statistics for whole sweep." << flush;
+      deallog << "    Writing statistics for whole sweep." << flush;
       
-      cout << "#  Description of fields" << endl
+      deallog << "#  Description of fields" << endl
 	   << "#  =====================" << endl
 	   << "#  General:"              << endl
 	   << "#    time"                << endl;
-      cout.setf (ios::scientific, ios::floatfield);
       
-      TimeStep<dim>::write_statistics_descriptions (cout, parameters);
-      cout << endl << endl;
+      TimeStep<dim>::write_statistics_descriptions (logfile, parameters);
+      deallog << endl << endl;
       
       for (unsigned int timestep=0; timestep<timesteps.size(); ++timestep)
 	{
-	  cout << setprecision(4) << setw(6) << timesteps[timestep]->get_time()
+	  deallog << timesteps[timestep]->get_time()
 	       << "   ";
 	  dynamic_cast<TimeStep<dim>*>
 	    (static_cast<TimeStepBase_Wave<dim>*>
-	     (timesteps[timestep]))->write_statistics (cout);
-	  cout << endl;
+	     (timesteps[timestep]))->write_statistics (logfile);
+	  deallog << endl;
 	};
 
-      AssertThrow (cout, ExcIO());
+      AssertThrow (logfile, ExcIO());
       
-      cout << endl;
+      deallog << endl;
     };
 
   
 				   // write summary
   if (true)
     {
-      cout << "    Writing summary." << flush;
+      deallog << "    Writing summary." << flush;
       
       sweep_info.write_summary (parameters.eval_list,
-				cout);
-      AssertThrow (cout, ExcIO());
+				logfile);
+      AssertThrow (logfile, ExcIO());
 
-      cout << endl;
+      deallog << endl;
     };
 };
 
@@ -3668,7 +3669,7 @@ void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack
   typename DataOutInterface<dim+1>::OutputFormat output_format
     = DataOutInterface<dim+1>::parse_output_format (parameters.output_format);
   
-  cout << "    Writing stacked time steps" << flush;
+  deallog << "    Writing stacked time steps" << flush;
   DataOutBase::EpsFlags eps_flags;
   eps_flags.height_vector = eps_flags.color_vector = 2;
   eps_flags.draw_mesh = false;
@@ -3676,8 +3677,8 @@ void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack
   eps_flags.azimut_angle = 0;
   eps_flags.turn_angle = 0;
   data_out_stack.set_flags (eps_flags);
-  data_out_stack.write (cout, output_format);
-  cout << '.' << endl;
+  data_out_stack.write (logfile, output_format);
+  deallog << '.' << endl;
 };
 
 
@@ -5120,25 +5121,9 @@ SweepInfo::write_summary (const list<EvaluationBase<dim>*> &eval_list,
       
       for (typename list<EvaluationBase<dim>*>::const_iterator i = eval_list.begin();
 	   i != eval_list.end(); ++i)
-//	out << "    "
-// 	    << (*i)->description ()
-// 	    << ": "
-// 	    << setprecision(12) << setw(12)
-// 	    << (*i)->get_final_result ()
-//          << endl;
+
       (*i)->print_final_result (out);
     };
-
-// exclude timing information for testcase  
-//   out << "  Timing information:" << endl
-//       << "  -------------------" << endl
-//       << "    Time for grid generation : " << timers.grid_generation()  << " secs." << endl
-//       << "    Time for primal problem  : " << timers.primal_problem()   << " secs." << endl
-//       << "    Time for dual problem    : " << timers.dual_problem()     << " secs." << endl
-//       << "    Time for error estimation: " << timers.error_estimation() << " secs." << endl
-//       << "    Time for postprocessing  : " << timers.postprocessing()   << " secs." << endl;
-//   out << endl;
-
   
   time_t  time1= time (0);
   tm     *time = localtime(&time1); 
@@ -5763,13 +5748,13 @@ TimeStep_Wave<dim>::StatisticData::write_descriptions (ostream &out)
 template <int dim>
 void TimeStep_Wave<dim>::StatisticData::write (ostream &out) const
 {
-  out << setw(6) << n_active_cells             << ' '
-      << setw(6) << n_dofs                     << ' '
-      << setw(3) << n_solver_steps_helmholtz   << ' '
-      << setw(3) << n_solver_steps_projection  << ' '
-      << setprecision(4) << setw(6) << energy.first               << ' '
-      << setprecision(4) << setw(6) << energy.second              << ' '
-      << setprecision(6) << setw(8) << energy.first+energy.second;
+  out << n_active_cells             << ' '
+      << n_dofs                     << ' '
+      << n_solver_steps_helmholtz   << ' '
+      << n_solver_steps_projection  << ' '
+      << energy.first               << ' '
+      << energy.second              << ' '
+      << energy.first+energy.second;
 };
 
 
@@ -5812,10 +5797,10 @@ TimeStep_Dual<dim>::TimeStep_Dual (const string &dual_fe)
 
 template <int dim>
 void TimeStep_Dual<dim>::do_initial_step () {
-  cout << "  Dual problem: time="
-       << setprecision(4) << setw(6) << time
-       << ", step=" << setw(4) << timestep_no
-       << ", sweep=" << setw(2) << sweep_no
+  deallog << "  Dual problem: time="
+       << time
+       << ", step=" << timestep_no
+       << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs" << flush;
@@ -5862,7 +5847,7 @@ void TimeStep_Dual<dim>::do_initial_step () {
 				    dof_handler->n_dofs(),
 				    0, 0,
 				    make_pair (0.0, 0.0));
-  cout << "." << endl;
+  deallog << "." << endl;
 };
 
 
@@ -5870,10 +5855,10 @@ void TimeStep_Dual<dim>::do_initial_step () {
 template <int dim>
 void TimeStep_Dual<dim>::do_timestep ()
 {
-  cout << "  Dual problem: time="
-       << setprecision(4) << setw(6) << time
-       << ", step=" << setw(4) << timestep_no
-       << ", sweep=" << setw(2) << sweep_no
+  deallog << "  Dual problem: time="
+       << time
+       << ", step=" << timestep_no
+       << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs" << flush;
@@ -5995,7 +5980,7 @@ void TimeStep_Dual<dim>::do_timestep ()
 				  solver_steps2,
 				  compute_energy ());
   
-  cout << "." << endl;
+  deallog << "." << endl;
 };
 
 
@@ -6598,7 +6583,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 {
   sweep_info->get_timers().error_estimation.start();
 
-  cout << "[ee]" << flush;
+  deallog << "[ee]" << flush;
   
   if ((parameters.refinement_strategy == WaveParameters<dim>::energy_estimator)
       ||
@@ -7647,7 +7632,7 @@ void TimeStep_ErrorEstimation<dim>::StatisticData::write_descriptions (ostream &
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::StatisticData::write (ostream &out) const
 {
-  out << setprecision(4) << setw(6) << estimated_error;
+  out << estimated_error;
 };
 
 
@@ -7867,10 +7852,10 @@ template class TimeStep<2>;
 template <int dim>
 void TimeStep_Postprocess<dim>::postprocess_timestep () 
 {
-  cout << "  Postprocessing: time="
-       << setprecision(4) << setw(6) << time
-       << ", step=" << setw(4) << timestep_no
-       << ", sweep=" << setw(2) << sweep_no
+  deallog << "  Postprocessing: time="
+       << time
+       << ", step=" << timestep_no
+       << ", sweep=" << sweep_no
        << ". "
        << flush;
 
@@ -7900,7 +7885,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       (((timestep_no % parameters.write_steps_interval) == 0) ||
        (next_timestep == 0)))
     {
-      cout << "[o]" << flush;
+      deallog << "[o]" << flush;
 
       DataOut<dim>::OutputFormat output_format
 	= DataOut<dim>::parse_output_format (parameters.output_format);
@@ -7971,15 +7956,15 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 
       out.build_patches ();
       
-      out.write (cout, output_format);
+      out.write (logfile, output_format);
 
-      cout << "." << flush;
+      deallog << "." << flush;
     };
 
   if (parameters.write_stacked_data &&
       (timestep_no % parameters.write_stacked_interval == 0))
     {
-      cout << "[st]" << flush;
+      deallog << "[st]" << flush;
 
       sweep_data->data_out_stack->new_parameter_value (time,
 						       (timestep_no == 0 ?
@@ -8030,7 +8015,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
     };
   
 	
-  cout << endl;
+  deallog << endl;
   sweep_info->get_timers().postprocessing.stop();
 };
 
@@ -8162,10 +8147,10 @@ TimeStep_Primal<dim>::TimeStep_Primal (const string &primal_fe)
 template <int dim>
 void TimeStep_Primal<dim>::do_initial_step ()
 {
-  cout << "  Primal problem: time="
-       << setprecision(4) << setw(6) << time
-       << ", step=" << setw(4) << timestep_no
-       << ", sweep=" << setw(2) << sweep_no
+  deallog << "  Primal problem: time="
+       << time
+       << ", step=" << timestep_no
+       << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs" << flush;
@@ -8197,7 +8182,7 @@ void TimeStep_Primal<dim>::do_initial_step ()
 				  0,
 				  make_pair (0.0, 0.0));
 
-  cout << "." << endl;
+  deallog << "." << endl;
 };
 
 
@@ -8206,10 +8191,10 @@ void TimeStep_Primal<dim>::do_initial_step ()
 template <int dim>
 void TimeStep_Primal<dim>::do_timestep ()
 {
-  cout << "  Primal problem: time="
-       << setprecision(4) << setw(6) << time
-       << ", step=" << setw(4) << timestep_no
-       << ", sweep=" << setw(2) << sweep_no
+  deallog << "  Primal problem: time="
+       << time
+       << ", step=" << timestep_no
+       << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs" << flush;
@@ -8325,7 +8310,7 @@ void TimeStep_Primal<dim>::do_timestep ()
 				  solver_steps2,
 				  compute_energy ());
   
-  cout << "." << endl;
+  deallog << "." << endl;
 };
 
 
@@ -9121,7 +9106,7 @@ template <int dim>
 void WaveProblem<dim>::run (ParameterHandler &prm) 
 {
   parse_parameters (prm);
-//  prm.print_parameters (cout, Text);
+//  prm.print_parameters (logfile, Text);
 
 
 				   ////////////////////////////////
@@ -9170,10 +9155,14 @@ void WaveProblem<dim>::run (ParameterHandler &prm)
 
 
 
-int main () {
+int main ()
+{
 				   // no additional output to console
-  deallog.depth_console (0);
+  deallog.attach(logfile);
+  deallog.depth_console(0);
 
+  logfile.precision(4);
+  
   WaveProblem<2> waves;
   MultipleParameterLoop input_data;
 

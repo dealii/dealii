@@ -27,6 +27,7 @@
 #include <base/parameter_handler.h>
 #include <grid/dof_constraints.h>
 #include <basic/grid_out.h>
+#include <base/logstream.h>
 
 #include <fstream>
 #include <cmath>
@@ -234,7 +235,12 @@ void make_tria (Triangulation<3> &tria, int step)
 
 
 
-int main () {
+int main ()
+{
+  ofstream logfile("constraints.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
   FiniteElement<3> *fe;
   
   for (unsigned int element=0; element<2; ++element)
@@ -251,11 +257,11 @@ int main () {
       
       for (int step=0; step<9; ++step)
 	{
-	  cout << "Element=" << element << ", Step=" << step << endl;
+	  deallog << "Element=" << element << ", Step=" << step << endl;
 	  
 	  Triangulation<3> tria;
 	  make_tria (tria, step);
-	  GridOut().write_gnuplot (tria, cout);
+	  GridOut().write_gnuplot (tria, logfile);
 	  
 	  DoFHandler<3> dof (&tria);
 	  dof.distribute_dofs (*fe);
@@ -264,12 +270,12 @@ int main () {
 	  dof.make_hanging_node_constraints (constraints);
 	  constraints.close ();
       
-	  constraints.print (cout);
+	  constraints.print (logfile);
       
 					   // release fe
 	  dof.clear ();
 
-	  cout << endl;
+	  deallog << endl;
 	};
 
       delete fe;

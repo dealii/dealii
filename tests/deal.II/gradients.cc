@@ -22,11 +22,17 @@
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
 #include <lac/vector.h>
+#include <base/logstream.h>
+
+#include <fstream>
 
 
+int main ()
+{
+  ofstream logfile("gradients.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
 
-
-int main () {
   Triangulation<2> tria;
   GridGenerator::hyper_cube (tria,0,1);
   tria.begin_active()->vertex(2)(0) = 2;
@@ -42,8 +48,7 @@ int main () {
   
   Vector<double> val(4);
 
-  cout << "------------------------------------------------------" << endl
-       << "Testing transformation of gradients of shape function:" << endl;
+  deallog << "Testing transformation of gradients of shape function:" << endl;
   
 				   // test for each of the four
 				   // shape functions
@@ -86,7 +91,7 @@ int main () {
 		break;
 	};
 
-      cout << "  Shape function " << vertex
+      deallog << "  Shape function " << vertex
 	   << ": "
 	   << (ok ? "OK" : "WRONG!")
 	   << endl;
@@ -94,8 +99,6 @@ int main () {
       if (!ok)
 	testcase_succeeded = false;
     };
-
-  cout << "------------------------------------------------------" << endl;
 
   if (testcase_succeeded)
     return 0;
