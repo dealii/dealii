@@ -300,6 +300,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p>
+       Changed: The <code class="class">Table</code> accessor classes
+       have been moved to a namespace <code
+       class="class">internal</code>. Since these classes are not (or should
+       not be) used directly in applications, this should not change
+       compatibility. However, they will now no longer show up in the class
+       overview of the documentation, which they were cluttering up.
+       <br>
+       (WB 2003/02/13)
+       </p>
+
   <li> <p> 
        New: The <code class="class">Function</code> class now has an assignment
        operator. This way, you can put function objects into
@@ -543,6 +554,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       Changed: The <code class="class">BlockVector</code> accessor classes
+       have been moved to a namespace <code
+       class="class">internal</code>. Since these classes are not (or should
+       not be) used directly in applications, this should not change
+       compatibility. However, they will now no longer show up in the class
+       overview of the documentation, which they were cluttering up.
+       <br>
+       (WB 2003/02/13)
+       </p>
 
   <li> <p> New: The <code class="class">SolverGMRES</code> now accepts
   an <code class="class">AdditionalData</code> parameter

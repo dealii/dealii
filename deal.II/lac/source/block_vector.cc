@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,11 +42,15 @@ template void BlockVector<float>::equ<float>(const float,
 template void BlockVector<float>::scale<double>(const BlockVector<double>&);
 template void BlockVector<float>::scale<float>(const BlockVector<float>&);
 
-namespace BlockVectorIterators
+namespace internal
 {
-  template class Iterator<double,false>;
-  template class Iterator<double,true>;
+  namespace BlockVectorIterators
+  {
+    template class Iterator<double,false>;
+    template class Iterator<double,true>;
 
-  template class Iterator<float,false>;
-  template class Iterator<float,true>;
+    template class Iterator<float,false>;
+    template class Iterator<float,true>;
+  }
 }
+

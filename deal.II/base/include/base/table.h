@@ -33,7 +33,6 @@ template <typename T> class Table<6,T>;
 
 
 
-
 /**
  * Base class for an array of indices of fixed size used for the
  * @ref{TableBase} class. Actually, this class serves a dual purpose,
@@ -42,22 +41,22 @@ template <typename T> class Table<6,T>;
  *
  * @author Wolfgang Bangerth, 2002
  */
-template <int N>
-class TableIndicesBase
-{
-  public:
-                                     /**
-                                      * Access the value of the
-                                      * @p{i}th index.
-                                      */
-    unsigned int operator[] (const unsigned int i) const;
+  template <int N>
+  class TableIndicesBase
+  {
+    public:
+                                       /**
+                                        * Access the value of the
+                                        * @p{i}th index.
+                                        */
+      unsigned int operator[] (const unsigned int i) const;
     
-  protected:
-                                     /**
-                                      * Store the indices in an array.
-                                      */
-    unsigned indices[N];
-};
+    protected:
+                                       /**
+                                        * Store the indices in an array.
+                                        */
+      unsigned indices[N];
+  };
 
 
 /**
@@ -74,9 +73,10 @@ class TableIndicesBase
  *
  * @author Wolfgang Bangerth, 2002
  */
-template <int N>
-class TableIndices
-{};
+  template <int N>
+  class TableIndices
+  {
+  };
 
 
 
@@ -92,22 +92,22 @@ class TableIndices
  *
  * @author Wolfgang Bangerth, 2002
  */
-template <>
-class TableIndices<1> : public TableIndicesBase<1>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+  template <>
+  class TableIndices<1> : public TableIndicesBase<1>
+  {
+    public:
+                                       /**
+                                        * Default constructor. Set all
+                                        * indices to zero.
+                                        */
+      TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      */
-    TableIndices (const unsigned int index1);
-};
+                                       /**
+                                        * Constructor. Set indices to
+                                        * the given values.
+                                        */
+      TableIndices (const unsigned int index1);
+  };
 
 
 
@@ -122,23 +122,23 @@ class TableIndices<1> : public TableIndicesBase<1>
  *
  * @author Wolfgang Bangerth, 2002
  */
-template <>
-class TableIndices<2> : public TableIndicesBase<2>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+  template <>
+  class TableIndices<2> : public TableIndicesBase<2>
+  {
+    public:
+                                       /**
+                                        * Default constructor. Set all
+                                        * indices to zero.
+                                        */
+      TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2);
-};
+                                       /**
+                                        * Constructor. Set indices to
+                                        * the given values.
+                                        */
+      TableIndices (const unsigned int index1,
+                    const unsigned int index2);
+  };
 
 
 
@@ -153,24 +153,24 @@ class TableIndices<2> : public TableIndicesBase<2>
  *
  * @author Wolfgang Bangerth, 2002
  */
-template <>
-class TableIndices<3> : public TableIndicesBase<3>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+  template <>
+  class TableIndices<3> : public TableIndicesBase<3>
+  {
+    public:
+                                       /**
+                                        * Default constructor. Set all
+                                        * indices to zero.
+                                        */
+      TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3);
-};
+                                       /**
+                                        * Constructor. Set indices to
+                                        * the given values.
+                                        */
+      TableIndices (const unsigned int index1,
+                    const unsigned int index2,
+                    const unsigned int index3);
+  };
 
 
 /**
@@ -184,25 +184,25 @@ class TableIndices<3> : public TableIndicesBase<3>
  *
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
-template <>
-class TableIndices<4> : public TableIndicesBase<4>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+  template <>
+  class TableIndices<4> : public TableIndicesBase<4>
+  {
+    public:
+                                       /**
+                                        * Default constructor. Set all
+                                        * indices to zero.
+                                        */
+      TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3,
-		  const unsigned int index4);
-};
+                                       /**
+                                        * Constructor. Set indices to
+                                        * the given values.
+                                        */
+      TableIndices (const unsigned int index1,
+                    const unsigned int index2,
+                    const unsigned int index3,
+                    const unsigned int index4);
+  };
 
 
 /**
@@ -216,26 +216,26 @@ class TableIndices<4> : public TableIndicesBase<4>
  *
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
-template <>
-class TableIndices<5> : public TableIndicesBase<5>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
+  template <>
+  class TableIndices<5> : public TableIndicesBase<5>
+  {
+    public:
+                                       /**
+                                        * Default constructor. Set all
+                                        * indices to zero.
+                                        */
+      TableIndices ();
 
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3,
-		  const unsigned int index4,
-		  const unsigned int index5);
-};
+                                       /**
+                                        * Constructor. Set indices to
+                                        * the given values.
+                                        */
+      TableIndices (const unsigned int index1,
+                    const unsigned int index2,
+                    const unsigned int index3,
+                    const unsigned int index4,
+                    const unsigned int index5);
+  };
 
 
 /**
@@ -249,28 +249,31 @@ class TableIndices<5> : public TableIndicesBase<5>
  *
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
-template <>
-class TableIndices<6> : public TableIndicesBase<6>
+  template <>
+  class TableIndices<6> : public TableIndicesBase<6>
+  {
+    public:
+                                       /**
+                                        * Default constructor. Set all
+                                        * indices to zero.
+                                        */
+      TableIndices ();
+
+                                       /**
+                                        * Constructor. Set indices to
+                                        * the given values.
+                                        */
+      TableIndices (const unsigned int index1,
+                    const unsigned int index2,
+                    const unsigned int index3,
+                    const unsigned int index4,
+                    const unsigned int index5,
+                    const unsigned int index6);
+  };
+
+
+namespace internal
 {
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * indices to zero.
-                                      */
-    TableIndices ();
-
-                                     /**
-                                      * Constructor. Set indices to
-                                      * the given values.
-                                      */
-    TableIndices (const unsigned int index1,
-                  const unsigned int index2,
-                  const unsigned int index3,
-		  const unsigned int index4,
-		  const unsigned int index5,
-		  const unsigned int index6);
-};
-
 
 /**
  * Have a namespace in which we declare some classes that are used to
@@ -289,8 +292,8 @@ class TableIndices<6> : public TableIndicesBase<6>
  *
  * @author Wolfgang Bangerth, 2002
  */
-namespace TableBaseAccessors
-{
+  namespace TableBaseAccessors
+  {
 /**
  * Have a class which declares some nested typedefs, depending on its
  * template parameters. The general template declares nothing, but
@@ -298,31 +301,31 @@ namespace TableBaseAccessors
  * indicating constness of the table for which accessor objects are to
  * be generated in this namespace.
  */
-  template <int N, typename T, bool Constness>
-  class Types
-  {};
+    template <int N, typename T, bool Constness>
+    class Types
+    {};
 
 /**
  * Have a class which declares some nested typedefs, depending on its
  * template parameters. Specialization for accessors to constant
  * objects.
  */
-  template <int N, typename T> struct Types<N,T,true> 
-  {
-      typedef const T value_type;
-      typedef const TableBase<N,T> TableType;
-  };
+    template <int N, typename T> struct Types<N,T,true> 
+    {
+        typedef const T value_type;
+        typedef const TableBase<N,T> TableType;
+    };
 
 /**
  * Have a class which declares some nested typedefs, depending on its
  * template parameters. Specialization for accessors to non-constant
  * objects.
  */
-  template <int N, typename T> struct Types<N,T,false> 
-  {
-      typedef T value_type;
-      typedef TableBase<N,T> TableType;
-  };
+    template <int N, typename T> struct Types<N,T,false> 
+    {
+        typedef T value_type;
+        typedef TableBase<N,T> TableType;
+    };
   
 
 /**
@@ -363,104 +366,104 @@ namespace TableBaseAccessors
  * 
  * @author Wolfgang Bangerth, 2002
  */
-  template <int N, typename T, bool C, unsigned int P>
-  class Accessor
-  {
-    public:
-                                       /**
-                                        * Import two typedefs from the
-                                        * switch class above.
-                                        */
-      typedef typename Types<N,T,C>::value_type * pointer;      
-      typedef typename Types<N,T,C>::TableType    TableType;
+    template <int N, typename T, bool C, unsigned int P>
+    class Accessor
+    {
+      public:
+                                         /**
+                                          * Import two typedefs from the
+                                          * switch class above.
+                                          */
+        typedef typename Types<N,T,C>::value_type * pointer;      
+        typedef typename Types<N,T,C>::TableType    TableType;
 
-    private:
-                                       /**
-                                        * Constructor. Take a pointer
-                                        * to the table object to know
-                                        * about the sizes of the
-                                        * various dimensions, and a
-                                        * pointer to the subset of
-                                        * data we may access.
-                                        *
-                                        * The constructor is made
-                                        * private in order to prevent
-                                        * you having such objects
-                                        * around. The only way to
-                                        * create such objects is via
-                                        * the @p{Table} class, which
-                                        * only generates them as
-                                        * temporary objects. This
-                                        * guarantees that the accessor
-                                        * objects go out of scope
-                                        * earlier than the mother
-                                        * object, avoid problems with
-                                        * data consistency.
-                                        */
-      Accessor (const TableType &table,
-                const pointer    data);
+      private:
+                                         /**
+                                          * Constructor. Take a pointer
+                                          * to the table object to know
+                                          * about the sizes of the
+                                          * various dimensions, and a
+                                          * pointer to the subset of
+                                          * data we may access.
+                                          *
+                                          * The constructor is made
+                                          * private in order to prevent
+                                          * you having such objects
+                                          * around. The only way to
+                                          * create such objects is via
+                                          * the @p{Table} class, which
+                                          * only generates them as
+                                          * temporary objects. This
+                                          * guarantees that the accessor
+                                          * objects go out of scope
+                                          * earlier than the mother
+                                          * object, avoid problems with
+                                          * data consistency.
+                                          */
+        Accessor (const TableType &table,
+                  const pointer    data);
 
-                                       /**
-                                        * Default constructor. Not
-                                        * needed, and invisible, so
-                                        * private.
-                                        */
-      Accessor ();
-                                       /**
-                                        * Copy constructor. Not
-                                        * needed, and invisible, so
-                                        * private.
-                                        */
-      Accessor (const Accessor &a);
+                                         /**
+                                          * Default constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
+                                          */
+        Accessor ();
+                                         /**
+                                          * Copy constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
+                                          */
+        Accessor (const Accessor &a);
 
-    public:
+      public:
       
-                                       /**
-                                        * Index operator. Performs a
-                                        * range check.
-                                        */
-      Accessor<N,T,C,P-1> operator [] (const unsigned int i) const;
+                                         /**
+                                          * Index operator. Performs a
+                                          * range check.
+                                          */
+        Accessor<N,T,C,P-1> operator [] (const unsigned int i) const;
 
-                                       /**
-                                        * Exception for range
-                                        * check. Do not use global
-                                        * exception since this way we
-                                        * can output which index is
-                                        * the wrong one.
-                                        */
-      DeclException3 (ExcIndexRange, int, int, int,
-                      << "The " << N-P+1 << "th index has a value of "
-                      << arg1 << " but needs to be in the range ["
-                      << arg2 << "," << arg3 << "[");
-    private:
-                                       /**
-                                        * Store the data given to the
-                                        * constructor. There are no
-                                        * non-const member functions
-                                        * of this class, so there is
-                                        * no reason not to make these
-                                        * elements constant.
-                                        */
-      const TableType &table;
-      const pointer   data;
+                                         /**
+                                          * Exception for range
+                                          * check. Do not use global
+                                          * exception since this way we
+                                          * can output which index is
+                                          * the wrong one.
+                                          */
+        DeclException3 (ExcIndexRange, int, int, int,
+                        << "The " << N-P+1 << "th index has a value of "
+                        << arg1 << " but needs to be in the range ["
+                        << arg2 << "," << arg3 << "[");
+      private:
+                                         /**
+                                          * Store the data given to the
+                                          * constructor. There are no
+                                          * non-const member functions
+                                          * of this class, so there is
+                                          * no reason not to make these
+                                          * elements constant.
+                                          */
+        const TableType &table;
+        const pointer   data;
 
-                                       // declare some other classes
-                                       // as friends. make sure to
-                                       // work around bugs in some
-                                       // compilers
+                                         // declare some other classes
+                                         // as friends. make sure to
+                                         // work around bugs in some
+                                         // compilers
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG      
-      template <int N1, typename T1> friend class Table;
-      template <int N1, typename T1, bool C1, unsigned int P1>
-      friend class Accessor;
+        template <int N1, typename T1> friend class Table;
+        template <int N1, typename T1, bool C1, unsigned int P1>
+        friend class Accessor;
 #  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
-      friend class Table<N,T>;
-      friend class Accessor<N,T,C,P+1>;
+        friend class Table<N,T>;
+        friend class Accessor<N,T,C,P+1>;
 #  endif
 #else
-      friend class Table<N,T>;
-      friend class Accessor<N,T,C,P+1>;
+        friend class Table<N,T>;
+        friend class Accessor<N,T,C,P+1>;
 #endif
-  };
+    };
 
 
   
@@ -473,150 +476,151 @@ namespace TableBaseAccessors
  *
  * @author Wolfgang Bangerth, 2002
  */
-  template <int N, typename T, bool C>
-  class Accessor<N,T,C,1>
-  {
-    public:
-                                       /**
-                                        * Typedef constant and
-                                        * non-constant iterator
-                                        * types to the elements of
-                                        * this row, as well as all
-                                        * the other types usually
-                                        * required for the standard
-                                        * library algorithms.
-                                        */
-      typedef typename Types<N,T,C>::value_type value_type;
-      typedef value_type* pointer;
-      typedef const value_type* const_pointer;
-      typedef value_type* iterator;
-      typedef const value_type* const_iterator;
-      typedef value_type& reference;
-      typedef const value_type& const_reference;
-      typedef size_t size_type;
-      typedef ptrdiff_t difference_type;
+    template <int N, typename T, bool C>
+    class Accessor<N,T,C,1>
+    {
+      public:
+                                         /**
+                                          * Typedef constant and
+                                          * non-constant iterator
+                                          * types to the elements of
+                                          * this row, as well as all
+                                          * the other types usually
+                                          * required for the standard
+                                          * library algorithms.
+                                          */
+        typedef typename Types<N,T,C>::value_type value_type;
+        typedef value_type* pointer;
+        typedef const value_type* const_pointer;
+        typedef value_type* iterator;
+        typedef const value_type* const_iterator;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
+        typedef size_t size_type;
+        typedef ptrdiff_t difference_type;
 
-                                       /**
-                                        * Import a typedef from the
-                                        * switch class above.
-                                        */
-      typedef typename Types<N,T,C>::TableType    TableType;
+                                         /**
+                                          * Import a typedef from the
+                                          * switch class above.
+                                          */
+        typedef typename Types<N,T,C>::TableType    TableType;
 
-    private:
+      private:
       
-                                       /**
-                                        * Constructor. Take a pointer
-                                        * to the table object to know
-                                        * about the sizes of the
-                                        * various dimensions, and a
-                                        * pointer to the subset of
-                                        * data we may access (which in
-                                        * this particular case is only
-                                        * one row).
-                                        *
-                                        * The constructor is made
-                                        * private in order to prevent
-                                        * you having such objects
-                                        * around. The only way to
-                                        * create such objects is via
-                                        * the @p{Table} class, which
-                                        * only generates them as
-                                        * temporary objects. This
-                                        * guarantees that the accessor
-                                        * objects go out of scope
-                                        * earlier than the mother
-                                        * object, avoid problems with
-                                        * data consistency.
-                                        */
-      Accessor (const TableType &table,
-                const pointer    data);
+                                         /**
+                                          * Constructor. Take a pointer
+                                          * to the table object to know
+                                          * about the sizes of the
+                                          * various dimensions, and a
+                                          * pointer to the subset of
+                                          * data we may access (which in
+                                          * this particular case is only
+                                          * one row).
+                                          *
+                                          * The constructor is made
+                                          * private in order to prevent
+                                          * you having such objects
+                                          * around. The only way to
+                                          * create such objects is via
+                                          * the @p{Table} class, which
+                                          * only generates them as
+                                          * temporary objects. This
+                                          * guarantees that the accessor
+                                          * objects go out of scope
+                                          * earlier than the mother
+                                          * object, avoid problems with
+                                          * data consistency.
+                                          */
+        Accessor (const TableType &table,
+                  const pointer    data);
 
-                                       /**
-                                        * Default constructor. Not
-                                        * needed, and invisible, so
-                                        * private.
-                                        */
-      Accessor ();
+                                         /**
+                                          * Default constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
+                                          */
+        Accessor ();
 
-                                       /**
-                                        * Copy constructor. Not
-                                        * needed, and invisible, so
-                                        * private.
-                                        */
-      Accessor (const Accessor &a);
+                                         /**
+                                          * Copy constructor. Not
+                                          * needed, and invisible, so
+                                          * private.
+                                          */
+        Accessor (const Accessor &a);
 
-    public:
+      public:
       
-                                       /**
-                                        * Index operator. Performs a
-                                        * range check.
-                                        */
-      reference operator [] (const unsigned int) const;
+                                         /**
+                                          * Index operator. Performs a
+                                          * range check.
+                                          */
+        reference operator [] (const unsigned int) const;
       
-                                       /**
-                                        * Return the length of one row,
-                                        * i.e. the number of elements
-                                        * corresponding to the last
-                                        * index of the table object.
-                                        */
-      unsigned int size () const;
+                                         /**
+                                          * Return the length of one row,
+                                          * i.e. the number of elements
+                                          * corresponding to the last
+                                          * index of the table object.
+                                          */
+        unsigned int size () const;
         
-                                       /**
-                                        * Return an iterator to the
-                                        * first element of this
-                                        * row.
-                                        */
-      iterator begin () const;
+                                         /**
+                                          * Return an iterator to the
+                                          * first element of this
+                                          * row.
+                                          */
+        iterator begin () const;
       
-                                       /**
-                                        * Return an interator to the
-                                        * element past the end of
-                                        * this row.
-                                        */
-      iterator end () const;
+                                         /**
+                                          * Return an interator to the
+                                          * element past the end of
+                                          * this row.
+                                          */
+        iterator end () const;
       
-                                       /**
-                                        * Exception for range
-                                        * check. Do not use global
-                                        * exception since this way we
-                                        * can output which index is
-                                        * the wrong one.
-                                        */
-      DeclException3 (ExcIndexRange, int, int, int,
-                      << "The " << N << "th index has a value of "
-                      << arg1 << " but needs to be in the range ["
-                      << arg2 << "," << arg3 << "[");
-    private:
-                                       /**
-                                        * Store the data given to the
-                                        * constructor. There are no
-                                        * non-const member functions
-                                        * of this class, so there is
-                                        * no reason not to make these
-                                        * elements constant.
-                                        */
-      const TableType &table;
-      const pointer   data;
+                                         /**
+                                          * Exception for range
+                                          * check. Do not use global
+                                          * exception since this way we
+                                          * can output which index is
+                                          * the wrong one.
+                                          */
+        DeclException3 (ExcIndexRange, int, int, int,
+                        << "The " << N << "th index has a value of "
+                        << arg1 << " but needs to be in the range ["
+                        << arg2 << "," << arg3 << "[");
+      private:
+                                         /**
+                                          * Store the data given to the
+                                          * constructor. There are no
+                                          * non-const member functions
+                                          * of this class, so there is
+                                          * no reason not to make these
+                                          * elements constant.
+                                          */
+        const TableType &table;
+        const pointer   data;
 
-                                       // declare some other classes
-                                       // as friends. make sure to
-                                       // work around bugs in some
-                                       // compilers
+                                         // declare some other classes
+                                         // as friends. make sure to
+                                         // work around bugs in some
+                                         // compilers
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
-      template <int N1, typename T1> friend class Table;
-      template <int N1, typename T1, bool C1, unsigned int P1>
-      friend class Accessor;
+        template <int N1, typename T1> friend class Table;
+        template <int N1, typename T1, bool C1, unsigned int P1>
+        friend class Accessor;
 #  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
-      friend class Table<2,T>;
-      friend class Accessor<N,T,C,2>;
+        friend class Table<2,T>;
+        friend class Accessor<N,T,C,2>;
 #  endif
 #else
-      friend class Table<2,T>;
-      friend class Accessor<N,T,C,2>;
+        friend class Table<2,T>;
+        friend class Accessor<N,T,C,2>;
 #endif
-  };
-}
+    };
+  }
   
+} // namespace internal
 
 
 
@@ -1071,7 +1075,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    TableBaseAccessors::Accessor<2,T,true,1>
+    internal::TableBaseAccessors::Accessor<2,T,true,1>
     operator [] (const unsigned int i) const;
 
                                      /**
@@ -1084,7 +1088,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    TableBaseAccessors::Accessor<2,T,false,1>
+    internal::TableBaseAccessors::Accessor<2,T,false,1>
     operator [] (const unsigned int i);
 
                                      /**
@@ -1217,7 +1221,7 @@ class Table<3,T> : public TableBase<3,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    TableBaseAccessors::Accessor<3,T,true,2>
+    internal::TableBaseAccessors::Accessor<3,T,true,2>
     operator [] (const unsigned int i) const;
 
                                      /**
@@ -1231,7 +1235,7 @@ class Table<3,T> : public TableBase<3,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    TableBaseAccessors::Accessor<3,T,false,2>
+    internal::TableBaseAccessors::Accessor<3,T,false,2>
     operator [] (const unsigned int i);
 
                                      /**
@@ -1304,7 +1308,7 @@ class Table<4,T> : public TableBase<4,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    TableBaseAccessors::Accessor<4,T,true,3>
+    internal::TableBaseAccessors::Accessor<4,T,true,3>
     operator [] (const unsigned int i) const;
 
                                      /**
@@ -1318,7 +1322,7 @@ class Table<4,T> : public TableBase<4,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    TableBaseAccessors::Accessor<4,T,false,3>
+    internal::TableBaseAccessors::Accessor<4,T,false,3>
     operator [] (const unsigned int i);
 
                                      /**
@@ -1394,7 +1398,7 @@ class Table<5,T> : public TableBase<5,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    TableBaseAccessors::Accessor<5,T,true,4>
+    internal::TableBaseAccessors::Accessor<5,T,true,4>
     operator [] (const unsigned int i) const;
 
                                      /**
@@ -1408,7 +1412,7 @@ class Table<5,T> : public TableBase<5,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    TableBaseAccessors::Accessor<5,T,false,4>
+    internal::TableBaseAccessors::Accessor<5,T,false,4>
     operator [] (const unsigned int i);
 
                                      /**
@@ -1487,7 +1491,7 @@ class Table<6,T> : public TableBase<6,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    TableBaseAccessors::Accessor<6,T,true,5>
+    internal::TableBaseAccessors::Accessor<6,T,true,5>
     operator [] (const unsigned int i) const;
 
                                      /**
@@ -1501,7 +1505,7 @@ class Table<6,T> : public TableBase<6,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    TableBaseAccessors::Accessor<6,T,false,5>
+    internal::TableBaseAccessors::Accessor<6,T,false,5>
     operator [] (const unsigned int i);
 
                                      /**
@@ -1730,156 +1734,159 @@ TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
 
 
 
-namespace TableBaseAccessors 
+namespace internal
 {
-  template <int N, typename T, bool C, unsigned int P>
-  inline
-  Accessor<N,T,C,P>::Accessor (const TableType &table,
-                               const pointer    data)
-                  :
-                  table (table),
-                  data (data)
-  {}
-
-
-
-  template <int N, typename T, bool C, unsigned int P>
-  inline
-  Accessor<N,T,C,P>::Accessor (const Accessor &)
-                  :
-                  table (*static_cast<const TableType*>(0)),
-                  data (0)
+  namespace TableBaseAccessors 
   {
-                                     // accessor objects are only
-                                     // temporary objects, so should
-                                     // not need to be copied around
-    Assert (false, ExcInternalError());
-  }
+    template <int N, typename T, bool C, unsigned int P>
+    inline
+    Accessor<N,T,C,P>::Accessor (const TableType &table,
+                                 const pointer    data)
+                    :
+                    table (table),
+                    data (data)
+    {}
+
+
+
+    template <int N, typename T, bool C, unsigned int P>
+    inline
+    Accessor<N,T,C,P>::Accessor (const Accessor &)
+                    :
+                    table (*static_cast<const TableType*>(0)),
+                    data (0)
+    {
+                                       // accessor objects are only
+                                       // temporary objects, so should
+                                       // not need to be copied around
+      Assert (false, ExcInternalError());
+    }
   
 
   
-  template <int N, typename T, bool C, unsigned int P>
-  inline
-  Accessor<N,T,C,P>::Accessor ()
-                  :
-                  table (*static_cast<const TableType*>(0)),
-                  data (0)
-  {
-                                     // accessor objects are only
-                                     // temporary objects, so should
-                                     // not need to be copied around
-    Assert (false, ExcInternalError());
-  }
+    template <int N, typename T, bool C, unsigned int P>
+    inline
+    Accessor<N,T,C,P>::Accessor ()
+                    :
+                    table (*static_cast<const TableType*>(0)),
+                    data (0)
+    {
+                                       // accessor objects are only
+                                       // temporary objects, so should
+                                       // not need to be copied around
+      Assert (false, ExcInternalError());
+    }
   
 
   
-  template <int N, typename T, bool C, unsigned int P>
-  inline
-  Accessor<N,T,C,P-1>
-  Accessor<N,T,C,P>::operator [] (const unsigned int i) const 
-  {
-    Assert (i < table.size()[N-P],
-            ExcIndexRange (i, 0, table.size()[N-P]));
+    template <int N, typename T, bool C, unsigned int P>
+    inline
+    Accessor<N,T,C,P-1>
+    Accessor<N,T,C,P>::operator [] (const unsigned int i) const 
+    {
+      Assert (i < table.size()[N-P],
+              ExcIndexRange (i, 0, table.size()[N-P]));
 
-                                     // access i-th
-                                     // subobject. optimize on the
-                                     // case i==0
-    if (i==0)
-      return Accessor<N,T,C,P-1> (table, data);
-    else 
-      {
-                                         // note: P>1, otherwise the
-                                         // specialization would have
-                                         // been taken!
-        unsigned int subobject_size = table.size()[N-1];
-        for (int p=P-1; p>1; --p)
-          subobject_size *= table.size()[N-p];
-        const pointer new_data = data + i*subobject_size;
-        return Accessor<N,T,C,P-1> (table, new_data);
-      };
-  }
-
-
-
-  template <int N, typename T, bool C>
-  inline
-  Accessor<N,T,C,1>::Accessor (const TableType &table,
-                               const pointer    data)
-                  :
-                  table (table),
-                  data (data)
-  {}
+                                       // access i-th
+                                       // subobject. optimize on the
+                                       // case i==0
+      if (i==0)
+        return Accessor<N,T,C,P-1> (table, data);
+      else 
+        {
+                                           // note: P>1, otherwise the
+                                           // specialization would have
+                                           // been taken!
+          unsigned int subobject_size = table.size()[N-1];
+          for (int p=P-1; p>1; --p)
+            subobject_size *= table.size()[N-p];
+          const pointer new_data = data + i*subobject_size;
+          return Accessor<N,T,C,P-1> (table, new_data);
+        };
+    }
 
 
 
-  template <int N, typename T, bool C>
-  inline
-  Accessor<N,T,C,1>::Accessor ()
-                  :
-                  table (*static_cast<const TableType*>(0)),
-                  data (0)
-  {
-                                     // accessor objects are only
-                                     // temporary objects, so should
-                                     // not need to be copied around
-    Assert (false, ExcInternalError());
-  }
+    template <int N, typename T, bool C>
+    inline
+    Accessor<N,T,C,1>::Accessor (const TableType &table,
+                                 const pointer    data)
+                    :
+                    table (table),
+                    data (data)
+    {}
+
+
+
+    template <int N, typename T, bool C>
+    inline
+    Accessor<N,T,C,1>::Accessor ()
+                    :
+                    table (*static_cast<const TableType*>(0)),
+                    data (0)
+    {
+                                       // accessor objects are only
+                                       // temporary objects, so should
+                                       // not need to be copied around
+      Assert (false, ExcInternalError());
+    }
   
 
 
-  template <int N, typename T, bool C>
-  inline
-  Accessor<N,T,C,1>::Accessor (const Accessor &)
-                  :
-                  table (*static_cast<const TableType*>(0)),
-                  data (0)
-  {
-                                     // accessor objects are only
-                                     // temporary objects, so should
-                                     // not need to be copied around
-    Assert (false, ExcInternalError());
-  }
+    template <int N, typename T, bool C>
+    inline
+    Accessor<N,T,C,1>::Accessor (const Accessor &)
+                    :
+                    table (*static_cast<const TableType*>(0)),
+                    data (0)
+    {
+                                       // accessor objects are only
+                                       // temporary objects, so should
+                                       // not need to be copied around
+      Assert (false, ExcInternalError());
+    }
 
 
   
-  template <int N, typename T, bool C>
-  inline
-  typename Accessor<N,T,C,1>::reference
-  Accessor<N,T,C,1>::operator [] (const unsigned int i) const 
-  {
-    Assert (i < table.size()[N-1],
-            ExcIndexRange (i, 0, table.size()[N-1]));
-    return data[i];
-  }
+    template <int N, typename T, bool C>
+    inline
+    typename Accessor<N,T,C,1>::reference
+    Accessor<N,T,C,1>::operator [] (const unsigned int i) const 
+    {
+      Assert (i < table.size()[N-1],
+              ExcIndexRange (i, 0, table.size()[N-1]));
+      return data[i];
+    }
 
 
   
-  template <int N, typename T, bool C>
-  inline
-  unsigned int
-  Accessor<N,T,C,1>::size () const
-  {
-    return table.size()[N-1];
-  }
+    template <int N, typename T, bool C>
+    inline
+    unsigned int
+    Accessor<N,T,C,1>::size () const
+    {
+      return table.size()[N-1];
+    }
 
 
 
-  template <int N, typename T, bool C>
-  inline
-  typename Accessor<N,T,C,1>::iterator
-  Accessor<N,T,C,1>::begin () const
-  {
-    return data;
-  }
+    template <int N, typename T, bool C>
+    inline
+    typename Accessor<N,T,C,1>::iterator
+    Accessor<N,T,C,1>::begin () const
+    {
+      return data;
+    }
 
 
 
-  template <int N, typename T, bool C>
-  inline
-  typename Accessor<N,T,C,1>::iterator
-  Accessor<N,T,C,1>::end () const
-  {
-    return data+table.size()[N-1];
+    template <int N, typename T, bool C>
+    inline
+    typename Accessor<N,T,C,1>::iterator
+    Accessor<N,T,C,1>::end () const
+    {
+      return data+table.size()[N-1];
+    }
   }
 }
 
@@ -2204,26 +2211,26 @@ Table<2,T>::reinit (const unsigned int size1,
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<2,T,true,1>
+internal::TableBaseAccessors::Accessor<2,T,true,1>
 Table<2,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  return TableBaseAccessors::Accessor<2,T,true,1>(*this,
-                                                  this->val+i*n_cols());
+  return internal::TableBaseAccessors::Accessor<2,T,true,1>(*this,
+                                                            this->val+i*n_cols());
 }
 
 
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<2,T,false,1>
+internal::TableBaseAccessors::Accessor<2,T,false,1>
 Table<2,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  return TableBaseAccessors::Accessor<2,T,false,1>(*this,
-                                                   this->val+i*n_cols());
+  return internal::TableBaseAccessors::Accessor<2,T,false,1>(*this,
+                                                             this->val+i*n_cols());
 }
 
 
@@ -2320,14 +2327,14 @@ Table<3,T>::Table (const unsigned int size1,
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<3,T,true,2>
+internal::TableBaseAccessors::Accessor<3,T,true,2>
 Table<3,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   const unsigned int subobject_size = this->table_size[1] *
                                       this->table_size[2];
-  return (TableBaseAccessors::Accessor<3,T,true,2>
+  return (internal::TableBaseAccessors::Accessor<3,T,true,2>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2336,14 +2343,14 @@ Table<3,T>::operator [] (const unsigned int i) const
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<3,T,false,2>
+internal::TableBaseAccessors::Accessor<3,T,false,2>
 Table<3,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   const unsigned int subobject_size = this->table_size[1] *
                                       this->table_size[2];
-  return (TableBaseAccessors::Accessor<3,T,false,2>
+  return (internal::TableBaseAccessors::Accessor<3,T,false,2>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2364,7 +2371,7 @@ Table<3,T>::operator () (const unsigned int i,
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
   return this->val[(i*this->table_size[1]+j)
-		  *this->table_size[2] + k];
+                   *this->table_size[2] + k];
 }
 
 
@@ -2383,7 +2390,7 @@ Table<3,T>::operator () (const unsigned int i,
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
   return this->val[(i*this->table_size[1]+j)
-		  *this->table_size[2] + k];
+                   *this->table_size[2] + k];
 }
 
 
@@ -2407,7 +2414,7 @@ Table<4,T>::Table (const unsigned int size1,
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<4,T,true,3>
+internal::TableBaseAccessors::Accessor<4,T,true,3>
 Table<4,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
@@ -2415,7 +2422,7 @@ Table<4,T>::operator [] (const unsigned int i) const
   const unsigned int subobject_size = this->table_size[1] *
                                       this->table_size[2] *
 				      this->table_size[3];
-  return (TableBaseAccessors::Accessor<4,T,true,3>
+  return (internal::TableBaseAccessors::Accessor<4,T,true,3>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2424,7 +2431,7 @@ Table<4,T>::operator [] (const unsigned int i) const
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<4,T,false,3>
+internal::TableBaseAccessors::Accessor<4,T,false,3>
 Table<4,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
@@ -2432,7 +2439,7 @@ Table<4,T>::operator [] (const unsigned int i)
   const unsigned int subobject_size = this->table_size[1] *
                                       this->table_size[2] *
 				      this->table_size[3];
-  return (TableBaseAccessors::Accessor<4,T,false,3>
+  return (internal::TableBaseAccessors::Accessor<4,T,false,3>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2457,7 +2464,7 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   return this->val[((i*this->table_size[1]+j)
 		    *this->table_size[2] + k)
-		  *this->table_size[3] + l];
+                   *this->table_size[3] + l];
 }
 
 
@@ -2480,7 +2487,7 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   return this->val[((i*this->table_size[1]+j)
 		    *this->table_size[2] + k)
-		  *this->table_size[3] + l];
+                   *this->table_size[3] + l];
 }
 
 
@@ -2506,7 +2513,7 @@ Table<5,T>::Table (const unsigned int size1,
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<5,T,true,4>
+internal::TableBaseAccessors::Accessor<5,T,true,4>
 Table<5,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
@@ -2515,7 +2522,7 @@ Table<5,T>::operator [] (const unsigned int i) const
                                       this->table_size[2] *
 				      this->table_size[3] *
 				      this->table_size[4];
-  return (TableBaseAccessors::Accessor<5,T,true,4>
+  return (internal::TableBaseAccessors::Accessor<5,T,true,4>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2524,7 +2531,7 @@ Table<5,T>::operator [] (const unsigned int i) const
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<5,T,false,4>
+internal::TableBaseAccessors::Accessor<5,T,false,4>
 Table<5,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
@@ -2533,7 +2540,7 @@ Table<5,T>::operator [] (const unsigned int i)
                                       this->table_size[2] *
 				      this->table_size[3] *
 				      this->table_size[4];
-  return (TableBaseAccessors::Accessor<5,T,false,4>
+  return (internal::TableBaseAccessors::Accessor<5,T,false,4>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2562,7 +2569,7 @@ Table<5,T>::operator () (const unsigned int i,
   return this->val[(((i*this->table_size[1]+j)
 		     *this->table_size[2] + k)
 		    *this->table_size[3] + l)
-		  *this->table_size[4] + m];
+                   *this->table_size[4] + m];
 }
 
 
@@ -2589,7 +2596,7 @@ Table<5,T>::operator () (const unsigned int i,
   return this->val[(((i*this->table_size[1]+j)
 		     *this->table_size[2] + k)
 		    *this->table_size[3] + l)
-		  *this->table_size[4] + m];
+                   *this->table_size[4] + m];
 }
 
 
@@ -2615,7 +2622,7 @@ Table<6,T>::Table (const unsigned int size1,
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<6,T,true,5>
+internal::TableBaseAccessors::Accessor<6,T,true,5>
 Table<6,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
@@ -2625,7 +2632,7 @@ Table<6,T>::operator [] (const unsigned int i) const
 				      this->table_size[3] *
 				      this->table_size[4] *
 				      this->table_size[5];
-  return (TableBaseAccessors::Accessor<6,T,true,5>
+  return (internal::TableBaseAccessors::Accessor<6,T,true,5>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2634,7 +2641,7 @@ Table<6,T>::operator [] (const unsigned int i) const
 
 template <typename T>
 inline
-TableBaseAccessors::Accessor<6,T,false,5>
+internal::TableBaseAccessors::Accessor<6,T,false,5>
 Table<6,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
@@ -2644,7 +2651,7 @@ Table<6,T>::operator [] (const unsigned int i)
 				      this->table_size[3] *
 				      this->table_size[4] *
 				      this->table_size[5];
-  return (TableBaseAccessors::Accessor<6,T,false,5>
+  return (internal::TableBaseAccessors::Accessor<6,T,false,5>
           (*this,
            this->val+i*subobject_size));
 }
@@ -2677,7 +2684,7 @@ Table<6,T>::operator () (const unsigned int i,
 		      *this->table_size[2] + k)
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
-		  *this->table_size[5] + n];
+                   *this->table_size[5] + n];
 }
 
 
@@ -2708,7 +2715,7 @@ Table<6,T>::operator () (const unsigned int i,
 		      *this->table_size[2] + k)
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
-		  *this->table_size[5] + n];
+                   *this->table_size[5] + n];
 }
 
 

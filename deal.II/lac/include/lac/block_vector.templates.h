@@ -582,118 +582,120 @@ BlockVector<Number>::memory_consumption () const
 
 
 
-namespace BlockVectorIterators
+namespace internal
 {
-  
-
-  template <typename number, bool constness>
-  Iterator<number,constness>::
-  Iterator (BlockVectorType &parent,
-	    const unsigned   global_index)
-		  :
-		  parent (&parent),
-		  global_index (global_index)
+  namespace BlockVectorIterators
   {
-				     // find which block we are
-				     // in. for this, take into
-				     // account that it happens at
-				     // times that people want to
-				     // initialize iterators
-				     // past-the-end
-    if (global_index < parent.size())
-      {
-	const std::pair<unsigned int, unsigned int>
-	  indices = parent.block_indices.global_to_local(global_index);
-	current_block      = indices.first;
-	index_within_block = indices.second;
+
+    template <typename number, bool constness>
+    Iterator<number,constness>::
+    Iterator (BlockVectorType &parent,
+              const unsigned   global_index)
+                    :
+                    parent (&parent),
+                    global_index (global_index)
+    {
+                                       // find which block we are
+                                       // in. for this, take into
+                                       // account that it happens at
+                                       // times that people want to
+                                       // initialize iterators
+                                       // past-the-end
+      if (global_index < parent.size())
+        {
+          const std::pair<unsigned int, unsigned int>
+            indices = parent.block_indices.global_to_local(global_index);
+          current_block      = indices.first;
+          index_within_block = indices.second;
 	
-	next_break_backward
-	  = parent.block_indices.local_to_global (current_block, 0);
-	next_break_forward
-	  = (parent.block_indices.local_to_global (current_block, 0)
-	     +parent.block_indices.block_size(current_block)-1);
-      }
-    else
-				       // past the end. only have one
-				       // value for this
-      {
-	this->global_index  = parent.size ();
-	current_block       = parent.n_blocks();
-	index_within_block  = 0;
-	next_break_backward = global_index;
-	next_break_forward  = static_cast<unsigned int>(-1);
-      };
-  }
-
-  
-
-  template <typename number, bool constness>
-  void
-  Iterator<number,constness>::move_forward ()
-  {
-    if (global_index != next_break_forward)
-      ++index_within_block;
-    else
-      {
-					 // ok, we traverse a boundary
-					 // between blocks:
-	index_within_block = 0;
-	++current_block;
-
-					 // break backwards is now old
-					 // break forward
-	next_break_backward = next_break_forward+1;
-
-					 // compute new break forward
-	if (current_block < parent->block_indices.size())
-	  next_break_forward
-	    += parent->block_indices.block_size(current_block);
-	else
-					   // if we are beyond the end,
-					   // then move the next
-					   // boundary arbitrarily far
-					   // away
-	  next_break_forward = static_cast<unsigned int>(-1);
-      };
-  
-    ++global_index;
-  }
-
-
-
-  template <typename number, bool constness>
-  void
-  Iterator<number,constness>::move_backward ()
-  {
-    if (global_index != next_break_backward)
-      --index_within_block;
-    else
-      if (current_block != 0)
-	{
-					   // ok, we traverse a boundary
-					   // between blocks:
-	  --current_block;
-	  index_within_block = parent->block_indices.block_size(current_block)-1;
-	
-					   // break forwards is now old
-					   // break backward
-	  next_break_forward = next_break_backward-1;
-	
-					   // compute new break forward
-	  next_break_backward
-	    -= parent->block_indices.block_size (current_block);
-	}
+          next_break_backward
+            = parent.block_indices.local_to_global (current_block, 0);
+          next_break_forward
+            = (parent.block_indices.local_to_global (current_block, 0)
+               +parent.block_indices.block_size(current_block)-1);
+        }
       else
-					 // current block was 0, we now
-					 // get into unspecified terrain
-	{
-	  --current_block;
-	  index_within_block = static_cast<unsigned int>(-1);
-	  next_break_forward = 0;
-	  next_break_backward = 0;
-	};
+                                         // past the end. only have one
+                                         // value for this
+        {
+          this->global_index  = parent.size ();
+          current_block       = parent.n_blocks();
+          index_within_block  = 0;
+          next_break_backward = global_index;
+          next_break_forward  = static_cast<unsigned int>(-1);
+        };
+    }
+
   
-    --global_index;
+
+    template <typename number, bool constness>
+    void
+    Iterator<number,constness>::move_forward ()
+    {
+      if (global_index != next_break_forward)
+        ++index_within_block;
+      else
+        {
+                                           // ok, we traverse a boundary
+                                           // between blocks:
+          index_within_block = 0;
+          ++current_block;
+
+                                           // break backwards is now old
+                                           // break forward
+          next_break_backward = next_break_forward+1;
+
+                                           // compute new break forward
+          if (current_block < parent->block_indices.size())
+            next_break_forward
+              += parent->block_indices.block_size(current_block);
+          else
+                                             // if we are beyond the end,
+                                             // then move the next
+                                             // boundary arbitrarily far
+                                             // away
+            next_break_forward = static_cast<unsigned int>(-1);
+        };
+  
+      ++global_index;
+    }
+
+
+
+    template <typename number, bool constness>
+    void
+    Iterator<number,constness>::move_backward ()
+    {
+      if (global_index != next_break_backward)
+        --index_within_block;
+      else
+        if (current_block != 0)
+          {
+                                             // ok, we traverse a boundary
+                                             // between blocks:
+            --current_block;
+            index_within_block = parent->block_indices.block_size(current_block)-1;
+	
+                                             // break forwards is now old
+                                             // break backward
+            next_break_forward = next_break_backward-1;
+	
+                                             // compute new break forward
+            next_break_backward
+              -= parent->block_indices.block_size (current_block);
+          }
+        else
+                                           // current block was 0, we now
+                                           // get into unspecified terrain
+          {
+            --current_block;
+            index_within_block = static_cast<unsigned int>(-1);
+            next_break_forward = 0;
+            next_break_backward = 0;
+          };
+  
+      --global_index;
+    }
   }
 }
 
