@@ -96,6 +96,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: There are now functions returning the transpose of <code
+       class="class">Tensor</code> objects of rank 2.
+       <br>
+       (WB 2002/08/31)
+       </p>
+
+  <li> <p> 
        New: Row accessors for the <code class="class">vector2d</code>
        class now have a member function <code
        class="member">size</code> that returns the size of the row,
@@ -211,7 +218,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2002/06/14)
        </p>
 
-  <li> <p> Fix: Bug in <code
+  <li> <p> Fixed: Bug in <code
        class="member">Triangulation<3>::load_user_flags(vector&lt;bool&gt;
        &)</code> is now fixed.
        <br>
@@ -226,7 +233,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2002/06/14)
        </p>
 
-  <li> <p> Change: <code
+  <li> <p> Changed: <code
        class="member">Triangulation<1>::n_quads</code> now returns 0,
        instead of throwing an assertion, as before. The same holds for
        similar functions like <code

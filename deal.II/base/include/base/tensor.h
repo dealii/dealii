@@ -1013,6 +1013,85 @@ invert (const Tensor<2,dim> &t)
 
 
 /**
+ * Return the transpose of the given tensor. Since the compiler can
+ * perform the return value optimization, and since the size of the
+ * return object is known, it is acceptable to return the result by
+ * value, rather than by reference as a parameter. Note that there are
+ * specializations of this function for @p{dim==1,2,3}.
+ *
+ * @author Wolfgang Bangerth, 2002
+ */
+template <int dim>
+inline
+Tensor<2,dim>
+transpose (const Tensor<2,dim> &t) 
+{
+  Tensor<2,dim> tt = t;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i+1; j<dim; ++j)
+      {
+        const double x = tt[i][j];
+        tt[i][j] = tt[j][i];
+        tt[j][i] = x;
+      };
+  return tt;
+};
+
+
+
+/**
+ * Return the transpose of the given tensor. This is the
+ * specialization of the general template for @p{dim==1}.
+ *
+ * @author Wolfgang Bangerth, 2002
+ */
+inline
+Tensor<2,1>
+transpose (const Tensor<2,1> &t) 
+{
+  return t;
+};
+
+
+
+
+/**
+ * Return the transpose of the given tensor. This is the
+ * specialization of the general template for @p{dim==2}.
+ *
+ * @author Wolfgang Bangerth, 2002
+ */
+inline
+Tensor<2,2>
+transpose (const Tensor<2,2> &t) 
+{
+  const double x[2][2] = {{t[0][0], t[1][0]}, {t[0][1], t[1][1]}};
+  return Tensor<2,2>(x);
+};
+
+
+
+
+/**
+ * Return the transpose of the given tensor. This is the
+ * specialization of the general template for @p{dim==3}.
+ *
+ * @author Wolfgang Bangerth, 2002
+ */
+inline
+Tensor<2,3>
+transpose (const Tensor<2,3> &t) 
+{
+  const double x[3][3] = {{t[0][0], t[1][0], t[2][0]},
+                          {t[0][1], t[1][1], t[2][1]},
+                          {t[0][2], t[1][2], t[2][2]}};
+  return Tensor<2,3>(x);
+};
+
+
+
+
+/**
  * Multiplication of a tensor of general rank with a scalar double
  * from the right.
  */
