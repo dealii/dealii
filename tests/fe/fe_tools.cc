@@ -2,7 +2,7 @@
 //    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,7 +11,7 @@
 //
 //--------------------------------------------------------------------------
 
-// Test the cell matrices generated in FETools.
+// Test the cell matrices generated in FETools and the local renumbering vector.
 
 #include "../tests.h"
 #include <iostream>
@@ -83,11 +83,60 @@ void test_projection (std::ostream& out)
 }
 
 
+template<int dim>
+void test_renumbering(const FiniteElement<dim>& fe)
+{
+  std::vector<unsigned int> v(fe.dofs_per_cell);
+  std::vector<std::vector<unsigned int> > start;
+  FETools::compute_component_wise(fe, v, start);
+
+  deallog << fe.get_name() << std::endl << '[';
+  for (unsigned int i=0;i<v.size();++i)
+    deallog << ' ' << v[i];
+  deallog << " ]" << std::endl;
+
+  for (unsigned int i=0;i<start.size();++i)
+    {
+      deallog << "Base " << i << ':';
+      for (unsigned int j=0;j<start[i].size();++j)
+	deallog << ' ' << start[i][j];
+      deallog << std::endl;
+    }
+  
+}
+
+
+template<int dim>
+void test_renumbering()
+{
+  deallog.push("Renumber");
+  
+  FE_Q<dim> q1(1);
+  FE_Q<dim> q3(3);
+//Todo:[GK] Test Raviart-Thomas and Nedelec?
+  
+  FESystem<dim> q1_3(q1,3);
+  test_renumbering(q1_3);
+  FESystem<dim> q3_3(q3,3);
+  test_renumbering(q3_3);
+  FESystem<dim> q3_2_q1_3(q3, 2, q1, 3);
+  test_renumbering(q3_2_q1_3);
+
+  deallog.pop();
+}
+
+
 int main()
 {
   std::ofstream logfile("fe_tools.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
   
   test_projection<1>(logfile);
   test_projection<2>(logfile);
   test_projection<3>(logfile);
+  
+  test_renumbering<1>();
+  test_renumbering<2>();
+  test_renumbering<3>();
 }
