@@ -251,6 +251,12 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 {
   public:
 				     /**
+				      * Propagate typedef from BaseClass
+				      * to this class.
+				      */
+    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+
+				     /**
 				      * Constructor.
 				      * By default, an illegal
 				      * accessor is constructed.
@@ -616,6 +622,12 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 {
   public:
 				     /**
+				      * Propagate typedef from BaseClass
+				      * to this class.
+				      */
+    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+
+				     /**
 				      * Constructor. Should never be called and
 				      * thus produces an error.
 				      */
@@ -644,6 +656,12 @@ template <int dim>
 class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 {
   public:
+				     /**
+				      * Propagate typedef from BaseClass
+				      * to this class.
+				      */
+    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+
 				     /**
 				      *  Constructor.
 				      */
@@ -963,6 +981,12 @@ template <int dim>
 class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 {
   public:
+				     /**
+				      * Propagate typedef from BaseClass
+				      * to this class.
+				      */
+    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+
 				     /**
 				      *  Constructor.
 				      */
@@ -1320,6 +1344,12 @@ template <int dim>
 class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 {
   public:
+				     /**
+				      * Propagate typedef from BaseClass
+				      * to this class.
+				      */
+    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+
 				     /**
 				      *  Constructor.
 				      */
