@@ -6520,53 +6520,55 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
   
 				   // first do it for the cells to the
 				   // left
-  if (cell->neighbor(0)->has_children())
-    {
-      cell_iterator neighbor = cell->neighbor(0);
-      Assert (neighbor->level() == cell->level(), ExcInternalError());
-      
-				       // right child
-      neighbor = neighbor->child(1);
-      while (1)
-	{
-	  Assert (neighbor->neighbor(1) == cell->child(0),
-		  ExcInternalError());
-	  neighbor->set_neighbor (1, cell);
-
-					   // move on to further children
-					   // on the boundary between this
-					   // cell and its neighbor
-	  if (neighbor->has_children())
-	    neighbor = neighbor->child(1);
-	  else
-	    break;
-	};
-    };
+  if (cell->neighbor(0).state() == valid)
+    if (cell->neighbor(0)->has_children())
+      {
+	cell_iterator neighbor = cell->neighbor(0);
+	Assert (neighbor->level() == cell->level(), ExcInternalError());
+	
+					 // right child
+	neighbor = neighbor->child(1);
+	while (1)
+	  {
+	    Assert (neighbor->neighbor(1) == cell->child(0),
+		    ExcInternalError());
+	    neighbor->set_neighbor (1, cell);
+	    
+					     // move on to further children
+					     // on the boundary between this
+					     // cell and its neighbor
+	    if (neighbor->has_children())
+	      neighbor = neighbor->child(1);
+	    else
+	      break;
+	  };
+      };
 
   				   // now do it for the cells to the
 				   // left
-  if (cell->neighbor(1)->has_children())
-    {
-      cell_iterator neighbor = cell->neighbor(1);
-      Assert (neighbor->level() == cell->level(), ExcInternalError());
-      
-				       // left child
-      neighbor = neighbor->child(0);
-      while (1)
-	{
-	  Assert (neighbor->neighbor(0) == cell->child(1),
-		  ExcInternalError());
-	  neighbor->set_neighbor (0, cell);
-
-					   // move on to further children
-					   // on the boundary between this
-					   // cell and its neighbor
-	  if (neighbor->has_children())
-	    neighbor = neighbor->child(0);
-	  else
-	    break;
-	};
-    };
+  if (cell->neighbor(1).state() == valid)
+    if (cell->neighbor(1)->has_children())
+      {
+	cell_iterator neighbor = cell->neighbor(1);
+	Assert (neighbor->level() == cell->level(), ExcInternalError());
+	
+					 // left child
+	neighbor = neighbor->child(0);
+	while (1)
+	  {
+	    Assert (neighbor->neighbor(0) == cell->child(1),
+		    ExcInternalError());
+	    neighbor->set_neighbor (0, cell);
+	    
+					     // move on to further children
+					     // on the boundary between this
+					     // cell and its neighbor
+	    if (neighbor->has_children())
+	      neighbor = neighbor->child(0);
+	    else
+	      break;
+	  };
+      };
 
 	
 				   // delete the vertex which will not be
