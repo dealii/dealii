@@ -107,7 +107,7 @@ $(target) : $(libraries)
 run: $(target)
 	@echo ============================ Running $<
 	./$(target) ee.gauss.prm
-	./(target) ee.singular.prm
+	./$(target) ee.singular.prm
 	./$(target) ee.kink.prm
 	gnuplot make_ps
 
