@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2001, 2002, 2003 Ralf Hartmann
+// Copyright (C) 2001, 2002, 2003, 2004 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -231,7 +231,7 @@ void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
   exact_areas.push_back(2.);
   show[0][0]=1;
   show[0][1]=1;
-  show[0][5]=1;
+  show[0][4]=1;
 }
 
 
@@ -306,7 +306,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       double pi=acos(-1);
       double alpha=2*atan(0.5);
       exact_areas.push_back(4+pi-2.5*(alpha-sin(alpha)));
-      for (unsigned int i=0; i<=4; ++i)
+      for (unsigned int i=0; i<=3; ++i)
 	show[2][i]=1;
     }
 
@@ -322,7 +322,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       p1(1) = 4.;
       GridGenerator::hyper_rectangle(*tria, p0, p1);
       exact_areas.push_back(1.5);
-      show[3][5] = 1;
+      show[3][4] = 1;
     }
 
   if (4 && false)
@@ -431,7 +431,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       p1(2) = 6.;
       GridGenerator::hyper_rectangle(*tria, p0, p1);
       exact_areas.push_back(4.5);
-      show[4][5] = 1;
+      show[4][4] = 1;
     }
 }
 
