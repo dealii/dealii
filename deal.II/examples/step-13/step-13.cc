@@ -439,7 +439,7 @@ namespace Evaluation
 				     // that were not so we could not
 				     // give a reasonable value of the
 				     // solution there and the rest of
-				     // the computation were useless
+				     // the computations were useless
 				     // anyway. So make sure through
 				     // the ``AssertThrow'' macro
 				     // already used in the step-9
@@ -469,11 +469,42 @@ namespace Evaluation
 				     // wrong.
     AssertThrow (evaluation_point_found,
 		 ExcEvaluationPointNotFound(evaluation_point));
-
-				     // If we are sure that we have
-				     // found the evaluation point, we
-				     // can add the results into the
-				     // table of results:
+				     // Note that we have used the
+				     // ``Assert'' macro in other
+				     // example programs as well. It
+				     // differed from the
+				     // ``AssertThrow'' macro used
+				     // here in that it simply aborts
+				     // the program, rather than
+				     // throwing an exception, and
+				     // that it did so only in debug
+				     // mode. It was the right macro
+				     // to use to check about the size
+				     // of vectors passed as arguments
+				     // to functions, and the like.
+				     //
+				     // However, here the situation is
+				     // different: whether we find the
+				     // evaluation point or not may
+				     // change from refinement to
+				     // refinement (for example, if
+				     // the four cells around point
+				     // are coarsened away, then the
+				     // point may vanish after
+				     // refinement and
+				     // coarsening). This is something
+				     // that cannot be predicted from
+				     // a few number of runs of the
+				     // program in debug mode, but
+				     // should be checked always, also
+				     // in production runs. Thus the
+				     // use of the ``AssertThrow''
+				     // macro here.
+    
+				     // Now, if we are sure that we
+				     // have found the evaluation
+				     // point, we can add the results
+				     // into the table of results:
     results_table.add_value ("DoFs", dof_handler.n_dofs());
     results_table.add_value ("u(x_0)", point_value);
   };
