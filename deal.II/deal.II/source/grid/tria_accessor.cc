@@ -265,7 +265,7 @@ int TriaObjectAccessor<2, dim>::vertex_index (const unsigned int corner) const
 {
   Assert (corner<4, ExcIndexRange(corner,0,4));
 
-  const int corner_convention[4] = { 0,0,1,1 };
+  static const int corner_convention[4] = { 0,0,1,1 };
   return line(corner)->vertex_index(corner_convention[corner]);
 }
 

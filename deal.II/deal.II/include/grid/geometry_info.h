@@ -1404,7 +1404,7 @@ GeometryInfo<2>::vertices_adjacent_to_line (const unsigned int line,
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, 2));
 
-  const unsigned int vertex_indices[lines_per_cell][2] =
+  static const unsigned int vertex_indices[lines_per_cell][2] =
     { {0, 1}, {1, 2}, {3, 2}, {0, 3} };
 
   return vertex_indices[line][vertex];
@@ -1422,7 +1422,7 @@ GeometryInfo<3>::vertices_adjacent_to_line (const unsigned int line,
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, 2));
 
-  const unsigned int vertex_indices[lines_per_cell][2] =
+  static const unsigned int vertex_indices[lines_per_cell][2] =
     { {0, 1}, {1, 2}, {3, 2}, {0, 3},
       {4, 5}, {5, 6}, {7, 6}, {4, 7},
       {0, 4}, {1, 5}, {2, 6}, {3, 7}  };
