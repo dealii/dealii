@@ -2376,8 +2376,8 @@ rm -f conftest.$ac_objext conftest.$ac_ext
 	  ;;
 
       hp_aCC)
-	  	            CXXFLAGSG="$CXXFLAGS -g1"
-          CXXFLAGSO="$CXXFLAGS -z +O2"
+	  	            CXXFLAGSG="$CXXFLAGS -g1 -AA"
+          CXXFLAGSO="$CXXFLAGS -z +O2 -AA"
           CXXFLAGSPIC="+Z"
 	  # for linking shared libs, -b is also necessary...
           ;;
