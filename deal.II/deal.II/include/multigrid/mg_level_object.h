@@ -13,6 +13,10 @@
 #ifndef __deal2__mg_level_object_h
 #define __deal2__mg_level_object_h
 
+#include <base/subscriptor.h>
+#include <vector>
+
+
 
 /**
  * An array with an object for each level.  The purpose of this class

@@ -15,6 +15,7 @@
 
 #include <lac/vector.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_level_object.h>
 
 /**
  * Multilevel matrix. This class implements the interface defined by
