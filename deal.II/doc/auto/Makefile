@@ -9,22 +9,19 @@
 # depends upon
 kdoc.base     = $(shell echo ../../base/include/base/*.h)
 kdoc.lac      = $(shell echo ../../lac/include/lac/*.h)
-kdoc.basic    = $(shell echo ../../deal.II/include/basic/*.h)
-kdoc.grid     = $(filter-out $(kdoc.dof), \
-                $(shell echo ../../deal.II/include/grid/*.h))
-kdoc.dof      = $(shell echo ../../deal.II/include/grid/dof*.h) \
-                $(shell echo ../../deal.II/include/grid/mg_*.h) \
+kdoc.grid     = $(shell echo ../../deal.II/include/grid/*.h)
+kdoc.dof      = $(shell echo ../../deal.II/include/dofs/*.h) \
                 $(shell echo ../../deal.II/include/fe/*.h)
 kdoc.numerics = $(shell echo ../../deal.II/include/numerics/*.h)
 
 # for latex-output, we join the different libraries of the
 # deal.II library into just one file
-kdoc.dealII = $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
+kdoc.dealII = $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
 
 # user projects. the projects should be independent of each other, so
 # we need not take care of cross-dependencies each time 
-kdoc.transport     = $(shell echo ../../projects/transport/trans_dg/*.h)
-kdoc.wave-equation = $(shell echo ../../projects/wave-equation/include/*.h)
+kdoc.transport     = $(shell echo ../../../projects/transport/trans_dg/*.h)
+kdoc.wave-equation = $(shell echo ../../../projects/wave-equation/include/*.h)
 
 
 # specify the names of the resulting doc libraries
