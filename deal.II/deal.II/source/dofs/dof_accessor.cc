@@ -215,7 +215,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 template <int dim>
 void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
-						    const int index) const {
+					       const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -231,8 +231,8 @@ void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 
 template <int dim>
 void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const int index) const {
+						      const unsigned int i,
+						      const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
@@ -823,6 +823,7 @@ template class TriaActiveIterator<2,DoFCellAccessor<2> >;
 #if deal_II_dimension == 3
 template class DoFObjectAccessor<1, 3>;
 template class DoFObjectAccessor<2, 3>;
+template class DoFObjectAccessor<3, 3>;
 template class DoFCellAccessor<3>;
 
 template class TriaRawIterator   <3,DoFObjectAccessor<1, 3> >;
