@@ -753,10 +753,10 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
   
   get_fe().fill_fe_face_values(get_mapping(),
 			       cell, face_no,
-			  quadrature,
-			  *mapping_data,
-			  *fe_data,
-			  *this);
+			       quadrature,
+			       *mapping_data,
+			       *fe_data,
+			       *this);
 };
 
 
