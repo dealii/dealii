@@ -28,20 +28,12 @@ kdoc.multigrid= $(shell echo $D/deal.II/include/multigrid/*.h)
 
 
 # specify the names of the resulting doc libraries
-ifeq ($(multigrid),yes)
 kdoc.library-files = base.kdoc         \
                      lac.kdoc          \
                      grid.kdoc         \
                      dof.kdoc          \
                      numerics.kdoc     \
                      multigrid.kdoc
-else
-kdoc.library-files = base.kdoc         \
-                     lac.kdoc          \
-                     grid.kdoc         \
-                     dof.kdoc          \
-                     numerics.kdoc
-endif
 
 kdoc: kdoc-installed $(kdoc.library-files)
 
