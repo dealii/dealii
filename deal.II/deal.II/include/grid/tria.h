@@ -1310,7 +1310,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * The direction of moving is random,
 				      * while the length of the shift vector
 				      * has a value of #factor# times the
-				      * average length of the active lines
+				      * minimal length of the active lines
 				      * adjacent to this vertex. Note that
 				      * #factor# should obviously be well
 				      * below #0.5#.
