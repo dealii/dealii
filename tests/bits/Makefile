@@ -172,7 +172,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	volume_1 volume_2 volume_3 volume_4 \
 	mapping_cartesian_1 \
 	mapping_q4_3d \
-	q_points solution_transfer
+	q_points solution_transfer_1
 
 ############################################################
 
