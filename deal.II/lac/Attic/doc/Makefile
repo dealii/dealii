@@ -16,7 +16,7 @@ kdoc: $(kdoc.inc)
 		lac   $(kdoc.inc:..%=../..%)
 
 cvslog:
-	@cd .. ; ../deal.II/doc/cvslog/cvs2html -o doc/cvslog/lac -a -k
+	@cd .. ; ../deal.II/doc/cvslog/cvs2html -o doc/cvslog/lac #-a -k
 
 clean:
 	rm -f 	doc.kdoc/lac/* \
