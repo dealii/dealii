@@ -659,14 +659,14 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 		    for (unsigned int k=0; k<n_subdivisions; ++k)
 		      {
 //TODO:[GK] Put in correct order
-			out << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k   << '\t'
+			out << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
 			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
+			    << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
 			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k   << '\t'
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1 << '\t'
+			    << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
 			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
+			    << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
 			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1 << '\t'
 			    << std::endl;
 		      };
 		break;
@@ -700,7 +700,11 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
       out << std::endl;
     };
 
-  out << "attribute \"element type\" string \"quads\"" << std::endl
+  out << "attribute \"element type\" string \"";
+  if (dim==1) out << "lines";
+  if (dim==2) out << "quads";
+  if (dim==3) out << "cubes";
+  out << "\"" << std::endl
       << "attribute \"ref\" string \"positions\"" << std::endl;
   
 				   /////////////////////////////
