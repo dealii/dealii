@@ -57,7 +57,8 @@ check_vmult_quadratic(std::vector<double>& residuals,
   PreconditionSSOR<MATRIX> ssor;
   ssor.initialize(A, 1.2);
 
-  PreconditionBlock<MATRIX, float>::AdditionalData data(std::sqrt(A.n()+.3), 1.2);
+  typename PreconditionBlock<MATRIX, float>::AdditionalData
+    data((unsigned int) std::sqrt(A.n()+.3), 1.2);
   
   PreconditionBlockJacobi<MATRIX, float> block_jacobi;
   block_jacobi.initialize(A, data);
