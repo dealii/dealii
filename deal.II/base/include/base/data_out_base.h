@@ -291,7 +291,7 @@ class ParameterHandler;
  * details of the viewpoint, light source, etc.
  *
  *
- * @author Wolfgang Bangerth 1999, 2000; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999
+ * @author Wolfgang Bangerth 1999, 2000, 2001; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999
  */
 class DataOutBase 
 {
