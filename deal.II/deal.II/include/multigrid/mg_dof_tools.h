@@ -8,6 +8,7 @@
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 
+//TODO: Consider incorporating these functions in DoFTools
 
 /**
  * This is a collection of functions operating on, and manipulating
@@ -18,7 +19,7 @@
  * for more information.
  *
  * All member functions are static, so there is no need to create an
- * object of class #DoFTools#.
+ * object of class #MGDoFTools#.
  *
  * @author Wolfgang Bangerth and others, 1999
  */
@@ -28,29 +29,36 @@ class MGDoFTools
 				     /**
 				      * Write the sparsity structure
 				      * of the matrix belonging to the
-				      * specified #level# including
-				      * constrained degrees of freedom
-				      * into the matrix structure. The
-				      * sparsity pattern does not
-				      * include entries introduced by
-				      * the elimination of constrained
-				      * nodes.  The sparsity pattern
-				      * is not compressed, since if
-				      * you want to call
-				      * #ConstraintMatrix::condense(1)#
-				      * afterwards, new entries have
-				      * to be added. However, if you
-				      * don't want to call
-				      * #ConstraintMatrix::condense(1)#,
+				      * specified #level#. The sparsity pattern
+				      * is not compressed, so before 
+				      * creating the actual matrix
 				      * you have to compress the
 				      * matrix yourself, using
 				      * #SparseMatrixStruct::compress()#.
+				      *
+				      * There is no need to consider
+				      * hanging nodes here, since only
+				      * one level is considered.
 				      */
     template <int dim>
     static void
     make_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
-			   const unsigned int       level,
-			   SparsityPattern         &sparsity);
+			   SparsityPattern         &sparsity,
+			   const unsigned int       level);
+
+				     /**
+				      * Make a sparsity pattern including fluxes
+				      * of discontinuous Galerkin methods.
+				      * @see make_sparsity_pattern
+				      * $see DoFTools
+				      */
+    template <int dim>
+    static void
+    make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
+				SparsityPattern         &sparsity,
+				const unsigned int       level);
+
+
 };
 
 

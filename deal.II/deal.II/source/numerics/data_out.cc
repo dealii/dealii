@@ -85,8 +85,18 @@ template <int dim>
 void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 					    const string         &name)
 {
+//  unsigned int n = dofs->get_fe().n_components ();
+//    if (n > 1)
+//      {
+//        vector<string> names (dofs->get_fe().n_components ());
+//        for (unsigned int i=0;i<n;++i)
+//  	{
+//  	  names[i] = name + string("_");
+//  	}
+//    }
+//TODO: Murks hier
   add_data_vector (vec, vector<string>(1,name));
-};
+}
 
 
 
