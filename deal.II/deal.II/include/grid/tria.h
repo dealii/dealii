@@ -2916,7 +2916,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * triangulation when some
 				      * vertices are discarded, but we
 				      * do not want to renumber the
-				      * remaining one, leading to
+				      * remaining ones, leading to
 				      * holes in the numbers of used
 				      * vertices.  You can get the
 				      * number of used vertices using
@@ -2926,19 +2926,19 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      * Return a constant reference to
-				      * all the vertices used in this
-				      * triangulation. Note that not
-				      * necessarily all vertices in
-				      * this array are actually used;
-				      * for example, if you coarsen a
-				      * mesh, then some vertices are
-				      * deleted, but their positions
-				      * in this array are unchanged as
-				      * the indices of vertices are
-				      * only allocated once. You can
-				      * find out about which vertices
-				      * are actually used by the
-				      * function
+				      * all the vertices present in
+				      * this triangulation. Note that
+				      * not necessarily all vertices
+				      * in this array are actually
+				      * used; for example, if you
+				      * coarsen a mesh, then some
+				      * vertices are deleted, but
+				      * their positions in this array
+				      * are unchanged as the indices
+				      * of vertices are only allocated
+				      * once. You can find out about
+				      * which vertices are actually
+				      * used by the function
 				      * @ref{get_used_vertices}.
 				      */
     const std::vector<Point<dim> > &
