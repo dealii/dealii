@@ -12,8 +12,25 @@
 //----------------------------  subscriptor.cc  ---------------------------
 
 
+#include <base/thread_management.h>
 #include <base/subscriptor.h>
 #include <typeinfo>
+
+namespace 
+{
+// create a lock that might be used to control subscription to and
+// unsubscription from objects, as that might happen in parallel.
+// since it should happen rather seldom that several threads try to
+// operate on different objects at the same time (the usual case is
+// that they subscribe to the same object right after thread
+// creation), a global lock should be sufficient, rather than one that
+// operates on a per-object base (in which case we would have to
+// include the huge <thread_management.h> file into the
+// <subscriptor.h> file).
+  Threads::ThreadMutex subscription_lock;
+};
+
+
 
 /*
 #include <set>
@@ -112,13 +129,17 @@ void Subscriptor::subscribe () const
     object_info = &typeid(*this);
 #endif
 
+  subscription_lock.acquire();
   ++counter;
+  subscription_lock.release();
 };
 
 
 void Subscriptor::unsubscribe () const {
   Assert (counter>0, ExcNotUsed());
+  subscription_lock.acquire();
   --counter;
+  subscription_lock.release();
 };
 
 
