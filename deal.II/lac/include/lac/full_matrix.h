@@ -777,6 +777,7 @@ FullMatrix<number>::operator = (const MATRIX& M)
   const typename MATRIX::const_iterator end = M.end();
   for (entry = M.begin();entry != end;++entry)
     el(entry->row(), entry->column()) = entry->value();
+  return *this;
 }
 
 /*----------------------------   fullmatrix.h     ---------------------------*/
