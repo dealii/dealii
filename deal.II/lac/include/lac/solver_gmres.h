@@ -87,7 +87,8 @@ class SolverGMRES : public Subscriptor, private Solver<VECTOR>
 					  * set the number of temporary
 					  * vectors to 30.
 					  */
-	AdditionalData(const unsigned int max_n_tmp_vectors=30):
+	AdditionalData(const unsigned int max_n_tmp_vectors = 30)
+			:
 			max_n_tmp_vectors(max_n_tmp_vectors)
 	  {};
 	
@@ -109,10 +110,10 @@ class SolverGMRES : public Subscriptor, private Solver<VECTOR>
 				      * Solver method.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState solve (const MATRIX &A,
-						       VECTOR       &x,
-						       const VECTOR &b,
-						       const PRECONDITIONER& precondition);
+    typename Solver<VECTOR>::ReturnState solve (const MATRIX         &A,
+						VECTOR               &x,
+						const VECTOR         &b,
+						const PRECONDITIONER &precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
 		    int,
@@ -207,7 +208,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
   deallog.push("GMRES");
 
-  const unsigned int n_tmp_vectors = (additional_data.max_n_tmp_vectors);
+  const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
 				   // allocate an array of n_tmp_vectors
 				   // temporary vectors from the VectorMemory
