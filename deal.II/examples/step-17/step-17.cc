@@ -84,6 +84,13 @@
 #include <iostream>
 
 
+                                 // Now, here comes the declaration of the
+                                 // main class and of various other things
+                                 // below it. As mentioned in the
+                                 // introduction, almost all of this has been
+                                 // copied verbatim from step-8, so we only
+                                 // comment on the few things that are
+                                 // different.
 template <int dim>
 class ElasticProblem 
 {
@@ -106,26 +113,92 @@ class ElasticProblem
 
     ConstraintMatrix     hanging_node_constraints;
 
-                                     // xxx no sparsity
+                                     // In step-8, this would have been the
+                                     // place where we would have declared the
+                                     // member variables for the sparsity
+                                     // pattern, the system matrix, right
+                                     // hand, and solution vector. We change
+                                     // these declarations to use parallel
+                                     // PETSc objects instead (note that the
+                                     // fact that we use the parallel versions
+                                     // is denoted the fact that we use the
+                                     // classes from the
+                                     // ``PETScWrappers::MPI'' namespace;
+                                     // sequential versions of these classes
+                                     // are in the ````PETScWrappers''
+                                     // namespace, i.e. without the ``MPI''
+                                     // part). Note also that we do not use a
+                                     // separate sparsity pattern, since PETSc
+                                     // manages that as part of its matrix
+                                     // data structures.
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
     PETScWrappers::MPI::Vector       solution;
     PETScWrappers::MPI::Vector       system_rhs;
 
+                                     // The next change is that we have to
+                                     // declare a variable that indicates the
+                                     // MPI communicator over which we are
+                                     // supposed to distribute our
+                                     // computations. Note that if this is a
+                                     // sequential job without support by MPI,
+                                     // then PETSc provides some dummy type
+                                     // for ``MPI_Comm'', so we do not have to
+                                     // care here whether the job is really a
+                                     // parallel one:
     MPI_Comm mpi_communicator;
     
-                                     // xxx
-    const unsigned int n_partitions;
-    const unsigned int this_partition;
+                                     // Then we have two variables that tell
+                                     // us where in the parallel world we
+                                     // are. The first of the following
+                                     // variables, ``n_mpi_processes'' tells
+                                     // us how many MPI processes there exist
+                                     // in total, while the second one,
+                                     // ``this_mpi_process'', indicates which
+                                     // is the number of the present process
+                                     // within this space of processes. The
+                                     // latter variable will have a unique
+                                     // value for each process between zero
+                                     // and (less than)
+                                     // ``n_mpi_processes''. If this program
+                                     // is run on a single machine without MPI
+                                     // support, then their values are ``1''
+                                     // and ``0'', respectively.
+    const unsigned int n_mpi_processes;
+    const unsigned int this_mpi_process;
 
-    unsigned int local_dofs;
-    std::vector<bool> partition_is_dof_owner;
+                                     // In order to obtain values for the
+                                     // above two variables, we need to query
+                                     // the MPI subsystem (in case there is no
+                                     // MPI running at all, these functions
+                                     // automatically query some wrappers that
+                                     // PETSc provides and that return default
+                                     // values for a single process). We could
+                                     // initialize above variables in the
+                                     // constructor of this class, but since
+                                     // they never change we chose to mark
+                                     // them as ``const'', and so they can
+                                     // only be initialized if we package all
+                                     // the querying functions into auxiliary,
+                                     // static functions that return the
+                                     // requested values as their return
+                                     // value. The argument they take denotes
+                                     // the MPI communicator object from which
+                                     // they shall query the total number of
+                                     // processes, and the rank within this
+                                     // communicator:
+    static
+    unsigned int
+    get_n_mpi_processes (const MPI_Comm &mpi_communicator);
 
-    static unsigned int get_n_partitions (const MPI_Comm &mpi_communicator);
-    static unsigned int get_this_partition (const MPI_Comm &mpi_communicator);
+    static
+    unsigned int
+    get_this_mpi_process (const MPI_Comm &mpi_communicator);
 };
 
 
+                                 // The following is again taken from step-8
+                                 // without change:
 template <int dim>
 class RightHandSide :  public Function<dim> 
 {
@@ -189,12 +262,21 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 
 
 
-                                 // xxx
+                                 // So here first come the two functions that
+                                 // query the number of processes associated
+                                 // with an MPI communicator object, as well
+                                 // as the rank of the present process within
+                                 // it. Note again that PETSc provides dummy
+                                 // implementations of these functions if no
+                                 // MPI support is requested. These dummy
+                                 // functions return ``1'' and ``0'' for the
+                                 // total number of processes and the rank of
+                                 // the present process within the
+                                 // communicator, respectively.
 template <int dim>
 unsigned int
-ElasticProblem<dim>::get_n_partitions (const MPI_Comm &mpi_communicator)
+ElasticProblem<dim>::get_n_mpi_processes (const MPI_Comm &mpi_communicator)
 {
-                                   // xxx int vs uint
   int n_jobs;
   MPI_Comm_size (mpi_communicator, &n_jobs);
 
@@ -205,7 +287,7 @@ ElasticProblem<dim>::get_n_partitions (const MPI_Comm &mpi_communicator)
 
 template <int dim>
 unsigned int
-ElasticProblem<dim>::get_this_partition (const MPI_Comm &mpi_communicator)
+ElasticProblem<dim>::get_this_mpi_process (const MPI_Comm &mpi_communicator)
 {
   int rank;
   MPI_Comm_rank (mpi_communicator, &rank);
@@ -215,15 +297,29 @@ ElasticProblem<dim>::get_this_partition (const MPI_Comm &mpi_communicator)
 
 
 
+                                 // The first step in the actual
+                                 // implementation of things is the
+                                 // constructor of the main class. Apart from
+                                 // initializing the same member variables
+                                 // that we already had in step-8, we here
+                                 // initialize the MPI communicator variable
+                                 // we shall use with the global MPI
+                                 // communicator linking all processes
+                                 // together (in more complex applications,
+                                 // one could here use a communicator object
+                                 // that only links a subset of all
+                                 // processes), and call above helper
+                                 // functions to determine the number of
+                                 // processes and where the present one fits
+                                 // into this picture:
 template <int dim>
 ElasticProblem<dim>::ElasticProblem ()
                 :
 		dof_handler (triangulation),
 		fe (FE_Q<dim>(1), dim),
-                                                 // xxx
                 mpi_communicator (MPI_COMM_WORLD),
-                n_partitions (get_n_partitions(mpi_communicator)),
-                this_partition (get_this_partition(mpi_communicator))
+                n_mpi_processes (get_n_mpi_processes(mpi_communicator)),
+                this_mpi_process (get_this_mpi_process(mpi_communicator))
 {}
 
 
@@ -235,42 +331,76 @@ ElasticProblem<dim>::~ElasticProblem ()
 }
 
 
+                                 // The second step is the function in which
+                                 // we set up the various variables for the
+                                 // global linear system to be solved.
 template <int dim>
 void ElasticProblem<dim>::setup_system ()
 {
-                                   // xxx
+                                   // First, we need to generate an
+                                   // enumeration for the degrees of freedom
+                                   // in our problem. Further below, we will
+                                   // show how we assign each cell to one of
+                                   // the MPI processes before we even get
+                                   // here. What we then need to do is to
+                                   // enumerate the degrees of freedom in a
+                                   // way so that all degrees of freedom
+                                   // associated with cells in subdomain zero
+                                   // (which resides on process zero) come
+                                   // before all DoFs associated with cells on
+                                   // subdomain one, before those on cells on
+                                   // process two, and so on. We need this
+                                   // since we have to split the global
+                                   // vectors for right hand side and
+                                   // solution, as well as the matrix into
+                                   // contiguous chunks of rows that live on
+                                   // each of the processors, and we will want
+                                   // to do this in a way that requires
+                                   // minimal communication. This is done
+                                   // using the following two functions, which
+                                   // first generates an initial ordering of
+                                   // all degrees of freedom, and then re-sort
+                                   // them according to above criterion:
   dof_handler.distribute_dofs (fe);
   DoFRenumbering::subdomain_wise (dof_handler);
 
-  local_dofs
+                                   // While we're at it, let us also count how
+                                   // many degrees of freedom there exist on
+                                   // the present process:
+  const unsigned int n_local_dofs
     = DoFTools::count_dofs_with_subdomain_association (dof_handler,
-                                                       this_partition);
+                                                       this_mpi_process);  
 
-  {
-    partition_is_dof_owner.resize (dof_handler.n_dofs());
-    std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
-    DoFTools::get_subdomain_association (dof_handler,
-                                         subdomain_association);
-    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-      partition_is_dof_owner[i] = (subdomain_association[i] ==
-                                   this_partition);
-  }
-  
-  
+                                   // Then we initialize the system matrix,
+                                   // solution, and right hand side
+                                   // vectors. Since they all need to work in
+                                   // parallel, we have to pass them an MPI
+                                   // communication object, as well as their
+                                   // global sizes, and also how many rows out
+                                   // of this global size are to be stored
+                                   // locally:
+  system_matrix.reinit (mpi_communicator,
+                        dof_handler.n_dofs(),
+                        dof_handler.n_dofs(),
+                        n_local_dofs,
+                        dof_handler.max_couplings_between_dofs());
+
+  solution.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
+  system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
+
+                                   // Finally, we need to initialize the
+                                   // objects denoting hanging node
+                                   // constraints for the present grid. Note
+                                   // that since PETSc handles the sparsity
+                                   // pattern internally to the matrix, there
+                                   // is no need to set up an independent
+                                   // sparsity pattern here, and to condense
+                                   // it for constraints, as we have done in
+                                   // all other example programs.
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
   hanging_node_constraints.close ();
-
-                                   // no sparsity pattern
-  system_matrix.reinit (mpi_communicator,
-                        dof_handler.n_dofs(),
-                        dof_handler.n_dofs(),
-                        local_dofs,
-                        dof_handler.max_couplings_between_dofs());
-
-  solution.reinit (mpi_communicator, dof_handler.n_dofs(), local_dofs);
-  system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), local_dofs);
 }
 
 
@@ -313,7 +443,7 @@ void ElasticProblem<dim>::assemble_system ()
 						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
                                      // xxx
-    if (cell->subdomain_id() == this_partition)
+    if (cell->subdomain_id() == this_mpi_process)
       {
         cell_matrix.clear ();
         cell_rhs.clear ();
@@ -419,13 +549,17 @@ void ElasticProblem<dim>::solve ()
 
   PETScWrappers::Vector localized_solution (solution);
   hanging_node_constraints.distribute (localized_solution);
-  
+
+
+  std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
+  DoFTools::get_subdomain_association (dof_handler,
+                                       subdomain_association);  
   for (unsigned int i=0; i<localized_solution.size(); ++i)
-    if (partition_is_dof_owner[i] == true)
+    if (subdomain_association[i] == this_mpi_process)
       solution(i) = static_cast<PetscScalar>(localized_solution(i));
   solution.compress ();  
 
-  if (this_partition == 0)
+  if (this_mpi_process == 0)
     std::cout << "   Solver converged in "
               << solver_control.last_step()
               << " iterations." << std::endl;
@@ -452,14 +586,14 @@ void ElasticProblem<dim>::refine_grid ()
                                         std::vector<bool>(),
                                         0,
                                         multithread_info.n_default_threads,
-                                        this_partition);
+                                        this_mpi_process);
     
     const unsigned int local_cells
-      = (n_partitions == 1 ?
+      = (n_mpi_processes == 1 ?
          triangulation.n_active_cells() :
-         (this_partition != n_partitions-1 ?
-          triangulation.n_active_cells() / n_partitions :
-          triangulation.n_active_cells() - triangulation.n_active_cells() / n_partitions * (n_partitions-1)));
+         (this_mpi_process != n_mpi_processes-1 ?
+          triangulation.n_active_cells() / n_mpi_processes :
+          triangulation.n_active_cells() - triangulation.n_active_cells() / n_mpi_processes * (n_mpi_processes-1)));
     PETScWrappers::MPI::Vector
       global_error_per_cell (mpi_communicator,
                              triangulation.n_active_cells(),
@@ -482,7 +616,7 @@ void ElasticProblem<dim>::refine_grid ()
   triangulation.execute_coarsening_and_refinement ();
 
                                    // xxx
-  GridTools::partition_triangulation (n_partitions, triangulation);
+  GridTools::partition_triangulation (n_mpi_processes, triangulation);
 }
 
 
@@ -493,7 +627,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   PETScWrappers::Vector global_solution;
   global_solution = solution;
       
-  if (this_partition == 0)
+  if (this_mpi_process == 0)
     {
       std::string filename = "solution-";
       filename += ('0' + cycle);
@@ -544,7 +678,7 @@ void ElasticProblem<dim>::run ()
   for (unsigned int cycle=0; cycle<10; ++cycle)
     {
                                        // xxx
-      if (this_partition == 0)
+      if (this_mpi_process == 0)
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
@@ -553,13 +687,13 @@ void ElasticProblem<dim>::run ()
 	  triangulation.refine_global (3);
 
                                            // xxx
-          GridTools::partition_triangulation (n_partitions, triangulation);
+          GridTools::partition_triangulation (n_mpi_processes, triangulation);
 	}
       else
 	refine_grid ();
 
                                        // xxx
-      if (this_partition == 0)
+      if (this_mpi_process == 0)
         std::cout << "   Number of active cells:       "
                   << triangulation.n_active_cells()
                   << std::endl;
@@ -567,12 +701,12 @@ void ElasticProblem<dim>::run ()
       setup_system ();
 
                                        // xxx
-      if (this_partition == 0)
+      if (this_mpi_process == 0)
         {
           std::cout << "   Number of degrees of freedom: "
                     << dof_handler.n_dofs()
                     << " (by partition:";
-          for (unsigned int partition=0; partition<n_partitions; ++partition)
+          for (unsigned int partition=0; partition<n_mpi_processes; ++partition)
             std::cout << (partition==0 ? ' ' : '+')
                       << (DoFTools::
                           count_dofs_with_subdomain_association (dof_handler,
