@@ -6,7 +6,7 @@ kdoc.inc  = $(wildcard ../include/base/*.h)
 
 
 
-doc-html: kdoc cvslog
+doc-html: kdoc
 
 
 # make kdoc doc; make sure that the *.kdoc files exist by
