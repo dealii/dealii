@@ -28,10 +28,12 @@ template class SparseMatrix<TYPEMAT>;
 
 #include <lac/sparse_matrix.2.templates>
 
-#undef TYPE2
-#define TYPE2 long double
+				 // a prerelease of gcc3.0 fails to
+				 // compile this due to long double
+//  #undef TYPE2
+//  #define TYPE2 long double
 
-#include <lac/sparse_matrix.2.templates>
+//  #include <lac/sparse_matrix.2.templates>
 
 #undef TYPE2
 #undef TYPEMAT
