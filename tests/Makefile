@@ -2,7 +2,7 @@
 # Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
-all: base lac fe deal.II big-tests
+all: base lac fe deal.II bits
 
 base:
 	cd base ; $(MAKE)
@@ -13,11 +13,14 @@ lac:
 fe:
 	cd fe ; $(MAKE)
 
+bits:
+	cd bits ; $(MAKE)
+
 deal.II:
 	cd deal.II ; $(MAKE)
 
 report:
-	@for i in base lac fe deal.II ; do \
+	@for i in base lac fe deal.II bits ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
@@ -60,8 +63,8 @@ all-headers:
 	@rm -rf tmp-all-headers
 
 
-clean: clean-base clean-lac clean-deal.II clean-fe
-veryclean: veryclean-base veryclean-lac veryclean-deal.II veryclean-fe
+clean: clean-base clean-lac clean-deal.II clean-fe clean-bits
+veryclean: veryclean-base veryclean-lac veryclean-deal.II veryclean-fe veryclean-bits
 
 clean-base:
 	cd base ; $(MAKE) clean
@@ -87,14 +90,15 @@ clean-deal.II:
 veryclean-deal.II:
 	cd deal.II ; $(MAKE) veryclean
 
-clean-big:
-	cd big-tests ; $(MAKE) clean
+clean-bits:
+	cd bits ; $(MAKE) clean
 
-veryclean-big:
-	cd big-tests ; $(MAKE) veryclean
+veryclean-bits:
+	cd bits ; $(MAKE) veryclean
 
-.PHONY : all base lac fe deal.II big-tests \
-	clean clean-base clean-lac clean-fe clean-deal.II clean-big \
-	veryclean veryclean-base veryclean-lac veryclean-fe veryclean-deal.II veryclean-big
+
+.PHONY : all base lac fe deal.II bits \
+	clean clean-base clean-lac clean-fe clean-deal.II clean-bits \
+	veryclean veryclean-base veryclean-lac veryclean-fe veryclean-deal.II veryclean-bits
 
 include Makefile.paths
