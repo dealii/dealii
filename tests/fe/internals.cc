@@ -12,6 +12,7 @@
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_q.h>
+#include <fe/fe_q_hierarchical.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_nedelec.h>
@@ -137,6 +138,10 @@ main()
   CHECK_ALL(Q,2,2);
   CHECK_ALL(Q,3,2);
 
+  CHECK_ALL(Q_Hierarchical,1,2);
+  CHECK_ALL(Q_Hierarchical,2,2);
+  CHECK_ALL(Q_Hierarchical,3,2);
+
   CHECK_M(DGQ,0,3);
   CHECK_M(DGQ,1,3);
   CHECK_M(DGQ,2,3);
@@ -148,6 +153,9 @@ main()
 
   CHECK_ALL(Q,1,3);
   CHECK_ALL(Q,2,3);
+
+  CHECK_ALL(Q_Hierarchical,1,3);
+  CHECK_ALL(Q_Hierarchical,2,3);
 
   CHECK_ALL(Nedelec, 1, 2);
   CHECK_ALL(Nedelec, 1, 3);
