@@ -20,7 +20,7 @@
 // this was due to us computing the output vector size before we
 // resized the output vector
 //
-// reported by Brent Bailey (ailey@utias.utoronto.ca) on Wed Oct 22
+// reported by Brent Bailey (bailey@utias.utoronto.ca) on Wed Oct 22
 // 17:02:59 2003
 
 #include <base/logstream.h>
