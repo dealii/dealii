@@ -20,6 +20,8 @@
       <li> <a href="#prerequisites">System requirements</a>
       <li> <a href="#installation">Installation</a>
       <li> <a href="#compiler">Compiler flags</a>
+      <li> <a href="#external-libs">Using third-party libraries and
+             subroutines</a>
       <li> <a href="#problems">Problems, questions, mailing lists</a>
       <li> <a href="#license">License</a>
     </ul>
@@ -472,14 +474,17 @@
     <a name="compiler">
     <h2>Compiler flags</h2>
 
+    <p>
     Since the ISO C++ standard is still quite new and compilers still
     change a lot, you might need to provide special options for the
     compiler. We have tried to automatize this process using the
     ./configure script at least for the gcc compilers we use. If you need
     additional flags, try the following two ways:
+    </p>
 
     <ul>
-    <li> Set environment variables before configuring. If you want to add
+    <li> <p>
+    Set environment variables before configuring. If you want to add
     a flag to produce <code>gprof</code> output, for instance, configure
     the package using the following command sequence:
     <pre>
@@ -489,21 +494,58 @@
     </pre>
     These are the commands for <tt>csh</tt>. They have to be changed
     accordingly for <tt>bash</tt>
+    </p>
 
-    <li> If that does not work, edit the file
+    <li> 
+    <p>
+    If that does not work, edit the file
     common/Make.global_options.in and rerun ./configure in the
-    top-level directory.
+    top-level directory, or change the file 
+    common/Make.global_options, which is what ./configure generates
+    out of common/Make.global_options.in.
+    </p>
+    </ul>
 
+    <p>
     The first method is preferred, since it will be easier to
     incorporate it into the configuration script later. Furthermore,
     your version of <acronym>deal.II</acronym> will not be changed
     from the original.
+    </p>
 
     <p>
-
     We would like to hear about necessary or useful modifications so
     that we can include them into the distribution.
+    </p>
 
+
+    <a name="external-libs">
+    <h2>Using third-party libraries and subroutines</h2>
+
+    <p>
+    <acronym>deal.II</acronym> is able to interface some external 
+    libraries and subroutines for special purposes inside the library
+    or application programs built on
+    <acronym>deal.II</acronym>. Presently supported are the following:
+
+    <ul>
+      <li>
+      <p>
+      <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
+      (Adaptive Communications Environment)</a>: This library is used
+      to support multithreading in a cross-platform way. It also
+      enables programs to use interprocess communication and many
+      other related services using a platform independent
+      interface. On how to enable using this library, see the section on
+      <a href="#options">Configuration Options</a> above.
+      </p>
+
+      <li>
+      <p>
+      It is also possible to use some subroutines from the ...
+      </p>
+    </ul>
+    </p>
 
 
     <a name="problems">
