@@ -122,9 +122,7 @@ class Boundary : public Subscriptor
 
 				     /**
 				      * Return equally spaced
-				      * intermediate points on a
-				      * boundary line.
-//TODO: this function is also called for inner lines!?
+				      * intermediate points on a line.
                                       *
 				      * The number of points requested
 				      * is given by the size of the
@@ -133,14 +131,18 @@ class Boundary : public Subscriptor
 				      * arrange the points in
 				      * approximately equal distances.
 				      *
-				      * This function is needed by the
-				      * @p{MappingQ} class. As this
-				      * function is not needed for Q1
-				      * mappings, it is not made pure
-				      * virtual, to avoid the need to
-				      * overload it.  The default
-				      * implementation throws an error
-				      * in any case, however.
+				      * This function is called by the
+				      * @p{MappingQ} class. This
+				      * happens on each face line of a
+				      * cells that has got at least
+				      * one boundary line.
+				      *
+				      * As this function is not needed
+				      * for @p{MappingQ1}, it is not
+				      * made pure virtual, to avoid
+				      * the need to overload it.  The
+				      * default implementation throws
+				      * an error in any case, however.
 				      */
     virtual void
     get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
@@ -150,7 +152,6 @@ class Boundary : public Subscriptor
 				      * Return equally spaced
 				      * intermediate points on a
 				      * boundary quad.
-//TODO: this function is also called for inner quads!?
 				      *
 				      * The number of points requested
 				      * is given by the size of the
@@ -164,14 +165,18 @@ class Boundary : public Subscriptor
 				      * @p{(m+1)(m+1)} approximately
 				      * equal-sized subquads.
 				      *
-				      * This function is needed by the
-				      * @p{MappingQ} class. As this
-				      * function is not needed for Q1
-				      * mappings, it is not made pure
-				      * virtual, to avoid the need to
-				      * overload it.  The default
-				      * implementation throws an error
-				      * in any case, however.
+				      * This function is called by the
+				      * @p{MappingQ<3>} class. This
+				      * happens each face quad of
+				      * cells in 3d that has got at
+				      * least one boundary face quad.
+				      *
+				      * As this function is not needed
+				      * for @p{MappingQ1}, it is not
+				      * made pure virtual, to avoid
+				      * the need to overload it.  The
+				      * default implementation throws
+				      * an error in any case, however.
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
