@@ -18,6 +18,9 @@
 #include <lac/vectorbase.h>
 #endif
 
+#include <base/exceptions.h>
+
+
 
 /**
  *  Double precision Vector.
@@ -251,6 +254,24 @@ class dVector : public VectorBase
 				      */
     void print(const char* format = 0) const;
 				     //@}
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The given index " << arg1
+		    << " should be less than " << arg2 << ".");
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidNumber,
+		    int,
+		    << "The provided number is invalid here: " << arg1);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcOutOfMemory);
 };
 
 
@@ -264,13 +285,13 @@ inline int dVector::n() const
 
 inline double dVector::operator() (int i) const
 {
-				    //THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
   return val[i];
 }
 
 inline double& dVector::operator() (int i)
 {
-				    //THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
   return val[i];
 }
 

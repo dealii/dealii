@@ -4,26 +4,26 @@
 // DEAL is Copyright(1995) by
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
-static const char* OBJFILE = "DEAL $RCSfile$ $Revision$";
-
 #include <lac/ivector.h>
+
+
 
 iVector::iVector()
 {
   dim=maxdim=1;
   val = new int[1];
-  //THROWUNCOND(!val, Error(Error::NoMem,"iVector::iVector"));
+  Assert (val != 0, ExcOutOfMemory());
   val[0] = 0;
 }
 
 iVector::iVector(int n)
 {
+  Assert (n>0, ExcInvalidNumber(n));
+
   dim = n;
   maxdim = n;
-  //THROW1(n<=0, IntError(IntError::IllegalDimension, n, "iVector::iVector"));
-
   val = new int[maxdim];
-  //THROWUNCOND(!val, Error(Error::NoMem,"iVector::iVector"));
+  Assert (val != 0, ExcOutOfMemory());
   (*this) = 0;
 }
 
@@ -36,12 +36,12 @@ iVector::iVector(const iVector& v)
 
 void iVector::reinit(int n, int fast)
 {
-  //THROW1(n<=0, IntError(IntError::IllegalDimension, n, "iVector::reinit"));
+  Assert (n>0, ExcInvalidNumber(n));
   if (n>maxdim)
   {
     delete[] val;
     val = new int[n];
-    //THROWUNCOND(!val, Error(Error::NoMem,"iVector::reinit"));
+    Assert (val != 0, ExcOutOfMemory());
     maxdim = n;
   }
   dim = n;
@@ -55,7 +55,7 @@ void iVector::reinit(const iVector& v, int fast)
   {
     delete[] val;
     val = new int[n];
-    //THROWUNCOND(!val, Error(Error::NoMem,"iVector::reinit"));
+    Assert (val != 0, ExcOutOfMemory());
     maxdim = n;
   }
   dim = n;

@@ -1,30 +1,9 @@
 // $Id$
 
-static const char* OBJFILE = "DEAL $RCSfile$ $Revision$";
-
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <lac/dfmatrix.h>
-#include <base/exceptions.h>
-
-
-
-DeclException2 (ExcDimensionMismatch,
-		int, int,
-		<< "The two dimensions " << arg1 << " and " << arg2
-		<< "do not match here.");
-DeclException0 (ExcNotQuadratic);
-DeclException0 (ExcInternalError);
-DeclException3 (ExcInvalidDestination,
-		int, int, int,
-		<< "Target region not in matrix: size in this direction="
-		<< arg1 << ", size of new matrix=" << arg2
-		<< ", offset=" << arg3);
-DeclException1 (ExcNotImplemented,
-		int,
-		<< "This function is not implemented for the given"
-		<< " matrix dimension " << arg1);
 
 
 

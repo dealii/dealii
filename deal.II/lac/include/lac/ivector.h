@@ -11,6 +11,7 @@
 #include <base/types.h>
 #endif
 
+#include <base/exceptions.h>
 
 
 /**
@@ -133,6 +134,24 @@ protected:
 				      */
     void equ(int a, const iVector& V);
 				     //@}
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The given index " << arg1
+		    << " should be less than " << arg2 << ".");
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidNumber,
+		    int,
+		    << "The provided number is invalid here: " << arg1);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcOutOfMemory);
 };
 
 
@@ -151,13 +170,13 @@ inline int iVector::n() const
 
 inline int iVector::operator() (int i) const
 {
-//THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
   return val[i];
 }
 
 inline int& iVector::operator() (int i)
 {
-//  THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
   return val[i];
 }
 #endif

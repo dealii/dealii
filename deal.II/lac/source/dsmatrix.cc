@@ -4,8 +4,6 @@
 // DEAL is Copyright(1995) by
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
-static const char* OBJFILE = "DEAL $RCSfile$ $Revision$";
-
 #include <lac/dsmatrix.h>
 #include <ostream.h>
 
@@ -120,9 +118,9 @@ inline void quicksort(long r, T* a)
 void
 dSMatrixStruct::reinit(int m, int n, int max_per_row)
 {
-//  THROW1(m<=0, IntError(IntError::IllegalDimension, m));
-//  THROW1(n<=0, IntError(IntError::IllegalDimension, n));
-//  THROW1(max_per_row<=0, IntError(IntError::IllegalDimension, max_per_row));
+  Assert (m>0, ExcInvalidNumber(m));
+  Assert (n>0, ExcInvalidNumber(n));
+  Assert (max_per_row>0, ExcInvalidNumber(max_per_row));
   rows = m;
   cols = n;
   vec_len = m * max_per_row;
@@ -204,8 +202,9 @@ dSMatrixStruct::operator () (int i, int j)
 void
 dSMatrixStruct::add (int i, int j)
 {
-  //THROW1((i<0) || (i>=rows), IntError(IntError::Range,i));
-  //THROW1((j<0) || (j>=cols), IntError(IntError::Range,j));
+  Assert ((i>=0) && (i<rows), ExcInvalidIndex(i,rows));
+  Assert ((j>=0) && (j<cols), ExcInvalidIndex(j,cols));
+
   int k;
   for (k=rowstart[i]; k<rowstart[i+1]; k++)
     {

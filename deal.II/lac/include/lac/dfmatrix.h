@@ -13,6 +13,10 @@
 #include <lac/ivector.h>
 #endif
 
+#include <base/exceptions.h>
+
+
+
 /**
  *  Double precision full Matrix.
  *  Memory for Components is supplied explicitly <p>
@@ -154,8 +158,8 @@ class dFMatrix
 				      */
     double operator() (int i, int j) const
       {
-					 //THROW2((i<0) || (i>=dim_image), IntError(IntError::Range,i));
-					 //THROW2((j<0) || (j>=dim_range), IntError(IntError::Range,i));
+	Assert ((i>=0) && (i<dim_image), ExcInvalidIndex (i, dim_image));
+	Assert ((j>=0) && (j<dim_range), ExcInvalidIndex (i, dim_range));
 	return el(i,j);
       }
 
@@ -164,8 +168,8 @@ class dFMatrix
 				      */
     double& operator() (int i, int j)
       {
-					 //THROW2((i<0) || (i>=dim_image), IntError(IntError::Range,i));
-					 //THROW2((j<0) || (j>=dim_range), IntError(IntError::Range,i));
+	Assert ((i>=0) && (i<dim_image), ExcInvalidIndex (i, dim_image));
+	Assert ((j>=0) && (j<dim_range), ExcInvalidIndex (i, dim_range));
 	return el(i,j);
       }
 
@@ -349,5 +353,43 @@ class dFMatrix
 				      */
     void print(FILE* fp, const char* format = 0) const;
 				     //@}
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The given index " << arg1
+		    << " should be less than " << arg2 << ".");
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcDimensionMismatch,
+		    int, int,
+		    << "The two dimensions " << arg1 << " and " << arg2
+		    << "do not match here.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotQuadratic);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
+				     /**
+				      * Exception
+				      */
+    DeclException3 (ExcInvalidDestination,
+		    int, int, int,
+		    << "Target region not in matrix: size in this direction="
+		    << arg1 << ", size of new matrix=" << arg2
+		    << ", offset=" << arg3);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcNotImplemented,
+		    int,
+		    << "This function is not implemented for the given"
+		    << " matrix dimension " << arg1);
 };
 #endif

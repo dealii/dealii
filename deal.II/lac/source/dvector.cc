@@ -4,8 +4,6 @@
 // DEAL is Copyright(1995) by
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
-static const char* OBJFILE = "DEAL $RCSfile$ $Revision$";
-
 #include <lac/dvector.h>
 #include <math.h>
 
@@ -16,14 +14,14 @@ dVector::dVector() : val(0)
 
 dVector::dVector(int n) : val(0)
 {
+  Assert (n>0, ExcInvalidNumber(n));
+
   dim = n;
   maxdim = n;
-  //THROW1(n<0, IntError(IntError::IllegalDimension, n, "dVector"));
-
   if (n)
     {
       val = new double[maxdim];
-      //THROWUNCOND(!val, Error(Error::NoMem,"dVector::dVector"));
+      Assert (val != 0, ExcOutOfMemory());
       (*this) = 0.;
     }
 }
@@ -36,19 +34,19 @@ dVector::dVector(const dVector& v) : val(0)
   if (dim)
     {
       val = new double[maxdim];
-      //THROWUNCOND(!val, Error(Error::NoMem,"dVector::dVector"));
+      Assert (val != 0, ExcOutOfMemory());
       for (int i=0;i<dim;i++) val[i] = v.val[i];
     }
 }
 
 void dVector::reinit(int n, int fast)
 {
-  //THROW1(n<=0, IntError(IntError::IllegalDimension, n));
+  Assert (n>0, ExcInvalidNumber(n));
   if (n>maxdim)
   {
     if (val) delete[] val;
     val = new double[n];
-    //THROWUNCOND(!val, Error(Error::NoMem,"dVector::reinit"));
+    Assert (val != 0, ExcOutOfMemory());
     maxdim = n;
   }
   dim = n;
@@ -62,7 +60,7 @@ void dVector::reinit(const dVector& v, int fast)
   {
     if (val) delete[] val;
     val = new double[n];
-    //THROWUNCOND(!val, Error(Error::NoMem,"dVector::reinit"));
+    Assert (val != 0, ExcOutOfMemory());
     maxdim = n;
   }
   dim = n;
@@ -172,8 +170,9 @@ dVector& dVector::operator = (const dVector& v)
 void dVector::cadd(int i, const VectorBase& V, double s, int j)
 {
   const dVector& v = (const dVector&) V;
-  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
-  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
+
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert ((j>=0) || (j<v.dim), ExcInvalidIndex(j,v.dim));
 
   val[i] += s*v.val[j];
 }
@@ -181,9 +180,10 @@ void dVector::cadd(int i, const VectorBase& V, double s, int j)
 void dVector::cadd(int i, const VectorBase& V, double s, int j, double t, int k)
 {
   const dVector& v = (const dVector&) V;
-  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
-  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
-  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cadd"));
+
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert ((j>=0) || (j<v.dim), ExcInvalidIndex(j,v.dim));
+  Assert ((k>=0) || (k<v.dim), ExcInvalidIndex(k,v.dim));
 
   val[i] += s*v.val[j] + t*v.val[k];
 }
@@ -192,26 +192,28 @@ void dVector::cadd(int i, const VectorBase& V, double s, int j,
 		   double t, int k, double q, int l, double r, int m)
 {
   const dVector& v = (const dVector&) V;
-  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
-  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
-  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cadd"));
-  //THROW1((l<0) || (l>v.dim), IntError(IntError::Range,l,"cadd"));
-  //THROW1((m<0) || (m>v.dim), IntError(IntError::Range,m,"cadd"));
+
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert ((j>=0) || (j<v.dim), ExcInvalidIndex(j,v.dim));
+  Assert ((k>=0) || (k<v.dim), ExcInvalidIndex(k,v.dim));
+  Assert ((l>=0) || (l<v.dim), ExcInvalidIndex(l,v.dim));
+  Assert ((m>=0) || (m<v.dim), ExcInvalidIndex(m,v.dim));
 
   val[i] += s*v.val[j] + t*v.val[k] + q*v.val[l] + r*v.val[m];
 }
 
 void dVector::czero(int i)
 {
-    //THROW1((i<0) || (i>dim), IntError(IntError::Range,i));
-    val[i] = 0.;
+  Assert ((i>=0) && (i<dim), ExcInvalidIndex(i,dim));
+  val[i] = 0.;
 }
 
 void dVector::cequ(int i, const VectorBase& V, double s, int j)
 {
   const dVector& v = (const dVector&) V;
-  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
-  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
+
+  Assert ((i>=0) && (i<dim), ExcInvalidIndex(i,dim));
+  Assert ((j>=0) && (j<v.dim), ExcInvalidIndex(j,v.dim));
 
   val[i] = s*v.val[j];
 }
@@ -219,9 +221,10 @@ void dVector::cequ(int i, const VectorBase& V, double s, int j)
 void dVector::cequ(int i, const VectorBase& V, double s, int j, double t, int k)
 {
   const dVector& v = (const dVector&) V;
-  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
-  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
-  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cequ"));
+
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert ((j>=0) || (j<v.dim), ExcInvalidIndex(j,v.dim));
+  Assert ((k>=0) || (k<v.dim), ExcInvalidIndex(k,v.dim));
 
   val[i] = s*v.val[j] + t*v.val[k];
 }
@@ -230,11 +233,12 @@ void dVector::cequ(int i, const VectorBase& V, double s, int j,
 		   double t, int k, double q, int l, double r, int m)
 {
   const dVector& v = (const dVector&) V;
-  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
-  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
-  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cequ"));
-  //THROW1((l<0) || (l>v.dim), IntError(IntError::Range,l,"cequ"));
-  //THROW1((m<0) || (m>v.dim), IntError(IntError::Range,m,"cequ"));
+
+  Assert ((i>=0) || (i<dim), ExcInvalidIndex(i,dim));
+  Assert ((j>=0) || (j<v.dim), ExcInvalidIndex(j,v.dim));
+  Assert ((k>=0) || (k<v.dim), ExcInvalidIndex(k,v.dim));
+  Assert ((l>=0) || (l<v.dim), ExcInvalidIndex(l,v.dim));
+  Assert ((m>=0) || (m<v.dim), ExcInvalidIndex(m,v.dim));
 
   val[i] = s*v.val[j] + t*v.val[k] + q*v.val[l] + r*v.val[m];
 }

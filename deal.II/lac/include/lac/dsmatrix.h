@@ -16,6 +16,9 @@
 #include <lac/ivector.h>
 #endif
 
+#include <base/exceptions.h>
+
+
 
 class ostream;
 template <int dim> class DoFHandler;
@@ -79,7 +82,27 @@ public:
     friend class ConstraintMatrix;
     friend class DoFHandler<1>;
     friend class DoFHandler<2>;
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidNumber,
+		    int,
+		    << "The provided number is invalid here: " << arg1);
+    				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The given index " << arg1
+		    << " should be less than " << arg2 << ".");
+
 };
+
+
+
+
+
 
 /*
 CLASS
