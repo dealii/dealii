@@ -58,7 +58,8 @@ tests_x = anna_? \
 	  dof_constraints_* \
 	  apply_boundary_values_* \
 	  error_estimator_* \
-	  cylinder_shell_*
+	  cylinder_shell_* \
+	  grid_in_*
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += petsc_*

@@ -527,6 +527,207 @@ void GridIn<3>::read_xda (std::istream &in)
 
 
 
+template <int dim>
+void GridIn<dim>::read_msh (std::istream &in)
+{
+  Assert (tria != 0, ExcNoTriangulationSelected());
+  AssertThrow (in, ExcIO());
+
+  unsigned int n_vertices;
+  unsigned int n_cells;
+  unsigned int dummy;
+  std::string line;
+  
+  getline(in, line);
+
+  AssertThrow (line=="$NOD",
+	       ExcInvalidGMSHInput(line));
+
+  in >> n_vertices;
+
+  std::vector<Point<dim> >     vertices (n_vertices);
+				   // set up mapping between numbering
+				   // in msh-file (nod) and in the
+				   // vertices vector
+  std::map<int,int> vertex_indices;
+  
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+    {
+      int vertex_number;
+      double x[3];
+
+				       // read vertex
+      in >> vertex_number
+	 >> x[0] >> x[1] >> x[2];
+     
+      for (unsigned int d=0; d<dim; ++d)
+	vertices[vertex](d) = x[d];
+				       // store mapping;
+      vertex_indices[vertex_number] = vertex;
+    };
+  
+				   // This is needed to flush the last
+				   // new line
+  getline (in, line);
+  
+				   // Now read in next bit
+  getline (in, line);
+  AssertThrow (line=="$ENDNOD",
+	       ExcInvalidGMSHInput(line));
+
+  
+  getline (in, line);
+  AssertThrow (line=="$ELM",
+	       ExcInvalidGMSHInput(line));
+
+  in >> n_cells;
+				   // set up array of cells
+  std::vector<CellData<dim> > cells;
+  SubCellData                 subcelldata;
+
+  for (unsigned int cell=0; cell<n_cells; ++cell) 
+    {
+				       // note that since in the input
+				       // file we found the number of
+				       // cells at the top, there
+				       // should still be input here,
+				       // so check this:
+      AssertThrow (in, ExcIO());
+      
+/*  
+    $ENDNOD
+    $ELM
+    NUMBER-OF-ELEMENTS
+    ELM-NUMBER ELM-TYPE REG-PHYS REG-ELEM NUMBER-OF-NODES NODE-NUMBER-LIST
+    ...
+    $ENDELM
+*/
+      
+      unsigned int cell_type;
+      unsigned int material_id;
+      unsigned int nod_num;
+      
+      in >> dummy          // ELM-NUMBER
+	 >> cell_type	   // ELM-TYPE
+	 >> material_id	   // REG-PHYS
+	 >> dummy	   // reg_elm
+	 >> nod_num;
+      
+/*       `ELM-TYPE'
+	 defines the geometrical type of the N-th element:
+	 `1'
+	 Line (2 nodes, 1 edge).
+                                                                                                
+	 `3'
+	 Quadrangle (4 nodes, 4 edges).
+                                                                                                
+	 `5'
+	 Hexahedron (8 nodes, 12 edges, 6 faces).
+                                                                                    
+	 `15'
+	 Point (1 node).
+*/
+      
+      if (((cell_type == 1) && (dim == 1)) ||
+	  ((cell_type == 3) && (dim == 2)) ||
+	  ((cell_type == 5) && (dim == 3)))
+					 // found a cell
+	{
+					   // allocate and read indices
+	  cells.push_back (CellData<dim>());
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	    in >> cells.back().vertices[i];
+	  cells.back().material_id = material_id;
+
+					   // transform from ucd to
+					   // consecutive numbering
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	    if (vertex_indices.find (cells.back().vertices[i]) != vertex_indices.end())
+					       // vertex with this index exists
+	      cells.back().vertices[i] = vertex_indices[cells.back().vertices[i]];
+	    else 
+	      {
+						 // no such vertex index
+		AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+		cells.back().vertices[i] = -1;
+	      };
+	}
+      else
+	if ((cell_type == 1) && ((dim == 2) || (dim == 3)))
+					   // boundary info
+	  {
+	    subcelldata.boundary_lines.push_back (CellData<1>());
+	    in >> subcelldata.boundary_lines.back().vertices[0]
+	       >> subcelldata.boundary_lines.back().vertices[1];
+	    subcelldata.boundary_lines.back().material_id = material_id;
+
+					     // transform from ucd to
+					     // consecutive numbering
+	    for (unsigned int i=0; i<2; ++i)
+	      if (vertex_indices.find (subcelldata.boundary_lines.back().vertices[i]) !=
+		  vertex_indices.end())
+						 // vertex with this index exists
+		subcelldata.boundary_lines.back().vertices[i]
+		  = vertex_indices[subcelldata.boundary_lines.back().vertices[i]];
+	      else 
+		{
+						   // no such vertex index
+		  AssertThrow (false,
+			       ExcInvalidVertexIndex(cell,
+						     subcelldata.boundary_lines.back().vertices[i]));
+		  subcelldata.boundary_lines.back().vertices[i] = -1;
+		};
+	  }
+	else
+	  if ((cell_type == 3) && (dim == 3))
+					     // boundary info
+	    {
+ 	      subcelldata.boundary_quads.push_back (CellData<2>());
+ 	      in >> subcelldata.boundary_quads.back().vertices[0]
+ 	         >> subcelldata.boundary_quads.back().vertices[1]
+ 		 >> subcelldata.boundary_quads.back().vertices[2]
+ 		 >> subcelldata.boundary_quads.back().vertices[3];
+	      
+ 	      subcelldata.boundary_quads.back().material_id = material_id;
+	      
+					       // transform from gmsh to
+					       // consecutive numbering
+ 	      for (unsigned int i=0; i<4; ++i)
+ 	        if (vertex_indices.find (subcelldata.boundary_quads.back().vertices[i]) !=
+ 		    vertex_indices.end())
+ 		                                   // vertex with this index exists
+		  subcelldata.boundary_quads.back().vertices[i]
+		    = vertex_indices[subcelldata.boundary_quads.back().vertices[i]];
+ 	        else
+ 	          {
+						     // no such vertex index
+ 	            Assert (false,
+ 		            ExcInvalidVertexIndex(cell,
+ 			                          subcelldata.boundary_quads.back().vertices[i]));
+ 		    subcelldata.boundary_quads.back().vertices[i] = -1;
+ 		  };
+	      
+	    }
+	  else
+					     // cannot read this
+	    AssertThrow (false, ExcGmshUnsupportedGeometry(cell_type));
+    };
+
+  
+				   // check that no forbidden arrays are used
+  Assert (subcelldata.check_consistency(dim), ExcInternalError());
+
+  AssertThrow (in, ExcIO());
+
+				   // do some clean-up on vertices...
+  delete_unused_vertices (vertices, cells, subcelldata);
+				   // ... and cells
+  GridReordering<dim>::reorder_cells (cells);
+  tria->create_triangulation (vertices, cells, subcelldata);
+}
+
+
+
 
 template <int dim>
 void GridIn<dim>::skip_empty_lines (std::istream &in)

@@ -92,6 +92,11 @@ class SubCellData;
  * code. We don't have an exact specification of the format, but the reader
  * can read in several example files. If the reader does not grok your files,
  * it should be fairly simple to extend it.
+ *
+ * <li> <tt>Gmsh mesh</tt> format: this format is used by the @p GMSH
+ * mesh generator (see http://www.geuz.org/gmsh/ ). The documentation
+ * in the @p GMSH manual explains how to generate meshes compatible with
+ * the deal.II library (i.e. quads rather than triangles).
  * </ul>
  *
  *
@@ -148,7 +153,7 @@ class SubCellData;
  * that class if you experience unexpected problems when reading grids
  * through this class.
  *
- * @author Wolfgang Bangerth, 1998, 2000
+ * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004
  */
 template <int dim>
 class GridIn
@@ -185,6 +190,11 @@ class GridIn
 				      */
     void read_xda (std::istream &);
     
+    				     /**
+				      * Read grid data from an msh file.
+				      */
+    void read_msh (std::istream &);
+
 				     /**
 				      * Exception
 				      */
@@ -223,7 +233,22 @@ class GridIn
 		    int,
 		    << "The specified dimension " << arg1
 		    << " is not the same as that of the triangulation to be created.");
-    
+				    
+    DeclException1 (ExcInvalidGMSHInput,
+		    std::string,
+		    << "The string <" << arg1 << "> is not recognized at the present"
+		    << " position of a Gmsh Mesh file.");
+
+    DeclException1 (ExcGmshUnsupportedGeometry,
+		    int,
+		    << "The Element Identifier <" << arg1 << "> is not "
+		    << "supported in the Deal.II Library.\n"
+		    << "Supported elements are: \n"
+		    << "ELM-TYPE\n"
+		    << "1 Line (2 nodes, 1 edge).\n"
+		    << "3 Quadrangle (4 nodes, 4 edges).\n"
+		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).\n"
+		    << "15 Point (1 node).");
   private:
 				     /**
 				      * Store address of the triangulation to
