@@ -11,10 +11,10 @@ include $D/common/Make.global_options
 # Targets for compilation
 ############################################################
 
-%.g.o : %.cc Makefile
+%.g.o : %.cc
 	@echo =====debug========= $<
 	@$(CXX) $(flags) -c $< -o $@
-%.o : %.cc Makefile
+%.o : %.cc
 	@echo =====optimized===== $<
 	@$(CXX) $(flags) -c $< -o $@
 

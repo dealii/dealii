@@ -1,4 +1,22 @@
 active cell: a triangulation cell that is not refined further
 
+boundary component: part of the domain in physical space. Denotes
+either function for a curved boundary or the selection of a <<boundary
+condition>>
+
+boundary condition: part of the weak formulation of a partial
+differential equation
+
+boundary indicator: data of lower dimensional <<triangulation
+object>>s, indicating the number of a <<boundary component>>
+
+hex: hexahedron, mapping of the unit cube into the domain
+
 locally finest level: all active cells, i.e. the finest cell at each
 point of the domain
+
+quad: quadrilateral, mapping of the unit square into the domain
+
+triangulation object: the different kinds of polytopes forming a
+triangulation, lines, quadrilaterals and hexahedra
+

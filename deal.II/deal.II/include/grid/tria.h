@@ -487,7 +487,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  This class is written to be as independent of the dimension as possible
  *  (thus the complex construction of the #TriangulationLevel# classes) to
  *  allow code-sharing, to allow reducing the need to mirror changes in the code
- *  for one dimenion to the code for other dimensions. Nonetheless, some of
+ *  for one dimension to the code for other dimensions. Nonetheless, some of
  *  the functions are dependent of the dimension and there only exist
  *  specialized versions for distinct dimensions.
  *
@@ -510,7 +510,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  The #Triangulation# class provides iterator which enable looping over all
  *  lines, cells,
  *  etc without knowing the exact representation used to describe them. Their
- *  names are typedef's in the #TriaDimensionInfo# base class (thus making them
+ *  names are typedefs in the #TriaDimensionInfo# base class (thus making them
  *  local types to this class) and are as follows:
  *
  *  #raw_line_iterator#: loop over all lines, used or not (declared for
@@ -649,7 +649,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  There are several possibilities to create a triangulation:
  *  \begin{itemize}
  *    \item The most common domains, such as hypercubes (i.e. lines, squares,
- *       cubes, etc), hyperballs (circles, balls, ...) and some other, more
+ *       cubes, etc), hyper-balls (circles, balls, ...) and some other, more
  *       weird domains such as the L-shape region and higher dimensional
  *       generalizations and others, are provided by the #GridGenerator#
  *       class which takes a triangulation and fills it by a division
@@ -715,9 +715,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   \end{itemize}
  *
  *   The material id for each cell must be specified upon construction of
- *   a triangulation. (There is a special section on material ids and
+ *   a triangulation. (There is a special section on material identifier and
  *   boundary indicators. See there for more information.)
- *   The standard region functions (for hypercube, hyperball,
+ *   The standard region functions (for hypercube, hyper-ball,
  *   etc.) denote all cells the material id zero. You may change that afterwards,
  *   but you should not use the material id 255. When reading a triangulation,
  *   the material id must be specified in the input file (UCD format) or is
@@ -725,7 +725,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   be given to the creation function.
  *
  *   Regarding the boundary indicator for lines in two dimensions and quads
- *   in three (subsummed by the word "faces"), all interior faces are denoted
+ *   in three (subsumed by the word "faces"), all interior faces are denoted
  *   the value 255. Trying to give an interior face another value results in
  *   an error if in debug mode. Faces at the boundary of the domain are preset
  *   with the boundary indicator zero, but you can give a list of faces with
@@ -760,7 +760,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   has another drawback related to the
  *   placement of cells, however: the children of a cell will not occupy the
  *   same region of the domain as the mother cell does. While this is the
- *   usual behaviour with cells at the boundary, here you may get into trouble
+ *   usual behavior with cells at the boundary, here you may get into trouble
  *   when using multigrid algorithms or when transferring solutions from coarse
  *   to fine grids and back. In general, the use of this function is only safe
  *   if you only use the most refined level of the triangulation for
@@ -779,14 +779,14 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   After all the cells you wanted to mark for refinement, call the
  *   #execute_coarsening_and_refinement# function to actually perform
  *   the refinement. This function itself first calls the
- *   #prepare_coarsening_and_refinement# function to regularise the resulting
+ *   #prepare_coarsening_and_refinement# function to regularize the resulting
  *   triangulation: since a face between two adjacent cells may only
  *   be subdivided once (i.e. the levels of two adjacent cells may
  *   differ by one at most; it is not possible to have a cell refined
  *   twice while the neighboring one is not refined), some additional
  *   cells are flagged for refinement to smooth the grid. This
  *   enlarges the number of resulting cells but makes the grid more
- *   regular, thus leading to better approximationonal properties and,
+ *   regular, thus leading to better approximation properties and,
  *   above all, making the handling of data structures and algorithms
  *   much much easier. To be honest, this is mostly an algorithmic
  *   step than one needed by the finite element method.
@@ -796,7 +796,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   The reason for first coarsening, then refining is that the
  *   refinement usually adds some additional cells to keep the triangulation
- *   regular and thus satifies all refinement requests, while the coarsening
+ *   regular and thus satisfies all refinement requests, while the coarsening
  *   does not delete cells not requested for; therefore the refinement will
  *   often revert some effects of coarsening while the opposite is not true.
  *   The stated order of coarsening before refinement will thus normally
@@ -818,7 +818,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   the criterion is greater than the threshold being given as the second
  *   argument. Analogously,
  *   #coarsen (const Vector<float> &criterion, const double threshold)# flags those
- *   cells for coarsening for which the criterion is less than the treshold.
+ *   cells for coarsening for which the criterion is less than the threshold.
  *
  *   There are two variations of these functions, which rely on #refine# and
  *   coarsen by computing the thresholds from other information:
@@ -851,7 +851,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     makes up for a certain fraction of the total error. If this fraction is 50
  *     per cent, for example, the threshold is computed such that the cells with
  *     a criterion greater than the threshold together account for half of the
- *     total error. The definition of the fraction is a bit unintuitive, since
+ *     total error. The definition of the fraction is a bit counterintuitive, since
  *     the total error is the sum over all cells of the local contribution
  *     squared. We define that the fraction $\alpha$ be such that those
  *     elements with the greatest error are refined for which the condition
@@ -861,7 +861,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     indicator with $\eta^2 = \sum \eta_K^2$, with here the sum running over
  *     all cells.
  *
- *     For the bottom fraction the same holds: the treshold for coarsening is
+ *     For the bottom fraction the same holds: the threshold for coarsening is
  *     computed such that the cells with criterion less than the threshold
  *     together make up for the fraction of the total error specified.
  *
@@ -869,7 +869,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     functionals, but may lead to very slow convergence of the grid
  *     if only few cells are refined in each step.
  *
- *     From the implementational point, this time we really need to
+ *     From the point of view of implementation, this time we really need to
  *     sort the array of criteria.
  *     Just like the other strategy described above, this function only
  *     computes the threshold values and then passes over to #refine# and
@@ -909,7 +909,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   in additional cells being produced, which may not be necessary in all
  *   cases. If switched on, calling #execute_*# results in
  *   flagging additional cells for refinement to avoid
- *   vertices as the ones mentioned. The algorithms for both regularisation
+ *   vertices as the ones mentioned. The algorithms for both regularization
  *   and smoothing of triangulations are described below in the section on
  *   technical issues. The reason why this parameter must be given to the
  *   constructor rather than to #execute_*# is that it would result
@@ -951,10 +951,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     dimensions.
  *
  *     Looking at an interpolation of the second derivative of the finite
- *     element solution (asuming bilinear finite elements), one sees that the
+ *     element solution (assuming bilinear finite elements), one sees that the
  *     numerical solution is almost totally wrong, compared with the true second
  *     derivative. Indeed, on regular meshes, there exist sharp estimations that
- *     the $H^2$-error is only $O(1)$, so we should not be suprised; however, the
+ *     the $H^2$-error is only $O(1)$, so we should not be surprised; however, the
  *     numerical solution may show a value for the second derivative which may
  *     be a factor of ten away from the true value. These problems are located
  *     on the small cell adjacent to the center vertex, where cells of
@@ -1017,7 +1017,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     integral or if one has rough boundary data.
  *
  *   \item #do_not_produce_unrefined_islands#:
- *     This flag prevents the occurence of unrefined islands. In more detail:
+ *     This flag prevents the occurrence of unrefined islands. In more detail:
  *     It prohibits the coarsening of a cell if 'most of the neighbors' will
  *     be refined after the step.
  *
@@ -1040,30 +1040,30 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   \subsection{Material and boundary information}
  *
- *   Each line, quad, etc stores one byte of information denoting the material
- *   a cell is made of (used in the computation of stiffness matrices) and to
- *   which part of the boundary it belongs. Obviously, the material id is what
- *   is needed for a cell, while for all structures with a dimension less than
- *   the dimension of the domain (i.e. lines in 2D, lines and quads in 3D), the
- *   boundary information is what is needed. Since either material or boundary
- *   information is needed, but never both, only one field is used to store this
- *   data, namely the #TriangulationLevel<1>::LinesData.material_id# and
- *   #TriangulationLevel<2>::QuadsData.material_id# vectors. The data can be
- *   read and written using line, quad and cell iterators.
+ *   Each line, quad, etc stores one byte of information denoting the
+ *   material of a cell or the part of the boundary, a lower
+ *   dimensional object belongs to. The material of a cell may be used
+ *   during matrix generation in order to implement different
+ *   coefficients in different parts of the domain. It is not used by
+ *   functions of the grid and dof handling libraries.
  *
- *   Material and boundary indicators are stored as one byte (an
- *   #unsigned char#). They can therefore be in the range zero to 255, but
- *   only zero to 254 is allowed. The value 255 is reserved to denote
- *   interior lines (in 2D) and interior lines and quads (in 3D), which need
- *   not have a boundary or material indicator. However, using this value, it
- *   is possible to say whether a line in 2D is interior or not, which would
- *   otherwise be impossible because the hierarchical structure of a
- *   triangulation stores neighborship information and the like only with
- *   cells. Finding out whether a line is an interior one would then only be
- *   possible by looking at the cell it belongs to. There would be no way to
- *   loop over all lines and for example do a contour integral, since there
- *   would be no way to find out which of the lines we loop over actually are
- *   on the contour.
+ *   Boundary indicators on lower dimensional objects (these have no
+ *   material id) indicate the number of a boundary component. These
+ *   are used for two purposes: First, they specify a boundary
+ *   curve. When a cell is refined, a function can be used to place
+ *   new vertices on this curve. See the section on boundary
+ *   approximation below. Furthermore, the the weak formulation of the
+ *   partial differential equation may have different boundary
+ *   conditions on different parts of the boundary. The boundary
+ *   indicator can be used in creating the matrix or the right hand
+ *   side vector to indicate these different parts of the model (this
+ *   use is like the material id of cells).
+
+ *   Material and boundary indicators may be in the range from zero to
+ *   254. The value 255 is reserved to denote interior lines (in 2D)
+ *   and interior lines and quads (in 3D), which do not have a
+ *   boundary or material indicator. This way, a program can easily
+ *   determine, whether such an object is at the boundary or not.
  *
  *   Since in one dimension, no substructures of lower dimension exist to
  *   cells (of course apart from vertices, but these are handled
@@ -1140,7 +1140,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   #save_refine_flags# and #load_refine_flags#, these two functions store
  *   and read the flags of all used lines, quads, etc, not only of the
  *   active ones (well, activity is a concept which really only applies to
- *   cells, not for example to lines in 2D, so the abovementioned generalisation
+ *   cells, not for example to lines in 2D, so the abovementioned generalization
  *   to {\it all} lines, quads, etc seems plausible).
  *
  *   If you want to store more specific user flags, you can use the functions
@@ -1179,13 +1179,14 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   \subsection{Boundary approximation}
  *
- *   To be updated!
- *
- *   You can specify a boundary function: if a new vertex is created on a
- *   side or face at the boundary, this function is used to compute where
- *   it will be placed. See \Ref{Boundary} for the details. Usage with
- *   the #Triangulation# object is then like this (let #Ball# be a class
- *   derived from #Boundary<2>#):
+ *   You can specify a boundary function for each boundary
+ *   component. If a new vertex is created on a side or face at the
+ *   boundary, this function is used to compute where it will be
+ *   placed. The boundary indicator of the face will be used to
+ *   determine the proper component. See \Ref{Boundary} for the
+ *   details. Usage with the #Triangulation# object is then like this
+ *   (let #Ball# be a class derived from #Boundary<2>#):
+ * 
  *   \begin{verbatim}
  *     void main () {
  *       Triangulation<2> tria;
@@ -1218,32 +1219,32 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   You should take note of one caveat: if you have concave boundaries, you
  *   must make sure that a new boundary vertex does not lie to much inside the
  *   to be refined cell. The reason is that the center vertex is placed at the
- *   point which is the arithmetic mean of the eight surrounding vertices.
+ *   point which is the arithmetic mean of the vertices of the original cell.
  *   Therefore if your new boundary vertex is too near the center of the old
  *   quadrilateral or hexahedron, the distance to the midpoint vertex will become
- *   too small, thus generating distorted cells. Remedy: you have to take care
+ *   too small, thus generating distorted cells. Remedy: take care
  *   of such situations when defining the coarse grid.
  *
  *
  *   \subsection{Technical details}
  *
- *   \subsubsection{Algorithms for mesh regularisation and smoothing upon refinement}
+ *   \subsubsection{Algorithms for mesh regularization and smoothing upon refinement}
  *
  *   We chose an inductive point of view: since upon creation of the
  *   triangulation all cells are on the same level, all regularity assumptions
  *   regarding the maximum difference in level of cells sharing a common face,
- *   edge or vertex hold. Since we use the regularisation and smoothing in
+ *   edge or vertex hold. Since we use the regularization and smoothing in
  *   each step of the mesh history, when coming to the point of refining it
  *   further the assumptions also hold.
  *
- *   The regularisation and smoothing is done in the
+ *   The regularization and smoothing is done in the
  *   #prepare_coarsening_and_refinement# function, which is called by
  *   #execute_coarsening_and_refinement# at the very beginning.  It
  *   decides which additional cells to flag for refinement by looking
  *   at the old grid and the refinement flags for each cell.
  *
  *   \begin{itemize}
- *   \item {\it Regularisation:} The algorithm walks over all cells checking
+ *   \item {\it Regularization:} The algorithm walks over all cells checking
  *     whether the present cell is flagged for refinement and a neighbor of the
  *     present cell is refined once less than the present one. If so, flag the
  *     neighbor for refinement. Because of the induction above, there may be no
@@ -1279,7 +1280,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       (which is the number of faces minus the number of faces of this cell
  *       which are located on the boundary), then this cell is flagged for
  *       refinement. Since this may lead to cells on the same level which also
- *       will need refinement, we will need additional loops of regularisation
+ *       will need refinement, we will need additional loops of regularization
  *       and smoothing over all cells until nothing changes any more.
  *
  *     \item #eliminate_refined_*_islands#:
@@ -1293,15 +1294,15 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *       For a description of the distinction between the two versions of the
  *       flag see above in the section about mesh smoothing in the general part
- *       of this class's description.
+ *       of this classes description.
  *
  *       The same applies as above: several loops may be necessary.
  *     \end{itemize}
  *   \end{itemize}
  *
- *   Regularisation and smoothing are a bit complementary in that we check
+ *   Regularization and smoothing are a bit complementary in that we check
  *   whether we need to set additional refinement flags when being on a cell
- *   flagged for refinement (regularisation) or on a cell not flagged for
+ *   flagged for refinement (regularization) or on a cell not flagged for
  *   refinement. This makes readable programming easier.
  *
  *   All the described algorithms apply only for more than one space dimension,
@@ -1310,7 +1311,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   upon later.
  *
  *
- *   \subsubsection{Implementational conventions for two spatial dimensions}
+ *   \subsubsection{Implementation conventions for two spatial dimensions}
  *
  *   There is a convention about the direction of the bounding lines of quads in
  *   2D. The direction of a line is the direction of point 0 towards point 1. We
@@ -1354,12 +1355,12 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   coordinates #(1,0)#, vertex 2 at #(1,1)# and vertex 3 at #(0,1)#.
  *
  *
- *   \subsection{Implementational conventions for three spatial dimensions}
+ *   \subsection{Implementation conventions for three spatial dimensions}
  *
  *   By convention, we will use the following numbering for vertices, lines and
- *   faces of hexehedra in three space dimensions. Before giving these 
+ *   faces of hexahedra in three space dimensions. Before giving these 
  *   conventions we declare the following sketch to be the standard way of
- *   drawing 3d pictures of hexhedra:
+ *   drawing 3d pictures of hexahedra:
  *   \begin{verbatim}
  *         *-------*        *-------*
  *        /|       |       /       /|
@@ -1706,9 +1707,9 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * boundary object is done by
 				      * #set_boundary(number)#, which
 				      * uses the default argument of this
-				      * function and resets the boundary
+				      * function and replaces the boundary
 				      * approximation by a piecewise
-				      * straight one.
+				      * straight line.
 				      */
     void set_boundary (unsigned int         number,
 		       const Boundary<dim> &boundary_object = straight_boundary);

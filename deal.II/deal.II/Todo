@@ -91,9 +91,6 @@ Unify lots of code of the two Cuthill-McKee dof renumbering functions
   of numbers. Simple task.
 
 
-Update documentation on Boundaries in Triangulation<dim> (Guido!)
-
-
 Add support for MGTransferPrebuilt and MGSmoother if a user wants
   to solve exactly on another than the coarsest grid. In this case,
   some matrices and other arrays need not be computed.
