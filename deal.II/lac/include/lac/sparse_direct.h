@@ -94,6 +94,17 @@
  * which size it should be increased. However, most often the
  * indicated value is far too small and can not be relied upon.
  *
+ *
+ * @section3{Note on parallelization}
+ *
+ * Due to the use of global variables through COMMON blocks, the calls
+ * to the sparse direct solver routines is not multithreading-capable,
+ * i.e. at each time there may only be one call to these functions
+ * active. You have to synchronise your calls to the functions
+ * provided by this class using mutexes (see the @ref{Threads}
+ * namespace for such classes) to avoid multiple active calls at the
+ * same time if you use multithreading.
+ *
  * @author Wolfgang Bangerth, 2000, 2001
  */
 class SparseDirectMA27 : public Subscriptor
@@ -378,6 +389,17 @@ class SparseDirectMA27 : public Subscriptor
  * The constructor of this class takes several arguments. Their
  * meaning is equivalent to those of the constructor of the
  * @ref{SparseDirectMA27} class; see there for more information.
+ *
+ *
+ * @section3{Note on parallelization}
+ *
+ * Due to the use of global variables through COMMON blocks, the calls
+ * to the sparse direct solver routines is not multithreading-capable,
+ * i.e. at each time there may only be one call to these functions
+ * active. You have to synchronise your calls to the functions
+ * provided by this class using mutexes (see the @ref{Threads}
+ * namespace for such classes) to avoid multiple active calls at the
+ * same time if you use multithreading.
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
