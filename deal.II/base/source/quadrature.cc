@@ -240,6 +240,8 @@ void QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
 {
   const unsigned int dim=2;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  Assert (q_points.size() == quadrature.n_quadrature_points,
+	  ExcDimensionMismatch (q_points.size(), quadrature.n_quadrature_points));
   
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
     switch (face_no)
@@ -270,6 +272,8 @@ void QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
 {
   const unsigned int dim=3;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  Assert (q_points.size() == quadrature.n_quadrature_points,
+	  ExcDimensionMismatch (q_points.size(), quadrature.n_quadrature_points));
   
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
     switch (face_no)
@@ -332,6 +336,8 @@ void QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
   const unsigned int dim=2;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
   Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
+  Assert (q_points.size() == quadrature.n_quadrature_points,
+	  ExcDimensionMismatch (q_points.size(), quadrature.n_quadrature_points));
   
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
     switch (face_no)
@@ -406,6 +412,8 @@ void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
   const unsigned int dim=3;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
   Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
+  Assert (q_points.size() == quadrature.n_quadrature_points,
+	  ExcDimensionMismatch (q_points.size(), quadrature.n_quadrature_points));
 
 
 				   // for all faces and subfaces:
@@ -638,6 +646,60 @@ QProjector<dim>::project_to_all_subfaces (const Quadrature<dim-1> &quadrature)
   
   return Quadrature<dim>(q_points, weights);
 }
+
+
+
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
+				   const unsigned int        child_no)
+{
+  Assert (child_no < GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange (child_no, 0, GeometryInfo<dim>::children_per_cell));
+  
+  const unsigned int n_q_points = quadrature.n_quadrature_points;  
+    
+				   // projection is simple: copy over
+				   // old points, scale them, and if
+				   // necessary shift them
+  std::vector<Point<dim> > q_points = quadrature.get_points ();
+  for (unsigned int i=0; i<n_q_points; ++i)
+    q_points[i] /= 2;
+
+  switch (dim)
+    {
+      case 1:
+      {
+	if (child_no == 1)
+	  for (unsigned int i=0; i<n_q_points; ++i)
+	    q_points[i][0] += 0.5;
+	break;
+      };
+
+      case 2:
+      {
+	if ((child_no == 1) || (child_no == 2))
+	  for (unsigned int i=0; i<n_q_points; ++i)
+	    q_points[i][0] += 0.5;
+	if ((child_no == 2) || (child_no == 3))
+	  for (unsigned int i=0; i<n_q_points; ++i)
+	    q_points[i][1] += 0.5;
+	break;
+      };
+
+      default:
+	    Assert (false, ExcNotImplemented());
+    };
+
+				   // for the weights, things are
+				   // equally simple: copy them and
+				   // scale them
+  std::vector<double> weights = quadrature.get_weights ();
+  for (unsigned int i=0; i<n_q_points; ++i)
+    weights[i] *= (1./GeometryInfo<dim>::children_per_cell);
+
+  return Quadrature<dim> (q_points, weights);
+};
 
 
 

@@ -279,7 +279,6 @@ template <int dim>
 class QProjector
 {
   public:
-    
 				     /**
 				      * Compute the quadrature points
 				      * on the cell if the given
@@ -347,6 +346,30 @@ class QProjector
 				      */
     static Quadrature<dim>
     project_to_all_subfaces (const Quadrature<dim-1> &quadrature);
+
+				     /**
+				      * Project a give quadrature
+				      * formula to a child of a
+				      * cell. You may want to use this
+				      * function in case you want to
+				      * extend an integral only over
+				      * the area which a potential
+				      * child would occupy. The child
+				      * numbering is the same as the
+				      * children would be numbered
+				      * upon refinement of the cell.
+				      *
+				      * As integration using this
+				      * quadrature formula now only
+				      * extends over a fraction of the
+				      * cell, the weights of the
+				      * resulting object are scaled by
+				      * @p{1./GeometryInfo<dim>::children_per_cell}.
+				      */
+    static
+    Quadrature<dim>
+    project_to_child (const Quadrature<dim>  &quadrature,
+		      const unsigned int      child_no);
 };
 
 
@@ -369,6 +392,7 @@ template <>
 double Quadrature<0>::weight (const unsigned int) const;
 template <>
 const std::vector<double> & Quadrature<0>::get_weights () const;
+
 template <>
 void QProjector<1>::project_to_face (const Quadrature<0> &,
 				     const unsigned int,
