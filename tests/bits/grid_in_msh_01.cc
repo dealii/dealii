@@ -21,7 +21,6 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_in.h>
-#include <grid/grid_out.h>
   
 #include <fstream>
 #include <cmath>
@@ -57,7 +56,9 @@ int main ()
   try
     {
       gmsh_grid<2> ("grid_in_msh_01.2d.msh");
+      gmsh_grid<2> ("grid_in_msh_01.2da.msh");
       gmsh_grid<3> ("grid_in_msh_01.3d.msh");
+      gmsh_grid<3> ("grid_in_msh_01.3da.msh");
     }
   catch (std::exception &exc)
     {
