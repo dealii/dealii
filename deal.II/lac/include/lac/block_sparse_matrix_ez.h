@@ -76,6 +76,12 @@ class BlockSparseMatrixEZ : public Subscriptor
     BlockSparseMatrixEZ & operator = (const BlockSparseMatrixEZ<Number>&);
 
 				     /**
+				      * Set matrix to zero dimensions
+				      * and release memory.
+				      */
+    void clear ();
+    
+				     /**
 				      * Initialize to given block
 				      * numbers.  After this
 				      * operation, the matrix will
