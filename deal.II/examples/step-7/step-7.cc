@@ -224,12 +224,33 @@ class Solution : public Function<dim>,
 				 // their mathematical definition and
 				 // probably needs not much
 				 // explanation.
+				 //
+				 // The only thing that is worth
+				 // mentioning is that if we access
+				 // elements of a base class that is
+				 // template dependent (in this case
+				 // the elements of
+				 // ``SolutionBase<dim>''), then the
+				 // C++ language forces us to write
+				 // ``this->n_source_centers'' (for
+				 // example). Note that the ``this->''
+				 // qualification is not necessary if
+				 // the base class is not template
+				 // dependent, and also that the gcc
+				 // compilers, among others, don't
+				 // enforce this requirement of the
+				 // C++ standard. The reason why this
+				 // is necessary is complicated; some
+				 // books on C++ may explain it, so if
+				 // you are interested you can look it
+				 // up under the phrase ``two-stage
+				 // (name) lookup''.
 template <int dim>
 double Solution<dim>::value (const Point<dim>   &p,
 			     const unsigned int) const
 {
   double return_value = 0;
-  for (unsigned int i=0; i<n_source_centers; ++i)
+  for (unsigned int i=0; i<this->n_source_centers; ++i)
     {
 				       // One of the few things worth
 				       // mentioning is the following
@@ -237,13 +258,14 @@ double Solution<dim>::value (const Point<dim>   &p,
 				       // the vector (x-x_i). It is
 				       // computed in the way that one
 				       // would intuitively expect:
-      const Point<dim> shifted_point = p-source_centers[i];
+      const Point<dim> shifted_point = p-this->source_centers[i];
       
 				       // The ``Point<dim>'' class
 				       // offers a member function
 				       // ``square'' that does what
 				       // it's name suggests.
-      return_value += std::exp(-shifted_point.square() / (width*width));
+      return_value += std::exp(-shifted_point.square() /
+			       (this->width * this->width));
     };
   
   return return_value;
@@ -279,9 +301,9 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
 				   // class, which makes up for their
 				   // mutual exchange ability.
 
-  for (unsigned int i=0; i<n_source_centers; ++i)
+  for (unsigned int i=0; i<this->n_source_centers; ++i)
     {
-      const Point<dim> shifted_point = p-source_centers[i];
+      const Point<dim> shifted_point = p-this->source_centers[i];
       
 				       // For the gradient, note that
 				       // it's direction is along
@@ -290,7 +312,8 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
 				       // vector, where the factor is
 				       // given by the exponentials.
       return_value += (-2 / (width*width) *
-		       std::exp(-shifted_point.square() / (width*width)) *
+		       std::exp(-shifted_point.square() /
+				(this->width * this->width)) *
 		       shifted_point);
     };
   
@@ -331,18 +354,21 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 				  const unsigned int) const
 {
   double return_value = 0;
-  for (unsigned int i=0; i<n_source_centers; ++i)
+  for (unsigned int i=0; i<this->n_source_centers; ++i)
     {
-      const Point<dim> shifted_point = p-source_centers[i];
+      const Point<dim> shifted_point = p-this->source_centers[i];
       
 				       // The first contribution is
 				       // the Laplacian:
-      return_value += ((2*dim - 4*shifted_point.square()/(width*width)) / 
-		       (width*width) *
-		       std::exp(-shifted_point.square() / (width*width)));
+      return_value += ((2*dim - 4*shifted_point.square()/
+			(this->width * this->width)) / 
+		       (this->width * this->width) *
+		       std::exp(-shifted_point.square() /
+				(this->width * this->width)));
 				       // And the second is the
 				       // solution itself:
-      return_value += std::exp(-shifted_point.square() / (width*width));
+      return_value += std::exp(-shifted_point.square() /
+			       (this->width * this->width));
     };
   
   return return_value;
