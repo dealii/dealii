@@ -461,20 +461,27 @@ class VectorTools
 				      *
 				      * The additional argument
 				      * #weight# allows to evaluate
-				      * weighted norms. This is useful
-				      * for weighting the error of
-				      * different parts differently. A
-				      * special use is to have
-				      * #weight=0# in some parts of
-				      * the domain, e.g. at the
-				      * location of a shock and
-				      * #weight=1# elsewhere. This
-				      * allows convergence tests in
-				      * smooth parts of in general
-				      * discontinuous solutions.  By
-				      * default, no weighting function
-				      * is given, i.e. weight=1 in the
-				      * whole domain.
+				      * weighted norms.  The weight
+				      * function may be
+				      * one-dimensional, establishing
+				      * a weight in the domain. It
+				      * also may have as many
+				      * components as the finite
+				      * element function: Then,
+				      * different components get
+				      * different weights.  This can
+				      * be applied for instant with
+				      * the characteristic function of
+				      * a subset of the domain or a
+				      * weight function selecting only
+				      * some components of the
+				      * solution. The weight function
+				      * is expected to be positive,
+				      * but negative values are not
+				      * filtered. By default, no
+				      * weighting function is given,
+				      * i.e. weight=1 in the whole
+				      * domain.
 				      *
 				      * It is assumed that the number
 				      * of components of the function
