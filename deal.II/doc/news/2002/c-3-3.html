@@ -186,6 +186,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: The <code class="class">IteratorState::IteratorState</code>
+       enum is now called <code
+       class="class">IteratorState::IteratorStates</code>. This works
+       around a bug in Sun's Forte C++ compilers which can't handle
+       members of namespaces with the same name as the enclosing
+       namespace.
+       <br>
+       (WB 2002/03/20)
+       </p>
+
+  <li> <p> 
        Fixed: In 3d, the function <code
        class="member">DoFTools::make_hanging_node_constraints</code> 
        contained an assertion that failed erroneously for finite
