@@ -50,6 +50,13 @@ flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
 
+# If in multithread mode, add the ACE library to the libraries which
+# we need to link with:
+ifneq ($(with-multithreading),no)
+  libraries += $(lib-ACE)
+endif
+
+
 %.go : %.cc Makefile
 	@echo =====debug========= $<
 	@$(CXX) $(flags) -c $< -o $@
