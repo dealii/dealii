@@ -21,7 +21,8 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 				 const unsigned int n_dofs,
 				 const unsigned int n_transform_functions,
 				 const unsigned int n_values_arrays,
-				 const UpdateFlags update_flags) :
+				 const UpdateFlags update_flags,
+				 const FiniteElement<dim> &fe) :
 		n_quadrature_points (n_q_points),
 		total_dofs (n_dofs),
 		n_transform_functions (n_transform_functions),
@@ -36,7 +37,8 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 					dFMatrix(n_transform_functions,
 						 n_quadrature_points)),
 		selected_dataset (0),
-		update_flags (update_flags) {};
+		update_flags (update_flags),
+		fe(&fe)        {};
 
 
 
@@ -163,8 +165,8 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				   fe.total_dofs,
 				   fe.n_transform_functions,
 				   1,
-				   update_flags),
-		fe(&fe),
+				   update_flags,
+				   fe),
 		unit_shape_gradients(fe.total_dofs,
 				     vector<Point<dim> >(quadrature.n_quadrature_points)),
 		unit_shape_gradients_transform(fe.n_transform_functions,
@@ -266,13 +268,15 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const unsigned int n_dofs,
 					 const unsigned int n_transform_functions,
 					 const unsigned int n_faces_or_subfaces,
-					 const UpdateFlags update_flags) :
+					 const UpdateFlags         update_flags,
+					 const FiniteElement<dim> &fe) :
 		FEValuesBase<dim> (n_q_points,
 				   n_support_points,
 				   n_dofs,
 				   n_transform_functions,
 				   n_faces_or_subfaces,
-				   update_flags),
+				   update_flags,
+				   fe),
 		unit_shape_gradients (n_faces_or_subfaces,
 				      vector<vector<Point<dim> > >(n_dofs,
 								   vector<Point<dim> >(n_q_points))),
@@ -314,8 +318,8 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell,
-				       update_flags),
-		fe(&fe)
+				       update_flags,
+				       fe)
 {
   unit_face_quadrature_points = quadrature.get_quad_points();
   weights = quadrature.get_weights ();  
@@ -432,8 +436,8 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
-				       update_flags),
-		fe(&fe)
+				       update_flags,
+				       fe)
 {
   Assert ((update_flags & update_support_points) == false,
 	  ExcInvalidUpdateFlag());
