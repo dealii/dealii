@@ -64,7 +64,14 @@ template <typename> class BlockVector;
  * Since the Schur complement of a matrix corresponds to a Gaussian
  * block elimination, the right hand side of the condensed system must
  * be preprocessed. Furthermore, the eliminated variable must be
- * reconstructed after solving.The solution of the system above by a
+ * reconstructed after solving.
+ *
+ * \begin{verbatim}
+ *   g = g + B A-inverse f
+ *   u = A-inverse (f - D-transpose p)
+ * \end{verbatim}
+ *
+ * Applying these transformations, the solution of the system above by a
  * @p{SchurMatrix} @p{schur} is coded as follows:
  *
  * \begin{verbatim}
@@ -93,7 +100,17 @@ class SchurMatrix :
 				    * of the block system, this
 				    * function provides the right hand
 				    * side for the Schur complement.
-				   */
+				    *
+				    * The result is stored in the
+				    * first argument, which is also
+				    * part of the input data. If it is
+				    * necessary to conserve the data,
+				    * @p{dst} must be copied before
+				    * calling this function. This is
+				    * reasonable, since in many cases,
+				    * only the pre-processed right
+				    * hand side is needed.
+				    */
   void prepare_rhs (BlockVector<double>& dst,
 		    const BlockVector<double>& src) const;
 
