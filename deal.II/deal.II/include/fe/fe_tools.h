@@ -435,9 +435,10 @@ class FETools
 				      */
     DeclException1 (ExcHangingNodesNotAllowed,
 		    int,
-		    << "You are using continuous elements on a grid with hanging "
-		    << "nodes without providing hanging node constraints. Use this"
-		    << "function with additional ConstraintMatrix argument, instead.");
+		    << "You are using continuous elements on a grid with "
+		    << "hanging nodes but without providing hanging node "
+		    << "constraints. Use the respective function with "
+		    << "additional ConstraintMatrix argument(s), instead.");
   
 				     /**
 				      * Exception
