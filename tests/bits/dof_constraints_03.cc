@@ -12,8 +12,10 @@
 //----------------------------  dof_constraints_03.cc  ---------------------------
 
 
-// simply check what happens when condensing matrices. This test was
-// written when I changed a few things in the algorithm
+// simply check what happens when condensing matrices. This test was written
+// when I changed a few things in the algorithm. By simply looping over all
+// entries of the sparse matrix, we also check that things went right during
+// compression of the sparsity pattern.
 
 #include "../tests.h"
 #include <lac/sparsity_pattern.h>
