@@ -260,12 +260,61 @@ class GridTools
                                   Triangulation<dim> &triangulation);
     
                                      /**
+                                      * For each active cell, return in the
+                                      * output array to which subdomain (as
+                                      * given by the @p{cell->subdomain_id()}
+                                      * function) it belongs. The output array
+                                      * is supposed to have the right size
+                                      * already when calling this function.
+				      *
+				      * This function returns the association
+				      * of each cell with one subdomain. If
+				      * you are looking for the association of
+				      * each @em DoF with a subdomain, use the
+				      * <tt>DoFTools::get_subdomain_association</tt>
+				      * function.
+                                      */
+    template <int dim>
+    static void
+    get_subdomain_association (const Triangulation<dim>  &triangulation,
+                               std::vector<unsigned int> &subdomain);
+
+                                     /**
+                                      * Count how many cells are uniquely
+                                      * associated with the given @p subdomain
+                                      * index.
+                                      *
+                                      * This function will generate an
+                                      * exception if there are no cells with
+                                      * the given @p subdomain index.
+				      *
+				      * This function returns the number of
+				      * cells associated with one
+				      * subdomain. If you are looking for the
+				      * association of @em DoFs with this
+				      * subdomain, use the
+				      * <tt>DoFTools::count_dofs_with_subdomain_association</tt>
+				      * function.
+                                      */
+    template <int dim>
+    static unsigned int
+    count_cells_with_subdomain_association (const Triangulation<dim> &triangulation,
+                                            const unsigned int        subdomain);
+
+                                     /**
                                       * Exception
                                       */
     DeclException1 (ExcInvalidNumberOfPartitions,
                     int,
                     << "The number of partitions you gave is " << arg1
                     << ", but must be greater than zero.");
+                                     /**
+                                      * Exception
+                                      */
+    DeclException1 (ExcNonExistentSubdomain,
+                    int,
+                    << "The subdomain id " << arg1
+                    << " has no cells associated with it.");
 				     /**
 				      * Exception
 				      */

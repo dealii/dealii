@@ -322,6 +322,46 @@ partition_triangulation (const unsigned int  n_partitions,
 
 
 
+template <int dim>
+void
+GridTools::
+get_subdomain_association (const Triangulation<dim>  &triangulation,
+                           std::vector<unsigned int> &subdomain)
+{
+  Assert (subdomain.size() == triangulation.n_active_cells(),
+          ExcDimensionMismatch (subdomain.size(),
+                                triangulation.n_active_cells()));
+  unsigned int index = 0;
+  for (typename Triangulation<dim>::active_cell_iterator
+         cell = triangulation.begin_active();
+       cell!=triangulation.end(); ++cell, ++index)
+    subdomain[index] = cell->subdomain_id();
+
+  Assert (index == subdomain.size(), ExcInternalError());
+}
+
+
+
+template <int dim>
+unsigned int
+GridTools::
+count_cells_with_subdomain_association (const Triangulation<dim> &triangulation,
+                                        const unsigned int        subdomain)
+{
+  unsigned int count = 0;
+  for (typename Triangulation<dim>::active_cell_iterator
+         cell = triangulation.begin_active();
+       cell!=triangulation.end(); ++cell)
+    if (cell->subdomain_id() == subdomain)
+      ++count;
+
+  Assert (count != 0, ExcNonExistentSubdomain(subdomain));
+
+  return count;
+}
+
+
+
 #if deal_II_dimension != 1
 template
 double
@@ -355,3 +395,16 @@ template
 void
 GridTools::partition_triangulation (const unsigned int,
                                     Triangulation<deal_II_dimension> &);
+
+template
+void
+GridTools::
+get_subdomain_association (const Triangulation<deal_II_dimension>  &,
+                           std::vector<unsigned int> &);
+
+template
+unsigned int
+GridTools::
+count_cells_with_subdomain_association (const Triangulation<deal_II_dimension> &,
+                                        const unsigned int        );
+
