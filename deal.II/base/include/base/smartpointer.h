@@ -86,7 +86,10 @@ class SmartPointer
 				      * pointers. The pointer
 				      * subscribes to the new object
 				      * automatically and unsubscribes
-				      * to an old one if it exists.
+				      * to an old one if it exists. It
+				      * will not try to subscribe to a
+				      * null-pointer, but stilll
+				      * delete the old subscription.
 				      */
     SmartPointer<T> & operator= (T *tt);
 
