@@ -499,6 +499,8 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
   
 };
 
+
+
 template <>
 void VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
 						  const VectorFunctionMap&,
@@ -552,6 +554,8 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	  boundary_values[face_dofs[i]] = dof_values[i];
       };
 };
+
+
 
 template <int dim>
 void
@@ -1075,4 +1079,6 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 };
 
 
+
+// explicit instantiations
 template VectorTools<deal_II_dimension>;
