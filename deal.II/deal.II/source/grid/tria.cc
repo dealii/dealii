@@ -2275,7 +2275,7 @@ void Triangulation<dim>::refine (const dVector &criteria,
   const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (criteria(index) >= threshold)
+    if (fabs(criteria(index)) >= threshold)
       cell->set_refine_flag();
 };
 
@@ -2291,7 +2291,7 @@ void Triangulation<dim>::coarsen (const dVector &criteria,
   const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (criteria(index) <= threshold)
+    if (fabs(criteria(index)) <= threshold)
       cell->set_coarsen_flag();
 };
 

@@ -1353,13 +1353,19 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * Refine the triangulation according to
 				      * the given criteria. The criterion is a
 				      * #double# value for each cell which
-				      * determines which cells are to be refine
+				      * determines which cells are to be refined
 				      * by comparison with the threshold: if the
 				      * value for a cell is larger than the
 				      * threshold, the cell is flagged for
 				      * refinement. It is your duty to guarantee
 				      * that the threshold value is in a
-				      * resonable range.
+				      * resonable range. Please note that the
+				      * #criteria# array may contain negative
+				      * values (sometimes, error estimators
+				      * are evaluated in a way which produces
+				      * positive and negative values), but the
+				      * comparison with #threshold# is done only
+				      * on the absolute values of the criteria.
 				      *
 				      * The cells are only flagged for
 				      * refinement, they are not actually
@@ -1377,7 +1383,8 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				     /**
 				      * Analogue to the #refine# function:
 				      * flag all cells for coarsening for
-				      * which the criterion is less than the
+				      * which the absolute value of the
+				      * criterion is less than the
 				      * given threshold.
 				      */
     void coarsen (const dVector &criteria,
