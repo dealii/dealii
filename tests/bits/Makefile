@@ -49,7 +49,8 @@ tests_x = anna_? \
           find_cell_* \
           sparse_matrix_* \
 	  full_matrix_vector_* \
-	  solver_selector
+	  solver_selector \
+	  deal_solver_*
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += vector_* petsc_*
