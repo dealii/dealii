@@ -308,15 +308,28 @@ else
 	  dnl       of the same class if the latter is not public and therefore not
 	  dnl       accessible at global scope in general. I nevertheless think that
 	  dnl       this is valid.)
+	  dnl
+	  dnl Besides this, choose the most standard conforming mode of the compiler,
+	  dnl i.e. -model ansi and -std strict_ansi. Unfortunately, we have to
+	  dnl also add the flag -implicit_local (generating implicit instantiations of 
+	  dnl template with the `weak' link flag) since otherwise not all templates
+	  dnl are instantiated (also some from the standards library are missing).
 
-
-	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -DDEBUG"
-	  CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -fast"
+	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
 
 	  for i in 175 236 237 381 487 1136 1156 111 1182 265 ; do
 	    CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
 	    CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
 	  done
+
+	  dnl If we use -model ansi to compile the files, we also have to specify 
+	  dnl it for linking
+	  LDFLAGS="$LDFLAGS -model ansi"
+
+	  dnl For some reason, cxx also forgets to add the math lib to the linker
+	  dnl line, so we do that ourselves
+	  LDFLAGS="$LDFLAGS -lm"
 
           dnl if necessary: -shared, -pthread 
           dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
