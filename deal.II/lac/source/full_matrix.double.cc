@@ -130,6 +130,7 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
     deallog << "rank deficiency " << rank << endl;
   delete[] work;
   delete[] s;
+  delete[] matrix;
 }
 
 #endif
