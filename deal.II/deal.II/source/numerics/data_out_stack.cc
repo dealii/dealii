@@ -166,12 +166,21 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 	    data_vector->data.reinit (vec.size());
 	    std::copy (vec.begin(), vec.end(),
 		       data_vector->data.begin());
-	    break;
+	    return;
 	  };
-      Assert (data_vector != dof_data.end(),
-	      ExcVectorNotDeclared (names[0]));
+
+                                       // ok. not found. there is a
+                                       // slight chance that
+                                       // n_dofs==n_cells, so only
+                                       // bomb out if the next if
+                                       // statement will not be run
+      if (dof_handler->n_dofs() != dof_handler->get_tria().n_active_cells())
+        Assert (false, ExcVectorNotDeclared (names[0]));
     }
-  else
+
+                                   // search cell data
+  if ((vec.size() != dof_handler->n_dofs()) ||
+      (dof_handler->n_dofs() == dof_handler->get_tria().n_active_cells()))
     {
       typename std::vector<DataVector>::iterator data_vector=cell_data.begin();
       for (; data_vector!=cell_data.end(); ++data_vector)
@@ -180,11 +189,15 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 	    data_vector->data.reinit (vec.size());
 	    std::copy (vec.begin(), vec.end(),
 		       data_vector->data.begin());
-	    break;
+	    return;
 	  };
-      Assert (data_vector != cell_data.end(),
-	      ExcVectorNotDeclared (names[0]));
+      Assert (false, ExcVectorNotDeclared (names[0]));
     };
+
+                                   // we have either return or Assert
+                                   // statements above, so shouldn't
+                                   // get here!
+  Assert (false, ExcInternalError());
 }
 
 

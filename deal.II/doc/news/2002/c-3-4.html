@@ -66,7 +66,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Changed: Class and structures that are declared inside namespaces named
+       Changed: Classes and structures that are declared inside namespaces named
        <code class="class">internal</code> are now no longer shown in the class
        index view of the documentation of each of the sublibraries. Since they
        are supposed to be used internally only, this is no drawback for the
@@ -80,12 +80,12 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        Fixed: Some of the formulas in the step-14 tutorial were obviously 
        scrambled a little. This is now fixed.
        <br>
-       (WB 2003/01/30)
+       (Roy Stogner, WB 2003/01/30)
        </p>
 
   <li> <p> 
        Changed: The main Makefile has been changed to sequentialize building 
-       the base, lac, and deal.II subibraries. We changed this, since on some
+       the base, lac, and deal.II sublibraries. We changed this, since on some
        systems (notably AIX), the latter libraries need to be linked against
        the former ones, when creating shared libraries.
        <br>
@@ -740,6 +740,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">DataOutStack</code> class had a problem
+       when there were as many degrees of freedom as there were cells (i.e. if
+       we were using DG0 elements). This should now be fixed.
+       <br>
+       (WB 2003/03/02)
+       </p>
+
+  <li> <p>
        Fixed: The <code class="class">DataOutFaces</code> class was
        broken for cell data. It should now be correct, although the
        algorithm used is not optimal, being approximately quadratic in
@@ -856,8 +864,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        member function <code class="member">half_hyper_ball</code>,
        derived from member <code class="member">hyper_ball</code>.     
        The intial mesh contains four elements. This mesh will work with
-       the boundary class <code class="class">template <int dim> 
-       HalfHyperBallBoundary</code>.
+       the boundary class <code class="class">HalfHyperBallBoundary</code>.
        <br>
        (Brian Carnes 2002/12/16)
        </p>
@@ -1096,7 +1103,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> Improved: Several functions like the <code
-       class="member">DoFHandler::distribute</code> and <code
+       class="member">DoFHandler::distribute_dofs</code> and <code
        class="member">DoFTools::make_flux_sparsity_pattern</code>
        functions altered the <code
        class="member">user_flags</code>. This was stated in the
