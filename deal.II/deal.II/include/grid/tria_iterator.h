@@ -221,9 +221,9 @@ template <int dim> class Triangulation;
 template <int dim, typename Accessor>
 class TriaRawIterator :
 #ifdef HAVE_STD_ITERATOR_CLASS  
-               public std::iterator<std::bidirectional_iterator_tag,int>
+               public std::iterator<std::bidirectional_iterator_tag,Accessor>
 #else
-               bidirectional_iterator<Accessor,int>
+               public bidirectional_iterator<Accessor,int>
 #endif
 {
   public:
@@ -255,7 +255,7 @@ class TriaRawIterator :
 				      * convertible.
 				      *
 				      * Through this constructor, it is also
-				      * possible to construct object for
+				      * possible to construct objects for
 				      * derived iterators:
 				      * @begin{verbatim}
 				      * DoFCellAccessor dof_accessor;
