@@ -25,8 +25,8 @@ static const long double pi=3.141592653589793238462643;
 template <int dim>
 void gnuplot_output()
 {
-  cout << "Output of grids into gnuplot files:" << std::endl
-       << "===================================" << std::endl;
+  std::cout << "Output of grids into gnuplot files:" << std::endl
+	    << "===================================" << std::endl;
   
   Triangulation<dim> triangulation;
   GridGenerator::hyper_ball (triangulation);
@@ -43,13 +43,13 @@ void gnuplot_output()
   for (unsigned int refinement=0; refinement<2;
        ++refinement, triangulation.refine_global(1))
     {
-      cout << "Pefinement level: " << refinement << std::endl;
+      std::cout << "Refinement level: " << refinement << std::endl;
       string filename_base="ball";
       filename_base += ('0'+refinement);
       
       for (unsigned int order=1; order<4; ++order)
 	{
-	  cout << "Order = " << order;
+	  std::cout << "Order = " << order;
 	  
 	  const MappingQ<dim> mapping (order);
 	  string filename=filename_base+"_mapping_q";
@@ -57,8 +57,8 @@ void gnuplot_output()
 	  filename += ".dat";
 	  ofstream gnuplot_file(filename.c_str());
 
-	  cout << ".   Writing gnuplot file <"
-	       << filename << ">..." << std::endl;
+	  std::cout << ".   Writing gnuplot file <"
+		    << filename << ">..." << std::endl;
 	  
 	  grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);
 	}
@@ -76,7 +76,7 @@ void compute_pi_by_area ()
   const QGauss4<dim> quadrature;
   for (unsigned int order=1; order<5; ++order)
     {
-      cout << "Order = " << order << std::endl;
+      std::cout << "Order = " << order << std::endl;
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball (triangulation);
   
@@ -120,7 +120,9 @@ void compute_pi_by_area ()
       table.set_precision("eval.pi", 16);
       table.set_scientific("error", true);
 
-      table.write_text(cout);
+      table.write_text(std::cout);
+
+      std::cout << std::endl;
     };
 };
 
@@ -135,7 +137,7 @@ void compute_pi_by_perimeter ()
   const QGauss4<dim-1> quadrature;
   for (unsigned int order=1; order<5; ++order)
     {
-      cout << "Order = " << order << endl;
+      std::cout << "Order = " << order << endl;
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball (triangulation);
   
@@ -181,14 +183,16 @@ void compute_pi_by_perimeter ()
       table.set_precision("eval.pi", 16);
       table.set_scientific("error", true);
 
-      table.write_text(cout);
+      table.write_text(std::cout);
+
+      std::cout << std::endl;
     };
 };
 
 
 int main () 
 {
-  cout.precision (16);
+  std::cout.precision (16);
 
   gnuplot_output<2>();
 
