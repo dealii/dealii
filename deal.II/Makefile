@@ -19,8 +19,6 @@ help:
 	@echo "=  all: base, lac, 1d, 2d and 3d, contrib                            ="
 	@echo "=  debug: baseg, lacg, 1dg, 2dg and 3dg, contrib                     ="
 	@echo "=  online-doc: generate the documentation in HTML format             ="
-	@echo "=  printable-doc: generate the documentation in Postscript format.   ="
-	@echo "=      You need to have Doc++ and LaTeX installed for that.          ="
 	@echo "=  tex-doc: same, but only generate the LaTeX file, don't compile it ="
 	@echo "=  TODO: create a TODO file from TODO lines in the source files      ="
 	@echo "=  TAGS: create a TAGS file from include and source files            ="
@@ -107,28 +105,6 @@ online-doc:
 	@echo =======================================================
 	@echo "The online documentation can now be accessed through"
 	@echo "  $D/doc/index.html"
-	@echo =======================================================
-	@echo
-	@echo
-
-printable-doc:
-	cd $D/doc/auto ; $(MAKE) latex/deal_II_technical_reference.ps
-	@echo
-	@echo
-	@echo =======================================================
-	@echo "The generated postscript file can be found here:"
-	@echo "  $D/doc/auto/latex/deal_II_technical_reference.ps"
-	@echo =======================================================
-	@echo
-	@echo
-
-tex-doc:
-	cd $D/doc/auto ; $(MAKE) latex/deal_II_technical_reference.tex
-	@echo
-	@echo
-	@echo =======================================================
-	@echo "The generated LaTeX file can be found here:"
-	@echo "  $D/doc/auto/latex/deal_II_technical_reference.tex"
 	@echo =======================================================
 	@echo
 	@echo
