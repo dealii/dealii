@@ -63,11 +63,17 @@ MappingCartesian<dim>::update_each (const UpdateFlags in) const
 
 template <int dim>
 typename Mapping<dim>::InternalDataBase *
-MappingCartesian<dim>::get_data (const UpdateFlags      flags,
+MappingCartesian<dim>::get_data (const UpdateFlags      update_flags,
 				 const Quadrature<dim> &q) const
 {
-  Assert (flags & update_normal_vectors == 0, ExcNotImplemented());
+  //  Assert (flags & update_normal_vectors == 0, ExcNotImplemented());
+
   InternalData* data = new InternalData (q);
+
+  data->update_once = update_once(update_flags);
+  data->update_each = update_each(update_flags);
+  data->update_flags = data->update_once | data->update_each;
+
   return data;
 }
 
@@ -75,11 +81,16 @@ MappingCartesian<dim>::get_data (const UpdateFlags      flags,
 
 template <int dim>
 typename Mapping<dim>::InternalDataBase *
-MappingCartesian<dim>::get_face_data (const UpdateFlags,
+MappingCartesian<dim>::get_face_data (const UpdateFlags update_flags,
 				      const Quadrature<dim-1>& quadrature) const
 {
   QProjector<dim> q (quadrature, false);
   InternalData* data = new InternalData (q);
+
+  data->update_once = update_once(update_flags);
+  data->update_each = update_each(update_flags);
+  data->update_flags = data->update_once | data->update_each;
+
   return data;
 }
 
@@ -87,11 +98,16 @@ MappingCartesian<dim>::get_face_data (const UpdateFlags,
 
 template <int dim>
 typename Mapping<dim>::InternalDataBase *
-MappingCartesian<dim>::get_subface_data (const UpdateFlags,
+MappingCartesian<dim>::get_subface_data (const UpdateFlags update_flags,
 					 const Quadrature<dim-1> &quadrature) const
 {
   QProjector<dim> q (quadrature, true);
   InternalData* data = new InternalData (q);
+
+  data->update_once = update_once(update_flags);
+  data->update_each = update_each(update_flags);
+  data->update_flags = data->update_once | data->update_each;
+
   return data;
 }
 
@@ -107,7 +123,6 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 				     std::vector<Point<dim> > &quadrature_points,
 				     std::vector<Point<dim> > &normal_vectors) const
 {
-//TODO:[GK] does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   UpdateFlags update_flags(data.current_update_flags());
 
   const unsigned int npts = quadrature_points.size ();
@@ -210,7 +225,7 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 		n (1) = 1.;
 		break;
 	  case 203:
-		n (0) = 1.;
+		n (0) = -1.;
 		break;
 					   // 3D
 	  case 300:
