@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1161,9 +1161,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // lower left corner
 	  << "0 0 "
 					 // upper right corner
-	  << static_cast<unsigned int>( (x_max-x_min) * scale )+1
+	  << lrint( (x_max-x_min) * scale )+1
 	  << ' '
-	  << static_cast<unsigned int>( (y_max-y_min) * scale )+1
+	  << lrint( (y_max-y_min) * scale )+1
 	  << std::endl;
 
 				       // define some abbreviations to keep
