@@ -32,7 +32,7 @@ unsigned int PolynomialSpace<dim>::power(const unsigned int x,
 template <int dim>
 double
 PolynomialSpace<dim>::compute_value(const unsigned int /*i*/,
-				const Point<dim> &p) const
+				    const Point<dim> & /*p*/) const
 {
   Assert(false, ExcNotImplemented());
   return 0.;
@@ -42,7 +42,7 @@ PolynomialSpace<dim>::compute_value(const unsigned int /*i*/,
 template <int dim>
 Tensor<1,dim>
 PolynomialSpace<dim>::compute_grad(const unsigned int /*i*/,
-			       const Point<dim> &p) const
+				   const Point<dim> &/*p*/) const
 {
   Assert(false, ExcNotImplemented());
   return Tensor<1,dim>();
@@ -52,7 +52,7 @@ PolynomialSpace<dim>::compute_grad(const unsigned int /*i*/,
 template <int dim>
 Tensor<2,dim>
 PolynomialSpace<dim>::compute_grad_grad(const unsigned int /*i*/,
-				    const Point<dim> &p) const
+					const Point<dim> &/*p*/) const
 {
   Assert(false, ExcNotImplemented());
   return Tensor<2,dim>();
