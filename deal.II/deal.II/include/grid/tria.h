@@ -979,15 +979,20 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   It is recommended that a functions using the flags states so in its
  *   documentation.
  *
- *   There is another set of user data, namely a <tt>void *</tt>, for each
- *   line, quad, etc. You can access these user pointers through the
- *   functions <tt>user_pointer()</tt>, <tt>clear_user_pointer()</tt> and
- *   <tt>set_user_pointer(p)</tt> in the accessor classes. These pointers are
- *   neither used nor changed by the library and are @p NULL by
- *   default. Thus, their handling is the sole responsibility of the
- *   application program.  Especially, the pointers are not inherited
- *   to children upon refinement. Still, after a remeshing they are
- *   available on all cells, where they were set on the previous mesh.
+ *   There is another set of user data, namely a <tt>void *</tt>, for
+ *   each line, quad, etc. You can access these user pointers through
+ *   the functions <tt>user_pointer()</tt>,
+ *   <tt>clear_user_pointer()</tt> and <tt>set_user_pointer(p)</tt> in
+ *   the accessor classes. These pointers are not used nor changed in
+ *   many places of the library, and those classes and functions that
+ *   do use them should document this clearly; the most prominent user
+ *   of these pointers is the Solutiontransfer class.
+ *
+ *   The value of these user pointers is @p NULL by default. Note that
+ *   the pointers are not inherited to children upon
+ *   refinement. Still, after a remeshing they are available on all
+ *   cells, where they were set on the previous mesh (unless, of
+ *   course, overwritten by the SolutionTransfer class).
  *
  *   The usual warning about the missing type safety of @p void pointers are
  *   obviously in place here; responsibility for correctness of types etc
@@ -996,6 +1001,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   Just like the user flags, this field is not available for vertices,
  *   which does no harm since the vertices have a unique and continuous number
  *   unlike the structured objects lines and quads. 
+ *
  *
  *   @sect3{Boundary approximation}
  *

@@ -327,6 +327,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The documentation of the <code
+       class="member">Triangulation</code> class mentioned that no
+       places in the library use or touch the user pointers. That is
+       wrong, the <code class="member">SolutionTransfer</code> class
+       actually does. This is now properly documented.
+       <br> 
+       (WB 2004/09/15)
+       </p>
+
+  <li> <p>
        Fixed: The <code
        class="member">DerivativeApproximation::approximate_second_derivative</code>
        function produced wrong results ("not a number", or an exception instead of
