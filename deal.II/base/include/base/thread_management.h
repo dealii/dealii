@@ -500,13 +500,13 @@ namespace Threads
 					* files including it, we use a
 					* void pointer instead.
 					*/
-      volatile void * const thread_id_list;
+      void * const thread_id_list;
 
 				       /**
 					* Mutex by which we guard all
 					* accesses to the thread list.
 					*/
-      PosixThreadMutex list_mutex;
+      mutable PosixThreadMutex list_mutex;
   };
   
   
