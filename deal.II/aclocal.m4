@@ -411,6 +411,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   
       compaq_cxx)
           dnl Disable some warning messages:
+	  dnl  #11: ` unrecognized preprocessing directive" (we use
+	  dnl       #warning at one place)
           dnl #175: `subscript out of range' (detected when instantiating a
           dnl       template and looking at the indices of an array of
           dnl       template dependent size, this error is triggered in a
@@ -452,7 +454,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
           CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
   
-          for i in 175 236 237 381 487 1136 1156 111 1182 265 450 ; do
+          for i in 11 175 236 237 381 487 1136 1156 111 1182 265 450 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
             CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
           done
