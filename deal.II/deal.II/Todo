@@ -14,16 +14,6 @@ Write monitors to control whether enough memory was allocated for
   (for DoF)
 
 
-Write Triangulation::mesh_function.
-
-
-Unify CellAccessor<1> and <2> by renaming
-    LineAccessor<dim> -> SubstructAccessor<dim,1>
-    QuadAccessor<dim> -> SubstructAccessor<dim,2>
-  and deriving CellAccessor<dim> from SubstructAccessor<dim,dim>
-  Do the same with DoFLineAccessor and DoFQuadAccessor
-  
-
 Remove gcc2.8 workaround with DoFSubstructAccessor for general <dim>
 
 
