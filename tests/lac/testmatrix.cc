@@ -114,7 +114,7 @@ FDMatrix::nine_point_structure(SparsityPattern& structure) const
 
 template<typename MATRIX>
 void
-FDMatrix::nine_point(MATRIX& A, bool nonsymmetric) const
+FDMatrix::nine_point(MATRIX& A, bool) const
 {
    for(unsigned int i=0;i<=ny-2;i++)
     {
