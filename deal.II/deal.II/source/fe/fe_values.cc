@@ -666,8 +666,7 @@ unsigned int
 FEFaceValuesBase<dim>::memory_consumption () const
 {
   return (FEValuesBase<dim>::memory_consumption () +
-	  MemoryConsumption::memory_consumption (quadrature) +
-	  MemoryConsumption::memory_consumption (present_face));
+	  MemoryConsumption::memory_consumption (quadrature));
 }
 
 
@@ -740,7 +739,6 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
   this->present_cell = cell;
-  this->present_face = cell->face(face_no);
 
   this->get_mapping().fill_fe_face_values(cell, face_no,
 					  this->quadrature,
@@ -838,7 +836,6 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
   
   this->present_cell  = cell;
-  this->present_face  = cell->face(face_no);
 
   this->get_mapping().fill_fe_subface_values(cell, face_no, subface_no,
 					     this->quadrature,

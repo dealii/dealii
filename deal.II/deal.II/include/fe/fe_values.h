@@ -720,11 +720,6 @@ class FEValuesBase : protected FEValuesData<dim>
     const std::vector<double> & get_JxW_values () const;
     
 				     /**
-				      * Return the present cell.
-				      */
-    const typename DoFHandler<dim>::cell_iterator & get_cell() const;
-
-				     /**
 				      * Constant reference to the
 				      * selected mapping object.
 				      */
@@ -1000,12 +995,6 @@ class FEFaceValuesBase : public FEValuesBase<dim>
     const std::vector<Tensor<1,dim> > & get_boundary_forms () const;
 
 				     /**
-				      * Return the present
-				      * face.
-				      */
-    typename DoFHandler<dim>::face_iterator get_face() const;
-
-				     /**
 				      * Return a reference to the copy
 				      * of the quadrature formula
 				      * stored by this object.
@@ -1025,15 +1014,6 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * formula here.
 				      */
     const Quadrature<dim-1> quadrature;
-
-				     /**
-				      * Stores the face or subface,
-				      * resp., that was selected the
-				      * last time the @p{reinit}
-				      * function was called. Is used
-				      * by the @p{get_face} function.
-				      */
-    typename DoFHandler<dim>::face_iterator present_face;
 };
 
 
@@ -1455,16 +1435,6 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 
 template <int dim>
 inline
-const typename DoFHandler<dim>::cell_iterator &
-FEValuesBase<dim>::get_cell() const
-{
-  return present_cell;
-}
-
-
-
-template <int dim>
-inline
 const FiniteElement<dim> & 
 FEValuesBase<dim>::get_fe () const
 {
@@ -1505,17 +1475,6 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
   
   return this->normal_vectors[i];
 }
-
-
-template <int dim>
-inline
-typename DoFHandler<dim>::face_iterator
-FEFaceValuesBase<dim>::get_face() const 
-{
-  return present_face;
-}
-
-
 
 
 template <int dim>
