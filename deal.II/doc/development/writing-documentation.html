@@ -108,8 +108,10 @@
     <p>
     In order to allow better structured output for long comments,
     doxygen supports a great number of tags for enumerations,
-    sectioning, markup, and other fields. For example, here is how to
-    generate
+    sectioning, markup, and other fields. We encourage you to take a
+    look at the <a href="http://www.doxygen.org/"
+    target="_top">doxygen webpage</a> to get an overview. However,
+    here is a brief summary of the most often used features:
     </p>
     <ul> <li> <em>Itemized lists:</em>
 	 By writing comments like the following,
@@ -229,13 +231,13 @@
     </p>
 
     <p>
-    In the future, it would certainly help if the scripts understood
-    something like a <code>title</code> or <code>section</code> tag
-    (preferably something similar to the DocBook SGML commands for
-    that) in the comments, which could help to better structure the
-    output, especially for the longer programs. One would probably
-    like to put a section break before each new function or class, or
-    something along these lines.
+    In the future, it would certainly help if the scripts became a
+    little smarter. The only real functionality we presently have
+    beyond converting comments to interspersed text is that they can
+    extract section headings (take a look at step-16 does this), but
+    it would be interesting if one could add formulae, for example, or
+    if the tools could also generate output in a format that would
+    allow for higher quality printing than what we get from HTML.
     </p>
 
     <h4>Code examples for the usage of single classes</h4>
@@ -244,13 +246,17 @@
     <acronym>doxygen</acronym>. These example files go into
     <tt>deal.II/examples/doxygen</tt>. If they are short,
     documentation should be inside and they are included into the
-    documentation with <code>@include filename</code>.
+    documentation with <code>@include filename</code>. Take a look how
+    the class <code>BlockMatrixArray</code> does this.
     </p>
     
     <p>
     Larger example files should be documented using the
     <acronym>doxygen</acronym> command <code>@dotinclude</code> and
-    related commands.
+    related commands. However, if these programs do something
+    reasonable and do not only demonstrate a single topic, you should
+    consider converting them to a complete example program in the
+    <code>step-XX</code> series.
     </p>
     <hr>
     
