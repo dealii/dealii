@@ -1,8 +1,8 @@
 // $Id$
 // Copyright Guido Kanschat, 1999
 
-#ifndef __lac_sparsematrix_H
-#define __lac_sparsematrix_H
+#ifndef __lac_sparse_vanka_H
+#define __lac_sparse_vanka_H
 
 #include <base/smartpointer.h>
 #include <lac/forward-declarations.h>
@@ -29,8 +29,9 @@
  *
  * This local system is solved and the values are updated into the
  * destination vector.
- * @author Guido Kanschat
- */
+ *
+ * Remark: the Vanka method is a non-symmetric preconditioning method.
+ * @author Guido Kanschat */
 template<typename number>
 class SparseVanka
 {
@@ -48,19 +49,36 @@ class SparseVanka
     SparseVanka(const SparseMatrix<number>& M,
 		const vector<int>& indices);
 				     /**
-				      * Do the preconditioning.
+				      * Do the preconditioning. This
+				      * function contains a dispatch
+				      * mechanism to use the
+				      * multiplicative version by
+				      * default and the additive version
+				      * if requested by #set_additive#.
 				      */
     template<typename number2>
     void operator() (Vector<number2>& dst,
 		     const Vector<number2>& src) const;
 
 				     /**
-				      * In-place application of the
-				      * method.
+				      * Application of the Vanka operator.
+				      * This function takes two vector
+				      * arguments, the residual in #src#
+				      * and the resulting update vector
+				      * in #dst#.
 				      */
     template<typename number2>
-    void apply(Vector<number2>& dst) const;
-    
+    void forward(Vector<number2>& dst, const Vector<number2>& src) const;
+				     /**
+				      * Application of the transpose
+				      * Vanka operator.
+				      * This function takes two vector
+				      * arguments, the residual in #src#
+				      * and the resulting update vector
+				      * in #dst#.
+				      */
+    template<typename number2>
+    void backward(Vector<number2>& dst, const Vector<number2>& src) const;
   private:
 				     /**
 				      * Pointer to the matrix.
@@ -81,8 +99,8 @@ void
 SparseVanka<number>::operator() (Vector<number2>& dst,
 				 const Vector<number2>& src) const
 {
-  dst = src;
-  apply(dst);
+  dst = 0.;
+  forward(dst, src);
 }
 
 

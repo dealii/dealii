@@ -11,7 +11,7 @@
 
 #include <cmath>
 #include <lac/sparsematrix.templates.h>
-#include <lac/sparsevanka.templates.h>
+#include <lac/sparse_vanka.templates.h>
 
 #define TYPEMAT float
 

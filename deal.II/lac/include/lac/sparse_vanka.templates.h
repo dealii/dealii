@@ -1,7 +1,7 @@
 // $Id$
 // Copyright Guido Kanschat, 1999
 
-#include <lac/sparsevanka.h>
+#include <lac/sparse_vanka.h>
 #include <lac/fullmatrix.h>
 
 #include <map>
@@ -16,7 +16,8 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number>& M,
 template<typename number>
 template<typename number2>
 void
-SparseVanka<number>::apply(Vector<number2>& dst) const
+SparseVanka<number>::forward(Vector<number2>& dst,
+			   const Vector<number2>& src) const
 {
   for (unsigned int global_i=0; global_i<indices.size() ; ++global_i)
     {
@@ -36,6 +37,10 @@ SparseVanka<number>::apply(Vector<number2>& dst) const
 	local_index.insert(pair<unsigned int, unsigned int>
 			   (structure.column_number(row, i), i));
 
+//       for (map<unsigned int, unsigned int>::iterator is=local_index.begin();
+// 	   is!=local_index.end();++is)
+// 	cerr << "map " << is->first << '\t' << is->second << endl;
+      
 				       // Build local matrix
 
       for (map<unsigned int, unsigned int>::iterator is=local_index.begin();
@@ -45,7 +50,7 @@ SparseVanka<number>::apply(Vector<number2>& dst) const
 	  unsigned int i = is->second;
 	  unsigned int n = structure.row_length(irow);
 	  
-	  b(i) = dst(irow);
+	  b(i) = src(irow);
 	  
 	  for (unsigned int j=0;j<n;++j)
 	    {
@@ -54,9 +59,9 @@ SparseVanka<number>::apply(Vector<number2>& dst) const
 		= local_index.find(col);
 	      if (js == local_index.end())
 		{
-		  b(i) -= matrix->raw_entry(irow,col) * dst(col);
+		  b(i) -= matrix->raw_entry(irow,j) * dst(col);
 		} else {
-		  A(i,j) = matrix->raw_entry(irow,col);
+		  A(i,js->second) = matrix->raw_entry(irow,j);
 		}
 	    }
 	}
@@ -71,7 +76,7 @@ SparseVanka<number>::apply(Vector<number2>& dst) const
 	  unsigned int irow = is->first;
 	  unsigned int i = is->second;
 	  dst(irow) = x(i);
-	}     
+	}
     }
 }
 
