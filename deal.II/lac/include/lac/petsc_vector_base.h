@@ -22,6 +22,8 @@
 
 #include <petscvec.h>
 
+#include <utility>
+
 /*! @addtogroup PETSc
  *@{
  */
