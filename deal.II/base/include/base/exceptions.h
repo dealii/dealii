@@ -429,9 +429,14 @@ class Exception5 : public ExceptionBase {                             \
 			   way.
 */
 
-//#include <exception>
+#include <exception>
 
-class GlobalExcIO// : public exception
+
+/**
+ * Exception class to be thrown whenever an I/O operation in the library
+ * fails.
+ */
+class GlobalExcIO : public exception
 {
   public:
     virtual const char * what () const {
