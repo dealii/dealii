@@ -61,62 +61,63 @@ class FullMatrix : public Table<2,number>
     class const_iterator;
     
 				     /**
-                                          * Accessor class for iterators
-                                          */
-        class Accessor
-        {
-          public:
-                                             /**
-                                              * Constructor. Since we use
-                                              * accessors only for read
-                                              * access, a const matrix
-                                              * pointer is sufficient.
-                                              */
-            Accessor (const FullMatrix<number> *matrix,
-                      const unsigned int row,
-                      const unsigned int col);
+				      * Accessor class for iterators
+				      */
+    class Accessor
+    {
+      public:
+					 /**
+					  * Constructor. Since we use
+					  * accessors only for read
+					  * access, a const matrix
+					  * pointer is sufficient.
+					  */
+	Accessor (const FullMatrix<number> *matrix,
+		  const unsigned int row,
+		  const unsigned int col);
 
-                                             /**
-                                              * Row number of the element
-                                              * represented by this
-                                              * object.
-                                              */
-            unsigned int row() const;
+					 /**
+					  * Row number of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned int row() const;
 
-                                             /**
-                                              * Column number of the
-                                              * element represented by
-                                              * this object.
-                                              */
-            unsigned int column() const;
+					 /**
+					  * Column number of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int column() const;
 
-                                             /**
-                                              * Value of this matrix entry.
-                                              */
-            number value() const;
+					 /**
+					  * Value of this matrix entry.
+					  */
+	number value() const;
 	
-          protected:
-                                             /**
-                                              * The matrix accessed.
-                                              */
-            const FullMatrix<number>* matrix;
+      protected:
+					 /**
+					  * The matrix accessed.
+					  */
+	const FullMatrix<number>* matrix;
 
-                                             /**
-                                              * Current row number.
-                                              */
-            unsigned int a_row;
+					 /**
+					  * Current row number.
+					  */
+	unsigned int a_row;
 
-                                             /**
-                                              * Current column number.
-                                              */
-            unsigned short a_col;
+					 /**
+					  * Current column number.
+					  */
+	unsigned short a_col;
 
-                                             /**
-                                              * Make enclosing class a
-                                              * friend.
-                                              */
-            friend class const_iterator;
-        };
+					 /**
+					  * Make enclosing class a
+					  * friend.
+					  */
+	friend class const_iterator;
+    };
+
 				     /**
 				      * STL conforming iterator.
 				      */
@@ -474,11 +475,11 @@ class FullMatrix : public Table<2,number>
 				      */
     template<typename number2>
     void Tadd (const FullMatrix<number2> &src,
-	      const double factor,
-	      const unsigned int dst_offset_i = 0,
-	      const unsigned int dst_offset_j = 0,
-	      const unsigned int src_offset_i = 0,
-	      const unsigned int src_offset_j = 0);
+	       const double factor,
+	       const unsigned int dst_offset_i = 0,
+	       const unsigned int dst_offset_j = 0,
+	       const unsigned int src_offset_i = 0,
+	       const unsigned int src_offset_j = 0);
     
 				     /**
 				      * Matrix-matrix-multiplication.

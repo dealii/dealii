@@ -913,7 +913,9 @@ class TableBase : public Subscriptor
     const T & el (const TableIndices<N> &indices) const;
   
                                      /**
-* @deprecated This function accesses data directly and should not be used!
+				      * @deprecated This function
+				      * accesses data directly and
+				      * should not be used!
 				      *
                                       * Direct read-only access to
                                       * data field. Used by
