@@ -424,7 +424,20 @@ class BlockTrianglePrecondition
     BlockTrianglePrecondition(unsigned int block_rows,
 			      VectorMemory<Vector<number> >& mem,
 			      bool backward = false);
-
+				     /**
+				      * Enter a block. This calls
+				      * BlockMatrixArray::enter(). Remember
+				      * that the diagonal blocks
+				      * should actually be inverse
+				      * matrices or preconditioners.
+				      */
+    template <class MATRIX>
+    void enter (const MATRIX      &matrix,
+		const unsigned int row,
+		const unsigned int col,
+		const double       prefix = 1.,
+		const bool         transpose = false);
+    
 				     /**
 				      * Resize preconditioner to a new
 				      * size and clear all blocks.
@@ -625,6 +638,18 @@ BlockMatrixArray<number>::print_latex (STREAM& out) const
       }
   out << "\\end{array}" << std::endl;
 }
+
+template <typename number>
+template <class MATRIX>
+inline
+void
+BlockTrianglePrecondition<number>::enter (const MATRIX& matrix,
+					  unsigned row, unsigned int col,
+					  double prefix, bool transpose)
+{
+  BlockMatrixArray<number>::enter(matrix, row, col, prefix, transpose);
+}
+
 
 
 ///@endif
