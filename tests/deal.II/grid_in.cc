@@ -16,6 +16,8 @@
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_boundary_lib.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
 #include <grid/grid_out.h>
 #include <grid/grid_in.h>
 #include <grid/grid_generator.h>
@@ -28,7 +30,7 @@ std::ofstream logfile("grid_in.output");
 
 
 template <int dim>
-void test ()
+void test1 ()
 {  
   Triangulation<dim> tria;
   GridIn<dim> gi;
@@ -41,12 +43,39 @@ void test ()
 };
 
 
+template <int dim>
+void test2 ()
+{
+                                   // read a much larger grid (30k
+                                   // cells). with the old grid
+                                   // reordering scheme, this took >90
+                                   // minutes (exact timing not
+                                   // available, program was killed
+                                   // before), with the new one it
+                                   // takes less than 8 seconds
+  Triangulation<dim> tria;
+  GridIn<dim> gi;
+  gi.attach_triangulation (tria);
+  std::ifstream in ("grid_in.in2");
+  gi.read_xda (in);
+
+  int hash = 0;
+  int index = 0;
+  for (typename Triangulation<dim>::active_cell_iterator c=tria.begin_active();
+       c!=tria.end(); ++c, ++index)
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells()+1);
+  deallog << hash << std::endl;
+};
+
+
 int main ()
 {
   logfile.precision (2);
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  test<2> ();
+  test1<2> ();
+  test2<2> ();
 };
 
