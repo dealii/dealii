@@ -637,10 +637,17 @@ class GridOut
 				      * documentation of the
 				      * GridOutFlags::Gnuplot() class.
 				      */
-    template <int dim>
-    void write_gnuplot (const Triangulation<dim> &tria,
-			std::ostream             &out,
-			const Mapping<dim>       *mapping=0);
+    void write_gnuplot (const Triangulation<3> &tria,
+			std::ostream           &out,
+			const Mapping<3>       *mapping=0);
+
+				     /**
+				      * Specialization of above
+				      * function for 2d
+				      */
+    void write_gnuplot (const Triangulation<2> &tria,
+			std::ostream           &out,
+			const Mapping<2>       *mapping=0);
 
 				     /**
 				      * Declaration of the specialization
