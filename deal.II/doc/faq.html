@@ -60,18 +60,26 @@
 
   <p>
   You can't, this version of gcc simply does not work with
-  <acronym>deal.II</acronym>. gcc 2.96 was created by RedHat from a
-  snapshot somewhere between 2.95 and 3.0; it contained a large number
-  of compiler bugs, which have partly been fixed, but too many remain
-  as that we were able to make the library work with this
-  compiler. Also note that version 2.96 is not an 
-  officially released version of gcc. Simply use either gcc 2.95.2 or
-  3.X.
+  <acronym>deal.II</acronym>, or at least did not. Post-3.4 versions of 
+  <acronym>deal.II</acronym> will contain fixes for this problem, but versions
+  up to and including 3.4 cannot be compiled with gcc 2.96.
+  </p>
+
+  <p>
+  gcc 2.96 was created by
+  RedHat from a snapshot somewhere between 2.95 and 3.0; it contained a large
+  number of compiler bugs, which have partly been fixed, but too many remain as
+  that we were able to make the library work with this compiler until we could
+  get hold of such a system (the main development was done in Germany, which is
+  SuSE country, not Red Hat). Also note that version 2.96 is not an officially
+  released version of gcc. Simply use either gcc 2.95 or 3.X. 
   </p>
 
   <p>
   RedHat provides updates to gcc version 3.0 or later, and downgrades
-  to gcc version 2.95, all of which work with <acronym>deal.II</acronym>.
+  to gcc version 2.95, all of which work with <acronym>deal.II</acronym>. Red
+  Hat releases starting with version 8.0 will also be based on a different
+  compiler, so the problem does not exist there any more.
   </p>
   
 
