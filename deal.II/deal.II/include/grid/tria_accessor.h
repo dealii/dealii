@@ -307,7 +307,7 @@ class TriaAccessor
 
 /**
  * Common template for line, quad, hex accessors.  According to
- * @p celldim objects of this class represent lines, quadrilaterals,
+ * @p celldim, objects of this class represent lines, quadrilaterals,
  * or hexahedra in @p dim space dimensions. Concrete implementations
  * are done for specialized @p celldim template parameter. For easier
  * access, we nevertheless document all functions of the specialized
