@@ -2,6 +2,7 @@
 $compiler_table{"gcc295"} = "gcc 2.95";
 $compiler_table{"gcc30"} = "gcc 3.0";
 $compiler_table{"icc50"} = "Intel ICC 5.0";
+$compiler_table{"icc60"} = "Intel ICC 6.0";
 
 # first read in list of test results
 while (<>)
