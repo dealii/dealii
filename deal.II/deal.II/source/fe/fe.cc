@@ -407,7 +407,7 @@ void
 FiniteElementBase<dim>::
 compute_2nd (const Mapping<dim>                   &mapping,
 	     const typename DoFHandler<dim>::cell_iterator &cell,
-	     const unsigned int                    offset,
+	     const unsigned int,
 	     typename Mapping<dim>::InternalDataBase &mapping_internal,
 	     InternalDataBase                     &fe_internal,
 	     FEValuesData<dim>                    &data) const
@@ -469,11 +469,11 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				       // cell
       for (unsigned int d=0; d<dim; ++d)
 	{
-	  Assert (diff_quot2.size() + offset <=
+	  Assert (diff_quot2.size() <=
 		  diff_quot[d].size(),
 		  ExcInternalError());
 	  mapping.transform_covariant (&*diff_quot2.begin(), &*diff_quot2.end(),
-				       diff_quot[d].begin()+offset,
+				       diff_quot[d].begin(),
 				       mapping_internal);
 
 	  for (unsigned int q=0; q<n_q_points; ++q)
