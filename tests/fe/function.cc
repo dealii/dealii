@@ -3,6 +3,7 @@
 
 // Test the different FEValuesBase::get_function_values
 
+#include "../tests.h"
 #include <fstream>
 
 #include <base/quadrature_lib.h>
@@ -85,7 +86,7 @@ int main()
 {
   std::ofstream logfile("function.output");
   deallog.attach(logfile);
-//  deallog.depth_console(0);
+  deallog.depth_console(0);
 
   test_vectors<2>();
   
