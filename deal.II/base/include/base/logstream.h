@@ -5,9 +5,10 @@
 /*----------------------------   logstream.h     ---------------------------*/
 
 
-#include <stack>
 #include <string>
+#include <stack>
 #include <iostream>
+
 
 
 
@@ -15,43 +16,69 @@
  * A class that simplifies the process of execution logging by
  * providing
  * \begin{itemize}
- * \item a push and pop mechanism for prefixes and
+ * \item a push and pop mechanism for prefixes, and
  * \item the possibility of distributing information to files and the
  *   console.
  * \end{itemize}
  */
 class LogStream
 {
-public:
-  stack<string> prefixes;
-  ostream& std;
-  ostream* file;
+//  private:
+  public:
+    
+				     /**
+				      * Stack of strings which are printed
+				      * at the beginning of each line to
+				      * allow identification where the
+				      * output was generated.
+				      */
+    stack<string> prefixes;
 
-  bool was_endl;
-  unsigned std_depth, file_depth;
+				     /**
+				      * Default stream, where the output
+				      * is to go to. This stream defaults
+				      * to #cerr#, but can be set to another
+				      * stream through the constructor.
+				      */
+    ostream  &std;
+
+				     /**
+				      * Pointer to a stream, where a copy of
+				      * the output is to go to. Usually, this
+				      * will be a file stream.
+				      *
+				      * You can set and reset this stream
+				      * by the #attach# function.
+				      */
+    ostream  *file;
+    
+    bool was_endl;
+    unsigned int std_depth, file_depth;
   
-public:
-				   /**
-				    * Standard constructor, since we
-				    * intend to provide an object
-				    * clog in the library.
-				    */
-  LogStream();
+  public:
+				     /**
+				      * Standard constructor, since we
+				      * intend to provide an object
+				      * #deallog# in the library. Set the
+				      * standard output stream to #cerr#.
+				      */
+    LogStream();
     
-  				   /**
-				    * Enable output to a second
-				    * stream.
-				    */
-  void attach(ostream& o);
+				     /**
+				      * Enable output to a second
+				      * stream #o#.
+				      */
+    void attach(ostream& o);
     
-				   /**
-				    * Disable output to the second
-				    * stream. 
-				    */
-  void detach()
-      {
-	file = 0;
-      }
+				     /**
+				      * Disable output to the second
+				      * stream. You may want to call
+				      * #close# on the stream that was
+				      * previously attached to this object.
+				      */
+    void detach();
+    
+
     
 				     /**
 				      * Push another prefix on the
@@ -60,21 +87,21 @@ public:
 				      * colon and there is a double
 				      * colon after the last prefix.
 				      */
-    void push(const string& text)
-      {
-	string pre=prefixes.top();
-	pre += text;
-	pre += string(":");
-	prefixes.push(pre);
-      }
-    
+    void push (const string& text) {
+				       // strange enough: if make this
+				       // function non-inline with
+				       // gcc2.8, we get very strange
+				       // compiler errors...
+      string pre=prefixes.top();
+      pre += text;
+      pre += string(":");
+      prefixes.push(pre);
+    }
+        
 				     /**
 				      * Remove the last prefix.
 				      */
-    void pop()
-      {
-  	prefixes.pop();
-      }
+    void pop();
      
 				     /**
 				      * Maximum number of levels to be
@@ -87,10 +114,7 @@ public:
 				      * this function with #n=0#, no
 				      * console output will be written.
 				      */
-    void depth_console(unsigned n)
-      {
-  	std_depth = n;
-      }
+    void depth_console (unsigned int n);
      
 				     /**
 				      * Maximum number of levels to be
@@ -101,14 +125,37 @@ public:
 				      * with care, since it may spoile
 				      * the value of a log file.
 				      */
-    void depth_file(unsigned n)
-      {
- 	file_depth = n;
-      }
+    void depth_file (unsigned int n);
 
-    ostream & get_std_stream () const {
-      return std;
-    };
+				     /**
+				      * Output a character constant through
+				      * this stream.
+				      */
+    LogStream & operator << (const char *);
+    
+				     /**
+				      * Output a function. This really is not
+				      * to output the function, but calls the
+				      * function on the present object. It
+				      * works the same way as it is possible
+				      * to output the stream manipulators
+				      * (like #endl#, etc) work on standard
+				      * streams: #stream << endl;#. We need
+				      * to overload this function in order
+				      * to know when we have to print the
+				      * prefixes, since a user may use several
+				      * calls to #operator <<# before the
+				      * line is complete. The overloaded
+				      * function #void endl(LogStream &)#
+				      * tells the #LogStream# that the end of
+				      * the line is reached.
+				      */
+    LogStream & operator << (void (*f)(LogStream &));
+
+				     /**
+				      * Declare this function as a friend.
+				      */
+    friend void endl (LogStream &);
 };
 
 
@@ -121,11 +168,15 @@ template <class T>
 inline void
 writestuff(LogStream& s, const T& t)
 {
-  if (s.prefixes.size()<=s.std_depth)
-    s.get_std_stream () << t;
-  if (s.file && (s.prefixes.size()<=s.file_depth))
+ 				   // print the object #t# to each of the
+ 				   // two streams, if necessary
+  if (s.prefixes.size() <= s.std_depth)
+    s.std << t;
+
+  if (s.file && (s.prefixes.size() <= s.file_depth))
     *(s.file) << t;
 }
+;
 
 
 
@@ -134,44 +185,44 @@ template <class T>
 inline LogStream&
 operator << (LogStream& s, const T& t)
 {
+				   // if the previous command was an
+				   // #endl#, print the topmost prefix
+				   // and a colon
   if (s.was_endl)
-  {
-    writestuff(s, s.prefixes.top());
-    writestuff(s,':');
-  }
-  s.was_endl = false;
+    {
+      writestuff(s, s.prefixes.top());
+      writestuff(s,':');
+      s.was_endl = false;
+    };
+
+				   // print the rest of the message
   writestuff(s,t);
   return s;
 }
 
-//template <>
-inline LogStream&
-operator << (LogStream& s, const char* c)
-{
-  if (s.was_endl)
-  {
-    writestuff(s, s.prefixes.top());
-    writestuff(s,':');
-  }
-  s.was_endl = false;
-  writestuff(s, c);
-  return s;
-}
 
+
+
+/**
+ * Overloaded version of the stream manipulator function #endl# which
+ * results in calling the original version of #endl# for each of the
+ * two streams, if the present prefix number does not exceed the
+ * specified maximal number.
+ */
 inline void endl(LogStream& s)
 {
+				   // there seems to be no proper way to
+				   // pass a pointer to an overloaded
+				   // function through a template parameter,
+				   // since the compiler can't know which of
+				   // the functions it is; do the overload
+				   // resolution by hand like this:
   ostream& (*p) (ostream &) = &endl;
-  writestuff(s, p);
+  writestuff (s, p);
   s.was_endl = true;
 }
 
-//template <>
-inline LogStream&
-operator << (LogStream& s, void (*f)(LogStream&))
-{
-  f(s);
-  return s;
-}
+
 
 extern LogStream deallog;
 
