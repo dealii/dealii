@@ -156,7 +156,7 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 				   // if the size of the matrix is very small,
 				   // then only allocate a number of vectors
 				   // which is needed
-  const unsigned int n_tmp_vectors = (A.m()+3 > max_n_tmp_vector ?
+  const unsigned int n_tmp_vectors = (A.m()+3 > max_n_tmp_vectors ?
 				      max_n_tmp_vectors :
 				      A.m()+3);
 
