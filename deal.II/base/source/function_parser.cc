@@ -55,7 +55,8 @@ void FunctionParser<dim>::initialize(const std::string variables,
   for (unsigned int i=0; i<this->n_components; ++i) {
     // Add the variuous constants to the parser.
     std::map< std::string, double >::iterator
-      constant = constants.begin(),
+      constant = constants.begin();
+    std::map< std::string, double >::const_iterator
       endc  = constants.end();
     for(;constant != endc; ++constant) {
       AssertThrow( fp[i].AddConstant(constant->first, constant->second),
