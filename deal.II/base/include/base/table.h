@@ -929,6 +929,12 @@ class TableBase : public Subscriptor
                                       * table.
                                       */
     TableIndices<N> table_size;
+
+				     /**
+				      * Make all other table classes
+				      * friends.
+				      */
+    template <int, typename> friend class TableBase;
 };
 
 

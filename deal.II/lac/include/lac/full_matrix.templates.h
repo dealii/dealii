@@ -70,7 +70,7 @@ template <typename number2>
 FullMatrix<number>&
 FullMatrix<number>::operator = (const FullMatrix<number2>& M)
 {
-  Table<2,number>::operator=(M);
+  TableBase<2,number>::operator=(M);
   return *this;
 }
 
