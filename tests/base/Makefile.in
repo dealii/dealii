@@ -25,9 +25,10 @@ quadrature_test.exe: quadrature_test.go    $(libraries)
 reference.exe      : reference.go abort.go $(libraries)
 tensor.exe         : tensor.go             $(libraries)
 timer.exe          : timer.go              $(libraries)
+auto_derivative_function.exe        : auto_derivative_function.go            $(libraries)
 
 
-tests = logtest quadrature_test reference tensor timer polynomial_test
+tests = logtest quadrature_test reference tensor timer polynomial_test auto_derivative_function
 
 ############################################################
 
