@@ -252,6 +252,15 @@ MinimizationProblem<dim>::MinimizationProblem (const unsigned int run_number)
                                  // then only seek updates to this function
                                  // with zero boundary values, so that the
                                  // boundary values are always correct.
+                                 //
+                                 // Note how we have specialized this function
+                                 // to 1d only. We do this since the second
+                                 // part of the function, where we deal with
+                                 // boundary values, is only correct if we are
+                                 // in 1d. Not generating a general template
+                                 // for this function prevents the compiler
+                                 // from erroneously compiling this function
+                                 // for other space dimensions, then.
 template <>
 void MinimizationProblem<1>::initialize_solution () 
 {
