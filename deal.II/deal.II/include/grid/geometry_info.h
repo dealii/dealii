@@ -339,6 +339,30 @@ struct GeometryInfo<1>
     static unsigned int child_cell_from_point (const Point<1> &p);
 
 				     /**
+				      * Given coordinates @p{p} on the
+				      * unit cell, return the values
+				      * of the coordinates of this
+				      * point in the coordinate system
+				      * of the given child. Neither
+				      * original nor returned
+				      * coordinates need actually be
+				      * inside the cell, we simply
+				      * perform a scale-and-shift
+				      * operation with a shift that
+				      * depends on the number of the
+				      * child.
+				      */
+    static Point<1> cell_to_child_coordinates (const Point<1>    &p,
+					       const unsigned int child_index);
+
+				     /**
+				      * Return true if the given point
+				      * is inside the unit cell of the
+				      * present space dimension.
+				      */
+    static bool is_inside_unit_cell (const Point<1> &p);
+    
+				     /**
 				      * Exception
 				      */
     DeclException1 (ExcInvalidCoordinate,
@@ -562,6 +586,31 @@ struct GeometryInfo<2>
 				      */
     static unsigned int child_cell_from_point (const Point<2> &p);
 
+
+				     /**
+				      * Given coordinates @p{p} on the
+				      * unit cell, return the values
+				      * of the coordinates of this
+				      * point in the coordinate system
+				      * of the given child. Neither
+				      * original nor returned
+				      * coordinates need actually be
+				      * inside the cell, we simply
+				      * perform a scale-and-shift
+				      * operation with a shift that
+				      * depends on the number of the
+				      * child.
+				      */
+    static Point<2> cell_to_child_coordinates (const Point<2>    &p,
+					       const unsigned int child_index);
+
+				     /**
+				      * Return true if the given point
+				      * is inside the unit cell of the
+				      * present space dimension.
+				      */
+    static bool is_inside_unit_cell (const Point<2> &p);
+    
 				     /**
 				      * Exception
 				      */
@@ -784,6 +833,31 @@ struct GeometryInfo<3>
 				      */
     static unsigned int child_cell_from_point (const Point<3> &p);
 
+
+				     /**
+				      * Given coordinates @p{p} on the
+				      * unit cell, return the values
+				      * of the coordinates of this
+				      * point in the coordinate system
+				      * of the given child. Neither
+				      * original nor returned
+				      * coordinates need actually be
+				      * inside the cell, we simply
+				      * perform a scale-and-shift
+				      * operation with a shift that
+				      * depends on the number of the
+				      * child.
+				      */
+    static Point<3> cell_to_child_coordinates (const Point<3>    &p,
+					       const unsigned int child_index);
+
+				     /**
+				      * Return true if the given point
+				      * is inside the unit cell of the
+				      * present space dimension.
+				      */
+    static bool is_inside_unit_cell (const Point<3> &p);
+    
 				     /**
 				      * Exception
 				      */
@@ -1028,6 +1102,83 @@ GeometryInfo<3>::child_cell_from_point (const Point<3> &p)
 }
 
 
+
+inline
+Point<1>
+GeometryInfo<1>::cell_to_child_coordinates (const Point<1>    &p,
+					    const unsigned int child_index)
+{
+  Assert (child_index < GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange (child_index, GeometryInfo<dim>::children_per_cell));
+  const double x = p[0]*2 - (child_index == 1 ? 1. : 0.);
+  return Point<dim>(x);
+}
+
+
+
+inline
+Point<2>
+GeometryInfo<2>::cell_to_child_coordinates (const Point<2>    &p,
+					    const unsigned int child_index)
+{
+  Assert (child_index < GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange (child_index, GeometryInfo<dim>::children_per_cell));
+
+  const double x = p[0]*2 - ((child_index == 1) || (child_index == 2) ? 1. : 0.);
+  const double y = p[1]*2 - ((child_index == 2) || (child_index == 3) ? 1. : 0.);
+    
+  return Point<dim>(x,y);
+}
+
+
+
+inline
+Point<3>
+GeometryInfo<3>::cell_to_child_coordinates (const Point<3>    &p,
+					    const unsigned int child_index)
+{
+  Assert (child_index < GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange (child_index, GeometryInfo<dim>::children_per_cell));
+
+  const double x = p[0]*2 - ((child_index == 1) || (child_index == 2) ||
+			     (child_index == 5) || (child_index == 6)    ? 1. : 0.);
+  const double y = p[1]*2 - ((child_index == 4) || (child_index == 5) ||
+			     (child_index == 6) || (child_index == 7)    ? 1. : 0.);
+  const double z = p[2]*2 - ((child_index == 2) || (child_index == 3) ||
+			     (child_index == 6) || (child_index == 7)    ? 1. : 0.);
+    
+  return Point<dim>(x,y,z);
+}
+
+
+
+inline
+bool
+GeometryInfo<1>::is_inside_unit_cell (const Point<1> &p)
+{
+  return (p[0] >= 0.) && (p[0] <= 1.);
+}
+
+
+
+inline
+bool
+GeometryInfo<2>::is_inside_unit_cell (const Point<2> &p)
+{
+  return (p[0] >= 0.) && (p[0] <= 1.) &&
+	 (p[1] >= 0.) && (p[1] <= 1.);
+}
+
+
+
+inline
+bool
+GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
+{
+  return (p[0] >= 0.) && (p[0] <= 1.) &&
+	 (p[1] >= 0.) && (p[1] <= 1.) &&
+	 (p[2] >= 0.) && (p[2] <= 1.);
+}
 
 
 
