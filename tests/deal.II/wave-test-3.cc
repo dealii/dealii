@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by Wolfgang Bangerth
+//    Copyright (C) 1998, 1999, 2000, 2001 by Wolfgang Bangerth
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1751,7 +1751,6 @@ class WaveProblem :  public MultipleParameterLoop::UserClass {
 };
 
 
-/* $Id$ */
 
 
 #include <lac/vector.h>
@@ -2348,7 +2347,6 @@ template class SplitLine<2>;
 template class OneBranch1d<2>;
 template class SecondCrossing<2>;
 template class HuyghensWave<2>;
-/*  $Id$ */
 
 
 #include <grid/tria.h>
@@ -2962,7 +2960,6 @@ template class EvaluateOneBranch1d<2>;
 template class EvaluateSecondCrossing1d<2>;
 template class EvaluateHuyghensWave<2>;
 
-/* $Id$ */
 
 #include <base/data_out_base.h>
 #include <numerics/histogram.h>
@@ -3292,7 +3289,6 @@ void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack
 
 template class TimestepManager<2>;
   
-/* $Id$ */
 
 #include <base/exceptions.h>
 #include <base/function.h>
@@ -4571,7 +4567,6 @@ if (prm.get("Refinement criterion")=="energy estimator")
 
 
 template class WaveParameters<2>;
-/* $Id$ */
 
 #include <numerics/data_out_stack.h>
 #include <dofs/dof_handler.h>  //??
@@ -4598,7 +4593,6 @@ SweepData<dim>::~SweepData ()
 
 
 template class SweepData<2>;
-/* $Id$ */
 
 
 #include <iomanip>
@@ -4669,7 +4663,6 @@ template
 void SweepInfo::write_summary (const list<EvaluationBase<2>*> &eval_list,
 			       ostream &out) const;
 
-/* $Id$ */
 
 
 #include <base/quadrature.h>
@@ -5203,7 +5196,6 @@ void TimeStep_Wave<dim>::StatisticData::write (ostream &out) const
 
 template class TimeStepBase_Wave<2>;
 template class TimeStep_Wave<2>;
-/* $Id$ */
 
 #include <base/function.h>
 #include <lac/full_matrix.h>
@@ -5787,7 +5779,6 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 
 
 template class TimeStep_Dual<2>;
-/* $Id$ */
 
 
 #include <base/tensor.h>
@@ -6613,7 +6604,6 @@ TimeStep_ErrorEstimation<dim>::CellwiseError::CellwiseError (const unsigned int 
 
 
 template class TimeStep_ErrorEstimation<2>;
-/* $Id$ */
 
 
 #include <lac/vector.h>
@@ -6756,7 +6746,6 @@ void TimeStep<dim>::write_statistics (ostream &out) const
 
 
 template class TimeStep<2>;
-/* $Id$ */
 
 
 #include <lac/vector.h>
@@ -6991,7 +6980,6 @@ void TimeStep_Postprocess<dim>::StatisticData::write (ostream &out) const
 
 
 template class TimeStep_Postprocess<2>;
-/* $Id$ */
 
 #include <base/function.h>
 #include <lac/full_matrix.h>
@@ -7574,7 +7562,6 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 
 
 template class TimeStep_Primal<2>;
-/* $Id$ */
 
 #include <lac/vector.h>
 
@@ -7599,7 +7586,6 @@ void UserMatrix::precondition (Vector<double> &dst,
 };
 
 
-/* $Id$ */
 
 
 #include <fe/fe_q.h>
@@ -7728,7 +7714,6 @@ string int_to_string (const unsigned int i, const unsigned int digits) {
 template class FEHelper<2>;
 
 
-/* $Id$ */
 
 
 #include <base/logstream.h>
