@@ -40,8 +40,10 @@ my $version = $ARGV[0];
 my $file = "announce-$version";
 die "Announcement file $file does not exist" unless (-r $file);
 
-
 $test = 0 if ($ARGV[1] eq 'ok');
+
+open ANNOUNCEMENT, $file;
+my @announcement = <ANNOUNCEMENT>;
 
 print "=====Announcing version $version=====\n";
 
