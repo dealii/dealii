@@ -2039,10 +2039,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 
 
-// if in optimized mode: include more templates
-#ifndef DEBUG
+// include more templates in debug and optimized mode
 #  include "tria_accessor.templates.h"
-#endif
 
 
 #endif
