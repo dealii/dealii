@@ -277,7 +277,7 @@ class dFMatrix
     double matrix_scalar_product (const dVector &u, const dVector &v) const;
     
 				     /**
-				      * A=Inverse(A). Inversion of this by
+				      * A=Inverse(A). Inversion of (*this) by
 				      * Gauss-Jordan-algorithm
 				      */
     void gauss_jordan ();
@@ -381,11 +381,23 @@ class dFMatrix
 				      * After execution of householder, the upper
 				      *  triangle contains the resulting matrix R, <p>
 				      * the lower the incomplete factorization matrices.
+				      * 
+				      * #householder(src); backward(dst, src);# gives
+				      * the solution #dst# of the linear system
+				      * #(*this)dst=src#.
+				      *
+				      * Note that #src# and #(*this)# (i.e. the
+				      * matrix itself) is changed in
+				      * the process of the #householder(src)# function!!
 				      */
-    void householder (dVector& y);
+    void householder (dVector& src);
 
 				     /**
 				      * Least - Squares - Approximation by QR-factorization.
+				      *
+				      * Note that #src# and #(*this)# (i.e. the
+				      * matrix itself) is changed in
+				      * the process of this function!!
 				      */
     double least_squares (dVector& dst, dVector& src);
 
@@ -460,6 +472,10 @@ class dFMatrix
 				      * Exception
 				      */
     DeclException0 (ExcNotQuadratic);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotRegular);
 				     /**
 				      * Exception
 				      */

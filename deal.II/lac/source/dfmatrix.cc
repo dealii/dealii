@@ -1047,7 +1047,7 @@ void dFMatrix::clear () {
 
 void dFMatrix::invert (const dFMatrix &M) {
   Assert (dim_range == dim_image, ExcNotQuadratic());
-  Assert ((dim_range>=1) && (dim_range<=3), ExcNotImplemented(dim_range));
+  Assert ((dim_range>=1) && (dim_range<=4), ExcNotImplemented(dim_range));
   Assert (dim_range == M.dim_range,
           ExcDimensionMismatch(dim_range,M.dim_range));
   Assert (dim_image == M.dim_image,
@@ -1091,6 +1091,105 @@ void dFMatrix::invert (const dFMatrix &M) {
 	    el(2,2) = (t4-t8)*t07;
 	    return;
       };
+
+      case 4:
+      {
+					 // with (linalg);
+					 // a:=matrix(4,4);
+					 // evalm(a);
+					 // ai:=inverse(a);
+					 // readlib(C);
+					 // C(ai,optimized,filename=x4);
+
+	const double t14 = M.el(0,0)*M.el(1,1);
+	const double t15 = M.el(2,2)*M.el(3,3);
+	const double t17 = M.el(2,3)*M.el(3,2);
+	const double t19 = M.el(0,0)*M.el(2,1);
+	const double t20 = M.el(1,2)*M.el(3,3);
+	const double t22 = M.el(1,3)*M.el(3,2);
+	const double t24 = M.el(0,0)*M.el(3,1);
+	const double t25 = M.el(1,2)*M.el(2,3);
+	const double t27 = M.el(1,3)*M.el(2,2);
+	const double t29 = M.el(1,0)*M.el(0,1);
+	const double t32 = M.el(1,0)*M.el(2,1);
+	const double t33 = M.el(0,2)*M.el(3,3);
+	const double t35 = M.el(0,3)*M.el(3,2);
+	const double t37 = M.el(1,0)*M.el(3,1);
+	const double t38 = M.el(0,2)*M.el(2,3);
+	const double t40 = M.el(0,3)*M.el(2,2);
+	const double t42 = t14*t15-t14*t17-t19*t20+t19*t22+
+			   t24*t25-t24*t27-t29*t15+t29*t17+
+			   t32*t33-t32*t35-t37*t38+t37*t40;
+	const double t43 = M.el(2,0)*M.el(0,1);
+	const double t46 = M.el(2,0)*M.el(1,1);
+	const double t49 = M.el(2,0)*M.el(3,1);
+	const double t50 = M.el(0,2)*M.el(1,3);
+	const double t52 = M.el(0,3)*M.el(1,2);
+	const double t54 = M.el(3,0)*M.el(0,1);
+	const double t57 = M.el(3,0)*M.el(1,1);
+	const double t60 = M.el(3,0)*M.el(2,1);
+	const double t63 = t43*t20-t43*t22-t46*t33+t46*t35+
+			   t49*t50-t49*t52-t54*t25+t54*t27+
+			   t57*t38-t57*t40-t60*t50+t60*t52;
+	const double t65 = 1/(t42+t63);
+	const double t71 = M.el(0,2)*M.el(2,1);
+	const double t73 = M.el(0,3)*M.el(2,1);
+	const double t75 = M.el(0,2)*M.el(3,1);
+	const double t77 = M.el(0,3)*M.el(3,1);
+	const double t81 = M.el(0,1)*M.el(1,2);
+	const double t83 = M.el(0,1)*M.el(1,3);
+	const double t85 = M.el(0,2)*M.el(1,1);
+	const double t87 = M.el(0,3)*M.el(1,1);
+	const double t101 = M.el(1,0)*M.el(2,2);
+	const double t103 = M.el(1,0)*M.el(2,3);
+	const double t105 = M.el(2,0)*M.el(1,2);
+	const double t107 = M.el(2,0)*M.el(1,3);
+	const double t109 = M.el(3,0)*M.el(1,2);
+	const double t111 = M.el(3,0)*M.el(1,3);
+	const double t115 = M.el(0,0)*M.el(2,2);
+	const double t117 = M.el(0,0)*M.el(2,3);
+	const double t119 = M.el(2,0)*M.el(0,2);
+	const double t121 = M.el(2,0)*M.el(0,3);
+	const double t123 = M.el(3,0)*M.el(0,2);
+	const double t125 = M.el(3,0)*M.el(0,3);
+	const double t129 = M.el(0,0)*M.el(1,2);
+	const double t131 = M.el(0,0)*M.el(1,3);
+	const double t133 = M.el(1,0)*M.el(0,2);
+	const double t135 = M.el(1,0)*M.el(0,3);
+	el(0,0) = (M.el(1,1)*M.el(2,2)*M.el(3,3)-M.el(1,1)*M.el(2,3)*M.el(3,2)-
+		   M.el(2,1)*M.el(1,2)*M.el(3,3)+M.el(2,1)*M.el(1,3)*M.el(3,2)+
+		   M.el(3,1)*M.el(1,2)*M.el(2,3)-M.el(3,1)*M.el(1,3)*M.el(2,2))*t65;
+	el(0,1) = -(M.el(0,1)*M.el(2,2)*M.el(3,3)-M.el(0,1)*M.el(2,3)*M.el(3,2)-
+		    t71*M.el(3,3)+t73*M.el(3,2)+t75*M.el(2,3)-t77*M.el(2,2))*t65;
+	el(0,2) = (t81*M.el(3,3)-t83*M.el(3,2)-t85*M.el(3,3)+t87*M.el(3,2)+
+		   t75*M.el(1,3)-t77*M.el(1,2))*t65;
+	el(0,3) = -(t81*M.el(2,3)-t83*M.el(2,2)-t85*M.el(2,3)+t87*M.el(2,2)+
+		    t71*M.el(1,3)-t73*M.el(1,2))*t65;
+	el(1,0) = -(t101*M.el(3,3)-t103*M.el(3,2)-t105*M.el(3,3)+t107*M.el(3,2)+
+		    t109*M.el(2,3)-t111*M.el(2,2))*t65;
+	el(1,1) = (t115*M.el(3,3)-t117*M.el(3,2)-t119*M.el(3,3)+t121*M.el(3,2)+
+		   t123*M.el(2,3)-t125*M.el(2,2))*t65;
+	el(1,2) = -(t129*M.el(3,3)-t131*M.el(3,2)-t133*M.el(3,3)+t135*M.el(3,2)+
+		    t123*M.el(1,3)-t125*M.el(1,2))*t65;
+	el(1,3) = (t129*M.el(2,3)-t131*M.el(2,2)-t133*M.el(2,3)+t135*M.el(2,2)+
+		   t119*M.el(1,3)-t121*M.el(1,2))*t65;
+	el(2,0) = (t32*M.el(3,3)-t103*M.el(3,1)-t46*M.el(3,3)+t107*M.el(3,1)+
+		   t57*M.el(2,3)-t111*M.el(2,1))*t65;
+	el(2,1) = -(t19*M.el(3,3)-t117*M.el(3,1)-t43*M.el(3,3)+t121*M.el(3,1)+
+		    t54*M.el(2,3)-t125*M.el(2,1))*t65;
+	el(2,2) = (t14*M.el(3,3)-t131*M.el(3,1)-t29*M.el(3,3)+t135*M.el(3,1)+
+		   t54*M.el(1,3)-t125*M.el(1,1))*t65;
+	el(2,3) = -(t14*M.el(2,3)-t131*M.el(2,1)-t29*M.el(2,3)+t135*M.el(2,1)+
+		    t43*M.el(1,3)-t121*M.el(1,1))*t65;
+	el(3,0) = -(t32*M.el(3,2)-t101*M.el(3,1)-t46*M.el(3,2)+t105*M.el(3,1)+
+		    t57*M.el(2,2)-t109*M.el(2,1))*t65;
+	el(3,1) = (t19*M.el(3,2)-t115*M.el(3,1)-t43*M.el(3,2)+t119*M.el(3,1)+
+		   t54*M.el(2,2)-t123*M.el(2,1))*t65;
+	el(3,2) = -(t14*M.el(3,2)-t129*M.el(3,1)-t29*M.el(3,2)+t133*M.el(3,1)+
+		    t54*M.el(1,2)-t123*M.el(1,1))*t65;
+	el(3,3) = (t14*M.el(2,2)-t129*M.el(2,1)-t29*M.el(2,2)+t133*M.el(2,1)+
+		   t43*M.el(1,2)-t119*M.el(1,1))*t65;
+      }
     };    
 };
   
@@ -1115,3 +1214,120 @@ void dFMatrix::print_formatted (ostream &out, const unsigned int precision) cons
   
   out.setf (0, ios::floatfield);                 // reset output format
 };
+
+
+// Gauss-Jordan-Algorithmus
+// cf. Stoer I (4th Edition) p. 153
+
+void dFMatrix::gauss_jordan()
+{
+  Assert (dim_range == dim_image, ExcNotQuadratic());
+  iVector p(n());
+
+  unsigned int i,j,k,r;
+  double max, hr;
+
+  for (i=0; i<n(); ++i) p(i) = i;
+
+  for (j=0; j<n(); ++j)
+    {
+				       // pivotsearch
+      max = fabs(el(j,j));
+      r = j;
+      for (i=j+1; i<n(); ++i)
+	{
+	  if (fabs(el(i,j)) > max)
+	    {
+	      max = fabs(el(i,j));
+	      r = i;
+	    }
+	}
+      Assert(max>1.e-16, ExcNotRegular());
+				       // rowinterchange
+      if (r>j)
+	{
+	  for (k=0; k<n(); ++k)
+	    {
+	      hr = el(j,k) ; el(j,k) = el(r,k) ; el(r,k) = hr;
+	    }
+	  i = p(j) ; p(j) = p(r) ; p(r) = i;
+	}
+
+				       // transformation
+      hr = 1./el(j,j);
+      el(j,j) = hr;
+      for (k=0; k<n(); ++k)
+	{
+	  if (k==j) continue;
+	  for (i=0; i<n(); ++i)
+	    {
+	      if (i==j) continue;
+	      el(i,k) -= el(i,j)*el(j,k)*hr;
+	    }
+	}
+      for (i=0; i<n(); ++i)
+	{
+	  el(i,j) *= hr;
+	  el(j,i) *= -hr;
+	}
+      el(j,j) = hr;
+    }
+				   // columninterchange
+  dVector hv(n());
+  for (i=0; i<n(); ++i)
+    {
+      for (k=0; k<n(); ++k) hv(p(k)) = el(i,k);
+      for (k=0; k<n(); ++k) el(i,k) = hv(k);
+    }
+}
+
+// QR-transformation cf. Stoer 1 4.8.2 (p. 191)
+
+void dFMatrix::householder(dVector& src)
+{
+  // m > n, src.n() = m
+  Assert (dim_range <= dim_image, ExcDimensionMismatch(dim_range, dim_image));
+  Assert (src.size() == dim_range, ExcDimensionMismatch(src.size(), dim_range));
+
+  for (unsigned int j=0 ; j<n() ; ++j)
+  {
+    double sigma = 0;
+    unsigned int i;
+    for (i=j ; i<m() ; ++i) sigma += el(i,j)*el(i,j);
+    if (fabs(sigma) < 1.e-15) return;
+    double s = el(j,j);
+    s = (s<0) ? sqrt(sigma) : -sqrt(sigma);
+    double dj = s;
+
+    double beta = 1./(s*el(j,j)-sigma);
+    el(j,j) -= s;
+
+    for (unsigned int k=j+1 ; k<n() ; ++k)
+    {
+      double sum = 0.;
+      for (i=j ; i<m() ; ++i) sum += el(i,j)*el(i,k);
+      sum *= beta;
+
+      for (i=j ; i<m() ; ++i) el(i,k) += sum*el(i,j);
+    }
+
+    double sum = 0.;
+    for (i=j ; i<m() ; ++i) sum += el(i,j)*src(i);
+    sum *= beta;
+
+    for (i=j ; i<m() ; ++i) src(i) += sum*el(i,j);
+    el(j,j) = dj;
+  }
+}
+
+double dFMatrix::least_squares(dVector& dst, dVector& src)
+{
+  // m > n, m = src.n, n = dst.n
+
+  householder(src);
+  backward(dst, src);
+
+  double sum = 0.;
+  for (unsigned int i=n() ; i<m() ; ++i) sum += src(i) * src(i);
+  return sqrt(sum);
+}
