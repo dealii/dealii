@@ -90,7 +90,7 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
   Assert (matrix.n() == dof_handler->n_dofs(), ExcInvalidData());
   Assert (((AssemblerData<dim>*)local_data)->fe == dof_handler->get_selected_fe(),
 	  ExcInvalidData());
-  Assert (rhs_vector.size() == dof_handler->n_dofs(),
+  Assert (!assemble_rhs || (rhs_vector.size()==dof_handler->n_dofs()),
 	  ExcInvalidData());
 };
 
