@@ -674,7 +674,8 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 	  ExcComponentMismatch());
 
 				   // field to store the indices
-  std::vector<unsigned int> face_dofs (fe.dofs_per_face, -1);
+  std::vector<unsigned int> face_dofs (fe.dofs_per_face,
+				       DoFHandler<dim>::invalid_dof_index);
   std::vector<Point<dim> >  dof_locations (face_dofs.size(), Point<dim>());
   
 				   // array to store the values of
