@@ -729,12 +729,12 @@ class DataOut {
     };
 };
 
-				 /** 
-				  * Structure for the control of
-				  * eps_output. See general
-				  * documentation of class DataOut for
-				  * description.
-				  */
+
+
+/**
+ * Structure for the control of encapsulated postscript output. See
+ * general documentation of class #DataOut# for description.
+ */
 class EpsOutputData{
   public:
 				     /** 

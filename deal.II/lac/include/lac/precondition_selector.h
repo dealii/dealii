@@ -91,8 +91,8 @@ class PreconditionSelector
 				     /**
 				      * Takes the matrix that is needed
 				      * for preconditionings that involves a
-				      * matrix. e.g. for precondition_jacobi,
-				      * ~_sor, ~_ssor.
+				      * matrix. e.g. for #precondition_jacobi#,
+				      * #~_sor#, #~_ssor#.
 				      */
     void use_matrix(const Matrix &M);
 
