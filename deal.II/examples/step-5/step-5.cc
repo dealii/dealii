@@ -300,7 +300,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // as the preconditions CG method),
 				 // assembling the matrix and right
 				 // hand side can take a comparable
-				 // time, and you should thing about
+				 // time, and you should think about
 				 // using one or two optimizations at
 				 // some places.
 				 //
@@ -787,10 +787,9 @@ void LaplaceProblem<dim>::run ()
 				       // triangulation object when we
 				       // ask it to read the
 				       // file). Then we open the
-				       // respective file and fill the
-				       // triangulation with it
-				       // because you like to work
-				       // with it:
+				       // respective file and
+				       // initialize the triangulation
+				       // with the data in the file:
       if (cycle == 0)
 	{
 	  GridIn<dim> grid_in;
@@ -851,15 +850,19 @@ void LaplaceProblem<dim>::run ()
 					   // of the ``UCD''-file is
 					   // ``inp''), as supported
 					   // by AVS Explorer, for
-					   // example:
-	  
+					   // example:	  
 	  grid_in.read_ucd (input_file);
+                                           // If you like to use
+                                           // another input format,
+                                           // you have to use an other
+                                           // ``grid_in.read_xxx''
+                                           // function. (See the
+                                           // documentation of the
+                                           // ``GridIn'' class to find
+                                           // out what input formats
+                                           // are presently
+                                           // supported.)
 
-                                           // If you like to use other
-                                           // input format, you have
-                                           // to use an other
-                                           // grid_in.read_``blabla''
-                                           // funktion.
 					   // The grid in the file
 					   // describes a
 					   // circle. Therefore we

@@ -447,7 +447,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // the number of degrees of freedom
 				   // per cell before: the following
 				   // value will be set to 9 (in 2D
-				   // because of Q2S) now, where it was
+				   // because of the biquadratic
+				   // element used) now, where it was
 				   // 4 before.
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;

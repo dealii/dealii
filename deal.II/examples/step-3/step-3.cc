@@ -118,10 +118,9 @@ class LaplaceProblem
 				     // variables. There are variables
 				     // describing the triangulation
 				     // and the numbering of the
-				     // degrees of freedom...  The
-				     // FEQ<2> is the space which
-				     // has the following base
-				     // functions: {1,x,y,xy}
+				     // degrees of freedom...
+				     // (FEQ1<2> is the space with
+				     // shape functions {1,x,y,xy})
     Triangulation<2>     triangulation;
     FEQ1<2>              fe;
     DoFHandler<2>        dof_handler;
@@ -358,8 +357,8 @@ void LaplaceProblem::assemble_system ()
 				   // list them as well. The advantage
 				   // of this proceeding is that we
 				   // calculate only what we
-				   // need. This optimates the process
-				   // of solving:
+				   // need. This optimatizes the
+				   // process of solving:
   FEValues<2> fe_values (fe, quadrature_formula, 
 			 UpdateFlags(update_values    |
 				     update_gradients |
@@ -429,8 +428,9 @@ void LaplaceProblem::assemble_system ()
 				   // global matrix, we have to know
 				   // the global numbers of the
 				   // degrees of freedom. When we get
-				   // them, we need a scratch (temporal) array
-				   // for these numbers:
+				   // them, we need a scratch
+				   // (temporary) array for these
+				   // numbers:
   vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // Now for the loop over all
@@ -710,7 +710,7 @@ void LaplaceProblem::solve ()
 				   // PrimitiveVectorMemory class is
 				   // such a helper class which the
 				   // solver can ask for memory. The
-				   // angle brackets ``<>''indicate
+				   // angle brackets ``<>'' indicate
 				   // that this class really takes a
 				   // template parameter (here the
 				   // data type of the vectors we
