@@ -24,7 +24,6 @@
 
 
 
-
 template <int dim>
 class Ball :
   public StraightBoundary<dim> {
@@ -294,7 +293,12 @@ void test (const int test_case) {
   filename += ('0'+test_case);
   
   ofstream out(filename.c_str());
-  GridOut::write_gnuplot (tria, out);
+  GridOut grid_out;
+  GridOut::EpsFlags<3> eps_flags;
+  eps_flags.azimut_angle += 20;
+  eps_flags.turn_angle += 20;
+  grid_out.set_flags (eps_flags);
+  grid_out.write_eps (tria, out);
     
   cout << "     Total number of cells        = " << tria.n_cells() << endl
        << "     Total number of active cells = " << tria.n_active_cells() << endl;

@@ -18,7 +18,7 @@ int main (int argc, char **argv) {
 				   // no additional output to console
   deallog.depth_console (0);
 
-  PoissonProblem<2> poisson;
+  PoissonProblem<3> poisson;
   MultipleParameterLoop input_data;
 
   poisson.declare_parameters(input_data);
