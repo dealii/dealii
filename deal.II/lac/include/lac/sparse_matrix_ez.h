@@ -1587,7 +1587,7 @@ template <class MATRIXA, class MATRIXB>
 inline void
 SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 				       const MATRIXB& B,
-				       bool transpose)
+				       const bool transpose)
 {
 // Compute the result
 // r_ij = \sum_kl b_ik b_jl a_kl
