@@ -20,9 +20,16 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <iostream>
-
 #include <fstream>
+
+// we only need output streams, but older compilers did not provide
+// them in a separate include file
+#ifdef HAVE_STD_OSTREAM_HEADER
+#  include <ostream>
+#else
+#  include <iostream>
+#endif
+
 
 
 /**
