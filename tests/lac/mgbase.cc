@@ -15,9 +15,9 @@ class TransferTest
     virtual void prolongate(unsigned l,
 			    Vector<double>& dst,
 			    const Vector<double>& src) const;
-    virtual void restrict(unsigned l,
-			  Vector<double>& dst,
-			  const Vector<double>& src) const;
+    virtual void restrict_and_add (unsigned l,
+				   Vector<double>& dst,
+				   const Vector<double>& src) const;
     friend class MGBase;
 };
 
@@ -57,15 +57,15 @@ class MGTest
       {
 	for (unsigned int l = minlevel; l <= maxlevel; ++l)
 	  {
-	    d[l].reinit(1);
-	    s[l].reinit(1);
+	    defect[l].reinit(1);
+	    solution[l].reinit(1);
 	  }
       }
     
     virtual void level_vmult(unsigned level,
-				Vector<double>& dst,
-				const Vector<double>& src,
-				const Vector<double>& rhs);
+			     Vector<double>& dst,
+			     const Vector<double>& src,
+			     const Vector<double>& rhs);
     
     void doit()
       {
@@ -97,9 +97,9 @@ TransferTest::prolongate(unsigned l,
 }
 
 void
-TransferTest::restrict(unsigned l,
-		       Vector<double>&,
-		       const Vector<double>&) const
+TransferTest::restrict_and_add (unsigned l,
+				Vector<double>&,
+				const Vector<double>&) const
 {
   deallog << "Restricting  " << l << " to " << l-1 << endl;
 }
