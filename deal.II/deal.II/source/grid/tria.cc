@@ -26,7 +26,7 @@
 #include <numeric>
 #include <map>
 #include <cmath>
-
+#include <iostream>
 
 
 // initialize the @p{straight_boundary} pointer of the triangulation
@@ -8439,7 +8439,8 @@ template <int dim>
 void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 					   std::vector<bool>       &v,
 					   const unsigned int  magic_number2,
-					   std::istream            &in) {
+					   std::istream            &in)
+{
   AssertThrow (in, ExcIO());
 
   unsigned int magic_number;
