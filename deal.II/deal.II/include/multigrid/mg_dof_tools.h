@@ -185,6 +185,7 @@ class MGTools
 		     const std::vector<bool>& selected = std::vector<bool>(),
 		     const std::vector<unsigned int>& target_component
 		     = std::vector<unsigned int>());
+
 				     /**
 				      * Adjust vectors on all levels
 				      * to correct size.  Count the
@@ -207,7 +208,7 @@ class MGTools
 				      *
 				      * The argument
 				      * @p target_component allows to
-				      * re-sort and groupt components
+				      * re-sort and group components
 				      * as in
 				      * DoFRenumbering::component_wise.
 				      */
