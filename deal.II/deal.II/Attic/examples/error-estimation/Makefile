@@ -90,7 +90,7 @@ endif
 # make rule for the target
 $(target) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) $(flags) -o $@ $(libraries) -lg++ $(user-libs)
+	@$(CXX) $(flags) -o $@ $(libraries) $(user-libs)
 
 run: $(target)
 	$(run-action)
