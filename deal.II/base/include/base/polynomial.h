@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //----------------------------  polynomial.h  ---------------------------
-#ifndef __deal2__polynomial_H
-#define __deal2__polynomial_H
+#ifndef __deal2__polynomial_h
+#define __deal2__polynomial_h
 
 
 
