@@ -121,12 +121,13 @@ TODO:
 
 
 TAGS:
-	@cd $D/common ; etags $D/base/source/*.cc $D/base/include/*/*.h \
-	$D/lac/source/*.cc $D/lac/include/*/*.h \
-	$D/deal.II/source/*/*.cc $D/deal.II/include/*/*.h \
-	$D/tests/*/*.cc $D/tests/*/*.h \
-	$D/examples/*/*.cc
-
+	@cd $D/common ; etags $D/base/source/*.cc \
+	$D/lac/source/*.cc $D/deal.II/source/*/*.cc \
+	$D/tests/*/*.cc $D/examples/*/*.cc \
+	--language=none --regex='/.*/' \
+	$D/base/include/*/*.h $D/lac/include/*/*.h \
+	$D/deal.II/include/*/*.h $D/tests/*/*.h; \
+	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
 
 clean: common/scripts/make_dependencies \
