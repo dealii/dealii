@@ -844,10 +844,13 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
   InternalData *mdata=get_cell_data(cell, update_transformation_values);
   Assert(mdata!=0, ExcInternalError());
 
+  compute_shapes(std::vector<Point<dim> > (1, p), *mdata);
+
   return transform_unit_to_real_cell_internal(cell, p, *mdata);
 }
 
 
+// TODO:  remove obsolete arguments.
 template <int dim>
 Point<dim> MappingQ1<dim>::transform_unit_to_real_cell_internal (
   const typename Triangulation<dim>::cell_iterator cell,
