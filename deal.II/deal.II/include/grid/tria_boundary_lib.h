@@ -248,7 +248,21 @@ class HyperShellBoundary : public StraightBoundary<dim>
 				      */
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
-    
+
+				     /**
+				      * Compute the normals to the
+				      * boundary at the vertices of
+				      * the given face.
+				      *
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual void
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+
   private:
 				     /**
 				      * Store the center of the spheres.
@@ -290,6 +304,20 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 				      */
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+
+				     /**
+				      * Compute the normals to the
+				      * boundary at the vertices of
+				      * the given face.
+				      *
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual void
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
     
   private:
 				     /**

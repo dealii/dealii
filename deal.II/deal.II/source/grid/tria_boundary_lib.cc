@@ -469,6 +469,37 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
+
+#if deal_II_dimension == 1
+
+template <>
+void
+HyperShellBoundary<1>::
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 Boundary<1>::FaceVertexNormals &) const
+{
+  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+};
+
+#endif
+
+
+template <int dim>
+void
+HyperShellBoundary<dim>::
+get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
+{
+				   // this is equivalent to the case
+				   // in the hyperball boundary. note
+				   // that we need not normalize nor
+				   // direct the normal
+  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
+    face_vertex_normals[vertex] = face->vertex(vertex)-center;
+};
+
+
+
 /* ---------------------------------------------------------------------- */
 
 
@@ -537,6 +568,35 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 				   // inner part of the shell. proceed
 				   // as in the base class
   return HyperShellBoundary<dim>::get_new_point_on_quad (quad);
+};
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+HalfHyperShellBoundary<1>::
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 Boundary<1>::FaceVertexNormals &) const
+{
+  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+};
+
+#endif
+
+
+
+template <int dim>
+void
+HalfHyperShellBoundary<dim>::
+get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
+{
+  if (face->center()(0) == center(0))
+    StraightBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
+  else
+    HyperShellBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
 };
 
 
