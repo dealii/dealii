@@ -525,5 +525,123 @@ class JumpFunction : public Function<dim>
 
 
 
+/**
+ * Given a wavenumber vector generate a cosine function. The
+ * wavenumber coefficient is given as a @p{d}-dimensional point @p{k}
+ * in Fourier space, and the function is then recovered as @p{f(x) =
+ * \prod_i cos(k_i x_i) = Re(\exp(i k.x))}.
+ *
+ * The class has its name from the fact that it resembles one
+ * component of a Fourier cosine decomposition.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+template <int dim>
+class FourierCosineFunction : public Function<dim> 
+{
+  public:
+				     /**
+				      * Constructor. Take the Fourier
+				      * coefficients in each space
+				      * direction as argument.
+				      */
+    FourierCosineFunction (const Point<dim> &fourier_coefficients);
+    
+				     /**
+				      * Return the value of the
+				      * function at the given
+				      * point. Unless there is only
+				      * one component (i.e. the
+				      * function is scalar), you
+				      * should state the component you
+				      * want to have evaluated; it
+				      * defaults to zero, i.e. the
+				      * first component.
+				      */
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * Return the gradient of the
+				      * specified component of the
+				      * function at the given point.
+				      */
+    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+				      * Compute the Laplacian of a
+				      * given component at point @p{p}.
+				      */
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
+  private:
+				     /**
+				      * Stored Fourier coefficients.
+				      */
+    const Point<dim> fourier_coefficients;
+};
+
+
+
+/**
+ * Given a wavenumber vector generate a sine function. The
+ * wavenumber coefficient is given as a @p{d}-dimensional point @p{k}
+ * in Fourier space, and the function is then recovered as @p{f(x) =
+ * \prod_i sin(k_i x_i) = Im(\exp(i k.x))}.
+ *
+ * The class has its name from the fact that it resembles one
+ * component of a Fourier sine decomposition.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+template <int dim>
+class FourierSineFunction : public Function<dim> 
+{
+  public:
+				     /**
+				      * Constructor. Take the Fourier
+				      * coefficients in each space
+				      * direction as argument.
+				      */
+    FourierSineFunction (const Point<dim> &fourier_coefficients);
+    
+				     /**
+				      * Return the value of the
+				      * function at the given
+				      * point. Unless there is only
+				      * one component (i.e. the
+				      * function is scalar), you
+				      * should state the component you
+				      * want to have evaluated; it
+				      * defaults to zero, i.e. the
+				      * first component.
+				      */
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * Return the gradient of the
+				      * specified component of the
+				      * function at the given point.
+				      */
+    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+				      * Compute the Laplacian of a
+				      * given component at point @p{p}.
+				      */
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
+  private:
+				     /**
+				      * Stored Fourier coefficients.
+				      */
+    const Point<dim> fourier_coefficients;
+};
+
+
+
 
 #endif

@@ -1112,6 +1112,148 @@ JumpFunction<dim>::memory_consumption () const
 };
 
 
+
+
+
+/* ---------------------- FourierSineFunction ----------------------- */
+
+
+template <int dim>
+FourierCosineFunction<dim>::
+FourierCosineFunction (const Point<dim> &fourier_coefficients)
+		:
+		Function<dim> (1),
+                fourier_coefficients (fourier_coefficients)
+{};
+
+
+
+template <int dim>
+double
+FourierCosineFunction<dim>::value (const Point<dim>   &p,
+				   const unsigned int  component) const
+{
+  Assert (component==0, ExcIndexRange(component,0,1));
+  double val=1;
+  for (unsigned int i=0; i<dim; ++i)
+    val *= std::cos(fourier_coefficients[i] * p[i]);
+  return val;
+};
+
+
+
+template <int dim>
+Tensor<1,dim>
+FourierCosineFunction<dim>::gradient (const Point<dim>   &p,
+				      const unsigned int  component) const
+{
+  Assert (component==0, ExcIndexRange(component,0,1));
+  Tensor<1,dim> grad;
+  for (unsigned int i=0; i<dim; ++i)
+    grad[i] = 1;
+
+  for (unsigned int i=0; i<dim; ++i)
+    {
+      const double cos_i = std::cos(fourier_coefficients[i] * p[i]);
+      const double sin_i = std::sin(fourier_coefficients[i] * p[i]);
+      
+      for (unsigned int d=0; d<dim; ++d)
+	if (d==i)
+	  grad[d] *= - fourier_coefficients[i] * sin_i;
+	else
+	  grad[d] *= cos_i;
+    };
+  
+  return grad;
+};
+
+
+
+template <int dim>
+double
+FourierCosineFunction<dim>::laplacian (const Point<dim>   &p,
+				       const unsigned int  component) const
+{
+  Assert (component==0, ExcIndexRange(component,0,1));
+  double val = -(fourier_coefficients*fourier_coefficients);
+  for (unsigned int i=0; i<dim; ++i)
+    val *= std::cos(fourier_coefficients[i] * p[i]);
+  return val;
+};
+
+
+
+
+/* ---------------------- FourierSineFunction ----------------------- */
+
+
+
+template <int dim>
+FourierSineFunction<dim>::
+FourierSineFunction (const Point<dim> &fourier_coefficients)
+		:
+		Function<dim> (1),
+                fourier_coefficients (fourier_coefficients)
+{};
+
+
+
+template <int dim>
+double
+FourierSineFunction<dim>::value (const Point<dim>   &p,
+				 const unsigned int  component) const
+{
+  Assert (component==0, ExcIndexRange(component,0,1));
+  double val=1;
+  for (unsigned int i=0; i<dim; ++i)
+    val *= std::sin(fourier_coefficients[i] * p[i]);
+  return val;
+};
+
+
+
+template <int dim>
+Tensor<1,dim>
+FourierSineFunction<dim>::gradient (const Point<dim>   &p,
+				    const unsigned int  component) const
+{
+  Assert (component==0, ExcIndexRange(component,0,1));
+  Tensor<1,dim> grad;
+  for (unsigned int i=0; i<dim; ++i)
+    grad[i] = 1;
+
+  for (unsigned int i=0; i<dim; ++i)
+    {
+      const double cos_i = std::cos(fourier_coefficients[i] * p[i]);
+      const double sin_i = std::sin(fourier_coefficients[i] * p[i]);
+      
+      for (unsigned int d=0; d<dim; ++d)
+	if (d==i)
+	  grad[d] *= fourier_coefficients[i] * cos_i;
+	else
+	  grad[d] *= sin_i;
+    };
+  
+  return grad;
+};
+
+
+
+template <int dim>
+double
+FourierSineFunction<dim>::laplacian (const Point<dim>   &p,
+				     const unsigned int  component) const
+{
+  Assert (component==0, ExcIndexRange(component,0,1));
+  double val = -(fourier_coefficients*fourier_coefficients);
+  for (unsigned int i=0; i<dim; ++i)
+    val *= std::sin(fourier_coefficients[i] * p[i]);
+  return val;
+};
+
+
+
+
 template class SquareFunction<1>;
 template class SquareFunction<2>;
 template class SquareFunction<3>;
@@ -1130,3 +1272,10 @@ template class ExpFunction<3>;
 template class JumpFunction<1>;
 template class JumpFunction<2>;
 template class JumpFunction<3>;
+template class FourierCosineFunction<1>;
+template class FourierCosineFunction<2>;
+template class FourierCosineFunction<3>;
+template class FourierSineFunction<1>;
+template class FourierSineFunction<2>;
+template class FourierSineFunction<3>;
+
