@@ -7,8 +7,6 @@ when a new release shall be issued:
 
 2/ tell your friends to tag their programs
 
-3/ change the content of the `Version' file on both HEAD and branch
-
 10/ cvs tag all files with Version-x-y-z
 
 11/ tell your friends to tag their programs
