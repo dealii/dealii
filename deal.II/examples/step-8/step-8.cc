@@ -303,7 +303,7 @@ ElasticProblem<dim>::ElasticProblem () :
 						 // vector-valued
 						 // finite element as
 						 // outer product of
-						 // several scala
+						 // several scald
 						 // finite
 						 // elements. Of
 						 // course, the number
@@ -373,7 +373,7 @@ ElasticProblem<dim>::~ElasticProblem ()
 				 // do not do so, since they only take
 				 // care how many degrees of freedom
 				 // there are per vertex, line and
-				 // cell, and they do not askwhat they
+				 // cell, and they do not ask what they
 				 // represent, i.e. whether the finite
 				 // element under consideration is
 				 // vector-valued or whether it is,
@@ -545,7 +545,7 @@ void ElasticProblem<dim>::assemble_system ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
 					   // One of the few comments
-					   // in place is how we acces
+					   // in place is how we access
 					   // the function ``comp(i)''
 					   // used in the
 					   // introduction. This is
@@ -594,7 +594,7 @@ void ElasticProblem<dim>::assemble_system ()
 						     // ``shape_grads[i][q_point]''
 						     // returns the
 						     // gradient of
-						     // the ith shape
+						     // the i-th shape
 						     // function at
 						     // quadrature
 						     // point
@@ -603,7 +603,7 @@ void ElasticProblem<dim>::assemble_system ()
 						     // ``comp(i)'',
 						     // which is the
 						     // derivative of
-						     // the ith shape
+						     // the i-th shape
 						     // function with
 						     // respect to the
 						     // comp(i)th

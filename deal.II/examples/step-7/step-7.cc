@@ -119,7 +119,7 @@ class SolutionBase
 				 // declared, now we still need to
 				 // assign values to them. Here, we
 				 // can show another small piece of
-				 // template sourcery, namely how we
+				 // template sorcery, namely how we
 				 // can assign different values to
 				 // these variables depending on the
 				 // dimension. We will only use the 2d
@@ -129,7 +129,7 @@ class SolutionBase
 				 //
 				 // First we assign values to the
 				 // centers for the 1d case, where we
-				 // place the centers equidistanly at
+				 // place the centers equidistantly at
 				 // -1/3, 0, and 1/3:
 template <>
 const Point<1>
@@ -237,7 +237,7 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
 				   // dimension ``dim''. Its default
 				   // constructor sets it to the
 				   // vector containing only zeroes,
-				   // so we need not explicitely care
+				   // so we need not explicitly care
 				   // for its initialization.
   Tensor<1,dim> return_value;
 				   // Note that we could as well have
@@ -250,7 +250,7 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
 				   // ``Point<dim>'' class is derived
 				   // from the ``Tensor<1,dim>''
 				   // class, which makes up for their
-				   // mutual exchangeability.
+				   // mutual exchange ability.
 
   for (unsigned int i=0; i<n_source_centers; ++i)
     {
@@ -523,9 +523,9 @@ class LaplaceProblem
 				     // be done by overloading the
 				     // several dereferencing
 				     // operators of that
-				     // class. Withing the
+				     // class. Within the
 				     // constructors, destructors, and
-				     // assignement operators of that
+				     // assignment operators of that
 				     // class, we can however also
 				     // manage increasing or
 				     // decreasing the use counters of
@@ -600,7 +600,7 @@ class LaplaceProblem
 				     // to collect all this data and
 				     // to output it at the end of the
 				     // run as a table in a simple
-				     // text format or in tex
+				     // text format or in Tex
 				     // format. Here we don't only use
 				     // the ``TableHandler'' but we
 				     // use the derived class
@@ -673,7 +673,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // example program.
 
 				   // The rest of the function is
-				   // almost identitcally taken over
+				   // almost identically taken over
 				   // from previous examples:
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -735,7 +735,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // the face integral quadrature
 				   // requires the measure of the face
 				   // in a lower-dimensional
-				   // mannifold. Internally these two
+				   // manifold. Internally these two
 				   // classes are rooted on a common
 				   // base class which does most of
 				   // the work; that, however, is
@@ -894,7 +894,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // no need to do so), so faces
 				       // can only have an indicator
 				       // equal to ``1'' if we have
-				       // explicitely set it.
+				       // explicitly set it.
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	if (cell->face(face)->boundary_indicator() == 1)
 	  {
@@ -1119,7 +1119,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				   // error on each cell. Since
 				   // accuracy with 16 digits is not
 				   // so important for these
-				   // quantities, we sace some memory
+				   // quantities, we save some memory
 				   // by using ``float'' instead of
 				   // ``double'' values.
   Vector<float> difference_per_cell (triangulation.n_active_cells());
@@ -1289,7 +1289,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				 // grids, and in this loop first
 				 // problem setup, assemblage of the
 				 // linear system, solution, and
-				 // postprocessing.
+				 // post-processing.
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
@@ -1502,7 +1502,7 @@ void LaplaceProblem<dim>::run ()
 				   // information available in the
 				   // quadratic approximation. We can,
 				   // for example, write each cell as
-				   // four subcells with bilinear data
+				   // four sub-cells with bilinear data
 				   // each, such that we have nine
 				   // data points for each cell in the
 				   // triangulation. The graphic
@@ -1513,20 +1513,20 @@ void LaplaceProblem<dim>::run ()
 				   // information we have.
 				   //
 				   // In order to allow writing more
-				   // than one subcell per actual
+				   // than one sub-cell per actual
 				   // cell, the ``build_patches''
 				   // function accepts a parameter
 				   // (the default is ``1'', which is
 				   // why you haven't seen this
 				   // parameter in previous
 				   // examples). This parameter
-				   // denotes into how many subcells
+				   // denotes into how many sub-cells
 				   // per space direction each cell
 				   // shall be subdivided for
 				   // output. For example, if you give
 				   // ``2'', this leads to 4 cells in
 				   // 2D and 8 cells in 3D. For
-				   // quadratic elements, two subcells
+				   // quadratic elements, two sub-cells
 				   // per space direction is obviously
 				   // the right choice, so this is
 				   // what we choose:
@@ -1555,7 +1555,7 @@ void LaplaceProblem<dim>::run ()
 				   // the specific columns.
   convergence_table.write_text(cout);
 				   // The table can also be written
-				   // into a tex file.  The (nicely)
+				   // into a Tex file.  The (nicely)
 				   // formatted table can be viewed at
 				   // after calling `latex filename'
 				   // and e.g. `xdvi filename', where
@@ -1705,7 +1705,7 @@ int main ()
 				       // Now for the three calls to
 				       // the main class. Each call is
 				       // blocked into curly braces in
-				       // order to detroy the
+				       // order to destroy the
 				       // respective objects (i.e. the
 				       // finite element and the
 				       // LaplaceProblem object) at
