@@ -220,6 +220,32 @@ class Tensor<1,dim>
 				      */
     Tensor<1,dim>   operator - () const;
     
+                                     /**
+                                      * Return the Frobenius-norm of a
+                                      * tensor, i.e. the square root
+                                      * of the sum of squares of all
+                                      * entries. For the present case
+                                      * of rank-1 tensors, this equals
+                                      * the usual
+                                      * <tt>l<sub>2</sub></tt> norm of
+                                      * the vector.
+                                      */
+    double norm () const;
+
+                                     /**
+                                      * Return the square of the
+                                      * Frobenius-norm of a tensor,
+                                      * i.e. the square root of the
+                                      * sum of squares of all entries.
+				      *
+				      * This function mainly exists
+				      * because it makes computing the
+				      * norm simpler recursively, but
+				      * may also be useful in other
+				      * contexts.
+                                      */
+    double norm_square () const;
+
 				     /**
 				      * Reset all values to zero.
 				      *
@@ -633,6 +659,28 @@ Tensor<1,dim> Tensor<1,dim>::operator - () const
   for (unsigned int i=0; i<dim; ++i)
     result.values[i] = -values[i];
   return result;
+}
+
+
+
+template <int dim>
+inline
+double Tensor<1,dim>::norm () const
+{
+  return std::sqrt (norm_square());
+}
+
+
+
+template <int dim>
+inline
+double Tensor<1,dim>::norm_square () const
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    s += values[i] * values[i];
+
+  return s;
 }
 
 

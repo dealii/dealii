@@ -157,6 +157,27 @@ class Tensor
 				      * entries of a tensor.
 				      */
     Tensor<rank_,dim>   operator - () const;
+
+                                     /**
+                                      * Return the Frobenius-norm of a tensor,
+                                      * i.e. the square root of the sum of
+                                      * squares of all entries.
+                                      */
+    double norm () const;
+
+                                     /**
+                                      * Return the square of the
+                                      * Frobenius-norm of a tensor,
+                                      * i.e. the square root of the
+                                      * sum of squares of all entries.
+				      *
+				      * This function mainly exists
+				      * because it makes computing the
+				      * norm simpler recursively, but
+				      * may also be useful in other
+				      * contexts.
+                                      */
+    double norm_square () const;
     
 				     /**
 				      * Fill a vector with all tensor elements.
@@ -167,7 +188,7 @@ class Tensor
 				      * usual in C++, the rightmost
 				      * index of the tensor marches fastest.
 				      */
-    void unroll(Vector<double> & result) const;
+    void unroll (Vector<double> & result) const;
 
 
 				     /**
@@ -392,6 +413,29 @@ Tensor<rank_,dim>::operator - () const
 
   return tmp;
 }
+
+
+
+template <int rank_, int dim>
+inline
+double Tensor<rank_,dim>::norm () const
+{
+  return std::sqrt (norm_square());
+}
+
+
+
+template <int rank_, int dim>
+inline
+double Tensor<rank_,dim>::norm_square () const
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    s += subtensor[i].norm_square();
+
+  return s;
+}
+
 
 
 template <int rank_, int dim>
