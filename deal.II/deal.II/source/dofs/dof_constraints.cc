@@ -98,7 +98,14 @@ void ConstraintMatrix::close () {
 				   endl = lines.end();
   for (; line!=endl; ++line)
     {
-				       // first remove zero entries
+				       // first remove zero
+				       // entries. that would mean
+				       // that in the linear
+				       // constraint for a node,
+				       // x_i = ax_1 + bx_2 + ...,
+				       // another node times 0
+				       // appears. obviously,
+				       // 0*something can be omitted
       line->entries.erase (remove_if (line->entries.begin(),
 				      line->entries.end(),
 				      compose1 (bind2nd (equal_to<double>(), 0),
@@ -111,6 +118,31 @@ void ConstraintMatrix::close () {
   
 				   // sort the lines
   sort (lines.begin(), lines.end());
+
+#ifdef DEBUG
+				   // if in debug mode: check that no
+				   // dof is constraint to another dof
+				   // that is also constrained
+  for (vector<ConstraintLine>::const_iterator line=lines.begin();
+       line!=lines.end(); ++line)
+    for (vector<pair<unsigned int,double> >::const_iterator entry=line->entries.begin();
+	 entry!=line->entries.end(); ++entry)
+      {
+					 // make sure that
+					 // entry->first is not the
+					 // index of a line itself
+	const ConstraintLine test_line = { entry->first,
+					   vector<pair<unsigned int,double> >() };
+	const vector<ConstraintLine>::const_iterator
+	  test_line_position = lower_bound (lines.begin(),
+					    lines.end(),
+					    test_line);
+	Assert ((test_line_position == lines.end())
+		||
+		(test_line_position->line != entry->first),
+		ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
+      };
+#endif
   
   sorted = true;
 };

@@ -332,6 +332,14 @@ class ConstraintMatrix : public Subscriptor
 		    << "The entry for the indices " << arg1 << " and "
 		    << arg2 << " already exists, but the values "
 		    << arg3 << " (old) and " << arg4 << " (new) differ.");
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcDoFConstrainedToConstrainedDoF,
+		    int, int,
+		    << "You tried to constrain DoF " << arg1
+		    << " to DoF " << arg2
+		    << ", but that one is also constrained. This is not allowed!");
     
   private:
 
@@ -339,7 +347,8 @@ class ConstraintMatrix : public Subscriptor
 				      * This class represents one line of a
 				      * constraint matrix.
 				      */
-    struct ConstraintLine {
+    struct ConstraintLine
+    {
 					 /**
 					  * Number of this line. Since only very
 					  * few lines are stored, we can not
