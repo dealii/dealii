@@ -24,7 +24,7 @@ FEQ1Mapping<1>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const vector<bool> restriction_is_additive_flags) :
+			     const vector<bool> &restriction_is_additive_flags) :
 		FiniteElement<1> (FiniteElementData<1> (dofs_per_vertex,
 							dofs_per_line,
 							GeometryInfo<1>::vertices_per_cell,
@@ -147,7 +147,7 @@ FEQ1Mapping<2>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const vector<bool> restriction_is_additive_flags) :
+			     const vector<bool> &restriction_is_additive_flags) :
 		FiniteElement<2> (FiniteElementData<2> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
@@ -321,7 +321,7 @@ FEQ1Mapping<3>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const vector<bool> restriction_is_additive_flags) :
+			     const vector<bool> &restriction_is_additive_flags) :
 		FiniteElement<3> (FiniteElementData<3> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,

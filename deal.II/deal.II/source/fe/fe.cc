@@ -253,7 +253,7 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 
 template <int dim>
 FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data,
-				   const vector<bool> restriction_is_additive_flags) :
+				   const vector<bool> &restriction_is_additive_flags) :
 		FiniteElementBase<dim> (fe_data,
 					restriction_is_additive_flags) {};
 

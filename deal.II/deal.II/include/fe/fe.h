@@ -278,7 +278,8 @@ class FiniteElementBase : public Subscriptor,
 				      * component and second index in
 				      * component.
 				      */
-    pair<unsigned int,unsigned int> face_system_to_component_index (unsigned int index) const; 
+    pair<unsigned int,unsigned int> face_system_to_component_index (unsigned int index) const;
+    
  				     /**
 				      * The base element establishing a
 				      * component.
@@ -915,7 +916,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Constructor
 				      */
     FiniteElement (const FiniteElementData<dim> &fe_data,
-		   const vector<bool> restriction_is_additive_flags);
+		   const vector<bool> &restriction_is_additive_flags);
 
 				     /**
 				      * Destructor. Only declared to have a
