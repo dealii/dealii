@@ -84,7 +84,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
   FEFaceValues<dim> fe_face_values_cell (fe, quadrature,
 					 UpdateFlags(update_gradients      |
 						     update_JxW_values     |
-						     (neumann_bc.empty() ?
+						     ((neumann_bc.empty() ||
+						       (coefficient != 0))  ?
 						      0 : update_q_points) |
 						     update_normal_vectors)); 
   FEFaceValues<dim> fe_face_values_neighbor (fe, quadrature, update_gradients);
