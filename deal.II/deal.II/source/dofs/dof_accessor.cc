@@ -658,10 +658,28 @@ DoFCellAccessor<1>::face (const unsigned int) const {
 
 
 
-template <>
+/* this function looks like a template, but actually isn't one, it
+   will only work for the dimension selected by the preprocessor
+   guard above.
+   
+   the correct thing to do would be
+
+   template <>
+   template <typename number>
+   void
+   DoFCellAccessor<1>::get... (vector<number>...)
+
+   but this does not work, at least not at present using egcs1.1.1. we therefore
+   separate the different implementations for the different dimensions using
+   the preprocecssor and double check using an assertion in the function body.
+*/
+template <int dim>
+template <typename number>
 void
-DoFCellAccessor<1>::get_dof_values (const Vector<double> &values,
-				    Vector<double>       &local_values) const {
+DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
+				      Vector<number>       &local_values) const {
+  Assert (dim==1, ::ExcInternalError());
+  
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -672,20 +690,41 @@ DoFCellAccessor<1>::get_dof_values (const Vector<double> &values,
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  vector<double>::iterator next_local_value=local_values.begin();
+  typename vector<number>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_local_value++ = values(vertex_dof_index(vertex,d));
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next_local_value++ = values(dof_index(d));
+
+  Assert (next_local_value == local_values.end(),
+	  ::ExcInternalError());
 };
 
 
 
-template <>
+/* this function looks like a template, but actually isn't one, it
+   will only work for the dimension selected by the preprocessor
+   guard above.
+   
+   the correct thing to do would be
+
+   template <>
+   template <typename number>
+   void
+   DoFCellAccessor<1>::get... (vector<number>...)
+
+   but this does not work, at least not at present using egcs1.1.1. we therefore
+   separate the different implementations for the different dimensions using
+   the preprocecssor and double check using an assertion in the function body.
+*/
+template <int dim>
+template <typename number>
 void
-DoFCellAccessor<1>::set_dof_values (const Vector<double> &local_values,
-				    Vector<double>       &values) const {
+DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
+				      Vector<number>       &values) const {
+  Assert (dim==1, ::ExcInternalError());
+  
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -696,12 +735,15 @@ DoFCellAccessor<1>::set_dof_values (const Vector<double> &local_values,
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  vector<double>::const_iterator next_local_value=local_values.begin();
+  typename vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
        values(vertex_dof_index(vertex,d)) = *next_local_value++;
   for (unsigned int d=0; d<dofs_per_line; ++d)
     values(dof_index(d)) = *next_local_value++;
+
+  Assert (next_local_value == local_values.end(),
+	  ::ExcInternalError());
 };
 
 
@@ -720,10 +762,28 @@ DoFCellAccessor<2>::face (const unsigned int i) const {
 
 
 
-template <>
+/* this function looks like a template, but actually isn't one, it
+   will only work for the dimension selected by the preprocessor
+   guard above.
+   
+   the correct thing to do would be
+
+   template <>
+   template <typename number>
+   void
+   DoFCellAccessor<1>::get... (vector<number>...)
+
+   but this does not work, at least not at present using egcs1.1.1. we therefore
+   separate the different implementations for the different dimensions using
+   the preprocecssor and double check using an assertion in the function body.
+*/
+template <int dim>
+template <typename number>
 void
-DoFCellAccessor<2>::get_dof_values (const Vector<double> &values,
-				    Vector<double>       &local_values) const {
+DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
+				    Vector<number>       &local_values) const {
+  Assert (dim==2, ::ExcInternalError());
+  
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -735,7 +795,7 @@ DoFCellAccessor<2>::get_dof_values (const Vector<double> &values,
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  vector<double>::iterator next_local_value=local_values.begin();
+  typename vector<number>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_local_value++ = values(vertex_dof_index(vertex,d));
@@ -744,14 +804,35 @@ DoFCellAccessor<2>::get_dof_values (const Vector<double> &values,
       *next_local_value++ = values(this->line(line)->dof_index(d));
   for (unsigned int d=0; d<dofs_per_quad; ++d)
     *next_local_value++ = values(dof_index(d));
+
+  Assert (next_local_value == local_values.end(),
+	  ::ExcInternalError());
 };
 
 
 
-template <>
+/* this function looks like a template, but actually isn't one, it
+   will only work for the dimension selected by the preprocessor
+   guard above.
+   
+   the correct thing to do would be
+
+   template <>
+   template <typename number>
+   void
+   DoFCellAccessor<1>::get... (vector<number>...)
+
+   but this does not work, at least not at present using egcs1.1.1. we therefore
+   separate the different implementations for the different dimensions using
+   the preprocecssor and double check using an assertion in the function body.
+*/
+template <int dim>
+template <typename number>
 void
-DoFCellAccessor<2>::set_dof_values (const Vector<double> &local_values,
-				    Vector<double>       &values) const {
+DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
+				      Vector<number>       &values) const {
+  Assert (dim==2, ::ExcInternalError());
+  
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -763,7 +844,7 @@ DoFCellAccessor<2>::set_dof_values (const Vector<double> &local_values,
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  vector<double>::const_iterator next_local_value=local_values.begin();
+  typename vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       values(vertex_dof_index(vertex,d)) = *next_local_value++;
@@ -772,8 +853,10 @@ DoFCellAccessor<2>::set_dof_values (const Vector<double> &local_values,
       values(this->line(line)->dof_index(d)) = *next_local_value++;
   for (unsigned int d=0; d<dofs_per_quad; ++d)
     values(dof_index(d)) = *next_local_value++;
-};
 
+  Assert (next_local_value == local_values.end(),
+	  ::ExcInternalError());
+};
 
 
 #endif
@@ -790,10 +873,28 @@ DoFCellAccessor<3>::face (const unsigned int i) const {
 
 
 
-template <>
+/* this function looks like a template, but actually isn't one, it
+   will only work for the dimension selected by the preprocessor
+   guard above.
+   
+   the correct thing to do would be
+
+   template <>
+   template <typename number>
+   void
+   DoFCellAccessor<1>::get... (vector<number>...)
+
+   but this does not work, at least not at present using egcs1.1.1. we therefore
+   separate the different implementations for the different dimensions using
+   the preprocecssor and double check using an assertion in the function body.
+*/
+template <int dim>
+template <typename number>
 void
-DoFCellAccessor<3>::get_dof_values (const Vector<double> &values,
-				    Vector<double>       &local_values) const {
+DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
+				      Vector<number>       &local_values) const {
+  Assert (dim==3, ::ExcInternalError());
+
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -806,26 +907,47 @@ DoFCellAccessor<3>::get_dof_values (const Vector<double> &values,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  vector<double>::iterator next_local_value=local_values.begin();
-  for (unsigned int vertex=0; vertex<8; ++vertex)
+  typename vector<number>::iterator next_local_value = local_values.begin();
+  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_local_value++ = values(vertex_dof_index(vertex,d));
-  for (unsigned int line=0; line<12; ++line)
+  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next_local_value++ = values(this->line(line)->dof_index(d));
-  for (unsigned int quad=0; quad<6; ++quad)
+  for (unsigned int quad=0; quad<GeometryInfo<dim>::quads_per_cell; ++quad)
     for (unsigned int d=0; d<dofs_per_quad; ++d)
       *next_local_value++ = values(this->quad(quad)->dof_index(d));
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next_local_value++ = values(dof_index(d));
+
+  Assert (next_local_value == local_values.end(),
+	  ::ExcInternalError());
 };
 
 
 
-template <>
+/* this function looks like a template, but actually isn't one, it
+   will only work for the dimension selected by the preprocessor
+   guard above.
+   
+   the correct thing to do would be
+
+   template <>
+   template <typename number>
+   void
+   DoFCellAccessor<1>::get... (vector<number>...)
+
+   but this does not work, at least not at present using egcs1.1.1. we therefore
+   separate the different implementations for the different dimensions using
+   the preprocecssor and double check using an assertion in the function body.
+*/
+template <int dim>
+template <typename number>
 void
-DoFCellAccessor<3>::set_dof_values (const Vector<double> &local_values,
-				    Vector<double>       &values) const {
+DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
+				      Vector<number>       &values) const {
+  Assert (dim==3, ::ExcInternalError());
+
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -838,18 +960,21 @@ DoFCellAccessor<3>::set_dof_values (const Vector<double> &local_values,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
-  vector<double>::const_iterator next_local_value=local_values.begin();
-  for (unsigned int vertex=0; vertex<8; ++vertex)
+  typename vector<number>::const_iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       values(vertex_dof_index(vertex,d)) = *next_local_value++;
-  for (unsigned int line=0; line<12; ++line)
+  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       values(this->line(line)->dof_index(d)) = *next_local_value++;
-  for (unsigned int quad=0; quad<6; ++quad)
+  for (unsigned int quad=0; quad<GeometryInfo<dim>::quads_per_cell; ++quad)
     for (unsigned int d=0; d<dofs_per_quad; ++d)
       values(this->quad(quad)->dof_index(d)) = *next_local_value++;
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     values(dof_index(d)) = *next_local_value++;
+
+  Assert (next_local_value == local_values.end(),
+	  ::ExcInternalError());
 };
 
 
@@ -860,9 +985,10 @@ DoFCellAccessor<3>::set_dof_values (const Vector<double> &local_values,
 
 
 template <int dim>
+template <typename number>
 void
-DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<double> &values,
-						   Vector<double>       &interpolated_values) const {
+DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
+						   Vector<number>       &interpolated_values) const {
   const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
   
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -879,8 +1005,8 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<double> &values,
   else
 				     // otherwise clobber them from the children
     {
-      Vector<double> tmp1(total_dofs);
-      Vector<double> tmp2(total_dofs);
+      Vector<number> tmp1(total_dofs);
+      Vector<number> tmp2(total_dofs);
       
       interpolated_values.clear ();
 
@@ -891,7 +1017,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<double> &values,
 					   // child, if necessary by
 					   // interpolation itself
 	  this->child(child)->get_interpolated_dof_values (values,
-						     tmp1);
+							   tmp1);
 					   // interpolate these to the mother
 					   // cell
 	  dof_handler->get_fe().restrict(child).vmult (tmp2, tmp1);
@@ -913,9 +1039,10 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<double> &values,
 
 
 template <int dim>
+template <typename number>
 void
-DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<double> &local_values,
-						       Vector<double>       &values) const {
+DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &local_values,
+						       Vector<number>       &values) const {
   const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
   
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -932,7 +1059,7 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<double> &loc
   else
 				     // otherwise distribute them to the children
     {
-      Vector<double> tmp(total_dofs);
+      Vector<number> tmp(total_dofs);
       
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
 	   ++child)
@@ -952,6 +1079,45 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<double> &loc
 
 
 // explicit instantiations
+
+
+// for double
+template
+void
+DoFCellAccessor<deal_II_dimension>::get_dof_values (const Vector<double> &,
+						    Vector<double>       &) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::get_interpolated_dof_values (const Vector<double> &,
+								 Vector<double>       &) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::set_dof_values (const Vector<double> &,
+						    Vector<double>       &) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::set_dof_values_by_interpolation(const Vector<double> &,
+								    Vector<double>       &) const;
+// for float
+template
+void
+DoFCellAccessor<deal_II_dimension>::get_dof_values (const Vector<float> &,
+						    Vector<float>       &) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::get_interpolated_dof_values (const Vector<float> &,
+								 Vector<float>       &) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::set_dof_values (const Vector<float> &,
+						    Vector<float>       &) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::set_dof_values_by_interpolation(const Vector<float> &,
+								    Vector<float>       &) const;
+
+
+
 #if deal_II_dimension == 1
 template class DoFLineAccessor<1,CellAccessor<1> >;
 template class DoFCellAccessor<1>;

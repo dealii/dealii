@@ -355,7 +355,7 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      */
     TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
     line (const unsigned int i) const;
-
+    
 				     /**
 				      * Return the #i#th child as a DoF quad
 				      * iterator. This function is needed since
@@ -759,8 +759,9 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * function is only callable for active
 				      * cells.
 				      */
-    void get_dof_values (const Vector<double> &values,
-			 Vector<double>       &local_values) const;
+    template <typename number>
+    void get_dof_values (const Vector<number> &values,
+			 Vector<number>       &local_values) const;
 
 				     /**
 				      * Return the interpolation of the given
@@ -801,8 +802,13 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * what the this function does in these
 				      * cases.
 				      */
-    void get_interpolated_dof_values (const Vector<double> &values,
-				      Vector<double>       &interpolated_values) const;
+    template <typename number>
+    void get_interpolated_dof_values (const Vector<number> &values,
+				      Vector<number>       &interpolated_values) const;
+//     void get_interpolated_dof_values (const Vector<double> &values,
+// 				      Vector<double>       &interpolated_values) const;
+//     void get_interpolated_dof_values (const Vector<float> &values,
+// 				      Vector<float>       &interpolated_values) const;
 
 				     /**
 				      * This function is the counterpart to
@@ -825,9 +831,10 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      *
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
-				      */				       
-    void set_dof_values (const Vector<double> &local_values,
-			 Vector<double>       &values) const;
+				      */
+    template <typename number>
+    void set_dof_values (const Vector<number> &local_values,
+			 Vector<number>       &values) const;
 
 				     /**
 				      * This, again, is the counterpart to
@@ -882,8 +889,9 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * the prolongation matrices represent in
 				      * this case.
 				      */
-    void set_dof_values_by_interpolation (const Vector<double> &local_values,
-					  Vector<double>       &values) const;
+    template <typename number>
+    void set_dof_values_by_interpolation (const Vector<number> &local_values,
+					  Vector<number>       &values) const;
     
     				     /**
 				      *  Exception
