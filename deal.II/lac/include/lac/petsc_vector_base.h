@@ -820,12 +820,12 @@ namespace PETScWrappers
                                        // read access..
       PetscScalar *ptr;
       int ierr
-        = VecGetArray (vector, &ptr);
+        = VecGetArray (static_cast<const Vec &>(vector), &ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       const PetscScalar value = *(ptr+index);
 
-      ierr = VecRestoreArray (vector, &ptr);
+      ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       
       return value;
