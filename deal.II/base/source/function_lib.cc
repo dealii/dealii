@@ -319,7 +319,7 @@ CosineFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 	  case 2:
 		gradients[i][0] = -M_PI_2* sin(M_PI_2*p(0)) * cos(M_PI_2*p(1));
 		gradients[i][1] = -M_PI_2* cos(M_PI_2*p(0)) * sin(M_PI_2*p(1));
-		return;
+		break;
 	  case 3:
 		gradients[i][0] = -M_PI_2* sin(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
 		gradients[i][1] = -M_PI_2* cos(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * cos(M_PI_2*p(2));

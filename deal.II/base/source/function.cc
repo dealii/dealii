@@ -123,17 +123,69 @@ void Function<dim>::vector_gradient_list (const vector<Point<dim> >       &point
       for (unsigned int component=0; component<n_components; ++component)
 	gradients[i][component] = gradient(points[i], component);
     };
-};
+}
 
+
+
+template <int dim>
+double Function<dim>::laplacian (const Point<dim> &,
+			     const unsigned int) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return 0;
+}
+
+
+template <int dim>
+void Function<dim>::vector_laplacian (const Point<dim> &,
+				  Vector<double>   &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+}
+
+
+
+template <int dim>
+void Function<dim>::laplacian_list (const vector<Point<dim> > &points,
+				vector<double>            &laplacians,
+				const unsigned int         component) const
+{
+				   // check whether component is in
+				   // the valid range is up to the
+				   // derived class
+  Assert (laplacians.size() == points.size(),
+	  ExcDimensionMismatch(laplacians.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    laplacians[i]  = this->laplacian (points[i], component);
+}
+
+
+template <int dim>
+void Function<dim>::vector_laplacian_list (const vector<Point<dim> > &points,
+				       vector<Vector<double> >   &laplacians) const
+{
+				   // check whether component is in
+				   // the valid range is up to the
+				   // derived class
+  Assert (laplacians.size() == points.size(),
+	  ExcDimensionMismatch(laplacians.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    this->vector_laplacian (points[i], laplacians[i]);
+}
+
+//------------------------------------------------------------//
 
 template <int dim>
 ZeroFunction<dim>::ZeroFunction (const unsigned int n_components) :
 		Function<dim> (n_components)
-{};
+{}
 
 
 template <int dim>
-ZeroFunction<dim>::~ZeroFunction () {};
+ZeroFunction<dim>::~ZeroFunction ()
+{}
 
 
 template <int dim>
@@ -230,6 +282,8 @@ void ZeroFunction<dim>::vector_gradient_list (const vector<Point<dim> >       &p
     };
 };
 
+//------------------------------------------------------------//
+
 
 template <int dim>
 ConstantFunction<dim>::ConstantFunction (const double value,
@@ -287,52 +341,45 @@ void ConstantFunction<dim>::vector_value_list (const vector<Point<dim> > &points
     };
 };
 
+//------------------------------------------------------------//
 
 template <int dim>
-double Function<dim>::laplacian (const Point<dim> &,
-			     const unsigned int) const
+ComponentSelectFunction<dim>::ComponentSelectFunction (const unsigned int selected,
+						       const double value,
+						       const unsigned int n_components)
+		:
+		ConstantFunction<dim> (value, n_components),
+		selected(selected)
+{}
+
+
+template <int dim>
+void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
+						 Vector<double>   &return_value) const
 {
-  Assert (false, ExcPureFunctionCalled());
-  return 0;
+  Assert (return_value.size() == n_components,
+	  ExcDimensionMismatch (return_value.size(), n_components));
+
+  fill_n (return_value.begin(), n_components, 0.);
+  return_value(selected) = function_value;
 }
 
 
-template <int dim>
-void Function<dim>::vector_laplacian (const Point<dim> &,
-				  Vector<double>   &) const
-{
-  Assert (false, ExcPureFunctionCalled());
-}
-
 
 template <int dim>
-void Function<dim>::laplacian_list (const vector<Point<dim> > &points,
-				vector<double>            &laplacians,
-				const unsigned int         component) const
+void ComponentSelectFunction<dim>::vector_value_list (const vector<Point<dim> > &points,
+					       vector<Vector<double> >   &values) const
 {
-				   // check whether component is in
-				   // the valid range is up to the
-				   // derived class
-  Assert (laplacians.size() == points.size(),
-	  ExcDimensionMismatch(laplacians.size(), points.size()));
+  Assert (values.size() == points.size(),
+	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
-    laplacians[i]  = this->laplacian (points[i], component);
-}
-
-
-template <int dim>
-void Function<dim>::vector_laplacian_list (const vector<Point<dim> > &points,
-				       vector<Vector<double> >   &laplacians) const
-{
-				   // check whether component is in
-				   // the valid range is up to the
-				   // derived class
-  Assert (laplacians.size() == points.size(),
-	  ExcDimensionMismatch(laplacians.size(), points.size()));
-
-  for (unsigned int i=0; i<points.size(); ++i)
-    this->vector_laplacian (points[i], laplacians[i]);
+    {
+      Assert (values[i].size() == n_components,
+	      ExcDimensionMismatch(values[i].size(), n_components));
+      fill_n (values[i].begin(), n_components, 0.);
+      values[i](selected) = function_value;
+    }
 }
 
 
@@ -341,9 +388,12 @@ void Function<dim>::vector_laplacian_list (const vector<Point<dim> > &points,
 template class Function<1>;
 template class ZeroFunction<1>;
 template class ConstantFunction<1>;
+template class ComponentSelectFunction<1>;
 template class Function<2>;
 template class ZeroFunction<2>;
 template class ConstantFunction<2>;
+template class ComponentSelectFunction<2>;
 template class Function<3>;
 template class ZeroFunction<3>;
 template class ConstantFunction<3>;
+template class ComponentSelectFunction<3>;

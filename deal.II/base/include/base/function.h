@@ -462,5 +462,53 @@ class ConstantFunction : public ZeroFunction<dim>
     const double function_value;
 };
 
+/**
+ * This is a constant vector-valued function, that is different from
+ * zero only in one component.
+ *
+ * It is especially useful as a weight function for
+ * @p{VectorTools::integrate_difference}, where it allows to integrate
+ * only one component.
+ * @author Guido Kanschat, 2000
+ */
+template <int dim>
+class ComponentSelectFunction : public ConstantFunction<dim>
+{
+  public:
+				     /**
+				      * Constructor. Provide the
+				      * component selected, the value
+				      * for that component and the
+				      * number of components.
+				      */
+    ComponentSelectFunction (const unsigned int selected,
+			     const double value,
+			     const unsigned int n_components);
+
+    				     /**
+				      * Return the value of the function
+				      * at the given point for all
+				      * components.
+				      */
+    virtual void   vector_value (const Point<dim> &p,
+				 Vector<double>   &return_value) const;
+
+				     /**
+				      * Set #values# to the point values
+				      * of the function at the #points#,
+				      * for all components.
+				      * It is assumed that #values#
+				      * already has the right size, i.e.
+				      * the same size as the #points#
+				      * array.
+				      */
+    virtual void vector_value_list (const vector<Point<dim> > &points,
+				    vector<Vector<double> >   &values) const;
+
+  protected:
+    const unsigned int selected;
+};
+
+
 
 #endif
