@@ -34,6 +34,17 @@
  * Also, if you draw a cut through a 3d grid, you can extrude the refinement
  * level in the direction orthogonal to the cut plane.
  *
+ * A more useful application of this feature is the following: if you use the
+ * GNUPLOT command (for a 2d grid here)
+ * \begin{verbatim}
+ *   splot [:][:][2.5:3.5] "grid_file.gnuplot"
+ * \end{verbatim}
+ * then the whole x- and y-range will be plotted, i.e. the whole grid, but
+ * only those lines with a z-value between 2.5 and 3.5. Since the z-values
+ * were chosen to be the level to which a cell belongs, this results in a
+ * plot of those cells only that belong to level 3 in this example. This
+ * way, it is easy to produce plots of the different levels of grid.
+ *
  *
  * \subsection{Encapsulated postscript format}
  * In this format, each line of the triangulation is written separately. We
