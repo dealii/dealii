@@ -21,6 +21,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <functional>
 
 #ifdef DEAL_II_USE_MT
 #  include <vector>
