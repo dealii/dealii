@@ -490,7 +490,7 @@ FE_Nedelec<dim>::shape_grad_component (const unsigned int i,
 	      const double x = p(0),
 			   y = p(1),
 			   z = p(2);
-	      static const double unit_gradients[12][3][3]
+	      const double unit_gradients[12][3][3]
 		= { { {0,-(1-z), -(1-y)}, {0,0,0}, {     0,      0, 0} },
 		    { {0,     0,      0}, {0,0,0}, { (1-y),     -x, 0} },
                     { {0,    -z,  (1-y)}, {0,0,0}, {     0,      0, 0} },
