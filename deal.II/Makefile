@@ -207,9 +207,7 @@ distclean: clean \
 build-test:
 	echo AUTOMATED DEAL.II BUILD TEST          | tee    build-test-log
 	echo BEGIN HEADER `date -u '+%Y-%m-%d %T'`                | tee -a build-test-log
-	echo DEAL_II_VERSION=`cat Version`         | tee -a build-test-log
 	echo USER=$(USER)                          | tee -a build-test-log
-	echo SYSTEM=`contrib/config/config.guess`  | tee -a build-test-log
 	echo HOST=`hostname`.`dnsdomainname`       | tee -a build-test-log
 	echo BUILDTESTFLAGS=$(BUILDTESTFLAGS)      | tee -a build-test-log
 	echo BUILDTESTNOTE=$(BUILDTESTNOTE)        | tee -a build-test-log
