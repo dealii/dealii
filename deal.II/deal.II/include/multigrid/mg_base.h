@@ -452,7 +452,7 @@ class MGBase : public Subscriptor
  * @author Guido Kanschat, 1999
  */
 template<class MG, class VECTOR = Vector<double> >
-class PreconditionMG
+class PreconditionMG : public Subscriptor
 {
   public:
 				     /**
