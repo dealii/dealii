@@ -64,7 +64,6 @@ void CellData<3>::rotate (unsigned int)
 
 
 
-
 bool SubCellData::check_consistency (const unsigned int dim) const
 {
   switch (dim) 
@@ -77,6 +76,7 @@ bool SubCellData::check_consistency (const unsigned int dim) const
     };
   return true;
 };
+
 
 
 void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
@@ -109,6 +109,7 @@ void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
 };
 
 
+
 void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const
 {
 //  Assert (refine_flags.size() == refine_flags.capacity() ||
@@ -128,6 +129,7 @@ void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) c
   Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
 	  ExcMemoryInexact (coarsen_flags.size(), neighbors.size()));
 };
+
 
 
 void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
@@ -175,6 +177,7 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 };
 
 
+
 void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) const
 {
 //  Assert (lines.lines.size() == lines.lines.capacity() ||
@@ -206,6 +209,7 @@ void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) c
 
   TriangulationLevel<0>::monitor_memory (true_dimension);
 };
+
 
 
 void TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
@@ -244,6 +248,7 @@ void TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
 };
 
 
+
 void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) const
 {
 //  Assert (quads.quads.size() == quads.quads.capacity() ||
@@ -275,6 +280,7 @@ void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) c
 
   TriangulationLevel<1>::monitor_memory (true_dimension);
 };
+
 
 
 void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
@@ -313,6 +319,7 @@ void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
 };
 
 
+
 void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const
 {
 //  Assert (hexes.hexes.size() == hexes.hexes.capacity() ||
@@ -346,6 +353,7 @@ void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) c
 };
 
 
+
 TriaNumberCache<1>::TriaNumberCache () :
 		n_lines (0),
 		n_active_lines (0) 
@@ -354,12 +362,14 @@ TriaNumberCache<1>::TriaNumberCache () :
 {};
 
 
+
 TriaNumberCache<2>::TriaNumberCache () :
 		n_quads (0),
 		n_active_quads (0) 
 						 // all other fields are
 						 // default constructed
 {};
+
 
 
 TriaNumberCache<3>::TriaNumberCache () :
