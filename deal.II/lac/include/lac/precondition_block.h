@@ -162,6 +162,43 @@ class PreconditionBlock : public virtual Subscriptor
     void initialize (const MATRIX& A,
 		     const AdditionalData parameters);
 
+
+				     /**
+				      * Initialize matrix and block
+				      * size for permuted
+				      * preconditioning. Additionally
+				      * to the parameters of the other
+				      * initalize() function, we hand
+				      * over two index vectors with
+				      * the permutation and its
+				      * inverse. For the meaning of
+				      * these vectors see
+				      * PreconditionBlockSOR.
+				      *
+				      * In a second step, the inverses
+				      * of the diagonal blocks may be
+				      * computed. Make sure you use
+				      * invert_permuted_diagblocks()
+				      * to yield consistent data.
+				      *
+				      * Additionally, a relaxation
+				      * parameter for derived classes
+				      * may be provided.
+				      */
+    void initialize (const MATRIX& A,
+		     const std::vector<unsigned int>& permutation,
+		     const std::vector<unsigned int>& inverse_permutation,
+		     const AdditionalData parameters);
+
+				     /**
+				      * Replacement of
+				      * invert_diagblocks() for
+				      * permuted preconditioning.
+				      */ 
+    void invert_permuted_diagblocks(
+      const std::vector<unsigned int>& permutation,
+      const std::vector<unsigned int>& inverse_permutation);
+
 				     /**
 				      * Deletes the inverse diagonal
 				      * block matrices if existent,

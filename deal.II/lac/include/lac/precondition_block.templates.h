@@ -76,6 +76,140 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
     invert_diagblocks();
 }
 
+template <class MATRIX, typename inverse_type>
+void PreconditionBlock<MATRIX,inverse_type>::initialize (
+  const MATRIX &M,
+  const std::vector<unsigned int>& permutation,
+  const std::vector<unsigned int>& inverse_permutation,
+  const AdditionalData parameters)
+{
+  
+  const unsigned int bsize = parameters.block_size;
+  
+  clear();
+  Assert (M.m() == M.n(), ExcMatrixNotSquare());
+  A = &M;
+  Assert (bsize>0, ExcIndexRange(bsize, 1, M.m()));
+  Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
+  blocksize=bsize;
+  relaxation = parameters.relaxation;
+  var_same_diagonal = parameters.same_diagonal;
+  nblocks = A->m()/bsize;
+  
+  if (parameters.invert_diagonal)
+    invert_permuted_diagblocks(permutation, inverse_permutation);
+  
+}
+
+template <class MATRIX, typename inverse_type>
+void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
+  const std::vector<unsigned int>& permutation,
+  const std::vector<unsigned int>& inverse_permutation)
+{
+  Assert (A!=0, ExcNotInitialized());
+  Assert (blocksize!=0, ExcNotInitialized());
+
+  const MATRIX &M=*A;
+  Assert (var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
+
+  FullMatrix<inverse_type> M_cell(blocksize);
+
+  if (same_diagonal())
+    {
+      deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
+				       // Invert only the first block
+				       // This is a copy of the code in the
+				       // 'else' part, stripped of the outer loop
+      if (store_diagonals)
+	var_diagonal.resize(1);
+      var_inverse.resize(1);
+      var_inverse[0].reinit(blocksize, blocksize);
+
+      for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+	{
+	  typename MATRIX::const_iterator entry = M.begin(row_cell);
+	  const typename MATRIX::const_iterator row_end = M.end(row_cell);
+	  while(entry != row_end)
+	    {
+	      if (entry->column() < blocksize)
+		M_cell(row_cell, entry->column()) = entry->value();
+	      ++entry;
+	    }
+	}
+      if (store_diagonals)
+	var_diagonal[0] = M_cell;
+      var_inverse[0].invert(M_cell);
+    }
+  else
+    {
+				       // cell_row, cell_column are the
+				       // numbering of the blocks (cells).
+				       // row_cell, column_cell are the local
+				       // numbering of the unknowns in the
+				       // blocks.
+				       // row, column are the global numbering
+				       // of the unkowns.
+
+				       // set the @p{var_inverse} array to the right
+				       // size. we could do it like this:
+				       // var_inverse = vector<>(nblocks,FullMatrix<>())
+				       // but this would involve copying many
+				       // FullMatrix objects.
+				       //
+				       // the following is a neat trick which
+				       // avoids copying
+      if (store_diagonals)
+	{
+	  std::vector<FullMatrix<inverse_type> >
+	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
+	  var_diagonal.swap (tmp);
+	}
+
+      if (true)
+	{
+	  std::vector<FullMatrix<inverse_type> >
+	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
+	  var_inverse.swap (tmp);
+					   // make sure the tmp object
+					   // goes out of scope as
+					   // soon as possible
+	};
+
+      M_cell = 0;
+      
+      for (unsigned int cell=0; cell<nblocks; ++cell)
+	{
+	  const unsigned int cell_start = cell*blocksize;
+	  for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+	    {
+	      const unsigned int urow = row_cell + cell_start;
+
+	      const unsigned int row = permutation[urow];
+
+	      typename MATRIX::const_iterator entry = M.begin(row);
+	      const typename MATRIX::const_iterator row_end = M.end(row);
+
+	      for (;entry != row_end; ++entry)
+		{
+		  //if (entry->column()<cell_start)
+		  if (inverse_permutation[entry->column()]<cell_start)
+		    continue;
+		  
+		  const unsigned int column_cell = inverse_permutation[entry->column()]-cell_start;
+		  if (column_cell >= blocksize)
+		    continue;
+		  M_cell(row_cell, column_cell) = entry->value();
+		}
+	    }
+
+	  if (store_diagonals)
+	    var_diagonal[cell] = M_cell;
+	  var_inverse[cell].invert(M_cell);
+	}
+    }
+}
+
+
 
 template <class MATRIX, typename inverse_type>
 const FullMatrix<inverse_type>&
