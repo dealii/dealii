@@ -351,6 +351,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number,blocks,blocks> &uncondensed
 	}
       else
 	{
+	  Assert (false, ExcNotImplemented ());
 	}
       
 //  					 // row must be distributed
