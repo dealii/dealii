@@ -48,6 +48,7 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out_rotation.write_tecplot (deallog.get_file_stream());
   data_out_rotation.write_vtk (deallog.get_file_stream());
   data_out_rotation.write_gnuplot (deallog.get_file_stream());
+  data_out_rotation.write_deal_II_intermediate (deallog.get_file_stream());
 
                                    // following only implemented for
                                    // 1d+rotation=2d

@@ -38,6 +38,7 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out.write_tecplot (deallog.get_file_stream());
   data_out.write_vtk (deallog.get_file_stream());
   data_out.write_gnuplot (deallog.get_file_stream());
+  data_out.write_deal_II_intermediate (deallog.get_file_stream());
 
                                    // the following is only
                                    // implemented for 2d
