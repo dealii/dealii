@@ -143,8 +143,8 @@ class MGDoFHandler : public DoFHandler<dim> {
 
 				     /**
 				      * Renumber the degrees of freedom according
-				      * to the given scheme, eventually using
-				      * constraint information and the given
+				      * to the given scheme, eventually
+				      * using the given
 				      * starting points. The starting points
 				      * default to an empty list, the use of
 				      * constraint information defaults to
@@ -155,7 +155,6 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      */
     void renumber_dofs (const unsigned int       level,
 			const RenumberingMethod  method,
-			const bool               use_constraints         = false,
 			const vector<int>       &starting_points = vector<int>());
 
 				     /**
