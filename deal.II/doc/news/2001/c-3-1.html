@@ -249,6 +249,19 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: There are now functions 
+       <code class="member">SparsityPattern::copy_from</code> and
+       <code class="member">SparseMatrix::copy_from</code>
+       that can be used to construct sparsity patterns and matrix at
+       once, i.e. without setting up a sparsity pattern element by
+       element, possibly after using a way too large value for the
+       maximal row length, then calling 
+       <code class="member">SparsityPattern::compress</code> etc.
+       <br>
+       (WB 2001/05/07)
+       </p>
+
+  <li> <p>
        New: <code class="member">BlockIndices::block_size</code>
        returns the size of a specified block.
        <br>
