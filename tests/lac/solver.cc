@@ -36,7 +36,14 @@ check_method( SOLVER& solver, const MATRIX& A,
 {
   u = 0.;
   f = 1.;
-  solver.solve(A,u,f,P);
+  try 
+    {
+      solver.solve(A,u,f,P);
+    }
+  catch (std::exception& e)
+    {
+      deallog << e.what() << std::endl;
+    }  
 }
 
 int main()
@@ -51,7 +58,7 @@ int main()
   SolverControl control(100, 1.e-3);
   SolverControl verbose_control(100, 1.e-3, true);
   SolverCG<> cg(control, mem);
-  SolverGMRES<> gmres(control, mem,20);
+  SolverGMRES<> gmres(control, mem, 8);
   SolverBicgstab<> bicgstab(control, mem);
   SolverRichardson<> rich(control, mem);
   SolverQMRS<> qmrs(control, mem);
@@ -93,6 +100,17 @@ int main()
 
       try
 	{
+	  deallog.push("no-fail");
+
+	  control.set_max_steps(10);
+	  check_method(cg,A,u,f,prec_no);
+	  check_method(bicgstab,A,u,f,prec_no);
+	  check_method(gmres,A,u,f,prec_no);
+	  check_method(qmrs,A,u,f,prec_no);
+	  control.set_max_steps(100);
+	  
+	  deallog.pop();
+	  
 	  deallog.push("no");
 	  
 	  check_method(cg,A,u,f,prec_no);
@@ -115,15 +133,7 @@ int main()
 	  deallog.push("sor");
 	  
 	  check_method(rich,A,u,f,prec_sor);
-	  try 
-	    {
-	      check_method(cg,A,u,f,prec_sor);
-	    }
-	  catch (std::exception& e)
-	    {
-	      deallog << e.what() << std::endl;
-	    }
-	  
+	  check_method(cg,A,u,f,prec_sor);
 	  check_method(bicgstab,A,u,f,prec_sor);
 	  check_method(gmres,A,u,f,prec_sor);
 	  
