@@ -2125,13 +2125,13 @@ bool CellAccessor<dim>::has_boundary_lines () const
 #if deal_II_dimension == 1
 
 template <>
-inline
 TriaIterator<1,CellAccessor<1> >
 CellAccessor<1>::
 neighbor_child_on_subface (const unsigned int,
                            const unsigned int) const
 {
   Assert (false, ExcNotImplemented());
+  return TriaIterator<1,CellAccessor<1> >();
 }
 
 #endif
@@ -2139,7 +2139,6 @@ neighbor_child_on_subface (const unsigned int,
 #if deal_II_dimension == 2
 
 template <>
-inline
 TriaIterator<2,CellAccessor<2> >
 CellAccessor<2>::
 neighbor_child_on_subface (const unsigned int face,
@@ -2167,7 +2166,6 @@ neighbor_child_on_subface (const unsigned int face,
 #if deal_II_dimension == 3
 
 template <>
-inline
 TriaIterator<3,CellAccessor<3> >
 CellAccessor<3>::
 neighbor_child_on_subface (const unsigned int face,
