@@ -375,8 +375,8 @@ BlockSparseMatrix<number,rows,columns>::set (const unsigned int i,
 					     const number value)
 {
   const pair<unsigned int,unsigned int>
-    row_index = sparsity_pattern.row_indices.global_to_local (i),
-    col_index = sparsity_pattern.column_indices.global_to_local (j);
+    row_index = sparsity_pattern->row_indices.global_to_local (i),
+    col_index = sparsity_pattern->column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first].set (row_index.second,
 						     col_index.second,
 						     value);
@@ -391,8 +391,8 @@ BlockSparseMatrix<number,rows,columns>::add (const unsigned int i,
 					     const number value)
 {
   const pair<unsigned int,unsigned int>
-    row_index = sparsity_pattern.row_indices.global_to_local (i),
-    col_index = sparsity_pattern.column_indices.global_to_local (j);
+    row_index = sparsity_pattern->row_indices.global_to_local (i),
+    col_index = sparsity_pattern->column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first].add (row_index.second,
 						     col_index.second,
 						     value);
@@ -435,8 +435,8 @@ BlockSparseMatrix<number,rows,columns>::operator () (const unsigned int i,
 						     const unsigned int j) const
 {
   const pair<unsigned int,unsigned int>
-    row_index = sparsity_pattern.row_indices.global_to_local (i),
-    col_index = sparsity_pattern.column_indices.global_to_local (j);
+    row_index = sparsity_pattern->row_indices.global_to_local (i),
+    col_index = sparsity_pattern->column_indices.global_to_local (j);
   return sub_objects[row_index.first][col_index.first] (row_index.second,
 							col_index.second);
 };
