@@ -6,7 +6,14 @@
 
 
 template <int dim>
+Function<dim>::Function (const double initial_time) :
+		time(initial_time) {};
+
+
+
+template <int dim>
 Function<dim>::~Function () {};
+
 
 
 template <int dim>
@@ -49,6 +56,25 @@ void Function<dim>::gradient_list (const vector<Point<dim> > &points,
 };
 
 
+
+template <int dim>
+double Function<dim>::get_time () const {
+  return time;
+};
+
+
+
+template <int dim>
+void Function<dim>::set_time (const double new_time) {
+  time = new_time;
+};
+
+
+
+template <int dim>
+void Function<dim>::advance_time (const double delta_t) {
+  set_time (time+delta_t);
+};
 
 
 
