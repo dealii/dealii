@@ -232,6 +232,10 @@ class FullMatrix : public Subscriptor
 				     /**
 				      * Matrix-matrix-multiplication.
 				      * $C=A*B$.
+				      *
+				      * Assumes that #A# and #B# have
+				      * compatible sizes and thet #C#
+				      * already has the right size.
 				      */
     template<typename number2>
     void mmult (FullMatrix<number2>       &C,
