@@ -306,6 +306,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: The <code class="class">SolverCG</code> class now
+       saves the initial matrix vector product if the initial value of
+       the solution is vector is zero, as it is common practice to use
+       this is starting vector.
+       <br>
+       (WB 2001/06/25)
+       </p>
+
+  <li> <p>
        New: <code class="member">SparsityPattern::reinit</code> no
        more throws an error if the given maximal row lengths are all
        zero.
