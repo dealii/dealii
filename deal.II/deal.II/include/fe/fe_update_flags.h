@@ -206,33 +206,62 @@ enum UpdateFlags
 };
 
 
+
+/**
+ * Global operator which sets the bits from the second argument also
+ * in the first one.
+ */
 inline
 UpdateFlags &
-operator |= (UpdateFlags& f1, const UpdateFlags& f2)
+operator |= (UpdateFlags &f1, const UpdateFlags &f2)
 {
   f1 = static_cast<UpdateFlags> (f1 | f2);
   return f1;
 }
 
 
+
+/**
+ * Global operator which returns an object in which all bits are set
+ * which are either set in the first or the second argument. This
+ * operator exists since if it did not then the result of the bit-or
+ * @p{operator |} would be an integer which would in turn trigger a
+ * compiler warning when we tried to assign it to an object of type
+ * @ref{UpdateFlags}.
+ */
 inline
 UpdateFlags
-operator | (const UpdateFlags& f1, const UpdateFlags& f2)
+operator | (const UpdateFlags &f1, const UpdateFlags &f2)
 {
   UpdateFlags result = f1;
   result |= f2;
   return result;
 }
 
+
+
+/**
+ * Global operator which clears all the bits in the first argument if
+ * they are not also set in the second argument.
+ */
 inline
 UpdateFlags &
-operator &= (UpdateFlags& f1, const UpdateFlags& f2)
+operator &= (UpdateFlags &f1, const UpdateFlags &f2)
 {
   f1 = static_cast<UpdateFlags> (f1 & f2);
   return f1;
 }
 
 
+
+/**
+ * Global operator which returns an object in which all bits are set
+ * which are set in the first as well as the second argument. This
+ * operator exists since if it did not then the result of the bit-and
+ * @p{operator &} would be an integer which would in turn trigger a
+ * compiler warning when we tried to assign it to an object of type
+ * @ref{UpdateFlags}.
+ */
 inline
 UpdateFlags
 operator & (const UpdateFlags& f1, const UpdateFlags& f2)
