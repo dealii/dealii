@@ -324,6 +324,7 @@ class FiniteElementData
  * constrained. Only one level of indirection is allowed. It is not known
  * at the time of this writing whether this is a constraint itself.
  *
+ * 
  * @sect3{Finite elements in three dimensions}
  *
  * For the interface constraints, almost the same holds as for the 2D case.
@@ -363,24 +364,47 @@ class FiniteElementData
  * Triangulation. Therefore, this numbering is seen from the
  * outside and inside, respectively, depending on the face.
  *
- * If of the cells adjacent to one line more than one is refined and
- * there is at least one unrefined cell, then the degrees of freedom
- * on the refined line are constrained from two cells. For example,
- * consider the cell behind the face shown above is refined, while the
- * one in front of the face is not refined; then the dofs on the lines
- * numbered 9 and 10 are constrained. If there are two more cells
- * below the ones just introduced, with a common face right below the
- * one shown, and of these is one refined and one unrefined one, then
- * the degrees on the two mentioned small lines are constrained a
- * second time. Since these constraints must be unique, it follows
- * that the constraints for the degrees of freedom on refined lines
- * may only be in terms of the degrees of freedom on the unrefined
- * line, not in terms of the other degrees of freedom on a face.
+ * The three-dimensional case has a few pitfalls available for derived classes
+ * that want to implement constraint matrices. Consider the following case:
+ * @verbatim
+ *          *-------*
+ *         /       /|
+ *        /       / |
+ *       /       /  |
+ *      *-------*   |
+ *      |       |   *-------*
+ *      |       |  /       /|
+ *      |   1   | /       / |
+ *      |       |/       /  |
+ *      *-------*-------*   |
+ *      |       |       |   *
+ *      |       |       |  /
+ *      |   2   |   3   | /
+ *      |       |       |/
+ *      *-------*-------*
+ * @endverbatim
+ * Now assume that we want to refine cell 2. We will end up with two faces
+ * with hanging nodes, namely the faces between cells 1 and 2, as well as
+ * between cells 2 and 3. Constraints have to be applied to the degrees of
+ * freedom on both these faces. The problem is that there is now an edge
+ * (the top right one of cell 2) which is part of both faces. The hanging
+ * node(s) on this edge are therefore constrained twice, once from both
+ * faces. To be meaningful, these constraints of course have to be
+ * consistent: both faces have to constrain the hanging nodes on the edge to
+ * the same nodes on the coarse edge (and only on the edge, as there can
+ * then be no constraints to nodes on the rest of the face), and they have
+ * to do so with the same weights. This is sometimes tricky since the nodes
+ * on the edge may have different local numbers.
  *
- * Since the handling of constraints on degrees of freedom is mostly done
- * by the ConstraintMatrix class, this class checks whether the constraints
- * introduced from the two sides are unique; it is able to handle the fact
- * that the constraints for some of the dofs are entered more than once.
+ * For the constraint matrix this means the following: if a degree of freedom
+ * on one edge of a face is constrained by some other nodes on the same edge
+ * with some weights, then the weights have to be exactly the same as those
+ * for constrained nodes on the three other edges with respect to the
+ * corresponding nodes on these edges. If this isn't the case, you will get
+ * into trouble with the ConstraintMatrix class that is the primary consumer
+ * of the constraint information: while that class is able to handle
+ * constraints that are entered more than once (as is necessary for the case
+ * above), it insists that the weights are exactly the same.
  *
  * @author Wolfgang Bangerth, 1998, 2002, Ralf Hartmann, Guido Kanschat, 2001
  */
