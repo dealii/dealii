@@ -153,7 +153,7 @@ print TABLE_FILE <<"EOT"
 <body>
 
 <h3 align="center">Results for $this_year/$this_month</h3>
-<table>
+<table align="center">
 <tr><th>Date <th> Fail
 EOT
     ;
