@@ -17,6 +17,10 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 
 #include <cmath>
 
@@ -186,6 +190,55 @@ GridTools::scale (const double        scaling_factor,
 
 
 
+template <int dim, typename Container>
+typename Container::active_cell_iterator
+GridTools::find_active_cell_around_point (const Container  &container,
+                                          const Point<dim> &p)
+{
+                                   // first find the coarse grid cell
+                                   // that contains the point. we can
+                                   // only do this by a linear search
+  typename Container::cell_iterator cell = container.begin(0);
+  for (; cell!=container.end(0); ++cell)
+    if (cell->point_inside (p))
+      break;
+
+                                   // make sure that we found a cell
+                                   // in the coarse grid that contains
+                                   // this point. for cases where this
+                                   // might happen unexpectedly, see
+                                   // the documentation of this
+                                   // function
+  AssertThrow (cell != container.end(0),
+               ExcPointNotFoundInCoarseGrid<dim> (p));
+
+                                   // now do the logarithmic part of
+                                   // the algorithm: go from child to
+                                   // grandchild
+  while (cell->has_children())
+    {
+      unsigned int c=0;
+      for (; c<GeometryInfo<dim>::children_per_cell; ++c)
+        if (cell->point_inside (p))
+          break;
+
+                                       // make sure we found a child
+                                       // cell
+      AssertThrow (c != GeometryInfo<dim>::children_per_cell,
+                   ExcPointNotFound<dim> (p));
+
+                                       // then reset cell to the child
+      cell = cell->child(c);
+    }
+
+                                   // now that we have a terminal
+                                   // cell, return it
+  return cell;
+}
+
+
+
+
 #if deal_II_dimension != 1
 template
 double
@@ -199,3 +252,18 @@ void GridTools::shift<deal_II_dimension> (const Point<deal_II_dimension> &,
 template
 void GridTools::scale<deal_II_dimension> (const double,
 					  Triangulation<deal_II_dimension> &);
+
+template
+Triangulation<deal_II_dimension>::active_cell_iterator
+GridTools::find_active_cell_around_point (const Triangulation<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &p);
+
+template
+DoFHandler<deal_II_dimension>::active_cell_iterator
+GridTools::find_active_cell_around_point (const DoFHandler<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &p);
+
+template
+MGDoFHandler<deal_II_dimension>::active_cell_iterator
+GridTools::find_active_cell_around_point (const MGDoFHandler<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &p);

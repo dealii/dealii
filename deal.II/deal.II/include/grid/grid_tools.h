@@ -23,11 +23,12 @@
 
 
 /**
- * This class is a collection of algorithms working on
- * triangulations. See the descriptions of the individual functions
- * for more information.
+ * This class is a collection of algorithms working on triangulations,
+ * such as shifting or rotating triangulations, but also finding a
+ * cell that contains a given point. See the descriptions of the
+ * individual functions for more information.
  *
- * @author Wolfgang Bangerth, 2001
+ * @author Wolfgang Bangerth, 2001, 2003
  */
 class GridTools
 {
@@ -142,18 +143,125 @@ class GridTools
     static
     void scale (const double        scaling_factor,
 		Triangulation<dim> &triangulation);
+
+                                     /**
+                                      * Find and return an iterator to
+                                      * the active cell that surrounds
+                                      * a given point @p{ref}. The
+                                      * type of the first parameter
+                                      * may be either
+                                      * @ref{Triangulation},
+                                      * @ref{DoFHandler}, or
+                                      * @ref{MGDoFHandler}, i.e. we
+                                      * can find the cell around a
+                                      * point for iterators into each
+                                      * of these classes.
+                                      *
+                                      * The algorithm used in this
+                                      * function proceeds by first
+                                      * looking for the surrounding
+                                      * cell on the coarse grid, and
+                                      * then recursively checking its
+                                      * sibling cells. The complexity
+                                      * is thus @p{O(M+log N)} where
+                                      * @p{M} is the number of coarse
+                                      * grid cells, and @p{N} the
+                                      * total number of cells.
+                                      *
+                                      * There are cases where this
+                                      * function will not found a
+                                      * given point in space
+                                      * dimensions higher than one,
+                                      * even though it is inside the
+                                      * domain being discretized, or
+                                      * will find a point that is
+                                      * actually outside the
+                                      * domain. The reason for this is
+                                      * that we use piecewise d-linear
+                                      * mappings of the unit cell to
+                                      * real cells. Thus, if a point
+                                      * is close to a convex boundary
+                                      * or on it, it may not be inside
+                                      * any of the cells since they
+                                      * have straight boundaries that
+                                      * lie entirely inside the
+                                      * domain.
+                                      *
+                                      * Another case for this is that
+                                      * a point may not be found even
+                                      * though it is actually in one
+                                      * of the cells. This may happen,
+                                      * if the point is not in one of
+                                      * the coarse grid cells, even
+                                      * though it is in one of the
+                                      * cells on finer levels of the
+                                      * triangulation. Note that this
+                                      * of course implies that mother
+                                      * and child cells do not exactly
+                                      * overlap, a case that is
+                                      * frequent along curved
+                                      * boundaries. In this latter
+                                      * case, a different algorithm
+                                      * may be used instead that uses
+                                      * a linear search over all
+                                      * active cells, rather than
+                                      * first searchin for a coarse
+                                      * grid cell. Note, however, that
+                                      * such an algorithm has a
+                                      * significantly higher numerical
+                                      * cost than the logarithmic
+                                      * algorithm used here.
+                                      *
+                                      * Lastly, if a point lies on the
+                                      * boundary of two or more cells,
+                                      * then the algorithm may return
+                                      * with any of these cells. While
+                                      * this is in general not really
+                                      * problem, if may be a nuisance
+                                      * if the point lies at the
+                                      * boundary of cells with
+                                      * different refinement levels
+                                      * and one would rather like to
+                                      * evaluate a solution on the
+                                      * cell with more refinement. For
+                                      * this, more sophisticated
+                                      * algorithms would be necessary,
+                                      * though.
+                                      */
+    template <int dim, typename Container>
+    static
+    typename Container::active_cell_iterator
+    find_active_cell_around_point (const Container  &container,
+                                   const Point<dim> &p);
     
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcTriangulationHasBeenRefined);
-
 				     /**
 				      * Exception
 				      */
     DeclException1 (ExcScalingFactorNotPositive,
 		    double,
 		    << "The scaling factor must be positive, but is " << arg1);
+				     /**
+				      * Exception
+				      */
+    template <int N>
+    DeclException1 (ExcPointNotFoundInCoarseGrid,
+		    Point<N>,
+		    << "The point <" << arg1
+                    << "> could not be found inside any of the "
+                    << "coarse grid cells.");
+				     /**
+				      * Exception
+				      */
+    template <int N>
+    DeclException1 (ExcPointNotFound,
+		    Point<N>,
+		    << "The point <" << arg1
+                    << "> could not be found inside any of the "
+                    << "subcells of a coarse grid cell.");
 };
 
 
