@@ -1,7 +1,3 @@
-Replace the declaration of vector<bool> in tria.h by something real
-  when gcc2.8 is available
-
-
 Rewrite code like
       int flagged_cells = 0;
       for (; cell!=endc; ++cell)
@@ -32,8 +28,6 @@ Let ParameterHandler and DataIn/Out throw exceptions. Make more tests
   
 Replace function objects by mem_fun, fun_ptr, ... when member function
   templates are supported.
-
-implement ProblemBase::distribute_cell_to_dof_vector
 
 
 Remove gcc2.8 workaround with DoFSubstructAccessor
@@ -67,11 +61,6 @@ Update DoFHandler::distribute_cell_to_dof_vector for higher order
   on the vertices).
 
 
-Replace <multimap.h> in dof.cc by <multimap> and <pair.h> by
-  <pair> in dof_constraints.h
-
-
-
 
 
 DEAL:
@@ -90,13 +79,6 @@ Let all the reinit functions in /lac free their memory, if reinit
   is called with less requirements. Maybe give free all memory
   if the given dimension is zero. If so, check all deal.II files
   for use of reinit.
-Use unsigned integers for the colnums array in dSMatrixStruct. This
-  would enhance safety since colnum=-1 would no longer point to a
-  valid address. Additionally, add a break statement upon first
-  encounter of sorted colnums==-1 in dsmatrixstruct::compress (by
-  now, all -1's are sorted _first_, so we can't skip them if we want
-  to get to the other colnums. If it were MAXINT instead of -1, we
-  could skip all entries after finding the first MAXINT).
 
 Why are there all these unsafe casts from VectorBase to dVector
   in dvector.cc?
@@ -108,10 +90,6 @@ Use unsigned integers for the colnums array in dSMatrixStruct. This
   now, all -1's are sorted _first_, so we can't skip them if we want
   to get to the other colnums. If it were MAXINT instead of -1, we
   could skip all entries after finding the first MAXINT).
-
-Why are there all these unsafe casts from VectorBase to dVector
-  in dvector.cc?
-
 
 Optimize dSMatrixStruct::compress, using standard sort algorithms
   and only sorting the used range of indices, not those with
