@@ -1684,7 +1684,7 @@ namespace LaplaceSolver
     GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
 						     estimated_error_per_cell,
 						     0.3, 0.03);
-    triangulation->execute_coarsening_and_refinement ();
+    this->triangulation->execute_coarsening_and_refinement ();
   };
 
 };
