@@ -26,13 +26,19 @@
     <a name="prerequisites">
     <h2>System requirements</h2>
 
-    By this time (February 2000), <acronym>deal.II</acronym> has been
+    <p>
+    At present, <acronym>deal.II</acronym> has been
     developed and tested on Unix systems only. It can be used positively on
     <ul>
-      <li>Linux ELF with gcc 2.95.x
-      <li>Sun Solaris 2.5 / 2.6 with egcs 1.1.2 and gcc 2.95.x
+      <li>Linux ELF with egcs 1.1.x and gcc 2.95.x;
+      <li>Sun Solaris 2.5, 2.6, and 7, with egcs 1.1.x and gcc 2.95.x.
     </ul>
+    <acronym>deal.II</acronym> uses only very few features of an
+    operating system. It should therefore be rather simple to port it
+    to other systems, at least with the compilers stated above.
+    </p>
 
+    <p>
     In order to compile and use the <acronym>deal.II</acronym> library
     (and its sub-libraries /base and /lac) you need to have the
     following programs installed:
@@ -83,13 +89,6 @@
            platforms. AVS is a commercial program available for most
            Unix flavors.
     </ul>
-<!--
-    Note that we have only tested the library under Unix (extensively
-    under SunOS and Linux). We believe that it should be possible with
-    little effort to use it on other platforms as well. In that case
-    it may be necessary to change some settings in the configure.in
-    script or in the file common/Make.global_options.in.
---!>
     <p>
 
     In case you didn't find your favorite graphics format above it
