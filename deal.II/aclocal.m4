@@ -64,6 +64,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	AC_MSG_RESULT(C++ compiler is gcc-3.4)
   	GXX_VERSION=gcc3.4
   	;;
+      *3.5*)
+  	AC_MSG_RESULT(C++ compiler is gcc-3.5)
+  	GXX_VERSION=gcc3.5
+  	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
   	dnl of modern C++, so we don't support them
@@ -677,6 +681,10 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
         *3.4*)
   	  AC_MSG_RESULT(F77 compiler is gcc-3.4)
   	  F77_VERSION=gcc3.4
+  	  ;;
+        *3.5*)
+  	  AC_MSG_RESULT(F77 compiler is gcc-3.5)
+  	  F77_VERSION=gcc3.5
   	  ;;
         *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	  dnl These compilers are too old to support a useful subset
