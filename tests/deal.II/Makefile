@@ -1,7 +1,7 @@
 # Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -51,6 +51,7 @@ filtered_iterator.exe        : filtered_iterator.g.$(OBJEXT)           $(lib-2d)
 grid_in.exe                  : grid_in.g.$(OBJEXT)                     $(lib-2d)           $(libraries)
 grid_in_3d.exe               : grid_in_3d.g.$(OBJEXT)                            $(lib-3d) $(libraries)
 face_orientations_3d.exe     : face_orientations_3d.g.$(OBJEXT)                  $(lib-3d) $(libraries)
+mg_dof_handler.exe           : mg_dof_handler.g.$(OBJEXT)              $(lib-2d)           $(libraries)
 
 
 tests = $(sort \
@@ -59,7 +60,8 @@ tests = $(sort \
           matrices error_estimator intergrid_constraints intergrid_map \
           wave-test-3 dof_renumbering support_point_map filtered_matrix \
 	  boundaries sparsity_pattern grid_tools subdomain_ids \
-	  filtered_iterator grid_out grid_in grid_in_3d face_orientations_3d)
+	  filtered_iterator grid_out grid_in grid_in_3d face_orientations_3d \
+          mg_dof_handler)
 
 ############################################################
 
