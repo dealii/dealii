@@ -1148,11 +1148,17 @@ class BlockVector
 
 				     /**
 				      * Make the iterator class a
-				      * friend.
+				      * friend. We have to work around
+				      * a compiler bug here again.
 				      */
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+    template <typename N, bool C>
+    friend class BlockVectorIterators::Iterator;
+#else
     friend class iterator;
     friend class const_iterator;
-
+#endif
+    
     template <typename Number2> friend class BlockVector;
 };
 
