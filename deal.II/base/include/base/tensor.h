@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -215,7 +215,7 @@ class Tensor
 
 /*--------------------------- Inline functions -----------------------------*/
 
-
+/// @if NoDoc
 
 template <int rank_, int dim>
 inline
@@ -393,7 +393,7 @@ Tensor<rank_,dim>::memory_consumption ()
   return sizeof(Tensor<rank_,dim>);
 }
 
-
+/// @endif
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
 
@@ -433,6 +433,8 @@ std::ostream & operator << (std::ostream &out, const Tensor<rank_,1> &p)
  * Contract a tensor of rank 1 with a tensor of rank 1. The result is
  * <tt>sum_j src1[j] src2[j]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
  * @author Guido Kanschat, 2000
  */
 template <int dim>
@@ -452,6 +454,9 @@ double contract (const Tensor<1,dim> &src1,
  * Contract a tensor of rank 2 with a tensor of rank 1. The result is
  * <tt>dest[i] = sum_j src1[i][j] src2[j]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -472,6 +477,9 @@ void contract (Tensor<1,dim>       &dest,
  * Contract a tensor of rank 1 with a tensor of rank 2. The result is
  * <tt>dest[i] = sum_j src1[j] src2[j][i]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
+ * @relates Tensor<2,dim>
  * @author Guido Kanschat, 2001
  */
 template <int dim>
@@ -492,6 +500,8 @@ void contract (Tensor<1,dim>       &dest,
  * Contract a tensor of rank 2 with a tensor of rank 2. The result is
  * <tt>dest[i][k] = sum_j src1[i][j] src2[j][k]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -520,6 +530,8 @@ void contract (Tensor<2,dim>       &dest,
  * Note that the number of the index is counted from 1 on, not from
  * zero as usual.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -590,6 +602,9 @@ void contract (Tensor<2,dim>       &dest,
  * Note that the number of the index is counted from 1 on, not from
  * zero as usual.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
+ * @relates Tensor<3,dim>
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -635,6 +650,9 @@ void contract (Tensor<2,dim>       &dest,
  * Contract a tensor of rank 3 with a tensor of rank 2. The result is
  * <tt>dest[i][j][l] = sum_k src1[i][j][k] src2[k][l]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
+ * @relates Tensor<3,dim>
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -657,6 +675,9 @@ void contract (Tensor<3,dim>       &dest,
  * Contract a tensor of rank 2 with a tensor of rank 3. The result is
  * <tt>dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
+ * @relates Tensor<3,dim>
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -678,6 +699,9 @@ void contract (Tensor<3,dim>       &dest,
  * Contract a tensor of rank 3 with a tensor of rank 3. The result is
  * <tt>dest[i][j][k][l] = sum_m src1[i][j][m] src2[m][k][l]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<3,dim>
+ * @relates Tensor<3,dim>
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -701,6 +725,8 @@ void contract (Tensor<4,dim>       &dest,
  * Form the outer product of two tensors of rank 1 and 1, i.e.
  * <tt>dst[i][j] = src1[i] * src2[j]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>
@@ -719,6 +745,9 @@ void outer_product (Tensor<2,dim>       &dst,
  * Form the outer product of two tensors of rank 1 and 2, i.e.
  * <tt>dst[i][j][k] = src1[i] * src2[j][k]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>
@@ -738,6 +767,9 @@ void outer_product (Tensor<3,dim>       &dst,
  * Form the outer product of two tensors of rank 2 and 1, i.e.
  * <tt>dst[i][j][k] = src1[i][j] * src2[k]</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>
@@ -761,6 +793,8 @@ void outer_product (Tensor<3,dim>       &dst,
  * templates that depend on the rank of a tensor, which may sometimes
  * be zero (i.e. a scalar).
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>
@@ -782,6 +816,8 @@ void outer_product (Tensor<1,dim>       &dst,
  * templates that depend on the rank of a tensor, which may sometimes
  * be zero (i.e. a scalar).
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>
@@ -804,6 +840,8 @@ void outer_product (Tensor<1,dim>       &dst,
  * of the arguments is two (e.g. from the <tt>dim==2</tt> case in the
  * switch).
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
  * @author Guido Kanschat, 2001
  */
 template <int dim>
@@ -828,6 +866,8 @@ cross_product (Tensor<1,dim>       &dst,
  * the <tt>dim==3</tt> case in the switch).
  *
  * @author Guido Kanschat, 2001
+ * @relates Tensor
+ * @relates Tensor<1,dim>
  */
 template <int dim>
 inline
@@ -850,6 +890,7 @@ cross_product (Tensor<1,dim>       &dst,
  * one. Since this is a number, the return value is, of course, the
  * number itself.
  *
+ * @relates Tensor
  * @author Wolfgang Bangerth, 1998
  */
 template <int rank>
@@ -875,6 +916,8 @@ double determinant (const Tensor<rank,1> &t)
  * one. Since this is a number, the return value is, of course, the
  * number itself.
  *
+ * @relates Tensor
+ * @relates Tensor<1,dim>
  * @author Wolfgang Bangerth, 1998
  */
 inline
@@ -888,6 +931,8 @@ double determinant (const Tensor<1,1> &t)
 /**
  * Compute the determinant of a tensor or rank 2, here for <tt>dim==2</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 1998
  */
 inline
@@ -903,6 +948,8 @@ double determinant (const Tensor<2,2> &t)
 /**
  * Compute the determinant of a tensor or rank 2, here for <tt>dim==3</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 1998
  */
 inline
@@ -928,6 +975,8 @@ double determinant (const Tensor<2,3> &t)
  * Compute and return the trace of a tensor of rank 2, i.e. the sum of
  * its diagonal entries.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 2001
  */
 template <int dim>
@@ -947,6 +996,8 @@ double trace (const Tensor<2,dim> &d)
  * size of the return object is known, it is acceptable to return the
  * result by value, rather than by reference as a parameter.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>
@@ -1013,6 +1064,8 @@ invert (const Tensor<2,dim> &t)
  * value, rather than by reference as a parameter. Note that there are
  * specializations of this function for <tt>dim==1,2,3</tt>.
  *
+ * @relates Tensor
+ * @relates Tensor<2,dim>
  * @author Wolfgang Bangerth, 2002
  */
 template <int dim>
@@ -1088,6 +1141,8 @@ transpose (const Tensor<2,3> &t)
 /**
  * Multiplication of a tensor of general rank with a scalar double
  * from the right.
+ *
+ * @relates Tensor
  */
 template <int rank, int dim>
 inline
@@ -1105,6 +1160,8 @@ operator * (const Tensor<rank,dim> &t,
 /**
  * Multiplication of a tensor of general rank with a scalar double
  * from the left.
+ *
+ * @relates Tensor
  */
 template <int rank, int dim>
 inline
@@ -1121,6 +1178,8 @@ operator * (const double            factor,
 
 /**
  * Division of a tensor of general rank by a scalar double.
+ *
+ * @relates Tensor
  */
 template <int rank, int dim>
 inline
