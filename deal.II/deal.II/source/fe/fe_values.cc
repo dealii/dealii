@@ -804,9 +804,16 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
   Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
 	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
 
-//TODO:[GK] Reinsert this assertion? It tests a necessary, not a sufficient condition
-  //  Assert (cell->face(face_no)->at_boundary() == false,
-  //	  ExcReinitCalledWithBoundaryFace());
+				   // check that the face we are
+				   // presently working on is not at
+				   // the boundary, since boundary
+				   // faces cannot, by definition, be
+				   // further refined as there is no
+				   // other cell behind the face, and
+				   // then there is no point in using
+				   // subfacevalues on these faces
+  Assert (cell->face(face_no)->at_boundary() == false,
+	  ExcReinitCalledWithBoundaryFace());
   
   present_cell  = cell;
   present_face  = cell->face(face_no);
