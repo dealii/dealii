@@ -824,7 +824,7 @@ GridIn<dim>::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
 				   // array and replace the old one by
 				   // the new one
   std::vector<Point<dim> > tmp;
-  tmp.reserve (count(vertex_used.begin(), vertex_used.end(), true));
+  tmp.reserve (std::count(vertex_used.begin(), vertex_used.end(), true));
   for (unsigned int v=0; v<vertices.size(); ++v)
     if (vertex_used[v] == true)
       tmp.push_back (vertices[v]);
