@@ -614,6 +614,10 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      *
 				      * To condense a given sparsity pattern,
 				      * use #ConstraintMatrix::condense#.
+				      *
+				      * This function uses the user flags for
+				      * the faces. If you need the user flags,
+				      * store them beforehand.
 				      */
     void make_constraint_matrix (ConstraintMatrix &) const;
 

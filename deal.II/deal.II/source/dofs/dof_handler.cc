@@ -1138,7 +1138,26 @@ void DoFHandler<1>::make_constraint_matrix (ConstraintMatrix &cm) const {
 
 template <>
 void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const {
+  const unsigned int dim = 2;
+  
   constraints.clear ();
+
+				   // first mark all faces which are subject
+				   // to constraints. We do so by looping
+				   // over all active cells and checking
+				   // whether any of the faces are refined
+				   // which can only be from the neighboring
+				   // cell because this one is active. In that
+				   // case, the face is subject to constraints
+  tria->clear_user_flags ();
+  Triangulation<dim>::active_cell_iterator cell = tria->begin_active(),
+					   endc = tria->end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->face(face)->has_children()) 
+	cell->face(face)->set_user_flag();
+  
+
   
   line_iterator line = begin_line(),
 		endl = end_line();

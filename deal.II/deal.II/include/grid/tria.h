@@ -860,7 +860,7 @@ enum MeshSmoothing {
  *   interface between regions of different materials.
  *
  *
- *   \subsection{Refinement and of a triangulation}
+ *   \subsection{Refinement and coarsening of a triangulation}
  *
  *   Refinement of a triangulation may be done through several ways. The most
  *   low-level way is directly through iterators: let #i# be an iterator to
@@ -881,6 +881,17 @@ enum MeshSmoothing {
  *   structures and algorithms much much easier. To be honest, this is mostly
  *   an algorithmic step than one needed by the finite element method.
  *
+ *   To coarsen a grid, the same way as above is possible by using
+ *   #i->set_coarsen_flag# and calling #execute_coarsening#. You can use
+ *   #execute_coarsening_and_refinement# to get both actions done, first
+ *   coarsening and refinement. The reason for this order is that the
+ *   refinement usually adds some additional cells to keep the triangulation
+ *   regular and thus satifies all refinement requests, while the coarsening
+ *   does not delete cells not requested for; therefore the refinement will
+ *   often revert some effects of coarsening while the opposite is not true.
+ *   The stated order of coarsening before refinement will thus normally
+ *   lead to a result closer to the intended one.
+ *
  *   Marking cells for refinement 'by hand' through iterators is one way to
  *   produce a new grid, especially if you know what kind of grid you are
  *   looking for, e.g. if you want to have a grid successively refined
@@ -895,20 +906,22 @@ enum MeshSmoothing {
  *   vector of values, one per active cell, which denote the criterion according
  *   to which the triangulation is to be refined. It marks all cells for which
  *   the criterion is greater than the threshold being given as the second
- *   argument.
+ *   argument. Analogously,
+ *   #coarsen (const dVector &criterion, const double threshold)# flags those
+ *   cells for coarsening for which the criterion is less than the treshold.
  *
- *   There are two variations of this function, which rely on #refine# by
- *   computing the threshold from other information:
+ *   There are two variations of these functions, which rely on #refine# and
+ *   coarsen by computing the thresholds from other information:
  *   \begin{itemize}
- *   \item #refine_fixed_number#: this function takes a vector as above and
- *     a value between zero and one denoting the fraction of cells to be
- *     refined. For this purpose, it sorts the criteria per cell and takes
- *     the threshold to be the one belonging to the cell with the
+ *   \item #refine_and_coarsen_fixed_number#: this function takes a vector as
+ *     above and two values between zero and one denoting the fractions of cells to
+ *     be refined and coarsened. For this purpose, it sorts the criteria per cell
+ *     and takes the threshold to be the one belonging to the cell with the
  *     #fraction times n_active_cells# highest criterion. For example, if
  *     the fraction is $0.3$, the threshold is computed to a value such that
  *     30 per cent of cells have a criterion higher than the threshold and are
  *     thus flagged for refinement. The flagging for refinement is done through
- *     the central #refine# function.
+ *     the central #refine# function. For coarsening, the same holds.
  *
  *     The sorting of criteria is not done actually, since we only need one
  *     value, in the example above the criterion of the cell which is at
@@ -919,15 +932,15 @@ enum MeshSmoothing {
  *     than #N log N# for sorting all values.
  *
  *     A typical value for the fraction of cells to be refined is 0.3.
- *     However, for singular functions or error functionals, you may want to
- *     chose a smaller value to avoid overrefinement in regions which do not
- *     contribute much to the error.
+ *     However, for singular functions or singular error functionals, you may
+ *     want to chose a smaller value to avoid overrefinement in regions which
+ *     do not contribute much to the error.
  *
- *   \item #refine_fixed_fraction#: this function computes the threshold such
- *     that the number of cells getting flagged for refinement makes up for a
- *     certain fraction of the total error. If this fraction is 50 per cent,
- *     for example, the threshold is computed such that the cells with a
- *     criterion greater than the threshold together account for half of the
+ *   \item #refine_and_coarsen_fixed_fraction#: this function computes the
+ *     threshold such that the number of cells getting flagged for refinement
+ *     makes up for a certain fraction of the total error. If this fraction is 50
+ *     per cent, for example, the threshold is computed such that the cells with
+ *     a criterion greater than the threshold together account for half of the
  *     total error. The definition of the fraction is a bit unintuitive, since
  *     the total error is the sum over all cells of the local contribution
  *     squared. We define that the fraction $\alpha$ be such that those
@@ -938,37 +951,19 @@ enum MeshSmoothing {
  *     indicator with $\eta^2 = \sum \eta_K^2$, with here the sum running over
  *     all cells.
  *
+ *     For the bottom fraction the same holds: the treshold for coarsening is
+ *     computed such that the cells with criterion less than the threshold
+ *     together make up for the fraction of the total error specified.
+ *
  *     This strategy is more suited for singular functions and error
  *     functionals, but may lead to very slow convergence of the grid
  *     if only few cells are refined in each step.
  *
  *     From the implementational point, this time we really need to
- *     sort the array of criteria. However, it is not necessary to sort
- *     the whole array, since for example if you chose the fraction at
- *     50 per cent of the total error, it is only necessary to sort at
- *     most the 50 per cent of cells ranking topmost in the list of error
- *     per cell. It is thus reasonable to use an algorithm like
- *     #partial_sort# of the C++ standard library, which only sorts part
- *     of the array and lets the rest unsorted. However, in many cases
- *     much fewer than 50 per cent of the cells account for 50 per cent
- *     of the error, so it may be possible to get away with sorting less
- *     than 50 per cent of the cells. We therefore divide the whole lot
- *     of 50 per cent of cells into, say, 5 parts, first sort for the
- *     10 per cent with highest error; look whether they together make up
- *     for 50 per cent and if so thats ok, we can leave the rest unsorted;
- *     if not, sort the next 10 per cent, and so on. The default is to
- *     devide the maximum number of cells which may get refined (which
- *     equals the fraction of the total error, as explained above) into
- *     five parts, but this value may be given as a parameter to the
- *     #refine_fixed_fraction# function. For highly singular error
- *     functionals, it may be more efficient to chose a greater number
- *     than five. Chosing a value which is too large should not lead to
- *     a large performance drawback; chosing too small a value however
- *     may lead to significantly higher computational costs for sorting
- *     than necessary.
- *
+ *     sort the array of criteria.
  *     Just like the other strategy described above, this function only
- *     computes the threshold value and then passes over to #refine#.
+ *     computes the threshold values and then passes over to #refine# and
+ *     #coarsen#.
  *
  *     A typical value for the fraction of the total error is 0.5.
  *   \end{itemize}
@@ -981,6 +976,9 @@ enum MeshSmoothing {
  *   It is assumed that the criterion is a value in a certain norm over each
  *   element, such that the square of the total error is the sum over the
  *   squares of the criteria on the cells. The criteria shall be positive.
+ *
+ *   You can suppress coarsening or refining by giving zero as the fraction
+ *   for one of the operations.
  *
  *
  *   \subsection{Smoothing of a triangulation}
@@ -1178,6 +1176,8 @@ enum MeshSmoothing {
  *       tria.execute_refinement ();
  *     };        
  *   \end{verbatim}
+ *
+ *   The same scheme is employed for coarsening and the coarsening flags.
  *
  *   You may write other information to the output file between different sets
  *   of refinement information, as long as you read it upon re-creation of the
@@ -1586,9 +1586,20 @@ class Triangulation : public TriaDimensionInfo<dim> {
 		 const double   threshold);
 
 				     /**
+				      * Analogue to the #refine# function:
+				      * flag all cells for coarsening for
+				      * which the criterion is less than the
+				      * given threshold.
+				      */
+    void coarsen (const dVector &criteria,
+		  const double   threshold);
+    
+				     /**
 				      * Refine the triangulation by refining
-				      * a certain fraction #fraction_of_cells#
-				      * with the highest error. To actually
+				      * a certain fraction #top_fraction_of_cells#
+				      * with the highest error. Likewise coarsen
+				      * the fraction #bottom_fraction_of_cells#
+				      * with the least error. To actually
 				      * perform the refinement, call
 				      * #execute_refinement#.
 				      *
@@ -1598,27 +1609,28 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * Refer to the general doc of this class
 				      * for more information.
 				      */
-    void refine_fixed_number (const dVector &criteria,
-			      const double   fraction_of_cells);
+    void refine_and_coarsen_fixed_number (const dVector &criteria,
+					  const double   top_fraction_of_cells,
+					  const double   bottom_fraction_of_cells);
 
 				     /**
 				      * Refine the triangulation by flagging
 				      * those cells which make up a certain
-				      * #fraction_of_error# of the total error.
+				      * #top_fraction# of the total error.
+				      * Likewise, coarsen all cells which
+				      * make up only #bottom_fraction#.
 				      * To actually perform the refinement, call
-				      * #execute_refinement#.
+				      * #execute_coarsening_and_refinement#.
 				      *
-				      * #fraction_of_error# shall be a value
+				      * #*_fraction# shall be a values
 				      * between zero and one.
-				      * #n_sorting_parts# shall be one or
-				      * greater.
 				      *
 				      * Refer to the general doc of this class
 				      * for more information.
 				      */
-    void refine_fixed_fraction (const dVector      &criteria,
-				const double        fraction_of_error,
-				const unsigned int  n_sorting_parts = 5);
+    void refine_and_coarsen_fixed_fraction (const dVector &criteria,
+					    const double   top_fraction,
+					    const double   bottom_fraction);
     
 				     /**
 				      *  Refine all cells on all levels which
@@ -1656,7 +1668,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * Execute both refinement and coarsening
 				      * of the triangulation.
 				      */
-    void execute_refinement_and_coarsening ();
+    void execute_coarsening_and_refinement ();
 				     /*@}*/
 
 				     /**
@@ -1689,6 +1701,17 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  #save_refine_flags#.
 				      */
     void load_refine_flags (istream &in);
+
+				     /**
+				      * Analogue to #save_refine_flags#.
+				      */
+    void save_coarsen_flags (ostream &out) const;
+
+    				     /**
+				      * Analogue to #load_refine_flags#.
+				      */
+    void load_coarsen_flags (istream &out);
+
     				     /*@}*/
 
 
@@ -2432,6 +2455,14 @@ class Triangulation : public TriaDimensionInfo<dim> {
                                       */
     void prepare_coarsening ();
 
+				     /**
+				      * Actually delete a cell, which is the
+				      * main step for the coarsening process.
+				      * This is the dimension dependent part
+				      * of #execute_coarsening#.
+				      */
+    void delete_cell (cell_iterator &cell);
+    
 				     /**
 				      *  Array of pointers pointing to the
 				      *  #TriangulationLevel<dim># objects

@@ -263,7 +263,7 @@ class ConstraintMatrix {
 				      */
     DeclException1 (ExcLineExists,
 		    unsigned int,
-		    << "The lines " << arg1
+		    << "The line " << arg1
 		    << " which is to be created already exists.");
 				     /**
 				      * Exception

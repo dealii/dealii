@@ -729,6 +729,74 @@ void Triangulation<dim>::load_refine_flags (istream &in) {
 };
 
 
+
+template <int dim>
+void Triangulation<dim>::save_coarsen_flags (ostream &out) const {
+  unsigned int N = n_active_cells();
+  active_cell_iterator cell = begin_active(),
+		       endc = end();
+
+  unsigned char *flags = new unsigned char[N/8+1];
+  for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
+  
+  for (unsigned int position=0; cell!=endc; ++cell, ++position)
+    flags[position/8] |= (cell->coarsen_flag_set() ? (1<<(position%8)) : 0);
+
+				   // format:
+				   // 0. magic number
+				   // 1. number of active cells
+				   // 2. the flags
+				   // 3. magic number 0xabcd
+  out << mn_tria_coarsen_flags_begin << " " << N << endl;
+  for (unsigned int i=0; i<N/8+1; ++i) 
+    out << static_cast<unsigned int>(flags[i]) << " ";
+  
+  out << endl;
+  out << mn_tria_coarsen_flags_end << endl;
+
+  delete[] flags;
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_coarsen_flags (istream &in) {
+  unsigned int magic_number;
+  in >> magic_number;
+  Assert (magic_number==mn_tria_coarsen_flags_begin, ExcGridReadError());
+
+  unsigned int N;
+  in >> N;
+  Assert (N==n_active_cells(), ExcGridsDoNotMatch(N, n_active_cells()));
+
+  unsigned char *flags = new unsigned char[N/8+1];
+  unsigned short int tmp;
+  for (unsigned int i=0; i<N/8+1; ++i) 
+    {
+      in >> tmp;
+      flags[i] = tmp;
+    };
+  
+  
+  active_cell_iterator cell = begin_active(),
+		       endc = end();
+  unsigned int position=0;
+  for (; cell!=endc; ++cell, ++position)
+    if (flags[position/8] & (1<<(position%8)))
+      cell->set_coarsen_flag();
+    else
+      cell->clear_coarsen_flag();
+
+  Assert (position==N, ExcGridReadError());
+
+  in >> magic_number;
+  Assert (magic_number==mn_tria_coarsen_flags_end, ExcGridReadError());
+
+  delete[] flags;
+};
+
+
+
 #if deal_II_dimension == 1
 
 template <>
@@ -1910,23 +1978,47 @@ void Triangulation<dim>::refine (const dVector &criteria,
 
 
 template <int dim>
-void Triangulation<dim>::refine_fixed_number (const dVector &criteria,
-					      const double   fraction) {
+void Triangulation<dim>::coarsen (const dVector &criteria,
+				  const double   threshold) {
+  Assert (criteria.size() == n_active_cells(),
+	  ExcInvalidVectorSize(criteria.size(), n_active_cells()));
+
+  active_cell_iterator cell = begin_active();
+  const unsigned int n_cells = criteria.size();
+  
+  for (unsigned int index=0; index<n_cells; ++cell, ++index)
+    if (criteria(index) <= threshold)
+      cell->set_coarsen_flag();
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::refine_and_coarsen_fixed_number (const dVector &criteria,
+							  const double   top_fraction,
+							  const double   bottom_fraction) {
 				   // correct number of cells is
 				   // checked in #refine#
-  Assert ((fraction>0) && (fraction<=1), ExcInvalidParameterValue());
-
-				   // refine at least one cell
-  const int refine_cells = max(static_cast<int>(fraction*criteria.size()),
+  Assert ((top_fraction>0) && (top_fraction<=1), ExcInvalidParameterValue());
+  Assert ((bottom_fraction>0) && (bottom_fraction<=1), ExcInvalidParameterValue());
+  Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
+				   // refine at least one cell; algorithmic
+				   // simplification
+  const int refine_cells = max(static_cast<int>(top_fraction*criteria.size()),
 			       1);
+  const int coarsen_cells = max(static_cast<int>(bottom_fraction*criteria.size()),
+				1);
   
   dVector tmp(criteria);  
-  nth_element (tmp.begin(),
-	       tmp.begin()+refine_cells,
+  nth_element (tmp.begin(), tmp.begin()+refine_cells,
 	       tmp.end(),
 	       greater<double>());
-
   refine (criteria, *(tmp.begin() + refine_cells));
+
+  nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
+	       tmp.end(),
+	       greater<double>());
+  coarsen (criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
 };
 
 
@@ -1940,35 +2032,16 @@ double sqr(double a) {
 
 
 template <int dim>
-void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
-						const double       fraction_of_error,
-						const unsigned int n_sorting_steps) {
+void
+Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
+						       const double   top_fraction,
+						       const double   bottom_fraction) {
 				   // correct number of cells is
 				   // checked in #refine#
-  Assert ((fraction_of_error>0) && (fraction_of_error<=1),
-	  ExcInvalidParameterValue());
+  Assert ((top_fraction>0) && (top_fraction<=1), ExcInvalidParameterValue());
+  Assert ((bottom_fraction>0) && (bottom_fraction<=1), ExcInvalidParameterValue());
+  Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
 
-				   // rename variable since we have to change it
-  unsigned n_sorting_parts = n_sorting_steps;
-  
-
-				   // number of cells to be sorted per part
-  unsigned cells_per_part
-    = static_cast<int>(rint(fraction_of_error * criteria.size() / n_sorting_parts));
-
-				   // if number of elements is so small or the
-				   // fraction so high that we will get into trouble
-				   // with the maximum number of elements to be
-				   // sorted, fall back to only one sorting step.
-				   // Do so also if cells_per_part was rounded
-				   // to zero
-  if ((cells_per_part*n_sorting_parts > criteria.size()) ||
-      (cells_per_part == 0)) 
-    {
-      cells_per_part = criteria.size();
-      n_sorting_parts = 1;
-    };
-  
 				   // let tmp be the cellwise square of the
 				   // error, which is what we have to sum
 				   // up and compare with
@@ -1978,70 +2051,46 @@ void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
   const double total_error = tmp.l1_norm();
   
   dVector partial_sums(criteria.size());
-  for (unsigned int part=0; part<n_sorting_parts; ++part)
-    {
-				       // partially sort next part of range
-      partial_sort (tmp.begin()+part*cells_per_part,
-		    tmp.begin()+(part+1)*cells_per_part,
-		    tmp.end(),
-		    greater<double>());
-				       // compute partial sum of the range
-				       // as yet sorted. In principle it
-				       // would be sufficient to only sum up
-				       // the newly sorted part and give the
-				       // partial sum an initial value equal
-				       // to the previously last partial sum,
-				       // but at present I do not know how
-				       // to do so in an easy way. Think
-				       // about it and fix it if you want!
-				       // (This way doesn't eat up much
-				       // computing time anyway, much less
-				       // than the sorting, so I don't care
-				       // about fixing this myself.)
-      partial_sum (tmp.begin(),
-		   tmp.begin()+(part+1)*cells_per_part,
-		   partial_sums.begin());
-      
-				       // check whether the sorted
-				       // region already is enough
-      if (*(partial_sums.begin()+(part+1)*cells_per_part-1) >=
-	  (fraction_of_error*total_error))
-	{
-					   // find first entry in the partial
-					   // sum which is greater than the
-					   // fraction of the error. We only
-					   // need to search the newly created
-					   //region
-	  const dVector::const_iterator threshold_ptr
-	    = lower_bound (partial_sums.begin()+part*cells_per_part,
-			   partial_sums.begin()+(part+1)*cells_per_part,
-			   fraction_of_error*total_error);
-	  Assert (threshold_ptr<partial_sums.begin()+(part+1)*cells_per_part,
-		  ExcInternalError());
+  sort (tmp.begin(), tmp.end(), greater<double>());
+  partial_sum (tmp.begin(), tmp.end(), partial_sums.begin());
 
-					   // now find the corresponding
-					   // criterion and call refine
-	  if (threshold_ptr==partial_sums.begin())
-	    refine (criteria, sqrt(*threshold_ptr));
-	  else
-	    refine (criteria,
-						     // revert partial sum into
-						     // a single value
-		    sqrt(*threshold_ptr - *(threshold_ptr-1)));
-	  return;
-	};
-    };
-				   // this should not have happened: when
-				   // we come to this point, we have either
-				   // used more cells than the given fraction
-				   // to reach the fraction_of_error, or
-				   // something has gone terribly wrong.
+				   // compute thresholds
+  dVector::const_iterator p;
+  double top_threshold, bottom_threshold;
+  p = lower_bound (partial_sums.begin(), partial_sums.end(),
+		   top_fraction*total_error);
+  if (p==partial_sums.begin())
+    top_threshold = sqrt(*p);
+  else
+    top_threshold = sqrt(*p - *(p-1));
+
+  p = upper_bound (partial_sums.begin(), partial_sums.end(),
+		   total_error*(1-bottom_fraction));
+  if (p==partial_sums.end())
+    bottom_threshold = 0;
+  else
+    bottom_threshold = sqrt(*p - *(p-1));
+
+  Assert (bottom_threshold<=top_threshold, ExcInternalError());
+
+				   // in some rare cases it may happen that
+				   // both thresholds are the same (e.g. if
+				   // there are many cells with the same
+				   // error indicator). That would mean that
+				   // all cells will be flagged for
+				   // refinement or coarsening, but some will
+				   // be flagged for both, namely those for
+				   // which the indicator equals the
+				   // thresholds. This is forbidden, however.
 				   //
-				   // Only exception: there are so few cells
-				   // that fraction*n_cells == n_cells
-				   // (integer arithmetic!)
-  Assert (n_sorting_parts * cells_per_part == criteria.size(),
-	  ExcInternalError());
+				   // In that case we arbitrarily reduce the
+				   // bottom threshold by one permille.
+  if (bottom_threshold==top_threshold)
+    bottom_threshold *= 0.999;
+  
+				   // actually flag cells
+  refine (criteria, top_threshold);
+  coarsen (criteria, bottom_threshold);
 };
 
 
@@ -2978,20 +3027,30 @@ void Triangulation<dim>::prepare_refinement () {
 
 void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
 					   const unsigned int dimension) {
-  refine_flags.reserve (total_cells);
-  refine_flags.insert (refine_flags.end(),
-		       total_cells - refine_flags.size(),
-		       false);
-  
-  coarsen_flags.reserve (total_cells);
-  coarsen_flags.insert (coarsen_flags.end(),
-			total_cells - coarsen_flags.size(),
-			false);
-
-  neighbors.reserve (total_cells*(2*dimension));
-  neighbors.insert (neighbors.end(),
-		    total_cells*(2*dimension) - neighbors.size(),
-		    make_pair(-1,-1));
+				   // we need space for total_cells
+				   // cells. Maybe we have more already
+				   // with those cells which are unused,
+				   // so only allocate new space if needed.
+				   //
+				   // note that all arrays should have equal
+				   // sizes (checked by #monitor_memory#
+  if (total_cells > refine_flags.size()) 
+    {
+      refine_flags.reserve (total_cells);
+      refine_flags.insert (refine_flags.end(),
+			   total_cells - refine_flags.size(),
+			   false);
+      
+      coarsen_flags.reserve (total_cells);
+      coarsen_flags.insert (coarsen_flags.end(),
+			    total_cells - coarsen_flags.size(),
+			    false);
+      
+      neighbors.reserve (total_cells*(2*dimension));
+      neighbors.insert (neighbors.end(),
+			total_cells*(2*dimension) - neighbors.size(),
+			make_pair(-1,-1));
+    };
 };
 
 
@@ -3026,35 +3085,39 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines) {
   for (; u!=e; ++u)
     ++used_lines;
 
-  unsigned int new_size = used_lines + new_lines;
+  const unsigned int new_size = used_lines + new_lines;
 
+				   // same as in #reserve_space<0>#: only
+				   // allocate space if necessary
+  if (new_size>lines.lines.size()) 
+    {
 //  cout << "  lines: pre: siz=" << lines.lines.size() << ", cap=" << lines.lines.capacity();
-  lines.lines.reserve (new_size);
+      lines.lines.reserve (new_size);
 //  cout << " inter: siz=" << lines.lines.size() << ", cap=" << lines.lines.capacity()
 //       << " (newsize=" << new_size << ")";
-  lines.lines.insert (lines.lines.end(), new_size-lines.lines.size(), Line());
+      lines.lines.insert (lines.lines.end(), new_size-lines.lines.size(), Line());
 //  cout << " post: siz=" << lines.lines.size() << ", cap=" << lines.lines.capacity() << endl;
   
 //  cout << "  used : pre: siz=" << lines.used.size() << ", cap=" << lines.used.capacity();
-  lines.used.reserve (new_size);
+      lines.used.reserve (new_size);
 //  cout << " inter: siz=" << lines.used.size() << ", cap=" << lines.used.capacity()
 //       << " (newsize=" << new_size << ")";
-  lines.used.insert (lines.used.end(), new_size-lines.used.size(), false);
+      lines.used.insert (lines.used.end(), new_size-lines.used.size(), false);
 //  cout << " post: siz=" << lines.used.size() << ", cap=" << lines.used.capacity() << endl;
   
-  lines.user_flags.reserve (new_size);
-  lines.user_flags.insert (lines.user_flags.end(),
-			   new_size-lines.user_flags.size(), false);
-  
-  lines.children.reserve (new_size);
-  lines.children.insert (lines.children.end(), new_size-lines.children.size(),
-			 -1);
+      lines.user_flags.reserve (new_size);
+      lines.user_flags.insert (lines.user_flags.end(),
+			       new_size-lines.user_flags.size(), false);
+      
+      lines.children.reserve (new_size);
+      lines.children.insert (lines.children.end(), new_size-lines.children.size(),
+			     -1);
 
-  lines.material_id.reserve (new_size);
-  lines.material_id.insert (lines.material_id.end(),
-			    new_size-lines.material_id.size(),
-			    255);
-
+      lines.material_id.reserve (new_size);
+      lines.material_id.insert (lines.material_id.end(),
+				new_size-lines.material_id.size(),
+				255);
+    };
 };
 
 
@@ -3085,8 +3148,6 @@ void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (lines.lines.size(), lines.children.size()));
   Assert (lines.lines.size() == lines.material_id.size(),
 	  ExcMemoryInexact (lines.lines.size(), lines.material_id.size()));
-  Assert (lines.used[lines.used.size()-1]==true ,
-	  ExcUnusedMemoryAtEnd());
 
   TriangulationLevel<0>::monitor_memory (true_dimension);
 };
@@ -3103,26 +3164,30 @@ void TriangulationLevel<2>::reserve_space (const unsigned int new_quads) {
   for (; u!=e; ++u)
     ++used_quads;
 
-  unsigned int new_size = used_quads + new_quads;
-  
-  quads.quads.reserve (new_size);
-  quads.quads.insert (quads.quads.end(), new_size-quads.quads.size(), Quad());
-  
-  quads.used.reserve (new_size);
-  quads.used.insert (quads.used.end(), new_size-quads.used.size(), false);
-  
-  quads.user_flags.reserve (new_size);
-  quads.user_flags.insert (quads.user_flags.end(),
-			   new_size-quads.user_flags.size(), false);
-  
-  quads.children.reserve (new_size);
-  quads.children.insert (quads.children.end(), new_size-quads.children.size(),
-			 -1);
+  const unsigned int new_size = used_quads + new_quads;
 
-  quads.material_id.reserve (new_size);
-  quads.material_id.insert (quads.material_id.end(),
-			    new_size-quads.material_id.size(),
-			    255);
+				   // see above...
+  if (new_size>quads.quads.size())
+    {
+      quads.quads.reserve (new_size);
+      quads.quads.insert (quads.quads.end(), new_size-quads.quads.size(), Quad());
+      
+      quads.used.reserve (new_size);
+      quads.used.insert (quads.used.end(), new_size-quads.used.size(), false);
+  
+      quads.user_flags.reserve (new_size);
+      quads.user_flags.insert (quads.user_flags.end(),
+			       new_size-quads.user_flags.size(), false);
+  
+      quads.children.reserve (new_size);
+      quads.children.insert (quads.children.end(), new_size-quads.children.size(),
+			     -1);
+
+      quads.material_id.reserve (new_size);
+      quads.material_id.insert (quads.material_id.end(),
+				new_size-quads.material_id.size(),
+				255);
+    };
 };
 
 
@@ -3152,8 +3217,6 @@ void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (quads.quads.size(), quads.children.size()));
   Assert (quads.quads.size() == quads.material_id.size(),
 	  ExcMemoryInexact (quads.quads.size(), quads.material_id.size()));
-  Assert (quads.used[quads.used.size()-1]==true ,
-	  ExcUnusedMemoryAtEnd());
 
   TriangulationLevel<1>::monitor_memory (true_dimension);
 };
