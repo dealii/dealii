@@ -45,9 +45,10 @@ OP \+|\-|\/|\||\^|(==)|(!=)|(<<)|(>>)|(->)|(\+\+)|(\-\-)
 <COMMENT>"*/"       { yy_pop_state(); }
 
 DeclException[0-9]  { yylval = string("@") + string(yytext); return(DECLEXCEPTION); }
+<EXC_IGNORE>"(" { yy_push_state(EXC_IGNORE); }
+<EXC_IGNORE>")" { yy_pop_state(); }
 <EXC_IGNORE>.
 <EXC_IGNORE>\n
-<EXC_IGNORE>");" { yy_pop_state(); }
 
 "//"                { yy_push_state(LINECOMMENT); }
 <LINECOMMENT>.
@@ -55,9 +56,9 @@ DeclException[0-9]  { yylval = string("@") + string(yytext); return(DECLEXCEPTIO
 
  /* scan CVS id in file preamble */
 
-"$Id$" { cvs_id = string(yytext); }
-<LINECOMMENT>"$Id$" { cvs_id = string(yytext); }
-<COMMENT>"$Id$" { cvs_id = string(yytext); }
+"$Id$]*"$" { cvs_id = string(yytext); }
+<LINECOMMENT>"$Id$]*"$" { cvs_id = string(yytext); }
+<COMMENT>"$Id$]*"$" { cvs_id = string(yytext); }
 
 
  /* Ignore function bodies */
@@ -95,6 +96,7 @@ friend    { return FRIEND; }
 typedef   { return TYPEDEF; }
 namespace { return NAMESPACE; }
 using     { return USING; }
+long      { return LONG; }
 typename {}
 
 {CLASS}  { yylval = string(yytext); return CLASS; }
@@ -124,6 +126,11 @@ typename {}
 void enterfunction()
 {
   yy_push_state(INFUNCTION);
+}
+
+void enterexc()
+{
+  yy_push_state(EXC_IGNORE);
 }
 
 void enterbaseinitializers()

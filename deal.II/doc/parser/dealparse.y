@@ -13,6 +13,7 @@ stack<string> access_stack;
 
 int yylex();
 void enterfunction();
+void enterexc();
 void enterbaseinitializers();  
 
 string doctext;
@@ -49,6 +50,7 @@ void yyerror(const char* s)
 %token OP
 %token TEMPLATE
 %token UNSIGNED
+%token LONG
 %token INT
 %token FLOAT
 %token CHAR
@@ -255,6 +257,7 @@ class_declaration: class_head
       class_name = class_stack.top() + string("::") + class_name;
       class_stack.push(class_name);
       access_stack.push(string("private"));
+      cout << "@@@" << endl;
     } '{' class_body '}'
     {
       class_stack.pop();
@@ -312,6 +315,7 @@ friend_declaration:
 
 vartype:
   identifier { $$ = $1; }
+  | LONG IDENTIFIER { $$ = string("long ") + $2; }
   | UNSIGNED IDENTIFIER { $$ = string("unsigned ") + $2; }
   | CONST vartype { $$ = string("const ") + $2; }
   | vartype '*' CONST { $$ = $1 +  string("* const"); }
@@ -380,11 +384,13 @@ template_declaration:
 ;
 
 deal_exception_declaration:
-  DECLEXCEPTION '(' IDENTIFIER deal_exception_arglist ')'
+  DECLEXCEPTION '(' IDENTIFIER
   { cout << setw(OUTW) << $1 << ':' << $3 << endl
 	 << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	 << setw(OUTW) << "@Access:" << access_stack.top() << endl;
-    printdoc(cout); }
+    printdoc(cout);
+    enterexc();
+  }
 ;
 
 deal_exception_arglist: /* empty */
@@ -398,9 +404,10 @@ deal_exception_arg:
 ;
 
 deal_exception_output_declaration: OP
-  | deal_exception_output_declaration vartype
+  | expression
+/*  | deal_exception_output_declaration vartype
   | deal_exception_output_declaration literal
-  | deal_exception_output_declaration OP
+  | deal_exception_output_declaration OP */
 ;
 
 %%
