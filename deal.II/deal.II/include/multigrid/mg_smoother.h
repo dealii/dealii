@@ -36,7 +36,25 @@ class MGSmoother :  public Subscriptor
   public:
 
 				     /**
-				      * Constructor. This one sets clobbers
+				      * Constructor. This one collects
+				      * the indices of the degrees of freedom
+				      * on the interior boundaries between
+				      * the different levels, which are
+				      * needed by the function
+				      * #set_zero_interior_boundaries#.
+				      *
+				      * Since this function is implemented
+				      * a bit different in 1d (there are no
+				      * faces of cells, just vertices),
+				      * there are actually two sets of
+				      * constructors, namely this one for 1d
+				      * and the following one for all other
+				      * dimensions.
+				      */
+    MGSmoother (const MGDoFHandler<1> &mg_dof);
+
+				     /**
+				      * Constructor. This one collects
 				      * the indices of the degrees of freedom
 				      * on the interior boundaries between
 				      * the different levels, which are

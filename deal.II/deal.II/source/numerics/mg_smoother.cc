@@ -11,7 +11,17 @@
 #include <algorithm>
 
 
+#if deal_II_dimension == 1
 
+MGSmoother::MGSmoother (const MGDoFHandler<1> &/*mg_dof*/) 
+{
+  Assert (false, ExcNotImplemented());
+};
+
+#endif
+
+
+#if deal_II_dimension > 1
 
 template <int dim>
 MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof) 
@@ -71,6 +81,8 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof)
     };      
 };
 
+#endif
+
 
 
 MGSmoother::~MGSmoother () 
@@ -104,4 +116,8 @@ MGSmoother::post_smooth (const unsigned int  level,
 
 
 // explicit instantiations
+// don't do the following instantiation in 1d, since there is a specialized
+// function there
+#if deal_II_dimension > 1
 template MGSmoother::MGSmoother (const MGDoFHandler<deal_II_dimension>&);
+#endif
