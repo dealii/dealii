@@ -390,33 +390,34 @@ class KellyErrorEstimator
 
 
 				     /**
-				      * All data needed by the several
+				      * All small temporary data
+				      * objects that are needed once
+				      * per thread by the several
 				      * functions of the error
-				      * estimator is gathered in this
-				      * struct. It is passed as a
-				      * reference to the separate
-				      * functions in this class.
-				      *
-				      * The reason for invention of
-				      * this object is two-fold:
-				      * first, class member data is
-				      * not possible because no real
-				      * object is created (all
-				      * functions are @p{static}),
-				      * which is a historical
-				      * reason. Second, if we don't
-				      * collect the data the various
-				      * functions need somewhere at a
-				      * central place, that would mean
-				      * that the functions would have
-				      * to allocate them upon
-				      * need. However, then some
-				      * variables would be allocated
-				      * over and over again, which can
-				      * take a significant amount of
-				      * time (10-20 per cent) and most
-				      * importantly, memory allocation
-				      * requires synchronisation in
+				      * estimator are gathered in this
+				      * struct. The reason for this
+				      * structure is mainly that we
+				      * have a number of functions
+				      * that operate on cells or faces
+				      * and need a number of small
+				      * temporary data objects. Since
+				      * these functions may run in
+				      * parallel, we cannot make these
+				      * objects member variables of
+				      * the enclosing class. On the
+				      * other hand, declaring them
+				      * locally in each of these
+				      * functions would require their
+				      * reallocating every time we
+				      * visit the next cell or face,
+				      * which we found can take a
+				      * significant amount of time if
+				      * it happens often even in the
+				      * single threaded case (10-20
+				      * per cent in our measurements);
+				      * however, most importantly,
+				      * memory allocation requires
+				      * synchronisation in
 				      * multithreaded mode. While that
 				      * is done by the C++ library and
 				      * has not to be handcoded, it
@@ -425,7 +426,9 @@ class KellyErrorEstimator
 				      * the functions of this class in
 				      * parallel, since they are quite
 				      * often blocked by these
-				      * synchronisation points.
+				      * synchronisation points,
+				      * slowing everything down by a
+				      * factor of two or three.
 				      *
 				      * Thus, every thread gets an
 				      * instance of this class to work
@@ -433,25 +436,8 @@ class KellyErrorEstimator
 				      * memory itself, or synchronise
 				      * with other threads.
 				      */
-    struct Data
+    struct PerThreadData
     {
-	const Mapping<dim>                  &mapping;
-	const DoFHandler<dim>               &dof_handler;
-	const Quadrature<dim-1>             &quadrature;
-	const typename FunctionMap<dim>::type &neumann_bc;
-	const std::vector<const Vector<double>*> &solutions;
-	const std::vector<bool>                   component_mask;
-	const Function<dim>                 *coefficients;
-	const unsigned int                   n_threads;
-	const unsigned int                   n_solution_vectors;
-
-					 /**
-					  * Reference to the global
-					  * object that stores the
-					  * face integrals.
-					  */
-	FaceIntegrals           &face_integrals;  
-
 					 /**
 					  * A vector to store the jump
 					  * of the normal vectors in
@@ -517,19 +503,11 @@ class KellyErrorEstimator
 	std::vector<double>          JxW_values;
 
 					 /**
-					  * A constructor of the
-					  * class Data. All variables are
-					  * passed as references.
+					  * Constructor.
 					  */
-	Data(const Mapping<dim>                  &mapping,
-	     const DoFHandler<dim>               &dof,
-	     const Quadrature<dim-1>             &quadrature,
-	     const typename FunctionMap<dim>::type &neumann_bc,
-	     const std::vector<const Vector<double>*> &solutions,
-	     const std::vector<bool>                  &component_mask,
-	     const Function<dim>                 *coefficients,
-	     const unsigned int                   n_threads,
-	     FaceIntegrals                       &face_integrals);
+	PerThreadData (const DoFHandler<dim>               &dof,
+                       const Quadrature<dim-1>             &quadrature,
+                       const unsigned int      n_solution_vectors);
     };
 
 
@@ -548,8 +526,16 @@ class KellyErrorEstimator
 				      * dimension is implemented
 				      * seperatly.
 				      */
-    static void estimate_some (Data &data,
-			       const unsigned int this_thread);
+    static void estimate_some (const Mapping<dim>                  &mapping,
+                               const DoFHandler<dim>               &dof_handler,
+                               const Quadrature<dim-1>             &quadrature,
+                               const typename FunctionMap<dim>::type &neumann_bc,
+                               const std::vector<const Vector<double>*> &solutions,
+                               const std::vector<bool>                  &component_mask,
+                               const Function<dim>                 *coefficients,
+                               const std::pair<unsigned int, unsigned int> this_thread,
+                               FaceIntegrals                       &face_integrals,
+                               PerThreadData                       &per_thread_data);
     				
 				     /**
 				      * Actually do the computation on
@@ -571,11 +557,20 @@ class KellyErrorEstimator
 				      * ending up with a function of
 				      * 500 lines of code.
 				      */
-    static void integrate_over_regular_face (Data                       &data,
-					     const active_cell_iterator &cell,
-					     const unsigned int          face_no,
-					     FEFaceValues<dim>          &fe_face_values_cell,
-					     FEFaceValues<dim>          &fe_face_values_neighbor);
+    static
+    void
+    integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
+                                 const Quadrature<dim-1>             &quadrature,
+                                 const typename FunctionMap<dim>::type &neumann_bc,
+                                 const std::vector<const Vector<double>*> &solutions,
+                                 const std::vector<bool>                  &component_mask,
+                                 const Function<dim>                 *coefficients,
+                                 FaceIntegrals                       &face_integrals,
+                                 PerThreadData              &per_thread_data,
+                                 const active_cell_iterator &cell,
+                                 const unsigned int          face_no,
+                                 FEFaceValues<dim>          &fe_face_values_cell,
+                                 FEFaceValues<dim>          &fe_face_values_neighbor);
 
 
 				     /**
@@ -588,11 +583,19 @@ class KellyErrorEstimator
 				      * integration is a bit more
 				      * complex.
 				      */
-    static void integrate_over_irregular_face (Data                       &data,
-					       const active_cell_iterator &cell,
-					       const unsigned int          face_no,
-					       FEFaceValues<dim>          &fe_face_values,
-					       FESubfaceValues<dim>       &fe_subface_values);
+    static
+    void
+    integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
+                                   const Quadrature<dim-1>             &quadrature,
+                                   const std::vector<const Vector<double>*> &solutions,
+                                   const std::vector<bool>                  &component_mask,
+                                   const Function<dim>                 *coefficients,
+                                   FaceIntegrals                       &face_integrals,
+                                   PerThreadData              &per_thread_data,
+                                   const active_cell_iterator &cell,
+                                   const unsigned int          face_no,
+                                   FEFaceValues<dim>          &fe_face_values,
+                                   FESubfaceValues<dim>       &fe_subface_values);
 
 				     /** 
 				      * By the resolution of Defect
@@ -607,26 +610,29 @@ class KellyErrorEstimator
 				      * doesn't hurt on the other
 				      * compilers as well.
 				      */
-    friend class Data;
+    friend class PerThreadData;
 };
 
 
 /* -------------- declaration of explicit specializations ------------- */
 
 
-template <> KellyErrorEstimator<1>::Data::Data(
-  const Mapping<1>                    &,
+template <> KellyErrorEstimator<1>::PerThreadData::PerThreadData(
   const DoFHandler<1>                 &,
   const Quadrature<0>                 &,
-  const FunctionMap<1>::type          &,
-  const std::vector<const Vector<double>*> &,
-  const std::vector<bool>                  &,
-  const Function<1>                   *,
-  const unsigned int                   ,
-  FaceIntegrals                       &);
+  const unsigned int);
 
 template <> void KellyErrorEstimator<1>::estimate_some (
-  Data &, const unsigned int);
+  const Mapping<1>                  &mapping,
+  const DoFHandler<1>               &dof_handler,
+  const Quadrature<0>               &quadrature,
+  const FunctionMap<1>::type        &neumann_bc,
+  const std::vector<const Vector<double>*> &solutions,
+  const std::vector<bool>                  &component_mask,
+  const Function<1>                   *coefficients,
+  const std::pair<unsigned int, unsigned int> this_thread,
+  FaceIntegrals                       &face_integrals,
+  PerThreadData                       &per_thread_data);
 
 template <> void KellyErrorEstimator<1>::estimate (
   const Mapping<1>                    &mapping,
@@ -640,14 +646,27 @@ template <> void KellyErrorEstimator<1>::estimate (
   const unsigned int);
 
 template <> void KellyErrorEstimator<1>::integrate_over_regular_face (
-  Data &,
+  const DoFHandler<1>               &dof_handler,
+  const Quadrature<0>             &quadrature,
+  const FunctionMap<1>::type &neumann_bc,
+  const std::vector<const Vector<double>*> &solutions,
+  const std::vector<bool>                  &component_mask,
+  const Function<1>                 *coefficients,
+  FaceIntegrals                       &face_integrals,
+  PerThreadData &,
   const active_cell_iterator &,
   const unsigned int      ,
   FEFaceValues<1>        &,
   FEFaceValues<1>        &);
 
 template <> void KellyErrorEstimator<1>::integrate_over_irregular_face (
-  Data &,
+  const DoFHandler<1>               &dof_handler,
+  const Quadrature<0>             &quadrature,
+  const std::vector<const Vector<double>*> &solutions,
+  const std::vector<bool>                  &component_mask,
+  const Function<1>                 *coefficients,
+  FaceIntegrals                       &face_integrals,
+  PerThreadData &,
   const active_cell_iterator &,
   const unsigned int          ,
   FEFaceValues<1>            &,
