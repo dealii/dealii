@@ -80,6 +80,13 @@ FELinear<1>::shape_grad(const unsigned int i,
 
 
 template <>
+void FELinear<1>::get_unit_ansatz_points (vector<Point<1> >  &ansatz_points) const {
+  FiniteElement<1>::get_unit_ansatz_points (ansatz_points);
+};
+
+
+
+template <>
 void FELinear<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
 				     const Boundary<1>  &boundary,
 				     vector<Point<1> >  &ansatz_points) const {
@@ -352,6 +359,18 @@ void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cel
 
 
 
+template <>
+void FELinear<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const {
+  Assert (unit_points.size() == total_dofs,
+	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+
+  unit_points[0] = Point<2> (0,0);
+  unit_points[1] = Point<2> (1,0);
+  unit_points[2] = Point<2> (1,1);
+  unit_points[3] = Point<2> (0,1);
+};
+  
+
 #endif
 
 
@@ -361,7 +380,7 @@ void FELinear<dim>::get_ansatz_points (const typename DoFHandler<dim>::cell_iter
 				       const Boundary<dim>  &,
 				       vector<Point<dim> >  &ansatz_points) const {
   Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension (ansatz_points.size(), 1<<(dim-1)));
+	  ExcWrongFieldDimension (ansatz_points.size(), total_dofs));
   
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     ansatz_points[vertex] = cell->vertex(vertex);

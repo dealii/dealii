@@ -258,6 +258,28 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 
 
 template <>
+void FiniteElement<1>::get_unit_ansatz_points (vector<Point<1> > &unit_points) const {
+  Assert (unit_points.size() == total_dofs,
+	  ExcWrongFieldDimension(unit_points.size(), total_dofs));
+				   // compute ansatz points. The first ones
+				   // belong to vertex one, the second ones
+				   // to vertex two, all following are
+				   // equally spaced along the line
+  unsigned int next = 0;
+				   // first the dofs in the vertices
+  for (unsigned int i=0; i<dofs_per_vertex; ++i)
+    ansatz_points[next++] = Point<1>(0);
+  for (unsigned int i=0; i<dofs_per_vertex; ++i)
+    ansatz_points[next++] = Point<1>(1);
+  
+				   // now dofs on line
+  for (unsigned int i=0; i<dofs_per_line; ++i) 
+    ansatz_points[next++] = Point<1>((i+1.0)/(dofs_per_line+1.0));
+};
+
+
+
+template <>
 void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
 					  const Boundary<1> &,
 					  vector<Point<1> > &ansatz_points) const {
@@ -278,7 +300,7 @@ void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &ce
 				   // now dofs on line
   for (unsigned int i=0; i<dofs_per_line; ++i) 
     ansatz_points[next++] = cell->vertex(0) +
-			    Point<1>((i+1.0)/(total_dofs+1.0)*h);
+			    Point<1>((i+1.0)/(dofs_per_line+1.0)*h);
 };
 
 #endif
@@ -329,7 +351,7 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
   Assert (ansatz_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension(ansatz_points.size(), dofs_per_face));
   
-  static vector<Point<dim> > dummy(total_dofs);
+  vector<Point<dim> > dummy(total_dofs);
   fill_fe_values (cell, global_unit_points,
 		  jacobians, compute_jacobians,
 		  dummy, false,
@@ -391,6 +413,13 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
   if (compute_normal_vectors)
     get_normal_vectors (cell, face_no, subface_no,
 			unit_points, normal_vectors);
+};
+
+
+
+template <int dim>
+void FiniteElement<dim>::get_unit_ansatz_points (vector<Point<dim> > &) const {
+  Assert (false, ExcPureFunctionCalled());
 };
 
 

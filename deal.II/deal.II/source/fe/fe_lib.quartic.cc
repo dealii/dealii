@@ -392,6 +392,13 @@ FEQuarticSub<1>::shape_grad(const unsigned int i,
 
 
 template <>
+void FEQuarticSub<1>::get_unit_ansatz_points (vector<Point<1> > &unit_points) const {
+  FiniteElement<1>::get_unit_ansatz_points (unit_points);
+};
+
+
+
+template <>
 void FEQuarticSub<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
 					 const Boundary<1>  &boundary,
 					 vector<Point<1> >  &ansatz_points) const {
@@ -2648,6 +2655,40 @@ void FEQuarticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator 
   local_mass_matrix(24,23) = t723;
   local_mass_matrix(24,24) = 5408.0/99225.0*t3-5408.0/99225.0*t7+10816.0/
 			     99225.0*t10+5408.0/99225.0*t12-10816.0/99225.0*t15-5408.0/99225.0*t17;
+};
+
+
+
+template <>
+void FEQuarticSub<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const {
+  Assert (unit_points.size() == total_dofs,
+	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+
+  unit_points[0] = Point<2>(0,0);
+  unit_points[1] = Point<2>(1,0);
+  unit_points[2] = Point<2>(1,1);
+  unit_points[3] = Point<2>(0,1);
+  unit_points[4] = Point<2>(1./4,0);
+  unit_points[5] = Point<2>(2./4,0);
+  unit_points[6] = Point<2>(3./4,0);
+  unit_points[7] = Point<2>(1,1./4);
+  unit_points[8] = Point<2>(1,2./4);
+  unit_points[9] = Point<2>(1,3./4);
+  unit_points[10] = Point<2>(1./4,1);
+  unit_points[11] = Point<2>(2./4,1);
+  unit_points[12] = Point<2>(3./4,1);
+  unit_points[13] = Point<2>(0,1./4);
+  unit_points[14] = Point<2>(0,2./4);
+  unit_points[15] = Point<2>(0,3./4);
+  unit_points[16] = Point<2>(1./4,1./4);
+  unit_points[17] = Point<2>(3./4,1./4);
+  unit_points[18] = Point<2>(3./4,3./4);
+  unit_points[19] = Point<2>(1./4,3./4);
+  unit_points[20] = Point<2>(1./2,1./4);
+  unit_points[21] = Point<2>(3./4,1./2);
+  unit_points[22] = Point<2>(1./2,3./4);
+  unit_points[23] = Point<2>(1./4,1./2);
+  unit_points[24] = Point<2>(1./2,1./2);
 };
 
 

@@ -50,6 +50,12 @@ class FELinear : public FELinearMapping<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
+    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
 				    vector<Point<dim> > &ansatz_points) const;
@@ -100,6 +106,12 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      */
     virtual Point<dim> shape_grad(const unsigned int i,
 				  const Point<dim>& p) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -179,6 +191,12 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
+    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
 				    vector<Point<dim> > &ansatz_points) const;
@@ -249,6 +267,12 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      */
     virtual Point<dim> shape_grad(const unsigned int i,
 				  const Point<dim>& p) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
 
 				     /**
 				      * Refer to the base class for detailed

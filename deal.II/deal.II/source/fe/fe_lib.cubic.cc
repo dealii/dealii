@@ -379,6 +379,13 @@ FECubicSub<1>::shape_grad(const unsigned int i,
 
 
 template <>
+void FECubicSub<1>::get_unit_ansatz_points (vector<Point<1> > &unit_points) const {
+  FiniteElement<1>::get_unit_ansatz_points (unit_points);
+};
+
+
+
+template <>
 void FECubicSub<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
 					   const Boundary<1>  &boundary,
 					   vector<Point<1> >  &ansatz_points) const {
@@ -1535,6 +1542,31 @@ void FECubicSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &c
   local_mass_matrix(15,13) = t301;
   local_mass_matrix(15,14) = t316;
   local_mass_matrix(15,15) = -t287+t288-t311-t290+t312+t292;
+};
+
+
+
+template <>
+void FECubicSub<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const {
+  Assert (unit_points.size() == total_dofs,
+	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
+
+  unit_points[0] = Point<2>(0,0);
+  unit_points[1] = Point<2>(1,0);
+  unit_points[2] = Point<2>(1,1);
+  unit_points[3] = Point<2>(0,1);
+  unit_points[4] = Point<2>(1./3,0);
+  unit_points[5] = Point<2>(2./3,0);
+  unit_points[6] = Point<2>(1,1./3);
+  unit_points[7] = Point<2>(1,2./3);
+  unit_points[8] = Point<2>(1./3,1);
+  unit_points[9] = Point<2>(2./3,1);
+  unit_points[10]= Point<2>(0,1./3);
+  unit_points[11]= Point<2>(0,2./3);
+  unit_points[12]= Point<2>(1./3,1./3);
+  unit_points[13]= Point<2>(2./3,1./3);
+  unit_points[14]= Point<2>(2./3,2./3);
+  unit_points[15]= Point<2>(1./3,2./3);
 };
 
 

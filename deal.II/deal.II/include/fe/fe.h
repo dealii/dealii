@@ -778,6 +778,24 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 const Boundary<dim> &boundary) const;
 
 				     /**
+				      * Return the ansatz points of the
+				      * ansatz functions on the unit cell.
+				      *
+				      * The function assumes that the
+				      * #unit_points# array already has the
+				      * right size. The order of points in
+				      * the array matches that returned by
+				      * the #cell->get_dof_indices# function.
+				      *
+				      * For one space dimension there is a
+				      * standard implementation assuming
+				      * equidistant off-points on the unit
+				      * line. For all other dimensions, an
+				      * overwritten function has to be provided.
+				      */
+    virtual void get_unit_ansatz_points (vector<Point<dim> > &unit_points) const;
+    
+				     /**
 				      * Compute the off-points of the finite
 				      * element basis functions on the given
 				      * cell in real space.
@@ -797,7 +815,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * #ansatz_points# array already has the
 				      * right size. The order of points in
 				      * the array matches that returned by
-				      * the #face->get_dof_indices# function.
+				      * the #cell->get_dof_indices# function.
 				      *
 				      * For one space dimension there is a
 				      * standard implementation assuming
