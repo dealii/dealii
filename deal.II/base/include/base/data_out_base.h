@@ -1121,7 +1121,7 @@ class DataOutBase
  * file. Within a program, this can be changed by the member function
  * #set_format#. Using this default format, it is possible to leave
  * the format selection completely to the parameter file. A suitable
- * suffic for the output file name can be obtained by #default_suffix#
+ * suffix for the output file name can be obtained by #default_suffix#
  * without arguments.
  *
  * @author Wolfgang Bangerth, 1999
