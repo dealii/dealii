@@ -1379,7 +1379,7 @@ dnl     template <typename T2>
 dnl     X operator = (T2 &);
 dnl };
 dnl 
-dnl template X X::operator=<> (float &);
+dnl template X X::operator=<float> (float &);
 dnl /* ---------------------------------------------------------- */
 dnl
 dnl The compiler only groks this if the "operator=" is prepended
