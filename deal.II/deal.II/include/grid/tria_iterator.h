@@ -487,7 +487,34 @@ class TriaRawIterator :
 				     /**
 				      *  Exception
 				      */
-    DeclException0 (ExcDereferenceInvalidObject);
+    DeclException1 (ExcDereferenceInvalidObject,
+		    TriaRawIterator,
+		    << "You tried to dereference an iterator for which this "
+		    << "is not possible. More information on this iterator: "
+		    << "level=" << arg1.accessor.level()
+		    << ", index=" << arg1.accessor.index()
+		    << ", state="
+		    << (arg1.state() == IteratorState::valid ? "valid" :
+			(arg1.state() == IteratorState::past_the_end ?
+			 "past_the_end" : "invalid")));
+
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
+				     // the above exception class is
+				     // supposed to report information
+				     // about *this, but to do so it
+				     // needs to access member
+				     // elements of the enclosing
+				     // class. by defect report #45
+				     // to the C++ standard, this is
+				     // supposed to be allowed, but
+				     // gcc2.95 rejects it (pre-defect
+				     // report era), so declare the
+				     // member class a friend. only do
+				     // this if ./configure detected
+				     // the necessity to do so
+    friend class ExcDereferenceInvalidObject;
+#endif
+    
 				     /**
 				      *  Exception
 				      */
@@ -862,7 +889,8 @@ inline
 const Accessor &
 TriaRawIterator<dim,Accessor>::operator * () const
 {
-  Assert (state() == IteratorState::valid, ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid,
+	  ExcDereferenceInvalidObject(*this));
   return accessor;
 };
 
@@ -873,7 +901,8 @@ inline
 Accessor &
 TriaRawIterator<dim,Accessor>::operator * ()
 {
-  Assert (state() == IteratorState::valid, ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid,
+	  ExcDereferenceInvalidObject(*this));
   return accessor;
 };
 
@@ -914,8 +943,10 @@ inline
 bool
 TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
 {
-  Assert (state() != IteratorState::invalid, ExcDereferenceInvalidObject());
-  Assert (i.state() != IteratorState::invalid, ExcDereferenceInvalidObject());
+  Assert (state() != IteratorState::invalid,
+	  ExcDereferenceInvalidObject(*this));
+  Assert (i.state() != IteratorState::invalid,
+	  ExcDereferenceInvalidObject(i));
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
 	  ExcInvalidComparison());
   
