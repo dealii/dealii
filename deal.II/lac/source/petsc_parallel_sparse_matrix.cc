@@ -121,7 +121,7 @@ namespace PETScWrappers
                              const unsigned int n_nonzero_per_row,
                              const bool         is_symmetric)
     {
-      Assert (local_rows < m, ExcLocalRowsTooLarge (local_rows, m));
+      Assert (local_rows <= m, ExcLocalRowsTooLarge (local_rows, m));
       
                                        // use the call sequence indicating only
                                        // a maximal number of elements per row
@@ -159,7 +159,7 @@ namespace PETScWrappers
                              const std::vector<unsigned int> &row_lengths,
                              const bool         is_symmetric)
     {
-      Assert (local_rows < m, ExcLocalRowsTooLarge (local_rows, m));
+      Assert (local_rows <= m, ExcLocalRowsTooLarge (local_rows, m));
 
       Assert (row_lengths.size() == m,
               ExcDimensionMismatch (row_lengths.size(), m));
