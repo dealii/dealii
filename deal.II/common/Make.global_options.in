@@ -34,8 +34,7 @@ LDFLAGS              = @LDFLAGS@
 F77                  = @F77@
 F77-VERSION          = @F77_VERSION@
 F77LIBS              = @F77LIBS@
-NEEDS_F77LIBS        = @NEEDS_F77LIBS@
-LIBS                 = @LIBS@ @TECPLOT_LIB@ @HSL_LIB@
+LIBS                 = @LIBS@
 LIBDIR               = $D/lib
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
@@ -58,12 +57,6 @@ USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
 
 TARGET               = @target@
-
-# if FORTRAN sublibs are used, add F77 libs to linker flags
-ifeq ($(NEEDS_F77LIBS),yes)
-  LDFLAGS += $(F77LDFLAGS)
-  LIBS    += $(F77LIBS)
-endif
 
 ######################################################
 # now configuration for compiler flags, pathes, etc

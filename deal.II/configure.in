@@ -63,7 +63,7 @@ AC_SUBST(DEAL_II_VERSION)
 AC_SUBST(DEAL_II_MAJOR)
 AC_SUBST(DEAL_II_MINOR)
 AC_SUBST(DEAL_II_PATH)
-
+LDFLAGS="-L$DEAL_II_PATH/lib $LDFLAGS"
 
 dnl    For backward compatibility, also have DEAL2_DIR alias DEAL_II_PATH
 DEAL2_DIR=$DEAL_II_PATH
@@ -366,6 +366,7 @@ dnl -------------------------------------------------------------
 if test "x$NEEDS_F77LIBS" != "x" ; then
    AC_MSG_RESULT(Adding FORTRAN libraries $F77LIBS)
    LIBS="$LIBS $F77LIBS"
+   LDFLAGS="$F77FLAGS $LDFLAGS"
 fi
 
 dnl -------------------------------------------------------------
@@ -374,7 +375,6 @@ dnl -------------------------------------------------------------
 
 DEAL_II_CONFIGURE_TECPLOT
 AC_SUBST(TECPLOT_INCLUDE_DIR)
-AC_SUBST(TECPLOT_LIB)
 
 DEAL_II_CONFIGURE_PETSC
 AC_SUBST(USE_CONTRIB_PETSC)

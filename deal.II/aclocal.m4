@@ -4167,7 +4167,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_HSL, dnl
   if test "x$hsl_subroutines" != "x" ; then
     AC_MSG_RESULT($hsl_subroutines)
     USE_CONTRIB_HSL=yes
-    AC_SUBST(HSL_LIB,'$(LIBDIR)/libhsl$(lib-suffix)')
+    LIBS="-lhsl $LIBS"
     AC_SUBST(HSL_INCLUDE_DIR,'-I$D/contrib/hsl/include')
     AC_SUBST(NEEDS_F77LIBS,"yes")
   else
@@ -4205,6 +4205,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
       test -r "$TECPLOT_INCLUDE_DIR/TECIO.h") ; then
     AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
 	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
+    LIBS="$TECPLOT_LIB $LIBS"
   fi
 ])
 
