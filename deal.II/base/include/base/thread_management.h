@@ -250,11 +250,11 @@ namespace Threads
 				    * configuration detected the
 				    * absence of these functions, then
 				    * barriers will not be available,
-				    * and using this class will result
-				    * in an exception been thrown. The
-				    * rest of the threading
-				    * functionality will be available,
-				    * though.
+				    * and creating objects of this
+				    * class will result in an
+				    * exception been thrown. The rest
+				    * of the threading functionality
+				    * will be available, though.
 				    *
 				    * @author Wolfgang Bangerth, 2002
 				    */
