@@ -262,7 +262,7 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>                 &dof_
       for (unsigned int n=0; n<2; ++n)
 	{
 					   // find right active neighbor
-	  DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
+	  typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
 	  if (neighbor.state() == valid)
 	    while (neighbor->has_children())
 	      neighbor = neighbor->child(n==0 ? 1 : 0);
@@ -660,7 +660,7 @@ integrate_over_regular_face (Data                       &data,
 			     FEFaceValues<dim>          &fe_face_values_cell,
 			     FEFaceValues<dim>          &fe_face_values_neighbor)
 {
-  const DoFHandler<dim>::face_iterator face = cell->face(face_no);
+  const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
   const unsigned int n_q_points         = data.quadrature.n_quadrature_points,
 		     n_components       = data.dof_handler.get_fe().n_components(),
 		     n_solution_vectors = data.n_solution_vectors;
@@ -824,7 +824,7 @@ integrate_over_irregular_face (Data                       &data,
 			       FEFaceValues<dim>          &fe_face_values,
 			       FESubfaceValues<dim>       &fe_subface_values)
 {
-  const DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
+  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
   const unsigned int n_q_points         = data.quadrature.n_quadrature_points,
 		     n_components       = data.dof_handler.get_fe().n_components(),
 		     n_solution_vectors = data.n_solution_vectors;
@@ -976,7 +976,7 @@ integrate_over_irregular_face (Data                       &data,
 				   // subfaces and store them with the
 				   // mother face
   vector<double> sum (n_solution_vectors, 0);
-  DoFHandler<dim>::face_iterator face = cell->face(face_no);
+  typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
   for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face;
        ++subface_no) 
     {
