@@ -8,7 +8,7 @@
 #include <base/exceptions.h>
 #include <lac/forward-declarations.h>
 #include <vector>
-
+#include <string>
 
 
 
@@ -35,6 +35,14 @@
  *    This scheme is only useful if the data has only positive values.
  *    Negative and zero values are sorted into the leftmost interval.
  * \end{itemize}
+ *
+ * To keep programs extendible, you can use the two functions
+ * #get_interval_spacing_names# and #parse_interval_spacing#, which always
+ * give you a complete list of spacing formats presently supported and are
+ * able to generate the respective value of the #enum#. If you use them,
+ * you can write your program in a way such that it only needs to be
+ * recompiled to take effect of newly added formats, without changing your
+ * code.
  *
  *
  * \subsection{Output formats}
@@ -118,6 +126,22 @@ class Histogram
     void write_gnuplot (ostream &out) const;
 
 				     /**
+				      * Return allowed names for the interval
+				      * spacing as string. At present this
+				      * is "linear|logarithmic".
+				      */
+    static string get_interval_spacing_names ();
+
+				     /**
+				      * Get a string containing one of the
+				      * names returned by the above function
+				      * and return the respective value of
+				      * #IntervalSpacing#. Throw an error
+				      * if the string is no valid one.
+				      */
+    static IntervalSpacing parse_interval_spacing (const string &name);
+    
+				     /**
 				      * Exception.
 				      */
     DeclException0 (ExcEmptyData);
@@ -140,6 +164,13 @@ class Histogram
 		    int, int,
 		    << "The two array sizes " << arg1 << " and " << arg2
 		    << " must match, but don't.");
+				     /**
+				      * Exception.
+				      */
+    DeclException1 (ExcInvalidName,
+		    string,
+		    << "The given name <" << arg1
+		    << "> does not match any of the known formats.");
     
   private:
 				     /**

@@ -249,6 +249,31 @@ void Histogram::write_gnuplot (ostream &out) const
 
 
 
+string Histogram::get_interval_spacing_names () 
+{
+  return "linear|logarithmic";
+};
+
+
+
+Histogram::IntervalSpacing
+Histogram::parse_interval_spacing (const string &name)
+{
+  if (name=="linear")
+    return linear;
+  else
+    if (name=="logarithmic")
+      return logarithmic;
+    else
+      {
+	AssertThrow (false, ExcInvalidName(name));
+
+	return linear;
+      };
+};
+
+
+
 
 // explicit instantiations for float
 template
