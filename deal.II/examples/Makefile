@@ -4,7 +4,7 @@
 
 
 # existing examples. take dirnames and strip 'step'
-steps = $(shell echo step-*)
+steps = $(shell echo step-? step-??)
 
 
 # default is: build all examples. for each example, there is a target
