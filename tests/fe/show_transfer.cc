@@ -17,12 +17,16 @@
 
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
+#include <lac/sparse_matrix.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_values.h>
-#include <multigrid/multigrid.h>
+#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
+#include <fe/fe_dgp.h>
+#include <multigrid/mg_transfer.h>
 #include <multigrid/mg_dof_handler.h>
 
 #include <vector>
@@ -31,7 +35,7 @@
 
 char fname[50];
 
-#define TEST(l,el) { el fe; print_matrix(of, tr, l, fe, #el); }
+#define TEST(l,el, deg) { el fe(deg); print_matrix(of, tr, l, fe, #el); }
 
 template<int dim>
 inline void
@@ -75,26 +79,16 @@ main()
 
   std::ofstream of("transfer.dat");
   
-  TEST(1,FEQ1<2>);
-  TEST(1,FEQ2<2>);
-  TEST(1,FEQ3<2>);
-  TEST(1,FEQ4<2>);
+  TEST(1, FE_Q<2>, 1);
+  TEST(1, FE_Q<2>, 2);
+  TEST(1, FE_Q<2>, 3);
+//  TEST(1, FE_Q<2>, 4);
 
-  TEST(1,FEDG_Q0<2>);
-  TEST(1,FEDG_Q1<2>);
-  TEST(1,FEDG_Q2<2>);
-  TEST(1,FEDG_Q3<2>);
-  TEST(1,FEDG_Q4<2>);
+  TEST(1, FE_DGQ<2>, 0);
+  TEST(1, FE_DGQ<2>, 1);
+  TEST(1, FE_DGQ<2>, 2);
+  TEST(1, FE_DGQ<2>, 3);
+  TEST(1, FE_DGQ<2>, 4);
 
-  TEST(2,FEQ1<2>);
-  TEST(2,FEQ2<2>);
-  TEST(2,FEQ3<2>);
-  TEST(2,FEQ4<2>);
-
-  TEST(2,FEDG_Q0<2>);
-  TEST(2,FEDG_Q1<2>);
-  TEST(2,FEDG_Q2<2>);
-  TEST(2,FEDG_Q3<2>);
-  TEST(2,FEDG_Q4<2>);
   return 0;
 }
