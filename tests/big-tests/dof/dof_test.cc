@@ -347,7 +347,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   
   cout << "    Writing grid..." << endl;
   ofstream out((file_prefix + prm.get("Grid file")).c_str());
-  GridOut::write_gnuplot (tria, out);
+  GridOut().write_gnuplot (*tria, out);
 
 
 
