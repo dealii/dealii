@@ -51,9 +51,10 @@ void MGTransferPrebuilt<number>::build_matrices (
 				   // have a size greater zero.
   prolongation_matrices.resize (0);
   prolongation_matrices.resize (n_levels-1);
+#ifndef DEAL_PREFER_MATRIX_EZ
   prolongation_sparsities.resize (0);
   prolongation_sparsities.resize (n_levels-1);
-
+#endif
 				   // two fields which will store the
 				   // indices of the multigrid dofs
 				   // for a cell and one of its children
@@ -74,10 +75,18 @@ void MGTransferPrebuilt<number>::build_matrices (
 				       // necessary. this, of course, is the
 				       // number of degrees of freedom per
 				       // cell
+#ifdef DEAL_PREFER_MATRIX_EZ      
+      prolongation_matrices[level].reinit (sizes[level+1],
+					   sizes[level],
+					   dofs_per_cell);
+#else
+				       // increment dofs_per_cell
+				       // since a useless diagonal
+				       // element will be stored
       prolongation_sparsities[level].reinit (sizes[level+1],
-					      sizes[level],
-//TODO:[WB,GK] evil hack, must be corrected!
-					      dofs_per_cell+1);
+					     sizes[level],
+					     dofs_per_cell+1);
+#endif
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)

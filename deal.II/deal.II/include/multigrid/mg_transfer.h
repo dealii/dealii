@@ -14,9 +14,14 @@
 #define __deal2__mg_transfer_h
 
 
-#include <lac/sparsity_pattern.h>
 #include <lac/block_vector.h>
-#include <lac/block_sparsity_pattern.h>
+#ifdef DEAL_PREFER_MATRIX_EZ
+#  include <lac/sparse_matrix_ez.h>
+#  include <lac/block_sparse_matrix_ez.h>
+#else
+#  include <lac/sparsity_pattern.h>
+#  include <lac/block_sparsity_pattern.h>
+#endif
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 
@@ -165,7 +170,21 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				    */
     std::vector<unsigned int> sizes;
 
-
+#ifdef DEAL_PREFER_MATRIX_EZ
+				     /**
+				      * The actual prolongation matrix.
+				      * column indices belong to the
+				      * dof indices of the mother cell,
+				      * i.e. the coarse level.
+				      * while row indices belong to the
+				      * child cell, i.e. the fine level.
+				      */
+    std::vector<SparseMatrixEZ<double> > prolongation_matrices;
+#else
+				     /**
+				      * Sparsity patterns for transfer
+				      * matrices.
+				      */
     std::vector<SparsityPattern>   prolongation_sparsities;
 
 				     /**
@@ -177,6 +196,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      * child cell, i.e. the fine level.
 				      */
     std::vector<SparseMatrix<double> > prolongation_matrices;
+#endif
 };
 
 
