@@ -1300,6 +1300,7 @@ template <int dim>
 inline
 const FiniteElement<dim> & DoFHandler<dim>::get_fe () const
 {
+  Assert(selected_fe!=0, ExcNoFESelected());
   return *selected_fe;
 };
 
