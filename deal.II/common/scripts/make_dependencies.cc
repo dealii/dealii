@@ -27,7 +27,8 @@
 //   $basepath/.o-file $basepath/.g.o-file: file included_files
 //
 // $basepath is the dir where the object files are to be placed (as
-// given by the -B parameter to this script)
+// given by the -B parameter to this script). if no path is given, no
+// path is printed. if one is given, a slash is appended if necessary
 
 // Author: Wolfgang Bangerth, 2003 (and based on a previous perl
 // script written 1998, 1999, 2000, 2001, 2002)
@@ -41,7 +42,9 @@
 #include <vector>
 #include <cassert>
 
-                                 // base path for object files
+                                 // base path for object files,
+                                 // including trailing slash if
+                                 // non-empty
 std::string basepath;
 
                                  // list of include directories
@@ -354,7 +357,11 @@ int main (int argc, char **argv)
                                        // then this is the base name
                                        // for object files
       else if ((arg.length()>2) && (arg[0]=='-') && (arg[1]=='B'))
-        basepath = std::string(arg.begin()+2, arg.end());
+        {
+          basepath = std::string(arg.begin()+2, arg.end());
+          if (basepath[basepath.size()-1] != '/')
+            basepath += '/';
+        }
 
                                        // otherwise assume that this
                                        // is one of the files for
@@ -411,7 +418,7 @@ int main (int argc, char **argv)
 
                                        // ...write the rule for the .o
                                        // file...
-      std::cout << basepath << "/" << basename << ".o: \\"
+      std::cout << basepath << basename << ".o: \\"
                 << std::endl
                 << "\t\t" << *file;      
       for (std::set<std::string>::const_iterator i=includes.begin();
@@ -421,7 +428,7 @@ int main (int argc, char **argv)
 
                                        // ...and a similar rule for
                                        // the .g.o file
-      std::cout << basepath << "/" << basename << ".g.o: \\"
+      std::cout << basepath << basename << ".g.o: \\"
                 << std::endl
                 << "\t\t" << *file;
       for (std::set<std::string>::const_iterator i=includes.begin();
