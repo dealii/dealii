@@ -31,25 +31,25 @@
  * solver is in.
  *
  * The possible values of State are
- * <OL>
- * <LI> #iterate = 0#: continue
- * the iteration.
- * <LI> #success#: the goal is reached,
- * the iterative method can terminate
- * successfully.
- * <LI> #failure#!: the iterative
- * method should stop because
- * convergence cannot be achieved or at
- * least was not achieved within the given
- * maximal number of iterations.
- * </OL>
+ * \begin{itemize}
+ * \item #iterate = 0#: continue the iteration.
+ * \item #success#: the goal is reached, the iterative method can terminate
+ *       successfully.
+ * \item #failure#: the iterative method should stop because convergence 
+ *       could not be achieved or at least was not achieved within the given
+ *       maximal number of iterations.
+ * \end{itemize}
  */
 class SolverControl : public Subscriptor
 {
   public:
 
-    enum State
-    {
+				     /**
+				      * #Enum# denoting the different states
+				      * a solver can be in. See the general
+				      * documentation for more information.
+				      */
+    enum State {
       iterate = 0, success, failure
     };
     
