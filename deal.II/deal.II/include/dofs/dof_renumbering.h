@@ -330,7 +330,7 @@ class DoFRenumbering
 				      * vector.
 				      */    
     template <int dim, class ITERATOR, class ENDITERATOR>
-    static void
+    static unsigned int
     compute_component_wise (std::vector<unsigned int>& new_index,
 			    ITERATOR& start,
 			    const ENDITERATOR& end,
