@@ -53,7 +53,9 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
     = matrix->get_sparsity_pattern();
 				   // space to be used for local systems
   FullMatrix<float> local_matrix;
-
+  Vector<float> b;
+  Vector<float> x;
+  
 				   // traverse all rows of the matrix
   for (unsigned int row=0; row< matrix->m() ; ++row)
     {
@@ -93,8 +95,8 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 	if (build_matrix)
 	  inverses[row]->reinit (row_length, row_length);
       
-      Vector<float> b(row_length);
-      Vector<float> x(row_length);
+      b.reinit (row_length);
+      x.reinit (row_length);
 
 				       // mapping between:
 				       // 1 column number of all
