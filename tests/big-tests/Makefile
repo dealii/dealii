@@ -22,16 +22,20 @@ h-files  = $(wildcard ../include/*.h)
 examples: $(cc-files:.cc=)
 
 %.o : %.cc
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	@echo ================= Compiling $<
+	@$(CXX) $(CXXFLAGS.g) -o $@ -g -c $<
 
 grid/grid_test: grid/grid_test.o
-	$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
+	@echo ================= Linking $@
+	@$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
 
 dof/dof_test: dof/dof_test.o
-	$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
+	@echo ================= Linking $@
+	@$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
 
 poisson/poisson: poisson/poisson.o
-	$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
+	@echo ================= Linking $@
+	@$(CXX) $(CXXFLAGS.g) -o $@ $< ../../mia/control.o $(LIBS.g) -lg++
 
 
 run: run_grid_test run_dof_test
@@ -58,6 +62,7 @@ clean:
 #to remake this file upon inclusion at the bottom
 #of this file.
 Makefile.dep: $(cc-files) $(h-files)
-	$(CXX) $(INCPATH) -M $(cc-files) > Makefile.dep
+	@echo ================= Making $@
+	@$(CXX) $(INCPATH) -M $(cc-files) > Makefile.dep
 
 include Makefile.dep
