@@ -114,7 +114,10 @@ namespace
   };
 
 
-
+                                   // the following class is only
+                                   // needed in 2d, so avoid trouble
+                                   // with compilers warning otherwise
+#if deal_II_dimension == 2
   class Rotate2d
   {
     public:
@@ -130,6 +133,7 @@ namespace
     private:
       const double angle;
   };
+#endif
 
 
   template <int dim>
