@@ -32,14 +32,11 @@
 #include <functional>
 #include <cmath>
 
-#ifdef DEAL_II_USE_MT
-#  include <vector>
-#  include <numeric>
+#include <vector>
+#include <numeric>
 
-#  include <base/thread_management.h>
-#  include <base/multithread_info.h>
-#endif
-
+#include <base/thread_management.h>
+#include <base/multithread_info.h>
 
 
 
@@ -288,11 +285,13 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
   
   const unsigned int n_rows = m();
 
-#ifdef DEAL_II_USE_MT
-				   // in MT mode: start new threads only
-				   // if the matrix is sufficiently large.
-				   // the limit is mostly artificial
-  if (n_rows/multithread_info.n_default_threads > 2000)
+				   // in MT mode: start new threads
+				   // only if the matrix is
+				   // sufficiently large.  the limit
+				   // is mostly artificial
+  if (DEAL_II_USE_MT &&
+      (multithread_info.n_default_threads > 1) &&
+      (n_rows/multithread_info.n_default_threads > 2000))
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
 
@@ -326,21 +325,22 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
       thread_manager.wait ();
 
       return;
-    };
-#endif
-
-				   // if not in MT mode or size<2000
-				   // do it in an oldfashioned way
-  const number       *val_ptr    = &val[cols->rowstart[0]];
-  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-  somenumber         *dst_ptr    = &dst(0);
-  for (unsigned int row=0; row<n_rows; ++row)
+    }
+  else
     {
-      somenumber s = 0.;
-      const number *const val_end_of_row = &val[cols->rowstart[row+1]];
-      while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * src(*colnum_ptr++);
-      *dst_ptr++ = s;
+				       // if not in MT mode or size<2000
+				       // do it in an oldfashioned way
+      const number       *val_ptr    = &val[cols->rowstart[0]];
+      const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+      somenumber         *dst_ptr    = &dst(0);
+      for (unsigned int row=0; row<n_rows; ++row)
+	{
+	  somenumber s = 0.;
+	  const number *const val_end_of_row = &val[cols->rowstart[row+1]];
+	  while (val_ptr != val_end_of_row)
+	    s += *val_ptr++ * src(*colnum_ptr++);
+	  *dst_ptr++ = s;
+	};
     };
 };
 
@@ -453,11 +453,13 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
   const unsigned int n_rows = m();
-#ifdef DEAL_II_USE_MT
+
 				   // if in MT mode and size sufficiently
 				   // large: do it in parallel; the limit
 				   // is mostly artificial
-  if (n_rows/multithread_info.n_default_threads > 2000)
+  if (DEAL_II_USE_MT &&
+      (multithread_info.n_default_threads > 1) &&
+      (n_rows/multithread_info.n_default_threads > 2000))
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
 
@@ -499,24 +501,26 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
       return std::accumulate (partial_sums.begin(),
 			      partial_sums.end(),
 			      0.);
-    };
-#endif
-				   // if not in MT mode or the matrix is
-				   // too small: do it one-by-one
-  somenumber          sum        = 0.;
-  const number       *val_ptr    = &val[cols->rowstart[0]];
-  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-  for (unsigned int row=0; row<n_rows; ++row)
+    }
+  else
     {
-      somenumber s = 0.;
-      const number *val_end_of_row = &val[cols->rowstart[row+1]];
-      while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * v(*colnum_ptr++);
-
-      sum += s* v(row);
+				       // if not in MT mode or the matrix is
+				       // too small: do it one-by-one
+      somenumber          sum        = 0.;
+      const number       *val_ptr    = &val[cols->rowstart[0]];
+      const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+      for (unsigned int row=0; row<n_rows; ++row)
+	{
+	  somenumber s = 0.;
+	  const number *val_end_of_row = &val[cols->rowstart[row+1]];
+	  while (val_ptr != val_end_of_row)
+	    s += *val_ptr++ * v(*colnum_ptr++);
+	  
+	  sum += s* v(row);
+	};
+      
+      return sum;
     };
-
-  return sum;
 };
 
 
@@ -564,11 +568,13 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
   const unsigned int n_rows = m();
-#ifdef DEAL_II_USE_MT
+
 				   // if in MT mode and size sufficiently
 				   // large: do it in parallel; the limit
 				   // is mostly artificial
-  if (n_rows/multithread_info.n_default_threads > 2000)
+  if (DEAL_II_USE_MT &&
+      (multithread_info.n_default_threads != 1) &&
+      (n_rows/multithread_info.n_default_threads > 2000))
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
 
@@ -611,24 +617,26 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
       return std::accumulate (partial_sums.begin(),
 			      partial_sums.end(),
 			      0.);
-    };
-#endif
-				   // if not in MT mode or the matrix is
-				   // too small: do it one-by-one
-  somenumber          sum        = 0.;
-  const number       *val_ptr    = &val[cols->rowstart[0]];
-  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-  for (unsigned int row=0; row<n_rows; ++row)
+    }
+  else
     {
-      somenumber s = 0.;
-      const number *val_end_of_row = &val[cols->rowstart[row+1]];
-      while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * v(*colnum_ptr++);
-
-      sum += s* u(row);
+				       // if not in MT mode or the matrix is
+				       // too small: do it one-by-one
+      somenumber          sum        = 0.;
+      const number       *val_ptr    = &val[cols->rowstart[0]];
+      const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+      for (unsigned int row=0; row<n_rows; ++row)
+	{
+	  somenumber s = 0.;
+	  const number *val_end_of_row = &val[cols->rowstart[row+1]];
+	  while (val_ptr != val_end_of_row)
+	    s += *val_ptr++ * v(*colnum_ptr++);
+	  
+	  sum += s* u(row);
+	};
+      
+      return sum;
     };
-
-  return sum;
 };
 
 
@@ -720,11 +728,13 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
   Assert(n() == u.size(), ExcDimensionMismatch(n(),u.size()));
 
   const unsigned int n_rows = m();
-#ifdef DEAL_II_USE_MT
+
 				   // if in MT mode and size sufficiently
 				   // large: do it in parallel; the limit
 				   // is mostly artificial
-  if (n_rows/multithread_info.n_default_threads > 2000)
+  if (DEAL_II_USE_MT &&
+      (multithread_info.n_default_threads > 1) &&
+      (n_rows/multithread_info.n_default_threads > 2000))
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
  
@@ -768,23 +778,24 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
       return std::sqrt(std::accumulate (partial_norms.begin(),
 					partial_norms.end(),
 					0.));
-    };
-#endif
-  
-  somenumber norm=0.;   
-  
-  for (unsigned int i=0; i<n_rows; ++i)
-    {
-      somenumber s = b(i);
-      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
-	{
-	  const unsigned int p = cols->colnums[j];
-	  s -= val[j] * u(p);
-	}
-      dst(i) = s;
-      norm += dst(i)*dst(i);
     }
-  return std::sqrt(norm);
+  else
+    {
+      somenumber norm=0.;   
+  
+      for (unsigned int i=0; i<n_rows; ++i)
+	{
+	  somenumber s = b(i);
+	  for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
+	    {
+	      const unsigned int p = cols->colnums[j];
+	      s -= val[j] * u(p);
+	    }
+	  dst(i) = s;
+	  norm += dst(i)*dst(i);
+	}
+      return std::sqrt(norm);
+    };
 }
 
 
@@ -797,10 +808,10 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 					 const std::pair<unsigned int, unsigned int> interval,
 					 somenumber               *partial_norm) const
 {
+#ifdef DEAL_II_USE_MT
   const unsigned int begin_row = interval.first,
 		     end_row   = interval.second;
   
-#ifdef DEAL_II_USE_MT
   somenumber norm=0.;   
   
   for (unsigned int i=begin_row; i<end_row; ++i)

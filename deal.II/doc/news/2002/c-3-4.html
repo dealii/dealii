@@ -333,6 +333,20 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Changed: In multithread mode, the <code
+       class="class">SparseMatrix</code> would spawn
+       <code>multithread_info.n_default_threads</code> threads to
+       perform matrix-vector multiplications and similar
+       operations. It would even do so if
+       <code>multithread_info.n_default_threads</code> was equal to
+       one. In that case, we now do the operation on the thread we are
+       presently on, eliminating the overhead of spawning a single
+       thread, and later waiting and terminating it.
+       <br>
+       (WB 2002/11/13)
+       </p>
+ 
+  <li> <p>
        Fixed: In the <code class="class">SparseDirectMA27</code> class, wrapping 
        the MA27 solver written in Fortran77 into some structure amenable to C++,
        we wrote beyond the end of an array on rare inputs. This is now fixed. The
