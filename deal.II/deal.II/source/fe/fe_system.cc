@@ -800,11 +800,18 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
                       for (unsigned int q=0; q<n_q_points; ++q)
                         data.shape_gradients[out_index+s][q]=
                           base_data.shape_gradients[in_index+s][q];
-                    
-                    if (base_flags & update_second_derivatives)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        data.shape_2nd_derivatives[out_index+s][q]=
-                          base_data.shape_2nd_derivatives[in_index+s][q];
+
+                                                     // _we_ handle
+                                                     // computation of
+                                                     // second
+                                                     // derivatives,
+                                                     // so the base
+                                                     // elements
+                                                     // should not
+                                                     // have computed
+                                                     // them!
+                    Assert (!(base_flags & update_second_derivatives),
+                            ExcInternalError());
                   };
               };
         };
