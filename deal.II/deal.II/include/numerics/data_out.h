@@ -460,11 +460,13 @@ class DataOut : public DataOut_DoFData<dim,dim>
 {
   public:
     				     /**
-				      * This is the central function of
-				      * this class since it builds the list of
-				      * patches to be written by the low-level
-				      * functions of the base class. See the
-				      * general documentation of this class
+				      * This is the central function
+				      * of this class since it builds
+				      * the list of patches to be
+				      * written by the low-level
+				      * functions of the base
+				      * class. See the general
+				      * documentation of this class
 				      * for further information.
 				      *
 				      * The function supports
@@ -481,33 +483,34 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				     /**
 				      * Return the first cell which we
 				      * want output for. The default
-				      * implementation returns the first
-				      * active cell, but you might want
-				      * to return other cells in a derived
-				      * class.
+				      * implementation returns the
+				      * first active cell, but you
+				      * might want to return other
+				      * cells in a derived class.
 				      */
     virtual typename DoFHandler<dim>::cell_iterator
     first_cell ();
     
 				     /**
-				      * Return the next cell after @p{cell} which
-				      * we want output for.
-				      * If there are no more cells,
-				      * @p{dofs->end()} shall be returned.
+				      * Return the next cell after
+				      * @p{cell} which we want output
+				      * for.  If there are no more
+				      * cells, @p{dofs->end()} shall
+				      * be returned.
 				      *
-				      * The default
-				      * implementation returns the next
-				      * active cell, but you might want
-				      * to return other cells in a derived
+				      * The default implementation
+				      * returns the next active cell,
+				      * but you might want to return
+				      * other cells in a derived
 				      * class. Note that the default
-
 				      * implementation assumes that
-				      * the given @p{cell} is active, which
-				      * is guaranteed as long as @p{first_cell}
-				      * is also used from the default
-				      * implementation. Overloading only one
-				      * of the two functions might not be
-				      * a good idea.
+				      * the given @p{cell} is active,
+				      * which is guaranteed as long as
+				      * @p{first_cell} is also used
+				      * from the default
+				      * implementation. Overloading
+				      * only one of the two functions
+				      * might not be a good idea.
 				      */
     virtual typename DoFHandler<dim>::cell_iterator
     next_cell (const typename DoFHandler<dim>::cell_iterator &cell);
