@@ -24,16 +24,13 @@
 #include <lac/petsc_vector_base.h>
 
 
-/*! @addtogroup PETSc
- *@{
- */
-
 namespace PETScWrappers
 {
 /**
  * Namespace for PETSc classes that work in parallel over MPI, such as
  * distributed vectors and matrices.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   namespace MPI
@@ -49,7 +46,7 @@ namespace PETScWrappers
  * functions). Only the functions creating a vector of specific type differ,
  * and are implemented in this particular class.
  *
- * @section 1 Parallel communication model
+ * @section PETScParVec1 Parallel communication model
  *
  * The parallel functionality of PETSc is built on top of the Message Passing
  * Interface (MPI). MPI's communication model is built on collective
@@ -75,7 +72,7 @@ namespace PETScWrappers
  * discussed below.
  *
  *
- * @section 2 Accessing individual elements of a vector
+ * @section PETScParVec2 Accessing individual elements of a vector
  *
  * PETSc does allow read access to individual elements of a vector, but in the
  * distributed case only to elements that are stored locally. We implement
@@ -137,7 +134,9 @@ namespace PETScWrappers
  * compress(), or making sure that all processes do the same type of
  * operations at the same time, for example by placing zero additions if
  * necessary.
- * 
+ *
+ * @ingroup PETSc
+ * @brief Parallel vector using MPI
  * @author Wolfgang Bangerth, 2004
  */
     class Vector : public VectorBase
@@ -463,10 +462,9 @@ namespace PETScWrappers
       return *this;
     }    
   }
-  
+/*@}*/  
 }
 
-/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

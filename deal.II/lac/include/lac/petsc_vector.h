@@ -24,10 +24,6 @@
 #include <lac/petsc_vector_base.h>
 #include <lac/petsc_parallel_vector.h>
 
-/*! @addtogroup PETSc
- *@{
- */
-
 
 namespace PETScWrappers
 {
@@ -40,6 +36,8 @@ namespace PETScWrappers
  * functions). Only the functions creating a vector of specific type differ,
  * and are implemented in this particular class.
  *
+ * @ingroup PETSc
+ * @brief Sequential vector
  * @author Wolfgang Bangerth, 2004
  */
   class Vector : public VectorBase
@@ -174,7 +172,7 @@ namespace PETScWrappers
   };
 
 
-
+/// @if NoDoc
 // ------------------ template and inline functions -------------
 
 
@@ -290,9 +288,10 @@ namespace PETScWrappers
 
     return *this;
   }
+/// @endif
+
 }
 
-/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 
