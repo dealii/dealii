@@ -8,6 +8,8 @@
 template <int dim> class Triangulation;
 template <int dim> class DoFHandler;
 class dVector;
+class dFMatrix;
+class dSMatrix;
 
 
 #include <grid/tria_accessor.h>
@@ -93,6 +95,10 @@ class DoFAccessor {
 				      * Exception
 				      */
     DeclException0 (ExcVectorDoesNotMatch);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixDoesNotMatch);
 
   protected:
 				     /**
@@ -225,6 +231,32 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
     TriaIterator<dim,DoFLineAccessor<dim,BaseClass> > child (const unsigned int) const;
 
 				     /**
+				      * Distribute a local (cell based) vector
+				      * to a global one by mapping the local
+				      * numbering of the degrees of freedom
+				      * to the global one and entering the
+				      * local values into the global vector.
+				      *
+				      * The elements are {\it added} up to
+				      * the elements in the global vector,
+				      * rather than just set, since this is
+				      * usually what one wants.
+				      */
+    void distribute_local_to_global (const dVector &local_source,
+				     dVector       &global_destination) const;
+
+				     /**
+				      * This function does much the same as the
+				      * #distribute_local_to_global(dVector,dVector)#
+				      * function, but operates on matrices
+				      * instead of vectors. The sparse matrix
+				      * is supposed to have non-zero entry
+				      * slots where required.
+				      */
+    void distribute_local_to_global (const dFMatrix &local_source,
+				     dSMatrix       &global_destination) const;
+    
+				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
@@ -317,6 +349,32 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      */
     TriaIterator<dim,DoFQuadAccessor<dim,BaseClass> > child (const unsigned int) const;
 
+				     /**
+				      * Distribute a local (cell based) vector
+				      * to a global one by mapping the local
+				      * numbering of the degrees of freedom
+				      * to the global one and entering the
+				      * local values into the global vector.
+				      *
+				      * The elements are {\it added} up to
+				      * the elements in the global vector,
+				      * rather than just set, since this is
+				      * usually what one wants.
+				      */
+    void distribute_local_to_global (const dVector &local_source,
+				     dVector       &global_destination) const;
+
+				     /**
+				      * This function does much the same as the
+				      * #distribute_local_to_global(dVector,dVector)#
+				      * function, but operates on matrices
+				      * instead of vectors. The sparse matrix
+				      * is supposed to have non-zero entry
+				      * slots where required.
+				      */
+    void distribute_local_to_global (const dFMatrix &local_source,
+				     dSMatrix       &global_destination) const;
+    
 				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.

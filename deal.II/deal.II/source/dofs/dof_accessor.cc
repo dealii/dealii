@@ -6,6 +6,11 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
+
+#include <lac/dvector.h>
+#include <lac/dfmatrix.h>
+#include <lac/dsmatrix.h>
+
 #include <vector>
 
 
@@ -118,6 +123,61 @@ DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFLineAccessor<dim,BaseClass>::
+distribute_local_to_global (const dVector &local_source,
+			    dVector       &global_destination) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (local_source.size() == (2*dof_handler->get_selected_fe().dofs_per_vertex +
+				  dof_handler->get_selected_fe().dofs_per_line),
+	  ExcVectorDoesNotMatch());
+  Assert (dof_handler->n_dofs() == global_destination.size(),
+	  ExcVectorDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.size();
+  
+				   // get indices of dofs
+  vector<int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell vector
+  for (unsigned int j=0; j<n_dofs; ++j)
+    global_destination(dofs[j]) += local_source(j);
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFLineAccessor<dim,BaseClass>::
+distribute_local_to_global (const dFMatrix &local_source,
+			    dSMatrix       &global_destination) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (local_source.m() == (2*dof_handler->get_selected_fe().dofs_per_vertex +
+			       dof_handler->get_selected_fe().dofs_per_line),
+	  ExcVectorDoesNotMatch());
+  Assert (local_source.m() == local_source.n(),
+	  ExcMatrixDoesNotMatch());
+  Assert (dof_handler->n_dofs() == global_destination.m(),
+	  ExcMatrixDoesNotMatch());
+  Assert (global_destination.m() == global_destination.n(),
+	  ExcMatrixDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.m();
+
+				   // get indices of dofs
+  vector<int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell matrix
+  for (unsigned int i=0; i<n_dofs; ++i)
+    for (unsigned int j=0; j<n_dofs; ++j)
+      global_destination.add(dofs[i], dofs[j], local_source(i,j));
 };
 
 
@@ -254,6 +314,63 @@ DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFQuadAccessor<dim,BaseClass>::
+distribute_local_to_global (const dVector &local_source,
+			    dVector       &global_destination) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (local_source.size() == (4*dof_handler->get_selected_fe().dofs_per_vertex +
+				  4*dof_handler->get_selected_fe().dofs_per_line +
+				  dof_handler->get_selected_fe().dofs_per_quad),
+	  ExcVectorDoesNotMatch());
+  Assert (dof_handler->n_dofs() == global_destination.size(),
+	  ExcVectorDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.size();
+
+				   // get indices of dofs
+  vector<int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell vector
+  for (unsigned int j=0; j<n_dofs; ++j)
+    global_destination(dofs[j]) += local_source(j);
+};
+
+
+
+template <int dim, typename BaseClass>
+void DoFQuadAccessor<dim,BaseClass>::
+distribute_local_to_global (const dFMatrix &local_source,
+			    dSMatrix       &global_destination) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
+  Assert (local_source.m() == (4*dof_handler->get_selected_fe().dofs_per_vertex +
+			       4*dof_handler->get_selected_fe().dofs_per_line +
+			       dof_handler->get_selected_fe().dofs_per_quad),
+	  ExcMatrixDoesNotMatch());
+  Assert (local_source.m() == local_source.n(),
+	  ExcMatrixDoesNotMatch());
+  Assert (dof_handler->n_dofs() == global_destination.m(),
+	  ExcMatrixDoesNotMatch());
+  Assert (global_destination.m() == global_destination.n(),
+	  ExcMatrixDoesNotMatch());
+  
+  const unsigned int n_dofs = local_source.m();
+
+				   // get indices of dofs
+  vector<int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell matrix
+  for (unsigned int i=0; i<n_dofs; ++i)
+    for (unsigned int j=0; j<n_dofs; ++j)
+      global_destination.add(dofs[i], dofs[j], local_source(i,j));
 };
 
 
