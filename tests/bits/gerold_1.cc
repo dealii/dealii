@@ -86,7 +86,7 @@ void LaplaceProblem<dim>::run ()
   grid_in.attach_triangulation (triangulation);
 
 
- std::ifstream input_file("gerold_1.inp");
+  std::ifstream input_file("gerold_1.inp");
  
 
   cout << "read ucd data file" << endl;
