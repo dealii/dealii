@@ -32,6 +32,18 @@
 
     <dl>
       <dt>
+          <strong>2004/10/21: Q<sub>r</sub> elements of arbitrary order now
+          support hanging node constraints also in 3d</strong>
+      </dt>
+      <dd>
+          Lagrange elements previously had hanging node constraint matrices
+          hard coded in 3d, which were only available for r=1,2. Thanks to
+          code written by Oliver Kayser-Herold, this information is now
+          computed on-the-fly, which allows the use of Lagrange elements of
+          arbitrary order also in 3d on meshes with hanging nodes.
+      </dd>
+
+      <dt>
           <strong style="color:red">2004/05/25: Version 5.0 released</strong>
       </dt>
       <dd>
