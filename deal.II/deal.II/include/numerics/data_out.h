@@ -21,7 +21,7 @@
 #include <base/data_out_base.h>
 #include <dofs/dof_handler.h>
 
-#include <boost_local/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 template <int>      class FEValuesBase;
