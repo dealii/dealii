@@ -369,6 +369,14 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: For some cases the <code
+       class="member">CellAccessor<3>::neighbor_child_on_subface</code>
+       function returned a wrong cell. This is now fixed.
+       <br>
+       (RH 2004/10/29)
+       </p>
+
+  <li> <p>
        Fixed: The <code>GridGenerator::cylinder</code> function in 3d
        assigned the wrong boundary value to the top and bottom part of
        the cylinder if the half length of the cylinder was not equal
