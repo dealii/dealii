@@ -19,6 +19,72 @@
 #include <typeinfo>
 
 
+namespace internal
+{
+				   /**
+				    * A namespace in which we
+				    * implement helper classes for the
+				    * subscriptor class.
+				    */
+  namespace Subscriptor
+  {
+                                     /**
+                                      * Template class that declares
+                                      * in inner typedef with the
+                                      * following semantics: if the
+                                      * first template parameter is
+                                      * @p{true}, then the inner
+                                      * typedef is @p{volatile T},
+                                      * otherwise @p{T}. We achieve
+                                      * this behavior by partial
+                                      * specialization of the general
+                                      * template for both values of
+                                      * the boolean argument.
+                                      *
+                                      * This trick is used to declare
+                                      * the type of the counter
+                                      * variable to be eiter volatile
+                                      * or not, depending on whether
+                                      * we are in multithreaded mode
+                                      * or not. (If we are in MT mode,
+                                      * then we need the @p{volatile}
+                                      * specifier since more than one
+                                      * thread my modify the counter
+                                      * at the same time.
+                                      *
+                                      * Since we only partially
+                                      * specialize the case that the
+                                      * boolean template argument is
+                                      * @p{false}, this general
+                                      * template catches the case that
+                                      * it is @p{true}, i.e. in a
+                                      * sense it is also a
+                                      * specialization since a
+                                      * @p{bool} can only have two
+                                      * states.
+                                      *
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    template <bool, typename T> struct PossiblyVolatile
+    {
+        typedef volatile T type;
+    };
+
+                                     /**
+                                      * Specialization of the template
+                                      * for the case that the first
+                                      * template argument is
+                                      * @p{false}, i.e. the
+                                      * non-volatile case.
+                                      */
+    template <typename T> struct PossiblyVolatile<false,T>
+    {
+        typedef T type;
+    };
+  }
+}
+
+
 
 /**
  * Handling of subscriptions.
@@ -105,61 +171,6 @@ class Subscriptor
 
 
   private:
-                                     /**
-                                      * Template class that declares
-                                      * in inner typedef with the
-                                      * following semantics: if the
-                                      * first template parameter is
-                                      * @p{true}, then the inner
-                                      * typedef is @p{volatile T},
-                                      * otherwise @p{T}. We achieve
-                                      * this behavior by partial
-                                      * specialization of the general
-                                      * template for both values of
-                                      * the boolean argument.
-                                      *
-                                      * This trick is used to declare
-                                      * the type of the counter
-                                      * variable to be eiter volatile
-                                      * or not, depending on whether
-                                      * we are in multithreaded mode
-                                      * or not. (If we are in MT mode,
-                                      * then we need the @p{volatile}
-                                      * specifier since more than one
-                                      * thread my modify the counter
-                                      * at the same time.
-                                      *
-                                      * Since we only partially
-                                      * specialize the case that the
-                                      * boolean template argument is
-                                      * @p{false}, this general
-                                      * template catches the case that
-                                      * it is @p{true}, i.e. in a
-                                      * sense it is also a
-                                      * specialization since a
-                                      * @p{bool} can only have two
-                                      * states.
-                                      *
-                                      * @author Wolfgang Bangerth, 2003
-                                      */
-    template <bool, typename T> struct PossiblyVolatile
-    {
-        typedef volatile T type;
-    };
-
-                                     /**
-                                      * Specialization of the template
-                                      * for the case that the first
-                                      * template argument is
-                                      * @p{false}, i.e. the
-                                      * non-volatile case.
-                                      */
-    template <typename T> struct PossiblyVolatile<false,T>
-    {
-        typedef T type;
-    };
-    
-        
     				     /**
 				      * Store the number of objects
 				      * which subscribed to this
@@ -188,7 +199,7 @@ class Subscriptor
 				      * template class to selectively
 				      * add volatility.
 				      */
-    mutable PossiblyVolatile<DEAL_II_USE_MT,unsigned int>::type counter;
+    mutable internal::Subscriptor::PossiblyVolatile<DEAL_II_USE_MT,unsigned int>::type counter;
 
 				     /**
 				      * Pointer to the typeinfo object
