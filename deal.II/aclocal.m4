@@ -397,3 +397,56 @@ void f()
       AC_DEFINE(DEAL_II_DECLARE_LRAND48)
     ])
 )
+
+
+
+dnl When compiling with ACE thread support, there are many constructs
+dnl that are not allowed in C++, or that yield warnings when compiling with
+dnl -ansi -pedantic. Check this, and if that is the case, set the variables
+dnl $deal_II_ace_remove_ansi and $deal_II_ace_remove_pedantic to "yes".
+dnl
+dnl Usage: DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
+AC_DEFUN(DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS, dnl
+  AC_MSG_CHECKING(whether compilation with ACE disallows flags)
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="-ansi -I$withmultithreading"
+  AC_TRY_COMPILE(
+    [
+#  include <ace/Thread_Manager.h>
+#  include <ace/Synch.h>
+    ],
+    [],
+    [
+      deal_II_ace_remove_ansi="no"
+    ],
+    [
+      deal_II_ace_remove_ansi="yes"
+    ])
+  CXXFLAGS="-pedantic -Werror -I$withmultithreading"
+  AC_TRY_COMPILE(
+    [
+#  include <ace/Thread_Manager.h>
+#  include <ace/Synch.h>
+    ],
+    [],
+    [
+      deal_II_ace_remove_pedantic="no"
+    ],
+    [
+      deal_II_ace_remove_pedantic="yes"
+    ])
+
+  if test $deal_II_ace_remove_ansi = "no" ; then
+    if test $deal_II_ace_remove_pedantic = "no" ; then 
+      AC_MSG_RESULT(no)
+    else
+      AC_MSG_RESULT(-pedantic)
+    fi
+  else
+    if test $deal_II_ace_remove_pedantic = "no" ; then 
+      AC_MSG_RESULT(-ansi)
+    else
+      AC_MSG_RESULT(-ansi -pedantic)
+    fi
+  fi
+)

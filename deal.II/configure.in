@@ -370,8 +370,6 @@ dnl - Set preprocessor directives if necessary
 dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
 dnl - _REENTRANT is a flag that is used in the standard UNIX
 dnl   headers to make reentrant functions (with suffix _r) declared
-dnl - remove -ansi from compiler flags again, since ACE yields hundreds of
-dnl   error messages with this flag
 if test "$enablemultithreading" = yes ; then
   if test "$GXX" = yes ; then
     DEAL_II_GET_THREAD_FLAGS
@@ -379,8 +377,6 @@ if test "$enablemultithreading" = yes ; then
 
     AC_DEFINE(__USE_MALLOC)
     AC_DEFINE(_REENTRANT)
-
-    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
   else
     if test "x$GXX_VERSION" = "xibm_xlc" ; then
       CXXFLAGSG = "$CXXFLAGSG -threaded"  
@@ -393,6 +389,7 @@ if test "$enablemultithreading" = yes ; then
     fi
   fi
 fi
+
 
 
 
@@ -417,6 +414,23 @@ AC_SUBST(withmultithreading)
 
 
 
+
+dnl Possibly remove -ansi -pedantic from compiler flags again, since ACE
+dnl yields hundreds of error messages with these flags. do that
+dnl only conditionally
+if test "$enablemultithreading" = yes ; then
+  if test "$GXX" = yes ; then
+    DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
+    if test "x$deal_II_ace_remove_ansi" = "xyes" ; then
+      CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
+      CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-ansi//g;'`"
+    fi
+    if test "x$deal_II_ace_remove_pedantic" = "xyes" ; then
+      CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-pedantic//g;'`"
+      CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-pedantic//g;'`"
+    fi
+  fi
+fi
 
 
 dnl --------------------------------------------------------------
