@@ -469,10 +469,10 @@ documentation, etc</a>.
 <ol>
   <li> <p>
        New: Implement
-       <code class="member">DoFTools::make_sparsity_pattern</class>,
-       <code class="member">DoFTools::make_boundary_sparsity_pattern</class>,
+       <code class="member">DoFTools::make_sparsity_pattern</code>,
+       <code class="member">DoFTools::make_boundary_sparsity_pattern</code>,
        and 
-       <code class="member">ConstraintMatrix::condense</class> to work on
+       <code class="member">ConstraintMatrix::condense</code> to work on
        the <code class="class">CompressedSparsityPattern</code> and
        <code class="class">CompressedBlockSparsityPattern</code> and
        classes.
@@ -481,7 +481,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="member">FE*Values::get_quadrature</class>
+       New: <code class="member">FE*Values::get_quadrature</code>
        returns a reference to the quadrature formula used by a
        FEValues object.
        <br>
@@ -490,7 +490,7 @@ documentation, etc</a>.
 
   <li> <p>
        New:  <code
-       class="member">DoFTools::compute_intergrid_transfer_representation</class>
+       class="member">DoFTools::compute_intergrid_transfer_representation</code>
        is a function that generates a matrix representation that can
        be used to transfer data from one grid to one component of the
        fields on another, finer, grid.
@@ -499,7 +499,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Changed: the  <code class="class">GeometryInfo</class> class
+       Changed: the  <code class="class">GeometryInfo</code> class
        has been reverted from a general template that calculates the
        values of its member variables by recursion/induction to a set
        of explicitely specialized classes. This seemed necessary since
@@ -517,7 +517,7 @@ documentation, etc</a>.
 
   <li> <p>
        Changed: the classes that denote flags to the <code
-       class="class">TimeStepBase_Tria</class> class have been move
+       class="class">TimeStepBase_Tria</code> class have been move
        from local classes to a namespace of their own, names
        <code class="class">TimeStepBase_Tria_Flags</code>.
        <br>
