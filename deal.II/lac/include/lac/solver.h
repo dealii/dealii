@@ -21,7 +21,7 @@ class SolverControl;
 /**
  * Base class for iterative solvers.
  *
-//TODO: * HAS TO BE UPDATED!
+//TODO:[?] * HAS TO BE UPDATED!
  *
  * This class defines possible
  * return states of linear solvers and provides interfaces to a memory

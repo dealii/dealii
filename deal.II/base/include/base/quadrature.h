@@ -252,7 +252,7 @@ template <int dim>
 class QProjector : public Quadrature<dim>
 {
   public:
-//TODO: remove this constructor again and return to old state with static-only functions. move this function to something in the finite element classes which is the only place where it is used.    
+//TODO:[GK] remove this constructor again and return to old state with static-only functions. move this function to something in the finite element classes which is the only place where it is used.    
 				     /**
 				      * Constructor for a quadrature rule on all (sub)faces.
 				      * The quadrature rule

@@ -195,23 +195,15 @@ SolverGMRES<VECTOR>::solve (const MATRIX& A,
 				   const VECTOR& b,
 				   const PRECONDITIONER& precondition)
 {
-				   // this code was written by the fathers of
-				   // DEAL. I take absolutely no guarantees
-				   // for any failures or airplane-explosions
-				   // or nuclear wars or whatever resulting
-				   // from this code. I tried to clean a bit,
-				   // but whoever wrote this code in the first
-				   // place should get stoned, IMHO! (WB)
-
-				   // This code was definitely NOT
-				   // written by the fathers of DEAL
-				   // and it is very unclear to me,
-				   // why such a strange piece of code
-				   // should be here. It has a lot of
-				   // flaws, the old GMRES of DEAL did
-				   // not have. (GK)
-//TODO: Check, why there are two different start residuals.
-//TODO: Allocate vectors only when needed.
+				   // this code was written a very
+				   // long time ago by people not
+				   // associated with deal.II. we
+				   // don't make any guarantees to its
+				   // optimality or that it even works
+				   // as expected...
+  
+//TODO:[?] Check, why there are two different start residuals.
+//TODO:[?] Allocate vectors only when needed.
 
   deallog.push("GMRES");
 

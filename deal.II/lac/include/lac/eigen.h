@@ -151,7 +151,7 @@ class EigenPower : private Solver<VECTOR>
     AdditionalData additional_data;
 };
 
-//TODO: Finish documentation after fixing parameters.
+//TODO:[GK] Finish documentation after fixing parameters.
 
 /**
  * Inverse iteration (Wieland).

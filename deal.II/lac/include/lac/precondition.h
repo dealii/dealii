@@ -432,7 +432,7 @@ class PreconditionLACSolver : public Subscriptor
     const PRECONDITION* precondition;
 };
 
-//TODO: Use SmartPointer for SOLVER and PRECONDITION above?
+//TODO:[?] Use SmartPointer for SOLVER and PRECONDITION above?
 // Another Subscriptor?
 
 

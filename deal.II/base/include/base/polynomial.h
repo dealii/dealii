@@ -173,7 +173,7 @@ class LagrangeEquidistant: public Polynomial<double>
  *
  * @author Guido Kanschat, 2000
  */
-//TODO: test this class Legendre, it has never been tested up to now
+//TODO:[GK] test this class Legendre, it has never been tested up to now
 template <typename number>
 class Legendre : public Polynomial<number>
 {
