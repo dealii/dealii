@@ -13,7 +13,9 @@
 #include <base/exceptions.h>
 #include <iostream>
 #include <vector>
-#include <lac/forward-declarations.h>
+
+template <typename number> class Vector;
+
 
 
 // general template; specialized for rank==1; the general template is in
@@ -164,27 +166,29 @@ class Tensor<1,dim> {
 				     /**
 				      * Fill a vector with all tensor elements.
 				      *
-				      * Thsi function unrolls all
+				      * This function unrolls all
 				      * tensor entries into a single,
 				      * linearly numbered vector. As
 				      * usual in C++, the rightmost
 				      * index marches fastest.
 				      */
-    void unroll(Vector<double> & result) const;
+    void unroll (Vector<double> &result) const;
      
   protected:
 				     /**
-				      *  Stores the values in a simple array.
+				      *  Store the values in a simple array.
 				      */
     double values[dim];
 
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion(Vector<double> & result, unsigned& start_index) const;
+    void unroll_recursion (Vector<double> & result,
+			   unsigned& start_index) const;
 
     template<>
-    friend void Tensor<2,dim>::unroll_recursion(Vector<double> &, unsigned&) const;
+    friend void Tensor<2,dim>::unroll_recursion(Vector<double> &,
+						unsigned&) const;
 };
 
 				 /**

@@ -11,10 +11,9 @@
 #include <base/point.h>
 #include <base/functiontime.h>
 #include <base/tensorindex.h>
-#include <lac/forward-declarations.h>
+#include <base/forward-declarations.h>
 
-template<int rank_, int dim>
-class Tensor;
+template <typename number> class Vector;
 
 /**
  * Base class for multi-valued functions.
