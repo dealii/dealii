@@ -30,6 +30,10 @@ template <int dim> class MappingQ;
  * element.
  *
  *
+ * @sect3{Restriction on transformations}
+ *
+ * @sect3{Prolongation and restriction matrices}
+ *
  * @sect3{Numbering of the degrees of freedom (DoFs)}
  *
  * Nedelec elements have their degrees of freedom on edges, with shape
@@ -80,7 +84,7 @@ template <int dim> class MappingQ;
  * implemented there.
  *
  *
- * @author Anna Schneebeli, Wolfgang Bangerth, 2002
+ * @author Wolfgang Bangerth, Anna Schneebeli, 2002
  */
 template <int dim>
 class FE_Nedelec : public FiniteElement<dim>

@@ -29,8 +29,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),
 							   dim),
-//TODO: I'd think this element is actually additive in the restriction
-				    std::vector<bool> (dim,false),
+				    std::vector<bool> (FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,false),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,
 								    std::vector<bool>(dim,true))),
 		degree(degree)
@@ -86,24 +85,72 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 	  {
 	    case 1:
 	    {
-//TODO: check!              
-					       // DoF on bottom line
-					       // of coarse cell will
-					       // be mean value of
-					       // bottom DoFs on the
-					       // two adjacent child
-					       // cells
-	      this->restriction[0](0,0) = 0.5;
-	      this->restriction[1](0,0) = 0.5;
-					       // same for other DoFs
-	      this->restriction[1](1,1) = 0.5;
-	      this->restriction[2](1,1) = 0.5;
-
-	      this->restriction[2](2,2) = 0.5;
-	      this->restriction[3](2,2) = 0.5;
-
-	      this->restriction[3](3,3) = 0.5;
-	      this->restriction[0](3,3) = 0.5;
+                                               // this is a strange
+                                               // element, since it is
+                                               // both additive and
+                                               // then it is also
+                                               // not. ideally, we
+                                               // would like to have
+                                               // the value of the
+                                               // shape function on
+                                               // the coarse line to
+                                               // be the mean value of
+                                               // that on the two
+                                               // child ones. thus,
+                                               // one should make it
+                                               // additive. however,
+                                               // additivity only
+                                               // works if an element
+                                               // does not have any
+                                               // continuity
+                                               // requirements, since
+                                               // otherwise degrees of
+                                               // freedom are shared
+                                               // between adjacent
+                                               // elements, and when
+                                               // we make the element
+                                               // additive, that would
+                                               // mean that we end up
+                                               // adding up
+                                               // contributions not
+                                               // only from the child
+                                               // cells of this cell,
+                                               // but also from the
+                                               // child cells of the
+                                               // neighbor, and since
+                                               // we cannot know
+                                               // whether there even
+                                               // exists a neighbor we
+                                               // cannot simply make
+                                               // the element
+                                               // additive.
+					       //
+                                               // so, until someone
+                                               // comes along with a
+                                               // better alternative,
+                                               // we do the following:
+                                               // make the element
+                                               // non-additive, and
+                                               // simply pick the
+                                               // value of one of the
+                                               // child lines for the
+                                               // value of the mother
+                                               // line (note that we
+                                               // have to multiply by
+                                               // two, since the shape
+                                               // functions scale with
+                                               // the inverse
+                                               // Jacobian). we thus
+                                               // throw away the
+                                               // information of one
+                                               // of the child lines,
+                                               // but there seems to
+                                               // be no other way than
+                                               // that...
+	      this->restriction[0](0,0) = 2.;
+	      this->restriction[1](1,1) = 2.;
+	      this->restriction[3](2,2) = 2.;
+	      this->restriction[0](3,3) = 2.;
 
 	      break;
 	    };
@@ -138,42 +185,14 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 	    {
 					       // same principle as in
 					       // 2d
-	      this->restriction[0](0,0) = 0.5;
-	      this->restriction[1](0,0) = 0.5;
-
-	      this->restriction[1](1,1) = 0.5;
-	      this->restriction[2](1,1) = 0.5;
-
-	      this->restriction[2](2,2) = 0.5;
-	      this->restriction[3](2,2) = 0.5;
-
-	      this->restriction[3](3,3) = 0.5;
-	      this->restriction[0](3,3) = 0.5;
-
-	      this->restriction[4](4,4) = 0.5;
-	      this->restriction[5](4,4) = 0.5;
-
-	      this->restriction[5](5,5) = 0.5;
-	      this->restriction[6](5,5) = 0.5;
-
-	      this->restriction[6](6,6) = 0.5;
-	      this->restriction[7](6,6) = 0.5;
-
-	      this->restriction[7](7,7) = 0.5;
-	      this->restriction[4](7,7) = 0.5;
-
-
-	      this->restriction[1](8,8) = 0.5;
-	      this->restriction[5](8,8) = 0.5;
-
-	      this->restriction[2](9,9) = 0.5;
-	      this->restriction[6](9,9) = 0.5;
-
-	      this->restriction[3](10,10) = 0.5;
-	      this->restriction[7](10,10) = 0.5;
-
-	      this->restriction[0](11,11) = 0.5;
-	      this->restriction[5](11,11) = 0.5;
+	      this->restriction[0](0,0) = 2.;
+	      this->restriction[1](1,1) = 2.;
+	      this->restriction[2](2,2) = 2.;
+	      this->restriction[3](3,3) = 2.;
+	      this->restriction[4](4,4) = 2.;
+	      this->restriction[5](5,5) = 2.;
+	      this->restriction[6](6,6) = 2.;
+	      this->restriction[7](7,7) = 2.;
 	      
 	      break;
 	    };
