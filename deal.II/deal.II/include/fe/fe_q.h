@@ -261,8 +261,7 @@ class FE_Q : public FiniteElement<dim>
 				      * In 1d, this function does
 				      * nothing.
 				      */
-    static void build_face_renumbering (const FiniteElementData<dim-1> &fe_data,
-					const unsigned int              degree,
+    static void build_face_renumbering (const unsigned int              degree,
 					std::vector<unsigned int>      &numbering);
 
 				     /**
