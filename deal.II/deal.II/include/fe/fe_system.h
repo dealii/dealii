@@ -594,7 +594,7 @@ class FESystem : public FiniteElement<dim>
 					  * filled by the @p{get_data}
 					  * function.
 					  */
-	typename std::vector<FiniteElementBase<dim>::InternalDataBase *> base_fe_datas;
+	typename std::vector<typename FiniteElementBase<dim>::InternalDataBase *> base_fe_datas;
 
 					 /**
 					  * Pointers to the
