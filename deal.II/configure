@@ -3714,7 +3714,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	    X operator = (T2 &);
 	};
 
-	template X X::operator=<> (float &);
+	template X X::operator=<float> (float &);
 
 #ifdef F77_DUMMY_MAIN
 #  ifdef __cplusplus

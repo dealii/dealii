@@ -1403,7 +1403,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
 	    X operator = (T2 &);
 	};
 
-	template X X::operator=<> (float &);
+	template X X::operator=<float> (float &);
     ],
     [],
     [
