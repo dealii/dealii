@@ -16,7 +16,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
-#include <base/vector2d.h>
+#include <base/table.h>
 
 #include <vector>
 #include <map>
@@ -191,7 +191,7 @@ class BlockMatrixArray : public Subscriptor
 				      * Array of block entries in the
 				      * matrix.
 				      */
-    vector<Entry> entries;
+    std::vector<Entry> entries;
 
   private:
 				     /**
@@ -384,8 +384,8 @@ BlockMatrixArray<MATRIX>::vmult_add (BlockVector<number>& dst,
 
   static Vector<number> aux;
   
-  typename vector<Entry>::const_iterator m = entries.begin();
-  typename vector<Entry>::const_iterator end = entries.end();
+  typename std::vector<Entry>::const_iterator m = entries.begin();
+  typename std::vector<Entry>::const_iterator end = entries.end();
   
   for (; m != end ; ++m)
     {
@@ -439,8 +439,8 @@ BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<number>& dst,
   Assert (src.n_blocks() == block_rows,
 	  ExcDimensionMismatch(src.n_blocks(), block_rows));
 
-  typename vector<Entry>::const_iterator m = entries.begin();
-  typename vector<Entry>::const_iterator end = entries.end();
+  typename std::vector<Entry>::const_iterator m = entries.begin();
+  typename std::vector<Entry>::const_iterator end = entries.end();
   
   static Vector<number> aux;
   
@@ -509,24 +509,24 @@ void
 BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
 {
   out << "\\begin{array}{"
-      << string(n_block_cols(), 'c')
+      << std::string(n_block_cols(), 'c')
       << "}" << std::endl;
 
-  vector2d<string> array(n_block_rows(), n_block_cols());
-  typedef map<const MATRIX*, string> NameMap;
+  Table<2,std::string> array(n_block_rows(), n_block_cols());
+  typedef map<const MATRIX*, std::string> NameMap;
   NameMap matrix_names;
   
-  typename vector<Entry>::const_iterator m = entries.begin();
-  typename vector<Entry>::const_iterator end = entries.end();
+  typename std::vector<Entry>::const_iterator m = entries.begin();
+  typename std::vector<Entry>::const_iterator end = entries.end();
 
   unsigned int matrix_number = 0;
   for (; m != end ; ++m)
     {
       if (matrix_names.find(m->matrix) == matrix_names.end())
 	{
-	  pair<typename NameMap::iterator, bool> x =
+	  std::pair<typename NameMap::iterator, bool> x =
 	    matrix_names.insert(
-	      pair<const MATRIX*, string> (m->matrix, string("M")));
+	      std::pair<const MATRIX*, std::string> (m->matrix, std::string("M")));
 	  STRINGSTREAM stream;
 	  stream << matrix_number++;
 	  stream << std::ends;
@@ -574,9 +574,9 @@ BlockTrianglePrecondition<MATRIX>::do_row (
 {
   const typename BlockMatrixArray<MATRIX>::Entry* diagonal = 0;
   
-  typename vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
+  typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
     m = entries.begin();
-  typename vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
+  typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
     end = entries.end();
   
   static Vector<number> aux;
