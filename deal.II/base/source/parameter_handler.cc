@@ -1076,6 +1076,14 @@ ParameterHandler::memory_consumption () const
 
 ParameterHandler::Section::~Section () 
 {
+				   // first release the memory pointed
+				   // to by the second component of
+				   // the pair, since we became owner
+				   // of that memory through the
+				   // clone() call
+  for (EntryType::iterator q=entries.begin(); q!=entries.end(); ++q)
+    delete q->second.second;
+				   // then clear entire map
   entries.clear ();
 
   std::map<std::string, Section*>::iterator p;

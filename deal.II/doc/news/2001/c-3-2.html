@@ -68,6 +68,14 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: In the <code class="class">ParameterHandler</code>
+       class, we leaked 8 or 12 bytes of memory per declared
+       parameter. This is now fixed.
+       <br>
+       (WB 2001/11/28)
+       </p>
+
+  <li> <p>
        New: <code class="class">Functions::CutOffFunctionCinfty</code>,
        <code class="class">Functions::CutOffFunctionW1</code>, and
        <code class="class">Functions::CutOffFunctionLinfty</code>
