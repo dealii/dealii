@@ -239,7 +239,6 @@ class SwappableVector : public Vector<number>
 				      */
     string filename;
 
-#ifdef DEAL_II_USE_MT
 				     /**
 				      * If in multithread mode, then
 				      * the #alert# function has
@@ -247,16 +246,25 @@ class SwappableVector : public Vector<number>
 				      * coordinate with the #reload#
 				      * function. This is done through
 				      * the following lock.
+				      *
+				      * If not in MT mode, then the
+				      * class used here is empty, and
+				      * we can as well get away
+				      * with it.
 				      */
-    ACE_Thread_Mutex lock;
+    Threads::ThreadMutex lock;
 
 				     /**
 				      * Declare a thread manager that
 				      * is used to spawn threads in
 				      * #alert# detached.
+				      *
+				      * If not in MT mode, then the
+				      * class used here is empty, and
+				      * we can as well get away
+				      * without it.
 				      */
     static Threads::ThreadManager thread_manager;
-#endif
 
 				     /**
 				      * Flag by which the #alert#
