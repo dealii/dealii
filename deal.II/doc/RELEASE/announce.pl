@@ -53,7 +53,9 @@ print "=====Announcing version $version=====\n";
 
 if ($test)
 {
-    @recipients = ('wolfgang@dealii.org', 'guido.kanschat@gmx.net', 'ralf@dealii.org');
+    @recipients = ('wolfgang@dealii.org',
+		   'guido.kanschat@iwr.uni-heidelberg.de',
+		   'ralf@dealii.org');
 } else {
     @recipients = (
 		  'dealii@dealii.org',
@@ -65,8 +67,7 @@ if ($test)
 		  'oon-digest@oonumerics.org',
 		  'scicomp@uni-erlangen.de',
 		  'na.digest@na-net.ornl.gov',
-		  'num.info@hermes.iwr.uni-heidelberg.de',
-		  'kollegiaten@iwr.uni-heidelberg.de');
+		  'num.info@hermes.iwr.uni-heidelberg.de');
 }
 my $r;
 
