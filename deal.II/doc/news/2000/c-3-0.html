@@ -164,7 +164,6 @@
 <ol>
 
   <li> <p>
-
        Improved: <code class="class">PreconditionBlockSOR</code><code
        class="member">::Tvmult(...)</code> is implemented.
        <br>
@@ -172,7 +171,6 @@
        </p>
 
   <li> <p>
-
        Improved: The breakdown criterion of <code
        class="class">SolverBicgstab</code> can be changed by the use
        of <code class="class">SolverBicgstab::AdditionalData</code>.
@@ -393,6 +391,24 @@
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Changed: The functions
+       <code class="member">Triangulation::refine</code>,
+       <code class="member">Triangulation::coarsen</code>,
+       <code
+       class="member">Triangulation::refine_and_coarsen_fixed_fraction</code>,
+       and
+       <code
+       class="member">Triangulation::refine_and_coarsen_fixed_number</code>
+       have been moved from the triangulation class to a separate
+       class <code class="class">GridRefinement</code> as they are not
+       intricately bound to the triangulation but rather form a
+       distinct class of functions that flag cells for refinement or
+       coarsening based on error indicators.
+       <br>
+       (WB 2000/07/28)
+       </p>
+
   <li> <p>
        New: <code class="member">DataOut::clear_input_data_references</code>
        clears all reference to input data vectors and to the <code
