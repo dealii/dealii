@@ -116,15 +116,15 @@
 <ol>
   <li> <p> 
        New: For recognizing a diverging solver before the maximum
-       number of steps is reached, <code
-       class="class">SolverControl</code> returns <code
-       class="member">failure</code> also if the residual increases
-       the start residual by a specific factor. This factor is given
-       to the <code class="class">SolverControl</code> by the <code
-       class="member">set_failure_criterion</code> function. After
-       calling the latter function the checking of this additional
-       failure criterion may again be disabled by calling <code
-       class="member">clear_failure_criterion</code>.
+       number of steps is reached, 
+       <code class="class">SolverControl</code> returns 
+       <code class="member">failure</code> also if the residual
+       increases over the start residual by a specific factor. This
+       factor is given to the <code class="class">SolverControl</code> 
+       object by the <code class="member">set_failure_criterion</code>
+       function. After calling the latter function, checking of this
+       additional failure criterion may again be disabled by calling
+       <code class="member">clear_failure_criterion</code>.
        <br>
        (Ralf Hartmann 2000/06/26)
        </p>
