@@ -1,6 +1,6 @@
 //----------------------------  sparse_matrix_vector_07.cc  ---------------------------
-//    $Id$
-//    Version: $Name$ 
+//    sparse_matrix_vector_07.cc,v 1.5 2004/02/26 17:25:45 wolf Exp
+//    Version:  
 //
 //    Copyright (C) 2004 by the deal.II authors
 //
@@ -65,7 +65,7 @@ void test (Vector<double> &v,
       Assert (x(i) == result, ExcInternalError());
     }
 
-  Assert (s == x.l2_norm(), ExcInternalError());
+  Assert (std::fabs((s - x.l2_norm())/s) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 //----------------------------  vector_18.cc  ---------------------------
-//    $Id$
-//    Version: $Name$ 
+//    vector_18.cc,v 1.4 2004/02/26 17:25:45 wolf Exp
+//    Version:  
 //
 //    Copyright (C) 2004 by the deal.II authors
 //
@@ -33,7 +33,7 @@ void test (Vector<double> &v)
   v.compress ();
 
                                    // then check the norm
-  Assert (v.l2_norm() == std::sqrt(norm), ExcInternalError());
+  Assert (std::fabs((v.l2_norm() - std::sqrt(norm))/std::sqrt(norm)) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
