@@ -553,7 +553,7 @@ bool ParameterHandler::declare_entry (const std::string           &entry,
   if (p->entries.find (entry) != p->entries.end())
     return false;
 
-  p->entries[entry] = make_pair(default_value, pattern.clone());
+  p->entries[entry] = std::make_pair(default_value, pattern.clone());
 
 				   // check whether default answer matches
 				   // the pattern
@@ -1017,8 +1017,8 @@ bool ParameterHandler::scan_line (std::string        line,
 				       // pointer, since we don't need the
 				       // pattern in the entries section -- only
 				       // in the defaults section)
-      pc->entries[entry_name] = make_pair(entry_value,
-					  static_cast<Patterns::PatternBase*>(0));
+      pc->entries[entry_name]
+	= std::make_pair(entry_value, static_cast<Patterns::PatternBase*>(0));
 
       return true;
     };
@@ -1339,8 +1339,8 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 				       // pointer, since we don't need the
 				       // pattern in the entries section -- only
 				       // in the defaults section)
-      pc->entries[choice->entry_name] = make_pair(entry_value,
-						  static_cast<Patterns::PatternBase*>(0));
+      pc->entries[choice->entry_name]
+	= std::make_pair(entry_value, static_cast<Patterns::PatternBase*>(0));
             
 				       // get out of subsection again
       subsection_path.swap (choice->subsection_path);
