@@ -98,8 +98,7 @@ class FiniteElementData
 				      * Default constructor. Constructs an element
 				      * which is not so useful. Checking
 				      * #total_dofs# is therefore a good way to
-				      * check if something went wrong.
-				      */
+				      * check if something went wrong.  */
     FiniteElementData ();
 
 				     /**
@@ -732,7 +731,8 @@ class FiniteElementBase :
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FiniteElement : public FiniteElementBase<dim> {
+class FiniteElement : public FiniteElementBase<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -1317,6 +1317,25 @@ class FiniteElement : public FiniteElementBase<dim> {
 					FullMatrix<double>            &local_mass_matrix) const =0;
 
 				     /**
+				      * Number of base elements in a mixed
+				      * discretization. This function returns
+				      * 1 for simple elements.
+				      */
+    virtual unsigned int n_base_elements() const;
+    
+				     /**
+				      * Access to base element
+				      * objects.  By default,
+				      * #base_element(0)# is #this#.
+				      * This function is overloaded by
+				      * system elements to allow
+				      * access to the different
+				      * components of mixed
+				      * discretizations.
+				      */
+    virtual const FiniteElement<dim>& base_element(unsigned index) const;
+    
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcPureFunctionCalled);
@@ -1338,7 +1357,7 @@ class FiniteElement : public FiniteElementBase<dim> {
     DeclException1 (ExcComputationNotUseful,
 		    int,
 		    << "The computation you required from this function is not "
-		    << "feasable or not probable in the present dimension ("
+		    << "feasible or not probable in the present dimension ("
 		    << arg1 << ") because it would be prohibitively expensive.");
 };
 

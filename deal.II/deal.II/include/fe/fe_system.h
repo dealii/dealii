@@ -68,7 +68,8 @@
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template <int dim>
-class FESystem : public FiniteElement<dim>
+class FESystem //<dim>
+  : public FiniteElement<dim>
 {
 				     /**
 				      * Copy constructor prohibited.
@@ -346,7 +347,7 @@ class FESystem : public FiniteElement<dim>
 				      * of finite elements composed
 				      * into this structure.
 				      */
-    unsigned n_base_elements() const;
+    virtual unsigned n_base_elements() const;
 
 				     /**
 				      * How often is a composing element used.
@@ -369,7 +370,7 @@ class FESystem : public FiniteElement<dim>
 				      * by index.
 				      *
 				      */
-    const FiniteElement<dim>& base_element(unsigned index) const;
+    virtual const FiniteElement<dim>& base_element(unsigned index) const;
 
   private:
 
