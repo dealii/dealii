@@ -26,7 +26,7 @@ std::string output_file_name = "dof_tools_11.output";
 struct Comp
 {
     template <int dim>
-    bool operator() (const Point<dim> p, const Point<dim> q)
+    bool operator() (const Point<dim> p, const Point<dim> q) const
       {
         for (unsigned int d=0; d<dim; ++d)
           if (p(d) < q(d))
