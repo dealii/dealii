@@ -165,7 +165,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 	  cell_matrix.clear ();
 	  cell_vector.clear ();
 	  
-	  fe_values.reinit (cell, face, fe, boundary);
+	  fe_values.reinit (cell, face, boundary);
 
 	  const dFMatrix       &values    = fe_values.get_shape_values ();
 	  const vector<double> &weights   = fe_values.get_JxW_values ();

@@ -106,7 +106,6 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 						    present_level,
 						    present_index,
 						    dof_handler),
-		    fe,
 		    boundary);
   const unsigned int n_dofs = dof_handler->get_selected_fe().total_dofs;
 

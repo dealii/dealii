@@ -370,7 +370,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
     {
       double diff=0;
 				       // initialize for this cell
-      fe_values.reinit (cell, fe, boundary);
+      fe_values.reinit (cell, boundary);
 
       switch (norm) 
 	{

@@ -224,7 +224,7 @@ template <int dim>
 void KellyErrorEstimator<dim>::
 integrate_over_regular_face (const active_cell_iterator &cell,
 			     const unsigned int          face_no,
-			     const FiniteElement<dim>   &fe,
+			     const FiniteElement<dim>   &,
 			     const Boundary<dim>        &boundary,
 			     const FunctionMap          &neumann_bc,
 			     const unsigned int          n_q_points,
@@ -237,7 +237,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
   
 				   // initialize data of the restriction
 				   // of this cell to the present face
-  fe_face_values_cell.reinit (cell, face_no, fe, boundary);
+  fe_face_values_cell.reinit (cell, face_no, boundary);
   
 				   // set up a vector of the gradients
 				   // of the finite element function
@@ -275,8 +275,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				       // get restriction of finite element
 				       // function of #neighbor# to the
 				       // common face.
-      fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor,
-				      fe, boundary);
+      fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor, boundary);
 
 				       // get a list of the gradients of
 				       // the finite element solution
@@ -380,7 +379,7 @@ template <int dim>
 void KellyErrorEstimator<dim>::
 integrate_over_irregular_face (const active_cell_iterator &cell,
 			       const unsigned int          face_no,
-			       const FiniteElement<dim>   &fe,
+			       const FiniteElement<dim>   &,
 			       const Boundary<dim>        &boundary,
 			       const unsigned int          n_q_points,
 			       FEFaceValues<dim>          &fe_face_values,
@@ -429,16 +428,14 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 				       // present cell to the subface and
 				       // store the gradient of the solution
 				       // in psi
-      fe_subface_values.reinit (cell, face_no, subface_no,
-				fe, boundary);
+      fe_subface_values.reinit (cell, face_no, subface_no, boundary);
       fe_subface_values.get_function_grads (solution, psi);
 
 				       // restrict the finite element on the
 				       // neighbor cell to the common #subface#.
 				       // store the gradient in #neighbor_psi#
       vector<Point<dim> > neighbor_psi (n_q_points);
-      fe_face_values.reinit (neighbor_child, neighbor_neighbor,
-			     fe, boundary);
+      fe_face_values.reinit (neighbor_child, neighbor_neighbor, boundary);
       fe_face_values.get_function_grads (solution, neighbor_psi);
       
 				       // compute the jump in the gradients

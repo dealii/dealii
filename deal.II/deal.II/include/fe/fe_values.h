@@ -6,9 +6,10 @@
 /*----------------------------   fe_values.h     ---------------------------*/
 
 
+#include <base/exceptions.h>
+#include <base/subscriptor.h>
 #include <lac/dfmatrix.h>
 #include <grid/point.h>
-#include <base/exceptions.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
 
@@ -617,10 +618,13 @@ class FEValues : public FEValuesBase<dim> {
 				      * may use other ways.)
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &,
-		 const FiniteElement<dim> &,
 		 const Boundary<dim> &);
 
   private:
+				     /**
+				      * Store the finite element for later use.
+				      */
+  SmartPointer<const FiniteElement<dim> > fe;
 				     /**
 				      * Store the gradients of the shape
 				      * functions at the quadrature points on
@@ -889,8 +893,12 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
-		 const FiniteElement<dim>             &fe,
 		 const Boundary<dim>                  &boundary);
+private:
+				     /**
+				      * Store the finite element for later use.
+				      */
+  SmartPointer<const FiniteElement<dim> > fe;
 };
 
 
@@ -1041,13 +1049,17 @@ class FESubfaceValues : public FEFaceValuesBase<dim> {
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const unsigned int                    subface_no,
-		 const FiniteElement<dim>             &fe,
 		 const Boundary<dim>                  &boundary);
 
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcReinitCalledWithBoundaryFace);
+private:
+				     /**
+				      * Store the finite element for later use.
+				      */
+  SmartPointer<const FiniteElement<dim> > fe;
 };
 
 

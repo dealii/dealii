@@ -164,6 +164,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				   fe.n_transform_functions,
 				   1,
 				   update_flags),
+		fe(&fe),
 		unit_shape_gradients(fe.total_dofs,
 				     vector<Point<dim> >(quadrature.n_quadrature_points)),
 		unit_shape_gradients_transform(fe.n_transform_functions,
@@ -201,7 +202,6 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 
 template <int dim>
 void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
-			    const FiniteElement<dim>                      &fe,
 			    const Boundary<dim>                           &boundary) {
   present_cell = cell;
 				   // fill jacobi matrices and real
@@ -211,7 +211,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
       (update_flags & update_q_points)  ||
       (update_flags & update_gradients) ||
       (update_flags & update_ansatz_points))
-    fe.fill_fe_values (cell,
+    fe->fill_fe_values (cell,
 		       unit_quadrature_points,
 		       jacobi_matrices,
 		       update_flags & (update_jacobians  |
@@ -227,7 +227,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe.total_dofs; ++i)
+    for (unsigned int i=0; i<fe->total_dofs; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	for (unsigned int s=0; s<dim; ++s)
 	  {
@@ -314,7 +314,8 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell,
-				       update_flags)
+				       update_flags),
+		fe(&fe)
 {
   unit_face_quadrature_points = quadrature.get_quad_points();
   weights = quadrature.get_weights ();  
@@ -353,7 +354,6 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 template <int dim>
 void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				const unsigned int                             face_no,
-				const FiniteElement<dim>                      &fe,
 				const Boundary<dim>                           &boundary) {
   present_cell  = cell;
   selected_dataset = face_no;
@@ -365,7 +365,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       (update_flags & update_gradients) ||
       (update_flags & update_ansatz_points) ||
       (update_flags & update_JxW_values))
-    fe.fill_fe_face_values (cell,
+    fe->fill_fe_face_values (cell,
 			    face_no,
 			    unit_face_quadrature_points,
 			    unit_quadrature_points[face_no],
@@ -388,7 +388,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe.total_dofs; ++i)
+    for (unsigned int i=0; i<fe->total_dofs; ++i)
       {
 	fill_n (shape_gradients[i].begin(),
 		n_quadrature_points,
@@ -432,7 +432,8 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
-				       update_flags)
+				       update_flags),
+		fe(&fe)
 {
   Assert ((update_flags & update_ansatz_points) == false,
 	  ExcInvalidUpdateFlag());
@@ -479,7 +480,6 @@ template <int dim>
 void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int         face_no,
 				   const unsigned int         subface_no,
-				   const FiniteElement<dim>  &fe,
 				   const Boundary<dim>       &boundary) {
   Assert (cell->face(face_no)->at_boundary() == false,
 	  ExcReinitCalledWithBoundaryFace());
@@ -493,7 +493,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
       (update_flags & update_q_points)  ||
       (update_flags & update_gradients) ||
       (update_flags & update_JxW_values))
-    fe.fill_fe_subface_values (cell,
+    fe->fill_fe_subface_values (cell,
 			       face_no,
 			       subface_no,
 			       unit_face_quadrature_points,
@@ -515,7 +515,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    for (unsigned int i=0; i<fe.total_dofs; ++i) 
+    for (unsigned int i=0; i<fe->total_dofs; ++i) 
       {
 	fill_n (shape_gradients[i].begin(),
 		n_quadrature_points,

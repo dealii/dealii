@@ -6,6 +6,7 @@
 /*----------------------------   fe.h     ---------------------------*/
 
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 #include <grid/point.h>
 #include <grid/dof.h>
 #include <grid/geometry_info.h>
@@ -212,7 +213,11 @@ struct FiniteElementData<2> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-struct FiniteElementBase : public FiniteElementData<dim> {
+struct FiniteElementBase :
+  public Subscriptor,
+  public FiniteElementData<dim>
+
+{
   public:
 				     /**
 				      * Construct an object of this type.
