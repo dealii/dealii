@@ -78,8 +78,10 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 				   // neighbor cells, so using two objects
 				   // gives us a performance gain).
   FEFaceValues<dim> fe_face_values_cell (fe, quadrature,
-					 UpdateFlags(update_gradients  |
-						     update_JxW_values |
+					 UpdateFlags(update_gradients      |
+						     update_JxW_values     |
+						     (neumann_bc.empty() ?
+						      0 : update_q_points) |
 						     update_normal_vectors)); 
   FEFaceValues<dim> fe_face_values_neighbor (fe, quadrature, update_gradients);
   FESubfaceValues<dim> fe_subface_values (fe, quadrature, update_gradients);
