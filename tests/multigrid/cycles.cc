@@ -75,6 +75,10 @@ void test_cycles(unsigned int minlevel, unsigned int maxlevel)
   
   mg1.set_cycle(Multigrid<VECTOR>::w_cycle);
   mg1.cycle();
+  deallog << std::endl;
+  
+  mg1.set_cycle(Multigrid<VECTOR>::f_cycle);
+  mg1.cycle();
 }
 
 int main()
