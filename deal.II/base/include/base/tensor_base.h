@@ -24,7 +24,7 @@
 #include <vector>
 
 template <typename number> class Vector;
-
+template <int dim> class Point;
 
 // general template; specialized for rank==1; the general template is in
 // tensor.h
@@ -40,7 +40,8 @@ template <int rank, int dim> class Tensor;
  * which acts as a tensor of rank one but has more functionality.
  */
 template <int dim>
-class Tensor<1,dim> {
+class Tensor<1,dim>
+{
       public:
 				     /**
 				      * Provide a way to get the
@@ -214,16 +215,6 @@ class Tensor<1,dim> {
 
   protected:
 				     /**
-				      * Store the values in a simple array.
-				      * For @p{dim==0} store one element, because
-				      * otherways the compiler would choke.
-				      * We catch this case in the constructor
-				      * to disallow the creation of such
-				      * an object.
-				      */
-    double values[(dim!=0) ? (dim) : 1];
-
-				     /**
 				      * Help function for unroll.
 				      */
     void unroll_recursion (Vector<double> &result,
@@ -240,6 +231,24 @@ class Tensor<1,dim> {
 				     // the function unroll_loops a friend,
 				     // but that seems to be impossible as well.
     template<int otherrank, int otherdim>  friend class Tensor;
+
+  private:
+				     /**
+				      * Store the values in a simple array.
+				      * For @p{dim==0} store one element, because
+				      * otherways the compiler would choke.
+				      * We catch this case in the constructor
+				      * to disallow the creation of such
+				      * an object.
+				      */
+    double values[(dim!=0) ? (dim) : 1];
+
+				       /**
+					* Point is allowed access to
+					* the coordinates. This is
+					* supposed to improve speed.
+					*/
+    friend class Point<dim>;
 };
 
 				 /**

@@ -310,7 +310,10 @@ template <int dim>
 inline
 Point<dim> Point<dim>::operator - () const 
 {
-  return (Point<dim>(*this) -(*(Tensor<1,dim>*)this));
+  Point<dim> result;
+  for (unsigned int i=0; i<dim; ++i)
+      result.values[i] = -values[i];
+  return result;
 };
 
 
