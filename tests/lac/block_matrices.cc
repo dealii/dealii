@@ -142,6 +142,16 @@ void test ()
     for (unsigned int i=0; i<10; ++i)
       bsm.add (row, (row*5+i*9)%29, 0.5);
 
+
+				   // Check the iterator
+  deallog.push("Iterator");
+  BlockSparseMatrix<double>::const_iterator iter = bsm.begin();
+  const BlockSparseMatrix<double>::const_iterator end_iter = bsm.end();
+  for (;iter != end_iter;++iter)
+    deallog << iter->row() << '\t' << iter->column()
+	    << '\t' << iter->value() << std::endl;
+  deallog.pop();
+  
 				   // now allocate two block vectors
 				   // and see what we can get after
 				   // vmults:
