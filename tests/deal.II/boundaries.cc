@@ -45,7 +45,7 @@ class MySquareFunction : public Function<dim>
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const
-      {	return 100*(component+1)*p.square()*sin(p.square()); };
+      {	return 100*(component+1)*p.square()*std::sin(p.square()); };
     
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
@@ -90,7 +90,7 @@ check ()
       GridGenerator::hyper_ball(tr, Point<dim>(), 1);
     }
   else
-    GridGenerator::hyper_cube(tr, -1./sqrt(dim),1./sqrt(dim));
+    GridGenerator::hyper_cube(tr, -1./std::sqrt(static_cast<double>(dim)),1./std::sqrt(static_cast<double>(dim)));
   if (dim != 1)
     {
       static const HyperBallBoundary<dim> boundary;
