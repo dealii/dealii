@@ -114,6 +114,7 @@ mesh_3d_8.exe           : mesh_3d_8.g.$(OBJEXT)            $(libraries)
 mesh_3d_9.exe           : mesh_3d_9.g.$(OBJEXT)            $(libraries)
 mesh_3d_10.exe          : mesh_3d_10.g.$(OBJEXT)           $(libraries)
 mesh_3d_11.exe          : mesh_3d_11.g.$(OBJEXT)           $(libraries)
+mesh_3d_12.exe          : mesh_3d_12.g.$(OBJEXT)           $(libraries)
 q_points.exe            : q_points.g.$(OBJEXT)             $(libraries)
 
 
@@ -146,7 +147,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	hyper_ball_3d cylinder coarsening_3d \
 	mesh_3d_1 mesh_3d_2 mesh_3d_3 mesh_3d_4 mesh_3d_5 \
 	mesh_3d_6 mesh_3d_7 mesh_3d_8 mesh_3d_9 mesh_3d_10 \
-	mesh_3d_11 \
+	mesh_3d_11 mesh_3d_12 \
 	q_points
 
 ############################################################
