@@ -1176,7 +1176,17 @@ bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
 	p = std::lower_bound (lines.begin (),
 			      lines.end (),
 			      index_comparison);
-      return ((p->line == index) &&
+				       // return if an entry for this
+				       // line was found and if it has
+				       // only one entry equal to 1.0
+				       //
+				       // note that lower_bound only
+				       // returns a valid iterator if
+				       // 'index' is less than the
+				       // largest line index in out
+				       // constraints list
+      return ((p != lines.end()) &&
+	      (p->line == index) &&
 	      (p->entries.size() == 1) &&
 	      (p->entries[0].second == 1.0));
     }
@@ -1189,7 +1199,7 @@ bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
 		  (i->entries[0].second == 1.0));
 
       return false;
-    };
+    }
 }
 
 
