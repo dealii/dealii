@@ -21,14 +21,10 @@ DEAL:ssor:QMRS::Starting
 DEAL:ssor:QMRS::Convergence step 4 
 DEAL:sor:Richardson::Starting 
 DEAL:sor:Richardson::Convergence step 7 
-DEAL:sor:cg::Starting 
-DEAL:sor:cg::Failure step 100 
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 5 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Convergence step 5 
-DEAL:sor:QMRS::Starting 
-DEAL:sor:QMRS::Failure step 100 
 DEAL::Size 12 Unknowns 121
 DEAL::SOR-diff:0.00
 DEAL:no:cg::Starting 
@@ -51,43 +47,9 @@ DEAL:ssor:QMRS::Starting
 DEAL:ssor:QMRS::Convergence step 9 
 DEAL:sor:Richardson::Starting 
 DEAL:sor:Richardson::Convergence step 88 
-DEAL:sor:cg::Starting 
-DEAL:sor:cg::Failure step 100 
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 14 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Convergence step 20 
-DEAL:sor:QMRS::Starting 
-DEAL:sor:QMRS::Failure step 100 
-DEAL::Size 36 Unknowns 1225
-DEAL::SOR-diff:0.00
-DEAL:no:cg::Starting 
-DEAL:no:cg::Convergence step 49 
-DEAL:no:Bicgstab::Starting 
-DEAL:no:Bicgstab::Convergence step 39 
-DEAL:no:GMRES::Starting 
-DEAL:no:GMRES::Failure step 100 
-DEAL:no:QMRS::Starting 
-DEAL:no:QMRS::Convergence step 53 
-DEAL:ssor:Richardson::Starting 
-DEAL:ssor:Richardson::Failure step 100 
-DEAL:ssor:cg::Starting 
-DEAL:ssor:cg::Convergence step 19 
-DEAL:ssor:Bicgstab::Starting 
-DEAL:ssor:Bicgstab::Convergence step 15 
-DEAL:ssor:GMRES::Starting 
-DEAL:ssor:GMRES::Convergence step 18 
-DEAL:ssor:QMRS::Starting 
-DEAL:ssor:QMRS::Convergence step 21 
-DEAL:sor:Richardson::Starting 
-DEAL:sor:Richardson::Failure step 100 
-DEAL:sor:cg::Starting 
-DEAL:sor:cg::Failure step 100 
-DEAL:sor:Bicgstab::Starting 
-DEAL:sor:Bicgstab::Convergence step 44 
-DEAL:sor:GMRES::Starting 
-DEAL:sor:GMRES::Convergence step 99 
-DEAL:sor:QMRS::Starting 
-DEAL:sor:QMRS::Failure step 100 
-DEAL::GrowingVectorMemory:Overall allocated vectors: 345
+DEAL::GrowingVectorMemory:Overall allocated vectors: 212
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 20

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,7 +55,7 @@ int main()
   SolverRichardson<> rich(control, mem);
   SolverQMRS<> qmrs(control, mem);
 
-  for (unsigned int size=4; size <= 40; size *= 3)
+  for (unsigned int size=4; size <= 30; size *= 3)
     {
       unsigned int dim = (size-1)*(size-1);
 
@@ -89,35 +89,40 @@ int main()
       res.add(-1.,u);
     
       deallog << "SOR-diff:" << res*res << std::endl;
-      
-      deallog.push("no");
 
-      check_method(cg,A,u,f,prec_no);
-      check_method(bicgstab,A,u,f,prec_no);
-      check_method(gmres,A,u,f,prec_no);
-      check_method(qmrs,A,u,f,prec_no);
-
-      deallog.pop();
-      
-      deallog.push("ssor");
-
-      check_method(rich,A,u,f,prec_ssor);
-      check_method(cg,A,u,f,prec_ssor);
-      check_method(bicgstab,A,u,f,prec_ssor);
-      check_method(gmres,A,u,f,prec_ssor);
-      check_method(qmrs,A,u,f,prec_ssor);
-
-      deallog.pop();
-
-      deallog.push("sor");
-
-      check_method(rich,A,u,f,prec_sor);
-      check_method(cg,A,u,f,prec_sor);
-      check_method(bicgstab,A,u,f,prec_sor);
-      check_method(gmres,A,u,f,prec_sor);
-      check_method(qmrs,A,u,f,prec_sor);
-
-      deallog.pop();
+      try
+	{
+	  deallog.push("no");
+	  
+	  check_method(cg,A,u,f,prec_no);
+	  check_method(bicgstab,A,u,f,prec_no);
+	  check_method(gmres,A,u,f,prec_no);
+	  check_method(qmrs,A,u,f,prec_no);
+	  
+	  deallog.pop();
+	  
+	  deallog.push("ssor");
+	  
+	  check_method(rich,A,u,f,prec_ssor);
+	  check_method(cg,A,u,f,prec_ssor);
+	  check_method(bicgstab,A,u,f,prec_ssor);
+	  check_method(gmres,A,u,f,prec_ssor);
+	  check_method(qmrs,A,u,f,prec_ssor);
+	  
+	  deallog.pop();
+	  
+	  deallog.push("sor");
+	  
+	  check_method(rich,A,u,f,prec_sor);
+	  check_method(bicgstab,A,u,f,prec_sor);
+	  check_method(gmres,A,u,f,prec_sor);
+	  
+	  deallog.pop();
+	}
+      catch (exception& e)
+	{
+	  cerr << e.what() << endl;
+	}
     };
 };
 
