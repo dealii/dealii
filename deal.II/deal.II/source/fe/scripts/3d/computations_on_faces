@@ -19,9 +19,12 @@
 
   outward_vector := linalg[crossprod] (map(diff, image, xi), 
                                        map(diff, image,eta)):
-  detJ := linalg[norm] (outward_vector, 2):
+  detJ := sqrt (outward_vector[1]*outward_vector[1] +
+                outward_vector[2]*outward_vector[2] +
+                outward_vector[3]*outward_vector[3]):
   normal_vector := map (p->p/detJ, outward_vector):
 
+  measure := int (int (detJ, xi=0..1), eta=0..1):
 
   readlib(C):
   C(detJ, optimized):
