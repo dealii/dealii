@@ -316,7 +316,7 @@ DoFCellAccessor<1>::get_dof_values (const dVector  &values,
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
   Assert (dof_values.size() == 0, ExcVectorNotEmpty());
-  Assert ((unsigned int)values.n() == dof_handler->n_dofs(),
+  Assert (values.n() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
   
   dof_values.reserve (dof_handler->get_selected_fe().total_dofs);
@@ -336,7 +336,7 @@ DoFCellAccessor<2>::get_dof_values (const dVector  &values,
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
   Assert (dof_values.size() == 0, ExcVectorNotEmpty());
-  Assert ((unsigned int)values.n() == dof_handler->n_dofs(),
+  Assert (values.n() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
     
   dof_values.reserve (dof_handler->get_selected_fe().total_dofs);

@@ -27,7 +27,7 @@ Triangulation<dim>::~Triangulation () {
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
 
-  levels.erase (levels.begin(), levels.end());
+  levels.resize (0);
 };
 
 
@@ -1648,7 +1648,7 @@ unsigned int Triangulation<1>::max_adjacent_cells () const {
 template <int dim>
 unsigned int Triangulation<dim>::max_adjacent_cells () const {
   cell_iterator cell = begin(0),
-		endc = (levels.size() != 0 ? begin(1) : cell_iterator(end()));
+		endc = (levels.size() > 1 ? begin(1) : cell_iterator(end()));
 				   // store the largest index of the vertices
 				   // used on level 0
   unsigned int max_vertex_index = 0;
@@ -1773,16 +1773,8 @@ void Triangulation<1>::execute_refinement () {
 	    bind2nd (equal_to<bool>(), true),
 	    needed_vertices);
 
-  vertices.reserve (needed_vertices);
-  vertices_used.reserve (needed_vertices);
-  vertices.insert (vertices.end(),
-		   needed_vertices-vertices.size(),
-		   Point<1>());
-  vertices_used.insert (vertices_used.end(),
-			needed_vertices-vertices_used.size(),
-			false);
-
-
+  vertices.resize (needed_vertices, Point<1>());
+  vertices_used.resize (needed_vertices, false);
 
 
 				   // Do REFINEMENT
@@ -2049,15 +2041,8 @@ void Triangulation<2>::execute_refinement () {
 	    needed_vertices);
 
 				   // reserve enough space for all vertices
-  vertices.reserve (needed_vertices);
-  vertices_used.reserve (needed_vertices);
-  vertices.insert (vertices.end(),
-		   needed_vertices-vertices.size(),
-		   Point<2>());
-  vertices_used.insert (vertices_used.end(),
-			needed_vertices-vertices_used.size(),
-			false);
-
+  vertices.resize (needed_vertices, Point<2>());
+  vertices_used.resize (needed_vertices, false);
 
 
 

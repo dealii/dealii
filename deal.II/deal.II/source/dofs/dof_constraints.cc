@@ -102,7 +102,7 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
-  unsigned int n_rows = (unsigned int)uncondensed.n_rows();
+  unsigned int n_rows = uncondensed.n_rows();
 
   if (next_constraint == lines.end()) 
 				     // if no constraint is to be handled
@@ -137,13 +137,13 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
-  for (int row=0; row<uncondensed.n_rows(); ++row)
+  for (unsigned int row=0; row<uncondensed.n_rows(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
 				       // copy entries if column will not
 				       // be condensed away, distribute
 				       // otherwise
-      for (int j=uncondensed.get_rowstart_indices()[row];
+      for (unsigned int j=uncondensed.get_rowstart_indices()[row];
 	   j<uncondensed.get_rowstart_indices()[row+1]; ++j)
 	if (new_line[uncondensed.get_column_numbers()[j]] != -1)
 	  condensed.add (new_line[row], new_line[uncondensed.get_column_numbers()[j]]);
@@ -161,7 +161,7 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
     else
 				       // line must be distributed
       {
-	for (int j=uncondensed.get_rowstart_indices()[row];
+	for (unsigned int j=uncondensed.get_rowstart_indices()[row];
 	     j<uncondensed.get_rowstart_indices()[row+1]; ++j)
 					   // for each entry: distribute
 	  if (new_line[uncondensed.get_column_numbers()[j]] != -1)
@@ -209,21 +209,16 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
 				   // for gcc2.9: replace this by
 				   // distribute(sparsity.n_rows(), -1)
   vector<int> distribute;
-  distribute.reserve (sparsity.n_rows());
-				   // replace the following line, since
-				   // gcc2.8 chokes over it.
-//  distribute.insert (distribute.end(), sparsity.n_rows(), -1);
-  for (unsigned int i=0; i<(unsigned int)sparsity.n_rows(); ++i)
-    distribute.push_back (-1);
+  distribute.resize (sparsity.n_rows(), -1);
   
-  for (int c=0; c<(signed int)lines.size(); ++c)
-    distribute[lines[c].line] = c;
+  for (unsigned int c=0; c<lines.size(); ++c)
+    distribute[lines[c].line] = (signed int)c;
 
   int n_rows = sparsity.n_rows();
   for (int row=0; row<n_rows; ++row)
     if (distribute[row] == -1)
 				       // regular line. loop over cols
-      for (int j=sparsity.get_rowstart_indices()[row];
+      for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
 	if (sparsity.get_column_numbers()[j] == -1)
@@ -243,7 +238,7 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
 	  }
     else
 				       // row must be distributed
-      for (int j=sparsity.get_rowstart_indices()[row];
+      for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
 	if (sparsity.get_column_numbers()[j] == -1)
@@ -286,7 +281,7 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 	  ExcMatrixNotSquare());
   Assert (condensed.n() == condensed.m(),
 	  ExcMatrixNotSquare());
-  Assert ((unsigned int)condensed.n()+n_constraints() == (unsigned int)uncondensed.n(),
+  Assert (condensed.n()+n_constraints() == uncondensed.n(),
 	  ExcWrongDimension());
 
 				   // store for each line of the matrix
@@ -299,7 +294,7 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
-  unsigned int n_rows = (unsigned int)uncondensed_struct.n_rows();
+  unsigned int n_rows = uncondensed_struct.n_rows();
 
   if (next_constraint == lines.end()) 
 				     // if no constraint is to be handled
@@ -334,13 +329,13 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
-  for (int row=0; row<uncondensed_struct.n_rows(); ++row)
+  for (unsigned int row=0; row<uncondensed_struct.n_rows(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
 				       // copy entries if column will not
 				       // be condensed away, distribute
 				       // otherwise
-      for (int j=uncondensed_struct.get_rowstart_indices()[row];
+      for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
 	   j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
 	if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
 	  condensed.add (new_line[row], new_line[uncondensed_struct.get_column_numbers()[j]],
@@ -361,7 +356,7 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
     else
 				       // line must be distributed
       {
-	for (int j=uncondensed_struct.get_rowstart_indices()[row];
+	for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
 	     j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
 					   // for each column: distribute
 	  if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
@@ -414,16 +409,10 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 				   // for gcc2.9: replace this by
 				   // distribute(sparsity.n_rows(), -1)
   vector<int> distribute;
-  distribute.reserve (sparsity.n_rows());
-				   // replace the following line, since
-				   // gcc2.8 chokes over it.
-//  distribute.insert (distribute.end(), sparsity.n_rows(), -1);
-  for (unsigned int i=0; i<(unsigned int)sparsity.n_rows(); ++i)
-    distribute.push_back (-1);
-
+  distribute.resize (sparsity.n_rows(), -1);
   
-  for (int c=0; c<(signed int)lines.size(); ++c)
-    distribute[lines[c].line] = c;
+  for (unsigned int c=0; c<lines.size(); ++c)
+    distribute[lines[c].line] = (signed int)c;
 
   int n_rows = sparsity.n_rows();
   for (int row=0; row<n_rows; ++row) 
@@ -431,7 +420,7 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
       
     if (distribute[row] == -1)
 				       // regular line. loop over cols
-      for (int j=sparsity.get_rowstart_indices()[row];
+      for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
 	if (sparsity.get_column_numbers()[j] == -1)
@@ -458,7 +447,7 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 	  }
     else
 				       // row must be distributed
-      for (int j=sparsity.get_rowstart_indices()[row];
+      for (unsigned int j=sparsity.get_rowstart_indices()[row];
 	   j<sparsity.get_rowstart_indices()[row+1]; ++j)
 					 // end of row reached?
 	if (sparsity.get_column_numbers()[j] == -1)
@@ -514,7 +503,7 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 void ConstraintMatrix::condense (const dVector &uncondensed,
 				 dVector       &condensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert ((unsigned int)condensed.n()+n_constraints() == (unsigned int)uncondensed.n(),
+  Assert (condensed.n()+n_constraints() == uncondensed.n(),
 	  ExcWrongDimension());
   
 				   // store for each line of the vector
@@ -527,7 +516,7 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
 
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
-  unsigned int n_rows = (unsigned int)uncondensed.n();
+  unsigned int n_rows = uncondensed.n();
 
   if (next_constraint == lines.end()) 
 				     // if no constraint is to be handled
@@ -562,7 +551,7 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
-  for (int row=0; row<uncondensed.n(); ++row)
+  for (unsigned int row=0; row<uncondensed.n(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
 				       // copy entry
@@ -590,7 +579,7 @@ void ConstraintMatrix::condense (dVector &vec) const {
     return;
   
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  for (unsigned int row=0; row<(unsigned int)vec.n(); ++row)
+  for (unsigned int row=0; row<vec.n(); ++row)
     if (row == (*next_constraint).line)
 				       // line must be distributed
       {
@@ -614,7 +603,7 @@ void ConstraintMatrix::condense (dVector &vec) const {
 void ConstraintMatrix::distribute (const dVector &condensed,
 				   dVector       &uncondensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert ((unsigned int)condensed.n()+n_constraints() == (unsigned int)uncondensed.n(),
+  Assert (condensed.n()+n_constraints() == uncondensed.n(),
 	  ExcWrongDimension());
 
 				   // store for each line of the new vector
@@ -627,7 +616,7 @@ void ConstraintMatrix::distribute (const dVector &condensed,
 
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
-  unsigned int n_rows = (unsigned int)uncondensed.n();
+  unsigned int n_rows = uncondensed.n();
 
   if (next_constraint == lines.end()) 
 				     // if no constraint is to be handled
@@ -662,7 +651,7 @@ void ConstraintMatrix::distribute (const dVector &condensed,
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
-  for (unsigned int line=0; line<(unsigned int)uncondensed.n(); ++line) 
+  for (unsigned int line=0; line<uncondensed.n(); ++line) 
     if (old_line[line] != -1)
 				       // line was not condensed away
       uncondensed(line) = condensed(old_line[line]);

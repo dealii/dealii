@@ -782,9 +782,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				   // workaround
 //  vector<int> new_number(sparsity.n_rows(), -1);
   vector<int> new_number;
-  new_number.reserve (sparsity.n_rows());
-  for (unsigned int i=0; i<(unsigned int)sparsity.n_rows(); ++i)
-    new_number.push_back (-1);
+  new_number.resize (sparsity.n_rows(), -1);
   
 				   // store the indices of the dofs renumbered
 				   // in the last round. Default to starting
@@ -809,14 +807,15 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
       unsigned int min_coordination = n_dofs;
       for (int row=0; row<n_dofs; ++row) 
 	{
-	  int j;
+	  unsigned int j;
 	  for (j=sparsity.get_rowstart_indices()[row];
 	       j<sparsity.get_rowstart_indices()[row+1]; ++j)
 	    if (sparsity.get_column_numbers()[j] == -1)
 	      break;
-					   // post: coordination is now
+					   // post-condition after loop:
+					   // coordination is now
 					   // j-rowstart[row]
-	  if (j-sparsity.get_rowstart_indices()[row] < (signed int)min_coordination)
+	  if (j-sparsity.get_rowstart_indices()[row] <  min_coordination)
 	    {
 	      min_coordination = j-sparsity.get_rowstart_indices()[row];
 	      starting_point   = row;
@@ -848,7 +847,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				       // dofs numbered in the last
 				       // round
       for (unsigned int i=0; i<last_round_dofs.size(); ++i)
-	for (int j=sparsity.get_rowstart_indices()[last_round_dofs[i]];
+	for (unsigned int j=sparsity.get_rowstart_indices()[last_round_dofs[i]];
 	     j<sparsity.get_rowstart_indices()[last_round_dofs[i]+1]; ++j)
 	  if (sparsity.get_column_numbers()[j] == -1)
 	    break;
@@ -888,7 +887,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 	   s!=next_round_dofs.end(); ++s) 
 	{
 	  unsigned int coordination = 0;
-	  for (int j=sparsity.get_rowstart_indices()[*s];
+	  for (unsigned int j=sparsity.get_rowstart_indices()[*s];
 	       j<sparsity.get_rowstart_indices()[*s+1]; ++j)
 	    if (sparsity.get_column_numbers()[j] == -1)
 	      break;
@@ -1015,12 +1014,12 @@ void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const
 				  2*selected_fe->dofs_per_line);
 
 	Assert(2*selected_fe->dofs_per_vertex+selected_fe->dofs_per_line ==
-	       (unsigned int)selected_fe->constraints().n(),
+	       selected_fe->constraints().n(),
 	       ExcDifferentDimensions(2*selected_fe->dofs_per_vertex+
 				      selected_fe->dofs_per_line,
 				      selected_fe->constraints().n()));
 	Assert(selected_fe->dofs_per_vertex+2*selected_fe->dofs_per_line ==
-	       (unsigned int)selected_fe->constraints().m(),
+	       selected_fe->constraints().m(),
 	       ExcDifferentDimensions(3*selected_fe->dofs_per_vertex+
 				      2*selected_fe->dofs_per_line,
 				      selected_fe->constraints().m()));
@@ -1141,17 +1140,13 @@ void DoFHandler<dim>::make_transfer_matrix (const DoFHandler<dim> &transfer_from
 #ifdef DEBUG
   for (unsigned int c=0; c<(1<<dim); ++c)
     {
-      Assert ((unsigned int)selected_fe->prolongate(c).m() ==
-	      selected_fe->total_dofs,
+      Assert (selected_fe->prolongate(c).m() == selected_fe->total_dofs,
 	      ExcMatrixHasWrongSize(selected_fe->prolongate(c).m()));
-      Assert ((unsigned int)selected_fe->prolongate(c).n() ==
-	      selected_fe->total_dofs,
+      Assert (selected_fe->prolongate(c).n() == selected_fe->total_dofs,
 	      ExcMatrixHasWrongSize(selected_fe->prolongate(c).n()));
-      Assert ((unsigned int)selected_fe->restrict(c).m() ==
-	      selected_fe->total_dofs,
+      Assert (selected_fe->restrict(c).m() == selected_fe->total_dofs,
 	      ExcMatrixHasWrongSize(selected_fe->restrict(c).m()));
-      Assert ((unsigned int)selected_fe->restrict(c).n() ==
-	      selected_fe->total_dofs,
+      Assert (selected_fe->restrict(c).n() == selected_fe->total_dofs,
 	      ExcMatrixHasWrongSize(selected_fe->restrict(c).n()));
     };
 #endif
@@ -1478,23 +1473,17 @@ void DoFHandler<1>::reserve_space (const FiniteElement<1> &fe) {
                                    // their size
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
-  levels.erase (levels.begin(), levels.end());
+  levels.resize (0);
 
   vertex_dofs.erase (vertex_dofs.begin(), vertex_dofs.end());
-  vertex_dofs.reserve (tria->vertices.size());
-  vertex_dofs.insert (vertex_dofs.end(),
-		      tria->vertices.size(),
-		      -1);
+  vertex_dofs.resize (tria->vertices.size(), -1);
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<1>);
 
-      levels.back()->line_dofs.reserve (tria->levels[i]->lines.lines.size() *
-					fe.dofs_per_line);
-      levels.back()->line_dofs.insert (levels.back()->line_dofs.end(),
-				       (tria->levels[i]->lines.lines.size() *
-					fe.dofs_per_line),
+      levels.back()->line_dofs.resize (tria->levels[i]->lines.lines.size() *
+				       fe.dofs_per_line,
 				       -1);
     };
 };
@@ -1510,30 +1499,21 @@ void DoFHandler<2>::reserve_space (const FiniteElement<2> &fe) {
                                    // their size
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
-  levels.erase (levels.begin(), levels.end());
+  levels.resize (0);
 
   vertex_dofs.erase (vertex_dofs.begin(), vertex_dofs.end());
-  vertex_dofs.reserve (tria->vertices.size());
-  vertex_dofs.insert (vertex_dofs.end(),
-		      tria->vertices.size(),
+  vertex_dofs.resize (tria->vertices.size(),
 		      -1);
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<2>);
 
-      levels.back()->line_dofs.reserve (tria->levels[i]->lines.lines.size() *
-					fe.dofs_per_line);
-      levels.back()->line_dofs.insert (levels.back()->line_dofs.end(),
-				       (tria->levels[i]->lines.lines.size() *
-					fe.dofs_per_line),
+      levels.back()->line_dofs.resize (tria->levels[i]->lines.lines.size() *
+				       fe.dofs_per_line,
 				       -1);
-      
-      levels.back()->quad_dofs.reserve (tria->levels[i]->quads.quads.size() *
-					fe.dofs_per_quad);
-      levels.back()->quad_dofs.insert (levels.back()->quad_dofs.end(),
-				       (tria->levels[i]->quads.quads.size() *
-					fe.dofs_per_quad),
+      levels.back()->quad_dofs.resize (tria->levels[i]->quads.quads.size() *
+				       fe.dofs_per_quad,
 				       -1);
     };
 };
