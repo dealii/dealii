@@ -16,7 +16,7 @@
 
 #include <base/config.h>
 #include <base/point.h>
-#include <base/vector2d.h>
+#include <base/table.h>
 #include <grid/geometry_info.h>
 #include <vector>
 #include <string>
@@ -486,7 +486,7 @@ class DataOutBase
 					  * should yield the same value for all
 					  * patches provided.
 					  */
-	vector2d<float> data;
+	Table<2,float> data;
 	
 					 /**
 					  * Default constructor. Sets
