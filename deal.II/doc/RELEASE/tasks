@@ -44,7 +44,7 @@ when a new release shall be issued:
 
 10/ tell your friends to tag their programs
 
-11a/ cvs export -P -r Version-x-y-z and form a tarball of that.
+11a/ cvs export -r Version-x-y-z and form a tarball of that.
 
 11b/ Produce the online documentation and form a tarball of the doxygen output
 
