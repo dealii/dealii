@@ -187,10 +187,6 @@ old argument 'const unsigned int selected_component'.
 Update documentation on Boundaries in Triangulation<dim> (Guido!)
 
 
-Make DataOut_Patch local to DataOutBase, as noted in the comment,
-  whenever the compiler happily accepts that.
-
-
 Fix MGTransferPrebuilt::build_matrices, think about diagonals in
 square sparse matrices.
 
@@ -208,7 +204,8 @@ Fix a potential problem with viewing angles in 3d Eps GridOut (see
 
 
 Move the GridOut::EpsFlags<3>::EpsFlags constructor into the
-  appropriate .cc-file if the compiler supports this.
+  appropriate .cc-file if the compiler supports this. Same
+  applies to DataOut::Patch<dim>
 
 
 Remove the hack in Make_forward_declarations when using gcc2.95. See
