@@ -247,12 +247,22 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: <code class="class">GridGenerator</code>::<code
+       class="member">hyper_rectangle</code> creates
+       coordinate-parallel rectangles in arbitrary dimension.
+       <br>
+       (GK 2001/03/16)
+       </p>
+
+  <li> <p>
        Changed: The syntax of the <code
-       class="member">FiniteElemente<dim>::get_unit_support_points</code>
+       class="class">FiniteElement&lt;dim&gt;</code>::<code
+       class="member">get_unit_support_points</code>
        function is changed; it returns a reference to the vector of
        points. These points are now computed by the constructor of the
        <code class="class">FiniteElement</code> and not on each <code
-       class="member">FiniteElemente<dim>::get_unit_support_points</code>
+       class="class">FiniteElement&lt;dim&gt;</code>::<code
+       class="member">get_unit_support_points</code>
        function call as before.
        <br>
        (WB 2001/03/14)
@@ -260,7 +270,8 @@ documentation, etc</a>.
 
   <li> <p> 
        Removed: The function <code
-       class="member">FiniteElemente<dim>::get_support_points</code>
+       class="class">FiniteElement&lt;dim&gt;</code>::<code
+       class="member">get_support_points</code>
        is removed as the <code class="class">FiniteElement</code>
        cannot know the position of the support points by itself. This is
        because the support points depend on the unit support points
