@@ -15,11 +15,11 @@ INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
 CXXFLAGS.g= -ansi -DDEBUG -ggdb -Wall -W -Wconversion \
             -Winline -Woverloaded-virtual -fno-builtin\
-	    -fno-vtable-thunks -ftemplate-depth-32\
+	    -fno-vtable-thunks -ftemplate-depth-32 -pg\
             $(INCLUDE)
 CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
             -felide-constructors -fnonnull-objects \
-	    -fno-vtable-thunks -ftemplate-depth-32\
+	    -fno-vtable-thunks -ftemplate-depth-32 -pg\
             $(INCLUDE)
 
 
