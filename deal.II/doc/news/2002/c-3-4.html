@@ -50,6 +50,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> 
+       New: There are now operators to allow multiplication and
+       division of <code class="class">Tensor</code> objects by scalar
+       factors.
+       <br>
+       (WB 2002/06/07)
+       </p>
 </ol>
 
 
@@ -66,6 +73,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       Fixed: The <code class="member">get_dof_indices</code>
+       functions of DoF accessor classes used to work also for
+       non-active cells. However, the results were bogus except for
+       the special case that we had a finite element that has all its
+       degrees of freedom located in vertices. This is now fixed: the
+       function throws an exception in all other cases, since there is
+       no useful meaning for it then. It continues to work in the
+       special case.
+       <br>
+       (WB 2002/06/08)
+       </p>
+
   <li> <p> 
        New: For encapsulated postscript of 2d grids, it is now
        possible to tell the <code class="class">GridOut</code> to

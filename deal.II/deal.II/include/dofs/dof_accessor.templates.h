@@ -157,6 +157,19 @@ DoFObjectAccessor<1,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
 				 this->dof_handler->get_fe().dofs_per_line),
 	  typename BaseClass::ExcVectorDoesNotMatch());
 
+				   // this function really only makes
+				   // sense on non-active objects if
+				   // all degrees of freedom are
+				   // located on vertices, since
+				   // otherwise there are degrees of
+				   // freedom on sub-objects which are
+				   // not allocated for this
+				   // non-active thing
+  Assert (this->active() ||
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   2*this->dof_handler->get_fe().dofs_per_vertex),
+	  typename DoFAccessor<dim>::ExcNotActive());
+  
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
@@ -257,6 +270,20 @@ DoFObjectAccessor<2,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
 				 this->dof_handler->get_fe().dofs_per_quad),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
+				   // this function really only makes
+				   // sense on non-active objects if
+				   // all degrees of freedom are
+				   // located on vertices, since
+				   // otherwise there are degrees of
+				   // freedom on sub-objects which are
+				   // not allocated for this
+				   // non-active thing
+  Assert (this->active() ||
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   4*this->dof_handler->get_fe().dofs_per_vertex),
+	  typename DoFAccessor<dim>::ExcNotActive());
+  
+  
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
@@ -375,6 +402,19 @@ DoFObjectAccessor<3,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
 				 this->dof_handler->get_fe().dofs_per_hex),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
+				   // this function really only makes
+				   // sense on non-active objects if
+				   // all degrees of freedom are
+				   // located on vertices, since
+				   // otherwise there are degrees of
+				   // freedom on sub-objects which are
+				   // not allocated for this
+				   // non-active thing
+  Assert (this->active() ||
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   8*this->dof_handler->get_fe().dofs_per_vertex),
+	  typename DoFAccessor<dim>::ExcNotActive());
+  
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
@@ -392,6 +432,7 @@ DoFObjectAccessor<3,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next++ = dof_index(d);
 };
+
 
 
 template <int dim>
