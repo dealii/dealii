@@ -257,6 +257,34 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
 	  set<int> dofs_on_face (dofs_on_face_vector.begin(),
 				 dofs_on_face_vector.end());
+#ifdef DEBUG
+					   // in debug mode: compute an element
+					   // in the matrix which is
+					   // guaranteed to belong to a boundary
+					   // dof. We do this to check that the
+					   // entries in the cell matrix are
+					   // guaranteed to be zero if the
+					   // respective dof is not on the
+					   // boundary. Since because of
+					   // round-off, the actual
+					   // value of the matrix entry may be
+					   // only close to zero, we assert that
+					   // it is small relative to an element
+					   // which is guaranteed to be nonzero.
+					   // (absolute smallness does not
+					   // suffice since the size of the
+					   // domain scales in here)
+					   //
+					   // for this purpose we seek the
+					   // diagonal of the matrix, where there
+					   // must be an element belonging to
+					   // the boundary. we take the maximum
+					   // diagonal entry.
+	  double max_diag_entry = 0;
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    if (fabs(cell_matrix(i,i)) > max_diag_entry)
+	      max_diag_entry = fabs(cell_matrix(i,i));
+#endif  
 	  
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -267,7 +295,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 			   cell_matrix(i,j));
 	      else
 		{
-		  Assert (fabs(cell_matrix(i,j)) <= 1e-10,
+						   // compare here for relative
+						   // smallness
+		  Assert (fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
 			  ExcInternalError ());
 		};
 	  
@@ -276,7 +306,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
 	    else
 	      {
-		Assert (fabs(cell_vector(j)) <= 1e-10,
+						   // compare here for relative
+						   // smallness
+		Assert (fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
 			ExcInternalError());
 	      };
 	};
