@@ -149,8 +149,6 @@ sparse_matrix_07.exe    : sparse_matrix_07.g.$(OBJEXT)     $(libraries)
 sparse_matrix_08.exe    : sparse_matrix_08.g.$(OBJEXT)     $(libraries)
 sparse_matrix_09.exe    : sparse_matrix_09.g.$(OBJEXT)     $(libraries)
 sparse_matrix_10.exe    : sparse_matrix_10.g.$(OBJEXT)     $(libraries)
-sparse_matrix_11.exe    : sparse_matrix_11.g.$(OBJEXT)     $(libraries)
-sparse_matrix_12.exe    : sparse_matrix_12.g.$(OBJEXT)     $(libraries)
 
 petsc_01.exe            : petsc_01.g.$(OBJEXT)             $(libraries)
 petsc_02.exe            : petsc_02.g.$(OBJEXT)             $(libraries)
@@ -207,7 +205,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
         sparse_matrix_04 sparse_matrix_05 sparse_matrix_05a \
 	sparse_matrix_06 \
         sparse_matrix_07 sparse_matrix_08 sparse_matrix_09 \
-        sparse_matrix_10 sparse_matrix_11 sparse_matrix_12
+        sparse_matrix_10
 
 ifeq ($(USE_CONTRIB_HSL),yes)
   tests += petsc_01 petsc_02 petsc_03 petsc_04 petsc_05 petsc_06 \
