@@ -467,7 +467,8 @@ template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 					     const FunctionMap   &dirichlet_bc,
-					     map<int,double>     &boundary_values)
+					     map<int,double>     &boundary_values,
+					     const vector<bool>  &component_mask_)
 {
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
@@ -476,6 +477,15 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
   Assert (fe.n_components == dirichlet_bc.begin()->second->n_components,
 	  ExcComponentMismatch());
   Assert (fe.dofs_per_vertex == fe.n_components,
+	  ExcComponentMismatch());
+
+				   // set the component mask to either
+				   // the original value or a vector
+				   // of #true#s
+  const vector<bool> component_mask ((component_mask_.size() == 0) ?
+				     vector<bool> (fe.n_components, true) :
+				     component_mask_);
+  Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
   
 				   // check whether boundary values at the
@@ -493,11 +503,16 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
       while (leftmost_cell->has_children())
 	leftmost_cell = leftmost_cell->child(0);
 
-				       // now set the value of the leftmost
-				       // degree of freedom
+				       // now set the value of the
+				       // leftmost degree of
+				       // freedom. setting also
+				       // created the entry in the map
+				       // if it did not exist
+				       // beforehand
       for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-	boundary_values[leftmost_cell->vertex_dof_index(0,i)]
-	  = dirichlet_bc.find(0)->second->value(leftmost_cell->vertex(0), i);
+	if (component_mask[fe.face_system_to_component_index(i).first])
+	  boundary_values[leftmost_cell->vertex_dof_index(0,i)]
+	    = dirichlet_bc.find(0)->second->value(leftmost_cell->vertex(0), i);
     };
 
 				   // same for the right boundary of
@@ -518,8 +533,9 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 				       // now set the value of the rightmost
 				       // degree of freedom
       for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-	boundary_values[rightmost_cell->vertex_dof_index(1,i)]
-	  = dirichlet_bc.find(1)->second->value(rightmost_cell->vertex(1), i);
+	if (component_mask[fe.face_system_to_component_index(i).first])
+	  boundary_values[rightmost_cell->vertex_dof_index(1,i)]
+	    = dirichlet_bc.find(1)->second->value(rightmost_cell->vertex(1), i);
     };
   
 };
@@ -533,7 +549,8 @@ template <int dim>
 void
 VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					       const FunctionMap     &dirichlet_bc,
-					       map<int,double>       &boundary_values)
+					       map<int,double>       &boundary_values,
+					       const vector<bool>    &component_mask_)
 {
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
@@ -544,6 +561,15 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
   
   Assert (n_components == dirichlet_bc.begin()->second->n_components,
 	  ExcInvalidFE());
+
+				   // set the component mask to either
+				   // the original value or a vector
+				   // of #true#s
+  const vector<bool> component_mask ((component_mask_.size() == 0) ?
+				     vector<bool> (fe.n_components, true) :
+				     component_mask_);
+  Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
+	  ExcComponentMismatch());
 
   typename FunctionMap::const_iterator function_ptr;
 
@@ -581,8 +607,9 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					     // enter into list
 	    
 	    for (unsigned int i=0; i<face_dofs.size(); ++i)
-	      boundary_values[face_dofs[i]]
-		= dof_values_system[i](fe.face_system_to_component_index(i).first);
+	      if (component_mask[fe.face_system_to_component_index(i).first])
+		boundary_values[face_dofs[i]]
+		  = dof_values_system[i](fe.face_system_to_component_index(i).first);
 	  }
 	else
 					   // fe has only one component,

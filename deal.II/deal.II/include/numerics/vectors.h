@@ -367,6 +367,22 @@ class VectorTools
 				      * of the boundary part to be projected
 				      * on already was in the variable.
 				      *
+				      * The flags in the last
+				      * parameter, #component_mask#
+				      * denote which components of the
+				      * finite element space shall be
+				      * interpolated. If it is left as
+				      * specified by the default value
+				      * (i.e. an empty array), all
+				      * components are
+				      * interpolated. If is different
+				      * from the default value, it is
+				      * assumed that the number of
+				      * entries equals the number of
+				      * components in the boundary
+				      * functions and the finite
+				      * element.
+				      *
 				      * It is assumed that the number
 				      * of components of the functions
 				      * in #dirichlet_bc# matches that
@@ -378,7 +394,8 @@ class VectorTools
 				      */
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
 					     const FunctionMap     &dirichlet_bc,
-					     map<int,double>       &boundary_values);
+					     map<int,double>       &boundary_values,
+					     const vector<bool>    &component_mask = vector<bool>());
 
 				     /**
 				      * Project #function# to the boundary
