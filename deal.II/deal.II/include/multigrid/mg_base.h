@@ -11,6 +11,8 @@
 
 #include <vector>
 
+#define FLOAT float
+
 
 /**
  * Abstract base class for coarse grid solvers.
@@ -31,8 +33,8 @@ class MGCoarseGridSolver
 				      * about the matrix is removed to
 				      * that class.
 				      */
-    virtual void operator() (unsigned int level, Vector<float>& dst,
-			     const Vector<float>& src) const = 0;
+    virtual void operator() (unsigned int level, Vector<FLOAT>& dst,
+			     const Vector<FLOAT>& src) const = 0;
 };
 
 
@@ -65,9 +67,27 @@ class MGSmootherBase
 				      * things.
 				      */
     virtual void smooth (const unsigned int   level,
-			 Vector<float>       &u,
-			 const Vector<float> &rhs) const = 0;
+			 Vector<FLOAT>       &u,
+			 const Vector<FLOAT> &rhs) const = 0;
 
+};
+
+/**
+ * Smoother doing nothing.
+ * @author Guido Kanschat, 1999
+ */
+class MGSmootherIdentity
+  :
+  public MGSmootherBase
+{
+  public:
+				     /**
+				      * Implementation of the interface in #MGSmootherBase#.
+				      * This function does nothing.
+				      */
+    virtual void smooth (const unsigned int   level,
+			 Vector<FLOAT>       &u,
+			 const Vector<FLOAT> &rhs) const;
 };
 
 /**
@@ -100,8 +120,8 @@ class MGTransferBase  :  public Subscriptor
 				      * level.
 				      */
     virtual void prolongate (const unsigned int   to_level,
-			     Vector<float>       &dst,
-			     const Vector<float> &src) const = 0;
+			     Vector<FLOAT>       &dst,
+			     const Vector<FLOAT> &src) const = 0;
 
 				     /**
 				      * Restrict a vector from level
@@ -117,9 +137,43 @@ class MGTransferBase  :  public Subscriptor
 				      * level.
 				      */
     virtual void restrict (const unsigned int   from_level,
-			   Vector<float>       &dst,
-			   const Vector<float> &src) const = 0;
+			   Vector<FLOAT>       &dst,
+			   const Vector<FLOAT> &src) const = 0;
 };
+
+/**
+ * An array with a vector for each level.
+ * The purpose of this class is mostly to provide range checking that is missing in
+ * those ultra-fashionable STL vectors.
+ * @author Guido Kanschat, 1999
+ */
+template<class VECTOR>
+class MGVector
+  :
+  public Subscriptor,
+  public vector<VECTOR>
+{
+  public:
+				     /**
+				      * Constructor allowing to initialize the number of levels.
+				      */
+    MGVector(unsigned int minlevel, unsigned int maxlevel);
+				     /**
+				      * Safe access operator.
+				      */
+    VECTOR& operator[](unsigned int);
+				     /**
+				      * Safe access operator.
+				      */
+    const VECTOR& operator[](unsigned int) const;
+  private:
+				     /**
+				      * Level of first component.
+				      */
+    unsigned int minlevel;
+};
+
+
 
 /**
  * An array of matrices for each level.
@@ -137,7 +191,21 @@ class MGMatrix
 				     /**
 				      * Constructor allowing to initialize the number of levels.
 				      */
-    MGMatrix(unsigned int n_levels);
+    MGMatrix(unsigned int minlevel, unsigned int maxlevel);
+				     /**
+				      * Safe access operator.
+				      */
+    MATRIX& operator[](unsigned int);
+				     /**
+				      * Safe access operator.
+				      */
+    const MATRIX& operator[](unsigned int) const;
+    
+  private:
+				     /**
+				      * Level of first component.
+				      */
+    unsigned int minlevel;
 };
 
 
@@ -168,8 +236,8 @@ class MGCoarseGridLACIteration
 				      * matrix, vectors and
 				      * preconditioner.
 				      */
-    virtual void operator() (unsigned int level, Vector<float>& dst,
-			     const Vector<float>& src) const;
+    virtual void operator() (unsigned int level, Vector<FLOAT>& dst,
+			     const Vector<FLOAT>& src) const;
   private:
 				     /**
 				      * Reference to the solver.
@@ -207,29 +275,10 @@ class MGCoarseGridLACIteration
  * */
 class MGBase
 {
+  private:
     MGBase(const MGBase&);
     const MGBase& operator=(const MGBase&);
-    
-				     /**
-				      * Auxiliary vector, defect.
-				      */
-    vector<Vector<float> > d;
 
-				     /**
-				      * Auxiliary vector, solution.
-				      */
-    vector<Vector<float> > s;
-
-				     /**
-				      * Auxiliary vector.
-				      */
-    Vector<float> t;
-    
-				     /**
-				      * Prolongation and restriction object.
-				      */
-    SmartPointer<const MGTransferBase> transfer;
-    
   protected:
 				     /**
 				      * Highest level of cells.
@@ -240,6 +289,28 @@ class MGBase
 				      * Level for coarse grid solution.
 				      */
     unsigned int minlevel;
+				     /**
+				      * Auxiliary vector, defect.
+				      */
+    MGVector<Vector<FLOAT> > d;
+
+				     /**
+				      * Auxiliary vector, solution.
+				      */
+    MGVector<Vector<FLOAT> > s;
+
+  private:
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector<FLOAT> t;
+    
+				     /**
+				      * Prolongation and restriction object.
+				      */
+    SmartPointer<const MGTransferBase> transfer;
+    
+  protected:
 
 				     /**
 				      * The actual v-cycle multigrid method.
@@ -262,9 +333,9 @@ class MGBase
 				      * derived class.
 				      */
     virtual void level_residual(unsigned int level,
-			     Vector<float>& dst,
-			     const Vector<float>& src,
-			     const Vector<float>& rhs) = 0;  
+			     Vector<FLOAT>& dst,
+			     const Vector<FLOAT>& src,
+			     const Vector<FLOAT>& rhs) = 0;  
 
   
   public:
@@ -273,8 +344,27 @@ class MGBase
 				      */
     MGBase(const MGTransferBase& transfer,
 		  unsigned int maxlevel, unsigned int minlevel);
+				     /**
+				      * Virtual destructor.
+				      */
     virtual ~MGBase();
-    
+				     /**
+				      * Execute v-cycle algorithm.
+				      * This function assumes, that
+				      * the vector #d# is properly
+				      * filled with the residual in
+				      * the outer defect correction
+				      * scheme. After execution of
+				      * #vcycle()#, the result is in
+				      * the vector #s#. We propose to
+				      * write functions #copy_from_mg#
+				      * and #copy_to_mg# in derived
+				      * classes of #MGBase# to access
+				      * #d# and #s#.
+				      */
+    void vcycle(const MGSmootherBase& pre_smooth,
+		const MGSmootherBase& post_smooth,
+		const MGCoarseGridSolver& cgs);
 };
 
 
@@ -288,16 +378,64 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>
 template<class SOLVER, class MATRIX, class PRECOND>
 void
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>::operator()
-(unsigned int, Vector<float>& dst, const Vector<float>& src) const
+(unsigned int, Vector<FLOAT>& dst, const Vector<FLOAT>& src) const
 {
   solver.solve(matrix, dst, src, precondition);
 }
 
-template<class MATRIX>
-MGMatrix<MATRIX>::MGMatrix(unsigned int nlevels)
+//////////////////////////////////////////////////////////////////////
+
+template<class VECTOR>
+MGVector<VECTOR>::MGVector(unsigned int min, unsigned int max)
 		:
-		vector<MATRIX>(nlevels)
+		vector<VECTOR>(max-min+1),
+		minlevel(min)
 {}
+
+
+template<class VECTOR>
+VECTOR&
+MGVector<VECTOR>::operator[](unsigned int i)
+{
+  Assert((i>=minlevel)&&(i<minlevel+size()),ExcIndexRange(i,minlevel,minlevel+size()));
+  return vector<VECTOR>::operator[](i-minlevel);
+}
+
+
+template<class VECTOR>
+const VECTOR&
+MGVector<VECTOR>::operator[](unsigned int i) const
+{
+  Assert((i>=minlevel)&&(i<minlevel+size()),ExcIndexRange(i,minlevel,minlevel+size()));
+  return vector<VECTOR>::operator[](i-minlevel);
+}
+
+//////////////////////////////////////////////////////////////////////
+
+template<class MATRIX>
+MGMatrix<MATRIX>::MGMatrix(unsigned int min, unsigned int max)
+		:
+		vector<MATRIX>(max-min+1),
+		minlevel(min)
+{}
+
+
+template<class MATRIX>
+MATRIX&
+MGMatrix<MATRIX>::operator[](unsigned int i)
+{
+  Assert((i>=minlevel)&&(i<minlevel+size()),ExcIndexRange(i,minlevel,minlevel+size()));
+  return vector<MATRIX>::operator[](i-minlevel);
+}
+
+
+template<class MATRIX>
+const MATRIX&
+MGMatrix<MATRIX>::operator[](unsigned int i) const
+{
+  Assert((i>=minlevel)&&(i<minlevel+size()),ExcIndexRange(i,minlevel,minlevel+size()));
+  return vector<MATRIX>::operator[](i-minlevel);
+}
 
 
 #endif

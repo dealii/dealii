@@ -107,7 +107,12 @@ ReductionControl::check (const unsigned int step,
     };
 
   if (check_value < reduced_tol)
-    return success;
+    {
+      if (log_result)
+	deallog << "Convergence step " << step
+		<< " value " << check_value << endl;
+      return success;
+    }
   else
     return SolverControl::check(step, check_value);
 };

@@ -42,7 +42,7 @@ main()
     {
       deallog << "Size " << size << endl;
       
-      unsigned int dim = (size+1)*(size+1);
+      unsigned int dim = (size-1)*(size-1);
 
 				       // Make matrix
       FDMatrix testproblem(size, size);
@@ -73,6 +73,7 @@ main()
 
       check_method(rich,A,u,f,prec_ssor);
       check_method(cg,A,u,f,prec_ssor);
+//      testproblem.gnuplot_print(cout, u);
       check_method(bicgstab,A,u,f,prec_ssor);
       check_method(gmres,A,u,f,prec_ssor);
 

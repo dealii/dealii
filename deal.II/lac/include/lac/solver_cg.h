@@ -158,7 +158,7 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
       
       g.add(alpha,Ad);
       x.add(alpha,d );
-      res = sqrt(g*g);
+      res = g.l2_norm();
 
       conv = control().check(it,res);
       if (conv) break;

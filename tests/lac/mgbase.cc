@@ -47,11 +47,17 @@ class MGTest
     MGCoarseGridSolver& solver;
 
   public:
-    MGTest(TransferTest& t, SmoothTest& s, MGCoarseGridTest& c)
+    MGTest(TransferTest& t, SmoothTest& sm, MGCoarseGridTest& cs)
 		    : MGBase(t, 9, 3),
-		      smoother(s),
-		      solver(c)
-      {}
+		      smoother(sm),
+		      solver(cs)
+      {
+	for (unsigned int l = minlevel; l <= maxlevel; ++l)
+	  {
+	    d[l].reinit(1);
+	    s[l].reinit(1);
+	  }
+      }
     
     virtual void level_residual(unsigned level,
 				Vector<float>& dst,

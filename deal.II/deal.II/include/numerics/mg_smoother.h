@@ -111,29 +111,6 @@ class MGSmoother
 };
 
 /**
- * Smoother doing nothing.
- * @author Guido Kanschat, 1999
- */
-class MGSmootherIdentity
-  :
-  public MGSmoother
-{
-  public:
-				     /**
-				      * Constructor.
-				      */
-    template<int dim>
-    MGSmootherIdentity(const MGDoFHandler<dim> &mg_dof);
-				     /**
-				      * Implementation of the interface in #MGSmootherBase#.
-				      * This function does nothing.
-				      */
-    virtual void smooth (const unsigned int   level,
-			 Vector<float>       &u,
-			 const Vector<float> &rhs) const;
-};
-
-/**
  * Implementation of an SOR smoother.
  *
  * This class is an implementation of a smootin algorithm for multigrid. It
