@@ -2941,6 +2941,7 @@ rm -f conftest.$ac_objext conftest.$ac_ext
         case "$target" in
       *apple-darwin*)
 	CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
+	CXXFLAGSO="$CXXFLAGSO -Wno-long-double"
         ;;
     esac
 

@@ -279,6 +279,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     case "$target" in
       *apple-darwin*)
 	CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
+	CXXFLAGSO="$CXXFLAGSO -Wno-long-double"
         ;;
     esac
 
