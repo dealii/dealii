@@ -306,6 +306,14 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: Class <code class="class">CompressedBlockSparsityPattern</code>
+       may be used as an intermediate form of the <code
+       class="class">BlockSparsityPattern</code>.
+       <br>
+       (WB 2001/06/23)
+       </p>
+
+  <li> <p>
        New: Class <code class="class">CompressedSparsityPattern</code>
        may be used as an intermediate form of the <code
        class="class">SparsityPattern</code> class if memory
@@ -457,7 +465,9 @@ documentation, etc</a>.
        <code class="member">DoFTools::make_boundary_sparsity_pattern</class>,
        and 
        <code class="member">ConstraintMatrix::condense</class> to work on
-       the <code class="class">CompressedSparsityPattern</code> class.
+       the <code class="class">CompressedSparsityPattern</code> and
+       <code class="class">CompressedBlockSparsityPattern</code> and
+       classes.
        <br>
        (WB 2001/06/22)
        </p>
