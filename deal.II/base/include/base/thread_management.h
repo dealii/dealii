@@ -17,9 +17,14 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
-#include <utility>
-#include <vector>
 #include <iterator>
+#include <vector>
+#include <utility>
+
+#include <list>
+#include <boost_local/type_traits.hpp>
+#include <boost_local/tuple/tuple.hpp>
+#include <boost_local/shared_ptr.hpp>
 
 #if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_POSIX)
@@ -32,9 +37,6 @@
 
 namespace Threads 
 {
-				   // forward declarations
-  class FunDataBase;
-
 /**
  * This class is used instead of a true lock class when not using
  * multithreading. It allows to write programs such that they start
@@ -183,54 +185,6 @@ namespace Threads
 					* returns immediately.
 					*/
       inline void wait (DummyThreadMutex &) {};
-  };
-  
-/**
- * This class is used instead of a true thread manager class when not
- * using multithreading. It allows to write programs such that they
- * start new threads and/or lock objects in multithreading mode, and
- * use dummy thread management and synchronisation classes instead
- * when running in single-thread mode. Specifically, the @p{spawn}
- * functions only call the function but wait for it to return instead
- * of running in on another thread, and the mutices do nothing
- * really. The only reason to provide such a function is that the
- * program can be compiled both in MT and non-MT mode without
- * difference.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  class DummyThreadManager 
-  {
-    public:
-				       /**
-					* Typedef for a global
-					* function that might be
-					* called on a new thread.
-					*/
-      typedef void * (*FunPtr) (void *);
-
-				       /**
-					* Emulate spawning a new
-					* thread and calling the
-					* passed function
-					* thereon. Actually only call
-					* that function with the given
-					* parameters, and wait for it
-					* to return.
-					*/
-      void spawn (const FunPtr fun_ptr,
-		  void *       fun_data,
-		  int          flags) const;
-
-				       /**
-					* Emulate that we wait for
-					* other threads to
-					* return. Since no other
-					* threads have been started,
-					* the right thing, of course,
-					* is to return immediately.
-					*/
-      inline void wait () const {};
   };
 
 
@@ -546,85 +500,14 @@ namespace Threads
   };
 
 
-  class PosixThreadManager 
-  {
-    public:
-				       /**
-					* Typedef for a global
-					* function that might be
-					* called on a new thread.
-					*/
-      typedef void * (*FunPtr) (void *);
-
-				       /**
-					* Constructor. Initialize data
-					* structures.
-					*/
-      PosixThreadManager ();
-
-				       /**
-					* Destructor. Wait for all
-					* spawned threads if they have
-					* not yet finished, and
-					* release the resources of
-					* this object.
-					*/
-      ~PosixThreadManager ();
-      
-				       /**
-					* Spawn a new thread and
-					* calling the passed function
-					* thereon. Store the
-					* identifier of the thread for
-					* later operations as waiting
-					* for that thread.
-					*
-					* The @p{flags} argument is
-					* currently ignored.
-					*/
-      void spawn (const FunPtr fun_ptr,
-		  void *       fun_data,
-		  int          flags);
-
-				       /**
-					* Wait for all spawned threads
-					* to return.
-					*/
-      void wait () const;
-
-    private:
-				       /**
-					* Copy constructor. Made
-					* private since copying these
-					* kinds of objects is a no-go.
-					*/
-      PosixThreadManager (const PosixThreadManager &) {};
-      
-				       /**
-					* List of thread ids. This
-					* variable actually points to
-					* an object of type
-					* @p{std::list<pthread_t>},
-					* but to avoid including
-					* @p{<list>} into this central
-					* header file and all other
-					* files including it, we use a
-					* void pointer instead.
-					*/
-      void * const thread_id_list;
-
-				       /**
-					* Mutex by which we guard all
-					* accesses to the thread list.
-					*/
-      mutable PosixThreadMutex list_mutex;
-  };
-  
-  
-  
+                                   /**
+                                    * If using POSIX functions, then
+                                    * alias the POSIX wrapper classes
+                                    * to the names we use throughout
+                                    * the library.
+                                    */
   typedef PosixThreadMutex     ThreadMutex;
   typedef PosixThreadCondition ThreadCondition;  
-  typedef PosixThreadManager   ThreadManager;
   typedef PosixThreadBarrier   Barrier;
 
 #  else
@@ -637,4189 +520,19 @@ namespace Threads
 				    * classes are aliased to dummy
 				    * classes that actually do
 				    * nothing, in particular not lock
-				    * objects or start new
-				    * threads. Likewise for the
+				    * objects. Likewise for the
 				    * barrier class.
 				    */
   typedef DummyThreadMutex     ThreadMutex;
   typedef DummyThreadCondition ThreadCondition;  
-  typedef DummyThreadManager   ThreadManager;
   typedef DummyBarrier         Barrier;
 #endif
-
-
-
-				   /**
-				    * Given a class, argument type,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class RetType>
-  struct MemFunPtr0
-  {
-      typedef RetType (Class::*type) ();
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class RetType>
-  struct MemFunPtr0<const Class, RetType>
-  {
-      typedef RetType (Class::*type) () const;
-  };
-#endif  
-				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class RetType>
-  struct MemFunPtr1
-  {
-      typedef RetType (Class::*type) (Arg1);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class RetType>
-  struct MemFunPtr1<const Class, Arg1, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1) const;
-  };
-#endif  
-				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class RetType>
-  struct MemFunPtr2
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class RetType>
-  struct MemFunPtr2<const Class, Arg1, Arg2, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2) const;
-  };
-#endif  
-
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class RetType>
-  struct MemFunPtr3
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class RetType>
-  struct MemFunPtr3<const Class, Arg1, Arg2, Arg3, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3) const;
-  };
-#endif  
-
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class RetType>
-  struct MemFunPtr4
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class RetType>
-  struct MemFunPtr4<const Class, Arg1, Arg2, Arg3, Arg4, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4) const;
-  };
-#endif  
-
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class RetType>
-  struct MemFunPtr5
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class RetType>
-  struct MemFunPtr5<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5) const;
-  };
-#endif  
-
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class RetType>
-  struct MemFunPtr6
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class RetType>
-  struct MemFunPtr6<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const;
-  };
-#endif  
-
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class RetType>
-  struct MemFunPtr7
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class RetType>
-  struct MemFunPtr7<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const;
-  };
-#endif  
-
-
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class RetType>
-  struct MemFunPtr8
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class RetType>
-  struct MemFunPtr8<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const;
-  };
-#endif  
-
-
-
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class RetType>
-  struct MemFunPtr9
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class RetType>
-  struct MemFunPtr9<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const;
-  };
-#endif  
-
   
+}
 
 
-  				   /**
-				    * Given a class, argument types,
-				    * and the return type, generate a
-				    * local typedef denoting a pointer
-				    * to such a member function.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class RetType>
-  struct MemFunPtr10
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10);
-  };
-
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
-				   /**
-				    * Same as above, but for the case
-				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
-				    */
-  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class RetType>
-  struct MemFunPtr10<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10, RetType>
-  {
-      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const;
-  };
-#endif  
-
-  
-  
-/**
- * Class used to store a pointer temporarily and delete the object
- * pointed to upon destruction of this object. For more information on
- * use and internals of this class see the report on multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  class FunEncapsulation
-  {
-    private:
-				       /**
-					* Default constructor. Construct
-					* the object empty, i.e. set
-					* @p{data==0}. Since this is not
-					* very useful, disallow it by
-					* declaring this constructor
-					* @p{private}.
-					*/
-      FunEncapsulation ();
-
-    public:
-				       /**
-					* Copy constructor. Clone the
-					* object pointed to by
-					* @p{fun_data.fun_data_base}.
-					*/
-      FunEncapsulation (const FunEncapsulation &fun_encapsulation);
-
-				       /**
-					* This is the usual
-					* constructor. Set @p{fun_data_base} to
-					* @p{fun_data_base}. This is what
-					* the @p{fun_data_*} functions
-					* use.
-					*/
-      FunEncapsulation (FunDataBase *fun_data_base);
-
-				       /**
-					* Destructor. Delete the object
-					* pointed to by @p{fun_data_base}.
-					*/
-      ~FunEncapsulation ();
-
-				       /**
-					* Copy another object of this
-					* type by cloning its @p{fun_data_base}
-					* object.
-					*/
-      const FunEncapsulation & operator = (const FunEncapsulation &fun_encapsulation);
-    
-				       /**
-					* Pointer to the object which
-					* contains all the parameters.
-					*/
-      const FunDataBase * fun_data_base;
-  };
-
-
-
-/**
- * Abstract base class for those classes that actually store
- * parameters of functions. For more information on use and internals
- * of this class see the report on multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  class FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a
-					* function that satifies the
-					* requirements of thread entry
-					* points.
-					*/
-      typedef void * (*ThreadEntryPoint) (void *);
-
-				       /**
-					* Default constructor. Store the
-					* pointer to the function which
-					* we will use as thread entry
-					* point for the derived class.
-					*/
-      FunDataBase (const ThreadEntryPoint thread_entry_point);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunDataBase (const FunDataBase &);
-
-				       /**
-					* Destructor. Needs to be
-					* virtual to make destruction of
-					* derived classes through base
-					* class pointers.
-					*/
-      virtual ~FunDataBase ();
-
-				       /**
-					* Virtual constructor. Needed to
-					* copy an object of which we
-					* only have a pointer to the
-					* base class. Copying such
-					* objects is necessary to
-					* guarantee memory consistency.
-					*/
-      virtual FunDataBase * clone () const = 0;
-
-				       /**
-					* Lock to be used when starting
-					* a thread and which is released
-					* after the data of this object
-					* is copied and therefore no
-					* more needed. This ensures that
-					* no data is deleted when it is
-					* still in use.
-					*/
-      mutable ThreadMutex lock;
-
-                                       /**
-                                        * A condition variable that is
-                                        * used for the same purpose.
-                                        */
-      mutable ThreadCondition condition;
-    
-    private:
-				       /**
-					* Pointer to the thread entry
-					* point function. The address of
-					* that function is passed from
-					* the derived classes to the
-					* constructor of this class.
-					*/
-      ThreadEntryPoint thread_entry_point;
-
-				       /**
-					* Make the thread starter
-					* function a friend, since it
-					* needs to have access to the
-					* @p{thread_entry_point} variable.
-					*/
-      friend void spawn (ThreadManager          &thread_manager,
-			 const FunEncapsulation &fun_data);
-  };
-
-
-
-/**
- * Class to store the parameters of a void function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename RetType>
-  class FunData0 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) ();
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData0 (FunPtr fun_ptr);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData0 (const FunData0 &fun_data0);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-
-//TODO:[WB] (compiler) with some compilers we get into trouble if the following class is not public, since we can't somehow declare the encapsulate function as friend. change this when compilers accept the friend declaration
-  public:
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData0<RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    *
-					    * Since the function in
-					    * question here does not
-					    * take parameters, this
-					    * function also does
-					    * nothing. It is only
-					    * present for
-					    * orthogonality of thread
-					    * creation.
-					    */
-	  FunEncapsulation collect_args ();
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-// we should be declaring the following function friend, but gcc2.95
-// does not allow us to do that at present...
-//  				       /**
-//  					* Declare a function that uses
-//  					* the @ref{ArgCollector} as
-//  					* friend.
-//  					*/
-//        friend
-//        FunData0<void>::ArgCollector
-//        encapsulate (void (*fun_ptr)());
-  };
-
-
-
-/**
- * Class to store the parameters of a unary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename RetType>
-  class FunData1 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData1 (FunPtr fun_ptr,
-		Arg1   arg1);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData1 (const FunData1 &fun_data1);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData1<Arg1,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_>
-      friend
-      typename FunData1<Arg1_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_));
-  };
-
-
-
-/**
- * Class to store the parameters of a binary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename Arg2, typename RetType>
-  class FunData2 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData2 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData2 (const FunData2 &fun_data2);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData2<Arg1,Arg2,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_>
-      friend
-      typename FunData2<Arg1_,Arg2_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_));
-  };
-
-  
-/**
- * Class to store the parameters of a ternary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  class FunData3 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData3 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2,
-		Arg3   arg3);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData3 (const FunData3 &fun_data3);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData3<Arg1,Arg2,Arg3,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_>
-      friend
-      typename FunData3<Arg1_,Arg2_,Arg3_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_,Arg2_,Arg3_));
-  };
-
-
-/**
- * Class to store the parameters of a quaternary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  class FunData4 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData4 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2,
-		Arg3   arg3,
-		Arg4   arg4);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData4 (const FunData4 &fun_data4);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_>
-      friend
-      typename FunData4<Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_));
-  };
-
-
-
-/**
- * Class to store the parameters of a quintary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  class FunData5 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData5 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2,
-		Arg3   arg3,
-		Arg4   arg4,
-		Arg5   arg5);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData5 (const FunData5 &fun_data5);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_>
-      friend
-      typename FunData5<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_, Arg5_));
-  };
-
-
-/**
- * Class to store the parameters of a function with 6 arguments. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  class FunData6 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData6 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2,
-		Arg3   arg3,
-		Arg4   arg4,
-		Arg5   arg5,
-		Arg6   arg6);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData6 (const FunData6 &fun_data6);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_>
-      friend
-      typename FunData6<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
-				   Arg4_, Arg5_, Arg6_));
-  };
-  
-  
-/**
- * Class to store the parameters of a function with 7 arguments. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  class FunData7 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData7 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2,
-		Arg3   arg3,
-		Arg4   arg4,
-		Arg5   arg5,
-		Arg6   arg6,
-		Arg7   arg7);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData7 (const FunData7 &fun_data7);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_>
-      friend
-      typename FunData7<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
-				   Arg4_, Arg5_, Arg6_, Arg7_));
-  };
-  
-  
-/**
- * Class to store the parameters of a function with 8 arguments. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  class FunData8 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData8 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2,
-		Arg3   arg3,
-		Arg4   arg4,
-		Arg5   arg5,
-		Arg6   arg6,
-		Arg7   arg7,
-		Arg8   arg8);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData8 (const FunData8 &fun_data8);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      Arg8   arg8;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7,
-					 Arg8 arg8);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_>
-      friend
-      typename FunData8<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
-				   Arg4_, Arg5_, Arg6_,
-				   Arg7_, Arg8_));
-  };
-  
-  
-/**
- * Class to store the parameters of a function with 9 arguments. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2001
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  class FunData9 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData9 (FunPtr fun_ptr,
-		Arg1   arg1,
-		Arg2   arg2,
-		Arg3   arg3,
-		Arg4   arg4,
-		Arg5   arg5,
-		Arg6   arg6,
-		Arg7   arg7,
-		Arg8   arg8,
-		Arg9   arg9);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData9 (const FunData9 &fun_data9);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      Arg8   arg8;
-      Arg9   arg9;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7,
-					 Arg8 arg8,
-					 Arg9 arg9);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_>
-      friend
-      typename FunData9<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
-				   Arg4_, Arg5_, Arg6_,
-				   Arg7_, Arg8_, Arg9_));
-  };
-  
-  
-/**
- * Class to store the parameters of a function with 10 arguments. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2001
- */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  class FunData10 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a global
-					* function which we will call
-					* from this class.
-					*/
-      typedef RetType (*FunPtr) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10);
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      FunData10 (FunPtr fun_ptr,
-		 Arg1   arg1,
-		 Arg2   arg2,
-		 Arg3   arg3,
-		 Arg4   arg4,
-		 Arg5   arg5,
-		 Arg6   arg6,
-		 Arg7   arg7,
-		 Arg8   arg8,
-		 Arg9   arg9,
-		 Arg10  arg10);
-
-				       /**
-					* Copy constructor.
-					*/
-      FunData10 (const FunData10 &fun_data10);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      Arg8   arg8;
-      Arg9   arg9;
-      Arg10  arg10;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7,
-					 Arg8 arg8,
-					 Arg9 arg9,
-					 Arg10 arg10);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
-      friend
-      typename FunData10<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_,void>::ArgCollector
-      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
-				   Arg4_, Arg5_, Arg6_,
-				   Arg7_, Arg8_, Arg9_,
-				   Arg10_));
-  };
-  
-  
-/**
- * Class to store the parameters of a void function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <class Class, typename RetType>
-  class MemFunData0 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr0<Class,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData0 (FunPtr fun_ptr,
-		   Class *object);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData0 (const MemFunData0 &fun_data0);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData0<Class,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object);
-
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_>
-      friend
-      typename MemFunData0<Class_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)());
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_>
-      friend
-      typename MemFunData0<const Class_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)() const);
-#endif
-  };
-
-
-
-/**
- * Class to store the parameters of a unary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <class Class, typename Arg1, typename RetType>
-  class MemFunData1 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr1<Class,Arg1,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData1 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData1 (const MemFunData1 &fun_data1);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
-      
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData1<Class,Arg1,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1   arg1);
-
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1);
-
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_>
-      friend
-      typename MemFunData1<Class_,Arg1_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_>
-      friend
-      typename MemFunData1<const Class_,Arg1_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_) const);
-#endif
-  };
-
-
-
-/**
- * Class to store the parameters of a binary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  class MemFunData2 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr2<Class,Arg1,Arg2,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData2 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData2 (const MemFunData2 &fun_data2);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData2<Class,Arg1,Arg2,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2);
-	  
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2);
-    
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_>
-      friend
-      typename MemFunData2<Class_,Arg1_,Arg2_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_>
-      friend
-      typename MemFunData2<const Class_,Arg1_,Arg2_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_) const);
-#endif
-  };
-
-  
-/**
- * Class to store the parameters of a ternary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  class MemFunData3 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr3<Class,Arg1,Arg2,Arg3,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData3 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2,
-		   Arg3   arg3);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData3 (const MemFunData3 &fun_data3);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3);
-
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_>
-      friend 
-      typename MemFunData3<Class_,Arg1_,Arg2_,Arg3_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_,Arg2_,Arg3_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_>
-      friend 
-      typename MemFunData3<const Class_,Arg1_,Arg2_,Arg3_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_,Arg2_,Arg3_) const);
-#endif
-  };
-
-
-
-/**
- * Class to store the parameters of a quaternary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  class MemFunData4 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData4 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2,
-		   Arg3   arg3,
-		   Arg4   arg4);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData4 (const MemFunData4 &fun_data4);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3,
-					 Arg4   arg4);
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_>
-      friend
-      typename MemFunData4<Class_,Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_>
-      friend
-      typename MemFunData4<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_) const);
-#endif  
-};
-
-
-
-/**
- * Class to store the parameters of a quintary function. For more
- * information on use and internals of this class see the report on
- * multithreading.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  class MemFunData5 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData5 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2,
-		   Arg3   arg3,
-		   Arg4   arg4,
-		   Arg5   arg5);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData5 (const MemFunData5 &fun_data5);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3,
-					 Arg4   arg4,
-					 Arg5   arg5);
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_>
-      friend 
-      typename MemFunData5<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_>
-      friend 
-      typename MemFunData5<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_) const);
-#endif
-  };
-  
-
-  
-/**
- * Class to store the parameters of a function with 6 arguments. For
- * more information on use and internals of this class see the report
- * on this subject.
- *
- * @author Wolfgang Bangerth, Ralf Hartmann, 2000
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  class MemFunData6 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData6 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2,
-		   Arg3   arg3,
-		   Arg4   arg4,
-		   Arg5   arg5,
-		   Arg6   arg6);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData6 (const MemFunData6 &fun_data6);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3,
-					 Arg4   arg4,
-					 Arg5   arg5,
-					 Arg6   arg6);
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_>
-      friend 
-      typename MemFunData6<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_>
-      friend 
-      typename MemFunData6<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_) const);
-#endif  
-  };
-
-
-
-/**
- * Class to store the parameters of a function with 7 arguments. For
- * more information on use and internals of this class see the report
- * on this subject.
- *
- * @author Wolfgang Bangerth, Ralf Hartmann, 2001
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  class MemFunData7 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData7 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2,
-		   Arg3   arg3,
-		   Arg4   arg4,
-		   Arg5   arg5,
-		   Arg6   arg6,
-		   Arg7   arg7);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData7 (const MemFunData7 &fun_data7);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3,
-					 Arg4   arg4,
-					 Arg5   arg5,
-					 Arg6   arg6,
-					 Arg7   arg7);
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_>
-      friend 
-      typename MemFunData7<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_, Arg7_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_>
-      friend 
-      typename MemFunData7<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_, Arg7_) const);
-#endif
-  };
-  
-  
-/**
- * Class to store the parameters of a function with 8 arguments. For
- * more information on use and internals of this class see the report
- * on this subject.
- *
- * @author Wolfgang Bangerth, Ralf Hartmann, 2001
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  class MemFunData8 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData8 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2,
-		   Arg3   arg3,
-		   Arg4   arg4,
-		   Arg5   arg5,
-		   Arg6   arg6,
-		   Arg7   arg7,
-		   Arg8   arg8);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData8 (const MemFunData8 &fun_data8);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      Arg8   arg8;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7,
-					 Arg8 arg8);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3,
-					 Arg4   arg4,
-					 Arg5   arg5,
-					 Arg6   arg6,
-					 Arg7   arg7,
-					 Arg8   arg8);
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_>
-      friend 
-      typename MemFunData8<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_,
-					   Arg7_, Arg8_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_>
-      friend 
-      typename MemFunData8<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_,
-					   Arg7_, Arg8_) const);
-#endif
-  };
-  
-  
-/**
- * Class to store the parameters of a function with 9 arguments. For
- * more information on use and internals of this class see the report
- * on this subject.
- *
- * @author Wolfgang Bangerth, Ralf Hartmann, 2001
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  class MemFunData9 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData9 (FunPtr fun_ptr,
-		   Class *object,
-		   Arg1   arg1,
-		   Arg2   arg2,
-		   Arg3   arg3,
-		   Arg4   arg4,
-		   Arg5   arg5,
-		   Arg6   arg6,
-		   Arg7   arg7,
-		   Arg8   arg8,
-		   Arg9   arg9);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData9 (const MemFunData9 &fun_data9);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      Arg8   arg8;
-      Arg9   arg9;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7,
-					 Arg8 arg8,
-					 Arg9 arg9);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3,
-					 Arg4   arg4,
-					 Arg5   arg5,
-					 Arg6   arg6,
-					 Arg7   arg7,
-					 Arg8   arg8,
-					 Arg9   arg9);
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_>
-      friend 
-      typename MemFunData9<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_,
-					   Arg7_, Arg8_, Arg9_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_>
-      friend 
-      typename MemFunData9<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_,
-					   Arg7_, Arg8_, Arg9_) const);
-#endif
-  };
-  
-  
-/**
- * Class to store the parameters of a function with 10 arguments. For
- * more information on use and internals of this class see the report
- * on this subject.
- *
- * @author Wolfgang Bangerth, Ralf Hartmann, 2001
- */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  class MemFunData10 : public FunDataBase
-  {
-    public:
-				       /**
-					* Typedef a pointer to a member
-					* function which we will call
-					* from this class.
-					*/
-      typedef typename MemFunPtr10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::type FunPtr;
-
-				       /**
-					* Constructor. Store pointer to
-					* the function and the values of
-					* the arguments.
-					*/
-      MemFunData10 (FunPtr fun_ptr,
-		    Class *object,
-		    Arg1   arg1,
-		    Arg2   arg2,
-		    Arg3   arg3,
-		    Arg4   arg4,
-		    Arg5   arg5,
-		    Arg6   arg6,
-		    Arg7   arg7,
-		    Arg8   arg8,
-		    Arg9   arg9,
-		    Arg10  arg10);
-
-				       /**
-					* Copy constructor.
-					*/
-      MemFunData10 (const MemFunData10 &fun_data10);
-
-				       /**
-					* Virtual constructor.
-					*/
-      virtual FunDataBase * clone () const;
-
-    private:
-
-				       /**
-					* Pointer to the function to be
-					* called and values of the
-					* arguments to be passed.
-					*/
-      FunPtr fun_ptr;
-
-				       /**
-					* Pointer to the object which
-					* we shall work on.
-					*/
-      Class *object;
- 
-				       /**
-					* Values of the arguments of the
-					* function to be called.
-					*/
-      Arg1   arg1;
-      Arg2   arg2;
-      Arg3   arg3;
-      Arg4   arg4;
-      Arg5   arg5;
-      Arg6   arg6;
-      Arg7   arg7;
-      Arg8   arg8;
-      Arg9   arg9;
-      Arg10  arg10;
-      
-				       /**
-					* Static function used as entry
-					* point for the new thread.
-					*/
-      static void * thread_entry_point (void *arg);
-
-				       /**
-					* Helper class, used to collect
-					* the values of the parameters
-					* which we will pass to the
-					* function, once we know its
-					* type.
-					*/
-      class ArgCollector
-      {
-	public:
-					   /**
-					    * Typedef the function
-					    * pointer type of the
-					    * underlying class to a
-					    * local type.
-					    */
-	  typedef typename MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::FunPtr FunPtr;
-	
-					   /**
-					    * Constructor. Take and store a
-					    * pointer to the function which
-					    * is to be called.
-					    */
-	  ArgCollector (FunPtr fun_ptr);
-    
-					   /**
-					    * Take the arguments with
-					    * which we want to call the
-					    * function and produce and
-					    * object of the desired type
-					    * from that.
-					    */
-	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1,
-					 Arg2 arg2,
-					 Arg3 arg3,
-					 Arg4 arg4,
-					 Arg5 arg5,
-					 Arg6 arg6,
-					 Arg7 arg7,
-					 Arg8 arg8,
-					 Arg9 arg9,
-					 Arg10 arg10);
-    
-					   /**
-					    * Same as above, but take
-					    * a reference instead of a
-					    * pointer. This allows us
-					    * to be a little
-					    * convenient, as we can
-					    * use @p{object} or
-					    * @p{this}, without taking
-					    * care that one is a
-					    * reference and the other
-					    * a pointer.
-					    */
-	  FunEncapsulation collect_args (Class &object,
-					 Arg1   arg1,
-					 Arg2   arg2,
-					 Arg3   arg3,
-					 Arg4   arg4,
-					 Arg5   arg5,
-					 Arg6   arg6,
-					 Arg7   arg7,
-					 Arg8   arg8,
-					 Arg9   arg9,
-					 Arg10  arg10);
-	private:
-					   /**
-					    * Space to temporarily store
-					    * the function pointer.
-					    */
-	  FunPtr fun_ptr;
-      };
-
-				       /**
-					* Declare a function that uses
-					* the @ref{ArgCollector} as
-					* friend.
-					*/
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
-      friend 
-      typename MemFunData10<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_,
-					   Arg7_, Arg8_, Arg9_, Arg10_));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
-      friend 
-      typename MemFunData10<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_,void>::ArgCollector
-      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
-					   Arg4_, Arg5_, Arg6_,
-					   Arg7_, Arg8_, Arg9_, Arg10_) const);
-#endif
-  };
-  
-  
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  inline
-  FunData0<void>::ArgCollector
-  encapsulate (void (*fun_ptr)());
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1>
-  inline
-  typename FunData1<Arg1,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1));
-
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2>
-  inline
-  typename FunData2<Arg1,Arg2,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2));
-  
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3>
-  inline
-  typename FunData3<Arg1,Arg2,Arg3,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3));
-  
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  typename FunData4<Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4));
-
-
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  inline
-  typename FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5));
-
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  inline
-  typename FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6));
-
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-  inline
-  typename FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7));
-
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-  inline
-  typename FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8));
-
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
-  inline
-  typename FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9));
-
-
-				   /**
-				    * Encapsulate a function pointer
-				    * into an object with which a new
-				    * thread can later be spawned.
-				    * For more information on use and
-				    * internals of this class see the
-				    * report on multithreading.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
-  inline
-  typename FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10));
-
-
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class>
-  inline
-  typename MemFunData0<Class,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)());
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class>
-  inline
-  typename MemFunData0<const Class,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)() const);
-#endif
- 
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1>
-  inline
-  typename MemFunData1<Class,Arg1,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1>
-  inline
-  typename MemFunData1<const Class,Arg1,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1) const);
-#endif
- 
-
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2>
-  inline
-  typename MemFunData2<Class,Arg1,Arg2,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2>
-  inline
-  typename MemFunData2<const Class,Arg1,Arg2,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2) const);
-#endif
-   
-
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3>
-  inline
-  typename MemFunData3<Class,Arg1,Arg2,Arg3,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3>
-  inline
-  typename MemFunData3<const Class,Arg1,Arg2,Arg3,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3) const);
-#endif
-   
-
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  typename MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  typename MemFunData4<const Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4) const);
-#endif
-   
-
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  inline
-  typename MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  inline
-  typename MemFunData5<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5) const);
-#endif
- 
-
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  inline
-  typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  inline
-  typename MemFunData6<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const);
-#endif
- 
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-  inline
-  typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-  inline
-  typename MemFunData7<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const);
-#endif
- 
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-  inline
-  typename MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-  inline
-  typename MemFunData8<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const);
-#endif
- 
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
-  inline
-  typename MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
-  inline
-  typename MemFunData9<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const);
-#endif
- 
-				   /**
-				    * Encapsulate a member function
-				    * pointer into an object with
-				    * which a new thread can later be
-				    * spawned.  For more information
-				    * on use and internals of this
-				    * class see the report on this
-				    * subject.
-				    *
-				    * This function exists once for
-				    * each number of parameters.
-				    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
-  inline
-  typename MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10));
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-                                   /**
-				    * Same as the previous function,
-				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
-                                    */
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
-  inline
-  typename MemFunData10<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const);
-#endif
- 
-  
-				   /**
-				    * Spawn a new thread using the
-				    * function and parameters
-				    * encapsulated in @p{fun_data}, and
-				    * using the given thread manager
-				    * object.
-				    */
-  void spawn (ThreadManager          &thread_manager,
-	      const FunEncapsulation &fun_data);
-
-
-				   /**
-				    * Spawn several threads at once,
-				    * using the same parameters and
-				    * calling the same function.
-				    */
-  void spawn_n (ThreadManager          &thread_manager,
-		const FunEncapsulation &fun_encapsulation,
-		const unsigned int      n_threads);
+namespace Threads
+{
 
                                    /**
                                     * Return the number of presently
@@ -4912,3617 +625,94 @@ namespace Threads
   split_interval (const unsigned int begin,
 		  const unsigned int end,
 		  const unsigned int n_intervals);
-  
-  
 
-/**
- * This class is used to make some sanity checks on the numbers of
- * objects of some types related with thread spawning, which are
- * created and deleted. This is a helpful thing when trying to
- * implement the data copying using @p{clone} functions etc, in order to
- * avoid that there are some objects which are copied but not deleted.
- *
- * It basically only monitors the number of objects which is alive at
- * each time, and complains if the number is nonzero when the counting
- * object is deleted. Since one will probably want to use one global
- * counter, the complaint is raised at the end of the program, and
- * then means that somewhen within the lifetime of your program there
- * has occured a memory leak.
- *
- * This class is not meant for public use.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  struct FunDataCounter
+                                   /**
+                                    * A namespace in which helper
+                                    * functions and the like for the
+                                    * threading subsystem are
+                                    * implemented. The members of this
+                                    * namespace are not meant for
+                                    * public use.
+                                    *
+                                    * The classes inside this
+                                    * namespace are suppressed by the
+                                    * documentation script in the
+                                    * class overview table, to keep it
+                                    * short.
+                                    * 
+                                    * @author Wolfgang Bangerth, 2003
+                                    */
+  namespace internal
   {
-				       /**
-					* Constructor. Sets all
-					* counters to zero.
-					*/
-      FunDataCounter ();
-      
-				       /**
-					* Destructor. Check whether
-					* the total number of objects
-					* is zero, otherwise throw an
-					* exception.
-					*/
-      ~FunDataCounter ();
+                                     /**
+                                      * If in a sub-thread an
+                                      * exception is thrown, it is not
+                                      * propagated to the main
+                                      * thread. Therefore, the
+                                      * exception handler that is
+                                      * provided by the applications
+                                      * main function or some of its
+                                      * other parts will not be able
+                                      * to catch these
+                                      * exceptions. Therefore, we have
+                                      * to provide an exception
+                                      * handler in the top function of
+                                      * each sub-thread that at least
+                                      * catches the exception and
+                                      * prints some information,
+                                      * rather than letting the
+                                      * operating system to just kill
+                                      * the program without a
+                                      * message. In each of the
+                                      * functions we use as entry
+                                      * points to new threads, we
+                                      * therefore install a try-catch
+                                      * block, and if an exception of
+                                      * type @p{std::exception} is
+                                      * caught, it passes over control
+                                      * to this function, which will
+                                      * then provide some output.
+                                      */
+    void handle_std_exception (const std::exception &exc);
 
-				       /**
-					* Counters for the two types
-					* of objects which we
-					* presently monitor.
-					*/
-      unsigned int n_fun_encapsulation_objects;
-      unsigned int n_fun_data_base_objects;
+                                     /**
+                                      * Same as above, but the type of
+                                      * the exception is not derived
+                                      * from @p{std::exception}, so
+                                      * there is little way to provide
+                                      * something more useful.
+                                      */
+    void handle_unknown_exception ();
 
-				       /**
-					* Exception
-					*/
-      DeclException2 (ExcObjectsExist,
-		      char*, int,
-		      << "There are still " << arg2 << " objects of type "
-		      << arg1 << " alive. You probably have a memory "
-		      << "leak somewhere.");
-  };
-
-
-                                   /**
-                                    * The following function is used
-                                    * for internal bookkeeping of the
-                                    * number of existing threads. It
-                                    * is not thought for use in
-                                    * application programs, but only
-                                    * for use in the template
-                                    * functions below.
-                                    */
-  void register_new_thread ();
+                                     /**
+                                      * The following function is used
+                                      * for internal bookkeeping of the
+                                      * number of existing threads. It
+                                      * is not thought for use in
+                                      * application programs, but only
+                                      * for use in the template
+                                      * functions below.
+                                      */
+    void register_thread ();
   
-                                   /**
-                                    * The following function is used
-                                    * for internal bookkeeping of the
-                                    * number of existing threads. It
-                                    * is not thought for use in
-                                    * application programs, but only
-                                    * for use in the template
-                                    * functions below.
-                                    */
-  void deregister_new_thread ();  
-
-                                   /**
-                                    * If in a sub-thread an exception
-                                    * is thrown, it is not propagated
-                                    * to the main thread. Therefore,
-                                    * the exception handler that is
-                                    * provided by the applications
-                                    * main function or some of its
-                                    * other parts will not be able to
-                                    * catch these
-                                    * exceptions. Therefore, we have
-                                    * to provide an exception handler
-                                    * in the top function of each
-                                    * sub-thread that at least catches
-                                    * the exception and prints some
-                                    * information, rather than letting
-                                    * the operating system to just
-                                    * kill the program without a
-                                    * message. In each of the
-                                    * functions we use as entry points
-                                    * to new threads, we therefore
-                                    * install a try-catch block, and
-                                    * if an exception of type
-                                    * @p{std::exception} is caught, it
-                                    * passes over control to this
-                                    * function, which will then
-                                    * provide some output.
-                                    */
-  void handle_std_exception (const std::exception &exc);
-
-                                   /**
-                                    * Same as above, but the type of
-                                    * the exception is not derived
-                                    * from @p{std::exception}, so
-                                    * there is little way to provide
-                                    * something more useful.
-                                    */
-  void handle_unknown_exception ();
+                                     /**
+                                      * The following function is used
+                                      * for internal bookkeeping of the
+                                      * number of existing threads. It
+                                      * is not thought for use in
+                                      * application programs, but only
+                                      * for use in the template
+                                      * functions below.
+                                      */
+    void deregister_thread ();  
+  }
   
 }   // end declarations of namespace Threads
 
 
-
-
-
-
-
 /* ----------- implementation of functions in namespace Threads ---------- */
 namespace Threads 
-{
-
-/* ---------------------- FunData0 implementation ------------------------ */
-
-  template <typename RetType>
-  FunData0<RetType>::FunData0 (FunPtr fun_ptr) :
-		  FunDataBase (&FunData0<RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename RetType>
-  FunData0<RetType>::FunData0 (const FunData0 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr)
-  {}
-
-
-
-  template <typename RetType>
-  FunDataBase *
-  FunData0<RetType>::clone () const 
-  {
-    return new FunData0 (*this);
-  }
-
-
-
-  template <typename RetType>
-  void *
-  FunData0<RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData0<RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)();
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename RetType>
-  FunData0<RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  
-  template <typename RetType>
-  FunEncapsulation
-  FunData0<RetType>::ArgCollector::collect_args ()
-  {
-    return new FunData0<void>(fun_ptr);
-  }
- 
-
-
-/* ---------------------- FunData1 implementation ------------------------ */
-
-  template <typename Arg1, typename RetType>
-  FunData1<Arg1,RetType>::FunData1 (FunPtr fun_ptr,
-				    Arg1   arg1) :
-		  FunDataBase (&FunData1<Arg1,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1)
-  {}
-
-
-
-  template <typename Arg1, typename RetType>
-  FunData1<Arg1,RetType>::FunData1 (const FunData1 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1)
-  {}
-
-
-
-  template <typename Arg1, typename RetType>
-  FunDataBase *
-  FunData1<Arg1,RetType>::clone () const 
-  {
-    return new FunData1 (*this);
-  }
-
-
-
-  template <typename Arg1, typename RetType>
-  void *
-  FunData1<Arg1,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData1<Arg1,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename RetType>
-  FunData1<Arg1,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  template <typename Arg1, typename RetType>
-  FunEncapsulation
-  FunData1<Arg1,RetType>::ArgCollector::collect_args (Arg1 arg1)
-  {
-    return new FunData1<Arg1,void>(fun_ptr, arg1);
-  }
- 
-  
-
-
-/* ---------------------- FunData2 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename RetType>
-  FunData2<Arg1,Arg2,RetType>::FunData2 (FunPtr fun_ptr,
-					 Arg1   arg1,
-					 Arg2   arg2) :
-		  FunDataBase (&FunData2<Arg1,Arg2,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename RetType>
-  FunData2<Arg1,Arg2,RetType>::FunData2 (const FunData2 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename RetType>
-  FunDataBase *
-  FunData2<Arg1,Arg2,RetType>::clone () const 
-  {
-    return new FunData2 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename RetType>
-  void *
-  FunData2<Arg1,Arg2,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData2<Arg1,Arg2,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename RetType>
-  FunData2<Arg1,Arg2,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  
-  template <typename Arg1, typename Arg2, typename RetType>
-  FunEncapsulation
-  FunData2<Arg1,Arg2,RetType>::ArgCollector::collect_args (Arg1 arg1,
-							   Arg2 arg2)
-  {
-    return new FunData2<Arg1,Arg2,void>(fun_ptr, arg1, arg2);
-  }
- 
-  
-
-
-/* ---------------------- FunData3 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  FunData3<Arg1,Arg2,Arg3,RetType>::FunData3 (FunPtr fun_ptr,
-					      Arg1   arg1,
-					      Arg2   arg2,
-					      Arg3   arg3) :
-		  FunDataBase (&FunData3<Arg1,Arg2,Arg3,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  FunData3<Arg1,Arg2,Arg3,RetType>::FunData3 (const FunData3 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  FunDataBase *
-  FunData3<Arg1,Arg2,Arg3,RetType>::clone () const 
-  {
-    return new FunData3 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  void *
-  FunData3<Arg1,Arg2,Arg3,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData3<Arg1,Arg2,Arg3,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  FunData3<Arg1,Arg2,Arg3,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  FunEncapsulation
-  FunData3<Arg1,Arg2,Arg3,RetType>::ArgCollector::collect_args (Arg1 arg1,
-								Arg2 arg2,
-								Arg3 arg3)
-  {
-    return new FunData3<Arg1,Arg2,Arg3,void>(fun_ptr, arg1, arg2, arg3);
-  }
- 
-  
-
-
-/* ---------------------- FunData4 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::FunData4 (FunPtr fun_ptr,
-						   Arg1   arg1,
-						   Arg2   arg2,
-						   Arg3   arg3,
-						   Arg4   arg4) :
-		  FunDataBase (&FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::FunData4 (const FunData4 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  FunDataBase *
-  FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::clone () const 
-  {
-    return new FunData4 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  void *
-  FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData4<Arg1,Arg2,Arg3,Arg4,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3, arg4);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  FunEncapsulation
-  FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::collect_args (Arg1 arg1,
-								     Arg2 arg2,
-								     Arg3 arg3,
-								     Arg4 arg4)
-  {
-    return new FunData4<Arg1,Arg2,Arg3,Arg4,void>(fun_ptr, arg1, arg2, arg3, arg4);
-  }
- 
-  
-
-
-/* ---------------------- FunData5 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunData5 (FunPtr fun_ptr,
-							Arg1   arg1,
-							Arg2   arg2,
-							Arg3   arg3,
-							Arg4   arg4,
-							Arg5   arg5) :
-		  FunDataBase (&FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunData5 (const FunData5 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  FunDataBase *
-  FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::clone () const 
-  {
-    return new FunData5 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  void *
-  FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  FunEncapsulation
-  FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::collect_args (Arg1 arg1,
-									  Arg2 arg2,
-									  Arg3 arg3,
-									  Arg4 arg4,
-									  Arg5 arg5)
-  {
-    return new FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,void>(fun_ptr, arg1, arg2,
-						       arg3, arg4, arg5);
-  }
-
-
-
-  
-/* ---------------------- FunData6 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunData6 (FunPtr fun_ptr,
-							     Arg1   arg1,
-							     Arg2   arg2,
-							     Arg3   arg3,
-							     Arg4   arg4,
-							     Arg5   arg5,
-							     Arg6   arg6) :
-		  FunDataBase (&FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunData6 (const FunData6 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  FunDataBase *
-  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::clone () const 
-  {
-    return new FunData6 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  void *
-  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  FunEncapsulation
-  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::collect_args (Arg1 arg1,
-									       Arg2 arg2,
-									       Arg3 arg3,
-									       Arg4 arg4,
-									       Arg5 arg5,
-									       Arg6 arg6)
-  {
-    return new FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>(fun_ptr, arg1, arg2,
-							    arg3, arg4, arg5, arg6);
-  }
- 
-  
-
-
-
-/* ---------------------- FunData7 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunData7 (FunPtr fun_ptr,
-								  Arg1   arg1,
-								  Arg2   arg2,
-								  Arg3   arg3,
-								  Arg4   arg4,
-								  Arg5   arg5,
-								  Arg6   arg6,
-								  Arg7   arg7) :
-		  FunDataBase (&FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunData7 (const FunData7 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  FunDataBase *
-  FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::clone () const 
-  {
-    return new FunData7 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  void *
-  FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  FunEncapsulation
-  FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::collect_args (Arg1 arg1,
-										    Arg2 arg2,
-										    Arg3 arg3,
-										    Arg4 arg4,
-										    Arg5 arg5,
-										    Arg6 arg6,
-										    Arg7 arg7)
-  {
-    return new FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>(fun_ptr, arg1, arg2,
-								 arg3, arg4, arg5, arg6, arg7);
-  }
- 
-  
-
-
-
-/* ---------------------- FunData8 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::
-  FunData8 (FunPtr fun_ptr,
-	    Arg1   arg1,
-	    Arg2   arg2,
-	    Arg3   arg3,
-	    Arg4   arg4,
-	    Arg5   arg5,
-	    Arg6   arg6,
-	    Arg7   arg7,
-	    Arg8   arg8) :
-		  FunDataBase (&FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7),
-		  arg8 (arg8)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::
-  FunData8 (const FunData8 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7),
-		  arg8 (fun_data.arg8)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunDataBase *
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::clone () const 
-  {
-    return new FunData8 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  void *
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-    Arg8              arg8    = fun_data->arg8;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunEncapsulation
-  FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::ArgCollector::collect_args (Arg1 arg1,
-											 Arg2 arg2,
-											 Arg3 arg3,
-											 Arg4 arg4,
-											 Arg5 arg5,
-											 Arg6 arg6,
-											 Arg7 arg7,
-											 Arg8 arg8)
-  {
-    return new FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>(fun_ptr, arg1, arg2,
-								      arg3, arg4, arg5, arg6,
-								      arg7, arg8);
-  }
- 
-  
-
-/* ---------------------- FunData9 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::
-  FunData9 (FunPtr fun_ptr,
-	    Arg1   arg1,
-	    Arg2   arg2,
-	    Arg3   arg3,
-	    Arg4   arg4,
-	    Arg5   arg5,
-	    Arg6   arg6,
-	    Arg7   arg7,
-	    Arg8   arg8,
-	    Arg9   arg9) :
-		  FunDataBase (&FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7),
-		  arg8 (arg8),
-		  arg9 (arg9)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::
-  FunData9 (const FunData9 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7),
-		  arg8 (fun_data.arg8),
-		  arg9 (fun_data.arg9)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  FunDataBase *
-  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::clone () const 
-  {
-    return new FunData9 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  void *
-  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-    Arg8              arg8    = fun_data->arg8;
-    Arg9              arg9    = fun_data->arg9;    
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  FunEncapsulation
-  FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::
-  collect_args (Arg1 arg1,
-		Arg2 arg2,
-		Arg3 arg3,
-		Arg4 arg4,
-		Arg5 arg5,
-		Arg6 arg6,
-		Arg7 arg7,
-		Arg8 arg8,
-		Arg9 arg9)
-  {
-    return
-      new FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>
-      (fun_ptr, arg1, arg2,
-       arg3, arg4, arg5, arg6,
-       arg7, arg8, arg9);
-  }
- 
-  
-
-/* ---------------------- FunData10 implementation ------------------------ */
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::
-  FunData10 (FunPtr fun_ptr,
-	     Arg1   arg1,
-	     Arg2   arg2,
-	     Arg3   arg3,
-	     Arg4   arg4,
-	     Arg5   arg5,
-	     Arg6   arg6,
-	     Arg7   arg7,
-	     Arg8   arg8,
-	     Arg9   arg9,
-	     Arg10  arg10) :
-		  FunDataBase (&FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7),
-		  arg8 (arg8),
-		  arg9 (arg9),
-		  arg10 (arg10)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::
-  FunData10 (const FunData10 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7),
-		  arg8 (fun_data.arg8),
-		  arg9 (fun_data.arg9),
-		  arg10 (fun_data.arg10)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  FunDataBase *
-  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::clone () const 
-  {
-    return new FunData10 (*this);
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  void *
-  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-    Arg8              arg8    = fun_data->arg8;
-    Arg9              arg9    = fun_data->arg9;
-    Arg10             arg10   = fun_data->arg10;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  FunEncapsulation
-  FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::
-  collect_args (Arg1 arg1,
-		Arg2 arg2,
-		Arg3 arg3,
-		Arg4 arg4,
-		Arg5 arg5,
-		Arg6 arg6,
-		Arg7 arg7,
-		Arg8 arg8,
-		Arg9 arg9,
-		Arg10 arg10)
-  {
-    return
-      new FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>
-      (fun_ptr, arg1, arg2,
-       arg3, arg4, arg5, arg6,
-       arg7, arg8, arg9, arg10);
-  }
- 
-  
-
-
-
-/* ---------------------- MemFunData0 implementation ------------------------ */
-
-  template <class Class, typename RetType>
-  MemFunData0<Class,RetType>::MemFunData0 (FunPtr  fun_ptr,
-					   Class  *object) :
-		  FunDataBase (&MemFunData0<Class,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object)
-  {}
-
-
-
-  template <class Class, typename RetType>
-  MemFunData0<Class,RetType>::MemFunData0 (const MemFunData0 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object)
-  {}
-
-
-
-  template <class Class, typename RetType>
-  FunDataBase *
-  MemFunData0<Class,RetType>::clone () const 
-  {
-    return new MemFunData0 (*this);
-  }
-
-
-
-  template <class Class, typename RetType>
-  void *
-  MemFunData0<Class,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData0<Class,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)();
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename RetType>
-  MemFunData0<Class,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  
-  template <class Class, typename RetType>
-  FunEncapsulation
-  MemFunData0<Class,RetType>::ArgCollector::collect_args (Class *object)
-  {
-    return new MemFunData0<Class,void>(fun_ptr, object);
-  }
- 
-
-
-  template <class Class, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData0<Class,RetType>::ArgCollector::collect_args (Class &object)
-  {
-    return collect_args (&object);
-  }
- 
-
-
-/* ---------------------- MemFunData1 implementation ------------------------ */
-
-  template <class Class, typename Arg1, typename RetType>
-  MemFunData1<Class,Arg1,RetType>::MemFunData1 (FunPtr  fun_ptr,
-						Class  *object,
-						Arg1    arg1) :
-		  FunDataBase (&MemFunData1<Class,Arg1,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename RetType>
-  MemFunData1<Class,Arg1,RetType>::MemFunData1 (const MemFunData1 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename RetType>
-  FunDataBase *
-  MemFunData1<Class,Arg1,RetType>::clone () const 
-  {
-    return new MemFunData1 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename RetType>
-  void *
-  MemFunData1<Class,Arg1,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData1<Class,Arg1,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename RetType>
-  MemFunData1<Class,Arg1,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  template <class Class, typename Arg1, typename RetType>
-  FunEncapsulation
-  MemFunData1<Class,Arg1,RetType>::ArgCollector::collect_args (Class *object,
-							       Arg1   arg1)
-  {
-    return new MemFunData1<Class,Arg1,void>(fun_ptr, object, arg1);
-  }
- 
-  
-
-  template <class Class, typename Arg1, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData1<Class,Arg1,RetType>::ArgCollector::collect_args (Class &object,
-							       Arg1   arg1)
-  {
-    return collect_args (&object, arg1);
-  }
-
-  
-/* ---------------------- MemFunData2 implementation ------------------------ */
-
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  MemFunData2<Class,Arg1,Arg2,RetType>::MemFunData2 (FunPtr  fun_ptr,
-						     Class  *object,
-						     Arg1    arg1,
-						     Arg2    arg2) :
-		  FunDataBase (&MemFunData2<Class,Arg1,Arg2,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  MemFunData2<Class,Arg1,Arg2,RetType>::MemFunData2 (const MemFunData2 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  FunDataBase *
-  MemFunData2<Class,Arg1,Arg2,RetType>::clone () const 
-  {
-    return new MemFunData2 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  void *
-  MemFunData2<Class,Arg1,Arg2,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData2<Class,Arg1,Arg2,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  MemFunData2<Class,Arg1,Arg2,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  FunEncapsulation
-  MemFunData2<Class,Arg1,Arg2,RetType>::ArgCollector::collect_args (Class *object,
-								    Arg1   arg1,
-								    Arg2   arg2)
-  {
-    return new MemFunData2<Class,Arg1,Arg2,void>(fun_ptr, object, arg1, arg2);
-  }
- 
-  
-  template <class Class, typename Arg1, typename Arg2, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData2<Class,Arg1,Arg2,RetType>::ArgCollector::collect_args (Class &object,
-								    Arg1   arg1,
-								    Arg2   arg2)
-  {
-    return collect_args (&object, arg1, arg2);
-  }
- 
-  
-
-
-/* ---------------------- MemFunData3 implementation ------------------------ */
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::MemFunData3 (FunPtr  fun_ptr,
-							  Class  *object,
-							  Arg1    arg1,
-							  Arg2    arg2,
-							  Arg3    arg3) :
-		  FunDataBase (&MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::MemFunData3 (const MemFunData3 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  FunDataBase *
-  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::clone () const 
-  {
-    return new MemFunData3 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  void *
-  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData3<Class,Arg1,Arg2,Arg3,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
- 	
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  FunEncapsulation
-  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::ArgCollector::collect_args (Class *object,
-									 Arg1   arg1,
-									 Arg2   arg2,
-									 Arg3   arg3)
-  {
-    return new MemFunData3<Class,Arg1,Arg2,Arg3,void>(fun_ptr, object,
-						      arg1, arg2, arg3);
-  }
- 
-  
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::ArgCollector::collect_args (Class &object,
-									 Arg1   arg1,
-									 Arg2   arg2,
-									 Arg3   arg3)
-  {
-    return collect_args (&object, arg1, arg2, arg3);
-  }
-  
-
-
-/* ---------------------- MemFunData4 implementation ------------------------ */
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::MemFunData4 (FunPtr  fun_ptr,
-							       Class  *object,
-							       Arg1    arg1,
-							       Arg2    arg2,
-							       Arg3    arg3,
-							       Arg4    arg4) :
-		  FunDataBase (&MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::MemFunData4 (const MemFunData4 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  FunDataBase *
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::clone () const 
-  {
-    return new MemFunData4 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  void *
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3, arg4);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  FunEncapsulation
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::collect_args (Class *object,
-									      Arg1   arg1,
-									      Arg2   arg2,
-									      Arg3   arg3,
-									      Arg4   arg4)
-  {
-    return new MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>(fun_ptr, object,
-							   arg1, arg2, arg3, arg4);
-  }
- 
-  
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::collect_args (Class &object,
-									      Arg1   arg1,
-									      Arg2   arg2,
-									      Arg3   arg3,
-									      Arg4   arg4)
-  {
-    return collect_args (&object, arg1, arg2, arg3, arg4);
-  }
-  
-
-/* ---------------------- MemFunData5 implementation ------------------------ */
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::MemFunData5 (FunPtr  fun_ptr,
-								    Class  *object,
-								    Arg1    arg1,
-								    Arg2    arg2,
-								    Arg3    arg3,
-								    Arg4    arg4,
-								    Arg5    arg5) :
-		  FunDataBase (&MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::MemFunData5 (const MemFunData5 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  FunDataBase *
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::clone () const 
-  {
-    return new MemFunData5 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  void *
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  FunEncapsulation
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::collect_args (Class *object,
-										   Arg1   arg1,
-										   Arg2   arg2,
-										   Arg3   arg3,
-										   Arg4   arg4,
-										   Arg5   arg5)
-  {
-    return new MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>(fun_ptr, object,
-								arg1, arg2, arg3, arg4, arg5);
-  }
- 
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::collect_args (Class &object,
-										   Arg1   arg1,
-										   Arg2   arg2,
-										   Arg3   arg3,
-										   Arg4   arg4,
-										   Arg5   arg5)
-  {
-    return collect_args (&object, arg1, arg2, arg3, arg4, arg5);
-  }
-  
-
-  
-/* ---------------------- MemFunData6 implementation ------------------------ */
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::MemFunData6 (FunPtr  fun_ptr,
-									 Class  *object,
-									 Arg1    arg1,
-									 Arg2    arg2,
-									 Arg3    arg3,
-									 Arg4    arg4,
-									 Arg5    arg5,
-									 Arg6    arg6) :
-		  FunDataBase (&MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::MemFunData6 (const MemFunData6 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  FunDataBase *
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::clone () const 
-  {
-    return new MemFunData6 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  void *
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  FunEncapsulation
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::collect_args (Class *object,
-											Arg1   arg1,
-											Arg2   arg2,
-											Arg3   arg3,
-											Arg4   arg4,
-											Arg5   arg5,
-											Arg6   arg6)
-  {
-    return new MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>(fun_ptr, object,
-								     arg1, arg2, arg3, arg4, arg5, arg6);
-  }
-  
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::collect_args (Class &object,
-											Arg1   arg1,
-											Arg2   arg2,
-											Arg3   arg3,
-											Arg4   arg4,
-											Arg5   arg5,
-											Arg6   arg6)
-  {
-    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6);
-  }
-
-
-
-  
-
-/* ---------------------- MemFunData7 implementation ------------------------ */
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::MemFunData7 (FunPtr  fun_ptr,
-									      Class  *object,
-									      Arg1    arg1,
-									      Arg2    arg2,
-									      Arg3    arg3,
-									      Arg4    arg4,
-									      Arg5    arg5,
-									      Arg6    arg6,
-									      Arg7    arg7) :
-		  FunDataBase (&MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::MemFunData7 (const MemFunData7 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  FunDataBase *
-  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::clone () const 
-  {
-    return new MemFunData7 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  void *
-  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  FunEncapsulation
-  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::collect_args (Class *object,
-											     Arg1   arg1,
-											     Arg2   arg2,
-											     Arg3   arg3,
-											     Arg4   arg4,
-											     Arg5   arg5,
-											     Arg6   arg6,
-											     Arg7   arg7)
-  {
-    return new MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>(fun_ptr, object,
-									  arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-  }
-  
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::collect_args (Class &object,
-											     Arg1   arg1,
-											     Arg2   arg2,
-											     Arg3   arg3,
-											     Arg4   arg4,
-											     Arg5   arg5,
-											     Arg6   arg6,
-											     Arg7   arg7)
-  {
-    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-  }
-  
-
-/* ---------------------- MemFunData8 implementation ------------------------ */
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::MemFunData8 (FunPtr  fun_ptr,
-										   Class  *object,
-										   Arg1    arg1,
-										   Arg2    arg2,
-										   Arg3    arg3,
-										   Arg4    arg4,
-										   Arg5    arg5,
-										   Arg6    arg6,
-										   Arg7    arg7,
-										   Arg8    arg8) :
-		  FunDataBase (&MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7),
-		  arg8 (arg8)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::MemFunData8 (const MemFunData8 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7),
-		  arg8 (fun_data.arg8)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunDataBase *
-  MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::clone () const 
-  {
-    return new MemFunData8 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  void *
-  MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-    Arg8              arg8    = fun_data->arg8;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  FunEncapsulation
-  MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::ArgCollector::collect_args (Class *object,
-												  Arg1   arg1,
-												  Arg2   arg2,
-												  Arg3   arg3,
-												  Arg4   arg4,
-												  Arg5   arg5,
-												  Arg6   arg6,
-												  Arg7   arg7,
-												  Arg8   arg8)
-  {
-    return new MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>(fun_ptr, object,
-									       arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-  }
-  
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::ArgCollector::collect_args (Class &object,
-												  Arg1   arg1,
-												  Arg2   arg2,
-												  Arg3   arg3,
-												  Arg4   arg4,
-												  Arg5   arg5,
-												  Arg6   arg6,
-												  Arg7   arg7,
-												  Arg8   arg8)
-  {
-    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-  }
-
-
-/* ---------------------- MemFunData9 implementation ------------------------ */
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::MemFunData9 (FunPtr  fun_ptr,
-											Class  *object,
-											Arg1    arg1,
-											Arg2    arg2,
-											Arg3    arg3,
-											Arg4    arg4,
-											Arg5    arg5,
-											Arg6    arg6,
-											Arg7    arg7,
-											Arg8    arg8,
-											Arg9    arg9) :
-		  FunDataBase (&MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7),
-		  arg8 (arg8),
-		  arg9 (arg9)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::MemFunData9 (const MemFunData9 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7),
-		  arg8 (fun_data.arg8),
-		  arg9 (fun_data.arg9)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  FunDataBase *
-  MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::clone () const 
-  {
-    return new MemFunData9 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  void *
-  MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-    Arg8              arg8    = fun_data->arg8;
-    Arg9              arg9    = fun_data->arg9;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3, arg4,
-                           arg5, arg6, arg7, arg8, arg9);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  FunEncapsulation
-  MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::collect_args (Class *object,
-												       Arg1   arg1,
-												       Arg2   arg2,
-												       Arg3   arg3,
-												       Arg4   arg4,
-												       Arg5   arg5,
-												       Arg6   arg6,
-												       Arg7   arg7,
-												       Arg8   arg8,
-												       Arg9   arg9)
-  {
-    return new MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>(fun_ptr, object,
-										    arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-  }
-  
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::collect_args (Class &object,
-												       Arg1   arg1,
-												       Arg2   arg2,
-												       Arg3   arg3,
-												       Arg4   arg4,
-												       Arg5   arg5,
-												       Arg6   arg6,
-												       Arg7   arg7,
-												       Arg8   arg8,
-												       Arg9   arg9)
-  {
-    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-  }
-
-
-/* ---------------------- MemFunData10 implementation ------------------------ */
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::MemFunData10 (FunPtr  fun_ptr,
-												Class  *object,
-												Arg1    arg1,
-												Arg2    arg2,
-												Arg3    arg3,
-												Arg4    arg4,
-												Arg5    arg5,
-												Arg6    arg6,
-												Arg7    arg7,
-												Arg8    arg8,
-												Arg9    arg9,
-												Arg10   arg10) :
-		  FunDataBase (&MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point),
-		  fun_ptr (fun_ptr),
-		  object (object),
-		  arg1 (arg1),
-		  arg2 (arg2),
-		  arg3 (arg3),
-		  arg4 (arg4),
-		  arg5 (arg5),
-		  arg6 (arg6),
-		  arg7 (arg7),
-		  arg8 (arg8),
-		  arg9 (arg9),
-		  arg10 (arg10)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::MemFunData10 (const MemFunData10 &fun_data) :
-		  FunDataBase (fun_data),
-		  fun_ptr (fun_data.fun_ptr),
-		  object (fun_data.object),
-		  arg1 (fun_data.arg1),
-		  arg2 (fun_data.arg2),
-		  arg3 (fun_data.arg3),
-		  arg4 (fun_data.arg4),
-		  arg5 (fun_data.arg5),
-		  arg6 (fun_data.arg6),
-		  arg7 (fun_data.arg7),
-		  arg8 (fun_data.arg8),
-		  arg9 (fun_data.arg9),
-		  arg10(fun_data.arg10)		  
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  FunDataBase *
-  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::clone () const 
-  {
-    return new MemFunData10 (*this);
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  void *
-  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point (void *arg) 
-  {
-				     // convenience typedef, since we
-				     // will need that class name
-				     // several times below
-    typedef MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType> ThisClass;
-  
-    FunEncapsulation *fun_encapsulation
-      = reinterpret_cast<FunEncapsulation*>(arg);
-    const ThisClass *fun_data
-      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
-
-				     // copy the parameters
-    typename ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
-    Class            *object  = fun_data->object;
-    Arg1              arg1    = fun_data->arg1;
-    Arg2              arg2    = fun_data->arg2;
-    Arg3              arg3    = fun_data->arg3;
-    Arg4              arg4    = fun_data->arg4;
-    Arg5              arg5    = fun_data->arg5;
-    Arg6              arg6    = fun_data->arg6;
-    Arg7              arg7    = fun_data->arg7;
-    Arg8              arg8    = fun_data->arg8;
-    Arg9              arg9    = fun_data->arg9;
-    Arg10             arg10   = fun_data->arg10;
-
-
-				     // copying of parameters is done,
-				     // now we can release the lock on
-				     // @p{fun_data}, by first making
-				     // sure that the main thread is
-				     // hanging in the condition
-				     // variable's wait() function,
-				     // and then signalling that the
-				     // condition has been met,
-				     // i.e. that the data has been
-				     // copied. (note that there can
-				     // be only one listener, so
-				     // signal() is fine and we don't
-				     // need broadcast())
-    fun_data->lock.acquire ();
-    fun_data->condition.signal ();
-    fun_data->lock.release ();
-
-                                     // register new thread, call the
-				     // function, and upon its return,
-				     // de-register it again. since an
-				     // exception that is thrown from
-				     // one of the called functions
-				     // will not propagate to the main
-				     // thread, it will kill the
-				     // program if not treated here
-				     // before we return to the
-				     // operating system's thread
-				     // library
-    register_new_thread ();
-    try 
-      {
-        (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5,
-                           arg6, arg7, arg8, arg9, arg10);
-      }
-    catch (const std::exception &exc)
-      {
-        handle_std_exception (exc);
-      }
-    catch (...)
-      {
-        handle_unknown_exception ();
-      };
-    deregister_new_thread ();
-  
-    return 0;
-  }
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
-		  fun_ptr (fun_ptr)
-  {}
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  FunEncapsulation
-  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::collect_args (Class *object,
-													      Arg1   arg1,
-													      Arg2   arg2,
-													      Arg3   arg3,
-													      Arg4   arg4,
-													      Arg5   arg5,
-													      Arg6   arg6,
-													      Arg7   arg7,
-													      Arg8   arg8,
-													      Arg9   arg9,
-													      Arg10  arg10)
-  {
-    return new MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>(fun_ptr, object,
-										    arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-  }
-  
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
-  inline
-  FunEncapsulation
-  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::collect_args (Class &object,
-													      Arg1   arg1,
-													      Arg2   arg2,
-													      Arg3   arg3,
-													      Arg4   arg4,
-													      Arg5   arg5,
-													      Arg6   arg6,
-													      Arg7   arg7,
-													      Arg8   arg8,
-													      Arg9   arg9,
-													      Arg10  arg10)
-  {
-    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-  }
-
-
-/* ---------------------------------------------------------------- */
-
-  inline
-  FunData0<void>::ArgCollector
-  encapsulate (void (*fun_ptr)())
-  {
-    return fun_ptr;
-  }
-
-
-
-  template <typename Arg1>
-  typename FunData1<Arg1,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1))
-  {
-    return fun_ptr;
-  }
-  
-
-  
-  template <typename Arg1, typename Arg2>
-  typename FunData2<Arg1,Arg2,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2))
-  {
-    return fun_ptr;
-  }
-  
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3>
-  typename FunData3<Arg1,Arg2,Arg3,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3))
-  {
-    return fun_ptr;
-  }
-  
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  typename FunData4<Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4))
-  {
-    return fun_ptr;
-  }
-  
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  typename FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5))
-  {
-    return fun_ptr;
-  }
-
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  typename FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6))
-  {
-    return fun_ptr;
-  }
-
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-  typename FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7))
-  {
-    return fun_ptr;
-  }
-
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-  typename FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8))
-  {
-    return fun_ptr;
-  }
-
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
-  typename FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5,
-			       Arg6, Arg7, Arg8, Arg9))
-  {
-    return fun_ptr;
-  }
-
-
-  
-  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
-  typename FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
-  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5,
-			       Arg6, Arg7, Arg8, Arg9, Arg10))
-  {
-    return fun_ptr;
-  }
-
-
-  
-  template <class Class>
-  typename MemFunData0<Class,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)())
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class>
-  typename MemFunData0<const Class,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)() const)
-  {
-    return fun_ptr;
-  }
-#endif
-
-
-
-  template <class Class, typename Arg1>
-  typename MemFunData1<Class,Arg1,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1>
-  typename MemFunData1<const Class,Arg1,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1) const)
-  {
-    return fun_ptr;
-  }
-#endif
-  
-
-  
-  template <class Class, typename Arg1, typename Arg2>
-  typename MemFunData2<Class,Arg1,Arg2,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2>
-  typename MemFunData2<const Class,Arg1,Arg2,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2) const)
-  {
-    return fun_ptr;
-  }
-#endif
-  
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3>
-  typename MemFunData3<Class,Arg1,Arg2,Arg3,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3>
-  typename MemFunData3<const Class,Arg1,Arg2,Arg3,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3) const)
-  {
-    return fun_ptr;
-  }
-#endif
-  
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  typename MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  typename MemFunData4<const Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4) const)
-  {
-    return fun_ptr;
-  }
-#endif
-
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  typename MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  typename MemFunData5<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5) const)
-  {
-    return fun_ptr;
-  }
-#endif
-
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  typename MemFunData6<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const)
-  {
-    return fun_ptr;
-  }
-#endif
-
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-  typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-  typename MemFunData7<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const)
-  {
-    return fun_ptr;
-  }
-#endif
-
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-  typename MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-  typename MemFunData8<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const)
-  {
-    return fun_ptr;
-  }
-#endif
-
-
-
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
-  typename MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
-  typename MemFunData9<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const)
-  {
-    return fun_ptr;
-  }
-#endif
-  
-
-  
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
-  typename MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10))
-  {
-    return fun_ptr;
-  }
-
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
-  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
-  typename MemFunData10<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
-  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const)
-  {
-    return fun_ptr;
-  }
-#endif
-  
-
-  
+{  
   template <typename ForwardIterator>
   std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
@@ -8582,7 +772,5754 @@ namespace Threads
   }  
 
 
-	    
+  namespace internal 
+  {
+                                     /**
+                                      * A type that is used to
+                                      * distinguish argument lists of
+                                      * functions by enumeration.
+                                      */
+    template <int> struct int2type
+    {
+    };
+  } 
+
+
+  namespace internal 
+  {
+                                     /**
+                                      * Given an arbitrary type RT,
+                                      * store an element of it and grant
+                                      * access to it through functions
+                                      * get() and set(). There are
+                                      * specializations for reference
+                                      * types (which cannot be set), and
+                                      * for type void.
+                                      */
+    template <typename RT> struct return_value
+    {
+      private:
+        RT value;
+      public:
+        inline return_value () : value() {}
+      
+        inline RT get () const { return value; }
+        inline void set (RT v) { value = v; }
+    };
+
+  
+                                     /**
+                                      * Given an arbitrary type RT,
+                                      * store an element of it and grant
+                                      * access to it through functions
+                                      * get() and set(). This is the
+                                      * specialization for reference
+                                      * types: since they cannot be set
+                                      * after construction time, we
+                                      * store a pointer instead, that
+                                      * holds the address of the object
+                                      * being referenced.
+                                      */
+    template <typename RT> struct return_value<RT &>
+    {
+      private:
+        RT * value;
+      public:
+        inline return_value () : value(0) {}
+
+        inline RT & get () const { return *value; }
+        inline void set (RT & v) { value = &v; }
+    };
+
+  
+                                     /**
+                                      * Given an arbitrary type RT,
+                                      * store an element of it and grant
+                                      * access to it through functions
+                                      * get() and set(). This is the
+                                      * specialization for type void:
+                                      * there is obviously nothing to
+                                      * store, so no function set(), and
+                                      * a function get() that returns
+                                      * void.
+                                      */
+    template <> struct return_value<void> {
+        static inline void get () {}
+    };
+  }
+
+  
+
+  namespace internal
+  {
+                                     /**
+                                      * Call arbitrary functions with
+                                      * return type RT. For each number
+                                      * of arguments to these functions,
+                                      * there is an instance of the
+                                      * do_call function in this class
+                                      * that unpacks the argument list
+                                      * (which is passed by reference)
+                                      * and calls the function. The
+                                      * number of arguments is
+                                      * distinguished by the last
+                                      * argument. The return value
+                                      * object is the second last. A
+                                      * second version of the do_call
+                                      * function is used to call member
+                                      * function pointers, in which case
+                                      * there is an additional argument
+                                      * at second position holding a
+                                      * reference to the object with
+                                      * which the member function
+                                      * pointer is to be called.
+                                      *
+                                      * There is a specialization of
+                                      * this class for the case that the
+                                      * return type is void, in which
+                                      * case there is no return value to
+                                      * be set.
+                                      */
+    template <typename RT>
+    struct Caller 
+    {
+                                         /**
+                                          * Call a function with 0
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<0> &)
+          {
+            ret_val.set ((*fun_ptr) ());
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 0 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<0> &)
+          {
+            ret_val.set ((obj.*fun_ptr) ());
+          }
+
+
+                                         /**
+                                          * Call a function with 1
+                                          * argument, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<1> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 1 argument, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<1> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>()));
+          }
+
+
+
+
+                                         /**
+                                          * Call a function with 2
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<2> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 2 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<2> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 3
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<3> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 3 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<3> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 4
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<4> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>(),
+                                     arg_list.template get<3>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 4 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<4> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>(),
+                                         arg_list.template get<3>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 5
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<5> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>(),
+                                     arg_list.template get<3>(),
+                                     arg_list.template get<4>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 5 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<5> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>(),
+                                         arg_list.template get<3>(),
+                                         arg_list.template get<4>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 6
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<6> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>(),
+                                     arg_list.template get<3>(),
+                                     arg_list.template get<4>(),
+                                     arg_list.template get<5>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 6 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<6> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>(),
+                                         arg_list.template get<3>(),
+                                         arg_list.template get<4>(),
+                                         arg_list.template get<5>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 7
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<7> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>(),
+                                     arg_list.template get<3>(),
+                                     arg_list.template get<4>(),
+                                     arg_list.template get<5>(),
+                                     arg_list.template get<6>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 7 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<7> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>(),
+                                         arg_list.template get<3>(),
+                                         arg_list.template get<4>(),
+                                         arg_list.template get<5>(),
+                                         arg_list.template get<6>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 8
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<8> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>(),
+                                     arg_list.template get<3>(),
+                                     arg_list.template get<4>(),
+                                     arg_list.template get<5>(),
+                                     arg_list.template get<6>(),
+                                     arg_list.template get<7>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 8 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<8> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>(),
+                                         arg_list.template get<3>(),
+                                         arg_list.template get<4>(),
+                                         arg_list.template get<5>(),
+                                         arg_list.template get<6>(),
+                                         arg_list.template get<7>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 9
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<9> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>(),
+                                     arg_list.template get<3>(),
+                                     arg_list.template get<4>(),
+                                     arg_list.template get<5>(),
+                                     arg_list.template get<6>(),
+                                     arg_list.template get<7>(),
+                                     arg_list.template get<8>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 9 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<9> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>(),
+                                         arg_list.template get<3>(),
+                                         arg_list.template get<4>(),
+                                         arg_list.template get<5>(),
+                                         arg_list.template get<6>(),
+                                         arg_list.template get<7>(),
+                                         arg_list.template get<8>()));
+          }
+
+
+                                         /**
+                                          * Call a function with 10
+                                          * arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<10> &)
+          {
+            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
+                                     arg_list.template get<1>(),
+                                     arg_list.template get<2>(),
+                                     arg_list.template get<3>(),
+                                     arg_list.template get<4>(),
+                                     arg_list.template get<5>(),
+                                     arg_list.template get<6>(),
+                                     arg_list.template get<7>(),
+                                     arg_list.template get<8>(),
+                                     arg_list.template get<9>()));
+          }
+
+                                         /**
+                                          * Call a member function with
+                                          * 10 arguments, and set the
+                                          * return value.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<RT> &ret_val,
+                                    const int2type<10> &)
+          {
+            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
+                                         arg_list.template get<1>(),
+                                         arg_list.template get<2>(),
+                                         arg_list.template get<3>(),
+                                         arg_list.template get<4>(),
+                                         arg_list.template get<5>(),
+                                         arg_list.template get<6>(),
+                                         arg_list.template get<7>(),
+                                         arg_list.template get<8>(),
+                                         arg_list.template get<9>()));
+          }
+    };
+
+
+
+  
+                                     /**
+                                      * Call arbitrary functions with
+                                      * void return type. For each
+                                      * number of arguments to these
+                                      * functions, there is an instance
+                                      * of the do_call function in this
+                                      * class that unpacks the argument
+                                      * list (which is passed by
+                                      * reference) and calls the
+                                      * function. The number of
+                                      * arguments is distinguished by
+                                      * the last argument. The return
+                                      * value object is the second last,
+                                      * but since the return type is
+                                      * void, this is of course simply
+                                      * ignored. A second version of the
+                                      * do_call function is used to call
+                                      * member function pointers, in
+                                      * which case there is an
+                                      * additional argument at second
+                                      * position holding a reference to
+                                      * the object with which the member
+                                      * function pointer is to be
+                                      * called.
+                                      */
+    template <>
+    struct Caller<void>
+    {
+                                         /**
+                                          * Call a void function with 0
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &,
+                                    internal::return_value<void> &,
+                                    const int2type<0> &)
+          {
+            (*fun_ptr) ();
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 0 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &,
+                                    internal::return_value<void> &,
+                                    const int2type<0> &)
+          {
+            (obj.*fun_ptr) ();
+          }
+
+
+                                         /**
+                                          * Call a void function with 1
+                                          * argument.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<1> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 1 argument.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<1> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>());
+          }
+
+
+
+
+                                         /**
+                                          * Call a void function with 2
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<2> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 2 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<2> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 3
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<3> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 3 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<3> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 4
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<4> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>(),
+                        arg_list.template get<3>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 4 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<4> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>(),
+                            arg_list.template get<3>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 5
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<5> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>(),
+                        arg_list.template get<3>(),
+                        arg_list.template get<4>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 5 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<5> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>(),
+                            arg_list.template get<3>(),
+                            arg_list.template get<4>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 6
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<6> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>(),
+                        arg_list.template get<3>(),
+                        arg_list.template get<4>(),
+                        arg_list.template get<5>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 6 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<6> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>(),
+                            arg_list.template get<3>(),
+                            arg_list.template get<4>(),
+                            arg_list.template get<5>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 7
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<7> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>(),
+                        arg_list.template get<3>(),
+                        arg_list.template get<4>(),
+                        arg_list.template get<5>(),
+                        arg_list.template get<6>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 7 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<7> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>(),
+                            arg_list.template get<3>(),
+                            arg_list.template get<4>(),
+                            arg_list.template get<5>(),
+                            arg_list.template get<6>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 8
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<8> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>(),
+                        arg_list.template get<3>(),
+                        arg_list.template get<4>(),
+                        arg_list.template get<5>(),
+                        arg_list.template get<6>(),
+                        arg_list.template get<7>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 8 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<8> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>(),
+                            arg_list.template get<3>(),
+                            arg_list.template get<4>(),
+                            arg_list.template get<5>(),
+                            arg_list.template get<6>(),
+                            arg_list.template get<7>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 9
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<9> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>(),
+                        arg_list.template get<3>(),
+                        arg_list.template get<4>(),
+                        arg_list.template get<5>(),
+                        arg_list.template get<6>(),
+                        arg_list.template get<7>(),
+                        arg_list.template get<8>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 9 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<9> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>(),
+                            arg_list.template get<3>(),
+                            arg_list.template get<4>(),
+                            arg_list.template get<5>(),
+                            arg_list.template get<6>(),
+                            arg_list.template get<7>(),
+                            arg_list.template get<8>());
+          }
+
+
+                                         /**
+                                          * Call a void function with 10
+                                          * arguments.
+                                          */
+        template <typename PFun, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<10> &)
+          {
+            (*fun_ptr) (arg_list.template get<0>(),
+                        arg_list.template get<1>(),
+                        arg_list.template get<2>(),
+                        arg_list.template get<3>(),
+                        arg_list.template get<4>(),
+                        arg_list.template get<5>(),
+                        arg_list.template get<6>(),
+                        arg_list.template get<7>(),
+                        arg_list.template get<8>(),
+                        arg_list.template get<9>());
+          }
+
+                                         /**
+                                          * Call a void member function
+                                          * with 10 arguments.
+                                          */
+        template <typename PFun, typename C, typename ArgList>
+        static inline void do_call (PFun     fun_ptr,
+                                    C       &obj,
+                                    ArgList &arg_list,
+                                    internal::return_value<void> &,
+                                    const int2type<10> &)
+          {
+            (obj.*fun_ptr) (arg_list.template get<0>(),
+                            arg_list.template get<1>(),
+                            arg_list.template get<2>(),
+                            arg_list.template get<3>(),
+                            arg_list.template get<4>(),
+                            arg_list.template get<5>(),
+                            arg_list.template get<6>(),
+                            arg_list.template get<7>(),
+                            arg_list.template get<8>(),
+                            arg_list.template get<9>());
+          }
+    };
+  
+  
+
+                                     /**
+                                      * Call an arbitrary function by
+                                      * dispatching to the functions in
+                                      * the Caller class based on the
+                                      * number of elements in the
+                                      * argument list and the return
+                                      * type.
+                                      */
+    template <typename RT, typename PFun, typename ArgList>
+    static inline void call (PFun     fun_ptr,
+                             ArgList &arg_list,
+                             internal::return_value<RT> &ret_val)
+    {
+      Caller<RT>::do_call (fun_ptr, arg_list, ret_val,
+                           int2type<boost::tuples::length<ArgList>::value>());
+    }
+
+
+  
+                                     /**
+                                      * Call an arbitrary member
+                                      * function by dispatching to the
+                                      * functions in the Caller class
+                                      * based on the number of elements
+                                      * in the argument list and the
+                                      * return type.
+                                      */
+    template <typename RT, typename PFun, typename C, typename ArgList>
+    static inline void call (PFun     fun_ptr,
+                             C       &obj,
+                             ArgList &arg_list,
+                             internal::return_value<RT> &ret_val)
+    {
+      Caller<RT>::do_call (fun_ptr, obj, arg_list, ret_val,
+                           int2type<boost::tuples::length<ArgList>::value>());
+    }  
+  }
+
+
+
+  namespace internal
+  {
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments, and whether the
+                                      * second argument is a const or
+                                      * non-const class, dependening on
+                                      * which the member function will
+                                      * also me const or
+                                      * non-const. There are
+                                      * specializations of this class
+                                      * for each number of arguments,
+                                      * and the const and non-const
+                                      * versions.
+                                      */
+    template <typename RT, class C, typename ArgList,
+              int length = boost::tuples::length<ArgList>::value>
+    struct mem_fun_ptr_helper;
+  
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 0 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 0>
+    {
+        typedef RT (C::*type) ();
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 0 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 0>
+    {
+        typedef RT (C::*type) () const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 1 argument
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 1>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 1 argument
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 1>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 2 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 2>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 2 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 2>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 3 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 3>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 3 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 3>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 4 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 4>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 4 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 4>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 5 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 5>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 5 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 5>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 6 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 6>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 6 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 6>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 7 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 7>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 7 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 7>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 8 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 8>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type,
+                               typename boost::tuples::element<7,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 8 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 8>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type,
+                               typename boost::tuples::element<7,ArgList>::type) const;
+    };
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 9 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 9>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type,
+                               typename boost::tuples::element<7,ArgList>::type,
+                               typename boost::tuples::element<8,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 9 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 9>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type,
+                               typename boost::tuples::element<7,ArgList>::type,
+                               typename boost::tuples::element<8,ArgList>::type) const;
+    };
+
+
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 10 arguments
+                                      * and non-const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, C, ArgList, 10>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type,
+                               typename boost::tuples::element<7,ArgList>::type,
+                               typename boost::tuples::element<8,ArgList>::type,
+                               typename boost::tuples::element<9,ArgList>::type);
+    };
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 10 arguments
+                                      * and const member functions.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr_helper<RT, const C, ArgList, 10>
+    {
+        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
+                               typename boost::tuples::element<1,ArgList>::type,
+                               typename boost::tuples::element<2,ArgList>::type,
+                               typename boost::tuples::element<3,ArgList>::type,
+                               typename boost::tuples::element<4,ArgList>::type,
+                               typename boost::tuples::element<5,ArgList>::type,
+                               typename boost::tuples::element<6,ArgList>::type,
+                               typename boost::tuples::element<7,ArgList>::type,
+                               typename boost::tuples::element<8,ArgList>::type,
+                               typename boost::tuples::element<9,ArgList>::type) const;
+    };
+
+  
+
+                                     /**
+                                      * Construct a pointer to member
+                                      * function based on the template
+                                      * arguments, and whether the
+                                      * second argument is a const or
+                                      * non-const class, dependening on
+                                      * which the member function will
+                                      * also me const or non-const. We
+                                      * do this by dispatching to the
+                                      * mem_fun_ptr_helper classes that
+                                      * are overloaded on the number of
+                                      * elements and the const/non-const
+                                      * decision.
+                                      *
+                                      * Note that the last template
+                                      * argument for the
+                                      * mem_fun_ptr_helper class is
+                                      * automatically computed in the
+                                      * default argument to the general
+                                      * template.
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_ptr
+    {
+        typedef typename mem_fun_ptr_helper<RT,C,ArgList>::type type;
+    };  
+  }
+
+
+  namespace internal
+  {
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments, and whether the
+                                      * second argument is a const or
+                                      * non-const class, dependening on
+                                      * which the member function will
+                                      * also me const or
+                                      * non-const. There are
+                                      * specializations of this class
+                                      * for each number of arguments.
+                                      */
+    template <typename RT, typename ArgList,
+              int length = boost::tuples::length<ArgList>::value>
+    struct fun_ptr_helper;
+  
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 0 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 0>
+    {
+        typedef RT (*type) ();
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 1 argument.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 1>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 2 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 2>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 3 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 3>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 4 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 4>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type,
+                            typename boost::tuples::element<3,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 5 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 5>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type,
+                            typename boost::tuples::element<3,ArgList>::type,
+                            typename boost::tuples::element<4,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 6 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 6>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type,
+                            typename boost::tuples::element<3,ArgList>::type,
+                            typename boost::tuples::element<4,ArgList>::type,
+                            typename boost::tuples::element<5,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 7 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 7>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type,
+                            typename boost::tuples::element<3,ArgList>::type,
+                            typename boost::tuples::element<4,ArgList>::type,
+                            typename boost::tuples::element<5,ArgList>::type,
+                            typename boost::tuples::element<6,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 8 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 8>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type,
+                            typename boost::tuples::element<3,ArgList>::type,
+                            typename boost::tuples::element<4,ArgList>::type,
+                            typename boost::tuples::element<5,ArgList>::type,
+                            typename boost::tuples::element<6,ArgList>::type,
+                            typename boost::tuples::element<7,ArgList>::type);
+    };
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 9 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 9>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type,
+                            typename boost::tuples::element<3,ArgList>::type,
+                            typename boost::tuples::element<4,ArgList>::type,
+                            typename boost::tuples::element<5,ArgList>::type,
+                            typename boost::tuples::element<6,ArgList>::type,
+                            typename boost::tuples::element<7,ArgList>::type,
+                            typename boost::tuples::element<8,ArgList>::type);
+    };
+
+
+
+                                     /**
+                                      * Construct a pointer to non-member
+                                      * function based on the template
+                                      * arguments. This is the
+                                      * specialization for 10 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr_helper<RT, ArgList, 10>
+    {
+        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
+                            typename boost::tuples::element<1,ArgList>::type,
+                            typename boost::tuples::element<2,ArgList>::type,
+                            typename boost::tuples::element<3,ArgList>::type,
+                            typename boost::tuples::element<4,ArgList>::type,
+                            typename boost::tuples::element<5,ArgList>::type,
+                            typename boost::tuples::element<6,ArgList>::type,
+                            typename boost::tuples::element<7,ArgList>::type,
+                            typename boost::tuples::element<8,ArgList>::type,
+                            typename boost::tuples::element<9,ArgList>::type);
+    };
+
+  
+
+                                     /**
+                                      * Construct a pointer to
+                                      * non-member function based on the
+                                      * template arguments. We do this
+                                      * by dispatching to the
+                                      * fun_ptr_helper classes that are
+                                      * overloaded on the number of
+                                      * elements.
+                                      *
+                                      * Note that the last template
+                                      * argument for the
+                                      * fun_ptr_helper class is
+                                      * automatically computed in the
+                                      * default argument to the general
+                                      * template.
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_ptr
+    {
+        typedef typename fun_ptr_helper<RT,ArgList>::type type;
+    };  
+  }
+
+
+  namespace internal 
+  {
+                                     /**
+                                      * Extract the Nth element of the
+                                      * type list and make it a
+                                      * reference.
+                                      */
+    template <int N, typename Tuple>
+    struct add_reference_to_Nth
+    {
+        typedef typename boost::tuples::element<N,Tuple>::type ArgType;
+        typedef typename boost::add_reference<ArgType>::type type;
+    };
+  
+                                     /**
+                                      * Specializations of this template
+                                      * declare a typedef to a tuple
+                                      * type that has the same basic
+                                      * types as the first template
+                                      * argument, but all references
+                                      * instead of values. The second
+                                      * argument is used to distinguish
+                                      * between the lengths of argument
+                                      * lists. The default argument
+                                      * makes it possible to omit this
+                                      * length argument.
+                                      */
+    template <typename Tuple, int = boost::tuples::length<Tuple>::value>
+    struct tie_args_helper;
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 0.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,0>
+    {
+        typedef Tuple type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 1.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,1>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 2.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,2>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 3.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,3>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 4.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,4>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type,
+                     typename add_reference_to_Nth<3,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 5.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,5>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type,
+                     typename add_reference_to_Nth<3,Tuple>::type,
+                     typename add_reference_to_Nth<4,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 6.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,6>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type,
+                     typename add_reference_to_Nth<3,Tuple>::type,
+                     typename add_reference_to_Nth<4,Tuple>::type,
+                     typename add_reference_to_Nth<5,Tuple>::type>
+        type;
+    };
+
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 7.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,7>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type,
+                     typename add_reference_to_Nth<3,Tuple>::type,
+                     typename add_reference_to_Nth<4,Tuple>::type,
+                     typename add_reference_to_Nth<5,Tuple>::type,
+                     typename add_reference_to_Nth<6,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 8.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,8>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type,
+                     typename add_reference_to_Nth<3,Tuple>::type,
+                     typename add_reference_to_Nth<4,Tuple>::type,
+                     typename add_reference_to_Nth<5,Tuple>::type,
+                     typename add_reference_to_Nth<6,Tuple>::type,
+                     typename add_reference_to_Nth<7,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 9.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,9>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type,
+                     typename add_reference_to_Nth<3,Tuple>::type,
+                     typename add_reference_to_Nth<4,Tuple>::type,
+                     typename add_reference_to_Nth<5,Tuple>::type,
+                     typename add_reference_to_Nth<6,Tuple>::type,
+                     typename add_reference_to_Nth<7,Tuple>::type,
+                     typename add_reference_to_Nth<8,Tuple>::type>
+        type;
+    };
+
+
+                                     /**
+                                      * Make a tuple type of all
+                                      * references out of the given
+                                      * tuple. Specialization for tuple
+                                      * of length 10.
+                                      */
+    template <typename Tuple>
+    struct tie_args_helper<Tuple,10>
+    {
+        typedef 
+        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
+                     typename add_reference_to_Nth<1,Tuple>::type,
+                     typename add_reference_to_Nth<2,Tuple>::type,
+                     typename add_reference_to_Nth<3,Tuple>::type,
+                     typename add_reference_to_Nth<4,Tuple>::type,
+                     typename add_reference_to_Nth<5,Tuple>::type,
+                     typename add_reference_to_Nth<6,Tuple>::type,
+                     typename add_reference_to_Nth<7,Tuple>::type,
+                     typename add_reference_to_Nth<8,Tuple>::type,
+                     typename add_reference_to_Nth<9,Tuple>::type>
+        type;
+    };
+
+
+  
+                                     /**
+                                      * Declare a typedef to a tuple
+                                      * type that has the same basic
+                                      * types as the template
+                                      * argument, but all references
+                                      * instead of values.
+                                      *
+                                      * Do so by redirecting to the
+                                      * tie_args_helper specializations;
+                                      * note that the second argument of
+                                      * these templates is computed
+                                      * automatically by the default
+                                      * argument specification.
+                                      */
+    template <typename Tuple>
+    struct tie_args 
+    {
+        typedef typename tie_args_helper<Tuple>::type type;
+    };
+  }
+
+#if (DEAL_II_USE_MT == 1)
+#  if defined(DEAL_II_USE_MT_POSIX)
+  
+  namespace internal 
+  {
+                                     /**
+                                      * Base class describing a
+                                      * thread. This is the basic
+                                      * class abstracting the
+                                      * operating system's POSIX
+                                      * implementation into a C++
+                                      * class. It provides a mechanism
+                                      * to start a new thread, as well
+                                      * as for joining it.
+                                      *
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    struct thread_description_base
+    {
+      private:
+                                         /**
+                                          * Variable holding the data
+                                          * the operating system needs
+                                          * to work with a thread.
+                                          */
+        pthread_t             thread;
+
+                                         /**
+                                          * Store whether the
+                                          * @p{join()} member function
+                                          * as already been called. If
+                                          * @p{true}, then @p{join}
+                                          * will return immediately,
+                                          * otherwise it needs to go
+                                          * through a call to the
+                                          * operating system.
+                                          *
+                                          * This class is generated
+                                          * exactly once per thread,
+                                          * but is kept in the
+                                          * background: user's should
+                                          * not directly access this
+                                          * class. Access to it is
+                                          * performed through counted
+                                          * pointers, both from
+                                          * @p{Thread<>} objects as
+                                          * well as from the thread
+                                          * entry point function on
+                                          * the new thread. It is only
+                                          * deleted when all users
+                                          * have freed it, which means
+                                          * that also the new thread
+                                          * has ended.
+                                          */
+        mutable volatile bool was_joined;
+
+                                         /**
+                                          * Mutex used to synchronise
+                                          * calls to the @p{join()}
+                                          * function.
+                                          */
+        mutable ThreadMutex   join_mutex;
+
+      public:
+
+                                         /**
+                                          * Constructor.
+                                          */
+        thread_description_base () : was_joined (false) {};
+
+                                         /**
+                                          * Destructor.
+                                          */
+        virtual ~thread_description_base ();
+
+                                         /**
+                                          * Create a new thread with
+                                          * the given thread entry
+                                          * point and arguments. Store
+                                          * the result of the
+                                          * operation in the
+                                          * @p{thread} member variable
+                                          * for further use.
+                                          */
+        void create (void * (*p) (void *), void *d);
+
+                                         /**
+                                          * Join a thread, i.e. wait
+                                          * for it to finish. This
+                                          * function can safely be
+                                          * called from different
+                                          * threads at the same time,
+                                          * and can also be called
+                                          * more than once.
+                                          */
+        void join () const;
+    };
+
+#  else       // some other threading model
+#    error Not Implemented
+#  endif     // defined(DEAL_II_USE_MT_POSIX)
+
+                                     /**
+                                      * Class derived from
+                                      * @ref{thread_description_base}
+                                      * that also provides the
+                                      * possibility to store a return
+                                      * value.
+                                      *
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    template <typename RT>
+    struct thread_description : public thread_description_base
+    {
+        return_value<RT> ret_val;
+    };
+
+                                     // forward declare another class
+    template <typename> struct wrapper_base;
+  }
+
+
+
+                                   /**
+                                    * User visible class describing a
+                                    * thread. Relays all real calls to
+                                    * the internal thread object
+                                    * abstracting the operating
+                                    * system's functions, to which it
+                                    * keeps a shared pointer. This
+                                    * object can be freely copied
+                                    * around in user space.
+                                    *
+                                    * The default value of the
+                                    * template argument is @p{void},
+                                    * so if the function you are
+                                    * calling on a new thread has no
+                                    * return value, you can omit the
+                                    * template argument.
+                                    * 
+                                    * @author Wolfgang Bangerth, 2003
+                                    */
+  template <typename RT = void>
+  class Thread
+  {
+                                       /**
+                                        * Construct a thread object
+                                        * with a pointer to an
+                                        * internal thread object. This
+                                        * is the constructor used to
+                                        * the @p{spawn} family of
+                                        * functions.
+                                        *
+                                        * We would like to make this
+                                        * constructor private and only
+                                        * grant the
+                                        * @p{wrapper_base::fire_up}
+                                        * function friendship, but
+                                        * granting friendship to
+                                        * functions in other
+                                        * namespaces doesn't work with
+                                        * some compilers, so only do
+                                        * so if the configure script
+                                        * decided that this is safe.
+                                        */
+#ifdef DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
+    public:
+#endif
+      Thread (const boost::shared_ptr<internal::thread_description<RT> > &td)
+                      : thread_descriptor (td) {};
+
+    public:
+      
+                                       /**
+                                        * Default constructor. You
+                                        * can't do much with a thread
+                                        * object constructed this way,
+                                        * except for assigning it a
+                                        * thread object that holds
+                                        * data created by the
+                                        * @p{spawn} functions.
+                                        */
+      Thread () {};
+
+                                       /**
+                                        * Join the thread represented
+                                        * by this object, i.e. wait
+                                        * for it to finish. You can't
+                                        * call this function if you
+                                        * have used the default
+                                        * constructor of this class
+                                        * and have not assigned a
+                                        * thread object to it.
+                                        */
+      void join () const {
+        AssertThrow (thread_descriptor, ExcNoThread());
+        thread_descriptor->join ();
+      };
+
+                                       /**
+                                        * Get the return value of the
+                                        * function of the
+                                        * thread. Since this is only
+                                        * available once the thread
+                                        * finishes, this implicitely
+                                        * also calls @p{join()}.
+                                        */
+      RT return_value () {
+        join ();
+        return thread_descriptor->ret_val.get();
+      };
+
+
+                                       /**
+                                        * Check for equality of thread
+                                        * objects. Since objects of
+                                        * this class store an implicit
+                                        * pointer to an object that
+                                        * exists exactly once for each
+                                        * thread, the check is simply
+                                        * to compare these pointers.
+                                        */
+      bool operator == (const Thread &t) {
+        return thread_descriptor == t.thread_descriptor;
+      };
+
+                                       /**
+                                        * Exception
+                                        */
+      DeclException0 (ExcNoThread);
+      
+    private:
+                                       /**
+                                        * Shared pointer to the object
+                                        * representing the thread, and
+                                        * abstracting operating system
+                                        * functions to work on
+                                        * it. Boost's shared pointer
+                                        * implementation will make
+                                        * sure that that object lives
+                                        * as long as there is at least
+                                        * one subscriber to it.
+                                        */
+      boost::shared_ptr<internal::thread_description<RT> > thread_descriptor;
+
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
+      template <typename RT_> friend struct Threads::internal::wrapper_base;
+#endif
+  };
+
+
+
+  namespace internal
+  {
+
+                                     /**
+                                      * Base class for the classes
+                                      * wrapping function pointers and
+                                      * arguments for non-member and
+                                      * member functions.
+                                      *
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    template <typename RT>
+    struct wrapper_base
+    {
+
+                                         /**
+                                          * Start a new thread, wait
+                                          * until it has copied the
+                                          * data out of this object,
+                                          * and return the thread
+                                          * descriptor.
+                                          */
+        Thread<RT> fire_up () {
+          thread_descriptor =
+            DescriptionPointer(new internal::thread_description<RT>());
+
+          ThreadMutex::ScopedLock lock (mutex);        
+          thread_descriptor->create (entry_point, (void *)this);
+          condition.wait (mutex);
+
+          return thread_descriptor;
+        }
+
+      protected:
+                                         /**
+                                          * Typedef for the type of a
+                                          * thread entry point, as
+                                          * required by POSIX.
+                                          */
+        typedef void * (*EntryPoint) (void *);
+
+                                         /**
+                                          * Typedef for shared
+                                          * pointers to the objects
+                                          * describing threads on the
+                                          * OS level.
+                                          */
+        typedef
+        boost::shared_ptr<internal::thread_description<RT> >
+        DescriptionPointer;
+
+                                         /**
+                                          * Constructor. Take the
+                                          * address of a thread entry
+                                          * point and store it.
+                                          */
+        wrapper_base (const EntryPoint ep)
+                        : entry_point (ep) {};
+
+                                         /**
+                                          * Shared pointer to the
+                                          * unique object describing a
+                                          * thread on the OS level.
+                                          */
+        DescriptionPointer thread_descriptor;
+
+                                         /**
+                                          * Mutex and condition
+                                          * variable used to
+                                          * synchronise calling and
+                                          * called thread.
+                                          */
+        mutable ThreadMutex     mutex;    
+        mutable ThreadCondition condition;
+
+      private:
+                                         /**
+                                          * Address of the thread
+                                          * entry point. Is set in the
+                                          * constructor, and is the
+                                          * address of a function in
+                                          * derived classes.
+                                          */
+        const EntryPoint entry_point;
+    };
+  
+
+                                     /**
+                                      * Wrap the arguments to a
+                                      * non-member or static member
+                                      * function and provide an entry
+                                      * point for a new thread that
+                                      * unwraps this data and calls
+                                      * the function with them.
+                                      *
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    template <typename RT, typename ArgList>
+    struct fun_wrapper : public wrapper_base<RT>
+    {
+                                         /**
+                                          * Typedef for the type of
+                                          * the function to be called
+                                          * on the new thread.
+                                          */
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;
+
+                                         /**
+                                          * Typedef for a typelist of
+                                          * reference arguments to the
+                                          * function to be called.
+                                          */
+        typedef typename internal::tie_args<ArgList>::type ArgReferences;
+
+                                         /**
+                                          * Constructor. Store the
+                                          * necessary information
+                                          * about the function to be
+                                          * called and with which
+                                          * arguments.
+                                          *
+                                          * Pass down the address of
+                                          * this class's thread entry
+                                          * point function. This way,
+                                          * we can ensure that object
+                                          * and thread entry point
+                                          * function always are in
+                                          * synch with respect to
+                                          * their knowledge of the
+                                          * types involved.
+                                          */
+        fun_wrapper (FunPtr               fun_ptr,
+                     const ArgReferences &args)
+                        : wrapper_base<RT> (&entry_point),
+                          fun_ptr (fun_ptr),
+                          args (args)  {};
+      private:
+                                         /**
+                                          * Default constructor. Made
+                                          * private and not
+                                          * implemented to prevent
+                                          * calling.
+                                          */
+        fun_wrapper ();
+
+                                         /**
+                                          * Copy constructor. Made
+                                          * private and not
+                                          * implemented to prevent
+                                          * calling.
+                                          */
+        fun_wrapper (const fun_wrapper &);
+
+                                         /**
+                                          * Pointer to the function to
+                                          * be called on the new
+                                          * thread.
+                                          */
+        FunPtr        fun_ptr;
+
+                                         /**
+                                          * References to the
+                                          * arguments with which the
+                                          * function is to be called.
+                                          */
+        ArgReferences args;
+      
+
+                                         /**
+                                          * Entry point for the new
+                                          * thread.
+                                          */
+        static void * entry_point (void *arg)
+          {
+            const wrapper_base<RT> *w
+              = reinterpret_cast<const wrapper_base<RT>*> (arg);
+            const fun_wrapper *wrapper
+              = static_cast<const fun_wrapper*> (w);
+
+                                             // copy information from
+                                             // the stack of the
+                                             // calling thread
+            FunPtr    fun_ptr = wrapper->fun_ptr;
+            ArgList   args    = wrapper->args;
+
+            boost::shared_ptr<internal::thread_description<RT> >
+              thread_descriptor  = wrapper->thread_descriptor;
+          
+                                             // signal the fact that
+                                             // we have copied all the
+                                             // information that is
+                                             // needed
+            {
+              ThreadMutex::ScopedLock lock (wrapper->mutex);
+              wrapper->condition.signal ();
+            }
+
+                                             // call the
+                                             // function. since an
+                                             // exception that is
+                                             // thrown from one of the
+                                             // called functions will
+                                             // not propagate to the
+                                             // main thread, it will
+                                             // kill the program if
+                                             // not treated here
+                                             // before we return to
+                                             // the operating system's
+                                             // thread library
+            internal::register_thread ();
+            try 
+              {
+                internal::call (fun_ptr, args,
+                                thread_descriptor->ret_val);
+              }
+            catch (const std::exception &exc)
+              {
+                internal::handle_std_exception (exc);
+              }
+            catch (...)
+              {
+                internal::handle_unknown_exception ();
+              }
+            internal::deregister_thread ();
+          
+            return 0;
+          };
+    };
+
+  
+  
+                                     /**
+                                      * Wrap the arguments to a member
+                                      * function and provide an entry
+                                      * point for a new thread that
+                                      * unwraps this data and calls
+                                      * the function with them.
+                                      *
+                                      * @author Wolfgang Bangerth, 2003
+                                      */
+    template <typename RT, class C, typename ArgList>
+    struct mem_fun_wrapper : public wrapper_base<RT>
+    {
+                                         /**
+                                          * Typedef for the type of
+                                          * the function to be called
+                                          * on the new thread.
+                                          */
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;
+
+                                         /**
+                                          * Typedef for a typelist of
+                                          * reference arguments to the
+                                          * function to be called.
+                                          */
+        typedef typename internal::tie_args<ArgList>::type ArgReferences;
+      
+                                         /**
+                                          * Constructor. Store the
+                                          * necessary information
+                                          * about the function to be
+                                          * called and with which
+                                          * arguments.
+                                          *
+                                          * Pass down the address of
+                                          * this class's thread entry
+                                          * point function. This way,
+                                          * we can ensure that object
+                                          * and thread entry point
+                                          * function always are in
+                                          * synch with respect to
+                                          * their knowledge of the
+                                          * types involved.
+                                          */
+        mem_fun_wrapper (MemFunPtr            mem_fun_ptr,
+                         C                   &c,
+                         const ArgReferences &args)
+                        : wrapper_base<RT> (&entry_point),
+                          c (c),
+                          mem_fun_ptr (mem_fun_ptr),
+                          args (args)  {};
+      private:
+                                         /**
+                                          * Default constructor. Made
+                                          * private and not
+                                          * implemented to prevent
+                                          * calling.
+                                          */
+        mem_fun_wrapper ();
+
+                                         /**
+                                          * Copy constructor. Made
+                                          * private and not
+                                          * implemented to prevent
+                                          * calling.
+                                          */
+        mem_fun_wrapper (const mem_fun_wrapper &);
+      
+                                         /**
+                                          * Pointer to the function to
+                                          * be called on the new
+                                          * thread, as well as the
+                                          * object with which this has
+                                          * to happen.
+                                          */
+        C            &c;
+        MemFunPtr     mem_fun_ptr;
+
+                                         /**
+                                          * References to the
+                                          * arguments with which the
+                                          * function is to be called.
+                                          */
+        ArgReferences args;
+
+                                         /**
+                                          * Entry point for the new
+                                          * thread.
+                                          */
+        static void * entry_point (void *arg)
+          {
+            const wrapper_base<RT> *w
+              = reinterpret_cast<const wrapper_base<RT>*> (arg);
+            const mem_fun_wrapper *wrapper
+              = static_cast<const mem_fun_wrapper*> (w);
+
+                                             // copy information from
+                                             // the stack of the
+                                             // calling thread
+            MemFunPtr mem_fun_ptr = wrapper->mem_fun_ptr;
+            C        &c           = wrapper->c;
+            ArgList   args        = wrapper->args;
+
+            boost::shared_ptr<internal::thread_description<RT> >
+              thread_descriptor  = wrapper->thread_descriptor;
+
+                                             // signal the fact that
+                                             // we have copied all the
+                                             // information that is
+                                             // needed
+            {
+              ThreadMutex::ScopedLock lock (wrapper->mutex);
+              wrapper->condition.signal ();
+            }
+          
+                                             // call the
+                                             // function. since an
+                                             // exception that is
+                                             // thrown from one of the
+                                             // called functions will
+                                             // not propagate to the
+                                             // main thread, it will
+                                             // kill the program if
+                                             // not treated here
+                                             // before we return to
+                                             // the operating system's
+                                             // thread library
+            internal::register_thread ();
+            try 
+              {
+                internal::call (mem_fun_ptr, c, args,
+                                thread_descriptor->ret_val);
+              }
+            catch (const std::exception &exc)
+              {
+                internal::handle_std_exception (exc);
+              }
+            catch (...)
+              {
+                internal::handle_unknown_exception ();
+              }
+            internal::deregister_thread ();
+          
+            return 0;
+          };
+    };
+  }
+
+
+  namespace internal
+  {
+                                     /**
+                                      * General template declaration
+                                      * of a class that is used to
+                                      * encapsulate arguments to
+                                      * global and static member
+                                      * functions, make sure a new
+                                      * thread is created and that
+                                      * function being run on that
+                                      * thread.
+                                      *
+                                      * Although this general template
+                                      * is not implemented at all, the
+                                      * default template argument
+                                      * makes sure that whenever using
+                                      * the name of this class, the
+                                      * last template argument will be
+                                      * computed correctly from the
+                                      * previous arguments, and the
+                                      * correct specialization for
+                                      * this last template argument be
+                                      * used, even though we need to
+                                      * specify it.
+                                      */
+    template <typename RT, typename ArgList,
+              int length = boost::tuples::length<ArgList>::value>
+    class fun_encapsulator;
+
+
+                                     /**
+                                      * General template declaration
+                                      * of a class that is used to
+                                      * encapsulate arguments to
+                                      * non-static member functions,
+                                      * make sure a new thread is
+                                      * created and that function
+                                      * being run on that thread.
+                                      *
+                                      * Although this general template
+                                      * is not implemented at all, the
+                                      * default template argument
+                                      * makes sure that whenever using
+                                      * the name of this class, the
+                                      * last template argument will be
+                                      * computed correctly from the
+                                      * previous arguments, and the
+                                      * correct specialization for
+                                      * this last template argument be
+                                      * used, even though we need to
+                                      * specify it.
+                                      */
+    template <typename RT, typename C, typename ArgList,
+              int length = boost::tuples::length<ArgList>::value>
+    class mem_fun_encapsulator;
+  }
+
+
+// ----------- encapsulators for member functions not taking any parameters
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with no arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 0>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() () {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                ArgList()).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * no arguments.
+                                    */
+  template <typename RT, typename C>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<> >
+  spawn (C &c, RT (C::*fun_ptr)()) {
+    return internal::mem_fun_encapsulator<RT, C, boost::tuple<> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with no
+                                    * arguments.
+                                    */
+  template <typename RT, typename C>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,boost::tuple<> >
+  spawn (const C &c, RT (C::*fun_ptr)() const) {
+    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for unary member functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 1 argument.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 1>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 1 argument.
+                                    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1)) {
+    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 1
+                                    * argument.
+                                    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1) const) {
+    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for binary member functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 2 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 2>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,
+                                                           arg2)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 2 arguments.
+                                    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2)) {
+    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1, Arg2> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 2
+                                    * arguments.
+                                    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const) {
+    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1, Arg2> > (c,fun_ptr);
+  }
+
+
+
+// ----------- encapsulators for ternary member functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 3 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 3>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,
+                                                           arg2,
+                                                           arg3)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 3 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 3
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for member functions with 4 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 4 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 4>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,arg2,
+                                                           arg3,arg4)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 4 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 4
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for member functions with 5 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 5 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 5>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,arg2,
+                                                           arg3,arg4,
+                                                           arg5)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 5 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 5
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5> > (c,fun_ptr);
+  }
+
+
+// ----------- encapsulators for member functions with 6 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 6 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 6>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,arg2,
+                                                           arg3,arg4,
+                                                           arg5,arg6)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 6 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 6
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,
+                               boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6> > (c,fun_ptr);
+  }
+
+
+// ----------- encapsulators for member functions with 7 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 7 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 7>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,arg2,
+                                                           arg3,arg4,
+                                                           arg5,arg6,
+                                                           arg7)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 7 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                 Arg4, Arg5, Arg6, Arg7> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 7
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,
+                               boost::tuple<Arg1, Arg2, Arg3,
+                                            Arg4, Arg5, Arg6, Arg7> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7> > (c,fun_ptr);
+  }
+
+
+// ----------- encapsulators for member functions with 8 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 8 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 8>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,arg2,
+                                                           arg3,arg4,
+                                                           arg5,arg6,
+                                                           arg7,arg8)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 8 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                 Arg4, Arg5, Arg6,
+                                                 Arg7, Arg8> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 8
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,
+                               boost::tuple<Arg1, Arg2, Arg3,
+                                            Arg4, Arg5, Arg6,
+                                            Arg7, Arg8> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                      Arg6,Arg7,Arg8) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8> > (c,fun_ptr);
+  }
+
+
+// ----------- encapsulators for member functions with 9 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 9 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 9>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,arg2,
+                                                           arg3,arg4,
+                                                           arg5,arg6,
+                                                           arg7,arg8,
+                                                           arg9)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 9 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                 Arg4, Arg5, Arg6,
+                                                 Arg7, Arg8, Arg9> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8,Arg9)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 9
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,
+                               boost::tuple<Arg1, Arg2, Arg3,
+                                            Arg4, Arg5, Arg6,
+                                            Arg7, Arg8, Arg9> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                      Arg6,Arg7,Arg8,Arg9) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9> > (c,fun_ptr);
+  }
+
+
+// ----------- encapsulators for member functions with 10 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for member
+                                      * functions with 10 arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_encapsulator<RT, C, ArgList, 10>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9,
+                    typename boost::tuples::element<9,ArgList>::type arg10) {
+          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
+                                                boost::tie(arg1,arg2,
+                                                           arg3,arg4,
+                                                           arg5,arg6,
+                                                           arg7,arg8,
+                                                           arg9, arg10)).fire_up ();
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 10 arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9,
+            typename Arg10>
+  inline
+  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                 Arg4, Arg5, Arg6,
+                                                 Arg7, Arg8, Arg9, Arg10> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8,Arg9,Arg10)) {
+    return internal::mem_fun_encapsulator<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9,
+      Arg10> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 10
+                                    * arguments.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9,
+            typename Arg10>
+  inline
+  internal::mem_fun_encapsulator<RT,const C,
+                               boost::tuple<Arg1, Arg2, Arg3,
+                                            Arg4, Arg5, Arg6,
+                                            Arg7, Arg8, Arg9, Arg10> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                      Arg6,Arg7,Arg8,Arg9,Arg10) const) {
+    return internal::mem_fun_encapsulator<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9,
+      Arg10> > (c,fun_ptr);
+  }
+
+
+
+// ----------- encapsulators for functions not taking any parameters
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with no arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 0>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() () {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          ArgList()).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with no arguments.
+                                    */
+  template <typename RT>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<> >
+  spawn (RT (*fun_ptr)()) {
+    return internal::fun_encapsulator<RT, boost::tuple<> > (fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for unary functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 1 argument.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 1>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 1 argument.
+                                    */
+  template <typename RT, typename Arg1>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1> >
+  spawn (RT (*fun_ptr)(Arg1)) {
+    return internal::fun_encapsulator<RT, boost::tuple<Arg1> > (fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for binary functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 2 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 2>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,
+                                                     arg2)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 2 arguments.
+                                    */
+  template <typename RT, typename Arg1, typename Arg2>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2)) {
+    return internal::fun_encapsulator<RT, boost::tuple<Arg1, Arg2> > (fun_ptr);
+  }
+
+
+
+// ----------- encapsulators for ternary functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 3 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 3>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,
+                                                     arg2,
+                                                     arg3)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 3 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3> > (fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for functions with 4 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 4 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 4>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,arg2,
+                                                     arg3,arg4)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 4 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (fun_ptr);
+  }
+
+
+
+
+// ----------- encapsulators for functions with 5 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 5 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 5>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,arg2,
+                                                     arg3,arg4,
+                                                     arg5)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 5 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5> > (fun_ptr);
+  }
+
+
+// ----------- encapsulators for functions with 6 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 6 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 6>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,arg2,
+                                                     arg3,arg4,
+                                                     arg5,arg6)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 6 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6> > (fun_ptr);
+  }
+
+
+// ----------- encapsulators for functions with 7 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 7 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 7>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,arg2,
+                                                     arg3,arg4,
+                                                     arg5,arg6,
+                                                     arg7)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 7 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6, Arg7> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7> > (fun_ptr);
+  }
+
+
+// ----------- encapsulators for functions with 8 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 8 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 8>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,arg2,
+                                                     arg3,arg4,
+                                                     arg5,arg6,
+                                                     arg7,arg8)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 8 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6,
+                                           Arg7, Arg8> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                       Arg6,Arg7,Arg8)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8> > (fun_ptr);
+  }
+
+
+// ----------- encapsulators for functions with 9 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 9 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 9>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,arg2,
+                                                     arg3,arg4,
+                                                     arg5,arg6,
+                                                     arg7,arg8,
+                                                     arg9)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 9 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6,
+                                           Arg7, Arg8, Arg9> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                       Arg6,Arg7,Arg8,Arg9)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9> > (fun_ptr);
+  }
+
+
+// ----------- encapsulators for functions with 10 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Encapsulator class for
+                                      * functions with 10 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 10>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_encapsulator (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9,
+                    typename boost::tuples::element<9,ArgList>::type arg10) {
+          return fun_wrapper<RT,ArgList> (fun_ptr,
+                                          boost::tie(arg1,arg2,
+                                                     arg3,arg4,
+                                                     arg5,arg6,
+                                                     arg7,arg8,
+                                                     arg9, arg10)).fire_up ();
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with 10 arguments.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9,
+            typename Arg10>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6,
+                                           Arg7, Arg8, Arg9, Arg10> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                       Arg6,Arg7,Arg8,Arg9,Arg10)) {
+    return internal::fun_encapsulator<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9,
+      Arg10> > (fun_ptr);
+  }
+
+#else  // #if (DEAL_II_USE_MT == 1)
+
+  template <typename RT = void>
+  class Thread 
+  {
+    public:
+                                       /**
+                                        * Default constructor.
+                                        */
+      Thread ()  {};
+
+                                       /**
+                                        * Initialize the return value
+                                        * of this object using the
+                                        * given member-function
+                                        * pointer, object, and
+                                        * argument list.
+                                        */
+      template <typename PFun, typename C, typename ArgRefs>
+      Thread (PFun     fun_ptr,
+              C       &obj,
+              ArgRefs  arg_refs)
+        {
+          internal::call (fun_ptr, obj, arg_refs, rv);
+        };
+
+                                       /**
+                                        * Initialize the return value
+                                        * of this object using the
+                                        * given function pointer, and
+                                        * argument list.
+                                        */
+      template <typename PFun, typename ArgRefs>
+      Thread (PFun    fun_ptr,
+              ArgRefs arg_refs)
+        {
+          internal::call (fun_ptr, arg_refs, rv);
+        };
+
+                                       /**
+                                        * Get the return value of the
+                                        * function of the
+                                        * thread.
+                                        */
+      RT return_value () const 
+        {
+          return rv.get();
+        };
+
+                                       /**
+                                        * Join this thread. Is of
+                                        * course a no-op in this of no
+                                        * thread support.
+                                        */
+      void join () const {};
+
+                                       /**
+                                        * Compare for equality of
+                                        * threads. Since thrheads are
+                                        * not supported, there can
+                                        * only be exactly one thread,
+                                        * and the result is
+                                        * @p{true}. This function
+                                        * doesn't make much sense,
+                                        * though, when threads are not
+                                        * supported.
+                                        */
+      bool operator == (const Thread &)
+        {
+          return true;
+        };
+      
+    private:
+                                       /**
+                                        * Store the return value of
+                                        * the thread function.
+                                        */
+      internal::return_value<RT> rv;
+  };
+  
+
+  namespace internal
+  {
+                                     /**
+                                      * General template declaration
+                                      * of a class that is used to
+                                      * forward arguments to
+                                      * global and static member
+                                      * functions.
+                                      *
+                                      * Although this general template
+                                      * is not implemented at all, the
+                                      * default template argument
+                                      * makes sure that whenever using
+                                      * the name of this class, the
+                                      * last template argument will be
+                                      * computed correctly from the
+                                      * previous arguments, and the
+                                      * correct specialization for
+                                      * this last template argument be
+                                      * used, even though we need to
+                                      * specify it.
+                                      */
+    template <typename RT, typename ArgList,
+              int length = boost::tuples::length<ArgList>::value>
+    class fun_forwarder;
+
+                                     /**
+                                      * General template declaration
+                                      * of a class that is used to
+                                      * forward arguments to
+                                      * non-static member functions.
+                                      *
+                                      * Although this general template
+                                      * is not implemented at all, the
+                                      * default template argument
+                                      * makes sure that whenever using
+                                      * the name of this class, the
+                                      * last template argument will be
+                                      * computed correctly from the
+                                      * previous arguments, and the
+                                      * correct specialization for
+                                      * this last template argument be
+                                      * used, even though we need to
+                                      * specify it.
+                                      */
+    template <typename RT, typename C, typename ArgList,
+              int length = boost::tuples::length<ArgList>::value>
+    class mem_fun_forwarder;    
+  }
+
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with no arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 0>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() () {
+          return Thread<RT> (mem_fun_ptr, c,
+                             ArgList());
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with no arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<> >
+  spawn (C &c, RT (C::*fun_ptr)()) {
+    return internal::mem_fun_forwarder<RT, C, boost::tuple<> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * no arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C>
+  inline
+  internal::mem_fun_forwarder<RT,const C,boost::tuple<> >
+  spawn (const C &c, RT (C::*fun_ptr)() const) {
+    return internal::mem_fun_forwarder<RT, const C, boost::tuple<> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for unary member functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 1 argument.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 1>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions with
+                                    * 1 argument. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1)) {
+    return internal::mem_fun_forwarder<RT, C, boost::tuple<Arg1> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * const member functions with 1
+                                    * argument. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1) const) {
+    return internal::mem_fun_forwarder<RT, const C, boost::tuple<Arg1> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for binary member functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 2
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 2>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,
+                                        arg2));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 2 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2)) {
+    return internal::mem_fun_forwarder<RT, C, boost::tuple<Arg1, Arg2> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 2 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const) {
+    return internal::mem_fun_forwarder<RT, const C, boost::tuple<Arg1, Arg2> > (c,fun_ptr);
+  }
+
+
+
+// ----------- forwarders for ternary member functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 3
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 3>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,
+                                        arg2,
+                                        arg3));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 3 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 3 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2, Arg3> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for member functions with 4 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 4
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 4>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 4 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 4 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (c,fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for member functions with 5 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 5
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 5>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 5 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 5 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5> > (c,fun_ptr);
+  }
+
+
+// ----------- forwarders for member functions with 6 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 6
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 6>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 6 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 6 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::mem_fun_forwarder<RT,const C,
+                              boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6> > (c,fun_ptr);
+  }
+
+
+// ----------- forwarders for member functions with 7 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 7
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 7>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 7 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                Arg4, Arg5, Arg6, Arg7> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 7 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  internal::mem_fun_forwarder<RT,const C,
+                              boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6, Arg7> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7> > (c,fun_ptr);
+  }
+
+
+// ----------- forwarders for member functions with 8 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 8
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 8>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7,arg8));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 8 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                Arg4, Arg5, Arg6,
+                                                Arg7, Arg8> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 8 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  internal::mem_fun_forwarder<RT,const C,
+                              boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6,
+                                           Arg7, Arg8> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                      Arg6,Arg7,Arg8) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8> > (c,fun_ptr);
+  }
+
+
+// ----------- forwarders for member functions with 9 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 9
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 9>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7,arg8,
+                                        arg9));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 9 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                Arg4, Arg5, Arg6,
+                                                Arg7, Arg8, Arg9> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8,Arg9)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 9 arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::mem_fun_forwarder<RT,const C,
+                              boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6,
+                                           Arg7, Arg8, Arg9> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                      Arg6,Arg7,Arg8,Arg9) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9> > (c,fun_ptr);
+  }
+
+
+// ----------- forwarders for member functions with 10 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for member
+                                      * functions with 10
+                                      * arguments.
+                                      */
+    template <typename RT, typename C, typename ArgList>
+    class mem_fun_forwarder<RT, C, ArgList, 10>
+    {
+        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
+
+      public:
+        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9,
+                    typename boost::tuples::element<9,ArgList>::type arg10) {
+          return Thread<RT> (mem_fun_ptr, c,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7,arg8,
+                                        arg9, arg10));
+        };
+    
+      private:
+        C         &c;
+        MemFunPtr  mem_fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the non-const spawn
+                                    * function for member functions
+                                    * with 10 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9,
+            typename Arg10>
+  inline
+  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
+                                                Arg4, Arg5, Arg6,
+                                                Arg7, Arg8, Arg9, Arg10> >
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8,Arg9,Arg10)) {
+    return internal::mem_fun_forwarder<RT, C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9,
+      Arg10> > (c,fun_ptr);
+  }
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for const member functions with
+                                    * 10 arguments. This is the
+                                    * version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename C,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9,
+            typename Arg10>
+  inline
+  internal::mem_fun_forwarder<RT,const C,
+                              boost::tuple<Arg1, Arg2, Arg3,
+                                           Arg4, Arg5, Arg6,
+                                           Arg7, Arg8, Arg9, Arg10> >
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                      Arg6,Arg7,Arg8,Arg9,Arg10) const) {
+    return internal::mem_fun_forwarder<RT, const C,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9,
+      Arg10> > (c,fun_ptr);
+  }
+
+
+
+// ----------- forwarders for functions not taking any parameters
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with no arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 0>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() () {
+          return Thread<RT> (fun_ptr,
+                             ArgList());
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with no
+                                    * arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<> >
+  spawn (RT (*fun_ptr)()) {
+    return internal::fun_forwarder<RT, boost::tuple<> > (fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for unary functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 1 argument.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 1>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+ 
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 1 argument. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename Arg1>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1> >
+  spawn (RT (*fun_ptr)(Arg1)) {
+    return internal::fun_forwarder<RT, boost::tuple<Arg1> > (fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for binary functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 2 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 2>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,
+                                        arg2));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 2 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT, typename Arg1, typename Arg2>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2)) {
+    return internal::fun_forwarder<RT, boost::tuple<Arg1, Arg2> > (fun_ptr);
+  }
+
+
+
+// ----------- forwarders for ternary functions
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 3 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 3>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,
+                                        arg2,
+                                        arg3));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 3 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3> > (fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for functions with 4 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 4 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 4>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 4 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (fun_ptr);
+  }
+
+
+
+
+// ----------- forwarders for functions with 5 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 5 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 5>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 5 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5> > (fun_ptr);
+  }
+
+
+// ----------- forwarders for functions with 6 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 6 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 6>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 6 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6> > (fun_ptr);
+  }
+
+
+// ----------- forwarders for functions with 7 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 7 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 7>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 7 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                          Arg4, Arg5, Arg6, Arg7> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7> > (fun_ptr);
+  }
+
+
+// ----------- forwarders for functions with 8 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 8 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 8>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7,arg8));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 8 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                          Arg4, Arg5, Arg6,
+                                          Arg7, Arg8> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                       Arg6,Arg7,Arg8)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8> > (fun_ptr);
+  }
+
+
+// ----------- forwarders for functions with 9 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 9 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 9>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7,arg8,
+                                        arg9));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 9 arguments. This
+                                    * is the version of the @p{spawn}
+                                    * function for the case that
+                                    * threading is not enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                          Arg4, Arg5, Arg6,
+                                          Arg7, Arg8, Arg9> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                       Arg6,Arg7,Arg8,Arg9)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9> > (fun_ptr);
+  }
+
+
+// ----------- forwarders for functions with 10 arguments
+
+  namespace internal
+  {
+                                     /**
+                                      * Forwarder class for functions
+                                      * with 10 arguments.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_forwarder<RT, ArgList, 10>
+    {
+        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
+
+      public:
+        inline fun_forwarder (FunPtr fun_ptr)
+                        : fun_ptr(fun_ptr) {};
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+                    typename boost::tuples::element<1,ArgList>::type arg2,
+                    typename boost::tuples::element<2,ArgList>::type arg3,
+                    typename boost::tuples::element<3,ArgList>::type arg4,
+                    typename boost::tuples::element<4,ArgList>::type arg5,
+                    typename boost::tuples::element<5,ArgList>::type arg6,
+                    typename boost::tuples::element<6,ArgList>::type arg7,
+                    typename boost::tuples::element<7,ArgList>::type arg8,
+                    typename boost::tuples::element<8,ArgList>::type arg9,
+                    typename boost::tuples::element<9,ArgList>::type arg10) {
+          return Thread<RT> (fun_ptr,
+                             boost::tie(arg1,arg2,
+                                        arg3,arg4,
+                                        arg5,arg6,
+                                        arg7,arg8,
+                                        arg9, arg10));
+        };
+    
+      private:
+        FunPtr  fun_ptr;
+    };
+  
+  }
+
+
+                                   /**
+                                    * Overload of the spawn function
+                                    * for non-member or static member
+                                    * functions with 10
+                                    * arguments. This is the version
+                                    * of the @p{spawn} function for
+                                    * the case that threading is not
+                                    * enabled.
+                                    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9,
+            typename Arg10>
+  inline
+  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
+                                          Arg4, Arg5, Arg6,
+                                          Arg7, Arg8, Arg9, Arg10> >
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                       Arg6,Arg7,Arg8,Arg9,Arg10)) {
+    return internal::fun_forwarder<RT,
+      boost::tuple<Arg1, Arg2, Arg3,
+      Arg4, Arg5, Arg6,
+      Arg7, Arg8, Arg9,
+      Arg10> > (fun_ptr);
+  }
+  
+
+  
+#endif // #if (DEAL_II_USE_MT == 1)
+
+
+
+                                   /**
+                                    * A container for thread
+                                    * objects. Allows to add new
+                                    * thread objects and wait for them
+                                    * all together. The thread objects
+                                    * need to have the same return
+                                    * value for the called function.
+                                    *
+                                    * @author Wolfgang Bangerth, 2003
+                                    */
+  template <typename RT = void>
+  class ThreadGroup 
+  {
+    public:
+                                       /**
+                                        * Add another thread object to
+                                        * the collection.
+                                        */
+      ThreadGroup & operator += (const Thread<RT> &t) {
+        threads.push_back (t);
+        return *this;
+      };
+
+                                       /**
+                                        * Wait for all threads in the
+                                        * collection to finish. It is
+                                        * not a problem if some of
+                                        * them have already been
+                                        * waited for, i.e. you may
+                                        * call this function more than
+                                        * once, and you can also add
+                                        * new thread objects between
+                                        * subsequent calls to this
+                                        * function if you want.
+                                        */
+      void join_all () const {
+        for (typename std::list<Thread<RT> >::const_iterator
+               t=threads.begin(); t!=threads.end(); ++t)
+          t->join ();
+      };
+    
+    private:
+                                       /**
+                                        * List of thread objects.
+                                        */
+      std::list<Thread<RT> > threads;
+  };
+  
+  
 }   // end of implementation of namespace Threads
 
 

@@ -628,12 +628,10 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 	thread_data[i].patch_values_system[k].reinit(n_components);
     }
 
-  Threads::ThreadManager thread_manager;  
+  Threads::ThreadGroup<> threads;  
   for (unsigned int l=0; l<n_threads; ++l)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (&DataOut<dim>::build_some_patches)
-		    .collect_args (this, thread_data[l]));
-  thread_manager.wait();
+    threads += Threads::spawn (*this, &DataOut<dim>::build_some_patches)(thread_data[l]);
+  threads.join_all();
 }
 
 

@@ -20,13 +20,6 @@
 
 
 
-				 // allocate static variable
-template <typename number>
-Threads::ThreadManager SwappableVector<number>::thread_manager;
-
-
-
-
 template <typename number>
 SwappableVector<number>::SwappableVector ()
 		:
@@ -172,10 +165,9 @@ void SwappableVector<number>::alert ()
     lock.release ();
   else
 				     // data has not been preloaded so
-				     // far, so go on!
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (&SwappableVector<number>::reload_vector)
-		    .collect_args(this, true));
+				     // far, so go on! For this, start
+				     // a detached thread
+    Threads::spawn (*this, &SwappableVector<number>::reload_vector)(true);
 				   // note that reload_vector also
 				   // releases the lock
 }

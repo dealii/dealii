@@ -1197,7 +1197,7 @@ namespace LaplaceSolver
 
 				     // These ranges are then assigned
 				     // to a number of threads which
-				     // we create next, which each
+				     // we create next. Each will
 				     // assemble the local cell
 				     // matrices on the assigned
 				     // cells, and fill the matrix
@@ -1207,15 +1207,13 @@ namespace LaplaceSolver
 				     // different threads, we need a
 				     // mutex here:
     Threads::ThreadMutex mutex;
-    Threads::ThreadManager thread_manager;
+    Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      Threads::spawn (thread_manager,
-		      Threads::encapsulate(&Solver<dim>::assemble_matrix)
-		      .collect_args (this,
-				     linear_system,
-				     thread_ranges[thread].first,
-				     thread_ranges[thread].second,
-				     mutex));
+      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
+                 (linear_system,
+                  thread_ranges[thread].first,
+                  thread_ranges[thread].second,
+                  mutex);
 
 				     // While the spawned threads
 				     // assemble the system matrix, we
@@ -1244,7 +1242,7 @@ namespace LaplaceSolver
 				     // matrix assembling threads, and
 				     // condense the constraints in
 				     // the matrix as well:
-    thread_manager.wait ();
+    threads.join_all ();
     linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
 				     // Now that we have the linear
@@ -1420,7 +1418,13 @@ namespace LaplaceSolver
 				   // performed sequentially). Note
 				   // that we spawn only one thread,
 				   // and do the second action in the
-				   // main thread.
+				   // main thread. Since only one
+				   // thread is generated, we don't
+				   // use the ``Threads::ThreadGroup''
+				   // class here, but rather use the
+				   // one created thread object
+				   // directly to wait for this
+				   // particular thread's exit.
 				   //
 				   // Note that taking up the address
 				   // of the
@@ -1468,11 +1472,9 @@ namespace LaplaceSolver
 		    ConstraintMatrix      &)
       = &DoFTools::make_hanging_node_constraints;
     
-    Threads::ThreadManager thread_manager;
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (mhnc_p)
-		    .collect_args (dof_handler,
-				   hanging_node_constraints));
+    Threads::Thread<>
+      mhnc_thread = Threads::spawn (mhnc_p)(dof_handler,
+                                            hanging_node_constraints);
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
 			     dof_handler.n_dofs(),
@@ -1484,7 +1486,7 @@ namespace LaplaceSolver
 				     // object is fully set up, then
 				     // close it and use it to
 				     // condense the sparsity pattern:
-    thread_manager.wait ();
+    mhnc_thread.join ();
     hanging_node_constraints.close ();
     hanging_node_constraints.condense (sparsity_pattern);
 

@@ -2497,13 +2497,10 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // to write out the data, we wait
 				   // for that thread to finish
   Table<2,double> data_vectors (n_data_sets, n_nodes);
-  Threads::ThreadManager thread_manager;
   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
 		   Table<2,double> &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
-  Threads::spawn (thread_manager,
-		  Threads::encapsulate (fun_ptr)
-		  .collect_args(patches, data_vectors));
+  Threads::Thread<> reorder_thread = Threads::spawn (fun_ptr)(patches, data_vectors);
 
 				   ///////////////////////////////
 				   // first make up a list of used
@@ -2702,7 +2699,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // now write the data vectors to
 				   // @p{out} first make sure that all
 				   // data is in place
-  thread_manager.wait ();
+  reorder_thread.join ();
 
 				   // then write data.
 				   // the '1' means: node data (as opposed
@@ -2877,13 +2874,10 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
   
   Table<2,double> data_vectors (n_data_sets, n_nodes);
 
-  Threads::ThreadManager thread_manager;
   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
                    Table<2,double> &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
-  Threads::spawn (thread_manager,
-                  Threads::encapsulate (fun_ptr)
-                  .collect_args(patches, data_vectors));
+  Threads::Thread<> reorder_thread = Threads::spawn (fun_ptr)(patches, data_vectors);
 
                                    ///////////////////////////////
                                    // first make up a list of used
@@ -2977,7 +2971,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                                    // now write the data vectors to
                                    // @p{out} first make sure that all
                                    // data is in place
-  thread_manager.wait ();
+  reorder_thread.join ();
 
                                    // then write data.
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -3305,13 +3299,10 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   
   Table<2,double> data_vectors (n_data_sets, n_nodes);
 
-   Threads::ThreadManager thread_manager;
-   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
-		    Table<2,double> &)
-     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
-   Threads::spawn (thread_manager,
-		   Threads::encapsulate (fun_ptr)
-		   .collect_args(patches, data_vectors));
+  void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
+                   Table<2,double> &)
+    = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
+  Threads::Thread<> reorder_thread = Threads::spawn (fun_ptr)(patches, data_vectors);
 
 				    ///////////////////////////////
 				    // first make up a list of used
@@ -3319,7 +3310,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				    // coordinates
 
   
-   for (unsigned int d=1; d<=spacedim; ++d)
+  for (unsigned int d=1; d<=spacedim; ++d)
      {       
        unsigned int entry=0;
        
@@ -3395,7 +3386,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				    ///////////////////////////////////////
 				    // data output.
 				    //
-   thread_manager.wait ();
+   reorder_thread.join ();
 
 				    // then write data.
    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -3629,13 +3620,10 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // for that thread to finish
   Table<2,double> data_vectors (n_data_sets, n_nodes);
 
-  Threads::ThreadManager thread_manager;
   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
 		   Table<2,double> &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
-  Threads::spawn (thread_manager,
-		  Threads::encapsulate (fun_ptr)
-		  .collect_args(patches, data_vectors));
+  Threads::Thread<> reorder_thread = Threads::spawn (fun_ptr)(patches, data_vectors);
 
 				   ///////////////////////////////
 				   // first make up a list of used
@@ -3832,7 +3820,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // now write the data vectors to
 				   // @p{out} first make sure that all
 				   // data is in place
-  thread_manager.wait ();
+  reorder_thread.join ();
 
 				   // then write data.  the
 				   // 'POINTD_DATA' means: node data

@@ -468,7 +468,7 @@ approximate_derivative (const Mapping<dim>    &mapping,
   std::vector<IndexInterval> index_intervals
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
   void (*fun_ptr) (const Mapping<dim>    &,
 		   const DoFHandler<dim> &,
 		   const Vector<double>  &,
@@ -477,12 +477,10 @@ approximate_derivative (const Mapping<dim>    &mapping,
 		   Vector<float>         &)
     = &DerivativeApproximation::template approximate<DerivativeDescription,dim>;
   for (unsigned int i=0; i<n_threads; ++i)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate(fun_ptr)
-		    .collect_args (mapping, dof_handler, solution, component,
-				   index_intervals[i],
-				   derivative_norm));
-  thread_manager.wait ();
+    threads += Threads::spawn (fun_ptr)(mapping, dof_handler, solution, component,
+                                        index_intervals[i],
+                                        derivative_norm);
+  threads.join_all ();
 }
 
 

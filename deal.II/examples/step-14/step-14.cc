@@ -656,15 +656,13 @@ namespace LaplaceSolver
 						    n_threads);
 
     Threads::ThreadMutex mutex;
-    Threads::ThreadManager thread_manager;
+    Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      Threads::spawn (thread_manager,
-		      Threads::encapsulate(&Solver<dim>::assemble_matrix)
-		      .collect_args (this,
-				     linear_system,
-				     thread_ranges[thread].first,
-				     thread_ranges[thread].second,
-				     mutex));
+      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
+                 (linear_system,
+                  thread_ranges[thread].first,
+                  thread_ranges[thread].second,
+                  mutex);
 
     assemble_rhs (linear_system.rhs);
     linear_system.hanging_node_constraints.condense (linear_system.rhs);
@@ -675,7 +673,7 @@ namespace LaplaceSolver
 					      *boundary_values,
 					      boundary_value_map);
     
-    thread_manager.wait ();
+    threads.join_all ();
     linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
     MatrixTools::apply_boundary_values (boundary_value_map,
@@ -739,18 +737,15 @@ namespace LaplaceSolver
 		    ConstraintMatrix      &)
       = &DoFTools::make_hanging_node_constraints;
     
-    Threads::ThreadManager thread_manager;
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (mhnc_p)
-		    .collect_args (dof_handler,
-				   hanging_node_constraints));
+    Threads::Thread<>
+      mhnc_thread = Threads::spawn (mhnc_p)(dof_handler, hanging_node_constraints);
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
 			     dof_handler.n_dofs(),
 			     dof_handler.max_couplings_between_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
-    thread_manager.wait ();
+    mhnc_thread.join ();
     hanging_node_constraints.close ();
     hanging_node_constraints.condense (sparsity_pattern);
 
@@ -2651,14 +2646,10 @@ namespace LaplaceSolver
   void
   WeightedResidual<dim>::solve_problem ()
   {
-    Threads::ThreadManager thread_manager;
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (&WeightedResidual<2>::solve_primal_problem)
-		    .collect_args (this));
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (&WeightedResidual<2>::solve_dual_problem)
-		    .collect_args (this));
-    thread_manager.wait ();
+    Threads::ThreadGroup<> threads;
+    threads += Threads::spawn (*this, &WeightedResidual<2>::solve_primal_problem)();
+    threads += Threads::spawn (*this, &WeightedResidual<2>::solve_dual_problem)();
+    threads.join_all ();
   }
 
   
@@ -3007,7 +2998,8 @@ namespace LaplaceSolver
 				     // us from the necessity to
 				     // synchronise the threads
 				     // through a mutex each time they
-				     // write to this map.
+				     // write to (and modify the
+				     // structure of) this map.
     FaceIntegrals face_integrals;
     for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();
 	 cell!=dual_solver.dof_handler.end();
@@ -3031,18 +3023,15 @@ namespace LaplaceSolver
 				     // started wait until they have
 				     // all finished:
     const unsigned int n_threads = multithread_info.n_default_threads;
-    Threads::ThreadManager thread_manager;
+    Threads::ThreadGroup<> threads;
     for (unsigned int i=0; i<n_threads; ++i)
-      Threads::spawn (thread_manager,
-		      Threads::encapsulate (&WeightedResidual<dim>::
-					    estimate_some)
-		      .collect_args (this,
-				     primal_solution,
-				     dual_weights,
-				     n_threads, i,
-				     error_indicators,
-				     face_integrals));
-    thread_manager.wait();    
+      threads += Threads::spawn (*this, &WeightedResidual<dim>::estimate_some)
+                 (primal_solution,
+                  dual_weights,
+                  n_threads, i,
+                  error_indicators,
+                  face_integrals);
+    threads.join_all();    
 
 				     // Once the error contributions
 				     // are computed, sum them up. For

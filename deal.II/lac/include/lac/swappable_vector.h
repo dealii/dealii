@@ -278,18 +278,6 @@ class SwappableVector : public Vector<number>
     Threads::ThreadMutex lock;
 
 				     /**
-				      * Declare a thread manager that
-				      * is used to spawn threads in
-				      * @p{alert} detached.
-				      *
-				      * If not in MT mode, then the
-				      * class used here is empty, and
-				      * we can as well get away
-				      * without it.
-				      */
-    static Threads::ThreadManager thread_manager;
-
-				     /**
 				      * Flag by which the @p{alert}
 				      * function signifies that the
 				      * data has been preloaded

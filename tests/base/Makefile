@@ -20,6 +20,10 @@ default: run-tests
 
 ############################################################
 
+threads.cc : threads.pl
+	@echo =====regenerating== $@
+	@$(PERL) $^ > $@
+
 logtest.exe        : logtest.g.$(OBJEXT)                            $(lib-base.g)
 polynomial_test.exe: polynomial_test.g.$(OBJEXT) abort.g.$(OBJEXT)  $(lib-base.g)
 polynomial1d.exe   : polynomial1d.g.$(OBJEXT)                       $(lib-base.g)
@@ -28,12 +32,14 @@ reference.exe      : reference.g.$(OBJEXT) abort.g.$(OBJEXT)        $(libraries)
 table.exe          : table.g.$(OBJEXT)                              $(libraries)
 tensor.exe         : tensor.g.$(OBJEXT)                             $(libraries)
 timer.exe          : timer.g.$(OBJEXT)                              $(libraries)
+threads.exe        : threads.g.$(OBJEXT)                            $(libraries)
 auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries)
 
 
 tests = $(sort \
           logtest reference quadrature_test table tensor \
-          timer polynomial1d polynomial_test auto_derivative_function)
+          timer threads polynomial1d polynomial_test \
+	  auto_derivative_function)
 
 ############################################################
 

@@ -1,3 +1,6 @@
+// files on the new-threads branch: base/include/base/thread_management.h base/source/data_out_base.cc base/source/thread_management.cc deal.II/source/dofs/dof_tools.cc deal.II/source/grid/grid_generator.cc deal.II/source/multigrid/mg_dof_tools.cc deal.II/source/numerics/data_out.cc deal.II/source/numerics/data_out_faces.cc deal.II/source/numerics/data_out_rotation.cc deal.II/source/numerics/derivative_approximation.cc deal.II/source/numerics/error_estimator.cc deal.II/source/numerics/matrices.cc deal.II/source/numerics/time_dependent.cc examples/step-13/step-13.cc examples/step-14/step-14.cc examples/step-9/step-9.cc lac/include/lac/sparse_matrix.templates.h lac/include/lac/sparse_vanka.templates.h lac/include/lac/swappable_vector.h lac/include/lac/swappable_vector.templates.h configure configure.in aclocal.m4 common/Make.global_options.in contrib/hsl/source/detached_ma27.cc base/include/base/config.h.in
+
+
 //----------------------------  thread_management.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
@@ -29,91 +32,85 @@
 
 namespace Threads 
 {
-                                   // counter and access mutex for the
-                                   // number of threads
-  volatile unsigned int n_existing_threads_counter = 1;
-  ThreadMutex  n_existing_threads_mutex;
+  namespace internal
+  {
+                                     // counter and access mutex for the
+                                     // number of threads
+    volatile unsigned int n_existing_threads_counter = 1;
+    ThreadMutex  n_existing_threads_mutex;
 
   
-  void register_new_thread () 
-  {
-    ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
-    ++n_existing_threads_counter;
-  }
+    void register_thread () 
+    {
+      ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
+      ++n_existing_threads_counter;
+    }
 
 
   
-  void deregister_new_thread () 
-  {
-    ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
-    --n_existing_threads_counter;
-    Assert (n_existing_threads_counter >= 1,
-            ExcInternalError());
-  }
+    void deregister_thread () 
+    {
+      ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
+      --n_existing_threads_counter;
+      Assert (n_existing_threads_counter >= 1,
+              ExcInternalError());
+    }
 
 
 
-  void handle_std_exception (const std::exception &exc) 
-  {
-    std::cerr << std::endl << std::endl
-              << "---------------------------------------------------------"
-              << std::endl
-              << "In one of the sub-threads of this program, an exception\n"
-              << "was thrown and not caught. Since exceptions do not\n"
-              << "propagate to the main thread, the library has caught it.\n"
-              << "The information carried by this exception is given below.\n"
-              << std::endl
-              << "---------------------------------------------------------"
-              << std::endl;
-    std::cerr << "Exception on processing: " << std::endl
-              << exc.what() << std::endl
-              << "Aborting!" << std::endl
-              << "---------------------------------------------------------"
-              << std::endl;
-    std::abort ();
-  }
+    void handle_std_exception (const std::exception &exc) 
+    {
+      std::cerr << std::endl << std::endl
+                << "---------------------------------------------------------"
+                << std::endl
+                << "In one of the sub-threads of this program, an exception\n"
+                << "was thrown and not caught. Since exceptions do not\n"
+                << "propagate to the main thread, the library has caught it.\n"
+                << "The information carried by this exception is given below.\n"
+                << std::endl
+                << "---------------------------------------------------------"
+                << std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "---------------------------------------------------------"
+                << std::endl;
+      std::abort ();
+    }
 
 
 
-  void handle_unknown_exception ()
-  {
-    std::cerr << std::endl << std::endl
-              << "---------------------------------------------------------"
-              << std::endl
-              << "In one of the sub-threads of this program, an exception\n"
-              << "was thrown and not caught. Since exceptions do not\n"
-              << "propagate to the main thread, the library has caught it.\n"
-              << "The information carried by this exception is given below.\n"
-              << std::endl
-              << "---------------------------------------------------------"
-              << std::endl;
-    std::cerr << "Type of exception is unknown, but not std::exception.\n"
-              << "No additional information is available.\n"
-              << "---------------------------------------------------------"
-              << std::endl;
-    std::abort ();
+    void handle_unknown_exception ()
+    {
+      std::cerr << std::endl << std::endl
+                << "---------------------------------------------------------"
+                << std::endl
+                << "In one of the sub-threads of this program, an exception\n"
+                << "was thrown and not caught. Since exceptions do not\n"
+                << "propagate to the main thread, the library has caught it.\n"
+                << "The information carried by this exception is given below.\n"
+                << std::endl
+                << "---------------------------------------------------------"
+                << std::endl;
+      std::cerr << "Type of exception is unknown, but not std::exception.\n"
+                << "No additional information is available.\n"
+                << "---------------------------------------------------------"
+                << std::endl;
+      std::abort ();
+    }
   }
   
 
   
   unsigned int n_existing_threads () 
   {
-    ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
-    const unsigned int n = n_existing_threads_counter;
+    ThreadMutex::ScopedLock lock (internal::n_existing_threads_mutex);
+    const unsigned int n = internal::n_existing_threads_counter;
     return n;
   }
   
   
 #if DEAL_II_USE_MT != 1
-  void DummyThreadManager::spawn (const FunPtr fun_ptr,
-				  void *       fun_data,
-				  int          /*flags*/) const
-  {
-    (*fun_ptr) (fun_data);
-  }
-  
-
-  
   DummyBarrier::DummyBarrier (const unsigned int  count,
 			      const char         *,
 			      void               *)
@@ -219,256 +216,10 @@ namespace Threads
   
 
 
-  PosixThreadManager::PosixThreadManager ()
-		  :
-		  thread_id_list (new std::list<pthread_t>())
-  {}
-
-
-  PosixThreadManager::~PosixThreadManager ()
-  {
-				     // wait for all threads, and
-				     // release memory
-    wait ();
-    ThreadMutex::ScopedLock lock (list_mutex);
-    if (thread_id_list != 0)
-      delete reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
-  }
-
-
-
-  void
-  PosixThreadManager::spawn (const FunPtr fun_ptr,
-			     void *       fun_data,
-			     int)
-  {
-    std::list<pthread_t> &tid_list
-      = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
-    
-    list_mutex.acquire ();
-    tid_list.push_back (pthread_t());
-    pthread_t *tid = &tid_list.back();
-    list_mutex.release ();
-    
-                                     // start new thread. retry until
-                                     // we either succeed or get an
-                                     // error other than EAGAIN
-    int error = 0;
-    do 
-      {
-	error = pthread_create (tid, 0, fun_ptr, fun_data);
-      }
-    while (error == EAGAIN);
-
-    AssertThrow (error == 0, ExcInternalError());
-  }
-  
-
-
-  void
-  PosixThreadManager::wait () const
-  {
-    ThreadMutex::ScopedLock lock (list_mutex);
-    std::list<pthread_t> &tid_list
-      = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
-
-				     // wait for all the threads in
-				     // turn
-    for (std::list<pthread_t>::iterator i=tid_list.begin();
-	 i != tid_list.end(); ++i)
-      pthread_join (*i, 0);
-
-				     // now we know that these threads
-				     // have finished, remove their
-				     // tid's from the list. this way,
-				     // when new threads are spawned
-				     // and waited for, we won't wait
-				     // for expired threads with their
-				     // invalid handles again
-    tid_list.clear ();
-  }
   
 #  endif
 #endif  
   
-  FunDataCounter::FunDataCounter () :
-		  n_fun_encapsulation_objects (0),
-		  n_fun_data_base_objects (0)
-  {}
-  
-
-  
-  FunDataCounter::~FunDataCounter () 
-  {   
-    AssertThrow (n_fun_encapsulation_objects == 0,
-		 ExcObjectsExist("FunEncapsulation", n_fun_encapsulation_objects));
-    AssertThrow (n_fun_data_base_objects == 0,
-		 ExcObjectsExist("FunDataBase", n_fun_data_base_objects));
-  }
-      
-
-
-/**
- * This is the global object which we will use to count the number of
- * threads generated, and which is used to complain when there is a
- * memory leak.
- */
-  FunDataCounter fun_data_counter;
-
-
-  FunEncapsulation::FunEncapsulation () :
-		  fun_data_base (0)
-  {
-				     // keep some statistics on the
-				     // number of variables around
-    ++fun_data_counter.n_fun_encapsulation_objects;
-  }
-
-
-
-  FunEncapsulation::FunEncapsulation (FunDataBase *fun_data_base) :
-		  fun_data_base (fun_data_base)
-  {
-				     // keep some statistics on the
-				     // number of variables around
-    ++fun_data_counter.n_fun_encapsulation_objects;
-  }
-
-
-
-  FunEncapsulation::FunEncapsulation (const FunEncapsulation &fun_data) :
-		  fun_data_base (fun_data.fun_data_base->clone ())
-  {
-				     // keep some statistics on the
-				     // number of variables around
-    ++fun_data_counter.n_fun_encapsulation_objects;
-  }
-
-
-  FunEncapsulation::~FunEncapsulation ()
-  {
-                                     // note that the spawn() function
-                                     // makes sure that we only get
-                                     // here if the data has already
-                                     // been copied by the spawned
-                                     // thread, so destruction is safe
-                                     // here.
-                                     //
-                                     // so do so.
-    delete fun_data_base;
-    fun_data_base = 0;
-
-				   // keep some statistics on the
-				   // number of variables around
-    --fun_data_counter.n_fun_encapsulation_objects;
-  }
-    
-
-  const FunEncapsulation &
-  FunEncapsulation::operator = (const FunEncapsulation &/*fun_data*/)
-  {
-				     // this is not implemented at
-				     // present. return dummy value
-				     // instead
-    Assert (false, ExcNotImplemented());
-    const FunEncapsulation * const p = 0;
-    return *p;
-  }
-
-
-
-  FunDataBase::FunDataBase (const ThreadEntryPoint thread_entry_point) :
-		  thread_entry_point (thread_entry_point)
-  {
-				     // keep some statistics on the
-				     // number of variables around
-    ++fun_data_counter.n_fun_data_base_objects;
-  }
-
-
-
-  FunDataBase::FunDataBase (const FunDataBase &fun_data_base) :
-		  thread_entry_point (fun_data_base.thread_entry_point)
-  {
-				     // keep some statistics on the
-				     // number of variables around
-    ++fun_data_counter.n_fun_data_base_objects;
-  }
-
-
-
-  FunDataBase::~FunDataBase ()
-  {
-				     // invalidate pointer for security
-				     // reasons. accesses to this
-				     // pointer after lifetime of this
-				     // object will then fail
-    thread_entry_point = 0;
-
-				     // keep some statistics on the
-				     // number of variables around
-    --fun_data_counter.n_fun_data_base_objects;
-  }
-
-
-    
-  void spawn (ThreadManager          &thread_manager,
-	      const FunEncapsulation &fun_data)
-  {
-				     // lock the @p{fun_data_base} object
-				     // to avoid destruction while its
-				     // data is still accessed. the lock
-				     // is released by the new thread
-				     // once it has copied all data
-    fun_data.fun_data_base->lock.acquire ();
-				     // now start the new thread
-#if DEAL_II_USE_MT == 1
-#  if defined(DEAL_II_USE_MT_POSIX)
-    thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
-			  (void*)&fun_data,
-			  0);
-#  else
-#    error Not implemented
-#  endif
-#else
-                                     // if not in MT mode, then simply
-                                     // call the respective
-                                     // serializing function, that
-                                     // executes the given function
-                                     // and return
-    thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
-			  (void*)&fun_data,
-			  0);
-#endif
-
-                                     // unlock the mutex and wait for
-                                     // the condition that the data
-                                     // has been copied to be
-                                     // signalled. unlocking the mutex
-                                     // will allow the other thread to
-                                     // proceed to the signal() call,
-                                     // which we want to catch here
-                                     //
-                                     // the mutex will subsequently be
-                                     // locked again, but since we
-                                     // don't need it any more, we can
-                                     // go on unlocking it immediately
-                                     // again
-    fun_data.fun_data_base->condition.wait(fun_data.fun_data_base->lock);
-    fun_data.fun_data_base->lock.release ();
-  }
-
-
-  
-  void spawn_n (ThreadManager          &thread_manager,
-		const FunEncapsulation &fun_data,
-		const unsigned int      n_threads)
-  {
-    for (unsigned int i=0; i<n_threads; ++i)
-      spawn (thread_manager, fun_data);
-  }
-  
-
 
 
   std::vector<std::pair<unsigned int,unsigned int> >
@@ -504,5 +255,159 @@ namespace Threads
       };
     return return_values;
   } 
- 
+
+
+#if (DEAL_II_USE_MT == 1) && defined(DEAL_II_USE_MT_POSIX)
+
+  namespace internal
+  {
+    thread_description_base::~thread_description_base ()
+    {
+                                       // if we are here, then the
+                                       // last listener is just about
+                                       // to cease to exists. there
+                                       // are two possibilities (since
+                                       // there are two types of
+                                       // possible listeners, and
+                                       // exactly one listener is
+                                       // around):
+                                       //
+                                       // 1. there are no Thread<>
+                                       // objects around any more, but
+                                       // we are at the end of the
+                                       // entry_point function of the
+                                       // new thread; the thread is
+                                       // still running, though, and
+                                       // we are called from this new
+                                       // thread.
+                                       //
+                                       // if this is the case,
+                                       // apparently none of the
+                                       // orginal listeners has called
+                                       // join(), otherwise the thread
+                                       // would not be running any
+                                       // more. since there are no
+                                       // listeners any more, nobody
+                                       // will ever call join() on
+                                       // this thread any
+                                       // more. however, to avoid a
+                                       // resource leak, somebody has
+                                       // to do something like that --
+                                       // on the other hand, we can't
+                                       // since calling pthread_join()
+                                       // on ourself will create a
+                                       // deadlock, of course. so
+                                       // detach the thread.
+                                       //
+                                       // note that in this case,
+                                       // since nobody has ever called
+                                       // join(), was_joined must be
+                                       // false
+                                       //
+                                       // 2. the thread has already
+                                       // ended. in this case, the
+                                       // last Thread<> object
+                                       // refering to it just went out
+                                       // of scope. If this is the
+                                       // case, to prevent a memory
+                                       // leak, we have to call join
+                                       // on the thread, if this has
+                                       // not yet happened, i.e. if
+                                       // was_joined is false.
+                                       //
+                                       // if we are in case 2, then
+                                       // the destructor is called
+                                       // from another than the
+                                       // presently running thread
+                                       //
+                                       //
+                                       // now: how do we find out
+                                       // which case we're in? we
+                                       // could either call
+                                       // pthread_join and see whether
+                                       // we get an error back, or if
+                                       // we get back an error on
+                                       // pthread_detach. from the man
+                                       // pages, the second way seems
+                                       // a little bit safer, so go it:
+      if (was_joined == false)
+        {
+                                           // assume case 1:
+          int error = pthread_detach (thread);
+          if (error == 0)
+            return;
+
+                                           // ouch, could not
+                                           // detach. see if thread
+                                           // could not be found any
+                                           // more:
+          if (error == ESRCH)
+                                             // ok, this is the
+                                             // case. then we are in
+                                             // branch 2, and need to
+                                             // join the thread
+            join ();
+          else
+                                             // something went
+                                             // terribly wrong
+            AssertThrow (false, ExcInternalError());
+        }
+    }
+
+    
+    void
+    thread_description_base::create (void * (*p) (void *), void *d)
+    {
+                                       // start new thread. retry until
+                                       // we either succeed or get an
+                                       // error other than EAGAIN
+      int error = 0;
+      do
+        {
+          error = pthread_create (&thread, 0, p, d);
+        }
+      while (error == EAGAIN);
+
+      AssertThrow (error == 0, ExcInternalError());
+    }
+      
+    
+
+    void
+    thread_description_base::join () const
+    {
+                                       // use Schmidt's double
+                                       // checking pattern: if thread
+                                       // was already joined, then
+                                       // return immediately
+      if (was_joined)
+        return;
+
+                                       // otherwise make sure that
+                                       // only one thread can enter
+                                       // the following section at a
+                                       // time
+      ThreadMutex::ScopedLock lock(join_mutex);
+                                       // while getting the lock,
+                                       // another thread may have set
+                                       // was_joined to true, so check
+                                       // again (this is the double
+                                       // checking pattern) and only
+                                       // if we are really sure that
+                                       // this has not happened, call
+                                       // pthread_join
+      if (!was_joined)
+        {
+          const int error = pthread_join (thread, 0);
+          AssertThrow (error == 0, ExcInternalError());
+        }
+
+                                       // set the flag
+      was_joined = true;
+    }
+    
+  } // end namespace internal
+
+#endif  // (DEAL_II_USE_MT == 1) && defined(DEAL_II_USE_MT_POSIX)
+  
 }   // end namespace Thread

@@ -385,12 +385,11 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 
   if (DEAL_II_USE_MT)
     {
-      Threads::ThreadManager thread_manager;  
+      Threads::ThreadGroup<> threads;  
       for (unsigned int l=0;l<n_threads;++l)
-        Threads::spawn (thread_manager,
-                        Threads::encapsulate (&DataOutRotation<dim>::build_some_patches)
-                        .collect_args (this, thread_data[l]));
-      thread_manager.wait();
+        threads += Threads::spawn (*this, &DataOutRotation<dim>::build_some_patches)
+                   (thread_data[l]);
+      threads.join_all();
     }
   else
                                      // just one thread

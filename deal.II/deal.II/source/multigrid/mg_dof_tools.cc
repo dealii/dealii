@@ -321,7 +321,7 @@ MGTools::count_dofs_per_component (const MGDoFHandler<dim>& dof_handler,
 	  std::vector<std::vector<bool> >
 	    component_select (n_components,
 			      std::vector<bool>(n_components, false));
-	  Threads::ThreadManager thread_manager;
+	  Threads::ThreadGroup<> threads;
 	  for (unsigned int i=0; i<n_components; ++i)
 	    {
 	      void (*fun_ptr) (const unsigned int       level,
@@ -330,12 +330,10 @@ MGTools::count_dofs_per_component (const MGDoFHandler<dim>& dof_handler,
 			       std::vector<bool>          &)
 		= &DoFTools::template extract_level_dofs<dim>;
 	      component_select[i][i] = true;
-	      Threads::spawn (thread_manager,
-			      Threads::encapsulate (fun_ptr)
-			      .collect_args (l, dof_handler, component_select[i],
-					     dofs_in_component[i]));
+	      threads += Threads::spawn (fun_ptr)(l, dof_handler, component_select[i],
+                                                  dofs_in_component[i]);
 	    };
-	  thread_manager.wait();
+	  threads.join_all();
 	  
 					   // next count what we got
 	  for (unsigned int i=0; i<n_components; ++i)

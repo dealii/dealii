@@ -82,6 +82,12 @@
    description of this bug. */
 #undef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
 
+/* Define if we have to work around another bug in gcc with marking all
+   instances of a template class as friends to this class if the class is
+   inside a namespace. See the aclocal.m4 file in the top-level directory for
+   a description of this bug. */
+#undef DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
+
 /* Defined if the compiler does not properly implement the resolution of
    defect report #45 to the C++ standard, which makes nested types implicit
    friends of the enclosing class. */

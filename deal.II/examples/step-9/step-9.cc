@@ -48,10 +48,8 @@
 				 // functions are declared which we
 				 // need to start new threads and to
 				 // wait for threads to return
-				 // (i.e. the ``ThreadManager'' class
-				 // and the ``spawn'',
-				 // ``encapsulate'', and
-				 // ``collect_args'' functions). The
+				 // (i.e. the ``Thread'' class
+				 // and the ``spawn'' functions). The
 				 // second file has a class
 				 // ``MultithreadInfo'' (and a global
 				 // object ``multithread_info'' of
@@ -162,8 +160,8 @@ class AdvectionProblem
 				     // local contributions of a cell
 				     // to the global matrix at the
 				     // same time. This is done using
-				     // a ``Mutex'', which is a kind
-				     // of lock that can be owned by
+				     // a ``Mutex'', which is an
+				     // object that can be owned by
 				     // only one thread at a time. If
 				     // a thread wants to write to the
 				     // matrix, it has to acquire this
@@ -744,33 +742,53 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // many threads they shall spawn.
   const unsigned int n_threads = multithread_info.n_default_threads;
 				   // Next, we need an object which is
-				   // capable of starting new threads
-				   // and waiting for them to
-				   // finish. This is done using the
-				   // ``Threads::ThreadManager''
-				   // typedef. If the library is
-				   // configured to support
-				   // multi-threading, then this
-				   // typedef points to a class in the
-				   // ACE library which provides this
-				   // functionality. If you did not
-				   // configure for multi-threading,
-				   // then the typedef points to a
-				   // dummy class in which the
+				   // capable of keeping track of the
+				   // threads we created, and allows
+				   // us to wait until they all have
+				   // finished (to ``join'' them in
+				   // the language of threads). The
+				   // ``Threads::ThreadGroup'' class
+				   // does this, which is basically
+				   // just a container for objects of
+				   // type ``Threads::Thread'' that
+				   // represent a single thread;
+				   // ``Threads::Thread'' is what the
+				   // ``spawn'' function below will
+				   // return when we start a new
+				   // thread.
+				   //
+				   // Note that both ``ThreadGroup''
+				   // and ``Thread'' have a template
+				   // argument that represents the
+				   // return type of the function
+				   // being called on a separate
+				   // thread. Since most of the
+				   // functions that we will call on
+				   // different threads have return
+				   // type ``void'', the template
+				   // argument has a default value
+				   // ``void'', so that in that case
+				   // it can be omitted. (However, you
+				   // still need to write the angle
+				   // brackets, even if they are
+				   // empty.)
+				   //
+				   // If you did not configure for
+				   // multi-threading, then the
 				   // ``spawn'' function that is
 				   // supposed to start a new thread
 				   // in parallel only executes the
 				   // function which should be run in
-				   // parallel and waits for it to
-				   // return (i.e. the function is
-				   // executed
-				   // sequentially). Likewise, the
-				   // function ``wait'' that is
-				   // supposed to wait for all spawned
-				   // threads to return, returns
-				   // immediately, as there can't be
-				   // threads running.
-  Threads::ThreadManager thread_manager;
+				   // parallel, waits for it to return
+				   // (i.e. the function is executed
+				   // sequentially), and puts the
+				   // return value into the ``Thread''
+				   // object. Likewise, the function
+				   // ``join'' that is supposed to
+				   // wait for all spawned threads to
+				   // return, returns immediately, as
+				   // there can't be threads running.
+  Threads::ThreadGroup<> threads;
 
 				   // Now we have to split the range
 				   // of cells into chunks of
@@ -827,8 +845,8 @@ void AdvectionProblem<dim>::assemble_system ()
 						  dof_handler.end (),
 						  n_threads);
 
-				   // Now, for each of the chunks of
-				   // iterators we have computed,
+				   // Finally, for each of the chunks
+				   // of iterators we have computed,
 				   // start one thread (or if not in
 				   // multi-thread mode: execute
 				   // assembly on these chunks
@@ -836,11 +854,9 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // using the following sequence of
 				   // function calls:
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate(&AdvectionProblem<dim>::assemble_system_interval)
-		    .collect_args (this,
-				   thread_ranges[thread].first,
-				   thread_ranges[thread].second));
+    threads += Threads::spawn (*this, &AdvectionProblem<dim>::assemble_system_interval)
+               (thread_ranges[thread].first,
+                thread_ranges[thread].second);
 				   // The reasons and internal
 				   // workings of these functions can
 				   // be found in the report on the
@@ -851,11 +867,25 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // the ``assemble_system_interval''
 				   // function on the present object
 				   // (the ``this'' pointer), with the
-				   // next to arguments passed as
-				   // parameters. Each thread's number
-				   // is entered into an array
-				   // administered by the
-				   // ``thread_manager'' object.
+				   // arguments following in the
+				   // second set of parentheses passed
+				   // as parameters. The ``spawn''
+				   // function return an object of
+				   // type ``Threads::Thread'', which
+				   // we put into the ``threads''
+				   // container. If a thread exits,
+				   // the return value of the function
+				   // being called is put into a place
+				   // such that the thread objects can
+				   // access it using their
+				   // ``return_value'' function; since
+				   // the function we call doesn't
+				   // have a return value, this does
+				   // not apply here. Note that you
+				   // can copy around thread objects
+				   // freely, and that of course they
+				   // will still represent the same
+				   // thread.
 
 				   // When all the threads are
 				   // running, the only thing we have
@@ -866,18 +896,18 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // right hand side are
 				   // assemblesd. Waiting for all the
 				   // threads to finish can be done
-				   // using the following function
-				   // call, which uses the facts that
-				   // the identification number of the
-				   // spawned threads are stored in
-				   // the ``thread_manager''
-				   // object. Again, if the library
-				   // was not configured to use
+				   // using the ``joint_all'' function
+				   // in the ``ThreadGroup''
+				   // container, which just calls
+				   // ``join'' on each of the thread
+				   // objects it stores.
+				   //
+				   // Again, if the library was not
+				   // configured to use
 				   // multi-threading, then no threads
 				   // can run in parallel and the
-				   // following function returns
-				   // immediately.
-  thread_manager.wait ();  
+				   // function returns immediately.
+  threads.join_all ();  
 
 
 				   // After the matrix has been
@@ -1190,13 +1220,13 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // the information on the grid,
 				       // the DoF handler, or the DoF
 				       // numbers) they are only
-				       // read. This, the different
+				       // read. Thus, the different
 				       // threads do not disturb each
 				       // other.
 				       //
 				       // On the other hand, we would
 				       // now like to write the local
-				       // contributions to the glbal
+				       // contributions to the global
 				       // system of equations into the
 				       // global objects. This needs
 				       // some kind of
@@ -1452,15 +1482,17 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
 
-				   // Now we need a thread management
-				   // object, and then we can spawn
-				   // the threads which each work on
-				   // their assigned chunk of
-				   // cells. Note that as the function
-				   // called is not a member function,
-				   // but rather a static function, we
-				   // need not (and can not) pass a
-				   // ``this'' function in this case.
+				   // In the same way as before, we
+				   // use a ``Threads::ThreadGroup''
+				   // object to collect the descriptor
+				   // objects of different
+				   // threads. Note that as the
+				   // function called is not a member
+				   // function, but rather a static
+				   // function, we need not (and can
+				   // not) pass a ``this'' pointer to
+				   // the ``spawn'' function in this
+				   // case.
 				   //
 				   // Taking pointers to templated
 				   // functions seems to be
@@ -1477,28 +1509,27 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				   // to take a temporary variable for
 				   // that purpose. Here, in this
 				   // case, Compaq's ``cxx'' compiler
-				   // choked on the code so we use the
-				   // workaround with the function
-				   // pointer:
-  Threads::ThreadManager thread_manager;
+				   // choked on the code so we use
+				   // this workaround with the
+				   // function pointer:
+  Threads::ThreadGroup<> threads;
   void (*estimate_interval_ptr) (const DoFHandler<dim> &,
 				 const Vector<double> &,
 				 const IndexInterval &,
 				 Vector<float> &)
     = &GradientEstimation::template estimate_interval<dim>;
   for (unsigned int i=0; i<n_threads; ++i)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (estimate_interval_ptr)
-		    .collect_args (dof_handler, solution, index_intervals[i],
-				   error_per_cell));
+    threads += Threads::spawn (estimate_interval_ptr)(dof_handler, solution,
+                                                      index_intervals[i],
+                                                      error_per_cell);
 				   // Ok, now the threads are at work,
 				   // and we only have to wait for
 				   // them to finish their work:
-  thread_manager.wait ();
+  threads.join_all ();
 				   // Note that if the value of the
 				   // variable
 				   // ``multithread_info.n_default_threads''
-				   // was one, of if the library was
+				   // was one, or if the library was
 				   // not configured to use threads,
 				   // then the sequence of commands
 				   // above reduced to a complicated

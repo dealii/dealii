@@ -228,6 +228,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
     CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
 
+    dnl BOOST uses long long, so don't warn about this
+    CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
+
     dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
     dnl anything to avoid a warning
     case "$target" in
@@ -297,11 +300,35 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W //g;'`"
     fi
 
-    dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary warning
+    dnl Some system specific things
     case "$target" in
+      dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary warning
       *apple-darwin*)
 	CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
 	CXXFLAGSO="$CXXFLAGSO -Wno-long-double"
+        ;;
+
+      dnl On DEC OSF, including both stdio.h and unistd.h causes a warning
+      dnl from the preprocessor that cuserid is redefined as a preprocessor
+      dnl variable. Suppress this if necessary by switching off warnings
+      dnl from the preprocessor
+      *dec-osf*)
+        AC_MSG_CHECKING(for preprocessor warning with cuserid)
+	CXXFLAGS="$CXXFLAGSG -Werror"
+	AC_TRY_COMPILE(
+          [
+#	    include <stdio.h>
+#	    include <unistd.h>
+          ],
+          [;],
+          [
+            AC_MSG_RESULT(no)
+          ],
+          [
+            AC_MSG_RESULT(yes)
+            CXXFLAGSG="$CXXFLAGSG -Wp,-w"
+            CXXFLAGSO="$CXXFLAGSO -Wp,-w"
+          ])
         ;;
     esac
 
@@ -405,6 +432,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl #1182:`statement either is unreachable or causes unreachable code'
           dnl       (happens in switch(dim) clauses for other dimensions than
           dnl       the present one)
+	  dnl #450:`the type "long long" is nonstandard'
+	  dnl       BOOST uses long long, unfortunately
           dnl
           dnl Also disable the following error:
           dnl #265: `class "..." is inaccessible' (happens when we try to
@@ -423,11 +452,12 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
           CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
   
-          for i in 175 236 237 381 487 1136 1156 111 1182 265 ; do
+          for i in 175 236 237 381 487 1136 1156 111 1182 265 450 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
             CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
           done
   
+
           dnl If we use -model ansi to compile the files, we also have to
           dnl specify it for linking
           LDFLAGS="$LDFLAGS -model ansi"
@@ -481,7 +511,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           ;;
   
       borland_bcc)
-          CXXFLAGSG="$CXXFLAGS -q -DDEBUG -w -w-use -w-amp"
+          CXXFLAGSG="$CXXFLAGS -q -DDEBUG -w -w-use -w-amp -w-prc"
           CXXFLAGSO="$CXXFLAGS -q -O2"
           CXXFLAGSPIC=""
           LDFLAGSPIC=""
@@ -792,6 +822,7 @@ AC_DEFUN(DEAL_II_THREAD_CPPFLAGS, dnl
 [
   AC_MSG_CHECKING(for platform specific multi-threading defines)
   AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
    [
 #       if !defined (_REENTRANT) && !defined (_THREAD_SAFE)
@@ -958,8 +989,8 @@ AC_DEFUN(DEAL_II_CHECK_PARTLY_BRACKETED_INITIALIZER, dnl
     case "$GXX_VERSION" in
       gcc*)
   	AC_MSG_CHECKING(for only partly bracketed mutex initializer)
-	CXXFLAGS="$CXXFLAGSG -Werror"
 	AC_LANG(C++)
+	CXXFLAGS="$CXXFLAGSG -Werror"
 	AC_TRY_COMPILE(
    	[
 #	include <vector>
@@ -1041,6 +1072,7 @@ AC_DEFUN(DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS, dnl
 [
   AC_MSG_CHECKING(for posix thread functions)
   AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
    [
 #	include <pthread.h>
@@ -1245,6 +1277,7 @@ AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
 [
   AC_MSG_CHECKING(whether getrusage is properly declared)
   AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
 #include <sys/resource.h>
@@ -1412,9 +1445,9 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_RAND_R, dnl
 [
+  AC_MSG_CHECKING(for rand_r)
   AC_LANG(C++)
   CXXFLAGS=$CXXFLAGSG
-  AC_MSG_CHECKING(for rand_r)
   AC_TRY_COMPILE(
 	[
 #include <cstdlib>
@@ -1811,7 +1844,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 [
-  AC_MSG_CHECKING(for template friend in namespace bug)
+  AC_MSG_CHECKING(for 1st template friend in namespace bug)
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
@@ -1847,6 +1880,70 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
       AC_MSG_RESULT(yes. using workaround)
       AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG, 1, 
                          [Define if we have to work around a bug in gcc with
+                          marking all instances of a template class as friends
+		          to this class if the class is inside a namespace.
+                          See the aclocal.m4 file in the top-level directory
+                          for a description of this bug.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Another bug in gcc with template and namespaces (fixed since 3.2, 
+dnl but present in 3.0):
+dnl 
+dnl /* ----------------------------------------------- */
+dnl namespace NS {
+dnl   template <typename> struct Foo;
+dnl }
+dnl 
+dnl class Bar {
+dnl     template <typename Y> friend struct NS::Foo;
+dnl };
+dnl 
+dnl namespace NS {
+dnl   template <typename> struct Foo { Foo (); };
+dnl }
+dnl 
+dnl template struct NS::Foo<int>;
+dnl /* ----------------------------------------------- */
+dnl
+dnl gcc2.95 provides a really unhelpful error message, 3.0 gets an
+dnl internal compiler error.
+dnl
+dnl Usage: DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG2
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG2, dnl
+[
+  AC_MSG_CHECKING(for 2nd template friend in namespace bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG -Werror"
+  AC_TRY_COMPILE(
+    [
+	namespace NS {
+	  template <typename> struct Foo;
+	}
+
+	class Bar {
+	    template <typename Y> friend struct NS::Foo;
+	};
+
+	namespace NS {
+	  template <typename> struct Foo { Foo (); };
+	}
+
+	template struct NS::Foo<int>;
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2, 1, 
+                         [Define if we have to work around another bug in gcc with
                           marking all instances of a template class as friends
 		          to this class if the class is inside a namespace.
                           See the aclocal.m4 file in the top-level directory
@@ -2305,6 +2402,48 @@ AC_DEFUN(DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl The boost::shared_ptr class has a templated assignment operator
+dnl but no assignment operator matching the default operator
+dnl signature (this if for boost 1.29 at least). So when using
+dnl using a normal assignment between identical types, the
+dnl compiler synthesizes teh default operator, rather than using
+dnl the template. It doesn't matter here, but is probably an
+dnl oversight on behalf of the operators.
+dnl
+dnl With -Wsynth in gcc we then get a warning. So if we find that
+dnl this is still the case, disable -Wsynth, i.e. remove it from
+dnl the list of warning flags.
+dnl
+dnl Usage: DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT, dnl
+[
+  if test "x$GXX_VERSION" != "x" ; then
+    AC_MSG_CHECKING(for boost::shared_ptr assignment operator= template buglet)
+    AC_LANG(C++)
+    CXXFLAGS="-Wsynth -Werror -I `pwd`/contrib/boost/include"
+    AC_TRY_COMPILE(
+      [
+#       include <boost_local/shared_ptr.hpp>
+      ],
+      [
+        boost::shared_ptr<int> a,b;
+        a = b;
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ],
+      [
+        AC_MSG_RESULT(yes)
+	CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-Wsynth\s*//g;'`"
+      ])
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl gcc2.95 doesn't have the std::iterator class, but the standard
 dnl requires it, so check whether we have to work around it
 dnl
@@ -2472,9 +2611,9 @@ dnl Usage: DEAL_II_CHECK_ADVANCE_WARNING
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
 [
+  AC_MSG_CHECKING(for std::advance warning)
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG -Werror"
-  AC_MSG_CHECKING(for std::advance warning)
   AC_TRY_COMPILE(
 	[
 #include <map>
@@ -2760,9 +2899,9 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_CXXFLAGS_CONSISTENCY, dnl
 [
+  AC_MSG_CHECKING(for consistency of CXXFLAGSG flags)
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
-  AC_MSG_CHECKING(for consistency of CXXFLAGSG flags)
   AC_TRY_COMPILE(
     [],
     [;],
@@ -2774,8 +2913,8 @@ AC_DEFUN(DEAL_II_CHECK_CXXFLAGS_CONSISTENCY, dnl
       exit 1;
     ])
   
-  CXXFLAGS="$CXXFLAGSO"
   AC_MSG_CHECKING(for consistency of CXXFLAGSO flags)
+  CXXFLAGS="$CXXFLAGSO"
   AC_TRY_COMPILE(
     [],
     [;],

@@ -634,17 +634,16 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 				   // split all cells into threads if
 				   // multithreading is used and run
 				   // the whole thing
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
   for (unsigned int i=0; i<n_threads; ++i)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (&KellyErrorEstimator<dim>::estimate_some)
-		    .collect_args (mapping, dof_handler,
-                                   quadrature, neumann_bc, solutions,
-                                   component_mask, coefficients,
-                                   std::make_pair(i, n_threads),
-                                   face_integrals,
-                                   *data_structures[i]));
-  thread_manager.wait();
+    threads += Threads::spawn (&KellyErrorEstimator<dim>::estimate_some)
+               (mapping, dof_handler,
+                quadrature, neumann_bc, solutions,
+                component_mask, coefficients,
+                std::make_pair(i, n_threads),
+                face_integrals,
+                *data_structures[i]);
+  threads.join_all();
 
 				   // delete the structures for the
 				   // different threads again. the

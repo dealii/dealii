@@ -112,16 +112,14 @@ SparseVanka<number>::compute_inverses ()
 
       typedef void (SparseVanka<number>::*FunPtr)(const unsigned int,
                                                   const unsigned int);
-      FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
+      const FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
   
                                        // Now spawn the threads
-      Threads::ThreadManager thread_manager;
+      Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-        Threads::spawn (thread_manager,
-                        Threads::encapsulate (fun_ptr)
-                        .collect_args (this, blocking[i].first, blocking[i].second));
-  
-      thread_manager.wait ();
+        threads += Threads::spawn (*this, fun_ptr)(blocking[i].first,
+                                                   blocking[i].second);
+      threads.join_all ();
     };
 }
 
@@ -594,13 +592,11 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
              const std::vector<bool> * const) const;
           const mem_fun_p comp
             = &SparseVanka<number>::template apply_preconditioner<number2>;
-          Threads::ThreadManager thread_manager;
+          Threads::ThreadGroup<> threads;
           for (unsigned int block=0; block<n_blocks; ++block)
-            Threads::spawn (thread_manager,
-                            Threads::encapsulate (comp)
-                            .collect_args (this, dst, src, &dof_masks[block]));
-          
-          thread_manager.wait ();
+            threads += Threads::spawn(*static_cast<const SparseVanka<number>*>(this), comp)
+                       (dst, src,&dof_masks[block]);
+          threads.join_all ();
         }
       else
         for (unsigned int block=0; block<n_blocks; ++block)

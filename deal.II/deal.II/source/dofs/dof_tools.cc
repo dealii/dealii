@@ -1550,7 +1550,7 @@ count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
   std::vector<std::vector<bool> >
     component_select (n_components,
                       std::vector<bool>(n_components, false));
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
   for (unsigned int i=0; i<n_components; ++i)
     {
       void (*fun_ptr) (const DoFHandler<dim>      &,
@@ -1558,12 +1558,10 @@ count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
 		       std::vector<bool>          &)
         = &DoFTools::template extract_dofs<dim>;
       component_select[i][i] = true;
-      Threads::spawn (thread_manager,
-		      Threads::encapsulate (fun_ptr)
-		      .collect_args (dof_handler, component_select[i],
-				     dofs_in_component[i]));
+      threads += Threads::spawn (fun_ptr)(dof_handler, component_select[i],
+                                          dofs_in_component[i]);
     };
-  thread_manager.wait();
+  threads.join_all ();
 
 				   // next count what we got
   for (unsigned int i=0; i<n_components; ++i)
@@ -2167,7 +2165,7 @@ DoFTools::compute_intergrid_weights_2 (const DoFHandler<dim>              &coars
 								 coarse_grid.end(),
 								 multithread_info.n_default_threads);
 
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
   void (*fun_ptr) (const DoFHandler<dim>              &,
 		   const unsigned int                  ,
 		   const InterGridMap<DoFHandler,dim> &,
@@ -2178,16 +2176,14 @@ DoFTools::compute_intergrid_weights_2 (const DoFHandler<dim>              &coars
 		   const typename DoFHandler<dim>::active_cell_iterator &)
     = &DoFTools::template compute_intergrid_weights_3<dim>;
   for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (fun_ptr)
-		    .collect_args (coarse_grid, coarse_component,
-				   coarse_to_fine_grid_map, parameter_dofs,
-				   weight_mapping, weights,
-				   cell_intervals[i].first,
-				   cell_intervals[i].second));
+    threads += Threads::spawn (fun_ptr)(coarse_grid, coarse_component,
+                                        coarse_to_fine_grid_map, parameter_dofs,
+                                        weight_mapping, weights,
+                                        cell_intervals[i].first,
+                                        cell_intervals[i].second);
 
 				   // wait for the threads to finish
-  thread_manager.wait ();
+  threads.join_all ();
 }
 
 

@@ -71,7 +71,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
   const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
 
 				   // define starting and end point
 				   // for each thread
@@ -94,11 +94,9 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 					  Threads::ThreadMutex     &mutex);
   create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate(p)
-		    .collect_args (mapping, dof, q, matrix, coefficient,
-				   thread_ranges[thread], mutex));
-  thread_manager.wait ();  
+    threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
+                                  thread_ranges[thread], mutex);
+  threads.join_all ();  
 }
 
 
@@ -251,7 +249,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
   const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
 
 				   // define starting and end point
 				   // for each thread
@@ -276,12 +274,10 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 					  Threads::ThreadMutex     &mutex);
   create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate(p)
-		    .collect_args (mapping, dof, q, matrix, rhs,
-				   rhs_vector, coefficient,
-				   thread_ranges[thread], mutex));
-  thread_manager.wait ();  
+    threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
+                                  rhs_vector, coefficient,
+                                  thread_ranges[thread], mutex);
+  threads.join_all ();  
 }
 
 
@@ -470,7 +466,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 					    const Function<dim> * const coefficient)
 {
   const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
 
 				   // define starting and end point
 				   // for each thread
@@ -497,13 +493,11 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
        Threads::ThreadMutex      &mutex);
   create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate(p)
-		    .collect_args (mapping, dof, q, matrix,
-				   boundary_functions, rhs_vector,
-				   dof_to_boundary_mapping, coefficient,
-				   thread_ranges[thread], mutex));
-  thread_manager.wait ();  
+    threads += Threads::spawn (p)(mapping, dof, q, matrix,
+                                  boundary_functions, rhs_vector,
+                                  dof_to_boundary_mapping, coefficient,
+                                  thread_ranges[thread], mutex);
+  threads.join_all ();  
 }
 
 
@@ -898,7 +892,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
   const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
 
 				   // define starting and end point
 				   // for each thread
@@ -921,11 +915,9 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 					     Threads::ThreadMutex     &mutex);
   create_laplace_matrix_1_t p = &MatrixCreator::template create_laplace_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate(p)
-		    .collect_args (mapping, dof, q, matrix, coefficient,
-				   thread_ranges[thread], mutex));
-  thread_manager.wait ();  
+    threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
+                                  thread_ranges[thread], mutex);
+  threads.join_all ();  
 }
 
 
@@ -1081,7 +1073,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
   const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
 
 				   // define starting and end point
 				   // for each thread
@@ -1106,12 +1098,10 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 					     Threads::ThreadMutex     &mutex);
   create_laplace_matrix_2_t p = &MatrixCreator::template create_laplace_matrix_2<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate(p)
-		    .collect_args (mapping, dof, q, matrix, rhs,
-				   rhs_vector, coefficient,
-				   thread_ranges[thread], mutex));
-  thread_manager.wait ();  
+    threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
+                                  rhs_vector, coefficient,
+                                  thread_ranges[thread], mutex);
+  threads.join_all ();  
 }
 
 

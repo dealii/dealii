@@ -315,14 +315,12 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
       const mem_fun_p comp
 	= (&SparseMatrix<number>::
            template threaded_vmult<somenumber>);
-      Threads::ThreadManager thread_manager;
+      Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	Threads::spawn (thread_manager,
-			Threads::encapsulate (comp)
-			.collect_args (this, dst, src,
-				       n_rows * i / n_threads,
-				       n_rows * (i+1) / n_threads));
-      thread_manager.wait ();
+	threads += Threads::spawn (*this, comp) (dst, src,
+                                                 n_rows * i / n_threads,
+                                                 n_rows * (i+1) / n_threads);
+      threads.join_all();
 
       return;
     }
@@ -464,7 +462,6 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 				       // space for the norms of
 				       // the different parts
       std::vector<somenumber> partial_sums (n_threads, 0);
-      Threads::ThreadManager thread_manager;
 				       // then spawn threads. since
 				       // some compilers have trouble
 				       // finding out which
@@ -485,16 +482,15 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
       const mem_fun_p comp
 	= (&SparseMatrix<number>::
            template threaded_matrix_norm_square<somenumber>);
+      Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	Threads::spawn (thread_manager,
-			Threads::encapsulate (comp)
-			.collect_args (this, v,
-				       n_rows * i / n_threads,
-				       n_rows * (i+1) / n_threads,
-				       &partial_sums[i]));
+	threads += Threads::spawn (*this, comp)(v,
+                                                n_rows * i / n_threads,
+                                                n_rows * (i+1) / n_threads,
+                                                &partial_sums[i]);
 
 				       // ... and wait until they're finished
-      thread_manager.wait ();
+      threads.join_all ();
 				       // accumulate the partial results
       return std::accumulate (partial_sums.begin(),
 			      partial_sums.end(),
@@ -577,7 +573,6 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 				       // space for the norms of
 				       // the different parts
       std::vector<somenumber> partial_sums (n_threads, 0);
-      Threads::ThreadManager thread_manager;
 				       // then spawn threads. since
 				       // some compilers have trouble
 				       // finding out which
@@ -599,16 +594,15 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
       const mem_fun_p comp
 	= (&SparseMatrix<number>::
            template threaded_matrix_scalar_product<somenumber>);
+      Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	Threads::spawn (thread_manager,
-			Threads::encapsulate (comp)
-			.collect_args (this, u, v,
-				       n_rows * i / n_threads,
-				       n_rows * (i+1) / n_threads,
-				       &partial_sums[i]));
-
+	threads += Threads::spawn (*this, comp)(u, v,
+                                                n_rows * i / n_threads,
+                                                n_rows * (i+1) / n_threads,
+                                                &partial_sums[i]);
+  
 				       // ... and wait until they're finished
-      thread_manager.wait ();
+      threads.join_all ();
 				       // accumulate the partial results
       return std::accumulate (partial_sums.begin(),
 			      partial_sums.end(),
@@ -756,18 +750,16 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 	 somenumber               *) const;
       const mem_fun_p comp_residual = &SparseMatrix<number>::
 				     template threaded_residual<somenumber>;
-      Threads::ThreadManager thread_manager;
+      Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	Threads::spawn (thread_manager,
-			Threads::encapsulate (comp_residual)
-			.collect_args (this, dst, u, b,
-				       std::pair<unsigned int,unsigned int>
-				       (n_rows * i / n_threads,
-					n_rows * (i+1) / n_threads),
-				       &partial_norms[i]));
+	threads += Threads::spawn (*this, comp_residual)(dst, u, b,
+                                                         std::pair<unsigned int,unsigned int>
+                                                         (n_rows * i / n_threads,
+                                                          n_rows * (i+1) / n_threads),
+                                                         &partial_norms[i]);
 
 				       // ... and wait until they're finished
-      thread_manager.wait ();
+      threads.join_all ();
 				       // accumulate the partial results
       return std::sqrt(std::accumulate (partial_norms.begin(),
 					partial_norms.end(),

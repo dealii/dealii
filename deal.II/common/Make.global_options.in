@@ -95,17 +95,19 @@ endif
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
 
-include-path-base        = $D/base/include
-include-path-lac         = $D/lac/include
-include-path-deal2       = $D/deal.II/include
-include-path-contrib-hsl = $D/contrib/hsl/include
-include-path-tecplot     = $(TECIO_INCLUDE)
+include-path-base          = $D/base/include
+include-path-lac           = $D/lac/include
+include-path-deal2         = $D/deal.II/include
+include-path-contrib-hsl   = $D/contrib/hsl/include
+include-path-contrib-boost = $D/contrib/boost/include
+include-path-tecplot       = $(TECIO_INCLUDE)
 
 
 INCLUDE           = $(addprefix -I, $(include-path-base) \
                                     $(include-path-lac)  \
                                     $(include-path-deal2)\
 			            $(include-path-contrib-hsl)\
+			            $(include-path-contrib-boost)\
 				    $(include-path-tecplot))
 
 # compiler flags for debug and optimized mode

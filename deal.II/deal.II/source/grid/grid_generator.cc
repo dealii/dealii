@@ -955,12 +955,10 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
   std::vector<Vector<double> > us(dim, Vector<double> (dof_handler.n_dofs()));
   
 				   // solve linear systems in parallel
-  Threads::ThreadManager thread_manager;
+  Threads::ThreadGroup<> threads;
   for (unsigned int i=0; i<dim; ++i)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (&GridGenerator::laplace_solve)
-		    .collect_args (S, m[i], us[i]));
-  thread_manager.wait ();
+    threads += Threads::spawn (&GridGenerator::laplace_solve)(S, m[i], us[i]);
+  threads.join_all ();
   
 				   // change the coordinates of the
 				   // points of the triangulation
