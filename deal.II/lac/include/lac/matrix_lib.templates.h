@@ -20,6 +20,18 @@
 
 template <typename number>
 void
+MeanValueFilter::filter(Vector<number>& v) const
+{
+  number mean = v.mean_value();
+
+  for (unsigned int i=0;i<v.size();++i)
+    v(i) -= mean;
+}
+
+
+
+template <typename number>
+void
 MeanValueFilter::vmult(Vector<number>& dst,
 		       const Vector<number>& src) const
 {
@@ -46,6 +58,22 @@ MeanValueFilter::vmult_add(Vector<number>& dst,
   
   for (unsigned int i=0;i<dst.size();++i)
     dst(i) += src(i) - mean;
+}
+
+
+
+template <typename number>
+void
+MeanValueFilter::filter(BlockVector<number>& v) const
+{
+  Assert (component != static_cast<unsigned int>(-1),
+	  ExcNotInitialized());
+  
+  for (unsigned int i=0;i<v.n_blocks();++i)
+    if (i == component)
+      vmult(v.block(i), v.block(i));
+    else
+      v.block(i) = v.block(i);
 }
 
 

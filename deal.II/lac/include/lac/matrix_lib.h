@@ -92,7 +92,7 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
  * @p{BlockVector}, then an additional parameter selects a single
  * component for this operation.
  *
- * @author Guido Kanschat, 2002
+ * @author Guido Kanschat, 2002, 2003
  */
 class MeanValueFilter : public Subscriptor
 {
@@ -103,6 +103,18 @@ class MeanValueFilter : public Subscriptor
 				      */
     MeanValueFilter(unsigned int component = static_cast<unsigned int>(-1));
 
+				     /**
+				      * Subtract mean value from @p{v}.
+				      */
+    template <typename number>
+    void filter (Vector<number>& v) const;
+    
+				     /**
+				      * Subtract mean value from @p{v}.
+				      */
+    template <typename number>
+    void filter (BlockVector<number>& v) const;
+    
 				     /**
 				      * Return the source vector with
 				      * subtracted mean value.
