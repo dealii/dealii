@@ -61,9 +61,10 @@ namespace HSL
 		  unsigned int       *,
 		  int                *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
 
     
@@ -82,9 +83,10 @@ namespace HSL
 		  unsigned int       *,
 		  int                *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
 
 
@@ -100,33 +102,37 @@ namespace HSL
 		  const unsigned int *,
 		  const unsigned int *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
 
 
     extern "C" void ma27x1_ (unsigned int *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
       
 
     extern "C" void ma27x2_ (unsigned int *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
       
     
     extern "C" void ma27x3_ (const unsigned int *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
   }
 }
@@ -142,9 +148,10 @@ namespace HSL
     void ma47id_ (double       *,
 		  unsigned int *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
     
 
@@ -160,9 +167,10 @@ namespace HSL
 		  double             *,
 		  int                *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
 
       
@@ -181,9 +189,10 @@ namespace HSL
 		  double             *,
 		  int                *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
 
     
@@ -198,9 +207,10 @@ namespace HSL
 		  unsigned int       *,
 		  const unsigned int *)
     {
-      AssertThrow (false, ExcMessage("You can only use the HSL functions after putting "
-				     "the respective files in the right place, "
-				     "re-configuring the library and re-building it!"));
+      AssertThrow (false,
+                   ExcMessage("You can only use the HSL functions after putting "
+                              "the respective files in the right place, "
+                              "re-configuring the library and re-building it!"));
     }
   }
 }
@@ -504,7 +514,8 @@ SparseDirectMA27::~SparseDirectMA27()
 void
 SparseDirectMA27::set_detached_mode () 
 {
-  Assert (initialize_called == false, ExcInitializeAlreadyCalled());
+  Assert (initialize_called == false,
+          ExcInitializeAlreadyCalled());
   detached_mode = true;
 }
 
@@ -521,7 +532,8 @@ SparseDirectMA27::detached_mode_set () const
 void
 SparseDirectMA27::initialize (const SparsityPattern &sp)
 {
-  Assert (initialize_called == false, ExcInitializeAlreadyCalled());
+  Assert (initialize_called == false,
+          ExcInitializeAlreadyCalled());
 
 
                                    // first thing is: if detached mode
@@ -1164,7 +1176,8 @@ SparseDirectMA47::SparseDirectMA47 (const double LIW_factor_1,
 void
 SparseDirectMA47::initialize (const SparseMatrix<double> &m)
 {
-  Assert (initialize_called == false, ExcInitializeAlreadyCalled());
+  Assert (initialize_called == false,
+          ExcInitializeAlreadyCalled());
 
                                    // some initialization stuff
   call_ma47id (CNTL, ICNTL);
@@ -1264,7 +1277,8 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
 void
 SparseDirectMA47::factorize (const SparseMatrix<double> &m)
 {
-  Assert (factorize_called == false, ExcCantFactorizeAgain());
+  Assert (factorize_called == false,
+          ExcCantFactorizeAgain());
   
 				   // if necessary, initialize process
   if (initialize_called == false)
