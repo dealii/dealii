@@ -446,11 +446,13 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 				   // first find out which objects
 				   // need to be recomputed on each
 				   // cell we visit. this we have to
-				   // ask the finite element
-  const UpdateFlags flags = UpdateFlags(mapping.update_once (update_flags) |
-					mapping.update_each (update_flags) |
-					fe.update_once (update_flags)      |
-					fe.update_each (update_flags)      );
+				   // ask the finite element and mapping.
+				   // elements are first since they
+				   // might require update in mapping
+  UpdateFlags flags = fe.update_once (update_flags)
+			    | fe.update_each (update_flags);
+  flags |= mapping.update_once (flags)
+	   | mapping.update_each (flags);
 
 				   // then get objects into which the
 				   // FE and the Mapping can store
@@ -459,29 +461,10 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
   mapping_data = mapping.get_data(flags, quadrature);
   fe_data      = fe.get_data(flags, mapping, quadrature);
 
-				   // maybe some of the flags passed
-				   // to the get_data functions
-				   // resulted in other flags to be
-				   // set, so collect them again.
-				   //
-				   // example: a FE might need to have
-				   // the covariant transform of the
-				   // mapping to compute its shape
-				   // values
-//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
-//  flags = fe.update_once(update_flags)  
-//  flags = mapping.update_once(flags)
-// if the mapping should depend on the fe to compute some things, then
-// we would need to iterate, and the one cycle here isn't sufficient!?  
-  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
-					   mapping_data->update_each |
-					   fe_data->update_once      |
-					   fe_data->update_each      );
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				allflags);
+				flags);
 };
 
 
@@ -507,42 +490,25 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				   // first find out which objects
 				   // need to be recomputed on each
 				   // cell we visit. this we have to
-				   // ask the finite element
-  const UpdateFlags flags = UpdateFlags(mapping->update_once (update_flags) |
-					mapping->update_each (update_flags) |
-					fe.update_once (update_flags)      |
-					fe.update_each (update_flags)      );
+				   // ask the finite element and mapping.
+				   // elements are first since they
+				   // might require update in mapping
+  UpdateFlags flags = fe.update_once (update_flags)
+			    | fe.update_each (update_flags);
+  flags |= mapping->update_once (flags)
+	   | mapping->update_each (flags);
 
-				   // then get objects into which the
+			   // then get objects into which the
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
   mapping_data = mapping->get_data(flags, quadrature);
   fe_data      = fe.get_data(flags, *mapping, quadrature);
 
-				   // maybe some of the flags passed
-				   // to the get_data functions
-				   // resulted in other flags to be
-				   // set, so collect them again.
-				   //
-				   // example: a FE might need to have
-				   // the covariant transform of the
-				   // mapping to compute its shape
-				   // values
-//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
-//  flags = fe.update_once(update_flags)  
-//  flags = mapping.update_once(flags)
-// if the mapping should depend on the fe to compute some things, then
-// we would need to iterate, and the one cycle here isn't sufficient!?  
-  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
-					   mapping_data->update_each |
-					   fe_data->update_once      |
-					   fe_data->update_each      );
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				allflags);
+				flags);
 }
 
 
@@ -649,11 +615,13 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				   // first find out which objects
 				   // need to be recomputed on each
 				   // cell we visit. this we have to
-				   // ask the finite element
-  const UpdateFlags flags = UpdateFlags(mapping.update_once (update_flags) |
-					mapping.update_each (update_flags) |
-					fe.update_once (update_flags)      |
-					fe.update_each (update_flags)      );
+				   // ask the finite element and mapping.
+				   // elements are first since they
+				   // might require update in mapping
+  UpdateFlags flags = fe.update_once (update_flags)
+			    | fe.update_each (update_flags);
+  flags |= mapping.update_once (flags)
+	   | mapping.update_each (flags);
 
 				   // then get objects into which the
 				   // FE and the Mapping can store
@@ -662,29 +630,10 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
   mapping_data = mapping.get_face_data(flags, quadrature);
   fe_data      = fe.get_face_data(flags, mapping, quadrature);
 
-				   // maybe some of the flags passed
-				   // to the get_data functions
-				   // resulted in other flags to be
-				   // set, so collect them again.
-				   //
-				   // example: a FE might need to have
-				   // the covariant transform of the
-				   // mapping to compute its shape
-				   // values
-//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
-//  flags = fe.update_once(update_flags)  
-//  flags = mapping.update_once(flags)
-// if the mapping should depend on the fe to compute some things, then
-// we would need to iterate, and the one cycle here isn't sufficient!?  
-  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
-					   mapping_data->update_each |
-					   fe_data->update_once      |
-					   fe_data->update_each      );
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				allflags);
+				flags);
 };
 
 
@@ -704,11 +653,13 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				   // first find out which objects
 				   // need to be recomputed on each
 				   // cell we visit. this we have to
-				   // ask the finite element
-  const UpdateFlags flags = UpdateFlags(mapping->update_once (update_flags) |
-					mapping->update_each (update_flags) |
-					fe.update_once (update_flags)      |
-					fe.update_each (update_flags)      );
+				   // ask the finite element and mapping.
+				   // elements are first since they
+				   // might require update in mapping
+  UpdateFlags flags = fe.update_once (update_flags)
+			    | fe.update_each (update_flags);
+  flags |= mapping->update_once (flags)
+	   | mapping->update_each (flags);
 
 				   // then get objects into which the
 				   // FE and the Mapping can store
@@ -717,29 +668,10 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
   mapping_data = mapping->get_face_data(flags, quadrature);
   fe_data      = fe.get_face_data(flags, *mapping, quadrature);
 
-				   // maybe some of the flags passed
-				   // to the get_data functions
-				   // resulted in other flags to be
-				   // set, so collect them again.
-				   //
-				   // example: a FE might need to have
-				   // the covariant transform of the
-				   // mapping to compute its shape
-				   // values
-//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
-//  flags = fe.update_once(update_flags)  
-//  flags = mapping.update_once(flags)
-// if the mapping should depend on the fe to compute some things, then
-// we would need to iterate, and the one cycle here isn't sufficient!?  
-  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
-					   mapping_data->update_each |
-					   fe_data->update_once      |
-					   fe_data->update_each      );
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				allflags);
+				flags);
 };
 
 
@@ -798,11 +730,13 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				   // first find out which objects
 				   // need to be recomputed on each
 				   // cell we visit. this we have to
-				   // ask the finite element
-  const UpdateFlags flags = UpdateFlags(mapping.update_once (update_flags) |
-					mapping.update_each (update_flags) |
-					fe.update_once (update_flags)      |
-					fe.update_each (update_flags)      );
+				   // ask the finite element and mapping.
+				   // elements are first since they
+				   // might require update in mapping
+  UpdateFlags flags = fe.update_once (update_flags)
+			    | fe.update_each (update_flags);
+  flags |= mapping.update_once (flags)
+	   | mapping.update_each (flags);
 
 				   // then get objects into which the
 				   // FE and the Mapping can store
@@ -811,29 +745,10 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
   mapping_data = mapping.get_subface_data(flags, quadrature);
   fe_data      = fe.get_subface_data(flags, mapping, quadrature);
 
-				   // maybe some of the flags passed
-				   // to the get_data functions
-				   // resulted in other flags to be
-				   // set, so collect them again.
-				   //
-				   // example: a FE might need to have
-				   // the covariant transform of the
-				   // mapping to compute its shape
-				   // values
-//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
-//  flags = fe.update_once(update_flags)  
-//  flags = mapping.update_once(flags)
-// if the mapping should depend on the fe to compute some things, then
-// we would need to iterate, and the one cycle here isn't sufficient!?  
-  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
-					   mapping_data->update_each |
-					   fe_data->update_once      |
-					   fe_data->update_each      );
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				allflags);
+				flags);
 }
 
 
@@ -854,11 +769,13 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				   // first find out which objects
 				   // need to be recomputed on each
 				   // cell we visit. this we have to
-				   // ask the finite element
-  const UpdateFlags flags = UpdateFlags(mapping->update_once (update_flags) |
-					mapping->update_each (update_flags) |
-					fe.update_once (update_flags)      |
-					fe.update_each (update_flags)      );
+				   // ask the finite element and mapping.
+				   // elements are first since they
+				   // might require update in mapping
+  UpdateFlags flags = fe.update_once (update_flags)
+			    | fe.update_each (update_flags);
+  flags |= mapping->update_once (flags)
+	   | mapping->update_each (flags);
 
 				   // then get objects into which the
 				   // FE and the Mapping can store
@@ -867,29 +784,10 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
   mapping_data = mapping->get_subface_data(flags, quadrature);
   fe_data      = fe.get_subface_data(flags, *mapping, quadrature);
 
-				   // maybe some of the flags passed
-				   // to the get_data functions
-				   // resulted in other flags to be
-				   // set, so collect them again.
-				   //
-				   // example: a FE might need to have
-				   // the covariant transform of the
-				   // mapping to compute its shape
-				   // values
-//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
-//  flags = fe.update_once(update_flags)  
-//  flags = mapping.update_once(flags)
-// if the mapping should depend on the fe to compute some things, then
-// we would need to iterate, and the one cycle here isn't sufficient!?  
-  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
-					   mapping_data->update_each |
-					   fe_data->update_once      |
-					   fe_data->update_each      );
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				allflags);
+				flags);
 }
 
 
