@@ -17,6 +17,8 @@
  * All finite element classes using a Q1 mapping of the grid cell to the
  * unit cell may be derived from this class. The grid transformation functions
  * are implemented here and do not have to be taken care of later.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class FEQ1Mapping : public FiniteElement<dim>
@@ -30,12 +32,12 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      * two space dimensions, #dofs_per_hex#
 				      * shall be zero.
 				      */
-    FEQ1Mapping (const unsigned int dofs_per_vertex,
-		 const unsigned int dofs_per_line,
-		 const unsigned int dofs_per_quad,
-		 const unsigned int dofs_per_hex,
-		 const unsigned int n_components,
-		 const vector<bool> restriction_is_additive_flags);
+    FEQ1Mapping (const unsigned int  dofs_per_vertex,
+		 const unsigned int  dofs_per_line,
+		 const unsigned int  dofs_per_quad,
+		 const unsigned int  dofs_per_hex,
+		 const unsigned int  n_components,
+		 const vector<bool> &restriction_is_additive_flags);
 
     				     /**
 				      * Return the value of the #i#th shape
@@ -45,8 +47,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      * computation of the transformation from
 				      * unit cell to real space cell.
 				      */
-    virtual double shape_value_transform (const unsigned int i,
-					  const Point<dim> &p) const;
+    virtual double shape_value_transform (const unsigned int  i,
+					  const Point<dim>   &p) const;
 
 				     /**
 				      * Return the gradient of the #i#th shape
@@ -56,8 +58,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      * computation of the transformation from
 				      * unit cell to real space cell.
 				      */
-    virtual Tensor<1,dim> shape_grad_transform (const unsigned int i,
-						const Point<dim> &p) const;
+    virtual Tensor<1,dim> shape_grad_transform (const unsigned int  i,
+						const Point<dim>   &p) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -98,7 +100,7 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      * information on this function.
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int          face_no,
+				     const unsigned int           face_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;
 

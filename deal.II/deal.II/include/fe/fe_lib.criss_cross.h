@@ -143,7 +143,7 @@
  * the same number of degrees of freedoms.
  *
  * Apart from all this data, it must not be forgotten that we cannot
- * expect superconvergence neither in the Gauss points not in the vertices.
+ * expect superconvergence neither in the Gauss points nor in the vertices.
  * Thus we may improve the accuracy of the solution obtained with the linear
  * element by a postprocess, while we can't do so for the criss-cross element.
  *
