@@ -11,7 +11,7 @@
 //
 //----------------------------  petsc_deal_solver_01.cc  ---------------------------
 
-// test the CG solver
+// test the CG solver using the PETSc matrix and vector classes
 
 
 #include "../tests.h"

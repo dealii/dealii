@@ -11,7 +11,7 @@
 //
 //----------------------------  petsc_deal_solver_02.cc  ---------------------------
 
-// test the BiCGStab solver
+// test the BiCGStab solver using the PETSc matrix and vector classes
 
 
 

@@ -11,7 +11,7 @@
 //
 //----------------------------  petsc_deal_solver_05.cc  ---------------------------
 
-// test the QMRS solver
+// test the QMRS solver using the PETSc matrix and vector classes
 
 
 #include "../tests.h"

@@ -11,7 +11,7 @@
 //
 //----------------------------  petsc_deal_solver_04.cc  ---------------------------
 
-// test the MINRES solver
+// test the MINRES solver using the PETSc matrix and vector classes
 
 
 #include "../tests.h"
