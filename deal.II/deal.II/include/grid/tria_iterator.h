@@ -307,6 +307,25 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
 				      */
     bool operator != (const TriaRawIterator &) const;
 
+				     /**
+				      * Offer a weak ordering of iterators,
+				      * which is needed to make #map#s with
+				      * iterators being keys. An iterator
+				      * pointing to an element #a# is
+				      * less than another iterator pointing
+				      * to an element #b# if
+				      * level(a)<level(b) or
+				      * (level(a)==level(b) and index(a)<index(b)).
+				      *
+				      * Comparing iterators of which one or
+				      * both are invalid is an error. The
+				      * past-the-end iterator is always
+				      * ordered last. Two past-the-end
+				      * iterators rank the same, thus false
+				      * is returned in that case.
+				      */
+    bool operator < (const TriaRawIterator &) const;
+    
 				     /**@name Advancement of iterators*/
 				     /*@{*/
 				     /**
@@ -380,10 +399,12 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
 				      *  Return the state of the iterator.
 				      */
     IteratorState state () const;
-    
-    void print (ostream &out) const  {
-      out << accessor.level() << "." << accessor.index();
-    };
+
+				     /**
+				      * Print the iterator in the form
+				      * #level.index# to #out#.
+				      */
+    void print (ostream &out) const;
 
     
     
@@ -715,6 +736,22 @@ IteratorState TriaRawIterator<dim,Accessor>::state () const {
 
 template <int dim, class Accessor>
 inline
+bool TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const {
+  Assert (state() != invalid, ExcDereferenceInvalidObject());
+  Assert (i.state() != invalid, ExcDereferenceInvalidObject());
+  
+  return ((((accessor.level() < i.accessor.level()) ||
+	    ((accessor.level() == i.accessor.level()) &&
+	     (accessor.index() < i.accessor.index()))        ) &&
+	   (state()==valid)                                  &&
+	   (i.state()==valid)                                  ) ||
+	  ((state()==valid) && (i.state()==past_the_end)));
+};
+
+
+
+template <int dim, class Accessor>
+inline
 TriaRawIterator<dim,Accessor> &
 TriaRawIterator<dim,Accessor>::operator ++ () {
   Assert (state() == valid, ExcAdvanceInvalidObject());
@@ -733,6 +770,14 @@ TriaRawIterator<dim,Accessor>::operator -- () {
 
   --accessor;
   return *this;
+};
+
+
+
+template <int dim, class Accessor>
+inline
+void TriaRawIterator<dim,Accessor>::print (ostream &out) const {
+  out << accessor.level() << "." << accessor.index();
 };
 
 
