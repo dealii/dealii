@@ -58,7 +58,7 @@ clean:
 #of this file.
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
+	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
 		> lib/Makefile.dep
 
 # include all the dependencies

@@ -108,13 +108,13 @@ lib/libdeal_II_3d.a: $(o-files-3d)
 #of this file.
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
-		| perl -p -e 's!^lib/(g?o/.*):!lib/DIM_PLACEHOLDER/$$1:!g;' \
-		| perl -pe 's!(\.g?o):!_DIM_PLACEHOLDER$$1:!g;' \
-	        | perl -pe 's!^lib/DIM_PLACEHOLDER/(.*):!lib/1d/$$1 lib/2d/$$1 lib/3d/$$1:!g;'\
-	        | perl -pe 's!(lib/1d/[^ ]+)_DIM_PLACEHOLDER!$$1_1d!g;' \
-	        | perl -pe 's!(lib/2d/[^ ]+)_DIM_PLACEHOLDER!$$1_2d!g;' \
-	        | perl -pe 's!(lib/3d/[^ ]+)_DIM_PLACEHOLDER!$$1_3d!g;' \
+	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
+		| $(PERL) -p -e 's!^lib/(g?o/.*):!lib/DIM_PLACEHOLDER/$$1:!g;' \
+		| $(PERL) -pe 's!(\.g?o):!_DIM_PLACEHOLDER$$1:!g;' \
+	        | $(PERL) -pe 's!^lib/DIM_PLACEHOLDER/(.*):!lib/1d/$$1 lib/2d/$$1 lib/3d/$$1:!g;'\
+	        | $(PERL) -pe 's!(lib/1d/[^ ]+)_DIM_PLACEHOLDER!$$1_1d!g;' \
+	        | $(PERL) -pe 's!(lib/2d/[^ ]+)_DIM_PLACEHOLDER!$$1_2d!g;' \
+	        | $(PERL) -pe 's!(lib/3d/[^ ]+)_DIM_PLACEHOLDER!$$1_3d!g;' \
 		> lib/Makefile.dep
 
 # include all the dependencies

@@ -2,6 +2,9 @@
 #
 # Makefile for the whole library
 
+# include global options and pathes
+include Make.global_options
+
 
 help:
 	@echo "======================================================================"
@@ -33,116 +36,115 @@ MAKEOPTIONS = $(PAR)
 
 
 baseg:
-	cd ../base ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
 
 base:
-	cd ../base ; $(MAKE) $(MAKEOPTIONS) libg
-	cd ../base ; $(MAKE) $(MAKEOPTIONS) lib
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) lib
 
 lacg: 
-	cd ../lac ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
 
 lac:
-	cd ../lac ; $(MAKE) $(MAKEOPTIONS) libg
-	cd ../lac ; $(MAKE) $(MAKEOPTIONS) lib
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) lib
 
 1dg:
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
 
 2dg:
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
 
 3dg:
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 
 1d:
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
 
 2d:
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
 
 3d:
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
 all:
-	cd ../base ; $(MAKE) $(MAKEOPTIONS) libg
-	cd ../base ; $(MAKE) $(MAKEOPTIONS) lib
-	cd ../lac ; $(MAKE) $(MAKEOPTIONS) libg
-	cd ../lac ; $(MAKE) $(MAKEOPTIONS) lib
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) lib
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) lib
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
 
 online-doc:
-	cd ../doc/auto ; $(MAKE)
+	cd $D/doc ; $(MAKE)
 	@echo
 	@echo
 	@echo =======================================================
-	@echo "The online documentation can now be found in"
-	@echo "  ../doc/auto/kdoc/base/index.html"
-	@echo "  ../doc/auto/kdoc/lac/index.html"
-	@echo "  ../doc/auto/kdoc/deal.II/index.html"
+	@echo "The online documentation can now be accessed through"
+	@echo "  $D/doc/index.html"
 	@echo =======================================================
 	@echo
 	@echo
 
 printable-doc:
-	cd ../doc/auto ; $(MAKE) latex/deal_II_technical_reference.ps
+	cd $D/doc/auto ; $(MAKE) latex/deal_II_technical_reference.ps
 	@echo
 	@echo
 	@echo =======================================================
 	@echo "The generated postscript file can be found here:"
-	@echo "  ../doc/auto/latex/deal_II_technical_reference.ps"
+	@echo "  $D/doc/auto/latex/deal_II_technical_reference.ps"
 	@echo =======================================================
 	@echo
 	@echo
 
 tex-doc:
-	cd ../doc/auto ; $(MAKE) latex/deal_II_technical_reference.tex
+	cd $D/doc/auto ; $(MAKE) latex/deal_II_technical_reference.tex
 	@echo
 	@echo
 	@echo =======================================================
 	@echo "The generated LaTeX file can be found here:"
-	@echo "  ../doc/auto/latex/deal_II_technical_reference.tex"
+	@echo "  $D/doc/auto/latex/deal_II_technical_reference.tex"
 	@echo =======================================================
 	@echo
 	@echo
 
 TODO:
-	@cat ../base/Todo ../lac/Todo ../deal.II/Todo > TODO
-	@grep //TODO ../base/include/*/*.h ../base/source/*.cc  ../lac/include/*/*.h ../lac/source/*.cc  ../deal.II/include/*/*.h ../deal.II/source/*/*.cc >> TODO
-#	@grep \#TODO Makefile Make.g* Makefile.template ../*/source/Makefile ../*/Makefile >> TODO
+	@cat $D/base/Todo $D/lac/Todo $D/deal.II/Todo > TODO
+	@grep //TODO $D/base/include/*/*.h $D/base/source/*.cc  $D/lac/include/*/*.h $D/lac/source/*.cc  $D/deal.II/include/*/*.h $D/deal.II/source/*/*.cc >> TODO
+#	@grep \#TODO Makefile Make.g* Makefile.template $D/*/source/Makefile $D/*/Makefile >> TODO
 
 clean: clean-base clean-lac clean-dealII clean-doc
 	-rm TODO TAGS
 
 clean-base:
-	cd ../base ; $(MAKE) clean
+	cd $D/base ; $(MAKE) clean
 
 clean-lac:
-	cd ../lac ; $(MAKE) clean
+	cd $D/lac ; $(MAKE) clean
 
 clean-dealII:
-	cd ../deal.II ; $(MAKE) clean
+	cd $D/deal.II ; $(MAKE) clean
 
 clean-doc:
-	cd ../doc/auto ; $(MAKE) clean
+	cd $D/doc ; $(MAKE) clean
 
 
 TAGS: $(filter-out %/forward-declarations.h,                                \
-                  $(shell echo ../base/source/*.cc ../base/include/*/*.h    \
-                               ../lac/source/*.cc ../lac/include/*/*.h      \
-                               ../deal.II/source/*/*.cc ../deal.II/include/*/*.h \
-                               ../tests/*/*.cc ../tests/*/*.h ))
+                  $(shell echo $D/base/source/*.cc $D/base/include/*/*.h    \
+                               $D/lac/source/*.cc $D/lac/include/*/*.h      \
+                               $D/deal.II/source/*/*.cc $D/deal.II/include/*/*.h \
+                               $D/tests/*/*.cc $D/tests/*/*.h ))
 	@etags $^
 
 
-.PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all online-doc printable-doc tex-doc \
+.PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
+        online-doc printable-doc tex-doc \
         clean clean-base clean-lac clean-dealII clean-doc TAGS TODO

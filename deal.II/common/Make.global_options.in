@@ -1,0 +1,91 @@
+# $Id$
+
+######################################################
+# the following lines will be replaced by the output 
+# of ./configure
+
+D                    = @DEAL2_DIR@
+CXX                  = @CXX@
+GXX-VERSION          = @GXX_VERSION@
+OS                   = @OS@
+PERL                 = @PERL@
+enable-multithreading= @enablemultithreading@
+with-multithreading  = @withmultithreading@
+
+
+
+######################################################
+# now configuration for compiler flags, pathes, etc
+
+# path for libraries 
+
+lib-path-base  = $D/base/lib
+lib-path-lac   = $D/lac/lib
+lib-path-deal2 = $D/deal.II/lib
+
+# add search path for libraries for make dependencies
+
+vpath %.a $(lib-path-base)
+vpath %.a $(lib-path-lac)
+vpath %.a $(lib-path-deal2)
+
+
+# include paths. add library paths to existing variable
+
+base-include = -I$D/base/include
+lac-include  = -I$D/lac/include
+deal-include = -I$D/deal.II/include
+INCLUDE     += $(base-include) $(lac-include) $(deal-include)
+
+# compiler flags for debug and optimized mode
+
+CXXFLAGS.g   = -DDEBUG -ggdb -Wall -W -Wconversion \
+               -Winline -Woverloaded-virtual\
+	       -ftemplate-depth-32\
+               $(INCLUDE)
+CXXFLAGS.o   = -O2 -Wuninitialized -ffast-math \
+               -felide-constructors -fnonnull-objects \
+	       -ftemplate-depth-32 \
+               $(INCLUDE)
+
+
+# if not egcs-1.1 we can use additional flags for which that compiler
+# had quirks
+ifneq ($(GXX-VERSION),egcs1.1)
+  CXXFLAGS.o += -funroll-loops -funroll-all-loops
+endif
+
+
+# if not on Linux and we use egcs-1.1: enable -fno-vtable-thunks,
+# since vtable-thunks are broken and yield incorrect code. in fact,
+# they are also broken on Linux, but we can't link programs compiled
+# with -fno-vtable-thunks unless the whole compiler is recompiled,
+# which we don't want to force on the users
+ifneq ($(OS),Linux)
+  ifeq ($(GXX-VERSION),egcs1.1)
+    CXXFLAGS.g += -fno-vtable-thunks 
+    CXXFLAGS.o += -fno-vtable-thunks 
+  endif
+endif
+
+
+# if --enable-multithreading was given, then set the compiler flags
+# accordingly. note that this only sets the flags to generate programs
+# which use thread-safe allocation functions, include the right files,
+# etc, but the library won't use its multithread code. for this you
+# have to specify another flag.
+ifeq ($(enable-multithreading),yes)
+  CXXFLAGS.g += -threads -D__USE_MALLOC
+  CXXFLAGS.o += -threads -D__USE_MALLOC
+endif
+
+
+# if multithread support in the library is requested, then set the
+# respective flags
+ifneq ($(with-multithreading),no)
+  ACE_ROOT    = $(with-multithreading)
+  INCLUDE    += -I$(ACE_ROOT)
+  CXXFLAGS.g += -DDEAL_II_USE_MT
+  CXXFLAGS.o += -DDEAL_II_USE_MT
+endif
+

@@ -2,16 +2,13 @@
 Information about deal.II
 =========================
 
-Note: this is not yet finished, some information may still be missing
-though we hope that it is complete and correct.
-
 1) Preliminaries:
------------------
+=================
 In order to use the deal.II library (and its sublibraries /base and
 /lac) you need to have the following programs installed:
-  - A fairly complete C++ compiler. We use egcs1.1.2 but other
-    compilers might work as well. egcs1.0 will not work, however.
-    gcc2.95 works.
+  - A fairly complete C++ compiler. We use egcs1.1.2 and gcc2.95 but
+    other compilers might work as well. egcs1.0 will not work,
+    however.
   - Perl: any Perl 5.x version should work.
   - Make: we use GNU make, version 3.75. We also use GNU make 3.78
     which has much better support for parallel builds, so you may
@@ -19,34 +16,46 @@ In order to use the deal.II library (and its sublibraries /base and
     system. GNU make 3.77 had a serious flaw in the $(wildcard ...)
     function which prevented us from compiling some parts of the
     library (most of our Makefiles are fixed, though). Other make
-    programs are not standardized and will quite surely fail to work.
+    programs (i.e. non-GNU flavours) are not standardized and will
+    quite surely fail to work.
   - In case you want to generate the documentation from the header
     files, you only need Perl installed.
   - In case you want the printable documentation, however, you need
     Doc++ and LaTeX installed. It is known that Doc++ version 3.3.13
     is broken and generates invalid Tex, but 3.3.8 is ok.
   - The library generates output in formats readable by GNUPLOT, GMV
-    (general mesh viewer), AVS Explorer and directly to Encapsulated
-    Postscript. GNUPLOT and Eps should be available almost everywhere,
-    GMV is freely available for most Unix platforms. AVS is a
-    commercial program available for most Unix flavours.
+    (general mesh viewer), AVS Explorer, Povray, and directly to
+    Encapsulated Postscript. GNUPLOT and a postscript viewer (for EPS)
+    should be available almost everywhere, GMV is freely available for
+    most Unix platforms. Povray is freely available for almost all
+    platforms. AVS is a commercial program available for most Unix
+    flavours. 
 
 Note that we have only tested the library under Unix (extensively
 under SunOS and Linux). We believe that it should be possible with
-little effort to use it on other platforms as well. Note that if you
-didn't find your favourite graphics format above it is quite simple to
-add it to the list of supported ones (take a look at
-/base/include/base/data_out_base.h and /base/source/data_out_base.cc).
+little effort to use it on other platforms as well. In that case it
+may be necessary to change some settings in the configure.in script or
+in the file common/Make.global_options.in.
+
+In case you didn't find your favourite graphics format above it might
+be of interest that it is quite simple to add it to the list of
+supported ones (take a look at /base/include/base/data_out_base.h and
+/base/source/data_out_base.cc to see how output formats are
+implemented).
 
 
 2) Installation:
-----------------
+================
 The whole library usually comes as a .tar.gz file, that is a tarred
 file archive which is compressed with gzip. After unpacking it with
 gunzip and tar (or tar -xzf if you use GNU tar), you will find several
-subdirectories. Go to the /common subdirectory and type 'make', to
-obtain the following help (this output may change slightly over time,
-just try it):
+subdirectories. First run the script
+  ./configure
+which sets some paths and finds out what compiler you use. ./configure
+supports several flags which are discussed further down below. After
+configuring, go to the /common subdirectory and type 'make', to obtain
+the following help (this output may change slightly over time, just
+try it):
 
 =========================================================================
 =Global Makefile for the deal.II libraries                              =
@@ -71,35 +80,37 @@ just try it):
 To execute one of the commands, type 'make target-name'. Please note
 that building all libraries in debug and optimized mode takes about an
 hour on a Sun Ultra 450, so you may want to do this during lunchtime.
+
 In case you have a multi-processor machine, you can call 
 'make PAR=-j4 target-name' to let make call multiple instances of the
 compiler (in this case four). Since the make files are written in a
 way to minimize cross-dependencies, this speeds up compilation by
 about the factor given after '-j', at least if you have as many
-processors. 
+processors. If you have GNU make 3.78 or higher, it is simpler to
+directly call 'make -j4 target-name'.
+
+
+2.1) Configuration options:
+---------------------------
+
+You can give several flags to ./configure:
 
 3) Compiler flags:
-------------------
+==================
 
 Since the ISO C++ standard is still quite new and compilers still
 change a lot, you might need to provide special options for the
-compiler. You can do this by entering a value into the environment
-variable CXXFLAGS of your shell. An example for (t)csh is
+compiler. We have tried to automatize this process using the
+./configure script, but in case something is not as you want it,
+change the file common/Make.global_options.in and rerun ./configure in
+the top-level directory.
 
-setenv CXXFLAGS '-option1 -option2 value'
-
-Bash-users will know what to do instead. These options then will be
-handed to the compiler and the linker during translation of the
-library and your programs.
-
-If you work on Linux, you need to *remove* the flag -fno-vtable-thunks
-from the file /common/Make.global-options to allow for proper
-compilations. If you forget to do so, you will get linker errors about
-missing vtable symbols.
+We would like to hear about necessary modifications so that we can
+include them into the distribution.
 
 
 4) Problems, questions, further information:
---------------------------------------------
+============================================
 Feel free to ask if you have any problems with deal.II. If a
 question is of general interest, you may want to use our mailing list,
 which can be reached at
@@ -116,7 +127,7 @@ by third parties into the library; you will of course be credited by
 name for this.
 
 5) License:
------------
+===========
 Note that we have not yet fully finished the license under which we
 will distribute the library. However, we will keep to the following
 principles:

@@ -31,6 +31,9 @@ kdoc.library-files = kdoc/base.kdoc         \
 ##########################################################################
 
 
+# include global paths and variables
+include ../../common/Make.global_options
+
 # make rule names to rerun the generation of a library
 kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
@@ -58,7 +61,7 @@ all: default cvslog
 #################################################################################
 
 cvslog:
-	cd ../.. ; perl doc/auto/scripts/cvs2html -o doc/auto/cvs-backlog/newdeal -a -k -D 100
+	cd ../.. ; $(PERL) doc/auto/scripts/cvs2html -o doc/auto/cvs-backlog/newdeal -a -k -D 100
 
 
 
@@ -78,11 +81,11 @@ kdoc: $(kdoc.library-files) $(kdoc.library-files.rerun)
 # since the rule is a rather complex one, involving the computation of
 # variable names, here is the stripped down version for the base library:
 # kdoc/base.kdoc:
-#	@cd kdoc ; perl $(KDOCFLAGS) -dbase \
+#	@cd kdoc ; $(PERL) $(KDOCFLAGS) -dbase \
 #		base $(kdoc.base:../..%=../../..%)
 $(kdoc.library-files):
 	@cd kdoc ;                                                 \
-	 perl   $(KDOCFLAGS)                                       \
+	 $(PERL)   $(KDOCFLAGS)                                    \
 		-d$(subst .kdoc,,$(subst kdoc/,,$@))               \
 		$(subst .kdoc,,$(subst kdoc/,,$@))                 \
 		$($(subst /,.,$(subst .kdoc,,$@)):../..%=../../..%)
@@ -92,14 +95,14 @@ $(kdoc.library-files):
 # similar to the above one, but includes the other libraries
 $(kdoc.library-files.rerun):
 	@cd kdoc ;                                                       \
-	 perl   $(KDOCFLAGS) $(kdoc.library-files:kdoc/%.kdoc=-l%)       \
+	 $(PERL)   $(KDOCFLAGS) $(kdoc.library-files:kdoc/%.kdoc=-l%)    \
 		-d$(subst .kdoc.rerun,,$(subst kdoc/,,$@))               \
 		$(subst .kdoc.rerun,,$(subst kdoc/,,$@))                 \
 		$($(subst /,.,$(subst .kdoc.rerun,,$@)):../..%=../../..%)
 
 
 kdoc/names.html: $(kdoc.libray-files)
-	@cd kdoc ; perl ../scripts/index.pl *.kdoc > names.html
+	@cd kdoc ; $(PERL) ../scripts/index.pl *.kdoc > names.html
 
 
 
@@ -111,7 +114,7 @@ kdoc/names.html: $(kdoc.libray-files)
 # generate the input file for doc++
 %.doc++: Makefile
 	@echo $(kdoc.$(subst .doc++,,$(subst latex/,,$@)))  | \
-	 perl -pi -e 's# #\n#g;  s#\.\./\.\./#//\@Include: ../../../#g;' > \
+	 $(PERL) -pi -e 's# #\n#g;  s#\.\./\.\./#//\@Include: ../../../#g;' > \
 	 $@
 
 
@@ -132,8 +135,8 @@ kdoc/names.html: $(kdoc.libray-files)
 # file dependent
 %.tex1: %.tex
 	cat $<                           | \
-	 perl scripts/process-tex        | \
-	 perl -pi -e 's/cxx\./$(basename $(notdir $@)).cxx./g;' > $@
+	 $(PERL) scripts/process-tex        | \
+	 $(PERL) -pi -e 's/cxx\./$(basename $(notdir $@)).cxx./g;' > $@
 
 latex/deal_II_technical_reference.tex: latex/base.tex1 latex/lac.tex1 latex/dealII.tex1
 	@cat latex/header.tex                              > $@
@@ -180,7 +183,7 @@ doc++: doc++/base/index.html doc++/lac/index.html doc++/dealII/index.html
 # but it is hard to compute them from the '%'-sign used in the rule
 doc++/%/index.html: %.doc++
 	cp $^ $(patsubst %/index.html,%,$@)
-	cd $(patsubst %/index.html,%,$@) ; perl -pi -e 's!: ../!: ../../!g;' $^
+	cd $(patsubst %/index.html,%,$@) ; $(PERL) -pi -e 's!: ../!: ../../!g;' $^
 	cd $(patsubst %/index.html,%,$@) ; $(DOCPP) -p -H -u -G -S -a $^
 	cd $(patsubst %/index.html,%,$@) ; rm $^
 	rm $^

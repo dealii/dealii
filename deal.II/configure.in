@@ -1,0 +1,84 @@
+dnl $Id$
+dnl
+dnl    This is the input for the ./configure script of the deal.II
+dnl    libraries. The only output file is common/Make.global_options
+dnl    where all options and pathes are stored.
+dnl
+dnl
+dnl author: Wolfgang Bangerth, 1999
+dnl
+
+
+define([AC_CACHE_LOAD], )dnl
+define([AC_CACHE_SAVE], )dnl
+AC_INIT(base)
+
+
+dnl    Set the path to the deal.II libraries to `pwd`
+DEAL2_DIR=`pwd`
+AC_SUBST(DEAL2_DIR)
+
+
+dnl    Find the right C++ compiler. This modifies the following
+dnl    variables: CXX, GXX, CXXFLAGS
+AC_PROG_CXX
+if test $GXX = yes ; then
+  # find out the right version
+  GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
+  if test -n `echo $GCC_VERSION_STRING | grep egcs-1.1` ; then
+    AC_MSG_RESULT(Found egcs-1.1)
+    GXX_VERSION=egcs1.1
+  else
+    GXX_VERSION=other
+  fi
+else
+  AC_MSG_ERROR(No configuration options for this C++ compiler
+               supported at present)
+  exit 1
+fi
+AC_SUBST(GXX_VERSION)
+
+
+
+dnl    Check for the operating system
+OS=`uname`
+AC_SUBST(OS)
+
+
+dnl    Find path to perl
+AC_PATH_PROG(PERL, perl)
+
+
+dnl    Test whether multithreading support is requested. This
+dnl    does not tell deal.II to actually use it, but the
+dnl    compiler flags are set to allow for it,
+AC_ARG_ENABLE(multithreading,
+[  --enable-multithreading Set compiler flags to allow for multithreaded programs],
+    enablemultithreading=$enableval,
+    enablemultithreading=no)
+AC_SUBST(enablemultithreading)
+
+
+dnl    Test whether the user wants the multithread code in the 
+dnl    library to be used
+AC_ARG_WITH(multithreading,
+[  --with-multithreading=DIR use DIR as path to the ACE library],
+    withmultithreading=$withval,
+    withmultithreading=no)
+if test $withmultithreading != no ; then
+  AC_MSG_CHECKING(checking for ACE)
+  if test -d $withmultithreading ; then
+    AC_MSG_RESULT(found)
+  else
+    AC_MSG_RESULT(not found)
+    AC_MSG_ERROR(Invalid ACE path)
+  fi
+fi
+AC_SUBST(withmultithreading)
+
+
+dnl    Write output to the global options file
+AC_OUTPUT(common/Make.global_options)
+
+
+

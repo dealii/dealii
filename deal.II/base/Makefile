@@ -52,11 +52,11 @@ maybe-define-dimension  = $(patsubst %,-Ddata_out_dimension=%,$(maybe-define-dim
 lib/go/%.go :
 	@echo =====base=============debug========= $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
 lib/o/%.o :
 	@echo =====base=============optimized===== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) $(maybe-define-dimension) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) $(maybe-define-dimension) -c $< -o $@
 
 
 # rules
@@ -89,8 +89,8 @@ clean:
 #appended
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
-		| perl -p -e 's!(lib/g?o/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
+	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
+		| $(PERL) -p -e 's!(lib/g?o/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
 		> lib/Makefile.dep
 
 
