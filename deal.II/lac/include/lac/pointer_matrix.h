@@ -5,7 +5,6 @@
 
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
-#include <lac/vector_memory.h>
 
 /*! @addtogroup Matrix2
  *@{
