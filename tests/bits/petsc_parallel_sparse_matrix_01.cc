@@ -27,7 +27,6 @@
 #include <lac/petsc_parallel_sparse_matrix.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <fstream>
-#include <iostream>
 #include <cstdlib>
 
 
@@ -107,9 +106,7 @@ void test ()
     for (unsigned int j=0; j<csp.row_length(i); ++j)
       m.add (i, csp.column_number(i,j), 1.);
 
-  std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
   m.compress ();
-  std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
 
   deallog << "OK" << std::endl;
 }
