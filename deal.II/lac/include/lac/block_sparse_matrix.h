@@ -695,11 +695,6 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     DeclException0 (ExcMatrixNotInitialized);
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcDivideByZero);
-
     
   private:
 				     /**

@@ -1083,10 +1083,6 @@ class SparseMatrix : public virtual Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcDivideByZero);
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcIteratorRange,
 		    int, int,
 		    << "The iterators denote a range of " << arg1
