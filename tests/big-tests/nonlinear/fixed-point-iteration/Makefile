@@ -92,7 +92,7 @@ $(target) : $(libraries)
 
 # rule how to run the program
 run: $(target)
-	$(target) $(run-parameters)
+	./$(target) $(run-parameters)
 	$(additional-run-action)
 
 
