@@ -142,6 +142,7 @@ SparseVanka<number>::compute_inverses (const unsigned int begin,
 };
 
 
+
 template <typename number>
 void
 SparseVanka<number>::compute_inverse (const unsigned int    row,
@@ -159,16 +160,26 @@ SparseVanka<number>::compute_inverse (const unsigned int    row,
 
 				   // collect the dofs that couple
 				   // with #row#
-  local_indices.resize (0);
+  local_indices.resize (row_length);
   for (unsigned int i=0; i<row_length; ++i)
-    local_indices.push_back (structure.column_number(row, i));
-
-  const unsigned int n_couplings = local_indices.size();
+    local_indices[i] = structure.column_number(row, i);
   
 				   // Build local matrix
-  for (unsigned int i=0; i<n_couplings; ++i)
-    for (unsigned int j=0; j<n_couplings; ++j)
-      (*inverses[row])(i,j) = (*matrix)(local_indices[i], local_indices[j]);
+  for (unsigned int i=0; i<row_length; ++i)
+    for (unsigned int j=0; j<row_length; ++j)
+      {
+					 // if DoFs local_index[i] and
+					 // local_index[j] couple with
+					 // each other, then get the
+					 // value from the global
+					 // matrix. if not, then leave
+					 // the value in the small
+					 // matrix at zero
+	const unsigned int global_entry =
+	  structure(local_indices[i], local_indices[j]);
+	if (global_entry != SparsityPattern::invalid_entry)
+	  (*inverses[row])(i,j) = matrix->global_entry(global_entry);
+      };
   
 				   // Compute inverse
   inverses[row]->gauss_jordan();
