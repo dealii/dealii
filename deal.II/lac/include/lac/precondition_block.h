@@ -1122,7 +1122,7 @@ inline
 typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
 PreconditionBlockJacobi<MATRIX, inverse_type>::end () const
 {
-  return const_iterator(this, n_blocks() * block_size());
+  return const_iterator(this, this->n_blocks() * this->block_size());
 }
 
 
