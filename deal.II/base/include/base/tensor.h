@@ -138,7 +138,7 @@ class Tensor //<rank_, dim>
 				      * tensor entries into a single,
 				      * linearly numbered vector. As
 				      * usual in C++, the rightmost
-				      * index marches fastest.
+				      * index of the tensor marches fastest.
 				      */
     void unroll(Vector<double> & result) const;
     
