@@ -24,6 +24,10 @@
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
 /**
  * Sparse matrix without sparsity pattern.
  *
@@ -1091,7 +1095,7 @@ class SparseMatrixEZ : public Subscriptor
 #endif
 };
 
-
+/*@}*/
 /*---------------------- Inline functions -----------------------------------*/
 
 template <typename number>

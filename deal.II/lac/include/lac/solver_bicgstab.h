@@ -20,6 +20,11 @@
 #include <lac/solver_control.h>
 #include <cmath>
 #include <base/subscriptor.h>
+
+/*!@addtogroup Solvers */
+/*@{*/
+
+//! Iterative solver Bicg-stab.
 /**
  * Bicgstab algorithm by van der Vorst.
  *
@@ -226,6 +231,7 @@ class SolverBicgstab : public Solver<VECTOR>
   
 };
 
+/*@}*/
 /*-------------------------Inline functions -------------------------------*/
 
 template<class VECTOR>

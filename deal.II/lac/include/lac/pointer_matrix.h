@@ -7,6 +7,10 @@
 #include <base/smartpointer.h>
 #include <lac/vector_memory.h>
 
+/*! @addtogroup Matrix2
+ *@{
+ */
+
 /**
  * Abstract class for use in iterations.  This class provides the
  * interface required by LAC solver classes. It allows to use
@@ -142,7 +146,7 @@ private:
   SmartPointer<const MATRIX> m;
 };
 
-
+/*@}*/
 //----------------------------------------------------------------------//
 
 template<class VECTOR>

@@ -22,7 +22,10 @@
 #include <base/subscriptor.h>
 #include <cmath>
 
+/*!@addtogroup Solvers */
+/*@{*/
 
+//! Conjugate gradient method for symmetric positive definite matrices.
 /**
  * Preconditioned cg method.
  *
@@ -166,6 +169,7 @@ class SolverCG : public Solver<VECTOR>
     AdditionalData additional_data;
 };
 
+/*@}*/
 
 /*------------------------- Implementation ----------------------------*/
 
@@ -317,6 +321,5 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 					this->control().last_value());
 				   // otherwise exit as normal
 }
-
 
 #endif

@@ -33,6 +33,10 @@
 template <typename> class BlockVector;
 template <typename> class Vector;
 
+/*! @addtogroup Matrix2
+ *@{
+ */
+
 
 /**
  * Block matrix composed of different single matrices.
@@ -203,6 +207,12 @@ class BlockMatrixArray : public Subscriptor
     unsigned int block_cols;
 };
 
+/*@}*/
+
+/*! @addtogroup Preconditioners
+ *@{
+ */
+
 
 /**
  * Inversion of a block-triangular matrix.
@@ -318,7 +328,7 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
     bool backward;
 };
 
-
+/*@}*/
 //----------------------------------------------------------------------//
 
 template <class MATRIX>

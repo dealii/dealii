@@ -23,6 +23,10 @@
 #include <vector>
 
 
+/*! @addtogroup LAC
+ *@{
+ */
+
 /**
  * Memory management for vectors. This class is used by all
  * iterative methods to allocate space for auxilliary
@@ -176,7 +180,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 };
 
 
-
+/*@}*/
 /* --------------------- inline functions ---------------------- */
 
 

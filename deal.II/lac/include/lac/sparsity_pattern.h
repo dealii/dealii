@@ -28,6 +28,10 @@ class CompressedSparsityPattern;
 
 
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
 /**
  * Structure representing the sparsity pattern of a sparse matrix.
  * 
@@ -1039,6 +1043,7 @@ class SparsityPattern : public Subscriptor
 };
 
 
+/*@}*/
 /*---------------------- Inline functions -----------------------------------*/
 
 

@@ -22,6 +22,10 @@ template <class number> class Vector;
 template <class number> class SparseMatrix;
 
 
+/*! @addtogroup Preconditioners
+ *@{
+ */
+
 /**
  * Selects the preconditioner. The constructor of this class takes 
  * the name of the preconditioning and the damping parameter 
@@ -152,7 +156,7 @@ class PreconditionSelector : public Subscriptor
     const typename Vector::value_type omega;
 };
 
-
+/*@}*/
 /* --------------------- Inline and template functions ------------------- */
 
 

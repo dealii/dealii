@@ -23,6 +23,10 @@
 
 template <typename Number> class BlockVector;
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
 /**
  * Blocked sparse matrix. The behaviour of objects of this type is
  * almost as for the @p{SparseMatrix<...>} objects, with most of the
@@ -739,7 +743,7 @@ class BlockSparseMatrix : public Subscriptor
 
 
 
-
+/*@}*/
 /* ------------------------- Template functions ---------------------- */
 
 template <typename number>

@@ -1,5 +1,5 @@
 //----------------------------  sparse_mic.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -14,6 +14,10 @@
 #include <lac/sparse_matrix.h>
 #include <lac/sparse_decomposition.h>
 
+
+/*! @addtogroup Preconditioners
+ *@{
+ */
 
 /**
  * Modified incomplete Cholesky (MIC(0)) preconditioner.  This class
@@ -183,6 +187,6 @@ class SparseMIC : public SparseLUDecomposition<number>
     number get_rowsum (const unsigned int row) const;
 };
 
-
+/*@}*/
 
 #endif  // __deal2__

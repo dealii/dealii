@@ -17,6 +17,10 @@
 #include <base/config.h>
 #include <base/smartpointer.h>
 
+/*! @addtogroup Matrix2
+ *@{
+ */
+
 /**
  * Matrix with shifted diagonal values.
  *
@@ -138,7 +142,7 @@ class ShiftedMatrixGeneralized
 };
     
 
-
+/*@}*/
 //----------------------------------------------------------------------//
 
 template <class MATRIX>

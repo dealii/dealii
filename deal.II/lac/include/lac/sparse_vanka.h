@@ -29,6 +29,10 @@ template <typename number> class Vector;
 template <typename number> class SparseVanka;
 template <typename number> class SparseBlockVanka;
 
+/*! @addtogroup Preconditioners
+ *@{
+ */
+
 /**
  * Point-wise Vanka preconditioning.
  * This class does Vanka preconditioning  on a point-wise base.
@@ -594,5 +598,5 @@ class SparseBlockVanka : public SparseVanka<number>
 			    const BlockingStrategy      blocking_strategy);
 };
 
-
+/*@}*/
 #endif

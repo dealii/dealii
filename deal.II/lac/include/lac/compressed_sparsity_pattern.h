@@ -23,6 +23,10 @@ template <typename number> class SparseMatrix;
 #include <vector>
 #include <set>
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
 
 /**
  * This class acts as an intermediate form of the
@@ -352,7 +356,7 @@ class CompressedSparsityPattern : public Subscriptor
     friend class SparsityPattern;
 };
 
-
+/*@}*/
 /*---------------------- Inline functions -----------------------------------*/
 
 

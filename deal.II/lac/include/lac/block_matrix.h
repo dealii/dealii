@@ -19,6 +19,10 @@
 #include <base/smartpointer.h>
 #include <lac/block_vector.h>
 
+/*! @addtogroup Matrix2
+ *@{
+ */
+
 /**
  * A matrix with several copies of the same block on the diagonal.
  *
@@ -69,7 +73,7 @@ class BlockDiagonalMatrix : public Subscriptor
     SmartPointer<const MATRIX> matrix;
 };
 
-
+/*@}*/
 //----------------------------------------------------------------------//
 
 template <class MATRIX>

@@ -24,6 +24,10 @@
 
 
 
+/*! @addtogroup LAC
+ *@{
+ */
+
 /**
  * This class provides an interface to the sparse direct solver MA27
  * from the Harwell Subroutine Library. MA27 is a direct solver
@@ -972,7 +976,7 @@ class SparseDirectMA47 : public Subscriptor
                       const unsigned int *ICNTL);
 };
 
-
+/*@}*/
 
 
 #endif

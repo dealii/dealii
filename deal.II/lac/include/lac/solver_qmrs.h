@@ -22,7 +22,10 @@
 
 #include <cmath>
 
+/*!@addtogroup Solvers */
+/*@{*/
 
+//! Quasi-minimal residual method for symmetric matrices.
 /**
  * QMRS method.
  *
@@ -191,7 +194,7 @@ class SolverQMRS : public Solver<VECTOR>
     unsigned int step;
 };
 
-
+/*@}*/
 /*------------------------- Implementation ----------------------------*/
 
 

@@ -25,6 +25,10 @@
 template <typename number> class Vector;
 
 
+/*! @addtogroup Matrix2
+ *@{
+ */
+
 
 /**
  * This class is a wrapper for linear systems of equations with simple
@@ -567,7 +571,7 @@ class FilteredMatrix : public Subscriptor
 			     const bool                   matrix_is_symmetric) const;
 };
 
-
+/*@}*/
 /*---------------------- Inline functions -----------------------------------*/
 
 

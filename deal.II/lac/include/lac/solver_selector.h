@@ -28,6 +28,10 @@
 #include <lac/precondition.h>
 
 
+/*!@addtogroup Solvers */
+/*@{*/
+
+//! Selects a solver by changing a parameter.
 /**
  * By calling the @p{solve} function of this @p{SolverSelector}, it selects
  * the @p{solve} function of that @p{Solver} that was specified in the constructor
@@ -200,7 +204,7 @@ class SolverSelector : public Subscriptor
     typename SolverGMRES<VECTOR>::AdditionalData gmres_data;
 };
 
-
+/*@}*/
 /* --------------------- Inline and template functions ------------------- */
 
 

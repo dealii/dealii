@@ -24,6 +24,11 @@
 
 template <typename Number> class BlockVector;
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
+
 /**
  * A block matrix consisting of blocks of type @p{SparseMatrixEZ}.
  *
@@ -292,7 +297,7 @@ class BlockSparseMatrixEZ : public Subscriptor
     Table<2, SparseMatrixEZ<Number> > blocks;
 };
 
-  
+/*@}*/  
 /*----------------------------------------------------------------------*/
 
 

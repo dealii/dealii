@@ -26,6 +26,10 @@
 
 #include <cmath>
 
+/*!@addtogroup Solvers */
+/*@{*/
+
+//! Power method for eigenvalues.
 /**
  * Power method (von Mises).
  *
@@ -105,7 +109,7 @@ class EigenPower : private Solver<VECTOR>
     AdditionalData additional_data;
 };
 
-
+//! Inverse iteration for eigenvalues.
 /**
  * Inverse iteration (Wieland).
  *
@@ -209,6 +213,7 @@ class EigenInverse : private Solver<VECTOR>
     AdditionalData additional_data;
 };
 
+/*@}*/
 //----------------------------------------------------------------------
 
 

@@ -24,6 +24,10 @@
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
 
+/*! @addtogroup Preconditioners
+ *@{
+ */
+
 
 /**
  * Base class for @p{PreconditionBlockJacobi},
@@ -691,6 +695,7 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 };
 
+/*@}*/
 //----------------------------------------------------------------------//
 
 template<class MATRIX, typename inverse_type>

@@ -20,6 +20,10 @@
 #include <lac/solver_control.h>
 #include <base/subscriptor.h>
 
+/*!@addtogroup Solvers */
+/*@{*/
+
+//! Richardson's or stationary iteration.
 /**
  * Implementation of the richardson iteration method. The stopping criterion
  * is the norm of the residual.
@@ -162,7 +166,7 @@ class SolverRichardson : public Solver<VECTOR>
     typename VECTOR::value_type res;
 };
 
-
+/*@}*/
 /*----------------- Implementation of the Richardson Method ------------------*/
 
 

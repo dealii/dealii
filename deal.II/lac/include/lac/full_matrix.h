@@ -26,6 +26,10 @@
 template<typename number> class Vector;
 
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
 
 /**
  * Rectangular/quadratic full matrix.
@@ -746,7 +750,7 @@ class FullMatrix : public Table<2,number>
 		    << " matrix dimension " << arg1);
 };
 
-
+/*@}*/
 /*-------------------------Inline functions -------------------------------*/
 
 

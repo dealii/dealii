@@ -20,12 +20,13 @@ template <typename number> class Vector;
 template <class VECTOR>    class VectorMemory;
 class SolverControl;
 
+/*!@addtogroup Solvers */
+/*@{*/
 
+//! Base class for iterative solvers.
 /**
- * Base class for iterative solvers.  This class defines possible
- * return states of linear solvers and provides interfaces to a memory
- * pool and the control object.
- *
+ * This class defines possible return states of linear solvers and
+ * provides interfaces to a memory pool and the control object.
  *
  * @sect3{Requirements for template classes}
  *
@@ -174,7 +175,7 @@ class Solver : public Subscriptor
     VectorMemory<VECTOR> &memory;
 };
 
-
+/*@}*/
 /*-------------------------------- Inline functions ------------------------*/
 
 template <class VECTOR>

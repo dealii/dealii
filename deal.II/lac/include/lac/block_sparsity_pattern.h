@@ -28,6 +28,10 @@ template <typename number> class BlockSparseMatrix;
 class BlockSparsityPattern;
 class CompressedBlockSparsityPattern;
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
 
 /**
  * This is the base class for block versions of the sparsity pattern
@@ -496,7 +500,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 };
 
 
-
+/*@}*/
 /*---------------------- Template functions -----------------------------------*/
 
 

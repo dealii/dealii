@@ -19,7 +19,10 @@
 
 class ParameterHandler;
 
+/*!@addtogroup Solvers */
+/*@{*/
 
+//! Control of the stopping criterion for solvers
 /**
  * Control class for iterative solvers.
  *
@@ -356,7 +359,7 @@ class SolverControl : public Subscriptor
     bool         m_log_result;
 };
 
-
+//! Control of the stopping criterion depending on the initial residual.
 /**
  * Specialization of @p{SolverControl} which returns @p{success} if either
  * the specified tolerance is achieved or if the initial residual (or
@@ -448,6 +451,7 @@ class ReductionControl : public SolverControl
     double reduced_tol;
 };
 
+/*@}*/
 //------------------------------------------------------------//
 
 

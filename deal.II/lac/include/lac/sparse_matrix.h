@@ -23,6 +23,10 @@
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
 
+/*! @addtogroup Matrix1
+ *@{
+ */
+
 /**
  * Sparse matrix.
  *
@@ -1200,7 +1204,7 @@ class SparseMatrix : public virtual Subscriptor
     template <typename somenumber> friend class SparseMatrix;
 };
 
-
+/*@}*/
 /*---------------------- Inline functions -----------------------------------*/
 
 

@@ -23,6 +23,10 @@
 
 
 
+/*! @addtogroup Matrix2
+ *@{
+ */
+
 /**
  * Schur complement of a block matrix.
  *
@@ -207,6 +211,9 @@ class SchurMatrix :
 				    */
   unsigned int debug;
 };
+
+/*@}*/
+//----------------------------------------------------------------------//
 
 template <class MA_inverse, class MB, class MDt, class MC>
 SchurMatrix<MA_inverse, MB, MDt, MC>

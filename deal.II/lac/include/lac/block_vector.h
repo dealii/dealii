@@ -28,6 +28,10 @@ template <typename Number>
 class BlockVector;
 
 
+/*! @addtogroup LAC
+ *@{
+ */
+
 namespace internal
 {
 
@@ -1238,7 +1242,7 @@ class BlockVector
     template <typename Number2> friend class BlockVector;
 };
 
-
+/*@}*/
 /*----------------------- Inline functions ----------------------------------*/
 
 

@@ -1,5 +1,5 @@
 //----------------------------  sparse_ilu.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -17,6 +17,10 @@
 #include <lac/sparse_matrix.h>
 #include <lac/sparse_decomposition.h>
 
+
+/*! @addtogroup LAC
+ *@{
+ */
 
 /**
  * Incomplete LU decomposition of a sparse matrix into another sparse matrix.
@@ -188,7 +192,8 @@ class SparseILU : public SparseLUDecomposition<number>
 		    << " is not greater or equal than zero!");
 };
 
-
+/*@}*/
+//----------------------------------------------------------------------//
 
 template <typename number>
 template <typename somenumber>

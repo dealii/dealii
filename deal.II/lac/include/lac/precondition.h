@@ -22,6 +22,10 @@
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 
+/*! @addtogroup Preconditioners
+ *@{
+ */
+
 
 /**
  * No preconditioning.  This class helps you, if you want to use a
@@ -597,7 +601,7 @@ class PreconditionedMatrix : public Subscriptor
 
 
     
-
+/*@}*/
 /* ---------------------------------- Inline functions ------------------- */
 
 template<class VECTOR>

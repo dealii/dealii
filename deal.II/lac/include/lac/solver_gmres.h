@@ -26,6 +26,8 @@
 #include <vector>
 #include <cmath>
 
+/*!@addtogroup Solvers */
+/*@{*/
 
 namespace internal
 {
@@ -109,7 +111,7 @@ namespace internal
   }
 }
 
-
+//! Generalized minimal residual method.
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized
  * Minimal Residual Method. The stopping criterion is the norm of the
@@ -287,7 +289,7 @@ class SolverGMRES : public Solver<VECTOR>
     SolverGMRES (const SolverGMRES<VECTOR>&);
 };
 
-
+//! Generalized minimal residual method with flexible preconditioning.
 /**
  * Flexible GMRES.
  *
@@ -367,6 +369,7 @@ class SolverFGMRES : public Solver<VECTOR>
     FullMatrix<double> H1;
 };
 
+/*@}*/
 /* --------------------- Inline and template functions ------------------- */
 
 

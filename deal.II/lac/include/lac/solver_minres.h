@@ -21,7 +21,10 @@
 #include <cmath>
 #include <base/subscriptor.h>
 
+/*!@addtogroup Solvers */
+/*@{*/
 
+//! Minimal residual method for symmetric matrices.
 /**
  * Preconditioned MinRes method.
  *
@@ -137,7 +140,7 @@ class SolverMinRes : public Solver<VECTOR>
     double res2;
 };
 
-
+/*@}*/
 /*------------------------- Implementation ----------------------------*/
 
 

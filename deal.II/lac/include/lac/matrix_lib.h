@@ -10,6 +10,11 @@
 template<typename number> class Vector;
 template<typename number> class BlockVector;
 
+/*! @addtogroup Matrix2
+ *@{
+ */
+
+
 /**
  * Poor man's matrix product. Stores two matrices $m_1$ and $m_2$ and
  * implements matrix-vector multiplications for the product $m_1 m_2$
@@ -152,7 +157,7 @@ class MeanValueFilter : public Subscriptor
     unsigned int component;
 };
 
-
+/*@}*/
 //----------------------------------------------------------------------//
 
 template<class VECTOR>
