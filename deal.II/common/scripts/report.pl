@@ -1,6 +1,10 @@
 print <<'EOT'
 <HTML>
 <head>
+    <link href="screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <meta name="author" content="The deal.II authors">
+    <meta name="keywords" content="deal.II"></head>
 <title>Regression tests</title>
 </head>
 <body>
