@@ -304,7 +304,9 @@ class FilteredMatrix : public Subscriptor
 				      * needs to be done before
 				      * starting to solve with the
 				      * filtered matrix. If the matrix
-				      * is symmetric, set the second
+				      * is symmetric (i.e. the matrix
+				      * itself, not only its sparsity
+				      * pattern), set the second
 				      * parameter to @p{true} to use a
 				      * faster algorithm.
 				      */
