@@ -56,10 +56,10 @@ clean:
 #use perl to generate rules for the .go files as well
 #as to make rules not for tria.o and the like, but
 #rather for libbasic.a(tria.o)
-Makefile.dep: $(cc-files) $(h-files)
+../lib/Makefile.dep: $(cc-files) $(h-files)
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files) \
-		> Makefile.dep
+		> ../lib/Makefile.dep
 
 
-include Makefile.dep
+include ../lib/Makefile.dep
