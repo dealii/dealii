@@ -53,8 +53,17 @@ class SolverControl {
 				      * maximum number of iteration
 				      * steps before failure and the
 				      * tolerance to determine success
-				      * of the iteration.  */
-    SolverControl (const unsigned int n, const double tol);
+				      * of the iteration.
+				      *
+				      * #log_history# specifies whether
+				      * the history (i.e. the value to
+				      * be checked and the number of
+				      * the iteration step) shall be
+				      * printed to #deallog# stream.
+				      * Default is: do not print.
+				      */
+    SolverControl (const unsigned int n, const double tol,
+		   const bool log_history = false);
     
 				     /**
 				      * Decide about success or failure
@@ -107,17 +116,22 @@ class SolverControl {
 				     /**
 				      * Prescribed tolerance to be achieved.
 				      */
-    const double tol;
+    const double       tol;
     
 				     /**
 				      * Last value of the convergence criterion.
 				      */
-    double lvalue;
+    double             lvalue;
     
 				     /**
 				      * Last step.
 				      */
-    unsigned int lstep;
+    unsigned int       lstep;
+
+				     /**
+				      * Log convergence history to #deallog#?
+				      */
+    const bool         log_history;
 };
 
 

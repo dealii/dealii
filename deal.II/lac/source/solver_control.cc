@@ -9,11 +9,13 @@
 
 
 SolverControl::SolverControl (const unsigned int maxiter,
-			      const double tolerance) :
+			      const double tolerance,
+			      const bool log_history) :
 		maxsteps(maxiter),
 		tol(tolerance),
 		lvalue(1.e300),
-		lstep(0)
+		lstep(0),
+		log_history(log_history)
 {};
 
 
@@ -22,7 +24,8 @@ SolverControl::State
 SolverControl::check (const unsigned int step,
 		      const double check_value)
 {
-  deallog << "Check " << step << "\t" << check_value << endl;
+  if (log_history)
+    deallog << "Check " << step << "\t" << check_value << endl;
   
   lstep  = step;
   lvalue = check_value;
