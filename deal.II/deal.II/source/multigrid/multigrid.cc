@@ -31,7 +31,7 @@
 template <typename number>
 template <int dim>
 void MGTransferPrebuilt<number>::build_matrices (
-  const MGDoFHandler<dim> &mg_dof) 
+  const MGDoFHandler<dim> &mg_dof)
 {
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
@@ -40,11 +40,19 @@ void MGTransferPrebuilt<number>::build_matrices (
   for (unsigned int l=0;l<n_levels;++l)
     sizes[l] = mg_dof.n_dofs(l);
   
-				   // reset the size of the array of
-				   // matrices
-  prolongation_sparsities.resize (n_levels-1);
+				   // Reset the size of the array of
+				   // matrices. Call resize(0) first,
+				   // in order to delete all elements
+				   // as otherwise the copy
+				   // constructor of SparseMatrix and
+				   // SparsityPattern is called what
+				   // throws an error if existing
+				   // SparseMatrices/SparsityPatterns
+				   // have a size greater zero.
+  prolongation_matrices.resize (0);
   prolongation_matrices.resize (n_levels-1);
-
+  prolongation_sparsities.resize (0);
+  prolongation_sparsities.resize (n_levels-1);
 
 				   // two fields which will store the
 				   // indices of the multigrid dofs
