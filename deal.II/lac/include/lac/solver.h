@@ -49,42 +49,44 @@ class SolverControl;
  *   public:
  *                        // Application of matrix to vector src.
  *                        // write result into dst
- *     void vmult (Vector &dst, const Vector &src) const;
+ *     void vmult (VECTOR &dst, const VECTOR &src) const;
  * 
  *                        // Application of transpose to a Vector.
  *                        // Only used by certain iterative methods.
- *     void Tvmult (Vector &dst, const Vector &src) const;
+ *     void Tvmult (VECTOR &dst, const VECTOR &src) const;
  * };
  *
  *
- * class Vector
+ * class VECTOR
  * {
  *   public:
- *                        // resize and/or clear vector. note
+ *                        // resize to have the same structure
+ *                        // as the one provided and/or
+ *                        // clear vector. note
  *                        // that the second argument must have
  *                        // a default value equal to false
- *     void reinit (const unsigned int size,
+ *     void reinit (const VECTOR&,
  *                  bool  leave_elements_uninitialized = false);
  *
  *                        // scalar product
- *     double operator * (const Vector &v) const;
+ *     double operator * (const VECTOR &v) const;
  *
  *                        // addition of vectors
  *                        // $y = y + x$.
- *     void add (const Vector &x);
+ *     void add (const VECTOR &x);
  *
  *                        // $y = y + ax$.
  *     void add (const double  a,
- *               const Vector &x);
+ *               const VECTOR &x);
  *
  *                        // $y = ay + bx$.
  *     void sadd (const double  a,
  *                const double  b,
- *                const Vector &x);
+ *                const VECTOR &x);
  * 
  *                        // $y = ax$.
  *     void equ (const double  a,
- *               const Vector &x);
+ *               const VECTOR &x);
  *
  *                        // scale the elements of the vector
  *                        // by a fixed value
@@ -96,7 +98,7 @@ class SolverControl;
  * @end{verbatim}
  *
  * In addition, for some solvers there has to be a global function
- * @p{swap(vector &a, vector &b)} that exchanges the values of the two vectors.
+ * @p{swap(VECTOR &a, VECTOR &b)} that exchanges the values of the two vectors.
  *
  * The preconditioners used must have the same interface as matrices,
  * i.e. in particular they have to provide a member function @p{vmult}
@@ -135,7 +137,7 @@ class SolverControl;
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001
  */
-template <class Vector = ::Vector<double> >
+template <class VECTOR = Vector<double> >
 class Solver : public Subscriptor
 {
   public:
@@ -152,7 +154,7 @@ class Solver : public Subscriptor
 				      * least as long as that of the solver
 				      * object.
 				      */
-    Solver (SolverControl &, VectorMemory<Vector> &);
+    Solver (SolverControl &, VectorMemory<VECTOR> &);
 
 				     /**
 				      * Access to control object.
@@ -169,24 +171,24 @@ class Solver : public Subscriptor
 				     /**
 				      * Memory for auxilliary vectors.
 				      */
-    VectorMemory<Vector> &memory;
+    VectorMemory<VECTOR> &memory;
 };
 
 
 /*-------------------------------- Inline functions ------------------------*/
 
-template <class Vector>
+template <class VECTOR>
 inline
 SolverControl &
-Solver<Vector>::control() const
+Solver<VECTOR>::control() const
 {
   return cntrl;
 }
 
 
-template<class Vector>
+template<class VECTOR>
 inline
-Solver<Vector>::Solver(SolverControl &cn, VectorMemory<Vector> &mem)
+Solver<VECTOR>::Solver(SolverControl &cn, VectorMemory<VECTOR> &mem)
 		: cntrl(cn),
 		  memory(mem)
 {}
