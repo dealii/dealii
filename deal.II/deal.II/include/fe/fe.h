@@ -7,6 +7,7 @@
 #include <base/exceptions.h>
 #include <grid/point.h>
 #include <grid/dof.h>
+#include <grid/geometry_info.h>
 #include <lac/dfmatrix.h>
 
 
@@ -290,7 +291,7 @@ struct FiniteElementBase : public FiniteElementData<dim> {
 				      * matrix are discarded and will not fill
 				      * up the transfer matrix.
 				      */
-    dFMatrix restriction[(1<<dim)];
+    dFMatrix restriction[GeometryInfo<dim>::children_per_cell];
 
     				     /**
 				      * Have #N=2^dim# matrices keeping the
@@ -303,7 +304,12 @@ struct FiniteElementBase : public FiniteElementData<dim> {
 				      * to the destination cell, i.e. the
 				      * refined one, while the column indices
 				      * are for the unrefined cell's degrees of
-				      * freedom.
+				      * freedom. Thus, if #u0# is the vector
+				      * of values of degrees of freedom on the
+				      * coarse cell, * #prolongation[i]*u0#
+				      * yields the vector of values of the
+				      * degrees of freedom on the #i#th child
+				      * cell.
 				      *
 				      * Upon assembling the transfer matrix
 				      * between cells using this matrix array,
@@ -311,7 +317,7 @@ struct FiniteElementBase : public FiniteElementData<dim> {
 				      * matrix are discarded and will not fill
 				      * up the transfer matrix.
 				      */
-    dFMatrix prolongation[(1<<dim)];
+    dFMatrix prolongation[GeometryInfo<dim>::children_per_cell];
 
     				     /**
 				      * Specify the constraints which the
