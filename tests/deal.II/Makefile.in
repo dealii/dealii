@@ -301,6 +301,22 @@ intergrid_map.testcase: $(intergrid_map-o-files) $(libraries)
 
 
 ############################################################
+
+
+intergrid_constraints-cc-files = intergrid_constraints.cc 
+
+ifeq ($(debug-mode),on)
+intergrid_constraints-o-files = $(intergrid_constraints-cc-files:.cc=.go)
+else
+intergrid_constraints-o-files = $(intergrid_constraints-cc-files:.cc=.o)
+endif
+
+intergrid_constraints.testcase: $(intergrid_constraints-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS) $(lib-deal2-1d.g) $(lib-deal2-3d.g)
+
+
+############################################################
 # Continue with other targets if needed
 ############################################################
 
