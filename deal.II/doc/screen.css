@@ -9,6 +9,10 @@ frameset { background-color: white;
 	   frameborder: 0;
          }
 
+h1 { text-align:center;
+      color:#008000;
+   }
+
 td { vertical-align: top; }
 
 dt { font-weight: bold; }
