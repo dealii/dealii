@@ -32,6 +32,10 @@ report: compare
 		echo $$today - all-headers ; \
 	 fi
 
+report+mail:
+	$(MAKE) report | mail regression-tests@dealii.org
+
+
 # collect all header files, and for each try to do the following:
 # generate a file tmp.cc that contains nothing but "#include <xxx>"
 # with this particular header file. then try to compile it. this 
