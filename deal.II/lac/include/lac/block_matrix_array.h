@@ -388,6 +388,8 @@ BlockMatrixArray<MATRIX>::vmult_add (BlockVector<number>& dst,
   
   for (; m != end ; ++m)
     {
+      if (m->matrix->empty())
+	continue;
       if (m->prefix==1.)
 	{
 	  if (m->transpose)
@@ -445,6 +447,8 @@ BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<number>& dst,
   
   for (; m != end ; ++m)
     {
+      if (m->matrix->empty())
+	continue;
       if (m->prefix==1.)
 	{
 	  if (m->transpose)
