@@ -1,6 +1,6 @@
 //----------------------------  sparse_matrix_08.cc  ---------------------------
-//    $Id$
-//    Version: $Name$ 
+//    sparse_matrix_08.cc,v 1.4 2004/02/26 17:25:44 wolf Exp
+//    Version:  
 //
 //    Copyright (C) 2004 by the deal.II authors
 //
@@ -45,7 +45,7 @@ void test ()
                                    // compare against the exact value of the
                                    // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
-  Assert (m.frobenius_norm() == norm, ExcInternalError());
+  Assert (std::fabs((m.frobenius_norm() - norm)/norm) < 1e-14, ExcInternalError());
   
   deallog << "OK" << std::endl;
 }
