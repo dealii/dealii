@@ -49,7 +49,10 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 
 
 template <int dim>
-Triangulation<dim>::Triangulation (const Triangulation<dim> &) {
+Triangulation<dim>::Triangulation (const Triangulation<dim> &) :
+		Subscriptor ()      // do not set any subscriptors; anyway,
+			       // calling this constructor is an error!
+{
   Assert (false, ExcInternalError());
 };
 
