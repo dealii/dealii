@@ -14,7 +14,7 @@ examples:
 	cd examples ; make
 
 lib-clean:
-	-rm -f *~ include/*~ include/*/*~
+	-rm -f *~ include/*~ include/*/*~ include/basic/forward-declarations.h*
 	cd lib ; make clean
 
 examples-clean:
