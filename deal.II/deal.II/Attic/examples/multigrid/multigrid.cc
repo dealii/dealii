@@ -395,8 +395,13 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
 				   // apply Dirichlet bc as described
 				   // in the docs
   map<int, double> boundary_value_list;
-  VectorTools<dim>::interpolate_boundary_values (*dof, dirichlet_bc,
-						 boundary_value_list);
+
+  for (FunctionMap::const_iterator bc=dirichlet_bc.begin();
+       bc != dirichlet_bc.end(); ++bc)
+    VectorTools<dim>::interpolate_boundary_values (*dof,
+						   bc->first,
+						   *bc->second,
+						   boundary_value_list);
   MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					   system_matrix, solution,
 					   right_hand_side);  
@@ -414,7 +419,7 @@ void PoissonProblem<dim>::solve () {
 
 				   // solve
   cg.solve (system_matrix, solution, right_hand_side,
-	    PreconditionIdentity<Vector<double> >());
+	    PreconditionIdentity());
 				   // distribute solution
   constraints.distribute (solution);
 };
