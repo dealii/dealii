@@ -39,23 +39,4 @@ The name and call sequence of the exception was:
 Additional Information: 
 Index 3 is not in [0,3[
 --------------------------------------------------------
---------------------------------------------------------
-An error occurred in file <block_indices.h> in function
-    unsigned int BlockIndices::local_to_global(unsigned int, unsigned int) const
-The violated condition was: 
-    index < start_indices[block+1]-start_indices[block]
-The name and call sequence of the exception was:
-    ExcIndexRange (index, 0, start_indices[block+1]-start_indices[block])
-Additional Information: 
-Index 2 is not in [0,2[
---------------------------------------------------------
---------------------------------------------------------
-An error occurred in file <block_indices.h> in function
-    unsigned int BlockIndices::local_to_global(unsigned int, unsigned int) const
-The violated condition was: 
-    block < n_blocks
-The name and call sequence of the exception was:
-    ExcIndexRange(block, 0, n_blocks)
-Additional Information: 
-Index 2 is not in [0,2[
---------------------------------------------------------
+******** More assertions fail but messages are suppressed! ********
