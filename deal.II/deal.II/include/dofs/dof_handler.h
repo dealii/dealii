@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <map>
+#include <list>
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
 
@@ -956,15 +957,31 @@ class DoFHandler  :  public Subscriptor,
     unsigned int n_boundary_dofs () const;
 
     				     /**
-				      * Return the number of degrees of freedom
-				      * located on those parts of the boundary
-				      * which have a boundary indicator listed
-				      * in the given set. The reason that a
-				      * @p{map} rather than a @p{set} is used is the
-				      * same as descibed in the section on the
-				      * @p{make_boundary_sparsity_pattern} function.
+				      * Return the number of degrees
+				      * of freedom located on those
+				      * parts of the boundary which
+				      * have a boundary indicator
+				      * listed in the given set. The
+				      * reason that a @p{map} rather
+				      * than a @p{set} is used is the
+				      * same as descibed in the
+				      * section on the
+				      * @p{make_boundary_sparsity_pattern}
+				      * function.
 				      */
-    unsigned int n_boundary_dofs (const FunctionMap &boundary_indicators) const;
+    unsigned int
+    n_boundary_dofs (const FunctionMap &boundary_indicators) const;
+
+				     /**
+				      * Same function, but with
+				      * different data type of the
+				      * argument, which is here simply
+				      * a list of the boundary
+				      * indicators under
+				      * consideration.
+				      */
+    unsigned int
+    n_boundary_dofs (const list<unsigned char> &boundary_indicators) const;
 
 				     /**
 				      * Return a constant reference to the

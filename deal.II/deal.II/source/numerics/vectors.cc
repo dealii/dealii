@@ -719,7 +719,13 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 	  ExcComponentMismatch());
   
   vector<unsigned int> dof_to_boundary_mapping;
-  DoFTools::map_dof_to_boundary_indices (dof, boundary_functions,
+  list<unsigned char> selected_boundary_components;
+  for (typename map<unsigned char,const Function<dim>*>::const_iterator
+	 i=boundary_functions.begin();
+       i!=boundary_functions.end(); ++i)
+    selected_boundary_components.push_back (i->first);
+  
+  DoFTools::map_dof_to_boundary_indices (dof, selected_boundary_components,
 					 dof_to_boundary_mapping);
   
 				   // set up sparsity structure

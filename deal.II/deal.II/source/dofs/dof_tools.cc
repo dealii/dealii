@@ -1489,7 +1489,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 
 template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    const map<unsigned char,const Function<1>*> &,
+					    const list<unsigned char> &,
 					    vector<unsigned int> &)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
@@ -1532,12 +1532,15 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
 
 
 template <int dim>
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
-					    const map<unsigned char,const Function<dim>*> &boundary_indicators,
-					    vector<unsigned int>  &mapping)
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handler,
+					    const list<unsigned char> &boundary_indicators,
+					    vector<unsigned int>      &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-  Assert (boundary_indicators.find(255) == boundary_indicators.end(),
+  Assert (find (boundary_indicators.begin(),
+		boundary_indicators.end(),
+		255) ==
+	  boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
 
   mapping.clear ();
@@ -1555,7 +1558,9 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
   typename DoFHandler<dim>::active_face_iterator face = dof_handler.begin_active_face(),
 						 endf = dof_handler.end_face();
   for (; face!=endf; ++face)
-    if (boundary_indicators.find(face->boundary_indicator()) !=
+    if (find (boundary_indicators.begin(),
+	      boundary_indicators.end(),
+	      face->boundary_indicator()) !=
 	boundary_indicators.end())
       {
 	face->get_dof_indices (dofs_on_face);
@@ -1670,7 +1675,7 @@ DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
 template
 void
 DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
-				       const map<unsigned char,const Function<deal_II_dimension>*> &,
+				       const list<unsigned char> &,
 				       vector<unsigned int> &);
 
 #endif 

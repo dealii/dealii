@@ -16,7 +16,7 @@
 
 #include <base/exceptions.h>
 #include <vector>
-#include <map>
+#include <list>
 
 class SparsityPattern;
 template <typename number> class Vector;
@@ -801,7 +801,8 @@ class DoFTools
 				      * numbers of the trial functions
 				      * local to the boundary.
 				      *
-				      * Prior content of @p{mapping} is deleted.
+				      * Prior content of @p{mapping}
+				      * is deleted.
 				      *
 				      * This function is not
 				      * implemented for one
@@ -816,18 +817,21 @@ class DoFTools
 				 vector<unsigned int>  &mapping);
 
 				     /**
-				      * Same as the previous function, except
-				      * that only selected parts of the
-				      * boundary are considered.
+				      * Same as the previous function,
+				      * except that only those parts
+				      * of the boundary are considered
+				      * for which the boundary
+				      * indicator is listed in the
+				      * second argument.
 				      *
-				      * See the general doc of this class for
-				      * more information.
+				      * See the general doc of this
+				      * class for more information.
 				      */
     template <int dim>
     static void
-    map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
-				 const map<unsigned char,const Function<dim>*> &boundary_indicators,
-				 vector<unsigned int>  &mapping);
+    map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handler,
+				 const list<unsigned char> &boundary_indicators,
+				 vector<unsigned int>      &mapping);
     
 				   
 				     /**

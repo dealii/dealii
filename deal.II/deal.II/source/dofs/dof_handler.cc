@@ -1127,15 +1127,28 @@ DoFHandler<dim>::last_active_hex () const {
 #if deal_II_dimension == 1
 
 template <>
-unsigned int DoFHandler<1>::n_boundary_dofs () const {
+unsigned int DoFHandler<1>::n_boundary_dofs () const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
   return 0;
 };
 
 
+
 template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const {
+unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const
+{
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+unsigned int DoFHandler<1>::n_boundary_dofs (const list<unsigned char> &) const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
   return 0;
@@ -1145,7 +1158,8 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const {
 
 
 template <int dim>
-unsigned int DoFHandler<dim>::n_boundary_dofs () const {
+unsigned int DoFHandler<dim>::n_boundary_dofs () const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   
   set<int> boundary_dofs;
@@ -1165,8 +1179,11 @@ unsigned int DoFHandler<dim>::n_boundary_dofs () const {
 };    
 
 
+
 template <int dim>
-unsigned int DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const {
+unsigned int
+DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
@@ -1189,10 +1206,45 @@ unsigned int DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indic
 };    
 
 
+
 template <int dim>
-const Triangulation<dim> & DoFHandler<dim>::get_tria () const {
+unsigned int
+DoFHandler<dim>::n_boundary_dofs (const list<unsigned char> &boundary_indicators) const
+{
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (find (boundary_indicators.begin(),
+		boundary_indicators.end(),
+		255) ==
+	  boundary_indicators.end(),
+	  ExcInvalidBoundaryIndicator());
+  
+  set<int> boundary_dofs;
+
+  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  vector<unsigned int> dofs_on_face(dofs_per_face);
+  active_face_iterator face = begin_active_face (),
+		       endf = end_face();
+  for (; face!=endf; ++face)
+    if (find (boundary_indicators.begin(),
+	      boundary_indicators.end(),
+	      face->boundary_indicator()) !=
+	boundary_indicators.end())
+      {
+	face->get_dof_indices (dofs_on_face);
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  boundary_dofs.insert(dofs_on_face[i]);
+      };
+  return boundary_dofs.size();
+};    
+
+
+
+template <int dim>
+const Triangulation<dim> & DoFHandler<dim>::get_tria () const
+{
   return *tria;
 };
+
 
 
 template <int dim>
