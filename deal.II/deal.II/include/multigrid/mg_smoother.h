@@ -15,7 +15,6 @@
 
 
 #include <base/config.h>
-#include <lac/forward_declarations.h>
 #include <multigrid/mg_base.h>
 #include <base/smartpointer.h>
 #include <vector>

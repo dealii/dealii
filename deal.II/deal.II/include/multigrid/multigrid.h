@@ -20,8 +20,6 @@
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <multigrid/mg_base.h>
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
 
 #include <vector>
 

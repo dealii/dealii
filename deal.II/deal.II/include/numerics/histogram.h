@@ -16,7 +16,6 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
-#include <lac/forward_declarations.h>
 #include <vector>
 #include <string>
 

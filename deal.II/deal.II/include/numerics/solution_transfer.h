@@ -18,9 +18,6 @@
 
 
 #include <base/config.h>
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
-
 #include <base/smartpointer.h>
 #include <base/exceptions.h>
 #include <vector>

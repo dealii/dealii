@@ -21,12 +21,14 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
-#include <grid/forward_declarations.h>
-#include <lac/forward_declarations.h>
 
 #include <vector>
 #include <utility>
 
+// forward declarations
+class TimeStepBase;
+template <typename number> class Vector;
+template <int dim> class Triangulation;
 
 /**
  * This class provides an abstract interface to time dependent problems in that
