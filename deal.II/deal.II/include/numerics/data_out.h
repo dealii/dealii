@@ -383,10 +383,14 @@ class DataOut : public DataOut_DoFData<dim>
 				      * functions of the base class. See the
 				      * general documentation of this class
 				      * for further information.
+				      *
+				      * The functions supports multithreading.
 				      */
-    virtual void build_patches (const unsigned int n_subdivisions = 1);
+    virtual void build_patches (const unsigned int n_subdivisions = 1,
+				const unsigned int n_threads_     = 1);
+    
 
-				     /**
+   				     /**
 				      * Return the first cell which we
 				      * want output for. The default
 				      * implementation returns the first
@@ -408,6 +412,7 @@ class DataOut : public DataOut_DoFData<dim>
 				      * active cell, but you might want
 				      * to return other cells in a derived
 				      * class. Note that the default
+
 				      * implementation assumes that
 				      * the given #cell# is active, which
 				      * is guaranteed as long as #first_cell#
@@ -418,6 +423,37 @@ class DataOut : public DataOut_DoFData<dim>
 				      */
     virtual typename DoFHandler<dim>::cell_iterator
     next_cell (const typename DoFHandler<dim>::cell_iterator &cell);
+
+  private:
+				     /**
+				      * All data needed in one thread
+				      * is gathered in the struct
+				      * Data.
+				      * The data is handled globally
+				      * to avoid allocation of memory
+				      * in the threads.
+				      */
+    struct Data 
+    {
+	unsigned int n_threads;
+	unsigned int this_thread;
+	unsigned int n_components;
+	unsigned int n_datasets;
+	unsigned int n_subdivisions;
+	vector<double>          patch_values;
+	vector<Vector<double> > patch_values_system;
+	Data ()
+	  {}
+    };
+				     /**
+				      * Builds every #n_threads's#
+				      * patch. This function may be
+				      * called parallel.
+				      * If multithreading is not
+				      * used, the function is called
+				      * once and generates all patches.
+				      */
+    void * DataOut<dim>::build_some_patches (Data data);
 };
 
 
