@@ -97,11 +97,11 @@
  */
 
 /**
- * @defgroup PETSc PETSc
- * The classes in this module are wrappers around functionality provided by
- * the PETSc library. They provide a modern object-oriented interface that is
- * compatible with the interfaces of the other linear algebra classes in
- * deal.II.
+ * @defgroup PETScWrappers PETScWrappers The classes in this module are
+ * wrappers around functionality provided by the PETSc library. They provide a
+ * modern object-oriented interface that is compatible with the interfaces of
+ * the other linear algebra classes in deal.II. All classes and functions in
+ * this group reside in a namespace @p PETScWrappers.
  *
  * These classes are only available if a PETSc installation was detected
  * during configuration of deal.II. Refer to the README file for more details
