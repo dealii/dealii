@@ -1229,9 +1229,6 @@ template <>
 MGDoFHandler<1>::raw_quad_iterator
 MGDoFHandler<1>::last_raw_quad () const;
 template <>
-MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::last_raw_quad () const;
-template <>
 MGDoFHandler<1>::quad_iterator
 MGDoFHandler<1>::last_quad () const;
 template <>

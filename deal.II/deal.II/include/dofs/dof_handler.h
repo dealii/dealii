@@ -1261,12 +1261,6 @@ template <> DoFHandler<3>::face_iterator DoFHandler<3>::last_face (const unsigne
 template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::last_active_face () const;
 template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::last_active_face (const unsigned int level) const;
 
-template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
-
-template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
-template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
 template <>
 unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
 						     unsigned int          next_free_dof);
