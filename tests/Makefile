@@ -78,44 +78,44 @@ resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
 
 clean: clean-base clean-lac clean-deal.II clean-fe clean-bits
-veryclean: veryclean-base veryclean-lac veryclean-deal.II veryclean-fe veryclean-bits
+distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits
 
 clean-base:
 	cd base ; $(MAKE) clean
 
-veryclean-base:
-	cd base ; $(MAKE) veryclean
+distclean-base:
+	cd base ; $(MAKE) distclean
 
 clean-lac:
 	cd lac ; $(MAKE) clean
 
-veryclean-lac:
-	cd lac ; $(MAKE) veryclean
+distclean-lac:
+	cd lac ; $(MAKE) distclean
 
 clean-fe:
 	cd fe ; $(MAKE) clean
 
-veryclean-fe:
-	cd fe ; $(MAKE) veryclean
+distclean-fe:
+	cd fe ; $(MAKE) distclean
 
 clean-deal.II:
 	cd deal.II ; $(MAKE) clean
 
-veryclean-deal.II:
-	cd deal.II ; $(MAKE) veryclean
+distclean-deal.II:
+	cd deal.II ; $(MAKE) distclean
 
 clean-bits:
 	cd bits ; $(MAKE) clean
 
-veryclean-bits:
-	cd bits ; $(MAKE) veryclean
+distclean-bits:
+	cd bits ; $(MAKE) distclean
 
 abort.o: abort.cc
 	 @$(CXX) -ggdb -o $@ -c $<
 
 .PHONY : all base lac fe deal.II bits \
 	clean clean-base clean-lac clean-fe clean-deal.II clean-bits \
-	veryclean veryclean-base veryclean-lac veryclean-fe veryclean-deal.II veryclean-bits
+	distclean distclean-base distclean-lac distclean-fe distclean-deal.II distclean-bits
 
 include Makefile.paths
 include $D/common/Make.global_options
