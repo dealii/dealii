@@ -153,9 +153,16 @@ else
             GXX_VERSION=sun_workshop
           else
 
-            dnl  Aw, nothing suitable found...
-            AC_MSG_ERROR(Unrecognized compiler, sorry)
-            exit 1
+	    is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
+	    if test "x$is_kai_cc" != "x" ; then
+	      AC_MSG_RESULT(compile is KAI C++)
+	      GXX_VERSSION=kai_cc
+	    else
+
+              dnl  Aw, nothing suitable found...
+              AC_MSG_ERROR(Unrecognized compiler, sorry)
+              exit 1
+            fi
 	  fi
         fi
       fi
