@@ -104,7 +104,7 @@ CompressedSparsityPattern::max_entries_per_row () const
 {
   unsigned int m = 0;
   for (unsigned int i=1; i<rows; ++i)
-    m = std::max (m, column_indices[i].size());
+    m = std::max (m, static_cast<unsigned int>(column_indices[i].size()));
 
   return m;
 };
