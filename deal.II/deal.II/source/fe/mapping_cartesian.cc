@@ -457,49 +457,32 @@ MappingCartesian<dim>::transform_contravariant (std::vector<Point<dim> >       &
 template <int dim>
 Point<dim> MappingCartesian<dim>::transform_unit_to_real_cell (
   const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p,
-  const typename Mapping<dim>::InternalDataBase *const m_data) const
+  const Point<dim> &p) const
 {
-//TODO: wouldn't it be simpler in this function to compute local lengths ourselved, rather than relying on an InternalDataBase object?
-  
-				   // If m_data!=0 use this
-				   // InternalData.
-				   //
-				   // Otherwise use the get_data
-				   // function to create an
-				   // InternalData with data vectors
-				   // already of the right size; And
-				   // compute shape values and mapping
-				   // support points.
-				   //
-				   // Let, at the end, mdata be a
-				   // pointer to the given or the new
-				   // created InternalData
-  const InternalData *mdata;
-  if (m_data==0)
+  Tensor<1,dim> length;
+  const Point<dim> start = cell->vertex(0);
+  switch (dim)
     {
-      static Point<dim> dummy_p;
-      static Quadrature<dim> dummy_quadrature(dummy_p);
-      mdata=dynamic_cast<InternalData *> (get_data(update_default,
-						   dummy_quadrature));
+      case 1:
+	length[0] = cell->vertex(1)(0) - start(0);
+	break;
+      case 2:
+	length[0] = cell->vertex(1)(0) - start(0);
+	length[1] = cell->vertex(3)(1) - start(1);
+	break;
+      case 3:
+	length[0] = cell->vertex(1)(0) - start(0);
+	length[1] = cell->vertex(4)(1) - start(1);
+	length[2] = cell->vertex(3)(2) - start(2);
+	break;
+      default:
+	Assert(false, ExcNotImplemented());
     }
-  else
-    mdata = dynamic_cast<const InternalData *> (m_data);
-  Assert(mdata!=0, ExcInternalError());
 
-//TODO: don't we need to reinit() mdata on the present cell or initialize the mdata->length array in some other way?
-  
-				   // use now the InternalData, that
-				   // mdata is pointing to, to compute
-				   // the point in real space. it is
-				   // simply a scaled version of the
-				   // unit cell point shifted by the
-				   // (lower) left corner of the cell
   Point<dim> p_real = cell->vertex(0);
   for (unsigned int d=0; d<dim; ++d)
-    p_real(d) += mdata->length[d]*p(d);
+    p_real(d) +=length[d]*p(d);
 
-//TODO: memory leak: if initially mdata==0, then an object is created but never deleted. see mapping_q1 for a better implementation  
   return p_real;
 }
 
