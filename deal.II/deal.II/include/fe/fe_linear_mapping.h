@@ -22,15 +22,13 @@ class FELinearMapping : public FiniteElement<dim> {
   public:
 				     /**
 				      * Constructor. Simply passes through
-				      * its arguments to the base class.
+				      * its arguments to the base class. For
+				      * one space dimension, #dofs_per_quad#
+				      * shall be zero.
 				      */
     FELinearMapping (const unsigned int dofs_per_vertex,
 		     const unsigned int dofs_per_line,
-		     const unsigned int dofs_per_quad=0) :
-		    FiniteElement<dim> (dofs_per_vertex,
-					dofs_per_line,
-					dofs_per_quad,
-					GeometryInfo<dim>::vertices_per_cell) {};
+		     const unsigned int dofs_per_quad=0);
 
     				     /**
 				      * Return the value of the #i#th shape
@@ -146,6 +144,11 @@ class FELinearMapping : public FiniteElement<dim> {
 				 const dFMatrix         &shape_values_transform,
 				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidData);
 };
 
 

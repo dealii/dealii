@@ -34,6 +34,14 @@ FEQuadraticSub<1>::FEQuadraticSub (const int) :
 
 
 template <>
+const FiniteElementData<1>
+FEQuadraticSub<1>::get_fe_data () {
+  return FiniteElementData<1> (1, 1, GeometryInfo<1>::vertices_per_cell);
+};
+
+
+
+template <>
 void FEQuadraticSub<1>::initialize_matrices () {
 /*
   Get the prolongation matrices by the following little maple script:
@@ -255,6 +263,14 @@ FEQuadraticSub<2>::FEQuadraticSub (const int) :
 		FELinearMapping<2> (0, 0, 9)
 {
   initialize_matrices ();
+};
+
+
+
+template <>
+const FiniteElementData<2>
+FEQuadraticSub<2>::get_fe_data () {
+  return FiniteElementData<2> (1, 1, 1, GeometryInfo<2>::vertices_per_cell);
 };
 
 

@@ -24,7 +24,21 @@ class FEDGConstant : public FELinearMapping<dim> {
 				    */
     FEDGConstant ();
 
-				   /**
+				     /**
+				      * Declare a static function which returns
+				      * the number of degrees of freedom per
+				      * vertex, line, face, etc. This function
+				      * is used by the constructors, but is
+				      * mainly needed for the composed finite
+				      * elements, which assemble a FE object
+				      * from several other FEs. See the
+				      * documentation for the #FiniteElement#
+				      * class for more information on this
+				      * subject.
+				      */
+    static const FiniteElementData<dim> get_fe_data ();
+
+				     /**
 				    * Return the value of the #i#th shape
 				    * function at point #p# on the unit cell.
 				    */
@@ -130,6 +144,21 @@ class FEDGLinear : public FELinear<dim>{
 				      * Constructor
 				      */
     FEDGLinear();
+
+				     /**
+				      * Declare a static function which returns
+				      * the number of degrees of freedom per
+				      * vertex, line, face, etc. This function
+				      * is used by the constructors, but is
+				      * mainly needed for the composed finite
+				      * elements, which assemble a FE object
+				      * from several other FEs. See the
+				      * documentation for the #FiniteElement#
+				      * class for more information on this
+				      * subject.
+				      */
+    static const FiniteElementData<dim> get_fe_data ();
+
 				     /**
 				      * This function returns an error since the
 				      * correct use of the restriction
@@ -169,6 +198,21 @@ class FEDGQuadraticSub : public FEQuadraticSub<dim>{
 				      * Constructor
 				      */
     FEDGQuadraticSub();
+
+				     /**
+				      * Declare a static function which returns
+				      * the number of degrees of freedom per
+				      * vertex, line, face, etc. This function
+				      * is used by the constructors, but is
+				      * mainly needed for the composed finite
+				      * elements, which assemble a FE object
+				      * from several other FEs. See the
+				      * documentation for the #FiniteElement#
+				      * class for more information on this
+				      * subject.
+				      */
+    static const FiniteElementData<dim> get_fe_data ();
+
 				     /**
 				      * This function returns an error since the
 				      * correct use of the restriction
@@ -209,6 +253,21 @@ class FEDGCubicSub : public FECubicSub<dim>{
 				      * Constructor
 				      */
     FEDGCubicSub();
+
+				     /**
+				      * Declare a static function which returns
+				      * the number of degrees of freedom per
+				      * vertex, line, face, etc. This function
+				      * is used by the constructors, but is
+				      * mainly needed for the composed finite
+				      * elements, which assemble a FE object
+				      * from several other FEs. See the
+				      * documentation for the #FiniteElement#
+				      * class for more information on this
+				      * subject.
+				      */
+    static const FiniteElementData<dim> get_fe_data ();
+
 				     /**
 				      * This function returns an error since the
 				      * correct use of the restriction
@@ -248,6 +307,21 @@ class FEDGQuarticSub : public FEQuarticSub<dim>{
 				      * Constructor
 				      */
     FEDGQuarticSub();
+
+				     /**
+				      * Declare a static function which returns
+				      * the number of degrees of freedom per
+				      * vertex, line, face, etc. This function
+				      * is used by the constructors, but is
+				      * mainly needed for the composed finite
+				      * elements, which assemble a FE object
+				      * from several other FEs. See the
+				      * documentation for the #FiniteElement#
+				      * class for more information on this
+				      * subject.
+				      */
+    static const FiniteElementData<dim> get_fe_data ();
+
 				     /**
 				      * This function returns an error since the
 				      * correct use of the restriction

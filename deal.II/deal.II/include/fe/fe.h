@@ -78,12 +78,14 @@ struct FiniteElementData<1> {
 				      */
     FiniteElementData (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
-		       const unsigned int n_transform_functions) :
-		    dofs_per_vertex(dofs_per_vertex),
-		    dofs_per_line(dofs_per_line),
-		    dofs_per_face(dofs_per_vertex),
-		    total_dofs (2*dofs_per_vertex+dofs_per_line),
-		    n_transform_functions(n_transform_functions) {};
+		       const unsigned int n_transform_functions);
+
+				     /**
+				      * Another frequently used useful
+				      * constructor, copying the data from
+				      * another object.
+				      */
+    FiniteElementData (const FiniteElementData<1> &fe_data);
 
 				     /**
 				      * Comparison operator. It is not clear to
@@ -165,16 +167,14 @@ struct FiniteElementData<2> {
     FiniteElementData (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
 		       const unsigned int dofs_per_quad,
-		       const unsigned int n_transform_functions) :
-		    dofs_per_vertex(dofs_per_vertex),
-		    dofs_per_line(dofs_per_line),
-		    dofs_per_quad(dofs_per_quad),
-		    dofs_per_face(2*dofs_per_vertex+
-				  dofs_per_line),
-		    total_dofs (4*dofs_per_vertex+
-				4*dofs_per_line+
-				dofs_per_quad),
-		    n_transform_functions (n_transform_functions) {};
+		       const unsigned int n_transform_functions);
+
+    				     /**
+				      * Another frequently used useful
+				      * constructor, copying the data from
+				      * another object.
+				      */
+    FiniteElementData (const FiniteElementData<2> &fe_data);
 
 				     /**
 				      * Comparison operator. It is not clear to
@@ -224,14 +224,9 @@ struct FiniteElementBase :
 				      * Construct an object of this type.
 				      * You have to set the
 				      * matrices explicitely after calling
-				      * this base class' constructor. For
-				      * #dim==1#, #dofs_per_quad# must be
-				      * zero.
+				      * this base class' constructor.
 				      */
-    FiniteElementBase (const unsigned int dofs_per_vertex,
-		       const unsigned int dofs_per_line,
-		       const unsigned int dofs_per_quad,
-		       const unsigned int n_transform_functions);
+    FiniteElementBase (const FiniteElementData<dim> &fe_data);
     
 				     /**
 				      * Return a readonly reference to the
@@ -570,6 +565,28 @@ struct FiniteElementBase :
  *   the assumption does not hold, then the distribution has to happen
  *   with all nodes on the small and the large cells. This is not
  *   implemented in the #DoFHandler# class as of now.
+ * \end{itemize}
+ *
+ * On a more general note, a concrete finite element class, derived from
+ * the #FiniteElement# class needs to fulfill at least the following criteria:
+ * \begin{itemize}
+ * \item Overload and define all pure virtual functions;
+ * \item If a finite element is to be used as part of a composed finite
+ *   element, such as the #FESystem# of the #FEMixed# classes, it has
+ *   to provide a \textit{static} function namend #get_fe_data#, which
+ *   returns the data which also is stored in the #FiniteElementData# object
+ *   at the bottom of the class hierarchy. This function needs to be static,
+ *   since its output is needed at the time of construction of the composed
+ *   finite element, at which time the subobjects denoting the parts of the
+ *   composed element are not yet constructed. You need to make sure that
+ *   each element has such a function; the composed elements have no way
+ *   to make sure that the function is not inherited from a base class.
+ *   You may only use an inherited such function, if the result would be
+ *   the same.
+ *
+ *   It is also a good idea to use the output of this function to construct
+ *   the base class #FiniteElement# of a concrete element.
+ * \end{itemize}
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -579,14 +596,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				     /**
 				      * Constructor
 				      */
-    FiniteElement (const unsigned int dofs_per_vertex,
-		   const unsigned int dofs_per_line,
-		   const unsigned int dofs_per_quad,
-		   const unsigned int n_transform_functions) :
-		    FiniteElementBase<dim> (dofs_per_vertex,
-					    dofs_per_line,
-					    dofs_per_quad,
-					    n_transform_functions) {};
+    FiniteElement (const FiniteElementData<dim> &fe_data);
 
 				     /**
 				      * Destructor. Only declared to have a

@@ -31,6 +31,15 @@ FEQuarticSub<1>::FEQuarticSub (const int) :
 };
 
 
+
+template <>
+const FiniteElementData<1>
+FEQuarticSub<1>::get_fe_data () {
+  return FiniteElementData<1> (1, 3, GeometryInfo<1>::vertices_per_cell);
+};
+
+
+
 template <>
 void FEQuarticSub<1>::initialize_matrices () {
   prolongation[0](0,0) = 1.0;
@@ -255,6 +264,14 @@ FEQuarticSub<2>::FEQuarticSub (const int) :
 		FELinearMapping<2> (0, 0, 25)
 {
   initialize_matrices ();
+};
+
+
+
+template <>
+const FiniteElementData<2>
+FEQuarticSub<2>::get_fe_data () {
+  return FiniteElementData<2> (1, 3, 9, GeometryInfo<2>::vertices_per_cell);
 };
 
 

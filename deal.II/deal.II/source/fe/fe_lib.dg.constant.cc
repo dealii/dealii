@@ -43,6 +43,14 @@ FEDGConstant<1>::FEDGConstant () :
 
 
 template <>
+const FiniteElementData<1>
+FEDGConstant<1>::get_fe_data () {
+  return FiniteElementData<1> (0, 1, GeometryInfo<1>::vertices_per_cell);
+};
+
+
+
+template <>
 void FEDGConstant<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					  const Boundary<1>  &,
 					  vector<Point<1> >  &) const {
@@ -79,8 +87,18 @@ FEDGConstant<2>::FEDGConstant () :
   prolongation[3](0,0) = 1.0;
 };
 
-#endif
 
+
+template <>
+const FiniteElementData<2>
+FEDGConstant<2>::get_fe_data () {
+  return FiniteElementData<2> (0, 0, 1, GeometryInfo<2>::vertices_per_cell);
+};
+
+
+
+
+#endif
 
 
 

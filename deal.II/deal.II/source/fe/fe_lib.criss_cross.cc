@@ -305,11 +305,26 @@
 
 #if deal_II_dimension == 1
 
+// declare explicit instantiation
+template <>
+const FiniteElementData<1> FECrissCross<1>::get_fe_data ();
+
+
+
 template <>
 FECrissCross<1>::FECrissCross () :
-		FiniteElement<1> (0,0,0,0)
+		FiniteElement<1> (get_fe_data ())
 {
   Assert (false, ExcNotUseful());
+};
+
+
+
+template <>
+const FiniteElementData<1>
+FECrissCross<1>::get_fe_data () {
+				   // return more or less invalid data
+  return FiniteElementData<1> (0,0,0);
 };
 
 
@@ -456,9 +471,14 @@ void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
 
 #if deal_II_dimension == 2
 
+// declare explicit instantiation
+template <>
+const FiniteElementData<2> FECrissCross<2>::get_fe_data ();
+
+
 template <>
 FECrissCross<2>::FECrissCross () :
-		FiniteElement<2> (1,0,1,5)
+		FiniteElement<2> (get_fe_data ())
 {
   interface_constraints(0,0) = 1./2.;
   interface_constraints(0,1) = 1./2.;
@@ -505,6 +525,15 @@ FECrissCross<2>::FECrissCross () :
   restriction[3](3,3) = 1.0;
   restriction[3](4,1) = 1.0;
 };
+
+
+
+template <>
+const FiniteElementData<2>
+FECrissCross<2>::get_fe_data () {
+  return FiniteElementData<2> (1,0,1,5);
+};
+
 
 
 

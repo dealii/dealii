@@ -26,6 +26,104 @@ FEDGQuarticSub<dim>::FEDGQuarticSub():
 
 
 
+#if deal_II_dimension == 1
+
+template <>
+const FiniteElementData<1>
+FEDGLinear<1>::get_fe_data () {
+				   // no dofs at the vertices, all in the
+				   // interior of the line
+  return FiniteElementData<1> (0,
+			       FELinear<1>::get_fe_data().total_dofs,
+			       FELinear<1>::get_fe_data().n_transform_functions);
+};
+
+
+template <>
+const FiniteElementData<1>
+FEDGQuadraticSub<1>::get_fe_data () {
+				   // no dofs at the vertices, all in the
+				   // interior of the line
+  return FiniteElementData<1> (0,
+			       FEQuadraticSub<1>::get_fe_data().total_dofs,
+			       FEQuadraticSub<1>::get_fe_data().n_transform_functions);
+};
+
+
+template <>
+const FiniteElementData<1>
+FEDGCubicSub<1>::get_fe_data () {
+				   // no dofs at the vertices, all in the
+				   // interior of the line
+  return FiniteElementData<1> (0,
+			       FECubicSub<1>::get_fe_data().total_dofs,
+			       FECubicSub<1>::get_fe_data().n_transform_functions);
+};
+
+
+template <>
+const FiniteElementData<1>
+FEDGQuarticSub<1>::get_fe_data () {
+				   // no dofs at the vertices, all in the
+				   // interior of the line
+  return FiniteElementData<1> (0,
+			       FEQuarticSub<1>::get_fe_data().total_dofs,
+			       FEQuarticSub<1>::get_fe_data().n_transform_functions);
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 2
+
+template <>
+const FiniteElementData<2>
+FEDGLinear<2>::get_fe_data () {
+				   // no dofs at the vertices or lines, all in the
+				   // interior of the line
+  return FiniteElementData<2> (0, 0,
+			       FELinear<2>::get_fe_data().total_dofs,
+			       FELinear<2>::get_fe_data().n_transform_functions);
+};
+
+
+template <>
+const FiniteElementData<2>
+FEDGQuadraticSub<2>::get_fe_data () {
+				   // no dofs at the vertices or lines, all in the
+				   // interior of the line
+  return FiniteElementData<2> (0, 0,
+			       FEQuadraticSub<2>::get_fe_data().total_dofs,
+			       FEQuadraticSub<2>::get_fe_data().n_transform_functions);
+};
+
+
+template <>
+const FiniteElementData<2>
+FEDGCubicSub<2>::get_fe_data () {
+				   // no dofs at the vertices or lines, all in the
+				   // interior of the line
+  return FiniteElementData<2> (0, 0,
+			       FECubicSub<2>::get_fe_data().total_dofs,
+			       FECubicSub<2>::get_fe_data().n_transform_functions);
+};
+
+
+template <>
+const FiniteElementData<2>
+FEDGQuarticSub<2>::get_fe_data () {
+				   // no dofs at the vertices or lines, all in the
+				   // interior of the line
+  return FiniteElementData<2> (0, 0,
+			       FEQuarticSub<2>::get_fe_data().total_dofs,
+			       FEQuarticSub<2>::get_fe_data().n_transform_functions);
+};
+
+#endif
+
+
+
 template <int dim>
 const dFMatrix & 
 FEDGLinear<dim>::restrict (const unsigned int child) const {

@@ -14,7 +14,22 @@
 
 /*---------------------------- FELinearMapping ----------------------------------*/
 
+
+
 #if deal_II_dimension == 1
+
+template <>
+FELinearMapping<1>::FELinearMapping (const unsigned int dofs_per_vertex,
+				     const unsigned int dofs_per_line,
+				     const unsigned int dofs_per_quad) :
+		FiniteElement<1> (FiniteElementData<1> (dofs_per_vertex,
+							dofs_per_line,
+							GeometryInfo<1>::vertices_per_cell))
+{
+  Assert (dofs_per_quad==0, ExcInvalidData());
+};
+
+
 
 template <>
 inline
@@ -120,6 +135,18 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 
 
 #if deal_II_dimension == 2
+
+template <>
+FELinearMapping<2>::FELinearMapping (const unsigned int dofs_per_vertex,
+				     const unsigned int dofs_per_line,
+				     const unsigned int dofs_per_quad) :
+		FiniteElement<2> (FiniteElementData<2> (dofs_per_vertex,
+							dofs_per_line,
+							dofs_per_quad,
+							GeometryInfo<2>::vertices_per_cell))
+{};
+
+
 
 template <>
 inline
