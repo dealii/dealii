@@ -14,13 +14,16 @@
 
 #include <grid/grid_generator.h>
 #include <grid/tria.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
 #include <cmath>
 
 
 template <int dim>
 void GridGenerator::hyper_rectangle (Triangulation<dim>& tria,
 				     const Point<dim>& p_1,
-				     const Point<dim>& p_2)
+				     const Point<dim>& p_2,
+				     bool colorize)
 {
 				   // First, normalize input such that
 				   // p1 is lower in all coordinate directions.
@@ -89,6 +92,34 @@ void GridGenerator::hyper_rectangle (Triangulation<dim>& tria,
   cells[0].material_id = 0;
 
   tria.create_triangulation (vertices, cells, SubCellData());
+
+				   // Have to do this, since there are
+				   // no faces in 1D
+#if (deal_II_dimension>1)
+				   // Assign boundary indicators
+  if (colorize)
+    {
+      typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      switch(dim)
+	{
+	  case 2:
+	    cell->face(0)->set_boundary_indicator (2);
+	    cell->face(1)->set_boundary_indicator (1);
+	    cell->face(2)->set_boundary_indicator (3);
+	    cell->face(3)->set_boundary_indicator (0);
+	    break;
+	  case 3:
+	    cell->face(0)->set_boundary_indicator (2);
+	    cell->face(1)->set_boundary_indicator (3);
+	    cell->face(2)->set_boundary_indicator (4);
+	    cell->face(3)->set_boundary_indicator (1);
+	    cell->face(4)->set_boundary_indicator (5);
+	    cell->face(5)->set_boundary_indicator (0);
+	  default:
+	    Assert(false, ExcNotImplemented());
+	}
+    }
+#endif
 }
 
 

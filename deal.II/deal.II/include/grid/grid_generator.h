@@ -130,6 +130,18 @@ class GridGenerator
 				      * diagonally opposite corner
 				      * points @p{p1} and @p{p2}.
 				      *
+				      * If the @p{colorize} flag is
+				      * set, the
+				      * @p{boundary_indicator}s of the
+				      * surfaces are assigned, such
+				      * that the lower one in
+				      * @p{x}-direction is 0, the
+				      * upper one is 1. The indicators
+				      * for the surfaces in
+				      * @p{y}-direction are 2 and 3,
+				      * the ones for @p{z} are 4 and
+				      * 6.
+				      * 
 				      * The triangulation needs to be
 				      * void upon calling this
 				      * function.
@@ -137,7 +149,8 @@ class GridGenerator
     template <int dim>
     static void hyper_rectangle (Triangulation<dim> &tria,
 				 const Point<dim>& p1,
-				 const Point<dim>& p2);
+				 const Point<dim>& p2,
+				 bool colorize = false);
 
 				     /**
 				      * Hypercube with a layer of
