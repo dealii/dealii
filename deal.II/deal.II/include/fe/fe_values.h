@@ -1043,7 +1043,8 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * Value for orientation function.
 				      */
     bool my_orientation;
-				     /**
+
+    				     /**
 				      * Data table for orientation
 				      * values. Since the faces are
 				      * numbered in a creative
@@ -1051,7 +1052,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * values instead of computing
 				      * them.
 				      */
-    static const bool orientation_table[];
+    static const bool orientation_table[GeometryInfo<dim>::faces_per_cell];
 };
 
 

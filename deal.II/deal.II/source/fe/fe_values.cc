@@ -624,7 +624,7 @@ FEValues<dim>::memory_consumption () const
 #if deal_II_dimension == 1
 template <>
 const bool
-FEFaceValuesBase<1>::orientation_table[] =
+FEFaceValuesBase<1>::orientation_table[GeometryInfo<1>::faces_per_cell] =
 {
       false, true
 };
@@ -634,7 +634,7 @@ FEFaceValuesBase<1>::orientation_table[] =
 #if deal_II_dimension == 2
 template <>
 const bool
-FEFaceValuesBase<2>::orientation_table[] =
+FEFaceValuesBase<2>::orientation_table[GeometryInfo<2>::faces_per_cell] =
 {
       true, true, false, false
 };
@@ -644,7 +644,7 @@ FEFaceValuesBase<2>::orientation_table[] =
 #if deal_II_dimension == 3
 template <>
 const bool
-FEFaceValuesBase<3>::orientation_table[] =
+FEFaceValuesBase<3>::orientation_table[GeometryInfo<3>::faces_per_cell] =
 {
       true, false, true, false, true, false
 };
