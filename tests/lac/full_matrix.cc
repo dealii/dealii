@@ -99,7 +99,7 @@ main ()
 	  deallog << "l1-norm: " << C.l1_norm() << std::endl;
 	  D = C;
 	  D.gauss_jordan();
-	  D.print_formatted (logfile);
+	  D.print_formatted (logfile,3,false);
 	  deallog << "linfty-norm: " << D.linfty_norm() << std::endl
 		  << "Frobenius-norm: " << D.norm2() << std::endl;
 	  
