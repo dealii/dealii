@@ -48,28 +48,36 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
-  <li> <p> On AIX systems, the xlf Fortran77 compiler wasn't recognized 
+  <li> <p> Fixed: In the step-14 example program, overly conservative
+       quadrature formulas were chosen (with 2N+1 quadrature points per space
+       dimension, where N is the degree of polynomials). This is unnecessary,
+       and now fixed.
+       <br>
+       (WB 2003/09/23)
+       </p>
+
+  <li> <p> Fixed: On AIX systems, the xlf Fortran77 compiler wasn't recognized 
        due to the fact that when called with -v it generates many pages
        of output, later leading to a shell error. This is now fixed.
        <br>
        (WB 2003/09/19)
        </p>
 
-  <li> <p> The elastic example program, step-8, had a bug in the way
+  <li> <p> Fixed: The elastic example program, step-8, had a bug in the way
        the system matrix is assembled. In effect, we were solving the
        wrong equation. This should now be fixed.
        <br>
        (WB 2003/09/11)
        </p>
 
-  <li> <p> When building with both sparse direct solver MA27 and the
+  <li> <p> Fixed: When building with both sparse direct solver MA27 and the
        TECPLOT libraries, the <code>detached_ma27</code> would not
        link properly. This is now fixed.
        <br>
        (WB 2003/09/05)
        </p>
 
-  <li> <p> The script that builds the dependency lists for Makefiles
+  <li> <p> Improved: The script that builds the dependency lists for Makefiles
        has been rewritten in C++, since the previous perl script
        became just too slow after the addition of parts of
        BOOST. Using the old perl script should still work, although it
@@ -88,7 +96,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/08/19)
        </p>
 
-  <li> <p> First steps to a migration of the documentation from
+  <li> <p> New: First steps to a migration of the documentation from
        <tt>kdoc</tt> to <a href="http://www.doxygen.org">Doxygen</a> have
        been done. It can be generated after installing <a
        href="http://www.doxygen.org">Doxygen</a> by calling <tt>make</tt>
