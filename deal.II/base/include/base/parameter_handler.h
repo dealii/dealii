@@ -1,4 +1,4 @@
-//----------------------------  parameter_handler.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  parameter_handler.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__parameter_handler_h
 #define __deal2__parameter_handler_h
 

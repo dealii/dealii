@@ -1,15 +1,15 @@
-//----------------------------  subscriptor.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998 - 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  subscriptor.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__subscriptor_h
 #define __deal2__subscriptor_h
 
@@ -214,7 +214,7 @@ class Subscriptor
     mutable const std::type_info * object_info;
 };
 
-//----------------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 // If we are in optimized mode, the subscription checking is turned
 // off. Therefore, we provide inline definitions of subscribe and

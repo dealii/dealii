@@ -1,4 +1,4 @@
-//-----------------------  conditional_ostream.h  ----------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//-----------------------  conditional_ostream.h  ----------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__conditional_ostream_h
 #define __deal2__conditional_ostream_h
 

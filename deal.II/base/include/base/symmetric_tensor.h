@@ -1,15 +1,15 @@
-//----------------------------  symmetric_tensor.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal authors
+//    Copyright (C) 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  symmetric_tensor.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__symmetric_tensor_h
 #define __deal2__symmetric_tensor_h
 

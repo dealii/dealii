@@ -1,18 +1,18 @@
-//----------------------------   multithread_info.h     ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------   multithread_info.h     ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__multithread_info_h
 #define __deal2__multithread_info_h
-//----------------------------   multithread_info.h     ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <base/config.h>
@@ -123,7 +123,7 @@ extern MultithreadInfo multithread_info;
 
 
 
-//----------------------------   multithread_info.h     ---------------------------
+//---------------------------------------------------------------------------
 // end of #ifndef __deal2__multithread_info_h
 #endif
-//----------------------------   multithread_info.h     ---------------------------
+//---------------------------------------------------------------------------

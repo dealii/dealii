@@ -1,15 +1,15 @@
-//-----------------------------------------------------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//-----------------------------------------------------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__table_h
 #define __deal2__table_h
 
@@ -2564,7 +2564,7 @@ Table<1,T>::operator () (const unsigned int i)
 }
 
 
-//----------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 template <typename T>
 Table<2,T>::Table ()
@@ -2689,7 +2689,7 @@ Table<2,T>::n_cols () const
 
 
 
-//----------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 template <typename T>
 TransposeTable<T>::TransposeTable ()
@@ -2788,7 +2788,7 @@ TransposeTable<T>::n_cols () const
 
 
 
-//----------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 
 template <typename T>

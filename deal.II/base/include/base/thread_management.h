@@ -1,15 +1,15 @@
-//----------------------------  thread_management.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  thread_management.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__thread_management_h
 #define __deal2__thread_management_h
 
@@ -6653,7 +6653,7 @@ namespace Threads
 /// @endif
 
 
-//----------------------------   thread_management.h     ---------------------------
+//---------------------------------------------------------------------------
 // end of #ifndef __deal2__thread_management_h
 #endif
-//----------------------------   thread_management.h     ---------------------------
+//---------------------------------------------------------------------------
