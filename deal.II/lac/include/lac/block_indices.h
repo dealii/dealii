@@ -81,6 +81,14 @@ class BlockIndices
     BlockIndices<n_blocks> & operator = (const BlockIndices<n_blocks> &b);
 
 				     /**
+				      * Compare whether two objects
+				      * are the same, i.e. whether the
+				      * starting indices of all blocks
+				      * are equal.
+				      */
+    bool operator == (const BlockIndices<n_blocks> &b) const;
+    
+				     /**
 				      * Swap the contents of these two
 				      * objects.
 				      */
@@ -168,6 +176,20 @@ BlockIndices<n_blocks>::operator = (const BlockIndices<n_blocks> &b)
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = b.start_indices[i];
   return *this;
+};
+
+
+
+template <int n_blocks>
+inline
+bool
+BlockIndices<n_blocks>::operator == (const BlockIndices<n_blocks> &b) const
+{
+  for (unsigned int i=0; i<=n_blocks; ++i)
+    if (start_indices[i] != b.start_indices[i])
+      return false;
+  
+  return true;
 };
 
 
