@@ -1215,25 +1215,6 @@ FE_Q<2>::initialize_constraints ()
     .TableBase<2,double>::reinit (this->interface_constraints_size());
   subface_interpolation.Tmmult (this->interface_constraints,
 				face_interpolation);
-
-				   // in 3d we still have the
-				   // constraint matrices, so make the
-				   // check
-//TODO[WB]: get rid of this, the check has worked a long time, so it's time to get rid of the file in which constraint_matrices are actually declared.  
-  if (dim == 3)
-    if (this->degree < Matrices::n_constraint_matrices+1)
-      {
-	FullMatrix<double> x;
-	x.TableBase<2,double>::reinit (this->interface_constraints_size());
-	x.fill (Matrices::constraint_matrices[this->degree-1]);
-
-	for (unsigned int i=0; i<x.m(); ++i)
-	  for (unsigned int j=0; j<x.n(); ++j)
-	    Assert (std::fabs (x(i,j) - this->interface_constraints(i,j))
-                    <
-                    1e-14,
-		    ExcInternalError());
-      }    
 }
 
 #endif
