@@ -77,7 +77,7 @@ template <int dim>
 void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				 const Quadrature<dim>    &quadrature,
 				 const FiniteElement<dim> &fe,
-				 const UpdateFlags        &update_flags,
+				 const UpdateFlags         update_flags,
 				 const DirichletBC        &dirichlet_bc,
 				 const Boundary<dim>      &boundary) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
