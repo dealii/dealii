@@ -40,7 +40,7 @@ void FELinearMapping<1>::compute_jacobian_matrices (const DoFHandler<1>::cell_it
 
 
 template <>
-void FELinearMapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_iterator &cell,
+void FELinearMapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_iterator &,
 						     const vector<Point<1> > &unit_points,
 						     vector<Tensor<3,1> >    &jacobians_grad) 
 {
