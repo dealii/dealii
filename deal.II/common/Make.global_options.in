@@ -150,7 +150,12 @@ ifneq ($(with-multithreading),no)
 endif
 
 
+# when using shared libraries, we have to compile with -fPIC (note
+# that -fpic is not enough). On AIX, however, -fPIC is the default
+# and the compiler warns if we pass that flag to it.
 ifeq ($(enable-shared),yes)
-  CXXFLAGS.g += -fPIC
-  CXXFLAGS.o += -fPIC
+  ifneq ($(OS),AIX)
+    CXXFLAGS.g += -fPIC
+    CXXFLAGS.o += -fPIC
+  endif
 endif
