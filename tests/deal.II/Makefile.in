@@ -368,7 +368,6 @@ wave-test-3.output: wave-test-3.testcase
 	@./$<
 	@perl -pi -e 's/JobId.*//;\
 		s/value.*//;\
-		s/-?\d\.\d+e-1[4-9]/0/g;\
 		s/%%Creation Date:.*//;\
 		s/# Time =.*//; \
 		s/# Date =.*//; \

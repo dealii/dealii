@@ -15,13 +15,12 @@
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
-#include <fe/continuous.h>
+#include <fe/fe_lib.lagrange.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <lac/sparse_matrix.h>
 #include <dofs/dof_constraints.h>
-#include <dofs/dof_accessor.h>
 #include <numerics/dof_renumbering.h>
 #include <dofs/dof_tools.h>
 #include <base/logstream.h>
@@ -296,7 +295,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 
 
   deallog << "    Distributing degrees of freedom..." << endl;
-  FE_Q<dim> fe(1);
+  FEQ1<dim> fe;
   dof->distribute_dofs (fe);
 
   deallog << "    Renumbering degrees of freedom..." << endl;

@@ -22,8 +22,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
-#include <fe/continuous.h>
-#include <fe/mapping_q1.h>
+#include <fe/fe_lib.lagrange.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_values.h>
 #include <base/quadrature_lib.h>
@@ -61,7 +60,7 @@ class LaplaceProblem
     void output_results () const;
 
     Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
+    FEQ1<dim>            fe;
     DoFHandler<dim>      dof_handler;
 
     SparsityPattern      sparsity_pattern;
@@ -117,7 +116,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-  fe (1), dof_handler (triangulation)
+		dof_handler (triangulation)
 {};
 
 

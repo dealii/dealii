@@ -14,14 +14,12 @@
 
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
-#include <fe/mapping_q1.h>
-#include <fe/continuous.h>
+#include <fe/fe_lib.lagrange.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <lac/sparse_matrix.h>
 #include <base/parameter_handler.h>
-#include <dofs/dof_accessor.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <grid/grid_out.h>
@@ -244,10 +242,10 @@ int main ()
       switch (element)
 	{
 	  case 0:
-		fe = new FE_Q<3>(1);
+		fe = new FEQ1<3>();
 		break;
 	  case 1:
-		fe = new FE_Q<3>(2);
+		fe = new FEQ2<3>();
 		break;
 	};
       
