@@ -40,10 +40,6 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
-      *"egcs-1.1"*)
-  	AC_MSG_RESULT(C++ compiler is egcs-1.1)
-  	GXX_VERSION=egcs1.1
-  	;;
       *2.95*)
   	AC_MSG_RESULT(C++ compiler is gcc-2.95)
   	GXX_VERSION=gcc2.95
