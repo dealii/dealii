@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -99,6 +99,7 @@ int main()
       testproblem.five_point(A);
 
       PreconditionIdentity prec_no;
+      PreconditionRichardson prec_richardson(0.6);
       PreconditionSOR<> prec_sor;
       prec_sor.initialize(A, 1.2);
       PreconditionSSOR<> prec_ssor;
@@ -157,12 +158,28 @@ int main()
 	  deallog.pop();
 	  
 	  deallog.push("no");
-	  
+
+	  rich.set_omega(1./A.diag_element(0)); 
+	  check_solve(rich,A,u,f,prec_no);
 	  check_solve(cg,A,u,f,prec_no);
 	  check_solve(bicgstab,A,u,f,prec_no);
 	  check_solve(gmres,A,u,f,prec_no);
 	  check_solve(gmresright,A,u,f,prec_no);
 	  check_solve(qmrs,A,u,f,prec_no);
+	  rich.set_omega(1.);
+	  
+	  deallog.pop();
+	  
+	  deallog.push("rich");
+	  
+	  rich.set_omega(1./A.diag_element(0)); 
+	  check_solve(rich,A,u,f,prec_richardson);
+	  check_solve(cg,A,u,f,prec_richardson);
+	  check_solve(bicgstab,A,u,f,prec_richardson);
+	  check_solve(gmres,A,u,f,prec_richardson);
+	  check_solve(gmresright,A,u,f,prec_richardson);
+	  check_solve(qmrs,A,u,f,prec_richardson);
+	  rich.set_omega(1.);
 	  
 	  deallog.pop();
 	  

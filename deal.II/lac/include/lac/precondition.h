@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,6 +68,97 @@ class PreconditionIdentity : public Subscriptor
 				      */
     template<class VECTOR>
     void Tvmult_add (VECTOR&, const VECTOR&) const;
+};
+
+
+
+/**
+ * Preconditioning with Richardson's method. This preconditioner just
+ * scales the vector with a constant relaxation factor provided by the
+ * #AdditionalData object.
+ *
+ * In Krylov-space methods, this preconditioner should not have any
+ * effect. Using SolverRichardson, the two relaxation parameters will
+ * be just multiplied. Still, this class is usefull in multigrid
+ * smoother objects (MGSmootherRelaxation).
+ *
+ * @author Guido Kanschat, 2005
+ */
+class PreconditionRichardson : public Subscriptor
+{
+  public:
+				     /**
+				      * Parameters for Richardson
+				      * preconditioner.
+				      */
+    class AdditionalData
+    {
+      public:
+					 /**
+					  * Constructor. Block size
+					  * must be given since there
+					  * is no reasonable default
+					  * parameter.
+					  */
+	AdditionalData (const double relaxation = 1.);
+
+					 /**
+					  * Relaxation parameter.
+					  */
+	double relaxation;
+    };
+
+				     /**
+				      * Constructor with optional
+				      * setting of the relaxation
+				      * parameter
+				      */
+    PreconditionRichardson(const AdditionalData = AdditionalData());
+
+				     /**
+				      * Change the relaxaton parameter
+				      * in a way consistent with other
+				      * preconditioners.
+				      */
+    void initialize (const AdditionalData parameters);
+
+				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Apply transpose
+				      * preconditioner. Since this is
+				      * the identity, this function is
+				      * the same as
+				      * vmult().
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply preconditioner, adding to the previous value.
+				      */
+    template<class VECTOR>
+    void vmult_add (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Apply transpose
+				      * preconditioner, adding. Since this is
+				      * the identity, this function is
+				      * the same as
+				      * vmult_add().
+				      */
+    template<class VECTOR>
+    void Tvmult_add (VECTOR&, const VECTOR&) const;
+    
+  private:
+				     /**
+				      * The relaxation parameter
+				      * multiplied with the vectors.
+				      */
+    double relaxation;
 };
 
 
@@ -637,6 +728,66 @@ inline void
 PreconditionIdentity::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 {
   dst.add(src);
+}
+
+//----------------------------------------------------------------------//
+
+inline
+PreconditionRichardson::AdditionalData::AdditionalData (
+  const double relaxation)
+		:
+		relaxation(relaxation)
+{}
+
+
+inline
+PreconditionRichardson::PreconditionRichardson (
+  const PreconditionRichardson::AdditionalData parameters)
+		:
+		relaxation(parameters.relaxation)
+{}
+
+
+
+inline void
+PreconditionRichardson::initialize (
+  const PreconditionRichardson::AdditionalData parameters)
+{
+  relaxation = parameters.relaxation;
+}
+
+
+
+template<class VECTOR>
+inline void
+PreconditionRichardson::vmult (VECTOR &dst, const VECTOR &src) const
+{
+  dst.equ(relaxation,src);
+}
+
+
+
+template<class VECTOR>
+inline void
+PreconditionRichardson::Tvmult (VECTOR &dst, const VECTOR &src) const
+{
+  dst.equ(relaxation,src);
+}
+
+template<class VECTOR>
+inline void
+PreconditionRichardson::vmult_add (VECTOR &dst, const VECTOR &src) const
+{
+  dst.add(relaxation,src);
+}
+
+
+
+template<class VECTOR>
+inline void
+PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
+{
+  dst.add(relaxation,src);
 }
 
 //----------------------------------------------------------------------//

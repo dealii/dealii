@@ -42,6 +42,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> <p>Changed: the file <tt>multigrid/mg_dof_tools.h</tt> was
+  renamed to <tt>multigrid/mg_tools.h</tt> in order to match the name
+  of the class contained.
+  <br>
+  (GK 2005/03/09)
+  </p>
+
   <li> <p>Changed: <code class="class">DoFTools</code>::<code
   class="member">make_flux_sparsity_pattern</code>, <code
   class="class">MGTools</code>::<code
@@ -157,39 +164,45 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       Fixed: The <code>BlockSparseMatrix</code> class had no local
-       typedef <code>value_type</code> like all other classes, which
+       New: The <code class="class">PreconditionRichardson</code>
+       implements a Richardson preconditioner.
+
+       <br> 
+       (GK, 2005/03/10)
+       </p>
+
+  <li> <p> Fixed: The <code class="class">BlockSparseMatrix</code>
+       class had no local typedef <code
+       class="member">value_type</code> like all other classes, which
        made it a little awkward to use in some places. This has now
        been fixed.
+
        <br> 
        (WB, 2005/03/03)
        </p>
 
-  <li> <p>
-       Fixed: The <code>PETScWrappers::MatrixBase</code> class
-       documented that adding or setting a value that hasn't been in
-       the sparsity pattern before will lead to an exception being
-       thrown. This is of course wrong: PETSc allocates matrix entries
-       dynamically, as needed. The documentation is now fixed.
-       <br> 
-       (WB, 2005/03/03)
+  <li> <p> Fixed: The <code class="class">PETScWrappers</code>::<code
+       class="member">MatrixBase</code> class documented that adding
+       or setting a value that hasn't been in the sparsity pattern
+       before will lead to an exception being thrown. This is of
+       course wrong: PETSc allocates matrix entries dynamically, as
+       needed. The documentation is now fixed.
+       <br> (WB, 2005/03/03)
        </p>
 
-  <li> <p>
-       New: The <code>SparseMatrix</code> iterators had no <code>operator
-       &gt;</code>, only an <code>operator &lt;</code>. The missing operator
-       is now implemented. The same holds for the <code>FullMatrix</code>
-       class.
-       <br> 
-       (WB, 2005/03/01)
+  <li> <p> New: The <code class="class">SparseMatrix</code> iterators
+       had no <code class="member">operator &gt;</code>, only an <code
+       class="member">operator &lt;</code>. The missing operator is
+       now implemented. The same holds for the <code
+       class="class">FullMatrix</code> class.
+       <br> (WB, 2005/03/01)
        </p>
 
-  <li> <p>
-       Fixed: The <code>SparseMatrix</code> iterators could not be compared
-       using <code>operator &lt;</code>: the compiler complained that a
-       private member was accessed. This is now fixed.
-       <br> 
-       (WB, 2005/03/01)
+  <li> <p> Fixed: The <code class="class">SparseMatrix</code>
+       iterators could not be compared using <code
+       class="member">operator &lt;</code>: the compiler complained
+       that a private member was accessed. This is now fixed.
+       <br> (WB, 2005/03/01)
        </p>
 </ol>
 
