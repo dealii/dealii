@@ -5,12 +5,27 @@
 /*----------------------------   error-estimator.h     ---------------------------*/
 
 
+#include <base/exceptions.h>
+
+
+// forward declarations
+template <int dim> class DoFHandler;
+class dVector;
+
+
+
+
 template <int dim>
 class KellyErrorEstimator {
   public:
     void estimate_error (const DoFHandler<dim> &dof,
 			 const dVector         &solution,
 			 const dVector         &error) const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotImplemented);
 };
 
 
