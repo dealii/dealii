@@ -807,56 +807,56 @@ inline
 typename BlockSparseMatrix<number>::const_iterator&
 BlockSparseMatrix<number>::const_iterator::operator++ ()
 {
-  Assert (block_row<matrix->n_block_rows(), ExcIteratorPastEnd());
+  Assert (this->block_row<this->matrix->n_block_rows(), ExcIteratorPastEnd());
 
 				   // Remeber current row inside block
-  unsigned int local_row = base_iterator->row();
+  unsigned int local_row = this->base_iterator->row();
 				   // Advance inside block
-  ++base_iterator;
-  ++a_index;
+  ++this->base_iterator;
+  ++this->a_index;
 				   // If end of row inside block,
 				   // advance to next block
-  if (base_iterator == matrix->block(block_row, block_col).end(local_row))
+  if (this->base_iterator == this->matrix->block(this->block_row, this->block_col).end(local_row))
     {
-      if (block_col<matrix->n_block_cols()-1)
+      if (this->block_col<this->matrix->n_block_cols()-1)
 	{
 					   // Advance to next block in
 					   // row
-	  ++block_col;
-	  col_start = matrix->sparsity_pattern
-		      ->get_column_indices().local_to_global(block_col, 0);
+	  ++this->block_col;
+	  this->col_start = this->matrix->sparsity_pattern
+		      ->get_column_indices().local_to_global(this->block_col, 0);
 	}
       else
 	{
 					   // Advance to first block
 					   // in next row
-	  block_col = 0;
-	  col_start = 0;
-	  a_index = 0;
+	  this->block_col = 0;
+	  this->col_start = 0;
+	  this->a_index = 0;
 	  ++local_row;
-	  if (local_row>=matrix->block(block_row,0).m())
+	  if (local_row>=this->matrix->block(block_row,0).m())
 	    {
 					       // If final row in
 					       // block, go to next
 					       // block row
 	      local_row = 0;
-	      ++block_row;
-	      if (block_row<matrix->n_block_rows())
-		row_start = matrix->sparsity_pattern
-			    ->get_row_indices().local_to_global(block_row, 0);
+	      ++this->block_row;
+	      if (this->block_row < this->matrix->n_block_rows())
+		this->row_start = this->matrix->sparsity_pattern
+			    ->get_row_indices().local_to_global(this->block_row, 0);
 	    }
 	}
 				       // Finally, set base_iterator
 				       // to start of row determined
 				       // above
-      if (block_row<matrix->n_block_rows())
-	base_iterator = matrix->block(block_row, block_col).begin(local_row);
+      if (this->block_row < this->matrix->n_block_rows())
+	this->base_iterator = this->matrix->block(this->block_row, this->block_col).begin(local_row);
       else
 					 // Set base_iterator to a
 					 // defined state for
 					 // comparison. This is the
 					 // end() state.
-	base_iterator = matrix->block(0, 0).begin();
+	this->base_iterator = this->matrix->block(0, 0).begin();
     }
   return *this;
 }
@@ -898,12 +898,12 @@ inline
 bool
 BlockSparseMatrix<number>::const_iterator::operator == (const const_iterator& i) const
 {
-  if (matrix != i->matrix)
+  if (this->matrix != i->matrix)
     return false;
   
-  if (block_row == i->block_row
-      && block_col == i->block_col
-      && base_iterator == i->base_iterator)
+  if (this->block_row == i->block_row
+      && this->block_col == i->block_col
+      && this->base_iterator == i->base_iterator)
     return true;
   return false;
 }
@@ -925,15 +925,15 @@ inline
 bool
 BlockSparseMatrix<number>::const_iterator::operator < (const const_iterator& i) const
 {
-  if (block_row<i->block_row)
+  if (this->block_row<i->block_row)
     return true;
-  if (block_row == i->block_row)
+  if (this->block_row == i->block_row)
     {
-      if (base_iterator->row() < i->base_iterator->row())
+      if (this->base_iterator->row() < i->base_iterator->row())
 	return true;
-      if (base_iterator->row() == i->base_iterator->row())
+      if (this->base_iterator->row() == i->base_iterator->row())
 	{
-	  if (a_index < i->a_index)
+	  if (this->a_index < i->a_index)
 	    return true;
 	}
     }
