@@ -229,28 +229,35 @@ class Vector
     Number norm_sqr () const;
 
 				     /**
-				      * Return the mean value of the elements of
+				      * Mean value of the elements of
 				      * this vector.
 				      */
     Number mean_value () const;
 
 				     /**
-				      * Return the $l_1$-norm of the vector, i.e.
-				      * the sum of the absolute values.
+				      * $l_1$-norm of the vector.
+				      * The sum of the absolute values.
 				      */
     Number l1_norm () const;
 
 				     /**
-				      * Return the $l_2$-norm of the vector, i.e.
-				      * the square root of the sum of the
+				      * $l_2$-norm of the vector.  The
+				      * square root of the sum of the
 				      * squares of the elements.
 				      */
     Number l2_norm () const;
 
 				     /**
-				      * Return the maximum absolute value of the
-				      * elements of this vector, which is the
-				      * $l_\infty$-norm of a vector.
+				      * $l_p$-norm of the vector. The
+				      * pth root of the sum of the pth
+				      * powers of the absolute values
+				      * of the elements.
+				      */
+    Number lp_norm (double p) const;
+
+				     /**
+				      * Maximum absolute value of the
+				      * elements.
 				      */
     Number linfty_norm () const;
 

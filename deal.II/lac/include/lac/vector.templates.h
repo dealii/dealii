@@ -240,6 +240,36 @@ Number Vector<Number>::l2_norm () const
 
 
 template <typename Number>
+Number Vector<Number>::lp_norm (double p) const
+{
+  Assert (dim!=0, ExcEmptyVector());
+
+  Number sum0 = 0,
+	 sum1 = 0,
+	 sum2 = 0,
+	 sum3 = 0;
+
+				   // use modern processors better by
+				   // allowing pipelined commands to be
+				   // executed in parallel
+  const_iterator ptr  = begin(),
+		 eptr = ptr + (dim/4)*4;
+  while (ptr!=eptr)
+    {
+      sum0 += std::pow(std::fabs(*ptr++), p);
+      sum1 += std::pow(std::fabs(*ptr++), p);
+      sum2 += std::pow(std::fabs(*ptr++), p);
+      sum3 += std::pow(std::fabs(*ptr++), p);
+    };
+				   // add up remaining elements
+  while (ptr != end())
+    sum0 += pow(std::fabs(*ptr++), p);
+  
+  return pow(sum0+sum1+sum2+sum3, 1./p);
+};
+
+
+template <typename Number>
 Number Vector<Number>::linfty_norm () const {
   Assert (dim!=0, ExcEmptyVector());
 
