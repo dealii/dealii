@@ -69,7 +69,6 @@ class SparseMatrix : public Subscriptor
 				      */
     SparseMatrix (const SparseMatrix &);
 
-
 				     /**
 				      * Constructor. Takes the given matrix
 				      * sparsity structure to represent the
@@ -91,85 +90,99 @@ class SparseMatrix : public Subscriptor
 				      * structure.
 				      */
     virtual ~SparseMatrix ();
+
 				     /** 
-				      * Pseudo operator only copying empty objects.
+				      * Pseudo operator only copying
+				      * empty objects.
 				      */
     SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
-
 				     /**
-				      * Reinitialize the object but keep to
-				      * the sparsity pattern previously used.
-				      * This may be necessary if you #reinit#'d
-				      * the sparsity structure and want to
-				      * update the size of the matrix.
+				      * Reinitialize the object but
+				      * keep to the sparsity pattern
+				      * previously used.  This may be
+				      * necessary if you #reinit#'d
+				      * the sparsity structure and
+				      * want to update the size of the
+				      * matrix.
 				      *
-				      * Note that memory is only reallocated if
-				      * the new size exceeds the old size. If
-				      * that is not the case, the allocated
-				      * memory is not reduced. However, if the
-				      * sparsity structure is empty (i.e. the
-				      * dimensions are zero), then all memory
-				      * is freed.
+				      * Note that memory is only
+				      * reallocated if the new size
+				      * exceeds the old size. If that
+				      * is not the case, the allocated
+				      * memory is not reduced. However,
+				      * if the sparsity structure is
+				      * empty (i.e. the dimensions are
+				      * zero), then all memory is
+				      * freed.
 				      */
     virtual void reinit ();
 
 				     /**
-				      * Reinitialize the sparse matrix with the
-				      * given sparsity pattern. The latter tells
-				      * the matrix how many nonzero elements
-				      * there need to be reserved.
+				      * Reinitialize the sparse matrix
+				      * with the given sparsity
+				      * pattern. The latter tells the
+				      * matrix how many nonzero
+				      * elements there need to be
+				      * reserved.
 				      *
-				      * Regarding memory allocation, the same
-				      * applies as said above.
+				      * Regarding memory allocation,
+				      * the same applies as said
+				      * above.
 				      *
-				      * You have to make sure that the lifetime
-				      * of the sparsity structure is at least
-				      * as long as that of this matrix or as
-				      * long as #reinit# is not called with a
-				      * new sparsity structure.
+				      * You have to make sure that the
+				      * lifetime of the sparsity
+				      * structure is at least as long
+				      * as that of this matrix or as
+				      * long as #reinit# is not called
+				      * with a new sparsity structure.
 				      */
     virtual void reinit (const SparsityPattern &sparsity);
 
 				     /**
-				      * Release all memory and return to a state
-				      * just like after having called the
-				      * default constructor. It also forgets the
-				      * sparsity pattern it was previously tied
-				      * to.
+				      * Release all memory and return
+				      * to a state just like after
+				      * having called the default
+				      * constructor. It also forgets
+				      * the sparsity pattern it was
+				      * previously tied to.
 				      */
     virtual void clear ();
     
 				     /**
-				      * Return whether the object is empty. It
-				      * is empty if either both dimensions
-				      * are zero or no #SparsityPattern#
-				      * is associated.
+				      * Return whether the object is
+				      * empty. It is empty if either
+				      * both dimensions are zero or no
+				      * #SparsityPattern# is
+				      * associated.
 				      */
     bool empty () const;
 
 				     /**
-				      * Return the dimension of the image space.
-				      * To remember: the matrix is of dimension
+				      * Return the dimension of the
+				      * image space.  To remember: the
+				      * matrix is of dimension
 				      * $m \times n$.
 				      */
     unsigned int m () const;
     
 				     /**
-				      * Return the dimension of the range space.
-				      * To remember: the matrix is of dimension
+				      * Return the dimension of the
+				      * range space.  To remember: the
+				      * matrix is of dimension
 				      * $m \times n$.
 				      */
 
     unsigned int n () const;
 
 				     /**
-				      * Return the number of nonzero elements of
-				      * this matrix. Actually, it returns the
-				      * number of entries in the sparsity
-				      * pattern; if any of the entries should
-				      * happen to be zero, it is counted
-				      * anyway.
+				      * Return the number of nonzero
+				      * elements of this
+				      * matrix. Actually, it returns
+				      * the number of entries in the
+				      * sparsity pattern; if any of
+				      * the entries should happen to
+				      * be zero, it is counted anyway.
 				      */
     unsigned int n_nonzero_elements () const;
     
@@ -183,27 +196,33 @@ class SparseMatrix : public Subscriptor
 	      const number value);
     
 				     /**
-				      * Add #value# to the element #(i,j)#.
-				      * Throws an error if the entry does
-				      * not exist. Still, it is allowed to store
-				      * zero values in non-existent fields.
+				      * Add #value# to the element
+				      * #(i,j)#.  Throws an error if
+				      * the entry does not
+				      * exist. Still, it is allowed to
+				      * store zero values in
+				      * non-existent fields.
 				      */
     void add (const unsigned int i, const unsigned int j,
 	      const number value);
 
 				     /**
-				      * Copy the given matrix to this one.
-				      * The operation throws an error if the
-				      * sparsity patterns of the two involved
-				      * matrices do not point to the same
-				      * object, since in this case the copy
-				      * operation is cheaper. Since this
-				      * operation is notheless not for free,
-				      * we do not make it available through
-				      * #operator =#, since this may lead
-				      * to unwanted usage, e.g. in copy
-				      * arguments to functions, which should
-				      * really be arguments by reference.
+				      * Copy the given matrix to this
+				      * one.  The operation throws an
+				      * error if the sparsity patterns
+				      * of the two involved matrices
+				      * do not point to the same
+				      * object, since in this case the
+				      * copy operation is
+				      * cheaper. Since this operation
+				      * is notheless not for free, we
+				      * do not make it available
+				      * through #operator =#, since
+				      * this may lead to unwanted
+				      * usage, e.g. in copy arguments
+				      * to functions, which should
+				      * really be arguments by
+				      * reference.
 				      *
 				      * The source matrix may be a matrix
 				      * of arbitrary type, as long as its
@@ -214,14 +233,17 @@ class SparseMatrix : public Subscriptor
 				      * #this#.
 				      */
     template <typename somenumber>
-    SparseMatrix<number> & copy_from (const SparseMatrix<somenumber> &source);
+    SparseMatrix<number> &
+    copy_from (const SparseMatrix<somenumber> &source);
 
 				     /**
-				      * Add #matrix# scaled by #factor# to this
-				      * matrix. The function throws an error
-				      * if the sparsity patterns of the two
-				      * involved matrices do not point to the
-				      * same object, since in this case the
+				      * Add #matrix# scaled by
+				      * #factor# to this matrix. The
+				      * function throws an error if
+				      * the sparsity patterns of the
+				      * two involved matrices do not
+				      * point to the same object,
+				      * since in this case the
 				      * operation is cheaper.
 				      *
 				      * The source matrix may be a matrix
@@ -260,8 +282,9 @@ class SparseMatrix : public Subscriptor
     number diag_element (const unsigned int i) const;
 
 				     /**
-				      * Same as above, but return a writeable
-				      * reference. You're sure what you do?
+				      * Same as above, but return a
+				      * writeable reference. You're
+				      * sure you know what you do?
 				      */
     number & diag_element (const unsigned int i);
 
@@ -279,86 +302,102 @@ class SparseMatrix : public Subscriptor
     
     				     /**
 				      * This is for hackers. Get
-				      * access to the #i#th element of this
-				      * matrix. The elements are stored in
-				      * a consecutive way, refer to the
-				      * #SparsityPattern# class for more details.
+				      * access to the #i#th element of
+				      * this matrix. The elements are
+				      * stored in a consecutive way,
+				      * refer to the #SparsityPattern#
+				      * class for more details.
 				      *
-				      * You should use this interface very
-				      * carefully and only if you are absolutely
-				      * sure to know what you do. You should
-				      * also note that the structure of these
-				      * arrays may change over time.
-				      * If you change the layout yourself, you
-				      * should also rename this function to
-				      * avoid programs relying on outdated
-				      * information!
+				      * You should use this interface
+				      * very carefully and only if you
+				      * are absolutely sure to know
+				      * what you do. You should also
+				      * note that the structure of
+				      * these arrays may change over
+				      * time.  If you change the
+				      * layout yourself, you should
+				      * also rename this function to
+				      * avoid programs relying on
+				      * outdated information!
 				      */
     number global_entry (const unsigned int i) const;
 
 				     /**
-				      * Same as above, but with write access.
-				      * You certainly know what you do?
+				      * Same as above, but with write
+				      * access.  You certainly know
+				      * what you do?
 				      */
     number & global_entry (const unsigned int i);
 
 				     /**
-				      * Matrix-vector multiplication: let
-				      * $dst = M*src$ with $M$ being this matrix.
+				      * Matrix-vector multiplication:
+				      * let $dst = M*src$ with $M$
+				      * being this matrix.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
     
 				     /**
-				      * Matrix-vector multiplication: let
-				      * $dst = M^T*src$ with $M$ being this
-				      * matrix. This function does the same as
-				      * #vmult# but takes the transposed matrix.
+				      * Matrix-vector multiplication:
+				      * let $dst = M^T*src$ with $M$
+				      * being this matrix. This
+				      * function does the same as
+				      * #vmult# but takes the
+				      * transposed matrix.
 				      */
     template <typename somenumber>
     void Tvmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
   
 				     /**
-				      * Adding Matrix-vector multiplication. Add
-				      * $M*src$ on $dst$ with $M$ being this matrix.
+				      * Adding Matrix-vector
+				      * multiplication. Add $M*src$ on
+				      * $dst$ with $M$ being this
+				      * matrix.
 				      */
     template <typename somenumber>
     void vmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
     
 				     /**
-				      * Adding Matrix-vector multiplication. Add
-				      * $M^T*src$  to $dst$ with $M$ being this
-				      * matrix. This function does the same as
-				      * #vmult_add# but takes the transposed matrix.
+				      * Adding Matrix-vector
+				      * multiplication. Add $M^T*src$
+				      * to $dst$ with $M$ being this
+				      * matrix. This function does the
+				      * same as #vmult_add# but takes
+				      * the transposed matrix.
 				      */
     template <typename somenumber>
     void Tvmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
   
 				     /**
-				      * Return the norm of the vector $v$ with
-				      * respect to the norm induced by this
-				      * matrix, i.e. $\left(v,Mv\right)$. This
-				      * is useful, e.g. in the finite element
-				      * context, where the $L_2$ norm of a
-				      * function equals the matrix norm with
-				      * respect to the mass matrix of the vector
-				      * representing the nodal values of the
-				      * finite element function. Note that
-				      * even though the function's name might
-				      * suggest something different, for historic
-				      * reasons not the norm but its square
-				      * is returned, as defined above by
+				      * Return the norm of the vector
+				      * $v$ with respect to the norm
+				      * induced by this matrix,
+				      * i.e. $\left(v,Mv\right)$. This
+				      * is useful, e.g. in the finite
+				      * element context, where the
+				      * $L_2$ norm of a function
+				      * equals the matrix norm with
+				      * respect to the mass matrix of
+				      * the vector representing the
+				      * nodal values of the finite
+				      * element function. Note that
+				      * even though the function's
+				      * name might suggest something
+				      * different, for historic
+				      * reasons not the norm but its
+				      * square is returned, as defined
+				      * above by the scalar product.
+				      *
+				      * Note the order in which the
+				      * matrix appears. For
+				      * non-symmetric matrices there
+				      * is a difference whether the
+				      * matrix operates on the first
+				      * or on the second operand of
 				      * the scalar product.
 				      *
-				      * Note the order in which the matrix
-				      * appears. For non-symmetric matrices
-				      * there is a difference whether the
-				      * matrix operates on the first
-				      * or on the second operand of the
-				      * scalar product.
-				      *
-				      * Obviously, the matrix needs to be square
-				      * for this operation.
+				      * Obviously, the matrix needs to
+				      * be square for this operation.
 				      */
     template <typename somenumber>
     somenumber matrix_norm (const Vector<somenumber> &v) const;
@@ -391,12 +430,14 @@ class SparseMatrix : public Subscriptor
     number linfty_norm () const;
 
 				     /**
-				      * Compute the residual of an equation
-				      * #Ax=b#, where the residual is defined
-				      * to be #r=b-Ax# with #x# typically being
-				      * an approximate of the true solution of
-				      * the equation. Write the residual into
-				      * #dst#.
+				      * Compute the residual of an
+				      * equation #Ax=b#, where the
+				      * residual is defined to be
+				      * #r=b-Ax# with #x# typically
+				      * being an approximate of the
+				      * true solution of the
+				      * equation. Write the residual
+				      * into #dst#.
 				      */
     template <typename somenumber>
     somenumber residual (Vector<somenumber>       &dst,
@@ -408,7 +449,8 @@ class SparseMatrix : public Subscriptor
 			      const Vector<somenumber> &src,
 			      const number              om = 1.) const;
 				     /**
-				      * Apply SOR preconditioning to #src#.
+				      * Apply SOR preconditioning to
+				      * #src#.
 				      */
     template <typename somenumber>
     void precondition_SSOR (Vector<somenumber>       &dst,
@@ -426,10 +468,12 @@ class SparseMatrix : public Subscriptor
  			   const number              om = 1.) const;
     
 				     /**
-				      * Perform SSOR preconditioning in-place.
-				      * Apply the preconditioner matrix without
+				      * Perform SSOR preconditioning
+				      * in-place.  Apply the
+				      * preconditioner matrix without
 				      * copying to a second vector.
-				      * #omega# is the relaxation parameter.
+				      * #omega# is the relaxation
+				      * parameter.
 				      */
     template <typename somenumber>
     void SSOR (Vector<somenumber> &v,
@@ -446,8 +490,8 @@ class SparseMatrix : public Subscriptor
 
 				     /**
 				      * Do one SOR step on #v#.
-				      * Performs a direct SOR step with right hand
-				      * side #b#.
+				      * Performs a direct SOR step
+				      * with right hand side #b#.
 				      */
     template <typename somenumber>
     void SOR_step (Vector<somenumber> &v,
@@ -455,9 +499,9 @@ class SparseMatrix : public Subscriptor
 		   const number        om = 1.) const;
 
 				     /**
-				      * Do one adjoint SOR step on #v#.
-				      * Performs a direct TSOR step with right hand
-				      * side #b#.
+				      * Do one adjoint SOR step on
+				      * #v#.  Performs a direct TSOR
+				      * step with right hand side #b#.
 				      */
     template <typename somenumber>
     void TSOR_step (Vector<somenumber> &v,
@@ -465,9 +509,10 @@ class SparseMatrix : public Subscriptor
 		    const number        om = 1.) const;
 
 				     /**
-				      * Do one adjoint SSOR step on #v#.
-				      * Performs a direct SSOR step with right hand
-				      * side #b# by performing TSOR after SOR.
+				      * Do one adjoint SSOR step on
+				      * #v#.  Performs a direct SSOR
+				      * step with right hand side #b#
+				      * by performing TSOR after SOR.
 				      */
     template <typename somenumber>
     void SSOR_step (Vector<somenumber> &v,
@@ -475,45 +520,56 @@ class SparseMatrix : public Subscriptor
 		    const number        om = 1.) const;
 
 				     /**
-				      * Return a (constant) reference to the
-				      * underlying sparsity pattern of this
-				      * matrix.
+				      * Return a (constant) reference
+				      * to the underlying sparsity
+				      * pattern of this matrix.
 				      *
-				      * Though the return value is declared
-				      * #const#, you should be aware that it
-				      * may change if you call any nonconstant
-				      * function of objects which operate on
-				      * it.
+				      * Though the return value is
+				      * declared #const#, you should
+				      * be aware that it may change if
+				      * you call any nonconstant
+				      * function of objects which
+				      * operate on it.
 				      */
     const SparsityPattern & get_sparsity_pattern () const;
 
 				     /**
-				      * Print the matrix to the given stream,
-				      * using the format
+				      * Print the matrix to the given
+				      * stream, using the format
 				      * #(line,col) value#, i.e. one
-				      * nonzero entry of the matrix per line.
+				      * nonzero entry of the matrix
+				      * per line.
 				      */
     void print (ostream &out) const;
 
 				     /**
-				      * Print the matrix in the usual format,
-				      * i.e. as a matrix and not as a list of
-				      * nonzero elements. For better
-				      * readability, elements not in the matrix
-				      * are displayed as empty space, while
-				      * matrix elements which are explicitely
-				      * set to zero are displayed as such.
+				      * Print the matrix in the usual
+				      * format, i.e. as a matrix and
+				      * not as a list of nonzero
+				      * elements. For better
+				      * readability, elements not in
+				      * the matrix are displayed as
+				      * empty space, while matrix
+				      * elements which are explicitely
+				      * set to zero are displayed as
+				      * such.
 				      *
-				      * The parameters allow for a flexible setting of
-				      * the output format: #precision# and #scientific#
-				      * are used to determine the number format, where
-				      * #scientific# = #false# means fixed point notation.
-				      * A zero entry for #width# makes the function compute a
-				      * width, but it may be changed to a positive value,
-				      * if output is crude.
+				      * The parameters allow for a
+				      * flexible setting of the output
+				      * format: #precision# and
+				      * #scientific# are used to
+				      * determine the number format,
+				      * where #scientific# = #false#
+				      * means fixed point notation.  A
+				      * zero entry for #width# makes
+				      * the function compute a width,
+				      * but it may be changed to a
+				      * positive value, if output is
+				      * crude.
 				      *
-				      * Additionally, a character for an empty value
-				      * may be specified.
+				      * Additionally, a character for
+				      * an empty value may be
+				      * specified.
 				      *
 				      * This function
 				      * may produce {\bf large} amounts of
@@ -573,20 +629,22 @@ class SparseMatrix : public Subscriptor
     
   private:
 				     /**
-				      * Pointer to the sparsity pattern used
-				      * for this matrix. In order to guarantee
-				      * that it is not deleted while still in
-				      * use, we subscribe to it using the
-				      * #SmartPointer# class.
+				      * Pointer to the sparsity
+				      * pattern used for this
+				      * matrix. In order to guarantee
+				      * that it is not deleted while
+				      * still in use, we subscribe to
+				      * it using the #SmartPointer#
+				      * class.
 				      */
     SmartPointer<const SparsityPattern> cols;
 
 				     /**
 				      * Array of values for all the
 				      * nonzero entries. The position
-				      * within the matrix, i.e.
-				      * the row and column number for
-				      * a given entry can only be
+				      * within the matrix, i.e.  the
+				      * row and column number for a
+				      * given entry can only be
 				      * deduced using the sparsity
 				      * pattern. The same holds for
 				      * the more common operation of
@@ -596,23 +654,26 @@ class SparseMatrix : public Subscriptor
     number *val;
 
 				     /**
-				      * Allocated size of #val#. This can
-				      * be larger than the actually used part
-				      * if the size of the matrix was
-				      * reduced somewhen in the past by
+				      * Allocated size of #val#. This
+				      * can be larger than the
+				      * actually used part if the size
+				      * of the matrix was reduced
+				      * somewhen in the past by
 				      * associating a sparsity pattern
-				      * with a smaller size to this object
-				      * somewhen, using the #reinit#
-				      * function.
+				      * with a smaller size to this
+				      * object somewhen, using the
+				      * #reinit# function.
 				      */
     unsigned int max_len;
 
 				     /**
-				      * Version of #vmult# which only performs
-				      * its actions on the region defined by
-				      * #[begin_row,end_row)#. This function
-				      * is called by #vmult# in the case
-				      * of enabled multithreading.
+				      * Version of #vmult# which only
+				      * performs its actions on the
+				      * region defined by
+				      * #[begin_row,end_row)#. This
+				      * function is called by #vmult#
+				      * in the case of enabled
+				      * multithreading.
 				      */
     template <typename somenumber>
     void threaded_vmult (Vector<somenumber>       &dst,
@@ -621,11 +682,13 @@ class SparseMatrix : public Subscriptor
 			 const unsigned int        end_row) const;
 
 				     /**
-				      * Version of #matrix_norm# which only
-				      * performs its actions on the region
-				      * defined by #[begin_row,end_row)#. This
-				      * function is called by #matrix_norm# in
-				      * the case of enabled multithreading.
+				      * Version of #matrix_norm# which
+				      * only performs its actions on
+				      * the region defined by
+				      * #[begin_row,end_row)#. This
+				      * function is called by
+				      * #matrix_norm# in the case of
+				      * enabled multithreading.
 				      */
     template <typename somenumber>
     void threaded_matrix_norm (const Vector<somenumber> &v,
