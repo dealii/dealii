@@ -5,23 +5,25 @@
     <link href="../screen.css" rel="StyleSheet" media="screen">
     <link href="../print.css" rel="StyleSheet" media="print">
     <title>The deal.II news page</title>
-    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
-    <meta name="keywords" content="deal.II"></head>
+    <meta name="author" content="deal.II <info@dealii.org>">
+    <meta name="keywords" content="deal.II">
+    <meta name="CVS ID" content="$Id$">
+  </head>
 
 <body>
  <script type="text/javascript">
   <!--
-  var version = "$Name$";
-  version=version.replace(/\$.*: */,"");
-  version=version.replace(/.*Version-/,"");
-  version=version.replace(/\$/, "");
-  version=version.replace(/-/g, ".");
-  version=version.replace(/ /g, "");
+  var release = "$Name$";
+  release=release.replace(/\$.*: */,"");
+  release=release.replace(/.*Version-/,"");
+  release=release.replace(/\$/, "");
+  release=release.replace(/-/g, ".");
+  release=release.replace(/ /g, "");
   document.close();
   document.open();
-  if (version != "")
+  if (release != "")
   {
-    document.writeln("<h2>News file for version " + version + "</h2>");
+    document.writeln("<h2>News file for version " + release + "</h2>");
     document.writeln("<p>Check out this link for the <a href=\"http://www.dealii.org/news/news.html\">current version</a>");
   }
   //-->

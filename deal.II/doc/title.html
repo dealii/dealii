@@ -6,23 +6,24 @@
     <link href="screen.css" rel="StyleSheet" media="screen">
     <link href="print.css" rel="StyleSheet" media="print">
     <meta name="author" content="deal.II <info@dealii.org>">
+    <meta name="CVS ID" content="$Id$">
 </head>
 
 <!-- Page Body -->
 <body style="background-image:url(pictures/title-background.jpg);">
   <script type="text/javascript">
   <!--
-  var version = "$Name$";
-  version=version.replace(/\$.*: */,"");
-  version=version.replace(/.*Version-/,"");
-  version=version.replace(/\$/, "");
-  version=version.replace(/-/g, ".");
-  version=version.replace(/ /g, "");
+  var release = "$Name$";
+  release=release.replace(/\$.*: */,"");
+  release=release.replace(/.*Version-/,"");
+  release=release.replace(/\$/, "");
+  release=release.replace(/-/g, ".");
+  release=release.replace(/ /g, "");
   document.close();
   document.open();
-  if (version != "")
+  if (release != "")
   {
-    document.writeln("<h1 style=\"text-align: center;\">The deal.II Homepage Version "+ version + "</h1>");
+    document.writeln("<h1 style=\"text-align: center;\">The deal.II Homepage Version "+ release + "</h1>");
   } else {
     document.writeln("<h1 style=\"text-align: center;\">The deal.II Homepage</h1>");
   }
