@@ -160,7 +160,8 @@ operator << (LogStream& s, const char* c)
 
 inline void endl(LogStream& s)
 {
-  writestuff(s,"\n");
+  ostream& (*p) (ostream &) = &endl;
+  writestuff(s, p);
   s.was_endl = true;
 }
 
