@@ -4300,7 +4300,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
   if test "x$1" != "xyes" ; then
     AC_MSG_RESULT(external version not yet supported)
   else
-    UMFPACK_LIB ='$(LIBDIR)/liblac_umfpack.$(lib-suffix)'
+    UMFPACK_LIB='$(LIBDIR)/liblac_umfpack.$(lib-suffix)'
     UMFPACK_LIBG='$(LIBDIR)/liblac_umfpack.g.$(lib-suffix)'
     UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
     AC_MSG_RESULT(using included version)
