@@ -176,7 +176,7 @@ SolverMinRes<VECTOR>::print_vectors(const unsigned int,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState 
+void
 SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 			     VECTOR               &x,
 			     const VECTOR         &b,
