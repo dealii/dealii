@@ -3,11 +3,11 @@
 #include <base/tensor.h>
 #include <cmath>
 
+
 template <int dim> void
 Tensor<1,dim>::unroll( vector<double>& result) const
 {
-  Assert(false,
-	 ExcWrongVectorSize(1,1));
+  Assert(false,	 ExcNotImplemented());
 }
 
 
