@@ -13,7 +13,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <dofs/dof_constraints.h>
-#include <numerics/data_io.h>
+#include <numerics/data_out.h>
 #include <base/function.h>
 #include <base/parameter_handler.h>
 #include <fe/fe_lib.lagrange.h>
