@@ -219,15 +219,13 @@ class FETools
 				      * object.
 				      */
     template <int dim,
-              template <int> class DH1,
-              template <int> class DH2,
               class InVector, class OutVector>
     static
     void
-    interpolate (const DH1<dim> &dof1,
-                 const InVector &u1,
-                 const DH2<dim> &dof2,
-                 OutVector      &u2);
+    interpolate (const DoFHandler<dim> &dof1,
+                 const InVector        &u1,
+                 const DoFHandler<dim> &dof2,
+                 OutVector             &u2);
     
 				     /**
 				      * Gives the interpolation of a
@@ -267,25 +265,7 @@ class FETools
 			     const InVector&         u1,
 			     const DoFHandler<dim>&  dof2,
 			     const ConstraintMatrix& constraints,
-			     OutVector&              u2);
-
-
-                                     /**
-                                      * Same as last function, except
-                                      * that one or both of the dof
-                                      * handler objects might be of
-                                      * type @p hpDoFHandler.
-                                      */
-    template <int dim,
-              template <int> class DH1,
-              template <int> class DH2,              
-              class InVector, class OutVector>
-    static void interpolate (const DH1<dim>         &dof1,
-			     const InVector         &u1,
-			     const DH2<dim>         &dof2,
-			     const ConstraintMatrix &constraints,
-			     OutVector&              u2);
-    
+			     OutVector&              u2);    
 
 				     /**
 				      * Gives the interpolation of the
@@ -315,20 +295,6 @@ class FETools
 				      */
     template <int dim, class InVector, class OutVector>
     static void back_interpolate (const DoFHandler<dim>    &dof1,
-				  const InVector           &u1,
-				  const FiniteElement<dim> &fe2,
-				  OutVector                &u1_interpolated);
-
-                                     /**
-                                      * Same as last function, except
-                                      * that the dof handler objects
-                                      * might be of type
-                                      * @p hpDoFHandler.
-                                      */
-    template <int dim,
-              template <int> class DH,
-              class InVector, class OutVector>
-    static void back_interpolate (const DH<dim>            &dof1,
 				  const InVector           &u1,
 				  const FiniteElement<dim> &fe2,
 				  OutVector                &u1_interpolated);
