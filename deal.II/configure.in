@@ -325,6 +325,87 @@ DEAL_II_HAVE_STD_ITERATOR
 dnl See whether we have to declare lrand48 ourselves with -ansi
 DEAL_II_HAVE_LRAND48_DECLARED
 
+dnl See whether getrusage() is declared properly
+DEAL_II_CHECK_GETRUSAGE
+
+dnl Likewise for isnan()
+DEAL_II_CHECK_ISNAN
+
+
+
+
+
+dnl -------------------------------------------------------------
+dnl Multithreading
+dnl -------------------------------------------------------------
+
+dnl    Test whether multithreading support is requested. This
+dnl    does not tell deal.II to actually use it, but the
+dnl    compiler flags are set to allow for it,
+AC_ARG_ENABLE(multithreading,
+[  --enable-multithreading Set compiler flags to allow for multithreaded programs],
+    enablemultithreading=$enableval,
+    enablemultithreading=no)
+AC_SUBST(enablemultithreading)
+
+
+dnl Adjust compiler parameters if multithreading is desired:
+dnl - Use the right -threads/-pthread/-mthread option
+dnl - Set preprocessor directives if necessary
+dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
+dnl - _REENTRANT is a flag that is used in the standard UNIX
+dnl   headers to make reentrant functions (with suffix _r) declared
+dnl - remove -ansi from compiler flags again, since ACE yields hundreds of
+dnl   error messages with this flag
+if test "$enablemultithreading" = yes ; then
+  if test "$GXX" = yes ; then
+    DEAL_II_GET_THREAD_FLAGS
+    DEAL_II_THREAD_CPPFLAGS
+
+    AC_DEFINE(__USE_MALLOC)
+    AC_DEFINE(_REENTRANT)
+
+    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
+  else
+    if test "x$GXX_VERSION" = "xibm_xlc" ; then
+      CXXFLAGSG = "$CXXFLAGSG -threaded"  
+      CXXFLAGSO = "$CXXFLAGSO -threaded"
+    else
+      dnl Other compiler
+      AC_MSG_ERROR(No threading compiler options for this C++ compiler
+                   specified at present)
+      exit 1
+    fi
+  fi
+fi
+
+
+
+dnl    Test whether the user wants the multithread code in the 
+dnl    library to be used
+AC_ARG_WITH(multithreading,
+[  --with-multithreading=DIR use DIR as path to the ACE library],
+    withmultithreading=$withval,
+    withmultithreading=no)
+if test "$withmultithreading" != no ; then
+  AC_MSG_CHECKING(for ACE)
+  if test -d "$withmultithreading" ; then
+    AC_MSG_RESULT(found)
+  else
+    AC_MSG_RESULT(not found)
+    AC_MSG_ERROR(Invalid ACE path)
+  fi
+
+  AC_DEFINE(DEAL_II_USE_MT)
+fi
+AC_SUBST(withmultithreading)
+
+
+
+
+
+
+
 dnl Find path to a Fortran 77 compiler. By default try to find a
 dnl vendor compiler which is usually names `f77', and only if that could
 dnl not be found, use `g77' instead. The reasoning is that usually vendor
@@ -480,73 +561,6 @@ AC_SUBST(PERL)
 
 
 
-dnl -------------------------------------------------------------
-dnl Multithreading
-dnl -------------------------------------------------------------
-
-dnl    Test whether multithreading support is requested. This
-dnl    does not tell deal.II to actually use it, but the
-dnl    compiler flags are set to allow for it,
-AC_ARG_ENABLE(multithreading,
-[  --enable-multithreading Set compiler flags to allow for multithreaded programs],
-    enablemultithreading=$enableval,
-    enablemultithreading=no)
-AC_SUBST(enablemultithreading)
-
-
-dnl Adjust compiler parameters if multithreading is desired:
-dnl - Use the right -threads/-pthread/-mthread option
-dnl - Set preprocessor directives if necessary
-dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
-dnl - _REENTRANT is a flag that is used in the standard UNIX
-dnl   headers to make reentrant functions (with suffix _r) declared
-dnl - remove -ansi from compiler flags again, since ACE yields hundreds of
-dnl   error messages with this flag
-if test "$enablemultithreading" = yes ; then
-  if test "$GXX" = yes ; then
-    DEAL_II_GET_THREAD_FLAGS
-    DEAL_II_THREAD_CPPFLAGS
-
-    AC_DEFINE(__USE_MALLOC)
-    AC_DEFINE(_REENTRANT)
-
-    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
-  else
-    if test "x$GXX_VERSION" = "xibm_xlc" ; then
-      CXXFLAGSG = "$CXXFLAGSG -threaded"  
-      CXXFLAGSO = "$CXXFLAGSO -threaded"
-    else
-      dnl Other compiler
-      AC_MSG_ERROR(No threading compiler options for this C++ compiler
-                   specified at present)
-      exit 1
-    fi
-  fi
-fi
-
-
-
-dnl    Test whether the user wants the multithread code in the 
-dnl    library to be used
-AC_ARG_WITH(multithreading,
-[  --with-multithreading=DIR use DIR as path to the ACE library],
-    withmultithreading=$withval,
-    withmultithreading=no)
-if test "$withmultithreading" != no ; then
-  AC_MSG_CHECKING(for ACE)
-  if test -d "$withmultithreading" ; then
-    AC_MSG_RESULT(found)
-  else
-    AC_MSG_RESULT(not found)
-    AC_MSG_ERROR(Invalid ACE path)
-  fi
-
-  AC_DEFINE(DEAL_II_USE_MT)
-fi
-AC_SUBST(withmultithreading)
-
-
-
 dnl ------------------------------------------------------------
 dnl   Check whether some of the HSL functions have been dropped
 dnl   into their respective place in the contrib subdir.
@@ -694,15 +708,6 @@ else
 fi
 AC_SUBST(docxx)
 
-
-
-
-dnl -------------------------------------------------------------
-dnl Check for specific machine types and other checks
-dnl -------------------------------------------------------------
-
-DEAL_II_CHECK_GETRUSAGE
-DEAL_II_CHECK_ISNAN
 
 
 
