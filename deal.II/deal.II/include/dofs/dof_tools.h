@@ -33,7 +33,7 @@ class DoFTools
 				      * from the DoFHandler #dof#. The
 				      * respective entries in #selected_dofs#
 				      * are then flagged #true#, while all
-				      * others remain #false#.
+				      * others are set to #false#.
 				      *
 				      * The size of #select# shall equal
 				      * the number of components in the

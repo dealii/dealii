@@ -24,6 +24,9 @@ DoFTools::extract_dofs(const DoFHandler<dim> &dof,
   Assert(selected_dofs.size() == dof.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
 
+				   // preset all values by false
+  fill_n (selected_dofs.begin(), dof.n_dofs(), false);
+  
   vector<int> indices(fe.total_dofs);
   
   DoFHandler<dim>::active_cell_iterator c;
@@ -54,6 +57,9 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 	 ExcDimensionMismatch(local_select.size(), fe.n_components));
   Assert(selected_dofs.size() == dof.n_dofs(level),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs(level)));
+
+				   // preset all values by false
+  fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
 
   vector<int> indices(fe.total_dofs);
   
