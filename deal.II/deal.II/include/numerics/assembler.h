@@ -109,7 +109,7 @@ struct AssemblerData {
 		   dVector                  &rhs_vector,
 		   const Quadrature<dim>    &quadrature,
 		   const FiniteElement<dim> &fe,
-		   const UpdateFields       &update_flags,
+		   const UpdateFlags       &update_flags,
 		   const Boundary<dim>      &boundary);
     
 				     /**
@@ -155,7 +155,7 @@ struct AssemblerData {
 				      * FEValues object need to be reinitialized
 				      * on each cell.
 				      */
-    const UpdateFields       update_flags;
+    const UpdateFlags       update_flags;
 
 				     /**
 				      * Store a pointer to the object describing

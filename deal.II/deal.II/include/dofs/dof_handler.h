@@ -5,7 +5,6 @@
 /*----------------------------   dof.h     ---------------------------*/
 
 #include <vector>
-#include <fe/fe.h>
 #include <base/exceptions.h>
 
 
@@ -26,6 +25,8 @@ template <int dim, class Accessor> class TriaIterator;
 template <int dim, class Accessor> class TriaActiveIterator;
 
 template <int dim> class Triangulation;
+
+template <int dim> class FiniteElementBase;
 
 class dVector;
 class dSMatrix;
@@ -468,7 +469,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * don't need them after calling this
 				      * function, or if so store them.
 				      */
-    void distribute_dofs (const FiniteElement<dim> &);
+    void distribute_dofs (const FiniteElementBase<dim> &);
 
 				     /**
 				      * Renumber the degrees of freedom according
@@ -999,7 +1000,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * Return a constant reference to the
 				      * selected finite element object.
 				      */
-    const FiniteElement<dim> & get_selected_fe () const;
+    const FiniteElementBase<dim> & get_selected_fe () const;
 
 				     /**
 				      * Return a constant reference to the
@@ -1065,18 +1066,24 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * Reserve enough space in the 
 				      * #levels[]# objects to store the
 				      * numbers of the degrees of freedom
-				      * needed for the given element.
+				      * needed for the given element. The
+				      * given element is that one which
+				      * was selected when calling
+				      * #distribute_dofs# the last time.
 				      */
-    void reserve_space (const FiniteElement<dim> &);
+    void reserve_space ();
 
 				     /**
 				      * Distribute dofs on the given cell,
 				      * with new dofs starting with index
 				      * #next_free_dof#. Return the next
-				      * unused index number.
+				      * unused index number. The finite
+				      * element used is the one given to
+				      * #distribute_dofs#, which is copied
+				      * to #selected_fe#.
+				      *
 				      */
     int distribute_dofs_on_cell (active_cell_iterator &cell,
-				 const FiniteElement<dim> &fe,
 				 unsigned int next_free_dof);
 
 				     /**
@@ -1121,15 +1128,13 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				     /**
 				      * Store a copy of the finite element given
 				      * latest for the distribution of dofs. In
-				      * fact, since the FE class itself has not
-				      * much functionality, this object only
+				      * fact, since the FE base class itself has
+				      * not much functionality, this object only
 				      * stores numbers such as the number of
-				      * dofs per line etc. Calling any of the
-				      * more specific functions will result in
-				      * an error about calling a pure virtual
-				      * function.
+				      * dofs per line, but also restriction
+				      * and prolongation matrices, etc.
 				      */
-    FiniteElement<dim>       *selected_fe;
+    const FiniteElementBase<dim>   *selected_fe;
 
 				     /**
 				      * Store the number of dofs created last

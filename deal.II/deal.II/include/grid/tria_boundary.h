@@ -56,6 +56,11 @@ class Boundary {
     Specialisation of \Ref{Boundary}<dim>, which places the new point right
     into the middle of the given points. The middle is defined as the
     arithmetic mean of the points.
+
+    This class does not really describe a boundary in the usual sense. By
+    placing new points in teh middle of old ones, it rather assumes that the
+    boundary of the domain is given by the polygon/polyhedron defined by the
+    boundary of the initial coarse triangulation.
     */
 template <int dim>
 class StraightBoundary : public Boundary<dim> {

@@ -8,6 +8,7 @@
 #include <lac/dsmatrix.h>
 #include <base/exceptions.h>
 #include <grid/dof_constraints.h>
+#include <fe/fe_update_flags.h>
 #include <map>
 
 
@@ -22,7 +23,6 @@ template <int dim> class Equation;
 template <int dim> class Assembler;
 template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
-
 
 
 
@@ -83,8 +83,7 @@ enum NormType {
   since for higher order finite elements, we may be tempted to use curved faces
   of cells for better approximation of the boundary. In this case, the
   transformation from the unit cell to the real cell requires knowledge of
-  the exact boundary of the domain. By default it is assumed that the
-  boundary be approximated by straight segments.
+  the exact boundary of the domain.
   
 
   {\bf Solving}
@@ -106,7 +105,7 @@ enum NormType {
 
   Usually, all other boundary conditions, such as inhomogeneous Neumann values
   or mixed boundary conditions are handled in the weak formulation. No attempt
-  is made to include this into the process of assemblage therefore.
+  is made to include these into the process of assemblage therefore.
 
   The inclusion into the assemblage process is as follows: when the matrix and
   vectors are set up, a list of nodes subject to dirichlet bc is made and
@@ -165,6 +164,14 @@ enum NormType {
   This can be done by overloading the virtual function
   #make_boundary_value_list# which must return a list of boundary dofs
   and their corresponding values.
+
+  You should be aware that the boundary function may be evaluated at nodes
+  on the interior of faces. These, however, need not be on the true
+  boundary, but rather are on the approximation of the boundary represented
+  by teh mapping of the unit cell to the real cell. Since this mapping will
+  in most cases not be the exact one at the face, the boundary function is
+  evaluated at points which are not on the boundary and you should make
+  sure that the returned values are reasonable in some sense anyway.
   
 
   {\bf Computing errors}
@@ -301,7 +308,7 @@ class ProblemBase {
     virtual void assemble (const Equation<dim>      &equation,
 			   const Quadrature<dim>    &q,
 			   const FiniteElement<dim> &fe,
-			   const UpdateFields       &update_flags,
+			   const UpdateFlags        &update_flags,
 			   const DirichletBC        &dirichlet_bc = DirichletBC(),
 			   const Boundary<dim>      &boundary = StraightBoundary<dim>());
     
