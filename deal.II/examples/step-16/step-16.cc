@@ -1,10 +1,10 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
+/* Author: Guido Kanschat, University of Heidelberg, 2003 */
 
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 2003 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -63,12 +63,12 @@
 				 // class in step 5. Remark that we
 				 // replaced the DoFHandler by
 				 // MGDoFHandler. since this inherits
-				 // fron DoFHandler, the new object
+				 // from DoFHandler, the new object
 				 // incorporates the old functionality
 				 // plus the new functions for degrees
 				 // of freedom on different
 				 // levels. Furthermore, we added
-				 // MultiLevelObjects for sparsity
+				 // MGLevelObjects for sparsity
 				 // patterns and matrices.
 template <int dim>
 class LaplaceProblem 
