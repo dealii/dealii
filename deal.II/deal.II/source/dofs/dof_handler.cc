@@ -6,7 +6,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
-#include "../deal/dsmatrix.h"
+#include <lac/dsmatrix.h>
 #include <multimap.h>
 #include <algo.h>
 

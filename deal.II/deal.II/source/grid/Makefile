@@ -1,8 +1,12 @@
 # $Id$
 
-CXX       =c++
-CXXFLAGS.g=-DDEBUG -g -Wall -pedantic -Wconversion -Winline -Woverloaded-virtual -I../../include
-CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math -funroll-loops -felide-constructors -fnonnull-objects -I../../include
+CXX       = c++
+INCLUDE   = -I../../include -I../../../lac/include \
+            -I../../../base/include -I../../../mia/include
+CXXFLAGS.g= -DDEBUG -g -Wall -pedantic -Wconversion \
+            -Winline -Woverloaded-virtual $(INCLUDE)
+CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
+           -funroll-loops -felide-constructors -fnonnull-objects $(INCLUDE)
 
 ifeq ($(shell uname),SunOS)
 CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
@@ -28,9 +32,9 @@ h-files  = $(wildcard ../include/*/*.h)
 
 lib: lib.g.a lib.a
 
-lib.a: ../../lib/libbasic.a($(o-files))
+lib.a: ../../lib/libgrid.a($(o-files))
 
-lib.g.a: ../../lib/libbasic.g.a($(go-files))
+lib.g.a: ../../lib/libgrid.g.a($(go-files))
 
 clean:
 	rm -f *.o *.go *~ Makefile.dep
@@ -48,15 +52,11 @@ clean:
 #
 #use perl to generate rules for the .go files as well
 #as to make rules not for tria.o and the like, but
-#rather for libbasic.a(tria.o)
+#rather for libgrid.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files)
 	@echo ============================ Remaking Makefile
-	@$(CXX) -I../../include -DDEBUG -M *.cc > Makefile.dep.o
-	@cp Makefile.dep.o Makefile.dep.go
-	@perl -pi -e 's!^(.*\.o):!../../lib/libbasic.a(\1):!g' Makefile.dep.o
-	@perl -pi -e 's!\.o:!.go:!g' Makefile.dep.go
-	@perl -pi -e 's!^(.*\.go):!../../lib/libbasic.g.a(\1):!g' Makefile.dep.go
-	@cat Makefile.dep.o Makefile.dep.go > Makefile.dep
-	@rm Makefile.dep.o Makefile.dep.go
+	perl ../../Make_dep.pl ../../lib/libgrid $(INCLUDE) $(cc-files) \
+		> Makefile.dep
+
 
 include Makefile.dep

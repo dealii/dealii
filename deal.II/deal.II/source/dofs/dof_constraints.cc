@@ -3,7 +3,7 @@
 
 #include <algo.h>
 #include <grid/dof_constraints.h>
-#include "../deal/dsmatrix.h"
+#include <deal/dsmatrix.h>
 #include <iostream.h>
 
 
