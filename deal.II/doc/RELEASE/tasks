@@ -2,12 +2,10 @@ This file is internal information only. It lists the steps to be done
 when a new release shall be issued:
 
 - if a x.y.0 release, create a branch:
+    cvs tag all files with the tag Base-x-y
+    cvs tag -r all files with the tag Branch-x-y
 
-  $DEAL/common/scripts/cvs-create-branch x y
-
-  This script will create a branch tag Branch-x.y for you. Before using
-  the script check the last cvs call in this script and update files and
-  directories not to be released.
+- tell your friends to tag their programs
 
 - test the branch thoroughly
 
@@ -21,10 +19,12 @@ when a new release shall be issued:
 
 - cvs tag all files with Version-x-y-z
 
+- tell your friends to tag their programs
+
 - cvs export -r Version-x-y-z and form a tarball of that
 
-- put it onto the web server
+- put it on the web server
 
 - wait overnight
 
-- announce the relase
+- announce the release
