@@ -82,6 +82,11 @@
                                  // And this is simply C++ again:
 #include <fstream>
 #include <iostream>
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
                                  // Now, here comes the declaration of the
@@ -341,25 +346,44 @@ ElasticProblem<dim>::~ElasticProblem ()
 template <int dim>
 void ElasticProblem<dim>::setup_system ()
 {
-                                   // First, we need to generate an
-                                   // enumeration for the degrees of freedom
-                                   // in our problem. Further below, we will
-                                   // show how we assign each cell to one of
-                                   // the MPI processes before we even get
-                                   // here. What we then need to do is to
-                                   // enumerate the degrees of freedom in a
-                                   // way so that all degrees of freedom
-                                   // associated with cells in subdomain zero
-                                   // (which resides on process zero) come
-                                   // before all DoFs associated with cells on
-                                   // subdomain one, before those on cells on
-                                   // process two, and so on. We need this
-                                   // since we have to split the global
-                                   // vectors for right hand side and
-                                   // solution, as well as the matrix into
-                                   // contiguous chunks of rows that live on
-                                   // each of the processors, and we will want
-                                   // to do this in a way that requires
+                                   // Before we even start out setting up the
+                                   // system, there is one thing to do for a
+                                   // parallel program: we need to assign
+                                   // cells to each of the processes. We do
+                                   // this by splitting (``partitioning'') the
+                                   // mesh cells into as many chunks
+                                   // (``subdomains'') as there are processes
+                                   // in this MPI job (if this is a sequential
+                                   // job, then there is only one job and all
+                                   // cells will get a zero as subdomain
+                                   // indicator). This is done using an
+                                   // interface to the METIS library that does
+                                   // this in a very efficient way, trying to
+                                   // minimize the number of nodes on the
+                                   // interfaces between subdomains. All this
+                                   // is hidden behind the following call to a
+                                   // deal.II library function:
+  GridTools::partition_triangulation (n_mpi_processes, triangulation);
+  
+                                   // As for the linear system: First, we need
+                                   // to generate an enumeration for the
+                                   // degrees of freedom in our
+                                   // problem. Further below, we will show how
+                                   // we assign each cell to one of the MPI
+                                   // processes before we even get here. What
+                                   // we then need to do is to enumerate the
+                                   // degrees of freedom in a way so that all
+                                   // degrees of freedom associated with cells
+                                   // in subdomain zero (which resides on
+                                   // process zero) come before all DoFs
+                                   // associated with cells on subdomain one,
+                                   // before those on cells on process two,
+                                   // and so on. We need this since we have to
+                                   // split the global vectors for right hand
+                                   // side and solution, as well as the matrix
+                                   // into contiguous chunks of rows that live
+                                   // on each of the processors, and we will
+                                   // want to do this in a way that requires
                                    // minimal communication. This is done
                                    // using the following two functions, which
                                    // first generates an initial ordering of
@@ -519,7 +543,8 @@ void ElasticProblem<dim>::assemble_system ()
                                    // tells which process handles it. In more
                                    // generality, the subdomain id is used to
                                    // split a domain into several parts (we do
-                                   // this below), and which allows to
+                                   // this above, at the beginning of
+                                   // ``setup_system''), and which allows to
                                    // identify which subdomain a cell is
                                    // living on. In this application, we have
                                    // each process handle exactly one
@@ -821,7 +846,7 @@ unsigned int ElasticProblem<dim>::solve ()
     if (hanging_node_constraints.is_constrained (i)
         &&
         (subdomain_association[i] == this_mpi_process))
-      solution(i) = static_cast<PetscScalar>(localized_solution(i));
+      solution(i) = localized_solution(i);
 
                                    // After this has happened, flush the PETSc
                                    // buffers. This may or may not be strictly
@@ -838,7 +863,151 @@ unsigned int ElasticProblem<dim>::solve ()
 
 
 
-                                 // The fifth step is to take the solution
+                                 // Step five is to output the results we
+                                 // computed in this iteration. This is
+                                 // actually the same as done in step-8
+                                 // before, with two small differences. First,
+                                 // all processes call this function, but not
+                                 // all of them need to do the work associated
+                                 // with generating output. In fact, they
+                                 // shouldn't, since we would try to write to
+                                 // the same file multiple times at once. So
+                                 // we let only the first job do this, and all
+                                 // the other ones idle around during this
+                                 // time (or start their work for the next
+                                 // iteration, or simply yield their CPUs to
+                                 // other jobs that happen to run at the same
+                                 // time). The second thing is tath we not
+                                 // only output the solution vector, but also
+                                 // a vector that indicates which subdomain
+                                 // each cell belongs to. This will make for
+                                 // some nice pictures of partitioned domains.
+template <int dim>
+void ElasticProblem<dim>::output_results (const unsigned int cycle) const
+{
+                                   // One point to realize is that when we
+                                   // want to generate output on process zero
+                                   // only, we need to have access to all
+                                   // elements of the solution vector. So we
+                                   // need to get a local copy of the
+                                   // distributed vector, which is in fact
+                                   // simple:
+  const PETScWrappers::Vector localized_solution (solution);
+                                   // The thing to realize, however, is that
+                                   // we do this localization operation on all
+                                   // processes, not only the one that
+                                   // actually needs the data. This can't be
+                                   // avoided, however, with the communication
+                                   // model of MPI: MPi does not have a way to
+                                   // query data on another process, both
+                                   // sides have to initiate a communication
+                                   // at the same time. So even though most of
+                                   // the processes do not need the localized
+                                   // solution, we have to place the call here
+                                   // so that all processes execute it.
+                                   //
+                                   // (In reality, part of this work can in
+                                   // fact be avoided. What we do is send the
+                                   // local parts of all processes to all
+                                   // other processes. What we would really
+                                   // need to do is to initiate an operation
+                                   // on all processes where each process
+                                   // simply sends its local chunk of data to
+                                   // process zero, since this is the only one
+                                   // that actually needs it, i.e. we need
+                                   // something like a gather operation. PETSc
+                                   // can do this, but for simplicity's sake
+                                   // we don't attempt to make use of this
+                                   // here. We don't, since what we do is not
+                                   // very expensive in the grand scheme of
+                                   // things: it is one vector communication
+                                   // among all processes , which has to be
+                                   // compared to the number of communications
+                                   // we have to do when solving the linear
+                                   // system, setting up the block-ILU for the
+                                   // preconditioner, and other operations.)
+
+                                   // This being done, process zero goes ahead
+                                   // with setting up the output file as in
+                                   // step-8, and attaching the (localized)
+                                   // solution vector to the output
+                                   // object. (The code to generate the output
+                                   // file name is stolen and slightly
+                                   // modified from step-5, since we expect
+                                   // that we can do a number of cycles
+                                   // greater than 10, which is the maximum of
+                                   // what the code in step-8 could handle.)
+  if (this_mpi_process == 0)
+    {
+#ifdef HAVE_STD_STRINGSTREAM
+      std::ostringstream filename;
+      filename << "solution-" << cycle << ".gmv";
+      std::ofstream output (filename.str().c_str());
+#else
+      std::ostrstream filename;
+      filename << "solution-" << cycle << ".gmv";
+      std::ofstream output (filename.str());
+#endif
+
+      DataOut<dim> data_out;
+      data_out.attach_dof_handler (dof_handler);
+
+      std::vector<std::string> solution_names;
+      switch (dim)
+        {
+          case 1:
+                solution_names.push_back ("displacement");
+                break;
+          case 2:
+                solution_names.push_back ("x_displacement");	    
+                solution_names.push_back ("y_displacement");
+                break;
+          case 3:
+                solution_names.push_back ("x_displacement");	    
+                solution_names.push_back ("y_displacement");
+                solution_names.push_back ("z_displacement");
+                break;
+          default:
+                Assert (false, ExcInternalError());
+        }
+
+      data_out.add_data_vector (localized_solution, solution_names);
+
+                                       // The only thing we do here
+                                       // additionally is that we also output
+                                       // one value per cell indicating which
+                                       // subdomain (i.e. MPI process) it
+                                       // belongs to. This requires some
+                                       // conversion work, since the data the
+                                       // library provides us with is not the
+                                       // one the output class expects, but
+                                       // this is not difficult. First, set up
+                                       // a vector of integers, one per cell,
+                                       // that is then filled by the number of
+                                       // subdomain each cell is in:
+      std::vector<unsigned int> partition_int (triangulation.n_active_cells());
+      GridTools::get_subdomain_association (triangulation, partition_int);
+
+                                       // Then convert this integer vector
+                                       // into a floating point vector just as
+                                       // the output functions want to see:
+      const Vector<double> partitioning(partition_int.begin(),
+                                        partition_int.end());
+
+                                       // And finally add this vector as well:
+      data_out.add_data_vector (partitioning, "partitioning");
+
+                                       // This all being done, generate the
+                                       // intermediate format and write it out
+                                       // in GMV output format:
+      data_out.build_patches ();
+      data_out.write_gmv (output);
+    }
+}
+
+
+
+                                 // The sixth step is to take the solution
                                  // just computed, and evaluate some kind of
                                  // refinement indicator to refine the
                                  // mesh. The problem is basically the same as
@@ -897,96 +1066,115 @@ void ElasticProblem<dim>::refine_grid ()
                                       0,
                                       multithread_info.n_default_threads,
                                       this_mpi_process);
-  
-  const unsigned int local_cells
-    = (n_mpi_processes == 1 ?
-       triangulation.n_active_cells() :
-       (this_mpi_process != n_mpi_processes-1 ?
-        triangulation.n_active_cells() / n_mpi_processes :
-        triangulation.n_active_cells() - triangulation.n_active_cells() / n_mpi_processes * (n_mpi_processes-1)));
+
+                                   // Now all processes have computed error
+                                   // indicators for their own cells and
+                                   // stored them in the respective elements
+                                   // of the ``local_error_per_cell''
+                                   // vector. The elements of this vector for
+                                   // cells not on the present process are
+                                   // zero. However, since all processes have
+                                   // a copy of a copy of the entire
+                                   // triangulation and need to keep these
+                                   // copies in synch, they need the values of
+                                   // refinement indicators for all cells of
+                                   // the triangulation. Thus, we need to
+                                   // distribute our results. We do this by
+                                   // creating a distributed vector where each
+                                   // process has its share, and sets the
+                                   // elements it has computed. We will then
+                                   // later generate a local sequential copy
+                                   // of this distributed vector to allow each
+                                   // process to access all elements of this
+                                   // vector.
+                                   //
+                                   // So in the first step, we need to set up
+                                   // a parallel vector. For simplicity, every
+                                   // process will own a chunk with as many
+                                   // elements as this process owns cells, so
+                                   // that the first chunk of elements is
+                                   // stored with process zero, the next chunk
+                                   // with process one, and so on. It is
+                                   // important to remark, however, that these
+                                   // elements are not necessarily the ones we
+                                   // will write to. This is so, since the
+                                   // order in which cells are arranged,
+                                   // i.e. the order in which the elements of
+                                   // the vector correspond to cells, is not
+                                   // ordered according to the subdomain these
+                                   // cells belong to. In other words, if on
+                                   // this process we compute indicators for
+                                   // cells of a certain subdomain, we may
+                                   // write the results to more or less random
+                                   // elements if the distributed vector, that
+                                   // do not necessarily lie within the chunk
+                                   // of vector we own on the present
+                                   // process. They will subsequently have to
+                                   // be copied into another process's memory
+                                   // space then, an operation that PETSc does
+                                   // for us when we call the ``compress''
+                                   // function. This inefficiency could be
+                                   // avoided with some more code, but we
+                                   // refrain from it since it is not a major
+                                   // factor in the program's total runtime.
+                                   //
+                                   // So here's how we do it: count how many
+                                   // cells belong to this process, set up a
+                                   // distributed vector with that many
+                                   // elements to be stored locally, and copy
+                                   // over the elements we computed locally,
+                                   // then compress the result. In fact, we
+                                   // really only copy the elements that are
+                                   // nonzero, so we may miss a few that we
+                                   // computed to zero, but this won't hurt
+                                   // since the original values of the vector
+                                   // is zero anyway.
+  const unsigned int n_local_cells
+    = GridTools::count_cells_with_subdomain_association (triangulation,
+                                                         this_mpi_process);
   PETScWrappers::MPI::Vector
-    global_error_per_cell (mpi_communicator,
-                           triangulation.n_active_cells(),
-                           local_cells);
-  
+    distributed_all_errors (mpi_communicator,
+                            triangulation.n_active_cells(),
+                            n_local_cells);
   
   for (unsigned int i=0; i<local_error_per_cell.size(); ++i)
     if (local_error_per_cell(i) != 0)
-      global_error_per_cell(i) = local_error_per_cell(i);
-  global_error_per_cell.compress ();
+      distributed_all_errors(i) = local_error_per_cell(i);
+  distributed_all_errors.compress ();
 
-  
-  const Vector<float> estimated_error_per_cell (global_error_per_cell);
-  
+
+                                   // So now we have this distributed vector
+                                   // out there that contains the refinement
+                                   // indicators for all cells. To use it, we
+                                   // need to obtain a local copy...
+  const Vector<float> localized_all_errors (distributed_all_errors);
+
+                                   // ...which we can the subsequently use to
+                                   // finally refine the grid:
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						   estimated_error_per_cell,
+						   localized_all_errors,
 						   0.3, 0.03);
-
   triangulation.execute_coarsening_and_refinement ();
-
-                                   // xxx
-  GridTools::partition_triangulation (n_mpi_processes, triangulation);
-}
-
-
-template <int dim>
-void ElasticProblem<dim>::output_results (const unsigned int cycle) const
-{
-                                   // xxx
-  PETScWrappers::Vector global_solution;
-  global_solution = solution;
-      
-  if (this_mpi_process == 0)
-    {
-      std::string filename = "solution-";
-      filename += ('0' + cycle);
-      Assert (cycle < 10, ExcInternalError());
-  
-      filename += ".gmv";
-      std::ofstream output (filename.c_str());
-
-      DataOut<dim> data_out;
-      data_out.attach_dof_handler (dof_handler);
-
-      std::vector<std::string> solution_names;
-      switch (dim)
-        {
-          case 1:
-                solution_names.push_back ("displacement");
-                break;
-          case 2:
-                solution_names.push_back ("x_displacement");	    
-                solution_names.push_back ("y_displacement");
-                break;
-          case 3:
-                solution_names.push_back ("x_displacement");	    
-                solution_names.push_back ("y_displacement");
-                solution_names.push_back ("z_displacement");
-                break;
-          default:
-                Assert (false, ExcInternalError());
-        }
-
-                                       // xxx
-      std::vector<unsigned int> p (triangulation.n_active_cells());
-      GridTools::get_subdomain_association (triangulation, p);
-      Vector<double> x(p.begin(), p.end());
-      
-      data_out.add_data_vector (x, "partitioning");
-      data_out.add_data_vector (global_solution, solution_names);
-      data_out.build_patches ();
-      data_out.write_gmv (output);
-    }
 }
 
 
 
+                                 // Lastly, here is the driver function. It is
+                                 // almost unchanged from step-8, with the
+                                 // exception that we make sure that output is
+                                 // only generated from the first process, to
+                                 // avoid getting the same lines of output
+                                 // over and over again, once per
+                                 // process. Apart from this, the only other
+                                 // cosmetic change is that we output how many
+                                 // degrees of freedom there are per process,
+                                 // and how many iterations it took for the
+                                 // linear solver to converge:
 template <int dim>
 void ElasticProblem<dim>::run () 
 {
   for (unsigned int cycle=0; cycle<10; ++cycle)
     {
-                                       // xxx
       if (this_mpi_process == 0)
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
@@ -994,14 +1182,10 @@ void ElasticProblem<dim>::run ()
 	{
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
 	  triangulation.refine_global (3);
-
-                                           // xxx
-          GridTools::partition_triangulation (n_mpi_processes, triangulation);
 	}
       else
 	refine_grid ();
 
-                                       // xxx
       if (this_mpi_process == 0)
         std::cout << "   Number of active cells:       "
                   << triangulation.n_active_cells()
@@ -1015,11 +1199,11 @@ void ElasticProblem<dim>::run ()
           std::cout << "   Number of degrees of freedom: "
                     << dof_handler.n_dofs()
                     << " (by partition:";
-          for (unsigned int partition=0; partition<n_mpi_processes; ++partition)
-            std::cout << (partition==0 ? ' ' : '+')
+          for (unsigned int p=0; p<n_mpi_processes; ++p)
+            std::cout << (p==0 ? ' ' : '+')
                       << (DoFTools::
                           count_dofs_with_subdomain_association (dof_handler,
-                                                                 partition));
+                                                                 p));
           std::cout << ")" << std::endl;
         }
       
@@ -1035,21 +1219,43 @@ void ElasticProblem<dim>::run ()
 }
 
 
+                                 // So that's it, almost. ``main()'' works the
+                                 // same way as most of the main functions in
+                                 // the other example programs, i.e. it
+                                 // delegates work to the ``run'' function of
+                                 // a master object, and only wraps everything
+                                 // into some code to catch exceptions:
 int main (int argc, char **argv) 
 {
   try
     {
-                                       // xxx
+                                       // Here is the only real difference:
+                                       // PETSc requires that we initialize it
+                                       // at the beginning of the program, and
+                                       // un-initialize it at the end. So we
+                                       // call ``PetscInitialize'' and
+                                       // ``PetscFinalize''. The original code
+                                       // sits in between, enclosed in braces
+                                       // to make sure that the
+                                       // ``elastic_problem'' variable goes
+                                       // out of scope (and is destroyed)
+                                       // before we call
+                                       // ``PetscFinalize''. (If we wouldn't
+                                       // use braces, the destructor of
+                                       // ``elastic_problem'' would run after
+                                       // ``PetscFinalize''; since the
+                                       // destructor involves calls to PETSc
+                                       // functions, we would get strange
+                                       // error messages from PETSc.)
       PetscInitialize(&argc,&argv,0,0);
-      deallog.depth_console (0);
 
-                                       // xxx localize scope
       {
-        ElasticProblem<2> elastic_problem_2d;
-        elastic_problem_2d.run ();
+        deallog.depth_console (0);
+
+        ElasticProblem<2> elastic_problem;
+        elastic_problem.run ();
       }
 
-                                       // xxx
       PetscFinalize();      
     }
   catch (std::exception &exc)
