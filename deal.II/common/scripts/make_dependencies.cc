@@ -331,7 +331,7 @@ int main (int argc, char **argv)
 
                                    // parse all arguments (except the
                                    // name of the executable itself)
-  for (unsigned int c=1; c<argc; ++c)
+  for (unsigned int c=1; c<static_cast<unsigned int>(argc); ++c)
     {
       const std::string arg = argv[c];
 
