@@ -509,10 +509,33 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 
   for (unsigned int i=0; i<total_dofs; ++i)
     {
+      const unsigned int ii
+        = (dof.get_fe().is_primitive(i) ?
+           dof.get_fe().system_to_component_index(i).first
+           :
+           (std::find (dof.get_fe().get_nonzero_components(i).begin(),
+                       dof.get_fe().get_nonzero_components(i).end(),
+                       true)
+            -
+           dof.get_fe().get_nonzero_components(i).begin())
+           );
+      Assert (ii < dof.get_fe().n_components(),
+              ExcInternalError());
+
       for (unsigned int j=0; j<total_dofs; ++j)
 	{
-	  unsigned int ii = fe.system_to_component_index(i).first;
-	  unsigned int jj = fe.system_to_component_index(j).first;
+          const unsigned int jj
+            = (dof.get_fe().is_primitive(j) ?
+               dof.get_fe().system_to_component_index(j).first
+               :
+               (std::find (dof.get_fe().get_nonzero_components(j).begin(),
+                           dof.get_fe().get_nonzero_components(j).end(),
+                           true)
+                -
+                dof.get_fe().get_nonzero_components(j).begin())
+               );
+          Assert (jj < dof.get_fe().n_components(),
+                  ExcInternalError());          
 	  
 	  if (int_mask(ii,jj) != 0)
 	    int_dof_mask(i,j) = 'f';
