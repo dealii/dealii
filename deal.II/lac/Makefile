@@ -26,10 +26,10 @@ include $D/common/Make.global_options
 # production rules
 lib/go/%.go :
 	@echo =====lac==============debug========= $(<F)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 lib/o/%.o :
 	@echo =====lac==============optimized===== $(<F)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
 # rules

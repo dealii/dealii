@@ -1,0 +1,337 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <body>
+    <h1>Installation instructions and further information 
+        for <acronym>deal.II</acronym> </h1>
+	
+    This document contains the following sections:
+    <ul>
+      <li> <a href="#prerequisites">Prerequisites</a>
+      <li> <a href="#installation">Installation</a>
+      <li> <a href="#compiler">Compiler flags</a>
+      <li> <a href="#problems">Problems, questions, further information</a>
+      <li> <a href="#license">License</a>
+    </ul>
+
+
+    
+    <a name="prerequisites">
+    <h2>Prerequisites</h2>
+
+    In order to use the deal.II library (and its sub-libraries /base
+    and /lac) you need to have the following programs installed:
+    <ul>
+      <li> A fairly complete C++ compiler. We use egcs1.1.2 and
+	    gcc2.95 but other compilers might work as well. egcs1.0
+	    and older gcc versions will not work, however.
+
+      <li> Perl: any Perl 5.x version should work.
+
+      <li> Make: we use GNU make, version 3.75. We also use GNU make
+           3.78 which has much better support for parallel builds, so
+           you may want to consider this version if you have a
+           multiprocessor system. GNU make 3.77 had a serious flaw in
+           the <code>$(wildcard ...)</code> function which prevented
+           us from compiling some parts of the library (most of our
+           Makefiles are fixed, though). Other make programs
+           (i.e. non-GNU flavours) are not standardized and will
+           probably fail to work.
+
+      <li> In case you want to generate the documentation from the
+           header files, you only need Perl installed.
+
+      <li> In case you want the printable documentation, however, you
+           need Doc++ and LaTeX installed. It is known that Doc++
+           version 3.3.13 is broken and generates invalid Tex, but
+           3.3.8 is ok.
+
+      <li> The library generates output in formats readable by
+           GNUPLOT, GMV (general mesh viewer), AVS Explorer, Povray,
+           and directly to Encapsulated Postscript. GNUPLOT and a
+           postscript viewer (for EPS) should be available almost
+           everywhere, GMV is freely available for most Unix
+           platforms. Povray is freely available for almost all
+           platforms. AVS is a commercial program available for most
+           Unix flavours.
+    </ul>
+
+    Note that we have only tested the library under Unix (extensively
+    under SunOS and Linux). We believe that it should be possible with
+    little effort to use it on other platforms as well. In that case
+    it may be necessary to change some settings in the configure.in
+    script or in the file common/Make.global_options.in.
+
+    <p>
+
+    In case you didn't find your favourite graphics format above it
+    might be of interest that it is quite simple to add it to the list
+    of supported ones (take a look at
+    /base/include/base/data_out_base.h and
+    /base/source/data_out_base.cc to see how output formats are
+    implemented).
+
+
+
+    <a name="installation">
+    <h2>Installation</h2>
+
+    The whole library usually comes as a .tar.gz file, that is a
+    tarred file archive which is compressed with gzip. After unpacking
+    it with gunzip and tar (or tar -xzf if you use GNU tar), you will
+    find several subdirectories. First run the script 
+    <pre><code>
+         ./configure
+    </code></pre>
+    which sets some paths and finds out what compiler you
+    use. ./configure supports several flags which are discussed
+    further down <a href="#options">below</a>. After configuring, go
+    to the /common subdirectory and type 'make', to obtain the
+    following help (this output may change slightly over time, just
+    try it): 
+
+    <pre><code>
+======================================================================
+=Global Makefile for the deal.II libraries                           =
+======================================================================
+=Possible Targets                                                    =
+=  baseg lacg: debug libraries base and lac                          =
+=  base lac: debug and optimized libraries base and lac              =
+=  1dg 2dg 3dg: (1) and deal.II debug version for specified dimension=
+=  1d 2d 3d: (2) and deal.II for specified dimension                 =
+=  all: base, lac 1d, 2d and 3d                                      =
+=  online-doc: generate the documentation in HTML format             =
+=  printable-doc: generate the documentation in Postscript format.   =
+=      You need to have Doc++ and LaTeX installed for that.          =
+=  tex-doc: same, but only generate the LaTeX file, don't compile it =
+=  TODO: create a TODO file from TODO lines in the source files      =
+=  TAGS: create a TAGS file from include and source files            =
+=  clean: removes all object files, libraries, etc in all subdirs    =
+=                                                                    =
+=The following additional parameters may be specified to make:       =
+=  PAR=-jn where n is the number of parallel processes for parallel  =
+=          builds. If you use GNU make 3.78 or higher, you can       =
+=          call 'make -jn' directly. This parameter is no more       =
+=          necessary then.                                           =
+======================================================================
+    </code></pre>
+
+    To execute one of the commands, type 'make target-name'. Please
+    note that building all libraries in debug and optimized mode
+    presently takes about an hour on a Sun Ultra 450, so you may want
+    to do this during lunchtime.
+
+    <p>
+
+    In case you have a multi-processor machine, you can call 'make
+    PAR=-j4 target-name' to let make call multiple instances of the
+    compiler (in this case four). Since the make files are written in
+    a way to minimize cross-dependencies, this speeds up compilation
+    by about the factor given after '-j', at least if you have as many
+    processors. If you have GNU make 3.78 or higher, it is simpler to
+    directly call 'make -j4 target-name'.
+
+    <p>
+
+    After 'make' has finished, you will have two sets of
+    libraries. The first consists of the files
+    <ul>
+      <li> <code>base/lib/libbase.a</code>: The library containing the
+      code of the classes in the <code>/base</code> directory. These
+      are mostly helper classes (such as output of various data in
+      different data formats), and classes of general numerical
+      interest (such as classes representing functions, tensors,
+      etc.), but not very specifically about finite elements.
+
+      <li> <code>lac/lib/liblac.a</code>: <code>lac</code> is the
+      acronym for <i>L</i>inear <i>A</i>lgebra <i>C</i>lasses. This
+      library contains classes representing vectors, matrices, sparse
+      matrices, linear solvers, and the like.
+
+      <li> <code>deal.II/lib/libdeal_II_2d.a</code>: This is the
+      library containing all the classes representing finite element
+      methods, such as grid handlind, different finite elements,
+      etc. Thus suffix <code>_2d</code> obviously indicates that this
+      particularly library was compiled for two spatial dimensions,
+      but if you told 'make' to do sio, there will also be libraries
+      for one and three spatial dimensions.
+    </ul>
+
+    For each library, there will also be another library with the
+    suffix <code>.g.a</code> instead of <code>.a</code>. The
+    difference between the two sets of libraries is the following:
+    <ul>
+      <li> The <code>.g.a</code> versions contain debugging
+      information. In fact the <code>.g</code> reminds us of the fact
+      that gcc is called using the option <code>-g</code> to include
+      debugging information into its output.
+
+      <p>
+
+      Besides the debugging output the compiler puts into the output,
+      the library contains a great number of assertions (presently
+      about 2000) checking the validity of parameters to functions and
+      internal states. These assertions have proven to be an
+      invaluable mean to finding programming bugs since they will
+      almost always abort your program if something goes wrong. In our
+      experience, more than ninty per cent of all errors are invalid
+      parameters (such as vectors having the wrong size, etc) and they
+      are usually found almost instantaneously using the file name and
+      line number of where the problem occured.
+
+      <p>
+
+      You will want to link your programs against the
+      <code>.g.a</code> versions of the libraries while developing
+      your programs.
+
+      <li> The <code>.a</code> libraries do not contain debugging
+      information nor the assertions. For these reasons, they are much
+      smaller and your program will run significantly faster (the
+      performance penalty of the <code>.g.a</code> libraries is
+      between a factor of two and four, depending on which parts of
+      the libraries you use). Furthermore, these libraries are
+      compiled with optimization options of the compiler.
+
+      <p>
+
+      You will want to link your programs against these libraries when
+      your application runs stably and are used in production mode.
+    </ul>
+
+    <a name="options">
+    <h3>Configuration options</h3>
+
+    You can give several flags to ./configure:
+    <ul>
+    <li>
+      <code>--enable-multithreading</code>: This sets compiler
+      variables such that the resulting program supports
+      multithreading. Basically, for this different system include
+      files have to be selected (gcc option -threads) and memory
+      allocation has to be made thread-safe; the latter can be done
+      for the C++ standard containers by defining
+      <code>-D__USE_MALLOC</code>. Note that not all parts of the
+      deal.II library are fully threadsafe (though most are and
+      multithreaded programs are working well and routinely) and that
+      gcc's runtime library is not threadsafe unless you configure gcc
+      with <code>--enable-threads</code> and recompile it.
+
+    <li>
+     <code>--with-multithreading=ACE-path</code>: enabling
+     multithreading as shown above does not enable multithreading
+     inside the library itself. However, there are several places
+     where multithreading can be used (in some parts of the graphical
+     output routines, the KellyErrorEstimator class and some other
+     places), and you can switch to multithreading using this
+     configure option.
+
+     <p>
+
+     To support multithreading in a cross-platform way, we use the ACE
+     library. This needs to be installed separately, and the path to
+     its installation directory needs to be given to this option.
+
+     <p>
+
+     In our experience, if you want to use ACE on SUNs, you should
+     compile it for pthreads rather than Solaris threads.
+
+     <p>
+
+     Note that the multithread support in the library is still
+     experimental. 
+    </ul>
+
+
+    <a name="compiler">
+    <h2>Compiler flags</h2>
+
+    Since the ISO C++ standard is still quite new and compilers still
+    change a lot, you might need to provide special options for the
+    compiler. We have tried to automatize this process using the
+    ./configure script at least for the gcc compilers we use, but in
+    case something is not as you want it, change the file
+    common/Make.global_options.in and rerun ./configure in the
+    top-level directory.
+
+    <p>
+
+    We would like to hear about necessary modifications so that we can
+    include them into the distribution.
+
+
+
+    <a name="problems">
+    <h2>Problems, questions, further information</h2>
+
+    Feel free to ask if you have any problems with deal.II. If a
+    question is of general interest, you may want to use our mailing list,
+    which can be reached at
+    <a href="mailto:deal@iwr.uni-heidelberg.de">deal@iwr.uni-heidelberg.de</a>.
+  
+    <p>
+
+    For specific problems, send email to either
+    <a href="mailto:wolfgang.bangerth@iwr.uni-heidelberg.de">Wolfgang Bangerth</a> or
+    <a href="mailto:kanschat@iwr.uni-heidelberg.de">Guido Kanschat</a>.
+
+    <p>
+
+    We are interested in any feedback, whether positive or negative,
+    in order to determine the directions of future work on the
+    library. We are also very much interested in incorporating any
+    work and bug fixes by third parties into the library; you will of
+    course be credited by name for this.
+
+
+
+    <a name="license">
+    <h2>License</h2>
+
+    Note that we have not yet fully finished the license under which
+    we will distribute the library. However, we will keep to the
+    following principles:
+
+    <ul>
+      <li>
+        The library comes free of charge for non-commercial users, but
+         we keep a copyright in it. We will grant everyone access to
+         the library but we would like to ask you to not further
+         distribute it yourself.  This is to keep an overview over the
+         number of users and their background.
+
+      <li>
+        The libraries may not be stripped of our copyright and shall
+        not be used in commercial projects without our written prior
+        consent.
+
+      <li>
+        Scientific publications presenting results obtained with these
+        libraries shall state the names of the library and their
+        principle authors (at present Wolfgang Bangerth and Guido
+        Kanschat). There will be future articles about the library
+        which you are kindly asked to cite in your publications.
+    </ul>
+
+    Note that since our institute is evaluated at regular intervals,
+    we are interested in documenting the use of the programs and
+    libraries we create. This is the reason for not allowing to freely
+    re-distribute them. We would also be interested in collecting
+    publications with results obtained with the aid of these libraries
+    and would therefore like to ask you to drop us a note about every
+    such publication. Your publication will then be listed on the DEAL
+    homepage. You see, it works both ways.
+
+
+    <hr>
+    
+    <address>
+      <a href="mailto:deal@iwr.uni-heidelberg.de">The deal.II group</a></address>
+    <p>
+      Last modified: $Date$
+    </p>
+  </body>
+</html>
+
+

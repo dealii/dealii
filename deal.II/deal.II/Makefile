@@ -52,29 +52,29 @@ include $D/common/Make.global_options
 # listed immediately below
 lib/1d/go/%.go :
 	@echo =====deal.II====1d====debug========= $(<:source/%=%)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
 lib/1d/o/%.o :
 	@echo =====deal.II====1d====optimized===== $(<:source/%=%)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
 lib/2d/go/%.go :
 	@echo =====deal.II====2d====debug========= $(<:source/%=%)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
 lib/2d/o/%.o :
 	@echo =====deal.II====2d====optimized===== $(<:source/%=%)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
 lib/3d/go/%.go :
 	@echo =====deal.II====3d====debug========= $(<:source/%=%)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
 lib/3d/o/%.o :
 	@echo =====deal.II====3d====optimized===== $(<:source/%=%)
-	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 # special rules for exceptional files
 lib/3d/o/q1_mapping.jacobians_3d.o:
 	@echo =====deal.II====3d====opt==special== $(<:source/%=%)
-	@$(CXX) $(CXXFLAGS) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
+	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
 
 
 # rules how to make the libraries themselves
