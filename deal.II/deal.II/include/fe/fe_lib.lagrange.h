@@ -1,7 +1,7 @@
 /*----------------------------   fe_lib.h     ---------------------------*/
 /*      $Id$                 */
-#ifndef __fe_lib_H
-#define __fe_lib_H
+#ifndef __fe_lib_lagrange_H
+#define __fe_lib_lagrange_H
 /*----------------------------   fe_lib.h     ---------------------------*/
 
 
@@ -313,7 +313,7 @@ class FEQuarticSub : public FELinearMapping<dim> {
 
 
 /*----------------------------   fe_lib.h     ---------------------------*/
-/* end of #ifndef __fe_lib_H */
+/* end of #ifndef __fe_lib_lagrange_H */
 #endif
 /*----------------------------   fe_lib.h     ---------------------------*/
 
