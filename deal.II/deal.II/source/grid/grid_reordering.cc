@@ -11,29 +11,15 @@
 //
 //----------------------------  grid_reordering.cc  ---------------------------
 
-#include <base/thread_management.h>
 #include <grid/grid_reordering.h>
+#include <grid/grid_reordering_internal.h>
 
-#include <set>
 #include <algorithm>
+#include <set>
+#include <iostream>
+#include <fstream>
 
 
-
-namespace internal
-{
-// static variables
-#if deal_II_dimension == 3
-  const unsigned int GridReorderingInfo<3>::rotational_states_of_cells;
-  const unsigned int GridReorderingInfo<3>::rotational_states_of_faces;
-#endif
-
-}
-
-template <int dim>
-const unsigned int GridReordering<dim>::Cell::invalid_neighbor;
-
-template <int dim>
-const unsigned int GridReordering<dim>::FaceData::invalid_adjacent_cell;
 
 
 
@@ -48,1143 +34,6 @@ void GridReordering<1>::reorder_cells (const std::vector<CellData<1> > &)
 #endif
 
 
-
-#if deal_II_dimension == 3
-
-template <int dim>
-GridReordering<dim>::Cell::Cell () :
-		cell_no (invalid_neighbor)
-{
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    neighbors[i] = invalid_neighbor;
-}
-
-
-
-template <int dim>
-GridReordering<dim>::Cell::Cell (const CellData<dim> &cd,
-				 const unsigned int   cell_no) :
-		CellData<dim> (cd), cell_no(cell_no)
-{
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    neighbors[i] = invalid_neighbor;
-}
-
-
-template <int dim>
-GridReordering<dim>::Cell::Cell (const Cell &c) :
-		CellData<dim> (c),
-                cell_no(c.cell_no),
-                track_back_to_cell(c.track_back_to_cell)
-{
-  for (unsigned int i=0; i<internal::GridReorderingInfo<dim>::rotational_states_of_cells; ++i)
-    for (unsigned int j=0; j<GeometryInfo<dim>::faces_per_cell; ++j)
-      faces[i][j]=c.faces[i][j];
-
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    neighbors[i]=c.neighbors[i];
-}
-
-
-template <int dim>
-inline
-unsigned int GridReordering<dim>::Cell::count_neighbors () const
-{
-  unsigned int n = 0;
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    if (neighbors[i] != invalid_neighbor)
-      ++n;
-  return n;
-}
-
-
-
-template <int dim>
-void
-GridReordering<dim>::Cell::insert_faces (std::map<Face,FaceData> &/*global_faces*/)
-{
-  Assert (false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
-{
-  const unsigned int dim = 3;
-
-				   // first generate for each of the 6
-				   // faces of a cell in 3d the four
-				   // possible orientations and
-				   // cross-link them among each other
-				   //
-				   // do this generation step by first
-				   // only inserting each face in
-				   // standard orientation and then
-				   // fill in the other ones by
-				   // rotation of these faces
-				   //
-				   // note that we have the indices
-				   // reversed here compared to the
-				   // Cell class, for simplicity
-  const Face new_faces_tmp[GeometryInfo<dim>::faces_per_cell]
-    = { { { this->vertices[0], this->vertices[1],
-            this->vertices[2], this->vertices[3] } },
-	{ { this->vertices[4], this->vertices[5],
-            this->vertices[6], this->vertices[7] } },
-	{ { this->vertices[0], this->vertices[1],
-            this->vertices[5], this->vertices[4] } },
-	{ { this->vertices[1], this->vertices[5],
-            this->vertices[6], this->vertices[2] } },
-	{ { this->vertices[3], this->vertices[2],
-            this->vertices[6], this->vertices[7] } },
-	{ { this->vertices[0], this->vertices[4],
-            this->vertices[7], this->vertices[3] } } };
-  Face new_faces[GeometryInfo<dim>::faces_per_cell][internal::GridReorderingInfo<dim>::rotational_states_of_faces]
-    = { { new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-        { new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[2], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-        { new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-        { new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-        { new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] }};
-
-				   // first do the faces in their
-				   // usual direction
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int rot=1; rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces/2; ++rot)
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-	new_faces[face][rot].vertices[v]
-	  = new_faces[face][0].vertices[(v+rot) % GeometryInfo<dim>::vertices_per_face];
-				   // then do everything as viewed
-				   // from the back. this is simple,
-				   // as we only have to revert
-				   // indices 1 and 3
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int rot=internal::GridReorderingInfo<dim>::rotational_states_of_faces/2;
-	 rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
-	 ++rot)
-      {
-	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-	  new_faces[face][rot].vertices[v]
-	    = new_faces[face]
-	    [rot-internal::GridReorderingInfo<dim>::rotational_states_of_faces/2].vertices[v];
-	std::swap (new_faces[face][rot].vertices[1],
-		   new_faces[face][rot].vertices[3]);
-      };
-  
-	
-				   // now insert all the faces, by now
-				   // without specific order with
-				   // respect to the orientational
-				   // states of the cell. note that we
-				   // get the indices correct
-				   // here. also remark that the face
-				   // might already have been in the
-				   // map, depending on whether a
-				   // newighbor has already inserted
-				   // it or not. we don't care about
-				   // that here, though
-  std::map<Face,FaceData>::iterator
-    new_faces_ptr[internal::GridReorderingInfo<dim>::rotational_states_of_faces]
-    [GeometryInfo<dim>::faces_per_cell];
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int rot=0;
-	 rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
-	 ++rot)
-      new_faces_ptr[rot][face]
-	= global_faces.insert (std::make_pair(new_faces[face][rot], FaceData())).first;
-  
-				   // and crosslink them to each other
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int rot=0;
-	 rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
-	 ++rot)
-      for (unsigned int other_rot=0;
-	   other_rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
-	   ++other_rot)
-	{
-	  if (other_rot < rot)
-	    new_faces_ptr[rot][face]->second.reverse_faces[other_rot]
-	      = new_faces_ptr[other_rot][face];
-	  else
-	    if (other_rot > rot)
-	      new_faces_ptr[rot][face]->second.reverse_faces[other_rot-1]
-		= new_faces_ptr[other_rot][face];
-					   // if rot==other_rot, then
-					   // we need not link this
-					   // cell to itself
-	};
-  
-
-				   // for each of the faces (whether
-				   // already inserted or not) note
-				   // that the present cell is one of
-				   // the neighbors
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    {
-      if (new_faces_ptr[0][face]->second.adjacent_cells[0] ==
-	  FaceData::invalid_adjacent_cell)
-	{
-					   // no, faces had not been
-					   // used before, so we are the
-					   // first adjacent cell
-	  for (unsigned int rot=0;
-	       rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
-	       ++rot)
-	    {
-	      Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0]
-		      == FaceData::invalid_adjacent_cell,
-		      ExcInternalError());
-	      new_faces_ptr[rot][face]->second.adjacent_cells[0] = cell_no;
-	    };
-	}
-      else
-	{	
-					   // otherwise: cell had been
-					   // entered before, so we are
-					   // the second neighbor
-	  const unsigned int
-	    previous_neighbor = new_faces_ptr[0][face]->second.adjacent_cells[0];
-	  for (unsigned int rot=0;
-	       rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
-	       ++rot)
-	    {
-	      Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0] ==
-		      previous_neighbor,
-		      ExcInternalError());
-	      Assert (new_faces_ptr[rot][face]->second.adjacent_cells[1] ==
-		      FaceData::invalid_adjacent_cell,
-		      ExcInternalError());
-	      new_faces_ptr[rot][face]->second.adjacent_cells[1] = cell_no;
-	    };
-	};
-    };
-  
-  
-
-				   // we still have to link cell in
-				   // its 24 different orientations to
-				   // the 6 faces in their
-				   // orientations. now, there we
-				   // could hardcode which faces in
-				   // which rotation belong to the
-				   // cell in each direction, but
-				   // there a good reasons not to do
-				   // so:
-				   //
-				   // first, this depends on that we
-				   // know which orientation of the
-				   // cell has which number, but this
-				   // knowledge is hardcoded in the
-				   // function CellData::rotate, so
-				   // hardcoding it here again would
-				   // mean redundancy, and would above
-				   // that mean that we have to update
-				   // two very different place if we
-				   // chose to change one.
-				   //
-				   // second, finding out which face
-				   // belongs to which cell is error
-				   // prone, and one might get it
-				   // wrong.
-				   //
-				   // the solution is: compute it once
-				   // this function is first called
-				   // based on the information from
-				   // CellData::rotate and use that
-				   // data in following calls to this
-				   // function. the computed data has,
-				   // of course, to be a static member
-				   // function, and we store whether
-				   // the data has been initialized
-				   // already by checking the value of
-				   // a special flag. furthermore, we
-				   // guard the initialization by a
-				   // thread mutex to make it
-				   // thread-safe (in case someone
-				   // wanted to read in two grids at
-				   // the same time, for whatever
-				   // reason).
-  static Threads::ThreadMutex initialization_lock;
-  initialization_lock.acquire ();
-
-  static bool already_initialized = false;
-  
-				   // for each orientation of the
-				   // cell, store in which orientation
-				   // each of the six faces build the
-				   // cell (store which face and which
-				   // orientation):
-  static std::pair<unsigned int, unsigned int>
-    cell_orientation_faces[internal::GridReorderingInfo<dim>::rotational_states_of_cells][GeometryInfo<dim>::faces_per_cell];
-
-  if (already_initialized == false)
-    {
-      for (unsigned int rot=0; rot<internal::GridReorderingInfo<dim>::rotational_states_of_cells; ++rot)
-	{
-					   // initialize a standard
-					   // cell with the vertex
-					   // numbers of the present
-					   // cell we are working on
-	  CellData<dim> standard_cell;
-	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	    standard_cell.vertices[v] = this->vertices[v];
-
-					   // then rotate it the given
-					   // number of times
-	  standard_cell.rotate (rot);
-
-					   // then create the six
-					   // faces of the thus
-					   // rotated cell
-	  const Face standard_faces[GeometryInfo<dim>::faces_per_cell]
-	    = { { { standard_cell.vertices[0], standard_cell.vertices[1],
-		    standard_cell.vertices[2], standard_cell.vertices[3] } },
-		{ { standard_cell.vertices[4], standard_cell.vertices[5],
-		    standard_cell.vertices[6], standard_cell.vertices[7] } },
-		{ { standard_cell.vertices[0], standard_cell.vertices[1],
-		    standard_cell.vertices[5], standard_cell.vertices[4] } },
-		{ { standard_cell.vertices[1], standard_cell.vertices[5],
-		    standard_cell.vertices[6], standard_cell.vertices[2] } },
-		{ { standard_cell.vertices[3], standard_cell.vertices[2],
-		    standard_cell.vertices[6], standard_cell.vertices[7] } },
-		{ { standard_cell.vertices[0], standard_cell.vertices[4],
-		    standard_cell.vertices[7], standard_cell.vertices[3] } } };
-
-					   // then try to identify
-					   // these faces in the ones
-					   // we have already created
-	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	    {
-	      bool face_found = false;
-	      for (unsigned int f=0;
-		   (!face_found) && (f<GeometryInfo<dim>::faces_per_cell); ++f)
-		for (unsigned int r=0;
-		     r<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
-		     ++r)
-		  if (standard_faces[face] == new_faces[f][r])
-		    {
-		      cell_orientation_faces[rot][face] = std::make_pair(f,r);
-		      face_found = true;
-		      break;
-		    };
-
-					       // make sure that we
-					       // have found something
-					       // indeed
-	      Assert (face_found == true, ExcInternalError());
-	    };
-
-					   // more checks: make sure
-					   // that each of the
-					   // original faces appears
-					   // in one rotation or other
-					   // as face of the present
-					   // cell in its orientation
-					   // we currently check. as
-					   // we don't call this part
-					   // of the program too
-					   // often, don't make
-					   // differences between
-					   // debug and optimized mode
-	  std::vector<bool> face_used(GeometryInfo<dim>::faces_per_cell, false);
-	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	    {
-					       // ups, face already
-					       // used? can't be!
-	      Assert (face_used[face] == false, ExcInternalError());
-	      face_used[face] = true;
-	    };
-					   // since we have checked
-					   // that each face has not
-					   // been used previously, we
-					   // also know that all faces
-					   // have been used exactly
-					   // once, so no more checks
-					   // necessary
-	};
-
-				       // that's it: we now know which
-				       // faces build up this cell in
-				       // each of its possible
-				       // orientations
-      already_initialized = true;
-    };
-				   // initialization is done, so
-				   // release the lock and let other
-				   // threads run
-  initialization_lock.release ();
-
-				   // now we can use the information:
-				   // link the faces in their
-				   // directions to the cell in each
-				   // of its orientations
-  for (unsigned int rot=0;
-       rot<internal::GridReorderingInfo<dim>::rotational_states_of_cells;
-       ++rot)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      faces[rot][face] = new_faces_ptr
-			 [cell_orientation_faces[rot][face].second]
-			 [cell_orientation_faces[rot][face].first];
-}
-
-
-
-template <int dim>
-void GridReordering<dim>::Cell::fix_cell_neighbors ()
-{
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    {
-				       // then insert the neighbor
-				       // behind this face as neighbor
-				       // of the present cell. note
-				       // that it is not relevant to
-				       // which permutation of a face
-				       // we refer. note that it might
-				       // well be that some of the
-				       // neighbor indices are
-				       // FaceData::invalid_adjacent_cell
-      if (faces[0][face]->second.adjacent_cells[0] == cell_no)
-	neighbors[face] = faces[0][face]->second.adjacent_cells[1];
-      else
-	neighbors[face] = faces[0][face]->second.adjacent_cells[0];
-    };
-}
-
-
-
-template <int dim>
-void GridReordering<dim>::Cell::find_backtracking_point ()
-{
-				   // we know what neighbors we have,
-				   // we can determine the neighbor
-				   // with the maximal cell_no that is
-				   // smaller than that of the present
-				   // cell. we need this information
-				   // in the backtracking process and
-				   // don't want to compute it every
-				   // time again
-  track_back_to_cell = FaceData::invalid_adjacent_cell;
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    if ((neighbors[face] != FaceData::invalid_adjacent_cell)
-	&&
-	(neighbors[face] < cell_no)
-	&&
-	((neighbors[face] > track_back_to_cell)
-	 ||
-	 (track_back_to_cell == FaceData::invalid_adjacent_cell)))
-      track_back_to_cell = neighbors[face];
-
-				   // if this cell had no neighbors
-				   // with lower cell numbers, we
-				   // still need to know what cell to
-				   // track back to in case some
-				   // higher cell than the present one
-				   // failed to coexist with the
-				   // existing part of the mesh
-				   // irrespective of the rotation
-				   // state of this present cell. we
-				   // then simply track back to the
-				   // cell before this one, lacking a
-				   // better alternative. this does,
-				   // of course, not hold for cell 0,
-				   // from which we should never be
-				   // forced to track back
-  track_back_to_cell = cell_no-1;
-  if (cell_no == 0)
-    track_back_to_cell = 0;
-  else
-    if (track_back_to_cell == FaceData::invalid_adjacent_cell)
-      track_back_to_cell = cell_no-1;
-}
-
-
-
-template <int dim>
-inline
-bool GridReordering<dim>::Cell::check_consistency (const unsigned int rot) const
-{
-				   // make sure that for each face of
-				   // the cell the permuted faces are
-				   // not already in use, as that
-				   // would make the cell disallowed
-  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-    {
-      const FaceData &face = faces[rot][face_no]->second;
-
-      for (unsigned int face_rot=0;
-	   face_rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces-1;
-	   ++face_rot)
-	{
-	  const FaceData &reverse_face = face.reverse_faces[face_rot]->second;
-	  if (reverse_face.use_count != 0)
-	    return false;
-	};
-    };
-
-				   // no conflicts found
-  return true;
-}
-
-
-
-template <int dim>
-inline
-void GridReordering<dim>::Cell::mark_faces_used (const unsigned int rot)
-{
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    {
-      Assert (faces[rot][face]->second.use_count < 2,
-	      ExcInternalError());
-      ++faces[rot][face]->second.use_count;
-    };
-}
-
-
-
-template <int dim>
-inline
-void GridReordering<dim>::Cell::mark_faces_unused (const unsigned int rot)
-{
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    {
-      Assert (faces[rot][face]->second.use_count > 0,
-	      ExcInternalError());
-      --faces[rot][face]->second.use_count;
-    };
-}
-
-
-
-template <int dim>
-bool GridReordering<dim>::Face::operator < (const Face &face) const
-{
-  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-    {
-				       // if vertex index is smaller,
-				       // then comparison is true
-      if (vertices[v] < face.vertices[v])
-	return true;
-      else
-					 // if vertex index is greater,
-					 // then comparison is false
-	if (vertices[v] > face.vertices[v])
-	  return false;
-				       // if indices are equal, then test
-				       // next index
-    };
-
-				   // if all indices are equal:
-  return false;
-}
-
-
-
-template <int dim>
-bool GridReordering<dim>::Face::operator == (const Face &face) const
-{
-  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-    if (vertices[v] != face.vertices[v])
-      return false;
-  return true;
-}
-
-
-
-template <int dim>
-GridReordering<dim>::FaceData::FaceData () :
-		use_count (0)
-{
-  adjacent_cells[0] = adjacent_cells[1] = invalid_adjacent_cell;
-}
-
-
-
-
-
-
-template <int dim>
-inline
-void GridReordering<dim>::track_back (std::vector<Cell> &cells,
-				      RotationStack     &rotation_states,
-				      const unsigned     tbtc)
-{
-  unsigned int track_back_to_cell = tbtc;
-  
-  top_of_function:
-  
-  Assert (track_back_to_cell > 0, ExcInternalError());
-
-  unsigned int last_rotation_state = static_cast<unsigned int>(-1);
-  for (unsigned int cell_no=rotation_states.size()-1; cell_no>=track_back_to_cell; --cell_no)
-    {
-				       // store rotation state of
-				       // topmost cell, as we will
-				       // have to advance that by one
-      last_rotation_state = rotation_states.back();
-      
-				       // first mark faces of that
-				       // cell as no more used
-      cells[cell_no].mark_faces_unused (last_rotation_state);
-
-				       // then pop state from
-				       // stack
-      rotation_states.pop_back();
-    };
-  Assert (last_rotation_state < internal::GridReorderingInfo<dim>::rotational_states_of_cells, ExcInternalError());
-  
-				   // now we will have to find out
-				   // whether we can try the last cell
-				   // we have popped from the stack in
-				   // another rotation state, or will
-				   // have to backtrack further:
-  if (last_rotation_state < internal::GridReorderingInfo<dim>::rotational_states_of_cells-1)
-    {
-				       // possible. push that state to
-				       // the stack and leave
-      rotation_states.push_back (last_rotation_state+1);
-      return;
-    }
-  else
-    {
-				       // last cell can't be rotated
-				       // further. go on with
-				       // backtracking
-      const typename std::vector<Cell>::iterator
-	try_cell = cells.begin() + rotation_states.size();
-      
-      track_back_to_cell = try_cell->track_back_to_cell;
-      
-      Assert (track_back_to_cell > 0, ExcInternalError());
-
-				       // track further back. this
-				       // could be done by recursive
-				       // calls of this function,
-				       // which in this case would
-				       // represent a tail-recursion
-				       // as there is nothing more to
-				       // be done after calling the
-				       // function recursively, but we
-				       // prefer to write down the
-				       // tail-recursion by hand using
-				       // a goto, since the compiler
-				       // seems to have problems to
-				       // rewrite the tail recursion
-				       // as a goto.
-      goto top_of_function;
-    };
-}
-
-
-
-template <int dim>
-bool GridReordering<dim>::try_rotate_single_neighbors (std::vector<Cell> &cells,
-						       RotationStack     &rotation_states)
-{
-				   // the rotation state of the cell
-				   // which we try to add by rotating
-				   // neighbors has already been
-				   // popped from the stack, so we get
-				   // its number like this:
-  const unsigned int cell_no = rotation_states.size();
-
-				   // now try each of the neighbors
-				   // that have already been added to
-				   // the grid. don't try the cell
-				   // that we will track back to
-				   // anyway if this operation should
-				   // fail
-  for (unsigned int neighbor=0; neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
-    if (cells[cell_no].neighbors[neighbor] < cell_no)
-      if (cells[cell_no].neighbors[neighbor] != cells[cell_no].track_back_to_cell)
-	{
-	  const unsigned int neighbor_no = cells[cell_no].neighbors[neighbor];
-	  const unsigned int old_rotation_state = rotation_states[neighbor_no];
-	  
-					   // unlink faces used by the
-					   // present rotation state
-	  cells[neighbor_no].mark_faces_unused (old_rotation_state);
-
-					   // then try all rotation
-					   // states besides the ones
-					   // that have already been
-					   // tried:
-	  for (unsigned int neighbor_rot=old_rotation_state+1;
-	       neighbor_rot<internal::GridReorderingInfo<dim>::rotational_states_of_cells; ++neighbor_rot)
-	    {
-					       // first, if the
-					       // neighbor itself does
-					       // not fit in the grid,
-					       // then there is
-					       // nothing to do
-	      if (! cells[neighbor_no].check_consistency (neighbor_rot))
-		continue;
-
-					       // however, if the
-					       // neighbor worked,
-					       // then mark its faces
-					       // as used
-					       // preliminarily and
-					       // try to fit in the
-					       // present cell in some
-					       // orientation
-	      cells[neighbor_no].mark_faces_used (neighbor_rot);
-
-	      for (unsigned int cell_rot=0; cell_rot<internal::GridReorderingInfo<dim>::rotational_states_of_cells; ++cell_rot)
-		if (cells[cell_no].check_consistency (cell_rot) == true)
-		  {
-						     // ah, see,
-						     // this
-						     // combination
-						     // of neighbor
-						     // rotation and
-						     // this cell
-						     // works. enter
-						     // the
-						     // respective
-						     // states into
-						     // the arrays
-						     // and leave
-						     // with success
-		    rotation_states[neighbor_no] = neighbor_rot;
-		    
-		    rotation_states.push_back (cell_rot);
-		    cells[cell_no].mark_faces_used (cell_rot);
-
-		    return true;
-		  };
-	      
-					       // no, there was no
-					       // way to fit the
-					       // present cell into
-					       // the grid given
-					       // this orientation
-					       // of the
-					       // neighbor. discard
-					       // this attempt and
-					       // try that neighbors
-					       // next rotation
-	      cells[neighbor_no].mark_faces_unused (neighbor_rot);
-	    };
-	  
-					   // there was no way to
-					   // rotate this neighbor so
-					   // that the present cell
-					   // fit into the
-					   // grid. reinstantiate the
-					   // old state and go on to
-					   // the next neighbor
-	  cells[neighbor_no].mark_faces_used (old_rotation_state);
-	};
-
-				   // rotation of neighbors did not
-				   // help this cell, there is no
-				   // other way than to do a full
-				   // backtracking
-  return false;
-}
-
-
-
-template <int dim>
-void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
-					   std::vector<CellData<dim> > &original_cells,
-					   const std::vector<unsigned int>      &new_cell_numbers)
-{
-  const unsigned int n_cells = cells.size();
-  
-				   // stack of value indicating that
-				   // the nth cell needs to be rotated
-				   // so-and-so often, where n is the
-				   // position on the stack
-  RotationStack rotation_states;
-
-				   // for the first cell, the
-				   // rotational state can never be
-				   // important, since we can rotate
-				   // all other cells
-				   // accordingly. therefore preset
-				   // the rotation state of the first
-				   // cell
-  rotation_states.push_back (0);
-  cells[0].mark_faces_used (rotation_states.back());
-  
-  while (true)
-    {
-				       // if all cells have a coherent
-				       // orientation, then we can
-				       // exit the main loop
-      if (rotation_states.size() == n_cells)
-	break;
-      
-				       // try to push back another
-				       // cell in orientation zero
-      rotation_states.push_back (0);
-
-				       // check whether the present
-				       // cell in the present
-				       // orientation is valid
-      check_topmost_cell:
-      
-      const typename std::vector<Cell>::iterator
-	try_cell = cells.begin() + rotation_states.size()-1;
-      if (try_cell->check_consistency (rotation_states.back()))
-	{
-					   // yes, works, we found a
-					   // way of how to add the
-					   // present cell to the
-					   // existing cells without
-					   // violating any ordering
-					   // constraints. now mark
-					   // the respective faces as
-					   // used and go on with the
-					   // next cell
-	  try_cell->mark_faces_used (rotation_states.back());
-	  
-	  continue;
-	}
-      else
-	{
-					   // no, doesn't work. see if
-					   // we can rotate the top
-					   // cell so that it works
-	  if (rotation_states.back()+1
-	      < internal::GridReorderingInfo<dim>::rotational_states_of_cells)
-	    {
-					       // yes, can be
-					       // done. then do so and
-					       // check again
-	      ++rotation_states.back();
-	      goto check_topmost_cell;
-	    }
-	  else
-	    {
-					       // no, no more
-					       // orientation of the
-					       // top cell possible,
-					       // we have to backtrack
-					       // some way
-
-					       // first pop rotational
-					       // state of top cell,
-					       // since for that no
-					       // faces have been
-					       // marked as used yet
-	      rotation_states.pop_back();
-
-					       // in general, if we
-					       // fail to insert the
-					       // present cell somehow
-					       // into the existing
-					       // part of the grid,
-					       // then we track back
-					       // to the neighbor of
-					       // the failed cell with
-					       // the highest cell
-					       // index below the
-					       // index of the present
-					       // cell. however,
-					       // before we do so, we
-					       // try a simple
-					       // heuristic: if
-					       // rotating single
-					       // neighbors a little
-					       // helps the process
-					       // somewhat:
-	      const bool rotation_helps
-		= try_rotate_single_neighbors (cells, rotation_states);
-
-					       // if rotation helped,
-					       // then go on to the
-					       // next cell. the
-					       // called function has
-					       // already marked the
-					       // respective faces as
-					       // used and has pushed
-					       // the rotation state
-					       // of the present cell
-					       // to the stack
-	      if (rotation_helps == true)
-		continue;
-
-					       // if that failed to
-					       // help, then track
-					       // back
-	      track_back (cells, rotation_states, try_cell->track_back_to_cell);
-					       // and go on by
-					       // checking the now
-					       // topmost cell
-	      goto check_topmost_cell;
-	    };
-	};
-    };
-
-				   // rotate the cells according to
-				   // the results we have found. since
-				   // we operate on a stack, we do the
-				   // rotations from the back of the
-				   // array to the front
-  while (rotation_states.size() != 0)
-    {
-      const unsigned int
-	new_cell_number = rotation_states.size()-1;
-      const unsigned int
-	old_cell_number = std::find (new_cell_numbers.begin(),
-				     new_cell_numbers.end(),
-				     new_cell_number) - new_cell_numbers.begin();
-      Assert (old_cell_number < cells.size(), ExcInternalError());
-
-      original_cells[old_cell_number].rotate (rotation_states.back());
-
-				       // to check the correctness of
-				       // the program up to here:
-				       // unmark the cells' faces to
-				       // check whether they have all
-				       // correctly declared they
-				       // use. checking this is done
-				       // in the calling function, as
-				       // only that has direct access
-				       // to the map of faces (this
-				       // function only accesses it
-				       // through pointers stored in
-				       // the cells)
-      cells[new_cell_number].mark_faces_unused (rotation_states.back());
-
-				       // then delete this rotational
-				       // state as we don't need it
-				       // any more
-      rotation_states.pop_back ();
-    };
-}
-
-
-
-template <int dim>
-std::vector<unsigned int>
-GridReordering<dim>::presort_cells (std::vector<Cell>       &cells,
-				    std::map<Face,FaceData> &faces)
-{
-				   // first find the cell with the
-				   // least neighbors
-  unsigned int min_neighbors           = cells[0].count_neighbors();
-  unsigned int cell_with_min_neighbors = 0;
-
-
-				   // have an array into which we
-				   // insert the new cells numbers of
-				   // each cell
-  const unsigned int invalid_cell_number = static_cast<unsigned int>(-1);
-  std::vector<unsigned int> new_cell_numbers (cells.size(), invalid_cell_number);
-
-  unsigned int next_free_new_number = 0;
-  
-                                   // loop over each connected part of
-                                   // the domain. since the domain may
-                                   // consist of different unconnected
-                                   // parts, we have to loop until
-                                   // there are no more unnumbered
-                                   // cells
-  while (next_free_new_number < cells.size())
-   {
-				      // for initialization of
-				      // min_neighbors, go to the
-				      // first cell of this part of
-				      // the domain that has an
-				      // invalid cell number, i.e. has
-				      // not yet been renumbered
-     for (unsigned int i=0; i<cells.size(); ++i)
-       if (new_cell_numbers[i]==invalid_cell_number)
-	 {
-	   min_neighbors           = cells[i].count_neighbors();
-	   cell_with_min_neighbors = i;
-	   break;
-	 }
-     
-				      // check, if we have an as yet
-				      // unnumbered cell with less
-				      // neighbors than the first
-				      // found cell
-     for (unsigned int i=1; i<cells.size(); ++i)
-       if ((min_neighbors > cells[i].count_neighbors()) &&
-	   (new_cell_numbers[i]==invalid_cell_number))
-	 {  
-	   min_neighbors = cells[i].count_neighbors();
-	   cell_with_min_neighbors = i;
-	   if (min_neighbors == 1)
-					      // better is not possible
-	     break;
-	 };
-
-				      // have an array of the next
-				      // cells to be numbered (old numbers)
-     std::vector<unsigned int> next_round_cells (1, cell_with_min_neighbors);
-  
-				      // while there are still cells to
-				      // be renumbered:
-     while (next_round_cells.size() != 0)
-       {
-	 for (unsigned int i=0; i<next_round_cells.size(); ++i)
-	   {
-	     Assert (new_cell_numbers[next_round_cells[i]] == invalid_cell_number,
-		     ExcInternalError());
-	     
-	     new_cell_numbers[next_round_cells[i]] = next_free_new_number;
-	     ++next_free_new_number;
-	   };
-	 
-					  // for the next round, find all
-					  // neighbors of the cells of
-					  // this round which have not
-					  // yet been renumbered
-	 std::vector<unsigned int> new_next_round_cells;
-	 for (unsigned int i=0; i<next_round_cells.size(); ++i)
-	   for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	     if (cells[next_round_cells[i]].neighbors[n] != Cell::invalid_neighbor)
-	       if (new_cell_numbers[cells[next_round_cells[i]].neighbors[n]]
-		   == invalid_cell_number)
-		 new_next_round_cells.push_back (cells[next_round_cells[i]].neighbors[n]);
-	 
-	 
-					  // eliminate duplicates from
-					  // the new_next_round_cells
-					  // array. note that a cell
-					  // which is entered into this
-					  // array might have been
-					  // entered more than once since
-					  // it might be a neighbor of
-					  // more than one cell of the
-					  // present round
-					  //
-					  // in order to eliminate
-					  // duplicates, we first sort
-					  // tha array and then copy over
-					  // only unique elements to the
-					  // next_round_cells array,
-					  // which is needed for the next
-					  // loop iteration anyway
-	 std::sort (new_next_round_cells.begin(), new_next_round_cells.end());
-	 next_round_cells.clear ();
-	 unique_copy (new_next_round_cells.begin(), new_next_round_cells.end(),
-		      back_inserter(next_round_cells));
-       };
-   };   // end of loop over subdomains
-  
-    
-  Assert (std::find (new_cell_numbers.begin(), new_cell_numbers.end(), invalid_cell_number)
-	  ==
-	  new_cell_numbers.end(),
-	  ExcInternalError());
-
-				   // now that we know in which order
-				   // to sort the cells, do so:
-  std::vector<Cell> new_cells (cells.size());
-  for (unsigned int i=0; i<cells.size(); ++i)
-    new_cells[new_cell_numbers[i]] = cells[i];
-				   // then switch old and new array
-  std::swap (cells, new_cells);
-  
-				   // now we still have to convert all
-				   // old cell numbers to new cells
-				   // numbers. non-existent neighbors
-				   // (with index -1) are mapped to
-				   // non-existent neighbors, so we
-				   // need not touch these indices
-  for (unsigned int c=0; c<cells.size(); ++c)
-    {
-      cells[c].cell_no = new_cell_numbers[cells[c].cell_no];
-      Assert (cells[c].cell_no == c, ExcInternalError());
-
-      for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	if (cells[c].neighbors[n] != Cell::invalid_neighbor)
-	  {
-	    Assert (cells[c].neighbors[n] < new_cell_numbers.size(),
-		    ExcIndexRange(cells[c].neighbors[n], 0, 
-				  new_cell_numbers.size()));
-	    cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
-	  };
-    };
-
-  for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
-    for (unsigned int k=0; k<2; ++k)
-      if (i->second.adjacent_cells[k] != FaceData::invalid_adjacent_cell)
-	i->second.adjacent_cells[k] = new_cell_numbers[i->second.adjacent_cells[k]];
-
-  return new_cell_numbers;
-}
-
-		      
-
-template <int dim>
-void GridReordering<dim>::reorder_cells (std::vector<CellData<dim> > &original_cells)
-{
-				   // we need more information than
-				   // provided by the input parameter,
-				   // in particular we need
-				   // neighborship relations between
-				   // cells. therefore copy over the
-				   // old cells to another class that
-				   // provides space to these
-				   // informations
-  std::vector<Cell> cells;
-  cells.reserve (original_cells.size());
-  for (unsigned int i=0; i<original_cells.size(); ++i)
-    cells.push_back (Cell(original_cells[i], i));
-  
-				   // first generate all the faces
-				   // possible, i.e. in each possible
-				   // direction and rotational state
-  std::map<Face,FaceData> faces;
-  for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-    cells[cell_no].insert_faces (faces);
-
-				   // after all faces have been filled
-				   // and the faces have indices of
-				   // their neighbors, we may also
-				   // insert the neighbor indices into
-				   // the cells themselves
-  for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-    {
-      Cell &cell = cells[cell_no];
-      cell.fix_cell_neighbors ();
-    };
-
-
-				   // do a preordering step in order
-				   // to make further backtracking
-				   // more local
-  const std::vector<unsigned int>
-    new_cell_numbers = presort_cells (cells, faces);
-
-				   // finally do some preliminary work
-				   // to make backtracking simpler
-				   // later
-  for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-    cells[cell_no].find_backtracking_point ();
-  
-				   // now do the main work
-  find_reordering (cells, original_cells, new_cell_numbers);
-
-
-  
-				   // finally check the consistency of
-				   // the program by ensuring that all
-				   // faces have no use-marks any
-				   // more. to this end, the
-				   // find_reordering function has
-				   // cleared all used marks it knows
-				   // of
-  for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
-    Assert (i->second.use_count == 0, ExcInternalError());
-}
-
-#endif // deal_II_dimension == 3
 
 #if deal_II_dimension == 2
 
@@ -1722,13 +571,821 @@ void GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells
 #endif
 
 
-// explicit instantiations. only require the main function, it should
-// then claim whatever templates it needs. note that in 1d, the
-// respective function is already specialized, and in 2d we have an
-// explicit specialization of the whole class
+
 #if deal_II_dimension == 3
-template
-void
-GridReordering<deal_II_dimension>::
-reorder_cells (std::vector<CellData<deal_II_dimension> > &);
-#endif
+
+namespace internal
+{
+  namespace GridReordering3d
+  {
+    DeclException1 (GridOrientError,
+		    std::string,
+		    <<  "Grid Orientation Error"<< arg1);
+
+
+    //Switched two ints so that v1<v2;
+    inline void sort2(int &v1, int &v2)
+    {
+      if(v1>v2)
+	{
+	  int t=v1;
+	  v1=v2;
+	  v2=t;
+	}
+    }
+
+    CheapEdge::CheapEdge(int n0, int n1) : node0(n0), node1(n1)
+    {
+      //sort the entries so that node0<node1;
+      sort2(node0,node1);
+    }
+
+    bool CheapEdge::operator<(const CheapEdge & e2) const
+    {
+      if ((node0)<(e2.node0)) return true;
+      if ((node0)>(e2.node0)) return false;
+      if ((node1)<(e2.node1)) return true;
+      return false;
+    };
+
+  
+    // This is the guts of the matter...
+    void build_mesh(Mesh &m)
+    {
+      const ElementInfo &info = m.info; 
+      std::vector<Cell> & cell_list = m.cell_list;
+      std::vector<Edge> & edge_list = m.edge_list;
+
+      const unsigned int cell_list_length=cell_list.size();
+
+
+      unsigned int NumEdges=0;
+      // Corectly build the edge list
+      {
+	// edge_map stores the edge_number associated with a given CheapEdge
+	std::map<CheapEdge,int> edge_map;
+	unsigned int ctr=0;
+	for(unsigned int cur_cell_id=0; 
+	    cur_cell_id<cell_list_length; 
+	    ++cur_cell_id)
+	  {
+	    //Get the local node numbers on edge edge_num
+	    Cell & cur_cell = cell_list[cur_cell_id];
+	    //m.DumpCell(cur_cell);
+	    for(unsigned short int edge_num=0; 
+		edge_num<12; 
+		++edge_num)
+	      {
+		unsigned int gl_edge_num=0;
+		int l_edge_orient=1;
+		//Construct the CheapEdge
+		int node0=cur_cell.nodes[info.nodes_on_edge[edge_num][0]];
+		int node1=cur_cell.nodes[info.nodes_on_edge[edge_num][1]];
+		CheapEdge cur_edge(node0,node1);
+		if(edge_map.count(cur_edge)==0) // Edge not in map
+		  {
+		    // put edge in hash map with ctr value;
+		    edge_map[cur_edge]=ctr;
+		    gl_edge_num=ctr;
+		    edge_list.push_back(Edge(node0,node1)); //put the edge into the global edge list.
+		    ctr++;
+		  }
+		else
+		  {
+		    gl_edge_num=edge_map[cur_edge]; // get edge_num from hash_map;
+		    if (edge_list[gl_edge_num].nodes[0]!=node0)
+		      { 
+			l_edge_orient=-1;
+		      }
+		  }
+		cell_list[cur_cell_id].edges[edge_num]=gl_edge_num; // set edge number to edgenum;
+		cell_list[cur_cell_id].local_orientation_flags[edge_num]=l_edge_orient;
+	      }
+	  }
+	NumEdges=ctr;
+      }
+
+      //Count each of the edges.
+      {
+	std::vector<int> edge_count(NumEdges,0);
+      
+
+	//Count every time an edge occurs in a cube.
+	for(unsigned int cur_cell_id=0; 
+	    cur_cell_id<cell_list_length; 
+	    ++cur_cell_id)
+	  {
+	    Cell & cur_cell = cell_list[cur_cell_id];
+	    for(unsigned short int edge_num=0; 
+		edge_num<12; 
+		++edge_num)
+	      {
+		edge_count[cur_cell.edges[edge_num]]++;
+	      }	
+	  }
+
+	// So we now know howmany cubes contain a given edge.
+	// Just need to store the list of cubes in the edge
+
+	//Alocate the space for the neighbour list
+	for(unsigned int cur_edge_id = 0;
+	    cur_edge_id<NumEdges;
+	    ++cur_edge_id)
+	  {
+	    Edge & cur_edge = edge_list[cur_edge_id];
+	    unsigned int NN = edge_count[cur_edge_id];
+	    cur_edge.num_neighbouring_cubes=NN;
+	    cur_edge.neighbouring_cubes = new unsigned int [NN];
+	  }
+      
+	//Stores the position of the current neighbour in the edge's neighbour list
+	std::vector<int> cur_cell_edge_list_posn(NumEdges,0);
+	for(unsigned int cur_cell_id =0;
+	    cur_cell_id<cell_list_length;
+	    ++cur_cell_id)
+	  {
+	    Cell & cur_cell = cell_list[cur_cell_id];
+	    for(unsigned short int edge_num=0; 
+		edge_num<12; 
+		++edge_num)
+	      {
+		unsigned int gl_edge_id=cur_cell.edges[edge_num];
+		Edge & cur_edge = edge_list[gl_edge_id];
+		cur_edge.neighbouring_cubes[cur_cell_edge_list_posn[gl_edge_id]]=cur_cell_id;
+		cur_cell_edge_list_posn[gl_edge_id]++;
+	      }
+	  }
+      
+      }
+    }
+
+    // Deal Element Information
+    const int DealEdgeToNodeArray[8][3] = 
+      { 
+	{0,4,8},
+	{0,5,9},
+	{3,5,10},
+	{3,4,11},
+	{1,7,8},
+	{1,6,9},
+	{2,6,10},
+	{2,7,11}
+      };
+
+    const int DealEdgeOrientArray[8][3] =
+      {
+	{ 1, 1, 1},
+	{-1, 1, 1},
+	{-1,-1, 1},
+	{ 1,-1, 1},
+	{ 1, 1,-1},
+	{-1, 1,-1},
+	{-1,-1,-1}, 
+	{ 1,-1,-1}
+      };
+
+    const int DealNodesOnEdgeArray[12][2] =
+      {
+	{0,1},
+	{4,5},
+	{7,6},
+	{3,2},
+	{0,3},
+	{1,2},
+	{5,6},
+	{4,7},
+	{0,4},
+	{1,5},
+	{2,6},
+	{3,7}
+      };
+
+    //Starting at emination node (for edges) and chosing clockwise order
+    const int DealFaceNodeArray[6][4] = //TODO: HERE
+      {
+	{0,1,2,3},
+	{0,4,5,1},
+	{1,5,6,2},
+	{3,2,6,7},
+	{0,3,7,4},
+	{4,7,6,5}
+      };
+
+    DealElemInfo::DealElemInfo() : ElementInfo()
+    {
+      for(int node=0; node<8; ++node)
+	{
+	  for(int i=0;i<3;++i)
+	    {
+	      edge_to_node[node][i]=DealEdgeToNodeArray[node][i];
+	      edge_to_node_orient[node][i]=DealEdgeOrientArray[node][i];
+	    }
+	}
+
+      for (int edge=0;edge<12; ++edge)
+	{
+	  nodes_on_edge[edge][0]=DealNodesOnEdgeArray[edge][0];
+	  nodes_on_edge[edge][1]=DealNodesOnEdgeArray[edge][1];
+	}
+
+      for(int facenum=0;facenum<6;++facenum)
+	for(int nodenum=0;nodenum<4;++nodenum)
+	  nodes_on_face[facenum][nodenum]=DealFaceNodeArray[facenum][nodenum];
+ 
+    }
+
+
+
+
+
+
+    Edge::~Edge()
+    {
+      delete [] neighbouring_cubes;
+    }
+
+    bool Mesh::sanity_check() const
+    {
+      bool retval=true;
+      for(unsigned int i=0; i<cell_list.size(); ++i)
+	retval&=sanity_check(i);
+      return retval;
+    }
+
+    bool Mesh::sanity_check(int cellnum) const
+    {
+      //Should check that every edge coming into a node has the 
+      //same node value
+      bool retval=true;
+      for(int i=0;i<8;++i)
+	{
+	  retval&=sanity_check_node(cellnum,i);
+	}
+      return retval;
+    }
+
+    bool Mesh::sanity_check_node(int cell_num, int local_node_num) const
+    {
+      // Get the Local Node Numbers of the incoming edges
+      int e0 = info.edge_to_node[local_node_num][0];
+      int e1 = info.edge_to_node[local_node_num][1]; 
+      int e2 = info.edge_to_node[local_node_num][2];
+
+      // Global Edge Numbers
+      const Cell& c = cell_list[cell_num];
+  
+      int ge0 = c.edges[e0];
+      int ge1 = c.edges[e1];
+      int ge2 = c.edges[e2];
+
+
+      //  std::cout<<"Coming Into Node "<<node_num<< " are the local edges : "
+      //    <<e0<<" "<<e1<<" "<<e2<<std::endl;
+
+      int or0 = info.edge_to_node_orient[local_node_num][0]*c.local_orientation_flags[e0];
+      int or1 = info.edge_to_node_orient[local_node_num][1]*c.local_orientation_flags[e1];
+      int or2 = info.edge_to_node_orient[local_node_num][2]*c.local_orientation_flags[e2];
+
+      //  std::cout<<"They have orientations : "<<or0<<" "<<or1<<" "<<or2<<std::endl;
+
+      //What each edge thinks the current node should be.
+
+      int curglobalnodenum0 = edge_list[ge0].nodes[or0==1 ? 0 : 1];
+      int curglobalnodenum1 = edge_list[ge1].nodes[or1==1 ? 0 : 1];
+      int curglobalnodenum2 = edge_list[ge2].nodes[or2==1 ? 0 : 1];
+
+      //  std::cout<<"This means the current node is "
+      //    <<curglobalnodenum0 <<" "
+      //    <<curglobalnodenum1 <<" "
+      //    <<curglobalnodenum2 <<std::endl; 
+
+      bool retval = ((curglobalnodenum0 == curglobalnodenum1)&&
+		     (curglobalnodenum1 == curglobalnodenum2) );
+
+
+      if (!retval)
+	{
+	  std::cout<<"FAILED SANITY TEST";
+	  dump_cell(c);
+	}
+      Assert (retval == true, ExcInternalError());
+  
+      return retval;
+    }
+
+    void Mesh::dump_cell(const Cell &c) const
+    {
+      std::cout<<std::endl
+	       <<"===CELL NODES==="<<std::endl;
+      for(int i=0;i<8;++i)
+	std::cout<<"\t"<<c.nodes[i];
+      std::cout<<std::endl;
+      std::cout<<"===CELL EDGES==="<<std::endl;
+      for(int i=0;i<12;++i)
+	{
+	  std::cout<<"\t"<<c.edges[i]<<" "<<c.local_orientation_flags[i];
+	  if(c.edges[i]>=0)
+	    {
+	      std::cout<<":"<<edge_list[c.edges[i]].nodes[0]<<" ";
+	      std::cout<<":"<<edge_list[c.edges[i]].nodes[1]<<" ";
+	      std::cout<<":"<<edge_list[c.edges[i]].orientation_flag;
+	    }
+	  std::cout<<std::endl;
+	}
+    }
+
+
+    void Mesh::dump() const
+    {
+      std::cout<<std::endl
+	       <<"===NODES==="<<std::endl;
+      const int nnodes=node_list.size();
+      for(int i=0;i<nnodes;++i)
+	{
+	  std::cout<<i<<"\t"<<node_list[i](0)<<"\t"<<node_list[i](1)<<"\t"<<node_list[i](2)<<std::endl;
+	}
+
+      std::cout<<"===EDGES==="<<std::endl;
+      const unsigned int nedges=edge_list.size();
+      for(unsigned int i=0;i<nedges;++i)
+	{
+	  const Edge &e = edge_list[i];
+	  std::cout<<i<<"\t"<<e.orientation_flag<<"\t"<<e.nodes[0]<<"\t"<<e.nodes[1]<<std::endl;
+	}
+  
+      std::cout<<"===CELLS==="<<std::endl;
+      const int ncells=cell_list.size();
+      for(int i=0;i<ncells;++i)
+	{
+	  const Cell & c = cell_list[i];
+	  std::cout<<"cell "<<i<<std::endl<<"  nodes:\t";
+	  std::cout<<c.nodes[0]<<"\t"<<c.nodes[1]<<"\t"<<c.nodes[2]<<"\t"<<c.nodes[3]<<std::endl;
+	  std::cout<<"\t\t"<<c.nodes[4]<<"\t"<<c.nodes[5]<<"\t"<<c.nodes[6]<<"\t"<<c.nodes[7]<<std::endl;
+	  std::cout<<"  edges:"<<std::endl;
+	  for(int j=0;j<12;++j)
+	    std::cout<<"\t\t"<<c.edges[j]<<" "<<c.local_orientation_flags[j]<<std::endl;
+	}
+    }
+	
+    void Mesh::dump_edges(char const * const fname) const
+    {
+      const int nedges = edge_list.size();
+      const int npoints = node_list.size();
+ 
+      //Only do this if we've have the extra information
+      if (npoints==0) 
+	return;
+  
+      std::ofstream outfile(fname);
+
+      outfile<<npoints<<" "<<nedges<<std::endl;
+      for(int i=0;i<npoints;++i)
+	{
+	  const Point<3> & n = node_list[i];
+	  outfile<<n(0)<<" "<<n(1)<<" "<<n(2)<<std::endl;
+	} 
+      for(int i=0;i<nedges;++i)
+	{
+	  const Edge & e = edge_list[i];
+	  outfile<<e.nodes[0]<<" "
+		 <<e.nodes[1]<<" "
+		 <<e.orientation_flag<<" "
+		 <<e.group<<std::endl;
+	} 
+    }
+
+
+    /**
+     * This assignes an orientation to each edge so that 
+     * every cube is a rotated Deal.II cube.
+     */
+    bool Orienter::orient_edges(Mesh &m)
+    {
+  
+      // First check that the mesh is sensible
+      AssertThrow(m.sanity_check(),GridOrientError("Invalid Mesh Detected"));
+
+      // We start by looking only at the first cube.  
+      cur_posn=0; 
+      marker_cube=0;
+
+      // We mark each edge with a group number 
+      // (mostly for mesh debugging purposes)
+      cur_edge_group=1;
+      // While there are still cubes to orient
+      while(GetNextUnorientedCube(m))
+	{
+	  // And there are edges in the cube to orient
+	  while(OrientNextUnorientedEdge(m))
+	    {
+	      // Make all the sides in the current set match
+	      OrientEdgesInCurrentCube(m);
+	      // Add the adjacent cubes to the list for processing
+	      GetAdjacentCubes(m);
+	      // Start working on this list of cubes
+	      while(GetNextActiveCube(m))
+		{
+		  // Make sure the Cube doesn't have a contradiction 
+		  if(!Consistant(m,cur_posn))
+		    {
+		      m.dump_edges("edgelist.dat");
+		    }
+		  AssertThrow(Consistant(m,cur_posn),GridOrientError("Mesh is Unorientable"));
+		  // If we needed to orient any edges in the current cube
+		  // then we may have to process the neighbour.
+		  if(OrientEdgesInCurrentCube(m)) GetAdjacentCubes(m);
+		}
+	      cur_edge_group++;
+	    }
+	}
+      return true;
+    }
+
+    bool Orienter::GetNextUnorientedCube(Mesh &m)
+    {
+      // The last cube in the list
+      unsigned int end_cube_num = m.cell_list.size();
+      // Keep shifting along the list until we find a cube which is not
+      // fully oriented or the end.
+      while( (marker_cube<end_cube_num)&&(is_oriented(m,marker_cube)) )
+	marker_cube++;
+      cur_posn=marker_cube;
+      //Return true if we now point at a valid cube.
+      return cur_posn<end_cube_num;
+    }
+
+    bool Orienter::is_oriented(const Mesh &m, int cell_num)
+    {
+      const Cell& c = m.cell_list[cell_num];
+      for(int i = 0; i<12; ++i)
+	{
+	  int edgenum = c.edges[i];
+	  if (m.edge_list[edgenum].orientation_flag==0) return false;
+	}
+      return true;
+    }
+
+    bool Orienter::Consistant(Mesh &m, int cell_num)
+    {
+
+      const Cell& c = m.cell_list[cell_num];
+  
+      //Checks that all oriented edges in the group are oriented consistantly.  
+      for(int group=0; group<3; ++group)
+	{
+	  // When a nonzero orientation is first encoutered in the group it is 
+	  // stored in this
+	  int value=0;
+	  //Loop over all parallel edges
+	  for(int i=4*group;i<4*(group+1);++i)
+	    {
+	      //The local edge orientation within the cell
+	      int LOR = c.local_orientation_flags[i] *
+		m.edge_list[c.edges[i]].orientation_flag; 
+	      //If the edge has orientation
+	      if (LOR!=0)
+		{
+		  //And we haven't seen an oriented edge before
+		  if (value==0) 
+		    {
+		      //Store it's value
+		      value=LOR;
+		    }
+		  else
+		    {
+		      //If we have seen a oriented edge in this group
+		      //we'd better have the same orientation.
+		      if (value!=LOR) return false;
+		    }
+		}
+	    }
+	}
+      return true;
+    }
+
+    bool Orienter::OrientNextUnorientedEdge(Mesh &m)
+    {
+      cur_posn=marker_cube;
+      const Cell& c = m.cell_list[cur_posn];
+      int i=0;
+ 
+      // search for the unoriented side
+      while((i<12)&&(m.edge_list[c.edges[i]].orientation_flag!=0))
+	++i;
+  
+      //if we found none then return false
+      if (i==12)
+	return false;
+  
+      //Which edge group we're in.
+      int egrp=i/4;
+
+      //A sanity check that none of the other edges in the group have been oriented yet
+      //Each of the edges in the group should be un-oriented
+      for(int j=egrp*4;j<egrp*4+4;++j)
+	{
+	  Assert(m.edge_list[c.edges[j]].orientation_flag==0,
+		 GridOrientError("Tried to orient edge when other edges in group already oriented!"));
+	}
+
+      //Make the edge alignment match that of the local cube.
+      m.edge_list[c.edges[i]].orientation_flag
+	= c.local_orientation_flags[i];
+      m.edge_list[c.edges[i]].group=cur_edge_group;
+
+      edge_orient_array[i]=true;
+
+      return true;
+    }
+
+    bool Orienter::OrientEdgesInCurrentCube(Mesh &m)
+    {
+      bool retval = false;
+      for(int i=0;i<3;++i)
+	retval=retval||OrientEdgeSetInCurrentCube(m,i);
+      return retval;
+    }
+
+    bool Orienter::OrientEdgeSetInCurrentCube(Mesh &m,int n)
+    {
+      const Cell& c = m.cell_list[cur_posn];
+  
+      //Check if Any edge is oriented
+      int num_oriented =0 ;
+      int glorient = 0;
+      unsigned int edge_flags = 0;
+      unsigned int cur_flag = 1;
+      for(int i = 4*n; i<4*(n+1); ++i)
+	{
+	  int orient = m.edge_list[c.edges[i]].orientation_flag *
+	    c.local_orientation_flags[i];
+	  if (orient!=0)
+	    {
+	      num_oriented++;
+	      if (glorient!=0)
+		{
+		  AssertThrow(orient==glorient,GridOrientError("Attempted to Orient Misaligned cube"));
+		}
+	      else
+		{
+		  glorient=orient;
+		}
+	    }
+	  else
+	    {
+	      edge_flags|=cur_flag;
+	    }
+	  cur_flag*=2;
+	}
+
+      //were any of the sides oriented?
+      //were they all already oriented?
+      if ((glorient==0)||(num_oriented==4))
+	return false;
+
+      //If so orient all edges consistantly.
+      cur_flag = 1;
+      for(int i=4*n; i<4*(n+1); ++i)
+	{
+	  //std::cout<<i<<" ORIENTING\n";
+	  if ((edge_flags&cur_flag)!=0)
+	    {
+	      m.edge_list[c.edges[i]].orientation_flag 
+		= c.local_orientation_flags[i]*glorient;
+	      m.edge_list[c.edges[i]].group=cur_edge_group;
+	      edge_orient_array[i]=true;
+	    }
+	  cur_flag*=2;
+	} 
+      return true;
+    }
+
+    void Orienter::GetAdjacentCubes(Mesh &m)
+    {
+      const Cell& c = m.cell_list[cur_posn];
+      for(unsigned int e=0;e<12;++e)
+	{
+	  if(edge_orient_array[e])
+	    {
+	      edge_orient_array[e]=false;
+	      const unsigned int cur_local_edge_num = e;
+
+	      Edge & the_edge=m.edge_list[c.edges[cur_local_edge_num]];
+	      for(unsigned int local_cube_num = 0; 
+		  local_cube_num < the_edge.num_neighbouring_cubes; 
+		  ++local_cube_num)
+		{
+		  unsigned int global_cell_num = the_edge.neighbouring_cubes[local_cube_num];
+		  Cell& ncell=m.cell_list[global_cell_num];
+		  if (!ncell.waiting_to_be_processed)
+		    {
+		      SheetToProcess.push_back(global_cell_num);
+		      ncell.waiting_to_be_processed=true;
+		    }
+
+		}
+	    }
+
+	}
+    }	
+
+    bool Orienter::GetNextActiveCube(Mesh &m)
+    {
+      //Mark the curent Cube as finnished with.
+      Cell &c = m.cell_list[cur_posn];
+      c.waiting_to_be_processed=false;
+      if(SheetToProcess.size()!=0)
+	{
+	  cur_posn=SheetToProcess.back();
+	  SheetToProcess.pop_back();
+	  return true;
+	}
+      return false;
+    }
+
+    bool Orienter::CheckCellEdgeGroupConsistancy(const Mesh &m, const Cell & c, int egrp) const
+    {
+      int grp=0;
+      for(int i=4*egrp;i<4*egrp+4;++i)
+	{
+	  int cgrp = m.edge_list[c.edges[i]].group;
+	  if (cgrp!=0)
+	    {
+	      if(grp==0)
+		{
+		  grp=cgrp;
+		}
+	      else if (grp!=cgrp)
+		{
+		  return false;
+		}
+	    }
+	}
+      return true;
+    }
+      
+    
+    bool Orienter::CheckCellEdgeGroupConsistancy(const Mesh &m, const Cell &c) const
+    {
+      return ( 
+	      CheckCellEdgeGroupConsistancy(m,c,0) &&
+	      CheckCellEdgeGroupConsistancy(m,c,1) &&
+	      CheckCellEdgeGroupConsistancy(m,c,2)
+	      );
+    }
+
+    void Orienter::orient_cubes(Mesh & the_mesh)
+    {
+      // We assume that the mesh has all edges oriented already.
+  
+      const unsigned int numelems=the_mesh.cell_list.size();
+  
+      // This is a list of permutations that take node 0 to node i
+      // but only rotate the cube. 
+      // (This set is far from unique (there are 3 for each node - for our
+      // algorithm it doesn't matter which of the three we use)
+      const unsigned int CubePermutations[8][8] = {
+	{0,1,2,3,4,5,6,7},
+	{1,2,3,0,5,6,7,4},
+	{2,3,0,1,6,7,4,5},
+	{3,0,1,2,7,4,5,6},
+	{4,7,6,5,0,3,2,1},
+	{5,4,7,6,1,0,3,2},
+	{6,5,4,7,2,1,0,3},
+	{7,6,5,4,3,2,1,0}
+      };
+  
+      // So now we need to work out which node needs to be mapped to the 
+      // zero node. 
+      // The trick is that the node that should be the local zero node has
+      // three edges coming into it.
+      for(unsigned int i=0;i<numelems;++i)
+	{
+	  Cell& the_cell = the_mesh.cell_list[i];
+    
+	  // This stores whether the global oriented edge points in the same
+	  // direction as it's local edge on the current cube. (for each edge on
+	  // the curent cube)
+	  int local_edge_orientation[12];
+	  for(unsigned int j=0;j<12;++j)
+	    {
+	      // get the global edge
+	      const Edge& the_edge = the_mesh.edge_list[the_cell.edges[j]];
+	      // All edges should be oriented at this stage..
+	      Assert(the_edge.orientation_flag!=0,GridOrientError("Unoriented edge encountered"));
+	      // calculate whether it points the right way (1) or not (-1)
+	      local_edge_orientation[j]=(the_cell.local_orientation_flags[j]*the_edge.orientation_flag);
+	    }
+
+	  // Here the number of incoming edges is tallied for each node.
+	  int perm_num=-1;
+	  for(int node_num=0;node_num<8;++node_num)
+	    {
+	      //The local edge numbers coming into the node
+	      int iedg0 = the_mesh.info.edge_to_node[node_num][0];
+	      int iedg1 = the_mesh.info.edge_to_node[node_num][1];
+	      int iedg2 = the_mesh.info.edge_to_node[node_num][2];
+
+	      //The local orientation of the edge coming into the node.
+	      int isign0 = the_mesh.info.edge_to_node_orient[node_num][0];
+	      int isign1 = the_mesh.info.edge_to_node_orient[node_num][1];
+	      int isign2 = the_mesh.info.edge_to_node_orient[node_num][2];
+
+	      //Add one to the total for each edge pointing in 
+	      int Total  = ((local_edge_orientation[iedg0]*isign0==1)?1:0)
+		+ ((local_edge_orientation[iedg1]*isign1==1)?1:0)
+		+ ((local_edge_orientation[iedg2]*isign2==1)?1:0);
+      
+	      //      std::cout<<"TOTAL : "<<Total<<std::endl;
+      
+	      if (Total==3) 
+		{
+		  Assert(perm_num==-1, GridOrientError("More than one node with 3 incoming edges found in curent hex.")); 
+		  perm_num=node_num;
+		}
+	    }
+	  // We should now have a valid permutation number
+	  Assert(perm_num!=-1, GridOrientError("No node having 3 incoming edges found in curent hex.")); 
+
+	  // So use the apropriate rotation to get the new cube
+	  int temp[8];
+	  for(int i=0;i<8;++i)
+	    {
+	      temp[i]=the_cell.nodes[CubePermutations[perm_num][i]];
+	    }
+	  for(int i=0;i<8;++i)
+	    {
+	      the_cell.nodes[i]=temp[i];
+	    }
+	}
+    };
+
+  }
+}
+
+
+
+void GridReordering<3>::reorder_cells(std::vector<CellData<3> >& incubes, std::vector<Point<3> > * node_vec_ptr)
+{
+
+  Assert(incubes.size()!=0,
+	 ExcMessage("List of elements to orient was of zero length"));
+  
+  // This keeps track of all the local element conectivity information.
+  // e.g. what edges come into which nodes and with which orientation
+  internal::GridReordering3d::DealElemInfo deal_info; 
+  
+  //This does the real work
+  internal::GridReordering3d::Orienter orienter;
+
+  // This is the internal store for all global connectivity information
+  // it starts prety much empty.
+  internal::GridReordering3d::Mesh the_mesh(deal_info);
+
+  if(node_vec_ptr!=NULL)
+    {
+      the_mesh.node_list=*node_vec_ptr;
+    }
+  
+  //Copy the cells into our own internal data format.
+  const unsigned int numelems=incubes.size();
+  for(unsigned int i =0 ; i<numelems; ++i)
+    {
+      internal::GridReordering3d::Cell the_cell;
+      for(unsigned int j=0;j<8;j++)
+	{
+	  the_cell.nodes[j]=incubes[i].vertices[j];
+	}
+      the_mesh.cell_list.push_back(the_cell);
+    }
+  
+  // Build the conectivity information
+  // This fills in the conectivity information in the internal structure
+  build_mesh(the_mesh);
+
+  //Orient the mesh
+  orienter.orient_edges(the_mesh);
+
+  // Now we have a bunch of oriented edges int the structure
+  // we only have to turn the cubes so thy match the edge orientation.
+
+  orienter.orient_cubes(the_mesh);
+
+  // Copy the elements from our internal structure back into 
+  // their original location.
+  
+  for(unsigned int i =0 ; i<numelems; ++i)
+    {
+      internal::GridReordering3d::Cell& the_cell = the_mesh.cell_list[i];
+      for(unsigned int j=0;j<8;j++)
+	{
+	  incubes[i].vertices[j]=the_cell.nodes[j];
+	}
+    }
+}
+
+
+	
+
+#endif // deal_II_dimension == 3
+
