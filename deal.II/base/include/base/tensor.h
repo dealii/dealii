@@ -759,7 +759,42 @@ void outer_product (Tensor<1,dim>       &dst,
 };
 
 
-      
+
+/**
+ * Cross-product in 2d. This is just a rotation by 90 degrees
+ * clockwise to compute the outer normal from a tangential vector.
+ *
+ * @author Guido Kanschat, 2001
+ */
+inline
+void
+cross_product (Tensor<1,2>& dst,
+	       const Tensor<1,2>& src)
+{
+  dst[0] = src[1];
+  dst[1] = -src[0];
+}
+
+
+
+/**
+ * Cross-product of 2 vectors in 3d.
+ *
+ * @author Guido Kanschat, 2001
+ */
+inline
+void
+cross_product (Tensor<1,3>& dst,
+	       const Tensor<1,3>& src1,
+	       const Tensor<1,3>& src2)
+{
+  dst[0] = src1[1]*src2[2] - src1[2]*src2[1];
+  dst[1] = src1[2]*src2[0] - src1[0]*src2[2];
+  dst[2] = src1[0]*src2[1] - src1[1]*src2[0];
+}
+
+
+
 /**
  * Compute the determinant of a tensor of arbitrary rank and dimension
  * one. Since this is a number, the return value is, of course, the

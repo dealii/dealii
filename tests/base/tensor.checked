@@ -10,4 +10,7 @@ DEAL::25.0 31.0 37.0
 DEAL::45.0 57.0 69.0 
 DEAL::75.0 96.0 117. 
 
+DEAL:Cross product::	0.00	0.00	1.00
+DEAL:Cross product::	1.00	0.00	0.00
+DEAL:Cross product::	0.00	1.00	0.00
 DEAL::Result OK.

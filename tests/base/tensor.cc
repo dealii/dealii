@@ -61,14 +61,41 @@ int main ()
     };
   deallog << endl;
 
+  if (true)
+    {
+      deallog.push("Cross product");
+      Tensor<1,3> e1;
+      Tensor<1,3> e2;
+      Tensor<1,3> e3;
+      e1[0] = 1.;
+      e2[1] = 1.;
+      e3[2] = 1.;
+      Tensor<1,3> result;
+      cross_product(result,e1,e2);
+      deallog << '\t' << result[0]
+	      << '\t' << result[1]
+	      << '\t' << result[2] << endl;
+      
+      cross_product(result,e2,e3);
+      deallog << '\t' << result[0]
+	      << '\t' << result[1] << '\t'
+	      << result[2] << endl;
+      
+      cross_product(result,e3,e1);
+      deallog << '\t' << result[0]
+	      << '\t' << result[1]
+	      << '\t' << result[2] << endl;
+      
+	deallog.pop();
+    }
+
   if (tt==result)
     {
       deallog << "Result OK." << endl;
-      return 0;
     }
   else
     {
       deallog << "Result WRONG!" << endl;
-      return 1;
     };
+
 };
