@@ -177,8 +177,6 @@ clean:
 	-rm -f *~ */*~ */*/*~
 	cd lib ; $(MAKE) clean
 
-veryclean: clean
-	-rm -f include/grid/forward_declarations.h*
 
 ###################
 
