@@ -43,6 +43,7 @@
        <acronym>deal.II</acronym>?</a>
   <li> <a href="#problem-howto">How do I solve problem XXX with
        <acronym>deal.II</acronym>?</a>
+  <li> <a href="#problem-complex">Can I solve problems over complex numbers?</a>
   <li> <a href="#time-dependent">There is no tutorial program for
        time-dependent problems!</a>
   <li> <a href="#contribute">I want to contribute to the development
@@ -394,6 +395,27 @@
   the examples programs, then you have to write something up
   yourself. The example programs may nevertheless be a good guide on
   how to program with <acronym>deal.II</acronym>.
+  </p>
+
+
+  <a name="problem-complex"></a>
+  <h3>Can I solve problems over complex numbers?</h3>
+
+  <p>
+  Yes, you can, and it has been done numerous times with
+  <acronym>deal.II</acronym>. However, we have a standard
+  recommendation: consider such problems as systems of partial
+  differential equations, where the individual components of the
+  solution are the real and imaginary part of your unknown. The reason
+  for this is that for complex-valued problems, the product
+  <tt>&lt;u,v&gt;</tt> of two vectors is not the same as
+  <tt>&lt;v,u&gt;</tt>, and it is very easy to get this wrong in many
+  places. If you want to avoid these common traps, then the easiest
+  way around is to split up you equation into two equations of real
+  and imaginary part first, and then treat the resulting system as a
+  system of real variables. This also makes the type of linear system
+  clearer that you get after discretization, and tells you something
+  about which solver may be adequate for it.
   </p>
 
 
