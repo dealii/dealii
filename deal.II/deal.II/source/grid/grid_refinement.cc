@@ -81,21 +81,24 @@ void GridRefinement::refine (Triangulation<dim>   &tria,
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
   Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
-	  ExcInvalidParameterValue());  
-
-				   // nothing to do; especially we
-				   // do not want to flag with zero
-				   // error since then we may get
-				   // into conflict with coarsening
-				   // in some cases
-  if (threshold==0)
-    return;
+	  ExcInvalidParameterValue());
   
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
+
+  double new_threshold=threshold;
+				   // when threshold==0 find the
+				   // smallest value in criteria
+				   // greater 0
+  if (new_threshold==0)
+    for (unsigned int index=0; index<n_cells; ++index)
+      if (criteria(index)>0
+	  && (criteria(index)<new_threshold
+	      || new_threshold==0))
+	new_threshold=criteria(index);
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (std::fabs(criteria(index)) >= threshold)
+    if (std::fabs(criteria(index)) >= new_threshold)
       cell->set_refine_flag();
 };
 
