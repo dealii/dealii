@@ -27,7 +27,7 @@ full_matrix.exe           : full_matrix.go                                  $(li
 matrix_out.exe            : matrix_out.go                                   $(libraries)
 solver.exe                : solver.go                         testmatrix.go $(libraries)
 sparse_matrices.exe       : sparse_matrices.go                testmatrix.go $(libraries)
-sparse_matrices.opt       : sparse_matrices.o                 testmatrix.o  $(libraries_o)
+sparse_matrices.opt.exe   : sparse_matrices.o                 testmatrix.o  $(libraries_o)
 sparsity_pattern.exe      : sparsity_pattern.go               testmatrix.go $(libraries)
 sparse_ilu.exe            : sparse_ilu.go                     testmatrix.go $(libraries)
 vector-vector.exe         : vector-vector.go                                $(libraries)
