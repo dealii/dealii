@@ -60,17 +60,10 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
   Assert (vertices.size() == n_vertices_per_surface*2,
           ExcInternalError());
     
-                                   // next create cells from these
-                                   // vertices. only store the
-                                   // vertices of the upper surface,
-                                   // the lower ones are the same
-                                   // +12
   const unsigned int connectivity[3][4]
     = { { 1, 2, 3, 0 },
         { 3, 4, 5, 0 },
         { 0, 5, 6, 7 } };
-      
-                                   // now create cells out of this
   for (unsigned int i=0; i<3; ++i)
     {
       CellData<3> cell;
