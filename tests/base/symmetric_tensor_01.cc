@@ -11,11 +11,11 @@
 //
 //----------------------------  symmetric_tensor_01.cc  ---------------------------
 
+// test symmetric 2x2 tensors
 
 #include "../tests.h"
 #include <base/symmetric_tensor.h>
 #include <base/logstream.h>
-#include <lac/vector.h>
 #include <fstream>
 #include <iostream>
 
