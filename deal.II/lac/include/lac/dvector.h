@@ -108,6 +108,9 @@ class dVector : public VectorBase
 				     /**
 				      * Set all entries to zero. Equivalent to
 				      * #v = 0#, but more obvious and faster.
+				      * Note that this function does not change
+				      * the size of the vector, unlike the
+				      * STL's #vector<>::clear# function.
 				      */
     void clear ();
     
@@ -160,10 +163,16 @@ class dVector : public VectorBase
 				     /**
 				      * Change the dimension of the vector to
 				      * #N#. The reserved memory for this vector
-				      * remains unchanged, however, to make
+				      * remains unchanged if possible, to make
 				      * things faster, but this may waste some
 				      * memory, so take this in the back of your
 				      * head.
+				      * However, if #N==0# all memory is freed,
+				      * i.e. if you want to resize the vector
+				      * and release the memory not needed, you
+				      * have to first call #reinit(0)# and then
+				      * #reinit(N)#. This cited behaviour is
+				      * analogous to that of the STL containers.
 				      *
 				      * On #fast==false#, the vector is filled by
 				      * zeros.
@@ -175,7 +184,9 @@ class dVector : public VectorBase
 				      * vector #V#. The same applies as for
 				      * the other #reinit# function.
 				      *
-				      * The elements of #V# are not copied.
+				      * The elements of #V# are not copied, i.e.
+				      * this function is the same as calling
+				      * #reinit (V.size(), fast)#.
 				      */
     void reinit (const dVector& V, const bool fast=false);
     
@@ -457,6 +468,10 @@ class dVector : public VectorBase
 				      * Exception
 				      */
     DeclException0 (ExcOutOfMemory);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcEmptyVector);
 };
 
 

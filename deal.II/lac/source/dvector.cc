@@ -9,7 +9,7 @@
 #include <algorithm>
 
 
-inline double sqr (const double x) {
+static inline double sqr (const double x) {
   return x*x;
 };
 
@@ -24,17 +24,10 @@ dVector::dVector () :
 
 dVector::dVector (const unsigned int n) :
 		dim(n),
-		maxdim(n),
+		maxdim(0),
 		val(0)
 {
-  Assert (n>0, ExcInvalidNumber(n));
-
-  if (n)
-    {
-      val = new double[maxdim];
-      Assert (val != 0, ExcOutOfMemory());
-      clear ();
-    }
+  reinit (n, false);
 }
 
 
@@ -54,38 +47,33 @@ dVector::dVector (const dVector& v) :
 
 
 
-void dVector::reinit (const unsigned int n, const bool fast)
-{
-  Assert (n>0, ExcInvalidNumber(n));
-
+void dVector::reinit (const unsigned int n, const bool fast) {
+  if (n==0) 
+    {
+      if (val) delete[] val;
+      val = 0;
+      maxdim = dim = 0;
+      return;
+    };
+  
   if (n>maxdim)
-  {
-    if (val) delete[] val;
-    val = new double[n];
-    Assert (val != 0, ExcOutOfMemory());
-    maxdim = n;
-  }
+    {
+      if (val) delete[] val;
+      val = new double[n];
+      Assert (val != 0, ExcOutOfMemory());
+      maxdim = n;
+    };
   dim = n;
-  if (!fast)
+  if (fast == false)
     clear ();
 }
 
 
 
-void dVector::reinit (const dVector& v, const bool fast)
-{
-  const unsigned int n = v.size();
-  if (n>maxdim)
-  {
-    if (val) delete[] val;
-    val = new double[n];
-    Assert (val != 0, ExcOutOfMemory());
-    maxdim = n;
-  }
-  dim = n;
-  if (!fast)
-    clear ();
-}
+void dVector::reinit (const dVector& v, const bool fast) {
+  reinit (v.size(), fast);
+};
+
 
 
 
@@ -97,12 +85,15 @@ dVector::~dVector ()
 
 
 void dVector::clear () {
-  fill (begin(), end(), 0.);
+  if (dim>0)
+    fill (begin(), end(), 0.);
 }
 
 
 
 bool dVector::all_zero () const {
+  Assert (dim!=0, ExcEmptyVector());
+  
   const_iterator p = begin(),
 		 e = end();
   while (p!=e)
@@ -115,6 +106,8 @@ bool dVector::all_zero () const {
 
 double dVector::operator * (const dVector& v) const
 {
+  Assert (dim!=0, ExcEmptyVector());
+
   if (&v == this)
     return norm_sqr();
   
@@ -149,6 +142,8 @@ double dVector::operator * (const dVector& v) const
 
 double dVector::norm_sqr () const
 {
+  Assert (dim!=0, ExcEmptyVector());
+
   double sum0 = 0,
 	 sum1 = 0,
 	 sum2 = 0,
@@ -177,6 +172,8 @@ double dVector::norm_sqr () const
 
 double dVector::mean_value () const
 {
+  Assert (dim!=0, ExcEmptyVector());
+
   double sum0 = 0,
 	 sum1 = 0,
 	 sum2 = 0,
@@ -205,6 +202,8 @@ double dVector::mean_value () const
 
 double dVector::l1_norm () const
 {
+  Assert (dim!=0, ExcEmptyVector());
+
   double sum0 = 0,
 	 sum1 = 0,
 	 sum2 = 0,
@@ -239,6 +238,8 @@ double dVector::l2_norm () const
 
 
 double dVector::linfty_norm () const {
+  Assert (dim!=0, ExcEmptyVector());
+
   double max0=0.,
 	 max1=0.,
 	 max2=0.,
@@ -265,6 +266,8 @@ double dVector::linfty_norm () const {
 
 dVector& dVector::operator += (const dVector& v)
 {
+  Assert (dim!=0, ExcEmptyVector());
+
   add (v);
   return *this;
 }
@@ -273,7 +276,9 @@ dVector& dVector::operator += (const dVector& v)
 
 dVector& dVector::operator -= (const dVector& v)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin();
@@ -287,6 +292,8 @@ dVector& dVector::operator -= (const dVector& v)
 
 void dVector::add (const double v)
 {
+  Assert (dim!=0, ExcEmptyVector());
+
   iterator i_ptr = begin(),
 	   i_end = end();
   while (i_ptr!=i_end)
@@ -297,7 +304,9 @@ void dVector::add (const double v)
 
 void dVector::add (const dVector& v)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin();
@@ -309,7 +318,9 @@ void dVector::add (const dVector& v)
 
 void dVector::add (const double a, const dVector& v)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin();
@@ -322,6 +333,7 @@ void dVector::add (const double a, const dVector& v)
 void dVector::add (const double a, const dVector& v,
 		   const double b, const dVector& w)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
   iterator i_ptr = begin(),
@@ -336,6 +348,7 @@ void dVector::add (const double a, const dVector& v,
 
 void dVector::sadd (const double x, const dVector& v)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -348,6 +361,7 @@ void dVector::sadd (const double x, const dVector& v)
 
 void dVector::sadd (const double x, const double a, const dVector& v)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -361,6 +375,7 @@ void dVector::sadd (const double x, const double a, const dVector& v)
 void dVector::sadd (const double x, const double a,
 		    const dVector& v, const double b, const dVector& w)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
   iterator i_ptr = begin(),
@@ -377,6 +392,7 @@ void dVector::sadd (const double x, const double a,
 		    const dVector& v, const double b,
 		    const dVector& w, const double c, const dVector& y)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
   Assert (dim == y.dim, ExcDimensionsDontMatch(dim, y.dim));
@@ -394,6 +410,8 @@ void dVector::sadd (const double x, const double a,
 
 void dVector::scale (const double factor)
 {
+  Assert (dim!=0, ExcEmptyVector());
+
   iterator ptr=begin(), eptr=end();
   while (ptr!=eptr)
     *ptr++ *= factor;
@@ -404,6 +422,7 @@ void dVector::scale (const double factor)
 void dVector::equ (const double a, const dVector& u,
 		   const double b, const dVector& v)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
   Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
   iterator i_ptr = begin(),
@@ -418,6 +437,7 @@ void dVector::equ (const double a, const dVector& u,
 
 void dVector::equ (const double a, const dVector& u)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -429,6 +449,7 @@ void dVector::equ (const double a, const dVector& u)
 
 
 void dVector::ratio (const dVector &a, const dVector &b) {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (a.dim == b.dim, ExcDimensionsDontMatch (a.dim, b.dim));
 
 				   // no need to reinit with zeros, since
@@ -446,6 +467,7 @@ void dVector::ratio (const dVector &a, const dVector &b) {
 
 dVector& dVector::operator = (const double s)
 {
+  Assert (dim!=0, ExcEmptyVector());
   fill (begin(), end(), s);
   return *this;
 }
@@ -457,7 +479,8 @@ dVector& dVector::operator = (const dVector& v)
   if (v.dim != dim)
     reinit (v.dim, true);
 
-  copy (v.begin(), v.end(), begin());
+  if (dim!=0)
+    copy (v.begin(), v.end(), begin());
   return *this;
 }
 
@@ -466,6 +489,7 @@ dVector& dVector::operator = (const dVector& v)
 void dVector::cadd (const unsigned int i, const VectorBase& V,
 		    const double s, const unsigned int j)
 {
+  Assert (dim!=0, ExcEmptyVector());
   const dVector& v = (const dVector&) V;
 
   Assert (i<dim, ExcInvalidIndex(i,dim));
@@ -480,6 +504,7 @@ void dVector::cadd(unsigned int i, const VectorBase& V,
 		   double s, unsigned int j,
 		   double t, unsigned int k)
 {
+  Assert (dim!=0, ExcEmptyVector());
   const dVector& v = (const dVector&) V;
 
   Assert (i<dim, ExcInvalidIndex(i,dim));
@@ -497,6 +522,7 @@ void dVector::cadd (const unsigned int i, const VectorBase& V,
 		    const double q, const unsigned int l,
 		    const double r, const unsigned int m)
 {
+  Assert (dim!=0, ExcEmptyVector());
   const dVector& v = (const dVector&) V;
 
   Assert (i<dim, ExcInvalidIndex(i,dim));
@@ -512,6 +538,7 @@ void dVector::cadd (const unsigned int i, const VectorBase& V,
 
 void dVector::czero (const unsigned int i)
 {
+  Assert (dim!=0, ExcEmptyVector());
   Assert (i<dim, ExcInvalidIndex(i,dim));
   val[i] = 0.;
 }
@@ -521,6 +548,7 @@ void dVector::czero (const unsigned int i)
 void dVector::cequ (const unsigned int i, const VectorBase& V,
 		    const double s, const unsigned int j)
 {
+  Assert (dim!=0, ExcEmptyVector());
   const dVector& v = (const dVector&) V;
 
   Assert (i<dim, ExcInvalidIndex(i,dim));
@@ -535,6 +563,7 @@ void dVector::cequ (const unsigned int i, const VectorBase& V,
 		    const double s, const unsigned int j,
 		    const double t, const unsigned int k)
 {
+  Assert (dim!=0, ExcEmptyVector());
   const dVector& v = (const dVector&) V;
 
   Assert (i<dim, ExcInvalidIndex(i,dim));
@@ -552,6 +581,7 @@ void dVector::cequ (const unsigned int i, const VectorBase& V,
 		    const double q, const unsigned int l,
 		    const double r, const unsigned int m)
 {
+  Assert (dim!=0, ExcEmptyVector());
   const dVector& v = (const dVector&) V;
 
   Assert (i<dim, ExcInvalidIndex(i,dim));
@@ -574,6 +604,7 @@ const char* dVector::name () const
 
 void dVector::print (FILE* f, const char* format) const
 {
+  Assert (dim!=0, ExcEmptyVector());
   if (!format) format = " %5.2f";
   for (unsigned int j=0;j<size();j++)
     fprintf(f, format, val[j]);
@@ -584,6 +615,7 @@ void dVector::print (FILE* f, const char* format) const
 
 void dVector::print (const char* format) const
 {
+  Assert (dim!=0, ExcEmptyVector());
   if (!format) format = " %5.2f";
   for (unsigned int j=0;j<size();j++)
     printf (format, val[j]);
@@ -593,6 +625,11 @@ void dVector::print (const char* format) const
 
 
 void dVector::print (ostream &out) const {
+  Assert (dim!=0, ExcEmptyVector());
   for (unsigned int i=0; i<size(); ++i)
     out << val[i] << endl;
 };
+
+
+
+

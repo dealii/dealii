@@ -11,6 +11,17 @@
 
 
 
+dSMatrixStruct::dSMatrixStruct () :
+		max_dim(0),
+		max_vec_len(0),
+		rowstart(0),
+		colnums(0)
+{
+  reinit (0,0,0);
+};
+
+
+
 dSMatrixStruct::dSMatrixStruct (const unsigned int m, const unsigned int n,
 				const unsigned int max_per_row) 
 		: max_dim(0),
@@ -37,10 +48,8 @@ dSMatrixStruct::dSMatrixStruct (const unsigned int n,
 
 dSMatrixStruct::~dSMatrixStruct ()
 {
-  if (rowstart != 0)
-    delete[] rowstart;
-  if (colnums != 0)
-    delete[] colnums;
+  if (rowstart != 0)  delete[] rowstart;
+  if (colnums != 0)   delete[] colnums;
 }
 
 
@@ -50,28 +59,37 @@ void
 dSMatrixStruct::reinit (const unsigned int m, const unsigned int n,
 			const unsigned int max_per_row)
 {
-  Assert (m>0, ExcInvalidNumber(m));
-  Assert (n>0, ExcInvalidNumber(n));
-  Assert (max_per_row>0, ExcInvalidNumber(max_per_row));
+  Assert ((max_per_row>0) || ((m==0) && (n==0)), ExcInvalidNumber(max_per_row));
   rows = m;
   cols = n;
   vec_len = m * max_per_row;
   max_row_len = max_per_row;
 
+  if (m*n == 0)
+    {
+      if (rowstart)  delete[] rowstart;
+      if (colnums)   delete[] colnums;
+      rowstart = 0;
+      colnums = 0;
+      max_vec_len = vec_len = max_dim = rows = cols = 0;
+      compressed = false;
+      return;
+    };
+  
   if (rows > max_dim)
     {
       if (rowstart) delete[] rowstart;
       max_dim = rows;
       rowstart = new unsigned int[max_dim+1];
-    }
-
+    };
+  
   if (vec_len > max_vec_len)
     {
       if (colnums) delete[] colnums;
       max_vec_len = vec_len;
       colnums = new int[max_vec_len];
-    }
-
+    };
+  
   for (unsigned int i=0; i<=rows; i++)
     rowstart[i] = i * max_per_row;
   fill_n (&colnums[0], vec_len, -1);
@@ -87,6 +105,8 @@ dSMatrixStruct::reinit (const unsigned int m, const unsigned int n,
 void
 dSMatrixStruct::compress ()
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  
   if (compressed) return;
   unsigned int next_free_entry = 0,
 		next_row_start = 0,
@@ -160,9 +180,38 @@ dSMatrixStruct::compress ()
 
 
 
+bool
+dSMatrixStruct::empty () const {
+				   // let's try to be on the safe side of
+				   // life by using multiple possibilities in
+				   // the check for emptiness... (sorry for
+				   // this kludge -- emptying matrices and
+				   // freeing memory was not present in the
+				   // original implementation and I don't
+				   // know at how many places I missed
+				   // something in adding it, so I try to
+				   // be cautious. wb)
+  if ((rowstart==0) || (rows==0) || (cols==0))
+    {
+      Assert (rowstart==0, ExcInternalError());
+      Assert (rows==0, ExcInternalError());
+      Assert (cols==0, ExcInternalError());
+      Assert (colnums==0, ExcInternalError());
+      Assert (vec_len==0, ExcInternalError());
+      Assert (max_vec_len==0, ExcInternalError());
+      Assert (vec_len==0, ExcInternalError());
+
+      return true;
+    };
+  return false;
+};
+
+
+
 int
 dSMatrixStruct::operator () (const unsigned int i, const unsigned int j) const
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (i<rows, ExcInvalidIndex(i,rows));
   Assert (j<cols, ExcInvalidIndex(j,cols));
   Assert (compressed, ExcNotCompressed());
@@ -196,6 +245,7 @@ dSMatrixStruct::operator () (const unsigned int i, const unsigned int j) const
 void
 dSMatrixStruct::add (const unsigned int i, const unsigned int j)
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (i<rows, ExcInvalidIndex(i,rows));
   Assert (j<cols, ExcInvalidIndex(j,cols));
   Assert (compressed==false, ExcMatrixIsCompressed());
@@ -224,6 +274,7 @@ dSMatrixStruct::add (const unsigned int i, const unsigned int j)
 void
 dSMatrixStruct::add_matrix (const unsigned int n, const int* rowcols)
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned int i=0; i<n; ++i)
     for (unsigned int j=0; j<n; ++j)
       add(rowcols[i], rowcols[j]);
@@ -235,6 +286,7 @@ void
 dSMatrixStruct::add_matrix (const unsigned int m, const unsigned int n,
 			    const int* rows, const int* cols)
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned i=0; i<m; ++i)
     for (unsigned j=0; j<n; ++j)
       add(rows[i], cols[j]);
@@ -245,6 +297,7 @@ dSMatrixStruct::add_matrix (const unsigned int m, const unsigned int n,
 void
 dSMatrixStruct::add_matrix (const iVector& rowcols)
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   unsigned int i,j;
   for (i=0;i<rowcols.n();i++)
     for (j=0;j<rowcols.n();j++)
@@ -256,6 +309,7 @@ dSMatrixStruct::add_matrix (const iVector& rowcols)
 void
 dSMatrixStruct::add_matrix (const iVector& rows, const iVector& cols)
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   unsigned int i,j;
   for (i=0;i<rows.n();i++)
     for (j=0;j<cols.n();j++)
@@ -267,6 +321,7 @@ dSMatrixStruct::add_matrix (const iVector& rows, const iVector& cols)
 void
 dSMatrixStruct::print_gnuplot (ostream &out) const
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
       if (colnums[j]>=0)
@@ -278,6 +333,7 @@ dSMatrixStruct::print_gnuplot (ostream &out) const
 unsigned int
 dSMatrixStruct::bandwidth () const
 {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   unsigned int b=0;
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
@@ -297,6 +353,7 @@ dSMatrixStruct::bandwidth () const
 
 unsigned int
 dSMatrixStruct::n_nonzero_elements () const {
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (compressed, ExcNotCompressed());
   return colnums[rows]-colnums[0];
 };
@@ -315,7 +372,7 @@ dSMatrix::dSMatrix () :
 
 
 
-dSMatrix::dSMatrix (dSMatrixStruct &c)
+dSMatrix::dSMatrix (const dSMatrixStruct &c)
 		: cols(&c), val(0), max_len(0)
 {
   reinit();
@@ -334,22 +391,31 @@ void
 dSMatrix::reinit ()
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (cols->compressed, ExcNotCompressed());
-  
+  Assert (cols->compressed || cols->empty(), ExcNotCompressed());
+
+  if (cols->empty()) 
+    {
+      if (val) delete[] val;
+      val = 0;
+      max_len = 0;
+      return;
+    };
+        
   if (max_len<cols->vec_len)
-  {
-    if (val) delete[] val;
-    val = new double[cols->vec_len];
-    max_len = cols->vec_len;
-  }
-//  memset(val, 0, sizeof(*val) * cols->vec_len);
-  for (int i = cols->vec_len-1 ; i>=0 ; i--) val[i] = 0;
+    {
+      if (val) delete[] val;
+      val = new double[cols->vec_len];
+      max_len = cols->vec_len;
+    };
+
+  if (val)
+    fill_n (&val[0], cols->vec_len, 0);
 }
 
 
 
 void
-dSMatrix::reinit (dSMatrixStruct &sparsity) {
+dSMatrix::reinit (const dSMatrixStruct &sparsity) {
   cols = &sparsity;
   reinit ();
 };
@@ -377,6 +443,7 @@ dSMatrix::n_nonzero_elements () const {
 dSMatrix &
 dSMatrix::copy_from (const dSMatrix &matrix) {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
   for (unsigned int i = 0 ; i<cols->vec_len; ++i)
@@ -390,6 +457,7 @@ dSMatrix::copy_from (const dSMatrix &matrix) {
 void
 dSMatrix::add_scaled (const double factor, const dSMatrix &matrix) {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
   for (unsigned int i = 0 ; i<cols->vec_len; ++i)
@@ -402,6 +470,7 @@ void
 dSMatrix::vmult (dVector& dst, const dVector& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
 
@@ -422,6 +491,7 @@ dSMatrix::vmult (dVector& dst, const dVector& src) const
 void
 dSMatrix::Tvmult (dVector& dst, const dVector& src) const
 {
+  Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert(n() == dst.size(), ExcDimensionsDontMatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionsDontMatch(m(),src.size()));
@@ -444,6 +514,7 @@ double
 dSMatrix::matrix_norm (const dVector& v) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   Assert(m() == v.size(), ExcDimensionsDontMatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
 
@@ -470,6 +541,7 @@ double
 dSMatrix::residual (dVector& dst, const dVector& u, const dVector& b)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
   Assert(m() == b.size(), ExcDimensionsDontMatch(m(),b.size()));
   Assert(n() == u.size(), ExcDimensionsDontMatch(n(),u.size()));
@@ -494,6 +566,7 @@ void
 dSMatrix::Jacobi_precond (dVector& dst, const dVector& src, const double om)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
 
   const unsigned int n = src.size();
 
@@ -507,6 +580,7 @@ void
 dSMatrix::SSOR_precond (dVector& dst, const dVector& src, const double om)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
 
   int p;
   const unsigned int  n = src.size();
@@ -541,6 +615,7 @@ void
 dSMatrix::SOR_precond (dVector& dst, const dVector& src, const double om)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   dst = src;
   SOR(dst,om);
 }
@@ -549,6 +624,7 @@ void
 dSMatrix::SOR (dVector& dst, const double om)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   Assert(n() == m(), ExcDimensionsDontMatch(n(),m()));
   Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
 
@@ -569,6 +645,7 @@ void
 dSMatrix::SSOR (dVector& dst, const double om)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
 
   int p;
   const unsigned int  n = dst.size();
@@ -616,6 +693,7 @@ const dSMatrixStruct & dSMatrix::get_sparsity_pattern () const {
 
 void dSMatrix::print (ostream &out) const {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
 
   for (unsigned int i=0; i<cols->rows; ++i)
     for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
@@ -626,6 +704,7 @@ void dSMatrix::print (ostream &out) const {
 
 void dSMatrix::print_formatted (ostream &out, const unsigned int precision) const {
   Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
   out.precision (precision);
   out.setf (ios::scientific, ios::floatfield);   // set output format
   
@@ -642,3 +721,4 @@ void dSMatrix::print_formatted (ostream &out, const unsigned int precision) cons
 
   out.setf (0, ios::floatfield);                 // reset output format
 };
+

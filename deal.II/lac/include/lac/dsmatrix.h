@@ -28,13 +28,21 @@ template <int dim> class DoFHandler;
 CLASS
    dSMatrixStruct
 
-   @author Original version by Roland Becker, Guido Kanschat,
-      Franz-Theo Suttmeier; lots of enhancements, reorganisation
-      and documentation by Wolfgang Bangerth
+   @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth
    */
 class dSMatrixStruct
 {
   public:
+				     /**
+				      * Initialize the matrix empty, i.e. with
+				      * no memory allocated. This is useful if
+				      * you want such objects as member
+				      * variables in other classes. You can make
+				      * the structure usable by calling the
+				      * #reinit# function.
+				      */
+    dSMatrixStruct ();
+    
 				     /**
 				      * Initialize a rectangular matrix with
 				      * #m# rows and #n# columns,
@@ -50,7 +58,8 @@ class dSMatrixStruct
 				      * #n# with at most #max_per_row#
 				      * nonzero entries per row.
 				      */
-    dSMatrixStruct (const unsigned int n, const unsigned int max_per_row);
+    dSMatrixStruct (const unsigned int n,
+		    const unsigned int max_per_row);
 
 				     /**
 				      * Destructor.
@@ -63,6 +72,14 @@ class dSMatrixStruct
 				      * #m# rows and #n# columns,
 				      * with at most #max_per_row#
 				      * nonzero entries per row.
+				      *
+				      * If #m*n==0# all memory is freed,
+				      * resulting in a total reinitialization
+				      * of the object. If it is nonzero, new
+				      * memory is only allocated if the new
+				      * size extends the old one. This is done
+				      * to save time and to avoid fragmentation
+				      * of the heap.
 				      */
     void reinit (const unsigned int m,
 		 const unsigned int n,
@@ -85,6 +102,15 @@ class dSMatrixStruct
 				      * reduce memory requirements.
 				      */
     void compress ();
+
+				     /**
+				      * Return whether the object is empty. It
+				      * is empty if no memory is allocated,
+				      * which is the same as that both
+				      * dimensions are zero.
+				      */
+    bool empty () const;
+    
 
 				     /**
 				      * Return the index of the matrix
@@ -289,6 +315,10 @@ class dSMatrixStruct
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcEmptyObject);
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcInternalError);
 
   private:
@@ -351,7 +381,7 @@ class dSMatrix
 				      * long as #reinit# is not called with a
 				      * new sparsity structure.
 				      */
-    dSMatrix (dSMatrixStruct& c);
+    dSMatrix (const dSMatrixStruct &sparsity);
     
 				     /**
 				      * Destructor. Free all memory, but do not
@@ -361,21 +391,46 @@ class dSMatrix
     ~dSMatrix ();
     
 
-				     //
+				     /**
+				      * Reinitialize the object but keep to
+				      * the sparsity pattern previously used.
+				      * This may be necessary if you #reinit#'d
+				      * the sparsity structure and want to
+				      * update the size of the matrix.
+				      *
+				      * Note that memory is only reallocated if
+				      * the new size exceeds the old size. If
+				      * that is not the case, the allocated
+				      * memory is not reduced. However, if the
+				      * sparsity structure is empty (i.e. the
+				      * dimensions are zero), then all memory
+				      * is freed.
+				      */
     void reinit ();
-				     //
-    void reinit (dSMatrixStruct &);
 
 				     /**
-				      * Release all memory and return to a state
-				      * just like after having called the
-				      * default constructor.
+				      * Reinitialize the sparse matrix with the
+				      * given sparsity pattern. The latter tells
+				      * the matrix how many nonzero elements
+				      * there need to be reserved.
+				      *
+				      * Regarding memory allocation, the same
+				      * applies as said above.
 				      *
 				      * You have to make sure that the lifetime
 				      * of the sparsity structure is at least
 				      * as long as that of this matrix or as
 				      * long as #reinit# is not called with a
 				      * new sparsity structure.
+				      */
+    void reinit (const dSMatrixStruct &sparsity);
+
+				     /**
+				      * Release all memory and return to a state
+				      * just like after having called the
+				      * default constructor. It also forgets the
+				      * sparsity pattern it was previously tied
+				      * to.
 				      */
     void clear ();
     
