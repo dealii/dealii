@@ -143,7 +143,9 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	if (test=="random") test_case = 4;
 	else
 	  cerr << "This test seems not to be implemented!" << endl;
+
   
+  Boundary<dim> *boundary = 0;
   
   switch (test_case) 
     {
@@ -178,9 +180,9 @@ void TestCases<dim>::run (ParameterHandler &prm) {
       case 3:
       {
 					 // set the boundary function
-	Boundary<dim> *boundary = (test_case==2 ?
-				   static_cast<Boundary<dim>*>(new Ball<dim>()) :
-				   static_cast<Boundary<dim>*>(new CurvedLine<dim>()));
+	boundary = (test_case==2 ?
+		    static_cast<Boundary<dim>*>(new Ball<dim>()) :
+		    static_cast<Boundary<dim>*>(new CurvedLine<dim>()));
 	tria->set_boundary (boundary);
 	
 					 // refine once
@@ -188,7 +190,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	tria->execute_refinement ();
 	
 	Triangulation<dim>::active_cell_iterator cell, endc;
-	for (int i=0; i<4; ++i) 
+	for (int i=0; i<6-dim; ++i) 
 	  {
 	    cell = tria->begin_active();
 	    endc = tria->end();
@@ -212,7 +214,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	tria->execute_refinement ();
 	
 	Triangulation<dim>::active_cell_iterator cell, endc;
-	for (int i=0; i<(dim==2 ? 12 : 20); ++i) 
+	for (int i=0; i<(dim==2 ? 12 : (dim==3 ? 7 : 20)); ++i) 
 	  {
 	    int n_levels = tria->n_levels();
 	    cell = tria->begin_active();
@@ -291,6 +293,9 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 				   // release the lock that dof has to the
 				   // finite element object
   dof->clear ();
+  tria->set_boundary (0);
+  if (boundary)
+    delete boundary;
 };
 
 
