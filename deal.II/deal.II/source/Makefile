@@ -173,6 +173,7 @@ ifneq (1,${recursive-make-fwd-decl})
 	        | perl -pe 's!(\.\./lib/2d/[^ ]+)_DIM_PLACEHOLDER!$$1_2d!g;' \
 	        | perl -pe 's!(\.\./lib/3d/[^ ]+)_DIM_PLACEHOLDER!$$1_3d!g;' \
 		>> ../lib/Makefile.dep
+	@echo ============================ Done
 else
 	@echo ============================ Not remaking Makefile since in nested mode
 endif

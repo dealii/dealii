@@ -11,6 +11,13 @@
 #include <vector>
 
 
+// note: in non-debug mode, i.e. with optimizations, the file
+// dof_accessor.templates.h is included at the end of this file.
+// this includes a lot of templates and thus makes compilation
+// slower, but at the same time allows for more aggressive
+// inlining and thus faster code.
+
+
 
 /**
  * Define the basis for accessors to the degrees of freedom.
@@ -805,10 +812,6 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
     template <typename number>
     void get_interpolated_dof_values (const Vector<number> &values,
 				      Vector<number>       &interpolated_values) const;
-//     void get_interpolated_dof_values (const Vector<double> &values,
-// 				      Vector<double>       &interpolated_values) const;
-//     void get_interpolated_dof_values (const Vector<float> &values,
-// 				      Vector<float>       &interpolated_values) const;
 
 				     /**
 				      * This function is the counterpart to
@@ -907,6 +910,10 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 
 
 
+// if in optimized mode: include more templates
+#ifndef DEBUG
+#  include "dof_accessor.templates.h"
+#endif
 
 
 

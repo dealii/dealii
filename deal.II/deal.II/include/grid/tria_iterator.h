@@ -11,9 +11,14 @@
 #include <iostream>
 #include <base/exceptions.h>
 #include <base/point.h>
-#include <grid/tria_accessor.h>
+#include <grid/tria_iterator_base.h>
+//#include <grid/tria_accessor.h>
 
-
+// note: in non-debug mode, i.e. with optimizations, the file
+// tria_iterator.templates.h is included at the end of this file.
+// this includes a lot of templates and thus makes compilation
+// slower, but at the same time allows for more aggressive
+// inlining and thus faster code.
 
 
 
@@ -1008,6 +1013,12 @@ ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i) 
   return out;
 };
 
+
+
+// if in optimized mode: include more templates
+#ifndef DEBUG
+#  include "tria_iterator.templates.h"
+#endif
 
 
 /*----------------------------   tria-iterator.h     ---------------------------*/

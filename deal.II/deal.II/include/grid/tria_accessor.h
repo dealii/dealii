@@ -9,17 +9,15 @@
 #include <base/exceptions.h>
 #include <base/forward-declarations.h>
 #include <basic/forward-declarations.h>
+#include <grid/tria_iterator_base.h>
 
 
+// note: in non-debug mode, i.e. with optimizations, the file
+// tria_accessor.templates.h is included at the end of this file.
+// this includes a lot of templates and thus makes compilation
+// slower, but at the same time allows for more aggressive
+// inlining and thus faster code.
 
-
-
-
-/**
- *   The three states an iterator can be in: valid, past-the-end and
- *   invalid.
- */
-enum IteratorState { valid, past_the_end, invalid };
 
 
 
@@ -1280,6 +1278,11 @@ class TriaSubstructAccessor;
 template <>
 class TriaSubstructAccessor<1> :  public LineAccessor<1> {
   public:
+				     /**
+				      * Propagate the AccessorData type
+				      * into the present class.
+				      */
+    typedef typename LineAccessor<1>::AccessorData AccessorData;
     				     /**
 				      * Constructor
 				      */
@@ -1308,6 +1311,11 @@ class TriaSubstructAccessor<1> :  public LineAccessor<1> {
 template <>
 class TriaSubstructAccessor<2> : public QuadAccessor<2> {
   public:
+				     /**
+				      * Propagate the AccessorData type
+				      * into the present class.
+				      */
+    typedef typename QuadAccessor<2>::AccessorData AccessorData;
     				     /**
 				      * Constructor
 				      */
@@ -1337,6 +1345,12 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
 template <>
 class TriaSubstructAccessor<3> : public HexAccessor<3> {
   public:
+				     /**
+				      * Propagate the AccessorData type
+				      * into the present class.
+				      */
+    typedef typename HexAccessor<3>::AccessorData AccessorData;
+    
     				     /**
 				      * Constructor
 				      */
@@ -1377,6 +1391,12 @@ class TriaSubstructAccessor<3> : public HexAccessor<3> {
 template <int dim>
 class CellAccessor :  public TriaSubstructAccessor<dim> {
   public:
+				     /**
+				      * Propagate the AccessorData type
+				      * into the present class.
+				      */
+    typedef typename TriaSubstructAccessor<dim>::AccessorData AccessorData;
+    
 				     /**
 				      *  Constructor.
 				      */
@@ -1536,11 +1556,18 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 
 
 
-
-
+// if in optimized mode: include more templates
+#ifndef DEBUG
+#  include "tria_accessor.templates.h"
+#endif
 
 
 /*----------------------------   tria_accessor.h     ---------------------------*/
 /* end of #ifndef __tria_accessor_H */
 #endif
 /*----------------------------   tria_accessor.h     ---------------------------*/
+
+
+
+
+
