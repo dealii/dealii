@@ -24,7 +24,7 @@
 #endif
 
 #ifndef TIMER
-#define TIMER clock();
+#define TIMER clock()
 #endif
 
 #ifndef OVER_TIME
@@ -47,7 +47,7 @@ Timer::Timer()
 
 
 void Timer::start () {
-  running    = tru;
+  running    = true;
   overflow   = 0;
   start_time = TIMER / DIVIDE;
 };
