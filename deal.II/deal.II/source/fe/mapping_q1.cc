@@ -881,6 +881,7 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
 				   // transformation shape values
 				   // already computed at point p.
   const Quadrature<dim> point_quadrature(p);
+
   InternalData *mdata=dynamic_cast<InternalData *> (
     get_data(update_transformation_values, point_quadrature));
   Assert(mdata!=0, ExcInternalError());
@@ -889,7 +890,9 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
 				   // points
   compute_mapping_support_points(cell, mdata->mapping_support_points);
 
-  return transform_unit_to_real_cell_internal(*mdata);
+  const Point<dim> p_real=transform_unit_to_real_cell_internal(*mdata);
+  delete mdata;
+  return p_real;
 }
 
 
