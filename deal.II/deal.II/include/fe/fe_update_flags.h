@@ -46,6 +46,11 @@ enum UpdateFlags {
 					* Compute the points on the real cell
 					* on which the ansatz functions are
 					* located.
+					*
+					* Giving this flag to the
+					* #FESubfaceValues# class will result
+					* in an error, since ansatz points are
+					* not useful in that case.
 					*/
       update_ansatz_points = 16,
 				       /**
@@ -53,6 +58,11 @@ enum UpdateFlags {
 				        * to the face relative to this cell.
 				        * This flag is only evaluated by
 				        * the #FEFaceValues# class.
+					*
+					* Giving this flag to the
+					* #FEValues# class will result in
+					* an error, since normal vectors are
+					* not useful in that case.
 				        */
       update_normal_vectors = 32
 };

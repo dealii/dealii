@@ -572,8 +572,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * elements.
 				      *
 				      * This function is more or less an
-				      * interface to the #FEValues# class and
-				      * should not be used by users unless
+				      * interface to the #FEFaceValues# class
+				      * and should not be used by users unless
 				      * absolutely needed.
 				      */
     virtual void fill_fe_face_values (const DoFHandler<dim>::cell_iterator &cell,
@@ -592,6 +592,34 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      const bool           compute_normal_vectors,
 				      const Boundary<dim> &boundary) const;
 
+				     /**
+				      * This function does almost the same as
+				      * the above one, with the difference that
+				      * it considers the restriction of a finite
+				      * element to a subface (the child of a
+				      * face) rather than to a face. The number
+				      * of the subface in the face is given by
+				      * the #subface_no# parameter. The meaning
+				      * of the other parameters is the same as
+				      * for the #fill_fe_face_values# function.
+				      *
+				      * Since the usage of ansatz points on
+				      * subfaces is not useful, it is excluded
+				      * from the interface to this function.
+				      *
+				      * Like for the #fill_fe_face_values#
+				      * function, there is a default
+				      * implementation, using the
+				      * #fill_fe_values# function. There may
+				      * be better and more efficient solutions
+				      * for a special finite element, which is
+				      * why this function is made virtual.
+				      *
+				      * This function is more or less an
+				      * interface to the #FESubfaceValues# class
+				      * and should not be used by users unless
+				      * absolutely needed.
+				      */				       
     virtual void fill_fe_subface_values (const DoFHandler<dim>::cell_iterator &cell,
 					 const unsigned int           face_no,
 					 const unsigned int           subface_no,
@@ -664,6 +692,23 @@ class FiniteElement : public FiniteElementBase<dim> {
 				     vector<double>      &face_jacobi_determinants) const =0;
 
 				     /**
+				      * Does the same as the above function,
+				      * except that it computes the Jacobi
+				      * determinant of the transformation from
+				      * the unit face to the subface of #face#
+				      * with number #subface_no#.
+				      *
+				      * The function needs not take special care
+				      * about boundary approximation, since it
+				      * must not be called for faces at the
+				      * boundary.
+				      */
+    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+					const unsigned int           subface_no,
+					const vector<Point<dim-1> > &unit_points,
+					vector<double>      &face_jacobi_determinants) const =0;
+
+				     /**
 				      * Compute the normal vectors to the cell
 				      * at the quadrature points. See the
 				      * documentation for the #fill_fe_face_values#
@@ -681,7 +726,23 @@ class FiniteElement : public FiniteElementBase<dim> {
 				     const Boundary<dim>         &boundary,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const =0;
-    
+
+				     /**
+				      * Does the same as the above function,
+				      * except that it refers to the
+				      * subface #subface_no# of the given face.
+				      *
+				      * The function needs not take special care
+				      * about boundary approximation, since it
+				      * must not be called for faces at the
+				      * boundary.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int           face_no,
+				     const unsigned int           subface_no,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const =0;
+
 				     /**
 				      * Exception
 				      */
@@ -690,6 +751,10 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * Exception
 				      */
     DeclException0 (ExcNotImplemented);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcBoundaryFaceUsed);
 };
 
 

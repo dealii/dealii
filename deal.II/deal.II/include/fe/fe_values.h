@@ -897,6 +897,17 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
   quadrature points on the unit cell, which are stored in the
   #unit_quadrature_points# array. Note that #1<<(dim-1)# is the number of
   subfaces per face.
+
+  One subtle problem is that if a face is at the boundary, then computation
+  of subfaces may be a bit tricky, since we do not know whether the user
+  intends to better approximate the boundary by the subfaces or only wants
+  to have the subfaces be one part of the mother face. However, it is hardly
+  conceivable what someone wants when using this class for faces at the
+  boundary, in the end this class was invented to facilitate integration
+  along faces with cells of different refinement levels on both sides,
+  integration along the boundary of the domain is better done through
+  the #FEFaceValues# class. For this reason, calling #reinit# with a
+  boundary face will result in an error.
   
   @author Wolfgang Bangerth, 1998
   */
@@ -947,6 +958,11 @@ class FESubfaceValues : public FEFaceValuesBase<dim> {
 		 const unsigned int                    subface_no,
 		 const FiniteElement<dim>             &fe,
 		 const Boundary<dim>                  &boundary);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcReinitCalledWithBoundaryFace);
 };
 
 

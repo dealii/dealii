@@ -78,6 +78,9 @@ class FELinear : public FiniteElement<dim> {
     				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
+				      *
+				      * In two spatial dimensions, this function
+				      * simply returns the length of the face.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
 				     const Boundary<dim>         &boundary,
@@ -85,6 +88,22 @@ class FELinear : public FiniteElement<dim> {
 				     vector<double>      &face_jacobi_determinants) const;
 
 				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      *
+				      * In two spatial dimensions, this function
+				      * simply returns half the length of the
+				      * whole face.
+				      */
+    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+					const unsigned int           subface_no,
+					const vector<Point<dim-1> > &unit_points,
+					vector<double>      &face_jacobi_determinants) const;
+
+				     /**
+				      * Return the normal vectors to the
+				      * face with number #face_no# of #cell#.
+				      *
 				      * For linear finite elements, this function
 				      * is particularly simple since all normal
 				      * vectors are equal and can easiliy be
@@ -98,6 +117,27 @@ class FELinear : public FiniteElement<dim> {
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
 				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const;    
+
+				     /**
+				      * Return the normal vectors to the
+				      * subface with number #subface_no# of
+				      * the face with number #face_no# of #cell#.
+				      *
+				      * For linear finite elements, this function
+				      * is particularly simple since all normal
+				      * vectors are equal and can easiliy be
+				      * computed from the direction of the face
+				      * without using the transformation (Jacobi)
+				      * matrix, at least for two dimensions.
+				      *
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int           face_no,
+				     const unsigned int           subface_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;    
 };
@@ -171,9 +211,28 @@ class FEQuadratic : public FiniteElement<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
+    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+					const unsigned int           subface_no,
+					const vector<Point<dim-1> > &unit_points,
+					vector<double>      &face_jacobi_determinants) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
 				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const;    
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int           subface_no,
+				     const unsigned int           face_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;    
 };
@@ -247,9 +306,28 @@ class FECubic : public FiniteElement<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
+    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
+					const unsigned int           subface_no,
+					const vector<Point<dim-1> > &unit_points,
+					vector<double>      &face_jacobi_determinants) const;
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
 				     const unsigned int          face_no,
 				     const Boundary<dim>         &boundary,
+				     const vector<Point<dim-1> > &unit_points,
+				     vector<Point<dim> >         &normal_vectors) const;    
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
+				     const unsigned int           subface_no,
+				     const unsigned int           face_no,
 				     const vector<Point<dim-1> > &unit_points,
 				     vector<Point<dim> >         &normal_vectors) const;    
 };
