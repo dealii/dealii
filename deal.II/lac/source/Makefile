@@ -10,7 +10,7 @@ CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -fno-rtti -fno-exceptions $(INCLUDE)
 
 ifeq ($(shell uname),Linux)
-CXX       = /home/wolf/bin/gcc-2.8.1/bin/c++
+CXX       = /home/wolf/bin/gcc/bin/c++
 endif
 
 ifeq ($(shell uname),SunOS)
