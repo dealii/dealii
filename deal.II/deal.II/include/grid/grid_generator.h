@@ -100,14 +100,18 @@ template <typename number> class SparseMatrix;
  *      of the eight child-cubes from one of their neighbors.
  * @end{itemize}
  *
+ * Some of these functions receive a flag @p{colorize}. If this is
+ * set, parts of the boundary receive different boundary numbers,
+ * allowing them to be distinguished by application programs. See the
+ * documentation of the functions for details.
+ * 
  * Additionally this class provides a function
  * (@p{laplace_transformation}) that smoothly transforms a grid
  * according to given new boundary points. This can be used to
  * transform (simple-shaped) grids to a more complicated ones, like a
  * shell onto a grid of an airfoil, for example.
  *
- * @author Wolfgang Bangerth, 1998, 1999. Slit domain by Stefan
- * Nauber, 1999. Laplace transformation by Ralf Hartmann, 2001.
+ * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan Nauber, 1998, 1999, 2000, 2001, 2002.
  */
 class GridGenerator
 {
@@ -360,23 +364,35 @@ class GridGenerator
 				      */
     static void hyper_cube_slit (Triangulation<1> &tria,
 				 const double      left = 0.,
-				 const double      right= 1.);
+				 const double      right= 1.,
+				 const bool colorize = false);
 
 				     /**
 				      * Declaration of same function
 				      * for different space dimension.
+				      *
+				      * If colorize is selected, then
+				      * the two edges forming the slit
+				      * carry numbers 1 and 2, while
+				      * the outer boundary has number
+				      * 0.
 				      */
     static void hyper_cube_slit (Triangulation<2> &tria,
 				 const double      left = 0.,
-				 const double      right= 1.);
+				 const double      right= 1.,
+				 const bool colorize = false);
 
 				     /**
 				      * Declaration of same function
 				      * for different space dimension.
+				      *
+				      * Colorization is not
+				      * implemented in 3D.
 				      */
     static void hyper_cube_slit (Triangulation<3> &tria,
 				 const double      left = 0.,
-				 const double      right= 1.);
+				 const double      right= 1.,
+				 const bool colorize = false);
 
 				     /**
 				      * Produce a hyper-shell,

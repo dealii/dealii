@@ -162,7 +162,8 @@ void GridGenerator::hyper_cube (Triangulation<dim> &tria,
 
 void GridGenerator::hyper_cube_slit (Triangulation<1> &,
 				     const double,
-				     const double)
+				     const double,
+				     const bool)
 {
   Assert (false, ExcNotImplemented());
 };
@@ -257,7 +258,8 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
 void
 GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
 				const double left,
-				const double right)
+				const double right,
+				const bool colorize)
 {
   const double rl2=(right+left)/2;
   const Point<2> vertices[10] = { Point<2>(left, left ),
@@ -284,6 +286,14 @@ GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
   tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[10]),
 			     cells,
 			     SubCellData());       // no boundary information
+
+  if (colorize)
+    {
+      Triangulation<2>::cell_iterator cell = tria.begin();
+      cell->face(1)->set_boundary_indicator(1);
+      ++cell;
+      cell->face(3)->set_boundary_indicator(2);
+    }
 };
 
 
@@ -531,7 +541,8 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 
 void GridGenerator::hyper_cube_slit (Triangulation<3> &,
 				     const double,
-				     const double)
+				     const double,
+				     const bool)
 {
   Assert (false, ExcNotImplemented());
 };
