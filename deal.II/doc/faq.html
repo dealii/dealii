@@ -132,16 +132,17 @@
 
   <p>
   The Perl utility from Cygwin distribution (up to version 5.6.1-2)
-  contains a bug that causes a "permission denied" error when inplace
+  contains a bug that causes a "permission denied" error with in-place
   editing (using the <code>-pi</code> switch). This bug prevents
   building the online documentation from the source files. To solve
-  this problem there are two workarounds as described in <a
-  href="http://sources.redhat.com/ml/cygwin-apps/2001-11/msg00736.html">
-  Cygnus Solutions mailing list</a>.  First, one should specify an
+  this problem there are two workarounds as described in an article on
+  the <a
+  href="http://sources.redhat.com/ml/cygwin-apps/2001-11/msg00736.html">Cygnus
+  Solutions mailing list</a>.  First, one should specify an 
   explicit extension in all makefiles, i.e.  replace all
   <code>-npi</code> or <code>-pi</code> options with
   <code>-npi~</code> or <code>-pi~</code> for example. Second, apply a
-  patch to source code of perl utility and recompile.
+  patch to the source code of the perl utility and recompile.
   </p>
 
 
