@@ -1,9 +1,11 @@
-/*-------------------- precondition.h --------------------*/
-//$Id$
-// Guido Kanschat, University of Heidelberg, 1999
+/*----------------------------   precondition.h     ---------------------------*/
+/*      $Id$                 */
+#ifndef __precondition_H
+#define __precondition_H
+/*----------------------------   precondition.h     ---------------------------*/
 
-#ifndef __lac_precondition_h
-#define __lac_precondition_h
+
+
 
 /**
  * No preconditioning.
@@ -243,7 +245,7 @@ PreconditionIdentity::operator() (VECTOR& dst, const VECTOR& src) const
 }
 
 template<class MATRIX, class VECTOR>
-PreconditionUseMatrix<MATRIX, VECTOR>::PreconditionUseMatrix(const MATRIX& M,
+PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX& M,
 							     function_ptr method)
 		:
 		matrix(M), precondition(method)
@@ -252,14 +254,14 @@ PreconditionUseMatrix<MATRIX, VECTOR>::PreconditionUseMatrix(const MATRIX& M,
 
 template<class MATRIX, class VECTOR>
 void
-PreconditionUseMatrix<MATRIX, VECTOR>::operator() (VECTOR& dst,
+PreconditionUseMatrix<MATRIX,VECTOR>::operator() (VECTOR& dst,
 						   const VECTOR& src) const
 {
   (matrix.*precondition)(dst, src);
 }
 
 template<class MATRIX, class VECTOR>
-PreconditionRelaxation<MATRIX, VECTOR>::PreconditionRelaxation(const MATRIX& M,
+PreconditionRelaxation<MATRIX,VECTOR>::PreconditionRelaxation(const MATRIX& M,
 							     function_ptr method,
 							       double omega)
 		:
@@ -269,7 +271,7 @@ PreconditionRelaxation<MATRIX, VECTOR>::PreconditionRelaxation(const MATRIX& M,
 
 template<class MATRIX, class VECTOR>
 void
-PreconditionRelaxation<MATRIX, VECTOR>::operator() (VECTOR& dst,
+PreconditionRelaxation<MATRIX,VECTOR>::operator() (VECTOR& dst,
 						   const VECTOR& src) const
 {
   (matrix.*precondition)(dst, src, omega);
@@ -278,7 +280,7 @@ PreconditionRelaxation<MATRIX, VECTOR>::operator() (VECTOR& dst,
 //////////////////////////////////////////////////////////////////////
 
 template<class SOLVER, class MATRIX, class PRECONDITION>
-PreconditionLACSolver<SOLVER, MATRIX, PRECONDITION>
+PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 ::PreconditionLACSolver(SOLVER& solver,
 			const MATRIX& matrix,
 			const PRECONDITION& precondition)
@@ -289,7 +291,7 @@ PreconditionLACSolver<SOLVER, MATRIX, PRECONDITION>
 template<class SOLVER, class MATRIX, class PRECONDITION>
 template<class VECTOR>
 void
-PreconditionLACSolver<SOLVER, MATRIX, PRECONDITION>::operator() (VECTOR& dst,
+PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::operator() (VECTOR& dst,
 								 const VECTOR& src) const
 {
   solver.solve(matrix, dst, src, precondition);
@@ -297,4 +299,8 @@ PreconditionLACSolver<SOLVER, MATRIX, PRECONDITION>::operator() (VECTOR& dst,
 
 
 
+
+/*----------------------------   precondition.h     ---------------------------*/
+/* end of #ifndef __precondition_H */
 #endif
+/*----------------------------   precondition.h     ---------------------------*/

@@ -10,20 +10,20 @@
 
 
 template <typename number, typename inverse_type>
-PreconditionBlock<number, inverse_type>::PreconditionBlock ():
+PreconditionBlock<number,inverse_type>::PreconditionBlock ():
 		blocksize(0),
 		A(0)  {};
 
 
 template <typename number, typename inverse_type>
-PreconditionBlock<number, inverse_type>::~PreconditionBlock ()
+PreconditionBlock<number,inverse_type>::~PreconditionBlock ()
 {
   if (inverse.size()!=0)
     inverse.erase(inverse.begin(), inverse.end());
 }
 
 template <typename number, typename inverse_type>
-void PreconditionBlock<number, inverse_type>::clear ()
+void PreconditionBlock<number,inverse_type>::clear ()
 {
   if (inverse.size()!=0)
     inverse.erase(inverse.begin(), inverse.end());
@@ -31,7 +31,7 @@ void PreconditionBlock<number, inverse_type>::clear ()
 }
 
 template <typename number, typename inverse_type>
-void PreconditionBlock<number, inverse_type>::use_matrix(
+void PreconditionBlock<number,inverse_type>::use_matrix(
   const SparseMatrix<number> &M)
 {
   A = &M;
@@ -39,19 +39,19 @@ void PreconditionBlock<number, inverse_type>::use_matrix(
 
 
 template <typename number, typename inverse_type>
-void PreconditionBlock<number, inverse_type>::set_block_size(unsigned int bsize) {
+void PreconditionBlock<number,inverse_type>::set_block_size(unsigned int bsize) {
   blocksize=bsize;
 }
 
 
 template <typename number, typename inverse_type>
-unsigned int PreconditionBlock<number, inverse_type>::block_size() const {
+unsigned int PreconditionBlock<number,inverse_type>::block_size() const {
   return blocksize;
 }
 
 
 template <typename number, typename inverse_type>
-void PreconditionBlock<number, inverse_type>::invert_diagblocks()
+void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 {
   Assert (A!=0, ExcNoMatrixGivenToUse());
   const SparseMatrix<number> &M=*A;
@@ -115,18 +115,18 @@ void PreconditionBlock<number, inverse_type>::invert_diagblocks()
 /*--------------------- PreconditionBlockSOR -----------------------*/
 
 template<typename number, typename inverse_type>
-PreconditionBlockSOR<number, inverse_type>::PreconditionBlockSOR(const number omega):
+PreconditionBlockSOR<number,inverse_type>::PreconditionBlockSOR(const number omega):
 		omega(omega)  {}
 
 
 template<typename number, typename inverse_type>
-PreconditionBlockSOR<number, inverse_type>::~PreconditionBlockSOR(){}
+PreconditionBlockSOR<number,inverse_type>::~PreconditionBlockSOR(){}
 
 
 template <typename number, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<number, inverse_type>::operator() (Vector<number2> &dst,
-							     const Vector<number2> &src) const
+void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2> &dst,
+							    const Vector<number2> &src) const
 {
   Assert(A!=0, ExcNoMatrixGivenToUse());
   const SparseMatrix<number> &M=*A;

@@ -163,7 +163,7 @@ class LogStream
 				      */
     template <typename T>
     LogStream & operator << (const T &t);
-    
+
 				     /**
 				      * Output a function. This really is not
 				      * to output the function, but calls the

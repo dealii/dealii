@@ -19,7 +19,7 @@ static inline Number sqr (const Number x)
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>::BlockVector ()
+BlockVector<n_blocks,Number>::BlockVector ()
 {
   for (unsigned int i=0;i<=n_blocks;++i)
     start[n_blocks] = 0;
@@ -28,7 +28,7 @@ BlockVector<n_blocks, Number>::BlockVector ()
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>::BlockVector (const vector<unsigned int>& n)
+BlockVector<n_blocks,Number>::BlockVector (const vector<unsigned int>& n)
 {
   Assert(n.size()==n_blocks, ExcDimensionMismatch(n.size(), n_blocks));
 
@@ -38,7 +38,7 @@ BlockVector<n_blocks, Number>::BlockVector (const vector<unsigned int>& n)
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>::BlockVector (const BlockVector<n_blocks, Number>& v)
+BlockVector<n_blocks,Number>::BlockVector (const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -54,7 +54,7 @@ BlockVector<n_blocks, Number>::BlockVector (const BlockVector<n_blocks, Number>&
 //
 // template <int n_blocks, typename Number>
 // template <typename OtherNumber>
-// BlockVector<n_blocks, Number>::Vector (const BlockVector<n_blocks, OtherNumber>& v) :
+// BlockVector<n_blocks,Number>::Vector (const BlockVector<n_blocks, OtherNumber>& v) :
 // 		dim(v.size()),
 // 		maxdim(v.size()),
 // 		val(0)
@@ -70,7 +70,7 @@ BlockVector<n_blocks, Number>::BlockVector (const BlockVector<n_blocks, Number>&
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::reinit (const vector<unsigned int>& n,
+void BlockVector<n_blocks,Number>::reinit (const vector<unsigned int>& n,
 					    const bool fast)
 {
   Assert (n.size() == n_blocks,
@@ -89,7 +89,7 @@ void BlockVector<n_blocks, Number>::reinit (const vector<unsigned int>& n,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::reinit (const BlockVector<n_blocks, Number>& v,
+void BlockVector<n_blocks,Number>::reinit (const BlockVector<n_blocks,Number>& v,
 					    const bool fast)
 {
   for (unsigned int i=0;i<n_blocks;++i)
@@ -104,14 +104,14 @@ void BlockVector<n_blocks, Number>::reinit (const BlockVector<n_blocks, Number>&
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>::~BlockVector ()
+BlockVector<n_blocks,Number>::~BlockVector ()
 {
 }
 
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::clear ()
+void BlockVector<n_blocks,Number>::clear ()
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -122,7 +122,7 @@ void BlockVector<n_blocks, Number>::clear ()
 
 
 template <int n_blocks, typename Number>
-bool BlockVector<n_blocks, Number>::all_zero () const
+bool BlockVector<n_blocks,Number>::all_zero () const
 {
   bool result = true;
   for (unsigned int i=0;i<n_blocks;++i)
@@ -135,7 +135,7 @@ bool BlockVector<n_blocks, Number>::all_zero () const
 
 
 template <int n_blocks, typename Number>
-Number BlockVector<n_blocks, Number>::operator * (const BlockVector<n_blocks, Number>& v) const
+Number BlockVector<n_blocks,Number>::operator * (const BlockVector<n_blocks,Number>& v) const
 {
   Number sum = 0.;
   for (unsigned int i=0;i<n_blocks;++i)
@@ -148,7 +148,7 @@ Number BlockVector<n_blocks, Number>::operator * (const BlockVector<n_blocks, Nu
 
 
 template <int n_blocks, typename Number>
-Number BlockVector<n_blocks, Number>::norm_sqr () const
+Number BlockVector<n_blocks,Number>::norm_sqr () const
 {
   Number sum = 0.;
   for (unsigned int i=0;i<n_blocks;++i)
@@ -161,7 +161,7 @@ Number BlockVector<n_blocks, Number>::norm_sqr () const
 
 
 template <int n_blocks, typename Number>
-Number BlockVector<n_blocks, Number>::mean_value () const
+Number BlockVector<n_blocks,Number>::mean_value () const
 {
   Number sum = 0.;
   for (unsigned int i=0;i<n_blocks;++i)
@@ -174,7 +174,7 @@ Number BlockVector<n_blocks, Number>::mean_value () const
 
 
 template <int n_blocks, typename Number>
-Number BlockVector<n_blocks, Number>::l1_norm () const
+Number BlockVector<n_blocks,Number>::l1_norm () const
 {
   Number sum = 0.;
   for (unsigned int i=0;i<n_blocks;++i)
@@ -187,7 +187,7 @@ Number BlockVector<n_blocks, Number>::l1_norm () const
 
 
 template <int n_blocks, typename Number>
-Number BlockVector<n_blocks, Number>::l2_norm () const
+Number BlockVector<n_blocks,Number>::l2_norm () const
 {
   return sqrt(norm_sqr());
 }
@@ -195,7 +195,7 @@ Number BlockVector<n_blocks, Number>::l2_norm () const
 
 
 template <int n_blocks, typename Number>
-Number BlockVector<n_blocks, Number>::linfty_norm () const
+Number BlockVector<n_blocks,Number>::linfty_norm () const
 {
   Number sum = 0.;
   for (unsigned int i=0;i<n_blocks;++i)
@@ -212,7 +212,7 @@ Number BlockVector<n_blocks, Number>::linfty_norm () const
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>& BlockVector<n_blocks, Number>::operator += (const BlockVector<n_blocks, Number>& v)
+BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator += (const BlockVector<n_blocks,Number>& v)
 {
   add (v);
   return *this;
@@ -221,7 +221,7 @@ BlockVector<n_blocks, Number>& BlockVector<n_blocks, Number>::operator += (const
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>& BlockVector<n_blocks, Number>::operator -= (const BlockVector<n_blocks, Number>& v)
+BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator -= (const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -233,7 +233,7 @@ BlockVector<n_blocks, Number>& BlockVector<n_blocks, Number>::operator -= (const
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::add (const Number v)
+void BlockVector<n_blocks,Number>::add (const Number v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -244,7 +244,7 @@ void BlockVector<n_blocks, Number>::add (const Number v)
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::add (const BlockVector<n_blocks, Number>& v)
+void BlockVector<n_blocks,Number>::add (const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -255,8 +255,8 @@ void BlockVector<n_blocks, Number>::add (const BlockVector<n_blocks, Number>& v)
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::add (const Number a,
-					 const BlockVector<n_blocks, Number>& v)
+void BlockVector<n_blocks,Number>::add (const Number a,
+					 const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -267,10 +267,10 @@ void BlockVector<n_blocks, Number>::add (const Number a,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::add (const Number a,
-					 const BlockVector<n_blocks, Number>& v,
+void BlockVector<n_blocks,Number>::add (const Number a,
+					 const BlockVector<n_blocks,Number>& v,
 					 const Number b,
-					 const BlockVector<n_blocks, Number>& w)
+					 const BlockVector<n_blocks,Number>& w)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -281,8 +281,8 @@ void BlockVector<n_blocks, Number>::add (const Number a,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::sadd (const Number x,
-					  const BlockVector<n_blocks, Number>& v)
+void BlockVector<n_blocks,Number>::sadd (const Number x,
+					  const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -293,8 +293,8 @@ void BlockVector<n_blocks, Number>::sadd (const Number x,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::sadd (const Number x, const Number a,
-					  const BlockVector<n_blocks, Number>& v)
+void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
+					  const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -305,10 +305,10 @@ void BlockVector<n_blocks, Number>::sadd (const Number x, const Number a,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::sadd (const Number x, const Number a,
-					  const BlockVector<n_blocks, Number>& v,
+void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
+					  const BlockVector<n_blocks,Number>& v,
 					  const Number b,
-					  const BlockVector<n_blocks, Number>& w)
+					  const BlockVector<n_blocks,Number>& w)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -319,12 +319,12 @@ void BlockVector<n_blocks, Number>::sadd (const Number x, const Number a,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::sadd (const Number x, const Number a,
-					  const BlockVector<n_blocks, Number>& v,
+void BlockVector<n_blocks,Number>::sadd (const Number x, const Number a,
+					  const BlockVector<n_blocks,Number>& v,
 					  const Number b,
-					  const BlockVector<n_blocks, Number>& w,
+					  const BlockVector<n_blocks,Number>& w,
 					  const Number c,
-					  const BlockVector<n_blocks, Number>& y)
+					  const BlockVector<n_blocks,Number>& y)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -336,7 +336,7 @@ void BlockVector<n_blocks, Number>::sadd (const Number x, const Number a,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::scale (const Number factor)
+void BlockVector<n_blocks,Number>::scale (const Number factor)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -347,10 +347,10 @@ void BlockVector<n_blocks, Number>::scale (const Number factor)
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::equ (const Number a,
-					 const BlockVector<n_blocks, Number>& v,
+void BlockVector<n_blocks,Number>::equ (const Number a,
+					 const BlockVector<n_blocks,Number>& v,
 					 const Number b,
-					 const BlockVector<n_blocks, Number>& w)
+					 const BlockVector<n_blocks,Number>& w)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -361,8 +361,8 @@ void BlockVector<n_blocks, Number>::equ (const Number a,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::equ (const Number a,
-					 const BlockVector<n_blocks, Number>& v)
+void BlockVector<n_blocks,Number>::equ (const Number a,
+					 const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -372,7 +372,7 @@ void BlockVector<n_blocks, Number>::equ (const Number a,
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>& BlockVector<n_blocks, Number>::operator = (const Number s)
+BlockVector<n_blocks,Number>& BlockVector<n_blocks,Number>::operator = (const Number s)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -384,8 +384,8 @@ BlockVector<n_blocks, Number>& BlockVector<n_blocks, Number>::operator = (const 
 
 
 template <int n_blocks, typename Number>
-BlockVector<n_blocks, Number>&
-BlockVector<n_blocks, Number>::operator = (const BlockVector<n_blocks, Number>& v)
+BlockVector<n_blocks,Number>&
+BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks,Number>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -398,8 +398,8 @@ BlockVector<n_blocks, Number>::operator = (const BlockVector<n_blocks, Number>& 
 
 template <int n_blocks, typename Number>
 template<typename Number2>
-BlockVector<n_blocks, Number>&
-BlockVector<n_blocks, Number>::operator = (const BlockVector<n_blocks, Number2>& v)
+BlockVector<n_blocks,Number>&
+BlockVector<n_blocks,Number>::operator = (const BlockVector<n_blocks, Number2>& v)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -410,7 +410,7 @@ BlockVector<n_blocks, Number>::operator = (const BlockVector<n_blocks, Number2>&
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::print (ostream &out,
+void BlockVector<n_blocks,Number>::print (ostream &out,
 			    unsigned int precision,
 			    bool scientific,
 			    bool across) const
@@ -428,7 +428,7 @@ void BlockVector<n_blocks, Number>::print (ostream &out,
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::block_write (ostream &out) const
+void BlockVector<n_blocks,Number>::block_write (ostream &out) const
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {
@@ -438,7 +438,7 @@ void BlockVector<n_blocks, Number>::block_write (ostream &out) const
 
 
 template <int n_blocks, typename Number>
-void BlockVector<n_blocks, Number>::block_read (istream &in)
+void BlockVector<n_blocks,Number>::block_read (istream &in)
 {
   for (unsigned int i=0;i<n_blocks;++i)
     {

@@ -200,7 +200,7 @@ class PreconditionBlock: public Subscriptor
  */
 template<typename number,
          typename inverse_type = number>
-class PreconditionBlockSOR : public PreconditionBlock<number, inverse_type>
+class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
 {
   public:
 				     /**

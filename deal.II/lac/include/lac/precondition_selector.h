@@ -144,7 +144,7 @@ class PreconditionSelector
 
 
 template <class Matrix, class Vector>
-PreconditionSelector<Matrix, Vector>
+PreconditionSelector<Matrix,Vector>
 ::PreconditionSelector(string preconditioning,
 		       const typename Vector::value_type &omega) :
 		preconditioning(preconditioning),
@@ -152,7 +152,7 @@ PreconditionSelector<Matrix, Vector>
 
 
 template <class Matrix, class Vector>
-PreconditionSelector<Matrix, Vector>::~PreconditionSelector()
+PreconditionSelector<Matrix,Vector>::~PreconditionSelector()
 {
 				   // release the matrix A
   A=0;
@@ -160,14 +160,14 @@ PreconditionSelector<Matrix, Vector>::~PreconditionSelector()
 
 
 template <class Matrix, class Vector>
-void PreconditionSelector<Matrix, Vector>::use_matrix(const Matrix &M)
+void PreconditionSelector<Matrix,Vector>::use_matrix(const Matrix &M)
 {
   A=&M;
 }
 
 template <class Matrix, class Vector>
-void PreconditionSelector<Matrix, Vector>::operator() (Vector &dst,
-						       const Vector &src) const
+void PreconditionSelector<Matrix,Vector>::operator() (Vector &dst,
+						      const Vector &src) const
 {
   if (preconditioning=="none")
     {
@@ -196,7 +196,7 @@ void PreconditionSelector<Matrix, Vector>::operator() (Vector &dst,
 
 
 template <class Matrix, class Vector>
-string PreconditionSelector<Matrix, Vector>::get_precondition_names()
+string PreconditionSelector<Matrix,Vector>::get_precondition_names()
 {
   return "none|jacobi|sor|ssor";
 }

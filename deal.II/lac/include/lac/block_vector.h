@@ -33,7 +33,7 @@ class BlockVector
 				      * that of V, all components are copied
 				      * from V
 				      */
-    BlockVector (const BlockVector<n_blocks, Number>& V);
+    BlockVector (const BlockVector<n_blocks,Number>& V);
 
 
 // note: I disabled this function for the time being, since egcs1.1.2
@@ -86,25 +86,25 @@ class BlockVector
 				     /**
 				      * $U(0-N) = s$: fill all components.
 				      */
-    BlockVector<n_blocks, Number> & operator= (const Number s);
+    BlockVector<n_blocks,Number> & operator= (const Number s);
     
 				     /**
 				      *  $U = V$: copy all components.
 				      */
-    BlockVector<n_blocks, Number> &
-    operator= (const BlockVector<n_blocks, Number>& V);
+    BlockVector<n_blocks,Number> &
+    operator= (const BlockVector<n_blocks,Number>& V);
 
 				     /**
 				      * $U = V$ for different types.
 				      */
     template<typename Number2>
-    BlockVector<n_blocks, Number> &
+    BlockVector<n_blocks,Number> &
     operator= (const BlockVector<n_blocks, Number2>& V);
     
 				     /**
 				      * $U = U * V$: scalar product.
 				      */
-    Number operator* (const BlockVector<n_blocks, Number>& V) const;
+    Number operator* (const BlockVector<n_blocks,Number>& V) const;
 
 				     /**
 				      * Return square of the $l_2$-norm.
@@ -167,7 +167,7 @@ class BlockVector
 				      * this function is the same as calling
 				      * #reinit (V.size(), fast)#.
 				      */
-    void reinit (const BlockVector<n_blocks, Number> &V,
+    void reinit (const BlockVector<n_blocks,Number> &V,
 		 const bool            fast=false);
     
   				     /**
@@ -241,15 +241,15 @@ class BlockVector
 				      * Addition operator.
 				      * Fast equivalent to #U.add(1, V)#.
 				      */
-    BlockVector<n_blocks, Number> &
-    operator += (const BlockVector<n_blocks, Number> &V);
+    BlockVector<n_blocks,Number> &
+    operator += (const BlockVector<n_blocks,Number> &V);
 
     				     /**
 				      * Subtraction operator.
 				      * Fast equivalent to #U.add(-1, V)#.
 				      */
-    BlockVector<n_blocks, Number> &
-    operator -= (const BlockVector<n_blocks, Number> &V);
+    BlockVector<n_blocks,Number> &
+    operator -= (const BlockVector<n_blocks,Number> &V);
 
 				     /**
 				      * $U(0-DIM)+=s$.
@@ -263,49 +263,49 @@ class BlockVector
 				      * Simple vector addition, equal to the
 				      * #operator +=#.
 				      */
-    void add (const BlockVector<n_blocks, Number>& V);
+    void add (const BlockVector<n_blocks,Number>& V);
     
 				     /**
 				      * U+=a*V.
 				      * Simple addition of a scaled vector.
 				      */
-    void add (const Number a, const BlockVector<n_blocks, Number>& V);
+    void add (const Number a, const BlockVector<n_blocks,Number>& V);
     
 				     /**
 				      * U+=a*V+b*W.
 				      * Multiple addition of scaled vectors.
 				      */
-    void add (const Number a, const BlockVector<n_blocks, Number>& V,
-	      const Number b, const BlockVector<n_blocks, Number>& W);
+    void add (const Number a, const BlockVector<n_blocks,Number>& V,
+	      const Number b, const BlockVector<n_blocks,Number>& W);
     
 				     /**
 				      * U=s*U+V.
 				      * Scaling and simple vector addition.
 				      */
-    void sadd (const Number s, const BlockVector<n_blocks, Number>& V);
+    void sadd (const Number s, const BlockVector<n_blocks,Number>& V);
     
 				     /**
 				      * U=s*U+a*V.
 				      * Scaling and simple addition.
 				      */
-    void sadd (const Number s, const Number a, const BlockVector<n_blocks, Number>& V);
+    void sadd (const Number s, const Number a, const BlockVector<n_blocks,Number>& V);
     
 				     /**
 				      * U=s*U+a*V+b*W.
 				      * Scaling and multiple addition.
 				      */
     void sadd (const Number s, const Number a,
-	       const BlockVector<n_blocks, Number>& V,
-	       const Number b, const BlockVector<n_blocks, Number>& W);
+	       const BlockVector<n_blocks,Number>& V,
+	       const Number b, const BlockVector<n_blocks,Number>& W);
     
 				     /**
 				      * U=s*U+a*V+b*W+c*X.
 				      * Scaling and multiple addition.
 				      */
     void sadd (const Number s, const Number a,
-	       const BlockVector<n_blocks, Number>& V,
-	       const Number b, const BlockVector<n_blocks, Number>& W, 
-	       const Number c, const BlockVector<n_blocks, Number>& X);
+	       const BlockVector<n_blocks,Number>& V,
+	       const Number b, const BlockVector<n_blocks,Number>& W, 
+	       const Number c, const BlockVector<n_blocks,Number>& X);
     
 				     /**
 				      * Scale each element of the vector by the
@@ -319,14 +319,14 @@ class BlockVector
 				     /**
 				      *  U=a*V. Replacing.
 				      */
-    void equ (const Number a, const BlockVector<n_blocks, Number>& V);
+    void equ (const Number a, const BlockVector<n_blocks,Number>& V);
     
 				     /**
 				      * U=a*V+b*W.
 				      * Replacing by sum.
 				      */
-    void equ (const Number a, const BlockVector<n_blocks, Number>& V,
-	      const Number b, const BlockVector<n_blocks, Number>& W);
+    void equ (const Number a, const BlockVector<n_blocks,Number>& V,
+	      const Number b, const BlockVector<n_blocks,Number>& W);
 
 				     //@}
     
@@ -438,7 +438,7 @@ class BlockVector
 
 template <int n_blocks, typename Number>
 inline
-unsigned int BlockVector<n_blocks, Number>::size () const
+unsigned int BlockVector<n_blocks,Number>::size () const
 {
   return start[n_blocks];
 }
@@ -447,7 +447,7 @@ unsigned int BlockVector<n_blocks, Number>::size () const
 
 //  template <int n_blocks, typename Number>
 //  inline
-//  BlockVector<n_blocks, Number>::iterator BlockVector<n_blocks, Number>::begin () {
+//  BlockVector<n_blocks,Number>::iterator BlockVector<n_blocks,Number>::begin () {
 //    return &val[0];
 //  };
 
@@ -455,7 +455,7 @@ unsigned int BlockVector<n_blocks, Number>::size () const
 
 //  template <int n_blocks, typename Number>
 //  inline
-//  BlockVector<n_blocks, Number>::const_iterator BlockVector<n_blocks, Number>::begin () const {
+//  BlockVector<n_blocks,Number>::const_iterator BlockVector<n_blocks,Number>::begin () const {
 //    return &val[0];
 //  };
 
@@ -463,7 +463,7 @@ unsigned int BlockVector<n_blocks, Number>::size () const
 
 //  template <int n_blocks, typename Number>
 //  inline
-//  BlockVector<n_blocks, Number>::iterator BlockVector<n_blocks, Number>::end () {
+//  BlockVector<n_blocks,Number>::iterator BlockVector<n_blocks,Number>::end () {
 //    return &val[dim];
 //  };
 
@@ -471,7 +471,7 @@ unsigned int BlockVector<n_blocks, Number>::size () const
 
 //  template <typename Number>
 //  inline
-//  BlockVector<n_blocks, Number>::const_iterator BlockVector<n_blocks, Number>::end () const {
+//  BlockVector<n_blocks,Number>::const_iterator BlockVector<n_blocks,Number>::end () const {
 //    return &val[dim];
 //  };
 
@@ -479,7 +479,7 @@ unsigned int BlockVector<n_blocks, Number>::size () const
 
 template <int n_blocks, typename Number>
 inline
-Number BlockVector<n_blocks, Number>::operator() (const unsigned int i) const
+Number BlockVector<n_blocks,Number>::operator() (const unsigned int i) const
 {
   //  Assert (i<start[n_blocks], ExcInvalidIndex(i,dim));
 
@@ -493,7 +493,7 @@ Number BlockVector<n_blocks, Number>::operator() (const unsigned int i) const
 
 template <int n_blocks, typename Number>
 inline
-Number& BlockVector<n_blocks, Number>::operator() (const unsigned int i)
+Number& BlockVector<n_blocks,Number>::operator() (const unsigned int i)
 {
   //  Assert (i<dim, ExcInvalidIndex(i,dim));
 
@@ -506,7 +506,7 @@ Number& BlockVector<n_blocks, Number>::operator() (const unsigned int i)
 template <int n_blocks, typename Number>
 inline
 Vector<Number>&
-BlockVector<n_blocks, Number>::block(unsigned int i)
+BlockVector<n_blocks,Number>::block(unsigned int i)
 {
   Assert(i<n_blocks, ExcIndexRange(i,0,n_blocks));
 
@@ -516,7 +516,7 @@ BlockVector<n_blocks, Number>::block(unsigned int i)
 template <int n_blocks, typename Number>
 inline
 const Vector<Number>&
-BlockVector<n_blocks, Number>::block(unsigned int i) const
+BlockVector<n_blocks,Number>::block(unsigned int i) const
 {
   Assert(i<n_blocks, ExcIndexRange(i,0,n_blocks));
 

@@ -408,7 +408,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  Pointer to the #i#th
 				      *  child.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<celldim, dim> >
+    TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
     child (const unsigned int i) const;
 
 				     /**
