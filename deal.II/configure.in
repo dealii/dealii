@@ -258,9 +258,15 @@ else
       if test "x$GXX_VERSION" = "xintel_icc" ; then
 	dnl Disable some compiler warnings, as they often are wrong on
 	dnl out code:
-	dnl #175: subscript out of range (doesn't take into account that
+	dnl #175: `subscript out of range' (doesn't take into account that
 	dnl       some code is only reachable for some dimensions)
-        CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -DDEBUG -inline_debug_info"
+	dnl #327: `NULL reference is not allowed' (this happens when we
+	dnl       write "*static_cast<double*>(0)" or some such thing,
+	dnl       which we do to create invalid references)
+	dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
+	dnl       (allowed for compatibility)' (I don't understand what the
+	dnl       compiler means)
+        CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -DDEBUG -inline_debug_info"
         CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -unroll -w0"
 
       else
