@@ -693,7 +693,9 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     const Function<dim>      &exact_solution,
 					     Vector<float>            &difference,
 					     const Quadrature<dim>    &q,
-					     const NormType           &norm) {
+					     const NormType           &norm,
+					     const Function<dim>      *weight=0)
+{
   const FiniteElement<dim> &fe = dof.get_fe();
     
   difference.reinit (dof.get_tria().n_active_cells());
@@ -782,6 +784,17 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 		      Assert (false, ExcNotImplemented());
 	      };
 
+					     // now weight the values
+					     // at the quadrature points due
+					     // to the weighting function
+	    if (weight)
+	      {
+		vector<double> w(n_q_points);
+		weight->value_list(fe_values.get_quadrature_points(),w);
+		for (unsigned int q=0; q<n_q_points; ++q)
+		  psi[q]*=w[q];
+	      }
+
 					     // ok, now we have the integrand,
 					     // let's compute the integral,
 					     // which is
@@ -851,6 +864,17 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 	    vector<double> psi_square (psi.size(), 0.0);
 	    for (unsigned int i=0; i<n_q_points; ++i)
 	      psi_square[i] = sqr_point(psi[i]);
+
+					     // now weight the values
+					     // at the quadrature points due
+					     // to the weighting function
+	    if (weight)
+	      {
+		vector<double> w(n_q_points);
+		weight->value_list(fe_values.get_quadrature_points(),w);
+		for (unsigned int q=0; q<n_q_points; ++q)
+		  psi_square[q]*=w[q];
+	      }
 
 					     // add seminorm to L_2 norm or
 					     // to zero

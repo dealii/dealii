@@ -434,20 +434,6 @@ class VectorTools //<dim>
 				      * accuracy of the #double# data type is
 				      * used.
 				      *
-				      * See the general documentation of this
-				      * class for more information.
-				      */
-    static void integrate_difference (const DoFHandler<dim>    &dof,
-				      const Vector<double>     &fe_function,
-				      const Function<dim>      &exact_solution,
-				      Vector<float>            &difference,
-				      const Quadrature<dim>    &q,
-				      const NormType           &norm);
-
-				     /**
-				      * Compute the error for the solution of a system.
-				      * See the other #integrate_difference#.
-				      *
 				      * The additional argument #weight# allows
 				      * to evaluate weighted norms. This is useful
 				      * for weighting the error of different parts
@@ -460,6 +446,21 @@ class VectorTools //<dim>
 				      * solutions.
 				      * By default, no weighting function is given,
 				      * i.e. weight=1 in the whole domain.
+				      *
+				      * See the general documentation of this
+				      * class for more information.
+				      */
+    static void integrate_difference (const DoFHandler<dim>    &dof,
+				      const Vector<double>     &fe_function,
+				      const Function<dim>      &exact_solution,
+				      Vector<float>            &difference,
+				      const Quadrature<dim>    &q,
+				      const NormType           &norm,
+				      const Function<dim>      *weight=0);
+
+				     /**
+				      * Compute the error for the solution of a system.
+				      * See the other #integrate_difference#.
 				      */
     static void integrate_difference (const DoFHandler<dim>   &dof,
  				      const Vector<double>     &fe_function,
