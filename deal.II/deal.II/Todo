@@ -131,3 +131,5 @@ Move the TriaNumberCache into the Triangulation class once the
 
 Why is dof_renumbering.h in include/numerics, but dof_renumbering.cc
   in source/dofs??
+
+Fix comment in solution_transfer.h
