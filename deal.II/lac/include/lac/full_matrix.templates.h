@@ -1,4 +1,4 @@
-//----------------------------  full_matrix.templates.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  full_matrix.templates.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__full_matrix_templates_h
 #define __deal2__full_matrix_templates_h
 
@@ -1236,7 +1236,7 @@ FullMatrix<number>::determinant () const
 
 template <typename number>
 number
-FullMatrix<number>::norm2 () const
+FullMatrix<number>::frobenius_norm () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
@@ -1244,6 +1244,15 @@ FullMatrix<number>::norm2 () const
   for (unsigned int i=0; i<this->n_rows()*this->n_cols(); ++i)
     s += this->data()[i]*this->data()[i];
   return std::sqrt(s);
+}
+
+
+
+template <typename number>
+number
+FullMatrix<number>::norm2 () const
+{
+  return frobenius_norm();
 }
 
 
