@@ -243,7 +243,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 		{
 		  const double value = this->cell_data[dataset].has_block ?
 		    (*this->cell_data[dataset].block_data)(cell_number) :
-		    (*cell_data[dataset].single_data)(cell_number);
+		    (*this->cell_data[dataset].single_data)(cell_number);
 		  switch (dim)
 		    {
 		      case 1:
@@ -396,7 +396,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets,
 			     n_q_points * (n_subdivisions+1));
-  this->patches.insert (patches.end(), n_patches, default_patch);
+  this->patches.insert (this->patches.end(), n_patches, default_patch);
 
 #ifdef DEAL_II_USE_MT
 

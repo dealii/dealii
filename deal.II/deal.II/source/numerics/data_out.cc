@@ -522,7 +522,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
   ::DataOutBase::Patch<dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
-  this->patches.insert (patches.end(), n_patches, default_patch);
+  this->patches.insert (this->patches.end(), n_patches, default_patch);
 
 #ifdef DEAL_II_USE_MT
 
@@ -543,7 +543,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // consecutively.
   unsigned int patch_no = 0;
   for (typename std::vector< ::DataOutBase::Patch<dim> >::iterator
-	 patch = patches.begin(); patch != patches.end(); ++patch)
+	 patch = this->patches.begin(); patch != this->patches.end(); ++patch)
     patch->me = patch_no++;
 
 				   // Traverse the map of cells

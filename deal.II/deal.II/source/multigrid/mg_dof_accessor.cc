@@ -52,7 +52,7 @@ unsigned int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) co
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_line));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   return this->mg_dof_handler->mg_levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
@@ -69,7 +69,7 @@ void MGDoFObjectAccessor<1, dim>::set_mg_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_line));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   this->mg_dof_handler->mg_levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i] = index;
@@ -85,7 +85,7 @@ unsigned int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned in
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   return (this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
 	  .get_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex));
@@ -102,7 +102,7 @@ void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int ve
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
     .set_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
@@ -117,7 +117,7 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-				 dof_handler->get_fe().dofs_per_line),
+				 this->dof_handler->get_fe().dofs_per_line),
 	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
@@ -209,7 +209,7 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) co
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_quad));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
 
   return this->mg_dof_handler->mg_levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
@@ -226,7 +226,7 @@ void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_quad));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
 
   this->mg_dof_handler->mg_levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i] = index;
@@ -242,7 +242,7 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned in
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
   
   return (this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
 	  .get_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex));
@@ -259,7 +259,7 @@ void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int ve
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
     .set_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
@@ -274,13 +274,13 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
-				 4*dof_handler->get_fe().dofs_per_line +
-				 dof_handler->get_fe().dofs_per_quad),
+				 4*this->dof_handler->get_fe().dofs_per_line +
+				 this->dof_handler->get_fe().dofs_per_quad),
 	  DoFAccessor<2>::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -312,7 +312,7 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -391,7 +391,7 @@ unsigned int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) co
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_hex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_hex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_hex));
 
   return this->mg_dof_handler->mg_levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i];
@@ -408,7 +408,7 @@ void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->get_fe().dofs_per_hex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_hex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_hex));
 
   this->mg_dof_handler->mg_levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i] = index;
@@ -424,7 +424,7 @@ unsigned int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned in
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
   
   return (this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
 	  .get_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex));
@@ -441,7 +441,7 @@ void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int ve
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->get_fe().dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
     .set_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
@@ -456,15 +456,15 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   Assert (this->mg_dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
-				 12*dof_handler->get_fe().dofs_per_line +
-				 6*dof_handler->get_fe().dofs_per_quad +
-				 dof_handler->get_fe().dofs_per_hex),
+				 12*this->dof_handler->get_fe().dofs_per_line +
+				 6*this->dof_handler->get_fe().dofs_per_quad +
+				 this->dof_handler->get_fe().dofs_per_hex),
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
-		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -499,8 +499,8 @@ MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
-		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)

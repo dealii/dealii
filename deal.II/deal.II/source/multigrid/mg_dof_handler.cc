@@ -23,6 +23,8 @@
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
 #include <lac/sparse_matrix.h>
+#include <base/exceptions.h>
+
 
 #include <algorithm>
 
@@ -166,7 +168,7 @@ MGDoFHandler<1>::last_active (const unsigned int level) const {
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
 MGDoFHandler<1>::begin_raw_face (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -174,7 +176,7 @@ MGDoFHandler<1>::begin_raw_face (const unsigned int) const {
 template <>
 MGDoFDimensionInfo<1>::face_iterator
 MGDoFHandler<1>::begin_face (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -182,7 +184,7 @@ MGDoFHandler<1>::begin_face (const unsigned int) const {
 template <>
 MGDoFDimensionInfo<1>::active_face_iterator
 MGDoFHandler<1>::begin_active_face (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -190,7 +192,7 @@ MGDoFHandler<1>::begin_active_face (const unsigned int) const {
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
 MGDoFHandler<1>::end_face () const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -198,7 +200,7 @@ MGDoFHandler<1>::end_face () const {
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
 MGDoFHandler<1>::last_raw_face () const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -206,7 +208,7 @@ MGDoFHandler<1>::last_raw_face () const {
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
 MGDoFHandler<1>::last_raw_face (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -214,7 +216,7 @@ MGDoFHandler<1>::last_raw_face (const unsigned int) const {
 template <>
 MGDoFDimensionInfo<1>::face_iterator
 MGDoFHandler<1>::last_face () const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -222,7 +224,7 @@ MGDoFHandler<1>::last_face () const {
 template <>
 MGDoFDimensionInfo<1>::face_iterator
 MGDoFHandler<1>::last_face (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -230,7 +232,7 @@ MGDoFHandler<1>::last_face (const unsigned int) const {
 template <>
 MGDoFDimensionInfo<1>::active_face_iterator
 MGDoFHandler<1>::last_active_face () const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -238,7 +240,7 @@ MGDoFHandler<1>::last_active_face () const {
 template <>
 MGDoFDimensionInfo<1>::active_face_iterator
 MGDoFHandler<1>::last_active_face (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -246,7 +248,7 @@ MGDoFHandler<1>::last_active_face (const unsigned int) const {
 template <>
 MGDoFHandler<1>::raw_quad_iterator
 MGDoFHandler<1>::begin_raw_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -254,7 +256,7 @@ MGDoFHandler<1>::begin_raw_quad (const unsigned int) const {
 template <>
 MGDoFHandler<1>::quad_iterator
 MGDoFHandler<1>::begin_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -262,7 +264,7 @@ MGDoFHandler<1>::begin_quad (const unsigned int) const {
 template <>
 MGDoFHandler<1>::active_quad_iterator
 MGDoFHandler<1>::begin_active_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -270,7 +272,7 @@ MGDoFHandler<1>::begin_active_quad (const unsigned int) const {
 template <>
 MGDoFHandler<1>::raw_quad_iterator
 MGDoFHandler<1>::end_quad () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -278,7 +280,7 @@ MGDoFHandler<1>::end_quad () const {
 template <>
 MGDoFHandler<1>::raw_quad_iterator
 MGDoFHandler<1>::last_raw_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -286,7 +288,7 @@ MGDoFHandler<1>::last_raw_quad (const unsigned int) const {
 template <>
 MGDoFHandler<1>::quad_iterator
 MGDoFHandler<1>::last_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -294,7 +296,7 @@ MGDoFHandler<1>::last_quad (const unsigned int) const {
 template <>
 MGDoFHandler<1>::active_quad_iterator
 MGDoFHandler<1>::last_active_quad (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -302,7 +304,7 @@ MGDoFHandler<1>::last_active_quad (const unsigned int) const {
 template <>
 MGDoFHandler<1>::raw_quad_iterator
 MGDoFHandler<1>::last_raw_quad () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -310,7 +312,7 @@ MGDoFHandler<1>::last_raw_quad () const {
 template <>
 MGDoFHandler<1>::quad_iterator
 MGDoFHandler<1>::last_quad () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -318,7 +320,7 @@ MGDoFHandler<1>::last_quad () const {
 template <>
 MGDoFHandler<1>::active_quad_iterator
 MGDoFHandler<1>::last_active_quad () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -326,7 +328,7 @@ MGDoFHandler<1>::last_active_quad () const {
 template <>
 MGDoFHandler<1>::raw_hex_iterator
 MGDoFHandler<1>::begin_raw_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -334,7 +336,7 @@ MGDoFHandler<1>::begin_raw_hex (const unsigned int) const {
 template <>
 MGDoFHandler<1>::hex_iterator
 MGDoFHandler<1>::begin_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -342,7 +344,7 @@ MGDoFHandler<1>::begin_hex (const unsigned int) const {
 template <>
 MGDoFHandler<1>::active_hex_iterator
 MGDoFHandler<1>::begin_active_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -350,7 +352,7 @@ MGDoFHandler<1>::begin_active_hex (const unsigned int) const {
 template <>
 MGDoFHandler<1>::raw_hex_iterator
 MGDoFHandler<1>::end_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -358,7 +360,7 @@ MGDoFHandler<1>::end_hex () const {
 template <>
 MGDoFHandler<1>::raw_hex_iterator
 MGDoFHandler<1>::last_raw_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -366,7 +368,7 @@ MGDoFHandler<1>::last_raw_hex (const unsigned int) const {
 template <>
 MGDoFHandler<1>::hex_iterator
 MGDoFHandler<1>::last_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -374,7 +376,7 @@ MGDoFHandler<1>::last_hex (const unsigned int) const {
 template <>
 MGDoFHandler<1>::active_hex_iterator
 MGDoFHandler<1>::last_active_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -382,7 +384,7 @@ MGDoFHandler<1>::last_active_hex (const unsigned int) const {
 template <>
 MGDoFHandler<1>::raw_hex_iterator
 MGDoFHandler<1>::last_raw_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -390,7 +392,7 @@ MGDoFHandler<1>::last_raw_hex () const {
 template <>
 MGDoFHandler<1>::hex_iterator
 MGDoFHandler<1>::last_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -398,7 +400,7 @@ MGDoFHandler<1>::last_hex () const {
 template <>
 MGDoFHandler<1>::active_hex_iterator
 MGDoFHandler<1>::last_active_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 };
 
@@ -550,7 +552,7 @@ MGDoFHandler<2>::last_active_face (const unsigned int level) const {
 template <>
 MGDoFHandler<2>::raw_hex_iterator
 MGDoFHandler<2>::begin_raw_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -558,7 +560,7 @@ MGDoFHandler<2>::begin_raw_hex (const unsigned int) const {
 template <>
 MGDoFHandler<2>::hex_iterator
 MGDoFHandler<2>::begin_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -566,7 +568,7 @@ MGDoFHandler<2>::begin_hex (const unsigned int) const {
 template <>
 MGDoFHandler<2>::active_hex_iterator
 MGDoFHandler<2>::begin_active_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -574,7 +576,7 @@ MGDoFHandler<2>::begin_active_hex (const unsigned int) const {
 template <>
 MGDoFHandler<2>::raw_hex_iterator
 MGDoFHandler<2>::end_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -582,7 +584,7 @@ MGDoFHandler<2>::end_hex () const {
 template <>
 MGDoFHandler<2>::raw_hex_iterator
 MGDoFHandler<2>::last_raw_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -590,7 +592,7 @@ MGDoFHandler<2>::last_raw_hex (const unsigned int) const {
 template <>
 MGDoFHandler<2>::hex_iterator
 MGDoFHandler<2>::last_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -598,7 +600,7 @@ MGDoFHandler<2>::last_hex (const unsigned int) const {
 template <>
 MGDoFHandler<2>::active_hex_iterator
 MGDoFHandler<2>::last_active_hex (const unsigned int) const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -606,7 +608,7 @@ MGDoFHandler<2>::last_active_hex (const unsigned int) const {
 template <>
 MGDoFHandler<2>::raw_hex_iterator
 MGDoFHandler<2>::last_raw_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -614,7 +616,7 @@ MGDoFHandler<2>::last_raw_hex () const {
 template <>
 MGDoFHandler<2>::hex_iterator
 MGDoFHandler<2>::last_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -622,7 +624,7 @@ MGDoFHandler<2>::last_hex () const {
 template <>
 MGDoFHandler<2>::active_hex_iterator
 MGDoFHandler<2>::last_active_hex () const {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 };
 
@@ -1197,7 +1199,7 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
 				   // same state as it was at the
 				   // beginning of this function.
   std::vector<bool> user_flags;
-  tria->save_user_flags(user_flags);
+  this->tria->save_user_flags(user_flags);
   const_cast<Triangulation<dim> &>(*(this->tria)).clear_user_flags ();
 
 				   // now distribute indices on each level
@@ -1227,7 +1229,7 @@ MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
 					  unsigned int   next_free_dof) {
 
 				   // distribute dofs of vertices
-  if (selected_fe->dofs_per_vertex > 0)
+  if (this->selected_fe->dofs_per_vertex > 0)
     for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
       {
 	cell_iterator neighbor = cell->neighbor(v);
@@ -1242,11 +1244,11 @@ MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
 					       // mg dofs the same)
 	      {
 		if (v==0) 
-		  for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+		  for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
 		    cell->set_mg_vertex_dof_index (0, d,
 						   neighbor->mg_vertex_dof_index (1, d));
 		else
-		  for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+		  for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
 		    cell->set_mg_vertex_dof_index (1, d,
 						   neighbor->mg_vertex_dof_index (0, d));
 		
@@ -1256,13 +1258,13 @@ MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
 	  };
 	
 					 // otherwise: create dofs newly
-	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
 	  cell->set_mg_vertex_dof_index (v, d, next_free_dof++);
       };
   
 				   // dofs of line
-  if (selected_fe->dofs_per_line > 0)
-    for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
+  if (this->selected_fe->dofs_per_line > 0)
+    for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
       cell->set_mg_dof_index (d, next_free_dof++);
 
 				   // note that this cell has been processed
@@ -1308,7 +1310,7 @@ MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
 
 				   // dofs of quad
   if (this->selected_fe->dofs_per_quad > 0)
-    for (unsigned int d=0; d<selected_fe->dofs_per_quad; ++d)
+    for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
       cell->set_mg_dof_index (d, next_free_dof++);
 
 
@@ -1327,18 +1329,18 @@ template <>
 unsigned int
 MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					  unsigned int   next_free_dof) {
-  if (selected_fe->dofs_per_vertex > 0)
+  if (this->selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
     for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
       if (cell->mg_vertex_dof_index(vertex, 0) == DoFHandler<3>::invalid_dof_index)
-	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
 	  cell->set_mg_vertex_dof_index (vertex, d, next_free_dof++);
     
   				   // for the lines
-  if (selected_fe->dofs_per_line > 0)
+  if (this->selected_fe->dofs_per_line > 0)
     for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
       {
 	line_iterator line = cell->line(l);
@@ -1348,12 +1350,12 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // numbered (check only first dof)
 	if (line->mg_dof_index(0) == DoFHandler<3>::invalid_dof_index)
 					   // if not: distribute dofs
-	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
+	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
 	    line->set_mg_dof_index (d, next_free_dof++);	    
       };
 
   				   // for the quads
-  if (selected_fe->dofs_per_quad > 0)
+  if (this->selected_fe->dofs_per_quad > 0)
     for (unsigned int q=0; q<GeometryInfo<3>::lines_per_cell; ++q)
       {
 	quad_iterator quad = cell->quad(q);
@@ -1363,14 +1365,14 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // numbered (check only first dof)
 	if (quad->mg_dof_index(0) == DoFHandler<3>::invalid_dof_index)
 					   // if not: distribute dofs
-	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
+	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
 	    quad->set_mg_dof_index (d, next_free_dof++);	    
       };
 
 
 				   // dofs of cell
-  if (selected_fe->dofs_per_hex > 0)
-    for (unsigned int d=0; d<selected_fe->dofs_per_hex; ++d)
+  if (this->selected_fe->dofs_per_hex > 0)
+    for (unsigned int d=0; d<this->selected_fe->dofs_per_hex; ++d)
       cell->set_mg_dof_index (d, next_free_dof++);
 
 
@@ -1409,7 +1411,7 @@ unsigned int MGDoFHandler<dim>::n_dofs (const unsigned int level) const {
 template <>
 void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 				     const std::vector<unsigned int> &new_numbers) {
-  Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
+  Assert (new_numbers.size() == n_dofs(level), DoFHandler<1>::ExcRenumberingIncomplete());
   
 				   // note that we can not use cell iterators
 				   // in this function since then we would
@@ -1423,10 +1425,10 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 				     // the present level
     if ((i->get_coarsest_level() <= level) &&
 	(i->get_finest_level() >= level))
-      for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
-	i->set_index (level, d, selected_fe->dofs_per_vertex,
+      for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
+	i->set_index (level, d, this->selected_fe->dofs_per_vertex,
 		      new_numbers[i->get_index (level, d,
-						selected_fe->dofs_per_vertex)]);
+						this->selected_fe->dofs_per_vertex)]);
 
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i) 
@@ -1481,7 +1483,8 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 template <>
 void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 				     const std::vector<unsigned int>  &new_numbers) {
-  Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
+  Assert (new_numbers.size() == n_dofs(level),
+	  DoFHandler<3>::ExcRenumberingIncomplete());
   
   for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)
@@ -1489,10 +1492,10 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 				     // the present level
     if ((i->get_coarsest_level() <= level) &&
 	(i->get_finest_level() >= level))
-      for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
-	i->set_index (level, d, selected_fe->dofs_per_vertex,
+      for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
+	i->set_index (level, d, this->selected_fe->dofs_per_vertex,
 		      new_numbers[i->get_index (level, d,
-						selected_fe->dofs_per_vertex)]);
+						this->selected_fe->dofs_per_vertex)]);
   
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
@@ -1525,8 +1528,8 @@ template <>
 void MGDoFHandler<1>::reserve_space () {
   const unsigned int dim = 1;
   
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
+  Assert (this->selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
+  Assert (this->tria->n_levels() > 0, DoFHandler<dim>::ExcInvalidTriangulation());
 
 				   //////////////////////////
 				   // DESTRUCTION
@@ -1537,12 +1540,12 @@ void MGDoFHandler<1>::reserve_space () {
   
 				   // first allocate space for the
 				   // lines on each level
-  for (unsigned int i=0; i<tria->n_levels(); ++i) 
+  for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
     {
       mg_levels.push_back (new DoFLevel<1>);
 
-      mg_levels.back()->line_dofs = std::vector<unsigned int>(tria->levels[i]->lines.lines.size() *
-							 selected_fe->dofs_per_line,
+      mg_levels.back()->line_dofs = std::vector<unsigned int>(this->tria->levels[i]->lines.lines.size() *
+							 this->selected_fe->dofs_per_line,
 							 DoFHandler<1>::invalid_dof_index);
     };
 
@@ -1558,13 +1561,13 @@ void MGDoFHandler<1>::reserve_space () {
 				   // over all cells and storing the
 				   // maximum and minimum level each
 				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (tria->vertices.size());
+  mg_vertex_dofs.resize (this->tria->vertices.size());
 
-  std::vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
-  std::vector<unsigned int> max_level (tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (this->tria->vertices.size(), this->tria->n_levels());
+  std::vector<unsigned int> max_level (this->tria->vertices.size(), 0);
 
-  Triangulation<dim>::cell_iterator cell = tria->begin(),
-				    endc = tria->end();
+  Triangulation<dim>::cell_iterator cell = this->tria->begin(),
+				    endc = this->tria->end();
   for (; cell!=endc; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 	 ++vertex)
@@ -1577,15 +1580,15 @@ void MGDoFHandler<1>::reserve_space () {
       };
 
 				   // now allocate the needed space
-  for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
+  for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
     {
 //TODO:[WB,GK] These conditions are violated on unused vertices
-      Assert (min_level[vertex] < tria->n_levels(),   ExcInternalError());
+      Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
       mg_vertex_dofs[vertex].init (min_level[vertex],
 				   max_level[vertex],
-				   selected_fe->dofs_per_vertex);
+				   this->selected_fe->dofs_per_vertex);
     };
 };
 
@@ -1637,11 +1640,12 @@ void MGDoFHandler<2>::reserve_space () {
 				   // vertex we pass by  belongs to
   mg_vertex_dofs.resize (this->tria->vertices.size());
 
-  std::vector<unsigned int> min_level (this->tria->vertices.size(), tria->n_levels());
-  std::vector<unsigned int> max_level (tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (this->tria->vertices.size(),
+				       this->tria->n_levels());
+  std::vector<unsigned int> max_level (this->tria->vertices.size(), 0);
 
-  Triangulation<dim>::cell_iterator cell = tria->begin(),
-				    endc = tria->end();
+  Triangulation<dim>::cell_iterator cell = this->tria->begin(),
+				    endc = this->tria->end();
   for (; cell!=endc; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 	 ++vertex)
@@ -1655,10 +1659,10 @@ void MGDoFHandler<2>::reserve_space () {
 
 
 // now allocate the needed space
-  for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
+  for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
     {
 //TODO:[WB,GK] These conditions are violated on unused vertices
-      Assert (min_level[vertex] < tria->n_levels(),   ExcInternalError());
+      Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
       mg_vertex_dofs[vertex].init (min_level[vertex],
@@ -1676,8 +1680,8 @@ template <>
 void MGDoFHandler<3>::reserve_space () {
   const unsigned int dim = 3;
   
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
+  Assert (this->selected_fe != 0, DoFHandler<3>::ExcNoFESelected());
+  Assert (this->tria->n_levels() > 0, DoFHandler<3>::ExcInvalidTriangulation());
   
 				   ////////////////////////////
 				   // DESTRUCTION
@@ -1688,18 +1692,18 @@ void MGDoFHandler<3>::reserve_space () {
   
 				   // first allocate space for the
 				   // lines and quads on each level
-  for (unsigned int i=0; i<tria->n_levels(); ++i) 
+  for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
     {
       mg_levels.push_back (new DoFLevel<3>);
 
-      mg_levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
-							  selected_fe->dofs_per_line,
+      mg_levels.back()->line_dofs = std::vector<unsigned int> (this->tria->levels[i]->lines.lines.size() *
+							  this->selected_fe->dofs_per_line,
 							  DoFHandler<3>::invalid_dof_index);
-      mg_levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
-							  selected_fe->dofs_per_quad,
+      mg_levels.back()->quad_dofs = std::vector<unsigned int> (this->tria->levels[i]->quads.quads.size() *
+							  this->selected_fe->dofs_per_quad,
 							  DoFHandler<3>::invalid_dof_index);
-      mg_levels.back()->hex_dofs = std::vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
-							 selected_fe->dofs_per_hex,
+      mg_levels.back()->hex_dofs = std::vector<unsigned int> (this->tria->levels[i]->hexes.hexes.size() *
+							 this->selected_fe->dofs_per_hex,
 							 DoFHandler<3>::invalid_dof_index);
     };
 
@@ -1716,13 +1720,13 @@ void MGDoFHandler<3>::reserve_space () {
 				   // over all cells and storing the
 				   // maximum and minimum level each
 				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (tria->vertices.size());
+  mg_vertex_dofs.resize (this->tria->vertices.size());
 
-  std::vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
-  std::vector<unsigned int> max_level (tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (this->tria->vertices.size(), this->tria->n_levels());
+  std::vector<unsigned int> max_level (this->tria->vertices.size(), 0);
 
-  Triangulation<dim>::cell_iterator cell = tria->begin(),
-				    endc = tria->end();
+  Triangulation<dim>::cell_iterator cell = this->tria->begin(),
+				    endc = this->tria->end();
   for (; cell!=endc; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 	 ++vertex)
@@ -1736,15 +1740,15 @@ void MGDoFHandler<3>::reserve_space () {
 
 
 				   // now allocate the needed space
-  for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
+  for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
     {
 //TODO:[WB,GK] These conditions are violated on unused vertices
-      Assert (min_level[vertex] < tria->n_levels(),   ExcInternalError());
+      Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
       Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
       mg_vertex_dofs[vertex].init (min_level[vertex],
 				   max_level[vertex],
-				   selected_fe->dofs_per_vertex);
+				   this->selected_fe->dofs_per_vertex);
     };
 };
 

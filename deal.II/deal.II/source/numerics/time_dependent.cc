@@ -417,7 +417,9 @@ template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
 		TimeStepBase (0),
 		tria (0),
-		coarse_grid (0)
+		coarse_grid (0),
+		flags(0),
+		refinement_flags(0)
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };

@@ -638,7 +638,6 @@ class DataOut : public DataOut_DoFData<dim,dim>
 		    << "The number of subdivisions per patch, " << arg1
 		    << ", is not valid.");
     
-  private:
 				     /**
 				      * Define a map from cell
 				      * iterators to patch iterators
@@ -648,6 +647,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
       typename std::vector< ::DataOutBase::Patch<dim> >::iterator>
       PatchMap;
     
+  private:
 				     /**
 				      * All data needed in one thread
 				      * is gathered in the struct

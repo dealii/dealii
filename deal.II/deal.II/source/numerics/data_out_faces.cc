@@ -210,7 +210,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
   ::DataOutBase::Patch<dim-1,dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
-  this->patches.insert (patches.end(), n_patches, default_patch);
+  this->patches.insert (this->patches.end(), n_patches, default_patch);
 
 #ifdef DEAL_II_USE_MT
 

@@ -470,12 +470,6 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
     virtual void
     get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
-    
-  private:
-				     /**
-				      * Store the center of the spheres.
-				      */
-    const Point<dim> center;
 };
 
 

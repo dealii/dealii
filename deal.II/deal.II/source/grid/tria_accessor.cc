@@ -1563,8 +1563,9 @@ bool CellAccessor<1>::at_boundary () const
 template <>
 unsigned char CellAccessor<1>::material_id () const
 {
-  Assert (used(), TriaAccessor<1>::ExcCellNotUsed());
-  return tria->levels[present_level]->lines.material_id[present_index];
+  Assert (this->used(), TriaAccessor<1>::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]
+    ->lines.material_id[this->present_index];
 };
 
 
@@ -1572,8 +1573,8 @@ unsigned char CellAccessor<1>::material_id () const
 template <>
 void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
 {
-  Assert (used(), TriaAccessor<1>::ExcCellNotUsed());
-  tria->levels[present_level]->lines.material_id[present_index]
+  Assert (this->used(), TriaAccessor<1>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->lines.material_id[this->present_index]
     = mat_id;
 };
 
@@ -1581,7 +1582,7 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
 template <>
 bool CellAccessor<1>::point_inside (const Point<1> &p) const
 {
-  return (vertex(0)[0] <= p[0]) && (p[0] <= vertex(1)[0]);
+  return (this->vertex(0)[0] <= p[0]) && (p[0] <= this->vertex(1)[0]);
 }
 
 
@@ -1653,7 +1654,7 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
 				       // of the line to the point
       const Point<2> to_p = p-this->vertex(f);
 				       // vector describing the line
-      const Point<2> face = this->vertex((f+1)%4)-vertex(f);
+      const Point<2> face = this->vertex((f+1)%4)-this->vertex(f);
 
 				       // if we rotate the face vector
 				       // by 90 degrees to the left
@@ -1699,8 +1700,8 @@ bool CellAccessor<3>::at_boundary () const
 template <>
 unsigned char CellAccessor<3>::material_id () const
 {
-  Assert (used(), TriaAccessor<3>::ExcCellNotUsed());
-  return tria->levels[present_level]->hexes.material_id[present_index];
+  Assert (this->used(), TriaAccessor<3>::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]->hexes.material_id[this->present_index];
 };
 
 
@@ -1708,8 +1709,8 @@ unsigned char CellAccessor<3>::material_id () const
 template <>
 void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
 {
-  Assert (used(), TriaAccessor<3>::ExcCellNotUsed());
-  tria->levels[present_level]->hexes.material_id[present_index]
+  Assert (this->used(), TriaAccessor<3>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->hexes.material_id[this->present_index]
     = mat_id;						 
 };
 

@@ -654,8 +654,8 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 				   // points of the line are on the
 				   // axis of symmetry. if so, then
 				   // return the mid point
-  if ((line->vertex(0)(0) == center(0)) &&
-      (line->vertex(1)(0) == center(0)))
+  if ((line->vertex(0)(0) == this->center(0)) &&
+      (line->vertex(1)(0) == this->center(0)))
     return (line->vertex(0) + line->vertex(1))/2;
   
 
@@ -689,10 +689,10 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 {
 				   // same thing as for the new point
 				   // on the line
-  if ((quad->vertex(0)(0) == center(0)) &&
-      (quad->vertex(1)(0) == center(0)) &&
-      (quad->vertex(2)(0) == center(0)) &&
-      (quad->vertex(3)(0) == center(0)))
+  if ((quad->vertex(0)(0) == this->center(0)) &&
+      (quad->vertex(1)(0) == this->center(0)) &&
+      (quad->vertex(2)(0) == this->center(0)) &&
+      (quad->vertex(3)(0) == this->center(0)))
     return (quad->vertex(0) + quad->vertex(1) +
 	    quad->vertex(2) + quad->vertex(3)   )/4;
   
@@ -716,7 +716,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 				   // to the plane part of the
 				   // boundary
   const Point<dim> line_center = line->center();
-  if (line_center(0) == center(0))
+  if (line_center(0) == this->center(0))
     return StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
   else
     return HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
@@ -735,7 +735,7 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 				   // to the plane part of the
 				   // boundary
   const Point<dim> quad_center = quad->center();
-  if (quad_center(0) == center(0))
+  if (quad_center(0) == this->center(0))
     StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
   else
     HyperShellBoundary<dim>::get_intermediate_points_on_quad (quad, points);
@@ -779,7 +779,7 @@ HalfHyperShellBoundary<dim>::
 get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
 {
-  if (face->center()(0) == center(0))
+  if (face->center()(0) == this->center(0))
     StraightBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
   else
     HyperShellBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);

@@ -629,7 +629,7 @@ template <>
 TriaIterator<3, DoFObjectAccessor<2, 3> >
 DoFCellAccessor<3>::face (const unsigned int i) const
 {
-  return quad(i);
+  return this->quad(i);
 };
 
 #endif
