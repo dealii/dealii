@@ -2,7 +2,9 @@
 /* Copyright W. Bangerth, Guido Kanschat, Stefan Nauber  */
 /* University of Heidelberg, 1998, 1999                  */
 
-#include <basic/data_io.h>
+//#include <basic/data_io.h>
+#include "data_io.h"
+#include <base/trace.h>
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
@@ -18,7 +20,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <ctime>
-
+#include <set>
 
 
 
@@ -1114,87 +1116,105 @@ void DataOut<2>::write_eps (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
   
   // write preamble
-  if (true) 
-    {
-      // block this to have local
-      // variables destroyed after
-      // use
-      time_t  time1= time (0);
-      tm     *time = localtime(&time1); 
-      out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
-	  << "%%Title: Deal Output" << endl
-	  << "%%Creator: the deal.II library" << endl
-	  << "%%Creation Date: " 
-	  << time->tm_year+1900 << "/"
-	  << time->tm_mon+1 << "/"
-	  << time->tm_mday << " - "
-	  << time->tm_hour << ":"
-	  << setw(2) << time->tm_min << ":"
-	  << setw(2) << time->tm_sec << endl
-	  << "%%BoundingBox: -220 -261 220 450" << endl;
-    };  
-
-  // Get scaling factors for Bounding Box 310 x 310
-  
+  {
+    // block this to have local
+    // variables destroyed after
+    // use
+    time_t  time1= time (0);
+    tm     *time = localtime(&time1); 
+    out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
+	<< "%%Title: Deal Output" << endl
+	<< "%%Creator: the deal.II library" << endl
+	<< "%%Creation Date: " 
+	<< time->tm_year+1900 << "/"
+	<< time->tm_mon+1 << "/"
+	<< time->tm_mday << " - "
+	<< time->tm_hour << ":"
+	<< setw(2) << time->tm_min << ":"
+	<< setw(2) << time->tm_sec << endl
+	<< "%%BoundingBox: -5 -5 305 305" << endl;
+  };  
+    
   DoFHandler<2>::active_cell_iterator cell;
   DoFHandler<2>::active_cell_iterator endc = dofs->end();
 
-  double x, y, z, xmin=0, xmax=0, ymin=0, ymax=0, zmin=0, zmax=0, zscale, scale, xofs, yofs;
-  double cx[4], cy[4], cz[4];
-  int i;
+  multiset<DataOut<2>::eps_cell_data> cells;
 
-  for (cell=dofs->begin_active(); cell!=endc; ++cell)
+  unsigned i;
+
+  // Now get output values
+  for(cell=dofs->begin_active(); cell!=endc; ++cell)
+     {
+       eps_cell_data cd;
+       cd.vertices.resize(4);
+       for (i=0; i<4; i++)
+	 {
+	   (cd.vertices[i]).x=cell->vertex(i)(0);
+	   (cd.vertices[i]).y=cell->vertex(i)(1);
+	   (cd.vertices[i]).z=(*dof_data[0].data)(cell->vertex_dof_index(i,0));
+	 };
+       cd.turn(0.2,0.2);
+       cells.insert(cd);
+     };
+
+  // Get scaling factors for Bounding Box 310 x 310
+  set<DataOut<2>::eps_cell_data>::iterator c;
+
+  double xmin=cells.begin()->vertices[0].x;
+  double xmax=xmin;
+  double ymin=cells.begin()->vertices[0].y;
+  double ymax=ymin;
+
+  for(c=cells.begin();c!=cells.end();c++)
     {
       for (i=0; i<4; i++)
 	{
-	  x=cell->vertex(i)(0);
-	  y=cell->vertex(i)(1);
-	  z=(*dof_data[0].data)(cell->vertex_dof_index(i,0));
-	  xmin = ( x < xmin ? x : xmin );
-	  xmax = ( x > xmax ? x : xmax );
-	  ymin = ( y < ymin ? y : ymin );
-	  ymax = ( y > ymax ? y : ymax );
-	  zmin = ( z < zmin ? z : zmin );
-	  zmax = ( z > zmax ? z : zmax );
+	  double x,y;
+	  
+	  x=c->vertices[i].x;
+	  xmin=(xmin < x ? xmin : x);
+	  xmax=(xmax > x ? xmax : x);
+
+	  y=c->vertices[i].y;
+	  ymin=(ymin < y ? ymin : y);
+	  ymax=(ymax > y ? ymax : y);
 	}
-    }
-  x = xmax - xmin;
-  y = ymax - ymin;
-  z = zmax - zmin;
-  zscale = (x>y ? x : y)/z;
-  scale = 300 / (x > y ? x : y);
-  xofs = -(xmin*scale)+5;
-  yofs = -(ymin*scale)+5;
+    };
 
+  //  shift so that lower bounds are at (0,0), i.e. substract xmin, ymin resp.
+  //  scale to 300x300
 
-  for (cell=dofs->begin_active(); cell!=endc; ++cell) 
+  double xscale = 300 / (xmax-xmin);
+  double yscale = 300 / (ymax-ymin);
+  double scale = (xscale < yscale ? xscale : yscale);
+  double color,x[7],y[7],z[7];
+
+  //  Now we are ready to output...
+
+  for (c=cells.begin();c!=cells.end();c++)
     {
-      cx[0]=cell->vertex(0)(0); cy[0]=cell->vertex(0)(1); cz[0]=(*dof_data[0].data)(cell->vertex_dof_index(0,0))*zscale;
-      cx[1]=cell->vertex(1)(0); cy[1]=cell->vertex(1)(1); cz[1]=(*dof_data[0].data)(cell->vertex_dof_index(1,0))*zscale;;
-      cx[2]=cell->vertex(2)(0); cy[2]=cell->vertex(2)(1); cz[2]=(*dof_data[0].data)(cell->vertex_dof_index(2,0))*zscale;;
-      cx[3]=cell->vertex(3)(0); cy[3]=cell->vertex(3)(1); cz[3]=(*dof_data[0].data)(cell->vertex_dof_index(3,0))*zscale;;
-      
-      // Turn and scale
-
       for (i=0;i<4;i++)
 	{
-	  // x =  0.707 * cx[i] - 0.707 * cy[i] + 0.000 * cz[i];
-	  // y =  0.354 * cx[i] + 0.354 * cy[i] + 0.866 * cz[i];
-	  // z = -0.559 * cx[i] - 0.559 * cy[i] + 0.500 * cz[i];
-
-	  x = 0.707 * (cx[i] - cy[i]);
-	  y = 0.354 * (cx[i] + cy[i]) + 0.866 * cz[i];
-
-	  cx[i]=x*scale+xofs;
-	  cy[i]=y*scale+yofs;
+	  x[i]=c->vertices[i].x;
+	  y[i]=c->vertices[i].y;
+	  z[i]=c->vertices[i].z;
 	}
+      x[4]=x[0]-x[1]; x[5]=x[0]-x[2];
+      y[4]=y[0]-y[1]; y[5]=y[0]-y[2];
+      z[4]=z[0]-z[1]; z[5]=z[0]-z[2];
+      x[6]=y[4]*z[5]-y[5]*z[4];
+      y[6]=x[5]*z[4]-x[4]*z[5];
+      z[6]=x[4]*y[5]-x[5]*y[4];
 
-      out << cx[0] << " " << cy[0] << " moveto "
-	  << cx[1] << " " << cy[1] << " lineto "
-	  << cx[2] << " " << cy[2] << " lineto "
-	  << cx[3] << " " << cy[3] << " lineto "
-	  << cx[0] << " " << cy[0] << " lineto "
-	  << " closepath stroke" << endl;
+      color =  fabs((-x[6] - y[6] +z[6])/sqrt(3*(x[6]*x[6]+y[6]*y[6]+z[6]*z[6])));
+
+      out << color << " setgray "
+	  << (x[0]-xmin)*scale << " " << (c->vertices[0].y-ymin)*scale << " moveto "
+	  << (x[1]-xmin)*scale << " " << (c->vertices[1].y-ymin)*scale << " lineto "
+	  << (x[2]-xmin)*scale << " " << (c->vertices[2].y-ymin)*scale << " lineto "
+	  << (x[3]-xmin)*scale << " " << (c->vertices[3].y-ymin)*scale << " lineto "
+	  << (x[0]-xmin)*scale << " " << (c->vertices[0].y-ymin)*scale << " lineto "
+	  << " closepath fill" << endl;
     };
   out << "showpage" << endl;     
 
@@ -1305,7 +1325,58 @@ string DataOut<dim>::get_output_format_names () {
   return "ucd|gnuplot|gnuplot draft|povray mesh|eps|epsgrid";
 };
 
+template<int dim>
+bool DataOut<dim>::eps_cell_data::operator < (const eps_cell_data &other) const
+{
+  double maxz = vertices[0].z, 
+         othermaxz = other.vertices[0].z;
+  unsigned i;
 
+  for (i=1; i<4; i++)
+    { 
+      maxz = (maxz > vertices[i].z ? maxz : vertices[i].z);
+      othermaxz = (othermaxz > other.vertices[i].z ? othermaxz : other.vertices[i].z);
+    };
+
+  return maxz > othermaxz;
+};
+
+template <int dim>
+void DataOut<dim>::eps_vertex_data::turn(double azi, double ele)
+{
+  double nx,ny,nz;
+
+  double cx=cos(ele), cz=cos(azi), sx=sin(ele), sz=sin(azi);
+
+  nx = cz*x-sz*cx*y-sz*sx*z;
+  ny = sz*x+cz*sx*y-cz*sx*z;
+  nz =         sx*y+   cx*z;
+
+  x=nx; z=ny; y=nz;
+};
+
+//      ( 1 0    0 )
+// Dx = ( 0 cx -sx )
+//      ( 0 sx  cx )
+
+//      ( cy 0 sy )
+// Dy = (  0 1  0 )
+//      (-sy 0 cy )
+
+//      ( cz -sz 0 )
+// Dz = ( sz  cz 0 )
+//      (  0   0 1 )
+
+//       ( cz -sz 0 )( 1 0    0 )(x)   ( cz*x-sz*(cx*y-sx*z)+0*(sx*y+cx*z) )
+// Dxz = ( sz  cz 0 )( 0 cx -sx )(y) = ( sz*x+cz*(cx*y-sx*z)+0*(sx*y+cx*z) )
+//	 (  0   0 1 )( 0 sx  cx )(z)   (  0*x+	*(cx*y-sx*z)+1*(sx*y+cx*z) )
+
+template <int dim>
+void DataOut<dim>::eps_cell_data::turn(double azi, double ele)
+{
+  for (unsigned i=0; i<4; i++)
+    vertices[i].turn(azi,ele);
+};
 
 //explicite instantiations
 
