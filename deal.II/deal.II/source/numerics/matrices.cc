@@ -1021,7 +1021,7 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
   Quadrature<dim> low_points(support_points,
 			     phantom_weights);
 
-  FEValues<dim> fe(high, low_points, UpdateFlags(0));
+  FEValues<dim> fe(high, low_points, update_values);
   
   for (unsigned int i=0; i<low.dofs_per_cell; ++i)
     for (unsigned int j=0; j<high.dofs_per_cell; ++j)
