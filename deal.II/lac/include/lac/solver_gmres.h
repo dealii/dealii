@@ -144,6 +144,7 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 				   // but whoever wrote this code in the first
 				   // place should get stoned, IMHO! (WB)
 
+  deallog.push("GMRES");
 				   // allocate an array of n_tmp_vectors
 				   // temporary vectors from the VectorMemory
 				   // object; resize them but do not set their
@@ -310,6 +311,7 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
   for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
     memory.free (tmp_vectors[tmp]);
 
+  deallog.pop();
   if (iteration_state)
     return success;
   else
