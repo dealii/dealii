@@ -95,6 +95,10 @@ template <class T> class Vector;
  *     A typical value for the fraction of the total error is 0.5.
  *   @end{itemize}
  *
+ *   There are other functions relying on different methods to flag
+ *   cells for refinement or coarsening. See their documentation for
+ *   further information.
+ *
  *   For a more thorough discussion of advantages and disadvantages of the
  *   different strategies for refinement, see the paper of R. Becker and
  *   R. Rannacher titled "A Feed-Back Approach to Error Control in Finite
@@ -107,7 +111,7 @@ template <class T> class Vector;
  *   You can suppress coarsening or refining by giving zero as the fraction
  *   for one of the operations.
  *
- * @author Wolfgang Bangerth, 1998, 2000
+ * @author Wolfgang Bangerth, 1998, 2000; Thomas Richter, 2000
  */
 class GridRefinement
 {
@@ -302,13 +306,12 @@ class GridRefinement
   private:
     
 				     /**
-				      * Sorts the vector ind as
-				      * an index vector of a in
-				      * increasing order.
-				      * This implementation of
-				      * quicksort seems to be faster
-				      * than the STL version and is
-				      * needed in
+				      * Sorts the vector @p{ind} as an
+				      * index vector of @p{a} in
+				      * increasing order.  This
+				      * implementation of quicksort
+				      * seems to be faster than the
+				      * STL version and is needed in
 				      * @p{refine_and_coarsen_optimize}
 				      */
     template<typename number>
