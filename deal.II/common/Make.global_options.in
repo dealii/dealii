@@ -23,6 +23,7 @@ CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
 SHLIBLD              = @SHLIBLD@
+AR                   = @AR@
 RANLIB               = @RANLIB@
 LDFLAGS              = @LDFLAGS@
 F77                  = @F77@
