@@ -318,10 +318,15 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       (allowed for compatibility)' (I don't understand what the
           dnl       compiler means)
           CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424 -opt_report_levelmin"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC -shared"
 
+          dnl To reduce output, use -opt_report_levelmin where possible,
+          dnl i.e. post icc5
+          if test "x$GXX_VERSION" != "xintel_icc5" ; then
+            CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
+          fi
 
           dnl We would really like to use  -ansi -Xc, since that
 	  dnl is _very_ picky about standard C++, and is thus very efficient
