@@ -523,9 +523,28 @@ compute_2nd (const Mapping<dim>                   &mapping,
                                                    // nonzero
                                                    // compoment
                   unsigned int component=0;
-                  for (unsigned int k=0; k<=n; ++k)
-                    while (nonzero_components[shape_index][component] == false)
-                      ++component;
+                  for (unsigned int nonzero_comp=0; component<this->n_components();
+                       ++component)
+                    if (nonzero_components[shape_index][component] == true)
+                      {
+                        ++nonzero_comp;
+                                                         // check
+                                                         // whether we
+                                                         // have found
+                                                         // the
+                                                         // component
+                                                         // we are
+                                                         // looking
+                                                         // for. note
+                                                         // that
+                                                         // nonzero_comp
+                                                         // is 1-based
+                                                         // by the way
+                                                         // we compute
+                                                         // it
+                        if (nonzero_comp == n+1)
+                          break;
+                      }
                   Assert (component < this->n_components(),
                           ExcInternalError());
 
