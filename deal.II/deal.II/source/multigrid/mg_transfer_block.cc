@@ -29,6 +29,9 @@
 
 #include <algorithm>
 
+
+//TODO[GK]: the following two functions need to be in mg_transfer_base.all_dimensions.cc
+
 template <int dim>
 void MGTransferBlockBase::build_matrices (
   const DoFHandler<dim>&,
