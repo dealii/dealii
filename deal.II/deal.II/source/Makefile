@@ -49,8 +49,13 @@ all: 1d 2d 3d
 
 3d: ../lib/libdeal_II_3d.g.a ../lib/libdeal_II_3d.a
 
+# Debug version only
 
+debug: 2dg 1dg 3dg
 
+1dg: ../lib/libdeal_II_1d.g.a
+2dg: ../lib/libdeal_II_2d.g.a
+3dg: ../lib/libdeal_II_3d.g.a
 
 
 # rules how to generate object files from source files. note that
