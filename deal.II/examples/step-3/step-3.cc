@@ -128,7 +128,7 @@ class LaplaceProblem
 				     // system matrix resulting from
 				     // the discretization of the
 				     // Laplace equation...
-    SparseMatrixStruct   sparsity_pattern;
+    SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
 				     // ...and variables which will
@@ -245,7 +245,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // `sealed', so to say), and we can
 				   // initialize the matrix itself
 				   // with it. Note that the
-				   // SparseMatrixStruct object does
+				   // SparsityPattern object does
 				   // not hold the values of the
 				   // matrix, it only stores the
 				   // places where entries are. The

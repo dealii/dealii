@@ -121,7 +121,7 @@ class LaplaceProblem
 				     // hanging nodes:
     ConstraintMatrix     hanging_node_constraints;
 
-    SparseMatrixStruct   sparsity_pattern;
+    SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
     Vector<double>       solution;

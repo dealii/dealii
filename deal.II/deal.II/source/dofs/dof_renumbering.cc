@@ -1,6 +1,6 @@
 /* $Id$ */
 
-#include <lac/sparse_matrix.h>
+#include <lac/sparsity_pattern.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
@@ -23,8 +23,8 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 				    const bool         use_constraints,
 				    const vector<int> &starting_indices) {
 				   // make the connection graph
-  SparseMatrixStruct sparsity (dof_handler.n_dofs(),
-			       dof_handler.max_couplings_between_dofs());
+  SparsityPattern sparsity (dof_handler.n_dofs(),
+			    dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity);
 
   if (use_constraints) 
@@ -213,8 +213,8 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
 				    const bool              reversed_numbering,
 				    const vector<int>      &starting_indices) {
 				   // make the connection graph
-  SparseMatrixStruct sparsity (dof_handler.n_dofs(level),
-			       dof_handler.max_couplings_between_dofs());
+  SparsityPattern sparsity (dof_handler.n_dofs(level),
+			    dof_handler.max_couplings_between_dofs());
   MGDoFTools::make_sparsity_pattern (dof_handler, level, sparsity);
     
   const int n_dofs = sparsity.n_rows();

@@ -51,7 +51,7 @@ int main()
       
 				       // Make matrix
       FDMatrix testproblem(size, size);
-      SparseMatrixStruct structure(dim, dim, 5);
+      SparsityPattern structure(dim, dim, 5);
       testproblem.build_structure(structure);
       structure.compress();
       SparseMatrix<double>  A(structure);

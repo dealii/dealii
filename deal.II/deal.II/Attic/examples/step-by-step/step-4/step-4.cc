@@ -75,7 +75,7 @@ class LaplaceProblem
     FEQ1<dim>            fe;
     DoFHandler<dim>      dof_handler;
 
-    SparseMatrixStruct   sparsity_pattern;
+    SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
     Vector<double>       solution;

@@ -44,13 +44,13 @@ class MGDoFTools
 				      * #ConstraintMatrix::condense(1)#,
 				      * you have to compress the
 				      * matrix yourself, using
-				      * #SparseMatrixStruct::compress()#.
+				      * #SparsityPattern::compress()#.
 				      */
     template <int dim>
     static void
     make_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
 			   const unsigned int       level,
-			   SparseMatrixStruct      &sparsity);
+			   SparsityPattern         &sparsity);
 };
 
 

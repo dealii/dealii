@@ -49,7 +49,7 @@ SparseVanka<number>::compute_inverses ()
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this
 				   // will be used quite often
-  const SparseMatrixStruct &structure
+  const SparsityPattern &structure
     = matrix->get_sparsity_pattern();
 
   map<unsigned int, unsigned int> local_index;
@@ -67,7 +67,7 @@ SparseVanka<number>::compute_inverses ()
 					 //   entries in this row, and
 					 // 2 the position within this
 					 //   row (as stored in the
-					 //   sparsematrixstruct object
+					 //   SparsityPattern object
 					 //
 					 // since we do not explicitely
 					 // consider nonsysmmetric sparsity
@@ -133,7 +133,7 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this
 				   // will be used quite often
-  const SparseMatrixStruct &structure
+  const SparsityPattern &structure
     = matrix->get_sparsity_pattern();
   
 				   // space to be used for local
@@ -175,7 +175,7 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 					 //   entries in this row, and
 					 // 2 the position within this
 					 //   row (as stored in the
-					 //   sparsematrixstruct object
+					 //   SparsityPattern object
 					 //
 					 // since we do not explicitely
 					 // consider nonsysmmetric sparsity

@@ -4,7 +4,7 @@
 
 
 #include <dofs/dof_constraints.h>
-#include <lac/sparse_matrix.h>
+#include <lac/sparsity_pattern.h>
 #include <lac/vector.h>
 #include <iostream>
 #include <algorithm>
@@ -12,7 +12,8 @@
 
 
 
-bool ConstraintMatrix::ConstraintLine::operator < (const ConstraintMatrix::ConstraintLine &a) const {
+bool ConstraintMatrix::ConstraintLine::operator < (const ConstraintMatrix::ConstraintLine &a) const
+{
   return line < a.line;
 };
 
@@ -119,8 +120,8 @@ void ConstraintMatrix::clear () {
 
 
 
-void ConstraintMatrix::condense (const SparseMatrixStruct &uncondensed,
-				 SparseMatrixStruct       &condensed) const {
+void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
+				 SparsityPattern       &condensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed.n_rows() == uncondensed.n_cols(),
@@ -228,7 +229,7 @@ void ConstraintMatrix::condense (const SparseMatrixStruct &uncondensed,
 
 
 
-void ConstraintMatrix::condense (SparseMatrixStruct &sparsity) const {
+void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),

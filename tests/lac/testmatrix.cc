@@ -9,7 +9,7 @@ FDMatrix::FDMatrix(unsigned int nx, unsigned int ny)
 {}
 
 void
-FDMatrix::build_structure(SparseMatrixStruct& structure) const
+FDMatrix::build_structure(SparsityPattern& structure) const
 {
   for(unsigned int i=0;i<=ny-2;i++)
     {
@@ -118,7 +118,7 @@ FDMGTransfer::FDMGTransfer(unsigned int nx, unsigned int ny,
 
 void
 FDMGTransfer::build_matrix(unsigned int nx, unsigned int ny,
-			   SparseMatrixStruct& structure, SparseMatrix<double>& matrix)
+			   SparsityPattern& structure, SparseMatrix<double>& matrix)
 {
   structure.reinit((nx-1)*(ny-1),(2*nx-1)*(2*ny-1),9);
   

@@ -20,7 +20,7 @@ SparseILU<number>::SparseILU ()
 
 
 template <typename number>
-SparseILU<number>::SparseILU (const SparseMatrixStruct &sparsity) :
+SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
 		SparseMatrix<number> (sparsity)
 {};
 
@@ -35,7 +35,7 @@ void SparseILU<number>::reinit ()
 
 
 template <typename number>
-void SparseILU<number>::reinit (const SparseMatrixStruct &sparsity)
+void SparseILU<number>::reinit (const SparsityPattern &sparsity)
 {
   SparseMatrix<number>::reinit (sparsity);
 };
@@ -108,7 +108,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 	  
 				   // now work only on this
 				   // matrix
-  const SparseMatrixStruct &sparsity = get_sparsity_pattern();
+  const SparsityPattern             &sparsity = get_sparsity_pattern();
   const unsigned int * const rowstart_indices = sparsity.get_rowstart_indices();
   const int * const          column_numbers   = sparsity.get_column_numbers();
   

@@ -15,12 +15,15 @@ PreconditionBlock<number,inverse_type>::PreconditionBlock ():
 		A(0)  {};
 
 
+
 template <typename number, typename inverse_type>
 PreconditionBlock<number,inverse_type>::~PreconditionBlock ()
 {
   if (inverse.size()!=0)
     inverse.erase(inverse.begin(), inverse.end());
 }
+
+
 
 template <typename number, typename inverse_type>
 void PreconditionBlock<number,inverse_type>::clear ()
@@ -30,6 +33,8 @@ void PreconditionBlock<number,inverse_type>::clear ()
   blocksize=0;
 }
 
+
+
 template <typename number, typename inverse_type>
 void PreconditionBlock<number,inverse_type>::use_matrix(
   const SparseMatrix<number> &M)
@@ -38,16 +43,19 @@ void PreconditionBlock<number,inverse_type>::use_matrix(
 }
 
 
+
 template <typename number, typename inverse_type>
 void PreconditionBlock<number,inverse_type>::set_block_size(unsigned int bsize) {
   blocksize=bsize;
 }
 
 
+
 template <typename number, typename inverse_type>
 unsigned int PreconditionBlock<number,inverse_type>::block_size() const {
   return blocksize;
 }
+
 
 
 template <typename number, typename inverse_type>
@@ -119,8 +127,10 @@ PreconditionBlockSOR<number,inverse_type>::PreconditionBlockSOR(const number ome
 		omega(omega)  {}
 
 
+
 template<typename number, typename inverse_type>
 PreconditionBlockSOR<number,inverse_type>::~PreconditionBlockSOR(){}
+
 
 
 template <typename number, typename inverse_type>
@@ -137,9 +147,9 @@ void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2> &dst
   Assert (inverse.size()==0 || inverse.size()==n_cells,
 	  ExcWrongNumberOfInverses(inverse.size(), n_cells));
 
-  const SparseMatrixStruct &spars=M.get_sparsity_pattern();
-  const unsigned int *rowstart = spars.get_rowstart_indices();
-  const int *columns = spars.get_column_numbers();
+  const SparsityPattern &spars    = M.get_sparsity_pattern();
+  const unsigned int    *rowstart = spars.get_rowstart_indices();
+  const int             *columns  = spars.get_column_numbers();
 
   Vector<number2> b_cell(blocksize), x_cell(blocksize);
 

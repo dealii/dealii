@@ -1,9 +1,20 @@
+/*----------------------------   dof_constraints.templates.h     ---------------------------*/
+/*      $Id$                 */
+#ifndef __dof_constraints_templates_H
+#define __dof_constraints_templates_H
+/*----------------------------   dof_constraints.templates.h     ---------------------------*/
+
+
+#include <dofs/dof_constraints.h>
+#include <lac/sparse_matrix.h>
+
+
 template<typename number>
 void
 ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 			    SparseMatrix<number>       &condensed) const
 {
-  const SparseMatrixStruct &uncondensed_struct = uncondensed.get_sparsity_pattern ();
+  const SparsityPattern &uncondensed_struct = uncondensed.get_sparsity_pattern ();
   
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed_struct.is_compressed() == true, ExcMatrixNotClosed());
@@ -128,7 +139,7 @@ template<typename number>
 void
 ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 {
-  const SparseMatrixStruct &sparsity = uncondensed.get_sparsity_pattern ();
+  const SparsityPattern &sparsity = uncondensed.get_sparsity_pattern ();
 
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
@@ -466,3 +477,10 @@ ConstraintMatrix::distribute (Vector<number> &vec) const
 };
 
 
+
+
+
+/*----------------------------   dof_constraints.templates.h     ---------------------------*/
+/* end of #ifndef __dof_constraints_templates_H */
+#endif
+/*----------------------------   dof_constraints.templates.h     ---------------------------*/

@@ -63,7 +63,7 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c) :
+SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
 		cols(&c),
 		val(0),
 		max_len(0)
@@ -118,7 +118,7 @@ SparseMatrix<number>::reinit ()
 
 template <typename number>
 void
-SparseMatrix<number>::reinit (const SparseMatrixStruct &sparsity)
+SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
 {
   if (cols != 0)
     cols->unsubscribe();
@@ -881,7 +881,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
 
 
 template <typename number>
-const SparseMatrixStruct &
+const SparsityPattern &
 SparseMatrix<number>::get_sparsity_pattern () const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());

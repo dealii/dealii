@@ -389,7 +389,7 @@ class DoFHandler  :  public Subscriptor,
 				      * This is the maximum number of entries
 				      * per line in the system matrix; this
 				      * information can therefore be used upon
-				      * construction of the #SparseMatrixStruct#
+				      * construction of the #SparsityPattern#
 				      * object.
 				      *
 				      * The returned number is not really the

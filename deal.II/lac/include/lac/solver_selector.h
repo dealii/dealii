@@ -5,9 +5,8 @@
 #define __solver_selector_H
 /*----------------------------   solver_selector.h     ---------------------------*/
 
-#include <lac/solver.h>
 #include <base/smartpointer.h>
-#include <lac/sparse_matrix.h>
+#include <lac/solver.h>
 #include <lac/vector.h>
 #include <lac/vector_memory.h>
 #include <lac/solver_control.h>
@@ -17,7 +16,7 @@
 #include <lac/vector_memory.h>
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
-
+#include <lac/forward_declarations.h>
 
 
 /**

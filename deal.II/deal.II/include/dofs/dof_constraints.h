@@ -158,15 +158,15 @@ class ConstraintMatrix : public Subscriptor
 				      * Condense a given sparsity pattern. This
 				      * function assumes the uncondensed
 				      * matrix struct to be compressed and the
-				      * to be filled one to be empty. The
+				      * one to be filled to be empty. The
 				      * condensed structure is compressed
 				      * afterwards.
 				      *
 				      * The constraint matrix object must be
 				      * closed to call this function.
 				      */
-    void condense (const SparseMatrixStruct &uncondensed,
-		   SparseMatrixStruct       &condensed) const;
+    void condense (const SparsityPattern &uncondensed,
+		   SparsityPattern       &condensed) const;
 
 
 				     /**
@@ -185,7 +185,7 @@ class ConstraintMatrix : public Subscriptor
 				      * The matrix struct is compressed at the
 				      * end of the function.
 				      */
-    void condense (SparseMatrixStruct &sparsity) const;
+    void condense (SparsityPattern &sparsity) const;
 
 				     /**
 				      * Condense a given matrix. The associated

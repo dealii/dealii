@@ -112,7 +112,7 @@ int main()
       deallog << "Level " << level << " size " << size << endl;
 
 				       // Make matrix
-      vector<SparseMatrixStruct >  structure(maxlevel+1);
+      vector<SparsityPattern>  structure(maxlevel+1);
       MGMatrix<SparseMatrix<double> > A(minlevel,maxlevel);
 
       FDMatrix testproblem(size, size);

@@ -411,9 +411,9 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
       
 				   // set up mass matrix and right hand side
   vec.reinit (dof.n_dofs());
-  SparseMatrixStruct sparsity(dof.n_dofs(),
-			      dof.n_dofs(),
-			      dof.max_couplings_between_dofs());
+  SparsityPattern sparsity(dof.n_dofs(),
+			   dof.n_dofs(),
+			   dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof, sparsity);
   constraints.condense (sparsity);
   
@@ -672,8 +672,8 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
   dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
   
 				   // set up sparsity structure
-  SparseMatrixStruct sparsity(dof.n_boundary_dofs(boundary_functions),
-			      dof.max_couplings_between_boundary_dofs());
+  SparsityPattern sparsity(dof.n_boundary_dofs(boundary_functions),
+			   dof.max_couplings_between_boundary_dofs());
   DoFTools::make_boundary_sparsity_pattern (dof,
 					    boundary_functions,
 					    dof_to_boundary_mapping,

@@ -1,6 +1,6 @@
 /* $Id$ */
 
-#include <lac/sparse_matrix.h>
+#include <lac/sparsity_pattern.h>
 #include <dofs/mg_dof_handler.h>
 #include <dofs/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
@@ -11,7 +11,7 @@
 template <int dim>
 void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &mg_dof_handler,
 					const unsigned int       level,
-					SparseMatrixStruct      &sparsity)
+					SparsityPattern         &sparsity)
 {
   Assert (sparsity.n_rows() == mg_dof_handler.n_dofs(level),
 	  ExcDimensionMismatch (sparsity.n_rows(), mg_dof_handler.n_dofs(level)));
@@ -38,5 +38,5 @@ void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &mg_dof_handler,
 // explicit instantiations
 template void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
 						 const unsigned int,
-						 SparseMatrixStruct &);
+						 SparsityPattern &);
 

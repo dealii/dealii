@@ -128,7 +128,7 @@ class PoissonProblem {
 				     /**
 				      * Sparsity pattern of the system matrix.
 				      */
-    SparseMatrixStruct  system_sparsity;
+    SparsityPattern      system_sparsity;
 
 				     /**
 				      * System matrix.

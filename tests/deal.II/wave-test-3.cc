@@ -90,7 +90,7 @@ class TimeStep_Wave :  public virtual TimeStepBase_Wave<dim>
     const Quadrature<dim>    &quadrature;
     const Quadrature<dim-1>  &quadrature_face;
     ConstraintMatrix          constraints;
-    SparseMatrixStruct        system_sparsity;
+    SparsityPattern           system_sparsity;
     SparseMatrix<double>       mass_matrix, laplace_matrix;
     Vector<double>             u, v;
     StatisticData              statistic_data;
@@ -1147,7 +1147,7 @@ class UserMatrix :  public SparseMatrix<double> {
 				      * The first parameter is simply passed
 				      * down to the base class.
 				      */
-    UserMatrix (const SparseMatrixStruct &sparsity,
+    UserMatrix (const SparsityPattern &sparsity,
 		Preconditioning       p) :
 		    SparseMatrix<double>(sparsity),
 		    preconditioning (p) {};

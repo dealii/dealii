@@ -210,22 +210,22 @@ class ProblemBase {
 				     /**
 				      * Sparsity pattern of the system matrix.
 				      */
-    SparseMatrixStruct      system_sparsity;
+    SparsityPattern      system_sparsity;
 
 				     /**
 				      * System matrix.
 				      */
-    SparseMatrix<double>    system_matrix;
+    SparseMatrix<double> system_matrix;
 
 				     /**
 				      * Vector storing the right hand side.
 				      */
-    Vector<double>             right_hand_side;
+    Vector<double>       right_hand_side;
 
 				     /**
 				      * Solution vector.
 				      */
-    Vector<double>             solution;
+    Vector<double>       solution;
 
 				     /**
 				      * List of constraints introduced by

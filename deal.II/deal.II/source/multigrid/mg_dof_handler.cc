@@ -12,7 +12,6 @@
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
-#include <lac/sparse_matrix.h>
 
 #include <algorithm>
 

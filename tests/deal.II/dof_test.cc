@@ -298,8 +298,8 @@ void TestCases<dim>::run (const unsigned int test_case)
   deallog << "    Renumbering degrees of freedom..." << endl;
   DoFRenumbering::Cuthill_McKee (*dof);
     
-  SparseMatrixStruct sparsity (dof->n_dofs(),
-			       dof->max_couplings_between_dofs());
+  SparsityPattern sparsity (dof->n_dofs(),
+			    dof->max_couplings_between_dofs());
   
   
   DoFTools::make_sparsity_pattern (*dof, sparsity);

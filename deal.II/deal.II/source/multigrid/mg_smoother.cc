@@ -8,6 +8,7 @@
 #include <numerics/multigrid.h>
 #include <numerics/mg_smoother.h>
 #include <lac/vector.h>
+#include <lac/sparse_matrix.h>
 
 #include <algorithm>
 

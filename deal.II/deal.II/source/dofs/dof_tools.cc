@@ -11,7 +11,7 @@
 #include <fe/fe.h>
 #include <fe/fe_system.h>
 #include <dofs/dof_tools.h>
-#include <lac/sparse_matrix.h>
+#include <lac/sparsity_pattern.h>
 #include <lac/vector.h>
 
 #include <algorithm>
@@ -19,8 +19,8 @@
 
 template <int dim>
 void
-DoFTools::make_sparsity_pattern (const DoFHandler<dim>& dof,
-				 SparseMatrixStruct &sparsity)
+DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
+				 SparsityPattern       &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -47,9 +47,9 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>& dof,
 
 template <int dim>
 void
-DoFTools::make_sparsity_pattern (const DoFHandler<dim>& dof,
-					const vector<vector<bool> > &mask,
-					SparseMatrixStruct          &sparsity)
+DoFTools::make_sparsity_pattern (const DoFHandler<dim>       &dof,
+				 const vector<vector<bool> > &mask,
+				 SparsityPattern             &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -96,8 +96,8 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>& dof,
 
 template <>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
-						    const vector<int>  &,
-						    SparseMatrixStruct &)
+					       const vector<int>  &,
+					       SparsityPattern    &)
 {
     Assert (false, ExcInternalError());
 };
@@ -109,7 +109,7 @@ void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
 					  const DoFHandler<1>::FunctionMap  &,
 					  const vector<int>  &,
-					  SparseMatrixStruct &)
+					  SparsityPattern    &)
 {
   Assert (false, ExcInternalError());
 }
@@ -122,7 +122,7 @@ template <int dim>
 void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 					  const vector<int>  &dof_to_boundary_mapping,
-					  SparseMatrixStruct &sparsity)
+					  SparsityPattern    &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -164,7 +164,7 @@ template <int dim>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 					       const DoFHandler<dim>::FunctionMap  &boundary_indicators,
 					       const vector<int>  &dof_to_boundary_mapping,
-					       SparseMatrixStruct &sparsity)
+					       SparsityPattern    &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -209,8 +209,8 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 template<int dim>
 void
-DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
-				      SparseMatrixStruct &sparsity)
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
+				      SparsityPattern       &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
   
@@ -666,26 +666,26 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 #if deal_II_dimension > 1
 template void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
-				      SparseMatrixStruct &sparsity);
+				      SparsityPattern    &sparsity);
 template void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 					  const vector<int>  &,
-					  SparseMatrixStruct &);
+					  SparsityPattern    &);
 template void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 					  const DoFHandler<deal_II_dimension>::FunctionMap  &boundary_indicators,
 					  const vector<int>  &dof_to_boundary_mapping,
-					  SparseMatrixStruct &sparsity);
+					  SparsityPattern    &sparsity);
 #endif
 
 template void
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
-					       SparseMatrixStruct &sparsity);
+					       SparsityPattern    &sparsity);
 
 template void 
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				 const vector<vector<bool> > &mask,
-				 SparseMatrixStruct          &sparsity);
+				 SparsityPattern             &sparsity);
 
 template
 void

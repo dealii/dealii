@@ -507,10 +507,10 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
     return;
   
   
-  map<int,double>::const_iterator dof  = boundary_values.begin(),
-				  endd = boundary_values.end();
+  map<int,double>::const_iterator  dof  = boundary_values.begin(),
+				   endd = boundary_values.end();
   const unsigned int n_dofs             = matrix.m();
-  const SparseMatrixStruct &sparsity    = matrix.get_sparsity_pattern();
+  const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
   const int          *sparsity_colnums  = sparsity.get_column_numbers();
 

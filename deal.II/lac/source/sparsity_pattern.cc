@@ -15,7 +15,7 @@
 #include <numeric>
 
 
-SparseMatrixStruct::SparseMatrixStruct () :
+SparsityPattern::SparsityPattern () :
 		max_dim(0),
 		max_vec_len(0),
 		rowstart(0),
@@ -26,7 +26,7 @@ SparseMatrixStruct::SparseMatrixStruct () :
 
 
 
-SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &s) :
+SparsityPattern::SparsityPattern (const SparsityPattern &s) :
 		Subscriptor(),
 		max_dim(0),
 		max_vec_len(0),
@@ -43,9 +43,9 @@ SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &s) :
 
 
 
-SparseMatrixStruct::SparseMatrixStruct (const unsigned int m,
-					const unsigned int n,
-					const unsigned int max_per_row) 
+SparsityPattern::SparsityPattern (const unsigned int m,
+				  const unsigned int n,
+				  const unsigned int max_per_row) 
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
@@ -56,9 +56,9 @@ SparseMatrixStruct::SparseMatrixStruct (const unsigned int m,
 
 
 
-SparseMatrixStruct::SparseMatrixStruct (const unsigned int          m,
-					const unsigned int          n,
-					const vector<unsigned int> &row_lengths) 
+SparsityPattern::SparsityPattern (const unsigned int          m,
+				  const unsigned int          n,
+				  const vector<unsigned int> &row_lengths) 
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
@@ -69,8 +69,8 @@ SparseMatrixStruct::SparseMatrixStruct (const unsigned int          m,
 
 
 
-SparseMatrixStruct::SparseMatrixStruct (const unsigned int n,
-					const unsigned int max_per_row)
+SparsityPattern::SparsityPattern (const unsigned int n,
+				  const unsigned int max_per_row)
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
@@ -81,8 +81,8 @@ SparseMatrixStruct::SparseMatrixStruct (const unsigned int n,
 
 
 
-SparseMatrixStruct::SparseMatrixStruct (const unsigned int          m,
-					const vector<unsigned int> &row_lengths) 
+SparsityPattern::SparsityPattern (const unsigned int          m,
+				  const vector<unsigned int> &row_lengths) 
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
@@ -92,9 +92,9 @@ SparseMatrixStruct::SparseMatrixStruct (const unsigned int          m,
 };
 
 
-SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &original,
-					const unsigned int        max_per_row,
-					const unsigned int        extra_off_diagonals)
+SparsityPattern::SparsityPattern (const SparsityPattern &original,
+				  const unsigned int        max_per_row,
+				  const unsigned int        extra_off_diagonals)
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
@@ -180,7 +180,7 @@ SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &original,
 
 
 
-SparseMatrixStruct::~SparseMatrixStruct ()
+SparsityPattern::~SparsityPattern ()
 {
   if (rowstart != 0)  delete[] rowstart;
   if (colnums != 0)   delete[] colnums;
@@ -188,8 +188,8 @@ SparseMatrixStruct::~SparseMatrixStruct ()
 
 
 
-SparseMatrixStruct &
-SparseMatrixStruct::operator = (const SparseMatrixStruct &s)
+SparsityPattern &
+SparsityPattern::operator = (const SparsityPattern &s)
 {
   Assert (s.rowstart == 0, ExcInvalidConstructorCall());
   Assert (s.colnums == 0, ExcInvalidConstructorCall());
@@ -208,9 +208,9 @@ SparseMatrixStruct::operator = (const SparseMatrixStruct &s)
 
 
 void
-SparseMatrixStruct::reinit (const unsigned int m,
-			    const unsigned int n,
-			    const unsigned int max_per_row)
+SparsityPattern::reinit (const unsigned int m,
+			 const unsigned int n,
+			 const unsigned int max_per_row)
 {
 				   // simply map this function to the
 				   // other #reinit# function
@@ -221,9 +221,9 @@ SparseMatrixStruct::reinit (const unsigned int m,
 
 
 void
-SparseMatrixStruct::reinit (const unsigned int m,
-			    const unsigned int n,
-			    const vector<unsigned int> &row_lengths)
+SparsityPattern::reinit (const unsigned int m,
+			 const unsigned int n,
+			 const vector<unsigned int> &row_lengths)
 {
   Assert (((m==0) && (n==0)) || (*max_element(row_lengths.begin(), row_lengths.end()) > 0),
 	  ExcInvalidNumber(*max_element(row_lengths.begin(), row_lengths.end())));
@@ -300,7 +300,7 @@ SparseMatrixStruct::reinit (const unsigned int m,
 
 
 void
-SparseMatrixStruct::compress ()
+SparsityPattern::compress ()
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
   
@@ -405,7 +405,7 @@ SparseMatrixStruct::compress ()
 
 
 bool
-SparseMatrixStruct::empty () const {
+SparsityPattern::empty () const {
 				   // let's try to be on the safe side of
 				   // life by using multiple possibilities in
 				   // the check for emptiness... (sorry for
@@ -431,7 +431,7 @@ SparseMatrixStruct::empty () const {
 
 
 unsigned int
-SparseMatrixStruct::max_entries_per_row () const 
+SparsityPattern::max_entries_per_row () const 
 {
 				   // if compress() has not yet been
 				   // called, we can get the maximum
@@ -453,7 +453,7 @@ SparseMatrixStruct::max_entries_per_row () const
 
 
 int
-SparseMatrixStruct::operator () (const unsigned int i, const unsigned int j) const
+SparsityPattern::operator () (const unsigned int i, const unsigned int j) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (i<rows, ExcInvalidIndex(i,rows));
@@ -496,7 +496,7 @@ SparseMatrixStruct::operator () (const unsigned int i, const unsigned int j) con
 
 
 void
-SparseMatrixStruct::add (const unsigned int i, const unsigned int j)
+SparsityPattern::add (const unsigned int i, const unsigned int j)
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (i<rows, ExcInvalidIndex(i,rows));
@@ -525,7 +525,7 @@ SparseMatrixStruct::add (const unsigned int i, const unsigned int j)
 
 
 void
-SparseMatrixStruct::add_matrix (const unsigned int n, const int* rowcols)
+SparsityPattern::add_matrix (const unsigned int n, const int* rowcols)
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned int i=0; i<n; ++i)
@@ -536,8 +536,8 @@ SparseMatrixStruct::add_matrix (const unsigned int n, const int* rowcols)
 
 
 void
-SparseMatrixStruct::add_matrix (const unsigned int m, const unsigned int n,
-				const int* rows, const int* cols)
+SparsityPattern::add_matrix (const unsigned int m, const unsigned int n,
+			     const int* rows, const int* cols)
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned i=0; i<m; ++i)
@@ -548,7 +548,7 @@ SparseMatrixStruct::add_matrix (const unsigned int m, const unsigned int n,
 
 
 void
-SparseMatrixStruct::print_gnuplot (ostream &out) const
+SparsityPattern::print_gnuplot (ostream &out) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   for (unsigned int i=0; i<rows; ++i)
@@ -562,7 +562,7 @@ SparseMatrixStruct::print_gnuplot (ostream &out) const
 
 
 unsigned int
-SparseMatrixStruct::bandwidth () const
+SparsityPattern::bandwidth () const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   unsigned int b=0;
@@ -579,7 +579,4 @@ SparseMatrixStruct::bandwidth () const
 	break;
   return b;
 };
-
-
-
 

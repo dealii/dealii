@@ -56,7 +56,7 @@
  * superset of the sparsity pattern in the original matrix.
  *
  * Such fill-in can be accomplished by various ways, one of which is a
- * copy-constructor of the #SparseMatrixStruct# class which allows the addition
+ * copy-constructor of the #SparsityPattern# class which allows the addition
  * of side-diagonals to a given sparsity structure.
  *
  *
@@ -95,7 +95,7 @@ class SparseILU : protected SparseMatrix<number>
 				      *
 				      * You have to initialize
 				      * the matrix before usage with
-				      * #reinit(SparseMatrixStruct)#.
+				      * #reinit(SparsityPattern)#.
 				      */
     SparseILU ();
 
@@ -112,7 +112,7 @@ class SparseILU : protected SparseMatrix<number>
 				      * long as #reinit# is not called with a
 				      * new sparsity structure.
 				      */
-    SparseILU (const SparseMatrixStruct &sparsity);
+    SparseILU (const SparsityPattern &sparsity);
 
 				     /**
 				      * Reinitialize the object but keep to
@@ -143,7 +143,7 @@ class SparseILU : protected SparseMatrix<number>
 				      * function is not publically visible
 				      * any more.
 				      */
-    void reinit (const SparseMatrixStruct &sparsity);
+    void reinit (const SparsityPattern &sparsity);
 
 				     /**
 				      * Perform the incomplete LU factorization

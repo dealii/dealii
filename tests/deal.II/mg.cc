@@ -96,7 +96,7 @@ int main()
 	  deallog << "DoFs " << size << endl;
 	  deallog << "Levels: " << tr.n_levels() << endl;
 	  
-	  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
+	  SparsityPattern structure(size, dof.max_couplings_between_dofs());
 	  DoFTools::make_sparsity_pattern(dof, structure);
 	  structure.compress();
 	  
@@ -115,7 +115,7 @@ int main()
 	  solver.solve(A,u,f,precondition);
 	  
 	  u = 0.;
-	  vector<SparseMatrixStruct> mgstruct(tr.n_levels());
+	  vector<SparsityPattern> mgstruct(tr.n_levels());
 	  MGMatrix<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
 	  for (unsigned int i=0;i<tr.n_levels();++i)
 	    {

@@ -104,7 +104,7 @@ int main()
       for (unsigned int step=1;step < 5; ++step)
 	{
 	  deallog << "smoothing-steps" << step << endl;
-	  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
+	  SparsityPattern structure(size, dof.max_couplings_between_dofs());
 	  DoFTools::make_sparsity_pattern(dof, structure);
 
 	  ConstraintMatrix hanging_nodes;
@@ -128,7 +128,7 @@ int main()
 	  SolverControl control(20, 1.e-12, true);
 	  SolverRichardson<> solver(control, mem);
 	  
-	  vector<SparseMatrixStruct> mgstruct(tr.n_levels());
+	  vector<SparsityPattern> mgstruct(tr.n_levels());
 	  MGMatrix<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
 	  for (unsigned int i=0;i<tr.n_levels();++i)
 	    {

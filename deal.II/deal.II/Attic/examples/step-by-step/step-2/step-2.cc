@@ -221,8 +221,8 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // many rows and columns as there
 				   // are degrees of freedom on the
 				   // grid:
-  SparseMatrixStruct sparsity_pattern (dof_handler.n_dofs(),
-				       dof_handler.n_dofs());
+  SparsityPattern sparsity_pattern (dof_handler.n_dofs(),
+				    dof_handler.n_dofs());
 				   // We fill it with the places where
 				   // nonzero elements will be located
 				   // given the present numbering of
@@ -310,8 +310,8 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 				   // Renumber the degrees of freedom...
   DoFRenumbering::Cuthill_McKee (dof_handler);
 				   // ...regenerate the sparsity pattern...
-  SparseMatrixStruct sparsity_pattern (dof_handler.n_dofs(),
-				       dof_handler.n_dofs());
+  SparsityPattern sparsity_pattern (dof_handler.n_dofs(),
+				    dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
 				   // ...and output the result:

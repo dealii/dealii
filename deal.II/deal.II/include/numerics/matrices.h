@@ -24,7 +24,7 @@
  *
  * All functions take a sparse matrix object to hold the matrix to be
  * created. The functions assume that the matrix is initialized with a
- * sparsity pattern (#SparseMatrixStruct#) corresponding to the given degree
+ * sparsity pattern (#SparsityPattern#) corresponding to the given degree
  * of freedom handler, i.e. the sparsity structure is already as needed.
  * You can do this by calling the #DoFHandler<dim>::make_sparsity_pattern#
  * function.

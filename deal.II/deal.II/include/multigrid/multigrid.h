@@ -8,7 +8,6 @@
 #include <base/smartpointer.h>
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
-#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/mgbase.h>
 
@@ -194,16 +193,21 @@ class MGTransferPrebuilt : public MGTransferBase
 
   private:
 
-    vector<SparseMatrixStruct>   prolongation_sparsities;
+				     /**
+				      * Sparsity patterns for the
+				      * prolongation matrices on each
+				      * level.
+				      */
+    vector<SparsityPattern>      prolongation_sparsities;
 
-					 /**
-					  * The actual prolongation matrix.
-					  * column indices belong to the
-					  * dof indices of the mother cell,
-					  * i.e. the coarse level.
-					  * while row indices belong to the
-					  * child cell, i.e. the fine level.
-					  */
+				     /**
+				      * The actual prolongation matrix.
+				      * column indices belong to the
+				      * dof indices of the mother cell,
+				      * i.e. the coarse level.
+				      * while row indices belong to the
+				      * child cell, i.e. the fine level.
+				      */
     vector<SparseMatrix<float> > prolongation_matrices;
 };
 

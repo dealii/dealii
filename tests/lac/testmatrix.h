@@ -20,7 +20,7 @@ class FDMatrix
 				     /**
 				      * Generate the matrix structure.
 				      */
-    void build_structure(SparseMatrixStruct& structure) const;
+    void build_structure(SparsityPattern& structure) const;
     
 				     /**
 				      * Fill the matrix with values.
@@ -87,7 +87,7 @@ class FDMGTransfer
 				     /**
 				      * Prolongation matrix structures.
 				      */
-    vector<SparseMatrixStruct > structures;
+    vector<SparsityPattern> structures;
 				     /**
 				      * Prolongation matrices.
 				      */
@@ -101,5 +101,5 @@ class FDMGTransfer
 				      * fine to coarse (#vmult#).
 				      */
     void build_matrix(unsigned int nx, unsigned int ny,
-		      SparseMatrixStruct&, SparseMatrix<double>&);
+		      SparsityPattern&, SparseMatrix<double>&);
 };

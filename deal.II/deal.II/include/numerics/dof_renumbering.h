@@ -68,7 +68,7 @@
  *
  * The renumbering algorithms need quite a lot of memory, since they have
  * to store for each dof with which other dofs it couples. This is done
- * using a #SparseMatrixStruct# object used to store the sparsity pattern of
+ * using a #SparsityPattern# object used to store the sparsity pattern of
  * matrices. It
  * is not useful for the user to do anything between distributing the dofs
  * and renumbering, i.e. the calls to #DoFHandler::distribute_dofs# and

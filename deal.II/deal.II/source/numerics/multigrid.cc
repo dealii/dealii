@@ -10,7 +10,7 @@
 #include <numerics/multigrid.templates.h>
 #include <numerics/mg_smoother.h>
 #include <lac/vector.h>
-
+#include <lac/sparse_matrix.h>
 
 
 /* --------------------------------- MG ------------------------------------ */
@@ -91,7 +91,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 				   // level which have children
   for (unsigned int level=0; level<n_levels-1; ++level)
     {
-      prolongation_sparsities.push_back (SparseMatrixStruct());
+      prolongation_sparsities.push_back (SparsityPattern ());
 				       // reset the dimension of the structure.
 				       // note that for the number of entries
 				       // per row, the number of mother dofs

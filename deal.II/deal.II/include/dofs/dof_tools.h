@@ -84,12 +84,12 @@ class DoFTools
 				      * afterwards.
 				      *
 				      * Remember using
-				      * #SparseMatrixStruct::compress()#
+				      * #SparsityPattern::compress()#
 				      * after generating the pattern.
 				      */
     template<int dim>
     static void make_sparsity_pattern (const DoFHandler<dim> &dof,
-				       SparseMatrixStruct    &sparsity_pattern);
+				       SparsityPattern       &sparsity_pattern);
 
 				     /**
 				      * Locate non-zero entries for
@@ -149,7 +149,7 @@ class DoFTools
     template<int dim>
     static void make_sparsity_pattern (const DoFHandler<dim>       &dof,
 				       const vector<vector<bool> > &mask,
-				       SparseMatrixStruct          &sparsity_pattern);
+				       SparsityPattern             &sparsity_pattern);
 
     				     /**
 				      * Write the sparsity structure
@@ -170,7 +170,7 @@ class DoFTools
 				      * #ConstraintMatrix::condense(1)#,
 				      * you have to compress the
 				      * matrix yourself, using
-				      * #SparseMatrixStruct::compress()#.
+				      * #SparsityPattern::compress()#.
 				      *
 				      * Since this function is
 				      * obviously useless in one
@@ -181,7 +181,7 @@ class DoFTools
     static void
     make_boundary_sparsity_pattern (const DoFHandler<dim> &dof,
 				    const vector<int>     &dof_to_boundary_mapping,
-				    SparseMatrixStruct    &sparsity_pattern); 
+				    SparsityPattern       &sparsity_pattern); 
 
 				     /**
 				      * Write the sparsity structure of the
@@ -219,7 +219,7 @@ class DoFTools
     make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 				    const typename DoFHandler<dim>::FunctionMap &boundary_indicators,
 				    const vector<int>  &dof_to_boundary_mapping,
-				    SparseMatrixStruct &sparsity); 
+				    SparsityPattern    &sparsity); 
 
 				     /**
 				      * Generate sparsity pattern for
@@ -239,7 +239,7 @@ class DoFTools
 				      */
     template<int dim>
     static void make_flux_sparsity_pattern (const DoFHandler<dim> &dof_handler,
-					    SparseMatrixStruct    &sparsity_pattern);
+					    SparsityPattern       &sparsity_pattern);
     
 				     /**
 				      * Make up the constraints which
