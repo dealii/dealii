@@ -21,8 +21,9 @@
 
 void f(const std::vector<int>& v)
 {
-  const VectorSlice<const std::vector<int> > s(v,2,3);
-
+  const VectorSlice<const std::vector<int> >
+    s = make_slice(v,2,3);
+  
   for (unsigned int i=0;i<s.size();++i)
     std::cerr << '\t' << s[i];
   std::cerr << std::endl;
@@ -75,7 +76,8 @@ int main()
 
   f(v);
 
-  VectorSlice<std::vector<int> > s2(v, 3, 5);
+  const VectorSlice<const std::vector<int> >
+    s2 = make_slice(v, 3, 5);
   int n = s[4];
   n += 3;
 
