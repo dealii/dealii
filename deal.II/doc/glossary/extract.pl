@@ -16,8 +16,16 @@ EOT
 while(<>)
 {
     s/\s+/ /g;
-    s/<<([^>]+)>>/<A HREF="#$1">$1<\/A>/g;
-    s/([^:]+):(.*)/<DT><A CLASS="name" NAME="$1">$1<\/A><\/DT>\n\t<DD>$2<\/DD>/;
+    while ( /<<([^>]+)>>/g ) {
+	$link_name = $1;
+	$link_name =~ s/\s/_/g;
+	s/<<([^>]+)>>/<A HREF="#$link_name">$1<\/A>/g;
+    }
+    while ( /([^:]+):(.*)/g ) {
+	$link_name = $1;
+	$link_name =~ s/\s/_/g;
+	s/([^:]+):(.*)/<DT><A NAME="$link_name" CLASS="name">$1<\/A><\/DT>\n\t<DD>$2<\/DD>/;
+    }
     print "\n$_\n";
 }
 
