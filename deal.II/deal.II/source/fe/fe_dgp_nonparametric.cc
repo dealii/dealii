@@ -251,12 +251,13 @@ FE_DGPNonparametric<dim>::get_data (const UpdateFlags      update_flags,
 
 template <int dim>
 void
-FE_DGPNonparametric<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-			     const typename DoFHandler<dim>::cell_iterator &cell,
-			     const Quadrature<dim>                &quadrature,
-			     typename Mapping<dim>::InternalDataBase       &mapping_data,
-			     typename Mapping<dim>::InternalDataBase       &fedata,
-			     FEValuesData<dim>                    &data) const
+FE_DGPNonparametric<dim>::fill_fe_values (
+  const Mapping<dim>&,
+  const typename DoFHandler<dim>::cell_iterator& cell,
+  const Quadrature<dim>&                         quadrature,
+  typename Mapping<dim>::InternalDataBase&,
+  typename Mapping<dim>::InternalDataBase&       fedata,
+  FEValuesData<dim>&                             data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -265,6 +266,49 @@ FE_DGPNonparametric<dim>::fill_fe_values (const Mapping<dim>                   &
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
+  Assert (flags & update_q_points, ExcInternalError());
+  
+  const unsigned int n_q_points = data.quadrature_points.size();
+  
+  if (flags & (update_values | update_gradients))
+    for (unsigned int i=0; i<n_q_points; ++i)
+      {
+	polynomial_space.compute(data.quadrature_points[i],
+				 fe_data.values, fe_data.grads, fe_data.grad_grads);
+	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	  {
+	    if (flags & update_values)
+	      data.shape_values[k][i] = fe_data.values[k];
+	    if (flags & update_gradients)
+	      data.shape_gradients[k][i] = fe_data.grads[k];
+	    if (flags & update_second_derivatives)
+	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
+	  }
+      }
+  fe_data.first_cell = false;
+}
+
+
+
+template <int dim>
+void
+FE_DGPNonparametric<dim>::fill_fe_face_values (
+  const Mapping<dim>&,
+  const typename DoFHandler<dim>::cell_iterator& cell,
+  const unsigned int                             face,
+  const Quadrature<dim-1>&                       quadrature,
+  typename Mapping<dim>::InternalDataBase&,
+  typename Mapping<dim>::InternalDataBase&       fedata,
+  FEValuesData<dim>&                             data) const
+{
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+
+  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
+  Assert (flags & update_q_points, ExcInternalError());
 
   const unsigned int n_q_points = data.quadrature_points.size();
   
@@ -290,54 +334,15 @@ FE_DGPNonparametric<dim>::fill_fe_values (const Mapping<dim>                   &
 
 template <int dim>
 void
-FE_DGPNonparametric<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				  const typename DoFHandler<dim>::cell_iterator &cell,
-				  const unsigned int                    face,
-				  const Quadrature<dim-1>              &quadrature,
-				  typename Mapping<dim>::InternalDataBase       &mapping_data,
-				  typename Mapping<dim>::InternalDataBase       &fedata,
-				  FEValuesData<dim>                    &data) const
-{
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
-  const unsigned int n_q_points = data.quadrature_points.size();
-  
-  if (flags & (update_values | update_gradients))
-    for (unsigned int i=0; i<n_q_points; ++i)
-      {
-	polynomial_space.compute(data.quadrature_points[i],
-				 fe_data.values, fe_data.grads, fe_data.grad_grads);
-	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	  {
-	    if (flags & update_values)
-	      data.shape_values[k][i] = fe_data.values[k];
-	    if (flags & update_gradients)
-	      data.shape_gradients[k][i] = fe_data.grads[k];
-	    if (flags & update_second_derivatives)
-	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
-	  }
-      }
-  fe_data.first_cell = false;
-}
-
-
-
-template <int dim>
-void
-FE_DGPNonparametric<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-				     const typename DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int                    face,
-				     const unsigned int                    subface,
-				     const Quadrature<dim-1>              &quadrature,
-				     typename Mapping<dim>::InternalDataBase       &mapping_data,
-				     typename Mapping<dim>::InternalDataBase       &fedata,
-				     FEValuesData<dim>                    &data) const
+FE_DGPNonparametric<dim>::fill_fe_subface_values (
+  const Mapping<dim>&,
+  const typename DoFHandler<dim>::cell_iterator& cell,
+  const unsigned int                             face,
+  const unsigned int                             subface,
+  const Quadrature<dim-1>&                       quadrature,
+  typename Mapping<dim>::InternalDataBase&,
+  typename Mapping<dim>::InternalDataBase&       fedata,
+  FEValuesData<dim>&                             data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -346,6 +351,7 @@ FE_DGPNonparametric<dim>::fill_fe_subface_values (const Mapping<dim>            
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
+  Assert (flags & update_q_points, ExcInternalError());
 
   const unsigned int n_q_points = data.quadrature_points.size();
   

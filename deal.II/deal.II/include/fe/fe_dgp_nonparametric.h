@@ -25,6 +25,8 @@ template <int dim> class MappingQ;
 /**
  * Discontinuous finite elements evaluated at the mapped quadrature points.
  *
+ * Warning: this class does not work properly, yet. Don't use it!
+ *
  * This finite element implements complete polynomial spaces, that is,
  * $d$-dimensional polynomials of order $k$.
  *
