@@ -556,7 +556,14 @@ SparsityPattern::print_gnuplot (ostream &out) const
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
       if (colnums[j] != invalid_entry)
-	out << i << " " << -static_cast<signed int>(colnums[j]) << endl;
+					 // while matrix entries are
+					 // usually written (i,j),
+					 // with i vertical and j
+					 // horizontal, gnuplot output
+					 // is x-y, that is we have to
+					 // exchange the order of
+					 // output
+	out << static_cast<signed int>(colnums[j]) << " " << -i << endl;
 
   AssertThrow (out, ExcIO());
 }
