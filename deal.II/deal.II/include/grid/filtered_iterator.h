@@ -320,7 +320,7 @@ namespace IteratorFilters
  *   begin.set_to_next_positive(tria.begin_active());
  *   end = tria.end();
  *   n_flagged_cells = std::distance (begin, end);
- * @verbatim
+ * @endverbatim
  * Note that by the @p set_to_next_positive call the first cell with
  * a set user flag was assigned to the @p begin iterator. For the
  * @{end} iterator, no such call was necessary, since the past-the-end
@@ -333,7 +333,7 @@ namespace IteratorFilters
  *      std::distance (FI(IteratorFilters::UserFlagSet())
  *                            .set_to_next_positive(tria.begin_active()),
  *                     FI(IteratorFilters::UserFlagSet(), tria.end()));
- * @verbatim
+ * @endverbatim
  * It relies on the fact that if we create an unnamed filtered
  * iterator with a given predicate but no iterator value and assign it
  * the next positive value with respect to this predicate, it returns
@@ -349,7 +349,7 @@ namespace IteratorFilters
  * FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
  *   cell (FilteredIterator::SubdomainEqualTo(3)),
  *   endc (FilteredIterator::SubdomainEqualTo(3), tria.end());
- * cell.set_to_next_positive (tria.begin_active());
+ * cell.set_to_next_positive (tria.begin_active(3));
  * for (; cell!=endc; ++cell)
  *   assemble_local_matrix (cell);
  * @endverbatim
