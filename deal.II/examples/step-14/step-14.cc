@@ -2824,7 +2824,7 @@ namespace LaplaceSolver
   WeightedResidual<dim>::output_solution () const
   {
     const PrimalSolver<dim> &primal_solver = *this;
-    const PrimalSolver<dim> &dual_solver   = *this;
+    const DualSolver<dim>   &dual_solver   = *this;
     
     ConstraintMatrix primal_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints (primal_solver.dof_handler,
@@ -2889,7 +2889,7 @@ namespace LaplaceSolver
   estimate_error (Vector<float> &error_indicators) const
   {
     const PrimalSolver<dim> &primal_solver = *this;
-    const PrimalSolver<dim> &dual_solver   = *this;
+    const DualSolver<dim>   &dual_solver   = *this;
 
 				     // The first task in computing
 				     // the error is to set up vectors
@@ -3093,7 +3093,7 @@ namespace LaplaceSolver
 		 FaceIntegrals        &face_integrals) const
   {
     const PrimalSolver<dim> &primal_solver = *this;
-    const PrimalSolver<dim> &dual_solver   = *this;
+    const DualSolver<dim>   &dual_solver   = *this;
 
 				     // At the beginning, we
 				     // initialize two variables for
