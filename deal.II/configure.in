@@ -27,6 +27,10 @@ OS=`uname`
 AC_SUBST(OS)
 
 
+dnl    Set the language for which subsequent tests shall be
+dnl    performed to C++
+AC_LANG_CPLUSPLUS
+
 
 
 dnl -------------------------------------------------------------
@@ -179,13 +183,17 @@ dnl    Find the doc++ program
 AC_ARG_WITH(docxx,
 [  --with-docxx=PATH use the doc++ executable pointed to by PATH],
     docxx=$withval,
-    docxx=`which doc++`)
-AC_MSG_CHECKING(for doc++)
-if test -x $docxx ; then
-  AC_MSG_RESULT(found)
+    docxx=to-be-determined)
+if test "$docxx" = to-be-determined ; then
+  AC_PATH_PROG(docxx,"doc++")
 else
-  AC_MSG_RESULT(not found)
-  docxx=
+  AC_MSG_CHECKING(for doc++)
+  if test -x "$docxx" ; then
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+    docxx=
+  fi
 fi
 AC_SUBST(docxx)
 
