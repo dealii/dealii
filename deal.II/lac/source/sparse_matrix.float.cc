@@ -12,7 +12,6 @@
 //----------------------------  sparse_matrix.float.cc  ---------------------------
 
 
-#include <cmath>
 #include <lac/sparse_matrix.templates.h>
 
 

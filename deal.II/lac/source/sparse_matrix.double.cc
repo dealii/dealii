@@ -12,7 +12,6 @@
 //----------------------------  sparse_matrix.double.cc  ---------------------------
 
 
-#include <cmath>
 #include <lac/sparse_matrix.templates.h>
 
 #define TYPEMAT double
