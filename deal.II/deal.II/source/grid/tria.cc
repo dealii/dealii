@@ -610,18 +610,17 @@ void Triangulation<2>::create_hyper_L (const double a, const double b) {
 
 template <>
 void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius) {
-  const unsigned int dim=2;
   const double a = 1./(1+sqrt(2)); // equilibrate cell sizes at transition
 				   // from the inner part to the radial
 				   // cells
-  const Point<dim> vertices[8] = { p+Point<dim>(-1,-1)*(radius/sqrt(2)),
-				   p+Point<dim>(+1,-1)*(radius/sqrt(2)),
-				   p+Point<dim>(-1,-1)*(radius/sqrt(2)*a),
-				   p+Point<dim>(+1,-1)*(radius/sqrt(2)*a),
-				   p+Point<dim>(-1,+1)*(radius/sqrt(2)*a),
-				   p+Point<dim>(+1,+1)*(radius/sqrt(2)*a),
-				   p+Point<dim>(-1,+1)*(radius/sqrt(2)),
-				   p+Point<dim>(+1,+1)*(radius/sqrt(2)) };
+  const Point<2> vertices[8] = { p+Point<2>(-1,-1)*(radius/sqrt(2)),
+				 p+Point<2>(+1,-1)*(radius/sqrt(2)),
+				 p+Point<2>(-1,-1)*(radius/sqrt(2)*a),
+				 p+Point<2>(+1,-1)*(radius/sqrt(2)*a),
+				 p+Point<2>(-1,+1)*(radius/sqrt(2)*a),
+				 p+Point<2>(+1,+1)*(radius/sqrt(2)*a),
+				 p+Point<2>(-1,+1)*(radius/sqrt(2)),
+				 p+Point<2>(+1,+1)*(radius/sqrt(2)) };
   
   const int cell_vertices[5][4] = {{0, 1, 3, 2},
 				   {0, 2, 4, 6},
@@ -638,7 +637,7 @@ void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius
       cells[i].material_id = 0;
     };
   
-  create_triangulation (vector<Point<dim> >(&vertices[0], &vertices[8]),
+  create_triangulation (vector<Point<2> >(&vertices[0], &vertices[8]),
 			cells,
 			SubCellData());       // no boundary information
 };

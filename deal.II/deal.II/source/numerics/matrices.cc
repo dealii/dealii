@@ -453,9 +453,11 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 		first_diagonal_entry = matrix.diag_element(i);
 		break;
 	      };
-	  
-	  matrix.set(dof_number, dof_number,
-		     first_diagonal_entry);
+
+					   // use the dSMatrix:: as a workaround
+					   // for a bug in egcs
+	  matrix.dSMatrix::set(dof_number, dof_number,
+			       first_diagonal_entry);
 	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_diagonal_entry;
 	};

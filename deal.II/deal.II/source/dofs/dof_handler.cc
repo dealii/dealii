@@ -1503,7 +1503,9 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 
 					 // copy dofs one-by-one
 	for (unsigned int j=0; j<old_dofs.size(); ++j)
-	  transfer_matrix.set (new_dofs[j], old_dofs[j], 1.0);
+					   // use the dSMatrix:: as a workaround
+					   // for a bug in egcs
+	  transfer_matrix.dSMatrix::set (new_dofs[j], old_dofs[j], 1.0);
       }
     else
       if (!new_cell->active() && old_cell->active())
@@ -1530,9 +1532,12 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
 		  if (selected_fe->prolongate(c)(k,j) != 0.) 
-		    transfer_matrix.set (child_dof_indices[k],
-					 old_dof_indices[j],
-					 selected_fe->prolongate(c)(k,j));
+						     // use the dSMatrix::
+						     // as a workaround
+						     // for a bug in egcs
+		    transfer_matrix.dSMatrix::set (child_dof_indices[k],
+						   old_dof_indices[j],
+						   selected_fe->prolongate(c)(k,j));
 	    };
 	} else {
 					   // old cell has children, new one has not
@@ -1557,9 +1562,13 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
 		  if (selected_fe->restrict(c)(k,j) != 0.)
-		    transfer_matrix.set (new_dof_indices[k],
-					 child_dof_indices[j],
-					 selected_fe->restrict(c)(k,j));
+						     // use the dSMatrix:: as
+						     // a workaround
+						     // for a bug in egcs
+
+		    transfer_matrix.dSMatrix::set (new_dof_indices[k],
+						   child_dof_indices[j],
+						   selected_fe->restrict(c)(k,j));
 	    };
 	};
 };
