@@ -223,7 +223,7 @@ class DataIn {
  * much easier.
  *
  *
- * \subsection{GNUPLOT format}
+ * \subsection{GNUPLOT draft format}
  *
  * The GNUPLOT format is not able to handle data on unstructured grids
  * directly. Directly would mean that you only give the vertices and
@@ -242,8 +242,8 @@ class DataIn {
  * duplicates the functionality of the #Triangulation<dim>::print_gnuplot()#
  * functions. These, however, offer more functionality in some respect.
  * The grid is represented as a sequence of lines, where each cell is
- * a sequence of five vertices (the first one is appended to close the
- * contour of the cell) with the data appended after each vertex. Each cell
+ * a sequence of five vertices (the first one is appended at the end to close
+ * the contour of the cell) with the data appended after each vertex. Each cell
  * is therefore a sequence of five lines #x y v1 v2 ...# forming together
  * the bounding line of this cell. After each cell, two newlines are inserted
  * to prevent GNUPLOT from joining the lines bounding two cells.
@@ -253,6 +253,34 @@ class DataIn {
  * #set parametric# and #splot "filename" using 1:2:x# to get a 3d surface
  * plot of the (#x-2#)th data set. For example, using #x=4# would mean to
  * plot the second data set.
+ *
+ * This format is somewhat restricted to coninuous data and to finite elements
+ * of first order only. The reason for the first restriction is that it takes
+ * nodal values and can therefore only work if a finite element has degrees of
+ * freedom in the vertices of each cell. This is not the case for discontinuous
+ * elements. The second restriction is only a problem of quality of output: you
+ * actually can print quadratic or higher order elements using this style, but
+ * you will only seem the contour of each cell with the bounding lines of each
+ * cell being straight lines. You won't see the structure of the solution in the
+ * interior of a cell nor on the lines bounding it.
+ *
+ *
+ * \subsection{GNUPLOT 'quality' format}
+ *
+ * To remedy the abovementioned problems, the GNUPLOT 'quality' format was
+ * introduced. As noted above, GNUPLOT can handle tensor grids and displays
+ * them quite nicely, including hidden line removal. It can also handle more
+ * than one tensor grid, then called a patch. The idea now is to describe
+ * each cell as a patch of $N\times N$ points (in 2D). For linear elements,
+ * $2\times 2$ is sufficient, but for higher elements you will want to use
+ * a higher number. The #write_gnuplot# function writes the data in this format
+ * and the argument it takes is the number of subintervals it divides each cell
+ * into, i.e. $N-1$.
+ *
+ * This output routine also addresses the problem introduced with discontinuous
+ * elements, since it takes its data locally from each cell and displays it
+ * as a patch separately; it therefore does not use continuity and GNUPLOT will
+ * also plot discontinuities, if they are there.
  *
  *
  * \subsection{POVRAY format}
@@ -270,7 +298,7 @@ class DataIn {
  * term of memory and speed to the triangle mesh supported by POVRAY.
  *
  *
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998; GNUPLOT 'quality' format by Guido Kanschat with documentation by Wolfgang Bangerth, 1998
  */
 template <int dim>  
 class DataOut {
@@ -368,7 +396,7 @@ class DataOut {
 				     /**
 				      * Write data and grid to #out# according
 				      * to the given data format. This function
-				      * simply calles the appropriate
+				      * simply calls the appropriate
 				      * #write_*# function.
 				      *
 				      * In case of gnuplot output, the
@@ -383,9 +411,10 @@ class DataOut {
 				      * usually has. At present the following
 				      * formats are defined:
 				      * \begin{itemize}
-				      * \item UCD: #.inp#
-				      * \item GNUPLOT: #.gnuplot#
-				      * \item POVRAY: #.pov#
+				      * \item #ucd#: #.inp#
+				      * \item #gnuplot# and #gnuplot_draft#:
+				      *    #.gnuplot#
+				      * \item #povray#: #.pov#
 				      * \end{itemize}
 				      *
 				      * Since this function does not need data
