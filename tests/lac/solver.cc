@@ -104,8 +104,21 @@ int main()
 
       std::vector<unsigned int> permutation(dim);
       std::vector<unsigned int> inverse_permutation(dim);
-      for (unsigned int i=0;i<dim;++i)
-	permutation[i] = dim-i-1;
+
+				       // Create a permutation: Blocks
+				       // backwards and every second
+				       // block backwards
+      unsigned int k = 0;
+      for (unsigned int i=0;i<size-1;++i)
+	for (unsigned int j=0;j<size-1;++j)
+	  {
+	    if (i % 2)
+	      permutation[k++] = (size-i-2) * (size-1) + j;
+	    else
+	      permutation[k++] = (size-i-2) * (size-1) + size-j-2;
+	  }
+      
+
       for (unsigned int i=0;i<dim;++i)
 	inverse_permutation[permutation[i]] = i;
 
