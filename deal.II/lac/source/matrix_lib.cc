@@ -83,6 +83,14 @@ ProductSparseMatrix<number, vnumber>::Tvmult_add (VectorType& dst, const VectorT
 }
 
 
+template<typename number, typename vnumber>
+const void*
+ProductSparseMatrix<number, vnumber>::get () const
+{
+  return &*m1;
+}
+
+
 template class ProductSparseMatrix<double, double>;
 template class ProductSparseMatrix<double, float>;
 template class ProductSparseMatrix<float, double>;

@@ -94,6 +94,11 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 				      * Memory for auxiliary vector.
 				      */
     SmartPointer<VectorMemory<VECTOR> > mem;
+				     /**
+				      * Return some kind of
+				      * identifier.
+				      */
+    virtual const void* get() const;
 };
 
 
@@ -180,6 +185,11 @@ class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
 				      * Memory for auxiliary vector.
 				      */
     SmartPointer<VectorMemory<VectorType> > mem;
+				     /**
+				      * Return some kind of
+				      * identifier.
+				      */
+    virtual const void* get() const;
 };
 
 
@@ -335,6 +345,14 @@ ProductMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
   m1->Tvmult (*v, src);
   m2->Tvmult_add (dst, *v);
   mem->free(v);
+}
+
+
+template<class VECTOR>
+const void*
+ProductMatrix<VECTOR>::get () const
+{
+  return (void*) m1;
 }
 
 
