@@ -140,7 +140,8 @@ void ConstraintMatrix::add_entries (const unsigned int                        li
 					     // entry exists, break
 					     // innermost loop
 	    Assert (p->second == col_val_pair->second,
-		    ExcEntryAlreadyExists(line, column, p->second, value));
+		    ExcEntryAlreadyExists(line, col_val_pair->first,
+					  p->second, col_val_pair->second));
 	    break;
 	  };
       
