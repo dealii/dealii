@@ -30,7 +30,10 @@ class dVector;
    of Ainsworth for a complete discussion.
 
    It seem as if this error estimator should only be valid for linear ansatz
-   spaces, but no definite answer is given to this question at present.
+   spaces, and there are indications that for higher order ansatz spaces the
+   integrals computed here show superconvergence properties, i.e. they tend
+   to zero faster than the error itself, thus ruling out the values as error
+   indicators.
    
    
    {\bf Implementation}
@@ -74,6 +77,11 @@ class dVector;
 
    \item No other boundary conditions are considered.
    \end{itemize}
+
+   The integration along faces with hanging nodes is quite tricky, since one
+   of the elements has to be shifted one level up or down. See the
+   documentation for the #FEFaceValues# class for more information about
+   technical issues regarding this topic.
    
    @author Wolfgang Bangerth, 1998; thanks to Franz-Theo Suttmeier for
      clarifications about boundary conditions.
