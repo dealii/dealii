@@ -393,14 +393,14 @@ SparsityPattern::compress ()
 				       // the only exception here is
 				       // if the row contains no
 				       // entries at all
-      Assert ((rowstart[line] == rowstart[line+1])
+      Assert ((rowstart[line] == next_row_start)
 	      ||
 	      (find (&new_colnums[rowstart[line]+1],
 		     &new_colnums[next_row_start],
 		     new_colnums[rowstart[line]]) ==
 	       &new_colnums[next_row_start]),
 	      ExcInternalError());
-      Assert ((rowstart[line] == rowstart[line+1])
+      Assert ((rowstart[line] == next_row_start)
 	      ||
 	      (adjacent_find(&new_colnums[rowstart[line]+1],
 			     &new_colnums[next_row_start]) ==
