@@ -269,7 +269,6 @@ namespace Polynomials
   };
 
 
-//TODO[GK]: In contrast to the LagrangeEquidistant class, the following class is a template. Is this necessary, or could we make this more consistent?
 /**
  * Legendre polynomials of arbitrary order on @p{[0,1]}.
  *

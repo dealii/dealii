@@ -50,7 +50,7 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 		renumber(lexicographic_to_hierarchic_numbering (*this, degree)),
 		renumber_inverse(invert_numbering(renumber)),
 		face_renumber(face_lexicographic_to_hierarchic_numbering (degree)),
-		polynomial_space(Polynomials::Hierarchical<double>::generate_complete_basis(degree))
+		polynomial_space(Polynomials::Hierarchical::generate_complete_basis(degree))
 {
 				   // The matrix @p{dofs_cell} contains the 
 				   // values of the linear functionals of 
