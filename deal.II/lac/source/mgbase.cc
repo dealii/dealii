@@ -107,13 +107,14 @@ MGBase::level_mgstep(const unsigned int        level,
 				   // do recursion
   level_mgstep(level-1, pre_smooth, post_smooth, coarse_grid_solver);
 				   // do coarse grid correction
-  t.reinit(solution[level].size());
   transfer->prolongate(level, t, solution[level-1]);
-  solution[level].add(t);
+  solution[level] += t;
   
-				   // smoothing (modify s again)
+				   // smoothing (modify solution again)
+//TODO: what happens here? smooth overwrites the solution[level],
+//TODO: so the previous two statements should have no effect. No?  
   post_smooth.smooth(level, solution[level], defect[level]);
-}
+};
 
 
 //////////////////////////////////////////////////////////////////////
