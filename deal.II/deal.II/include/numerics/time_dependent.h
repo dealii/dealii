@@ -11,6 +11,8 @@
 #include <lac/forward-declarations.h>
 
 #include <vector>
+#include <utility>
+
 
 
 
@@ -532,10 +534,10 @@ class TimeStepBase : public Subscriptor
 				      * Enum denoting the type of problem
 				      * which will have to be solved next.
 				      */
-    enum NextAction {
-	  primal_problem,
-	  dual_problem,
-	  postprocess
+    enum {
+	  primal_problem = 0x0,
+	  dual_problem   = 0x1,
+	  postprocess    = 0x2
     };
     
 				     /**
@@ -777,15 +779,15 @@ class TimeStepBase : public Subscriptor
     const double time;
 
 				     /**
-				      * Variable storing whether
-				      *  the solution * of a primal or
-				      *  a dual problem is * actual,
-				      *  or any of the other actions
-				      *  specified in the enum. This
-				      *  variable is set by the
-				      *  #init_for_*# functions.
+				      * Variable storing whether the
+				      * solution of a primal or a dual
+				      * problem is actual, or any of
+				      * the other actions
+				      * specified. This variable is
+				      * set by the #init_for_*#
+				      * functions.
 				      */
-    NextAction next_action;
+    unsigned int next_action;
     
   private:
 				     /**
@@ -867,6 +869,12 @@ class TimeStepBase_Tria :  public TimeStepBase
     struct Flags;
     struct RefinementFlags;
     struct RefinementData;
+
+    enum {
+	  grid_refinement = 0x1000
+    };
+    
+    
     
 				     /**
 				      * Default constructor. Does nothing but
@@ -1002,12 +1010,41 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * would like to add or delete some
 				      * flags, so we have to wait anyway
 				      * with the use of this grid.
-				      *
-				      * The function is made virtual so
-				      * that you can overload it if needed.
 				      */
-    virtual void refine_grid (const RefinementData &data);
+    void refine_grid (const RefinementData data);
+
+				     /**
+				      * Respective init function for the
+				      * refinement loop; does nothing in
+				      * the default implementation, apart from
+				      * setting #next_action# to
+				      * #grid_refinement# but can
+				      * be overloaded.
+				      */
+    virtual void init_for_refinement ();
     
+				     /**
+				      * Virtual function that should fill
+				      * the vector with the refinement
+				      * criteria for the present triangulation.
+				      * It is used within the #refine_grid#
+				      * function to get the criteria for
+				      * the present time step, since they
+				      * can't be passed through its
+				      * argument when using the loop of
+				      * the time step management object.
+				      */
+    virtual void get_tria_refinement_criteria (Vector<float> &criteria) const = 0;
+    
+				     /**
+				      * The refinement
+				      * flags of the triangulation are stored
+				      * in a local variable thus allowing
+				      * a restoration. The coarsening flags
+				      * are also stored.
+				      */
+    void save_refine_flags ();
+
   protected:
     
 				     /**
@@ -1062,15 +1099,6 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      */
     vector<vector<bool> >   refine_flags, coarsen_flags;
 
-				     /**
-				      * The refinement
-				      * flags of the triangulation are stored
-				      * in a local variable thus allowing
-				      * a restoration. The coarsening flags
-				      * are also stored.
-				      */
-    void save_refine_flags ();
-
     				     /**
 				      * Restore the grid according to the saved
 				      * data. For this, the coarse grid is
@@ -1078,10 +1106,6 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * rebuilt using the saved flags.
 				      */
     void restore_grid ();
-    void mirror_refinement_flags (typename Triangulation<dim>::cell_iterator &new_cell,
-				  typename Triangulation<dim>::cell_iterator &old_cell);
-    
-    void adapt_grids (Triangulation<dim> &tria1, Triangulation<dim> &tria2);
 };
 
 
@@ -1170,15 +1194,23 @@ struct TimeStepBase_Tria<dim>::Flags
 template <int dim>
 struct TimeStepBase_Tria<dim>::RefinementFlags
 {
+    typedef vector<vector<pair<unsigned int, double> > >   CorrectionRelaxations;
+    static CorrectionRelaxations default_correction_relaxations;
+    
 				     /**
 				      * Constructor. The default values are
 				      * chosen such that almost no restriction
 				      * on the mesh refinement is imposed.
 				      */
-    RefinementFlags (const unsigned int max_refinement_level  = 0,
-		     const double cell_number_corridor_top    = (1<<dim),
-		     const double cell_number_corridor_bottom = 1,
-		     const unsigned int cell_number_correction_steps = 0);
+    RefinementFlags (const unsigned int max_refinement_level         = 0,
+		     const unsigned int first_sweep_with_correction  = 0,
+		     const unsigned int min_cells_for_correction     = 0,
+		     const double cell_number_corridor_top           = (1<<dim),
+		     const double cell_number_corridor_bottom        = 1,
+		     const CorrectionRelaxations &correction_relaxations = CorrectionRelaxations(),
+		     const unsigned int cell_number_correction_steps = 0,
+		     const bool mirror_flags_to_previous_grid        = false,
+		     const bool adapt_grids                          = false);
     
 				     /**
 				      * Maximum level of a cell in the
@@ -1227,7 +1259,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      * Number of iterations to be performed
 				      * to adjust the number of cells on a
 				      * time level to those on the previous
-				      * one.
+				      * one. Zero means: do no such iteration.
 				      */
     const unsigned int  cell_number_correction_steps;
 
@@ -1277,26 +1309,9 @@ struct TimeStepBase_Tria<dim>::RefinementData
 				     /**
 				      * Constructor
 				      */
-    RefinementData (const Vector<float> &criteria,
-		    const double         refinement_threshold,
+    RefinementData (const double         refinement_threshold,
 		    const double         coarsening_threshold=0);
     
-				     /**
-				      * Vector of values indicating the
-				      * error per cell or some other
-				      * quantity used to determine which cells
-				      * are to be refined and which are to be
-				      * coarsened.
-				      *
-				      * The vector contains exactly one value
-				      * per active cell, in the usual order
-				      * in which active cells are sorted in
-				      * loops over cells. It is assumed that
-				      * all values in this vector have a
-				      * nonnegative value.
-				      */
-    const Vector<float> &criteria;
-
 				     /**
 				      * Threshold for refinement: cells having
 				      * a larger value will be refined (at least
