@@ -6,6 +6,8 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 
+#include <function.h>
+
 
 
 TimeDependent::TimeSteppingData::TimeSteppingData (const unsigned int look_ahead,
@@ -128,12 +130,11 @@ void TimeDependent::delete_timestep (const unsigned int position)
 
 
 
-
 void
 TimeDependent::solve_primal_problem () 
 {
-  do_loop (&TimeStepBase::init_for_primal_problem,
-	   &TimeStepBase::solve_primal_problem,
+  do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
+	   mem_fun(&TimeStepBase::solve_primal_problem),
 	   timestepping_data_primal);
 };
 
@@ -142,8 +143,8 @@ TimeDependent::solve_primal_problem ()
 void
 TimeDependent::solve_dual_problem () 
 {
-  do_loop (&TimeStepBase::init_for_dual_problem,
-	   &TimeStepBase::solve_dual_problem,
+  do_loop (mem_fun(&TimeStepBase::init_for_dual_problem),
+	   mem_fun(&TimeStepBase::solve_dual_problem),
 	   timestepping_data_dual);
 };
 
@@ -152,8 +153,8 @@ TimeDependent::solve_dual_problem ()
 void
 TimeDependent::postprocess () 
 {
-  do_loop (&TimeStepBase::init_for_postprocessing,
-	   &TimeStepBase::postprocess_timestep,
+  do_loop (mem_fun(&TimeStepBase::init_for_postprocessing),
+	   mem_fun(&TimeStepBase::postprocess_timestep),
 	   timestepping_data_postprocess);
 };
 
