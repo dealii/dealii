@@ -247,6 +247,8 @@ MappingQ1<dim>::update_once (const UpdateFlags in) const
   return out;
 }
 
+
+
 template <int dim>
 UpdateFlags
 MappingQ1<dim>::update_each (const UpdateFlags in) const
