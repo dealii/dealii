@@ -18,7 +18,9 @@
 
 
 //TODO: [RH] Is this function only used inside this class?
-// It should be inline, anyway.
+// It should be inline, anyway. Also, there is no documentation.
+// rather, make it a file-static function, or better in an anonymous
+// namespace
 
 template <int dim>
 unsigned int TensorProductPolynomials<dim>::power(const unsigned int x,
