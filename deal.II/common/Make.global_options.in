@@ -52,19 +52,19 @@ vpath %.a $(lib-path-deal2)
 
 lib-suffix = @lib_suffix@
 
-lib-base.o     = $(lib-path-base)/libbase@lib_suffix@
-lib-base.g     = $(lib-path-base)/libbase.g@lib_suffix@
+lib-base.o     = $(lib-path-base)/libbase$(lib-suffix)
+lib-base.g     = $(lib-path-base)/libbase.g$(lib-suffix)
 
-lib-lac.o      = $(lib-path-lac)/liblac@lib_suffix@
-lib-lac.g      = $(lib-path-lac)/liblac.g@lib_suffix@
+lib-lac.o      = $(lib-path-lac)/liblac$(lib-suffix)
+lib-lac.g      = $(lib-path-lac)/liblac.g$(lib-suffix)
 
-lib-deal2-1d.o = $(lib-path-deal2)/libdeal_II_1d@lib_suffix@
-lib-deal2-2d.o = $(lib-path-deal2)/libdeal_II_2d@lib_suffix@
-lib-deal2-3d.o = $(lib-path-deal2)/libdeal_II_3d@lib_suffix@
+lib-deal2-1d.o = $(lib-path-deal2)/libdeal_II_1d$(lib-suffix)
+lib-deal2-2d.o = $(lib-path-deal2)/libdeal_II_2d$(lib-suffix)
+lib-deal2-3d.o = $(lib-path-deal2)/libdeal_II_3d$(lib-suffix)
 
-lib-deal2-1d.g = $(lib-path-deal2)/libdeal_II_1d.g@lib_suffix@
-lib-deal2-2d.g = $(lib-path-deal2)/libdeal_II_2d.g@lib_suffix@
-lib-deal2-3d.g = $(lib-path-deal2)/libdeal_II_3d.g@lib_suffix@
+lib-deal2-1d.g = $(lib-path-deal2)/libdeal_II_1d.g$(lib-suffix)
+lib-deal2-2d.g = $(lib-path-deal2)/libdeal_II_2d.g$(lib-suffix)
+lib-deal2-3d.g = $(lib-path-deal2)/libdeal_II_3d.g$(lib-suffix)
 
 
 # include paths. add library paths to existing variable
