@@ -5,11 +5,13 @@ when a new release shall be issued:
     cvs tag all files with the tag Base-x-y
     cvs tag -r all files with the tag Branch-x-y
 
+- change the content of the `Version' file on both HEAD and branch
+
 - tell your friends to tag their programs
 
 - test the branch thoroughly
 
-- Rename the changes file and create a new one for the next release
+- rename the changes file and create a new one for the next release
 
 - adjust news.html. Crosslink changes file. If necessary link an
   announcement. Do these things on both HEAD and branch. Be sure to
