@@ -1,5 +1,8 @@
 #!/bin/bash
 ######################################################################
+# Template: $Id$
+# Config: @Id@
+######################################################################
 # Template for an automatic build test of the deal.II library
 ######################################################################
 # cvs login must have been executed before calling this script!
