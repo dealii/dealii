@@ -21,7 +21,7 @@
 
 template <int dim>
 void
-fill_vector (vector<Quadrature<dim> *>& quadratures)
+fill_vector (std::vector<Quadrature<dim> *>& quadratures)
 {
   quadratures.push_back (new QGauss2<dim>());
   quadratures.push_back (new QGauss3<dim>());
@@ -42,13 +42,13 @@ fill_vector (vector<Quadrature<dim> *>& quadratures)
 
 template <int dim>
 void
-check_cells (vector<Quadrature<dim>*>& quadratures)
+check_cells (std::vector<Quadrature<dim>*>& quadratures)
 {
   for (unsigned int n=0; n<quadratures.size(); ++n)
     {
       Quadrature<dim>& quadrature = *quadratures[n];
-      const vector<Point<dim> > &points=quadrature.get_points();
-      const vector<double> &weights=quadrature.get_weights();
+      const std::vector<Point<dim> > &points=quadrature.get_points();
+      const std::vector<double> &weights=quadrature.get_weights();
 
       deallog << "Quadrature no." << n
 	      << " (" << typeid(*quadratures[n]).name() << ")";
@@ -109,7 +109,7 @@ check_cells (vector<Quadrature<dim>*>& quadratures)
 
 template <int dim>
 void
-check_faces (vector<Quadrature<dim-1>*>& quadratures, bool sub)
+check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 {
   if (sub)
     deallog.push("subfaces");
@@ -177,13 +177,13 @@ check_faces (vector<Quadrature<dim-1>*>& quadratures, bool sub)
 
 int main(int,char)
 {
-  ofstream logfile("quadrature_test.output");
+  std::ofstream logfile("quadrature_test.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  vector<Quadrature<1> *> q1;
-  vector<Quadrature<2> *> q2;
-  vector<Quadrature<3> *> q3;
+  std::vector<Quadrature<1> *> q1;
+  std::vector<Quadrature<2> *> q2;
+  std::vector<Quadrature<3> *> q3;
   fill_vector (q1);
   fill_vector (q2);
   fill_vector (q3);

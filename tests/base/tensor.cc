@@ -20,7 +20,7 @@
 
 int main ()
 {
-  ofstream logfile("tensor.output");
+  std::ofstream logfile("tensor.output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include <base/logstream.h>
 #include <base/tensor_product_polynomials.h>
@@ -22,7 +23,7 @@
 bool equals_delta_ij(double value, unsigned int i, unsigned int j)
 {
   double eps=1e-14;
-  if ((i==j && fabs(value-1)<eps) || (i!=j && fabs(value)<eps))
+  if ((i==j && std::fabs(value-1)<eps) || (i!=j && std::fabs(value)<eps))
     return true;
   else
     return false;
@@ -37,12 +38,12 @@ void Q3_4th_shape_function_values_and_grads_dim2(
 
 int main(int, char)
 {
-  ofstream logfile("polynomial_test.output");
+  std::ofstream logfile("polynomial_test.output");
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
   
-  vector<double> values(1);
+  std::vector<double> values(1);
   deallog << "LagrangeEquidistant polynoms:" << std::endl;
   for (unsigned int order=1; order<=4; ++order)
     {
@@ -81,12 +82,12 @@ int main(int, char)
 
   deallog << std::endl << "Test derivatives computed by the Horner scheme:" << std::endl;
   LagrangeEquidistant pol(4, 2);
-  vector<double> v_horner(6);
+  std::vector<double> v_horner(6);
   for (unsigned int i=0; i<=10; ++i)
     {
       double xi=i*0.1;
       deallog << "x=" << xi << ",    all derivatives: ";
-      vector<double> v_exact(6);
+      std::vector<double> v_exact(6);
       
       v_exact[0]=64.0*xi*xi*xi*xi-128.0*xi*xi*xi+76.0*xi*xi-12.0*xi;
       v_exact[1]=256.0*xi*xi*xi-384.0*xi*xi+152.0*xi-12.0;
@@ -102,7 +103,7 @@ int main(int, char)
 	{
 //    	  deallog << "v_horner[i]=" << v_horner[i]
 //    	       << "   v_exact[i]=" << v_exact[i] << std::endl;
-	  if (fabs(v_horner[i]-v_exact[i])>1e-12)
+	  if (std::fabs(v_horner[i]-v_exact[i])>1e-12)
 	    ok=false;
 	}
 
@@ -117,17 +118,17 @@ int main(int, char)
   if (true)
     {
       deallog << std::endl << "Derivatives of a polynomial of degree 0 (a constant function)." << std::endl;      
-      vector<double> a_const(1,1.);
+      std::vector<double> a_const(1,1.);
       const Polynomial<double> pol_const(a_const);
-      vector<double> exact_values(5,0.);
+      std::vector<double> exact_values(5,0.);
       exact_values[0]=1.;
-      vector<double> computed_values(5);
+      std::vector<double> computed_values(5);
 
       pol_const.value(0.24, computed_values);
       bool ok=true;
       for (unsigned int i=0; i<exact_values.size(); ++i)
 	{
-	  if (fabs(computed_values[i]-exact_values[i])>1e-15)
+	  if (std::fabs(computed_values[i]-exact_values[i])>1e-15)
 	    ok=false;
 	}
 
@@ -146,7 +147,7 @@ int main(int, char)
   deallog << "2D Example:" << std::endl;
   unsigned int p=3,
    n_tensor_pols=(p+1)*(p+1);
-  vector<Polynomial<double> > pols;
+  std::vector<Polynomial<double> > pols;
   
   for (unsigned int i=0; i<=p; ++i)
     pols.push_back(LagrangeEquidistant(p, i));
@@ -169,9 +170,9 @@ int main(int, char)
   Tensor<1,2> grad=tp_pol.compute_grad(i, point);
   Tensor<2,2> grad_grad=tp_pol.compute_grad_grad(i, point);
 
-  vector<double> vs(n_tensor_pols);
-  vector<Tensor<1,2> > grads(n_tensor_pols);
-  vector<Tensor<2,2> > grad_grads(n_tensor_pols);
+  std::vector<double> vs(n_tensor_pols);
+  std::vector<Tensor<1,2> > grads(n_tensor_pols);
+  std::vector<Tensor<2,2> > grad_grads(n_tensor_pols);
   tp_pol.compute(point, vs, grads, grad_grads);
 
 

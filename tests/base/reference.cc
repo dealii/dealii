@@ -44,10 +44,10 @@ public:
 
 int main()
 {
-  ofstream logfile("reference.output");
+  std::ofstream logfile("reference.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  cerr = logfile;
+  std::cerr = logfile;
   Test a("A");
   const Test b("B");
   SmartPointer<Test>       r=&a;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <base/timer.h>
 #include <base/logstream.h>
 #include <fstream>
+#include <cmath>
 
 // compute the ratio of two measurements and compare to
 // the expected value.
@@ -22,7 +23,7 @@
 void compare (double t1, double t2, double ratio)
 {
   double r = t2/t1;
-  double d = fabs(r-ratio) / ratio;
+  double d = std::fabs(r-ratio) / ratio;
 
 				   // relative error < 10%?
   if (d <= .1)
@@ -50,7 +51,7 @@ void burn (unsigned int n)
 
 int main ()
 {
-  ofstream logfile("timer.output");
+  std::ofstream logfile("timer.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

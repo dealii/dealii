@@ -111,7 +111,7 @@ void ExactSinExp<dim>::vector_gradient (const Point<dim>       &p,
 
 int main(int, char)
 {
-  ofstream logfile("auto_derivative_function.output");
+  std::ofstream logfile("auto_derivative_function.output");
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -131,7 +131,7 @@ int main(int, char)
     {
       formula=AutoDerivativeFunction<dim>::get_formula_of_order(order);
       auto_function.set_formula(formula);
-      deallog << "order=" << order << ",  formula=" << formula << endl;
+      deallog << "order=" << order << ",  formula=" << formula << std::endl;
       ConvergenceTable history;
       
       unsigned int factor=1;
