@@ -161,6 +161,7 @@ latex/deal_II_technical_reference.tex: latex/base.tex1 latex/lac.tex1 latex/deal
 	cd latex ; latex $(notdir $<)
 	-rm $(subst .tex,.log,$<)
 	-rm $(subst .tex,.aux,$<)
+	-rm $(subst .tex,.toc,$<)
 
 
 # generate postscript files from a latex output file
