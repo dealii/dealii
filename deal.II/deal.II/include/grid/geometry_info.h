@@ -230,11 +230,18 @@ struct GeometryInfo
 				      * line <tt>line</tt>, e.g.
 				      * <tt>GeometryInfo<2>::line_to_cell_vertices(2,0)=3</tt>.
 				      *
-				      * This function is useful and
-				      * implemented for <tt>dim=2</tt>
-				      * and <tt>dim=3</tt>, only. For
-				      * <tt>dim=2</tt> this call is
-				      * simply passed down to the
+				      * The order of the lines, as
+				      * well as their direction (which
+				      * in turn determines which is
+				      * the first and which the second
+				      * vertex on a line) is the
+				      * canonical one in deal.II, as
+				      * described in the documentation
+				      * of the Triangulation
+				      * class.
+				      *
+				      * For <tt>dim=2</tt> this call
+				      * is simply passed down to the
 				      * face_to_cell_vertices()
 				      * function.
 				      */
@@ -291,34 +298,6 @@ struct GeometryInfo
 				      * Triangulation class.
 				      */
     static Point<dimension> unit_cell_vertex (const unsigned int vertex);
-
-				     /**
-				      * Report, for <tt>vertex=0,1</tt> the
-				      * indices of the two vertices
-				      * adjacent to the line with
-				      * index @p line among the lines
-				      * forming this cell. In 1d, the
-				      * only line is the cell itself,
-				      * while in 2d and 3d there are 4
-				      * and 12 lines, respectively.
-				      *
-				      * The positions of these
-				      * vertices in the unit cell can
-				      * be obtained using the
-				      * @p unit_cell_vertex function.
-				      *
-				      * The order of the lines, as
-				      * well as their direction (which
-				      * in turn determines which is
-				      * the first and which the second
-				      * vertex on a line) is the
-				      * canonical one in deal.II, as
-				      * described in the documentation
-				      * of the Triangulation
-				      * class.
-				      */
-    static unsigned int vertices_adjacent_to_line (const unsigned int line,
-						   const unsigned int vertex);
 
 				     /**
 				      * Given a point @p p in unit
@@ -685,6 +664,18 @@ struct GeometryInfo<1>
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface);
+    
+				     /**
+				      * Map line vertex number to cell
+				      * vertex number.
+				      *
+				      * As in 1d there is only one
+				      * line (the cell itself), this
+				      * function simply returns @p
+				      * vertex.
+				      */
+    static unsigned int line_to_cell_vertices (const unsigned int line,
+					       const unsigned int vertex);
 
 				     /**
 				      * Return the position of the
@@ -696,34 +687,6 @@ struct GeometryInfo<1>
 				      * Triangulation class.
 				      */
     static Point<1> unit_cell_vertex (const unsigned int vertex);
-
-				     /**
-				      * Report, for <tt>vertex=0,1</tt> the
-				      * indices of the two vertices
-				      * adjacent to the line with
-				      * index @p line among the lines
-				      * forming this cell. In 1d, the
-				      * only line is the cell itself,
-				      * while in 2d and 3d there are 4
-				      * and 12 lines, respectively.
-				      *
-				      * The positions of these
-				      * vertices in the unit cell can
-				      * be obtained using the
-				      * @p unit_cell_vertex function.
-				      *
-				      * The order of the lines, as
-				      * well as their direction (which
-				      * in turn determines which is
-				      * the first and which the second
-				      * vertex on a line) is the
-				      * canonical one in deal.II, as
-				      * described in the documentation
-				      * of the Triangulation
-				      * class.
-				      */
-    static unsigned int vertices_adjacent_to_line (const unsigned int line,
-						   const unsigned int vertex);
 
 				     /**
 				      * Given a point @p p in unit
@@ -1003,8 +966,18 @@ struct GeometryInfo<2>
 				      * line <tt>line</tt>, e.g.
 				      * <tt>GeometryInfo<2>::line_to_cell_vertices(2,0)=3</tt>.
 				      *
-				      * This call is simply passed
-				      * down to the
+				      * The order of the lines, as
+				      * well as their direction (which
+				      * in turn determines which is
+				      * the first and which the second
+				      * vertex on a line) is the
+				      * canonical one in deal.II, as
+				      * described in the documentation
+				      * of the Triangulation
+				      * class.
+				      *
+				      * In 2d this function is simply
+				      * passes down to the
 				      * face_to_cell_vertices()
 				      * function.
 				      */
@@ -1042,34 +1015,6 @@ struct GeometryInfo<2>
 				      * Triangulation class.
 				      */
     static Point<2> unit_cell_vertex (const unsigned int i);
-
-				     /**
-				      * Report, for <tt>vertex=0,1</tt> the
-				      * indices of the two vertices
-				      * adjacent to the line with
-				      * index @p line among the lines
-				      * forming this cell. In 1d, the
-				      * only line is the cell itself,
-				      * while in 2d and 3d there are 4
-				      * and 12 lines, respectively.
-				      *
-				      * The positions of these
-				      * vertices in the unit cell can
-				      * be obtained using the
-				      * @p unit_cell_vertex function.
-				      *
-				      * The order of the lines, as
-				      * well as their direction (which
-				      * in turn determines which is
-				      * the first and which the second
-				      * vertex on a line) is the
-				      * canonical one in deal.II, as
-				      * described in the documentation
-				      * of the Triangulation
-				      * class.
-				      */
-    static unsigned int vertices_adjacent_to_line (const unsigned int line,
-						   const unsigned int vertex);
 
 				     /**
 				      * Given a point @p p in unit
@@ -1348,6 +1293,16 @@ struct GeometryInfo<3>
 				      * <tt>vertex</tt>th vertex of
 				      * line <tt>line</tt>, e.g.
 				      * <tt>GeometryInfo<3>::line_to_cell_vertices(10,1)=6</tt>.
+				      *
+				      * The order of the lines, as
+				      * well as their direction (which
+				      * in turn determines which is
+				      * the first and which the second
+				      * vertex on a line) is the
+				      * canonical one in deal.II, as
+				      * described in the documentation
+				      * of the Triangulation
+				      * class.
 				      */
     static unsigned int line_to_cell_vertices (const unsigned int line,
 					       const unsigned int vertex);
@@ -1394,34 +1349,6 @@ struct GeometryInfo<3>
 				      * Triangulation class.
 				      */
     static Point<3> unit_cell_vertex (const unsigned int i);
-
-				     /**
-				      * Report, for <tt>vertex=0,1</tt> the
-				      * indices of the two vertices
-				      * adjacent to the line with
-				      * index @p line among the lines
-				      * forming this cell. In 1d, the
-				      * only line is the cell itself,
-				      * while in 2d and 3d there are 4
-				      * and 12 lines, respectively.
-				      *
-				      * The positions of these
-				      * vertices in the unit cell can
-				      * be obtained using the
-				      * @p unit_cell_vertex function.
-				      *
-				      * The order of the lines, as
-				      * well as their direction (which
-				      * in turn determines which is
-				      * the first and which the second
-				      * vertex on a line) is the
-				      * canonical one in deal.II, as
-				      * described in the documentation
-				      * of the Triangulation
-				      * class.
-				      */
-    static unsigned int vertices_adjacent_to_line (const unsigned int line,
-						   const unsigned int vertex);
 
 				     /**
 				      * Given a point @p p in unit
@@ -1621,59 +1548,6 @@ GeometryInfo<3>::unit_cell_vertex (const unsigned int vertex)
 
 inline
 unsigned int
-GeometryInfo<1>::vertices_adjacent_to_line (const unsigned int line,
-					    const unsigned int vertex)
-{
-  Assert (line < lines_per_cell,
-	  ExcIndexRange (line, 0, lines_per_cell));
-  Assert (vertex < vertices_per_cell,
-	  ExcIndexRange (vertex, 0, 2));
-
-  return vertex;
-}
-
-
-
-inline
-unsigned int
-GeometryInfo<2>::vertices_adjacent_to_line (const unsigned int line,
-					    const unsigned int vertex)
-{
-  Assert (line < lines_per_cell,
-	  ExcIndexRange (line, 0, lines_per_cell));
-  Assert (vertex < vertices_per_cell,
-	  ExcIndexRange (vertex, 0, 2));
-
-  static const unsigned int vertex_indices[lines_per_cell][2] =
-    { {0, 1}, {1, 2}, {3, 2}, {0, 3} };
-
-  return vertex_indices[line][vertex];
-}
-
-
-
-inline
-unsigned int
-GeometryInfo<3>::vertices_adjacent_to_line (const unsigned int line,
-					    const unsigned int vertex)
-{
-  Assert (line < lines_per_cell,
-	  ExcIndexRange (line, 0, lines_per_cell));
-  Assert (vertex < vertices_per_cell,
-	  ExcIndexRange (vertex, 0, 2));
-
-  static const unsigned int vertex_indices[lines_per_cell][2] =
-    { {0, 1}, {1, 2}, {3, 2}, {0, 3},
-      {4, 5}, {5, 6}, {7, 6}, {4, 7},
-      {0, 4}, {1, 5}, {2, 6}, {3, 7}  };
-
-  return vertex_indices[line][vertex];
-}
-
-
-
-inline
-unsigned int
 GeometryInfo<1>::child_cell_from_point (const Point<1> &p)
 {
   Assert ((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
@@ -1840,6 +1714,19 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
   return (p[0] >= 0.) && (p[0] <= 1.) &&
 	 (p[1] >= 0.) && (p[1] <= 1.) &&
 	 (p[2] >= 0.) && (p[2] <= 1.);
+}
+
+
+
+inline
+unsigned int
+GeometryInfo<1>::line_to_cell_vertices (const unsigned int line,
+					const unsigned int vertex)
+{
+  Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
+  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
+
+  return vertex;
 }
 
 
