@@ -288,15 +288,15 @@ class SparseDirectMA27 : public Subscriptor
 				      * Arrays holding row and column
 				      * indices.
 				      */
-    vector<unsigned int> row_numbers;
-    vector<unsigned int> column_numbers;
+    std::vector<unsigned int> row_numbers;
+    std::vector<unsigned int> column_numbers;
 
 				     /**
 				      * Array to hold the matrix
 				      * elements, and later the
 				      * elements of the factors.
 				      */
-    vector<double>       A;
+    std::vector<double>       A;
 
 				     /**
 				      * Length of the @p{A} array.
@@ -313,9 +313,9 @@ class SparseDirectMA27 : public Subscriptor
 				      * Fortran.
 				      */
     unsigned int LIW;
-    vector<unsigned int> IW;
-    vector<unsigned int> IKEEP;
-    vector<unsigned int> IW1;
+    std::vector<unsigned int> IW;
+    std::vector<unsigned int> IKEEP;
+    std::vector<unsigned int> IW1;
     
     unsigned int NSTEPS;
     unsigned int MAXFRT;
@@ -610,15 +610,15 @@ class SparseDirectMA47 : public Subscriptor
 				      * Arrays holding row and column
 				      * indices.
 				      */
-    vector<unsigned int> row_numbers;
-    vector<unsigned int> column_numbers;
+    std::vector<unsigned int> row_numbers;
+    std::vector<unsigned int> column_numbers;
 
 				     /**
 				      * Array to hold the matrix
 				      * elements, and later the
 				      * elements of the factors.
 				      */
-    vector<double>       A;
+    std::vector<double>       A;
 
 				     /**
 				      * Length of the @p{A} array.
@@ -635,9 +635,9 @@ class SparseDirectMA47 : public Subscriptor
 				      * Fortran.
 				      */
     unsigned int LIW;
-    vector<unsigned int> IW;
-    vector<unsigned int> KEEP;
-    vector<unsigned int> IW1;
+    std::vector<unsigned int> IW;
+    std::vector<unsigned int> KEEP;
+    std::vector<unsigned int> IW1;
 
 				     /**
 				      * Fill the @p{A} array from the
