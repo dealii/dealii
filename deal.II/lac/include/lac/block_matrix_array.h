@@ -314,20 +314,20 @@ BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<VECTOR>& dst,
       if (m->prefix==1.)
 	{
 	  if (m->transpose)
-	    m->matrix->vmult_add(dst.block(m->row),
-				  src.block(m->col));
+	    m->matrix->vmult_add(dst.block(m->col),
+				  src.block(m->row));
 	  else
-	    m->matrix->Tvmult_add(dst.block(m->row),
-				 src.block(m->col));
+	    m->matrix->Tvmult_add(dst.block(m->col),
+				 src.block(m->row));
 	} else {
-	  aux.reinit(dst.block(m->row));
+	  aux.reinit(dst.block(m->col));
 	  if (m->transpose)
 	    m->matrix->vmult(aux,
-			      src.block(m->col));
+			      src.block(m->row));
 	  else
 	    m->matrix->Tvmult(aux,
-			     src.block(m->col));
-	  dst.block(m->row).add (m->prefix, aux);
+			     src.block(m->row));
+	  dst.block(m->col).add (m->prefix, aux);
 	}
     }
 }
