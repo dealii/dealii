@@ -331,6 +331,11 @@ class DataOut_DoFData : public DataOutInterface<dim>
  * for quadratic elementsyou may want to choose two, for cubic elements three,
  * and so on.
  *
+ * Note that after having called #build_patches# once, you can call one or
+ * more of the #write_*# functions of the base classes. You can therefore
+ * output the same data in more than one format without having to rebuild
+ * the patches.
+ *
  *
  * \subsection{User interface information}
  *
