@@ -340,7 +340,7 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 				   // if data given: write data, else
 				   // only write grid
   if (data.size() != 0)
-    {
+    {      
       out << data.size() << "    ";    // number of vectors
       for (unsigned int i=0; i!=data.size(); ++i)
 	out << 1 << ' ';               // number of components;
@@ -349,15 +349,28 @@ void DataOut<dim>::write_ucd (ostream &out) const {
       
       for (unsigned int i=0; i<data.size(); ++i)
 	out << data[i].name << ',' << data[i].units << endl;
-      
+
+      				       // AVS requires that the dof values
+				       // be given in exactly the same order
+				       // as in the vertex section and only
+				       // once.
+
+				       // note if a given vertex was
+				       // already written
+      vector<bool> already_written (dofs->n_dofs(), false);
+				       // write vertices
       for (cell=dofs->begin_active(); cell!=endc; ++cell)
-	for (unsigned int vertex=0; vertex<(1<<dim); ++vertex)
-	  {
-	    out << cell->vertex_dof_index(vertex,0) << "   ";
-	    for (unsigned int i=0; i!=data.size(); ++i)
-	      out << (*data[i].data)(cell->vertex_dof_index(vertex,0)) << ' ';
-	    out << endl;
-	  };
+	for (unsigned int vertex=0; vertex<(1<<dim); ++vertex) 
+	  if (already_written[cell->vertex_dof_index(vertex,0)]==false)
+	    {
+	      out << cell->vertex_dof_index(vertex,0) // vertex index
+		  << "   "; 
+	      for (unsigned int i=0; i!=data.size(); ++i)
+		out << (*data[i].data)(cell->vertex_dof_index(vertex,0)) << ' ';
+	      out << endl;
+
+	      already_written[cell->vertex_dof_index(vertex,0)] = true;
+	    };
     };
 				   // no cell data
 				   // no model data
