@@ -22,18 +22,18 @@ big-tests:
 clean: clean-base clean-lac clean-deal.II clean-fe
 
 clean-base:
-	cd base ; $(MAKE) clean
+	cd base ; $(MAKE) clean D=@DEAL2_DIR@
 
 clean-lac:
-	cd lac ; $(MAKE) clean
+	cd lac ; $(MAKE) clean D=@DEAL2_DIR@
 
 clean-fe:
-	cd fe ; $(MAKE) clean
+	cd fe ; $(MAKE) clean D=@DEAL2_DIR@
 
 clean-deal.II:
-	cd deal.II ; $(MAKE) clean
+	cd deal.II ; $(MAKE) clean D=@DEAL2_DIR@
 
 clean-big:
-	cd big-tests ; $(MAKE) clean
+	cd big-tests ; $(MAKE) clean D=@DEAL2_DIR@
 
 .PHONY : all base lac fe deal.II big-tests clean clean-base clean-lac clean-fe clean-deal.II clean-big
