@@ -14,6 +14,7 @@
 #define __deal2__table_h
 
 #include <base/config.h>
+#include <base/exceptions.h>
 #include <base/subscriptor.h>
 
 #include <cstddef>
@@ -21,8 +22,16 @@
 
 
 // forward declaration
-template <unsigned int N, typename T>
-class TableBase;
+template <unsigned int N, typename T> class TableBase;
+template <unsigned int N, typename T> class Table;
+template <typename T1> class Table<1,T1>;
+template <typename T1> class Table<2,T1>;
+template <typename T> class Table<3,T>;
+template <typename T> class Table<4,T>;
+template <typename T> class Table<5,T>;
+template <typename T> class Table<6,T>;
+
+
 
 
 /**
@@ -346,7 +355,11 @@ namespace TableBaseAccessors
  *
  * As stated for the entire namespace, you will not usually have to do
  * with these classes directly, and should not try to use their
- * interface directly as it may change without notice.
+ * interface directly as it may change without notice. In fact, since
+ * the constructors are made private, you will not even be able to
+ * generate objects of this class, as they are only thought as
+ * temporaries for access to elements of the table class, not for
+ * passing them around as arguments of functions, etc.
  * 
  * @author Wolfgang Bangerth, 2002
  */
@@ -361,6 +374,7 @@ namespace TableBaseAccessors
       typedef typename Types<N,T,C>::value_type * pointer;      
       typedef typename Types<N,T,C>::TableType    TableType;
 
+    private:
                                        /**
                                         * Constructor. Take a pointer
                                         * to the table object to know
@@ -368,10 +382,39 @@ namespace TableBaseAccessors
                                         * various dimensions, and a
                                         * pointer to the subset of
                                         * data we may access.
+                                        *
+                                        * The constructor is made
+                                        * private in order to prevent
+                                        * you having such objects
+                                        * around. The only way to
+                                        * create such objects is via
+                                        * the @p{Table} class, which
+                                        * only generates them as
+                                        * temporary objects. This
+                                        * guarantees that the accessor
+                                        * objects go out of scope
+                                        * earlier than the mother
+                                        * object, avoid problems with
+                                        * data consistency.
                                         */
       Accessor (const TableType &table,
                 const pointer    data);
 
+                                       /**
+                                        * Default constructor. Not
+                                        * needed, and invisible, so
+                                        * private.
+                                        */
+      Accessor ();
+                                       /**
+                                        * Copy constructor. Not
+                                        * needed, and invisible, so
+                                        * private.
+                                        */
+      Accessor (const Accessor &a);
+
+    public:
+      
                                        /**
                                         * Index operator. Performs a
                                         * range check.
@@ -400,6 +443,19 @@ namespace TableBaseAccessors
                                         */
       const TableType &table;
       const pointer   data;
+
+                                       // declare some other classes
+                                       // as friends. make sure to
+                                       // work around bugs in some
+                                       // compilers
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG      
+      template <typename T1> friend class Table<N+1,T1>;
+      template <unsigned int N1, typename T1, bool C1, unsigned int P1>
+      friend class Accessor;
+#else
+      friend class Accessor<N,T,C,P+1>;
+      friend class Table<N,T>;
+#endif
   };
 
 
@@ -408,7 +464,8 @@ namespace TableBaseAccessors
  * Accessor class for tables. This is the specialization for the last
  * index, which actually allows access to the elements of the table,
  * rather than recursively returning access objects for further
- * subsets.
+ * subsets. The same holds for this specialization as for the general
+ * template; see there for more information.
  *
  * @author Wolfgang Bangerth, 2002
  */
@@ -440,6 +497,8 @@ namespace TableBaseAccessors
                                         * switch class above.
                                         */
       typedef typename Types<N,T,C>::TableType    TableType;
+
+    private:
       
                                        /**
                                         * Constructor. Take a pointer
@@ -450,9 +509,39 @@ namespace TableBaseAccessors
                                         * data we may access (which in
                                         * this particular case is only
                                         * one row).
+                                        *
+                                        * The constructor is made
+                                        * private in order to prevent
+                                        * you having such objects
+                                        * around. The only way to
+                                        * create such objects is via
+                                        * the @p{Table} class, which
+                                        * only generates them as
+                                        * temporary objects. This
+                                        * guarantees that the accessor
+                                        * objects go out of scope
+                                        * earlier than the mother
+                                        * object, avoid problems with
+                                        * data consistency.
                                         */
       Accessor (const TableType &table,
                 const pointer    data);
+
+                                       /**
+                                        * Default constructor. Not
+                                        * needed, and invisible, so
+                                        * private.
+                                        */
+      Accessor ();
+
+                                       /**
+                                        * Copy constructor. Not
+                                        * needed, and invisible, so
+                                        * private.
+                                        */
+      Accessor (const Accessor &a);
+
+    public:
       
                                        /**
                                         * Index operator. Performs a
@@ -504,6 +593,19 @@ namespace TableBaseAccessors
                                         */
       const TableType &table;
       const pointer   data;
+
+                                       // declare some other classes
+                                       // as friends. make sure to
+                                       // work around bugs in some
+                                       // compilers
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+      template <typename T1> friend class Table<N+1,T1>;
+      template <unsigned int N1, typename T1, bool C1, unsigned int P1>
+      friend class Accessor;
+#else
+      friend class Accessor<N,T,C,2>;
+      friend class Table<2,T>;
+#endif
   };
 };
   
@@ -1627,6 +1729,36 @@ namespace TableBaseAccessors
   {};
 
 
+
+  template <unsigned int N, typename T, bool C, unsigned int P>
+  inline
+  Accessor<N,T,C,P>::Accessor (const Accessor &)
+                  :
+                  table (*static_cast<const TableType*>(0)),
+                  data (0)
+  {
+                                     // accessor objects are only
+                                     // temporary objects, so should
+                                     // not need to be copied around
+    Assert (false, ExcInternalError());
+  };
+  
+
+  
+  template <unsigned int N, typename T, bool C, unsigned int P>
+  inline
+  Accessor<N,T,C,P>::Accessor ()
+                  :
+                  table (*static_cast<const TableType*>(0)),
+                  data (0)
+  {
+                                     // accessor objects are only
+                                     // temporary objects, so should
+                                     // not need to be copied around
+    Assert (false, ExcInternalError());
+  };
+  
+
   
   template <unsigned int N, typename T, bool C, unsigned int P>
   inline
@@ -1664,6 +1796,36 @@ namespace TableBaseAccessors
                   table (table),
                   data (data)
   {};
+
+
+
+  template <unsigned int N, typename T, bool C>
+  inline
+  Accessor<N,T,C,1>::Accessor ()
+                  :
+                  table (*static_cast<const TableType*>(0)),
+                  data (0)
+  {
+                                     // accessor objects are only
+                                     // temporary objects, so should
+                                     // not need to be copied around
+    Assert (false, ExcInternalError());
+  };
+  
+
+
+  template <unsigned int N, typename T, bool C>
+  inline
+  Accessor<N,T,C,1>::Accessor (const Accessor &)
+                  :
+                  table (*static_cast<const TableType*>(0)),
+                  data (0)
+  {
+                                     // accessor objects are only
+                                     // temporary objects, so should
+                                     // not need to be copied around
+    Assert (false, ExcInternalError());
+  };  
 
 
   
@@ -2001,7 +2163,7 @@ Table<1,T>::operator () (const unsigned int i)
 
 
 template <typename T>
-Table<2,T>::Table () 
+Table<2,T>::Table ()
 {};
 
 
