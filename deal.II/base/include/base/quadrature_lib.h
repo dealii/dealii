@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,7 +36,8 @@ class QGauss : public Quadrature<dim>
   public:
 				   /**
 				    * Generate a formula with @p{p}
-				    * quadrature points (order @p{2p-1}).
+				    * quadrature points, exact for
+				    * polynomials of degree @p{2p-1}.
 				    */
     QGauss (const unsigned int p);
 };
