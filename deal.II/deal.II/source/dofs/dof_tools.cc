@@ -1379,7 +1379,12 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 
 	if ((weights(first_used_row,weight_mapping[global_dof]) == 1) &&
 	    (representants[first_used_row] == static_cast<int>(global_dof)))
-					   // dof unconstrained
+					   // dof unconstrained or
+					   // constrained to itself
+					   // (in case this cell is
+					   // mapped to itself, rather
+					   // than to children of
+					   // itself)
 	  continue;
 
 					 // otherwise enter all constraints
