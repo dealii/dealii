@@ -304,7 +304,8 @@ class TriaDimensionInfo<3>
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
-struct TriaNumberCache;
+struct TriaNumberCache
+{};
 
 /**
  * Cache class used to store the number of used and active elements
