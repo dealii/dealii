@@ -28,7 +28,6 @@
 #include <base/thread_management.h>
 #endif
 
-#include <strstream>
 
 
 

@@ -12,7 +12,6 @@
 //----------------------------  parameter_handler.cc  ---------------------------
 
 
-//TODO:[WB] (compiler) use i/ostringstream instead of i/ostrstream if they become available
 //TODO:[WB] (compiler) replace s.c_str() by s when that is possible
 
 #include <base/parameter_handler.h>
@@ -20,11 +19,15 @@
 #include <base/memory_consumption.h>
 #include <fstream>
 #include <iomanip>
-#include <strstream>
 #include <cstdlib>
 #include <algorithm>
 #include <list>
 
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 namespace Patterns
@@ -62,7 +65,12 @@ namespace Patterns
 
   bool Integer::match (const std::string &test_string) const
   {
+#ifdef HAVE_STD_STRINGSTREAM
+    std::istringstream str(test_string.c_str());
+#else
     std::istrstream str(test_string.c_str());
+#endif
+    
     int i;
     if (str >> i)
       {
@@ -88,7 +96,12 @@ namespace Patterns
 				     // output their values
     if (lower_bound <= upper_bound)
       {
+#ifdef HAVE_STD_STRINGSTREAM
+	std::ostringstream description;	
+#else
 	std::ostrstream description;
+#endif
+	
 	description << "[Integer range "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]"
@@ -121,7 +134,12 @@ namespace Patterns
 
   bool Double::match (const std::string &test_string) const
   {
+#ifdef HAVE_STD_STRINGSTREAM
+    std::istringstream str(test_string.c_str());
+#else
     std::istrstream str(test_string.c_str());
+#endif
+
     double d;
     if (str >> d)
       {
@@ -146,7 +164,12 @@ namespace Patterns
 				     // output their values
     if (lower_bound <= upper_bound)
       {
+#ifdef HAVE_STD_STRINGSTREAM
+	std::ostringstream description;	
+#else
 	std::ostrstream description;
+#endif
+
 	description << "[Floating point range "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]"

@@ -21,16 +21,22 @@
 #include <unistd.h>
 #include <iomanip>
 #include <fstream>
-#include <strstream>
+
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 LogStream deallog;
 
 
 LogStream::LogStream()
-		: std_out(&std::cerr), file(0), was_endl(true),
-		  std_depth(10000), file_depth(10000),
-		  print_utime(false), diff_utime(false),
-		  last_time (0.)
+		:
+		std_out(&std::cerr), file(0), was_endl(true),
+		std_depth(10000), file_depth(10000),
+		print_utime(false), diff_utime(false),
+		last_time (0.)
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
@@ -153,7 +159,13 @@ LogStream::print_line_head()
   
 #ifdef DEALII_MEMORY_DEBUG
   static const pid_t id = getpid();
+  
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream statname;
+#else
   std::ostrstream statname;
+#endif
+  
   statname << "/proc/" << id << "/stat" << std::ends;
   static long size;
   static string dummy;

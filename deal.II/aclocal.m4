@@ -366,8 +366,8 @@ AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
 )
 
 
-dnl gcc2.95 doesn't have the std::iterator class, but the standard requires it, so
-dnl check whether we have to work around it
+dnl gcc2.95 doesn't have the std::iterator class, but the standard requires
+dnl it, so check whether we have to work around it
 dnl
 dnl Usage: DEAL_II_HAVE_STD_ITERATOR
 dnl
@@ -385,6 +385,35 @@ AC_DEFUN(DEAL_II_HAVE_STD_ITERATOR, dnl
     [
       AC_MSG_RESULT(yes)
       AC_DEFINE(HAVE_STD_ITERATOR_CLASS)
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+)
+
+
+
+dnl Up to early gcc2.95 releases, the i/ostringstream classes were not
+dnl available. check their availability, or whether we have to fall back
+dnl to the old strstream classes.
+dnl
+dnl Usage: DEAL_II_HAVE_STD_RINGSTREAM
+dnl
+AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
+  AC_MSG_CHECKING(for std::i/ostringstream classes)
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <sstream>
+    ],
+    [
+	std::istringstream i;
+	std::ostringstream o;
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_STD_STRINGSTREAM)
     ],
     [
       AC_MSG_RESULT(no)

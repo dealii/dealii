@@ -12,13 +12,17 @@
 //----------------------------  exceptions.cc  ---------------------------
 
 
-//TODO:[WB] (compiler) use i/ostringstream instead of i/ostrstream if they become available
 //TODO:[WB] (compiler) replace s.c_str() by s when that is possible
 
 
 #include <base/exceptions.h>
 #include <string>
-#include <strstream>
+
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 ExceptionBase::ExceptionBase () :
@@ -92,7 +96,11 @@ const char * ExceptionBase::what () const throw ()
   static std::string description;
 				   // convert the messages printed by the
 				   // exceptions into a std::string
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream converter;
+#else
   std::ostrstream converter;
+#endif
 
   converter << "--------------------------------------------------------"
 	    << std::endl;

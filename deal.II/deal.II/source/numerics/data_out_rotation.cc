@@ -28,7 +28,6 @@
 #include <base/thread_management.h>
 #endif
 
-#include <strstream>
 #include <cmath>
 
 // if necessary try to work around a bug in the IBM xlC compiler

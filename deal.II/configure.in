@@ -94,6 +94,10 @@ if test "$GXX" = yes ; then
 	AC_MSG_RESULT(compiler is gcc-3.0)
 	GXX_VERSION=gcc3.0
 	;;
+    *3.1*)
+	AC_MSG_RESULT(compiler is gcc-3.1)
+	GXX_VERSION=gcc3.1
+	;;
     *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
 	dnl These compilers are too old to support a useful subset
 	dnl of modern C++, so we don't support them
@@ -623,8 +627,9 @@ dnl IBM's xlC compiler has a problem with some kind of code that does not
 dnl "using namespace std;" Try to work around if necessary
 DEAL_II_CHECK_IBM_XLC_ERROR
 
-dnl See whether we can use the std::iterator class
+dnl See whether we can use the std::iterator and std::stringstream classes
 DEAL_II_HAVE_STD_ITERATOR
+DEAL_II_HAVE_STD_STRINGSTREAM
 
 
 
@@ -688,6 +693,10 @@ if test "x$F77" != "x" ; then
       *3.0*)
 	  AC_MSG_RESULT(compiler is gcc-3.0)
 	  F77_VERSION=gcc3.0
+	  ;;
+      *3.1*)
+	  AC_MSG_RESULT(compiler is gcc-3.1)
+	  F77_VERSION=gcc3.1
 	  ;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
 	  dnl These compilers are too old to support a useful subset

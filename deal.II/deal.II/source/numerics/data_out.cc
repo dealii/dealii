@@ -29,7 +29,11 @@
 #include <base/thread_management.h>
 #endif
 
-#include <strstream>
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -201,7 +205,11 @@ add_data_vector (const VECTOR         &vec,
       names.resize (n_components);
       for (unsigned int i=0; i<n_components; ++i)
 	{
+#ifdef HAVE_STD_STRINGSTREAM
+	  std::ostringstream namebuf;
+#else
 	  std::ostrstream namebuf;
+#endif
 	  namebuf << name << '_' << i << std::ends;
   	  names[i] = namebuf.str();
   	};

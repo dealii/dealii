@@ -17,7 +17,12 @@
 #include <lac/solver_control.h>
 
 #include <cmath>
-#include <strstream>
+
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 /*----------------------- SolverControl ---------------------------------*/
 
@@ -47,7 +52,11 @@ SolverControl::NoConvergence::what () const throw ()
   static std::string description;
 				   // convert the messages printed by the
 				   // exceptions into a std::string
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream out;
+#else
   std::ostrstream out;
+#endif
 
   out << "Iterative method reported convergence failure in step "
       << last_step << " with residual " << last_residual << std::ends;
