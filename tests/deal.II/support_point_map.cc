@@ -34,6 +34,45 @@
 #include <fstream>
 
 
+template <int dim>
+struct PointComp 
+{
+    bool operator () (const Point<dim> &, const Point<dim> &) const;
+};
+
+
+template <>
+bool PointComp<1>::operator () (const Point<1> &p1,
+				const Point<1> &p2) const
+{
+  return p1(0) < p2(0);
+};
+
+
+// have somewhat weird orderings in 2d and 3d
+template <>
+bool PointComp<2>::operator () (const Point<2> &p1,
+				const Point<2> &p2) const
+{
+  return ((p1(0)+p1(1) < p2(0)+p2(1)) ||
+	  ((p1(0)+p1(1) == p2(0)+p2(1)) &&
+	   (p1(0)-p1(1) < p2(0)-p2(1))));
+};
+
+
+
+template <>
+bool PointComp<3>::operator () (const Point<3> &p1,
+				const Point<3> &p2) const
+{
+  return ((p1(2) < p2(2)) ||
+	  (p1(2) == p2(2)) &&
+	  ((p1(0)+p1(1) < p2(0)+p2(1)) ||
+	   ((p1(0)+p1(1) == p2(0)+p2(1)) &&
+	    (p1(0)-p1(1) < p2(0)-p2(1)))));
+};
+
+
 
 template <int dim>
 void
@@ -59,14 +98,24 @@ check ()
 
   MappingQ<dim> mapping(3);
   
-  FESystem<dim> element (FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
+  FESystem<dim> element (FE_Q<dim>(2), 1, FE_DGQ<dim>(1), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
+				   // get the forward map
   std::vector<Point<dim> > support_points (dof.n_dofs());
   DoFTools::map_dofs_to_support_points (mapping, dof, support_points);
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     deallog << i << ": " << support_points[i] << std::endl;
+
+				   // now get the backward map
+  std::map<Point<dim>,unsigned int,PointComp<dim> > point_map;
+  DoFTools::map_support_points_to_dofs (mapping, dof, point_map);
+  typename std::map<Point<dim>,unsigned int,PointComp<dim> >::const_iterator
+    i = point_map.begin(),
+    e = point_map.end();
+  for (; i!=e; ++i)
+    deallog << i->first << ',' << i->second << std::endl;
 }
 
 
