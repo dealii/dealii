@@ -34,7 +34,7 @@
     developed and tested on Unix systems only. It can be used positively on
     <ul>
       <li>Linux ELF with gcc 2.95.x;
-      <li>Sun Solaris 2.5, 2.6, and 7, with egcs 1.1.x and gcc 2.95.x;
+      <li>Sun Solaris 2.5, 2.6, and 7, with and gcc 2.95.x;
       <li>SGI IRIX64 with gcc 2.95.x;
       <li>IBM AIX 4.2, with gcc 2.95.x (with some restrictions on
           the use of shared libraries).
@@ -43,7 +43,10 @@
     operating system. It should therefore be rather simple to port it
     to other systems, at least with the compilers stated above. See <a
     href="http:porting.html">here</a>, if your system is not on this
-    list.
+    list. Note that we have supported egcs 1.1.x in previous releases
+    of the library (up to <acronym>deal.II</acronym> 3.0), but due to
+    some missing feature in the support of Standard C++, we now only
+    support later versions of gcc.
     </p>
 
     <p>
@@ -146,8 +149,8 @@
     The most important result of <code>./configure</code> is the
     creation of the file <code>common/Make.global_options</code>. This
     file contains compiler options, paths, etc which you may want to
-    use in the <a href="development/index.html" target="_top">Makefiles of your own
-    projects</a>. It is definitely a good
+    use in the <a href="development/index.html" target="_top">Makefiles
+    of your own projects</a>. It is definitely a good
     idea to include it into your Makefile, to allow using the same
     flags for compilation between library files and the files of your
     project, and to access the paths of the library files. To find
