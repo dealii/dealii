@@ -317,16 +317,20 @@ template <int dim>
 class LaplaceProblem 
 {
   public:
+//.........
     enum RefinementMode {
 	  global_refinement, adaptive_refinement
     };
     
+//.......
     LaplaceProblem (const FiniteElement<dim> &fe,
 		    const RefinementMode      refinement_mode);
     ~LaplaceProblem ();
+
     void run ();
     
   private:
+//.......
     void setup_system ();
     void assemble_system ();
     void solve ();
@@ -335,8 +339,190 @@ class LaplaceProblem
 
     Triangulation<dim>                      triangulation;
     DoFHandler<dim>                         dof_handler;
-				     //...
+
+				     // The finite elements which the
+				     // objects of this class operate
+				     // on are passed to the
+				     // constructor of this class. It
+				     // has to store a pointer to the
+				     // finite element for the member
+				     // functions to use. Now, for the
+				     // present class there is no big
+				     // deal in that, but since we
+				     // want to show techniques rather
+				     // than solutions in these
+				     // programs, we will here point
+				     // out a problem that often
+				     // occurs -- and of course the
+				     // right solution as well.
+				     //
+				     // Consider the following
+				     // situation that occurs in all
+				     // the example programs: we have
+				     // a triangulation object, and we
+				     // have a finite element object,
+				     // and we also have an object of
+				     // type ``DoFHandler'' that uses
+				     // both of the first two. These
+				     // three objects all have a
+				     // lifetime that is rather long
+				     // compared to most other
+				     // objects: they are basically
+				     // set at the beginning of the
+				     // program or an outer loop, and
+				     // they are destroyed at the very
+				     // end. The question is: can we
+				     // guarantee that the two objects
+				     // which the ``DoFHandler'' uses,
+				     // live at least as long as they
+				     // are in use? This means that
+				     // the ``DoFHandler'' must have a
+				     // kind of lock on the
+				     // destruction of the other
+				     // objects, and it can only
+				     // release this lock once it has
+				     // cleared all active references
+				     // to these objects. We have seen
+				     // what happens if we violate
+				     // this order of destruction in
+				     // the previous example program:
+				     // an exception is thrown that
+				     // terminates the program in
+				     // order to notify the programmer
+				     // of this potentially dangerous
+				     // state where an object is
+				     // pointed to that no longer
+				     // persists.
+				     //
+				     // We will show here how the
+				     // library managed to find out
+				     // that there are still active
+				     // references to an
+				     // object. Basically, the method
+				     // is along the following line:
+				     // all objects that are subject
+				     // to such potentially dangerous
+				     // pointers are derived from a
+				     // class called
+				     // ``Subscriptor''. For example,
+				     // the ``Triangulation'',
+				     // ``DoFHandler'', and a base
+				     // class of the ``FiniteElement''
+				     // class are derived from
+				     // ``Subscriptor``. This latter
+				     // class does not offer much
+				     // functionality, but it has a
+				     // built-in counter which we can
+				     // subscribe to, thus the name of
+				     // the class. Whenever we
+				     // initialize a pointer to that
+				     // object, we can increase it use
+				     // counter, and when we move away
+				     // our pointer or do not need it
+				     // any more, we decrease the
+				     // counter again. This way, we
+				     // can always check how many
+				     // objects still use that
+				     // object. If an object of a
+				     // class that is derived from the
+				     // ``Subscriptor'' class is
+				     // destroyed, it also has to call
+				     // the destructor of the
+				     // ``Subscriptor'' class; this
+				     // will then check whether the
+				     // counter is really zero. If
+				     // yes, then there are no active
+				     // references to this object any
+				     // more, and we can safely
+				     // destroy it. If the counter is
+				     // non-zero, however, then the
+				     // destruction would result in
+				     // stale and thus potentially
+				     // dangerous pointers, and we
+				     // rather throw an exception to
+				     // alert the programmer that she
+				     // is doing something dangerous
+				     // and better had her program
+				     // fixed.
+				     //
+				     // While this certainly all
+				     // sounds very well, it has some
+				     // problems in terms of
+				     // usability: what happens if I
+				     // forget to increase the counter
+				     // when I let a pointer point to
+				     // such an object? And what
+				     // happens if I forget to
+				     // decrease it again? Note that
+				     // this may lead to extremely
+				     // difficult to find bugs, since
+				     // the place where we have
+				     // forgotten something may be
+				     // very far away from the place
+				     // where the check for zeroness
+				     // of the counter upon
+				     // destruction actually
+				     // fails. This kind of bug is
+				     // very annoying and usually very
+				     // hard to fix.
+				     //
+				     // The solution to this problem
+				     // is to again use some C++
+				     // trickery: we create a class
+				     // that acts just like a pointer,
+				     // i.e. can be dereferenced, can
+				     // be assigned to and from other
+				     // pointers, and so on. This can
+				     // be done by overloading the
+				     // several dereferencing
+				     // operators of that
+				     // class. Withing the
+				     // constructors, destructors, and
+				     // assignement operators of that
+				     // class, we can however also
+				     // manage increasing or
+				     // decreasing the use counters of
+				     // the objects we point
+				     // to. Objects of that class
+				     // therefore can be used just
+				     // like ordinary pointers to
+				     // objects, but they also serve
+				     // to change the use counters of
+				     // those objects without the need
+				     // for the programmer to do so
+				     // herself. The class that
+				     // actually does all this is
+				     // called ``SmartPointer'' and
+				     // takes as template parameter
+				     // the data type of the object
+				     // which it shall point to. The
+				     // latter type may be any class,
+				     // as long as it is derived from
+				     // the ``Subscriptor'' class.
+				     //
+				     // In the present example
+				     // program, we protect object
+				     // using the pointer to the
+				     // finite element, i.e. the
+				     // following member variable,
+				     // from the situation that for
+				     // some reason the finite element
+				     // pointed to is destroyed while
+				     // still in use. Note that the
+				     // pointer is assigned at
+				     // construction time of this
+				     // object, and destroyed upon
+				     // destruction of this object, so
+				     // the lock on the destruction of
+				     // the finite element object is
+				     // basically all through the
+				     // lifetime of this object.
     SmartPointer<const FiniteElement<dim> > fe;
+
+				     // The next few member variables
+				     // are unspectacular, since they
+				     // have already been discussed in
+				     // detail:
     ConstraintMatrix                        hanging_node_constraints;
 
     SparsityPattern                         sparsity_pattern;
@@ -344,13 +530,13 @@ class LaplaceProblem
 
     Vector<double>                          solution;
     Vector<double>                          system_rhs;
-
+//.............
     RefinementMode                          refinement_mode;
 };
 
 
 
-
+//........
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const FiniteElement<dim> &fe,
 				     const RefinementMode refinement_mode) :
@@ -405,6 +591,9 @@ void LaplaceProblem<dim>::setup_system ()
 				   // matrix, refer to the second
 				   // example program.
 
+				   // The rest of the function is
+				   // almost identitcally taken over
+				   // from previous examples:
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
@@ -769,7 +958,7 @@ void LaplaceProblem<dim>::solve ()
 };
 
 
-
+//.....................				 
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
@@ -802,7 +991,7 @@ void LaplaceProblem<dim>::refine_grid ()
     };
 };
 
-
+//...............
 template <int dim>
 void LaplaceProblem<dim>::process_solution (const unsigned int cycle) const
 {
@@ -949,15 +1138,46 @@ void LaplaceProblem<dim>::run ()
 		cell->face(face)->set_boundary_indicator (1);
 	}
       else
+					 // If this is not the first
+					 // step, the we call
+					 // ``refine_grid'' to
+					 // actually refine the grid
+					 // according to the
+					 // refinement mode passed to
+					 // the constructor.
 	refine_grid ();      
 
+				       // The next steps you already
+				       // know from previous
+				       // examples. This is mostly the
+				       // basic set-up of every finite
+				       // element program:
       setup_system ();
       
       assemble_system ();
       solve ();
+
+				       // The last step in this chain
+				       // of function calls is usually
+				       // evaluation of the computed
+				       // solution for the quantities
+				       // one is interested in. This
+				       // is done in the following
+				       // function. We pass the number
+				       // of the loop iteration since
+				       // that might be of interest to
+				       // see in the logs which this
+				       // function produces.
       process_solution (cycle);
     };
   
+				   // After the last iteration we
+				   // output the solution on the
+				   // finest grid. This is done using
+				   // the following sequence of
+				   // statements which you have
+				   // already seen in previous
+				   // examples:
   string filename;
   switch (refinement_mode)
     {
@@ -983,7 +1203,7 @@ void LaplaceProblem<dim>::run ()
 };
 
 
-
+//.................
 int main () 
 {
   try
