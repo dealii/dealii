@@ -740,6 +740,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       New: The <code class="class">GridReordering</code> class now uses a
+       vastly better algorithm in 2d than previously. The new algorithm is
+       linear in time, where it could be exponential before.
+       <br>
+       (Michael Anderson 2003/02/21)
+       </p>
+
+  <li> <p>
        New: There is now a function <code
        class="member">GridIn::read_xda</code> that allows reading
        grids from a file in XDA format.
