@@ -11,16 +11,29 @@
 
 /**
  * Bicgstab algorithm by van der Vorst.
+ *
+ * The use of the #AdditionalData# struct is described in the #solver#
+ * base class.
  */
 template<class Matrix, class Vector>
 class SolverBicgstab //<Matrix,Vector>
   : public Solver<Matrix,Vector>
 {
   public:
+    				     /**
+				      * Standardized data struct to
+				      * pipe additional data to the
+				      * solver. This solver does not
+				      * need additional data yet.
+				      */
+    struct AdditionalData {};
+
 				     /**
 				      * Constructor.
 				      */
-    SolverBicgstab(SolverControl &cn, VectorMemory<Vector> &mem);
+    SolverBicgstab(SolverControl &cn,
+		   VectorMemory<Vector> &mem,
+		   const AdditionalData &data=AdditionalData());
 
 				     /**
 				      * Solve primal problem only.
@@ -132,10 +145,9 @@ class SolverBicgstab //<Matrix,Vector>
 
 template<class Matrix, class Vector>
 SolverBicgstab<Matrix, Vector>::SolverBicgstab(SolverControl &cn,
-					       VectorMemory<Vector> &mem)
-		:
-		Solver<Matrix,Vector>(cn,mem)
-{}
+					       VectorMemory<Vector> &mem,
+					       const AdditionalData &) :
+		Solver<Matrix,Vector>(cn,mem)  {}
 
 
 template<class Matrix, class Vector>

@@ -15,17 +15,28 @@
 /**
  * Preconditioned cg method.
  * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
+ *
+ * The use of the #AdditionalData# struct is described in the #solver#
+ * base class.
  */
 template<class Matrix, class Vector>
 class SolverCG : public Solver<Matrix,Vector>
 {
   public:
+    				     /**
+				      * Standardized data struct to
+				      * pipe additional data to the
+				      * solver. This solver does not
+				      * need additional data yet.
+				      */
+    struct AdditionalData {};
 
 				     /**
 				      * Constructor.
 				      */
-    SolverCG (SolverControl &cn, VectorMemory<Vector> &mem) :
-		    Solver<Matrix,Vector>(cn,mem) {};
+    SolverCG (SolverControl &cn,
+	      VectorMemory<Vector> &mem,
+	      const AdditionalData &data=AdditionalData());
 
 				     /**
 				      * Solver method.
@@ -69,6 +80,13 @@ class SolverCG : public Solver<Matrix,Vector>
 
 /*------------------------- Implementation ----------------------------*/
  
+
+template<class Matrix, class Vector>
+SolverCG<Matrix,Vector>::SolverCG(SolverControl &cn,
+				  VectorMemory<Vector> &mem,
+				  const AdditionalData &) :
+		Solver<Matrix,Vector>(cn,mem) {};
+
 
 template<class Matrix, class Vector>
 double SolverCG<Matrix,Vector>::criterion()

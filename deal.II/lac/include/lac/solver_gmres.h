@@ -45,19 +45,39 @@
  * computational speed against memory. One of the few other
  * possibilities is to use a good preconditioner.
  *
+ * The use of the #AdditionalData# struct is described in the #solver#
+ * base class.
+ *
  * @author Wolfgang Bangerth
  */
 template<class Matrix, class Vector>
 class SolverGMRES : public Solver<Matrix, Vector>
 {
   public:
+    				     /**
+				      * Standardized data struct to
+				      * pipe additional data to the
+				      * solver.
+				      */
+    struct AdditionalData 
+    {
+	AdditionalData(const unsigned int max_n_tmp_vectors=30):
+			max_n_tmp_vectors(max_n_tmp_vectors) {};
+	
+					 /**
+					  * Maximum number of
+					  * tmp vectors.
+					  */
+	const unsigned int    max_n_tmp_vectors;
+    };
+    
 				     /**
 				      * Constructor.
 				      */
     SolverGMRES (SolverControl        &cn,
 		 VectorMemory<Vector> &mem,
-		 const unsigned int    max_n_tmp_vectors);
-    
+		 const AdditionalData &data=AdditionalData());
+
 				     /**
 				      * Solver method.
 				      */
@@ -74,7 +94,11 @@ class SolverGMRES : public Solver<Matrix, Vector>
 		    << "any results, and much more for reasonable ones.");
     
   protected:
-    const unsigned int max_n_tmp_vectors;
+				     /**
+				      * Includes the maximum number of
+				      * tmp vectors.
+				      */
+    AdditionalData additional_data;
     
 				     /**
 				      * Implementation of the computation of
@@ -102,11 +126,12 @@ class SolverGMRES : public Solver<Matrix, Vector>
 template <class Matrix, class Vector>
 SolverGMRES<Matrix,Vector>::SolverGMRES (SolverControl        &cn,
 					 VectorMemory<Vector> &mem,
-					 const unsigned int    max_n_tmp_vectors) :
+					 const AdditionalData &data) :
 		Solver<Matrix,Vector> (cn,mem),
-		max_n_tmp_vectors (max_n_tmp_vectors)
+		additional_data(data)
 {
-  Assert (max_n_tmp_vectors >= 10, ExcTooFewTmpVectors (max_n_tmp_vectors));
+  Assert (additional_data.max_n_tmp_vectors >= 10, 
+	  ExcTooFewTmpVectors (additional_data.max_n_tmp_vectors));
 };
 
 
@@ -162,8 +187,8 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 				   // if the size of the matrix is very small,
 				   // then only allocate a number of vectors
 				   // which is needed
-  const unsigned int n_tmp_vectors = (A.m()+3 > max_n_tmp_vectors ?
-				      max_n_tmp_vectors :
+  const unsigned int n_tmp_vectors = (A.m()+3 > additional_data.max_n_tmp_vectors ?
+				      additional_data.max_n_tmp_vectors :
 				      A.m()+3);
 
 				   // allocate an array of n_tmp_vectors

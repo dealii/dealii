@@ -90,6 +90,29 @@ template <class Vector> class VectorMemory;
  *               double b, const Vector& z);
  * };
  * \end{verbatim}
+ *
+ * \subsection{AdditionalData}
+ * Several solvers need additional data, like the damping parameter #omega# of the
+ * #SolverRichardson# class or the maximum number of tmp vectors of the #SolverGMRES#.
+ * To have a standardized constructor for each solver class the #struct AdditionalData#
+ * has been introduced to each solver class. Some solver needs no additional data, like
+ * the SolverCG or SolverBicgstab. For these solvers the struct #AdditionalData# is empty
+ * and the calling
+ * of the constructor has not change as a default #AdditionalData# is set by default. 
+ *
+ * Now the generating of a solver looks like
+ * \begin{verbatim}
+ *                               // GMRES with 50 tmp vectors
+ * SolverGMRES solver_gmres (solver_control, vector_memory,
+ *                           SolverGMRES::AdditionalData(50));
+ *
+ *                               // Richardson with omega=0.8
+ * SolverRichardson solver_richardson (solver_control, vector_memory,
+ *                                     SolverGMRES::AdditionalData(0.8));
+ *
+ *                               // CG with default AdditionalData
+ * SolverCG solver_cg (solver_control, vector_memory);
+ * \end{verbatim}
  */
 template <class Matrix, class Vector>
 class Solver

@@ -16,6 +16,9 @@
  * Implementation of the richardson iteration method. The stopping criterion
  * is the norm of the residual.
  *
+ * The use of the #AdditionalData# struct is described in the #solver#
+ * base class.
+ *
  * @author Ralf Hartmann
  */
 template<class Matrix, class Vector>
@@ -23,11 +26,27 @@ class SolverRichardson : public Solver<Matrix, Vector>
 {
   public:
 				     /**
+				      * Standardized data struct to
+				      * pipe additional data to the
+				      * solver.
+				      */
+    struct AdditionalData 
+    {
+	AdditionalData(double omega=1):
+			omega(omega) {};
+	
+					 /**
+					  * Damping parameter.
+					  */
+	double omega;
+    };
+	
+				     /**
 				      * Constructor.
 				      */
-    SolverRichardson (SolverControl &cn, VectorMemory<Vector> &mem) :
-		    Solver<Matrix,Vector> (cn,mem), omega(1.)
-      {};
+    SolverRichardson (SolverControl &cn,
+		      VectorMemory<Vector> &mem,
+		      const AdditionalData &data=AdditionalData());
 
 				     /**
 				      * Solve $Ax=b$ for $x$.
@@ -60,9 +79,9 @@ class SolverRichardson : public Solver<Matrix, Vector>
     Vector *Vr, *Vd;
 
 				     /**
-				      * Damping-coefficient.
+				      * Damping parameter.
 				      */
-    double omega;  ;
+    AdditionalData additional_data;
     
 				     /**
 				      * Within the iteration loop, the
@@ -81,6 +100,14 @@ class SolverRichardson : public Solver<Matrix, Vector>
 
 
 /*----------------- Implementation of the Richardson Method ------------------*/
+
+
+template<class Matrix, class Vector>
+SolverRichardson<Matrix,Vector>::SolverRichardson(SolverControl &cn,
+						  VectorMemory<Vector> &mem,
+						  const AdditionalData &data):
+		Solver<Matrix,Vector> (cn,mem),
+		additional_data(data)  {};
 
 
 template<class Matrix,class Vector>
@@ -110,7 +137,7 @@ SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
 	break;
 
       precondition(d,r);
-      x.add(omega,d);
+      x.add(additional_data.omega,d);
     }
 
 				   // Deallocate Memory
@@ -133,11 +160,12 @@ SolverRichardson<Matrix,Vector>::criterion()
   return sqrt(res2);
 }
 
+
 template<class Matrix,class Vector>
 inline void
 SolverRichardson<Matrix,Vector>::set_omega(double om)
 {
-  omega=om;
+  additional_data.omega=om;
 }
 
 
