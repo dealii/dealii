@@ -30,7 +30,8 @@
  *  @see TriangulationLevel<2>
  */
 template <int dim>
-class TriangulationLevel;
+class TriangulationLevel
+{};
 
 
 /**
