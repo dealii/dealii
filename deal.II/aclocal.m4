@@ -3366,7 +3366,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT, dnl
 [
-  if test "x$GXX_VERSION" != "x" ; then
+  if test "x$GXX" = "xyes" ; then
     AC_MSG_CHECKING(for boost::shared_ptr assignment operator= template buglet)
     AC_LANG(C++)
     CXXFLAGS="-Wsynth -Werror -I `pwd`/contrib/boost/include"
