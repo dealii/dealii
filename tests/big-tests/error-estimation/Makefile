@@ -19,16 +19,16 @@ user-libs = ../../../mia/control.o
 
 # To run the program, use "make run"; to give parameters to the program,
 # give the parameters to the following variable:
-run-parameters  = 
+run-parameters  = ee.gauss.prm
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = gnuplot make_ps ; ./strip_comments
+additional-run-action = $(target) ee.singular.prm ; gnuplot make_ps ; ./strip_comments
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
 # following list
-delete-files = gnuplot* *inp *.ps *.eps history.*
+delete-files = data-*/*
 
 
 

@@ -1,0 +1,6 @@
+set Test case            = Singular
+set Initial refinement   = 1
+set Refinement criterion = { global | true error | estimated error }
+set Refinement fraction  = 0.2
+set Output base filename = data-singular/
+set Output format        = ucd

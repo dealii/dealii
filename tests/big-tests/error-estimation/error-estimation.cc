@@ -9,20 +9,18 @@
 #include <grid/dof_constraints.h>
 #include <basic/function.h>
 #include <basic/data_io.h>
+#include <basic/parameter_handler.h>
 #include <fe/fe_lib.h>
 #include <fe/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
 #include <numerics/error_estimator.h>
 
-
 #include <map.h>
 #include <fstream.h>
 #include <cmath>
 #include <string>
-extern "C" {
-#  include <stdlib.h>
-}
+#include <cstdlib>
 
 
 
@@ -54,7 +52,8 @@ class PoissonEquation :  public Equation<dim> {
 
 
 template <int dim>
-class PoissonProblem : public ProblemBase<dim> {
+class PoissonProblem : public ProblemBase<dim>,
+		       public MultipleParameterLoop::UserClass {
   public:
     enum RefineMode {
 	  global, true_error, error_estimator
@@ -63,19 +62,20 @@ class PoissonProblem : public ProblemBase<dim> {
     PoissonProblem ();
 
     void clear ();
-    void create_new ();
-    void run (const unsigned int start_level,
-	      const RefineMode refine_mode);
-    void print_history (const RefineMode refine_mode) const;
+    void create_new (const unsigned int);
+    void declare_parameters (ParameterHandler &prm);
+    void run (ParameterHandler &prm);
+    void print_history (const ParameterHandler &prm,
+			const RefineMode refine_mode) const;
     
   protected:
     Triangulation<dim> *tria;
     DoFHandler<dim>    *dof;
     
     Function<dim>      *rhs;
-    Function<dim>      *boundary_values;
+    Function<dim>      *solution_function;
 
-    HyperBallBoundary<dim> boundary;
+    Boundary<dim>      *boundary;
     
     vector<double> l2_error, linfty_error;
     vector<double> h1_error, estimated_error;
@@ -88,55 +88,90 @@ class PoissonProblem : public ProblemBase<dim> {
 
 
 
-/**
-  Right hand side constructed such that the exact solution is
-  $x*y*exp(-(x**2+y**2)*40)$.
-  */
 template <int dim>
-class RHSPoly : public Function<dim> {
+class Solution {
   public:
-    				     /**
-				      * Return the value of the function
-				      * at the given point.
-				      */
-    virtual double operator () (const Point<dim> &p) const;
+
+    class GaussShape : public Function<dim> {
+      public:
+	virtual double operator () (const Point<dim> &p) const;
+	virtual Point<dim> gradient (const Point<dim> &p) const;
+    };
+
+    class Singular : public Function<dim> {
+      public:
+	virtual double operator () (const Point<dim> &p) const;
+	virtual Point<dim> gradient (const Point<dim> &p) const;
+    };
 };
 
 
 
+
 template <int dim>
-class Solution : public Function<dim> {
+class RHS {
   public:
-    				     /**
-				      * Return the value of the function
-				      * at the given point.
-				      */
-    virtual double operator () (const Point<dim> &p) const;
+    
 				     /**
-				      * Return the gradient of the function
-				      * at the given point.
+				      *	Right hand side constructed such that
+				      * the exact solution is
+				      * $x*y*exp(-(x**2+y**2)*40)$.
 				      */
-    virtual Point<dim> gradient (const Point<dim> &p) const;
+    class GaussShape : public Function<dim> {
+      public:
+	virtual double operator () (const Point<dim> &p) const;
+    };
+
+    				     /**
+				      *	Right hand side constructed such that
+				      * the exact solution is
+				      * $r^{2/3} sin(2\phi)$.
+				      */
+    class Singular : public Function<dim> {
+      public:
+	virtual double operator () (const Point<dim> &p) const;
+    };
 };
 
 
 
 
-double RHSPoly<2>::operator () (const Point<2> &p) const {
+
+double Solution<2>::GaussShape::operator () (const Point<2> &p) const {
+  return p(0)*p(1)*exp(-40*p.square());
+};
+
+
+Point<2> Solution<2>::GaussShape::gradient (const Point<2> &p) const {
+  return Point<2> ((1-80.*p(0)*p(0))*p(1)*exp(-40*p.square()),
+		   (1-80.*p(1)*p(1))*p(0)*exp(-40*p.square()));
+};
+
+
+
+double Solution<2>::Singular::operator () (const Point<2> &p) const {
+  return pow(p.square(), 1./3.);
+};
+
+
+Point<2> Solution<2>::Singular::gradient (const Point<2> &p) const {
+  return 2./3.*pow(p.square(), -2./3.) * p;
+};
+
+
+
+double RHS<2>::GaussShape::operator () (const Point<2> &p) const {
   return (480.-6400.*p.square())*p(0)*p(1)*exp(-40.*p.square());
 };
 
 
 
-double Solution<2>::operator () (const Point<2> &p) const {
-  return p(0)*p(1)*exp(-40*p.square());
+double RHS<2>::Singular::operator () (const Point<2> &p) const {
+  return -4./9. * pow(p.square(), -2./3.);
 };
 
 
-Point<2> Solution<2>::gradient (const Point<2> &p) const {
-  return Point<2> ((1-80.*p(0)*p(0))*p(1)*exp(-40*p.square()),
-		   (1-80.*p(1)*p(1))*p(0)*exp(-40*p.square()));
-};
+
 
   
 
@@ -189,7 +224,7 @@ void PoissonEquation<dim>::assemble (dVector             &,
 template <int dim>
 PoissonProblem<dim>::PoissonProblem () :
 		tria(0), dof(0), rhs(0),
-		boundary_values(0), boundary() {};
+		solution_function(0), boundary(0) {};
 
 
 
@@ -212,12 +247,18 @@ void PoissonProblem<dim>::clear () {
       rhs = 0;
     };
 
-  if (boundary_values != 0) 
+  if (solution_function != 0) 
     {
-      delete boundary_values;
-      boundary_values = 0;
+      delete solution_function;
+      solution_function = 0;
     };
 
+  if (boundary != 0)
+    {
+      delete boundary;
+      boundary = 0;
+    };
+  
   l2_error.clear ();
   linfty_error.clear ();
   h1_error.clear ();
@@ -231,27 +272,52 @@ void PoissonProblem<dim>::clear () {
 
 
 template <int dim>
-void PoissonProblem<dim>::create_new () {
+void PoissonProblem<dim>::create_new (const unsigned int) {
   clear ();
-  
+
   tria = new Triangulation<dim>();
   dof = new DoFHandler<dim> (tria);
   set_tria_and_dof (tria, dof);
+  boundary = new HyperBallBoundary<dim> ();
+};
+
+
+
+template <int dim>
+void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
+  prm.declare_entry ("Test case", "Gauss shape", "Gauss shape\\|Singular");
+  prm.declare_entry ("Initial refinement", "2",
+		     ParameterHandler::RegularExpressions::Integer);
+  prm.declare_entry ("Refinement criterion", "estimated error",
+		     "global\\|true error\\|estimated error");
+  prm.declare_entry ("Refinement fraction", "0.3",
+		     ParameterHandler::RegularExpressions::Double);
+  prm.declare_entry ("Output base filename", "");
+  prm.declare_entry ("Output format", "ucd"
+		     "ucd\\|gnuplot");
 };
 
 
 
 
-
-
 template <int dim>
-void PoissonProblem<dim>::run (const unsigned int start_level,
-			       const RefineMode refine_mode) {
-  create_new ();
-
+void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << "======================================="
        << "=======================================" << endl
+       << "===== Test case: " << prm.get ("Test case") << endl
        << "===== Doing computation with refinement criterion: ";
+  RefineMode refine_mode;
+  if (prm.get("Refinement criterion")=="global")
+    refine_mode = global;
+  else
+    if (prm.get("Refinement criterion")=="true error")
+      refine_mode = true_error;
+    else
+      if (prm.get("Refinement criterion")=="estimated error")
+	refine_mode = error_estimator;
+      else
+	return;
+
   switch (refine_mode) 
     {
       case global:
@@ -264,16 +330,27 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 	    cout << "error estimator";
 	    break;
     };
+
+  const unsigned int start_level = prm.get_integer("Initial refinement");
   cout << endl
        << "======================================="
        << "=======================================" << endl;
   cout << "Making initial grid... " << endl;
-  tria->set_boundary (&boundary);
+  tria->set_boundary (boundary);
   tria->create_hyper_ball ();
   tria->refine_global (start_level);
 
-  rhs             = new RHSPoly<dim>();
-  boundary_values = new Solution<dim> ();
+  if (prm.get("Test case")=="Gauss shape")
+    rhs             = new RHS<dim>::GaussShape();
+  else
+    if (prm.get("Test case")=="Singular")
+      rhs             = new RHS<dim>::Singular();
+  
+  if (prm.get("Test case")=="Gauss shape")
+    solution_function = new Solution<dim>::GaussShape ();
+  else
+    if (prm.get("Test case")=="Singular")
+      solution_function = new Solution<dim>::Singular ();
   
   
   FELinear<dim>                   fe;
@@ -297,37 +374,38 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 					     update_jacobians | update_JxW_values);
   
       ProblemBase<dim>::FunctionMap dirichlet_bc;
-      dirichlet_bc[0] = boundary_values;
+      dirichlet_bc[0] = solution_function;
       assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
 
       cout << "    Solving..." << endl;
       solve ();
 
-      Solution<dim> sol;
       dVector       l2_error_per_cell, linfty_error_per_cell, h1_error_per_cell;
       dVector       estimated_error_per_cell;
       dVector       laplacian_per_cell;
       QGauss3<dim>  q;
   
       cout << "    Calculating L2 error... ";
-      integrate_difference (sol, l2_error_per_cell, q, fe, L2_norm);
+      integrate_difference (*solution_function, l2_error_per_cell, q,
+			    fe, L2_norm);
       cout << l2_error_per_cell.l2_norm() << endl;
       l2_error.push_back (l2_error_per_cell.l2_norm());
 
       cout << "    Calculating L-infinity error... ";
-      integrate_difference (sol, linfty_error_per_cell, q, fe, Linfty_norm);
+      integrate_difference (*solution_function, linfty_error_per_cell, q,
+			    fe, Linfty_norm);
       cout << linfty_error_per_cell.linfty_norm() << endl;
       linfty_error.push_back (linfty_error_per_cell.linfty_norm());
 
       cout << "    Calculating H1 error... ";
-      integrate_difference (sol, h1_error_per_cell, q, fe, H1_norm);
+      integrate_difference (*solution_function, h1_error_per_cell, q, fe, H1_norm);
       cout << h1_error_per_cell.l2_norm() << endl;
       h1_error.push_back (h1_error_per_cell.l2_norm());
 
       cout << "    Estimating H1 error... ";
       KellyErrorEstimator<dim> ee;
       QSimpson<dim-1> eq;
-      ee.estimate_error (*dof, eq, fe, boundary,
+      ee.estimate_error (*dof, eq, fe, *boundary,
 			 KellyErrorEstimator<dim>::FunctionMap(),
 			 solution,
 			 estimated_error_per_cell);
@@ -364,8 +442,7 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       out.add_data_vector (h1_error_per_dof, "H1-Error");
       out.add_data_vector (estimated_error_per_dof, "Estimated Error");
       out.add_data_vector (laplacian_per_dof, "Second derivative pointwise");
-//      string filename = "gnuplot.";
-      string filename = "ee.";
+      String filename = prm.get ("Output base filename");
       switch (refine_mode) 
 	{
 	  case global:
@@ -380,15 +457,22 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 	};
       filename += ('0'+(start_level+refine_step)/10);
       filename += ('0'+(start_level+refine_step)%10);
-      filename += ".inp";                            //*
+
+      if (prm.get("Output format")=="ucd")
+	filename += ".inp";
+      else
+	if (prm.get("Output format")=="gnuplot")
+	  filename += ".gnuplot";
+      
       cout << "    Writing error plots to <" << filename << ">..." << endl;
-  
-//      ofstream gnuplot(filename.c_str());
-//      out.write_gnuplot (gnuplot);
-//      gnuplot.close ();
-      ofstream ucd(filename.c_str());
-      out.write_ucd (ucd);
-      ucd.close();
+      ofstream outfile(filename);
+      if (prm.get("Output format")=="ucd")      
+	out.write_ucd (outfile);
+      else
+	if (prm.get("Output format")=="gnuplot")
+	  out.write_gnuplot (outfile);
+      
+      outfile.close();
 
       cout << "    Refining triangulation...";
       switch (refine_mode) 
@@ -397,11 +481,13 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 		tria->refine_global (1);
 		break;
 	  case true_error:
-		tria->refine_fixed_fraction (h1_error_per_cell, 0.5);
+		tria->refine_fixed_number (h1_error_per_cell,
+					   prm.get_double("Refinement fraction"));
 		tria->execute_refinement ();
 		break;
 	  case error_estimator:
-		tria->refine_fixed_number (estimated_error_per_cell, 0.2);
+		tria->refine_fixed_number (estimated_error_per_cell,
+					   prm.get_double("Refinement fraction"));
 		tria->execute_refinement ();
 		break;
 	};
@@ -409,14 +495,16 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       ++refine_step;
     };
   
-  print_history (refine_mode);
+  print_history (prm, refine_mode);
   cout << endl << endl << endl;
 };
 
 
 template <int dim>
-void PoissonProblem<dim>::print_history (const RefineMode refine_mode) const {
-  string filename("history.");
+void PoissonProblem<dim>::print_history (const ParameterHandler &prm,
+					 const RefineMode refine_mode) const {
+  String filename(prm.get("Output base filename"));
+  filename += "history.";
   switch (refine_mode) 
     {
       case global:
@@ -433,7 +521,7 @@ void PoissonProblem<dim>::print_history (const RefineMode refine_mode) const {
   
   cout << endl << "Printing convergence history to <" << filename << ">..."
        << endl;
-  ofstream out(filename.c_str());
+  ofstream out(filename);
   out << "# n_dofs    l2_error linfty_error "
       << "h1_error estimated_error "
       << "laplacian"
@@ -476,13 +564,20 @@ void PoissonProblem<dim>::print_history (const RefineMode refine_mode) const {
 
 
 
-int main () {
-  PoissonProblem<2> problem;
+int main (int argc, char **argv) {
+  if (argc!=2) 
+    {
+      cout << "Usage: error-estimation parameterfile" << endl << endl;
+      return 1;
+    };
 
-  problem.run (2, PoissonProblem<2>::global);
-  problem.run (2, PoissonProblem<2>::true_error);
-  problem.run (2, PoissonProblem<2>::error_estimator);
+  PoissonProblem<2> poisson;
+  MultipleParameterLoop input_data;
 
+  poisson.declare_parameters(input_data);
+  input_data.read_input (argv[1]);
+  input_data.loop (poisson);
+  
   return 0;
 };
 
