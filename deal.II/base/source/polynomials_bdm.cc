@@ -18,6 +18,8 @@ using namespace std;
 using namespace Polynomials;
 
 
+//TODO:[GK] Remove monomial_derivatives
+
 template <int dim>
 PolynomialsBDM<dim>::PolynomialsBDM (const unsigned int k)
 		:
@@ -88,20 +90,36 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
       for (unsigned int j=0;j<dim;++j)
 	grad_grads[i+j*n_sub][j] = p_grad_grads[i];
     }
-  
+
+				   // This is the first polynomial not
+				   // covered by the P_k subspace
   const unsigned int start = dim*n_sub;
+
+				   // Store values of auxiliary
+				   // polynomials and their
+				   // derivatives
+  std::vector<double> monoval0(3);
+  std::vector<double> monoval1(3);
+
+  monomials[0].value(unit_point(0), monoval0);
+  monomials[0].value(unit_point(1), monoval1);
   if (values.size() != 0)
     {
-      values[start][0] = monomials[0].value (unit_point(0));
-      values[start][1] = -unit_point(1)
-			 * monomial_derivatives[0].value (unit_point(0));
-      values[start+1][0] = -unit_point(0)
-			 * monomial_derivatives[0].value (unit_point(1));
-      values[start+1][1] = monomials[0].value (unit_point(1));
+      values[start][0] = monoval0[0];
+      values[start][1] = -unit_point(1) * monoval0[1];
+      values[start+1][0] = -unit_point(0) * monoval1[1];
+      values[start+1][1] = monoval1[0];
     }
   if (grads.size() != 0)
     {
-      Assert(false,ExcNotImplemented());
+      grads[start][0][0] = monoval0[1];
+      grads[start][0][1] = 0.;
+      grads[start][1][0] = -unit_point(1) * monoval0[2];
+      grads[start][1][1] = -monoval0[1];
+      grads[start+1][0][0] = -monoval1[1];
+      grads[start+1][0][1] = -unit_point(0) * monoval1[2];
+      grads[start+1][1][0] = 0.;
+      grads[start+1][1][1] = monoval1[1];
     }
   if (grad_grads.size() != 0)
     {
