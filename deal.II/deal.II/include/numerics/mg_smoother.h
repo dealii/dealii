@@ -86,6 +86,10 @@ class MGSmoother :  public Subscriptor
 				      * freedom on interior boundaries between
 				      * different levels to zero in the given
 				      * data vector #u#.
+				      *
+				      * Since the coarsest level (#level==0#)
+				      * has no interior boundaries, this
+				      * function does nothing in this case.
 				      */
     void set_zero_interior_boundary (const unsigned int  level,
 				     Vector<float>      &u) const;
@@ -96,6 +100,9 @@ class MGSmoother :  public Subscriptor
 				      * degree of freedom indices which are
 				      * located on interior boundaries between
 				      * differing levels of the triangulation.
+				      * Since the coarsest level has no
+				      * interior boundary dofs, the first
+				      * entry refers to the second level.
 				      *
 				      * These arrays are set by the constructor.
 				      */
