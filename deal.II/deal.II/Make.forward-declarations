@@ -26,12 +26,12 @@
 #   copy over the file if necessary.
 # - delete the two temporary files
 $(forward-declarations): $(filter-out %forward-declarations%,$(h-files))
-ifeq (0,${MAKELEVEL})
+ifneq (1,${recursive-make-fwd-decl})
 	@echo ============================ Checking $@
 	@touch $@.old
 	-@cp $@ $@.old > /dev/null 2>&1
 	@perl $D/deal.II/Make_forward_declarations $(filter-out %forward-declarations.h,$(h-files)) > $@.new
-	@make --silent $@
+	@make --silent recursive-make-fwd-decl=1 $@
 	@rm $@.old $@.new
 else
   ifneq (,$(shell diff $(forward-declarations).old $(forward-declarations).new))

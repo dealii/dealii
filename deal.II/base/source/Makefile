@@ -45,7 +45,7 @@ clean:
 #see the Makefile of the deal.II directory for a thorough
 #description of what happens here
 ../lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
-ifeq (0,${MAKELEVEL})
+ifneq (1,${recursive-make-fwd-decl})
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files) \
 		> ../lib/Makefile.dep
