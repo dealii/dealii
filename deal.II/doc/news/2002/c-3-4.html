@@ -540,6 +540,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The DoF accessor classes now have a function <code
+       class="member">get_fe()</code> that returns a reference to the finite
+       element being used on this cell. The result is of course identical to
+       what a call to <code
+       class="member">iterator-&gt;get_dof_handler().get_fe()</code> would have
+       yielded.
+       <br>
+       (WB 2003/01/10)
+       </p>
+
+  <li> <p> 
        New: Checked in new <code class="class">GridGenerator</code> 
        member function <code class="member">half_hyper_ball</code>,
        derived from member <code class="member">hyper_ball</code>.     

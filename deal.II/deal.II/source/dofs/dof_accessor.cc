@@ -38,13 +38,13 @@ void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (i<this->dof_handler->selected_fe->dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_line));
+  Assert (i<this->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
 
   this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_line+i] = index;
+    ->line_dofs[this->present_index*this->get_fe().dofs_per_line+i] = index;
 }
 
 
@@ -68,14 +68,14 @@ void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
+  Assert (i<this->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->selected_fe->dofs_per_vertex +
+				   this->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
 }
@@ -100,7 +100,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (local_source.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
 				  this->dof_handler->get_fe().dofs_per_line),
@@ -139,7 +139,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (local_source.m() == (2*this->dof_handler->get_fe().dofs_per_vertex +
 			       this->dof_handler->get_fe().dofs_per_line),
@@ -237,13 +237,13 @@ void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (i<this->dof_handler->selected_fe->dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_quad));
+  Assert (i<this->get_fe().dofs_per_quad,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
 
   this->dof_handler->levels[this->present_level]
-    ->quad_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_quad+i] = index;
+    ->quad_dofs[this->present_index*this->get_fe().dofs_per_quad+i] = index;
 }
 
 
@@ -256,14 +256,14 @@ DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 {
   Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
+  Assert (i<this->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->selected_fe->dofs_per_vertex +
+				   this->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
 }
@@ -276,7 +276,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
   Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
 				  4*this->dof_handler->get_fe().dofs_per_line +
@@ -304,7 +304,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
   Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.m() == (4*this->dof_handler->get_fe().dofs_per_vertex +
 			       4*this->dof_handler->get_fe().dofs_per_line +
@@ -417,13 +417,13 @@ void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (i<this->dof_handler->selected_fe->dofs_per_hex,
-	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_hex));
+  Assert (i<this->get_fe().dofs_per_hex,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
 
   this->dof_handler->levels[this->present_level]
-    ->hex_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_hex+i] = index;
+    ->hex_dofs[this->present_index*this->get_fe().dofs_per_hex+i] = index;
 }
 
 
@@ -435,15 +435,15 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 {
   Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<8,
 	  ExcIndexRange (i,0,8));
-  Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
+  Assert (i<this->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->selected_fe->dofs_per_vertex +
+				   this->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
 }
@@ -457,7 +457,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 {
   Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
 				  12*this->dof_handler->get_fe().dofs_per_line +
@@ -487,7 +487,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 {
   Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (this->dof_handler->selected_fe != 0,
+  Assert (&this->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.m() == (8*this->dof_handler->get_fe().dofs_per_vertex +
 			       12*this->dof_handler->get_fe().dofs_per_line +

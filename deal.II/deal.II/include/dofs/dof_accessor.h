@@ -26,6 +26,7 @@ template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
 template <int dim> class DoFHandler;
+template <int dim> class FiniteElement;
 
 template <int celldim, int dim> class DoFObjectAccessor;
 template <int dim>              class DoFObjectAccessor<0, dim>;
@@ -100,6 +101,14 @@ class DoFAccessor
     const DoFHandler<dim> &
     get_dof_handler () const;
 
+                                     /**
+                                      * Return the finite element that
+                                      * is used on the cell pointed to
+                                      * by this iterator.
+                                      */
+    const FiniteElement<dim> &
+    get_fe () const;
+    
 				     /**
 				      * Copy operator.
 				      */

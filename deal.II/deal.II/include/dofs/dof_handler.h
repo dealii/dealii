@@ -23,6 +23,7 @@
 #include <map>
 #include <set>
 
+template <int dim> class DoFAccessor;
 template <int dim> class DoFCellAccessor;
 template <int dim> class DoFLevel;
 template <int celldim, int dim> class DoFObjectAccessor;
@@ -1142,6 +1143,11 @@ class DoFHandler  :  public Subscriptor,
 				      * of freedom located at vertices.
 				      */
     std::vector<unsigned int>      vertex_dofs;
+
+				     /**
+				      * Make accessor objects friends.
+				      */
+    template <int dim1> friend class DoFAccessor;
 
 				     /**
 				      * Make accessor objects friends.
