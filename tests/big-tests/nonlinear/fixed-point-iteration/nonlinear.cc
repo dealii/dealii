@@ -19,6 +19,7 @@
 #include <numerics/base.h>
 #include <numerics/assembler.h>
 #include <numerics/error_estimator.h>
+#include <base/logstream.h>
 
 #include <map>
 #include <fstream>
@@ -248,6 +249,8 @@ void NonlinearProblem<dim>::run () {
 
 int main ()
 {
+  deallog.depth_console (0);
+  
   NonlinearProblem<2> problem;
   problem.run ();
 };
