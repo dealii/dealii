@@ -19,7 +19,12 @@
 #include <lac/vector_memory.h>
 #include <numerics/data_out.h>
 
-#include <strstream>
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
+
 #include <iomanip>
 #include <fstream>
 
@@ -112,10 +117,19 @@ DoFPrintSolverStep<dim, SOLVER, VECTOR>::print_vectors (const unsigned int step,
   out.add_data_vector(r, "residual");
   out.add_data_vector(d, "update");
 
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream filename;
+#else
   std::ostrstream filename;
+#endif
+
   filename << basename
-	   << setw(3) << setfill('0') << step
-	   << out.default_suffix() << ends;
+	   << std::setw(3) << setfill('0') << step
+	   << out.default_suffix();
+
+#ifndef HAVE_STD_STRINGSTREAM
+  filename << std::ends;
+#endif
 
   const std::string fname = filename.str();
 
