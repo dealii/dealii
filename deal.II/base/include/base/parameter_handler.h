@@ -14,6 +14,12 @@
 #define __deal2__parameter_handler_h
 
 
+//TODO:[WB] Use numeric_limits to designate the default values of bounds parameters
+// of Patterns::Integer and Patterns::Double. This would then allow to use half-open
+// intervals as well, among other advantages.
+
+
+
 // public classes; to be declared below
 class ParameterHandler;
 class MultipleParameterLoop;
@@ -24,8 +30,10 @@ class MultipleParameterLoop;
 #include <string>
 #include <base/exceptions.h>
 
+
 // forward declaration
 class LogStream;
+
 
 /**
  * List of possible output formats.
@@ -33,6 +41,7 @@ class LogStream;
 enum OutputStyle {
       Text, LaTeX, HTML
 };
+
 
 
 /**

@@ -49,6 +49,7 @@
  *
  * @author G. Kanschat, W. Bangerth
  */
+//TODO:[?] make class work with multithreading as well. better docs.
 class Timer
 {
   public:

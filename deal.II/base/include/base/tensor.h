@@ -392,6 +392,7 @@ Tensor<rank_,dim>::memory_consumption ()
     be properly accessed (haven't investigated why). If anyone has a better
     idea, realize it!
 */
+//TODO:[WB] move the exceptions back into the Tensor class, if the compiler allows to do so. Also rename them back (i.e. drop the initial Tensor* from the name)
 DeclException1 (ExcInvalidTensorIndex,
 		int,
 		<< "Invalid tensor index " << arg1);

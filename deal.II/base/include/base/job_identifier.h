@@ -37,6 +37,7 @@ class JobIdentifier
 				     /**
 				      * ???
 				      */
+//TODO:[GK] document this variable    
     static const char* program_id();
 
 				     /**

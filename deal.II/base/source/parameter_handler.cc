@@ -12,6 +12,9 @@
 //----------------------------  parameter_handler.cc  ---------------------------
 
 
+//TODO:[WB] use [io]stringstream instead of [io]strstream if they become available
+//TODO:[WB] replace s.c_str() by s when that is possible
+
 #include <base/parameter_handler.h>
 #include <base/logstream.h>
 #include <base/memory_consumption.h>

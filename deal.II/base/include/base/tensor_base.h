@@ -19,6 +19,9 @@
 // tensor stuff, so we don't want the whole tensor package to be included
 // everytime we use a point.
 
+
+//TODO:[WB] Change <iostream> to <ostream> when that becomes available
+
 #include <base/exceptions.h>
 #include <iostream>
 #include <vector>
@@ -68,37 +71,16 @@ class Tensor<1,dim>
 				      */
     static const unsigned int rank      = 1;
 
-#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)  
-				     /**
-				      * Unnecessary variable, only used in
-				      * the declaration of @p{array_type}.
-				      * This variable should be omitted,
-				      * but egcs1.1.2 chokes on that so
-				      * we need it presently.
-				      */
-    static const unsigned int array_size = ((dim!=0) ? (dim) : 1);
-
 				     /**
 				      * Declare an array type which can
 				      * be used to initialize statically
 				      * an object of this type.
 				      *
-				      * Use the same condition for @p{dim==0}
-				      * as in the @p{TensorBase<1,dim>} class.
+				      * Avoid warning about zero-sized
+				      * array for @p{dim==0} by
+				      * choosing lunatic value.
 				      */
-    typedef double array_type[array_size];
-#else
-
-				     /**
-				      * Declare an array type which can
-				      * be used to initialize statically
-				      * an object of this type.
-				      *
-				      * Use the same condition for @p{dim==0}
-				      * as in the @p{TensorBase<1,dim>} class.
-				      */
-    typedef double array_type[(dim!=0) ? dim : 1];
-#endif
+    typedef double array_type[(dim!=0) ? dim : (unsigned int)(-1)];
     
 				     /**
 				      * Constructor. Initialize all entries
@@ -262,6 +244,7 @@ class Tensor<1,dim>
 				 /**
 				  * Exception
 				  */
+//TODO:[WB] move the exceptions back into the Tensor class, if the compiler allows to do so. Also rename them back (i.e. drop the initial Tensor* from the name)
 DeclException2(ExcWrongVectorSize, int, int, << "Tensor has " << arg1
 	       << " entries, but vector has size " << arg2);
 DeclException1 (ExcDimTooSmall,
