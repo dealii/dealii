@@ -1,4 +1,5 @@
 #include <base/tensor.h>
+#include <lac/vector.h>
 #include <iostream>
 
 
@@ -10,6 +11,14 @@ int main () {
   Tensor<2,dim> t(a);
   Tensor<2,dim> tt;
   Tensor<2,dim> result(b);
+
+  Vector<double> unrolled(9);
+  
+  t.unroll(unrolled);
+  cout << "unrolled:";
+  for (unsigned i=0;i<9;i++)
+    cout << ' ' << unrolled(i);
+  cout << endl;
 
   cout << "t=" << endl;
   for (unsigned int i=0; i<dim; ++i)

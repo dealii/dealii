@@ -22,20 +22,20 @@ vpath %.a: $D/deal.II/lib
 test: run-reference run-logtest run-tensor
 
 
-reference: reference.go
-	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
+reference: reference.go -lbase.g
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 run-reference: reference
 	-./reference
 
-logtest: logtest.go
-	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
+logtest: logtest.go -lbase.g
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 run-logtest: logtest
 	-./logtest
 
-tensor: tensor.go
-	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
+tensor: tensor.go -lbase.g -llac.g
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 run-tensor: tensor
 	-./tensor
