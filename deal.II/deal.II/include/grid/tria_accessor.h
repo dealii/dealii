@@ -28,6 +28,7 @@ class Quad;
 class Hexahedron;
 
 
+//TODO:[WB] comment outdated. include templates right into this file
 // note: in non-debug mode, i.e. with optimizations, the file
 // tria_accessor.templates.h is included at the end of this file.
 // this includes a lot of templates and thus makes compilation
@@ -647,7 +648,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 
 /**
  * Closure class to stop induction of classes. Should never be called and thus
- * producesan error when created.
+ * produces an error when created.
  */
 template<int dim>
 class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
