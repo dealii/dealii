@@ -584,9 +584,6 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        return n;
  *      };  
  *    \end{verbatim}
- *    Unfortunately, #g++# presently (version 2.7.2) fails to find the right
- *    #distance# template instantiation; it seems we have to wait for future
- *    #g++# versions :-(
  *    
  *  \item {\it Refining all cells of a triangulation}
  *    \begin{verbatim}

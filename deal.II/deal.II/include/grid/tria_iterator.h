@@ -98,8 +98,7 @@
  *   the STL documentation. It is therefore possible to use the functions
  *   from the {\it algorithm section} of the C++ standard, e.g. #count_if#
  *   (see the documentation for \Ref{Triangulation} for an example) and
- *   several others. Unfortunately, with some of them (e.g. #distance#),
- *   g++2.7 has some problems and we will have to wait for g++2.8.
+ *   several others.
  *   
  *
  *   \subsection{Differences between the classes in this inheritance tree}
