@@ -622,6 +622,19 @@ namespace StandardExceptions
   DeclException0 (ExcDivideByZero);
 
 				   /**
+				    * Trying to allocate a new
+				    * object failed due to lack of
+				    * free memory.
+				    */
+  DeclException0 (ExcOutOfMemory);
+
+				   /**
+				    * An error occured reading or
+				    * writing a file.
+				    */
+  DeclException0 (ExcIO);
+
+				   /**
 				    * Exception denoting a part of the
 				    * library or application program
 				    * that has not yet been
