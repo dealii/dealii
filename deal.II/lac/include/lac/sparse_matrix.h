@@ -571,7 +571,7 @@ class SparseMatrix
 
 				     /**
 				      * Generate ILU.
-				      * The matrix will entries contain the
+				      * The matrix entries will contain the
 				      * incomplete LU-factorization of
 				      * the matrix #source#. Having a matrix
 				      * #source# and a matrix structure object
