@@ -14,15 +14,17 @@
 #define __deal2__fe_update_flags_h
 
 
+//TODO:[GK] Bring docs and declarations into synch
 /**
- * Provide a set of flags which tells the @p{FEValues<>::reinit} function, which
- * fields are to be updated for each cell. E.g. if you do not need the
- * gradients since you want to assemble the mass matrix, you can switch that
- * off. By default, all flags are off, i.e. no reinitialization will be done.
+ * Provide a set of flags which tells the @p{FEValues<>::reinit}
+ * function, which fields are to be updated for each cell. E.g. if you
+ * do not need the gradients since you want to assemble the mass
+ * matrix, you can switch that off. By default, all flags are off,
+ * i.e. no reinitialization will be done.
  *
  * A variable of this type has to be passed to the constructor of the
- * @p{FEValues} object. You can select more than one flag by concatenation
- * using the @p{|} (bitwise @p{or}) operator.
+ * @p{FEValues} object. You can select more than one flag by
+ * concatenation using the @p{|} (bitwise @p{or}) operator.
  *
  *
  * @sect2{Description of Flags}
@@ -60,7 +62,8 @@
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001
  */
-enum UpdateFlags {
+enum UpdateFlags
+{
 				       /**
 					* Default: update nothing.
 					*/
