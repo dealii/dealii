@@ -345,8 +345,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	    {
 	      typename DoFHandler<dim>::cell_iterator
 		neighbor = cell->neighbor(face);
-					       // Refinement edges are taken care of
-					       // by coarser cells
+					       // Refinement edges are
+					       // taken care of by
+					       // coarser cells
 	      if (neighbor->level() < cell->level())
 		continue;
 
