@@ -28,70 +28,212 @@ using namespace std;
 #endif
 
 
+/* ----------------------- FESystem::InternalData ------------------- */
+
+
+template <int dim>
+inline FiniteElementBase<dim>::InternalDataBase &
+FESystem<dim>::
+InternalData::get_fe_data (const unsigned int base_no) const
+{
+  Assert(base_no<base_fe_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_datas.size()));
+  return *base_fe_datas[base_no];
+};
+
+
+
+template <int dim>
+inline void
+FESystem<dim>::
+InternalData::set_fe_data (const unsigned int base_no,
+			   FiniteElementBase<dim>::InternalDataBase *ptr)
+{
+  Assert(base_no<base_fe_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_datas.size()));
+  base_fe_datas[base_no]=ptr;
+};
+
+
+
+template <int dim>
+inline FEValuesData<dim> &
+FESystem<dim>::
+InternalData::get_fe_values_data (const unsigned int base_no) const
+{
+  Assert(base_no<base_fe_values_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
+  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
+  return *base_fe_values_datas[base_no];
+};
+
+
+
+template <int dim>
+inline void
+FESystem<dim>::
+InternalData::set_fe_values_data (const unsigned int base_no,
+				  FEValuesData<dim> *ptr)
+{
+  Assert(base_no<base_fe_values_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
+  base_fe_values_datas[base_no]=ptr;
+};
+
+
+
+template <int dim>
+inline void
+FESystem<dim>::
+InternalData::delete_fe_values_data (const unsigned int base_no)
+{
+  Assert(base_no<base_fe_values_datas.size(),
+	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
+  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
+  delete base_fe_values_datas[base_no];
+  base_fe_values_datas[base_no]=0;
+}
+
+
+
+/* ---------------------------------- FESystem ------------------- */
+
+
+template <int dim>
+FESystem<dim>::FESystem (const FiniteElement<dim> &fe, const unsigned int n_elements) :
+		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements),
+				    compute_restriction_is_additive_flags (fe, n_elements)),
+                base_elements(1)
+{
+  base_elements[0] = ElementPair(fe.clone(), n_elements);
+  base_elements[0].first->subscribe ();
+  initialize ();
+};
+
+
+
+template <int dim>
+FESystem<dim>::FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
+			 const FiniteElement<dim> &fe2, const unsigned int n2) :
+		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2),
+				    compute_restriction_is_additive_flags (fe1, n1,
+									   fe2, n2)),
+                base_elements(2)
+{
+  base_elements[0] = ElementPair(fe1.clone(), n1);
+  base_elements[0].first->subscribe ();
+  base_elements[1] = ElementPair(fe2.clone(), n2);
+  base_elements[1].first->subscribe ();
+  initialize ();
+};
+
+
+
+template <int dim>
+FESystem<dim>::FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
+			 const FiniteElement<dim> &fe2, const unsigned int n2,
+			 const FiniteElement<dim> &fe3, const unsigned int n3) :
+		FiniteElement<dim> (multiply_dof_numbers(fe1, n1,
+							 fe2, n2,
+							 fe3, n3),
+				    compute_restriction_is_additive_flags (fe1, n1,
+									   fe2, n2,
+									   fe3, n3)),
+                base_elements(3)
+{
+  base_elements[0] = ElementPair(fe1.clone(), n1);  
+  base_elements[0].first->subscribe ();
+  base_elements[1] = ElementPair(fe2.clone(), n2);
+  base_elements[1].first->subscribe ();
+  base_elements[2] = ElementPair(fe3.clone(), n3);
+  base_elements[2].first->subscribe ();
+  initialize ();
+};
+
+
 
 template <int dim>
 FESystem<dim>::~FESystem ()
 {
-  for (unsigned i=0;i<base_elements.size();++i)
+				   // delete base elements created in
+				   // the constructor
+  for (unsigned i=0; i<base_elements.size(); ++i)
     {
-      base_elements[i].first -> unsubscribe ();
+      base_elements[i].first->unsubscribe();
       delete base_elements[i].first;
+      base_elements[i].first = 0;
     }
 };
+
 
 
 template <int dim>
 FiniteElement<dim>*
 FESystem<dim>::clone() const
 {
-  FiniteElement<dim> *fe=0;
   switch (n_base_elements())
     {
       case 1:
-	    fe=new FESystem(base_element(0),
-			    element_multiplicity(0));
+	    return new FESystem(base_element(0),
+				element_multiplicity(0));
       case 2:
-	    fe=new FESystem(base_element(0),
-			    element_multiplicity(0),
-			    base_element(1),
-			    element_multiplicity(1));
+	    return new FESystem(base_element(0),
+				element_multiplicity(0),
+				base_element(1),
+				element_multiplicity(1));
       case 3:
-	    fe=new FESystem(base_element(0),
-			    element_multiplicity(0),
-			    base_element(1),
-			    element_multiplicity(1),
-			    base_element(2),
-			    element_multiplicity(2));
+	    return new FESystem(base_element(0),
+				element_multiplicity(0),
+				base_element(1),
+				element_multiplicity(1),
+				base_element(2),
+				element_multiplicity(2));
       default:
 	    Assert(false, ExcNotImplemented());
     }
-  return fe;
+  return 0;
 }
 
 
+
 template <int dim>
-void FESystem<dim>::get_unit_support_points (
-  typename std::vector<Point<dim> > &unit_support_points) const
+void
+FESystem<dim>::
+get_unit_support_points (typename std::vector<Point<dim> > &unit_support_points) const
 {
+				   // generate unit support points
+				   // from unit support points of sub
+				   // elements
   unit_support_points.resize(dofs_per_cell);
   
   typename std::vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
   unsigned int comp = 0;
-  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+  for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
     {
-      const unsigned int base_element_dofs_per_cell
-	=base_element(base_el).dofs_per_cell;
+      const unsigned int
+	base_element_dofs_per_cell = base_element(base_el).dofs_per_cell;
  
       base_element(base_el).get_unit_support_points (base_unit_support_points);
+				       // if one of the base elements
+				       // has no support points, then
+				       // it makes no sense to define
+				       // support points for the
+				       // composed element, so return
+				       // an empty array to
+				       // demonstrate that fact
       if (base_unit_support_points.size()==0)
 	{
-	  base_unit_support_points.resize(0);
+	  unit_support_points.resize(0);
 	  return;
 	}
-      
+
+				       // otherwise distribute the
+				       // support of this base element
+				       // to all degrees of freedom
+				       // contributed by it
       Assert(base_unit_support_points.size()==base_element_dofs_per_cell,
 	     ExcInternalError());
-      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n, ++comp)
+      for (unsigned int n=0; n<element_multiplicity(base_el); ++n, ++comp)
 	for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
 	  unit_support_points[component_to_system_index(comp,i)]
 	    = base_unit_support_points[i];

@@ -14,7 +14,7 @@
 #define __deal2__fe_system_h
 
 
-/*----------------------------   fe_lib.system.h     ---------------------------*/
+/*----------------------------   fe_system.h     ---------------------------*/
 
 
 #include <fe/fe.h>
@@ -194,12 +194,13 @@ class FESystem : public FiniteElement<dim>
 				      * the @p{cell->get_dof_indices}
 				      * function, but:
 				      *
-				      * If the shape functions of one
-				      * of the base elements are not
-				      * Lagrangian interpolants at
-				      * some points, the size of the
-				      * array will be zero after
-				      * calling this function.
+				      * If one of the base elements
+				      * has no support points, then it
+				      * makes no sense to define
+				      * support points for the
+				      * composed element, so return an
+				      * empty array to demonstrate
+				      * that fact.
 				      */
     virtual void get_unit_support_points (typename std::vector<Point<dim> > &) const;    
 
@@ -572,151 +573,41 @@ class FESystem : public FiniteElement<dim>
 };
 
 
-/* ------------------------- template functions ------------------------- */
+/* ------------------------- inline functions ------------------------- */
 
 template<int dim>
 inline unsigned int
 FESystem<dim>::n_base_elements() const
 {
   return base_elements.size();
-}
-
-
-template <int dim>
-FESystem<dim>::FESystem (const FiniteElement<dim> &fe, const unsigned int n_elements) :
-		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements),
-				    compute_restriction_is_additive_flags (fe, n_elements)),
-  base_elements(1)
-{
-  base_elements[0] = ElementPair(fe.clone(), n_elements);
-  base_elements[0].first -> subscribe ();
-  initialize ();
 };
 
-
-template <int dim>
-FESystem<dim>::FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
-			 const FiniteElement<dim> &fe2, const unsigned int n2)
-		:
-		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2),
-				    compute_restriction_is_additive_flags (fe1, n1,
-									   fe2, n2)),
-  base_elements(2)
-{
-  base_elements[0] = ElementPair(fe1.clone(), n1);
-  base_elements[0].first -> subscribe ();
-  base_elements[1] = ElementPair(fe2.clone(), n2);
-  base_elements[1].first -> subscribe ();
-  initialize ();
-};
-
-
-template <int dim>
-FESystem<dim>::FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
-			 const FiniteElement<dim> &fe2, const unsigned int n2,
-			 const FiniteElement<dim> &fe3, const unsigned int n3)
-		:
-		FiniteElement<dim> (multiply_dof_numbers(fe1, n1,
-							 fe2, n2,
-							 fe3, n3),
-				    compute_restriction_is_additive_flags (fe1, n1,
-									   fe2, n2,
-									   fe3, n3)),
-  base_elements(3)
-{
-  base_elements[0] = ElementPair(fe1.clone(), n1);  
-  base_elements[0].first -> subscribe ();
-  base_elements[1] = ElementPair(fe2.clone(), n2);
-  base_elements[1].first -> subscribe ();
-  base_elements[2] = ElementPair(fe3.clone(), n3);
-  base_elements[2].first -> subscribe ();
-  initialize ();
-};
 
 
 template<int dim>
 inline unsigned int
-FESystem<dim>::element_multiplicity(unsigned int index) const
+FESystem<dim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
   return base_elements[index].second;
-}
+};
+
 
 
 template <int dim>
-inline const FiniteElement<dim>&
-FESystem<dim>::base_element(unsigned int index) const
+inline const FiniteElement<dim> &
+FESystem<dim>::base_element (const unsigned int index) const
 {
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
   return *base_elements[index].first;
-}
-
-
-template <int dim>
-inline FiniteElementBase<dim>::InternalDataBase &
-FESystem<dim>::
-InternalData::get_fe_data(unsigned int base_no) const
-{
-  Assert(base_no<base_fe_datas.size(),
-	 ExcIndexRange(base_no,0,base_fe_datas.size()));
-  return *base_fe_datas[base_no];
-}
+};
 
 
 
-template <int dim>
-inline void
-FESystem<dim>::
-InternalData::set_fe_data(unsigned int base_no,
-			  FiniteElementBase<dim>::InternalDataBase *ptr)
-{
-  Assert(base_no<base_fe_datas.size(),
-	 ExcIndexRange(base_no,0,base_fe_datas.size()));
-  base_fe_datas[base_no]=ptr;
-}
 
 
-template <int dim>
-inline FEValuesData<dim> &
-FESystem<dim>::
-InternalData::get_fe_values_data(unsigned int base_no) const
-{
-  Assert(base_no<base_fe_values_datas.size(),
-	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
-  return *base_fe_values_datas[base_no];
-}
-
-
-
-template <int dim>
-inline void
-FESystem<dim>::
-InternalData::set_fe_values_data(unsigned int base_no,
-				 FEValuesData<dim> *ptr)
-{
-  Assert(base_no<base_fe_values_datas.size(),
-	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  base_fe_values_datas[base_no]=ptr;
-}
-
-
-template <int dim>
-inline void
-FESystem<dim>::
-InternalData::delete_fe_values_data(unsigned int base_no)
-{
-  Assert(base_no<base_fe_values_datas.size(),
-	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
-  delete base_fe_values_datas[base_no];
-  base_fe_values_datas[base_no]=0;
-}
-
-
-/*----------------------------  fe_lib.system.h  ---------------------------*/
-
+/*----------------------------  fe_system.h  ---------------------------*/
 #endif
-/*----------------------------  fe_lib.system.h  ---------------------------*/
+/*----------------------------  fe_system.h  ---------------------------*/
