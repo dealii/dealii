@@ -26,9 +26,14 @@
 
 #include <fstream>
 
+#define PREC_CHECK(solver, method, precond) try \
+ { solver.method (A, u, f, precond);  } catch (...) {} \
+ residuals.push_back(control.last_value())
+
 template<class MATRIX>
 void
-check_vmult_quadratic(const MATRIX& A,
+check_vmult_quadratic(std::vector<double>& residuals,
+		      const MATRIX& A,
 		      const char* prefix)
 {
   deallog.push(prefix);
@@ -40,7 +45,7 @@ check_vmult_quadratic(const MATRIX& A,
   SolverControl control(10, 1.e-13, false);
   SolverRichardson<> rich(control, mem, .01);
   SolverRichardson<> prich(control, mem, 1.);
-  PreconditionIdentity prec;
+  PreconditionIdentity identity;
   PreconditionJacobi<MATRIX> jacobi;
   jacobi.initialize(A, .5);
   PreconditionSOR<MATRIX> sor;
@@ -51,19 +56,40 @@ check_vmult_quadratic(const MATRIX& A,
   u = 0.;
   f = 1.;
 
-  try { rich.solve(A, u, f, prec); }    catch (...) {}
-  try { prich.solve(A, u, f, jacobi); } catch (...) {}
-  try { prich.solve(A, u, f, ssor); }   catch (...) {}
-  try { prich.solve(A, u, f, sor); }    catch (...) {}
-
+  PREC_CHECK(rich, solve, identity);
+  PREC_CHECK(prich, solve, jacobi);
+  PREC_CHECK(prich, solve, ssor);
+  PREC_CHECK(prich, solve, sor);
+  
   u = 0.;
   deallog << "Transpose" << std::endl;
-  try { rich.Tsolve(A, u, f, prec); }    catch (...) {}
-  try { prich.Tsolve(A, u, f, jacobi); } catch (...) {}
-  try { prich.Tsolve(A, u, f, ssor); }   catch (...) {}
-  try { prich.Tsolve(A, u, f, sor); }    catch (...) {}
+  PREC_CHECK(rich, Tsolve, identity);
+  PREC_CHECK(prich, Tsolve, jacobi);
+  PREC_CHECK(prich, Tsolve, ssor);
+  PREC_CHECK(prich, Tsolve, sor);
   deallog.pop();
 }
+
+
+template <class MATRIX>
+void
+check_iterator (const MATRIX& A)
+{
+  for (typename MATRIX::const_iterator i = A.begin(); i!= A.end(); ++i)
+    deallog << '\t' << i->row()
+	    << '\t' << i->column()
+      	    << '\t' << i->index()
+      	    << '\t' << i->value()
+	    << std::endl;
+  deallog << "Repeat row 2" << std::endl;
+  for (typename MATRIX::const_iterator i = A.begin(2); i!= A.end(2); ++i)
+    deallog << '\t' << i->row()
+	    << '\t' << i->column()
+      	    << '\t' << i->index()
+      	    << '\t' << i->value()
+	    << std::endl;
+}
+
 
 int main()
 {
@@ -89,6 +115,9 @@ int main()
   FDMatrix testproblem (size, size);
   unsigned int dim = (size-1)*(size-1);
 
+  std::vector<double> A_res;
+  std::vector<double> E_res;
+  
   deallog << "Structure" << std::endl;
   SparsityPattern structure(dim, dim, 5);
   testproblem.five_point_structure(structure);
@@ -96,13 +125,16 @@ int main()
   SparseMatrix<double>  A(structure);
   deallog << "Assemble" << std::endl;
   testproblem.five_point(A, true);
-  check_vmult_quadratic(A, "5-SparseMatrix<double>");
+  check_vmult_quadratic(A_res, A, "5-SparseMatrix<double>");
 
   SparseMatrixEZ<double> E(dim,dim,row_length,2);
   deallog << "Assemble" << std::endl;
   testproblem.five_point(E, true);
-  check_vmult_quadratic(E, "5-SparseMatrixEZ<double>");
-
+  check_vmult_quadratic(E_res, E, "5-SparseMatrixEZ<double>");
+#ifdef DEBUG
+  check_iterator(E);
+#endif
+  
   A.clear();
   deallog << "Structure" << std::endl;
   structure.reinit(dim, dim, 9);
@@ -111,12 +143,16 @@ int main()
   A.reinit(structure);
   deallog << "Assemble" << std::endl;
   testproblem.nine_point(A);
-  check_vmult_quadratic(A, "9-SparseMatrix<double>");
+  check_vmult_quadratic(A_res, A, "9-SparseMatrix<double>");
 
   E.clear();
   E.reinit(dim,dim,row_length,2);
   deallog << "Assemble" << std::endl;
   testproblem.nine_point(E);
-  check_vmult_quadratic(E, "9-SparseMatrixEZ<double>");
-  
+  check_vmult_quadratic(E_res, E, "9-SparseMatrixEZ<double>");
+
+  for (unsigned int i=0;i<A_res.size();++i)
+    if (std::fabs(A_res[i] - E_res[i]) > 1.e-14)
+      deallog << "SparseMatrix and SparseMatrixEZ differ!!!"
+	      << std::endl;
 }

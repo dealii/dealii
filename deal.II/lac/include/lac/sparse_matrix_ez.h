@@ -31,8 +31,49 @@ template<typename number> class FullMatrix;
  * builds the pattern on the fly. Filling the matrix may consume more
  * time as with @p{SparseMatrix}, since large memory movements may be
  * involved. To help optimizing things, an expected row-length may be
- * provided to the constructor, as well as a mininmum size increment
+ * provided to the constructor, as well as an increment size
  * for rows.
+ *
+ * The storage structure: like with the usual sparse matrix, it is
+ * attempted to store only non-zero elements. these are stored in a
+ * single data array @p{data}. They are ordered by row and inside each
+ * row by column number. Each row is described by its starting point
+ * in the data array and its length. These are stored in the
+ * @p{row_info} array, together with additional useful information.
+ *
+ * Due to the structure, gaps may occur between rows. Whenever a new
+ * entry must be created, an attempt is made to use the gap in its
+ * row. If the gap is full, the row must be extended and all
+ * subsequent rows must be shifted backwards. This is a very expensive
+ * operation and should be avoided as much as possible.
+ *
+ * This is, where the optimization parameters, provided to the
+ * constructor or to the function @p{reinit} come
+ * in. @p{default_row_length} is the amount of entries that will be
+ * allocated for each row on initialization (the actual length of the
+ * rows is still zero). This means, that @p{default_row_length}
+ * entries can be added to this row without shifting other rows. If
+ * less entries are added, the additional memory will be wasted.
+ *
+ * If the space for a row is not sufficient, then it is enlarged by
+ * @p{default_increment} entries. This way, the subsequent rows are
+ * not shifted by single entries very often.
+ *
+ * Finally, the @p{default_reserve} allocates extra space at the end
+ * of the data array. This space is used whenever a row must be
+ * enlarged. Since @p{std::vector} doubles the capacity everytime it
+ * must increase it, this value should allow for all the growth needed.
+ *
+ * Suggested settings: @p{default_row_length} should be the length of
+ * a typical row, for instance the size of the stencil in regular
+ * parts of the grid. Then, @p{default_increment} may be the expected
+ * amount of entries added to the row by having one hanging node. This
+ * way, a good compromise between memory consumption and speed should
+ * be achieved. @p{default_reserve} should then be an estimate for the
+ * number of hanging nodes times @p{default_increment}.
+ *
+ * If the rows are expected to be filled more or less from first to
+ * last, using a @p{default_row_length} may not be such a bad idea.
  *
  * The name of this matrix is in reverence to a publication of the
  * Internal Revenue Service of the United States of America. I hope
@@ -124,9 +165,124 @@ class SparseMatrixEZ : public Subscriptor
 	static const unsigned short
 	invalid_diagonal = static_cast<unsigned short>(-1);
     };
-    
-    
+
   public:
+				     /**
+				      * Accessor class for iterators
+				      */
+    class Accessor
+    {
+      public:
+					 /**
+					  * Constructor. Since we use
+					  * accessors only for read
+					  * access, a const matrix
+					  * pointer is sufficient.
+					  */
+	Accessor (const SparseMatrixEZ<number>*,
+		  unsigned int row,
+		  unsigned short index);
+
+					 /**
+					  * Row number of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned int row() const;
+
+					 /**
+					  * Index in row of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned short index() const;
+
+					 /**
+					  * Column number of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int column() const;
+
+					 /**
+					  * Value of this matrix entry.
+					  */
+	number value() const;
+	
+	protected:
+					 /**
+					  * The matrix accessed.
+					  */
+	const SparseMatrixEZ<number>* matrix;
+
+					 /**
+					  * Current row number.
+					  */
+	unsigned int a_row;
+
+					 /**
+					  * Current index in row.
+					  */
+	unsigned short a_index;
+      };
+
+				     /**
+				      * STL conforming iterator.
+				      */
+    class const_iterator : private Accessor
+      {
+	public:
+					   /**
+					    * Constructor.
+					    */ 
+	const_iterator(const SparseMatrixEZ<number>*,
+		       unsigned int row,
+		       unsigned short index);
+	  
+					   /**
+					    * Prefix increment.
+					    */
+	const_iterator& operator++ ();
+
+					   /**
+					    * Postfix increment.
+					    */
+	const_iterator& operator++ (int);
+
+					   /**
+					    * Dereferencing operator.
+					    */
+	const Accessor& operator* () const;
+
+					   /**
+					    * Dereferencing operator.
+					    */
+	const Accessor* operator-> () const;
+
+					   /**
+					    * Comparison. True, if
+					    * both iterators point to
+					    * the same matrix
+					    * position.
+					    */
+	bool operator == (const const_iterator&) const;
+					   /**
+					    * Inverse of @p{==}.
+					    */
+	bool operator != (const const_iterator&) const;
+
+					   /**
+					    * Comparison
+					    * operator. Result is true
+					    * if either the first row
+					    * number is smaller or if
+					    * the row numbers are
+					    * equal and the first
+					    * index is smaller.
+					    */
+	bool operator < (const const_iterator&) const;
+      };
+    
 				     /**
 				      * Type of matrix entries. In analogy to
 				      * the STL container classes.
@@ -237,31 +393,6 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     unsigned int n () const;
 
-				     /**
-				      * Return the number of nonzero
-				      * elements of this
-				      * matrix. Actually, it returns
-				      * the number of entries in the
-				      * sparsity pattern; if any of
-				      * the entries should happen to
-				      * be zero, it is counted anyway.
-				      */
-//    unsigned int n_nonzero_elements () const;
-
-				     /**
-				      * Return the number of actually
-				      * nonzero elements of this
-				      * matrix.
-				      *
-				      * Note, that this function does
-				      * (in contrary to the
-				      * @p{n_nonzero_elements}) NOT
-				      * count all entries of the
-				      * sparsity pattern but only the
-				      * ones that are nonzero.
-				      */
-//    unsigned int n_actually_nonzero_elements () const;
-    
 				     /**
 				      * Set the element @p{(i,j)} to
 				      * @p{value}. Allocates the entry
@@ -428,6 +559,14 @@ class SparseMatrixEZ : public Subscriptor
 			const unsigned int j) const;
 
 				     /**
+				      * Return the value of the entry
+				      * (i,j). Returns zero for all
+				      * non-existing entries.
+				      */
+    number el (const unsigned int i,
+	       const unsigned int j) const;
+
+				     /**
 				      * Return the main diagonal element in
 				      * the @p{i}th row. This function throws an
 				      * error if the matrix is not square.
@@ -441,14 +580,14 @@ class SparseMatrixEZ : public Subscriptor
 				      * involve searching for the
 				      * right column number.
 				      */
-    number diag_element (const unsigned int i) const;
+//    number diag_element (const unsigned int i) const;
 
 				     /**
 				      * Same as above, but return a
 				      * writeable reference. You're
 				      * sure you know what you do?
 				      */
-    number & diag_element (const unsigned int i);
+//    number & diag_element (const unsigned int i);
     
 				     /**
 				      * Matrix-vector multiplication:
@@ -592,6 +731,42 @@ class SparseMatrixEZ : public Subscriptor
     void precondition_TSOR (Vector<somenumber>       &dst,
 			    const Vector<somenumber> &src,
 			    const number              om = 1.) const;
+
+				     /**
+				      * STL-like iterator with the
+				      * first entry.
+				      */
+    const_iterator begin () const;
+
+				     /**
+				      * Final iterator.
+				      */
+    const_iterator end () const;
+    
+				     /**
+				      * STL-like iterator with the
+				      * first entry of row @p{r}.
+				      */
+    const_iterator begin (unsigned int r) const;
+
+				     /**
+				      * Final iterator of row @p{r}.
+				      */
+    const_iterator end (unsigned int r) const;
+    
+				     /**
+				      * Return the number of nonzero
+				      * elements of this
+				      * matrix.
+				      */
+//    unsigned int n_nonzero_elements () const;
+
+				     /**
+				      * Return the number of actually
+				      * nonzero elements of this
+				      * matrix.
+				      */
+//    unsigned int n_actually_nonzero_elements () const;
     
 				     /**
 				      * Print the matrix to the given
@@ -667,8 +842,15 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     DeclException0(ExcNoDiagonal);
     
-  private:
+    				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The entry with index <" << arg1 << ',' << arg2
+		    << "> does not exist.");
 
+  private:
 				     /**
 				      * Find an entry. Return a
 				      * zero-pointer if the entry does
@@ -772,10 +954,9 @@ class SparseMatrixEZ : public Subscriptor
 				      * Increment when a row grows.
 				      */
     unsigned int increment;
-    
-				     // make all other sparse matrices
-				     // friends
-    template <typename somenumber> friend class SparseMatrix;
+
+    friend class Accessor;
+    friend class const_iterator;
 };
 
 
@@ -801,29 +982,140 @@ SparseMatrixEZ<number>::Entry::Entry()
 {}
 
 
-// template <typename number>
-// inline
-// bool
-// SparseMatrixEZ<number>::Entry::operator==(const Entry& e) const
-// {
-//   return column == e.column;
-// }
-
-
-// template <typename number>
-// inline
-// bool
-// SparseMatrixEZ<number>::Entry::operator<(const Entry& e) const
-// {
-//   return column < e.column;
-// }
-
 template <typename number>
 inline
 SparseMatrixEZ<number>::RowInfo::RowInfo(unsigned int start)
 		:
 		start(start), length(0), diagonal(invalid_diagonal)
 {}
+
+
+//----------------------------------------------------------------------//
+template <typename number>
+inline
+SparseMatrixEZ<number>::Accessor::Accessor (
+  const SparseMatrixEZ<number>* matrix,
+  unsigned int r,
+  unsigned short i)
+		:
+		matrix(matrix),
+		a_row(r),
+		a_index(i)
+{}
+
+
+template <typename number>
+inline
+unsigned int
+SparseMatrixEZ<number>::Accessor::row() const
+{
+  return a_row;
+}
+
+
+template <typename number>
+inline
+unsigned int
+SparseMatrixEZ<number>::Accessor::column() const
+{
+  return matrix->data[matrix->row_info[a_row].start+a_index].column;
+}
+
+
+template <typename number>
+inline
+unsigned short
+SparseMatrixEZ<number>::Accessor::index() const
+{
+  return a_index;
+}
+
+
+
+template <typename number>
+inline
+number
+SparseMatrixEZ<number>::Accessor::value() const
+{
+  return matrix->data[matrix->row_info[a_row].start+a_index].value;
+}
+
+
+template <typename number>
+inline
+SparseMatrixEZ<number>::const_iterator::const_iterator(
+  const SparseMatrixEZ<number>* matrix,
+  unsigned int r,
+  unsigned short i)
+		:
+		Accessor(matrix, r, i)
+{}
+
+
+template <typename number>
+inline
+SparseMatrixEZ<number>::const_iterator&
+SparseMatrixEZ<number>::const_iterator::operator++ ()
+{
+  Assert (a_row < matrix->m(), ExcIteratorPastEnd());
+  
+  ++a_index;
+  if (a_index >= matrix->row_info[a_row].length)
+    {
+      a_index = 0;
+      a_row++;
+    }
+  return *this;
+}
+
+
+template <typename number>
+inline
+const SparseMatrixEZ<number>::Accessor&
+SparseMatrixEZ<number>::const_iterator::operator* () const
+{
+  return *this;
+}
+
+
+template <typename number>
+inline
+const SparseMatrixEZ<number>::Accessor*
+SparseMatrixEZ<number>::const_iterator::operator-> () const
+{
+  return this;
+}
+
+
+template <typename number>
+inline
+bool
+SparseMatrixEZ<number>::const_iterator::operator == (
+  const const_iterator& other) const
+{
+  return (row() == other->row() && index() == other->index());
+}
+
+
+template <typename number>
+inline
+bool
+SparseMatrixEZ<number>::const_iterator::operator != (
+  const const_iterator& other) const
+{
+  return ! (*this == other);
+}
+
+
+template <typename number>
+inline
+bool
+SparseMatrixEZ<number>::const_iterator::operator < (
+  const const_iterator& other) const
+{
+  return (row() < other->row() ||
+	  (row() == other->row() && index() < other->index()));
+}
 
 
 //----------------------------------------------------------------------//
@@ -982,6 +1274,67 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
   entry->value += value;
 };
 
+
+
+template <typename number>
+inline
+number SparseMatrixEZ<number>::el (const unsigned int i,
+				   const unsigned int j) const
+{
+  Entry* entry = locate(i,j);
+  if (entry)
+    return entry->value;
+  return 0.;
+}
+
+
+
+template <typename number>
+inline
+number SparseMatrixEZ<number>::operator() (const unsigned int i,
+					   const unsigned int j) const
+{
+  Entry* entry = locate(i,j);
+  if (entry)
+    return entry->value;
+  Assert(false, ExcInvalidEntry(i,j));
+  return 0.;
+}
+
+
+template <typename number>
+inline
+SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::begin () const
+{
+  return const_iterator(this, 0, 0);
+}
+
+template <typename number>
+inline
+SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::end () const
+{
+  return const_iterator(this, m(), 0);
+}
+
+template <typename number>
+inline
+SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::begin (unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r, 0);
+}
+
+template <typename number>
+inline
+SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::end (unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r+1, 0);
+}
 
 #endif
 /*----------------------------   sparse_matrix.h     ---------------------------*/
