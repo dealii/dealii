@@ -3773,6 +3773,12 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     AC_DEFINE(DEAL_II_USE_PETSC, 1,
               [Defined if a PETSc installation was found and is going
                to be used])
+    dnl Set an additional variable (not via AC_DEFINE, since we don't want
+    dnl to have it in config.h) which we can use in doc/doxygen/options.dox.in.
+    dnl If we have PETSc, then the value of this variable expands to
+    dnl defining the string "DEAL_II_USE_PETSC" for the preprocessor. If
+    dnl we don't have no PETSc, then it does not define this string.
+    DEAL_II_DEFINE_DEAL_II_USE_PETSC=DEAL_II_USE_PETSC
   fi
 
 
