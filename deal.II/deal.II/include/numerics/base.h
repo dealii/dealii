@@ -308,7 +308,7 @@ class ProblemBase {
     virtual void assemble (const Equation<dim>      &equation,
 			   const Quadrature<dim>    &q,
 			   const FiniteElement<dim> &fe,
-			   const UpdateFlags        &update_flags,
+			   const UpdateFlags         update_flags,
 			   const DirichletBC        &dirichlet_bc = DirichletBC(),
 			   const Boundary<dim>      &boundary = StraightBoundary<dim>());
     
