@@ -89,6 +89,18 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: when checking for convergence in linear solvers in
+       <code class="member">SolverControl::check</code>, we first
+       checked whether the maximal iteration count was reached, and
+       only then whether the target residual was achieved. In cases,
+       where the target residual was only reached in the very last
+       allowed iteration, this led to a failure notice of the linear
+       solver, rather than to a success message. This is now fixed.
+       <br>
+       (WB 2001/11/19)
+       </p>
+
+  <li> <p>
        New: the <code class="class">SparseDirectMA27/47</code> classes
        now provide access to Mutex locks for external
        synchronisation. 

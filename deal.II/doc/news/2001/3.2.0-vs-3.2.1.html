@@ -15,6 +15,18 @@
 
 <ol>
   <li> <p>
+       Fixed: when checking for convergence in linear solvers in
+       <code class="member">SolverControl::check</code>, we first
+       checked whether the maximal iteration count was reached, and
+       only then whether the target residual was achieved. In cases,
+       where the target residual was only reached in the very last
+       allowed iteration, this led to a failure notice of the linear
+       solver, rather than to a success message. This is now fixed.
+       <br>
+       (WB 2001/11/19)
+       </p>
+
+  <li> <p>
        Fixed: an error in the definition of the <code
        class="member">SolverMinRes::solve</code> function prevented
        its compilation under some circumstances.
