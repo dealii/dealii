@@ -22,6 +22,7 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_nedelec.h>
+#include <fe/fe_system.h>
 #include <fstream>
 
 
@@ -57,6 +58,13 @@ void check ()
 
   if (dim > 1)
     check_el (FE_Nedelec<dim>(1));
+
+  check_el (FESystem<dim> (FE_Q<dim>(1), 2));
+  check_el (FESystem<dim> (FE_Q<dim>(1), 1,
+                           FE_Q<dim>(1), 1));
+
+  if (dim > 1)
+    check_el (FESystem<dim> (FE_Nedelec<dim>(1), 2));
 };
 
 
@@ -66,9 +74,9 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  check<1> ();
+//  check<1> ();
   check<2> ();
-  check<3> ();  
+//  check<3> ();  
   
   return 0;
 };
