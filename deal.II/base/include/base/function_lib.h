@@ -540,7 +540,7 @@ namespace Functions
  * Given a wavenumber vector generate a cosine function. The
  * wavenumber coefficient is given as a @p{d}-dimensional point @p{k}
  * in Fourier space, and the function is then recovered as @p{f(x) =
- * \prod_i cos(k_i x_i) = Re(\exp(i k.x))}.
+ * cos(\sum_i k_i x_i) = Re(\exp(i k.x))}.
  *
  * The class has its name from the fact that it resembles one
  * component of a Fourier cosine decomposition.
@@ -599,7 +599,7 @@ namespace Functions
  * Given a wavenumber vector generate a sine function. The
  * wavenumber coefficient is given as a @p{d}-dimensional point @p{k}
  * in Fourier space, and the function is then recovered as @p{f(x) =
- * \prod_i sin(k_i x_i) = Im(\exp(i k.x))}.
+ * sin(\sum_i k_i x_i) = Im(\exp(i k.x))}.
  *
  * The class has its name from the fact that it resembles one
  * component of a Fourier sine decomposition.
@@ -658,7 +658,7 @@ namespace Functions
  * of sine functions. Each wavenumber coefficient is given as a
  * @p{d}-dimensional point @p{k} in Fourier space, and the entire
  * function is then recovered as
- * @p{f(x) = \sum_j w_j \prod_i sin(k_i x_i) = Im(\sum_j w_j \exp(i k.x))}.
+ * @p{f(x) = \sum_j w_j sin(\sum_i k_i x_i) = Im(\sum_j w_j \exp(i k.x))}.
  *
  * @author Wolfgang Bangerth, 2001
  */
@@ -724,7 +724,7 @@ namespace Functions
  * of cosine functions. Each wavenumber coefficient is given as a
  * @p{d}-dimensional point @p{k} in Fourier space, and the entire
  * function is then recovered as
- * @p{f(x) = \sum_j w_j \prod_i cos(k_i x_i) = Re(\sum_j w_j \exp(i k.x))}.
+ * @p{f(x) = \sum_j w_j cos(\sum_i k_i x_i) = Re(\sum_j w_j \exp(i k.x))}.
  *
  * @author Wolfgang Bangerth, 2001
  */

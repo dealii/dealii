@@ -1119,7 +1119,7 @@ namespace Functions
   
   
   
-/* ---------------------- FourierSineFunction ----------------------- */
+/* ---------------------- FourierCosineFunction ----------------------- */
   
   
   template <int dim>
@@ -1138,10 +1138,7 @@ namespace Functions
 				     const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    double val=1;
-    for (unsigned int i=0; i<dim; ++i)
-      val *= std::cos(fourier_coefficients[i] * p[i]);
-    return val;
+    return std::cos(fourier_coefficients * p);
   };
   
   
@@ -1152,23 +1149,7 @@ namespace Functions
 					const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    Tensor<1,dim> grad;
-    for (unsigned int i=0; i<dim; ++i)
-      grad[i] = 1;
-    
-    for (unsigned int i=0; i<dim; ++i)
-      {
-	const double cos_i = std::cos(fourier_coefficients[i] * p[i]);
-	const double sin_i = std::sin(fourier_coefficients[i] * p[i]);
-	
-	for (unsigned int d=0; d<dim; ++d)
-	  if (d==i)
-	    grad[d] *= - fourier_coefficients[i] * sin_i;
-	  else
-	    grad[d] *= cos_i;
-      };
-    
-    return grad;
+    return -fourier_coefficients * std::sin(fourier_coefficients * p);
   };
   
   
@@ -1179,10 +1160,7 @@ namespace Functions
 					 const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    double val = -(fourier_coefficients*fourier_coefficients);
-    for (unsigned int i=0; i<dim; ++i)
-      val *= std::cos(fourier_coefficients[i] * p[i]);
-    return val;
+    return fourier_coefficients.square() * (-std::cos(fourier_coefficients * p));
   };
   
   
@@ -1208,10 +1186,7 @@ namespace Functions
 				   const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    double val=1;
-    for (unsigned int i=0; i<dim; ++i)
-      val *= std::sin(fourier_coefficients[i] * p[i]);
-    return val;
+    return std::sin(fourier_coefficients * p);
   };
   
   
@@ -1222,23 +1197,7 @@ namespace Functions
 				      const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    Tensor<1,dim> grad;
-    for (unsigned int i=0; i<dim; ++i)
-      grad[i] = 1;
-    
-    for (unsigned int i=0; i<dim; ++i)
-      {
-	const double cos_i = std::cos(fourier_coefficients[i] * p[i]);
-	const double sin_i = std::sin(fourier_coefficients[i] * p[i]);
-	
-	for (unsigned int d=0; d<dim; ++d)
-	  if (d==i)
-	    grad[d] *= fourier_coefficients[i] * cos_i;
-	  else
-	    grad[d] *= sin_i;
-      };
-    
-    return grad;
+    return fourier_coefficients * std::cos(fourier_coefficients * p);
   };
   
   
@@ -1249,10 +1208,7 @@ namespace Functions
 				       const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    double val = -(fourier_coefficients*fourier_coefficients);
-    for (unsigned int i=0; i<dim; ++i)
-      val *= std::sin(fourier_coefficients[i] * p[i]);
-    return val;
+    return fourier_coefficients.square() * (-std::sin(fourier_coefficients * p));
   };
   
 
@@ -1288,12 +1244,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      {
-	double val=1;
-	for (unsigned int i=0; i<dim; ++i)
-	  val *= std::sin(fourier_coefficients[s][i] * p[i]);
-	sum += weights[s] * val;
-      };
+      sum += weights[s] * std::sin(fourier_coefficients[s] * p);
     
     return sum;
   };
@@ -1310,26 +1261,7 @@ namespace Functions
     const unsigned int n = weights.size();
     Tensor<1,dim> sum;
     for (unsigned int s=0; s<n; ++s)
-      {
-	Tensor<1,dim> grad;
-	for (unsigned int i=0; i<dim; ++i)
-	  grad[i] = 1;
-    
-	for (unsigned int i=0; i<dim; ++i)
-	  {
-	    const double cos_i = std::cos(fourier_coefficients[s][i] * p[i]);
-	    const double sin_i = std::sin(fourier_coefficients[s][i] * p[i]);
-	    
-	    for (unsigned int d=0; d<dim; ++d)
-	      if (d==i)
-		grad[d] *= fourier_coefficients[s][i] * cos_i;
-	      else
-		grad[d] *= sin_i;
-	  };
-	
-	grad *= weights[s];
-	sum += grad;
-      };
+      sum += fourier_coefficients[s] * std::cos(fourier_coefficients[s] * p);
     
     return sum;
   };
@@ -1346,12 +1278,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      {
-	double val = -(fourier_coefficients[s]*fourier_coefficients[s]);
-	for (unsigned int i=0; i<dim; ++i)
-	  val *= std::sin(fourier_coefficients[s][i] * p[i]);
-	sum += val * weights[s];
-      };
+      sum -= fourier_coefficients[s].square() * std::sin(fourier_coefficients[s] * p);
     
     return sum;
   };
@@ -1388,12 +1315,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      {
-	double val=1;
-	for (unsigned int i=0; i<dim; ++i)
-	  val *= std::cos(fourier_coefficients[s][i] * p[i]);
-	sum += weights[s] * val;
-      };
+      sum += weights[s] * std::cos(fourier_coefficients[s] * p);
     
     return sum;
   };
@@ -1410,26 +1332,7 @@ namespace Functions
     const unsigned int n = weights.size();
     Tensor<1,dim> sum;
     for (unsigned int s=0; s<n; ++s)
-      {
-	Tensor<1,dim> grad;
-	for (unsigned int i=0; i<dim; ++i)
-	  grad[i] = 1;
-    
-	for (unsigned int i=0; i<dim; ++i)
-	  {
-	    const double cos_i = std::cos(fourier_coefficients[s][i] * p[i]);
-	    const double sin_i = std::sin(fourier_coefficients[s][i] * p[i]);
-	    
-	    for (unsigned int d=0; d<dim; ++d)
-	      if (d==i)
-		grad[d] *= -fourier_coefficients[s][i] * sin_i;
-	      else
-		grad[d] *= cos_i;
-	  };
-	
-	grad *= weights[s];
-	sum += grad;
-      };
+      sum -= fourier_coefficients[s] * std::sin(fourier_coefficients[s] * p);
     
     return sum;
   };
@@ -1446,12 +1349,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      {
-	double val = -(fourier_coefficients[s]*fourier_coefficients[s]);
-	for (unsigned int i=0; i<dim; ++i)
-	  val *= std::cos(fourier_coefficients[s][i] * p[i]);
-	sum += val * weights[s];
-      };
+      sum -= fourier_coefficients[s].square() * std::cos(fourier_coefficients[s] * p);
     
     return sum;
   };
