@@ -55,9 +55,9 @@ SparseMatrixEZ<number>::~SparseMatrixEZ()
 
 template <typename number>
 SparseMatrixEZ<number>&
-SparseMatrixEZ<number>::operator= (const SparseMatrixEZ<number>&)
+SparseMatrixEZ<number>::operator= (const SparseMatrixEZ<number>& m)
 {
-  Assert (false, ExcNotImplemented());
+  Assert (m.empty(), ExcInvalidConstructorCall());
   return *this;
 }
 
@@ -73,8 +73,6 @@ SparseMatrixEZ<number>::reinit(unsigned int n_rows,
   if (default_row_length == Entry::invalid)
     default_row_length = 5;
   if (default_increment == Entry::invalid)
-    default_increment = 4;
-  if (default_increment == 0)
     default_increment = 4;
   increment = default_increment;
   
@@ -357,6 +355,50 @@ SparseMatrixEZ<number>::memory_consumption() const
     sizeof (*this)
     + sizeof(unsigned int) * row_info.capacity()
     + sizeof(typename SparseMatrixEZ<number>::Entry) * data.capacity();
+}
+
+
+template <typename number>
+template <class STREAM>
+void
+SparseMatrixEZ<number>::print_statistics(STREAM& out, bool full)
+{
+  typename std::vector<RowInfo>::const_iterator row = row_info.begin();
+  const typename std::vector<RowInfo>::const_iterator endrow = row_info.end();
+
+				   // Add up entries actually used
+  unsigned int entries_used = 0;
+  unsigned int max_length = 0;
+  for (; row != endrow ; ++ row)
+    {
+      entries_used += row->length;
+      if (max_length < row->length)
+	max_length = row->length;
+    }
+  
+				   // Number of entries allocated is
+				   // position of last entry used
+  --row;
+  unsigned int entries_alloc = row->start + row->length;
+
+  out << "SparseMatrixEZ:used     entries:" << entries_used << std::endl
+      << "SparseMatrixEZ:alloc    entries:" << entries_alloc << std::endl
+      << "SparseMatrixEZ:reserved entries:" << data.capacity() << std::endl;
+  
+  if (full)
+    {
+      std::vector<unsigned int> length_used (max_length+1);
+      
+      for (row = row_info.begin() ; row != endrow; ++row)
+	{
+	  ++length_used[row->length];
+	}
+      for (unsigned int i=0; i< length_used.size();++i)
+	if (length_used[i] != 0)
+	  out << "SparseMatrixEZ:entries\t" << i
+	      << "\trows\t" << length_used[i]
+	      << std::endl;
+    }
 }
 
 

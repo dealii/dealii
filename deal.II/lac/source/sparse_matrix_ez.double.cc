@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix_ez.double.cc  ---------------------------
+//------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,14 +9,19 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix_ez.double.cc  ---------------------------
+//------------------------------------------------------------------------
 
 
+#include <base/logstream.h>
 #include <lac/sparse_matrix_ez.templates.h>
+#include <iostream>
 
 #define TYPEMAT double
 
 template class SparseMatrixEZ<TYPEMAT>;
+template void SparseMatrixEZ<TYPEMAT>::print_statistics(ostream&, bool);
+template void SparseMatrixEZ<TYPEMAT>::print_statistics(LogStream&, bool);
+
 
 #define TYPE2 float
 

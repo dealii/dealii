@@ -328,10 +328,10 @@ template <typename Number>
 inline
 SparseMatrixEZ<Number> &
 BlockSparseMatrixEZ<Number>::block (const unsigned int row,
-				  const unsigned int column)
+				    const unsigned int column)
 {
-  Assert (row<n_rows(), ExcIndexRange (row, 0, n_rows()));
-  Assert (column<n_cols(), ExcIndexRange (column, 0, n_cols()));
+  Assert (row<n_block_rows(), ExcIndexRange (row, 0, n_block_rows()));
+  Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
   
   return blocks[row][column];
 };
@@ -342,10 +342,10 @@ template <typename Number>
 inline
 const SparseMatrixEZ<Number> &
 BlockSparseMatrixEZ<Number>::block (const unsigned int row,
-				  const unsigned int column) const
+				    const unsigned int column) const
 {
-  Assert (row<n_rows(), ExcIndexRange (row, 0, n_rows()));
-  Assert (column<n_cols(), ExcIndexRange (column, 0, n_cols()));
+  Assert (row<n_block_rows(), ExcIndexRange (row, 0, n_block_rows()));
+  Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
   
   return blocks[row][column];
 };
