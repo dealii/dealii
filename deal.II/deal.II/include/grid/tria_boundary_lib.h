@@ -43,9 +43,9 @@ class CylinderBoundary : public StraightBoundary<dim>
 				     /**
 				      * Constructor. Per default
 				      * circular tube along the x-axis
-				      * (<tt>axis=0<\tt>). Choose
-				      * <tt>axis=1<\tt> or
-				      * <tt>axis=2<\tt> for a tube
+				      * (<tt>axis=0</tt>). Choose
+				      * <tt>axis=1</tt> or
+				      * <tt>axis=2</tt> for a tube
 				      * along the y- or z-axis,
 				      * respectively.
 				      */
@@ -131,9 +131,9 @@ class CylinderBoundary : public StraightBoundary<dim>
 				     /**
 				      * Denotes the axis of the
 				      * circular
-				      * tube. <tt>axis=0<\tt>,
-				      * <tt>axis=1<\tt> and
-				      * <tt>axis=2<\tt> denote the
+				      * tube. <tt>axis=0</tt>,
+				      * <tt>axis=1</tt> and
+				      * <tt>axis=2</tt> denote the
 				      * <tt>x-axis</tt>,
 				      * <tt>y-axis</tt> and
 				      * <tt>z-axis</tt>, respectively.
