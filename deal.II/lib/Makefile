@@ -55,14 +55,24 @@ endif
            $(lib-contrib-petsc-path.o)/libpetscmat$(lib-suffix) \
            $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
            $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
-  external-links-petsc:
+
+  ifeq ($(enable-shared),yes)
+    external-links-petsc:
 	@echo Setting up libraries for PETSc
-	@echo "======================debug============= Linking library:   libpetsc.g.so"
-	@$(CXX) -shared -o libpetsc.g.so \
+	@echo "======================debug============= Linking library:   libpetsc.g$(lib-suffix)"
+	@$(CXX) -shared -o libpetsc.g$(lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.g) $(xlib.g)
-	@echo "======================optimized========= Linking library:   libpetsc.so"
-	@$(CXX) -shared -o libpetsc.so \
+	@echo "======================optimized========= Linking library:   libpetsc$(lib-suffix)"
+	@$(CXX) -shared -o libpetsc$(lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
+  else
+    external-links-petsc:
+	@echo Setting up libraries for PETSc
+	@echo "======================debug============= Linking library:   libpetsc.g$(lib-suffix)"
+	@$(AR) ru libpetsc.g$(lib-suffix)  $(xlib.g)
+	@echo "======================optimized========= Linking library:   libpetsc$(lib-suffix)"
+	@$(AR) ru libpetsc$(lib-suffix) $(xlib.o)
+  endif
 
 else
   external-links-petsc:
