@@ -16,6 +16,7 @@
 
 #include <base/logstream.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_generator.h>
@@ -45,7 +46,21 @@ check_this (const DoFHandler<dim> &dof_handler,
 // forward declaration of a variable with the name of the output file
 extern std::string output_file_name;
 
-  
+
+// take a vector, and make a block vector out of it
+void
+make_block_vector (const Vector<double> &in,
+                   BlockVector<double>  &out)
+{
+  std::vector<unsigned int> block_sizes(2);
+  block_sizes[0] = in.size() / 2;
+  block_sizes[1] = in.size() - block_sizes[0];
+
+  out.reinit (block_sizes);
+  std::copy (in.begin(), in.end(), out.begin());
+}
+
+
 
 
 template <int dim>
