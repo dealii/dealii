@@ -391,10 +391,10 @@ class SparseMatrixEZ : public Subscriptor
 				      * efficient assembling of the
 				      * matrix.
 				      */
-    void reinit (unsigned int n_rows,
-		 unsigned int n_columns,
-		 unsigned int default_row_length = Entry::invalid,
-		 unsigned int default_increment = Entry::invalid);
+    void reinit (const unsigned int n_rows,
+		 const unsigned int n_columns,
+		 const unsigned int default_row_length = Entry::invalid,
+		 const unsigned int default_increment = Entry::invalid);
 
 				     /**
 				      * Release all memory and return

@@ -21,7 +21,8 @@
 
 
 template <typename number>
-BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ () :
+BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ ()
+                :
 		row_indices (0),
 		column_indices (0)
 {};
@@ -30,7 +31,9 @@ BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ () :
 
 template <typename number>
 BlockSparseMatrixEZ<number>::
-BlockSparseMatrixEZ (unsigned int rows, unsigned int cols) :
+BlockSparseMatrixEZ (const unsigned int rows,
+                     const unsigned int cols)
+                :
 		row_indices (rows),
 		column_indices (cols)
 {};
