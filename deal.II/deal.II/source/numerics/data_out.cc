@@ -125,8 +125,9 @@ add_data_vector (const VECTOR                   &vec,
 				   // vectors
   Assert ((vec.size() == dofs->get_tria().n_active_cells()) ||
 	  (vec.size() == dofs->n_dofs()),
-	  ExcInvalidVectorSize(vec.size(), dofs->get_tria().n_active_cells(),
-			       dofs->n_dofs()));
+	  ExcInvalidVectorSize(vec.size(),
+			       dofs->n_dofs(),
+			       dofs->get_tria().n_active_cells()));
   
 				   // either cell data and one name,
 				   // or dof data and n_components names
