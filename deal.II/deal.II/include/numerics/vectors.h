@@ -982,7 +982,11 @@ class VectorTools
 				      * Exception
 				      */
     DeclException0 (ExcNonInterpolatingFE);
-
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcNoComponentSelected);
+    
   private:
 				     /**
 				      * Null pointer used to 
