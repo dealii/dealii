@@ -227,6 +227,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: class <code class="class">SchurMatrix</code> implements
+       a Schur complement for block matrices. It provides matrix-vector
+       multiplication suitable for iterative methods as well as pre- and
+       post-processing of right hand side and slution, respectively. 
+       <br>
+       (GK 2001/02/13)
+       </p>
+
+  <li> <p>
        Removed: The explicite instantiations of <code
        class="class">SparseMatrix&lt;long double&gt;</code> are
        removed as a prerelease of gcc3.0 fails to compile it. A user
