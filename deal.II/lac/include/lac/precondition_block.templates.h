@@ -135,6 +135,17 @@ template<typename number, typename inverse_type>
 PreconditionBlockSOR<number,inverse_type>::~PreconditionBlockSOR(){}
 
 
+
+template<typename number, typename inverse_type>
+void
+PreconditionBlockSOR<number,inverse_type>::set_omega(number om)
+{
+  omega = om;
+}
+
+
+
+
 template <typename number, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<number,inverse_type>::operator() (Vector<number2>       &dst,

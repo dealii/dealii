@@ -224,6 +224,11 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
     virtual ~PreconditionBlockSOR();
 
 				     /**
+				      * Set the relaxation parameter.
+				      */
+    void set_omega(number omega);
+    
+				     /**
 				      * Execute block SOR preconditioning.
 				      * Make sure that the right
 				      * block size
@@ -248,7 +253,7 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
 				     /**
 				      * Damping parameter.
 				      */
-    const number omega;
+    number omega;
 };
 
 
