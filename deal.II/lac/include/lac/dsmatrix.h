@@ -155,9 +155,9 @@ class dSMatrix
     void add(int i,int j,double value) { val[cols->operator()(i,j)]+= value; }
   
 				     //
-    void vmult (dVector& dst,const dVector& src);
+    void vmult (dVector& dst,const dVector& src) const;
 				     //
-    void Tvmult(dVector& dst,const dVector& src);
+    void Tvmult(dVector& dst,const dVector& src) const;
   
 				     //
     double residual (dVector& dst,const dVector& x,const dVector& b);

@@ -325,7 +325,7 @@ dSMatrix::reinit (dSMatrixStruct &sparsity) {
 
 
 void
-dSMatrix::vmult(dVector& dst,const dVector& src)
+dSMatrix::vmult(dVector& dst,const dVector& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
@@ -344,7 +344,7 @@ dSMatrix::vmult(dVector& dst,const dVector& src)
 }
 
 void
-dSMatrix::Tvmult(dVector& dst,const dVector& src) 
+dSMatrix::Tvmult(dVector& dst,const dVector& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert(n() == dst.n(), ExcDimensionsDontMatch(n(),dst.n()));
