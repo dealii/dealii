@@ -1,3 +1,0 @@
-#!/bin/sh
-echo Validating $1
-cat $1 | sed  -e 's/http:\/\/www.w3.org\/TR\/REC-html40\/strict.dtd//' -e 's/\"\"//' | nsgmls -s -m /home/people/schrage/lib/sgml/pubtext/HTML4.soc 
