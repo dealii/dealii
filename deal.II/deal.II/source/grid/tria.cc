@@ -161,6 +161,9 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
   levels.reserve (old_tria.levels.size());
   for (unsigned int level=0; level<old_tria.levels.size(); ++level)
     levels.push_back (new TriangulationLevel<dim>(*old_tria.levels[level]));
+
+				   // note that we need not copy the
+				   // subscriptor!
 };
 
 
