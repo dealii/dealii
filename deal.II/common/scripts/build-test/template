@@ -60,6 +60,7 @@ MAKE=make
 
 #export PATH:$PATH
 #export LD_LIBRARY_PATH:$LD_LIBRARY_PATH
+#export LIBRARY_PATH
 
 ######################################################################
 # Mail program setup:
