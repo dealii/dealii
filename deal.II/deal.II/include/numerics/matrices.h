@@ -54,7 +54,19 @@ class dSMatrix;
  * \item #create_mass_matrix#: create the matrix with entries
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$. Here, the $\phi_i$
  *   are the basis functions of the finite element space given.
- *   This function uses the #MassMatrix# class. 
+ *   This function uses the #MassMatrix# class.
+ *
+ *   Two ways to create this matrix are offered. The first one uses
+ *   numerical quadrature and the #MassMatrix# class. In this case,
+ *   a coefficient may be given to evaluate
+ *   $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$ instead.
+ *   This way of setting up the mass matrix is quite general, but has
+ *   some drawbacks, see the documentation of the #MassMatrix# class.
+ *
+ *   The other way uses exact integration, as offered by the finite
+ *   element class used. This way you can avoid quadrature errors and
+ *   the assemblage is much faster. However, no coefficient can be
+ *   given.
  *
  * \item #create_laplace_matrix#: there are two versions of this; the
  *   one which takes the #Function<dim># object creates
@@ -73,6 +85,10 @@ class dSMatrix;
  * matrices, you have to condense the matrix using the
  * #ConstraintMatrix::condense# function; you also have to condense the
  * right hand side accordingly and distribute the solution afterwards.
+ *
+ * In all cases, the elements of the matrix to be assembled are simply
+ * summed up from the contributions of each cell. Therefore you may want
+ * to clear the matrix before assemblage.
  *
  * If you want to use boundary conditions, you have to use a function
  * like #ProblemBase<>::apply_dirichlet_bc# to matrix and right hand
@@ -110,7 +126,11 @@ class dSMatrix;
  * a right hand side, which will give a vector with
  * $f_i = \int_\Omega f(x) \phi_i(x) dx$. For this purpose, each function
  * exists in two versions, one only building the matrix and one also
- * building the right hand side vector.
+ * building the right hand side vector. (The #create_mass_matrix# function
+ * which does not use quadrature does not offer a version to evaluate a right
+ * hand side also, since this needs quadrature anyway. Take look at the
+ * #VectorTools# class to find a function to set up a right hand side vector
+ * only.)
  *
  * Creation of the right hand side
  * is the same for all operators and therefore for all of the functions
@@ -145,6 +165,11 @@ class MatrixCreator {
 				      * coefficient is given, it is assumed
 				      * to be constant one.
 				      * 
+				      * If the coefficient is constant, it
+				      * may be more adequate to use the
+				      * functions assembling the mass matrix
+				      * without quadrature.
+				      * 
 				      * See the general doc of this class
 				      * for more information.
 				      */
@@ -160,6 +185,11 @@ class MatrixCreator {
 				      * hand side vector. If no 
 				      * coefficient is given, it is assumed
 				      * to be constant one.
+				      *
+				      * If the coefficient is constant, it
+				      * may be more adequate to use the
+				      * functions assembling the mass matrix
+				      * without quadrature.
 				      * 
 				      * See the general doc of this class
 				      * for more information.
@@ -173,6 +203,27 @@ class MatrixCreator {
 				    dVector                  &rhs_vector,
 				    const Function<dim>      *a = 0);
 
+				     /**
+				      * Create the mass matrix by exact
+				      * evaluation without using a quadrature
+				      * formula.
+				      *
+				      * No right hand side may be created using
+				      * this function. See the general doc of
+				      * this class for more information.
+				      *
+				      * It is assumed that the matrix already
+				      * has the right size. The mass matrix
+				      * elements are summed up to the values
+				      * previously in the matrix, so if you want
+				      * the pure mass matrix, you have to clear
+				      * the matrix beforehand.
+				      */
+    static void create_mass_matrix (const DoFHandler<dim>    &dof,
+				    const FiniteElement<dim> &fe,
+				    const Boundary<dim>      &boundary,
+				    dSMatrix                 &matrix);
+    
 				     /**
 				      * Assemble the mass matrix and a right
 				      * hand side vector along the boundary.
@@ -351,6 +402,54 @@ class MatrixTools : public MatrixCreator<dim> {
  * The defaults for both right hand side and coefficient function is a
  * #NULL# pointer. If you need a coefficient but no right hand side object,
  * simply pass a #NULL# pointer to the constructor for its first argument.
+ *
+ *
+ * \subsection{Other possibilities}
+ *
+ * You will usually want to use this object only if you have coefficients
+ * which vary over each cell. If you have coefficients which are constant
+ * on each cell or even on the whole domain, you can get the local mass
+ * matrix easier by calling the #FiniteElement::get_local_mass_matrix# and
+ * then scaling this one on each cell. This has the additional benefit that
+ * the mass matrix is evaluated exactly, i.e. not using a quadrature formula
+ * and is normally much faster since it can be precomputed and needs only
+ * be scaled appropriately.
+ *
+ * The useful use of this object is therefore probable one of the following
+ * cases:
+ * \begin{itemize}
+ * \item Mass lumping: use an #Assembler# object and a special quadrature
+ *   formula to voluntarily evaluate the mass matrix incorrect. For example
+ *   by using the trapezoidal formula, the mass matrix will become a
+ *   diagonal (at least if no hanging nodes are considered). However, there
+ *   may be easier ways to set up the resulting matrix, for example by
+ *   scaling the diagonal elements of the unit matrix by the area element
+ *   of the respective cell.
+ *
+ * \item Nonconstant coefficient: if the coefficient varies considerably over
+ *   each element, there is no way around this class. However, there are many
+ *   cases where it is sufficient to assume that the function be constant on
+ *   each cell (taking on its mean value throughout the cell for example, or
+ *   more easily computed, its value at the center of mass of the element).
+ *   A proper analysis of the error introduced by an assumed constant
+ *   coefficient may be worth the effort.
+ *
+ *   Nonconstant coefficients to the mass matrix occur in mechanical problems
+ *   if the density or other mechanical properties vary with the space
+ *   coordinate.
+ *
+ * \item Simple plugging together of system matrices: if the system matrix has
+ *    the form $s_{ij} = m_{ij} + \alpha a_{ij}$, for example, with $M$ and
+ *    $A$ being the mass and laplace matrix, respectively (this matrix $S$
+ *    occurs in the discretization of the heat and the wave equation, amoung
+ *    others), once could conceive an equation object in which the #assemble#
+ *    functions do nothing but sum up the contributions delivered by the
+ *    #assemble# functions of the #MassMatrix# and #LaplaceMatrix# classes.
+ *    Since numerical quadrature is necessary here anyway, this way is
+ *    justifyable to quickly try something out. In the further process it
+ *    may be useful to replace this behaviour by more sophisticated methods,
+ *    however.
+ * \end{itemize}
  */
 template <int dim>
 class MassMatrix :  public Equation<dim> {
@@ -380,6 +479,10 @@ class MassMatrix :  public Equation<dim> {
 				      * constructor to use this function. If
 				      * a coefficient was given to the
 				      * constructor, it is used.
+				      *
+				      * This function assumes the cell matrix
+				      * and right hand side to have the right
+				      * size and to be empty.
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
