@@ -130,7 +130,8 @@ veryclean: clean
 	-rm -f *.exe *.testcase *.inp *.gpl *.eps *.gnuplot
 
 
-
+show-tests:
+	@echo $(tests)
 
 ############################################################
 # Automatic generation of dependencies
@@ -142,4 +143,4 @@ Makefile.depend: $(shell echo *.cc)
 	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 
 
-.PHONY: report
+.PHONY: report show-tests
