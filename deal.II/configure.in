@@ -110,13 +110,12 @@ fi
 AC_SUBST(withmultithreading)
 
 
-
 dnl    Test whether shared libraries support is requested. Note:
-dnl    default is 'yes', if not on AIX
+dnl    default is 'yes', if not on AIX or IRIX64
 AC_ARG_ENABLE(shared,
 [  --enable-shared Set compiler flags to generate shared libraries],
     enableshared=$enableval,
-    if test $OS = AIX ; then
+    if test $OS = AIX -o $OS = IRIX64 ; then
       enableshared=no ;
     else
       enableshared=yes ;
