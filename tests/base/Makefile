@@ -29,6 +29,7 @@ tests_x =  logtest \
 	   slice_vector \
 	   table \
 	   tensor \
+	   symmetric_tensor_* \
            timer \
 	   threads \
 	   polynomial* \
