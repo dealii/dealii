@@ -423,7 +423,8 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
 					     0U);
 			     
   std::vector<std::vector<unsigned int> >
-    ndofs(mg_dof.get_tria().n_levels(), target_component.size());
+    ndofs(mg_dof.get_tria().n_levels(),
+	  std::vector<unsigned int>(target_component.size()));
 
   count_dofs_per_component (mg_dof, ndofs);
   
