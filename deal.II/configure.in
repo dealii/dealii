@@ -107,10 +107,6 @@ AC_PATH_PROG(CC,$CC)
 
 dnl    Find the right C++ compiler. This modifies the following
 dnl    variables: CXX, GXX, CXXFLAGS
-dnl
-dnl    Note that we subsume gcc snapshots 2.96 and 2.97 under
-dnl    gcc version 2.95 as well, as they should support the same
-dnl    compiler flags
 AC_PROG_CXX
 AC_PATH_PROG(CXX,$CXX)
 if test $GXX = yes ; then
@@ -121,9 +117,17 @@ if test $GXX = yes ; then
 	AC_MSG_RESULT(Compiler is egcs-1.1)
 	GXX_VERSION=egcs1.1
 	;;
-    *2.95* | *2.96* | *2.97* )
+    *2.95*)
 	AC_MSG_RESULT(Compiler is gcc-2.95)
 	GXX_VERSION=gcc2.95
+	;;
+    *2.96*)
+	AC_MSG_RESULT(Compiler is gcc-2.96)
+	GXX_VERSION=gcc2.96
+	;;
+    *2.97*)
+	AC_MSG_RESULT(Compiler is gcc-2.97)
+	GXX_VERSION=gcc2.97
 	;;
     *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
 	dnl These compilers are too old to support a useful subset
@@ -159,8 +163,8 @@ dnl CXXFLAGSG are the flags for debug mode
 dnl -------------------------------------------------------------
 
 if test $GXX = yes ; then
-  CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -fnonnull-objects -ftemplate-depth-32"
-  CXXFLAGSG="$CXXFLAGS -DDEBUG -ggdb -ansi -pedantic -Wall -W -Wtraditional -Wpointer-arith -Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -ftemplate-depth-32"
+  CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
+  CXXFLAGSG="$CXXFLAGS -DDEBUG -ggdb -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
 
   dnl set some flags that are specific to some versions of the
   dnl compiler:
@@ -174,7 +178,7 @@ if test $GXX = yes ; then
   dnl   prevents programs from being linked, so take the risk of broken
   dnl   thunks on this platform
 
-  case "$GXXVERSION" in
+  case "$GXX_VERSION" in
     egcs1.1)
         case "$target" in
 	  *linux*)
@@ -192,6 +196,21 @@ if test $GXX = yes ; then
 	CXXFLAGSO="$CXXFLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
 	;;
   esac
+
+  dnl - after gcc2.95, some flags were deemed obsolete for C++
+  dnl   (and are only supported for C any more), so only define them for
+  dnl   previous compilers
+
+  case "$GXX_VERSION" in
+    egcs1.1 | gcc2.95)
+	CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
+	CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
+	;;
+
+    *)
+	;;
+  esac
+
 else
   dnl Other compiler
   AC_MSG_ERROR(No compiler options for this C++ compiler
@@ -333,7 +352,7 @@ AC_ARG_WITH(kdoc,
     kdocdir=${DEAL2_DIR}/contrib/kdoc/bin)
 AC_MSG_CHECKING(for kdoc)
 dnl lets see whether the file exists if not the default was taken
-if test $kdocdir != ${DEAL2_DIR}/contrib/kdoc/bin ; then
+if test "$kdocdir" != ${DEAL2_DIR}/contrib/kdoc/bin ; then
   if test -r $kdocdir/kdoc ; then
     AC_MSG_RESULT(found)
   else
@@ -341,7 +360,7 @@ if test $kdocdir != ${DEAL2_DIR}/contrib/kdoc/bin ; then
     AC_MSG_ERROR(Invalid kdoc path $kdocdir/kdoc)
   fi
 
-  if test -r $kdocdir/Version ; then
+  if test -r "$kdocdir/Version" ; then
     kdocversion=`cat $kdocdir/Version` ;
   else
     kdocversion=1;
