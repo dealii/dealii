@@ -4,6 +4,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.templates.h>
+#include <grid/geometry_info.h>
 
 /* Note: explicit instantiations at the end of the different sections!       */
 
@@ -595,18 +596,20 @@ CellAccessor<2>::face (const unsigned int i) const {
 
 template <int dim>
 int CellAccessor<dim>::neighbor_index (const unsigned int i) const {
-  Assert (i<2*dim,
+  Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
-  return tria->levels[present_level]->neighbors[present_index*2*dim+i].second;
+  return tria->levels[present_level]->
+    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second;
 };
 
 
 
 template <int dim>
 int CellAccessor<dim>::neighbor_level (const unsigned int i) const {
-  Assert (i<2*dim,
+  Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
-  return tria->levels[present_level]->neighbors[present_index*2*dim+i].first;
+  return tria->levels[present_level]->
+    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first;
 };
 
 
@@ -614,10 +617,13 @@ int CellAccessor<dim>::neighbor_level (const unsigned int i) const {
 template <int dim>
 void CellAccessor<dim>::set_neighbor (const unsigned int i,
 				      const TriaIterator<dim,CellAccessor<dim> > &pointer) const {
-  Assert (i<2*dim, typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
-  tria->levels[present_level]->neighbors[present_index*2*dim+i].first
+  Assert (i<GeometryInfo<dim>::faces_per_cell,
+	  typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
+  tria->levels[present_level]->
+    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first
     = pointer.accessor.present_level;
-  tria->levels[present_level]->neighbors[present_index*2*dim+i].second
+  tria->levels[present_level]->
+    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second
     = pointer.accessor.present_index;
 };
 
@@ -626,8 +632,9 @@ void CellAccessor<dim>::set_neighbor (const unsigned int i,
 template <int dim>
 bool CellAccessor<dim>::at_boundary (const unsigned int i) const {
   Assert (used(), typename TriaSubstructAccessor<dim>::ExcCellNotUsed());
-  Assert (i<2*dim,
-	  typename TriaSubstructAccessor<dim>::ExcInvalidIndex (i,0,2*dim-1));
+  Assert (i<GeometryInfo<dim>::faces_per_cell,
+	  typename TriaSubstructAccessor<dim>::
+	  ExcInvalidIndex (i,0,GeometryInfo<dim>::faces_per_cell-1));
   
   return (neighbor_index(i) == -1);
 };

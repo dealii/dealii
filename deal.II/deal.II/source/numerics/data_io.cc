@@ -5,6 +5,7 @@
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
+#include <grid/geometry_info.h>
 #include <fe/fe.h>
 
 #include <map>
@@ -119,13 +120,13 @@ void DataIn<dim>::read_ucd (istream &in) {
 	{
 					   // allocate and read indices
 	  cells.push_back (CellData<dim>());
-	  for (unsigned int i=0; i<(1<<dim); ++i)
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	    in >> cells.back().vertices[i];
 	  cells.back().material_id = material_id;
 
 					   // transform from ucd to
 					   // consecutive numbering
-	  for (unsigned int i=0; i<(1<<dim); ++i)
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	    if (vertex_indices.find (cells.back().vertices[i]) != vertex_indices.end())
 					       // vertex with this index exists
 	      cells.back().vertices[i] = vertex_indices[cells.back().vertices[i]];
@@ -246,7 +247,8 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 				       // use
       vector<bool> is_vertex_dof (dofs->n_dofs(), false);
       for (cell=dofs->begin_active(); cell!=endc; ++cell)
-	for (unsigned int vertex=0; vertex<(1<<dim); ++vertex) 
+	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+	     ++vertex) 
 	  is_vertex_dof[cell->vertex_dof_index(vertex,0)] = true;
 
       n_vertex_dofs = 0;
@@ -295,7 +297,8 @@ void DataOut<dim>::write_ucd (ostream &out) const {
       vector<bool> already_written (dofs->n_dofs(), false);
 				       // write vertices
       for (cell=dofs->begin_active(); cell!=endc; ++cell)
-	for (unsigned int vertex=0; vertex<(1<<dim); ++vertex) 
+	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+	     ++vertex) 
 	  if (already_written[cell->vertex_dof_index(vertex,0)]==false)
 	    {
 	      out << cell->vertex_dof_index(vertex,0) // vertex index
@@ -329,7 +332,8 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	      default:
 		    Assert (false, ExcNotImplemented());
 	    };
-	  for (unsigned int vertex=0; vertex<(1<<dim); ++vertex)
+	  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+	       ++vertex)
 	    out << cell->vertex_dof_index(vertex,0) << ' ';
 	  out << endl;
 	};
@@ -360,7 +364,8 @@ void DataOut<dim>::write_ucd (ostream &out) const {
       vector<bool> already_written (dofs->n_dofs(), false);
 				       // write vertices
       for (cell=dofs->begin_active(); cell!=endc; ++cell)
-	for (unsigned int vertex=0; vertex<(1<<dim); ++vertex) 
+	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+	     ++vertex) 
 	  if (already_written[cell->vertex_dof_index(vertex,0)]==false)
 	    {
 	      out << cell->vertex_dof_index(vertex,0) // vertex index
@@ -429,7 +434,7 @@ void DataOut<dim>::write_ucd_faces (ostream &out,
 	    default:
 		  Assert (false, ExcNotImplemented());
 	  };
-	for (unsigned int vertex=0; vertex<(1<<(dim-1)); ++vertex)
+	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
 	  out << face->vertex_dof_index(vertex,0) << ' ';
 	out << endl;
 

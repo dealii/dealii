@@ -3,6 +3,7 @@
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
+#include <grid/geometry_info.h>
 #include <basic/magic_numbers.h>
 #include <basic/data_io.h>
 #include <lac/dvector.h>
@@ -109,7 +110,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 				   // for all lines
   for (; line!=end(); ++line)
 				     // for each of the two vertices
-    for (unsigned int vertex=0; vertex<(1<<dim); ++vertex)
+    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 				       // if first cell adjacent to this
 				       // vertex is the present one, then
 				       // the neighbor is the second adjacent
@@ -210,10 +211,14 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	    swap (cells[cell].vertices[0], cells[cell].vertices[2]);
 	    swap (cells[cell].vertices[1], cells[cell].vertices[3]);
 					     // remake lines
-	    line_vertices[0] = make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
-	    line_vertices[1] = make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
-	    line_vertices[2] = make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
-	    line_vertices[3] = make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
+	    line_vertices[0]
+	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
+	    line_vertices[1]
+	      = make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
+	    line_vertices[2]
+	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
+	    line_vertices[3]
+	      = make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
 					     // allow for only one such
 					     // rotation
 	    break;
@@ -1654,7 +1659,7 @@ unsigned int Triangulation<dim>::max_adjacent_cells () const {
 				   // used on level 0
   unsigned int max_vertex_index = 0;
   for (; cell!=endc; ++cell)
-    for (unsigned vertex=0; vertex<(1<<dim); ++vertex)
+    for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       if (cell->vertex_index(vertex) > (signed int)max_vertex_index)
 	max_vertex_index = cell->vertex_index(vertex);
 
@@ -1665,10 +1670,10 @@ unsigned int Triangulation<dim>::max_adjacent_cells () const {
 				   // touch a vertex's usage count everytime
 				   // we find an adjacent element
   for (cell=begin(); cell!=endc; ++cell)
-    for (unsigned vertex=0; vertex<(1<<dim); ++vertex)
+    for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       ++usage_count[cell->vertex_index(vertex)];
 
-  return max (static_cast<unsigned int>(1<<dim),
+  return max (GeometryInfo<dim>::vertices_per_cell,
 	      static_cast<unsigned int>(*(max_element (usage_count.begin(),
 						       usage_count.end()))));
 };
@@ -1701,7 +1706,7 @@ void Triangulation<dim>::print_gnuplot (ostream &out, const unsigned int level) 
 
 
 void Triangulation<1>::print_gnuplot (ostream &out,
-				      const TriaDimensionInfo<1>::active_cell_iterator & cell) const {
+				      const active_cell_iterator & cell) const {
   out << cell->vertex(0) << " " << cell->level() << endl
       << cell->vertex(1) << " " << cell->level() << endl
       << endl;
@@ -1710,7 +1715,7 @@ void Triangulation<1>::print_gnuplot (ostream &out,
 
 
 void Triangulation<2>::print_gnuplot (ostream &out,
-				      const TriaDimensionInfo<2>::active_cell_iterator & cell) const {
+				      const active_cell_iterator & cell) const {
   out << cell->vertex(0) << " " << cell->level() << endl
       << cell->vertex(1) << " " << cell->level() << endl
       << cell->vertex(2) << " " << cell->level() << endl
@@ -1792,12 +1797,14 @@ void Triangulation<1>::execute_refinement () {
 				       // 2*flagged_cells that will be created
 				       // on that level
       levels[level+1]->
-	TriangulationLevel<0>::reserve_space (used_cells+2*flagged_cells, 1);
+	TriangulationLevel<0>::reserve_space (used_cells+
+					      GeometryInfo<1>::children_per_cell *
+					      flagged_cells, 1);
 				       // reserve space for 2*flagged_cells
 				       // new lines on the next higher
 				       // level
       levels[level+1]->
-	TriangulationLevel<1>::reserve_space (2*flagged_cells);
+	TriangulationLevel<1>::reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
       
       needed_vertices += flagged_cells;
     };
@@ -2517,7 +2524,7 @@ void Triangulation<dim>::prepare_refinement () {
       for (; cell != endc; --cell)
 	if (cell->refine_flag_set() == true)
 					   // loop over neighbors of cell
-	  for (unsigned int i=0; i<(2*dim); ++i)
+	  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
 	    if (cell->neighbor(i).state() == valid)
 	      if ((cell->neighbor_level(i) == cell->level()-1)
 		  &&

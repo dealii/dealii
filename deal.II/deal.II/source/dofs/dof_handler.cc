@@ -6,6 +6,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
+#include <grid/geometry_info.h>
 #include <fe/fe.h>
 #include <lac/dsmatrix.h>
 #include <map>
@@ -665,7 +666,7 @@ int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 					    unsigned int            next_free_dof) {
 
 				   // distribute dofs of vertices
-  for (unsigned int v=0; v<2; ++v)
+  for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
     {
       cell_iterator neighbor = cell->neighbor(v);
 
@@ -716,7 +717,7 @@ int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 					    unsigned int            next_free_dof) {
   if (selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
-    for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
@@ -725,7 +726,7 @@ int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 	  cell->set_vertex_dof_index (vertex, d, next_free_dof++);
     
   				   // for the four sides
-  for (unsigned int side=0; side<4; ++side)
+  for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
     {
       line_iterator line = cell->line(side);
 
@@ -1105,11 +1106,11 @@ void DoFHandler<2>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
       int dof_number=0;
 
 				       // fill dof indices on vertices
-      for (unsigned int vertex=0; vertex<4; ++vertex)
+      for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
 	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
 	  dofs_on_this_cell[dof_number++] = cell->vertex_dof_index (vertex,d);
 
-      for (unsigned int line=0; line<4; ++line)
+      for (unsigned int line=0; line<GeometryInfo<2>::faces_per_cell; ++line)
 	for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
 	  dofs_on_this_cell[dof_number++] = cell->line(line)->dof_index (d);
       
@@ -1139,7 +1140,7 @@ void DoFHandler<dim>::make_transfer_matrix (const DoFHandler<dim> &transfer_from
 				   // assert for once at the beginning the
 				   // the matrices have the correct sizes
 #ifdef DEBUG
-  for (unsigned int c=0; c<(1<<dim); ++c)
+  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
     {
       Assert (selected_fe->prolongate(c).m() == selected_fe->total_dofs,
 	      ExcMatrixHasWrongSize(selected_fe->prolongate(c).m()));
@@ -1185,7 +1186,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 				     dSMatrixStruct      &transfer_pattern) const {
   if (!new_cell->active() && !old_cell->active())
 				     // both cells have children; go deeper
-    for (unsigned int child=0; child<(1<<dim); ++child)
+    for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
       transfer_cell (old_cell->child(child), new_cell->child(child),
 		     transfer_pattern);
   else
@@ -1208,8 +1209,8 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
       if (!new_cell->active() && old_cell->active())
 					 // new cell has children, old one has not
 	{
-	  cell_iterator child[1<<dim];
-	  for (unsigned int c=0; c<(1<<dim); ++c) 
+	  cell_iterator child[GeometryInfo<dim>::children_per_cell];
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
 	    {
 	      child[c] = new_cell->child(c);
 	      Assert (child[c]->active(),
@@ -1223,7 +1224,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  Assert (old_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
 
-	  for (unsigned int c=0; c<(1<<dim); ++c)
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
@@ -1240,8 +1241,8 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    };
 	} else {
 					   // old cell has children, new one has not
-	  cell_iterator child[1<<dim];
-	  for (unsigned int c=0; c<(1<<dim); ++c) 
+	  cell_iterator child[GeometryInfo<dim>::children_per_cell];
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
 	    {
 	      child[c] = old_cell->child(c);
 	      Assert (child[c]->active(),
@@ -1255,7 +1256,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  Assert (new_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
 	  
-	  for (unsigned int c=0; c<(1<<dim); ++c)
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
@@ -1281,7 +1282,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 				     dSMatrix            &transfer_matrix) const {
   if (!new_cell->active() && !old_cell->active())
 				     // both cells have children; go deeper
-    for (unsigned int child=0; child<(1<<dim); ++child)
+    for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
       transfer_cell (old_cell->child(child), new_cell->child(child),
 		     transfer_matrix);
   else
@@ -1304,8 +1305,8 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
       if (!new_cell->active() && old_cell->active())
 					 // new cell has children, old one has not
 	{
-	  cell_iterator child[1<<dim];
-	  for (unsigned int c=0; c<(1<<dim); ++c) 
+	  cell_iterator child[GeometryInfo<dim>::children_per_cell];
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
 	    {
 	      child[c] = new_cell->child(c);
 	      Assert (child[c]->active(),
@@ -1319,7 +1320,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  Assert (old_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
 
-	  for (unsigned int c=0; c<(1<<dim); ++c)
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
@@ -1337,8 +1338,8 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	    };
 	} else {
 					   // old cell has children, new one has not
-	  cell_iterator child[1<<dim];
-	  for (unsigned int c=0; c<(1<<dim); ++c) 
+	  cell_iterator child[GeometryInfo<dim>::children_per_cell];
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
 	    {
 	      child[c] = old_cell->child(c);
 	      Assert (child[c]->active(),
@@ -1352,7 +1353,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	  Assert (new_dof_indices.size() == selected_fe->total_dofs,
 		  ExcInternalError ());
 	  
-	  for (unsigned int c=0; c<(1<<dim); ++c)
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	    {
 					       // numbers of child dofs
 	      vector<int> child_dof_indices;
