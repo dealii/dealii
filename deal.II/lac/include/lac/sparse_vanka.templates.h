@@ -168,7 +168,7 @@ SparseVanka<number>::compute_inverse (const unsigned int    row,
 				   // Build local matrix
   for (unsigned int i=0; i<n_couplings; ++i)
     for (unsigned int j=0; j<n_couplings; ++j)
-      (*inverses[row])(i,j) = matrix(local_indices[i], local_indices[j]);
+      (*inverses[row])(i,j) = (*matrix)(local_indices[i], local_indices[j]);
   
 				   // Compute inverse
   inverses[row]->gauss_jordan();
