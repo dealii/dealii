@@ -3076,8 +3076,9 @@ rm -f conftest.$ac_objext conftest.$ac_ext
           ;;
 
       MIPSpro*)
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -LANG:std -ansiW -woff 1429,1066,1485"
-          CXXFLAGSO="$CXXFLAGS -O2 -LANG:std -woff 1174,1552"
+          CXXFLAGSG="$CXXFLAGS -DDEBUG -no_auto_include -ansiW -woff 1429,1066,1485"
+          CXXFLAGSO="$CXXFLAGS -O2 -no_auto_include -woff 1174,1552"
+          LDFLAGS="$LDFLAGS -quiet_prelink"
           LIBS="$LIBS -lm"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"

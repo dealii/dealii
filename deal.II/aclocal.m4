@@ -403,19 +403,18 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl The indicated enumeration value is out of "int" range.
           dnl cc-1485 CC: WARNING File = /usr/include/CC/iomanip, Line = 122
           dnl This form for taking the address of a member function is nonstandard.
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -LANG:std -ansiW -woff 1429,1066,1485"
+          CXXFLAGSG="$CXXFLAGS -DDEBUG -no_auto_include -ansiW -woff 1429,1066,1485"
           dnl Disable some compiler warnings, that warn about variables
           dnl which are used in Assert templates but not in optimized mode
           dnl cc-1174 CC: full_matrix.templates.h, Line = 1461
           dnl The variable "typical_diagonal_element" was declared but never referenced.
           dnl cc-1552 CC: WARNING File = source/data_out_base.cc, Line = 3493
           dnl The variable "ierr" is set but never used.
-          CXXFLAGSO="$CXXFLAGS -O2 -LANG:std -woff 1174,1552"
+          CXXFLAGSO="$CXXFLAGS -O2 -no_auto_include -woff 1174,1552"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
-          dnl Avoid output of prelinker: although manpages tell that -quiet_prelinker
-          dnl should work, it is not accepted (CC ERROR parsing -quiet_prelinker:  unknown flag)
-          dnl LDFLAGS="$LDFLAGS -quiet_prelinker"
+          dnl Avoid output of prelinker
+          LDFLAGS="$LDFLAGS -quiet_prelink"
           dnl
           dnl Always link with math library: The -lm option must be at the end of the
           dnl linker command, therefore it cannot be included into LDFLAGS
