@@ -394,6 +394,16 @@
 
 <ol>
   <li> <p>
+       New: <code class="member">DataOut::clear_input_data_references</code>
+       clears all reference to input data vectors and to the <code
+       class="class">DoFHandler</code>. This function may be useful
+       after the patches have been built, to release memory as early
+       as possible, in this case before the output is actually written.
+       <br>
+       (WB 2000/07/26)
+       </p>
+
+  <li> <p>
        New: <code class="class">class DerivativeApproximation</code>
        approximates the norm of the gradient or second derivative of a
        finite element field on each cell from finite difference
@@ -684,7 +694,7 @@
   <li> <p>
        New: <code class="member">DataOut::clear_data_vectors</code>
        allows to re-use an object without deleting the <code
-       class="class">DoFHandler</code>
+       class="class">DoFHandler</code>. 
        <br>
        (GK 2000/04/05)
        </p>
