@@ -392,8 +392,9 @@ double Point<dim>::square () const {
 template <int dim>
 inline
 ostream & operator << (ostream &out, const Point<dim> &p) {
-  for (unsigned int i=0; i<dim; ++i)
-    out << p(i);
+  for (unsigned int i=0; i<dim-1; ++i)
+    out << p(i) << ' ';
+  out << p(dim-1);
   return out;
 };
 
