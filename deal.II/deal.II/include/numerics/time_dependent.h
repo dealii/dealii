@@ -423,8 +423,19 @@ class TimeDependent
 				      * function since this is some kind of
 				      * "constructor-like" function, which
 				      * should be called bottom-up.
+				      *
+				      * The default implementation of this
+				      * function calls #start_sweep# on all
+				      * time step objects.
 				      */
     virtual void start_sweep (const unsigned int sweep_no);
+
+				     /**
+				      * Analogon to the above function,
+				      * calling #end_sweep# of each time
+				      * step object.
+				      */
+    virtual void end_sweep ();
 
 				     /**
 				      * Exception.
@@ -715,8 +726,15 @@ class TimeStepBase : public Subscriptor
 				      * The default implementation of this
 				      * function does nothing.
 				      */
-    virtual void init_for_sweep ();
+    virtual void start_sweep ();
 
+				     /**
+				      * This is the analogon to the above
+				      * function, but it is called at the
+				      * end of a sweep.
+				      */
+    virtual void end_sweep ();
+    
 				     /**
 				      * Before the primal problem is
 				      * solved on each time level, this

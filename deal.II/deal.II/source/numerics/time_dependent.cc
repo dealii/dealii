@@ -185,8 +185,17 @@ void TimeDependent::start_sweep (const unsigned int s)
     };
 
   for (unsigned int step=0; step<timesteps.size(); ++step)
-    timesteps[step]->init_for_sweep ();
+    timesteps[step]->start_sweep ();
 };
+
+
+
+void TimeDependent::end_sweep ()
+{
+  for (unsigned int step=0; step<timesteps.size(); ++step)
+    timesteps[step]->end_sweep ();
+};
+  
 
 
 
@@ -222,7 +231,13 @@ TimeStepBase::sleep (const unsigned)
 
 
 void
-TimeStepBase::init_for_sweep () 
+TimeStepBase::start_sweep () 
+{};
+
+
+
+void
+TimeStepBase::end_sweep () 
 {};
 
 
