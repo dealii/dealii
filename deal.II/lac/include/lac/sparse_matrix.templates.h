@@ -313,8 +313,8 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
 	 const unsigned int        ,
 	 const unsigned int) const;
       const mem_fun_p comp
-	= &(SparseMatrix<number>::
-	    template threaded_vmult<somenumber>);
+	= (&SparseMatrix<number>::
+           template threaded_vmult<somenumber>);
       Threads::ThreadManager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
@@ -483,8 +483,8 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 	 const unsigned int        ,
 	 somenumber               *) const;
       const mem_fun_p comp
-	= &(SparseMatrix<number>::
-	    template threaded_matrix_norm_square<somenumber>);
+	= (&SparseMatrix<number>::
+           template threaded_matrix_norm_square<somenumber>);
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
 			Threads::encapsulate (comp)
@@ -597,8 +597,8 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 	 const unsigned int        ,
 	 somenumber               *) const;
       const mem_fun_p comp
-	= &(SparseMatrix<number>::
-	    template threaded_matrix_scalar_product<somenumber>);
+	= (&SparseMatrix<number>::
+           template threaded_matrix_scalar_product<somenumber>);
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
 			Threads::encapsulate (comp)
