@@ -950,7 +950,7 @@ namespace internal
     Accessor<BlockMatrix>::row() const
     {
       Assert (row_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
       
       return (matrix->row_block_indices.local_to_global(row_block, 0) +
               base_iterator->row());
@@ -963,7 +963,7 @@ namespace internal
     Accessor<BlockMatrix>::column() const
     {
       Assert (col_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
 
       return (matrix->column_block_indices.local_to_global(col_block,0) +
               base_iterator->column());
@@ -976,7 +976,7 @@ namespace internal
     Accessor<BlockMatrix>::block_row() const
     {
       Assert (row_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
 
       return row_block;
     }
@@ -988,7 +988,7 @@ namespace internal
     Accessor<BlockMatrix>::block_column() const
     {
       Assert (col_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
 
       return col_block;
     }
@@ -1000,9 +1000,9 @@ namespace internal
     Accessor<BlockMatrix>::value () const
     {
       Assert (row_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
       Assert (col_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
 
       return base_iterator->value();
     }
@@ -1015,9 +1015,9 @@ namespace internal
     Accessor<BlockMatrix>::advance ()
     {      
       Assert (row_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
       Assert (col_block != deal_II_numbers::invalid_unsigned_int,
-              ExcDereferenceEndIterator());
+              ExcIteratorPastEnd());
 
                                        // Remember current row inside block
       unsigned int local_row = base_iterator->row();
