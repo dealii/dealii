@@ -69,11 +69,11 @@ extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 int main()
 {
   ofstream logfile("mglocal.output");
-//  logfile.setf(ios::fixed);
-//  logfile.precision (3);
+  logfile.setf(ios::fixed);
+  logfile.precision (3);
   deallog.attach(logfile);
-  deallog.log_execution_time(true);
-//  deallog.depth_console(0);
+//  deallog.log_execution_time(true);
+  deallog.depth_console(0);
 
   Helmholtz equation;
   RHSFunction<2> rhs;
@@ -131,7 +131,7 @@ int main()
 	  hanging_nodes.condense(A);
 	  hanging_nodes.condense(f);
 
-	  if (true)
+	  if (false)
 	    {
 	      ofstream out_file("MGf");
 	      DataOut<2> out;
@@ -145,7 +145,7 @@ int main()
 	  u.reinit(f);
 	  PrimitiveVectorMemory<> mem;
 
-	  SolverControl control(20, 1.e-12, true);
+	  SolverControl control(20, 1.e-12, false);
 	  SolverCG<> solver(control, mem);
 	  
 	  MGLevelObject<SparsityPattern> mgstruct(0, tr.n_levels()-1);
@@ -186,19 +186,21 @@ Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer, tr.n_level
 	  solver.solve(A, u, f, mgprecondition);
 	  hanging_nodes.distribute(u);
 
-	  DataOut<2> out;
-	  char* name = new char[100];
+	  if (false)
+	    {
+	      DataOut<2> out;
+	      char* name = new char[100];
 
-	  sprintf(name, "MG-Q%d-%d", degree, step);
+	      sprintf(name, "MG-Q%d-%d", degree, step);
 	  
-	  ofstream ofile(name);
-	  out.attach_dof_handler(dof);
-	  out.add_data_vector(u,"u");
-	  out.add_data_vector(f,"f");
-	  out.build_patches(5);
-	  out.write_gnuplot(ofile);
-
-	  delete[] name;
+	      ofstream ofile(name);
+	      out.attach_dof_handler(dof);
+	      out.add_data_vector(u,"u");
+	      out.add_data_vector(f,"f");
+	      out.build_patches(5);
+	      out.write_gnuplot(ofile);
+	      delete[] name;
+	    }
 	}
       deallog.pop();
     }
