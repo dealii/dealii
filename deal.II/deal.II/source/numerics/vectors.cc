@@ -162,6 +162,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 					    function, tmp);
 
   constraints.condense (mass_matrix);
+  constraints.condense (tmp);
   MatrixTools<dim>::apply_boundary_values (boundary_values,
 					   mass_matrix, vec, tmp);
 
