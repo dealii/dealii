@@ -162,8 +162,8 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
   const unsigned int dofs_per_cell1=dof1.get_fe().dofs_per_cell;
   const unsigned int dofs_per_cell2=dof2.get_fe().dofs_per_cell;
   
-  Vector<double> u1_local(dofs_per_cell1);
-  Vector<double> u2_local(dofs_per_cell2);
+  Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
+  Vector<typename OutVector::value_type> u2_local(dofs_per_cell2);
 
   FullMatrix<double> interpolation_matrix(dofs_per_cell2,
 					  dofs_per_cell1);
@@ -235,8 +235,8 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 
   const unsigned int dofs_per_cell1=dof1.get_fe().dofs_per_cell;
 
-  Vector<double> u1_local(dofs_per_cell1);
-  Vector<double> u1_int_local(dofs_per_cell1);
+  Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
+  Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
   
   typename DoFHandler<dim>::active_cell_iterator cell = dof1.begin_active(),
 						 endc = dof1.end();
@@ -290,7 +290,7 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 				       // interpolate back to dof1
 				       // taking into account
 				       // constraints1
-      Vector<double> u2(dof2.n_dofs());
+      Vector<typename OutVector::value_type> u2(dof2.n_dofs());
       interpolate(dof1, u1, dof2, constraints2, u2);
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
@@ -322,8 +322,8 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
 
   const unsigned int dofs_per_cell=dof1.get_fe().dofs_per_cell;
 
-  Vector<double> u1_local(dofs_per_cell);
-  Vector<double> u1_diff_local(dofs_per_cell);
+  Vector<typename OutVector::value_type> u1_local(dofs_per_cell);
+  Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
   
   FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
   FETools::get_interpolation_difference_matrix(dof1.get_fe(), fe2,
@@ -403,7 +403,7 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 
   const unsigned int dofs_per_cell  = dof2.get_fe().dofs_per_cell;
   const Triangulation<dim> &tria=dof1.get_tria();
-  Vector<double> dof_values(dofs_per_cell);
+  Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
   
   for (unsigned int level=0; level<tria.n_levels()-1; ++level)
     {
