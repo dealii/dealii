@@ -62,7 +62,7 @@ endif
 %.output : %.exe
 	@echo =====Running======= $<
 	@ulimit -t 2400 ; ./$< ; \
-	  if test ! $$? == 0 ; then rm $@ ; false ; fi
+	  if test ! $$? = 0 ; then rm $@ ; false ; fi
 	@perl -pi $(normalize)  $@
 
 
