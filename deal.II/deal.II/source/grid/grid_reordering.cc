@@ -886,7 +886,7 @@ void GridReordering<dim>::find_reordering (vector<Cell<dim> >         &cells,
 					   vector<CellData<dim> >     &original_cells,
 					   const vector<unsigned int> &new_cell_numbers)
 {
-  cout << "Starting..." << flush;
+//  cout << "Starting..." << flush;
   
   const unsigned int n_cells = cells.size();
   
@@ -928,7 +928,7 @@ void GridReordering<dim>::find_reordering (vector<Cell<dim> >         &cells,
 	{
 	  max_size = rotation_states.size();
 //  	  if (max_size % 10 == 0)
-  	    cout << "New max size " << rotation_states.size() << endl;
+//  	    cout << "New max size " << rotation_states.size() << endl;
 	};
       
       const typename vector<Cell>::iterator
@@ -1070,7 +1070,7 @@ void GridReordering<dim>::find_reordering (vector<Cell<dim> >         &cells,
       rotation_states.pop_back ();
     };
 
-  cout << "Done!" << endl;
+//  cout << "Done!" << endl;
 };
 
 
