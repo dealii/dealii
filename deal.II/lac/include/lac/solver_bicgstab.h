@@ -43,7 +43,7 @@
  * The Bicgstab-method has two additional parameters: the first is a
  * boolean, deciding whether to compute the actual residual in each
  * step (@p{true}) or to use the length of the computed orthogonal
- * residual (@{false}). Remark, that computing the residual causes a
+ * residual (@p{false}). Remark, that computing the residual causes a
  * third matrix-vector-multiplication, though no additional
  * preconditioning, in each step. The reason for doing this is, that
  * the size of the orthogonalized residual computed during the
