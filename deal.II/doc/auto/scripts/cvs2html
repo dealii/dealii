@@ -89,6 +89,9 @@
 #
 # 1.58 2000-01-04  Jon Berndt            Added a -i option to invoke 
 #                                        backgound image
+#
+# 1.59 2000-01-12  Dag Brück and         Two additional Y2K bugs in 
+#                  Henrik Carlqvist      the dates presented
 # ---- ----------  --------------------  -------------------------------
 #
 # This program is protected by the GPL, and all modifications of
@@ -111,6 +114,7 @@
 #  Mark Cooke <mpc@star.sr.bham.ac.uk>
 #  Carlo Wood <carlo@runaway.xs4all.nl>
 #  Kirby Vandivort <kvandivo@ks.uiuc.edu>
+#  Dag Brück <dag@Dynasim.se>
 #
 # Copyright under GPL 1997,1998,1999,2000 by
 # Peter Toft (pto@sslug.dk) + the persons above
@@ -202,7 +206,7 @@ sub closemainfile {
   print OUTFILE "<p>File made using version $version of ";
   print OUTFILE "<a href=\"$URL\" target=\"_top\">cvs2html</a> by ";
 
-  printf OUTFILE "%s at %2d-%02d-%02d %2d:%02d  $revisionlimitertext",getlogin,  $year+1900, $mon+1, $mday,$hour,$min;
+  printf OUTFILE "%s at %4d-%02d-%02d %2d:%02d  $revisionlimitertext",getlogin,  $year+1900, $mon+1, $mday,$hour,$min;
   if ($cutdate>"00000000")
   {
     printf OUTFILE " leaving out any log message prior to $cutyearformat2";
@@ -1619,7 +1623,7 @@ if ($dochrono)
   print CHRONOFILE "<p><br>File made using version $version of ";
   print CHRONOFILE "<a href=\"$URL\" target=\"_top\">cvs2html</a> by ";
 
-  printf CHRONOFILE "%s at %2d-%02d-%02d %2d:%02d",getlogin,  $year, $mon+1, $mday,$hour,$min;
+  printf CHRONOFILE "%s at %4d-%02d-%02d %2d:%02d",getlogin,  1900+$year, $mon+1, $mday,$hour,$min;
   if ($cutdate>"00000000")
   {
     printf CHRONOFILE " leaving out any log message prior to $cutyearformat2 $revisionlimitertext";
