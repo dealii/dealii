@@ -633,55 +633,146 @@ void MinimizationProblem<dim>::assemble_step ()
 }
 
 
-
+                                 // Once we have a search (update) direction,
+                                 // we need to figure out how far to go in
+                                 // this direction. This is what line search
+                                 // is good for, and this function does
+                                 // exactly this: compute and return the
+                                 // length of the update step.
+                                 //
+                                 // Since we already know the direction, we
+                                 // only have to solve the one-dimensional
+                                 // problem of minimizing the energy along
+                                 // this direction. Note, however, that in
+                                 // general we do not have the gradient of the
+                                 // energy functional in this direction, so we
+                                 // have to approximate it (and the second
+                                 // derivatives) using finite differences.
+                                 //
+                                 // In most applications, it is sufficient to
+                                 // find an approximate minimizer of this
+                                 // one-dimensional problem, or even just a
+                                 // point that may not be a minimizer but
+                                 // instead just satisfies a few conditions
+                                 // like those of Armijo and Goldstein. The
+                                 // rational for this is generally that
+                                 // evaluating the objective function too
+                                 // often is too expensive. However, here, we
+                                 // are a little more lenient, since the
+                                 // overall run-time is dominated by inverting
+                                 // the system matrix in each nonlinear
+                                 // step. Thus, we will do this minimization
+                                 // by using a fixed number of five Newton
+                                 // steps in this one-dimensional problem, and
+                                 // using a bisection algorithm as a substep
+                                 // in it.
+                                 //
+                                 // As is quite common in step length
+                                 // procedures, this function contains a fair
+                                 // number of heuristics and strategies that
+                                 // might not be obvious at first. Step length
+                                 // determination is notorious for its
+                                 // complications, and this implementation is
+                                 // not an exception. Note that if one tries
+                                 // to omit the special-casing, then one
+                                 // oftentimes encounters situations where the
+                                 // found step length is really not very good.
 template <int dim>
 double
 MinimizationProblem<dim>::line_search (const Vector<double> &update) const
 {
+                                   // Start out with a zero step length:
   double alpha = 0.;
   Vector<double> tmp (present_solution.size());
-  
+
+                                   // Then do at most five Newton steps:
   for (unsigned int step=0; step<5; ++step)
     {
+                                       // At the present location, which is
+                                       // ``present_solution+alpha*update'',
+                                       // evaluate the energy"
       tmp = present_solution;
       tmp.add (alpha, update);
-      const double f_s = energy (dof_handler, tmp);
-      
+      const double f_a = energy (dof_handler, tmp);
+
+                                       // Then determine a finite difference
+                                       // step length ``dalpha'', and also
+                                       // evaluate the energy functional at
+                                       // positions ``alpha+dalpha'' and
+                                       // ``alpha-dalpha'' along the search
+                                       // direction:
       const double dalpha = (alpha != 0 ? alpha/100 : 0.01);
       
       tmp = present_solution;
       tmp.add (alpha+dalpha, update);
-      const double f_s_plus = energy (dof_handler, tmp);
+      const double f_a_plus = energy (dof_handler, tmp);
 
       tmp = present_solution;
       tmp.add (alpha-dalpha, update);
-      const double f_s_minus = energy (dof_handler, tmp);
+      const double f_a_minus = energy (dof_handler, tmp);
 
-      const double f_s_prime       = (f_s_plus-f_s_minus) / (2*dalpha);
-      const double f_s_doubleprime = ((f_s_plus-2*f_s+f_s_minus) /
+                                       // From these three data points, we can
+                                       // compute a finite difference
+                                       // approximation of the first and
+                                       // second derivatives:
+      const double f_a_prime       = (f_a_plus-f_a_minus) / (2*dalpha);
+      const double f_a_doubleprime = ((f_a_plus-2*f_a+f_a_minus) /
                                       (dalpha*dalpha));
 
-      if (std::fabs(f_s_prime) < 1e-7*std::fabs(f_s))
+                                       // If the gradient is (relative to the
+                                       // energy value) too small, then this
+                                       // means that we have found a minimum
+                                       // of the energy functional along the
+                                       // search direction. In this case,
+                                       // abort here and return the found step
+                                       // length value:
+      if (std::fabs(f_a_prime) < 1e-7*std::fabs(f_a))
         break;
 
-      if (std::fabs(f_s_doubleprime) < 1e-7*std::fabs(f_s_prime))
+                                       // Alternatively, also abort if the
+                                       // curvature is too small, because we
+                                       // can't compute a Newton step
+                                       // then. This is somewhat
+                                       // unsatisfactory, since we are not at
+                                       // a minimum, and can certainly be
+                                       // improved. There are a number of
+                                       // other strategies for this case,
+                                       // which we leave for interested
+                                       // readers:
+      if (std::fabs(f_a_doubleprime) < 1e-7*std::fabs(f_a_prime))
         break;
 
-      double step_length = -f_s_prime / f_s_doubleprime;
+                                       // Then compute the Newton step as the
+                                       // negative of the inverse Hessian
+                                       // applied to the gradient.
+      double step_length = -f_a_prime / f_a_doubleprime;
+
+                                       // And do a number of correcting steps:
+                                       // if the energy at the predicted new
+                                       // position would be larger than at the
+                                       // present position, then halve the
+                                       // step length and try again. If this
+                                       // does not help after three such
+                                       // cycles, then simply give up and use
+                                       // the value we have.
       for (unsigned int i=0; i<3; ++i)
         {
           tmp = present_solution;
           tmp.add (alpha+step_length, update);
           const double e = energy (dof_handler, tmp);
           
-          if (e >= f_s)
+          if (e >= f_a)
             step_length /= 2;
           else
             break;
         }
+
+                                       // After all this, update alpha and go
+                                       // on to the next Newton step.
       alpha += step_length;
     }
 
+                                   // Finally, return with the computed step length.
   return alpha;
 }
 
