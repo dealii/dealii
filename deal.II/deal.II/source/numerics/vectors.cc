@@ -1358,6 +1358,55 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 
 
 
+template <int dim, class InVector>
+void
+VectorTools::point_difference (const DoFHandler<dim>& dof,
+			       const InVector&        fe_function,
+			       const Function<dim>&   exact_function,
+			       Vector<double>&        difference,
+			       const Point<dim>&      point)  
+{
+  static const MappingQ1<dim> mapping;
+  const FiniteElement<dim>& fe = dof.get_fe();
+
+  Assert(difference.size() == fe.n_components(),
+	 ExcDimensionMismatch(difference.size(), fe.n_components()));
+
+  DoFHandler<dim>::active_cell_iterator cell = dof_handler->begin_active();
+  const DoFHandler<dim>::active_cell_iterator endc = dof_handler->end();
+
+  std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+  
+  for (;cell != endc; ++cell)
+    {
+      if (cell->point_inside(point))
+	{
+	  Point<dim> unit_point = mapping->transform_real_to_unit_cell(
+            cell, evaluation_point);
+          for (unsigned int i=0; i<dim; ++i)
+            Assert(0<=unit_point(i) && unit_point(i)<=1, ExcInternalError());
+          vector<Point<dim> > quadrature_point(1, unit_point);
+          vector<double> weight(1, 1.);
+          Quadrature<dim> quadrature(quadrature_point, weight);
+          FEValues<dim> fe_values(
+            mapping, fe, quadrature, UpdateFlags(update_values));
+          fe_values.reinit(cell);
+          fe_values.get_function_values(u, u_value);
+	  break;
+	}
+    }
+  if (fe.n_components() == 1)
+    {
+      const double value = exact_function.value(point);
+      difference(0) = value;
+    } else {
+      exact_function.vector_value(point, difference);
+    }
+  for (unsigned int i=0;i<difference.size();++i)
+    difference(i) -= u_value[0](i);
+}
+
+
 
 template <int dim, class InVector>
 double

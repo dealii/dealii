@@ -21,6 +21,7 @@
 #include <vector>
 #include <set>
 
+template <int dim> class Point;
 template <int dim> class Function;
 template <int dim> class FunctionMap;
 template <int dim> class Quadrature;
@@ -820,6 +821,27 @@ class VectorTools
 				      const Function<dim>   *weight=0,
 				      const double exponent = 2.);
 
+				     /**
+				      * Point error evaluation. Find
+				      * the first cell containing the
+				      * given point and compute the
+				      * difference of a finite element
+				      * function and a continuous
+				      * function at this point.
+				      *
+				      * Since the function uses a
+				      * simple test for checking
+				      * whether a point is in a cell,
+				      * it is only implemented for
+				      * Q1-mapping yet.
+				      */
+    template <int dim, class InVector>
+    static void point_difference (const DoFHandler<dim>& dof,
+				  const InVector&        fe_function,
+				  const Function<dim>&   exact_solution,
+				  Vector<double>&        difference,
+				  const Point<dim>&      point);
+    
 				     /**
 				      * Mean-value filter for Stokes.
 				      * The pressure in Stokes'
