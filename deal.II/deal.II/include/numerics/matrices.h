@@ -405,7 +405,7 @@ class MatrixCreator
  * roughly constant, irrespective of the discretization, and that the
  * number of boundary nodes is #sqrt(N)# in 2d, the algorithm for
  * symmetric sparsity patterns is #O(sqrt(N)*m*log(m))#, while it
- * would be #O(N*sqrt(N)*m*log(m))# for the general case; the latter
+ * would be #O(N*sqrt(N)*log(m))# for the general case; the latter
  * is too expensive to be performed.
  *
  * It seems as if we had to make clear not to overwrite the lines of other
