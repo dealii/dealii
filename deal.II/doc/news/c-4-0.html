@@ -80,6 +80,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: <code>step-9</code> had the computation of the value of the
+       solution in the mid-point of the neighbor cell wrong. This is now
+       fixed. Consequently, the resulting mesh also looks much nicer now (much
+       smoother). 
+       <br> 
+       (<a href="mailto:werner.scholz@tuwien.ac.at">Werner Scholz</a>
+        2003/12/11)
+       </p>
+
+  <li> <p>
        New: The <code>config.h</code> file now declares a variable <code
        class="member">deal_II_numbers::invalid_unsigned_int</code>.
        It is a representation of the largest number that can be put into an

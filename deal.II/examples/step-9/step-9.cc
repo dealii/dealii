@@ -1924,9 +1924,19 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
       fe_midpoint_value.get_function_values (solution, this_midpoint_value);
 		
 
-				       // Now loop over all active
-				       // neighbors and collect the
-				       // data we need.
+				       // Now loop over all active neighbors
+				       // and collect the data we
+				       // need. Allocate a vector just like
+				       // ``this_midpoint_value'' which we
+				       // will use to store the value of the
+				       // solution in the midpoint of the
+				       // neighbor cell. We allocate it here
+				       // already, since that way we don't
+				       // have to allocate memory repeatedly
+				       // in each iteration of this inner loop
+				       // (memory allocation is a rather
+				       // expensive operation):
+      std::vector<double> neighbor_midpoint_value(1);
       typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
@@ -1943,15 +1953,15 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 					   // the value of the finite
 					   // element function
 					   // thereon. Note that for
-					   // these information we
+					   // this information we
 					   // have to reinitialize the
 					   // ``FEValues'' object for
 					   // the neighbor cell.
 	  fe_midpoint_value.reinit (neighbor);
 	  const Point<dim> neighbor_center = fe_midpoint_value.quadrature_point(0);
 
-	  std::vector<double> neighbor_midpoint_value(1);
-	  fe_midpoint_value.get_function_values (solution, this_midpoint_value);
+	  fe_midpoint_value.get_function_values (solution,
+                                                 neighbor_midpoint_value);
 
 					   // Compute the vector ``y''
 					   // connecting the centers
