@@ -72,6 +72,17 @@ namespace internals
                                           * used here.
                                           */
         typedef const SparseMatrix<number> MatrixType;
+
+                                         /**
+                                          * Create a typedef for the non-const
+                                          * version of this accessor. This is
+                                          * only used in one place, but is
+                                          * needed to work around a problem in
+                                          * gcc 2.95 and 3.0.
+                                          */
+        typedef
+        internals::SparseMatrixIterators::Accessor<number,false>
+        NonConstAccessor;
         
                                          /**
                                           * Constructor.
@@ -86,7 +97,7 @@ namespace internals
                                           * non-const accessor to a const
                                           * accessor.
                                           */
-        Accessor (const Accessor<number,false> &a);
+        Accessor (const NonConstAccessor &a);
 
                                          /**
                                           * Value of this matrix entry.
@@ -130,6 +141,7 @@ namespace internals
                                               * classes access to it.
                                               */
             Reference (const Accessor *accessor);
+
           public:
 
                                              /**
@@ -186,8 +198,13 @@ namespace internals
                                               * type. To avoid trouble with
                                               * some compilers simply mark all
                                               * accessor classes as friends.
+                                              *
+                                              * We fully state the namespace
+                                              * of the accessor class to work
+                                              * around a bug in gcc2.95.
                                               */
-            template <typename, bool> friend class Accessor;
+            template <typename, bool>
+            friend class internals::SparseMatrixIterators::Accessor;
         };
             
       public:
@@ -261,6 +278,18 @@ namespace internals
         typename Accessor<number,Constness>::MatrixType
         MatrixType;
         
+
+                                         /**
+                                          * Create a typedef for the non-const
+                                          * version of this iterator. This is
+                                          * only used in one place, but is
+                                          * needed to work around a problem in
+                                          * gcc 2.95 and 3.0.
+                                          */
+        typedef
+        internals::SparseMatrixIterators::Iterator<number,false>
+        NonConstIterator;
+
                                          /**
                                           * Constructor. Create an iterator
                                           * into the matrix @p matrix for the
@@ -274,13 +303,20 @@ namespace internals
                                           * Conversion constructor to get from
                                           * a non-const iterator to a const
                                           * iterator.
+                                          *
+                                          * (Note: the fact that we fully
+                                          * specialize the namespace of the
+                                          * accessor class is to work around a
+                                          * bug in gcc 2.95 and 3.0. We really
+                                          * mean the present class, but with
+                                          * different template arguments.)
                                           */
-        Iterator (const Iterator<number,false> &i);
+        Iterator (const NonConstIterator &i);
         
                                          /**
                                           * Prefix increment.
                                           */
-	Iterator& operator++ ();
+	Iterator & operator++ ();
 
                                          /**
                                           * Postfix increment.
@@ -303,12 +339,12 @@ namespace internals
                                           * the same matrix
                                           * position.
                                           */
-	bool operator == (const Iterator&) const;
+	bool operator == (const Iterator &) const;
 
                                          /**
                                           * Inverse of <tt>==</tt>.
                                           */
-	bool operator != (const Iterator&) const;
+	bool operator != (const Iterator &) const;
 
                                          /**
                                           * Comparison
@@ -323,7 +359,7 @@ namespace internals
                                           * both iterators point into the same
                                           * matrix.
                                           */
-	bool operator < (const Iterator&) const;
+	bool operator < (const Iterator &) const;
 
       private:
                                          /**
@@ -1800,7 +1836,7 @@ namespace internals
     template <typename number>
     inline
     Accessor<number,true>::
-    Accessor (const Accessor<number,false> &a)
+    Accessor (const NonConstAccessor &a)
                     :
                     SparsityPatternIterators::Accessor (a),
                     matrix (a.matrix)
@@ -1942,7 +1978,7 @@ namespace internals
     template <typename number, bool Constness>
     inline
     Iterator<number, Constness>::
-    Iterator (const Iterator<number,false> &i)
+    Iterator (const NonConstIterator &i)
                     :
                     accessor(i.accessor)
     {}
