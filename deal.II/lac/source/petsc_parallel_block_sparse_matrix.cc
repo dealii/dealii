@@ -14,7 +14,7 @@
 #include <lac/petsc_parallel_block_sparse_matrix.h>
 
 
-
+#ifdef DEAL_II_USE_PETSC
 
 namespace PETScWrappers
 {
@@ -107,3 +107,4 @@ namespace PETScWrappers
 
   
 
+#endif

@@ -20,6 +20,7 @@
 #include <lac/petsc_parallel_sparse_matrix.h>
 #include <cmath>
 
+#ifdef DEAL_II_USE_PETSC
 
 
 /*! @addtogroup PETSc
@@ -194,5 +195,7 @@ namespace PETScWrappers
   
 }
 
+
+#endif    // DEAL_II_USE_PETSC
 
 #endif    // __deal2__petsc_parallel_block_sparse_matrix_h

@@ -26,7 +26,7 @@ endif
 
 $(LIBDIR)/lac/%.g.$(OBJEXT) :
 	@echo "=====lac==============debug======$(MT)== $(<F)"
-	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) -c $< -o $@ -save-temps
 $(LIBDIR)/lac/%.$(OBJEXT) :
 	@echo "=====lac==============optimized==$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@

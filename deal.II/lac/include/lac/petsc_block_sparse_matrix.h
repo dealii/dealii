@@ -21,6 +21,8 @@
 #include <cmath>
 
 
+#ifdef DEAL_II_USE_PETSC
+
 
 /*! @addtogroup PETSc
  *@{
@@ -50,7 +52,7 @@ namespace PETScWrappers
  *
  * @author Wolfgang Bangerth, 2004
  */
-  class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
+  class BlockSparseMatrix : public BlockMatrixBase<PETScWrappers::SparseMatrix>
   {
     public:
                                        /**
@@ -197,5 +199,7 @@ namespace PETScWrappers
 /*@}*/
 }
 
+
+#endif    // DEAL_II_USE_PETSC
 
 #endif    // __deal2__petsc_block_sparse_matrix_h
