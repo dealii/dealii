@@ -465,30 +465,6 @@ namespace deal_II_exceptions
   {
 
 /**
- *  Relay exceptions from the @p{Assert} macro to the
- *  @p{__IssueError_Assert} function. Used to convert the last
- *  argument from arbitrary type to @ref{ExceptionBase} which is not
- *  possible inside the @p{Assert} macro due to syntactical
- *  difficulties in connection with the way we use the macro and the
- *  declaration of the exception classes.
- *
- *  @see ExceptionBase
- */
-    template <class exc>
-    inline
-    void issue_error_assert_1 (const char *file,
-			       int         line,
-			       const char *function,
-			       const char *cond,
-			       const char *exc_name,
-			       exc         e)
-    {
-      issue_error_assert (file,line,function,cond,exc_name,e);
-    };
-    
-
-
-/**
  *  This routine does the main work for the
  *  exception generation mechanism used in the
  *  @p{Assert} macro.
@@ -522,8 +498,32 @@ namespace deal_II_exceptions
 				       // exception object
       e.SetFields (file, line, function, cond, exc_name);
       throw e;
-    };
+    }
     
+
+/**
+ *  Relay exceptions from the @p{Assert} macro to the
+ *  @p{__IssueError_Assert} function. Used to convert the last
+ *  argument from arbitrary type to @ref{ExceptionBase} which is not
+ *  possible inside the @p{Assert} macro due to syntactical
+ *  difficulties in connection with the way we use the macro and the
+ *  declaration of the exception classes.
+ *
+ *  @see ExceptionBase
+ */
+    template <class exc>
+    inline
+    void issue_error_assert_1 (const char *file,
+			       int         line,
+			       const char *function,
+			       const char *cond,
+			       const char *exc_name,
+			       exc         e)
+    {
+      issue_error_assert (file,line,function,cond,exc_name,e);
+    }
+    
+
 
 /**
  * Abort the program. This function is used so that we need not
@@ -533,7 +533,7 @@ namespace deal_II_exceptions
  */
     void abort ();
 
-  };
+  }
   
 };
 

@@ -3318,7 +3318,7 @@ namespace Threads
   FunData0<RetType>::FunData0 (FunPtr fun_ptr) :
 		  FunDataBase (&FunData0<RetType>::thread_entry_point),
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -3326,7 +3326,7 @@ namespace Threads
   FunData0<RetType>::FunData0 (const FunData0 &fun_data) :
 		  FunDataBase (fun_data),
 		  fun_ptr (fun_data.fun_ptr)
-  {};
+  {}
 
 
 
@@ -3335,7 +3335,7 @@ namespace Threads
   FunData0<RetType>::clone () const 
   {
     return new FunData0 (*this);
-  };
+  }
 
 
 
@@ -3366,14 +3366,14 @@ namespace Threads
     (*fun_ptr)();
   
     return 0;
-  };
+  }
 
 
 
   template <typename RetType>
   FunData0<RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   
@@ -3382,7 +3382,7 @@ namespace Threads
   FunData0<RetType>::ArgCollector::collect_args ()
   {
     return new FunData0<void>(fun_ptr);
-  };
+  }
  
 
 
@@ -3394,7 +3394,7 @@ namespace Threads
 		  FunDataBase (&FunData1<Arg1,RetType>::thread_entry_point),
 		  fun_ptr (fun_ptr),
 		  arg1 (arg1)
-  {};
+  {}
 
 
 
@@ -3403,7 +3403,7 @@ namespace Threads
 		  FunDataBase (fun_data),
 		  fun_ptr (fun_data.fun_ptr),
 		  arg1 (fun_data.arg1)
-  {};
+  {}
 
 
 
@@ -3412,7 +3412,7 @@ namespace Threads
   FunData1<Arg1,RetType>::clone () const 
   {
     return new FunData1 (*this);
-  };
+  }
 
 
 
@@ -3444,14 +3444,14 @@ namespace Threads
     (*fun_ptr)(arg1);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename RetType>
   FunData1<Arg1,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   template <typename Arg1, typename RetType>
@@ -3459,7 +3459,7 @@ namespace Threads
   FunData1<Arg1,RetType>::ArgCollector::collect_args (Arg1 arg1)
   {
     return new FunData1<Arg1,void>(fun_ptr, arg1);
-  };
+  }
  
   
 
@@ -3474,7 +3474,7 @@ namespace Threads
 		  fun_ptr (fun_ptr),
 		  arg1 (arg1),
 		  arg2 (arg2)
-  {};
+  {}
 
 
 
@@ -3484,7 +3484,7 @@ namespace Threads
 		  fun_ptr (fun_data.fun_ptr),
 		  arg1 (fun_data.arg1),
 		  arg2 (fun_data.arg2)
-  {};
+  {}
 
 
 
@@ -3493,7 +3493,7 @@ namespace Threads
   FunData2<Arg1,Arg2,RetType>::clone () const 
   {
     return new FunData2 (*this);
-  };
+  }
 
 
 
@@ -3526,14 +3526,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename RetType>
   FunData2<Arg1,Arg2,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   
@@ -3543,7 +3543,7 @@ namespace Threads
 							   Arg2 arg2)
   {
     return new FunData2<Arg1,Arg2,void>(fun_ptr, arg1, arg2);
-  };
+  }
  
   
 
@@ -3560,7 +3560,7 @@ namespace Threads
 		  arg1 (arg1),
 		  arg2 (arg2),
 		  arg3 (arg3)
-  {};
+  {}
 
 
 
@@ -3571,7 +3571,7 @@ namespace Threads
 		  arg1 (fun_data.arg1),
 		  arg2 (fun_data.arg2),
 		  arg3 (fun_data.arg3)
-  {};
+  {}
 
 
 
@@ -3580,7 +3580,7 @@ namespace Threads
   FunData3<Arg1,Arg2,Arg3,RetType>::clone () const 
   {
     return new FunData3 (*this);
-  };
+  }
 
 
 
@@ -3614,14 +3614,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename RetType>
   FunData3<Arg1,Arg2,Arg3,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   
@@ -3632,7 +3632,7 @@ namespace Threads
 								Arg3 arg3)
   {
     return new FunData3<Arg1,Arg2,Arg3,void>(fun_ptr, arg1, arg2, arg3);
-  };
+  }
  
   
 
@@ -3651,7 +3651,7 @@ namespace Threads
 		  arg2 (arg2),
 		  arg3 (arg3),
 		  arg4 (arg4)
-  {};
+  {}
 
 
 
@@ -3663,7 +3663,7 @@ namespace Threads
 		  arg2 (fun_data.arg2),
 		  arg3 (fun_data.arg3),
 		  arg4 (fun_data.arg4)
-  {};
+  {}
 
 
 
@@ -3672,7 +3672,7 @@ namespace Threads
   FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::clone () const 
   {
     return new FunData4 (*this);
-  };
+  }
 
 
 
@@ -3707,14 +3707,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3, arg4);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
   FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -3726,7 +3726,7 @@ namespace Threads
 								     Arg4 arg4)
   {
     return new FunData4<Arg1,Arg2,Arg3,Arg4,void>(fun_ptr, arg1, arg2, arg3, arg4);
-  };
+  }
  
   
 
@@ -3747,7 +3747,7 @@ namespace Threads
 		  arg3 (arg3),
 		  arg4 (arg4),
 		  arg5 (arg5)
-  {};
+  {}
 
 
 
@@ -3760,7 +3760,7 @@ namespace Threads
 		  arg3 (fun_data.arg3),
 		  arg4 (fun_data.arg4),
 		  arg5 (fun_data.arg5)
-  {};
+  {}
 
 
 
@@ -3769,7 +3769,7 @@ namespace Threads
   FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::clone () const 
   {
     return new FunData5 (*this);
-  };
+  }
 
 
 
@@ -3805,14 +3805,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
   FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -3826,7 +3826,7 @@ namespace Threads
   {
     return new FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,void>(fun_ptr, arg1, arg2,
 						       arg3, arg4, arg5);
-  };
+  }
 
 
 
@@ -3849,7 +3849,7 @@ namespace Threads
 		  arg4 (arg4),
 		  arg5 (arg5),
 		  arg6 (arg6)
-  {};
+  {}
 
 
 
@@ -3863,7 +3863,7 @@ namespace Threads
 		  arg4 (fun_data.arg4),
 		  arg5 (fun_data.arg5),
 		  arg6 (fun_data.arg6)
-  {};
+  {}
 
 
 
@@ -3872,7 +3872,7 @@ namespace Threads
   FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::clone () const 
   {
     return new FunData6 (*this);
-  };
+  }
 
 
 
@@ -3909,14 +3909,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
   FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -3931,7 +3931,7 @@ namespace Threads
   {
     return new FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>(fun_ptr, arg1, arg2,
 							    arg3, arg4, arg5, arg6);
-  };
+  }
  
   
 
@@ -3957,7 +3957,7 @@ namespace Threads
 		  arg5 (arg5),
 		  arg6 (arg6),
 		  arg7 (arg7)
-  {};
+  {}
 
 
 
@@ -3972,7 +3972,7 @@ namespace Threads
 		  arg5 (fun_data.arg5),
 		  arg6 (fun_data.arg6),
 		  arg7 (fun_data.arg7)
-  {};
+  {}
 
 
 
@@ -3981,7 +3981,7 @@ namespace Threads
   FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::clone () const 
   {
     return new FunData7 (*this);
-  };
+  }
 
 
 
@@ -4019,14 +4019,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
   FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -4042,7 +4042,7 @@ namespace Threads
   {
     return new FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>(fun_ptr, arg1, arg2,
 								 arg3, arg4, arg5, arg6, arg7);
-  };
+  }
  
   
 
@@ -4071,7 +4071,7 @@ namespace Threads
 		  arg6 (arg6),
 		  arg7 (arg7),
 		  arg8 (arg8)
-  {};
+  {}
 
 
 
@@ -4088,7 +4088,7 @@ namespace Threads
 		  arg6 (fun_data.arg6),
 		  arg7 (fun_data.arg7),
 		  arg8 (fun_data.arg8)
-  {};
+  {}
 
 
 
@@ -4097,7 +4097,7 @@ namespace Threads
   FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::clone () const 
   {
     return new FunData8 (*this);
-  };
+  }
 
 
 
@@ -4136,14 +4136,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename RetType>
   FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -4161,7 +4161,7 @@ namespace Threads
     return new FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>(fun_ptr, arg1, arg2,
 								      arg3, arg4, arg5, arg6,
 								      arg7, arg8);
-  };
+  }
  
   
 
@@ -4190,7 +4190,7 @@ namespace Threads
 		  arg7 (arg7),
 		  arg8 (arg8),
 		  arg9 (arg9)
-  {};
+  {}
 
 
 
@@ -4208,7 +4208,7 @@ namespace Threads
 		  arg7 (fun_data.arg7),
 		  arg8 (fun_data.arg8),
 		  arg9 (fun_data.arg9)
-  {};
+  {}
 
 
 
@@ -4217,7 +4217,7 @@ namespace Threads
   FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::clone () const 
   {
     return new FunData9 (*this);
-  };
+  }
 
 
 
@@ -4257,14 +4257,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename RetType>
   FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -4286,7 +4286,7 @@ namespace Threads
       (fun_ptr, arg1, arg2,
        arg3, arg4, arg5, arg6,
        arg7, arg8, arg9);
-  };
+  }
  
   
 
@@ -4317,7 +4317,7 @@ namespace Threads
 		  arg8 (arg8),
 		  arg9 (arg9),
 		  arg10 (arg10)
-  {};
+  {}
 
 
 
@@ -4336,7 +4336,7 @@ namespace Threads
 		  arg8 (fun_data.arg8),
 		  arg9 (fun_data.arg9),
 		  arg10 (fun_data.arg10)
-  {};
+  {}
 
 
 
@@ -4345,7 +4345,7 @@ namespace Threads
   FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::clone () const 
   {
     return new FunData10 (*this);
-  };
+  }
 
 
 
@@ -4386,14 +4386,14 @@ namespace Threads
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
   
     return 0;
-  };
+  }
 
 
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
   FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -4416,7 +4416,7 @@ namespace Threads
       (fun_ptr, arg1, arg2,
        arg3, arg4, arg5, arg6,
        arg7, arg8, arg9, arg10);
-  };
+  }
  
   
 
@@ -4430,7 +4430,7 @@ namespace Threads
 		  FunDataBase (&MemFunData0<Class,RetType>::thread_entry_point),
 		  fun_ptr (fun_ptr),
 		  object (object)
-  {};
+  {}
 
 
 
@@ -4439,7 +4439,7 @@ namespace Threads
 		  FunDataBase (fun_data),
 		  fun_ptr (fun_data.fun_ptr),
 		  object (fun_data.object)
-  {};
+  {}
 
 
 
@@ -4448,7 +4448,7 @@ namespace Threads
   MemFunData0<Class,RetType>::clone () const 
   {
     return new MemFunData0 (*this);
-  };
+  }
 
 
 
@@ -4479,14 +4479,14 @@ namespace Threads
     (object->*fun_ptr)();
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename RetType>
   MemFunData0<Class,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   
@@ -4495,7 +4495,7 @@ namespace Threads
   MemFunData0<Class,RetType>::ArgCollector::collect_args (Class *object)
   {
     return new MemFunData0<Class,void>(fun_ptr, object);
-  };
+  }
  
 
 
@@ -4505,7 +4505,7 @@ namespace Threads
   MemFunData0<Class,RetType>::ArgCollector::collect_args (Class &object)
   {
     return collect_args (&object);
-  };
+  }
  
 
 
@@ -4519,7 +4519,7 @@ namespace Threads
 		  fun_ptr (fun_ptr),
 		  object (object),
 		  arg1 (arg1)
-  {};
+  {}
 
 
 
@@ -4529,7 +4529,7 @@ namespace Threads
 		  fun_ptr (fun_data.fun_ptr),
 		  object (fun_data.object),
 		  arg1 (fun_data.arg1)
-  {};
+  {}
 
 
 
@@ -4538,7 +4538,7 @@ namespace Threads
   MemFunData1<Class,Arg1,RetType>::clone () const 
   {
     return new MemFunData1 (*this);
-  };
+  }
 
 
 
@@ -4571,14 +4571,14 @@ namespace Threads
     (object->*fun_ptr)(arg1);
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename Arg1, typename RetType>
   MemFunData1<Class,Arg1,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   template <class Class, typename Arg1, typename RetType>
@@ -4587,7 +4587,7 @@ namespace Threads
 							       Arg1   arg1)
   {
     return new MemFunData1<Class,Arg1,void>(fun_ptr, object, arg1);
-  };
+  }
  
   
 
@@ -4598,7 +4598,7 @@ namespace Threads
 							       Arg1   arg1)
   {
     return collect_args (&object, arg1);
-  };
+  }
 
   
 /* ---------------------- MemFunData2 implementation ------------------------ */
@@ -4613,7 +4613,7 @@ namespace Threads
 		  object (object),
 		  arg1 (arg1),
 		  arg2 (arg2)
-  {};
+  {}
 
 
 
@@ -4624,7 +4624,7 @@ namespace Threads
 		  object (fun_data.object),
 		  arg1 (fun_data.arg1),
 		  arg2 (fun_data.arg2)
-  {};
+  {}
 
 
 
@@ -4633,7 +4633,7 @@ namespace Threads
   MemFunData2<Class,Arg1,Arg2,RetType>::clone () const 
   {
     return new MemFunData2 (*this);
-  };
+  }
 
 
 
@@ -4667,14 +4667,14 @@ namespace Threads
     (object->*fun_ptr)(arg1, arg2);
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename Arg1, typename Arg2, typename RetType>
   MemFunData2<Class,Arg1,Arg2,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   
@@ -4685,7 +4685,7 @@ namespace Threads
 								    Arg2   arg2)
   {
     return new MemFunData2<Class,Arg1,Arg2,void>(fun_ptr, object, arg1, arg2);
-  };
+  }
  
   
   template <class Class, typename Arg1, typename Arg2, typename RetType>
@@ -4696,7 +4696,7 @@ namespace Threads
 								    Arg2   arg2)
   {
     return collect_args (&object, arg1, arg2);
-  };
+  }
  
   
 
@@ -4715,7 +4715,7 @@ namespace Threads
 		  arg1 (arg1),
 		  arg2 (arg2),
 		  arg3 (arg3)
-  {};
+  {}
 
 
 
@@ -4727,7 +4727,7 @@ namespace Threads
 		  arg1 (fun_data.arg1),
 		  arg2 (fun_data.arg2),
 		  arg3 (fun_data.arg3)
-  {};
+  {}
 
 
 
@@ -4736,7 +4736,7 @@ namespace Threads
   MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::clone () const 
   {
     return new MemFunData3 (*this);
-  };
+  }
 
 
 
@@ -4771,14 +4771,14 @@ namespace Threads
     (object->*fun_ptr)(arg1, arg2, arg3);
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
   MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
  	
 
   
@@ -4791,7 +4791,7 @@ namespace Threads
   {
     return new MemFunData3<Class,Arg1,Arg2,Arg3,void>(fun_ptr, object,
 						      arg1, arg2, arg3);
-  };
+  }
  
   
   
@@ -4804,7 +4804,7 @@ namespace Threads
 									 Arg3   arg3)
   {
     return collect_args (&object, arg1, arg2, arg3);
-  };
+  }
   
 
 
@@ -4824,7 +4824,7 @@ namespace Threads
 		  arg2 (arg2),
 		  arg3 (arg3),
 		  arg4 (arg4)
-  {};
+  {}
 
 
 
@@ -4837,7 +4837,7 @@ namespace Threads
 		  arg2 (fun_data.arg2),
 		  arg3 (fun_data.arg3),
 		  arg4 (fun_data.arg4)
-  {};
+  {}
 
 
 
@@ -4846,7 +4846,7 @@ namespace Threads
   MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::clone () const 
   {
     return new MemFunData4 (*this);
-  };
+  }
 
 
 
@@ -4882,14 +4882,14 @@ namespace Threads
     (object->*fun_ptr)(arg1, arg2, arg3, arg4);
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
   MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -4903,7 +4903,7 @@ namespace Threads
   {
     return new MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>(fun_ptr, object,
 							   arg1, arg2, arg3, arg4);
-  };
+  }
  
   
 
@@ -4917,7 +4917,7 @@ namespace Threads
 									      Arg4   arg4)
   {
     return collect_args (&object, arg1, arg2, arg3, arg4);
-  };
+  }
   
 
 /* ---------------------- MemFunData5 implementation ------------------------ */
@@ -4938,7 +4938,7 @@ namespace Threads
 		  arg3 (arg3),
 		  arg4 (arg4),
 		  arg5 (arg5)
-  {};
+  {}
 
 
 
@@ -4952,7 +4952,7 @@ namespace Threads
 		  arg3 (fun_data.arg3),
 		  arg4 (fun_data.arg4),
 		  arg5 (fun_data.arg5)
-  {};
+  {}
 
 
 
@@ -4961,7 +4961,7 @@ namespace Threads
   MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::clone () const 
   {
     return new MemFunData5 (*this);
-  };
+  }
 
 
 
@@ -4998,14 +4998,14 @@ namespace Threads
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
   MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -5020,7 +5020,7 @@ namespace Threads
   {
     return new MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>(fun_ptr, object,
 								arg1, arg2, arg3, arg4, arg5);
-  };
+  }
  
 
   
@@ -5035,7 +5035,7 @@ namespace Threads
 										   Arg5   arg5)
   {
     return collect_args (&object, arg1, arg2, arg3, arg4, arg5);
-  };
+  }
   
 
   
@@ -5059,7 +5059,7 @@ namespace Threads
 		  arg4 (arg4),
 		  arg5 (arg5),
 		  arg6 (arg6)
-  {};
+  {}
 
 
 
@@ -5074,7 +5074,7 @@ namespace Threads
 		  arg4 (fun_data.arg4),
 		  arg5 (fun_data.arg5),
 		  arg6 (fun_data.arg6)
-  {};
+  {}
 
 
 
@@ -5083,7 +5083,7 @@ namespace Threads
   MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::clone () const 
   {
     return new MemFunData6 (*this);
-  };
+  }
 
 
 
@@ -5121,14 +5121,14 @@ namespace Threads
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
   MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -5144,7 +5144,7 @@ namespace Threads
   {
     return new MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>(fun_ptr, object,
 								     arg1, arg2, arg3, arg4, arg5, arg6);
-  };
+  }
   
 
 
@@ -5160,7 +5160,7 @@ namespace Threads
 											Arg6   arg6)
   {
     return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6);
-  };
+  }
 
 
 
@@ -5188,7 +5188,7 @@ namespace Threads
 		  arg5 (arg5),
 		  arg6 (arg6),
 		  arg7 (arg7)
-  {};
+  {}
 
 
 
@@ -5204,7 +5204,7 @@ namespace Threads
 		  arg5 (fun_data.arg5),
 		  arg6 (fun_data.arg6),
 		  arg7 (fun_data.arg7)
-  {};
+  {}
 
 
 
@@ -5213,7 +5213,7 @@ namespace Threads
   MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::clone () const 
   {
     return new MemFunData7 (*this);
-  };
+  }
 
 
 
@@ -5252,14 +5252,14 @@ namespace Threads
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
   
     return 0;
-  };
+  }
 
 
 
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename RetType>
   MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
 		  fun_ptr (fun_ptr)
-  {};
+  {}
 
 
 
@@ -5276,7 +5276,7 @@ namespace Threads
   {
     return new MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>(fun_ptr, object,
 									  arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-  };
+  }
   
 
 
@@ -5293,7 +5293,7 @@ namespace Threads
 											     Arg7   arg7)
   {
     return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-  };
+  }
   
 
 /* ---------------------------------------------------------------- */
@@ -5303,7 +5303,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)())
   {
     return fun_ptr;
-  };
+  }
 
 
 
@@ -5312,7 +5312,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1))
   {
     return fun_ptr;
-  };
+  }
   
 
   
@@ -5321,7 +5321,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1, Arg2))
   {
     return fun_ptr;
-  };
+  }
   
 
   
@@ -5330,7 +5330,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3))
   {
     return fun_ptr;
-  };
+  }
   
 
   
@@ -5339,7 +5339,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4))
   {
     return fun_ptr;
-  };
+  }
   
 
   
@@ -5348,7 +5348,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5357,7 +5357,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5366,7 +5366,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5375,7 +5375,7 @@ namespace Threads
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5385,7 +5385,7 @@ namespace Threads
 			       Arg6, Arg7, Arg8, Arg9))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5395,7 +5395,7 @@ namespace Threads
 			       Arg6, Arg7, Arg8, Arg9, Arg10))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5404,7 +5404,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)())
   {
     return fun_ptr;
-  };
+  }
 
 
 
@@ -5413,7 +5413,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)(Arg1))
   {
     return fun_ptr;
-  };
+  }
   
 
   
@@ -5422,7 +5422,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2))
   {
     return fun_ptr;
-  };
+  }
   
 
   
@@ -5431,7 +5431,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3))
   {
     return fun_ptr;
-  };
+  }
   
 
   
@@ -5440,7 +5440,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5449,7 +5449,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5458,7 +5458,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5467,7 +5467,7 @@ namespace Threads
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7))
   {
     return fun_ptr;
-  };
+  }
 
 
   
@@ -5525,9 +5525,9 @@ namespace Threads
 	  }
 	else
 	  return_values[i].second = end;
-      };
+      }
     return return_values;
-  };  
+  }  
 
 
 	    
