@@ -77,7 +77,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   unsigned int minlevel = dst.get_minlevel();
   unsigned int maxlevel = dst.get_maxlevel();
 
-  dst.clear();
+  MGTools::reinit_vector(mg_dof_handler, dst);
 
   Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
 	 ExcMatricesNotBuilt());

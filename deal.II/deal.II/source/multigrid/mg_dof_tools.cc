@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -392,16 +392,26 @@ template<int dim, typename number>
 void
 MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
                         MGLevelObject<BlockVector<number> >& v,
-                        const std::vector<bool>& selected_in,
-			const std::vector<unsigned int>& target_component)
+                        std::vector<bool> selected,
+			std::vector<unsigned int> target_component)
 {
-				   // Copy selection vector to
-				   // non-const since we may want to
-				   // do some manipulations.
-  std::vector<bool> selected = selected_in;
-  
   const unsigned int ncomp = mg_dof.get_fe().n_components();
-
+  
+				   // If the selected and
+				   // target_component have size 0,
+				   // they must be replaced by default
+				   // values.
+				   //
+				   // Since we already made copies
+				   // when this function was called,
+				   // we use the arguments directly.
+  if (target_component.size() == 0)
+    {
+      target_component.resize(ncomp);
+      for (unsigned int i=0;i<ncomp;++i)
+	target_component[i] = i;
+    }
+  
 				   // If selected is an empty vector,
 				   // all components are selected.
   if (selected.size() == 0)
@@ -585,13 +595,13 @@ template void MGTools::reinit_vector<deal_II_dimension> (
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<BlockVector<double> >&,
-  const std::vector<bool>&,
-  const std::vector<unsigned int>&);
+  const std::vector<bool>,
+  const std::vector<unsigned int>);
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<BlockVector<float> >&,
-  const std::vector<bool>&,
-  const std::vector<unsigned int>&);
+  const std::vector<bool>,
+  const std::vector<unsigned int>);
 
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,

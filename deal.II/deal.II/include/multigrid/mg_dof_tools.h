@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -156,12 +156,14 @@ class MGTools
 				      * The boolean field @p selected
 				      * allows restricting this
 				      * operation to certain
-				      * components. In this case,
-				      * @p vector will only have as
-				      * many blocks as there are true
+				      * components. In this case, @p
+				      * vector will only have as many
+				      * blocks as there are true
 				      * values in @p selected (no
 				      * blocks of length zero are
-				      * padded in).
+				      * padded in). If this argument
+				      * is omitted, all blocks will be
+				      * considered.
 				      *
 				      * Degrees of freedom must be
 				      * sorted by component in order
@@ -170,16 +172,19 @@ class MGTools
 				      *
 				      * The argument
 				      * @p target_component allows to
-				      * re-sort and groupt components
+				      * re-sort and group components
 				      * as in
-				      * @p DoFRenumbering::component_wise.
+				      * DoFRenumbering::component_wise.
+				      *
+				      * 
 				      */
     template <int dim, typename number>
       static void
       reinit_vector (const MGDoFHandler<dim>& mg_dof,
 		     MGLevelObject<BlockVector<number> >& v,
-		     const std::vector<bool>& selected,
-		     const std::vector<unsigned int>& target_component);
+		     const std::vector<bool> selected = std::vector<bool>(),
+		     const std::vector<unsigned int> target_component
+		     = std::vector<unsigned int>());
 				     /**
 				      * Adjust vectors on all levels
 				      * to correct size.  Count the
@@ -204,7 +209,7 @@ class MGTools
 				      * @p target_component allows to
 				      * re-sort and groupt components
 				      * as in
-				      * @p DoFRenumbering::component_wise.
+				      * DoFRenumbering::component_wise.
 				      */
     template <int dim, typename number>
       static void
