@@ -187,3 +187,5 @@ system in a linear combination. This vector must have the size of the
 number of components and includes the weights. This could replace the 
 old argument 'const unsigned int selected_component'.
 
+
+Update documentation on Boundaries in Triangulation<dim> (Guido!)
