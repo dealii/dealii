@@ -66,28 +66,29 @@ plot "data-kink/history.global.gnuplot" using 1:2 title "global refinement -- L2
 set parametric
 set data style lines
 set nologscale xy
+set size 0.7,1
 
 set output "data-gauss/finest_mesh.global.eps"
-plot "data-gauss/global.finest_mesh.gnuplot"
+plot "data-gauss/global.finest_mesh.gnuplot" title "Finest mesh"
 
 set output "data-gauss/finest_mesh.true_error.eps"
-plot "data-gauss/true_error.finest_mesh.gnuplot"
+plot "data-gauss/true_error.finest_mesh.gnuplot" title "Finest mesh"
 
 set output "data-gauss/finest_mesh.estimated_error.eps"
-plot "data-gauss/estimated_error.finest_mesh.gnuplot"
+plot "data-gauss/estimated_error.finest_mesh.gnuplot" title "Finest mesh"
 
 
 
 set output "data-singular/finest_mesh.global.eps"
-plot "data-singular/global.finest_mesh.gnuplot"
+plot "data-singular/global.finest_mesh.gnuplot" title "Finest mesh"
 
 set output "data-singular/finest_mesh.estimated_error.eps"
-plot "data-singular/estimated_error.finest_mesh.gnuplot"
+plot "data-singular/estimated_error.finest_mesh.gnuplot" title "Finest mesh"
 
 
 
 set output "data-kink/finest_mesh.global.eps"
-plot "data-kink/global.finest_mesh.gnuplot"
+plot "data-kink/global.finest_mesh.gnuplot" title "Finest mesh"
 
 set output "data-kink/finest_mesh.estimated_error.eps"
-plot "data-kink/estimated_error.finest_mesh.gnuplot"
+plot "data-kink/estimated_error.finest_mesh.gnuplot" title "Finest mesh"

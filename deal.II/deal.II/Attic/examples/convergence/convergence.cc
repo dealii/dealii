@@ -386,7 +386,7 @@ void PoissonProblem<dim>::print_history () const {
 int main () {
   PoissonProblem<2> problem;
 
-  for (unsigned int level=1; level<9; ++level)
+  for (unsigned int level=1; level<8; ++level)
     problem.run (level);
 
   cout << endl << "Printing convergence history to <gnuplot.history>..." << endl;
