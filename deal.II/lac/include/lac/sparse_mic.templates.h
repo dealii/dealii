@@ -19,18 +19,18 @@
 
 template <typename number>
 SparseMIC<number>::SparseMIC ()
-                :
-                diag(0),
-                inv_diag(0),
-                inner_sums(0)
+		:
+		diag(0),
+		inv_diag(0),
+		inner_sums(0)
 {}
 
 
 
 template <typename number>
 SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
-                :
-                SparseLUDecomposition<number> (sparsity),
+		:
+		SparseLUDecomposition<number> (sparsity),
                 diag(0),
                 inv_diag(0),
                 inner_sums(0)
@@ -57,7 +57,7 @@ SparseMIC<number>::reinit ()
       std::vector<number> tmp;
       tmp.swap (inner_sums);
     };
-  
+
   SparseLUDecomposition<number>::reinit ();
 }
 
@@ -103,20 +103,20 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   if (strengthen_diagonal > 0)
     this->strengthen_diagonal_impl ();
 
-                                   // MIC implementation: (S. Margenov lectures)
-                                   // x[i] = a[i][i] - sum(k=1, i-1,
-                                   //              a[i][k]/x[k]*sum(j=k+1, N, a[k][j]))
-	
-                                   // TODO: for sake of simplicity,
-                                   // those are placed here A better
-                                   // implementation would store this
-                                   // values in the underlying sparse
-                                   // matrix itself.
+				   // MIC implementation: (S. Margenov lectures)
+				   // x[i] = a[i][i] - sum(k=1, i-1,
+				   //              a[i][k]/x[k]*sum(j=k+1, N, a[k][j]))
+
+				   // TODO: for sake of simplicity,
+				   // those are placed here. A better
+				   // implementation would store this
+				   // values in the underlying sparse
+				   // matrix itself.
   diag.resize (this->m());
   inv_diag.resize (this->m());
   inner_sums.resize (this->m());
 
-                                   // precalc sum(j=k+1, N, a[k][j]))
+				   // precalc sum(j=k+1, N, a[k][j]))
   for(unsigned int row=0; row<this->m(); row++) {
     inner_sums[row] = get_rowsum(row);
   }
@@ -124,20 +124,22 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   const unsigned int* const col_nums = this->get_sparsity_pattern().get_column_numbers();
   const unsigned int* const rowstarts = this->get_sparsity_pattern().get_rowstart_indices();
 
-  for(unsigned int row=0; row<this->m(); row++) {
-    number temp = this->diag_element(row);
-    number temp1 = 0;
-    const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
-
-    unsigned int k = 0;
-    for (const unsigned int * col=&col_nums[rowstarts[row]+1];
-         col<first_after_diagonal; ++col, k++)
-      temp1 += matrix.global_entry (col-col_nums)/diag[k]*inner_sums[k];
-
-    diag[row] = temp - temp1;
-    inv_diag[row] = 1.0/diag[row];
-    Assert(diag[row]>0, ExcInternal());
-  }
+  for(unsigned int row=0; row<this->m(); row++)
+    {
+      number temp = this->diag_element(row);
+      number temp1 = 0;
+      const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
+       
+      unsigned int k = 0;
+      for (const unsigned int * col=&col_nums[rowstarts[row]+1];
+	   col<first_after_diagonal; ++col, k++)
+	temp1 += matrix.global_entry (col-col_nums)/diag[k]*inner_sums[k];
+       
+      diag[row] = temp - temp1;
+       
+      inv_diag[row] = 1.0/diag[row];
+      Assert(diag[row]>0, ExcStrengthenDiagonalTooSmall());
+    }
 }
 
 
