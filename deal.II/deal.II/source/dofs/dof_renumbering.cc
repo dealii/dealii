@@ -60,10 +60,12 @@ class WrapDoFIterator : private T
 {
   public:
     WrapDoFIterator (const T& t) : T(t) {}
+
     void get_dof_indices (std::vector<unsigned int>& v) const
       {
 	(*this)->get_dof_indices(v);
       }
+
     template <class T2>
     bool operator != (const T2& i) const
       {
@@ -75,15 +77,19 @@ class WrapDoFIterator : private T
     T::operator==;
 };
 
+
+
 template <class T>
 class WrapMGDoFIterator : private T
 {
   public:
     WrapMGDoFIterator (const T& t) : T(t) {}
+
     void get_dof_indices (std::vector<unsigned int>& v) const
       {
 	(*this)->get_mg_dof_indices(v);
       }
+
     bool operator != (const WrapMGDoFIterator<T>& i) const
       {
 	return (! (T::operator==(i)));
@@ -96,13 +102,47 @@ class WrapMGDoFIterator : private T
 
 
 
+/**
+ * Provide comparator for DoFCellAccessors: it returns @p true if the center
+ * of the second cell is downstream of the center of the first one with
+ * respect to the direction given to the constructor.
+ */
+template <int dim>
+struct CompareDownstream
+{
+				     /**
+				      * Constructor.
+				      */
+    CompareDownstream (const Point<dim> &dir)
+                    :
+		    dir(dir) 
+      {}
+				     /**
+				      * Return true if c1 < c2.
+				      */    
+    bool operator () (const typename DoFHandler<dim>::cell_iterator &c1,
+		      const typename DoFHandler<dim>::cell_iterator &c2) const
+      {
+	const Point<dim> diff = c2->center() - c1->center();
+	return (diff*dir > 0);
+      }
+
+  private:
+				     /**
+				      * Flow direction.
+				      */
+    const Point<dim> dir;
+};
+
+
+
 template <int dim>
 void
-DoFRenumbering::Cuthill_McKee (
-  DoFHandler<dim>& dof_handler,
-  const bool       reversed_numbering,
-  const bool       use_constraints,
-  const std::vector<unsigned int>& starting_indices)
+DoFRenumbering::
+Cuthill_McKee (DoFHandler<dim> &dof_handler,
+               const bool       reversed_numbering,
+               const bool       use_constraints,
+               const std::vector<unsigned int> &starting_indices)
 {
   std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
 					DoFHandler<dim>::invalid_dof_index);
@@ -119,12 +159,12 @@ DoFRenumbering::Cuthill_McKee (
 
 template <int dim>
 void
-DoFRenumbering::compute_Cuthill_McKee (
-  std::vector<unsigned int>& new_indices,
-  const DoFHandler<dim>&     dof_handler,
-  const bool                 reversed_numbering,
-  const bool                 use_constraints,
-  const std::vector<unsigned int>& starting_indices)
+DoFRenumbering::
+compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
+                       const DoFHandler<dim>&     dof_handler,
+                       const bool                 reversed_numbering,
+                       const bool                 use_constraints,
+                       const std::vector<unsigned int>& starting_indices)
 {
 				   // make the connection graph. in
 				   // more than 2d use an intermediate
@@ -167,8 +207,9 @@ DoFRenumbering::compute_Cuthill_McKee (
   constraints.clear ();
   
   const unsigned int n_dofs = sparsity.n_rows();
-				   // store the new dof numbers; invalid_dof_index means
-				   // that no new number was chosen yet
+				   // store the new dof numbers;
+				   // invalid_dof_index means that no new
+				   // number was chosen yet
   Assert(new_indices.size() == n_dofs,
 	 ExcDimensionMismatch(new_indices.size(), n_dofs));
   
@@ -934,34 +975,6 @@ void DoFRenumbering::cell_wise_dg (
   dof.renumber_dofs(level, reverse);
 }
 
-/**
- * Provide comparator for DoFCellAccessors
- */
-
-template <int dim>
-struct CompCells
-{
-				     /**
-				      * Flow direction.
-				      */
-    const Point<dim>& dir;
-				     /**
-				      * Constructor.
-				      */
-    CompCells (const Point<dim>& dir) :
-		    dir(dir) 
-      {}
-				     /**
-				      * Return true if c1 < c2.
-				      */    
-    bool operator () (const typename DoFHandler<dim>::cell_iterator& c1,
-		      const typename DoFHandler<dim>::cell_iterator&c2) const
-      {
-	Point<dim> diff = c2->center() - c1->center();
-	double s = diff*dir;
-	return (s>0);
-      }
-};
 
 
 template <int dim>
@@ -986,7 +999,7 @@ DoFRenumbering::compute_downstream_dg (
 {
   std::vector<typename DoFHandler<dim>::cell_iterator>
     ordered_cells(dof.get_tria().n_active_cells());
-  CompCells<dim> comparator(direction);
+  const CompareDownstream<dim> comparator(direction);
   
   typename DoFHandler<dim>::active_cell_iterator begin = dof.begin_active();
   typename DoFHandler<dim>::active_cell_iterator end = dof.end();
@@ -1005,7 +1018,7 @@ void DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 {
   std::vector<typename MGDoFHandler<dim>::cell_iterator>
     ordered_cells(dof.get_tria().n_cells(level));
-  CompCells<dim> comparator(direction);
+  const CompareDownstream<dim> comparator(direction);
   
   typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
   typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
@@ -1013,7 +1026,7 @@ void DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
   std::copy (begin, end, ordered_cells.begin());
   std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
-  cell_wise_dg(dof, level, ordered_cells);
+  cell_wise_dg (dof, level, ordered_cells);
 }
 
 
