@@ -102,10 +102,11 @@ class FETools
 				      * denotes the dual solution.
 				      */
     template <int dim, typename number>
-    static void get_interpolation_difference_matrix(
-      const FiniteElement<dim> &fe1,
-      const FiniteElement<dim> &fe2,
-      FullMatrix<number> &difference_matrix);
+    static
+    void
+    get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
+					const FiniteElement<dim> &fe2,
+					FullMatrix<number> &difference_matrix);
 
 				     /**
 				      * Gives the interpolation of a the
