@@ -350,7 +350,7 @@ class SolutionTransfer
     PreparationState prepared_for;
 
 
-/**
+				     /**
 				      * Is used for #prepare_for_refining#
 				      * (of course also for
 				      * #repare_for_refining_and_coarsening#)

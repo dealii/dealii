@@ -351,7 +351,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-/**
+				     /**
 				      * This class is used to package all
 				      * data needed to call a specific unary
 				      * member function of an object. It is
@@ -495,7 +495,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-/**
+				     /**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific ternary member
@@ -545,7 +545,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-/**
+				     /**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific quaternary member
@@ -663,7 +663,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-/**
+				     /**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific hexary member
@@ -834,7 +834,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-/**
+				     /**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific nonary member
@@ -892,7 +892,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-/**
+				     /**
 				      * This class is used to package
 				      * all data needed to call a
 				      * specific decary member
@@ -953,7 +953,7 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
-/**
+				     /**
 				      * This class is used to package
 				      * all data needed to call a
 				      * global function. See the
@@ -986,7 +986,7 @@ class ThreadManager : public ACE_Thread_Manager
       };
 
 
-/**
+				     /**
 				      * This class is used to package
 				      * all data needed to call a
 				      * global function. See the
@@ -1410,7 +1410,7 @@ class ThreadManager : public ACE_Thread_Manager
       };
 
 
-/**
+				     /**
 				      * Wrapper function to allow spawning
 				      * threads for member functions as well,
 				      * rather than for global functions only.
@@ -1574,7 +1574,7 @@ class ThreadManager : public ACE_Thread_Manager
                                     typename Arg3, typename Arg4,
                                     typename Arg5, typename Arg6,
                                     typename Arg7, typename Arg8>
-      int spawn (Mem_Fun_Data8<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
+    int spawn (Mem_Fun_Data8<ObjectClass,Arg1,Arg2,Arg3,Arg4,Arg5,
 	                                   Arg6,Arg7,Arg8> *mem_fun_data,
 	       long flags = THR_NEW_LWP | THR_JOINABLE,
 	       ACE_thread_t * = 0,
@@ -1608,7 +1608,7 @@ class ThreadManager : public ACE_Thread_Manager
 	       size_t stack_size = 0);
 
 
-/**
+				     /**
 				      * Wrapper function to allow spawning
 				      * threads for member functions as well,
 				      * rather than for global functions only.
@@ -1632,7 +1632,7 @@ class ThreadManager : public ACE_Thread_Manager
 	       size_t stack_size = 0);
 
 
-/**
+				     /**
 				      * Wrapper function to allow spawning
 				      * threads for funtions.
 				      *
@@ -2287,10 +2287,10 @@ class ThreadManager : public ACE_Thread_Manager
 		 size_t stack_size[] = 0);
 
 
-private:
+  private:
 
 
-/**
+				     /**
 				      * This is a function satisfying the
 				      * requirements for thread entry points.
 				      * It takes as argument all the
@@ -2419,7 +2419,7 @@ private:
     static void * thread_entry_point10 (void *_arg);
 
 
-/**
+				     /**
 				      * This is a function satisfying the
 				      * requirements for thread entry points.
 				      * It takes as argument all the
