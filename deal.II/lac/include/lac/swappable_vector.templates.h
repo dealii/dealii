@@ -232,6 +232,10 @@ void SwappableVector<number>::kill_file ()
   lock.acquire();
 #endif
 
+				   // this is too bad: someone
+				   // requested the vector in advance,
+				   // but never got to fetch it. this
+				   // is most probably an error, not?
   Assert (data_is_preloaded == false, ExcInternalError());
   
   if (filename != "")
