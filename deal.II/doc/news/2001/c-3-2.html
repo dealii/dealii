@@ -212,6 +212,18 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: The <code class="class">NormType</code> enum used to
+       indicate the norm the <code
+       class="member">VectorTools::integrate_difference</code>
+       function shall integrate is moved from the global namespace
+       into the <code class="class">VectorTools</code> class. You
+       therefore have to prefix the members of this enum by the
+       respective class name.
+       <br>
+       (RH, WB 2001/11/29)
+       </p>
+
+  <li> <p>
        Fixed: The functions <code
        class="member">Mapping::transform_unit_to_real_cell</code>
        leaked some memory. This is now fixed.
@@ -221,7 +233,8 @@ documentation, etc</a>.
 
   <li> <p>
        Fixed: The <code class="class">DoFHandler</code> class had a
-       memory leak. This is now fixed.
+       memory leak. This is now fixed. Likewise for the <code
+       class="class">MGDoFHandler</code> class.
        <br>
        (WB 2001/11/28)
        </p>
