@@ -725,8 +725,8 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &fe) {
 
 
 
-int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator   &cell,
-					    unsigned int            next_free_dof) {
+unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
+						     unsigned int          next_free_dof) {
 
 				   // distribute dofs of vertices
   for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
@@ -776,8 +776,8 @@ int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 
 
 
-int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
-					    unsigned int            next_free_dof) {
+unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
+						     unsigned int          next_free_dof) {
   if (selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
     for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
@@ -824,7 +824,7 @@ int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator   &cell,
 
 template <int dim>
 void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
-				     bool use_constraints,
+				     const bool use_constraints,
 				     const vector<int> &starting_points) {
 				   // make the connection graph
   dSMatrixStruct sparsity (n_dofs(), max_couplings_between_dofs());
@@ -1185,7 +1185,7 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int> &dof_to_
 	
 					 // make sparsity pattern for this cell
 	for (unsigned int i=0; i<total_dofs; ++i)
-	  for (unsigned int j=0; j<total_dofs; ++j)
+	  for (unsigned int j=0; j<total_dofs; ++j) 
 	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
 			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
       };
@@ -1625,7 +1625,7 @@ void DoFHandler<dim>::map_dof_to_boundary_indices (vector<int> &mapping) const {
 
   mapping.clear ();
   mapping.insert (mapping.end(), n_dofs(), -1);
-
+  
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
   vector<int> dofs_on_face(dofs_per_face);
   int next_boundary_index = 0;
@@ -1665,6 +1665,10 @@ void DoFHandler<dim>::map_dof_to_boundary_indices (const FunctionMap &boundary_i
   mapping.clear ();
   mapping.insert (mapping.end(), n_dofs(), -1);
 
+				   // return if there is nothing to do
+  if (boundary_indicators.size() == 0)
+    return;
+  
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
   vector<int> dofs_on_face(dofs_per_face);
   int next_boundary_index = 0;
