@@ -784,7 +784,7 @@ void DoFRenumbering::cell_wise_dg (DoFHandler<deal_II_dimension>&,
 template
 void DoFRenumbering::cell_wise_dg (MGDoFHandler<deal_II_dimension>&,
 				   const unsigned int,
-				   const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
+				   const std::vector<MGDoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
 void DoFRenumbering::downstream_dg (DoFHandler<deal_II_dimension>&,
