@@ -588,75 +588,51 @@ bool
 FE_DGQ<dim>::has_support_on_face (unsigned int shape_index,
 				  const unsigned int face_index) const
 {
-  if (dim==1)
-    return true;
-  const unsigned int cell_start = (dim==2)
-				  ? first_quad_index
-				  : first_hex_index;
-  const unsigned int face_start = (dim==2)
-				  ? first_line_index
-				  : first_quad_index;
+
+  unsigned int n = degree+1;
+  unsigned int n2 = n*n;
   
-				   // Interior degrees of
-				   // freedom correspond to
-				   // shape functions with
-				   // support inside the cell.
-  if (shape_index >= cell_start)
-    return false;
-				   // Shape functions are sorted
-				   // by face. If we dived by
-				   // the number of shapes per
-				   // face, the result must be
-				   // equal to the face index.
-  if (shape_index >= face_start)
+  switch (dim)
     {
-      shape_index -= first_line_index;
-      shape_index /=  dofs_per_face;
-      return (shape_index == face_index);
-    }
-				   // Only degrees of freedom on
-				   // a vertex are left.
-  shape_index /=  dofs_per_vertex;
-				   // Use a table to figure out
-				   // which face is neighbor to
-				   // which vertex.
-  switch (100*dim+10*face_index+shape_index)
-    {
-      case 200:
-      case 230:
-      case 201:
-      case 211:
-      case 212:
-      case 222:
-      case 223:
-      case 233:
-      case 300:
-      case 320:
-      case 350:
-      case 301:
-      case 321:
-      case 331:
-      case 302:
-      case 332:
-      case 342:
-      case 303:
-      case 343:
-      case 353:
-      case 314:
-      case 324:
-      case 354:
-      case 315:
-      case 325:
-      case 335:
-      case 316:
-      case 336:
-      case 346:
-      case 317:
-      case 347:
-      case 357:
+      case 1:
+					 // This is not correct, but it
+					 // should not matter in 1D.
 	return true;
-      default:
+      case 2:
+	if (face_index==0 && shape_index < n)
+	  return true;
+	if (face_index==1 && (shape_index % n) == degree)
+	  return true;
+	if (face_index==2 && shape_index >= dofs_per_cell-n)
+	  return true;
+	if (face_index==3 && (shape_index % n) == 0)
+	  return true;
 	return false;
+      case 3:
+	if (true)
+	  {
+	    const unsigned int in2 = shape_index % n2;
+	    
+					     // y=0
+	    if (face_index==0 && in2 < n )
+	      return true;
+					     // y=1
+	    if (face_index==1 && in2 >= n2-n)
+	      return true;
+					     // z=0
+	    if (face_index==2 && shape_index < n2)
+	      return true;
+					     // x=1
+	    if (face_index==3 && (shape_index % n) == n-1)
+	      return true;
+					     // z=1
+	    if (face_index==4 && shape_index >= dofs_per_cell - n2)
+	      return true;
+					     // x=0
+	    if (face_index==5 && (shape_index % n) == 0)
+	      return true;
+	    return false;
+	  }
     }
   return true;
 }
