@@ -135,9 +135,7 @@ class GridGenerator
 				      * Initialize the given
 				      * Triangulation with a hypercube
 				      * with a slit. The slit goes
-				      * from the middle of the top
-				      * boundary to the middle of the
-				      * area.
+				      * from #(x=0,y=-1)# to #(0,0)# in 2d.
 				      *
 				      * The triangulation needs to be void
 				      * upon calling this function.
