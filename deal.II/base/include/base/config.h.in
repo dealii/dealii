@@ -77,6 +77,11 @@
    description of this bug. */
 #undef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
 
+/* Defined if the compiler does not properly implement the resolution of
+   defect report #45 to the C++ standard, which makes nested types implicit
+   friends of the enclosing class. */
+#undef DEAL_II_NESTED_CLASS_FRIEND_BUG
+
 /* Define if we have to work around a bug in Sun's Forte compiler. See the
    aclocal.m4 file in the top-level directory for a description of this bug.
    */
