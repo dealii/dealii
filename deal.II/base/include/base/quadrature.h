@@ -6,7 +6,7 @@
 /*----------------------------   quadrature.h     ---------------------------*/
 
 
-#include <grid/point.h>
+#include <base/point.h>
 #include <vector>
 
 

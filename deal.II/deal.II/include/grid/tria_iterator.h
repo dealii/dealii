@@ -10,7 +10,7 @@
 #include <iterator>
 #include <iostream>
 #include <base/exceptions.h>
-#include <grid/point.h>
+#include <base/point.h>
 #include <grid/tria_accessor.h>
 
 

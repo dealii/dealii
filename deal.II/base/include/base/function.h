@@ -8,7 +8,7 @@
 
 #include <base/exceptions.h>
 #include <vector>
-#include <grid/point.h>
+#include <base/point.h>
 
 
 

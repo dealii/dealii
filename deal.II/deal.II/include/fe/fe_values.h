@@ -9,7 +9,7 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <lac/dfmatrix.h>
-#include <grid/point.h>
+#include <base/point.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
 

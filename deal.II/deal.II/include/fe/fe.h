@@ -7,7 +7,7 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <grid/point.h>
+#include <base/point.h>
 #include <grid/dof.h>
 #include <grid/geometry_info.h>
 #include <lac/dfmatrix.h>

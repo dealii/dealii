@@ -5,7 +5,7 @@
 #define __tria_boundary_H
 /*----------------------------   boundary-function.h     ---------------------------*/
 
-#include <grid/point.h>
+#include <base/point.h>
 #include <grid/geometry_info.h>
 
 

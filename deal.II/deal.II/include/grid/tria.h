@@ -6,7 +6,7 @@
 /*----------------------------   tria.h     ---------------------------*/
 
 #include <vector>
-#include <grid/point.h>
+#include <base/point.h>
 #include <grid/geometry_info.h>
 
 
