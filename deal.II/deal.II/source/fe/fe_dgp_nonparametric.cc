@@ -209,8 +209,8 @@ template <int dim>
 typename Mapping<dim>::InternalDataBase *
 FE_DGPNonparametric<dim>::get_data (
   const UpdateFlags      update_flags,
-  const Mapping<dim>&    mapping,
-  const Quadrature<dim>& quadrature) const
+  const Mapping<dim>&,
+  const Quadrature<dim>&) const
 {
 				   // generate a new data object
   InternalData* data = new InternalData;
@@ -254,11 +254,11 @@ template <int dim>
 void
 FE_DGPNonparametric<dim>::fill_fe_values (
   const Mapping<dim>&,
-  const typename DoFHandler<dim>::cell_iterator& cell,
-  const Quadrature<dim>&                         quadrature,
+  const typename DoFHandler<dim>::cell_iterator&,
+  const Quadrature<dim>&,
   typename Mapping<dim>::InternalDataBase&,
-  typename Mapping<dim>::InternalDataBase&       fedata,
-  FEValuesData<dim>&                             data) const
+  typename Mapping<dim>::InternalDataBase& fedata,
+  FEValuesData<dim>& data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -295,9 +295,9 @@ template <int dim>
 void
 FE_DGPNonparametric<dim>::fill_fe_face_values (
   const Mapping<dim>&,
-  const typename DoFHandler<dim>::cell_iterator& cell,
-  const unsigned int                             face,
-  const Quadrature<dim-1>&                       quadrature,
+  const typename DoFHandler<dim>::cell_iterator&,
+  const unsigned int,
+  const Quadrature<dim-1>&,
   typename Mapping<dim>::InternalDataBase&,
   typename Mapping<dim>::InternalDataBase&       fedata,
   FEValuesData<dim>&                             data) const
@@ -337,10 +337,10 @@ template <int dim>
 void
 FE_DGPNonparametric<dim>::fill_fe_subface_values (
   const Mapping<dim>&,
-  const typename DoFHandler<dim>::cell_iterator& cell,
-  const unsigned int                             face,
-  const unsigned int                             subface,
-  const Quadrature<dim-1>&                       quadrature,
+  const typename DoFHandler<dim>::cell_iterator&,
+  const unsigned int,
+  const unsigned int,
+  const Quadrature<dim-1>&,
   typename Mapping<dim>::InternalDataBase&,
   typename Mapping<dim>::InternalDataBase&       fedata,
   FEValuesData<dim>&                             data) const
