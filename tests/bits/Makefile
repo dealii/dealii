@@ -124,6 +124,7 @@ normals_2.exe           : normals_2.g.$(OBJEXT)            $(libraries)
 normals_3.exe           : normals_3.g.$(OBJEXT)            $(libraries)
 normals_4.exe           : normals_4.g.$(OBJEXT)            $(libraries)
 mapping_cartesian_1.exe : mapping_cartesian_1.g.$(OBJEXT)  $(libraries)
+mapping_q4_3d.exe       : mapping_q4_3d.g.$(OBJEXT)        $(libraries)
 q_points.exe            : q_points.g.$(OBJEXT)             $(libraries)
 q_point_sum_1.exe       : q_point_sum_1.g.$(OBJEXT)        $(libraries)
 q_point_sum_2.exe       : q_point_sum_2.g.$(OBJEXT)        $(libraries)
@@ -170,6 +171,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	q_point_sum_1 q_point_sum_2 q_point_sum_3 q_point_sum_4 \
 	volume_1 volume_2 volume_3 volume_4 \
 	mapping_cartesian_1 \
+	mapping_q4_3d \
 	q_points
 
 ############################################################
