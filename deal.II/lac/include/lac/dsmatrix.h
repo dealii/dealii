@@ -150,9 +150,17 @@ class dSMatrix
     int n() const { return cols->cols; }
 
 				     //
-    void set(int i,int j,double value) { val[cols->operator()(i,j)] = value; }
+    void set(int i,int j,double value) {
+      Assert (cols->operator()(i,j) != -1,
+	      ExcInvalidIndex(i,j));
+      val[cols->operator()(i,j)] = value;
+    }
 				     //
-    void add(int i,int j,double value) { val[cols->operator()(i,j)]+= value; }
+    void add(int i,int j,double value) {
+      Assert (cols->operator()(i,j) != -1,
+	      ExcInvalidIndex(i,j));
+      val[cols->operator()(i,j)]+= value;
+    }
   
 				     //
     void vmult (dVector& dst,const dVector& src) const;
@@ -193,6 +201,14 @@ class dSMatrix
 		    int, int,
 		    << "The dimensions " << arg1 << " and " << arg2
 		    << " do not match properly.");
-    friend class ConstraintMatrix;
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The entry with index <" << arg1 << ',' << arg2
+		    << "> does not exist.");
+
+  friend class ConstraintMatrix;
 };
 #endif
