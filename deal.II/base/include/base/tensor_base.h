@@ -103,10 +103,7 @@ class Tensor<1,dim>
 				      * to zero if @p{initialize==true}; this
 				      * is the default behaviour.
 				      */
-#ifndef SUNFORTE    
-    explicit
-#endif    
-    Tensor (const bool initialize = true);
+    explicit Tensor (const bool initialize = true);
 
 				     /**
 				      * Copy constructor, where the data is
