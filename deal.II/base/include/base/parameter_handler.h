@@ -163,8 +163,10 @@ namespace Patterns
 				       /**
 					* Minimal integer value. If
 					* the @p{numeric_limits} class
-					* is available, otherwise set
-					* it so that this class
+					* is available use this
+					* information to obtain the
+					* extremal values, otherwise
+					* set it so that this class
 					* understands that all values
 					* are allowed.
 					*/
@@ -173,8 +175,10 @@ namespace Patterns
 				       /**
 					* Maximal integer value. If
 					* the @p{numeric_limits} class
-					* is available, otherwise set
-					* it so that this class
+					* is available use this
+					* information to obtain the
+					* extremal values, otherwise
+					* set it so that this class
 					* understands that all values
 					* are allowed.
 					*/
@@ -291,20 +295,24 @@ namespace Patterns
   {
     public:
 				       /**
-					* Minimal double value. If
-					* the @p{numeric_limits} class
-					* is available, otherwise set
-					* it so that this class
+					* Minimal double value. If the
+					* @p{numeric_limits} class is
+					* available use this
+					* information to obtain the
+					* extremal values, otherwise
+					* set it so that this class
 					* understands that all values
 					* are allowed.
 					*/
       static const double min_double_value;
       
 				       /**
-					* Maximal double value. If
-					* the @p{numeric_limits} class
-					* is available, otherwise set
-					* it so that this class
+					* Maximal double value. If the
+					* @p{numeric_limits} class is
+					* available use this
+					* information to obtain the
+					* extremal values, otherwise
+					* set it so that this class
 					* understands that all values
 					* are allowed.
 					*/
