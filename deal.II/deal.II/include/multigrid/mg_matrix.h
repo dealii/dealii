@@ -14,6 +14,7 @@
 #define __deal2__mg_matrix_h
 
 #include <lac/vector.h>
+#include <multigrid/mg_base.h>
 
 /**
  * Multilevel matrix. This class implements the interface defined by
