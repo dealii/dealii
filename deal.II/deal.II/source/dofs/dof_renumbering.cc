@@ -13,10 +13,10 @@
 
 
 template <int dim>
-void DoFRenumbering::renumber_Cuthill_McKee (DoFHandler<dim>   &dof_handler,
-					     const bool         reversed_numbering,
-					     const bool         use_constraints,
-					     const vector<int> &starting_indices) {
+void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
+				    const bool         reversed_numbering,
+				    const bool         use_constraints,
+				    const vector<int> &starting_indices) {
 				   // make the connection graph
   SparseMatrixStruct sparsity (dof_handler.n_dofs(),
 			       dof_handler.max_couplings_between_dofs());
@@ -201,10 +201,10 @@ void DoFRenumbering::renumber_Cuthill_McKee (DoFHandler<dim>   &dof_handler,
 
 
 template <int dim>
-void DoFRenumbering::renumber_Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
-					     const unsigned int      level,
-					     const bool              reversed_numbering,
-					     const vector<int>      &starting_indices) {
+void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
+				    const unsigned int      level,
+				    const bool              reversed_numbering,
+				    const vector<int>      &starting_indices) {
 				   // make the connection graph
   SparseMatrixStruct sparsity (dof_handler.n_dofs(level),
 			       dof_handler.max_couplings_between_dofs());
@@ -366,14 +366,14 @@ void DoFRenumbering::renumber_Cuthill_McKee (MGDoFHandler<dim>      &dof_handler
 
 // explicit instantiations
 template
-void DoFRenumbering::renumber_Cuthill_McKee (DoFHandler<deal_II_dimension> &dof_handler,
-					     const bool                     reversed_numbering,
-					     const bool                     use_constraints,
-					     const vector<int>             &starting_indices);
+void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension> &dof_handler,
+				    const bool                     reversed_numbering,
+				    const bool                     use_constraints,
+				    const vector<int>             &starting_indices);
 
 template
-void DoFRenumbering::renumber_Cuthill_McKee (MGDoFHandler<deal_II_dimension> &dof_handler,
-					     const unsigned int               level,
-					     const bool                       reversed_numbering,
-					     const vector<int>               &starting_indices);
+void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension> &dof_handler,
+				    const unsigned int               level,
+				    const bool                       reversed_numbering,
+				    const vector<int>               &starting_indices);
 

@@ -354,7 +354,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   dof->distribute_dofs (fe);
 
   cout << "    Renumbering degrees of freedom..." << endl;
-  DoFRenumbering::renumber_Cuthill_McKee (*dof);
+  DoFRenumbering::Cuthill_McKee (*dof);
     
   SparseMatrixStruct sparsity (dof->n_dofs(),
 			       dof->max_couplings_between_dofs());
