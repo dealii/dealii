@@ -31,7 +31,7 @@ template <int dim>
 void MGTransferBlockBase::build_matrices (
   const MGDoFHandler<dim>& mg_dof,
   const std::vector<bool>& select,
-  const std::vector<unsigned int>& target_component)
+  const std::vector<unsigned int>& /*target_component*/)
 {
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   const unsigned int n_components  = fe.n_components();
