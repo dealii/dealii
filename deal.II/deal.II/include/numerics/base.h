@@ -171,9 +171,9 @@ enum NormType {
   is the same as a #cell_iterator# takes when started with #begin_active# and
   promoted with the #++# operator.
   
-  You can use the #distribute_cell_to_dof_vector# function to convert cell
-  based data to a data vector with values on the degrees of freedom, which
-  can then be attached to a #DataOut# object to be printed.
+  You can use the #distribute_cell_to_dof_vector# function of the #DoFHandler#
+  class to convert cell based data to a data vector with values on the degrees
+  of freedom, which can then be attached to a #DataOut# object to be printed.
   
   Presently, there is the possibility to compute the following values from the
   difference, on each cell: #mean#, #L1_norm#, #L2_norm#, #Linfty_norm#.
@@ -187,6 +187,17 @@ enum NormType {
   not evaluate the difference at the end or corner points of the cells.
   You may want to chose a quadrature formula with more quadrature points
   or one with another distribution of the quadrature points in this case.
+  You should also take into account the superconvergence properties of finite
+  elements in some points: for example in 1D, the standard finite element
+  method is a collocation method and should return the exact value at nodal
+  points. Therefore, the trapezoidal rule should always return a vanishing
+  L-infinity error. Conversely, in 2D the maximum L-infinity error should
+  be located at the vertices or at the center of the cell, which would make
+  it plausible to use the Simpson quadrature rule. On the other hand, there
+  may be superconvergence at Gauss integration points. These examples are not
+  intended as a rule of thumb, rather they are though to illustrate that the
+  use of the wrong quadrature formula may show a significantly wrong result
+  and care should be taken to chose the right formula.
   
   To get the {\it global} L_1 error, you have to sum up the entries in
   #difference#, e.g. using the STL function
