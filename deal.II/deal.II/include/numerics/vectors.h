@@ -14,6 +14,7 @@
 #include <dofs/function_map.h>
 #include <map>
 #include <vector>
+#include <set>
 
 template <int dim> class Function;
 template <int dim> class FunctionMap;
@@ -174,6 +175,15 @@ enum NormType {
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
  *   @ref{MatrixCreator}@p{::create_*} functions which take a right hand side do,
  *   but without assembling a matrix.
+ *
+ * @item Creation of boundary right hand side vectors: The
+ *   @p{create_boundary_right_hand_side} function computes the vector
+ *   $f_i = \int_{\partial\Omega} g(x) \phi_i(x) dx$. This is the
+ *   right hand side contribution of boundary forces when having
+ *   inhomogeneous Neumann boundary values in Laplace's equation or
+ *   other second order operators. This function also takes an
+ *   optional argument denoting over which parts of the boundary the
+ *   integration shall extend.
  *
  * @item Interpolation of boundary values:
  *   The @ref{MatrixTools}@p{::apply_boundary_values} function takes a list
@@ -438,7 +448,10 @@ class VectorTools
 			 const bool                project_to_boundary_first = false);
 
 				     /**
-				      * Create a right hand side vector.
+				      * Create a right hand side
+				      * vector. Prior content of the
+				      * given @p{rhs_vector} vector is
+				      * deleted.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
@@ -461,6 +474,51 @@ class VectorTools
 					const Function<dim>   &rhs,
 					Vector<double>        &rhs_vector);
 
+				     /**
+				      * Create a right hand side
+				      * vector from boundary
+				      * forces. Prior content of the
+				      * given @p{rhs_vector} vector is
+				      * deleted.
+				      *
+				      * See the general documentation of this
+				      * class for further information.
+				      */
+    template <int dim>
+    static void create_boundary_right_hand_side (const Mapping<dim>      &mapping,
+						 const DoFHandler<dim>   &dof,
+						 const Quadrature<dim-1> &q,
+						 const Function<dim>     &rhs,
+						 Vector<double>          &rhs_vector,
+						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+
+				     /**
+				      * Specialization of above
+				      * function for 1d. Since the
+				      * computation is not useful in
+				      * 1d, this function simply
+				      * throws an exception.
+				      */
+    static void create_boundary_right_hand_side (const Mapping<1>    &mapping,
+						 const DoFHandler<1> &dof,
+						 const Quadrature<0> &q,
+						 const Function<1>   &rhs,
+						 Vector<double>      &rhs_vector,
+						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+    
+				     /**
+				      * Calls the
+				      * @p{create_boundary_right_hand_side}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    template <int dim>
+    static void create_boundary_right_hand_side (const DoFHandler<dim>   &dof,
+						 const Quadrature<dim-1> &q,
+						 const Function<dim>     &rhs,
+						 Vector<double>          &rhs_vector,
+						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+    
 				     /**
 				      * Prepare Dirichlet boundary
 				      * conditions.  Make up the list

@@ -545,6 +545,139 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 }
 
 
+
+#if deal_II_dimension != 1
+
+template <int dim>
+void
+VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
+					      const DoFHandler<dim>   &dof_handler,
+					      const Quadrature<dim-1> &quadrature,
+					      const Function<dim>     &rhs_function,
+					      Vector<double>          &rhs_vector,
+					      const std::set<unsigned char> &boundary_indicators)
+{
+  const FiniteElement<dim> &fe  = dof_handler.get_fe();
+  Assert (fe.n_components() == rhs_function.n_components,
+	  ExcComponentMismatch());
+  Assert (rhs_vector.size() == dof_handler.n_dofs(),
+	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+  rhs_vector.clear();
+  
+  UpdateFlags update_flags = UpdateFlags(update_values   |
+					 update_q_points |
+					 update_JxW_values);
+  FEFaceValues<dim> fe_values (mapping, fe, quadrature, update_flags);
+
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+		     n_q_points    = fe_values.n_quadrature_points,
+		     n_components  = fe.n_components();
+  
+  std::vector<unsigned int> dofs (dofs_per_cell);
+  Vector<double> cell_vector (dofs_per_cell);
+
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
+
+  if (n_components==1)
+    {
+      std::vector<double> rhs_values(n_q_points);
+      
+      for (; cell!=endc; ++cell)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (cell->face(face)->at_boundary () &&
+	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
+	       !=
+	       boundary_indicators.end()))
+	    {
+	      fe_values.reinit(cell, face);
+	  
+	      const FullMatrix<double>  &values    = fe_values.get_shape_values ();
+	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	      rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
+	      
+	      cell_vector.clear();
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  cell_vector(i) += rhs_values[point] *
+				    values(i,point) *
+				    weights[point];
+	
+	      cell->get_dof_indices (dofs);
+	  
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		rhs_vector(dofs[i]) += cell_vector(i);
+	    }
+    }
+  else
+    {
+      std::vector<Vector<double> > rhs_values(n_q_points, Vector<double>(n_components));
+      
+      for (; cell!=endc; ++cell) 
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (cell->face(face)->at_boundary () &&
+	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
+	       !=
+	       boundary_indicators.end()))
+	    {
+	      fe_values.reinit(cell, face);
+	  
+	      const FullMatrix<double>  &values    = fe_values.get_shape_values ();
+	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
+	  
+	      cell_vector.clear();
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  {
+		    const unsigned int component
+		      = fe.system_to_component_index(i).first;
+		    
+		    cell_vector(i) += rhs_values[point](component) *
+				      values(i,point) *
+				      weights[point];
+		  }
+	      
+	      cell->get_dof_indices (dofs);
+	      
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		rhs_vector(dofs[i]) += cell_vector(i);
+	    }
+    }
+};
+
+#else
+
+void
+VectorTools::create_boundary_right_hand_side (const Mapping<1>    &mapping,
+					      const DoFHandler<1> &dof_handler,
+					      const Quadrature<0> &quadrature,
+					      const Function<1>   &rhs_function,
+					      Vector<double>      &rhs_vector,
+					      const std::set<unsigned char> &boundary_indicators)
+{
+  Assert (false, ExcImpossibleInDim(1));
+};
+
+#endif
+
+template <int dim>
+void
+VectorTools::create_boundary_right_hand_side (const DoFHandler<dim>   &dof_handler,
+					      const Quadrature<dim-1> &quadrature,
+					      const Function<dim>     &rhs_function,
+					      Vector<double>          &rhs_vector,
+					      const std::set<unsigned char> &boundary_indicators)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  static const MappingQ1<dim> mapping;
+  create_boundary_right_hand_side(mapping, dof_handler, quadrature,
+				  rhs_function, rhs_vector,
+				  boundary_indicators);
+}
+
+
+
 #if deal_II_dimension == 1
 
 void
@@ -1361,6 +1494,25 @@ void VectorTools::create_right_hand_side (const DoFHandler<deal_II_dimension> &,
 					  const Quadrature<deal_II_dimension> &,
 					  const Function<deal_II_dimension>   &,
 					  Vector<double>                      &);
+
+#if deal_II_dimension != 1
+template
+void
+VectorTools::create_boundary_right_hand_side (const Mapping<deal_II_dimension>    &,
+					      const DoFHandler<deal_II_dimension> &,
+					      const Quadrature<deal_II_dimension-1> &,
+					      const Function<deal_II_dimension>   &,
+					      Vector<double>                      &,
+					      const std::set<unsigned char> &);
+#endif
+
+template
+void
+VectorTools::create_boundary_right_hand_side (const DoFHandler<deal_II_dimension> &,
+					      const Quadrature<deal_II_dimension-1> &,
+					      const Function<deal_II_dimension>   &,
+					      Vector<double>                      &,
+					      const std::set<unsigned char> &);
 template
 void VectorTools::interpolate_boundary_values (const DoFHandler<deal_II_dimension> &,
 					       const unsigned char,
