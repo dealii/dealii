@@ -456,95 +456,6 @@ class CompressedSparsityPattern : public Subscriptor
 
 
 inline
-unsigned int
-CompressedSparsityPattern::n_rows () const
-{
-  return rows;
-}
-
-
-
-inline
-unsigned int
-CompressedSparsityPattern::n_cols () const
-{
-  return cols;
-}
-
-
-
-inline
-void
-CompressedSparsityPattern::add (const unsigned int i,
-				const unsigned int j)
-{
-  Assert (i<rows, ExcInvalidIndex(i,rows));
-  Assert (j<cols, ExcInvalidIndex(j,cols));
-
-  lines[i].add (j);
-}
-
-
-
-inline
-CompressedSparsityPattern::Line::Line ()
-                :
-                cache_entries (0)
-{}
-
-
-
-inline
-unsigned int
-CompressedSparsityPattern::row_length (const unsigned int row) const
-{
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
-  
-  lines[row].flush_cache ();
-  return lines[row].entries.size();
-}
-
-
-
-inline
-unsigned int
-CompressedSparsityPattern::column_number (const unsigned int row,
-					  const unsigned int index) const
-{
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
-  Assert (index < lines[row].entries.size(),
-	  ExcIndexRange (index, 0, lines[row].entries.size()));
-
-  lines[row].flush_cache ();
-  return lines[row].entries[index];
-}
-
-
-
-inline
-void
-CompressedSparsityPattern::Line::add (const unsigned int j)
-{
-                                   // first check whether this entry is
-                                   // already in the cache. if so, we can
-                                   // safely return
-  for (unsigned int i=0; i<cache_entries; ++i)
-    if (cache[i] == j)
-      return;
-
-                                   // if not, see whether there is still some
-                                   // space in the cache. if not, then flush
-                                   // the cache first
-  if (cache_entries == cache_size)
-    flush_cache ();
-  
-  cache[cache_entries] = j;
-  ++cache_entries;
-}
-
-
-
-inline
 void
 CompressedSparsityPattern::Line::flush_cache () const
 {
@@ -686,6 +597,95 @@ CompressedSparsityPattern::Line::flush_cache () const
     }
   
   cache_entries = 0;
+}
+
+
+
+inline
+void
+CompressedSparsityPattern::Line::add (const unsigned int j)
+{
+                                   // first check whether this entry is
+                                   // already in the cache. if so, we can
+                                   // safely return
+  for (unsigned int i=0; i<cache_entries; ++i)
+    if (cache[i] == j)
+      return;
+
+                                   // if not, see whether there is still some
+                                   // space in the cache. if not, then flush
+                                   // the cache first
+  if (cache_entries == cache_size)
+    flush_cache ();
+  
+  cache[cache_entries] = j;
+  ++cache_entries;
+}
+
+
+
+inline
+unsigned int
+CompressedSparsityPattern::n_rows () const
+{
+  return rows;
+}
+
+
+
+inline
+unsigned int
+CompressedSparsityPattern::n_cols () const
+{
+  return cols;
+}
+
+
+
+inline
+void
+CompressedSparsityPattern::add (const unsigned int i,
+				const unsigned int j)
+{
+  Assert (i<rows, ExcInvalidIndex(i,rows));
+  Assert (j<cols, ExcInvalidIndex(j,cols));
+
+  lines[i].add (j);
+}
+
+
+
+inline
+CompressedSparsityPattern::Line::Line ()
+                :
+                cache_entries (0)
+{}
+
+
+
+inline
+unsigned int
+CompressedSparsityPattern::row_length (const unsigned int row) const
+{
+  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  
+  lines[row].flush_cache ();
+  return lines[row].entries.size();
+}
+
+
+
+inline
+unsigned int
+CompressedSparsityPattern::column_number (const unsigned int row,
+					  const unsigned int index) const
+{
+  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (index < lines[row].entries.size(),
+	  ExcIndexRange (index, 0, lines[row].entries.size()));
+
+  lines[row].flush_cache ();
+  return lines[row].entries[index];
 }
 
 
