@@ -214,6 +214,8 @@ class FiniteElementData
 };
 
 
+
+
 /**
  * Base class for finite elements in arbitrary dimensions. This class provides
  * several fields which describe a specific finite element and which are filled
@@ -729,12 +731,19 @@ class FiniteElementBase : public Subscriptor,
 };
 
 
+
+
 /**
  * Finite Element in any dimension. This class declares the
  * functionality to fill the fields of the #FiniteElementBase#
  * class. Since this is something that depends on the actual finite
  * element, the functions are declared virtual if it is not possible
- * to provide a reasonable standard implementation.
+ * to provide a reasonable standard implementation. Note that you will
+ * only seldomly use the functionality of this class in application
+ * programs, as you will normally be interested in the values and
+ * derivatives of shape functions on cells in physical space, rather
+ * than on the unit cell. In that case, you will have to use the
+ * #FEValues# class and its siblings.
  *
  *
  * \subsection{Finite elements in one dimension}
@@ -1066,21 +1075,24 @@ class FiniteElement : public FiniteElementBase<dim>
 					   const Point<dim>   &p) const = 0;
 
 				     /**
-				      * Return the value of the #i#th shape
-				      * function of the transformation mapping
-				      * from unit cell to real cell. For
-				      * isoparametric elements, this function
-				      * is the same as the trial functions,
-				      * but for sublinear or other mappings,
+				      * Return the value of the #i#th
+				      * shape function of the
+				      * transformation mapping from
+				      * unit cell to real cell. For
+				      * isoparametric elements, this
+				      * function is the same as the
+				      * trial functions, but for
+				      * sublinear or other mappings,
 				      * they differ.
 				      */
     virtual double shape_value_transform (const unsigned int i,
 					  const Point<dim> &p) const = 0;
 
 				     /**
-				      * Same as above: return gradient of the
-				      * #i#th shape function for the mapping
-				      * from unit to real cell.
+				      * Same as above: return gradient
+				      * of the #i#th shape function
+				      * for the mapping from unit to
+				      * real cell.
 				      */
     virtual Tensor<1,dim> shape_grad_transform (const unsigned int i,
 						const Point<dim> &p) const = 0;    
@@ -1696,6 +1708,7 @@ FiniteElementData<dim>::n_dofs_per_vertex () const
 };
 
 
+
 template <int dim>
 inline
 unsigned int 
@@ -1703,6 +1716,7 @@ FiniteElementData<dim>::n_dofs_per_line () const
 {
   return dofs_per_line;
 };
+
 
 
 template <int dim>
@@ -1714,6 +1728,7 @@ FiniteElementData<dim>::n_dofs_per_quad () const
 };
 
 
+
 template <int dim>
 inline
 unsigned int 
@@ -1721,6 +1736,7 @@ FiniteElementData<dim>::n_dofs_per_hex () const
 {
   return dofs_per_hex;
 };
+
 
 
 template <int dim>
@@ -1732,6 +1748,7 @@ FiniteElementData<dim>::n_dofs_per_face () const
 };
 
 
+
 template <int dim>
 inline
 unsigned int 
@@ -1739,6 +1756,7 @@ FiniteElementData<dim>::n_dofs_per_cell () const
 {
   return dofs_per_cell;
 };
+
 
 
 template <int dim>
@@ -1750,6 +1768,7 @@ FiniteElementData<dim>::n_components () const
 };
 
 
+
 template <int dim>
 inline
 unsigned int 
@@ -1757,6 +1776,7 @@ FiniteElementData<dim>::n_transform_functions () const
 {
   return transform_functions;
 };
+
 
 
 template <int dim>
@@ -1774,6 +1794,7 @@ FiniteElementBase<dim>::component_to_system_index (unsigned int component,
 }
 
 
+
 template <int dim>  
 inline
 pair<unsigned int,unsigned int>
@@ -1783,6 +1804,7 @@ FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
 	 ExcIndexRange(index, 0, system_to_component_table.size()));
   return system_to_component_table[index];
 }
+
 
 
 template <int dim>
@@ -1800,6 +1822,7 @@ FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
 }
 
 
+
 template <int dim>  
 inline
 pair<unsigned int,unsigned int>
@@ -1809,6 +1832,7 @@ FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) cons
 	 ExcIndexRange(index, 0, face_system_to_component_table.size()));
   return face_system_to_component_table[index];
 }
+
 
 
 template <int dim>  
@@ -1822,6 +1846,7 @@ FiniteElementBase<dim>::component_to_base (unsigned int index) const
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
   return component_to_base_table[index];
 }
+
 
 
 template <int dim>
