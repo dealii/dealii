@@ -606,7 +606,7 @@ namespace internal
       if ((node0)>(e2.node0)) return false;
       if ((node1)<(e2.node1)) return true;
       return false;
-    };
+    }
 
   
     // This is the guts of the matter...
@@ -1318,7 +1318,7 @@ namespace internal
 	      the_cell.nodes[i]=temp[i];
 	    }
 	}
-    };
+    }
 
   }
 }
