@@ -684,14 +684,62 @@ class FiniteElementBase : public Subscriptor,
 				      * constraints at the interface
 				      * between a refined and an
 				      * unrefined cell.
-				      *
+				      * 
 				      * The matrix is obviously empty
 				      * in only one space dimension,
 				      * since there are no constraints
 				      * then.
+				      *
+				      * Note that some finite elements
+				      * do not (yet) implement hanging
+				      * node constraints. If this is
+				      * the case, then this function
+				      * will generate an exception,
+				      * since no useful return value
+				      * can be generated. If you
+				      * should have a way to live with
+				      * this, then you might want to
+				      * use the
+				      * @p{constraints_are_implemented}
+				      * function to check up front
+				      * whethehr this function will
+				      * succeed or generate the
+				      * exception.
 				      */
     const FullMatrix<double> & constraints () const;
 
+                                     /**
+                                      * Return whether this element
+                                      * implements its hanging node
+                                      * constraints. The return value
+                                      * also indicates whether a call
+                                      * to the @p{constraint} function
+                                      * will generate an error or not.
+                                      *
+                                      * This function is mostly here
+                                      * in order to allow us write
+                                      * more efficient test programs
+                                      * which we run on all kinds of
+                                      * weird elements, and for which
+                                      * we simply need to exclude
+                                      * certain tests in case hanging
+                                      * node constraints are not
+                                      * implemented. It will in
+                                      * general probablz not be a
+                                      * great help in applications,
+                                      * since there is not much one
+                                      * can do if one needs hanging
+                                      * node constraints and they are
+                                      * not implemented. This function
+                                      * could be used to check whether
+                                      * a call to @p{constraints()}
+                                      * will succeed; however, one
+                                      * then still needs to cope with
+                                      * the lack of information this
+                                      * just expresses.
+                                      */
+    bool constraints_are_implemented () const;
+    
 				     /**
 				      * Comparison operator. We also
 				      * check for equality of the
@@ -1052,8 +1100,14 @@ class FiniteElementBase : public Subscriptor,
 				      * exactly one element being
 				      * @p{true}, since for most
 				      * spaces the individual vector
-				      * components are
-				      * independent. Only for those
+				      * components are independent. In
+				      * that case, the component with
+				      * the single zero is also the
+				      * first element of what
+				      * @p{system_to_component_index(i)}
+				      * returns.
+				      *
+				      * Only for those
 				      * spaces that couple the
 				      * components, for example to
 				      * make a shape function
@@ -1118,7 +1172,7 @@ class FiniteElementBase : public Subscriptor,
 				      * is always the case.
 				      *
 				      * Since this is an extremely
-				      * common operations, the result
+				      * common operation, the result
 				      * is cached in the
 				      * @p{cached_primitivity}
 				      * variable which is computed in
@@ -1245,9 +1299,19 @@ class FiniteElementBase : public Subscriptor,
                                       * when initializing their size,
                                       * it is placed into this
                                       * function, to avoid having to
-                                      * recomputed the
+                                      * recompute the
                                       * dimension-dependent size of
                                       * these matrices each time.
+                                      *
+                                      * Note that some elements do not
+                                      * implement the interface
+                                      * constraints for certain
+                                      * polynomial degrees. In this
+                                      * case, this function still
+                                      * returns the size these
+                                      * matrices should have when
+                                      * implemented, but the actual
+                                      * matrices are empty.
                                       */
     TableIndices<2>
     interface_constraints_size () const;

@@ -261,11 +261,20 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const
 
 
 template <int dim>
+bool
+FiniteElementBase<dim>::constraints_are_implemented () const
+{
+  return (this->dofs_per_face  == 0) || (interface_constraints.m() != 0);
+}
+
+
+
+template <int dim>
 const FullMatrix<double> &
 FiniteElementBase<dim>::constraints () const
 {
   Assert ((this->dofs_per_face  == 0) || (interface_constraints.m() != 0),
-	  ExcConstraintsVoid());
+          ExcConstraintsVoid());
   
   if (dim==1)
     Assert ((interface_constraints.m()==0) && (interface_constraints.n()==0),
