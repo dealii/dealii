@@ -199,6 +199,21 @@
 
 <ol>
   <li> <p>
+       New: <code class="member">DoFTools::make_flux_sparsity_pattern</code>
+       can be optimized by providing two coefficient msatrices.
+       <br>
+       (GK 2000/05/25)
+       </p>
+
+  <li> <p>
+       Improved: <code class="member">VectorTools::integrate_difference</code>
+       allows for vector-valued weight functions. L<sup>1</sup> and
+       L<sup>infinity</sup> norms are calculated correctly.
+       <br>
+       (GK 2000/05/25)
+       </p>
+
+  <li> <p>
        Changed: <code class="member">FE_DGx::restriction</code> is
        not an interpolation any more but a local projection which is
        more reasonable for DG elements.
