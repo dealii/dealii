@@ -134,11 +134,13 @@ tex-doc:
 	@echo
 
 TODO:
-	@cat $D/base/Todo $D/lac/Todo $D/deal.II/Todo > $@
 	@egrep -i '// *todo' $D/base/include/*/*.h $D/base/source/*.cc \
                      $D/lac/include/*/*.h $D/lac/source/*.cc   \
                      $D/deal.II/include/*/*.h $D/deal.II/source/*/*.cc \
-             >> $@
+	| perl -pi -e 's#$D/?#\n#g;' \
+	| perl -pi -e 's#(.*)(TODO:?)(\[.+\])#\3 \1\2\3#gi;' \
+	| perl -pi -e 's#\s*//\s*TODO:\s*(\[.+\])\s*#\n\1     #gi;' \
+             > $@
 
 
 TAGS: $(filter-out %/forward_declarations.h,                                \
