@@ -59,8 +59,7 @@ Tensor<rank_, dim>::unroll_recursion( Vector<double>& result, unsigned& index) c
   for (unsigned i=0; i<dim; ++i)
     {
       operator[](i).unroll_recursion(result, index);
-    }
-    
+    }    
 }
 
 

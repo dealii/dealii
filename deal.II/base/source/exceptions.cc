@@ -229,6 +229,6 @@ namespace deal_II_exceptions
       std::abort ();
     };
     
-  };
+  }
   
 };

@@ -1113,7 +1113,7 @@ namespace Functions
 				     // only simple data elements, so
 				     // use sizeof operator
     return sizeof (*this);
-  };
+  }
   
   
   
@@ -1128,7 +1128,7 @@ namespace Functions
 		  :
 		  Function<dim> (1),
     fourier_coefficients (fourier_coefficients)
-  {};
+  {}
   
   
   
@@ -1139,7 +1139,7 @@ namespace Functions
   {
     Assert (component==0, ExcIndexRange(component,0,1));
     return std::cos(fourier_coefficients * p);
-  };
+  }
   
   
   
@@ -1150,7 +1150,7 @@ namespace Functions
   {
     Assert (component==0, ExcIndexRange(component,0,1));
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
-  };
+  }
   
   
   
@@ -1161,7 +1161,7 @@ namespace Functions
   {
     Assert (component==0, ExcIndexRange(component,0,1));
     return fourier_coefficients.square() * (-std::cos(fourier_coefficients * p));
-  };
+  }
   
   
   
@@ -1176,7 +1176,7 @@ namespace Functions
 		  :
 		  Function<dim> (1),
     fourier_coefficients (fourier_coefficients)
-  {};
+  {}
   
   
   
@@ -1187,7 +1187,7 @@ namespace Functions
   {
     Assert (component==0, ExcIndexRange(component,0,1));
     return std::sin(fourier_coefficients * p);
-  };
+  }
   
   
   
@@ -1198,7 +1198,7 @@ namespace Functions
   {
     Assert (component==0, ExcIndexRange(component,0,1));
     return fourier_coefficients * std::cos(fourier_coefficients * p);
-  };
+  }
   
   
   
@@ -1209,7 +1209,7 @@ namespace Functions
   {
     Assert (component==0, ExcIndexRange(component,0,1));
     return fourier_coefficients.square() * (-std::sin(fourier_coefficients * p));
-  };
+  }
   
 
 
@@ -1230,7 +1230,7 @@ namespace Functions
     Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
     Assert (fourier_coefficients.size() == weights.size(),
 	    ExcInvalidArraySize());
-  };
+  }
   
   
   
@@ -1247,7 +1247,7 @@ namespace Functions
       sum += weights[s] * std::sin(fourier_coefficients[s] * p);
     
     return sum;
-  };
+  }
   
   
   
@@ -1264,7 +1264,7 @@ namespace Functions
       sum += fourier_coefficients[s] * std::cos(fourier_coefficients[s] * p);
     
     return sum;
-  };
+  }
   
   
   
@@ -1281,7 +1281,7 @@ namespace Functions
       sum -= fourier_coefficients[s].square() * std::sin(fourier_coefficients[s] * p);
     
     return sum;
-  };
+  }
 
 
 
@@ -1301,7 +1301,7 @@ namespace Functions
     Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
     Assert (fourier_coefficients.size() == weights.size(),
 	    ExcInvalidArraySize());
-  };
+  }
   
   
   
@@ -1318,7 +1318,7 @@ namespace Functions
       sum += weights[s] * std::cos(fourier_coefficients[s] * p);
     
     return sum;
-  };
+  }
   
   
   
@@ -1335,7 +1335,7 @@ namespace Functions
       sum -= fourier_coefficients[s] * std::sin(fourier_coefficients[s] * p);
     
     return sum;
-  };
+  }
   
   
   
@@ -1352,7 +1352,7 @@ namespace Functions
       sum -= fourier_coefficients[s].square() * std::cos(fourier_coefficients[s] * p);
     
     return sum;
-  };
+  }
   
   
 // explicit instantiations  
