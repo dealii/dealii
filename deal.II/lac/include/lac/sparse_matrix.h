@@ -611,10 +611,10 @@ class SparseMatrix : public Subscriptor
 				      * of enabled multithreading.
 				      */
     template <typename somenumber>
-    void * threaded_vmult (Vector<somenumber>       &dst,
-			   const Vector<somenumber> &src,
-			   const unsigned int        begin_row,
-			   const unsigned int        end_row) const;
+    void threaded_vmult (Vector<somenumber>       &dst,
+			 const Vector<somenumber> &src,
+			 const unsigned int        begin_row,
+			 const unsigned int        end_row) const;
 
 				     /**
 				      * Version of #matrix_norm# which only
@@ -624,10 +624,10 @@ class SparseMatrix : public Subscriptor
 				      * the case of enabled multithreading.
 				      */
     template <typename somenumber>
-    void * threaded_matrix_norm (const Vector<somenumber> &v,
-				 const unsigned int        begin_row,
-				 const unsigned int        end_row,
-				 somenumber               *partial_sum) const;
+    void threaded_matrix_norm (const Vector<somenumber> &v,
+			       const unsigned int        begin_row,
+			       const unsigned int        end_row,
+			       somenumber               *partial_sum) const;
 
 				     /**
 				      * Version of #residual# which only
@@ -637,12 +637,12 @@ class SparseMatrix : public Subscriptor
 				      * the case of enabled multithreading.
 				      */
     template <typename somenumber>
-    void * threaded_residual (Vector<somenumber>       &dst,
-			      const Vector<somenumber> &u,
-			      const Vector<somenumber> &b,
-			      const unsigned int        begin_row,
-			      const unsigned int        end_row,
-			      somenumber               *partial_norm) const;
+    void threaded_residual (Vector<somenumber>       &dst,
+			    const Vector<somenumber> &u,
+			    const Vector<somenumber> &b,
+			    const unsigned int        begin_row,
+			    const unsigned int        end_row,
+			    somenumber               *partial_norm) const;
 
 
 				     // make all other sparse matrices

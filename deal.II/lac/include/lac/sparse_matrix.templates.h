@@ -277,7 +277,7 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
 
 template <typename number>
 template <typename somenumber>
-void *
+void
 SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 				      const Vector<somenumber> &src,
 				      const unsigned int        begin_row,
@@ -300,8 +300,6 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 				   // when not in parallel mode.
   Assert (false, ExcInternalError());
 #endif
-
-  return 0;
 };
 
 
@@ -458,7 +456,7 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 
 template <typename number>
 template <typename somenumber>
-void *
+void
 SparseMatrix<number>::threaded_matrix_norm (const Vector<somenumber> &v,
 					    const unsigned int        begin_row,
 					    const unsigned int        end_row,
@@ -483,7 +481,6 @@ SparseMatrix<number>::threaded_matrix_norm (const Vector<somenumber> &v,
 				   // function should not have been called
   Assert (false, ExcInternalError());
 #endif
-  return 0;
 };
 
 
@@ -612,7 +609,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 
 template <typename number>
 template <typename somenumber>
-void *
+void
 SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 					 const Vector<somenumber> &u,
 					 const Vector<somenumber> &b,
@@ -639,8 +636,6 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 #else
   Assert (false, ExcInternalError());
 #endif
-
-  return 0;
 };
 
 
