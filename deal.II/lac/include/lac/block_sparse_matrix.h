@@ -20,7 +20,20 @@
 
 
 /**
- * Blocked sparse matrix.
+ * Blocked sparse matrix. The behaviour of objects of this type is
+ * almost as for the #SparseMatrix<...># objects, with most of the
+ * functions being implemented in both classes. The main difference is
+ * that the matrix represented by this object is composed of an array
+ * of sparse matrices (i.e. of type #SparseMatrix<number>#) and all
+ * accesses to the elements of this object are relayed to accesses of
+ * the base matrices.
+ *
+ * In addition to the usual matrix access and linear algebra
+ * functions, there are functions #block# which allow access to the
+ * different blocks of the matrix. This may, for example, be of help
+ * when you want to implement Schur complement methods, or block
+ * preconditioners, where each block belongs to a specific component
+ * of the equation you are presently discretizing.
  *
  *
  * \section{On template instantiations}
