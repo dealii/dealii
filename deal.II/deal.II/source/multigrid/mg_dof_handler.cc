@@ -1038,14 +1038,7 @@ void MGDoFHandler<dim>::renumber_dofs (const unsigned int      level,
   int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; -1 means
 				   // that no new number was chosen yet
-				   //
-				   // the commented line is what would be the
-				   // correct way to do, but gcc2.8 chokes
-				   // over that. The other lines are a
-				   // workaround
-//  vector<int> new_number(n_dofs, -1);
-  vector<int> new_number;
-  new_number.resize (n_dofs, -1);
+  vector<int> new_number(n_dofs, -1);
   
 				   // store the indices of the dofs renumbered
 				   // in the last round. Default to starting
@@ -1421,14 +1414,8 @@ void MGDoFHandler<2>::reserve_space () {
 				   // vertex we pass by  belongs to
   mg_vertex_dofs.resize (tria->vertices.size());
 
-				   // here again, gcc2.8 fails to
-				   // construct the vector properly
-				   // using parameters to the constructor
-//  vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
-//  vector<unsigned int> max_level (tria->vertices.size(), 0);
-  vector<unsigned int> min_level, max_level;
-  min_level.resize (tria->vertices.size(), tria->n_levels());
-  max_level.resize (tria->vertices.size(), 0);
+  vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
+  vector<unsigned int> max_level (tria->vertices.size(), 0);
 
   Triangulation<dim>::cell_iterator cell = tria->begin(),
 				    endc = tria->end();

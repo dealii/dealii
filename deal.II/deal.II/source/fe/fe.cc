@@ -215,11 +215,6 @@ FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data) :
 
 #if deal_II_dimension == 1
 
-// declare this function to be explicitely specialized before first use
-// egcs wants this, but gcc2.8.1 produces an internal compiler error, so
-// we drop this declaration again for the time being
-
-
 template <>
 void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 					   const Boundary<1> &,

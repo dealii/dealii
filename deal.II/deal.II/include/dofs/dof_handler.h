@@ -475,9 +475,6 @@ enum RenumberingMethod {
 template <int dim>
 class DoFHandler : public DoFDimensionInfo<dim> {
   public:
-				     // insert these definitions for gcc2.8,
-				     // since it can't inherit typedefs (I
-				     // believe it should, but it can't)
     typedef typename DoFDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
     typedef typename DoFDimensionInfo<dim>::line_iterator line_iterator;
     typedef typename DoFDimensionInfo<dim>::active_line_iterator active_line_iterator;

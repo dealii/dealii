@@ -123,9 +123,6 @@ class MGDoFDimensionInfo<3> {
 template <int dim>
 class MGDoFHandler : public DoFHandler<dim> {
   public:
-				     // insert these definitions for gcc2.8,
-				     // since it can't inherit typedefs (I
-				     // believe it should, but it can't)
     typedef typename MGDoFDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
     typedef typename MGDoFDimensionInfo<dim>::line_iterator line_iterator;
     typedef typename MGDoFDimensionInfo<dim>::active_line_iterator active_line_iterator;

@@ -240,11 +240,7 @@ void ConstraintMatrix::condense (SparseMatrixStruct &sparsity) const {
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
-				   //
-				   // for gcc2.9: replace this by
-				   // distribute(sparsity.n_rows(), -1)
-  vector<int> distribute;
-  distribute.resize (sparsity.n_rows(), -1);
+  vector<int> distribute(sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -448,11 +444,7 @@ void ConstraintMatrix::condense (SparseMatrix<double> &uncondensed) const {
 				   // otherwise, the number states which
 				   // line in the constraint matrix handles
 				   // this index
-  				   //
-				   // for gcc2.9: replace this by
-				   // distribute(sparsity.n_rows(), -1)
-  vector<int> distribute;
-  distribute.resize (sparsity.n_rows(), -1);
+  vector<int> distribute (sparsity.n_rows(), -1);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
