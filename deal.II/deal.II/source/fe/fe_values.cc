@@ -591,12 +591,11 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       };
 
 
+  Tensor<2,dim> tmp1, tmp2;
   if (update_flags & update_second_derivatives)
     for (unsigned int i=0; i<fe->total_dofs; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	{
-	  static Tensor<2,dim> tmp1, tmp2;
-
 					   // tmp1 := (d_k d_l phi) J_lj
 	  contract (tmp1, unit_shape_2nd_derivatives[face_no][i][j], jacobi_matrices[j]);
 					   // tmp2 := tmp1_kj J_ki
@@ -765,12 +764,11 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 		    jacobi_matrices[j][b][s]);
       };
 
+  Tensor<2,dim> tmp1, tmp2;
   if (update_flags & update_second_derivatives)
     for (unsigned int i=0; i<fe->total_dofs; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j)
 	{
-	  static Tensor<2,dim> tmp1, tmp2;
-
 					   // tmp1 := (d_k d_l phi) J_lj
 	  contract (tmp1,
 		    unit_shape_2nd_derivatives[selected_dataset][i][j],
