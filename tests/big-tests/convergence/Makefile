@@ -61,7 +61,7 @@ endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-flags     = $(CXXFLAGS)
+flags     = $(CXXFLAGS.o)
 endif
 
 
@@ -85,7 +85,7 @@ run: $(target)
 %.o : %.cc
 	@echo ============================ Compiling with optimization:   $<
 	@echo $(CXX) ... -c $< -o $@
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
 # rules which files the libraries depend upon
