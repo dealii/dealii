@@ -17,6 +17,8 @@
 #include <vector>
 
 
+#include <boost_local/shared_ptr.hpp>
+
 
 /**
  * An array with an object for each level.  The purpose of this class
@@ -95,7 +97,7 @@ class MGLevelObject : public Subscriptor
 				     /**
 				      * Array of the objects to be held.
 				      */
-    std::vector<Object> objects;
+    std::vector<boost::shared_ptr<Object> > objects;
 };
 
 
@@ -118,7 +120,7 @@ MGLevelObject<Object>::operator[] (const unsigned int i)
 {
   Assert((i>=minlevel) && (i<minlevel+objects.size()),
 	 ExcIndexRange (i, minlevel, minlevel+objects.size()));
-  return objects[i-minlevel];
+  return *objects[i-minlevel];
 }
 
 
@@ -128,7 +130,7 @@ MGLevelObject<Object>::operator[] (const unsigned int i) const
 {
   Assert((i>=minlevel) && (i<minlevel+objects.size()),
 	 ExcIndexRange (i, minlevel, minlevel+objects.size()));
-  return objects[i-minlevel];
+  return *objects[i-minlevel];
 }
 
 
@@ -138,10 +140,15 @@ MGLevelObject<Object>::resize (const unsigned int new_minlevel,
 			       const unsigned int new_maxlevel)
 {
   Assert (new_minlevel <= new_maxlevel, ExcInternalError());
+				   // note that on clear(), the
+				   // shared_ptr class takes care of
+				   // deleting the object it points to
+				   // by itself
   objects.clear ();
 
   minlevel = new_minlevel;
-  objects.resize (new_maxlevel - new_minlevel + 1);
+  for (unsigned int i=0; i<new_maxlevel-new_minlevel+1; ++i)
+    objects.push_back(boost::shared_ptr<Object> (new Object)); 
 }
 
 
@@ -149,9 +156,9 @@ template<class Object>
 void
 MGLevelObject<Object>::clear ()
 {
-  typename std::vector<Object>::iterator v;
+  typename std::vector<boost::shared_ptr<Object> >::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
-    v->clear();  
+    (*v)->clear();  
 }
 
 
