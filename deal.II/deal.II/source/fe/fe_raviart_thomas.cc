@@ -585,7 +585,7 @@ FE_RaviartThomas<2>::initialize_constraints ()
 				   // these entries
   for (unsigned int i=0; i<this->interface_constraints.m(); ++i)
     for (unsigned int j=0; j<this->interface_constraints.n(); ++j)
-      if (fabs(this->interface_constraints(i,j)) < 1e-14)
+      if (std::fabs(this->interface_constraints(i,j)) < 1e-14)
 	this->interface_constraints(i,j) = 0.;
 }
 
