@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,10 +50,17 @@ LogStream::LogStream()
 		std_out(&std::cerr), file(0), was_endl(true),
 		std_depth(10000), file_depth(10000),
 		print_utime(false), diff_utime(false),
-		last_time (0.)
+		last_time (0.), old_cerr(0)
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
+}
+
+
+LogStream::~LogStream()
+{
+  if (old_cerr)
+    std::cerr.rdbuf(old_cerr);
 }
 
 
@@ -74,7 +81,13 @@ void LogStream::detach ()
 
 void LogStream::log_cerr ()
 {
-  std::cerr.rdbuf(file->rdbuf());
+  if (old_cerr == 0)
+    {
+      old_cerr = std::cerr.rdbuf(file->rdbuf());
+    } else {
+      std::cerr.rdbuf(old_cerr);
+      old_cerr = 0;
+    }
 }
 
 

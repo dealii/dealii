@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,6 +62,11 @@ class LogStream
 				      * standard output stream to <tt>std::cerr</tt>.
 				      */
     LogStream ();
+
+				     /**
+				      * Destructor.
+				      */
+    ~LogStream();
     
 				     /**
 				      * Enable output to a second
@@ -89,6 +94,10 @@ class LogStream
 
 				     /**
 				      * Reroutes cerr to LogStream.
+				      * Works as a switch, turning
+				      * logging of <tt>cerr</tt> on
+				      * and of alternatingly with
+				      * every call.
 				      */
     void log_cerr ();
     
@@ -308,6 +317,12 @@ class LogStream
 				      */
     template <typename T>
     void print (const T &t);
+				     /**
+				      * Original buffer of
+				      * <tt>cerr</tt> in order to
+				      * leave this class properly.
+				      */
+    std::ostream::__streambuf_type* old_cerr;
 };
 
 
