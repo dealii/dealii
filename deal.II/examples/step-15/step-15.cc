@@ -1057,7 +1057,21 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
 }
 
 
-
+                                 // So here is the driver function,
+                                 // ``run()''. It generate a coarse mesh,
+                                 // refines it a couple of times, and
+                                 // initializes the starting values. It then
+                                 // goes into a loop in which we first set up
+                                 // the member variables for the new mesh, and
+                                 // then do a fixed number of five gradient
+                                 // steps. If after this the energy has not
+                                 // significantly decreased compares to the
+                                 // last time we checked, we assume that we
+                                 // have converged and exit, otherwise we
+                                 // refine the mesh and start over. Once we
+                                 // have determined that the computations have
+                                 // converged somewhere, we output the
+                                 // results.
 template <int dim>
 void MinimizationProblem<dim>::run () 
 {
