@@ -1026,21 +1026,14 @@ void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
 
 
 
+
 template <int dim>
 void MGDoFHandler<dim>::renumber_dofs (const unsigned int      level,
 				       const RenumberingMethod method,
-				       const bool              use_constraints,
 				       const vector<int>      &starting_points) {
 				   // make the connection graph
   dSMatrixStruct sparsity (n_dofs(level), max_couplings_between_dofs());
   make_sparsity_pattern (level, sparsity);
-
-  if (use_constraints) 
-    {
-      ConstraintMatrix constraints;
-      make_constraint_matrix (level, constraints);
-      constraints.condense (sparsity);
-    };
     
   int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; -1 means
