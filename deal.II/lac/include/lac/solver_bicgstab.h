@@ -255,7 +255,7 @@ SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
 
   step = 0;
 
-  ReturnState state;
+  ReturnState state = breakdown;
   
   do 
     {

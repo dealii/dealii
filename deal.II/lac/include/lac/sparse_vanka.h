@@ -8,6 +8,7 @@
 #include <lac/forward-declarations.h>
 
 #include <bvector.h>
+#include <vector>
 
 /**
  * Point-wise Vanka preconditioning.
@@ -50,6 +51,12 @@ class SparseVanka
     SparseVanka(const SparseMatrix<number>& M,
 		const bit_vector& selected);
 				     /**
+				      * Destructor.
+				      * Delete all allocated matrices.
+				      */
+    ~SparseVanka();
+    
+				     /**
 				      * Do the preconditioning. This
 				      * function contains a dispatch
 				      * mechanism to use the
@@ -80,6 +87,17 @@ class SparseVanka
 				      */
     template<typename number2>
     void backward(Vector<number2>& dst, const Vector<number2>& src) const;
+				     /**
+				      * Minimize memory consumption.
+				      * Activating this option reduces
+				      * memory needs of the Vanka object
+				      * to nealy zero. You pay for this
+				      * by a high increase of computing
+				      * time, since all local matrices
+				      * are built up and inverted every time.
+				      */
+    void conserve_memory();
+    
   private:
 				     /**
 				      * Pointer to the matrix.
@@ -91,6 +109,14 @@ class SparseVanka
 				      * multipliers.
 				      */
     const bit_vector& selected;
+				     /**
+				      * Conserve memory flag.
+				      */
+    bool conserve_mem;
+				     /**
+				      * Array of inverse matrices.
+				      */
+    mutable vector<SmartPointer<FullMatrix<float> > > inverses;
 };
 
 template<typename number>

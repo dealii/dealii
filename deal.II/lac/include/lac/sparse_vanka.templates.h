@@ -10,8 +10,22 @@ template<typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number>& M,
 				 const bit_vector& selected)
 		:
-		matrix(&M), selected(selected)
+		matrix(&M), selected(selected), conserve_mem(false), inverses(M.m(),0)
 {}
+
+template<typename number>
+SparseVanka<number>::~SparseVanka()
+{
+  vector<SmartPointer<FullMatrix<float> > >::iterator i;
+  for(i=inverses.begin();i!=inverses.end();++i)
+    {
+      FullMatrix<float>* p = *i;
+      *i = 0;
+      if (p != 0) delete p;
+    }
+}
+
+
 
 template<typename number>
 template<typename number2>
@@ -19,15 +33,33 @@ void
 SparseVanka<number>::forward(Vector<number2>& dst,
 			   const Vector<number2>& src) const
 {
+  FullMatrix<float> local_matrix;
   for (unsigned int row=0; row< matrix->m() ; ++row)
     {
+      bool build_matrix = true;
+      
       if (!selected[row])
 	continue;
-      
+
+	      
       const SparseMatrixStruct& structure = matrix->get_sparsity_pattern();
       unsigned int n = structure.row_length(row);
       
-      FullMatrix<float> A(n);
+      if (!conserve_mem)
+	{
+	  if (inverses[row] == 0)
+	    {
+	      FullMatrix<float>* p = new FullMatrix<float>;
+	      inverses[row] = p;
+	    } else {
+	      build_matrix = false;
+	    }
+	}
+
+      FullMatrix<float>& A = (conserve_mem) ? local_matrix : (*inverses[row]);
+
+      if (build_matrix) A.reinit(n);
+      
       Vector<float> b(n);
       Vector<float> x(n);
       
@@ -63,12 +95,14 @@ SparseVanka<number>::forward(Vector<number2>& dst,
 		{
 		  b(i) -= matrix->raw_entry(irow,j) * dst(col);
 		} else {
-		  A(i,js->second) = matrix->raw_entry(irow,j);
+		  if (build_matrix)
+		    A(i,js->second) = matrix->raw_entry(irow,j);
 		}
 	    }
 	}
 				       // Compute new values
-      A.gauss_jordan();
+      if (build_matrix)
+	A.gauss_jordan();
       A.vmult(x,b);
       
 				       // Distribute new values
