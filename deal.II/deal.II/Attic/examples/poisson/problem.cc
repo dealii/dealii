@@ -71,7 +71,9 @@ void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   else
     prm.declare_entry ("Test run", "zoom in", "zoom in\\|random");
 
-  prm.declare_entry ("Global refinement", "0", ParameterHandler::RegularExpressions::Integer);
+  prm.declare_entry ("Global refinement", "0",
+		     ParameterHandler::RegularExpressions::Integer);
+  prm.declare_entry ("Output file", "gnuplot.1");
 };
 
 
@@ -89,22 +91,25 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
       else
 	if (test=="random") test_case = 4;
 	else 
-	  cerr << "This test seems not to be implemented!" << endl;
+	  {
+	    cerr << "This test seems not to be implemented!" << endl;
+	    return false;
+	  };
 
   switch (test_case) 
     {
       case 1:
 	    make_zoom_in_grid ();
-	    return true;
+	    break;
       case 2:
 	    make_ball_grid ();
-	    return true;
+	    break;
       case 3:
 	    make_curved_line_grid ();
-	    return true;
+	    break;
       case 4:
 	    make_random_grid ();
-	    return true;
+	    break;
       default:
 	    return false;
     };
@@ -114,6 +119,8 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
     return false;
   else
     tria->refine_global (refine_global);
+
+  return true;
 };
 
 	  
@@ -172,6 +179,7 @@ void PoissonProblem<dim>::make_curved_line_grid () {
 
 template <int dim>
 void PoissonProblem<dim>::make_random_grid () {
+  tria->create_hypercube ();
   tria->refine_global (1);
 	
   Triangulation<dim>::active_cell_iterator cell, endc;
@@ -215,11 +223,11 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   PoissonEquation<dim>            equation (rhs);
   QGauss4<dim>                    quadrature;
   
-  cout << "Distributing dofs... "; 
+  cout << "    Distributing dofs... "; 
   dof->distribute_dofs (fe);
   cout << dof->n_dofs() << " degrees of freedom." << endl;
 
-  cout << "Assembling matrices..." << endl;
+  cout << "    Assembling matrices..." << endl;
   FEValues<dim>::UpdateStruct update_flags;
   update_flags.q_points  = update_flags.gradients  = true;
   update_flags.jacobians = update_flags.JxW_values = true;
@@ -229,12 +237,13 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   dirichlet_bc[0] = &zero;
   assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
 
-  cout << "Solving..." << endl;
+  cout << "    Solving..." << endl;
   solve ();
 
-  cout << "Printing..." << endl;
+  cout << "    Writing to file <" << prm.get("Output file") << ">..." << endl;
   DataOut<dim> out;
-  ofstream gnuplot("gnuplot.out.5");
+
+  ofstream gnuplot(prm.get("Output file"));
   fill_data (out); 
   out.write_gnuplot (gnuplot);
   gnuplot.close ();

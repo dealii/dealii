@@ -1,2 +1,3 @@
-set Test run          = random
-set Global refinement = 1
+set Test run          = { zoom in | ball | curved line | random }
+set Global refinement = {{ 2 | 4 | 6 | 0 }}
+set Output file       = gnuplot.{{ zoom_in | ball | curved_line | random }}
