@@ -12,6 +12,7 @@
 /*    further information on this license.                        */
 
 
+				 // Start out with well known things...
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
@@ -350,6 +351,18 @@ namespace Evaluation
 					     // variable:
 	    point_derivative += solution_gradients[q_point][0];
 	    ++evaluation_point_hits;
+
+					     // Finally break out of
+					     // the innermost loop
+					     // iterating over the
+					     // vertices of the
+					     // present cell, since if
+					     // we have found the
+					     // evaluation point at
+					     // one vertex it cannot
+					     // be at a following
+					     // vertex as well:
+	    break;
 	  };
 
 				     // Now we have looped over all
@@ -764,7 +777,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::LinearSystem::solve (Vector<double> &solution) const
   {
-    SolverControl           solver_control (10000, 1e-12); //TODO!
+    SolverControl           solver_control (5000, 1e-12);
     PrimitiveVectorMemory<> vector_memory;
     SolverCG<>              cg (solver_control, vector_memory);
 
@@ -779,14 +792,16 @@ namespace LaplaceSolver
 
 
 
-				   // @sect{The PrimalSolver class}
+				   // @sect4{The PrimalSolver class}
 
 				   // The ``PrimalSolver'' class is
 				   // also mostly unchanged except for
 				   // overloading the functions
 				   // ``solve_problem'', ``n_dofs'',
 				   // and ``postprocess'' of the base
-				   // class. These overloaded
+				   // class, and implementing the
+				   // ``output_solution''
+				   // function. These overloaded
 				   // functions do nothing particular
 				   // besides calling the functions of
 				   // the base class -- that seems
@@ -817,9 +832,24 @@ namespace LaplaceSolver
 				   // derived class using these
 				   // additional functions.
 				   //
-				   // Except for the reimplementation
-				   // of these three functions, this
-				   // class is also unchanged.
+				   // Regarding the implementation of
+				   // the ``output_solution''
+				   // function, we keep the
+				   // ``GlobalRefinement'' and
+				   // ``RefinementKelly'' classes in
+				   // this program, and they can then
+				   // rely on the default
+				   // implementation of this function
+				   // which simply outputs the primal
+				   // solution. The class implementing
+				   // dual weighted error estimators
+				   // will overload this function
+				   // itself, to also output the dual
+				   // solution.
+				   //
+				   // Except for this, the class is
+				   // unchanged with respect to the
+				   // previous example.
   template <int dim>
   class PrimalSolver : public Solver<dim>
   {
@@ -832,16 +862,16 @@ namespace LaplaceSolver
 		    const Function<dim>      &boundary_values);
 
       virtual
-      void
-      solve_problem ();
+      void solve_problem ();
       
       virtual
-      unsigned int
-      n_dofs () const;
+      unsigned int n_dofs () const;
       
       virtual
-      void
-      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+      void postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+
+      virtual
+      void output_solution () const;
       
     protected:
       const SmartPointer<const Function<dim> > rhs_function;
@@ -889,6 +919,34 @@ namespace LaplaceSolver
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
     return Solver<dim>::postprocess(postprocessor);
+  };
+
+
+  template <int dim>
+  void
+  PrimalSolver<dim>::output_solution () const
+  {
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler (dof_handler);
+    data_out.add_data_vector (solution, "solution");
+    data_out.build_patches ();
+
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ostringstream filename;
+#else
+    std::ostrstream filename;
+#endif
+    filename << "solution-"
+	     << refinement_cycle
+	     << ".gnuplot"
+	     << std::ends;
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ofstream out (filename.str().c_str());
+#else
+    std::ofstream out (filename.str());
+#endif
+    
+    data_out.write (out, DataOut<dim>::gnuplot);
   };
   
 
@@ -940,7 +998,12 @@ namespace LaplaceSolver
   };
 
 
-				   //TODO!!
+				   // @sect4{The RefinementGlobal and RefinementKelly classes}
+
+				   // For the following two classes,
+				   // the same applies as for most of
+				   // the above: the class is taken
+				   // from the previous example as-is:
   template <int dim>
   class RefinementGlobal : public PrimalSolver<dim>
   {
@@ -1300,7 +1363,6 @@ namespace Data
       q += sin(10*p(i)+5*p(0)*p(0));
     const double exponential = exp(q);
     return exponential;
-//    return 0;  // TODO!
   };
 
 
@@ -1328,8 +1390,6 @@ namespace Data
     t1 = t1*t1;
     
     return -u*(t1+t2+t3);
-//      const double pi = 3.1415926536;
-//      return 2.*pi*pi*sin(pi*p(0))*sin(pi*p(1));  //TODO!!
   };
 
 
@@ -1647,7 +1707,7 @@ namespace Data
 				 // with the rest of the program.
 
 
-
+				 //TODO
 namespace DualFunctional
 {
   template <int dim>
@@ -1715,13 +1775,120 @@ namespace DualFunctional
     AssertThrow (evaluation_point_found,
 		 ExcEvaluationPointNotFound(evaluation_point));
   };
+
+
+
+  template <int dim>
+  class PointXDerivativeEvaluation : public DualFunctionalBase<dim>
+  {
+    public:
+      PointXDerivativeEvaluation (const Point<dim> &evaluation_point,
+				  const double      tolerance);
+
+      virtual
+      void
+      assemble_rhs (const DoFHandler<dim> &dof_handler,
+		    Vector<double>        &rhs) const;
+      DeclException1 (ExcEvaluationPointNotFound,
+		      Point<dim>,
+		      << "The evaluation point " << arg1
+		      << " was not found among the vertices of the present grid.");
+
+    protected:
+      const Point<dim> evaluation_point;
+      const double     tolerance;
+  };
+
+
+  template <int dim>
+  PointXDerivativeEvaluation<dim>::
+  PointXDerivativeEvaluation (const Point<dim> &evaluation_point,
+			      const double      tolerance)
+		  :
+		  evaluation_point (evaluation_point),
+		  tolerance (tolerance)
+  {};
+  
+
+  template <int dim>
+  void
+  PointXDerivativeEvaluation<dim>::
+  assemble_rhs (const DoFHandler<dim> &dof_handler,
+		Vector<double>        &rhs) const
+  {
+    rhs.reinit (dof_handler.n_dofs());
+
+    QTrapez<1>     q_trapez;
+    QIterated<dim> quadrature (q_trapez, 4);
+    FEValues<dim> fe_values (dof_handler.get_fe(), quadrature,
+			     update_gradients |
+			     update_q_points  |
+			     update_JxW_values);
+    const unsigned int n_q_points = fe_values.n_quadrature_points;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    Vector<double> cell_rhs (dofs_per_cell);
+    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    double total_volume = 0;
+    
+    for (; cell!=endc; ++cell)
+      if (cell->center().distance(evaluation_point) -
+	  cell->diameter()/2
+	  <
+	  tolerance)
+	{
+	  fe_values.reinit (cell);
+	  cell_rhs.clear ();
+	  
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    if (fe_values.quadrature_point(q).distance(evaluation_point)
+		<
+		tolerance)
+	      {
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  cell_rhs(i) += fe_values.shape_grad(i,q)[0] *
+				 fe_values.JxW (q);
+		total_volume += fe_values.JxW (q);
+	      };
+	  
+	  cell->get_dof_indices (local_dof_indices);
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    rhs(local_dof_indices[i]) += cell_rhs(i);
+	};
+
+    rhs.scale (1./total_volume);
+    
+    std::cout << "Total volume=" << total_volume
+	      << ", should have been " << 3.1415926*tolerance*tolerance
+	      << std::endl;
+  };
   
 
 };
 
 
+				 // @sect3{Extending the LaplaceSolver namespace}
 namespace LaplaceSolver
 {
+
+				   // @sect4{The DualSolver class}
+
+				   // In the same way as the
+				   // ``PrimalSolver'' class above, we
+				   // now implement a
+				   // ``DualSolver''. It has all the
+				   // same features, the only
+				   // difference is that it does not
+				   // take a function object denoting
+				   // a right hand side object, but
+				   // now takes a
+				   // ``DualFunctionalBase'' object
+				   // that will assemble the right
+				   // hand side vector of the dual
+				   // problem. The rest is trivial:
   template <int dim>
   class DualSolver : public Solver<dim>
   {
@@ -1732,7 +1899,6 @@ namespace LaplaceSolver
 		  const Quadrature<dim-1>  &face_quadrature,
 		  const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
-				       //TODO!!
       virtual
       void
       solve_problem ();
@@ -1807,6 +1973,9 @@ namespace LaplaceSolver
   };
 
 
+				   // @sect4{The WeightedResidual class}
+
+				   //TODO!
   template <int dim>
   class WeightedResidual : public PrimalSolver<dim>,
 			   public DualSolver<dim>
@@ -1915,6 +2084,20 @@ namespace LaplaceSolver
 				      * memory itself, or synchronise
 				      * with other threads.
 				      */
+      struct CellData
+      {
+	  FEValues<dim>    fe_values;
+	  const SmartPointer<const Function<dim> > right_hand_side;
+
+	  std::vector<double> cell_residual;
+	  std::vector<double> rhs_values;	  
+	  std::vector<double> dual_weights;	  
+	  typename std::vector<Tensor<2,dim> > cell_grad_grads;
+	  CellData (const FiniteElement<dim> &dof_handler,
+		    const Quadrature<dim>    &quadrature,
+		    const Function<dim>      &right_hand_side);
+      };
+
       struct FaceData
       {
 	  FEFaceValues<dim>    fe_face_values_cell;
@@ -1929,19 +2112,6 @@ namespace LaplaceSolver
 		    const Quadrature<dim-1>  &face_quadrature);
       };
 
-      struct CellData
-      {
-	  FEValues<dim>    fe_values;
-	  const SmartPointer<const Function<dim> > right_hand_side;
-
-	  std::vector<double> cell_residual;
-	  std::vector<double> rhs_values;	  
-	  std::vector<double> dual_weights;	  
-	  typename std::vector<Tensor<2,dim> > cell_grad_grads;
-	  CellData (const FiniteElement<dim> &dof_handler,
-		    const Quadrature<dim>    &quadrature,
-		    const Function<dim>      &right_hand_side);
-      };
       
 
 
@@ -2015,6 +2185,30 @@ namespace LaplaceSolver
 
 
   template <int dim>
+  WeightedResidual<dim>::CellData::
+  CellData (const FiniteElement<dim> &fe,
+	    const Quadrature<dim>    &quadrature,
+	    const Function<dim>      &right_hand_side)
+		  :
+		  fe_values (fe, quadrature,
+			     update_values             |
+			     update_second_derivatives |
+			     update_q_points           |
+			     update_JxW_values),
+		  right_hand_side (&right_hand_side)
+  {  
+    const unsigned int n_q_points
+      = quadrature.n_quadrature_points;
+  
+    cell_residual.resize(n_q_points);
+    rhs_values.resize(n_q_points);    
+    dual_weights.resize(n_q_points);    
+    cell_grad_grads.resize(n_q_points);
+  };
+  
+  
+
+  template <int dim>
   WeightedResidual<dim>::FaceData::
   FaceData (const FiniteElement<dim> &fe,
 	    const Quadrature<dim-1>  &face_quadrature)
@@ -2042,30 +2236,6 @@ namespace LaplaceSolver
   };
   
 
-
-  template <int dim>
-  WeightedResidual<dim>::CellData::
-  CellData (const FiniteElement<dim> &fe,
-	    const Quadrature<dim>    &quadrature,
-	    const Function<dim>      &right_hand_side)
-		  :
-		  fe_values (fe, quadrature,
-			     update_values             |
-			     update_second_derivatives |
-			     update_q_points           |
-			     update_JxW_values),
-		  right_hand_side (&right_hand_side)
-  {  
-    const unsigned int n_q_points
-      = quadrature.n_quadrature_points;
-  
-    cell_residual.resize(n_q_points);
-    rhs_values.resize(n_q_points);    
-    dual_weights.resize(n_q_points);    
-    cell_grad_grads.resize(n_q_points);
-  };
-  
-  
 
 
   template <int dim>
@@ -2943,8 +3113,8 @@ void solve_problem ()
   data->create_coarse_grid (triangulation);
   
   const Point<dim> evaluation_point(0.75,0.75);
-  const DualFunctional::PointValueEvaluation<dim>
-    dual_functional (evaluation_point);
+  const DualFunctional::PointXDerivativeEvaluation<dim>
+    dual_functional (evaluation_point, 0.01);
   
   LaplaceSolver::Base<dim> * solver = 0;
   solver = new LaplaceSolver::WeightedResidual<dim> (triangulation,
@@ -2986,7 +3156,6 @@ int main ()
       deallog.depth_console (0);
 
       solve_problem<2> ();
-//      solve_problem<2> ("kelly");      
     }
   catch (std::exception &exc)
     {
