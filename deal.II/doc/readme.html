@@ -30,7 +30,9 @@
     developed and tested on Unix systems only. It can be used positively on
     <ul>
       <li>Linux ELF with egcs 1.1.x and gcc 2.95.x;
-      <li>Sun Solaris 2.5, 2.6, and 7, with egcs 1.1.x and gcc 2.95.x.
+      <li>Sun Solaris 2.5, 2.6, and 7, with egcs 1.1.x and gcc 2.95.x;
+      <li>IBM AIX 4.2, with gcc 2.95.x (with some restrictions on
+          the use of shared libraries).
     </ul>
     <acronym>deal.II</acronym> uses only very few features of an
     operating system. It should therefore be rather simple to port it
@@ -64,8 +66,7 @@
            <code>$(wildcard ...)</code> function which prevented us
            from compiling some parts of the library (most of our
            Makefiles use a workaround, though). Other make programs
-           (i.e. non-GNU) will
-           probably fail to work.
+           (i.e. non-GNU) will fail to work.
 
       <li> In case you want to generate the documentation from the
            header files, you only need Perl installed.
@@ -206,13 +207,15 @@
     suffix <code>.g.a</code> instead of <code>.a</code>. The
     difference between the two sets of libraries is the following:
     <ul>
-      <li> The <code>.g.a</code> versions contain debugging
+      <li>
+      <p>
+      The <code>.g.a</code> versions contain debugging
       information. In fact the <code>.g</code> reminds us of the fact
       that gcc is called using the option <code>-g</code> to include
       debugging information into its output.
+      </p>
 
       <p>
-
       Besides the debugging output the compiler puts into the output,
       the library contains a great number of assertions (presently
       about 2000) checking the validity of parameters to functions and
@@ -223,25 +226,29 @@
       parameters (such as vectors having the wrong size, etc) and they
       are usually found almost instantaneously using the file name and
       line number of where the problem occurred.
+      </p>
 
       <p>
-
       You will want to link your programs against the
       <code>.g.a</code> versions of the libraries while developing
       your programs.
+      </p>
 
-      <li> The <code>.a</code> libraries do not contain debugging
+      <li>
+      <p>
+      The <code>.a</code> libraries do not contain debugging
       information nor the assertions. For these reasons, they are much
       smaller and your program will run significantly faster (the
       performance penalty of the <code>.g.a</code> libraries is
       between a factor of two and four, depending on which parts of
       the libraries you use). Furthermore, these libraries are
       compiled with optimization options of the compiler.
+      </p>
 
       <p>
-
       You will want to link your programs against these libraries when
       your application runs stably and are used in production mode.
+      </p>
     </ul>
 
 
@@ -251,24 +258,31 @@
     You can give several flags to ./configure:
     <ul>
     <li>
+      <p>
       <code>--enable-shared</code>: Compile the files of deal.II
       into shared libraries, rather than statically linked
       libraries. Enabling this option saves disk space, link time and
       start-up time, so this is the default. However, some systems
       might not support shared libraries, in which case you should
       call ./configure with the parameter
-      <code>--disable-shared</code>. 
+      <code>--disable-shared</code>. (Since on AIX we could not get
+      shared libraries right immediately, they are disabled by default
+      on this system. Probably, there is a simple work-around, but
+      since we do not regularly test on AIX, we did not try very
+      hard.)
+      </p>
 
       <p>
-
       It is important to note that the actual size of the executable
       program in memory will be larger than when linked statically,
       since the dynamic linker does not remove symbols which are not
       used, in contrast to the static linker. Therefore, more main
       memory will be used when running your applications, but link
       time is significantly reduced.      
+      </p>
 
     <li>
+      <p>
       <code>--enable-multithreading</code>: This sets compiler
       variables such that the resulting program supports
       multithreading. Basically, for this different system include
@@ -280,33 +294,36 @@
       multi-threaded programs are working well and routinely) and that
       gcc's runtime library is not thread-safe unless you configure gcc
       with <code>--enable-threads</code> and recompile it.
+      </p>
 
     <li>
-     <code>--with-multithreading=ACE-path</code>: enabling
-     multithreading as shown above does not enable multithreading
-     inside the library itself. However, there are several places
-     where multithreading can be used (in some parts of the graphical
-     output routines, the KellyErrorEstimator class and some other
-     places), and you can switch to multithreading using this
-     configure option.
+      <p>
+      <code>--with-multithreading=ACE-path</code>: enabling
+      multithreading as shown above does not enable multithreading
+      inside the library itself. However, there are several places
+      where multithreading can be used (in some parts of the graphical
+      output routines, the KellyErrorEstimator class and some other
+      places), and you can switch to multithreading using this
+      configure option.
+      </p>
 
-     <p>
+      <p>
+      To support multithreading in a cross-platform way, we use the 
+      <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
+      (Adaptive Communications Environment)</a> library. This needs
+      to be installed separately, and the path to its installation
+      directory needs to be given to this option. 
+      </p>
 
-     To support multithreading in a cross-platform way, we use the 
-     <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
-     (Adaptive Communications Environment)</a> library. This needs
-     to be installed separately, and the path to its installation
-     directory needs to be given to this option. 
+      <p>
+      In our experience, if you want to use ACE on Sun, you should
+      compile it for pthreads rather than Solaris threads.
+      </p>
 
-     <p>
-
-     In our experience, if you want to use ACE on Sun, you should
-     compile it for pthreads rather than Solaris threads.
-
-     <p>
-
-     Note that the multi-thread support in the library is still
-     experimental. 
+      <p>
+      Note that the multi-thread support in the library is still
+      experimental.
+      </p>
     </ul>
 
     <p>
