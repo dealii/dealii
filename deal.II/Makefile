@@ -89,6 +89,8 @@ debug: deps
 optimized: deps
 	$(MAKE) $(MAKEOPTIONS) contrib baseo laco 2do 1do 3do
 
+# when HSL functions are used, we also compile the detached_ma27 program
+# which itself uses the optimized base library
 contrib: $(subst no,,$(subst yes,baseo,$(USE_CONTRIB_HSL)))
 	cd $D/contrib ; $(MAKE)
 
