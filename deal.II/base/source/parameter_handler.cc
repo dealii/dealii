@@ -141,7 +141,7 @@ namespace Patterns
 
   const double Double::min_double_value =
 #ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<double>::min();
+          -std::numeric_limits<double>::max();
 #else
           1;
 #endif
