@@ -60,10 +60,8 @@ SolverGaussSeidel<Matrix,Vector>::solve (const Matrix &A,
 					 Vector       &x,
 					 const Vector &b) {
 
-  deallog.push(__FILE__);
+  deallog.push("lac/solver_gauss_seidel.h");
   deallog.push("SolverGaussSeidel::solve");
-
-  TRACEMSG("Initialize Variables");
 
   unsigned int i;
   unsigned int n = b.size();
@@ -72,8 +70,6 @@ SolverGaussSeidel<Matrix,Vector>::solve (const Matrix &A,
   SolverControl::State conv=SolverControl::iterate;
 
   Vector defect(n);
-
-  TRACEMSG("Entering main loop");
 
   deallog.push("Main loop");
 
