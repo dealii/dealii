@@ -683,7 +683,8 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
 				   // faces, this function is disabled
 				   // altogether
   Assert(false, ExcNotImplemented());
-  
+
+/*  
   const double a = 1./(1+std::sqrt(3.0)); // equilibrate cell sizes at transition
 				          // from the inner part to the radial
 				          // cells
@@ -735,6 +736,7 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
   tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
 			     cells,
 			     SubCellData());       // no boundary information
+*/			     
 };
 
 
