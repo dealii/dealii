@@ -466,15 +466,16 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
-					     const FunctionMap   &dirichlet_bc,
+					     unsigned char        boundary_component,
+					     const Function<1>   &boundary_function,
 					     map<int,double>     &boundary_values,
 					     const vector<bool>  &component_mask_)
 {
-  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
+  Assert (boundary_component != 255,
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<1> &fe = dof.get_fe();
-  Assert (fe.n_components == dirichlet_bc.begin()->second->n_components,
+  Assert (fe.n_components == boundary_function.n_components,
 	  ExcComponentMismatch());
   Assert (fe.dofs_per_vertex == fe.n_components,
 	  ExcComponentMismatch());
@@ -490,7 +491,7 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
   
 				   // check whether boundary values at the
 				   // left boundary of the line are requested
-  if (dirichlet_bc.find(0) != dirichlet_bc.end())
+  if (boundary_component == 0)
     {
 				       // first find the leftmost active
 				       // cell by first traversing the coarse
@@ -512,12 +513,12 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
       for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
 	if (component_mask[fe.face_system_to_component_index(i).first])
 	  boundary_values[leftmost_cell->vertex_dof_index(0,i)]
-	    = dirichlet_bc.find(0)->second->value(leftmost_cell->vertex(0), i);
+	    = boundary_function.value(leftmost_cell->vertex(0), i);
     };
 
 				   // same for the right boundary of
 				   // the line are requested
-  if (dirichlet_bc.find(1) != dirichlet_bc.end())
+  if (boundary_component == 1)
     {
 				       // first find the leftmost active
 				       // cell by first traversing the coarse
@@ -535,7 +536,7 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
       for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
 	if (component_mask[fe.face_system_to_component_index(i).first])
 	  boundary_values[rightmost_cell->vertex_dof_index(1,i)]
-	    = dirichlet_bc.find(1)->second->value(rightmost_cell->vertex(1), i);
+	    = boundary_function.value(rightmost_cell->vertex(1), i);
     };
   
 };
@@ -548,18 +549,19 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 template <int dim>
 void
 VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
-					       const FunctionMap     &dirichlet_bc,
+					       unsigned char          boundary_component,
+					       const Function<dim>   &boundary_function,
 					       map<int,double>       &boundary_values,
 					       const vector<bool>    &component_mask_)
 {
-  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
+  Assert (boundary_component != 255,
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<dim> &fe           = dof.get_fe();
   const unsigned int        n_components = fe.n_components;
   const bool                fe_is_system = (n_components != 1);
   
-  Assert (n_components == dirichlet_bc.begin()->second->n_components,
+  Assert (n_components == boundary_function.n_components,
 	  ExcInvalidFE());
 
 				   // set the component mask to either
@@ -570,8 +572,6 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 				     component_mask_);
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
-
-  typename FunctionMap::const_iterator function_ptr;
 
 				   // field to store the indices of dofs
   vector<int>         face_dofs (fe.dofs_per_face, -1);
@@ -589,10 +589,8 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
 					endf = dof.end_face();
   for (; face!=endf; ++face)
-    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
-	dirichlet_bc.end()) 
-				       // face is subject to one of the
-				       // bc listed in #dirichlet_bc#
+    if (boundary_component == face->boundary_indicator()) 
+				       // face is of the right component
       {
 					 // get indices, physical location and
 					 // boundary values of dofs on this
@@ -602,7 +600,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 
 	if (fe_is_system)
 	  {
-	    function_ptr->second->vector_value_list (dof_locations, dof_values_system);
+	    boundary_function.vector_value_list (dof_locations, dof_values_system);
 	    
 					     // enter into list
 	    
@@ -617,7 +615,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	  {
 					     // get only the one component that
 					     // this function has
-	    function_ptr->second->value_list (dof_locations,
+	    boundary_function.value_list (dof_locations,
 					      dof_values_scalar,
 					      0);
 	    
@@ -636,7 +634,8 @@ void
 VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const FunctionMap        &boundary_functions,
 					   const Quadrature<dim-1>  &q,
-					   map<int,double>          &boundary_values) {
+					   map<int,double>          &boundary_values)
+{
   Assert (dof.get_fe().n_components == boundary_functions.begin()->second->n_components,
 	  ExcComponentMismatch());
   

@@ -356,6 +356,7 @@ class VectorTools
 					Vector<double>           &rhs_vector);
     
 				     /**
+				      * Prepare Dirichlet boundary conditions.
 				      * Make up the list of nodes subject
 				      * to Dirichlet boundary conditions
 				      * and the values to be
@@ -366,6 +367,11 @@ class VectorTools
 				      * the old one overwritten if a node
 				      * of the boundary part to be projected
 				      * on already was in the variable.
+				      *
+				      * The parameter #boundary_component# corresponds
+				      * to the number #boundary_indicator# of the face.
+				      * 255 is an illegal value, since it is reserved
+				      * for interior faces.
 				      *
 				      * The flags in the last
 				      * parameter, #component_mask#
@@ -384,8 +390,8 @@ class VectorTools
 				      * element.
 				      *
 				      * It is assumed that the number
-				      * of components of the functions
-				      * in #dirichlet_bc# matches that
+				      * of components of the function
+				      * in #boundary_function# matches that
 				      * of the finite element used by
 				      * #dof#.
 				      *
@@ -393,10 +399,13 @@ class VectorTools
 				      * information.
 				      */
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
-					     const FunctionMap     &dirichlet_bc,
+					     unsigned char          boundary_component,
+					     const Function<dim>   &boundary_function,
 					     map<int,double>       &boundary_values,
 					     const vector<bool>    &component_mask = vector<bool>());
 
+//TODO: Update project_boundary_values for more components
+//TODO: Replace FunctionMap
 				     /**
 				      * Project #function# to the boundary
 				      * of the domain, using the given quadrature
@@ -408,18 +417,18 @@ class VectorTools
 				      * on already was in the variable.
 				      *
 				      * It is assumed that the number
-				      * of components of the functions
-				      * in #boundary_functions#
+				      * of components of
+				      * #boundary_function#
 				      * matches that of the finite
 				      * element used by #dof#.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
 				      */
-    static void project_boundary_values (const DoFHandler<dim>    &dof,
-					 const FunctionMap        &boundary_functions,
-					 const Quadrature<dim-1>  &q,
-					 map<int,double>          &boundary_values);
+    static void project_boundary_values (const DoFHandler<dim>  &dof,
+					 const FunctionMap      &boundary_function,
+					 const Quadrature<dim-1>&q,
+					 map<int,double>        &boundary_values);
     
     				     /**
 				      * Compute the error of the finite element solution.

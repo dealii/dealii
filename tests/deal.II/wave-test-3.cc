@@ -5938,12 +5938,9 @@ void TimeStep_Dual<dim>::do_timestep ()
   map<int,double> boundary_value_list;
   if (dim != 1)
     {
-      VectorTools<dim>::FunctionMap dirichlet_bc;
       static const ZeroFunction<dim> boundary_values;
       
-      dirichlet_bc[0] = &boundary_values;
-      
-      VectorTools<dim>::interpolate_boundary_values (*dof_handler, dirichlet_bc,
+      VectorTools<dim>::interpolate_boundary_values (*dof_handler, 0, boundary_values,
 						     boundary_value_list);
       MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					       system_matrix, v,
@@ -8271,12 +8268,10 @@ void TimeStep_Primal<dim>::do_timestep ()
 				       // zero already.
       parameters.boundary_values_u->set_time (time);
       parameters.boundary_values_v->set_time (time);
-      VectorTools<dim>::FunctionMap dirichlet_bc;
-      dirichlet_bc[0] = parameters.boundary_values_u;
       
       map<int,double> boundary_value_list;
-      VectorTools<dim>::interpolate_boundary_values (*dof_handler,
-						     dirichlet_bc,
+      VectorTools<dim>::interpolate_boundary_values (*dof_handler, 0,
+						     *(parameters.boundary_values_u),
 						     boundary_value_list);
       MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					       system_matrix, u,
@@ -8300,11 +8295,9 @@ void TimeStep_Primal<dim>::do_timestep ()
 				   // at all
   if (dim != 1)
     {
-      VectorTools<dim>::FunctionMap dirichlet_bc;
-      dirichlet_bc[0] = parameters.boundary_values_v;
       map<int,double> boundary_value_list;
-      VectorTools<dim>::interpolate_boundary_values (*dof_handler,
-						     dirichlet_bc,
+      VectorTools<dim>::interpolate_boundary_values (*dof_handler, 0,
+						     *(parameters.boundary_values_v),
 						     boundary_value_list);
       MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					       system_matrix, v,

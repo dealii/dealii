@@ -74,7 +74,8 @@ template <int dim>
 void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				 const Quadrature<dim>    &quadrature,
 				 const UpdateFlags         update_flags,
-				 const FunctionMap        &dirichlet_bc) {
+				 const FunctionMap        &dirichlet_bc)
+{
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
   system_sparsity.reinit (dof_handler->n_dofs(),
@@ -123,8 +124,13 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // apply Dirichlet bc as described
 				   // in the docs
   map<int, double> boundary_value_list;
-  VectorTools<dim>::interpolate_boundary_values (*dof_handler, dirichlet_bc, 
-						 boundary_value_list);
+
+  for (FunctionMap::const_iterator dirichlet = dirichlet_bc.begin() ;
+       dirichlet != dirichlet_bc.end() ; ++dirichlet)
+    VectorTools<dim>::interpolate_boundary_values (*dof_handler,
+						   dirichlet->first,
+						   *(dirichlet->second), 
+						   boundary_value_list);
   MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					   system_matrix, solution,
 					   right_hand_side);  
@@ -134,7 +140,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 
 
 template <int dim>
-void ProblemBase<dim>::solve () {
+void ProblemBase<dim>::solve ()
+{
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
   SolverControl                    control(4000, 1e-16);
