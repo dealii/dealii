@@ -16,10 +16,13 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
+#include <numerics/matrices.h>
 #include <iomanip>
 #include <fstream>
 
 #include <base/logstream.h>
+
+ofstream logfile("fe_tables.output");
 
 #define TEST_ELEMENT(e) { deallog.push(#e); e el;\
   print_fe_statistics(el); deallog.pop(); deallog << endl; }
@@ -28,7 +31,8 @@
 #define TEST_MIXED2(e1,n1,e2,n2,d) { deallog.push(#e1 "x" #n1 "-" #e2 "x" #n2);\
   e1 eb1; e2 eb2; FESystem<d> el(eb1,n1,eb2,n2);\
   print_fe_statistics(el); deallog.pop(); deallog << endl; }
-
+#define TEST_MATRIX(e1,e2) { deallog.push( #e1 " onto " #e2); e1 el1; e2 el2;\
+  print_fe_matrices(el1,el2); deallog.pop(); deallog << endl; }
 
 template<int dim>
 inline void
@@ -78,13 +82,26 @@ print_fe_statistics(const FiniteElement<dim>& fe)
   deallog.pop();
 }
 
+template<int dim>
+inline void
+print_fe_matrices(const FiniteElement<dim>& high,
+		      const FiniteElement<dim>& low)
+{
+  FullMatrix<double> interpolation(low.dofs_per_cell, high.dofs_per_cell);
+  MatrixCreator<dim>::create_interpolation_matrix(high, low, interpolation);
+  deallog << "Interpolation" << endl;
+  interpolation.print(logfile);
+}
+
+
+
 int main()
 {
-  ofstream logfile("fe_tables.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
   logfile.precision(4);
+  logfile.setf(ios::fixed);
   
   deallog.push("GeometryInfo");
 
@@ -137,4 +154,10 @@ int main()
   TEST_MIXED2(FEQ1<2>,1,FEDG_Q0<2>,1,2);
   TEST_MIXED2(FEQ2<2>,3,FEQ1<2>,1,2);
   TEST_MIXED2(FEQ3<2>,3,FEQ2<2>,2,2);
+
+  deallog.push("Matrices");
+  TEST_MATRIX(FEQ2<2>, FEQ1<2>);
+  TEST_MATRIX(FEQ3<2>, FEQ2<2>);
+  TEST_MATRIX(FEQ4<2>, FEQ3<2>);
+  deallog.pop();
 }
