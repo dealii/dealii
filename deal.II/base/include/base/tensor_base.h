@@ -78,9 +78,11 @@ class Tensor<1,dim>
 				      *
 				      * Avoid warning about zero-sized
 				      * array for @p{dim==0} by
-				      * choosing lunatic value.
+				      * choosing lunatic value that is
+				      * likely to overflow memory
+				      * limits.
 				      */
-    typedef double array_type[(dim!=0) ? dim : (unsigned int)(-1)];
+    typedef double array_type[(dim!=0) ? dim : 1000000000];
     
 				     /**
 				      * Constructor. Initialize all entries

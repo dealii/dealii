@@ -311,7 +311,8 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream&))
 				   // next check whether this is the
 				   // @p{endl} manipulator, and if so
 				   // set a flag
-  if (p == &std::endl)
+  std::ostream & (* const p_endl) (std::ostream&) = &std::endl;
+  if (p == p_endl)
     was_endl = true;
 
   return *this;
