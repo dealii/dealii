@@ -73,7 +73,7 @@ class SolverRichardson : private Solver<VECTOR>
 				     /**
 				      * Virtual destructor.
 				      */
-    ~SolverRichardson ();
+    virtual ~SolverRichardson ();
     
 				     /**
 				      * Solve $Ax=b$ for $x$.
