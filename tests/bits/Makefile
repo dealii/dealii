@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
@@ -22,9 +21,9 @@ default: run-tests
 
 ############################################################
 
-tests_x = anna_? \
-	  gerold_1 \
-	  geometry_info_1 \
+tests_x = geometry_info_1 \
+	  grid_generator_?? \
+	  grid_in_* \
 	  point_inside_? \
 	  full_matrix_1 \
 	  block_matrix_array_* \
@@ -34,6 +33,8 @@ tests_x = anna_? \
 	  data_out_stack_0* \
 	  dof_tools_[0-9]* \
 	  fe_tools_[0-9]* \
+          anna_? \
+	  gerold_1 \
 	  roy_1 \
           denis_1 \
 	  unit_support_points \
@@ -61,7 +62,6 @@ tests_x = anna_? \
 	  apply_boundary_values_* \
 	  error_estimator_* \
 	  cylinder_shell_* \
-	  grid_in_* \
 	  compressed_sparsity_pattern_* \
 	  point_difference_* \
 	  umfpack_* \
