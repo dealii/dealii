@@ -998,12 +998,13 @@ void GridIn<dim>::read (const std::string& filename,
   
   Assert (in.is_open(), ExcFileNotOpen(filename.c_str()));
 
-  if (!in)
-    {
-      std::ios_base::iostate state = in.rdstate();
-      std::cerr << "File open, but error " << state << std::endl;
-      exit(1);
-    }
+//TODO:[GK] Do we really need the following, which does not compile with gcc 2.95?  
+//   if (!in)
+//     {
+//       std::ios_base::iostate state = in.rdstate();
+//       std::cerr << "File open, but error " << state << std::endl;
+//       exit(1);
+//     }
   
   read(in, format);
   in.close();
