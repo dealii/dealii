@@ -148,7 +148,8 @@ class PreconditionBlock : public virtual Subscriptor
 				      * parameter for derived classes
 				      * may be provided.
 				      */
-    void initialize (const MATRIX& A, AdditionalData parameters);
+    void initialize (const MATRIX& A,
+		     const AdditionalData parameters);
 
 				     /**
 				      * Deletes the inverse diagonal

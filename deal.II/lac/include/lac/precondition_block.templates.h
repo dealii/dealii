@@ -59,7 +59,7 @@ void PreconditionBlock<MATRIX,inverse_type>::clear ()
 template <class MATRIX, typename inverse_type>
 void PreconditionBlock<MATRIX,inverse_type>::initialize (
   const MATRIX &M,
-  AdditionalData parameters)
+  const AdditionalData parameters)
 {
   const unsigned int bsize = parameters.block_size;
   
