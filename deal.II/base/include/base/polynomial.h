@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,18 +43,20 @@ namespace Polynomials
   {
     public:
                                        /**
-                                        * Constructor. The coefficients
-                                        * of the polynomial are passed
-                                        * as arguments, and denote the
-                                        * polynomial @p{\sum_i a[i]
-                                        * x^i}, i.e. the first element
+                                        * Constructor. The
+                                        * coefficients of the
+                                        * polynomial are passed as
+                                        * arguments, and denote the
+                                        * polynomial $\sum_i a[i]
+                                        * x^i$, i.e. the first element
                                         * of the array denotes the
-                                        * constant term, the second the
-                                        * linear one, and so on. The
-                                        * degree of the polynomial
-                                        * represented by this object is
-                                        * thus the number of elements in
-                                        * the @p{coefficient} array
+                                        * constant term, the second
+                                        * the linear one, and so
+                                        * on. The degree of the
+                                        * polynomial represented by
+                                        * this object is thus the
+                                        * number of elements in the
+                                        * <tt>coefficient</tt> array
                                         * minus one.
                                         */
       Polynomial (const std::vector<number> &coefficients);
@@ -77,10 +79,10 @@ namespace Polynomials
                                        /**
                                         * Return the values and the
                                         * derivatives of the
-                                        * @p{Polynomial} at point @p{x}.
-                                        * @p{values[i],
-                                        * i=0,...,values.size()-1}
-                                        * includes the @p{i}th
+                                        * Polynomial at point <tt>x</tt>.
+                                        * <tt>values[i],
+                                        * i=0,...,values.size()-1</tt>
+                                        * includes the <tt>i</tt>th
                                         * derivative. The number of
                                         * derivatives to be computed is
                                         * thus determined by the size of
@@ -107,11 +109,11 @@ namespace Polynomials
                                        /**
                                         * Scale the abscissa of the
                                         * polynomial.  Given the
-                                        * polynomial $p(t)$ and the
-                                        * scaling $t = ax$, then the
+                                        * polynomial <i>p(t)</i> and the
+                                        * scaling <i>t = ax</i>, then the
                                         * result of this operation is
-                                        * the polynomial $q$, such that
-                                        * $q(x) = p(t)$.
+                                        * the polynomial <i>q</i>, such that
+                                        * <i>q(x) = p(t)</i>.
                                         *
                                         * The operation is performed in
                                         * place.
@@ -121,24 +123,24 @@ namespace Polynomials
                                        /**
                                         * Shift the abscissa oft the
                                         * polynomial.  Given the
-                                        * polynomial $p(t)$ and the
-                                        * shift $t = x + a$, then the
+                                        * polynomial <i>p(t)</i> and the
+                                        * shift <i>t = x + a</i>, then the
                                         * result of this operation is
-                                        * the polynomial $q$, such that
-                                        * $q(x) = p(t)$.
+                                        * the polynomial <i>q</i>, such that
+                                        * <i>q(x) = p(t)</i>.
                                         *
                                         * The template parameter allows
                                         * to compute the new
                                         * coefficients with higher
                                         * accuracy, since all
                                         * computations are performed
-                                        * with type @p{number2}. This
+                                        * with type <tt>number2</tt>. This
                                         * may be necessary, since this
                                         * operation involves a big
                                         * number of additions. On a Sun
                                         * Sparc Ultra with Solaris 2.8,
                                         * the difference between
-                                        * @p{double} and @p{long double}
+                                        * <tt>double</tt> and <tt>long double</tt>
                                         * was not significant, though.
                                         *
                                         * The operation is performed in
@@ -249,13 +251,13 @@ namespace Polynomials
                                        /**
                                         * Return a vector of Monomial
                                         * objects of orders zero
-                                        * through @p{degree}, which
+                                        * through <tt>degree</tt>, which
                                         * then spans the full space of
                                         * polynomials up to the given
                                         * degree. This function may be
                                         * used to initialize the
-                                        * @ref{TensorProductPolynomials}
-                                        * and @ref{PolynomialSpace}
+                                        * TensorProductPolynomials
+                                        * and PolynomialSpace
                                         * classes.
                                         */
       static
@@ -273,17 +275,17 @@ namespace Polynomials
 
 /**
  * Lagrange polynomials with equidistant interpolation points in
- * [0,1]. The polynomial of degree @p{n} has got @p{n+1} interpolation
+ * [0,1]. The polynomial of degree <tt>n</tt> has got <tt>n+1</tt> interpolation
  * points. The interpolation points are sorted in ascending
  * order. This order gives an index to each interpolation point.  A
  * Lagrangian polynomial equals to 1 at its `support point', and 0 at
  * all other interpolation points. For example, if the degree is 3,
  * and the support point is 1, then the polynomial represented by this
- * object is cubic and its value is 1 at the point @p{x=1/3}, and zero
- * at the point @p{x=0}, @p{x=2/3}, and @p{x=1}. All the polynomials
- * have polynomial order equal to @p{degree}, but together they span
+ * object is cubic and its value is 1 at the point <tt>x=1/3</tt>, and zero
+ * at the point <tt>x=0</tt>, <tt>x=2/3</tt>, and <tt>x=1</tt>. All the polynomials
+ * have polynomial order equal to <tt>degree</tt>, but together they span
  * the entire space of polynomials of degree less than or equal
- * @p{degree}.
+ * <tt>degree</tt>.
  *
  * The Lagrange polynomials are implemented up to degree 10.
  *
@@ -294,19 +296,19 @@ namespace Polynomials
     public:
                                        /**
                                         * Constructor. Takes the order
-                                        * @p{n} of the Lagrangian
+                                        * <tt>n</tt> of the Lagrangian
                                         * polynom and the index
-                                        * @p{support_point} of the
+                                        * <tt>support_point</tt> of the
                                         * support point. Fills the
-                                        * @p{coefficients} of the base
-                                        * class @p{Polynomial}.
+                                        * <tt>coefficients</tt> of the base
+                                        * class Polynomial.
                                         */
       LagrangeEquidistant (const unsigned int n,
                            const unsigned int support_point);
 
                                        /**
                                         * Return a vector of polynomial
-                                        * objects of order @p{degree},
+                                        * objects of order <tt>degree</tt>,
                                         * which then spans the full
                                         * space of polynomials up to the
                                         * given degree. The polynomials
@@ -314,10 +316,10 @@ namespace Polynomials
                                         * constructor of this class with
                                         * the same degree but support
                                         * point running from zero to
-                                        * @p{degree}. This function may
+                                        * <tt>degree</tt>. This function may
                                         * be used to initialize the
-                                        * @ref{TensorProductPolynomials}
-                                        * and @ref{PolynomialSpace}
+                                        * TensorProductPolynomials
+                                        * and PolynomialSpace
                                         * classes.
                                         */
       static
@@ -327,10 +329,10 @@ namespace Polynomials
     private:
 
                                        /**
-                                        * Computes the @p{coefficients}
+                                        * Computes the <tt>coefficients</tt>
                                         * of the base class
-                                        * @p{Polynomial}. This function
-                                        * is @p{static} to allow to be
+                                        * Polynomial. This function
+                                        * is <tt>static</tt> to allow to be
                                         * called in the
                                         * constructor.
                                         */
@@ -342,14 +344,14 @@ namespace Polynomials
 
 
 /**
- * Legendre polynomials of arbitrary order on @p{[0,1]}.
+ * Legendre polynomials of arbitrary order on <tt>[0,1]</tt>.
  *
- * Constructing a Legendre polynomial of order @p{k}, the coefficients
+ * Constructing a Legendre polynomial of order <tt>k</tt>, the coefficients
  * will be computed by the three-term recursion formula.  The
  * coefficients are stored in a static data vector to be available
  * when needed next time. Since the recursion is performed for the
  * interval $[-1,1]$, the polynomials are shifted to $[0,1]$ by the
- * @p{scale} and @p{shift} functions of @p{Polynomial}, afterwards.
+ * <tt>scale</tt> and <tt>shift</tt> functions of <tt>Polynomial</tt>, afterwards.
  *
  * @author Guido Kanschat, 2000
  */
@@ -358,20 +360,20 @@ namespace Polynomials
     public:
                                        /**
                                         * Constructor for polynomial of
-                                        * order @p{k}.
+                                        * order <tt>k</tt>.
                                         */
       Legendre (const unsigned int k);
 
                                        /**
                                         * Return a vector of Legendre
                                         * polynomial objects of orders
-                                        * zero through @p{degree}, which
+                                        * zero through <tt>degree</tt>, which
                                         * then spans the full space of
                                         * polynomials up to the given
                                         * degree. This function may be
                                         * used to initialize the
-                                        * @ref{TensorProductPolynomials}
-                                        * and @ref{PolynomialSpace}
+                                        * TensorProductPolynomials
+                                        * and PolynomialSpace
                                         * classes.
                                         */
       static
@@ -415,9 +417,9 @@ namespace Polynomials
 
 
 /**
- * Hierarchical polynomials of arbitrary order on @p{[0,1]}.
+ * Hierarchical polynomials of arbitrary order on <tt>[0,1]</tt>.
  *
- * When Constructing a Hierarchical polynomial of order @p{k}, 
+ * When Constructing a Hierarchical polynomial of order <tt>k</tt>, 
  * the coefficients will be computed by a recursion formula.  The
  * coefficients are stored in a static data vector to be available
  * when needed next time.
@@ -436,20 +438,20 @@ namespace Polynomials
  * polynomials in any way, although better conditioning of the 
  * element stiffness matrix could possibly be achieved with scaling.
  *
- * Calling the constructor with a given index @p{p} will generate the
- * following: if @p{p==0}, then the resulting polynomial is the linear
- * function associated with the left vertex, if @p{p==1} the one
- * associated with the right vertex. For higher values of @p{p}, you
- * get the polynomial of degree @p{p} that is orthogonal to all
- * previous ones. Note that for @p{p==0} you therefore do @em{not}
+ * Calling the constructor with a given index <tt>p</tt> will generate the
+ * following: if <tt>p==0</tt>, then the resulting polynomial is the linear
+ * function associated with the left vertex, if <tt>p==1</tt> the one
+ * associated with the right vertex. For higher values of <tt>p</tt>, you
+ * get the polynomial of degree <tt>p</tt> that is orthogonal to all
+ * previous ones. Note that for <tt>p==0</tt> you therefore do <b>not</b>
  * get a polynomial of degree zero, but one of degree one. This is to
  * allow generating a complete basis for polynomial spaces, by just
  * iterating over the indices given to the constructor.
  *
- * On the other hand, the function @p{generate_complete_basis} creates
+ * On the other hand, the function generate_complete_basis() creates
  * a complete basis of given degree. In order to be consistent with
  * the concept of a polynomial degree, if the given argument is zero,
- * it does @em{not} return the linear polynomial described above, but
+ * it does <b>not</b> return the linear polynomial described above, but
  * rather a constant polynomial.
  *
  * @author Brian Carnes, 2002
@@ -459,8 +461,8 @@ namespace Polynomials
     public:
                                      /**
 				      * Constructor for polynomial of
-				      * order @p{p}. There is an
-				      * exception for @p{p==0}, see
+				      * order <tt>p</tt>. There is an
+				      * exception for <tt>p==0</tt>, see
 				      * the general documentation.
 				      */
       Hierarchical (const unsigned int p);
@@ -469,11 +471,11 @@ namespace Polynomials
 				      * Return a vector of
 				      * Hierarchical polynomial
 				      * objects of orders zero through
-				      * @p{degree}, which then spans
+				      * <tt>degree</tt>, which then spans
 				      * the full space of polynomials
 				      * up to the given degree. Note
 				      * that there is an exception if
-				      * the given @p{degree} equals
+				      * the given <tt>degree</tt> equals
 				      * zero, see the general
 				      * documentation of this class.
 				      *

@@ -304,8 +304,8 @@ namespace Patterns
     public:
 				       /**
 					* Minimal double value. If the
-					* @ref numeric_limits class is
-					* available use this
+					* <tt>std::numeric_limits</tt>
+					* class is available use this
 					* information to obtain the
 					* extremal values, otherwise
 					* set it so that this class
@@ -754,7 +754,7 @@ namespace Patterns
  *   structure.
  *
  *   
- *   @section Declaration Declaration of entries
+ *   @section ParameterHandlerDeclaration Declaration of entries
  *   
  *   In order to use the facilities of a ParameterHandler object, one first has
  *   to make known the different entries the input file may or may not contain. This
@@ -847,7 +847,7 @@ namespace Patterns
  *   @endcode
  *
  *
- *   @section Input Input files and special characters
+ *   @section ParameterHandlerInput Input files and special characters
  *
  *   For the first example above the input file would look like the following:
  *   @verbatim
@@ -877,7 +877,7 @@ namespace Patterns
  *   <tt>=</tt> sign.
  *
  *   
- *   @section Reading Reading data from input sources
+ *   @section ParameterHandlerReading Reading data from input sources
  *   
  *   In order to read input you can use three possibilities: reading from an <tt>std::istream</tt> object,
  *   reading from a file of which the name is given and reading from a string in memory in
@@ -907,7 +907,7 @@ namespace Patterns
  *   written to <tt>std::cerr</tt>.
  *
  *   
- *   @section Access Getting entry values out of a ParameterHandler object
+ *   @section ParameterHandlerAccess Getting entry values out of a ParameterHandler object
  *   
  *   Each class gets its data out of a ParameterHandler object by
  *   calling the get()  member functions like this:
@@ -946,7 +946,7 @@ namespace Patterns
  *   input file.
  *   
  *   
- *   @section Style Style guide for data retrieval
+ *   @section ParameterHandlerStyle Style guide for data retrieval
  *   
  *   We propose that every class which gets data out of a
  *   ParameterHandler object provides a function named
@@ -955,7 +955,7 @@ namespace Patterns
  *   should call the <tt>BaseClass::get_parameters</tt> function.
  *
  *
- *   @section Large Experience with large parameter lists
+ *   @section ParameterHandlerLarge Experience with large parameter lists
  *  
  *   Experience has shown that in programs defining larger numbers of parameters (more than,
  *   say, fifty) it is advantageous to define an additional class holding these parameters.
@@ -969,7 +969,7 @@ namespace Patterns
  *   up your main class with dozens or more variables denoting the parameters.
  *
  *
- *   @section Future Possible future extensions
+ *   @section ParameterHandlerFuture Possible future extensions
  *   
  *   <ul>
  *   <li> Allow long input lines to be broken by appending a backslash character
@@ -1698,7 +1698,7 @@ class ParameterHandler
  *   program.
  *
  *   
- *   @section Usage Usage
+ *   @section ParameterHandlerUsage Usage
  *   
  *   The usage of this class is similar to the ParameterHandler class. First the
  *   entries and subsections have to be declared, then a loop is performed in which
@@ -1788,7 +1788,7 @@ class ParameterHandler
  *   run.
  *
  *   
- *   @section Syntax Syntax for variant and array entry values
+ *   @section ParameterHandlerUsageSyntax Syntax for variant and array entry values
  *   
  *   Variant values are specified like <tt>prefix{ v1 | v2 | v3 | ... }postfix</tt>. Whitespace
  *   to the right of the opening brace <tt>{</tt> is ignored as well as to the left of the
@@ -1801,7 +1801,7 @@ class ParameterHandler
  *   <tt>prefix{{ v1 | v2 | v3 }}postfix</tt>.
  *   
  *
- *   @section Example Worked example
+ *   @section ParameterHandlerExample Worked example
  *   
  *   Given the above extensions to the example program for the ParameterHandler and the
  *   following input file
@@ -1863,7 +1863,7 @@ class ParameterHandler
  *   the number of the run.
  *   
  *   
- *   @section References References
+ *   @section ParameterHandlerReferences References
  *   This class is inspired by the <tt>Multipleloop</tt> class of <tt>DiffPack</tt>.
  *
  *   @author Wolfgang Bangerth, October 1997
