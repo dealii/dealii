@@ -10,7 +10,8 @@
 SolverControl::SolverControl (const unsigned int maxiter,
 			      const double tolerance,
 			      const bool log_history,
-			      const bool log_result) :
+			      const bool log_result)
+		:
 		maxsteps(maxiter),
 		tol(tolerance),
 		lvalue(1.e300),
@@ -75,8 +76,11 @@ SolverControl::last_step() const
 
 ReductionControl::ReductionControl(const unsigned int n,
 				   const double tol,
-				   const double red) :
-		SolverControl (n, tol),
+				   const double red,
+				   const bool log_history,
+				   const bool log_result)
+		:
+		SolverControl (n, tol, log_history, log_result),
 		reduce(red)
 {};
 

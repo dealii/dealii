@@ -166,7 +166,10 @@ class SolverControl : public Subscriptor
  * class) is reduced by a given factor. This is useful in cases where
  * you don't want to solve exactly, but rather want to gain two digits.
  */
-class ReductionControl : public SolverControl {
+class ReductionControl
+  :
+  public SolverControl
+{
   public:
 				     /**
 				      * Constructor.  Provide the
@@ -176,7 +179,9 @@ class ReductionControl : public SolverControl {
 				      */
     ReductionControl (const unsigned int maxiter,
 		      const double tolerance,
-		      const double reduce);
+		      const double reduce,
+		      const bool log_history = false,
+		      const bool log_result = true);
 
 				     /**
 				      * Virtual destructor is needed
