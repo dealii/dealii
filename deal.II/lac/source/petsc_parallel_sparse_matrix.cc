@@ -415,22 +415,29 @@ namespace PETScWrappers
                                            //
                                            // note that we actually have to
                                            // set the entries to something
-                                           // non-zero!
-          for (unsigned int i=local_row_start; i<local_row_end; ++i)
-            for (unsigned int j=0; j<sparsity_pattern.row_length(i);
-                 ++j)
+                                           // non-zero! do the allocation one
+                                           // row at a time
+          {
+            const std::vector<PetscScalar>
+              values (sparsity_pattern.max_entries_per_row(),
+                      1.);
+            
+            for (unsigned int i=local_row_start; i<local_row_end; ++i)
               {
                 const int petsc_i = i;
-                const int petsc_j = sparsity_pattern.column_number(i,j);
-                const double value = 1;
-                MatSetValues (matrix, 1, &petsc_i, 1, &petsc_j,
-                              &value, INSERT_VALUES);
+                MatSetValues (matrix, 1, &petsc_i,
+                              sparsity_pattern.row_length(i),
+                              &colnums_in_window[rowstart_in_window[i-local_row_start]],
+                              &values[0], INSERT_VALUES);
               }
+          }
+          
           compress ();
 
                                            // set the dummy entries set above
                                            // back to zero
           *this = 0;
+          compress ();
           
 #endif
 
