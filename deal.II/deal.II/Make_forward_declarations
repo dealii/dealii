@@ -57,8 +57,12 @@ sub parse_class_declarations {
 	    # we look for declarations, where after the name comes a colon
 	    # or an open-brace, maybe also a semicolon or just nothing
 	    if (($rest =~ /^\s*[:\{;]/) || ($rest =~ /^\s*$/)) {
-#		print "$_";
-		print "$basepart $name;\n";
+		$declaration = $basepart . " " . $name;
+		# strip double spaces etc.
+		$declaration =~ s/\s\s+/ /g;
+		$declaration =~ s/^\s+//g;
+		$declaration =~ s/\s+$//g;
+		print $declaration, ";\n";
 	    }
 	}
     }
