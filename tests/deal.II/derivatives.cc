@@ -56,7 +56,7 @@ check (const unsigned int level,
 {
   Triangulation<dim> tr;
 
-  CosineFunction<dim> cosine;
+  Functions::CosineFunction<dim> cosine;
   
   DoFHandler<dim> dof(tr);
   if (dim==2)
