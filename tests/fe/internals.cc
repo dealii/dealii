@@ -15,6 +15,7 @@
 #include <fe/fe_values.h>
 #include <vector>
 #include <fstream>
+#include <iomanip>
 #include <string>
 
 template <int dim>
@@ -35,7 +36,7 @@ check_support (FiniteElement<dim>& finel, const char* name)
   cout << name << '<' << dim << '>' << " cell support points" << endl;
   
   for (unsigned int k=0;k<cell_points.size();++k)
-    cout << cell_points[k] << endl;
+    cout << setprecision(3) << cell_points[k] << endl;
   
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
     {
@@ -44,7 +45,7 @@ check_support (FiniteElement<dim>& finel, const char* name)
       finel.get_face_support_points (face, face_points);
       
       for (unsigned int k=0;k<face_points.size();++k)
-	cout << face_points[k] << endl;
+	cout << setprecision(3) << face_points[k] << endl;
     }
 }
 
@@ -52,6 +53,9 @@ template <int dim>
 inline void
 check_matrices (FiniteElement<dim>& fe, const char* name)
 {
+  cout << name << '<' << dim << '>' << " constraint " << endl;
+  fe.constraints().print_formatted (cout, 7, false, 10, "~");
+
   for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
     {
       cout << name << '<' << dim << '>' << " restriction " << i << endl;
