@@ -2,7 +2,7 @@
 //      $Id$   
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,7 +72,7 @@ void Polynomial::value (const double    x,
   unsigned int j_faculty=1;
   for (unsigned int j=0; j<values_size; ++j)
     {      
-      for (int k=m-1; k>=static_cast<int>(j); --k)
+      for (int k=m-2; k>=static_cast<int>(j); --k)
 	a[k]+=x*a[k+1];
       values[j]=j_faculty*a[j];
 
