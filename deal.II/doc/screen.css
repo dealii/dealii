@@ -18,13 +18,16 @@ frameset { background-color: white;
 	   frameborder: 0;
          }
 
-h1 { text-align:center;
-      color:#0000A0;
-   }
+h1 {
+	text-align:center;
+	color:#0000A0;
+}
 
-h1.head { text-align:center;
-          color:black;
-        }
+h1.head {
+	text-align:center;
+	font-weight: bold;
+	color:black;
+}
 
 h2 { color:#a00000;
    }
@@ -45,16 +48,20 @@ dt { font-weight: bold; }
 
 .chapter_title {}
 
-span.parhead { font-weight: bold;
-     	     } 	
+span.parhead {
+	font-weight: bold;
+} 	
 
-span.example { font-weight: bold;
-	       font-style: italic;
- 	     }
-pre.example { padding-left: 2 em;
-	      text-align: left;
-	      text-indent: 0;
-            }
+span.example {
+	font-weight: bold;
+	font-style: italic;
+}
+
+pre.example {
+	padding-left: 2 em;
+	text-align: left;
+	text-indent: 0;
+}
 	
 table.navbar { }
 
