@@ -626,10 +626,9 @@ class FE_Q : public FiniteElement<dim>
 				      * proper design.
 				      */
     static
-    void
+    std::vector<unsigned int>
     lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
-					   const unsigned int            degree,
-					   std::vector<unsigned int>    &numbering);
+					   const unsigned int            degree);
 
 				     /**
 				      * This is an analogon to the
@@ -637,9 +636,8 @@ class FE_Q : public FiniteElement<dim>
 				      * on faces.
 				      */
     static
-    void
-    face_lexicographic_to_hierarchic_numbering (const unsigned int         degree,
-						std::vector<unsigned int> &numbering);
+    std::vector<unsigned int>
+    face_lexicographic_to_hierarchic_numbering (const unsigned int degree);
 
 				     /**
 				      * Initialize the
@@ -737,7 +735,7 @@ class FE_Q : public FiniteElement<dim>
 				      * Mapping from lexicographic to
 				      * shape function numbering.
 				      */
-    std::vector<unsigned int> renumber;
+    const std::vector<unsigned int> renumber;
 
 				     /**
 				      * Inverse renumber
@@ -745,13 +743,13 @@ class FE_Q : public FiniteElement<dim>
 				      * shape function numbering to
 				      * lexicographic numbering.
 				      */
-    std::vector<unsigned int> renumber_inverse;
+    const std::vector<unsigned int> renumber_inverse;
              
 				     /**
 				      * Mapping from lexicographic to
 				      * shape function numbering on first face.
 				      */
-    std::vector<unsigned int> face_renumber;
+    const std::vector<unsigned int> face_renumber;
 
 				     /**
 				      * Pointer to the tensor
@@ -828,9 +826,12 @@ class FE_Q : public FiniteElement<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> void FE_Q<1>::initialize_unit_face_support_points ();
-template <> void FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int,
-								      std::vector<unsigned int>&);
+template <>
+void FE_Q<1>::initialize_unit_face_support_points ();
+
+template <>
+std::vector<unsigned int>
+FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)

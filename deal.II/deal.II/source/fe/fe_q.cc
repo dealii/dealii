@@ -23,6 +23,20 @@
 #include <fe/fe_values.h>
 
 
+namespace 
+{
+  std::vector<unsigned int>
+  invert_numbering (const std::vector<unsigned int> &in)
+  {
+    std::vector<unsigned int> out (in.size());
+    for (unsigned int i=0; i<in.size(); ++i)
+      out[in[i]]=i;
+    return out;
+  }
+}
+
+
+
 template <int dim>
 FE_Q<dim>::FE_Q (const unsigned int degree)
 		:
@@ -32,22 +46,11 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
                 degree(degree),
-                renumber(this->dofs_per_cell, 0),
-		renumber_inverse(this->dofs_per_cell, 0),
-		face_renumber(this->dofs_per_face, 0),
+                renumber(lexicographic_to_hierarchic_numbering (*this, degree)),
+		renumber_inverse(invert_numbering (renumber)),
+		face_renumber(face_lexicographic_to_hierarchic_numbering (degree)),
 		polynomial_space(Polynomials::LagrangeEquidistant::generate_complete_basis(degree))
 {
-				   // do some internal book-keeping on
-				   // cells and faces. if in 1d, the
-				   // face function is empty
-  lexicographic_to_hierarchic_numbering (*this, degree, renumber);
-  face_lexicographic_to_hierarchic_numbering (degree, face_renumber);
-  
-				   // build inverse of renumbering
-				   // vector
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-    renumber_inverse[renumber[i]]=i;
-
 				   // copy constraint matrices if they
 				   // are defined. otherwise leave them
 				   // at invalid size
@@ -801,11 +804,12 @@ FE_Q<dim>::get_dpo_vector(const unsigned int deg)
 
 
 template <int dim>
-void
+std::vector<unsigned int>
 FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
-						  const unsigned int            degree,
-						  std::vector<unsigned int>    &renumber)
+						  const unsigned int            degree)
 {
+  std::vector<unsigned int> renumber (fe_data.dofs_per_cell);
+  
   const unsigned int n = degree+1;
 
 
@@ -876,7 +880,8 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
-	
+
+	  Assert (index<renumber.size(), ExcInternalError());
 	  renumber[index] = i;
 	}
     };
@@ -961,6 +966,7 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 	  for (unsigned int jx = 1; jx<degree ;++jx)
 	    {
 	      unsigned int tensorindex = tensorstart + jx * incr;
+	      Assert (tensorindex<renumber.size(), ExcInternalError());
 	      renumber[tensorindex] = index++;
 	    }
 	}
@@ -1004,6 +1010,7 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 	      {
 		unsigned int tensorindex = tensorstart
 					   + jx * incx + jy * incy;
+		Assert (tensorindex<renumber.size(), ExcInternalError());
 		renumber[tensorindex] = index++;
 	      }
 	}
@@ -1018,31 +1025,34 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 		for (unsigned int jx = 1; jx<degree; jx++)
 		  {
 		    const unsigned int tensorindex = jx + jy*n + jz*n*n;
+		    Assert (tensorindex<renumber.size(), ExcInternalError());
 		    renumber[tensorindex]=index++;
 		  }  
 	  } 
     }
+
+  return renumber;
 }
 
 
 
 template <int dim>
-void
-FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int         degree,
-						       std::vector<unsigned int> &numbering)
+std::vector<unsigned int>
+FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
 {
-  FiniteElementData<dim-1> fe_data(FE_Q<dim-1>::get_dpo_vector(degree),1);
-  FE_Q<dim-1>::lexicographic_to_hierarchic_numbering (fe_data, degree, numbering); 
+  const FiniteElementData<dim-1> fe_data(FE_Q<dim-1>::get_dpo_vector(degree),1);
+  return FE_Q<dim-1>::lexicographic_to_hierarchic_numbering (fe_data, degree); 
 }
 
 
 #if (deal_II_dimension == 1)
 
 template <>
-void
-FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int,
-						     std::vector<unsigned int>&)
-{}
+std::vector<unsigned int>
+FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
+{
+  return std::vector<unsigned int>();
+}
 
 #endif
 
