@@ -18,7 +18,7 @@
 #if (deal_II_dimension == 1)
 
 template<>
-const unsigned int Mapping<deal_II_dimension>::normal_directions[2] =
+const unsigned int Mapping<1>::normal_directions[2] =
 {
   1, 0
 };
@@ -28,7 +28,7 @@ const unsigned int Mapping<deal_II_dimension>::normal_directions[2] =
 #if (deal_II_dimension == 2)
 
 template<>
-const unsigned int Mapping<deal_II_dimension>::normal_directions[4] =
+const unsigned int Mapping<2>::normal_directions[4] =
 {
   2, 0, 3, 1
 };
@@ -38,7 +38,7 @@ const unsigned int Mapping<deal_II_dimension>::normal_directions[4] =
 #if (deal_II_dimension == 3)
 
 template<>
-const unsigned int Mapping<deal_II_dimension>::normal_directions[6] =
+const unsigned int Mapping<3>::normal_directions[6] =
 {
   3, 2, 5, 0, 4, 1
 };
@@ -51,12 +51,7 @@ Mapping<dim>::~Mapping ()
 {}
 
 
-/*------------------------------ InternalData ------------------------------*/
-
-
-template <int dim>
-Mapping<dim>::InternalDataBase::~InternalDataBase ()
-{}
+/*------------------------------ InternalDataBase ------------------------------*/
 
 
 template <int dim>
@@ -67,6 +62,11 @@ Mapping<dim>::InternalDataBase::InternalDataBase ():
 		first_cell(true)
 {}
 
+
+
+template <int dim>
+Mapping<dim>::InternalDataBase::~InternalDataBase ()
+{}
 
 
 /*------------------------------ InternalData ------------------------------*/

@@ -111,6 +111,7 @@ class Mapping : public Subscriptor
 				      * Virtual destructor.
 				      */
     virtual ~Mapping ();
+    
 				     /**
 				      * Prepare internal data
 				      * structures and fill in values
@@ -129,6 +130,7 @@ class Mapping : public Subscriptor
     virtual InternalDataBase*
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const = 0;
+    
 				     /**
 				      * Prepare internal data
 				      * structure for transformation

@@ -142,6 +142,7 @@ class MappingCartesian : public Mapping<dim>
 				      * @p{p_real} on the real cell
 				      * @p{cell} and returns @p{p_real}.
 				      */
+//TODO: document meaning of mdata argument    
     virtual Point<dim> transform_unit_to_real_cell (
       const typename Triangulation<dim>::cell_iterator cell,
       const Point<dim> &p,
@@ -209,14 +210,14 @@ class MappingCartesian : public Mapping<dim>
 					 /**
 					  * Constructor.
 					  */
-	InternalData (const Quadrature<dim>& quadrature);
+	InternalData (const Quadrature<dim> &quadrature);
 
 					 /**
 					  * Length of the cell in
 					  * different coordinate
 					  * directions.
 					  */
-	std::vector<double> length;
+	Tensor<1,dim> length;
 
 					 /**
 					  * Vector of all quadrature
@@ -236,7 +237,7 @@ class MappingCartesian : public Mapping<dim>
         std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 	
 					 /**
-					  * Auxuliary vectors for internal use.
+					  * Auxiliary vectors for internal use.
 					  */
         std::vector<std::vector<Tensor<1,dim> > > aux;
     };
@@ -252,6 +253,14 @@ class MappingCartesian : public Mapping<dim>
 		       InternalData& data,
 		       std::vector<Point<dim> > &quadrature_points,
 		       std::vector<Point<dim> >& normal_vectors) const;
+
+  private:
+				     /**
+				      * Value to indicate that a given
+				      * face or subface number is
+				      * invalid.
+				      */
+    static const unsigned int invalid_face_number = static_cast<unsigned int>(-1);    
 };
 
 

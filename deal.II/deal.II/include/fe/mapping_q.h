@@ -25,7 +25,11 @@ class LagrangeEquidistant;
 
 
 //TODO: fill_fe_face_values should exist in a version doing all faces
-// to save initialization time.
+//TODO: to save initialization time.
+
+//TODO: doc: laplace_on_quad_vector, compute_laplace_on_quad, etc all
+//TODO: reference to each other, there is no description what they actually
+//TODO: do or are good for
 
 /**
  * Mapping class that uses Qp-mappings on boundary AND on inner
@@ -269,7 +273,7 @@ class MappingQ : public MappingQ1<dim>
 				      *
 				      * For @p{degree==2} this function
 				      * sets the
-				      * @p{laplace_on_quad_vector} to
+				      * @p{laplace_on_hex_vector} to
 				      * the hardcoded data. For
 				      * @p{degree>2} this vector is
 				      * computed.
@@ -358,6 +362,7 @@ class MappingQ : public MappingQ1<dim>
 				      * function. For @p{dim=1} and 2 this
 				      * function is empty.
 				      */
+//TODO: rename function to add_quad_support_points, to unify notation    
     void add_face_support_points(const typename Triangulation<dim>::cell_iterator &cell,
 				 std::vector<Point<dim> > &a) const;
     

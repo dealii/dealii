@@ -121,9 +121,11 @@ class Boundary : public Subscriptor
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
 				     /**
-				      * Return intermediate points
-				      * on the boundary line.
-				      *
+				      * Return equally spaced
+				      * intermediate points on a
+				      * boundary line.
+//TODO: this function is also called for inner lines!?
+                                      *
 				      * The number of points requested
 				      * is given by the size of the
 				      * vector @p{points}. It is the
@@ -145,8 +147,10 @@ class Boundary : public Subscriptor
 				     typename std::vector<Point<dim> > &points) const;
     
 				     /**
-				      * Return intermediate points
-				      * on the boundary quad.
+				      * Return equally spaced
+				      * intermediate points on a
+				      * boundary quad.
+//TODO: this function is also called for inner quads!?
 				      *
 				      * The number of points requested
 				      * is given by the size of the
@@ -235,8 +239,9 @@ class StraightBoundary : public Boundary<dim> {
 				      * p{n+1} partitions of equal
 				      * lengths.
 				      *
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
 				      * base class.
 				      */
     virtual void
@@ -250,8 +255,9 @@ class StraightBoundary : public Boundary<dim> {
 				      * @p{(m+1)(m+1)} subquads of equal
 				      * size.
 				      *
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
 				      * base class.
 				      */
     virtual void

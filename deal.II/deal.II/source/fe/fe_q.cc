@@ -49,6 +49,7 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 
 				   // do some internal book-keeping
   build_renumbering (*this, degree, renumber);
+//TODO: externalize this to a proper template function  
 #if deal_II_dimension > 1
   build_face_renumbering (FiniteElementData<dim-1>(FE_Q<dim-1>::get_dpo_vector(degree),1),
 			  degree,

@@ -26,10 +26,14 @@
 
 
 
+template <int dim>
+const unsigned int MappingCartesian<dim>::invalid_face_number;
+
+
+
 template<int dim>
 MappingCartesian<dim>::InternalData::InternalData (const Quadrature<dim>& q)
 		:
-		length (dim, 0.),
 		quadrature_points (q.get_points ())
 {}
 
@@ -41,6 +45,8 @@ MappingCartesian<dim>::update_once (const UpdateFlags) const
 {
   return update_default;
 }
+
+
 
 template <int dim>
 UpdateFlags
@@ -54,10 +60,11 @@ MappingCartesian<dim>::update_each (const UpdateFlags in) const
 }
 
 
+
 template <int dim>
 Mapping<dim>::InternalDataBase*
-MappingCartesian<dim>::get_data (const UpdateFlags flags,
-			  const Quadrature<dim>& q) const
+MappingCartesian<dim>::get_data (const UpdateFlags      flags,
+				 const Quadrature<dim> &q) const
 {
   Assert (flags & update_normal_vectors == 0, ExcNotImplemented());
   InternalData* data = new InternalData (q);
@@ -68,7 +75,7 @@ MappingCartesian<dim>::get_data (const UpdateFlags flags,
 template <int dim>
 Mapping<dim>::InternalDataBase*
 MappingCartesian<dim>::get_face_data (const UpdateFlags,
-			       const Quadrature<dim-1>& quadrature) const
+				      const Quadrature<dim-1>& quadrature) const
 {
   QProjector<dim> q (quadrature, false);
   InternalData* data = new InternalData (q);
@@ -80,7 +87,7 @@ MappingCartesian<dim>::get_face_data (const UpdateFlags,
 template <int dim>
 Mapping<dim>::InternalDataBase*
 MappingCartesian<dim>::get_subface_data (const UpdateFlags,
-				  const Quadrature<dim-1>& quadrature) const
+					 const Quadrature<dim-1> &quadrature) const
 {
   QProjector<dim> q (quadrature, true);
   InternalData* data = new InternalData (q);
@@ -93,45 +100,55 @@ MappingCartesian<dim>::get_subface_data (const UpdateFlags,
 template <int dim>
 void
 MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int face_no,
-				     const unsigned int sub_no,
-				     InternalData& data,
+				     const unsigned int        face_no,
+				     const unsigned int        sub_no,
+				     InternalData             &data,
 				     std::vector<Point<dim> > &quadrature_points,
-				     std::vector<Point<dim> >& normal_vectors) const
+				     std::vector<Point<dim> > &normal_vectors) const
 {
-  const UpdateFlags update_flags(data.current_update_flags());
+//TODO: does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
+  UpdateFlags update_flags(data.current_update_flags());
 
   const unsigned int npts = quadrature_points.size ();
   unsigned int offset = 0;
-  bool onface = false;
   
-  if (face_no == static_cast<unsigned int> (-1))
+  if (face_no != invalid_face_number)
     {
-      Assert (sub_no == static_cast<unsigned int> (-1), ExcInternalError());
-    } else {
-      onface = true;
 				       // Add 1 on both sides of
 				       // assertion to avoid compiler
 				       // warning about testing
 				       // unsigned int < 0 in 1d.
       Assert (face_no+1 < GeometryInfo<dim>::faces_per_cell+1,
 	      ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-      if (sub_no == static_cast<unsigned int> (-1))
+
+      if (sub_no == invalid_face_number)
+					 // called from FEFaceValues
 	offset = face_no * quadrature_points.size();
       else
 	{
+					   // called from FESubfaceValue
 	  Assert (sub_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
 		  ExcIndexRange (sub_no, 0, GeometryInfo<dim>::subfaces_per_face));
 	  offset = (face_no * GeometryInfo<dim>::subfaces_per_face + sub_no)
 		   * quadrature_points.size();
 	}
     }
-  
-				   // Compute start point and sizes along axes.
-				   // Strange vertex numbering makes this complicated again.
-  
-  Point<dim> start = cell->vertex (0);
+  else
+				     // invalid face number, so
+				     // subface should be invalid as
+				     // well
+    Assert (sub_no == invalid_face_number, ExcInternalError());
 
+				   // let @p{start} be the origin of a
+				   // local coordinate system. it is
+				   // chosen as the (lower) left
+				   // vertex
+  const Point<dim> start = cell->vertex(0);
+  
+				   // Compute start point and sizes
+				   // along axes.  Strange vertex
+				   // numbering makes this complicated
+				   // again.
   switch (dim)
     {
       case 1:
@@ -150,23 +167,34 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 	Assert(false, ExcNotImplemented());
     }
   
-  
+
+				   // transform quadrature point. this
+				   // is obtained simply by scaling
+				   // unit coordinates with lengths in
+				   // each direction
   if (update_flags & update_q_points)
     {
       Assert (quadrature_points.size() == npts,
 	      ExcDimensionMismatch(quadrature_points.size(), npts));
-      for (unsigned int i=0;i<npts;++i)
+      for (unsigned int i=0; i<npts; ++i)
 	{
-	  Point<dim> p = start;
-	  for (unsigned int d=0;d<dim;++d)
-	    p(d) += data.length[d]*data.quadrature_points[i+offset](d);
-	  quadrature_points[i] = p;
+	  quadrature_points[i] = start;
+	  for (unsigned int d=0; d<dim; ++d)
+	    quadrature_points[i](d) += data.length[d] *
+				       data.quadrature_points[i+offset](d);
 	}
     }
 
-  
+
+				   // compute normal vectors. since
+				   // cells are aligned to coordinate
+				   // axes, they are simply vectors
+				   // with exactly one entry equal to
+				   // 1 or -1
   if (update_flags & update_normal_vectors)
     {
+      Assert (normal_vectors.size() == npts,
+	      ExcDimensionMismatch(normal_vectors.size(), npts));
       Point<dim> n;
       switch (100*dim+face_no)
 	{
@@ -205,8 +233,9 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 	  default:
 		Assert (false, ExcInternalError());
 	}
-      for (unsigned int i=0;i<npts;++i)
-	normal_vectors[i] = n;
+				       // furthermore, all normal
+				       // vectors on a face are equal
+      std::fill_n (normal_vectors.begin(), normal_vectors.end(), n);
     }
   
   data.first_cell = false;
@@ -221,17 +250,25 @@ MappingCartesian<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator& cel
 				std::vector<Point<dim> >& quadrature_points,
 				std::vector<double>& JxW_values) const
 {
-  InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  InternalData &data=*data_ptr;
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
 
   typename std::vector<Point<dim> > dummy;
   
-  compute_fill (cell, static_cast<unsigned int> (-1), static_cast<unsigned int> (-1),
+  compute_fill (cell, invalid_face_number, invalid_face_number,
 		data,
 		quadrature_points,
 		dummy);
 
+				   // compute Jacobian
+				   // determinant. all values are
+				   // equal and are the product of the
+				   // local lengths in each coordinate
+				   // direction
+//TODO: does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_JxW_values)
     {
       double J = data.length[0];
@@ -247,34 +284,42 @@ MappingCartesian<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator& cel
 template <int dim>
 void
 MappingCartesian<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int       face_no,
-				     const Quadrature<dim-1> &q,
-				     typename Mapping<dim>::InternalDataBase &mapping_data,
-				     std::vector<Point<dim> >     &quadrature_points,
-				     std::vector<double>          &JxW_values,
-				     std::vector<Tensor<1,dim> >  &boundary_forms,
-				     std::vector<Point<dim> >     &normal_vectors) const
+					    const unsigned int            face_no,
+					    const Quadrature<dim-1>      &q,
+					    typename Mapping<dim>::InternalDataBase &mapping_data,
+					    std::vector<Point<dim> >     &quadrature_points,
+					    std::vector<double>          &JxW_values,
+					    std::vector<Tensor<1,dim> >  &boundary_forms,
+					    std::vector<Point<dim> >     &normal_vectors) const
 {
-  InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  InternalData &data=*data_ptr;
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
 
-  compute_fill (cell, face_no, static_cast<unsigned int> (-1),
+  compute_fill (cell, face_no, invalid_face_number,
 		data,
 		quadrature_points,
 		normal_vectors);
 
+				   // first compute Jacobian
+				   // determinant, which is simply the
+				   // product of the local lengths
+				   // since the jacobian is diagonal
   double J = 1.;
   for (unsigned int d=0;d<dim;++d)
     if (d != (normal_directions[face_no]/2))
       J *= data.length[d];
   
+//TODO: does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_JxW_values)
     {
       for (unsigned int i=0; i<JxW_values.size();++i)
 	JxW_values[i] = J * q.weight(i);
     }
 
+//TODO: does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_boundary_forms)
     {
       for (unsigned int i=0; i<boundary_forms.size();++i)
@@ -295,26 +340,34 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::c
 					std::vector<Tensor<1,dim> >  &boundary_forms,
 					std::vector<Point<dim> >     &normal_vectors) const
 {
-  InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  InternalData &data=*data_ptr;
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
 
   compute_fill (cell, face_no, sub_no,
 		data,
 		quadrature_points,
 		normal_vectors);
 
+				   // first compute Jacobian
+				   // determinant, which is simply the
+				   // product of the local lengths
+				   // since the jacobian is diagonal
   double J = 1.;
   for (unsigned int d=0;d<dim;++d)
     if (d != (normal_directions[face_no]/2))
       J *= data.length[d];
   
+//TODO: does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_JxW_values)
     {
       for (unsigned int i=0; i<JxW_values.size();++i)
 	JxW_values[i] = J * q.weight(i) / GeometryInfo<dim>::subfaces_per_face;
     }
 
+//TODO: does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_boundary_forms)
     {
       for (unsigned int i=0; i<boundary_forms.size();++i)
@@ -328,13 +381,13 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::c
 template <>
 void
 MappingCartesian<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &,
-				   const unsigned,
-				   const Quadrature<0>&,
-				   Mapping<1>::InternalDataBase&,
-				   std::vector<Point<1> >&,
-				   std::vector<double>&,
-				   std::vector<Tensor<1,1> >&,
-				   std::vector<Point<1> >&) const
+					  const unsigned,
+					  const Quadrature<0>&,
+					  Mapping<1>::InternalDataBase&,
+					  std::vector<Point<1> >&,
+					  std::vector<double>&,
+					  std::vector<Tensor<1,1> >&,
+					  std::vector<Point<1> >&) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -343,14 +396,14 @@ MappingCartesian<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &,
 template <>
 void
 MappingCartesian<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
-				      const unsigned,
-				      const unsigned,
-				      const Quadrature<0>&,
-				      Mapping<1>::InternalDataBase&,
-				      std::vector<Point<1> >&,
-				      std::vector<double>&,
-				      std::vector<Tensor<1,1> >&,
-				      std::vector<Point<1> >&) const
+					     const unsigned,
+					     const unsigned,
+					     const Quadrature<0>&,
+					     Mapping<1>::InternalDataBase&,
+					     std::vector<Point<1> >&,
+					     std::vector<double>&,
+					     std::vector<Tensor<1,1> >&,
+					     std::vector<Point<1> >&) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -407,6 +460,8 @@ Point<dim> MappingCartesian<dim>::transform_unit_to_real_cell (
   const Point<dim> &p,
   const typename Mapping<dim>::InternalDataBase *const m_data) const
 {
+//TODO: wouldn't it be simpler in this function to compute local lengths ourselved, rather than relying on an InternalDataBase object?
+  
 				   // If m_data!=0 use this
 				   // InternalData.
 				   //
@@ -432,12 +487,19 @@ Point<dim> MappingCartesian<dim>::transform_unit_to_real_cell (
     mdata = dynamic_cast<const InternalData *> (m_data);
   Assert(mdata!=0, ExcInternalError());
 
+//TODO: don't we need to reinit() mdata on the present cell or initialize the mdata->length array in some other way?
+  
 				   // use now the InternalData, that
 				   // mdata is pointing to, to compute
-				   // the point in real space.
+				   // the point in real space. it is
+				   // simply a scaled version of the
+				   // unit cell point shifted by the
+				   // (lower) left corner of the cell
   Point<dim> p_real = cell->vertex(0);
-  for (unsigned int d=0;d<dim;++d)
+  for (unsigned int d=0; d<dim; ++d)
     p_real(d) += mdata->length[d]*p(d);
+
+//TODO: memory leak: if initially mdata==0, then an object is created but never deleted. see mapping_q1 for a better implementation  
   return p_real;
 }
 
@@ -448,7 +510,7 @@ Point<dim> MappingCartesian<dim>::transform_real_to_unit_cell (
   const typename Triangulation<dim>::cell_iterator cell,
   const Point<dim> &p) const
 {
-  const Point<dim>& start =  cell->vertex (0);
+  const Point<dim> &start = cell->vertex(0);
   Point<dim> real = p;
   real -= start;
 
@@ -479,30 +541,36 @@ template <typename tensor_>
 inline
 void
 MappingCartesian<dim>::contravariant_transformation (std::vector<tensor_>       &dst,
-					      const std::vector<tensor_> &src,
-					      const Mapping<dim>::InternalDataBase &mapping_data,
-					      const unsigned int src_offset) const
+						     const std::vector<tensor_> &src,
+						     const Mapping<dim>::InternalDataBase &mapping_data,
+						     const unsigned int src_offset) const
 {
   Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());
-  const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
+
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_contravariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
-  typename std::vector<tensor_>::const_iterator vec = src.begin() + src_offset;
-  typename std::vector<tensor_>::iterator result = dst.begin();
-  typename std::vector<tensor_>::const_iterator end = dst.end();
+  typename std::vector<tensor_>::const_iterator vec    = src.begin() + src_offset;
+  typename std::vector<tensor_>::iterator       result = dst.begin();
+  typename std::vector<tensor_>::const_iterator end    = dst.end();
   
+				   // simply scale by Jacobian
+				   // (which is diagonal here)
   while (result!=end)
     {
-      for (unsigned int d=0;d<dim;++d)
+      for (unsigned int d=0; d<dim; ++d)
 	(*result)[d] = (*vec)[d]*data.length[d];
-      vec++;
-      result++;
+      ++vec;
+      ++result;
     }
 }
+
 
 
 template <int dim>
@@ -510,22 +578,27 @@ template <typename tensor_>
 inline
 void
 MappingCartesian<dim>::covariant_transformation (std::vector<tensor_>       &dst,
-					  const std::vector<tensor_> &src,
-					  const Mapping<dim>::InternalDataBase &mapping_data,
-					  const unsigned int src_offset) const
+						 const std::vector<tensor_> &src,
+						 const Mapping<dim>::InternalDataBase &mapping_data,
+						 const unsigned int src_offset) const
 {
   Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());
-  const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
+
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   
-  typename std::vector<tensor_>::const_iterator vec = src.begin() + src_offset;
-  typename std::vector<tensor_>::iterator result = dst.begin();
-  typename std::vector<tensor_>::const_iterator end = dst.end();
-  
+  typename std::vector<tensor_>::const_iterator vec    = src.begin() + src_offset;
+  typename std::vector<tensor_>::iterator       result = dst.begin();
+  typename std::vector<tensor_>::const_iterator end    = dst.end();
+
+				   // simply scale by inverse Jacobian
+				   // (which is diagonal here)
   while (result!=end)
     {
       for (unsigned int d=0;d<dim;++d)
@@ -538,6 +611,7 @@ MappingCartesian<dim>::covariant_transformation (std::vector<tensor_>       &dst
 
 
 //----------------------------------------------------------------------//
+// explicit instantiations
 
 template class MappingCartesian<deal_II_dimension>;
 

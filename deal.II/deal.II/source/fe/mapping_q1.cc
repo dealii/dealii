@@ -864,6 +864,7 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
       mdata=mdata_local;
     }
   else
+//TODO: can we assume that m_data->mapping_support_points is initialized    
     mdata = dynamic_cast<const InternalData *> (m_data);
   Assert(mdata!=0, ExcInternalError());
 

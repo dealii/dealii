@@ -60,7 +60,9 @@ FE_DGQ<dim>::FE_DGQ (unsigned int degree)
       poly = new TensorProductPolynomials<dim> (v);
     }
 
-				   // generate permutation/rotation index sets to generate some matrices from others
+				   // generate permutation/rotation
+				   // index sets to generate some
+				   // matrices from others
   std::vector<unsigned int> right;
   std::vector<unsigned int> top;
   rotate_indices (right, 'Z');
