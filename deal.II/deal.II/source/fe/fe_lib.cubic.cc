@@ -537,7 +537,7 @@ void FECubicSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &c
 
 template <>
 FECubicSub<2>::FECubicSub () :
-		FiniteElement<2> (1, 1, 1)
+		FiniteElement<2> (1, 2, 4)
 {
   interface_constraints(0,0) = -1.0/16.0;
   interface_constraints(0,1) = -1.0/16.0;

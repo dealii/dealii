@@ -316,7 +316,7 @@
 
 template <>
 FEQuarticSub<1>::FEQuarticSub () :
-		FiniteElement<1> (1, 2) {
+		FiniteElement<1> (1, 3) {
   prolongation[0](0,0) = 1.0;
   prolongation[0](0,1) = 0.0;
   prolongation[0](0,2) = 0.0;
@@ -550,7 +550,7 @@ void FEQuarticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator 
 
 template <>
 FEQuarticSub<2>::FEQuarticSub () :
-		FiniteElement<2> (1, 1, 1)
+		FiniteElement<2> (1, 3, 9)
 {
   interface_constraints(0,3) = 1.0;
   interface_constraints(1,0) = 35.0/128.0;
