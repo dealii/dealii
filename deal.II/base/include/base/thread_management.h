@@ -4250,6 +4250,24 @@ namespace Threads
 
 
   
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+  typename FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
+  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7))
+  {
+    return fun_ptr;
+  };
+
+
+  
+  template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
+  typename FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
+  encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8))
+  {
+    return fun_ptr;
+  };
+
+
+  
   template <class Class>
   typename MemFunData0<Class,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)())
