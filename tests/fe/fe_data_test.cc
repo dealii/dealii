@@ -28,6 +28,7 @@ void test_fe_datas()
 {
   std::vector<FiniteElement<dim> *> fe_datas;
   fe_datas.push_back(new FE_Q<dim> (1));
+  fe_datas.push_back(new FE_Q<dim> (2));
   fe_datas.push_back(new FE_Q<dim> (4));
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (2), 2));
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
@@ -75,6 +76,15 @@ void test_fe_datas()
       deallog << "dofs_per_face=" << fe_data->dofs_per_face << std::endl;
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
       deallog << "components=" << fe_data->components << std::endl;
+
+      for (unsigned int f=0;f<GeometryInfo<dim>>faces_per_cell;++f)
+	{
+	  deallog << "support on face " << f << ':';
+	  for (unsigned int s=0;s<fe_data->dofs_per_cell;++s)
+	    if (fe_datas[n]->has_support_on_face(s, f))
+	      deallog << '\t' << s;
+	  deallog << std::endl;
+	}
     }
 
 				   // delete all FiniteElementDatas
