@@ -137,6 +137,12 @@ class Vector {
 				      *  U = V            . Copy all components
 				      */
     Vector<Number>& operator= (const Vector<Number>& V);
+
+				     /**
+				      * U = V for different types.
+				      */
+    template<typename Number2>
+    Vector<Number>& operator= (const Vector<Number2>& V);
     
 				     /**
 				      *  U = U * V        . Scalar Produkt

@@ -526,10 +526,26 @@ Vector<Number>& Vector<Number>::operator = (const Number s)
 
 
 template <typename Number>
-Vector<Number>& Vector<Number>::operator = (const Vector<Number>& v)
+Vector<Number>&
+Vector<Number>::operator = (const Vector<Number>& v)
 {
   if (v.dim != dim)
     reinit (v.dim, true);
+  if (dim!=0)
+    copy (v.begin(), v.end(), begin());
+  
+  return *this;
+}
+
+
+
+template <typename Number>
+template<typename Number2>
+Vector<Number>&
+Vector<Number>::operator = (const Vector<Number2>& v)
+{
+  if (v.size() != dim)
+    reinit (v.size(), true);
   if (dim!=0)
     copy (v.begin(), v.end(), begin());
   
