@@ -179,6 +179,27 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 
 
 
+template <int dim>
+void Triangulation<dim>::block_write (ostream &out) const 
+{
+				   // write out the level information
+  out << levels.size() << endl << '[';
+  for (unsigned int level=0; level<levels.size(); ++level)
+    levels[level]->block_write (out);
+  out << ']';
+  
+				   // write out the vertices
+  out << '[';
+  out.write (reinterpret_cast<const char*>(vertices.begin()),
+	     reinterpret_cast<const char*>(vertices.end())
+	     - reinterpret_cast<const char*>(vertices.begin()));
+  out << ']';
+
+  write_bool_vector (0, vertices_used, 0, out);
+};
+
+  
+
 #if deal_II_dimension == 1
 
 template <>
@@ -3697,8 +3718,8 @@ void Triangulation<1>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
   AssertThrow (out, ExcIO());
   
-  out << cell->vertex(0) << " " << cell->level() << endl
-      << cell->vertex(1) << " " << cell->level() << endl
+  out << cell->vertex(0) << ' ' << cell->level() << endl
+      << cell->vertex(1) << ' ' << cell->level() << endl
       << endl;
 
   AssertThrow (out, ExcIO());
@@ -3714,11 +3735,11 @@ void Triangulation<2>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
   AssertThrow (out, ExcIO());
   
-  out << cell->vertex(0) << " " << cell->level() << endl
-      << cell->vertex(1) << " " << cell->level() << endl
-      << cell->vertex(2) << " " << cell->level() << endl
-      << cell->vertex(3) << " " << cell->level() << endl
-      << cell->vertex(0) << " " << cell->level() << endl
+  out << cell->vertex(0) << ' ' << cell->level() << endl
+      << cell->vertex(1) << ' ' << cell->level() << endl
+      << cell->vertex(2) << ' ' << cell->level() << endl
+      << cell->vertex(3) << ' ' << cell->level() << endl
+      << cell->vertex(0) << ' ' << cell->level() << endl
       << endl  // double new line for gnuplot 3d plots
       << endl;
 
@@ -3736,32 +3757,32 @@ void Triangulation<3>::print_gnuplot (ostream &out,
   AssertThrow (out, ExcIO());
 
 				   // front face
-  out << cell->vertex(0) << " " << cell->level() << endl
-      << cell->vertex(1) << " " << cell->level() << endl
-      << cell->vertex(2) << " " << cell->level() << endl
-      << cell->vertex(3) << " " << cell->level() << endl
-      << cell->vertex(0) << " " << cell->level() << endl
+  out << cell->vertex(0) << ' ' << cell->level() << endl
+      << cell->vertex(1) << ' ' << cell->level() << endl
+      << cell->vertex(2) << ' ' << cell->level() << endl
+      << cell->vertex(3) << ' ' << cell->level() << endl
+      << cell->vertex(0) << ' ' << cell->level() << endl
       << endl;
 				   // back face
-  out << cell->vertex(4) << " " << cell->level() << endl
-      << cell->vertex(5) << " " << cell->level() << endl
-      << cell->vertex(6) << " " << cell->level() << endl
-      << cell->vertex(7) << " " << cell->level() << endl
-      << cell->vertex(4) << " " << cell->level() << endl
+  out << cell->vertex(4) << ' ' << cell->level() << endl
+      << cell->vertex(5) << ' ' << cell->level() << endl
+      << cell->vertex(6) << ' ' << cell->level() << endl
+      << cell->vertex(7) << ' ' << cell->level() << endl
+      << cell->vertex(4) << ' ' << cell->level() << endl
       << endl;
 
 				   // now for the four connecting lines
-  out << cell->vertex(0) << " " << cell->level() << endl
-      << cell->vertex(4) << " " << cell->level() << endl
+  out << cell->vertex(0) << ' ' << cell->level() << endl
+      << cell->vertex(4) << ' ' << cell->level() << endl
       << endl;
-  out << cell->vertex(1) << " " << cell->level() << endl
-      << cell->vertex(5) << " " << cell->level() << endl
+  out << cell->vertex(1) << ' ' << cell->level() << endl
+      << cell->vertex(5) << ' ' << cell->level() << endl
       << endl;
-  out << cell->vertex(2) << " " << cell->level() << endl
-      << cell->vertex(6) << " " << cell->level() << endl
+  out << cell->vertex(2) << ' ' << cell->level() << endl
+      << cell->vertex(6) << ' ' << cell->level() << endl
       << endl;
-  out << cell->vertex(3) << " " << cell->level() << endl
-      << cell->vertex(7) << " " << cell->level() << endl
+  out << cell->vertex(3) << ' ' << cell->level() << endl
+      << cell->vertex(7) << ' ' << cell->level() << endl
       << endl;
 
   AssertThrow (out, ExcIO());
@@ -7047,7 +7068,7 @@ void Triangulation<3>::delete_cell (cell_iterator &cell) {
 	make_pair(cell->line(7), false),
 	make_pair(cell->line(8), false),
 	make_pair(cell->line(9), false),
-	make_pair(cell->line(0), false),
+	make_pair(cell->line(10), false),
 	make_pair(cell->line(11), false)  };
 				   // next make a map out of this for simpler
 				   // access to the flag associated with a
@@ -7081,7 +7102,7 @@ void Triangulation<3>::delete_cell (cell_iterator &cell) {
 	      line_is_needed[cell->face(nb)->line(i)] = true;
 	    };
 					   // ok for this neighbor
-	  break;
+	  continue;
 	};
 
 				       // if the neighbor is not refined,
@@ -7128,8 +7149,6 @@ void Triangulation<3>::delete_cell (cell_iterator &cell) {
 	      };
 	};
     };
-
-  Assert (line_is_needed.size()==12, ExcInternalError());
 
   
 				   // now, if the lines are not marked as
@@ -7178,9 +7197,9 @@ void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
 				   // 1. number of flags
 				   // 2. the flags
 				   // 3. magic number
-  out << magic_number1 << " " << N << endl;
+  out << magic_number1 << ' ' << N << endl;
   for (unsigned int i=0; i<N/8+1; ++i) 
-    out << static_cast<unsigned int>(flags[i]) << " ";
+    out << static_cast<unsigned int>(flags[i]) << ' ';
   
   out << endl << magic_number2 << endl;
   
