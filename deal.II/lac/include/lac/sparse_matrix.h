@@ -1302,6 +1302,16 @@ SparseMatrixStruct::column_number (const unsigned int row,
 
   return colnums[rowstart[row]+index];
 }
+
+
+inline
+unsigned int
+SparseMatrixStruct::n_nonzero_elements () const
+{
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
+  Assert (compressed, ExcNotCompressed());
+  return rowstart[rows]-rowstart[0];
+};
  
 
 template <typename number>

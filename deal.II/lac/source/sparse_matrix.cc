@@ -553,11 +553,4 @@ SparseMatrixStruct::bandwidth () const
 
 
 
-unsigned int
-SparseMatrixStruct::n_nonzero_elements () const {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  Assert (compressed, ExcNotCompressed());
-  return rowstart[rows]-rowstart[0];
-};
-
 
