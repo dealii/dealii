@@ -333,14 +333,14 @@ class DataIn {
  *     scale the cell vector there is the method #color#. It is called
  *     with the actual value of the cell, the maximum and the minimum
  *     value of a cell in the cell vector. It returns three values for
- *     red, green and blue. If there no cell_data vector than there is
+ *     red, green and blue. If there no #cell_data# vector than there is
  *     transparent shading.
  *   \item[LightShaded] just shades the plot. This is controlled by
  *     the vector #light# which stores the direction of the light 
  *     beams. This is done only if there is height information.
  *   \item[DefaultShading] is controlled by presence of different
  *     vectors. If there no height information then do no
- *     shading. Otherwise if there is cell_data use this for shading.
+ *     shading. Otherwise if there is #cell_data# use this for shading.
  *     Otherwise do light shading.
  * \end{enumerate}
  *

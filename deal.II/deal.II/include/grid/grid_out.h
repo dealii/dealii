@@ -325,7 +325,7 @@ class GridOut
     {
 					 /**
 					  * Angle of the line origin-viewer
-					  * against the z-axis in degrees
+					  * against the z-axis in degrees.
 					  *
 					  * Default is the Gnuplot-default
 					  * of 60.
