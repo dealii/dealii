@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II news page</title>
+    <meta name="author" content="Guido Kanschat">
+    <meta name="keywords" content="deal.II"></head>
+
+<body>
+<h2>Changes after Version 3.0</h2>
+<h3>General</h3>
+<ol>
+
+  <li> Fix: <code class="program">configure</code> now uses <code
+  class="program">config.guess</code> to determine the operating
+  system and hardware platform.
+
+</ol>
+
+<h3>base</h3>
+
+<h3>lac</h3>
+
+<ol>
+  <li> Fix: <code class="class">SolverCG</code> counts steps properly.
+
+  <li> New: <code class="class">Solver*</code>: There is a virtual function
+  <code>print_vectors</code> called in every step. It is void in the
+  solver itself but can be used to print intermediate iteration
+  vectors
+
+</ol>
+<h3>deal.II</h3>
+
+<ol>
+  <li> New: <code class="member">DataOut::clear_data_vectors</code>
+  allows to re-use an object without deleting the <code
+  class="class">DoFHandler</code>
+
+  <li> New: <code class="class">class DoFPrintSolverStep</code> prints intermediate
+  vectors of a solver as finite element functions using
+  <code class="class">DataOut</code>.
+
+</ol>

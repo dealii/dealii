@@ -34,3 +34,6 @@ pre.example { padding-left: 2 em;
 	
 table.navbar { }
 
+code.program { color: #700000; }
+code.class { color: #009000; }
+code.member { color: #006000; }
