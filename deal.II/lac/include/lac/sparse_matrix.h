@@ -231,6 +231,10 @@ namespace internals
                                           */
         template <typename, bool>
         friend class internals::SparseMatrixIterators::Iterator;
+
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
+        friend class Reference;
+#endif
     };
     
 
