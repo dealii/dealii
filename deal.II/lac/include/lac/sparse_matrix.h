@@ -816,7 +816,7 @@ class SparseMatrix : public Subscriptor
 				      * Access to values in internal
 				      * mode.  Returns the value of
 				      * the #index#th entry in
-				      * #row#. Here, #index refers to
+				      * #row#. Here, #index# refers to
 				      * the internal representation of
 				      * the matrix, not the column. Be
 				      * sure to understand what you are
