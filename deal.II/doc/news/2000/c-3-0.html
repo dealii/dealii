@@ -200,6 +200,27 @@
 
 <ol>
   <li> <p>
+       New: class <code class="class">FETools</code> performs
+       interpolations and extrapolations of discrete functions from one
+       <code class="class">FiniteElement</code> to another <code
+       class="class">FiniteElement</code>. It also provides the local
+       interpolation matrices that interpolate on each
+       cell. Furthermore it provides the interpolation difference
+       matrix id-I<sub>h</sub> that is needed for evaluating
+       (id-I<sub>h</sub>)z for e.g. the dual solution z.
+       </p>
+
+       <p>
+       Removed: The obsolete 
+       <code class="member">MatrixCreator::create_interpolation_matrix</code>
+       function now removed.
+       </p>
+
+       <p>
+       (Ralf Hartmann 2000/05/26)
+       </p>
+
+  <li> <p>
        New: <code class="member">DoFTools::make_flux_sparsity_pattern</code>
        can be optimized by providing two coefficient matrices.
        <br>
