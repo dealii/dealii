@@ -1019,13 +1019,12 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				       // coloring; level 0 is black,
 				       // other levels are blue
 				       // ... red
-      double levelscale  = 0.66666/std::max(1U,(max_level-1));
-      
-      out  << "/l  { neg "
-	   << (max_level)
-	   << " add "
-	   << levelscale
-	   << " mul 1 0.8 sethsbcolor} def" << std::endl;
+      if (eps_flags_base.color_lines_level)
+	out  << "/l  { neg "
+	     << (max_level)
+	     << " add "
+	     << (0.66666/std::max(1U,(max_level-1)))
+	     << " mul 1 0.8 sethsbcolor} def" << std::endl;
 
 				       // in 2d, we can also plot cell
 				       // and vertex numbers, but this
@@ -1066,7 +1065,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
   
   for (LineList::const_iterator line=line_list.begin();
        line!=line_list.end(); ++line)
-    if (eps_flags_base.color_lines_level && line-> level > 0)
+    if (eps_flags_base.color_lines_level && (line->level > 0))
 				       // lines colored according to
 				       // refinement level,
 				       // contributed by Jörg
