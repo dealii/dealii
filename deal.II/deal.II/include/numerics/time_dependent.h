@@ -14,9 +14,168 @@
 
 
 
+/**
+ * This class provides an abstract interface to time dependent method in that
+ * it addresses some of the most annoying aspects of this class of problems:
+ * data management. These problems frequently need large amounts of computer
+ * ressources, most notably computing time, main memory and disk space.
+ * Main memory reduction is often the most pressing need, methods to implement
+ * it are almost always quite messy, though, quickly leading to code that
+ * stores and reloads data at places scattered all over the program, and
+ * which becomes unmaintanable sometimes. The present class tries to offer
+ * a more structured interface, albeit simple, which emerged in my mind after
+ * messing with my wave equation simulation for several months.
+ *
+ * The design of this class is mostly tailored for the solution of time
+ * dependent partial differential equations where the computational
+ * meshes may differ between each two timesteps and where the computations
+ * on each time step take a rather long time compared with the overhead
+ * of this class. Since no reference to the class of problems is made within
+ * this class, it is not restricted to PDEs, though, and it seems likely that
+ * a solver for large ordinary matrix differential equations may successfully
+ * use the same setup and therefore this class.
+ *
+ *
+ * \subsection{Overview}
+ *
+ * The general structure of a time dependent problem solver using a timestepping
+ * scheme is about the following: we have a collection of time step objects
+ * on which we solve out problem subsequently. In order to do so, we need
+ * knowledge of the data on zero or several previous timesteps (when using single
+ * or multiple step methods, that is) and maybe also some data of time steps
+ * ahead (for example the computational grid on these). Dependening on the
+ * problem in question, a second loop over all timesteps may be done solving
+ * a dual problem, where the loop may run forward (one dual problem for each
+ * time step) or backward (using a global dual problem). Within one of these
+ * loops or using a separate loop, error estimators may be computed and the
+ * grids may be refined. Each of these loops are initiated by a call preparing
+ * each timestep object for the next loop, before actually starting the loop
+ * itself.
+ *
+ * We will denote a complete set of all these loops with the term "sweep".
+ * Since this library is mostly about adaptive methods, it is likely that the
+ * last loop within a sweep will generate refined meshes and that we will
+ * perform another sweep on these refined meshes. A total run will therefore
+ * often be a sequence of several sweeps. The global setup therefore looks
+ * like this:
+ * \begin{verbatim}
+ *    for sweep=0 to n_sweeps-1
+ *      for i=0 to n_timesteps-1
+ *        prepare timestep i for loop 0
+ *      for i=0 to n_timesteps-1
+ *        perform loop 0 on timestep i   (e.g. solve primal problem)
+ *
+ *    for sweep=0 to n_sweeps-1
+ *      for i=0 to n_timesteps-1
+ *        prepare timestep i for loop 1
+ *      for i=0 to n_timesteps-1
+ *        perform loop 1 on timestep i   (e.g. solve dual problem)
+ *
+ *    for sweep=0 to n_sweeps-1
+ *      for i=0 to n_timesteps-1
+ *        prepare timestep i for loop 2
+ *      for i=0 to n_timesteps-1
+ *        perform loop 2 on timestep i   (e.g. compute error information)
+ *
+ *    ...
+ * \end{verbatim}
+ * The user may specify that a loop shall run forward or backward (the latter
+ * being needed for the solution of global dual problems, for example).
+ *
+ * Going from the global overview to a more local viewpoint, we note that when
+ * a loop visits one timestep (e.g. to solve the primal or dual problem, or
+ * to compute error information), we need information on this, one or more
+ * previous time steps and zero or more timesteps in the future. However,
+ * often it is not needed to know all information from these timesteps and
+ * it is often a computational requirement to delete data at the first
+ * possible time when it is no more needed. Likewise, data should be reloaded
+ * at the latest time possible.
+ *
+ * In order to facilitate these principles, the concept of waking up and
+ * letting sleep a time step object was developed. Assume we have a time
+ * stepping scheme which needs to look ahead one time step and needs the
+ * data of the last two time steps, the following pseudocode described
+ * what the centeral loop function of this class will do when we move
+ * from timestep #n-1# to timestep #n#:
+ * \begin{verbatim}
+ *   wake up timestep n+1 with signal 1
+ *   wake up timestep n with signal 0
+ *   do computation on timestep n
+ *   let timestep n sleep with signal 0
+ *   let timestep n-1 sleep with signal 1
+ *   let timestep n-2 sleep with signal 2
+ *
+ *   move from n to n+1
+ * \end{verbatim}
+ * The signal number here denotes the distance of the timestep being sent
+ * the signal to the timestep where computations are done on. The calls to
+ * the #wake_up# and #sleep# functions with signal 0 could in principle
+ * be absorbed into the function doing the computation; we use these
+ * redundant signals, however, in order to separate computations and data
+ * management from each other, allowing to put all stuff around grid
+ * management, data reload and storage into one set of functions and
+ * computations into another.
+ *
+ * In the example above, possible actions might be: timestep #n+1# rebuilds
+ * the computational grid (there is a specialized class which can do this
+ * for you); timestep #n# builds matrices sets solution vectors to the right
+ * size, maybe using an initial guess; then it does the computations; then
+ * it deletes the matrices since they are not needed by subsequent timesteps;
+ * timestep #n-1# deletes those data vectors which are only needed by one
+ * timestep ahead; timestep #n-2# deletes the remaining vectors and deletes
+ * the computational grid, somewhere storing information how to rebuild it
+ * eventually.
+ *
+ * From the given sketch above, it is clear that each time step object sees
+ * the following sequence of events:
+ * \begin{verbatim}
+ *   wake up with signal 1
+ *   wake up signal 0
+ *   do computation
+ *   sleep with signal 0
+ *   sleep with signal 1
+ *   sleep with signal 2
+ * \end{verbatim}
+ * This pattern is repeated for each loop in each sweep.
+ *
+ * For the different loops within each sweep, the numbers of timesteps
+ * to look ahead (i.e. the maximum signal number to the #wake_up# function)
+ * and the look-behind (i.e. the maximum signal number to the #sleep#
+ * function) can be chosen separately. For example, it is usually only
+ * needed to look one time step behind when computing error estimation
+ * (in some cases, it may vene be possible to not look ahead or back
+ * at all, in which case only signals zero will be sent), while one
+ * needs a look back of at least one for a timestepping method.
+ *
+ * Finally, a note on the direction of look-ahead and look-back is in
+ * place: look-ahead always refers to the direction the loop is running
+ * in, i.e. for loops running forward, #wake_up# is called for timestep
+ * objects with a greater time value than the one previously computed on,
+ * while #sleep# is called for timesteps with a lower time. If the loop
+ * runs in the opposite direction, e.g. when solving a global dual
+ * problem, this order is reversed.
+ *
+ *
+ * \subsection{Implementation}
+ *
+ * Still to be written.
+ *
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
 class TimeDependent 
 {
   public:
+				     /**
+				      * Structure holding the two basic
+				      * entities that control a loop over
+				      * all time steps: how many time steps
+				      * ahead of the present one we shall
+				      * start waking up timestep objects
+				      * and how many timesteps behind
+				      * we shall call their #sleep#
+				      * method.
+				      */
     struct TimeSteppingData
     {
 					 /**
@@ -691,7 +850,7 @@ class TimeStepBase : public Subscriptor
  * memory resources are a point, through the #sleep# and #wake_up# functions
  * declared in the base class.
  *
- * In ddition to that, it offers a function which do some rather hairy refinement
+ * In addition to that, it offers a function which do some rather hairy refinement
  * rules for time dependent problems. trying to avoid to much change in the grids
  * between subsequent time levels, while also trying to retain the freedom of
  * refining each grid separately. There are lots of flags and numbers controlling
