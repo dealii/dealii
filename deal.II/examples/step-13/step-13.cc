@@ -49,6 +49,7 @@
 #include <numerics/error_estimator.h>
 
 				 // Now for the C++ standard headers:
+#include <iostream>
 #include <fstream>
 #include <list>
 
@@ -899,10 +900,10 @@ namespace LaplaceSolver
 
       void assemble_linear_system (LinearSystem &linear_system);
 
-      void assemble_matrix (LinearSystem                                &linear_system,
-			    const DoFHandler<dim>::active_cell_iterator &begin_cell,
-			    const DoFHandler<dim>::active_cell_iterator &end_cell,
-			    Threads::ThreadMutex                        &mutex) const      ;
+      void assemble_matrix (LinearSystem                                         &linear_system,
+			    const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
+			    const typename DoFHandler<dim>::active_cell_iterator &end_cell,
+			    Threads::ThreadMutex                                 &mutex) const      ;
   };
 
 
@@ -1009,10 +1010,10 @@ namespace LaplaceSolver
   
   template <int dim>
   void
-  Solver<dim>::assemble_matrix (LinearSystem                                &linear_system,
-				const DoFHandler<dim>::active_cell_iterator &begin_cell,
-				const DoFHandler<dim>::active_cell_iterator &end_cell,
-				Threads::ThreadMutex                        &mutex) const
+  Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
+				const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
+				const typename DoFHandler<dim>::active_cell_iterator &end_cell,
+				Threads::ThreadMutex                                 &mutex) const
   {
 				     //TODO: adaptive
     QGauss4<dim>  quadrature_formula;
