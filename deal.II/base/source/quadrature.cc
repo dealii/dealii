@@ -189,6 +189,35 @@ Quadrature<dim>::memory_consumption () const
 };
 
 
+//----------------------------------------------------------------------//
+
+template <int dim>
+QProjector<dim>::QProjector (const Quadrature<dim-1> &quadrature,
+			     const bool sub)
+  :
+  Quadrature<dim> (quadrature.n_quadrature_points
+		   * GeometryInfo<dim>::faces_per_cell
+		   * (sub ? GeometryInfo<dim>::subfaces_per_face : 1))
+{
+  if (sub)
+    project_to_subfaces (quadrature, quadrature_points);
+  else
+    project_to_faces (quadrature, quadrature_points);
+
+  const unsigned int n = GeometryInfo<dim>::faces_per_cell
+    * (sub ? GeometryInfo<dim>::subfaces_per_face : 1);
+
+//TODO: Can we keep it that simple for non-symmetric formulae?
+// Otherwise we'll have to include the weights in the project* functions.
+// This may pose a problem anyway, since we do not want to switch endpoints
+// in Gauﬂ-Radau formulae.
+
+  unsigned int k=0;
+  for (unsigned int i=0;i<n;++i)
+    for (unsigned int j=0;j<quadrature.n_quadrature_points;++j)
+      weights[k++] = quadrature.weight(j);
+}
+
 
 template <>
 void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
