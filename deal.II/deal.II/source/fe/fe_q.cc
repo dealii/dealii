@@ -69,6 +69,7 @@ namespace FE_Q_Helper
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
     static
 #endif
+    inline
     std::vector<unsigned int>
     invert_numbering (const std::vector<unsigned int> &in)
     {
@@ -85,6 +86,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     unsigned int int_sqrt (const unsigned int N)
     {
       for (unsigned int i=0; i<=N; ++i)
@@ -101,6 +103,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     unsigned int int_cuberoot (const unsigned int N)
     {
       for (unsigned int i=0; i<=N; ++i)
@@ -117,6 +120,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     Point<1>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
@@ -134,6 +138,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     Point<2>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
@@ -157,6 +162,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     Point<3>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
@@ -181,6 +187,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     Point<1>
     generate_face_unit_point (const unsigned int i,
 			      const unsigned int N,
@@ -202,6 +209,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     Point<2>
     generate_face_unit_point (const unsigned int i,
 			      const unsigned int N,
@@ -249,6 +257,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     bool
     constraint_function_is_active_on_child (const unsigned int          j,
 					    const unsigned int          subface,
@@ -272,6 +281,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     bool
     constraint_function_is_active_on_child (const unsigned int          j,
 					    const unsigned int          subface,
@@ -340,6 +350,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     unsigned int
     constraint_get_local_j (const unsigned int          j,
 			    const unsigned int          subface,
@@ -359,6 +370,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     unsigned int
     constraint_get_local_j (const unsigned int          /*j*/,
 			    const unsigned int          /*subface*/,
@@ -381,6 +393,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     bool
     constraint_is_support_point (const unsigned int          i,
 				 const unsigned int          j,
@@ -400,6 +413,7 @@ namespace FE_Q_Helper
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
     static
 #endif
+    inline
     bool
     constraint_is_support_point (const unsigned int          /*i*/,
 				 const unsigned int          /*j*/,
