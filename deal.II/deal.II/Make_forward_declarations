@@ -74,7 +74,27 @@ sub parse_class_declarations {
 		$declaration =~ s/\s\s+/ /g;
 		$declaration =~ s/^\s+//g;
 		$declaration =~ s/\s+$//g;
-		print $declaration, ";\n";
+
+		# impose a negativ-list of names we do not want to
+		# have in this file. this is due to a compiler bug in
+		# egcs 1.1.2, which does not gracefully handle local
+		# template classes if their name is globally defined,
+		# for example
+		#
+		# template <int dim> struct Y;
+		# struct X {template <int dim> struct Y{}; };
+		# X::Y<1> y;
+		#
+		# does not work. So we filter out these classes at 
+		# present. A better way would certainly be to only
+		# allow those classes into the forward-declarations.h
+		# file that are global, but that would mean parsing
+		# the include files instead of just searching for
+		# small bits...
+		if ( ! ($declaration =~ /EpsGrid|Patch/ ))
+		{
+		    print $declaration, ";\n";
+		}
 	    }
 	}
     }
