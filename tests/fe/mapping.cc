@@ -312,6 +312,27 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       exact_areas.push_back(1.5);
       show[3][5] = 1;
     }
+
+  if (4 && false)
+    {
+      Boundary<2> *boundary1=new HyperBallBoundary<2>(Point<2>(2.5,-0.5),
+						      sqrt(1.5*1.5+0.5*0.5));
+      boundary_ptr.push_back(boundary1);
+      tria=new Triangulation<2>();
+      tria_ptr.push_back(tria);
+      GridGenerator::hyper_cube(*tria, 0., 1.);
+      Point<2> &v2 = tria->begin_active()->vertex(2);
+      Point<2> &v3 = tria->begin_active()->vertex(3);
+      v2(0) = 2.;
+      v2(1) = 1.;
+      v3(0) = 0.5;
+      v3(1) = 1.5;
+      tria->set_boundary(1,*boundary1);
+      tria->begin_active()->face(1)->set_boundary_indicator(1);
+      exact_areas.push_back(0.);
+      for (unsigned int i=0; i<=4; ++i)
+	show[4][i]=1;
+    }
 }
 
 
