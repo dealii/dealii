@@ -77,7 +77,7 @@ main()
   GridGenerator::hyper_cube(tr, -1., 1.);
   tr.refine_global(2);
 
-  std::ofstream of("transfer.dat");
+  std::ofstream of("show_transfer.output");
   
   TEST(1, FE_Q<2>, 1);
   TEST(1, FE_Q<2>, 2);
