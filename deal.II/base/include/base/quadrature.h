@@ -186,6 +186,13 @@ class QIterated : public Quadrature<dim>
 				      * Exception
 				      */
     DeclException0 (ExcInvalidQuadratureFormula);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidNumberOfCopies,
+		    int,
+		    << "The numbers of copies (" << arg1
+		    << ") of the quadrature formula is not valid.");
     
   private:
 				     /**

@@ -22,12 +22,15 @@ Quadrature<0>::Quadrature (const unsigned int)
 {};
 
 
+
 template <int dim>
 Quadrature<dim>::Quadrature (const unsigned int n_q) :
 		n_quadrature_points(n_q),
 		quadrature_points (n_q, Point<dim>()),
 		weights (n_q, 0)
 {}
+
+
 
 template <int dim>
 Quadrature<dim>::Quadrature (const vector<Point<dim> > & points,
@@ -40,6 +43,8 @@ Quadrature<dim>::Quadrature (const vector<Point<dim> > & points,
 	 ExcDimensionMismatch(weights.size(), points.size()));
 }
 
+
+
 template <>
 Quadrature<0>::Quadrature (const Quadrature<-1> &,
 			   const Quadrature<1> &)
@@ -48,11 +53,14 @@ Quadrature<0>::Quadrature (const Quadrature<-1> &,
 };
 
 
+
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,
-			   const Quadrature<1> &) {
+			   const Quadrature<1> &)
+{
   Assert (false, ExcInternalError());
 };
+
 
 
 template <int dim>
@@ -93,56 +101,73 @@ Quadrature<dim>::Quadrature (const Quadrature<dim-1> &q1,
 };
 
 
+
 template <int dim>
-Quadrature<dim>::~Quadrature () {};
+Quadrature<dim>::~Quadrature ()
+{};
+
 
 
 template <>
-const Point<0> & Quadrature<0>::point (const unsigned int) const {
+const Point<0> & Quadrature<0>::point (const unsigned int) const
+{
   Assert (false, ExcInternalError());
   static const Point<0> dummy;
   return dummy;
 };
 
 
+
 template <int dim>
-const Point<dim> & Quadrature<dim>::point (const unsigned int i) const {
+const Point<dim> & Quadrature<dim>::point (const unsigned int i) const
+{
   Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return quadrature_points[i];
 };
 
 
+
 template <>
-const vector<Point<0> > & Quadrature<0>::get_points () const {
+const vector<Point<0> > & Quadrature<0>::get_points () const
+{
   Assert (false, ExcInternalError());
   return quadrature_points;
 };
 
 
+
 template <int dim>
-const vector<Point<dim> > & Quadrature<dim>::get_points () const {
+const vector<Point<dim> > & Quadrature<dim>::get_points () const
+{
   return quadrature_points;
 };
 
 
+
 template <>
-double Quadrature<0>::weight (const unsigned int) const {
+double Quadrature<0>::weight (const unsigned int) const
+{
   Assert (false, ExcInternalError());
   return 0;
 };
 
 
+
 template <int dim>
-double Quadrature<dim>::weight (const unsigned int i) const {
+double Quadrature<dim>::weight (const unsigned int i) const
+{
   Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return weights[i];
 };
 
 
+
 template <int dim>
-const vector<double> & Quadrature<dim>::get_weights () const {
+const vector<double> & Quadrature<dim>::get_weights () const
+{
   return weights;
 };
+
 
 
 template <>
@@ -151,6 +176,7 @@ const vector<double> & Quadrature<0>::get_weights () const
   Assert (false, ExcInternalError());
   return weights;
 };
+
 
 
 template <>
@@ -182,10 +208,12 @@ void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
 };
 
 
+
 template <>
 void QProjector<3>::project_to_face (const Quadrature<2> &quadrature,
 				     const unsigned int   face_no,
-				     vector<Point<3> >   &q_points) {
+				     vector<Point<3> >   &q_points)
+{
   const unsigned int dim=3;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
   
@@ -229,11 +257,13 @@ void QProjector<3>::project_to_face (const Quadrature<2> &quadrature,
 };
 
 
+
 template <>
 void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
 					const unsigned int   face_no,
 					const unsigned int   subface_no,
-					vector<Point<2> >   &q_points) {
+					vector<Point<2> >   &q_points)
+{
   const unsigned int dim=2;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
   Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
@@ -301,17 +331,19 @@ void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
 };
 
 
+
 template <>
 void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
 					const unsigned int   face_no,
 					const unsigned int   subface_no,
-					vector<Point<3> >   &q_points) {
+					vector<Point<3> >   &q_points)
+{
   const unsigned int dim=3;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
   Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
 
 
-// for all faces and subfaces: first project
+				   // for all faces and subfaces: first project
 				   // onto the first subface of each face, then
 				   // move it to the right place
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
@@ -456,6 +488,7 @@ void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
 };
 
 
+
 template <int dim>
 void
 QProjector<dim>::project_to_faces (const Quadrature<dim-1> &quadrature,
@@ -478,10 +511,11 @@ QProjector<dim>::project_to_faces (const Quadrature<dim-1> &quadrature,
 
 
 
+
 template <int dim>
 void
 QProjector<dim>::project_to_subfaces (const Quadrature<dim-1> &quadrature,
-				   vector<Point<dim> >     &q_points)
+				      vector<Point<dim> >     &q_points)
 {
   unsigned int npt = quadrature.n_quadrature_points;
   unsigned int nf = GeometryInfo<dim>::faces_per_cell;
@@ -502,7 +536,7 @@ QProjector<dim>::project_to_subfaces (const Quadrature<dim-1> &quadrature,
 
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+// ------------------------------------------------------------ //
 
 
 template <>
@@ -523,6 +557,7 @@ QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature)
 };
 
 
+
 template <>
 QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 			 const unsigned int   n_copies) :
@@ -530,10 +565,12 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 			       (base_quadrature.n_quadrature_points-1) * n_copies + 1 :
 			       base_quadrature.n_quadrature_points * n_copies) 
 {
-				   // we don't have to skip some points
-				   // in order to get a reasonable quadrature
-				   // formula
+  Assert (n_copies >= 1, ExcInvalidNumberOfCopies(n_copies));
+  
   if (!uses_both_endpoints(base_quadrature))
+				     // we don't have to skip some
+				     // points in order to get a
+				     // reasonable quadrature formula
     {
       unsigned int next_point = 0;
       for (unsigned int copy=0; copy<n_copies; ++copy)
@@ -577,7 +614,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
       Assert (n_end_points == 2, ExcInvalidQuadratureFormula());
 
 
-for (unsigned int copy=0; copy<n_copies; ++copy)
+      for (unsigned int copy=0; copy<n_copies; ++copy)
 	for (unsigned int q_point=0; q_point<base_quadrature.n_quadrature_points; ++q_point)
 	  {
 					     // skip the left point of this copy
@@ -614,14 +651,16 @@ for (unsigned int copy=0; copy<n_copies; ++copy)
 };
 
 
+
 // construct higher dimensional quadrature formula by tensor product of lower
 // dimensional iterated quadrature formulae
 template <int dim>
 QIterated<dim>::QIterated (const Quadrature<1> &base_quadrature,
-			   const unsigned int   N):
+			   const unsigned int   N) :
 		Quadrature<dim> (QIterated<dim-1>(base_quadrature, N),
 				 QIterated<1>(base_quadrature, N))
 {};
+
 
 
 // explicit instantiations; note: we need them all for all dimensions
