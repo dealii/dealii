@@ -788,9 +788,10 @@ namespace Functions
 /**
  * Cut-off function in L-infinity for an arbitrary ball.  This
  * function is the characteristic function of a ball around @p{center}
- * with a specified @p{radius}.
+ * with a specified @p{radius}. If vector valued, it can be restricted
+ * to a single component.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
   class CutOffFunctionLinfty : public Function<dim>
@@ -800,9 +801,17 @@ namespace Functions
 					* Constructor. Arguments are the
 					* center of the ball and its
 					* radius.
+					*
+					* If an argument @p{select} is
+					* given and not -1, the
+					* cut-off function will be
+					* non-zero for this component
+					* only.
 					*/
       CutOffFunctionLinfty (const double radius = 1.,
-			    Point<dim> = Point<dim>());
+			    Point<dim> = Point<dim>(),
+			    const unsigned int n_components = 1,
+			    const unsigned int select = no_component);
     
 				       /**
 					* Function value at one point.
@@ -817,6 +826,12 @@ namespace Functions
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
+				       /**
+					* Function values at multiple points.
+					*/
+      virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
+				      std::vector<Vector<double> >           &values) const;
+
     private:
 				       /**
 					* Center of the integration ball.
@@ -827,15 +842,27 @@ namespace Functions
 					* Radius of the ball.
 					*/
       const double radius;
+
+				       /**
+					* Component selected. If
+					* @p{no_component}, the function is
+					* the same in all components.
+					*/
+      const unsigned int selected;
+				       /**
+					* Value for no selected component.
+					*/
+      static const unsigned int no_component = static_cast<unsigned int>(-1);
   };
   
   
 /**
  * Cut-off function for an arbitrary ball. This function is a cone
  * with support in a ball of certain @p{radius} around @p{center}. The
- * maximum value is 1.
+ * maximum value is 1. If vector valued, it can be restricted
+ * to a single component.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
   class CutOffFunctionW1 : public Function<dim>
@@ -845,9 +872,17 @@ namespace Functions
 					* Constructor. Arguments are the
 					* center of the ball and its
 					* radius.
+					* radius.
+					*
+					* If an argument @p{select} is
+					* given, the cut-off function
+					* will be non-zero for this
+					* component only.
 					*/
       CutOffFunctionW1 (const double radius = 1.,
-			Point<dim> = Point<dim>());
+			Point<dim> = Point<dim>(),
+			const unsigned int n_components = 1,
+			const unsigned int select = no_component);
     
 				       /**
 					* Function value at one point.
@@ -861,6 +896,12 @@ namespace Functions
       virtual void value_list (const typename std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
+
+				       /**
+					* Function values at multiple points.
+					*/
+      virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
+				      std::vector<Vector<double> >           &values) const;
 
     private:
 				       /**
@@ -872,6 +913,18 @@ namespace Functions
 					* Radius of the ball.
 					*/
       const double radius;
+
+				       /**
+					* Component selected. If
+					* @p{no_component}, the
+					* function is the same in all
+					* components.
+					*/
+      const unsigned int selected;
+				       /**
+					* Value for no selected component.
+					*/
+      static const unsigned int no_component = static_cast<unsigned int>(-1);
   };
   
   
@@ -879,9 +932,10 @@ namespace Functions
  * Cut-off function for an arbitrary ball. This is the traditional
  * cut-off function in C-infinity for a ball of certain @p{radius}
  * around @p{center}, $f(r)=exp(1-1/(1-r**2/s**2))$, where $r$ is the
- * distance to the center, and $s$ is the radius of the sphere.
+ * distance to the center, and $s$ is the radius of the sphere. If
+ * vector valued, it can be restricted to a single component.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
   class CutOffFunctionCinfty : public Function<dim>
@@ -891,9 +945,17 @@ namespace Functions
 					* Constructor. Arguments are the
 					* center of the ball and its
 					* radius.
+					* radius.
+					*
+					* If an argument @p{select} is
+					* given, the cut-off function
+					* will be non-zero for this
+					* component only.
 					*/
       CutOffFunctionCinfty (const double radius = 1.,
-			    Point<dim> = Point<dim>());
+			    Point<dim> = Point<dim>(),
+			    const unsigned int n_components = 1,
+			    const unsigned int select = no_component);
     
 				       /**
 					* Function value at one point.
@@ -907,6 +969,12 @@ namespace Functions
       virtual void value_list (const typename std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
+
+				       /**
+					* Function values at multiple points.
+					*/
+      virtual void vector_value_list (const typename std::vector<Point<dim> > &points,
+				      std::vector<Vector<double> >           &values) const;
 
 				       /**
 					* Function gradient at one point.
@@ -924,6 +992,18 @@ namespace Functions
 					* Radius of the ball.
 					*/
       const double radius;
+
+				       /**
+					* Component selected. If
+					* @p{no_component}, the function is
+					* the same in all components.
+					*/
+      const unsigned int selected;
+
+				       /**
+					* Value for no selected component.
+					*/
+      static const unsigned int no_component = static_cast<unsigned int>(-1);      
   };
   
 };

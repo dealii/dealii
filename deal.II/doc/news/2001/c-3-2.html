@@ -108,10 +108,21 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Improved: The cut-off functions <code
+       class="class">Functios::CutOffFunctionLinfty</code>, <code
+       class="class">Functios::CutOffFunctionW1</code>, and <code
+       class="class">Functios::CutOffFunctionCinfty</code> can be
+       vector-valued now and optionally only a single componente can
+       be selected.
+       <br>
+       (GK 2002/01/10)
+       </p>
+
+  <li> <p>
        New: the <code
        class="member">deal_II_exceptions::set_additional_assert_output</code>
        function allows to set additional output to be printed upon
-       triggering an <code class="member">Assert()</code> call. This
+       triggering an <code>Assert()</code> call. This
        is helpful for parallel applications where you only see the
        text of the message but do not know from which cluster node it
        stems.

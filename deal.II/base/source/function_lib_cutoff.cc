@@ -15,6 +15,7 @@
 #include <base/tensor.h>
 #include <base/point.h>
 #include <base/function_lib.h>
+#include <lac/vector.h>
 
 #include <cmath>
 
@@ -41,20 +42,25 @@ namespace Functions
   
   template<int dim>
   CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
-						   const Point<dim> p)
+						   const Point<dim> p,
+						   const unsigned int n_components,
+						   unsigned int select)
 		  :
-		  Function<dim> (1),
-                  center(p),
-                  radius(r)
+		  Function<dim> (n_components),
+    center(p),
+    radius(r),
+    selected(select)
   {}
 
 
   template<int dim>
   double
   CutOffFunctionLinfty<dim>::value (const Point<dim>   &p,
-				    const unsigned int) const
+				    const unsigned int component) const
   {
-    return ((center.distance(p)<radius) ? 1. : 0.);
+    if (selected==no_component || component==selected)
+      return ((center.distance(p)<radius) ? 1. : 0.);
+    return 0.;
   }
 
 
@@ -62,34 +68,69 @@ namespace Functions
   void 
   CutOffFunctionLinfty<dim>::value_list (const typename std::vector<Point<dim> > &points,
 					 std::vector<double>                     &values,
-					 const unsigned int) const
+					 const unsigned int component) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    Assert (component < n_components,
+	    ExcIndexRange(component,0,n_components));
+    
+
+    if (selected==no_component || component==selected)
+      for (unsigned int k=0;k<values.size();++k)
+	values[k] = (center.distance(points[k])<radius) ? 1. : 0.;
+    else
+      fill (values.begin(), values.end(), 0.);
+  }
+
+  
+  template<int dim>
+  void
+  CutOffFunctionLinfty<dim>::vector_value_list (
+    const typename std::vector<Point<dim> > &points,
+    std::vector<Vector<double> >           &values) const
   {
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0;i<values.size();++i)
-      values[i] = (center.distance(points[i])<radius) ? 1. : 0.;
+    for (unsigned int k=0;k<values.size();++k)
+      {
+	double val = (center.distance(points[k])<radius) ? 1. : 0.;
+	if (selected==no_component)
+	  values[k] = val;
+	else
+	  {
+	    values[k] = 0.;
+	    values[k](selected) = val;
+	  }
+      }
   }
-
-
+  
 
   template<int dim>
   CutOffFunctionW1<dim>::CutOffFunctionW1 (const double     r,
-					   const Point<dim> p)
+					   const Point<dim> p,
+					   const unsigned int n_components,
+					   unsigned int select)
 		  :
-		  Function<dim> (1),
+		  Function<dim> (n_components),
                   center(p),
-                  radius(r)
+                  radius(r),
+    selected(select)
   {}
 
 
   template<int dim>
   double
   CutOffFunctionW1<dim>::value (const Point<dim>   &p,
-				const unsigned int) const
+				const unsigned int component) const
   {
-    const double d = center.distance(p);
-    return ((d<radius) ? (radius-d) : 0.);
+    if (selected==no_component || component==selected)
+      {
+	const double d = center.distance(p);
+	return ((d<radius) ? (radius-d) : 0.);
+      }
+    return 0.;  
   }
 
 
@@ -97,68 +138,138 @@ namespace Functions
   void 
   CutOffFunctionW1<dim>::value_list (const typename std::vector<Point<dim> > &points,
 				     std::vector<double>                     &values,
-				     const unsigned int) const
+				     const unsigned int component) const
   {
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
     
-    for (unsigned int i=0;i<values.size();++i)
-      {
-	const double d = center.distance(points[i]);
-	values[i] = ((d<radius) ? (radius-d) : 0.);
-      }
+    if (selected==no_component || component==selected)
+      for (unsigned int i=0;i<values.size();++i)
+	{
+	  const double d = center.distance(points[i]);
+	  values[i] = ((d<radius) ? (radius-d) : 0.);
+	}
+    else
+      fill (values.begin(), values.end(), 0.);
   }
 
 
 
   template<int dim>
+  void
+  CutOffFunctionW1<dim>::vector_value_list (
+    const typename std::vector<Point<dim> > &points,
+    std::vector<Vector<double> >           &values) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int k=0;k<values.size();++k)
+      {
+	const double d = center.distance(points[k]);
+	double val = (d<radius) ? (radius-d) : 0.;
+	if (selected==no_component)
+	  values[k] = val;
+	else
+	  {
+	    values[k] = 0.;
+	    values[k](selected) = val;
+	  }
+      }
+  }
+  
+
+  template<int dim>
   CutOffFunctionCinfty<dim>::CutOffFunctionCinfty (const double     r,
-						   const Point<dim> p)
+						   const Point<dim> p,
+						   const unsigned int n_components,
+						   unsigned int select)
 		  :
-		  Function<dim> (1),
+		  Function<dim> (n_components),
                   center(p),
-                  radius(r)
+                  radius(r),
+    selected(select)
   {}
 
 
   template<int dim>
   double
   CutOffFunctionCinfty<dim>::value (const Point<dim>   &p,
-				    const unsigned int) const
+				    const unsigned int component) const
   {
-    const double d = center.distance(p);
-    const double r = radius;
-    if (d>=r)
-      return 0.;
-    const double e = -r*r/(r*r-d*d);
-    return  ((e<-50) ? 0. : M_E * exp(e));
+    if (selected==no_component || component==selected)
+      {
+	const double d = center.distance(p);
+	const double r = radius;
+	if (d>=r)
+	  return 0.;
+	const double e = -r*r/(r*r-d*d);
+	return  ((e<-50) ? 0. : M_E * exp(e));
+      }
+    return 0.;
   }
-
+  
 
   template<int dim>
   void 
   CutOffFunctionCinfty<dim>::value_list (const typename std::vector<Point<dim> > &points,
 					 std::vector<double>                     &values,
-					 const unsigned int) const
+					 const unsigned int component) const
   {
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
     
     const double r = radius;
 
-    for (unsigned int i=0;i<values.size();++i)
+    if (selected==no_component || component==selected)
+      for (unsigned int i=0;i<values.size();++i)
+	{
+	  const double d = center.distance(points[i]);
+	  if (d>=r)
+	    {
+	      values[i] = 0.;
+	    } else {
+	      const double e = -r*r/(r*r-d*d);
+	      values[i] = (e<-50) ? 0. : M_E * exp(e);
+	    }
+	}
+    else
+      fill (values.begin(), values.end(), 0.);
+  }
+
+
+  template<int dim>
+  void
+  CutOffFunctionCinfty<dim>::vector_value_list (
+    const typename std::vector<Point<dim> > &points,
+    std::vector<Vector<double> >           &values) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int k=0;k<values.size();++k)
       {
-	const double d = center.distance(points[i]);
-	if (d>=r)
+	const double d = center.distance(points[k]);
+	const double r = radius;
+	double e = 0.;
+	double val = 0.;
+	if (d<radius)
 	  {
-	    values[i] = 0.;
-	  } else {
-	    const double e = -r*r/(r*r-d*d);
-	    values[i] = (e<-50) ? 0. : M_E * exp(e);
+	    e = -r*r/(r*r-d*d);
+	    if (e>-50)
+	      val = M_E * exp(e);
+	  }
+
+	if (selected==no_component)
+	  values[k] = val;
+	else
+	  {
+	    values[k] = 0.;
+	    values[k](selected) = val;
 	  }
       }
   }
-
+  
 
 
   template<int dim>
