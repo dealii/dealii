@@ -218,7 +218,7 @@ TensorProductPolynomials(const typename std::vector<Pol> &pols)
 		:
 		polynomials (pols.begin(), pols.end()),
 		n_tensor_pols(power(pols.size(), dim)),
-		n_pols_to(dim+1, 0)
+		n_pols_to(dim+1)
 {
   const unsigned int n_pols=polynomials.size();
 
