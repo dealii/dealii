@@ -13,7 +13,7 @@
 
 #include <map.h>
 #include <algo.h>
-
+#include <cmath>
 
 
 
@@ -110,17 +110,18 @@ void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
     }
   while ((++assembler).state() == valid);
 
+				   // condense system matrix in-place
+  constraints.condense (system_matrix);
+
+				   // condense right hand side in-place
+  constraints.condense (right_hand_side);
+
 				   // apply Dirichlet bc as described
 				   // in the docs
   apply_dirichlet_bc (system_matrix, solution,
 		      right_hand_side,
 		      dirichlet_bc, fe);
   
-				   // condense system matrix in-place
-  constraints.condense (system_matrix);
-
-				   // condense right hand side in-place
-  constraints.condense (right_hand_side);
 };
 
 
@@ -223,12 +224,6 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 	    for (unsigned int j=0; j<n_dofs; ++j) 
 	      for (unsigned int i=0; i<n_dofs; ++i)
 		psi[j] -= dof_values[i]*shape_values(i,j);
-	    cout << "  Cell = " << cell << ", ";
-	    cout << "    Delta = ";
-	    for (unsigned int i=0; i<psi.size(); ++i)
-	      cout << psi[i] << " ";
-	    cout << ", av = " << (psi[0]+psi[1]+psi[2]+psi[3])/4;
-	    cout << endl;
 
 					     // for L1_norm and Linfty_norm:
 					     // take absolute
@@ -241,7 +236,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 		case L1_norm:
 		case Linfty_norm:
 		      transform (psi.begin(), psi.end(),
-				 psi.begin(), ptr_fun(abs));
+				 psi.begin(), ptr_fun(fabs));
 		      break;
 		case L2_norm:
 		      transform (psi.begin(), psi.end(),
@@ -258,6 +253,10 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 	      {
 		case mean:
 		case L1_norm:
+		      diff = inner_product (psi.begin(), psi.end(),
+					    fe_values.get_JxW_values().begin(),
+					    0.0);
+		      break;
 		case L2_norm:
 		      diff = sqrt(inner_product (psi.begin(), psi.end(),
 						 fe_values.get_JxW_values().begin(),
@@ -267,9 +266,6 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 		      diff = *max_element (psi.begin(), psi.end());
 		      break;
 	      };
-	    
-	    if (norm==L2_norm)
-	      diff = sqrt(diff);
 	    
 	    break;
 	  };
