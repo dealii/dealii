@@ -154,6 +154,15 @@ class dFMatrix
 				      * of computing time!
 				      */
     bool operator == (const dFMatrix &) const;
-    
+
+				     /**
+                                      * Computes the determinant of a matrix.
+                                      * This is only implemented for one two and
+                                      * three dimensions, since for higher
+                                      * dimensions the numerical work explodes.
+                                      * Obviously, the matrix needs to be square
+                                      * for this function.
+                                      */
+    double determinant () const;
 };
 #endif

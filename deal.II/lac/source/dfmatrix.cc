@@ -860,3 +860,26 @@ dFMatrix::operator == (const dFMatrix &m) const
       if (el(i,j) != m.el(i,j)) return false;
   return true;
 };
+
+
+double dFMatrix::determinant () const {
+  THROW2 (dim_range != dim_image, );
+  THROW2 ((dim_range<1) || (dim_range>3), IntError::Range(dim_range));
+  
+  switch (dim_range) 
+    {
+      case 1:
+            return el(0,0);
+      case 2:
+            return el(0,0)*el(1,1) - el(1,0)*el(0,1);
+      case 3:
+            return  (el(0,0)*el(1,1)*el(2,2)
+                     -el(0,0)*el(1,2)*el(2,1)
+                     -el(1,0)*el(0,1)*el(2,2)
+                     +el(1,0)*el(0,2)*el(2,1)
+                     +el(2,0)*el(0,1)*el(1,2)
+                     -el(2,0)*el(0,2)*el(1,1));
+      default:
+            return 0;
+    };
+};
