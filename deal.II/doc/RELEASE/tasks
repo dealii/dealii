@@ -1,7 +1,11 @@
 This file is internal information only. It lists the steps to be done
 when a new release shall be issued:
 
-0/ cvs update -d -P
+0/
+	cvs update -d -P
+	make all
+	cd tests ; make all ; cd ..
+	cd examples ; make all ; cd ..
 
 *** Caveat: for a minor version x.y.Z,
 *** 1-3 must be performed on Branch-x-y
@@ -13,7 +17,7 @@ when a new release shall be issued:
   used to show changes after last release. Crosslink changes file. If
   necessary link an announcement.
 
-3/ obsolete
+3/ Commit the changes of step 2!
 
 4/ if a x.y.0 release, create a branch:
 	call common/scripts/cvs-create-branch <x> <y>
@@ -29,7 +33,7 @@ when a new release shall be issued:
 
 7/ test the branch thoroughly:
 	make distclean (if applicable)
-	./configure
+	./configure --with-umfpack
 	make all
 	cd tests
 	make all
