@@ -299,6 +299,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: the class <code
+  class="class">FE_DGPNonparametric</code> implements finite elements
+  where shape functions are polynomials of order <i>k</i> on the
+  actual grid cell. This is achieved by evaluating the polynomials at
+  the mapped quadrature points. No grid transfer matrices are
+  available for this class.
+  <br>
+  (GK 09/19/2002)
+  </p>
+
   <li> <p> 
        Fixed: Some of the various instances of the <code
        class="member">VectorTools::interpolate_boundary_values</code> functions
