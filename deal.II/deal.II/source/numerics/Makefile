@@ -15,10 +15,7 @@ CXX       = /home/wolf/bin/gcc-2.8.1/bin/c++
 endif
 
 ifeq ($(shell uname),SunOS)
-INCLUDE2.8=  -I/usr/local/source/libstdc++-2.8.0/libstdc++ \
-             -I/usr/local/source/libstdc++-2.8.0/libio
-CXXFLAGS  := $(CXXFLAGS) $(INCLUDE2.8)
-CXXFLAGS.g:= $(CXXFLAGS.g) $(INCLUDE2.8)
+CXX       = /usr/local/gcc/gcc-2.8.1/bin/c++
 endif
 
 

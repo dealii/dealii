@@ -22,15 +22,9 @@ ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc-2.8.1/bin/c++
 endif
 
-
 ifeq ($(shell uname),SunOS)
-INCLUDE2.8  =  -I/usr/local/source/libstdc++-2.8.0/libstdc++ \
-               -I/usr/local/source/libstdc++-2.8.0/libstdc++/stl \
-               -I/usr/local/source/libstdc++-2.8.0/libio
-CXXFLAGS  := $(CXXFLAGS) $(INCLUDE2.8)
-CXXFLAGS.g:= $(CXXFLAGS.g) $(INCLUDE2.8)
+CXX       = /usr/local/gcc/gcc-2.8.1/bin/c++
 endif
-
 
 cc-files = grid/grid_test.cc dof/dof_test.cc poisson/poisson.cc
 o-files  = $(cc-files:.cc=.o)
@@ -50,7 +44,7 @@ dof/dof_test: dof/dof_test.o $(LIBFILES.g)
 	@echo ================= Linking $@
 	@$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
 
-poisson/poisson: poisson/poisson.o $(LIBFILES.g)
+poisson/poisson:
 	@cd poisson ; make
 
 
