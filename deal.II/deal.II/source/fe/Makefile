@@ -55,7 +55,7 @@ clean:
 #rather for libfe.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files)
 	@echo ============================ Remaking Makefile
-	perl ../../Make_dep.pl ../../lib/libfe $(INCLUDE) $(cc-files) \
+	@perl ../../Make_dep.pl ../../lib/libfe $(INCLUDE) $(cc-files) \
 		> Makefile.dep
 
 

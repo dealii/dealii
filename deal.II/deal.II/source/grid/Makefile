@@ -55,7 +55,7 @@ clean:
 #rather for libgrid.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files)
 	@echo ============================ Remaking Makefile
-	perl ../../Make_dep.pl ../../lib/libgrid $(INCLUDE) $(cc-files) \
+	@perl ../../Make_dep.pl ../../lib/libgrid $(INCLUDE) $(cc-files) \
 		> Makefile.dep
 
 
