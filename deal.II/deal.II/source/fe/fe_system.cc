@@ -140,7 +140,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe,
 		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements),
 				    compute_restriction_is_additive_flags (fe, n_elements),
 				    compute_nonzero_components(fe, n_elements)),
-  base_elements(1)
+                base_elements(1)
 {
   base_elements[0] = ElementPair(fe.clone(), n_elements);
   base_elements[0].first->subscribe ();
@@ -159,7 +159,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
 									   fe2, n2),
 				    compute_nonzero_components(fe1, n1,
 							       fe2, n2)),
-  base_elements(2)
+                base_elements(2)
 {
   base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe ();
@@ -186,7 +186,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
 				    compute_nonzero_components(fe1, n1,
 							       fe2, n2,
 							       fe3, n3)),
-  base_elements(3)
+                base_elements(3)
 {
   base_elements[0] = ElementPair(fe1.clone(), n1);  
   base_elements[0].first->subscribe ();
@@ -221,22 +221,22 @@ FESystem<dim>::clone() const
   switch (n_base_elements())
     {
       case 1:
-	return new FESystem(base_element(0),
-			    element_multiplicity(0));
+            return new FESystem(base_element(0),
+                                element_multiplicity(0));
       case 2:
-	return new FESystem(base_element(0),
-			    element_multiplicity(0),
-			    base_element(1),
-			    element_multiplicity(1));
+            return new FESystem(base_element(0),
+                                element_multiplicity(0),
+                                base_element(1),
+                                element_multiplicity(1));
       case 3:
-	return new FESystem(base_element(0),
-			    element_multiplicity(0),
-			    base_element(1),
-			    element_multiplicity(1),
-			    base_element(2),
-			    element_multiplicity(2));
+            return new FESystem(base_element(0),
+                                element_multiplicity(0),
+                                base_element(1),
+                                element_multiplicity(1),
+                                base_element(2),
+                                element_multiplicity(2));
       default:
-	Assert(false, ExcNotImplemented());
+            Assert(false, ExcNotImplemented());
     }
   return 0;
 }
@@ -1259,178 +1259,178 @@ void FESystem<dim>::build_interface_constraints ()
 	switch (dim)
 	  {
 	    case 1:
-	  {
-					     // we should never get here!
-					     // (in 1d, the constraints matrix
-					     // should be of size zero)
-	    Assert (false, ExcInternalError());
-	    break;
-	  };
+            {
+                                               // we should never get here!
+                                               // (in 1d, the constraints matrix
+                                               // should be of size zero)
+              Assert (false, ExcInternalError());
+              break;
+            };
 
 	    case 2:
-	  {
-					     // the indices m=0..d_v-1 are
-					     // from the center vertex.
-					     // their order is the same
-					     // as for the first vertex
-					     // of the whole cell, so we
-					     // can use the
-					     // system_to_base_table
-					     // variable (using the
-					     // face_s_t_base_t function would
-					     // yield the same)
-	    if (m < this->dofs_per_vertex)
-	      m_index = this->system_to_base_table[m];
-	    else
-					       // then come the two sets of
-					       // line indices
-	      {
-		const unsigned int index_in_line
-		  = (m-this->dofs_per_vertex) % this->dofs_per_line;
-		const unsigned int sub_line
-		  = (m-this->dofs_per_vertex) / this->dofs_per_line;
-		Assert (sub_line < 2, ExcInternalError());
+            {
+                                               // the indices m=0..d_v-1 are
+                                               // from the center vertex.
+                                               // their order is the same
+                                               // as for the first vertex
+                                               // of the whole cell, so we
+                                               // can use the
+                                               // system_to_base_table
+                                               // variable (using the
+                                               // face_s_t_base_t function would
+                                               // yield the same)
+              if (m < this->dofs_per_vertex)
+                m_index = this->system_to_base_table[m];
+              else
+                                                 // then come the two sets of
+                                                 // line indices
+                {
+                  const unsigned int index_in_line
+                    = (m-this->dofs_per_vertex) % this->dofs_per_line;
+                  const unsigned int sub_line
+                    = (m-this->dofs_per_vertex) / this->dofs_per_line;
+                  Assert (sub_line < 2, ExcInternalError());
 
-						 // from this
-						 // information, try
-						 // to get base
-						 // element and
-						 // instance of base
-						 // element. we do
-						 // so by
-						 // constructing the
-						 // corresponding
-						 // face index of m
-						 // in the present
-						 // element, then
-						 // use
-						 // face_system_to_base_table
-		const unsigned int tmp1 = 2*this->dofs_per_vertex+index_in_line;
-		m_index.first = this->face_system_to_base_table[tmp1].first;
+                                                   // from this
+                                                   // information, try
+                                                   // to get base
+                                                   // element and
+                                                   // instance of base
+                                                   // element. we do
+                                                   // so by
+                                                   // constructing the
+                                                   // corresponding
+                                                   // face index of m
+                                                   // in the present
+                                                   // element, then
+                                                   // use
+                                                   // face_system_to_base_table
+                  const unsigned int tmp1 = 2*this->dofs_per_vertex+index_in_line;
+                  m_index.first = this->face_system_to_base_table[tmp1].first;
 
-						 // what we are
-						 // still missing is
-						 // the index of m
-						 // within the base
-						 // elements
-						 // interface_constraints
-						 // table
-						 //
-						 // here, the second
-						 // value of
-						 // face_system_to_base_table
-						 // can help: it
-						 // denotes the face
-						 // index of that
-						 // shape function
-						 // within the base
-						 // element. since
-						 // we know that it
-						 // is a line dof,
-						 // we can construct
-						 // the rest: tmp2
-						 // will denote the
-						 // index of this
-						 // shape function
-						 // among the line
-						 // shape functions:
-		Assert (this->face_system_to_base_table[tmp1].second >=
-			2*base_element(m_index.first.first).dofs_per_vertex,
-			ExcInternalError());
-		const unsigned int tmp2 = this->face_system_to_base_table[tmp1].second -
-					  2*base_element(m_index.first.first).dofs_per_vertex;
-		Assert (tmp2 < base_element(m_index.first.first).dofs_per_line,
-			ExcInternalError());
-		m_index.second = base_element(m_index.first.first).dofs_per_vertex +
-				 base_element(m_index.first.first).dofs_per_line*sub_line +
-				 tmp2;
-	      };
-	    break;
-	  };
+                                                   // what we are
+                                                   // still missing is
+                                                   // the index of m
+                                                   // within the base
+                                                   // elements
+                                                   // interface_constraints
+                                                   // table
+                                                   //
+                                                   // here, the second
+                                                   // value of
+                                                   // face_system_to_base_table
+                                                   // can help: it
+                                                   // denotes the face
+                                                   // index of that
+                                                   // shape function
+                                                   // within the base
+                                                   // element. since
+                                                   // we know that it
+                                                   // is a line dof,
+                                                   // we can construct
+                                                   // the rest: tmp2
+                                                   // will denote the
+                                                   // index of this
+                                                   // shape function
+                                                   // among the line
+                                                   // shape functions:
+                  Assert (this->face_system_to_base_table[tmp1].second >=
+                          2*base_element(m_index.first.first).dofs_per_vertex,
+                          ExcInternalError());
+                  const unsigned int tmp2 = this->face_system_to_base_table[tmp1].second -
+                                            2*base_element(m_index.first.first).dofs_per_vertex;
+                  Assert (tmp2 < base_element(m_index.first.first).dofs_per_line,
+                          ExcInternalError());
+                  m_index.second = base_element(m_index.first.first).dofs_per_vertex +
+                                   base_element(m_index.first.first).dofs_per_line*sub_line +
+                                   tmp2;
+                };
+              break;
+            };
 
 	    case 3:
-	  {
-					     // same way as above,
-					     // although a little
-					     // more complicated...
+            {
+                                               // same way as above,
+                                               // although a little
+                                               // more complicated...
 	      
-					     // the indices
-					     // m=0..5*d_v-1 are
-					     // from the center and
-					     // the four subline
-					     // vertices.  their
-					     // order is the same as
-					     // for the first vertex
-					     // of the whole cell,
-					     // so we can use the
-					     // simple arithmetic
-	    if (m < 5*this->dofs_per_vertex)
-	      m_index = this->system_to_base_table[m];
-	    else
-					       // then come the 12 sets of
-					       // line indices
-	      if (m < 5*this->dofs_per_vertex + 12*this->dofs_per_line)
-		{
-						   // for the
-						   // meaning of all
-						   // this, see the
-						   // 2d part
-		  const unsigned int index_in_line
-		    = (m-5*this->dofs_per_vertex) % this->dofs_per_line;
-		  const unsigned int sub_line
-		    = (m-5*this->dofs_per_vertex) / this->dofs_per_line;
-		  Assert (sub_line < 12, ExcInternalError());
+                                               // the indices
+                                               // m=0..5*d_v-1 are
+                                               // from the center and
+                                               // the four subline
+                                               // vertices.  their
+                                               // order is the same as
+                                               // for the first vertex
+                                               // of the whole cell,
+                                               // so we can use the
+                                               // simple arithmetic
+              if (m < 5*this->dofs_per_vertex)
+                m_index = this->system_to_base_table[m];
+              else
+                                                 // then come the 12 sets of
+                                                 // line indices
+                if (m < 5*this->dofs_per_vertex + 12*this->dofs_per_line)
+                  {
+                                                     // for the
+                                                     // meaning of all
+                                                     // this, see the
+                                                     // 2d part
+                    const unsigned int index_in_line
+                      = (m-5*this->dofs_per_vertex) % this->dofs_per_line;
+                    const unsigned int sub_line
+                      = (m-5*this->dofs_per_vertex) / this->dofs_per_line;
+                    Assert (sub_line < 12, ExcInternalError());
 
-		  const unsigned int tmp1 = 4*this->dofs_per_vertex+index_in_line;
-		  m_index.first = this->face_system_to_base_table[tmp1].first;
+                    const unsigned int tmp1 = 4*this->dofs_per_vertex+index_in_line;
+                    m_index.first = this->face_system_to_base_table[tmp1].first;
 
-		  Assert (this->face_system_to_base_table[tmp1].second >=
-			  4*base_element(m_index.first.first).dofs_per_vertex,
-			  ExcInternalError());
-		  const unsigned int tmp2 = this->face_system_to_base_table[tmp1].second -
-					    4*base_element(m_index.first.first).dofs_per_vertex;
-		  Assert (tmp2 < base_element(m_index.first.first).dofs_per_line,
-			  ExcInternalError());
-		  m_index.second = 5*base_element(m_index.first.first).dofs_per_vertex +
-				   base_element(m_index.first.first).dofs_per_line*sub_line +
-				   tmp2;
-		}
-	      else
-						 // on one of the four sub-quads
-		{   
-						   // for the
-						   // meaning of all
-						   // this, see the
-						   // 2d part
-		  const unsigned int index_in_quad
-		    = (m-5*this->dofs_per_vertex-12*this->dofs_per_line) % this->dofs_per_line;
-		  const unsigned int sub_quad
-		    = (m-5*this->dofs_per_vertex-12*this->dofs_per_line) / this->dofs_per_line;
-		  Assert (sub_quad < 4, ExcInternalError());
+                    Assert (this->face_system_to_base_table[tmp1].second >=
+                            4*base_element(m_index.first.first).dofs_per_vertex,
+                            ExcInternalError());
+                    const unsigned int tmp2 = this->face_system_to_base_table[tmp1].second -
+                                              4*base_element(m_index.first.first).dofs_per_vertex;
+                    Assert (tmp2 < base_element(m_index.first.first).dofs_per_line,
+                            ExcInternalError());
+                    m_index.second = 5*base_element(m_index.first.first).dofs_per_vertex +
+                                     base_element(m_index.first.first).dofs_per_line*sub_line +
+                                     tmp2;
+                  }
+                else
+                                                   // on one of the four sub-quads
+                  {   
+                                                     // for the
+                                                     // meaning of all
+                                                     // this, see the
+                                                     // 2d part
+                    const unsigned int index_in_quad
+                      = (m-5*this->dofs_per_vertex-12*this->dofs_per_line) % this->dofs_per_line;
+                    const unsigned int sub_quad
+                      = (m-5*this->dofs_per_vertex-12*this->dofs_per_line) / this->dofs_per_line;
+                    Assert (sub_quad < 4, ExcInternalError());
 
-		  const unsigned int tmp1 = 4*this->dofs_per_vertex+4*this->dofs_per_line+index_in_quad;
-		  m_index.first = this->face_system_to_base_table[tmp1].first;
+                    const unsigned int tmp1 = 4*this->dofs_per_vertex+4*this->dofs_per_line+index_in_quad;
+                    m_index.first = this->face_system_to_base_table[tmp1].first;
 
-		  Assert (this->face_system_to_base_table[tmp1].second >=
-			  4*base_element(m_index.first.first).dofs_per_vertex +
-			  4*base_element(m_index.first.first).dofs_per_line,
-			  ExcInternalError());
-		  const unsigned int tmp2 = this->face_system_to_base_table[tmp1].second -
-					    4*base_element(m_index.first.first).dofs_per_vertex -
-					    4*base_element(m_index.first.first).dofs_per_line;
-		  Assert (tmp2 < base_element(m_index.first.first).dofs_per_quad,
-			  ExcInternalError());
-		  m_index.second = 5*base_element(m_index.first.first).dofs_per_vertex +
-				   12*base_element(m_index.first.first).dofs_per_line +
-				   base_element(m_index.first.first).dofs_per_quad*sub_quad +
-				   tmp2;
-		};
+                    Assert (this->face_system_to_base_table[tmp1].second >=
+                            4*base_element(m_index.first.first).dofs_per_vertex +
+                            4*base_element(m_index.first.first).dofs_per_line,
+                            ExcInternalError());
+                    const unsigned int tmp2 = this->face_system_to_base_table[tmp1].second -
+                                              4*base_element(m_index.first.first).dofs_per_vertex -
+                                              4*base_element(m_index.first.first).dofs_per_line;
+                    Assert (tmp2 < base_element(m_index.first.first).dofs_per_quad,
+                            ExcInternalError());
+                    m_index.second = 5*base_element(m_index.first.first).dofs_per_vertex +
+                                     12*base_element(m_index.first.first).dofs_per_line +
+                                     base_element(m_index.first.first).dofs_per_quad*sub_quad +
+                                     tmp2;
+                  };
 	      
-	    break;
-	  };
+              break;
+            };
 		  
 	    default:
-	      Assert (false, ExcNotImplemented());
+                  Assert (false, ExcNotImplemented());
 	  };
 
 					 // now that we gathered all
