@@ -29,7 +29,7 @@ run-parameters  = $(target).prm
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = gnuplot make_ps
+additional-run-action = 
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
@@ -93,7 +93,6 @@ $(target) : $(libraries)
 # rule how to run the program
 run: $(target)
 	./$(target) $(run-parameters)
-	$(additional-run-action)
 
 
 # rule to make object files
