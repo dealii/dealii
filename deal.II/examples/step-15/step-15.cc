@@ -599,6 +599,7 @@ void MinimizationProblem<dim>::run ()
 
       refine_grid ();
     }
+  std::cout << "   Final Energy: " << energy (dof_handler, present_solution) << std::endl;
   std::cout << std::endl;
 }
 
