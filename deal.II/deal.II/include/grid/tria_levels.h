@@ -252,7 +252,7 @@ class TriangulationLevel<0> {
 				      */
     template <typename T>
     static void read_raw_vector (const unsigned int  magic_number1,
-				 const vector<T>    &v,
+				 vector<T>          &v,
 				 const unsigned int  magic_number2,
 				 istream            &in);
 
@@ -262,7 +262,7 @@ class TriangulationLevel<0> {
 				      * for #bool# vectors.
 				      */
     static void read_raw_vector (const unsigned int  magic_number1,
-				 const vector<bool> &v,
+				 vector<bool>       &v,
 				 const unsigned int  magic_number2,
 				 istream            &in);
 
@@ -273,7 +273,7 @@ class TriangulationLevel<0> {
 				      */
     template <typename T>
     static void read_rle_vector (const unsigned int  magic_number1,
-				 const vector<T>    &v,
+				 vector<T>          &v,
 				 const unsigned int  magic_number2,
 				 istream            &in);
 };
