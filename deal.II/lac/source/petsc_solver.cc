@@ -21,6 +21,11 @@
 
 #ifdef DEAL_II_USE_PETSC
 
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
+#  include <petscsles.h>
+#endif
+#include <petscversion.h>
+
 
 namespace PETScWrappers
 {
@@ -46,6 +51,76 @@ namespace PETScWrappers
   {
     int ierr;
 
+                                     // PETSc unfortunately changed its
+                                     // interfaces completely and incompatibly
+                                     // between 2.1.6 and 2.2.0. This forces
+                                     // us to work around this by offering two
+                                     // completely different
+                                     // implementations. sigh...
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
+                                     // first create a solver object
+    SLES sles;
+    ierr = SLESCreate (mpi_communicator, &sles);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+                                     // set the matrices involved. the
+                                     // last argument is irrelevant here,
+                                     // since we use the solver only once
+                                     // anyway
+    ierr = SLESSetOperators (sles, A, preconditioner,
+                             SAME_PRECONDITIONER);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+                                     // let derived classes set the solver
+                                     // type, and the preconditioning object
+                                     // set the type of preconditioner
+    KSP ksp;
+    ierr = SLESGetKSP (sles, &ksp);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    set_solver_type (ksp);
+    
+    PC pc;
+    ierr = SLESGetPC (sles, &pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    preconditioner.set_preconditioner_type (pc);
+  
+                                     // in the deal.II solvers, we always
+                                     // honor the initial guess in the
+                                     // solution vector. do so here as well:
+    KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
+  
+                                     // then a convergence monitor
+                                     // function. that function simply checks
+                                     // with the solver_control object we have
+                                     // in this object for convergence
+    KSPSetConvergenceTest (ksp, &convergence_test,
+                           reinterpret_cast<void *>(&solver_control));
+      
+                                     // then do the real work: set up solver
+                                     // internal data and solve the
+                                     // system. this could be joined in one
+                                     // operation, but it is recommended this
+                                     // way to be able to separate statistic
+                                     // output if requested
+    int iterations = 0;
+    ierr = SLESSetUp (sles, b, x);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+      
+    ierr = SLESSolve (sles, b, x, &iterations);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  
+                                     // and destroy the solver object
+    ierr = SLESDestroy (sles);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+#else
+                                     // and here is the PETSc post 2.1.6
+                                     // version: SLES objects have been
+                                     // completely abandoned, so use KSP and
+                                     // PC only
+    
                                      // first create a solver object
     KSP ksp;
     ierr = KSPCreate (mpi_communicator, &ksp);
@@ -99,6 +174,7 @@ namespace PETScWrappers
     ierr = KSPDestroy (ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+#endif
                                      // in case of failure: throw
                                      // exception
     if (solver_control.last_check() != SolverControl::success)
