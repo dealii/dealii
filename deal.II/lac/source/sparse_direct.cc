@@ -305,7 +305,7 @@ SparseDirectMA27::~SparseDirectMA27()
                                          // first close down client
         detached_mode_data->mutex.acquire ();
         write (detached_mode_data->server_client_pipe[1], "7", 1);
-        detached_mode_data->mutex.acquire ();
+        detached_mode_data->mutex.release ();
         
                                          // then also delete data
         delete detached_mode_data;
