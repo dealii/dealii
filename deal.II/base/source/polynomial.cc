@@ -75,14 +75,26 @@ Polynomial<number>::value (const number         x,
   const unsigned int m=coefficients.size();
   std::vector<number> a(coefficients);
   unsigned int j_faculty=1;
-  for (unsigned int j=0; j<values_size; ++j)
-    {      
+
+				   // loop over all requested
+				   // derivatives. note that
+				   // derivatives @p{j>m} are
+				   // necessarily zero, as they
+				   // differentiate the polynomial
+				   // more often than the highest
+				   // power is
+  for (unsigned int j=0; j<std::min(values_size, m); ++j)
+    {
       for (int k=m-2; k>=static_cast<int>(j); --k)
 	a[k]+=x*a[k+1];
       values[j]=j_faculty*a[j];
 
       j_faculty*=j+1;
     }
+
+				   // fill higher derivatives by zero
+  for (unsigned int j=std::min(values_size,m); j<values_size; ++j)
+    values[j] = 0;
 }
 
 
