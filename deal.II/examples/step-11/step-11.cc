@@ -132,8 +132,13 @@ void LaplaceProblem<dim>::setup_system ()
 {
 				   // The first task is trivial:
 				   // generate an enumeration of the
-				   // degrees of freedom:
+				   // degrees of freedom, and
+				   // initialize solution and right
+				   // hand side vector to their
+				   // correct sizes:
   dof_handler.distribute_dofs (fe);
+  solution.reinit (dof_handler.n_dofs());
+  system_rhs.reinit (dof_handler.n_dofs());
 
 				   // Next task is to construct the
 				   // object representing the
@@ -192,9 +197,6 @@ void LaplaceProblem<dim>::setup_system ()
   sparsity_pattern.copy_from (csp);
 
   system_matrix.reinit (sparsity_pattern);
-
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
 };
 
 
