@@ -163,6 +163,27 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: <code class="class">GridGenerator</code> has a new
+       function <code class="member">subdivided_hyper_rectangle</code> 
+       which generates a rectangle with given corner points and possibly 
+       different numbers of subdivisions in different directions.
+       Use it e.g., to generate a domain of 1*4 length units
+       with square cells.
+       <br> 
+       (Joerg Weimar 2003/09/09)
+       </p>
+
+  <li> <p>
+       Improved: <code class="class">GridOut</code> has a an improved
+       functionality for <code class="member">write_eps</code> 
+       to color the grid according to the refinement level.
+       A corresponding option is included in 
+       <code class="class">GridOutFlags::Eps<2></code>.
+       <br> 
+       (Joerg Weimar 2003/09/09)
+       </p>
+
   <li> <p> New: The <code class="class">TriaAccessor</code>::<code
        class="member">point_inside</code> function is now also
        implemented in 3d.
