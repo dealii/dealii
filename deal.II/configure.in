@@ -683,9 +683,8 @@ AC_ARG_WITH(blas,
     LIBS="$withval -lg2c $LIBS";
   fi
   ,
-  AC_CHECK_LIB(blas,
-	       main,
-	       LIBS="-lblas -lg2c $LIBS" ; AC_DEFINE(HAVE_LIBBLAS))
+  AC_CHECK_LIB(blas, daxpy_,
+               LIBS="-lblas -lg2c $LIBS" ; AC_DEFINE(HAVE_LIBBLAS),,-lg2c)
 )
 
 AC_ARG_WITH(lapack,
