@@ -513,29 +513,22 @@ void LaplaceProblem<dim>::assemble_system ()
       cell_rhs.clear ();
 
       fe_values.reinit (cell);
-      const FullMatrix<double> 
-	& shape_values = fe_values.get_shape_values();
-      const std::vector<std::vector<Tensor<1,dim> > >
-	& shape_grads  = fe_values.get_shape_grads();
-      const std::vector<double>
-	& JxW_values   = fe_values.get_JxW_values();
-      const std::vector<Point<dim> >
-	& q_points     = fe_values.get_quadrature_points();
 
-      coefficient.value_list (q_points, coefficient_values);
+      coefficient.value_list (fe_values.get_quadrature_points(),
+			      coefficient_values);
       
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += (coefficient_values[q_point] *
-				   (shape_grads[i][q_point]    *
-				    shape_grads[j][q_point])   *
-				   JxW_values[q_point]);
+				   (fe_values.shape_grad(i,q_point)    *
+				    fe_values.shape_grad(j,q_point))   *
+				   fe_values.JxW(q_point));
 
-	    cell_rhs(i) += (shape_values[i][q_point] *
+	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    1.0 *
-			    JxW_values[q_point]);
+			    fe_values.JxW(q_point));
 	  };
 
 
