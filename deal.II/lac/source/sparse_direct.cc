@@ -267,6 +267,26 @@ namespace CommunicationsLog
       unsigned int          scheduled_bytes;
       unsigned int          completed_bytes;
       std::string           description;
+
+    /**
+     * Constructor
+     */
+    Record (const pid_t           child_pid,
+	    const Direction       direction,
+	    const std::type_info *type,
+	    const unsigned int    count,
+	    const  unsigned int   scheduled_bytes,
+	    const unsigned int    completed_bytes,
+	    const std::string    &description)
+      :
+      child_pid (child_pid),
+      direction (direction),
+      type (type),
+      count (count),
+      scheduled_bytes (scheduled_bytes),
+      completed_bytes (completed_bytes),
+      description (description)
+    {}
   };
 
                                    /**
@@ -292,8 +312,8 @@ namespace CommunicationsLog
                              const unsigned int completed_bytes,
                              const std::string &descr)
   {
-    const Record record = {child_pid, direction, &typeid(T), count,
-			   sizeof(T)*count, completed_bytes, descr};
+    const Record record(child_pid, direction, &typeid(T), count,
+			sizeof(T)*count, completed_bytes, descr);
     Threads::ThreadMutex::ScopedLock lock (list_access_lock);
     communication_log.push_back (record);
   }
