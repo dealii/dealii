@@ -118,6 +118,9 @@ Fully implement the POVRAY format, i.e. use textures, a better angle
   of view, etc. The present implementation is only a rudimentary hack.
 
 
+Review the restruction matrices. I'm not really sure about their
+  meaning and how they are defined, so they may be wrong for linear
+  elements and they are not implemented at all for quadratic ones.
 
 
 

@@ -306,10 +306,22 @@ struct FiniteElementBase : public FiniteElementData<dim> {
 				      * are for the unrefined cell's degrees of
 				      * freedom. Thus, if #u0# is the vector
 				      * of values of degrees of freedom on the
-				      * coarse cell, * #prolongation[i]*u0#
+				      * coarse cell, #prolongation[i]*u0#
 				      * yields the vector of values of the
 				      * degrees of freedom on the #i#th child
 				      * cell.
+				      *
+				      * On the other hand, for finite elements
+				      * with embedded spaces, the basis function
+				      * phi0[i] on the coarse grid can be
+				      * expressed by
+				      * \sum_c \sum_j p^c_{ji) phi1[j]
+				      * where the sum over c runs over the child
+				      * cells and phi1[j] is the j_th basis
+				      * function on the c_th child cell. Note
+				      * that we need here the transpose of the
+				      * matrix p^c (p^c is returned by this
+				      * function with parameter c).
 				      *
 				      * Upon assembling the transfer matrix
 				      * between cells using this matrix array,

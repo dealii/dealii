@@ -15,7 +15,50 @@
 
 template <>
 FEQuadraticSub<1>::FEQuadraticSub () :
-		FiniteElement<1> (1, 1) {};
+		FiniteElement<1> (1, 1) {
+/*
+  Get the prolongation matrices by the following little maple script:
+
+  phi[0] := proc(xi) (1-xi)*(1-2*xi); end;
+  phi[1] := proc(xi) xi*(2*xi-1);     end;
+  phi[2] := proc(xi) 4*xi*(1-xi);     end;
+
+  points[0] := array(0..2, [0, 1/2, 1/4]);
+  points[1] := array(0..2, [1/2, 1, 3/4]);
+
+  prolongation := array(0..1,0..2, 0..2);
+
+  for i from 0 to 1 do
+    for j from 0 to 2 do
+      for k from 0 to 2 do
+        prolongation[i,j,k] := phi[k](points[i][j]);
+      od;
+    od;
+  od;
+
+  readlib(C);
+  C(prolongation);
+*/
+
+  prolongation[0](0,0) = 1.0;
+  prolongation[0](0,1) = 0.0;
+  prolongation[0](0,2) = 0.0;
+  prolongation[0](1,0) = 0.0;
+  prolongation[0](1,1) = 0.0;
+  prolongation[0](1,2) = 1.0;
+  prolongation[0](2,0) = 3.0/8.0;
+  prolongation[0](2,1) = -1.0/8.0;
+  prolongation[0](2,2) = 3.0/4.0;
+  prolongation[1](0,0) = 0.0;
+  prolongation[1](0,1) = 0.0;
+  prolongation[1](0,2) = 1.0;
+  prolongation[1](1,0) = 0.0;
+  prolongation[1](1,1) = 1.0;
+  prolongation[1](1,2) = 0.0;
+  prolongation[1](2,0) = -1.0/8.0;
+  prolongation[1](2,1) = 3.0/8.0;
+  prolongation[1](2,2) = 3.0/4.0;
+};
 
 
 
@@ -52,12 +95,29 @@ FEQuadraticSub<1>::shape_value(const unsigned int i,
       case 2: return 4*xi*(1-xi);
     }
   return 0.;
-}
+};
 
 
 
 template <>
 inline
+double
+FEQuadraticSub<1>::linear_shape_value(const unsigned int i,
+				      const Point<1>     &p) const
+{
+  Assert((i<2), ExcInvalidIndex(i));
+  const double xi = p(0);
+  switch (i)
+    {
+      case 0: return 1.-xi;
+      case 1: return xi;
+    }
+  return 0.;
+};
+
+
+
+template <>
 Point<1>
 FEQuadraticSub<1>::shape_grad(const unsigned int i,
 			      const Point<1>    &p) const
@@ -69,6 +129,23 @@ FEQuadraticSub<1>::shape_grad(const unsigned int i,
       case 0: return Point<1>(-3+4*xi);
       case 1: return Point<1>(4*xi-1);
       case 2: return Point<1>(4-8*xi);
+    }
+  return Point<1>();
+};
+
+
+
+template <>
+inline
+Point<1>
+FELinear<1>::linear_shape_grad(const unsigned int i,
+			       const Point<1>&) const
+{
+  Assert((i<2), ExcInvalidIndex(i));
+  switch (i)
+    {
+    case 0: return Point<1>(-1.);
+    case 1: return Point<1>(1.);
     }
   return Point<1>();
 };
@@ -172,9 +249,369 @@ FEQuadraticSub<2>::FEQuadraticSub () :
   interface_constraints(2,1) = 3./8.;
   interface_constraints(2,2) = 3./4.;
 
-				   // still implement restriction
-				   // and prolongation
-  Assert (false, ExcNotImplemented());
+/*
+  Get the prolongation matrices by the following little maple script:
+
+  phi[0] := proc(xi,eta) (1-xi)*( 2*xi-1) * (1-eta)*( 2*eta-1);    end;
+  phi[1] := proc(xi,eta)    xi *(-2*xi+1) * (1-eta)*( 2*eta-1);    end;
+  phi[2] := proc(xi,eta)    xi *(-2*xi+1) *    eta *(-2*eta+1);    end;
+  phi[3] := proc(xi,eta) (1-xi)*( 2*xi-1) *    eta *(-2*eta+1);    end;
+  phi[4] := proc(xi,eta) 4 * (1-xi)*xi        * (1-eta)*(1-2*eta); end;
+  phi[5] := proc(xi,eta) 4 *    xi *(-1+2*xi) * (1-eta)*eta;       end;
+  phi[6] := proc(xi,eta) 4 * (1-xi)*xi        *    eta *(-1+2*eta);end;
+  phi[7] := proc(xi,eta) 4 * (1-xi)*(1-2*xi)  * (1-eta)*eta;       end;
+  phi[8] := proc(xi,eta) 16 * xi*(1-xi) * eta*(1-eta);             end;
+
+  points_x[0] := array(0..8, [0, 1/2, 1/2, 0, 1/4, 1/2, 1/4, 0, 1/4]);
+  points_y[0] := array(0..8, [0, 0, 1/2, 1/2, 0, 1/4, 1/2, 1/4, 1/4]);
+
+  points_x[1] := array(0..8, [1/2, 1, 1, 1/2, 3/4, 1, 3/4, 1/2, 3/4]);
+  points_y[1] := array(0..8, [0, 0, 1/2, 1/2, 0, 1/4, 1/2, 1/4, 1/4]);
+
+  points_x[2] := array(0..8, [1/2, 1, 1, 1/2, 3/4, 1, 3/4, 1/2, 3/4]);
+  points_y[2] := array(0..8, [1/2, 1/2, 1, 1, 1/2, 3/4, 1, 3/4, 3/4]);
+
+  points_x[3] := array(0..8, [0, 1/2, 1/2, 0, 1/4, 1/2, 1/4, 0, 1/4]);
+  points_y[3] := array(0..8, [1/2, 1/2, 1, 1, 1/2, 3/4, 1, 3/4, 3/4]);
+
+  prolongation := array(0..3,0..8, 0..8);
+
+  for i from 0 to 3 do
+    for j from 0 to 8 do
+      for k from 0 to 8 do
+        prolongation[i,j,k] := phi[k](points_x[i][j], points_y[i][j]);
+      od;
+    od;
+  od;
+
+  readlib(C);
+  C(prolongation);
+*/
+
+  prolongation[0](0,0) = 1.0;
+  prolongation[0](0,1) = 0.0;
+  prolongation[0](0,2) = 0.0;
+  prolongation[0](0,3) = 0.0;
+  prolongation[0](0,4) = 0.0;
+  prolongation[0](0,5) = 0.0;
+  prolongation[0](0,6) = 0.0;
+  prolongation[0](0,7) = 0.0;
+  prolongation[0](0,8) = 0.0;
+  prolongation[0](1,0) = 0.0;
+  prolongation[0](1,1) = 0.0;
+  prolongation[0](1,2) = 0.0;
+  prolongation[0](1,3) = 0.0;
+  prolongation[0](1,4) = 1.0;
+  prolongation[0](1,5) = 0.0;
+  prolongation[0](1,6) = 0.0;
+  prolongation[0](1,7) = 0.0;
+  prolongation[0](1,8) = 0.0;
+  prolongation[0](2,0) = 0.0;
+  prolongation[0](2,1) = 0.0;
+  prolongation[0](2,2) = 0.0;
+  prolongation[0](2,3) = 0.0;
+  prolongation[0](2,4) = 0.0;
+  prolongation[0](2,5) = 0.0;
+  prolongation[0](2,6) = 0.0;
+  prolongation[0](2,7) = 0.0;
+  prolongation[0](2,8) = 1.0;
+  prolongation[0](3,0) = 0.0;
+  prolongation[0](3,1) = 0.0;
+  prolongation[0](3,2) = 0.0;
+  prolongation[0](3,3) = 0.0;
+  prolongation[0](3,4) = 0.0;
+  prolongation[0](3,5) = 0.0;
+  prolongation[0](3,6) = 0.0;
+  prolongation[0](3,7) = 1.0;
+  prolongation[0](3,8) = 0.0;
+  prolongation[0](4,0) = 3.0/8.0;
+  prolongation[0](4,1) = -1.0/8.0;
+  prolongation[0](4,2) = 0.0;
+  prolongation[0](4,3) = 0.0;
+  prolongation[0](4,4) = 3.0/4.0;
+  prolongation[0](4,5) = 0.0;
+  prolongation[0](4,6) = 0.0;
+  prolongation[0](4,7) = 0.0;
+  prolongation[0](4,8) = 0.0;
+  prolongation[0](5,0) = 0.0;
+  prolongation[0](5,1) = 0.0;
+  prolongation[0](5,2) = 0.0;
+  prolongation[0](5,3) = 0.0;
+  prolongation[0](5,4) = 3.0/8.0;
+  prolongation[0](5,5) = 0.0;
+  prolongation[0](5,6) = -1.0/8.0;
+  prolongation[0](5,7) = 0.0;
+  prolongation[0](5,8) = 3.0/4.0;
+  prolongation[0](6,0) = 0.0;
+  prolongation[0](6,1) = 0.0;
+  prolongation[0](6,2) = 0.0;
+  prolongation[0](6,3) = 0.0;
+  prolongation[0](6,4) = 0.0;
+  prolongation[0](6,5) = -1.0/8.0;
+  prolongation[0](6,6) = 0.0;
+  prolongation[0](6,7) = 3.0/8.0;
+  prolongation[0](6,8) = 3.0/4.0;
+  prolongation[0](7,0) = 3.0/8.0;
+  prolongation[0](7,1) = 0.0;
+  prolongation[0](7,2) = 0.0;
+  prolongation[0](7,3) = -1.0/8.0;
+  prolongation[0](7,4) = 0.0;
+  prolongation[0](7,5) = 0.0;
+  prolongation[0](7,6) = 0.0;
+  prolongation[0](7,7) = 3.0/4.0;
+  prolongation[0](7,8) = 0.0;
+  prolongation[0](8,0) = 9.0/64.0;
+  prolongation[0](8,1) = -3.0/64.0;
+  prolongation[0](8,2) = 1.0/64.0;
+  prolongation[0](8,3) = -3.0/64.0;
+  prolongation[0](8,4) = 9.0/32.0;
+  prolongation[0](8,5) = -3.0/32.0;
+  prolongation[0](8,6) = -3.0/32.0;
+  prolongation[0](8,7) = 9.0/32.0;
+  prolongation[0](8,8) = 9.0/16.0;
+  prolongation[1](0,0) = 0.0;
+  prolongation[1](0,1) = 0.0;
+  prolongation[1](0,2) = 0.0;
+  prolongation[1](0,3) = 0.0;
+  prolongation[1](0,4) = 1.0;
+  prolongation[1](0,5) = 0.0;
+  prolongation[1](0,6) = 0.0;
+  prolongation[1](0,7) = 0.0;
+  prolongation[1](0,8) = 0.0;
+  prolongation[1](1,0) = 0.0;
+  prolongation[1](1,1) = 1.0;
+  prolongation[1](1,2) = 0.0;
+  prolongation[1](1,3) = 0.0;
+  prolongation[1](1,4) = 0.0;
+  prolongation[1](1,5) = 0.0;
+  prolongation[1](1,6) = 0.0;
+  prolongation[1](1,7) = 0.0;
+  prolongation[1](1,8) = 0.0;
+  prolongation[1](2,0) = 0.0;
+  prolongation[1](2,1) = 0.0;
+  prolongation[1](2,2) = 0.0;
+  prolongation[1](2,3) = 0.0;
+  prolongation[1](2,4) = 0.0;
+  prolongation[1](2,5) = 1.0;
+  prolongation[1](2,6) = 0.0;
+  prolongation[1](2,7) = 0.0;
+  prolongation[1](2,8) = 0.0;
+  prolongation[1](3,0) = 0.0;
+  prolongation[1](3,1) = 0.0;
+  prolongation[1](3,2) = 0.0;
+  prolongation[1](3,3) = 0.0;
+  prolongation[1](3,4) = 0.0;
+  prolongation[1](3,5) = 0.0;
+  prolongation[1](3,6) = 0.0;
+  prolongation[1](3,7) = 0.0;
+  prolongation[1](3,8) = 1.0;
+  prolongation[1](4,0) = -1.0/8.0;
+  prolongation[1](4,1) = 3.0/8.0;
+  prolongation[1](4,2) = 0.0;
+  prolongation[1](4,3) = 0.0;
+  prolongation[1](4,4) = 3.0/4.0;
+  prolongation[1](4,5) = 0.0;
+  prolongation[1](4,6) = 0.0;
+  prolongation[1](4,7) = 0.0;
+  prolongation[1](4,8) = 0.0;
+  prolongation[1](5,0) = 0.0;
+  prolongation[1](5,1) = 3.0/8.0;
+  prolongation[1](5,2) = -1.0/8.0;
+  prolongation[1](5,3) = 0.0;
+  prolongation[1](5,4) = 0.0;
+  prolongation[1](5,5) = 3.0/4.0;
+  prolongation[1](5,6) = 0.0;
+  prolongation[1](5,7) = 0.0;
+  prolongation[1](5,8) = 0.0;
+  prolongation[1](6,0) = 0.0;
+  prolongation[1](6,1) = 0.0;
+  prolongation[1](6,2) = 0.0;
+  prolongation[1](6,3) = 0.0;
+  prolongation[1](6,4) = 0.0;
+  prolongation[1](6,5) = 3.0/8.0;
+  prolongation[1](6,6) = 0.0;
+  prolongation[1](6,7) = -1.0/8.0;
+  prolongation[1](6,8) = 3.0/4.0;
+  prolongation[1](7,0) = 0.0;
+  prolongation[1](7,1) = 0.0;
+  prolongation[1](7,2) = 0.0;
+  prolongation[1](7,3) = 0.0;
+  prolongation[1](7,4) = 3.0/8.0;
+  prolongation[1](7,5) = 0.0;
+  prolongation[1](7,6) = -1.0/8.0;
+  prolongation[1](7,7) = 0.0;
+  prolongation[1](7,8) = 3.0/4.0;
+  prolongation[1](8,0) = -3.0/64.0;
+  prolongation[1](8,1) = 9.0/64.0;
+  prolongation[1](8,2) = -3.0/64.0;
+  prolongation[1](8,3) = 1.0/64.0;
+  prolongation[1](8,4) = 9.0/32.0;
+  prolongation[1](8,5) = 9.0/32.0;
+  prolongation[1](8,6) = -3.0/32.0;
+  prolongation[1](8,7) = -3.0/32.0;
+  prolongation[1](8,8) = 9.0/16.0;
+  prolongation[2](0,0) = 0.0;
+  prolongation[2](0,1) = 0.0;
+  prolongation[2](0,2) = 0.0;
+  prolongation[2](0,3) = 0.0;
+  prolongation[2](0,4) = 0.0;
+  prolongation[2](0,5) = 0.0;
+  prolongation[2](0,6) = 0.0;
+  prolongation[2](0,7) = 0.0;
+  prolongation[2](0,8) = 1.0;
+  prolongation[2](1,0) = 0.0;
+  prolongation[2](1,1) = 0.0;
+  prolongation[2](1,2) = 0.0;
+  prolongation[2](1,3) = 0.0;
+  prolongation[2](1,4) = 0.0;
+  prolongation[2](1,5) = 1.0;
+  prolongation[2](1,6) = 0.0;
+  prolongation[2](1,7) = 0.0;
+  prolongation[2](1,8) = 0.0;
+  prolongation[2](2,0) = 0.0;
+  prolongation[2](2,1) = 0.0;
+  prolongation[2](2,2) = 1.0;
+  prolongation[2](2,3) = 0.0;
+  prolongation[2](2,4) = 0.0;
+  prolongation[2](2,5) = 0.0;
+  prolongation[2](2,6) = 0.0;
+  prolongation[2](2,7) = 0.0;
+  prolongation[2](2,8) = 0.0;
+  prolongation[2](3,0) = 0.0;
+  prolongation[2](3,1) = 0.0;
+  prolongation[2](3,2) = 0.0;
+  prolongation[2](3,3) = 0.0;
+  prolongation[2](3,4) = 0.0;
+  prolongation[2](3,5) = 0.0;
+  prolongation[2](3,6) = 1.0;
+  prolongation[2](3,7) = 0.0;
+  prolongation[2](3,8) = 0.0;
+  prolongation[2](4,0) = 0.0;
+  prolongation[2](4,1) = 0.0;
+  prolongation[2](4,2) = 0.0;
+  prolongation[2](4,3) = 0.0;
+  prolongation[2](4,4) = 0.0;
+  prolongation[2](4,5) = 3.0/8.0;
+  prolongation[2](4,6) = 0.0;
+  prolongation[2](4,7) = -1.0/8.0;
+  prolongation[2](4,8) = 3.0/4.0;
+  prolongation[2](5,0) = 0.0;
+  prolongation[2](5,1) = -1.0/8.0;
+  prolongation[2](5,2) = 3.0/8.0;
+  prolongation[2](5,3) = 0.0;
+  prolongation[2](5,4) = 0.0;
+  prolongation[2](5,5) = 3.0/4.0;
+  prolongation[2](5,6) = 0.0;
+  prolongation[2](5,7) = 0.0;
+  prolongation[2](5,8) = 0.0;
+  prolongation[2](6,0) = 0.0;
+  prolongation[2](6,1) = 0.0;
+  prolongation[2](6,2) = 3.0/8.0;
+  prolongation[2](6,3) = -1.0/8.0;
+  prolongation[2](6,4) = 0.0;
+  prolongation[2](6,5) = 0.0;
+  prolongation[2](6,6) = 3.0/4.0;
+  prolongation[2](6,7) = 0.0;
+  prolongation[2](6,8) = 0.0;
+  prolongation[2](7,0) = 0.0;
+  prolongation[2](7,1) = 0.0;
+  prolongation[2](7,2) = 0.0;
+  prolongation[2](7,3) = 0.0;
+  prolongation[2](7,4) = -1.0/8.0;
+  prolongation[2](7,5) = 0.0;
+  prolongation[2](7,6) = 3.0/8.0;
+  prolongation[2](7,7) = 0.0;
+  prolongation[2](7,8) = 3.0/4.0;
+  prolongation[2](8,0) = 1.0/64.0;
+  prolongation[2](8,1) = -3.0/64.0;
+  prolongation[2](8,2) = 9.0/64.0;
+  prolongation[2](8,3) = -3.0/64.0;
+  prolongation[2](8,4) = -3.0/32.0;
+  prolongation[2](8,5) = 9.0/32.0;
+  prolongation[2](8,6) = 9.0/32.0;
+  prolongation[2](8,7) = -3.0/32.0;
+  prolongation[2](8,8) = 9.0/16.0;
+  prolongation[3](0,0) = 0.0;
+  prolongation[3](0,1) = 0.0;
+  prolongation[3](0,2) = 0.0;
+  prolongation[3](0,3) = 0.0;
+  prolongation[3](0,4) = 0.0;
+  prolongation[3](0,5) = 0.0;
+  prolongation[3](0,6) = 0.0;
+  prolongation[3](0,7) = 1.0;
+  prolongation[3](0,8) = 0.0;
+  prolongation[3](1,0) = 0.0;
+  prolongation[3](1,1) = 0.0;
+  prolongation[3](1,2) = 0.0;
+  prolongation[3](1,3) = 0.0;
+  prolongation[3](1,4) = 0.0;
+  prolongation[3](1,5) = 0.0;
+  prolongation[3](1,6) = 0.0;
+  prolongation[3](1,7) = 0.0;
+  prolongation[3](1,8) = 1.0;
+  prolongation[3](2,0) = 0.0;
+  prolongation[3](2,1) = 0.0;
+  prolongation[3](2,2) = 0.0;
+  prolongation[3](2,3) = 0.0;
+  prolongation[3](2,4) = 0.0;
+  prolongation[3](2,5) = 0.0;
+  prolongation[3](2,6) = 1.0;
+  prolongation[3](2,7) = 0.0;
+  prolongation[3](2,8) = 0.0;
+  prolongation[3](3,0) = 0.0;
+  prolongation[3](3,1) = 0.0;
+  prolongation[3](3,2) = 0.0;
+  prolongation[3](3,3) = 1.0;
+  prolongation[3](3,4) = 0.0;
+  prolongation[3](3,5) = 0.0;
+  prolongation[3](3,6) = 0.0;
+  prolongation[3](3,7) = 0.0;
+  prolongation[3](3,8) = 0.0;
+  prolongation[3](4,0) = 0.0;
+  prolongation[3](4,1) = 0.0;
+  prolongation[3](4,2) = 0.0;
+  prolongation[3](4,3) = 0.0;
+  prolongation[3](4,4) = 0.0;
+  prolongation[3](4,5) = -1.0/8.0;
+  prolongation[3](4,6) = 0.0;
+  prolongation[3](4,7) = 3.0/8.0;
+  prolongation[3](4,8) = 3.0/4.0;
+  prolongation[3](5,0) = 0.0;
+  prolongation[3](5,1) = 0.0;
+  prolongation[3](5,2) = 0.0;
+  prolongation[3](5,3) = 0.0;
+  prolongation[3](5,4) = -1.0/8.0;
+  prolongation[3](5,5) = 0.0;
+  prolongation[3](5,6) = 3.0/8.0;
+  prolongation[3](5,7) = 0.0;
+  prolongation[3](5,8) = 3.0/4.0;
+  prolongation[3](6,0) = 0.0;
+  prolongation[3](6,1) = 0.0;
+  prolongation[3](6,2) = -1.0/8.0;
+  prolongation[3](6,3) = 3.0/8.0;
+  prolongation[3](6,4) = 0.0;
+  prolongation[3](6,5) = 0.0;
+  prolongation[3](6,6) = 3.0/4.0;
+  prolongation[3](6,7) = 0.0;
+  prolongation[3](6,8) = 0.0;
+  prolongation[3](7,0) = -1.0/8.0;
+  prolongation[3](7,1) = 0.0;
+  prolongation[3](7,2) = 0.0;
+  prolongation[3](7,3) = 3.0/8.0;
+  prolongation[3](7,4) = 0.0;
+  prolongation[3](7,5) = 0.0;
+  prolongation[3](7,6) = 0.0;
+  prolongation[3](7,7) = 3.0/4.0;
+  prolongation[3](7,8) = 0.0;
+  prolongation[3](8,0) = -3.0/64.0;
+  prolongation[3](8,1) = 1.0/64.0;
+  prolongation[3](8,2) = -3.0/64.0;
+  prolongation[3](8,3) = 9.0/64.0;
+  prolongation[3](8,4) = -3.0/32.0;
+  prolongation[3](8,5) = -3.0/32.0;
+  prolongation[3](8,6) = 9.0/32.0;
+  prolongation[3](8,7) = 9.0/32.0;
+  prolongation[3](8,8) = 9.0/16.0;
 };
 
 
@@ -678,15 +1115,15 @@ void FEQuadraticSub<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &
 
 
 template <int dim>
-void FEQuadraticSub<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
-				       const vector<Point<dim> >            &unit_points,
-				       vector<dFMatrix>  &jacobians,
-				       const bool,
-				       vector<Point<dim> > &ansatz_points,
-				       const bool,
-				       vector<Point<dim> > &q_points,
-				       const bool,
-				       const Boundary<dim> &) const {
+void FEQuadraticSub<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+					  const vector<Point<dim> >            &unit_points,
+					  vector<dFMatrix>    &jacobians,
+					  const bool           compute_jacobians,
+					  vector<Point<dim> > &ansatz_points,
+					  const bool           compute_ansatz_points,
+					  vector<Point<dim> > &q_points,
+					  const bool           compute_q_points,
+					  const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -694,230 +1131,79 @@ void FEQuadraticSub<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &
   Assert (ansatz_points.size() == total_dofs,
 	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
 
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-
-
-
-#if deal_II_dimension == 1
-
-template <>
-FECubic<1>::FECubic () :
-		FiniteElement<1> (1, 2) {};
-
-
-
-template <>
-void FECubic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
-				 const vector<Point<1> >            &unit_points,
-				 vector<dFMatrix>  &jacobians,
-				 const bool         compute_jacobians,
-				 vector<Point<1> > &ansatz_points,
-				 const bool         compute_ansatz_points,
-				 vector<Point<1> > &q_points,
-				 const bool         compute_q_points,
-				 const Boundary<1> &boundary) const {
-				   // simply pass down
-  FiniteElement<1>::fill_fe_values (cell, unit_points,
-				    jacobians, compute_jacobians,
-				    ansatz_points, compute_ansatz_points,
-				    q_points, compute_q_points, boundary);
-};
-
-
-
-template <>
-void FECubic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
-				    const Boundary<1>  &boundary,
-				    vector<Point<1> >  &ansatz_points) const {
-  FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
-};
-
-
-
-template <>
-void FECubic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
-					 const Boundary<1>  &,
-					 vector<Point<1> >  &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FECubic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-				     const Boundary<1>         &,
-				     const vector<Point<0> > &,
-				     vector<double>      &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FECubic<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
-					const unsigned int           ,
-					const vector<Point<0> > &,
-					vector<double>      &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FECubic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-				     const unsigned int,
-				     const Boundary<1> &,
-				     const vector<Point<0> > &,
-				     vector<Point<1> > &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FECubic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-				     const unsigned int,
-				     const unsigned int,				     
-				     const vector<Point<0> > &,
-				     vector<Point<1> > &) const {
-  Assert (false, ExcInternalError());
-};
-
-#endif
-
-
-
-#if deal_II_dimension == 2
-
-template <>
-FECubic<2>::FECubic () :
-		FiniteElement<2> (1, 2, 4) {};
-
-#endif
-
-
-
-template <int dim>
-double
-FECubic<dim>::shape_value (const unsigned int i,
-			   const Point<dim> &) const
-{
-  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
-  return 0.;
-};
-
-
-
-template <int dim>
-Point<dim>
-FECubic<dim>::shape_grad (const unsigned int i,
-			  const Point<dim> &) const
-{
-  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
-  return Point<dim> ();
-};
-
-
-
-template <int dim>
-void FECubic<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
-				   const vector<Point<dim> >            &unit_points,
-				   vector<dFMatrix>  &jacobians,
-				   const bool,
-				   vector<Point<dim> > &ansatz_points,
-				   const bool,
-				   vector<Point<dim> > &q_points,
-				   const bool,
-				   const Boundary<dim> &) const {
-  Assert (jacobians.size() == unit_points.size(),
-	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
-  Assert (q_points.size() == unit_points.size(),
-	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
-
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FECubic<dim>::get_ansatz_points (const typename DoFHandler<dim>::cell_iterator &,
-				      const Boundary<dim>  &,
-				      vector<Point<dim> >  &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FECubic<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &,
-					   const Boundary<dim>  &,
-					   vector<Point<dim> >  &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FECubic<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &,
-				       const Boundary<dim>         &,
-				       const vector<Point<dim-1> > &,
-				       vector<double>      &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FECubic<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
-					  const unsigned int           ,
-					  const vector<Point<dim-1> > &,
-					  vector<double>      &) const {
-  Assert (face->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
-
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FECubic<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &,
-				       const unsigned int,
-				       const Boundary<dim> &,
-				       const vector<Point<dim-1> > &,
-				       vector<Point<dim> > &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FECubic<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
-				       const unsigned int           face_no,
-				       const unsigned int           ,
-				       const vector<Point<dim-1> > &,
-				       vector<Point<dim> > &) const {
-  Assert (cell->face(face_no)->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
-
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FECubic<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &,
-					  const Boundary<dim> &,
-					  dFMatrix &) const {
-  Assert (false, ExcNotImplemented());
+  
+  unsigned int n_points=unit_points.size();
+
+  Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
+  for (unsigned int l=0; l<GeometryInfo<dim>::vertices_per_cell; ++l)
+    vertices[l] = cell->vertex(l);
+  
+
+  if (compute_q_points) 
+    {
+				       // initialize points to zero
+      for (unsigned int i=0; i<n_points; ++i)
+	q_points[i] = Point<dim> ();
+      
+				       // note: let x_l be the vector of the
+				       // lth quadrature point in real space and
+				       // xi_l that on the unit cell, let further
+				       // p_j be the vector of the jth vertex
+				       // of the cell in real space and
+				       // N_j(xi_l) be the value of the associated
+				       // basis function at xi_l, then
+				       // x_l(xi_l) = sum_j p_j N_j(xi_l)
+				       //
+				       // Here, N_j is the *linear* basis function,
+				       // not that of the finite element, since we
+				       // use a subparametric mapping
+      for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j) 
+	for (unsigned int l=0; l<n_points; ++l) 
+	  q_points[l] += vertices[j] * linear_shape_value(j, unit_points[l]);
+    };
+  
+
+/* jacobi matrices: compute d(x)/d(xi) and invert this
+   Let M(l) be the inverse of J at the quadrature point l, then
+     M_{ij}(l) = sum_s p_i(s) d(N_s(l))/d(xi_j)
+   where p_i(s) is the i-th coordinate of the s-th vertex vector,
+   N_s(l) is the value of the s-th vertex shape function at the
+   quadrature point l.
+
+   We could therefore write:
+   l=0..n_points-1
+     i=0..dim-1
+       j=0..dim-1
+         M_{ij}(l) = 0
+	 s=0..n_vertices
+	   M_{ij}(l) += p_i(s) d(N_s(l))/d(xi_j)
+
+  However, we rewrite the loops to only compute the gradient once for
+  each integration point and basis function.
+*/
+  if (compute_jacobians) 
+    {
+      dFMatrix M(dim,dim);
+      for (unsigned int l=0; l<n_points; ++l) 
+	{
+	  M.clear ();
+	  for (unsigned int s=0; s<GeometryInfo<dim>::vertices_per_cell; ++s)
+	    {
+					       // we want the linear transform,
+					       // so use that function
+	      const Point<dim> gradient = linear_shape_grad (s, unit_points[l]);
+	      for (unsigned int i=0; i<dim; ++i)
+		for (unsigned int j=0; j<dim; ++j)
+		  M(i,j) += vertices[s](i) * gradient(j);
+	    };
+	  jacobians[l].invert(M);
+	};
+    };
+
+				   // compute ansatz points, which are
+				   // the corners for linear elements
+  if (compute_ansatz_points)
+    get_ansatz_points (cell, boundary, ansatz_points);
 };
 
 

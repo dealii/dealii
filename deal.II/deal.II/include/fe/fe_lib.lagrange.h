@@ -269,118 +269,32 @@ class FEQuadraticSub : public FiniteElement<dim> {
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
 					dFMatrix &local_mass_matrix) const;
-};
 
-
-
-
-/**
- * Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions.
- * In one space dimension, a linear (subparametric) mapping from the unit cell
- * to the real cell is implemented.
- */
-template <int dim>
-class FECubic : public FiniteElement<dim> {
-  public:
-				     /**
-				      * Constructor
-				      */
-    FECubic ();
-
-				     /**
+  private:
+    				     /**
 				      * Return the value of the #i#th shape
 				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
 				      */
-    virtual double shape_value(const unsigned int i,
-			       const Point<dim>& p) const;
+    double linear_shape_value(const unsigned int i,
+			      const Point<dim>& p) const;
 
 				     /**
 				      * Return the gradient of the #i#th shape
 				      * function at point #p# on the unit cell.
+				      * Here, the (bi-)linear basis functions
+				      * are meant, which are used for the
+				      * computation of the transformation from
+				      * unit cell to real space cell.
 				      */
-    virtual Point<dim> shape_grad(const unsigned int i,
-				  const Point<dim>& p) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      *
-				      * For one dimensional elements, this
-				      * function simply passes through to
-				      * the one implemented in the base class.
-				      */
-    virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >            &unit_points,
-				 vector<dFMatrix>    &jacobians,
-				 const bool           compute_jacobians,
-				 vector<Point<dim> > &ansatz_points,
-				 const bool           compute_ansatz_points,
-				 vector<Point<dim> > &q_points,
-				 const bool           compute_q_points,
-				 const Boundary<dim> &boundary) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &ansatz_points) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &ansatz_points) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
-				     const Boundary<dim>         &boundary,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<double>      &face_jacobi_determinants) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
-					const unsigned int           subface_no,
-					const vector<Point<dim-1> > &unit_points,
-					vector<double>      &face_jacobi_determinants) const;
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int          face_no,
-				     const Boundary<dim>         &boundary,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const;    
-
-				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int           subface_no,
-				     const unsigned int           face_no,
-				     const vector<Point<dim-1> > &unit_points,
-				     vector<Point<dim> >         &normal_vectors) const;    
-
-    				     /**
-				      * Refer to the base class for detailed
-				      * information on this function.
-				      */
-    virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+    Point<dim> linear_shape_grad(const unsigned int i,
+				 const Point<dim>& p) const;
 };
+
+
 
 
 
