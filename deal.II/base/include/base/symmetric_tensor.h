@@ -615,6 +615,14 @@ class SymmetricTensor
 				      */
     SymmetricTensor & operator = (const SymmetricTensor &);
 
+                                     /**
+                                      * Convert the present symmetric tensor
+                                      * into a full tensor with the same
+                                      * elements, but using the different
+                                      * storage scheme of full tensors.
+                                      */
+    operator Tensor<rank,dim> () const;
+
 				     /**
 				      *  Test for equality of two tensors.
 				      */
@@ -893,6 +901,42 @@ SymmetricTensor<rank,dim>::operator = (const SymmetricTensor<rank,dim> &t)
 {
   data = t.data;
   return *this;
+}
+
+
+
+template <>
+inline
+SymmetricTensor<2,1>::
+operator Tensor<2,1> () const
+{
+  const double t[1][1] = {{data[0]}};
+  return Tensor<2,1>(t);
+}
+
+
+
+template <>
+inline
+SymmetricTensor<2,2>::
+operator Tensor<2,2> () const
+{
+  const double t[2][2] = {{data[0], data[2]},
+                          {data[2], data[1]}};
+  return Tensor<2,2>(t);
+}
+
+
+
+template <>
+inline
+SymmetricTensor<2,3>::
+operator Tensor<2,3> () const
+{
+  const double t[3][3] = {{data[0], data[3], data[4]},
+                          {data[3], data[1], data[5]},
+                          {data[4], data[5], data[2]}};
+  return Tensor<2,3>(t);
 }
 
 
