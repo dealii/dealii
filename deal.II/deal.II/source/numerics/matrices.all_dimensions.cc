@@ -213,7 +213,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 
   for (unsigned int i=0;i<blocks;++i)
     Assert (matrix.block(i,i).get_sparsity_pattern().optimize_diagonal(),
-	    typename SparsityPattern::ExcDiagonalNotOptimized());
+	    SparsityPattern::ExcDiagonalNotOptimized());
 
   
 				   // if no boundary values are to be applied
