@@ -16,6 +16,10 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <dofs/dof_handler.h>
+#include <multigrid/mg_dof_handler.h>
+
+#include <vector>
 
 
 /**
@@ -336,7 +340,7 @@ class DoFRenumbering
     template <int dim>
     static void
     cell_wise_dg (DoFHandler<dim>                     &dof_handler,
-		  const typename std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
+		  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
     
 
 				     /**
@@ -349,7 +353,7 @@ class DoFRenumbering
     static void
     cell_wise_dg (MGDoFHandler<dim>   &dof_handler,
 		  const unsigned int   level,
-		  const typename std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
+		  const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
     
 
 				     /**
