@@ -233,8 +233,7 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
   sparsity.compress();
 };
 
-	  
- 
+
 
 
 unsigned int ConstraintMatrix::n_constraints () const {

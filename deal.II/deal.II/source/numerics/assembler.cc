@@ -67,6 +67,20 @@ void Equation<2>::assemble (vector<dVector>   &,
 
 
 
+/*
+template <int dim>
+Assembler<dim>::AssemblerData::AssemblerData (DoFHandler<dim> *dof,
+					      const bool assemble_matrix,
+					      const bool assemble_rhs,
+					      const unsigned int n_rhs,
+					      ProblemBase<dim> *problem,
+					      const Quadrature<dim> *quadrature) :
+		dof(dof), assemble_matrix(assemble_matrix),
+		assemble_rhs(assemble_rhs), n_rhs(n_rhs),
+		problem(problem), quadrature(quadrature) {};
+		*/
+
+
 
 template <int dim>
 Assembler<dim>::Assembler (Triangulation<dim> *tria,
