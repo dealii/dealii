@@ -463,9 +463,9 @@ class SparseMatrixEZ : public Subscriptor
 				      * The function returns a reference to
 				      * @p{this}.
 				      */
-//    template <typename somenumber>
-//    SparseMatrix<number> &
-//    copy_from (const SparseMatrix<somenumber> &source);
+    template <class MATRIX>
+    SparseMatrixEZ<number> &
+    copy_from (const MATRIX &source);
 
 				     /**
 				      * This function is complete
@@ -518,22 +518,18 @@ class SparseMatrixEZ : public Subscriptor
     
 				     /**
 				      * Add @p{matrix} scaled by
-				      * @p{factor} to this matrix. The
-				      * function throws an error if
-				      * the sparsity patterns of the
-				      * two involved matrices do not
-				      * point to the same object,
-				      * since in this case the
-				      * operation is cheaper.
+				      * @p{factor} to this matrix.
 				      *
-				      * The source matrix may be a matrix
-				      * of arbitrary type, as long as its
-				      * data type is convertible to the
-				      * data type of this matrix.
+				      * The source matrix may be a
+				      * matrix of arbitrary type, as
+				      * long as its data type is
+				      * convertible to the data type
+				      * of this matrix and it has the
+				      * standard @p{const_iterator}.
 				      */
-//    template <typename somenumber>
-//    void add_scaled (const number factor,
-//		     const SparseMatrix<somenumber> &matrix);
+    template <class MATRIX>
+    void add_scaled (const number factor,
+		     const MATRIX &matrix);
     
 				     /**
 				      * Return the value of the entry
@@ -658,6 +654,11 @@ class SparseMatrixEZ : public Subscriptor
     template <typename somenumber>
     somenumber matrix_scalar_product (const Vector<somenumber> &u,
 				      const Vector<somenumber> &v) const;
+
+				     /**
+				      * Frobenius-norm of the matrix.
+				      */
+    number l2_norm () const;
     
     				     /**
 				      * Return the l1-norm of the matrix, that is
@@ -670,7 +671,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * $|Mv|_1\leq |M|_1 |v|_1$.
 				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
 				      */
-    number l1_norm () const;
+//    number l1_norm () const;
 
     				     /**
 				      * Return the linfty-norm of the
@@ -684,7 +685,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * $|Mv|_infty \leq |M|_infty |v|_infty$.
 				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
 				      */
-    number linfty_norm () const;
+//    number linfty_norm () const;
 
 				     /**
 				      * Apply the Jacobi
@@ -1330,6 +1331,45 @@ SparseMatrixEZ<number>::end (unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r+1, 0);
+}
+
+template<typename number>
+template <class MATRIX>
+inline
+SparseMatrixEZ<number>&
+SparseMatrixEZ<number>::copy_from (const MATRIX& M)
+{
+  reinit(M.m(), M.n());
+  
+  typename MATRIX::const_iterator start = M.begin();
+  const typename MATRIX::const_iterator final = M.end();
+
+  while (start != final)
+    {
+      set(start->row(), start->column(), start->value());
+      ++start;
+    }
+  return *this;
+}
+
+template<typename number>
+template <class MATRIX>
+inline
+void
+SparseMatrixEZ<number>::add_scaled (number factor,
+				    const MATRIX& M)
+{
+  Assert (M.m() == m(), ExcDimensionMismatch(M.m(), m()));
+  Assert (M.n() == n(), ExcDimensionMismatch(M.n(), n()));
+  
+  typename MATRIX::const_iterator start = M.begin();
+  const typename MATRIX::const_iterator final = M.end();
+
+  while (start != final)
+    {
+      add(start->row(), start->column(), factor * start->value());
+      ++start;
+    }
 }
 
 #endif

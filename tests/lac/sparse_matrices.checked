@@ -202,6 +202,7 @@ DEAL::	2	1	0	-1.00
 DEAL::	2	2	1	5.00
 DEAL::	2	3	2	-2.00
 DEAL::	2	6	3	-1.00
+DEAL::Matrices are equal
 DEAL::Structure
 DEAL::Assemble
 DEAL:9-SparseMatrix<double>:Richardson::Starting 

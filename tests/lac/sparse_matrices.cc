@@ -158,6 +158,11 @@ int main()
 #ifdef DEBUG
   check_iterator(E);
 #endif
+  E.add_scaled(-1., A);
+  if (E.l2_norm() < 1.e-14)
+    deallog << "Matrices are equal" << std::endl;
+  else
+    deallog << "Matrices differ!!" << std::endl;
   
   A.clear();
   deallog << "Structure" << std::endl;

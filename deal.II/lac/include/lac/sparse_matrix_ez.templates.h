@@ -114,6 +114,25 @@ SparseMatrixEZ<number>::vmult (Vector<somenumber>& dst,
 
 
 template <typename number>
+number
+SparseMatrixEZ<number>::l2_norm () const
+{
+  number sum = 0.;
+  const_iterator start = begin();
+  const_iterator final = end();
+
+  while (start != final)
+    {
+      const double value = start->value();
+      sum += value*value;
+      ++start;
+    }
+  return std::sqrt(sum);
+}
+
+
+
+template <typename number>
 template <typename somenumber>
 void
 SparseMatrixEZ<number>::Tvmult (Vector<somenumber>& dst,
