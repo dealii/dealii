@@ -1802,7 +1802,7 @@ void DataOutInterface<dim>::set_flags (const GmvFlags &flags)
 
 
 template <int dim>
-string DataOutInterface<dim>::default_suffix (OutputFormat output_format) 
+string DataOutInterface<dim>::default_suffix (OutputFormat output_format) const
 {
   if (output_format == default_format)
     output_format = default_fmt;

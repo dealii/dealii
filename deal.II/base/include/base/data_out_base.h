@@ -1240,7 +1240,7 @@ class DataOutInterface : private DataOutBase
 				      * suffix for the
 				      * #default_format# is returned.
 				      */
-    string default_suffix (const OutputFormat output_format = default_format);
+    string default_suffix (const OutputFormat output_format = default_format) const;
 
 				     /**
 				      * Return the #OutputFormat# value
