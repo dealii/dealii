@@ -98,6 +98,12 @@ class MatrixOut : public DataOutInterface<2,2>
 					  */
 	unsigned int block_size;
 
+				       /**
+					* If true, plot discontinuous
+					* patches, one for each entry.
+					**/
+      bool discontinuous;
+
 					 /**
 					  * Default constructor. Set
 					  * all elements of this
@@ -105,7 +111,8 @@ class MatrixOut : public DataOutInterface<2,2>
 					  * values.
 					  */
 	Options (const bool         show_absolute_values = false,
-		 const unsigned int block_size           = 1);
+		 const unsigned int block_size           = 1,
+		 const bool         discontinuous        = false);
     };
     
 				     /**
@@ -337,23 +344,31 @@ MatrixOut::build_patches (const Matrix      &matrix,
 			  const std::string &name,
 			  const Options     &options)
 {
-  const unsigned int
+  unsigned int
     gridpoints_x = (matrix.n() / options.block_size
 		    +
 		    (matrix.n() % options.block_size != 0 ? 1 : 0)),
     gridpoints_y = (matrix.m() / options.block_size
 		    +
 		    (matrix.m() % options.block_size != 0 ? 1 : 0));
-		
+
+				   // If continuous, the number of
+				   // plotted patches is matrix size-1
+  if (!options.discontinuous)
+    {
+      --gridpoints_x;
+      --gridpoints_y;
+    }
+  
 				   // first clear old data and set it
 				   // to virgin state
   patches.clear ();
-  patches.resize ((gridpoints_x-1) * (gridpoints_y-1));
+  patches.resize ((gridpoints_x) * (gridpoints_y));
 
 				   // now build the patches
   unsigned int index=0;
-  for (unsigned int i=0; i<gridpoints_y-1; ++i)
-    for (unsigned int j=0; j<gridpoints_x-1; ++j, ++index)
+  for (unsigned int i=0; i<gridpoints_y; ++i)
+    for (unsigned int j=0; j<gridpoints_x; ++j, ++index)
       {
 					 // within each patch, order
 					 // the points in such a way
@@ -393,10 +408,18 @@ MatrixOut::build_patches (const Matrix      &matrix,
 	patches[index].n_subdivisions = 1;
 
 	patches[index].data.reinit (1,4);
-	patches[index].data(0,0) = get_gridpoint_value(matrix, i,   j,   options);
-	patches[index].data(0,1) = get_gridpoint_value(matrix, i,   j+1, options);
-	patches[index].data(0,2) = get_gridpoint_value(matrix, i+1, j,   options);
-	patches[index].data(0,3) = get_gridpoint_value(matrix, i+1, j+1, options);
+	if (options.discontinuous)
+	  {
+	    patches[index].data(0,0) = get_gridpoint_value(matrix, i, j, options);
+	    patches[index].data(0,1) = get_gridpoint_value(matrix, i, j, options);
+	    patches[index].data(0,2) = get_gridpoint_value(matrix, i, j, options);
+	    patches[index].data(0,3) = get_gridpoint_value(matrix, i, j, options);
+	  } else {
+	    patches[index].data(0,0) = get_gridpoint_value(matrix, i,   j,   options);
+	    patches[index].data(0,1) = get_gridpoint_value(matrix, i,   j+1, options);
+	    patches[index].data(0,2) = get_gridpoint_value(matrix, i+1, j,   options);
+	    patches[index].data(0,3) = get_gridpoint_value(matrix, i+1, j+1, options);
+	  }
       };
 
 				   // finally set the name
