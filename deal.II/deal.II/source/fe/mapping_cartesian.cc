@@ -229,82 +229,63 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 				   // cells are aligned to coordinate
 				   // axes, they are simply vectors
 				   // with exactly one entry equal to
-				   // 1 or -1
+				   // 1 or -1. Furthermore, all
+				   // normals on a face have the same
+				   // value
   if (update_flags & update_normal_vectors)
     {
       Assert (normal_vectors.size() == npts,
 	      ExcDimensionMismatch(normal_vectors.size(), npts));
-      Point<dim> n;
+      Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+              ExcInternalError());
+      
       switch (dim)
         {
           case 2:
           {
-            switch (face_no)
-              {
-                case 0:
-                      n (1) = -1.;
-                      break;
-                case 1:
-                      n (0) = 1.;
-                      break;
-                case 2:
-                      n (1) = 1.;
-                      break;
-                case 3:
-                      n (0) = -1.;
-                      break;
-                default:
-                      Assert (false, ExcInternalError());
-              }
+            static const Point<dim>
+              normals[GeometryInfo<2>::faces_per_cell]
+              = { Point<dim>(0, -1),
+                  Point<dim>(1,  0),
+                  Point<dim>(0,  1),
+                  Point<dim>(-1, 0) };
+            std::fill (normal_vectors.begin(),
+                       normal_vectors.end(),
+                       normals[face_no]);
             break;
           }
 
           case 3:
           {
-            switch (face_no)
-              {
-                case 0:
-                      n (1) = -1.;
-                      break;
-                case 1:
-                      n (1) = 1.;
-                      break;
-                case 2:
-                      n (2) = -1.;
-                      break;
-                case 3:
-                      n (0) = 1.;
-                      break;
-                case 4:
-                      n (2) = 1.;
-                      break;
-                case 5:
-                      n (0) = -1.;
-                      break;
-                default:
-                      Assert (false, ExcInternalError());
-              }
+            static const Point<dim>
+              normals[GeometryInfo<3>::faces_per_cell]
+              = { Point<dim>(0, -1, 0),
+                  Point<dim>(0,  1, 0),
+                  Point<dim>(0,  0, -1),
+                  Point<dim>(1,  0, 0),
+                  Point<dim>(0,  0, 1),
+                  Point<dim>(-1, 0, 0) };
+            std::fill (normal_vectors.begin(),
+                       normal_vectors.end(),
+                       normals[face_no]);
             break;
           }
 
           default:
                 Assert (false, ExcNotImplemented());
         }
-      
-				       // furthermore, all normal
-				       // vectors on a face are equal
-      std::fill (normal_vectors.begin(), normal_vectors.end(), n);
     }
 }
 
 
 template <int dim>
 void
-MappingCartesian<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator& cell,
-				       const Quadrature<dim>& q, 
-				       typename Mapping<dim>::InternalDataBase& mapping_data,
-				       std::vector<Point<dim> >& quadrature_points,
-				       std::vector<double>& JxW_values) const
+MappingCartesian<dim>::
+fill_fe_values (const typename DoFHandler<dim>::cell_iterator& cell,
+                const Quadrature<dim>& q, 
+                typename Mapping<dim>::InternalDataBase& mapping_data,
+                std::vector<Point<dim> >& quadrature_points,
+                std::vector<double>& JxW_values) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

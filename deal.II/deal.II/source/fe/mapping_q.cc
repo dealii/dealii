@@ -925,8 +925,9 @@ MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell
 
 template<int dim>
 void
-MappingQ<dim>::add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
-				       std::vector<Point<dim> > &) const
+MappingQ<dim>::
+add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
+                        std::vector<Point<dim> > &) const
 {
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
@@ -935,10 +936,11 @@ MappingQ<dim>::add_quad_support_points(const typename Triangulation<dim>::cell_i
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (Tensor<1,dim>       *begin,
-				    Tensor<1,dim>       *end,
-				    const Tensor<1,dim> *src,
-				    const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::
+transform_covariant (Tensor<1,dim>       *begin,
+                     Tensor<1,dim>       *end,
+                     const Tensor<1,dim> *src,
+                     const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
@@ -958,10 +960,9 @@ MappingQ<dim>::transform_covariant (Tensor<1,dim>       *begin,
       else
 	tensor = data->covariant.begin();    
     }
+
   while (begin!=end)
-    {
-      contract (*(begin++), *(src++), *(tensor++));
-    }
+    contract (*(begin++), *(src++), *(tensor++));
 }
 
 
@@ -991,20 +992,20 @@ MappingQ<dim>::transform_covariant (Tensor<2,dim>       *begin,
       else
 	tensor = data->covariant.begin();
     }
+
   while (begin!=end)
-    {
-      contract (*(begin++), *(src++), *(tensor++));
-    }
+    contract (*(begin++), *(src++), *(tensor++));
 }
 
 
 
 template <int dim>
 void
-MappingQ<dim>::transform_contravariant (Tensor<1,dim>       *begin,
-					Tensor<1,dim>       *end,
-					const Tensor<1,dim> *src,
-					const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::
+transform_contravariant (Tensor<1,dim>       *begin,
+                         Tensor<1,dim>       *end,
+                         const Tensor<1,dim> *src,
+                         const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
@@ -1024,10 +1025,9 @@ MappingQ<dim>::transform_contravariant (Tensor<1,dim>       *begin,
       else
 	tensor = data->contravariant.begin();    
     }
+  
   while (begin!=end)
-    {
-      contract (*(begin++), *(tensor++), *(src++));
-    }
+    contract (*(begin++), *(tensor++), *(src++));
 }
 
 
@@ -1057,19 +1057,18 @@ MappingQ<dim>::transform_contravariant (Tensor<2,dim>       *begin,
       else
 	tensor = data->contravariant.begin();    
     }
+
   while (begin!=end)
-    {
-      contract (*(begin++), *(tensor++), *(src++));
-    }
+    contract (*(begin++), *(tensor++), *(src++));
 }
 
 
 
 template <int dim>
 Point<dim>
-MappingQ<dim>::transform_unit_to_real_cell (
-  const typename Triangulation<dim>::cell_iterator &cell,
-  const Point<dim>                                 &p) const
+MappingQ<dim>::
+transform_unit_to_real_cell (const typename Triangulation<dim>::cell_iterator &cell,
+                             const Point<dim>                                 &p) const
 {
 				   // Use the get_data function to
 				   // create an InternalData with data
@@ -1077,55 +1076,53 @@ MappingQ<dim>::transform_unit_to_real_cell (
 				   // transformation shape values
 				   // already computed at point p.
   const Quadrature<dim> point_quadrature(p);
-  InternalData *mdata=dynamic_cast<InternalData *> (
-    get_data(update_transformation_values, point_quadrature));
-  Assert(mdata!=0, ExcInternalError());
+  std::auto_ptr<InternalData>
+    mdata (dynamic_cast<InternalData *> (
+             get_data(update_transformation_values, point_quadrature)));
   
   mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
 					    || cell->has_boundary_lines());
 
-  typename MappingQ1<dim>::InternalData *p_data=0;
-  if (mdata->use_mapping_q1_on_current_cell)
-    p_data=&mdata->mapping_q1_data;
-  else
-    p_data=mdata;
+  typename MappingQ1<dim>::InternalData
+    *p_data = (mdata->use_mapping_q1_on_current_cell ?
+               &mdata->mapping_q1_data :
+               &*mdata);
 
   compute_mapping_support_points(cell, p_data->mapping_support_points);
   
-  const Point<dim> q=this->transform_unit_to_real_cell_internal(*p_data);
-  delete mdata;
-  return q;
+  return this->transform_unit_to_real_cell_internal(*p_data);
 }
 
 
 
 template <int dim>
 Point<dim>
-MappingQ<dim>::transform_real_to_unit_cell (
-  const typename Triangulation<dim>::cell_iterator &cell,
-  const Point<dim>                                 &p) const
+MappingQ<dim>::
+transform_real_to_unit_cell (const typename Triangulation<dim>::cell_iterator &cell,
+                             const Point<dim>                                 &p) const
 {
 				   // first a Newton iteration based
 				   // on a Q1 mapping
-  Point<dim> p_unit=MappingQ1<dim>::transform_real_to_unit_cell(cell, p);
+  Point<dim> p_unit = MappingQ1<dim>::transform_real_to_unit_cell(cell, p);
   
+                                   // then a Newton iteration based on
+                                   // the full MappingQ if we need
+                                   // this
   if (cell->has_boundary_lines() || use_mapping_q_on_all_cells)
     {
-				       // then a Newton iteration
-				       // based on the full MappingQ
       const Quadrature<dim> point_quadrature(p_unit);
-      InternalData *mdata=dynamic_cast<InternalData *> (
-	get_data(update_transformation_values | update_transformation_gradients,
-		 point_quadrature));
-      Assert(mdata!=0, ExcInternalError());
-      mdata->use_mapping_q1_on_current_cell=false;
+      std::auto_ptr<InternalData>
+        mdata (dynamic_cast<InternalData *> (
+                 get_data(update_transformation_values |
+                          update_transformation_gradients,
+                          point_quadrature)));
+      
+      mdata->use_mapping_q1_on_current_cell = false;
 
-      std::vector<Point<dim> > &points=mdata->mapping_support_points;
-      compute_mapping_support_points(cell, points);
+      std::vector<Point<dim> > &points = mdata->mapping_support_points;
+      compute_mapping_support_points (cell, points);
 
       this->transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
-  
-      delete mdata;
     }
   
   return p_unit;

@@ -66,13 +66,10 @@ MappingQ1Eulerian<dim>::compute_mapping_support_points(
 	      cell->index(),
 	      shiftmap_dof_handler);
 
-				   // We require the cell to be
-				   // active.  This is determined by
-				   // the user when looping over all
-				   // active cells in the problem
-				   // code.
-  Assert (dof_cell->active() == true,
-          ExcInactiveCell());
+				   // We require the cell to be active
+				   // since we can only then get nodal
+				   // values for the shifts
+  Assert (dof_cell->active() == true, ExcInactiveCell());
 
 				   // for Q1 elements, the number of
 				   // support points should equal the
