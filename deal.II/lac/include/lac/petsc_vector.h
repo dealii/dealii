@@ -59,7 +59,7 @@ namespace PETScWrappers
                                         * <tt>v=0;</tt>. Presumably, the user wants
                                         * to set every element of the vector to
                                         * zero, but instead, what happens is
-                                        * this call: <tt>v=Vector<number>(0);</tt>,
+                                        * this call: <tt>v=Vector@<number@>(0);</tt>,
                                         * i.e. the vector is replaced by one of
                                         * length zero.
                                         */

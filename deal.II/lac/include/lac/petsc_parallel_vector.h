@@ -168,7 +168,7 @@ namespace PETScWrappers
                                           * wants to set every element of the
                                           * vector to zero, but instead, what
                                           * happens is this call:
-                                          * <tt>v=Vector<number>(0);</tt>, i.e. the
+                                          * <tt>v=Vector@<number@>(0);</tt>, i.e. the
                                           * vector is replaced by one of
                                           * length zero.
                                           */
@@ -358,7 +358,7 @@ namespace PETScWrappers
     };
 
 
-
+/// @if NoDoc
 // ------------------ template and inline functions -------------
 
 
@@ -461,8 +461,8 @@ namespace PETScWrappers
 
       return *this;
     }    
+/// @endif
   }
-/*@}*/  
 }
 
 

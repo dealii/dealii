@@ -23,10 +23,6 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-/*! @addtogroup PETSc
- *@{
- */
-
 namespace PETScWrappers
 {
                                    // forward declarations
@@ -46,6 +42,8 @@ namespace PETScWrappers
  * surprisingly only shows the nonzero elements of the matrix, not all
  * elements.
  *
+ * @ingroup PETSc
+ * @brief Matrix iterator
  * @author Guido Kanschat, Roy Stogner, Wolfgang Bangerth, 2004
  */
     class const_iterator
@@ -280,6 +278,7 @@ namespace PETScWrappers
  * call SparseMatrix::compress() once at the end of the assembly stage and
  * before the matrix is actively used.
  * 
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class MatrixBase 
@@ -694,7 +693,7 @@ namespace PETScWrappers
 
 
 
-
+/// @if NoDoc
 // -------------------------- inline and template functions ----------------------
 
 
@@ -891,10 +890,9 @@ namespace PETScWrappers
     Assert (r < m(), ExcIndexRange(r, 0, m()));
     return const_iterator(this, r+1, 0);
   }
-      
+/// @endif      
 }
 
-/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

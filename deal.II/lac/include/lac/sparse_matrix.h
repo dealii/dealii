@@ -1628,6 +1628,8 @@ class SparseMatrix : public virtual Subscriptor
 };
 
 /*@}*/
+
+/// @if NoDoc
 /*---------------------- Inline functions -----------------------------------*/
 
 
@@ -2250,7 +2252,7 @@ SparseMatrix<number>::end (const unsigned int r)
   return end();
 }
 
-
+/// @endif
 
 
 /*----------------------------   sparse_matrix.h     ---------------------------*/

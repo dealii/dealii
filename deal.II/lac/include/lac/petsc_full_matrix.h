@@ -21,13 +21,13 @@
 
 #include <lac/petsc_matrix_base.h>
 
+
+namespace PETScWrappers
+{
 /*! @addtogroup PETSc
  *@{
  */
 
-
-namespace PETScWrappers
-{
 /**
  * Implementation of a sequential dense matrix class based on PETSC. All the
  * functionality is actually in the base class, except for the calls to
@@ -49,9 +49,9 @@ namespace PETScWrappers
       FullMatrix (const unsigned int m,
                   const unsigned int n);
   };
-}
-
+  
 /*@}*/
+}
 
 #endif // DEAL_II_USE_PETSC
 

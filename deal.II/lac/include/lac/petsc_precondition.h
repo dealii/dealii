@@ -21,11 +21,6 @@
 #include <petscpc.h>
 
 
-/*! @addtogroup PETSc
- *@{
- */
-
-
 namespace PETScWrappers
 {
                                    // forward declarations
@@ -42,6 +37,7 @@ namespace PETScWrappers
  * only to allow a similar interface than already used for the deal.II solver
  * and preconditioner classes.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionerBase
@@ -107,6 +103,7 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc Jacobi
  * preconditioner.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionJacobi : public PreconditionerBase
@@ -159,6 +156,7 @@ namespace PETScWrappers
  * the matrix for preconditioning. This can be changed, as is explained in the
  * relevant section of the PETSc manual, but is not implemented here.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionBlockJacobi : public PreconditionerBase
@@ -204,6 +202,7 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc SOR
  * preconditioner.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionSOR : public PreconditionerBase
@@ -266,6 +265,7 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc SSOR
  * preconditioner.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionSSOR : public PreconditionerBase
@@ -328,6 +328,7 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc Eisenstat
  * preconditioner.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionEisenstat : public PreconditionerBase
@@ -390,6 +391,7 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc Incomplete Cholesky
  * preconditioner.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionICC : public PreconditionerBase
@@ -452,6 +454,7 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc ILU
  * preconditioner.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class PreconditionILU : public PreconditionerBase
@@ -509,8 +512,6 @@ namespace PETScWrappers
   };
 
 }
-
-/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

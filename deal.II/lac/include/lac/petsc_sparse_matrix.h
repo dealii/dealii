@@ -23,11 +23,6 @@
 
 #include <vector>
 
-/*! @addtogroup PETSc
- *@{
- */
-
-
 namespace PETScWrappers
 {
 /**
@@ -39,6 +34,7 @@ namespace PETScWrappers
  * virtual functions). Only the functions creating a matrix of specific type
  * differ, and are implemented in this particular class.
  *
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
   class SparseMatrix : public MatrixBase
@@ -171,7 +167,7 @@ namespace PETScWrappers
   };
 
 
-
+/// @if NoDoc
 // -------- template and inline functions ----------
 
   inline
@@ -180,10 +176,8 @@ namespace PETScWrappers
   {
     MatrixBase::reinit ();
   }
-  
+///@endif  
 }
-
-/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 

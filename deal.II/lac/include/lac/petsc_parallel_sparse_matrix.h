@@ -24,10 +24,6 @@
 #include <vector>
 
 
-/*! @addtogroup PETSc
- *@{
- */
-
 
 namespace PETScWrappers
 {
@@ -48,6 +44,7 @@ namespace PETScWrappers
  * to individual elements in the documentation to the parallel vector
  * class. These comments apply here as well.
  * 
+ * @ingroup PETSc
  * @author Wolfgang Bangerth, 2004
  */
     class SparseMatrix : public MatrixBase
@@ -197,10 +194,7 @@ namespace PETScWrappers
     };
 
   }
-  
 }
-
-/*@}*/
 
 #endif // DEAL_II_USE_PETSC
 
