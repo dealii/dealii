@@ -1271,6 +1271,30 @@ Tensor<1,3> FECrissCross<3>::shape_grad_transform (const unsigned int,
 #endif // deal_II_dimension == 3
 
 
+
+template <int dim>
+Point<dim>
+FECrissCross<dim>::transform_unit_to_real_cell (const typename DoFHandler<dim>::cell_iterator,
+						const Point<dim> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Point<dim>();
+};
+
+
+
+template <int dim>
+Point<dim>
+FECrissCross<dim>::transform_real_to_unit_cell (const typename DoFHandler<dim>::cell_iterator,
+						const Point<dim> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Point<dim>();
+};
+
+
+
+
 /*--------------------------- QCrissCross* ------------------------------------*/
 
 
