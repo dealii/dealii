@@ -23,8 +23,7 @@
  * @author Guido Kanschat, 2002
  */
 template <class MATRIX, class VECTOR>
-class MGMatrix : public MGMatrixBase<VECTOR>,
-  public SmartPointer<MGLevelObject<MATRIX> >
+class MGMatrix : public MGMatrixBase<VECTOR>
 {
   public:
 				     /**
@@ -76,6 +75,12 @@ class MGMatrix : public MGMatrixBase<VECTOR>,
 				    */
   virtual void Tvmult_add(unsigned int level, VECTOR& dst,
 		     const VECTOR& src) const;    
+
+private:
+  /**
+   * Pointer to the matrix objects on each level.
+   */
+  SmartPointer<MGLevelObject<MATRIX> > matrix;
 };
 
 
@@ -91,8 +96,7 @@ class MGMatrix : public MGMatrixBase<VECTOR>,
  * @author Guido Kanschat, 2002
  */
 template <class MATRIX, typename number>
-class MGMatrixSelect : public MGMatrixBase<Vector<number> >,
-  public SmartPointer<MGLevelObject<MATRIX> >
+class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 {
   public:
 				     /**
@@ -153,6 +157,10 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >,
 			  const Vector<number>& src) const;    
 
   private:
+  /**
+   * Pointer to the matrix objects on each level.
+   */
+  SmartPointer<MGLevelObject<MATRIX> > matrix;
 				     /**
 				      * Row coordinate of selected block.
 				      */
@@ -170,7 +178,7 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >,
 template <class MATRIX, class VECTOR>
 MGMatrix<MATRIX, VECTOR>::MGMatrix (MGLevelObject<MATRIX>* p)
 		:
-		SmartPointer<MGLevelObject<MATRIX> > (p)
+		matrix (p)
 {}
 
 
@@ -178,7 +186,7 @@ template <class MATRIX, class VECTOR>
 void
 MGMatrix<MATRIX, VECTOR>::set_matrix (MGLevelObject<MATRIX>* p)
 {
-  (SmartPointer<MGLevelObject<MATRIX> >) (*this) = p;
+  matrix = p;
 }
 
 
@@ -188,10 +196,9 @@ MGMatrix<MATRIX, VECTOR>::vmult (unsigned int level,
 				 VECTOR& dst,
 				 const VECTOR& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].vmult(dst, src);
 }
 
@@ -202,10 +209,9 @@ MGMatrix<MATRIX, VECTOR>::vmult_add (unsigned int level,
 				 VECTOR& dst,
 				 const VECTOR& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].vmult_add(dst, src);
 }
 
@@ -216,10 +222,9 @@ MGMatrix<MATRIX, VECTOR>::Tvmult (unsigned int level,
 				 VECTOR& dst,
 				 const VECTOR& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].Tvmult(dst, src);
 }
 
@@ -230,10 +235,9 @@ MGMatrix<MATRIX, VECTOR>::Tvmult_add (unsigned int level,
 				 VECTOR& dst,
 				 const VECTOR& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].Tvmult_add(dst, src);
 }
 
@@ -245,8 +249,8 @@ MGMatrixSelect<MATRIX, number>::
 MGMatrixSelect (const unsigned int row,
 		const unsigned int col,
 		MGLevelObject<MATRIX>* p)
-		:
-		SmartPointer<MGLevelObject<MATRIX> > (p),
+  :
+  matrix (p),
   row(row),
   col(col)
 {}
@@ -257,7 +261,7 @@ template <class MATRIX, typename number>
 void
 MGMatrixSelect<MATRIX, number>::set_matrix (MGLevelObject<MATRIX>* p)
 {
-  (SmartPointer<MGLevelObject<MATRIX> >) (*this) = p;
+  matrix = p;
 }
 
 
@@ -279,10 +283,9 @@ vmult (unsigned int level,
        Vector<number>& dst,
        const Vector<number>& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].block(row, col).vmult(dst, src);
 }
 
@@ -294,10 +297,9 @@ vmult_add (unsigned int level,
 	   Vector<number>& dst,
 	   const Vector<number>& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].block(row, col).vmult_add(dst, src);
 }
 
@@ -309,10 +311,9 @@ Tvmult (unsigned int level,
 	Vector<number>& dst,
 	const Vector<number>& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].block(row, col).Tvmult(dst, src);
 }
 
@@ -324,10 +325,9 @@ Tvmult_add (unsigned int level,
 	    Vector<number>& dst,
 	    const Vector<number>& src) const
 {
-  Assert((SmartPointer<MGLevelObject<MATRIX> >) *this != 0,
-	 ExcNotInitialized());
+  Assert(matrix != 0, ExcNotInitialized());
   
-  const MGLevelObject<MATRIX>& m = **this;
+  const MGLevelObject<MATRIX>& m = *matrix;
   m[level].block(row, col).Tvmult_add(dst, src);
 }
 
