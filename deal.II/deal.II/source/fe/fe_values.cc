@@ -607,6 +607,9 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 				*this->mapping_data,
 				*this->fe_data,
 				*this);
+
+  this->fe_data->clear_first_cell ();
+  this->mapping_data->clear_first_cell ();
 }
 
 
@@ -758,6 +761,9 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				     *this->mapping_data,
 				     *this->fe_data,
 				     *this);
+
+  this->fe_data->clear_first_cell ();
+  this->mapping_data->clear_first_cell ();
 };
 
 
@@ -853,6 +859,9 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 					*this->mapping_data,
 					*this->fe_data,
 					*this);
+
+  this->fe_data->clear_first_cell ();
+  this->mapping_data->clear_first_cell ();
 };
 
 

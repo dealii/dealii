@@ -376,6 +376,12 @@ class FESystem : public FiniteElement<dim>
 				      * Implementation of the same
 				      * function in
 				      * @ref{FiniteElement}.
+				      *
+				      * Passes on control to
+				      * @p{compute_fill} that does the
+				      * work for all three
+				      * @p{fill_fe*_values}
+				      * functions.
 				      */
     virtual void
     fill_fe_values (const Mapping<dim>                      &mapping,
@@ -389,6 +395,11 @@ class FESystem : public FiniteElement<dim>
 				      * Implementation of the same
 				      * function in
 				      * @ref{FiniteElement}.
+				      *
+				      * Passes on control to
+				      * @p{compute_fill} that does the
+				      * work for all three
+				      * @p{fill_fe*_values} functions.
 				      */    
     virtual void
     fill_fe_face_values (const Mapping<dim>                   &mapping,
@@ -403,6 +414,11 @@ class FESystem : public FiniteElement<dim>
 				      * Implementation of the same
 				      * function in
 				      * @ref{FiniteElement}.
+				      *
+				      * Passes on control to
+				      * @p{compute_fill} that does the
+				      * work for all three
+				      * @p{fill_fe*_values} functions.
 				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim>                   &mapping,
@@ -416,18 +432,26 @@ class FESystem : public FiniteElement<dim>
     
 
 				     /**
+				      * Do the work for the three
+				      * @p{fill_fe*_values} functions.
+				      * 
 				      * Calls (among other things)
 				      * @p{fill_fe_([sub]face)_values}
 				      * of the base elements. Calls
 				      * @p{fill_fe_values} if
-				      * @p{face_no==-1} and
-				      * @p{sub_no==-1}; calls
-				      * @p{fill_fe_face_values} if
-				      * @p{face_no==-1} and
-				      * @p{sub_no!=-1}; and calls
-				      * @p{fill_fe_subface_values} if 
-				      * @p{face_no!=-1} and
-				      * @p{sub_no!=-1}.
+				      * @p{face_no==invalid_face_no}
+				      * and
+				      * @p{sub_no==invalid_face_no};
+				      * calls @p{fill_fe_face_values}
+				      * if
+				      * @p{face_no==invalid_face_no}
+				      * and
+				      * @p{sub_no!=invalid_face_no};
+				      * and calls
+				      * @p{fill_fe_subface_values} if
+				      * @p{face_no!=invalid_face_no}
+				      * and
+				      * @p{sub_no!=invalid_face_no}.
 				      */
     template <int dim_1>
     void compute_fill (const Mapping<dim>                   &mapping,
@@ -435,8 +459,8 @@ class FESystem : public FiniteElement<dim>
 		       const unsigned int                    face_no,
 		       const unsigned int                    sub_no,
 		       const Quadrature<dim_1>              &quadrature,
-		       typename Mapping<dim>::InternalDataBase      &mapping_data,
-		       typename Mapping<dim>::InternalDataBase      &fe_data,
+		       typename Mapping<dim>::InternalDataBase &mapping_data,
+		       typename Mapping<dim>::InternalDataBase &fe_data,
 		       FEValuesData<dim>                    &data) const ;
 
   private:
@@ -743,6 +767,22 @@ class FESystem : public FiniteElement<dim>
 					  * classes).
 					  */
 	void delete_fe_values_data (const unsigned int base_no);
+
+                                         /**
+                                          * Set the @p{first_cell}
+                                          * flag to @p{false}. Used by
+                                          * the @p{FEValues} class to
+                                          * indicate that we have
+                                          * already done the work on
+                                          * the first cell.
+                                          *
+                                          * In addition to calling the
+                                          * respective function of the
+                                          * base class, this function
+                                          * also calls the functions
+                                          * of the sub-data objects.
+                                          */
+        virtual void clear_first_cell ();
 	
       private:
 	

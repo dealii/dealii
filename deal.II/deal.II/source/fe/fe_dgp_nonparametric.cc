@@ -286,7 +286,6 @@ FE_DGPNonparametric<dim>::fill_fe_values (
 	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
 	  }
       }
-  fe_data.first_cell = false;
 }
 
 
@@ -328,7 +327,6 @@ FE_DGPNonparametric<dim>::fill_fe_face_values (
 	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
 	  }
       }
-  fe_data.first_cell = false;
 }
 
 
@@ -371,7 +369,6 @@ FE_DGPNonparametric<dim>::fill_fe_subface_values (
 	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
 	  }
       }
-  fe_data.first_cell = false;
 }
 
 

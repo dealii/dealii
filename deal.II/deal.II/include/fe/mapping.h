@@ -170,20 +170,38 @@ class Mapping : public Subscriptor
 					  */
 	UpdateFlags  current_update_flags() const;
 
-					 /**
-					  * Determine if this is the
-					  * first cell visited. Then,
-					  * we need to use
-					  * @p{update_once} to fill
-					  * cell-independent
-					  * fields. Users of derived
-					  * classes will have to set
-					  * this field to @p{false};
-					  * it is initialized to
-					  * @p{true}.
-					  */
-	bool first_cell;
+                                         /**
+                                          * Return whether we are
+                                          * presently initializing
+                                          * data for the first
+                                          * cell. The value of the
+                                          * field this function is
+                                          * returning is set to
+                                          * @p{true} in the
+                                          * constructor, and cleared
+                                          * by the @p{FEValues} class
+                                          * after the first cell has
+                                          * been initialized.
+                                          *
+                                          * This function is used to
+                                          * determine whether we need
+                                          * to use the @p{update_once}
+                                          * flags for computing data,
+                                          * or whether we can use the
+                                          * @p{update_each} flags.
+                                          */
+        bool is_first_cell () const;
 
+                                         /**
+                                          * Set the @p{first_cell}
+                                          * flag to @p{false}. Used by
+                                          * the @p{FEValues} class to
+                                          * indicate that we have
+                                          * already done the work on
+                                          * the first cell.
+                                          */
+        virtual void clear_first_cell ();
+        
 					 /**
 					  * Return an estimate (in
 					  * bytes) or the memory
@@ -191,6 +209,13 @@ class Mapping : public Subscriptor
 					  * object.
 					  */
 	virtual unsigned int memory_consumption () const;
+
+      private:
+                                         /**
+                                          * The value returned by
+                                          * @p{is_first_cell}.
+                                          */
+        bool first_cell;
     };
     
 				     /**
@@ -515,19 +540,37 @@ template<> const unsigned int Mapping<3>::normal_directions[6];
 template <int dim>
 inline
 UpdateFlags
-Mapping<dim>::InternalDataBase::current_update_flags() const
+Mapping<dim>::InternalDataBase::current_update_flags () const
 {
   if (first_cell)
     {
-      Assert(update_flags==(update_once|update_each), ExcInternalError());
+      Assert (update_flags==(update_once|update_each),
+              ExcInternalError());
       return update_flags;
     }
   else
     return update_each;
-  
-  return update_default;
-}
+};
 
+
+
+template <int dim>
+inline
+bool
+Mapping<dim>::InternalDataBase::is_first_cell () const
+{
+  return first_cell;
+};
+
+
+
+template <int dim>
+inline
+void
+Mapping<dim>::InternalDataBase::clear_first_cell ()
+{
+  first_cell = false;
+};
 
 
 #endif

@@ -127,6 +127,20 @@ InternalData::delete_fe_values_data (const unsigned int base_no)
 
 
 
+template <int dim>
+void
+FESystem<dim>::InternalData::clear_first_cell ()
+{
+                                   // call respective function of base
+                                   // class
+  FiniteElementBase<dim>::InternalDataBase::clear_first_cell ();
+                                   // then the functions of all the
+                                   // sub-objects
+  for (unsigned int i=0; i<base_fe_datas.size(); ++i)
+    base_fe_datas[i]->clear_first_cell ();
+};
+
+
 /* ---------------------------------- FESystem ------------------- */
 
 
@@ -529,12 +543,13 @@ FESystem<dim>::get_data (const UpdateFlags      flags_,
 
 template <int dim>
 void
-FESystem<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-			       const typename DoFHandler<dim>::cell_iterator &cell,
-			       const Quadrature<dim>                &quadrature,
-			       typename Mapping<dim>::InternalDataBase       &mapping_data,
-			       typename Mapping<dim>::InternalDataBase       &fe_data,
-			       FEValuesData<dim>                    &data) const
+FESystem<dim>::
+fill_fe_values (const Mapping<dim>                   &mapping,
+                const typename DoFHandler<dim>::cell_iterator &cell,
+                const Quadrature<dim>                &quadrature,
+                typename Mapping<dim>::InternalDataBase &mapping_data,
+                typename Mapping<dim>::InternalDataBase &fe_data,
+                FEValuesData<dim>                    &data) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
 	       quadrature, mapping_data, fe_data, data);
@@ -544,16 +559,17 @@ FESystem<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 
 template <int dim>
 void
-FESystem<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				    const typename DoFHandler<dim>::cell_iterator &cell,
-				    const unsigned int                    face_no,
-				    const Quadrature<dim-1>              &quadrature,
-				    typename Mapping<dim>::InternalDataBase       &mapping_data,
-				    typename Mapping<dim>::InternalDataBase       &fe_data,
-				    FEValuesData<dim>                    &data) const
+FESystem<dim>::
+fill_fe_face_values (const Mapping<dim>                   &mapping,
+                     const typename DoFHandler<dim>::cell_iterator &cell,
+                     const unsigned int                    face_no,
+                     const Quadrature<dim-1>              &quadrature,
+                     typename Mapping<dim>::InternalDataBase &mapping_data,
+                     typename Mapping<dim>::InternalDataBase &fe_data,
+                     FEValuesData<dim>                    &data) const
 {
-  compute_fill(mapping, cell, face_no, invalid_face_number,
-	       quadrature, mapping_data, fe_data, data);
+  compute_fill (mapping, cell, face_no, invalid_face_number,
+                quadrature, mapping_data, fe_data, data);
 };
 
 
@@ -561,17 +577,18 @@ FESystem<dim>::fill_fe_face_values (const Mapping<dim>                   &mappin
 
 template <int dim>
 void
-FESystem<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-				       const typename DoFHandler<dim>::cell_iterator &cell,
-				       const unsigned int                    face_no,
-				       const unsigned int                    sub_no,
-				       const Quadrature<dim-1>              &quadrature,
-				       typename Mapping<dim>::InternalDataBase       &mapping_data,
-				       typename Mapping<dim>::InternalDataBase       &fe_data,
-				       FEValuesData<dim>                    &data) const
+FESystem<dim>::
+fill_fe_subface_values (const Mapping<dim>                   &mapping,
+                        const typename DoFHandler<dim>::cell_iterator &cell,
+                        const unsigned int                    face_no,
+                        const unsigned int                    sub_no,
+                        const Quadrature<dim-1>              &quadrature,
+                        typename Mapping<dim>::InternalDataBase &mapping_data,
+                        typename Mapping<dim>::InternalDataBase &fe_data,
+                        FEValuesData<dim>                    &data) const
 {
-  compute_fill(mapping, cell, face_no, sub_no,
-	       quadrature, mapping_data, fe_data, data);
+  compute_fill (mapping, cell, face_no, sub_no,
+                quadrature, mapping_data, fe_data, data);
 }
 
 
@@ -579,14 +596,15 @@ FESystem<dim>::fill_fe_subface_values (const Mapping<dim>                   &map
 template <int dim>
 template <int dim_1>
 void
-FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
-			     const typename DoFHandler<dim>::cell_iterator &cell,
-			     const unsigned int                    face_no,
-			     const unsigned int                    sub_no,
-			     const Quadrature<dim_1>              &quadrature,
-			     typename Mapping<dim>::InternalDataBase       &mapping_data,
-			     typename Mapping<dim>::InternalDataBase       &fedata,
-			     FEValuesData<dim>                    &data) const
+FESystem<dim>::
+compute_fill (const Mapping<dim>                   &mapping,
+              const typename DoFHandler<dim>::cell_iterator &cell,
+              const unsigned int                    face_no,
+              const unsigned int                    sub_no,
+              const Quadrature<dim_1>              &quadrature,
+              typename Mapping<dim>::InternalDataBase &mapping_data,
+              typename Mapping<dim>::InternalDataBase &fedata,
+              FEValuesData<dim>                    &data) const
 {       
   const unsigned int n_q_points = quadrature.n_quadrature_points;
   
@@ -596,8 +614,9 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 				   // possible
   InternalData & fe_data = dynamic_cast<InternalData&> (fedata);
   
-				   // Either dim_1==dim (fill_fe_values)
-				   // or dim_1==dim-1 (fill_fe_(sub)face_values)
+				   // Either dim_1==dim
+				   // (fill_fe_values) or dim_1==dim-1
+				   // (fill_fe_(sub)face_values)
   Assert(dim_1==dim || dim_1==dim-1, ExcInternalError());
   const UpdateFlags flags(dim_1==dim ?
 			  fe_data.current_update_flags() :
@@ -606,7 +625,7 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 
   if (flags & (update_values | update_gradients))
     {
-      if (fe_data.first_cell)
+      if (fe_data.is_first_cell())
 	{
 					   // Initialize the
 					   // FEValuesDatas for the
@@ -631,8 +650,8 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 		base_fe_data = fe_data.get_fe_data(base_no);
 	      
 					       // compute update flags ...
-	      const UpdateFlags base_update_flags(mapping_data.update_flags
-						  | base_fe_data.update_flags);
+	      const UpdateFlags base_update_flags
+                = mapping_data.update_flags | base_fe_data.update_flags;
 	      
 					       // Initialize the FEValuesDatas
 					       // for the base elements.
@@ -663,7 +682,8 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 	  Assert(dim_1==dim, 
 		 typename FiniteElementData<dim>::
 		 ExcSpaceDimensionMismatch(dim_1,dim));
-	  cell_quadrature=dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer);
+	  cell_quadrature
+            = dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer);
 	  Assert (cell_quadrature != 0, ExcInternalError());
 	}
       else
@@ -671,7 +691,8 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 	  Assert(dim_1==dim-1, 
 		 typename FiniteElementData<dim>::
 		 ExcSpaceDimensionMismatch(dim_1,dim-1));
-	  face_quadrature=dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
+	  face_quadrature
+            = dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
 	  Assert (face_quadrature != 0, ExcInternalError());
 	}
 
@@ -701,18 +722,6 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
                                            // data on each face,
                                            // therefore use
                                            // base_fe_data.update_flags.
-                                           //
-                                           // Store these flags into
-                                           // base_flags before
-                                           // calling
-                                           // base_fe.fill_fe_([sub]face_)values
-                                           // as the latter changes
-                                           // the return value of
-                                           // base_fe_data.current_update_flags()
-          const UpdateFlags base_flags(dim_1==dim ?
-                                       base_fe_data.current_update_flags() :
-                                       base_fe_data.update_flags);	  
-          
 	  if (face_no==invalid_face_number)
 	    base_fe.fill_fe_values(mapping, cell,
 				   *cell_quadrature, mapping_data, base_fe_data, base_data);
@@ -752,6 +761,9 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
                                            // those shape functions
                                            // that belong to a given
                                            // base element
+          const UpdateFlags base_flags(dim_1==dim ?
+                                       base_fe_data.current_update_flags() :
+                                       base_fe_data.update_flags);          
           for (unsigned int system_index=0; system_index<this->dofs_per_cell;
                ++system_index)
             if (this->system_to_base_table[system_index].first.first == base_no)
@@ -816,12 +828,8 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
               };
         };
 
-      if (fe_data.first_cell)
+      if (fe_data.is_first_cell())
 	{
-	  fe_data.first_cell = false;
-	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
-	    Assert(fe_data.get_fe_data(base_no).first_cell==false, ExcInternalError());
-	  
 					   // delete FEValuesDatas that
 					   // are not needed any more
 	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)

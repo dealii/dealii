@@ -505,8 +505,6 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
   if (update_flags & update_covariant_transformation)
     for (unsigned int point=0; point<npts; ++point)
       data.covariant[point] = invert(data.contravariant[point]);
-
-  data.first_cell = false;
 }
 
 
