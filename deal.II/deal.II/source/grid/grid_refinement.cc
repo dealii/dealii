@@ -50,7 +50,7 @@ namespace
 
 #ifdef DEAL_II_USE_PETSC  
   PetscScalar
-  max_element (const PETScWrappers::VectorBase &criteria)
+  max_element (const PETScWrappers::Vector &criteria)
   {
                                      // this is horribly slow (since we have
                                      // to get the array of values from PETSc
@@ -63,7 +63,7 @@ namespace
 
 
   PetscScalar
-  min_element (const PETScWrappers::VectorBase &criteria)
+  min_element (const PETScWrappers::Vector &criteria)
   {
                                      // this is horribly slow (since we have
                                      // to get the array of values from PETSc
@@ -432,14 +432,14 @@ template
 void
 GridRefinement::
 refine (Triangulation<deal_II_dimension> &,
-        const PETScWrappers::VectorBase &,
+        const PETScWrappers::Vector &,
         const double);
 
 template
 void
 GridRefinement::
 coarsen (Triangulation<deal_II_dimension> &,
-         const PETScWrappers::VectorBase &,
+         const PETScWrappers::Vector &,
          const double);
 
 
@@ -447,7 +447,7 @@ template
 void
 GridRefinement::
 refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
-                                 const PETScWrappers::VectorBase &,
+                                 const PETScWrappers::Vector &,
                                  const double,
                                  const double);
 
@@ -455,7 +455,7 @@ template
 void
 GridRefinement::
 refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
-                                   const PETScWrappers::VectorBase &,
+                                   const PETScWrappers::Vector &,
                                    const double,
                                    const double);
 
@@ -463,5 +463,5 @@ template
 void
 GridRefinement::
 refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
-                             const PETScWrappers::VectorBase &);
+                             const PETScWrappers::Vector &);
 #endif

@@ -39,8 +39,8 @@ template <int dim> class FEValues;
 #ifdef DEAL_II_USE_PETSC
 namespace PETScWrappers
 {
-  class MatrixBase;
-  class VectorBase;
+  class SparseMatrix;
+  class Vector;
 }
 #endif
 
@@ -779,9 +779,9 @@ class MatrixTools : public MatrixCreator
 #ifdef DEAL_II_USE_PETSC
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   PETScWrappers::MatrixBase  &matrix,
-			   PETScWrappers::VectorBase  &solution,
-			   PETScWrappers::VectorBase  &right_hand_side,
+			   PETScWrappers::SparseMatrix  &matrix,
+			   PETScWrappers::Vector  &solution,
+			   PETScWrappers::Vector  &right_hand_side,
 			   const bool             eliminate_columns = true);
 #endif
 

@@ -20,8 +20,8 @@
 #include <lac/block_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_PETSC
-#  include <lac/petsc_matrix_base.h>
-#  include <lac/petsc_vector_base.h>
+#  include <lac/petsc_sparse_matrix.h>
+#  include <lac/petsc_vector.h>
 #endif
 
 #include <algorithm>
@@ -519,9 +519,9 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 void
 MatrixTools::
 apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-                       PETScWrappers::MatrixBase   &matrix,
-                       PETScWrappers::VectorBase   &solution,
-                       PETScWrappers::VectorBase   &right_hand_side,
+                       PETScWrappers::SparseMatrix   &matrix,
+                       PETScWrappers::Vector   &solution,
+                       PETScWrappers::Vector   &right_hand_side,
                        const bool        preserve_symmetry)
 {
   Assert (matrix.n() == right_hand_side.size(),
