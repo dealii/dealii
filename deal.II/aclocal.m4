@@ -2180,6 +2180,7 @@ dnl the DR says that this is allowed, since member classes are
 dnl implicitly also friends:
 dnl -----------------------------
 dnl struct X {
+dnl     X ();
 dnl   private:
 dnl     static int f();
 dnl     
@@ -2202,6 +2203,7 @@ AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG, dnl
   AC_TRY_COMPILE(
     [
 	struct X {
+            X ();
 	  private:
 	    static int f();
 	    
