@@ -3394,13 +3394,58 @@ AC_DEFUN(DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl In the gcc libstdc++ headers for std::complex, there is 
+dnl no defined default copy constructor, but a templated copy 
+dnl constructor. So when using using a normal assignment 
+dnl between identical types, the compiler synthesizes the 
+dnl default operator, rather than using the template. 
+dnl The code will still be ok, though.
+dnl
+dnl With -Wsynth in gcc we then get a warning. So if we find that
+dnl this is still the case, disable -Wsynth, i.e. remove it from
+dnl the list of warning flags.
+dnl
+dnl This is gcc bug 18644:
+dnl   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=18644
+dnl
+dnl Usage: DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX, dnl
+[
+  if test "x$GXX" = "xyes" ; then
+    AC_MSG_CHECKING(for problem with -Wsynth and std::complex)
+    AC_LANG(C++)
+    CXXFLAGS="-Wsynth -Werror"
+    AC_TRY_COMPILE(
+      [
+#       include <complex>
+      ],
+      [
+	std::complex<double> x;
+  	x = std::complex<double>(1,0);
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ],
+      [
+        AC_MSG_RESULT(yes)
+	CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-Wsynth\s*//g;'`"
+      ])
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl The boost::shared_ptr class has a templated assignment operator
 dnl but no assignment operator matching the default operator
 dnl signature (this if for boost 1.29 at least). So when using
 dnl using a normal assignment between identical types, the
 dnl compiler synthesizes teh default operator, rather than using
 dnl the template. It doesn't matter here, but is probably an
-dnl oversight on behalf of the operators.
+dnl oversight on behalf of the operators. It should be fixed in newer
+dnl versions of boost.
 dnl
 dnl With -Wsynth in gcc we then get a warning. So if we find that
 dnl this is still the case, disable -Wsynth, i.e. remove it from
