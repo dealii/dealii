@@ -8,6 +8,7 @@
 #include <strstream>
 #include <cstdlib>
 #include <algorithm>
+#include <list>
 
 
 bool Patterns::Integer::match (const string &test_string) const {
@@ -49,8 +50,9 @@ Patterns::Double::clone () const {
 
 
 
-Patterns::Sequence::Sequence (const string &seq) {
+Patterns::Selection::Selection (const string &seq) {
   sequence = seq;
+
   while (sequence.find(" |") != string::npos)
     sequence.replace (sequence.find(" |"), 2, '|');
   while (sequence.find("| ") != string::npos)
@@ -58,7 +60,7 @@ Patterns::Sequence::Sequence (const string &seq) {
 };
 
 
-bool Patterns::Sequence::match (const string &test_string) const {
+bool Patterns::Selection::match (const string &test_string) const {
   vector<string> choices;
   string tmp(sequence);
 				   // check the different possibilities
@@ -78,20 +80,100 @@ bool Patterns::Sequence::match (const string &test_string) const {
 };
 
 
-string Patterns::Sequence::description () const {
+string Patterns::Selection::description () const {
   return sequence;
 };
 
 
 Patterns::PatternBase *
-Patterns::Sequence::clone () const {
-  return new Patterns::Sequence(sequence);
+Patterns::Selection::clone () const {
+  return new Patterns::Selection(sequence);
+};
+
+
+
+Patterns::MultipleSelection::MultipleSelection (const string &seq) {
+  Assert (seq.find (",") == string::npos, ExcCommasNotAllowed(seq.find(",")));
+  
+  sequence = seq;
+  while (sequence.find(" |") != string::npos)
+    sequence.replace (sequence.find(" |"), 2, '|');
+  while (sequence.find("| ") != string::npos)
+    sequence.replace (sequence.find("| "), 2, '|');
+};
+
+
+bool Patterns::MultipleSelection::match (const string &test_string_list) const {
+  string tmp = test_string_list;
+  list<string> split_list;
+
+				   // first split the input list
+  while (tmp.length())
+    {
+      string name;
+      name = tmp;
+      
+      if (name.find(",") != string::npos)
+	{
+	  name.erase (name.find(","), string::npos);
+	  tmp.erase (0, test_string_list.find(",")+1);
+	}
+      else
+	tmp = "";
+      
+      while (name[0] == ' ')
+	name.erase (0,1);
+      while (name[name.length()-1] == ' ')
+	name.erase (name.length()-1, 1);
+
+      split_list.push_back (name);
+    };
+  
+
+				   // check the different possibilities
+  for (list<string>::const_iterator test_string = split_list.begin();
+       test_string != split_list.end(); ++test_string) 
+    {
+      bool string_found = false;
+      
+      tmp = sequence;
+      while (tmp.find('|') != string::npos) 
+	{
+	  if (*test_string == string(tmp, 0, tmp.find('|')))
+	    {
+	      string_found = true;
+	      continue;
+	    };
+	  
+	  tmp.erase (0, tmp.find('|')+1);
+	};
+				       // check last choice, not finished by |
+      if (!string_found)
+	if (*test_string == tmp)
+	  string_found = true;
+
+      if (!string_found)
+	return false;
+    };
+
+  return true;
+};
+
+
+string Patterns::MultipleSelection::description () const {
+  return sequence;
+};
+
+
+Patterns::PatternBase *
+Patterns::MultipleSelection::clone () const {
+  return new Patterns::Selection(sequence);
 };
 
 
 
 Patterns::Bool::Bool () :
-		Sequence ("true|false")
+		Selection ("true|false")
 {};
 
 

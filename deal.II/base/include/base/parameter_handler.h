@@ -103,9 +103,9 @@ struct Patterns {
 				      * signs do not matter and are
 				      * eliminated.
 				      */
-    class Sequence : public PatternBase {
+    class Selection : public PatternBase {
       public:
-	Sequence (const string &seq);
+	Selection (const string &seq);
 	virtual bool match (const string &test_string) const;
 	virtual string description () const;
 	virtual PatternBase * clone () const;
@@ -113,12 +113,43 @@ struct Patterns {
 	string sequence;
     };
 
+
+				     /**
+				      * This class is much like the #Selection#
+				      * class, but it allows the input to be
+				      * a comma-separated list of values which
+				      * each have to be given in the constructor
+				      * argument. For example, if the string to
+				      * the constructor was #"ucd|gmv|eps"#, then
+				      * the following would be legal input:
+				      * #eps, gmv#. You may give an arbitrarily
+				      * long list of values, where there may be
+				      * as many spaces around commas as you like.
+				      * However, commas are not allowed inside
+				      * the values given to the constructor.
+				      */
+    class MultipleSelection : public PatternBase {
+      public:
+	MultipleSelection (const string &seq);
+	virtual bool match (const string &test_string) const;
+	virtual string description () const;
+	virtual PatternBase * clone () const;
+
+	DeclException1 (ExcCommasNotAllowed,
+			int,
+			<< "A comma was found at position " << arg1
+			<< " of your input string, but commas are not allowed here.");
+	
+      private:
+	string sequence;
+    };
+
 				     /**
 				      * Test for the string being either
 				      * "true" or "false". This is mapped
-				      * to the #Sequence# class.
+				      * to the #Selection# class.
 				      */
-    class Bool : public Sequence {
+    class Bool : public Selection {
       public:
 	Bool ();
 	virtual PatternBase * clone () const;
@@ -196,7 +227,7 @@ struct Patterns {
  *       prm.enter_subsection("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
- *		            Patterns::Sequence("CG|GMRES|GaussElim"));
+ *		            Patterns::Selection("CG|GMRES|GaussElim"));
  *       prm.declare_entry ("Maximum number of iterations",
  *                          "20",
  *		            ParameterHandler::RegularExpressions::Integer());
@@ -407,7 +438,7 @@ struct Patterns {
  *       prm.enter_subsection ("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
- *                          Patterns::Sequence("CG|BiCGStab|GMRES"));
+ *                          Patterns::Selection("CG|BiCGStab|GMRES"));
  *       prm.declare_entry ("Maximum number of iterations",
  *                          "20",
  *                          Patterns::Integer());
@@ -442,7 +473,7 @@ struct Patterns {
  *       prm.enter_subsection ("Equation 1");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
- *                          Patterns::Sequence("Full|Sparse|Diagonal"));
+ *                          Patterns::Selection("Full|Sparse|Diagonal"));
  *       LinEq::declare_parameters (prm);  // for eq1
  *       prm.leave_subsection ();
  *           
@@ -451,7 +482,7 @@ struct Patterns {
  *       prm.enter_subsection ("Equation 2");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
- *                          Patterns::Sequence("Full|Sparse|Diagonal"));
+ *                          Patterns::Selection("Full|Sparse|Diagonal"));
  *       LinEq::declare_parameters (prm);  // for eq2
  *       prm.leave_subsection ();
  *     };
