@@ -93,10 +93,10 @@ template <class T>
 inline void
 writestuff(LogStream& s, const T& t)
 {
-//  if (s.prefixes.size()<=s.std_depth)
-  s.std << t;
-//  if (s.file && (s.prefixes.size()<=s.fil_depth))
-  *(s.file) << t;
+  if (s.prefixes.size()<=s.std_depth)
+    s.std << t;
+  if (s.file && (s.prefixes.size()<=s.fil_depth))
+    *(s.file) << t;
 }
 
 template <class T>
@@ -140,5 +140,7 @@ operator << (LogStream& s, void (*f)(LogStream&))
   f(s);
   return s;
 }
+
+extern LogStream deallog;
 
 #endif
