@@ -93,23 +93,23 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
 				   // vertices of the line is like that
   if (dim>=3)
     if (((middle(2) == 0) || (middle(2) == 1))
-				       // find out, if the line is in the
-				       // interior of the top or bottom face
-				       // of the domain, or at the edge.
-				       // lines at the edge need to undergo
-				       // the usual treatment, while for
-				       // interior lines taking the midpoint
-				       // is sufficient
-				       //
-				       // note: the trick with the boundary
-				       // id was invented after the above was
-				       // written, so we are not very strict
-				       // here with using these flags
+					 // find out, if the line is in the
+					 // interior of the top or bottom face
+					 // of the domain, or at the edge.
+					 // lines at the edge need to undergo
+					 // the usual treatment, while for
+					 // interior lines taking the midpoint
+					 // is sufficient
+					 //
+					 // note: the trick with the boundary
+					 // id was invented after the above was
+					 // written, so we are not very strict
+					 // here with using these flags
 	&& (line->boundary_indicator() == 1))
       return middle;
 
 
-double x=middle(0),
+  double x=middle(0),
 	 y=middle(1);
   
   if (y<x)
@@ -183,7 +183,7 @@ void test (const int test_case)
     };
 
 
-switch (test_case) 
+  switch (test_case) 
     {
       case 1: 
       {
@@ -256,10 +256,10 @@ switch (test_case)
     };
 
 
-GridOut().write_ucd (tria, logfile);
+  GridOut().write_ucd (tria, logfile);
     
   deallog << "     Total number of cells        = " << tria.n_cells() << std::endl
-       << "     Total number of active cells = " << tria.n_active_cells() << std::endl;
+	  << "     Total number of active cells = " << tria.n_active_cells() << std::endl;
 
   deallog.pop();
 };

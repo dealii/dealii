@@ -2841,42 +2841,81 @@ class Triangulation : public TriaDimensionInfo<dim>,
     unsigned int n_levels () const;
 
 				     /**
-				      * Return the total number of vertices.
-				      * Some of them may not be used, which
-				      * usually happens upon coarsening of
-				      * a triangulation when some vertices are
-				      * discarded, but we do not want to
-				      * renumber the remaining one, leading to
-				      * holes in the numbers of used vertices.
-				      * You can get the number of used vertices
-				      * using @p{n_used_vertices} function.
+				      * Return the total number of
+				      * vertices.  Some of them may
+				      * not be used, which usually
+				      * happens upon coarsening of a
+				      * triangulation when some
+				      * vertices are discarded, but we
+				      * do not want to renumber the
+				      * remaining one, leading to
+				      * holes in the numbers of used
+				      * vertices.  You can get the
+				      * number of used vertices using
+				      * @p{n_used_vertices} function.
 				      */
     unsigned int n_vertices () const;
+
+				     /**
+				      * Return a constant reference to
+				      * all the vertices used in this
+				      * triangulation. Note that not
+				      * necessarily all vertices in
+				      * this array are actually used;
+				      * for example, if you coarsen a
+				      * mesh, then some vertices are
+				      * deleted, but their positions
+				      * in this array are unchanged as
+				      * the indices of vertices are
+				      * only allocated once. You can
+				      * find out about which vertices
+				      * are actually used by the
+				      * function
+				      * @ref{get_used_vertices}.
+				      */
+    const std::vector<Point<dim> > &
+    get_vertices () const;
     
 				     /**
-				      * Return the number of vertices that are
-				      * presently in use, i.e. belong to at least
-				      * one used element.
+				      * Return the number of vertices
+				      * that are presently in use,
+				      * i.e. belong to at least one
+				      * used element.
 				      */
     unsigned int n_used_vertices () const;
+
+				     /**
+				      * Return a constant reference to
+				      * the array of @p{bool}s
+				      * indicating whether an entry in
+				      * the vertex array is used or
+				      * not.
+				      */
+    const std::vector<bool> &
+    get_used_vertices () const;
     
 				     /**
-				      * Return the maximum number of cells
-				      * meeting at a common vertex. Since this
-				      * number is an invariant under refinement,
-				      * only the cells on
-				      * the coarsest level are considered. The
-				      * operation is thus reasonably fast. The
-				      * invariance is only true for sufficiently
-				      * many cells in the coarsest triangulation
-				      * (e.g. for a single cell one would be
-				      * returned),
-				      * so a minimum of four is returned in
-				      * two dimensions, 8 in three dimensions,
-				      * etc, which is how many cells meet if the
+				      * Return the maximum number of
+				      * cells meeting at a common
+				      * vertex. Since this number is
+				      * an invariant under refinement,
+				      * only the cells on the coarsest
+				      * level are considered. The
+				      * operation is thus reasonably
+				      * fast. The invariance is only
+				      * true for sufficiently many
+				      * cells in the coarsest
+				      * triangulation (e.g. for a
+				      * single cell one would be
+				      * returned), so a minimum of
+				      * four is returned in two
+				      * dimensions, 8 in three
+				      * dimensions, etc, which is how
+				      * many cells meet if the
 				      * triangulation is refined.
 				      *
-				      * In one space dimension, two is returned.
+				      * In one space dimension, two is
+				      * returned.
 				      */
     unsigned int max_adjacent_cells () const;
     				     /*@}*/

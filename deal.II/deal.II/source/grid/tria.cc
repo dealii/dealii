@@ -3680,12 +3680,23 @@ unsigned int Triangulation<dim>::n_levels () const
 };
 
 
+
 template <int dim>
 unsigned int
 Triangulation<dim>::n_vertices () const 
 {
   return vertices.size();
 };
+
+
+
+template <int dim>
+const std::vector<Point<dim> > &
+Triangulation<dim>::get_vertices () const 
+{
+  return vertices;
+};
+
 
 
 template <int dim>
@@ -3697,10 +3708,20 @@ Triangulation<dim>::n_used_vertices () const
 };
 
 
+
+template <int dim>
+const std::vector<bool> &
+Triangulation<dim>::get_used_vertices () const 
+{
+  return vertices_used;
+};
+
+
 #if deal_II_dimension == 1
 
 template <>
-unsigned int Triangulation<1>::max_adjacent_cells () const {
+unsigned int Triangulation<1>::max_adjacent_cells () const
+{
   return 2;
 };
 
