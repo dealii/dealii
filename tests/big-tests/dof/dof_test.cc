@@ -100,8 +100,8 @@ TestCases<dim>::TestCases () :
 template <int dim>
 TestCases<dim>::~TestCases () 
 {
-  if (tria) delete tria;
   if (dof)  delete dof;
+  if (tria) delete tria;
 };
 
 
