@@ -39,11 +39,15 @@ flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
 # Note that we normalize output to a few digits after
 # the decimal punct, in order to be able to check across
 # different platforms where we might differ in round-off etc.
+#
+# Since the test suite is usually run automatically, we
+# impose a maximum run time of 30 CPU minutes for each
+# program.
 ############################################################
 
 %.output : %.exe
 	@echo =====Running======= $<
-	@./$<
+	@ulimit -t 1800 ; ./$<
 	@perl -pi $(normalize)  $@
 
 
