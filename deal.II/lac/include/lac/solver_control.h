@@ -15,6 +15,7 @@
 
 
 #include <base/subscriptor.h>
+class ParameterHandler;
 
 
 /**
@@ -82,7 +83,8 @@ class SolverControl : public Subscriptor
 				      * specifies the whether the final result is logged
 				      * to #deallog#. Default is yes.
 				      */
-    SolverControl (const unsigned int n, const double tol,
+    SolverControl (const unsigned int n = 100,
+		   const double tol = 1.e-10,
 		   const bool log_history = false,
 		   const bool log_result = true);
     
@@ -93,6 +95,16 @@ class SolverControl : public Subscriptor
 				      */
     virtual ~SolverControl();
     
+				     /**
+				      * Interface to parameter file.
+				      */
+    static void declare_parameters (ParameterHandler& param);
+
+				     /**
+				      * Read parameters from file.
+				      */
+    void parse_parameters (ParameterHandler& param);
+
 				     /**
 				      * Decide about success or failure
 				      * of an iteration.  This function
@@ -135,16 +147,53 @@ class SolverControl : public Subscriptor
 				      */
     unsigned int last_step() const;
 
+				     /**
+				      * Maximum number of steps.
+				      */
+    unsigned int max_steps () const;
+    
+				     /**
+				      * Change maximum number of steps.
+				      */
+    unsigned int set_max_steps (const unsigned int);
+    
+				     /**
+				      * Tolerance.
+				      */
+    double tolerance () const;
+
+				     /**
+				      * Change tolerance.
+				      */
+    double set_tolerance (const double);
+
+				     /**
+				      * Log each iteration step. Use
+				      * @p{log_frequency} for skipping
+				      * steps.
+				      */
+    void log_history (const bool);
+    
+				     /**
+				      * Set logging frequency.
+				      */
+    unsigned int log_frequency (unsigned int);
+
+				     /**
+				      * Log start and end step.
+				      */
+    void log_result (const bool);
+    
   protected:
 				     /**
 				      * Maximum number of steps.
 				      */
-    const unsigned int maxsteps;
+    unsigned int maxsteps;
     
 				     /**
 				      * Prescribed tolerance to be achieved.
 				      */
-    const double       tol;
+    double       tol;
     
 				     /**
 				      * Last value of the convergence criterion.
@@ -157,16 +206,23 @@ class SolverControl : public Subscriptor
     unsigned int       lstep;
 
 				     /**
-				      * Log convergence history to #deallog#?
+				      * Log convergence history to #deallog#.
 				      */
-    const bool         log_history;
+    bool         _log_history;
 				     /**
-				      * Log iteration result to #deallog#?
-				      * If true, after finishing the iteration, a
-				      * statement about failure or success together with
-				      * #lstep# and #lvalue# are logged.
+				      * Log only every nth step.
 				      */
-    const bool         log_result;
+    unsigned int _log_frequency;
+    
+				     /**
+				      * Log iteration result to
+				      * #deallog#.  If true, after
+				      * finishing the iteration, a
+				      * statement about failure or
+				      * success together with #lstep#
+				      * and #lvalue# are logged.
+				      */
+    bool         _log_result;
 };
 
 
@@ -191,9 +247,9 @@ class ReductionControl : public SolverControl
 				      * the arguments of the Control
 				      * constructor.
 				      */
-    ReductionControl (const unsigned int maxiter,
-		      const double tolerance,
-		      const double reduce,
+    ReductionControl (const unsigned int maxiter = 100,
+		      const double tolerance = 1.e-10,
+		      const double reduce = 1.e-2,
 		      const bool log_history = false,
 		      const bool log_result = true);
 
@@ -203,6 +259,16 @@ class ReductionControl : public SolverControl
 				      * in this class.
 				      */
     virtual ~ReductionControl();
+    
+				     /**
+				      * Interface to parameter file.
+				      */
+    static void declare_parameters (ParameterHandler& param);
+
+				     /**
+				      * Read parameters from file.
+				      */
+    void parse_parameters (ParameterHandler& param);
     
 				     /**
 				      * Decide about success or failure
@@ -221,12 +287,21 @@ class ReductionControl : public SolverControl
 				      */
     double initial_value() const;
 
+				     /**
+				      * Reduction factor.
+				      */
+    double reduction () const;
+
+				     /**
+				      * Change reduction factor.
+				      */
+    double set_reduction (const double);
 
 protected:
 				     /**
 				      * Desired reduction factor.
 				      */
-    const double reduce;
+    double reduce;
     
 				     /**
 				      * Initial value.
@@ -242,5 +317,71 @@ protected:
     double reduced_tol;
 };
 
+//------------------------------------------------------------//
+
+
+inline unsigned int
+SolverControl::max_steps () const
+{
+  return maxsteps;
+}
+
+
+inline unsigned int
+SolverControl::set_max_steps (unsigned int newval)
+{
+  unsigned int old = maxsteps;
+  maxsteps = newval;
+  return old;
+}
+
+
+inline double
+SolverControl::tolerance () const
+{
+  return tol;
+}
+
+
+inline double
+SolverControl::set_tolerance (double t)
+{
+  double old = tol;
+  tol = t;
+  return old;
+}
+
+
+inline void
+SolverControl::log_history (bool newval)
+{
+  _log_history = newval;
+}
+
+
+
+inline void
+SolverControl::log_result (bool newval)
+{
+  _log_result = newval;
+}
+
+
+inline double
+ReductionControl::reduction () const
+{
+  return reduce;
+}
+
+
+inline double
+ReductionControl::set_reduction (double t)
+{
+  double old = reduce;
+  reduce = t;
+  return old;
+}
 
 #endif
+
+
