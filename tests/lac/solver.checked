@@ -1,118 +1,118 @@
-JobId Sat Oct 30 23:15:21 1999
+
 DEAL::Size 4
 DEAL::SOR-diff:0
-DEAL:no:cg::Starting value 3
-DEAL:no:cg::Starting value 1.5
-DEAL:no:cg::Convergence step 2 value 7.41958e-17
+DEAL:no:cg::Starting 
+DEAL:no:cg::Starting 
+DEAL:no:cg::Convergence step 2 
 DEAL:no:Bicgstab::Go!
-DEAL:no:Bicgstab::Starting value 3
-DEAL:no:Bicgstab::Convergence step 3 value 8.52778e-16
-DEAL:no:GMRES::Starting value 3
-DEAL:no:GMRES::Starting value 1.34164
-DEAL:no:GMRES::Convergence step 2 value 2.26623e-17
-DEAL:no:QMRS::Starting value 3
-DEAL:no:QMRS::Convergence step 3 value 1.18334e-16
-DEAL:ssor:Richardson::Starting value 3
-DEAL:ssor:Richardson::Convergence step 15 value 5.46735e-06
-DEAL:ssor:cg::Starting value 3
-DEAL:ssor:cg::Starting value 0.712597
-DEAL:ssor:cg::Convergence step 4 value 1.12399e-08
+DEAL:no:Bicgstab::Starting 
+DEAL:no:Bicgstab::Convergence step 3 
+DEAL:no:GMRES::Starting 
+DEAL:no:GMRES::Starting 
+DEAL:no:GMRES::Convergence step 2 
+DEAL:no:QMRS::Starting 
+DEAL:no:QMRS::Convergence step 3 
+DEAL:ssor:Richardson::Starting 
+DEAL:ssor:Richardson::Convergence step 15 
+DEAL:ssor:cg::Starting 
+DEAL:ssor:cg::Starting 
+DEAL:ssor:cg::Convergence step 4 
 DEAL:ssor:Bicgstab::Go!
-DEAL:ssor:Bicgstab::Starting value 3
-DEAL:ssor:Bicgstab::Convergence step 3 value 6.87989e-07
-DEAL:ssor:GMRES::Starting value 1.59968
-DEAL:ssor:GMRES::Starting value 0.164948
-DEAL:ssor:GMRES::Convergence step 3 value 7.4443e-06
-DEAL:ssor:QMRS::Starting value 3
-DEAL:ssor:QMRS::Convergence step 11 value 7.53301e-06
-DEAL:sor:Richardson::Starting value 3
-DEAL:sor:Richardson::Convergence step 10 value 1.70637e-06
-DEAL:sor:cg::Starting value 3
-DEAL:sor:cg::Starting value 1.60952
-DEAL:sor:cg::Failure step 50 value 0.324887
+DEAL:ssor:Bicgstab::Starting 
+DEAL:ssor:Bicgstab::Convergence step 3 
+DEAL:ssor:GMRES::Starting 
+DEAL:ssor:GMRES::Starting 
+DEAL:ssor:GMRES::Convergence step 3 
+DEAL:ssor:QMRS::Starting 
+DEAL:ssor:QMRS::Convergence step 11 
+DEAL:sor:Richardson::Starting 
+DEAL:sor:Richardson::Convergence step 10 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Failure step 50 
 DEAL:sor:Bicgstab::Go!
-DEAL:sor:Bicgstab::Starting value 3
-DEAL:sor:Bicgstab::Convergence step 5 value 1.27555e-15
-DEAL:sor:GMRES::Starting value 1.46162
-DEAL:sor:GMRES::Starting value 0.551603
-DEAL:sor:GMRES::Convergence step 4 value 8.50618e-19
-DEAL:sor:QMRS::Starting value 3
-DEAL:sor:QMRS::Convergence step 12 value 3.57758e-06
+DEAL:sor:Bicgstab::Starting 
+DEAL:sor:Bicgstab::Convergence step 5 
+DEAL:sor:GMRES::Starting 
+DEAL:sor:GMRES::Starting 
+DEAL:sor:GMRES::Convergence step 4 
+DEAL:sor:QMRS::Starting 
+DEAL:sor:QMRS::Convergence step 12 
 DEAL::Size 12
 DEAL::SOR-diff:0
-DEAL:no:cg::Starting value 11
-DEAL:no:cg::Starting value 16.5
-DEAL:no:cg::Convergence step 16 value 9.449e-06
+DEAL:no:cg::Starting 
+DEAL:no:cg::Starting 
+DEAL:no:cg::Convergence step 16 
 DEAL:no:Bicgstab::Go!
-DEAL:no:Bicgstab::Starting value 11
-DEAL:no:Bicgstab::Convergence step 13 value 2.51439e-06
-DEAL:no:GMRES::Starting value 11
-DEAL:no:GMRES::Starting value 9.15255
-DEAL:no:GMRES::Convergence step 16 value 9.34333e-06
-DEAL:no:QMRS::Starting value 11
-DEAL:no:QMRS::Convergence step 18 value 6.58181e-06
-DEAL:ssor:Richardson::Starting value 11
-DEAL:ssor:Richardson::Failure step 50 value 0.00366793
-DEAL:ssor:cg::Starting value 11
-DEAL:ssor:cg::Starting value 12.1271
-DEAL:ssor:cg::Convergence step 10 value 2.95033e-06
+DEAL:no:Bicgstab::Starting 
+DEAL:no:Bicgstab::Convergence step 13 
+DEAL:no:GMRES::Starting 
+DEAL:no:GMRES::Starting 
+DEAL:no:GMRES::Convergence step 16 
+DEAL:no:QMRS::Starting 
+DEAL:no:QMRS::Convergence step 18 
+DEAL:ssor:Richardson::Starting 
+DEAL:ssor:Richardson::Failure step 50 
+DEAL:ssor:cg::Starting 
+DEAL:ssor:cg::Starting 
+DEAL:ssor:cg::Convergence step 10 
 DEAL:ssor:Bicgstab::Go!
-DEAL:ssor:Bicgstab::Starting value 11
-DEAL:ssor:Bicgstab::Convergence step 6 value 5.53349e-06
-DEAL:ssor:GMRES::Starting value 11.0547
-DEAL:ssor:GMRES::Starting value 5.98114
-DEAL:ssor:GMRES::Convergence step 9 value 4.72222e-06
-DEAL:ssor:QMRS::Starting value 11
-DEAL:ssor:QMRS::Convergence step 44 value 9.98265e-06
-DEAL:sor:Richardson::Starting value 11
-DEAL:sor:Richardson::Failure step 50 value 0.0549709
-DEAL:sor:cg::Starting value 11
-DEAL:sor:cg::Starting value 16.0372
-DEAL:sor:cg::Failure step 50 value 5.58864
+DEAL:ssor:Bicgstab::Starting 
+DEAL:ssor:Bicgstab::Convergence step 6 
+DEAL:ssor:GMRES::Starting 
+DEAL:ssor:GMRES::Starting 
+DEAL:ssor:GMRES::Convergence step 9 
+DEAL:ssor:QMRS::Starting 
+DEAL:ssor:QMRS::Convergence step 44 
+DEAL:sor:Richardson::Starting 
+DEAL:sor:Richardson::Failure step 50 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Failure step 50 
 DEAL:sor:Bicgstab::Go!
-DEAL:sor:Bicgstab::Starting value 11
-DEAL:sor:Bicgstab::Convergence step 19 value 8.78302e-07
-DEAL:sor:GMRES::Starting value 7.32173
-DEAL:sor:GMRES::Starting value 5.57038
-DEAL:sor:GMRES::Convergence step 24 value 5.02756e-06
-DEAL:sor:QMRS::Starting value 11
-DEAL:sor:QMRS::Convergence step 43 value 5.01457e-06
+DEAL:sor:Bicgstab::Starting 
+DEAL:sor:Bicgstab::Convergence step 19 
+DEAL:sor:GMRES::Starting 
+DEAL:sor:GMRES::Starting 
+DEAL:sor:GMRES::Convergence step 24 
+DEAL:sor:QMRS::Starting 
+DEAL:sor:QMRS::Convergence step 43 
 DEAL::Size 36
 DEAL::SOR-diff:2.21867e-30
-DEAL:no:cg::Starting value 35
-DEAL:no:cg::Starting value 100.53
-DEAL:no:cg::Failure step 50 value 0.000294568
+DEAL:no:cg::Starting 
+DEAL:no:cg::Starting 
+DEAL:no:cg::Failure step 50 
 DEAL:no:Bicgstab::Go!
-DEAL:no:Bicgstab::Starting value 35
-DEAL:no:Bicgstab::Convergence step 45 value 8.09686e-06
-DEAL:no:GMRES::Starting value 35
-DEAL:no:GMRES::Starting value 33.054
-DEAL:no:GMRES::Failure step 50 value 1.54196
-DEAL:no:QMRS::Starting value 35
-DEAL:no:QMRS::Failure step 50 value 0.00425757
-DEAL:ssor:Richardson::Starting value 35
-DEAL:ssor:Richardson::Failure step 50 value 11.3628
-DEAL:ssor:cg::Starting value 35
-DEAL:ssor:cg::Starting value 91.4249
-DEAL:ssor:cg::Convergence step 26 value 5.78212e-06
+DEAL:no:Bicgstab::Starting 
+DEAL:no:Bicgstab::Convergence step 45 
+DEAL:no:GMRES::Starting 
+DEAL:no:GMRES::Starting 
+DEAL:no:GMRES::Failure step 50 
+DEAL:no:QMRS::Starting 
+DEAL:no:QMRS::Failure step 50 
+DEAL:ssor:Richardson::Starting 
+DEAL:ssor:Richardson::Failure step 50 
+DEAL:ssor:cg::Starting 
+DEAL:ssor:cg::Starting 
+DEAL:ssor:cg::Convergence step 26 
 DEAL:ssor:Bicgstab::Go!
-DEAL:ssor:Bicgstab::Starting value 35
-DEAL:ssor:Bicgstab::Convergence step 18 value 6.7048e-06
-DEAL:ssor:GMRES::Starting value 41.0011
-DEAL:ssor:GMRES::Starting value 35.3154
-DEAL:ssor:GMRES::Convergence step 25 value 7.42378e-06
-DEAL:ssor:QMRS::Starting value 35
-DEAL:ssor:QMRS::Failure step 50 value 5.15537
-DEAL:sor:Richardson::Starting value 35
-DEAL:sor:Richardson::Failure step 50 value 16.5662
-DEAL:sor:cg::Starting value 35
-DEAL:sor:cg::Starting value 104.427
-DEAL:sor:cg::Failure step 50 value 133.931
+DEAL:ssor:Bicgstab::Starting 
+DEAL:ssor:Bicgstab::Convergence step 18 
+DEAL:ssor:GMRES::Starting 
+DEAL:ssor:GMRES::Starting 
+DEAL:ssor:GMRES::Convergence step 25 
+DEAL:ssor:QMRS::Starting 
+DEAL:ssor:QMRS::Failure step 50 
+DEAL:sor:Richardson::Starting 
+DEAL:sor:Richardson::Failure step 50 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Starting 
+DEAL:sor:cg::Failure step 50 
 DEAL:sor:Bicgstab::Go!
-DEAL:sor:Bicgstab::Starting value 35
-DEAL:sor:Bicgstab::Failure step 50 value 0.00034098
-DEAL:sor:GMRES::Starting value 25.3018
-DEAL:sor:GMRES::Starting value 23.4114
-DEAL:sor:GMRES::Failure step 50 value 0.223274
-DEAL:sor:QMRS::Starting value 35
-DEAL:sor:QMRS::Failure step 50 value 3.27927
+DEAL:sor:Bicgstab::Starting 
+DEAL:sor:Bicgstab::Failure step 50 
+DEAL:sor:GMRES::Starting 
+DEAL:sor:GMRES::Starting 
+DEAL:sor:GMRES::Failure step 50 
+DEAL:sor:QMRS::Starting 
+DEAL:sor:QMRS::Failure step 50 
