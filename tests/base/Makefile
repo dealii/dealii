@@ -10,7 +10,7 @@ INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
 
 CXXFLAGS  = -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti  \
+            -Winline -Woverloaded-virtual  \
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
 
 
