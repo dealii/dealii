@@ -1,10 +1,10 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 2001, 2002 */
+/* Author: Wolfgang Bangerth, ETH Zurich, 2002 */
 
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002 by the deal.II authors */
+/*    Copyright (C) 2002 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -508,6 +508,20 @@ namespace LaplaceSolver
 		    const Quadrature<dim>    &quadrature,
 		    const Function<dim>      &rhs_function,
 		    const Function<dim>      &boundary_values);
+
+				       // XXX
+      virtual
+      void
+      solve_problem ();
+      
+      virtual
+      unsigned int
+      n_dofs () const;
+      
+      virtual
+      void
+      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+      
     protected:
       const SmartPointer<const Function<dim> > rhs_function;
       virtual void assemble_rhs (Vector<double> &rhs) const;
@@ -528,6 +542,32 @@ namespace LaplaceSolver
                   rhs_function (&rhs_function)
   {};
 
+
+  template <int dim>
+  void
+  PrimalSolver<dim>::solve_problem ()
+  {
+    Solver<dim>::solve_problem ();
+  };
+
+
+
+  template <int dim>
+  unsigned int
+  PrimalSolver<dim>::n_dofs() const
+  {
+    return Solver<dim>::n_dofs();
+  };
+
+
+  template <int dim>
+  void
+  PrimalSolver<dim>::
+  postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
+  {
+    return Solver<dim>::postprocess(postprocessor);
+  };
+  
 
 
   template <int dim>
@@ -724,6 +764,233 @@ RightHandSide<dim>::value (const Point<dim>   &p,
   t1 = t1*t1;
   
   return -u*(t1+t2+t3);
+};
+
+
+
+
+namespace DualFunctional
+{
+  template <int dim>
+  class DualFunctionalBase : public Subscriptor
+  {
+    public:
+      virtual
+      void
+      assemble_rhs (const DoFHandler<dim> &dof_handler,
+		    Vector<double>        &rhs) const = 0;
+  };
+
+
+  template <int dim>
+  class PointValueEvaluation : public DualFunctionalBase<dim>
+  {
+    public:
+      PointValueEvaluation (const Point<dim> &evaluation_point);
+
+      virtual
+      void
+      assemble_rhs (const DoFHandler<dim> &dof_handler,
+		    Vector<double>        &rhs) const;
+    protected:
+      const Point<dim> evaluation_point;
+  };
+
+
+  template <int dim>
+  PointValueEvaluation<dim>::
+  PointValueEvaluation (const Point<dim> &evaluation_point)
+		  :
+		  evaluation_point (evaluation_point)
+  {};
+  
+
+  template <int dim>
+  void
+  PointValueEvaluation<dim>::
+  assemble_rhs (const DoFHandler<dim> &dof_handler,
+		Vector<double>        &rhs) const
+  {
+    rhs.reinit (dof_handler.n_dofs());
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    bool evaluation_point_found = false;
+    for (; (cell!=endc) && !evaluation_point_found; ++cell)
+      for (unsigned int vertex=0;
+	   vertex<GeometryInfo<dim>::vertices_per_cell;
+	   ++vertex)
+	if (cell->vertex(vertex) == evaluation_point)
+	  {
+	    rhs(cell->vertex_dof_index(vertex,0)) = 1;
+
+	    evaluation_point_found = true;
+	    break;
+	  };
+
+    AssertThrow (evaluation_point_found,
+		 ExcEvaluationPointNotFound(evaluation_point));
+  };
+  
+
+};
+
+
+namespace LaplaceSolver
+{
+  template <int dim>
+  class DualSolver : public Solver<dim>
+  {
+    public:
+      DualSolver (Triangulation<dim>       &triangulation,
+		  const FiniteElement<dim> &fe,
+		  const Quadrature<dim>    &quadrature,
+		  const DualFunctional::DualFunctionalBase<dim> &dual_functional);
+
+				       // XXX
+      virtual
+      void
+      solve_problem ();
+      
+      virtual
+      unsigned int
+      n_dofs () const;
+
+      virtual
+      void
+      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+
+    protected:
+      const SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
+      virtual void assemble_rhs (Vector<double> &rhs) const;
+
+      static const ZeroFunction<dim> boundary_values;
+  };
+
+
+  template <int dim>
+  DualSolver<dim>::
+  DualSolver (Triangulation<dim>       &triangulation,
+	      const FiniteElement<dim> &fe,
+	      const Quadrature<dim>    &quadrature,
+	      const DualFunctional::DualFunctionalBase<dim> &dual_functional)
+		  :
+		  Base<dim> (triangulation),
+		  Solver<dim> (triangulation, fe,
+			       quadrature, boundary_values),
+                  dual_functional (&dual_functional)
+  {};
+
+
+  template <int dim>
+  void
+  DualSolver<dim>::solve_problem ()
+  {
+    Solver<dim>::solve_problem ();
+  };
+
+
+
+  template <int dim>
+  unsigned int
+  DualSolver<dim>::n_dofs() const
+  {
+    return Solver<dim>::n_dofs();
+  };
+
+
+  template <int dim>
+  void
+  DualSolver<dim>::
+  postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
+  {
+    return Solver<dim>::postprocess(postprocessor);
+  };
+  
+
+
+  template <int dim>
+  void
+  DualSolver<dim>::
+  assemble_rhs (Vector<double> &rhs) const 
+  {
+    dual_functional->assemble_rhs (dof_handler, rhs);
+  };
+
+
+  template <int dim>
+  class WeightedResidual : public PrimalSolver<dim>,
+			   public DualSolver<dim>
+  {
+    public:
+      WeightedResidual (Triangulation<dim>       &coarse_grid,
+			const FiniteElement<dim> &fe,
+			const Quadrature<dim>    &quadrature,
+			const Function<dim>      &rhs_function,
+			const Function<dim>      &boundary_values,
+			const DualFunctional::DualFunctionalBase<dim> &dual_functional);
+
+      virtual
+      void
+      solve_problem ();
+
+      virtual
+      void
+      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+      
+      virtual
+      unsigned int
+      n_dofs () const;
+
+      virtual void refine_grid () {};
+  };
+
+
+
+  template <int dim>
+  WeightedResidual<dim>::
+  WeightedResidual (Triangulation<dim>       &coarse_grid,
+		    const FiniteElement<dim> &fe,
+		    const Quadrature<dim>    &quadrature,
+		    const Function<dim>      &rhs_function,
+		    const Function<dim>      &boundary_values,
+		    const DualFunctional::DualFunctionalBase<dim> &dual_functional)
+		  :
+		  Base<dim> (coarse_grid),
+                  PrimalSolver<dim> (coarse_grid, fe, quadrature,
+				     rhs_function, boundary_values),
+    DualSolver<dim> (coarse_grid, fe, quadrature,
+		     dual_functional)
+  {};
+
+
+  template <int dim>
+  void
+  WeightedResidual<dim>::solve_problem ()
+  {
+    PrimalSolver<dim>::solve_problem ();
+    DualSolver<dim>::solve_problem ();
+  };
+
+
+  template <int dim>
+  void
+  WeightedResidual<dim>::postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
+  {
+    PrimalSolver<dim>::postprocess (postprocessor);
+  };
+  
+  
+  template <int dim>
+  unsigned int
+  WeightedResidual<dim>::n_dofs () const
+  {
+    return PrimalSolver<dim>::n_dofs();
+  };
+  
+  
+  template class WeightedResidual<2>;
+
 };
 
 
