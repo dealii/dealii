@@ -351,7 +351,8 @@ class SparsityPattern : public Subscriptor
 				      * because the column numbers are
 				      * sorted.
 				      */
-    unsigned int operator() (const unsigned int i, const unsigned int j) const;
+    unsigned int operator() (const unsigned int i, 
+			     const unsigned int j) const;
 
 				     /**
 				      * Add a nonzero entry to the matrix.
@@ -361,7 +362,21 @@ class SparsityPattern : public Subscriptor
 				      * If the entry already exists, nothing
 				      * bad happens.
 				      */
-    void add (const unsigned int i, const unsigned int j);
+    void add (const unsigned int i, 
+	      const unsigned int j);
+    
+				     /**
+				      * Make the sparsity pattern
+				      * symmetric by adding the
+				      * sparsity pattern of the
+				      * transpose object.
+				      *
+				      * This function throws an
+				      * exception if the sparsity
+				      * pattern does not represent a
+				      * square matrix.
+				      */
+    void symmetrize ();
     
 				     /**
 				      * Print the sparsity of the matrix

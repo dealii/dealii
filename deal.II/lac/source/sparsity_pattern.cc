@@ -567,7 +567,42 @@ SparsityPattern::add (const unsigned int i,
 				   // wrong: there was not enough space
 				   // in this line
   Assert (false, ExcNotEnoughSpace(i, rowstart[i+1]-rowstart[i]));
-}
+};
+
+
+
+void
+SparsityPattern::symmetrize () 
+{
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
+  Assert (compressed==false, ExcMatrixIsCompressed());
+  Assert (rows==cols, ExcNotSquare());
+
+				   // loop over all elements presently
+				   // in the sparsity pattern and add
+				   // the transpose element. note:
+				   //
+				   // 1. that the sparsity pattern
+				   // changes which we work on
+				   //
+				   // 2. that the @p{add} function can
+				   // be called on elements that
+				   // already exist without any harm
+  for (unsigned int row=0; row<rows; ++row)
+    for (unsigned int k=rowstart[row]; k<rowstart[row+1]; k++)
+      {
+					 // check whether we are at
+					 // the end of the entries of
+					 // this row. if so, go to
+					 // next row
+	if (colnums[k] == invalid_entry)
+	  break;
+
+					 // otherwise add the
+					 // transpose entry
+	add (colnums[k], row);
+      };
+};
 
 
 

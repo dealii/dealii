@@ -40,6 +40,7 @@ SparseMatrix<number>::SparseMatrix () :
 {};
 
 
+
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
 		Subscriptor (m),
@@ -51,6 +52,7 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
   Assert (m.val==0, ExcInvalidConstructorCall());
   Assert (m.max_len==0, ExcInvalidConstructorCall());
 };
+
 
 
 template <typename number>
@@ -65,6 +67,7 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 };
 
 
+
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
 		cols(&c),
@@ -75,6 +78,7 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
 };
 
 
+
 template <typename number>
 SparseMatrix<number>::~SparseMatrix ()
 {
@@ -83,6 +87,7 @@ SparseMatrix<number>::~SparseMatrix ()
   if (val != 0)
     delete[] val;
 };
+
 
 
 template <typename number>
@@ -113,6 +118,7 @@ SparseMatrix<number>::reinit ()
 }
 
 
+
 template <typename number>
 void
 SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
@@ -120,6 +126,7 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
   cols = &sparsity;
   reinit ();
 };
+
 
 
 template <typename number>
@@ -133,6 +140,7 @@ SparseMatrix<number>::clear ()
 };
 
 
+
 template <typename number>
 bool
 SparseMatrix<number>::empty () const
@@ -144,6 +152,7 @@ SparseMatrix<number>::empty () const
 };
 
 
+
 template <typename number>
 unsigned int
 SparseMatrix<number>::n_nonzero_elements () const
@@ -151,6 +160,7 @@ SparseMatrix<number>::n_nonzero_elements () const
   Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->n_nonzero_elements ();
 };
+
 
 
 template <typename number>
@@ -161,6 +171,44 @@ SparseMatrix<number>::n_actually_nonzero_elements () const
   return count_if(&val[0], &val[n_nonzero_elements ()],
 		  bind2nd(not_equal_to<double>(), 0));
 };
+
+
+
+template <typename number>
+void
+SparseMatrix<number>::symmetrize ()
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols->rows == cols->cols, ExcMatrixNotSquare());
+  
+  const unsigned int n_rows = m();
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+				       // first skip diagonal entry
+      number             *val_ptr = &val[cols->rowstart[row]+1];
+      const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[row]+1];      
+      const number       *const val_end_of_row = &val[cols->rowstart[row+1]];
+
+				       // treat lower left triangle
+      while ((val_ptr != val_end_of_row) && (*colnum_ptr<row))
+	{
+					   // compute the mean of this
+					   // and the transpose value
+	  const number mean_value = (*val_ptr +
+				     val[(*cols)(*colnum_ptr,row)]) / 2.0;
+					   // set this value and the
+					   // transpose one to the
+					   // mean
+	  *val_ptr = mean_value;
+	  set (*colnum_ptr, row, mean_value);
+
+					   // advance pointers
+	  ++val_ptr;
+	  ++colnum_ptr;
+	};
+    };
+};
+
 
 
 template <typename number>

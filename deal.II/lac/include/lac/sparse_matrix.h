@@ -255,6 +255,34 @@ class SparseMatrix : public Subscriptor
 	      const number value);
 
 				     /**
+				      * Symmetrize the matrix by
+				      * forming the mean value between
+				      * the existing matrix and its
+				      * transpose, $A = \frac 12(A+A^T)$.
+				      *
+				      * This operation assumes that
+				      * the underlying sparsity
+				      * pattern represents a symmetric
+				      * object. If this is not the
+				      * case, then the result of this
+				      * operation will not be a
+				      * symmetric matrix, since it
+				      * only explicitely symmetrizes
+				      * by looping over the lower left
+				      * triangular part for efficiency
+				      * reasons; if there are entries
+				      * in the upper right triangle,
+				      * then these elements are missed
+				      * in the
+				      * symmetrization. Symmetrization
+				      * of the sparsity pattern can be
+				      * obtain by the
+				      * @ref{SparsityPattern}@p{::symmetrize}
+				      * function.
+				      */
+    void symmetrize ();
+    
+				     /**
 				      * Copy the given matrix to this
 				      * one.  The operation throws an
 				      * error if the sparsity patterns
