@@ -355,7 +355,7 @@ class FullMatrix : public Subscriptor
 				      * Compute the quadratic matrix norm.
 				      * Return value is the root of the square
 				      * sum of all matrix entries. Also called
-				      * Frobenius Norm.
+				      * Frobenius norm.
 				      * 
 				      * This norm is compatible with the $l_2$
 				      * vector norm. But it is not a natural
@@ -363,6 +363,21 @@ class FullMatrix : public Subscriptor
 				      * therefore it is not called $l_2$-norm.
 				      */
     number norm2 () const;
+
+				     /**
+				      * Compute the relative norm of
+				      * the skew-symmetric part. The
+				      * return value is the Frobenius
+				      * norm of the skew-symmetric
+				      * part of the matrix divided by
+				      * that of the matrix.
+				      *
+				      * Main purpose of this function
+				      * is to check, if a matrix is
+				      * symmetric within a certain
+				      * accuracy, or not.
+				      */
+    number relative_symmetry_norm2 () const;
     
 				     /**
 				      * A=Inverse(A). Inversion of

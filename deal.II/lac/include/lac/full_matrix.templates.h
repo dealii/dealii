@@ -1111,7 +1111,27 @@ FullMatrix<number>::norm2 () const
   number s = 0.;
   for (unsigned int i=0;i<dim_image*dim_range;++i)
     s += val[i]*val[i];
-  return s;
+  return sqrt(s);
+}
+
+
+template <typename number>
+number
+FullMatrix<number>::relative_symmetry_norm2 () const
+{
+  Assert (val != 0, ExcEmptyMatrix());
+  
+  number s = 0.;
+  number a = 0.;
+  for (unsigned int i=0;i<dim_image;++i)
+    for (unsigned int j=0;j<dim_range;++j)
+      {
+	a += ((*this)(i,j)-(*this)(j,i))*((*this)(i,j)-(*this)(j,i));
+	s += (*this)(i,j)*(*this)(i,j);
+      }
+  if (s!=0.)
+    return sqrt(a)/sqrt(s);
+  return 0;
 }
 
 
