@@ -1276,7 +1276,7 @@ rm -f conftest*
   CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
   CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
 
-  CXXFLAGSG="`echo $CXXFLAGS | perl -pi -e 's/-ansi//g;'"
+  CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
 fi
 
 
