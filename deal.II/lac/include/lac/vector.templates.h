@@ -71,7 +71,8 @@ Vector<Number>::Vector (const Vector<Number>& v) :
 
 
 template <typename Number>
-void Vector<Number>::reinit (const Vector<Number>& v, const bool fast)
+template <typename Number2>
+void Vector<Number>::reinit (const Vector<Number2>& v, const bool fast)
 {
   reinit (v.size(), fast);
 };

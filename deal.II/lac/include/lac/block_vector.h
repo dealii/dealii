@@ -639,8 +639,8 @@ class BlockVector
 				      *  use blocks of different
 				      *  sizes.
 				      */
-    BlockVector (unsigned int num_blocks = 0,
-		 unsigned int block_size = 0);
+    explicit BlockVector (unsigned int num_blocks = 0,
+			  unsigned int block_size = 0);
     
 				     /**
 				      * Copy-Constructor. Dimension set to
@@ -748,7 +748,8 @@ class BlockVector
 				      * this function is the same as calling
 				      * @p{reinit (V.size(), fast)}.
 				      */
-    void reinit (const BlockVector<Number> &V,
+    template <typename Number2>
+    void reinit (const BlockVector<Number2> &V,
 		 const bool                 fast=false);
     
 				     /**
@@ -1129,6 +1130,8 @@ class BlockVector
 				      */
     friend class iterator;
     friend class const_iterator;
+
+    template <typename Number2> friend class BlockVector;
 };
 
 

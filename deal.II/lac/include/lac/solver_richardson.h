@@ -57,14 +57,21 @@ class SolverRichardson : public Solver<VECTOR>
 					  * set the damping parameter
 					  * to one.
 					  */
-	AdditionalData(double omega=1):
-			omega(omega)
+	AdditionalData(double omega=1,
+		       bool use_preconditioned_residual = true):
+			omega(omega),
+			use_preconditioned_residual(use_preconditioned_residual)
 	  {};
 	
 					 /**
 					  * Relaxation parameter.
 					  */
 	double omega;
+					 /**
+					  * Parameter for stopping criterion.
+					  */
+	bool use_preconditioned_residual;
+	  
     };
 	
 				     /**
@@ -125,7 +132,7 @@ class SolverRichardson : public Solver<VECTOR>
 				      * Implementation of the computation of
 				      * the norm of the residual.
 				      */
-    virtual double criterion();
+    virtual typename VECTOR::value_type criterion();
     
 				     /**
 				      * Temporary vectors, allocated through
@@ -151,7 +158,7 @@ class SolverRichardson : public Solver<VECTOR>
 				      * norm of the residual vector and thus
 				      * the square root of the @p{res2} value.
 				      */
-    double res;
+    typename VECTOR::value_type res;
 };
 
 
@@ -196,13 +203,31 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 				       // but do it in 2 steps
       A.vmult(r,x);
       r.sadd(-1.,1.,b);
-      res=sqrt(r*r);
 
-      conv = control().check (iter, criterion());
-      if (conv != SolverControl::iterate)
-	break;
-
+      if (!additional_data.use_preconditioned_residual)
+	{
+	  res = r*r;
+//      cout << '[' << res << ' ';
+	  res=sqrt(res);
+//      cout << res << ' ' << r.l1_norm() << ']';
+//      r.print(cout);
+	  conv = control().check (iter, criterion());
+	  if (conv != SolverControl::iterate)
+	    break;
+	}
+      
       precondition.vmult(d,r);
+      if (additional_data.use_preconditioned_residual)
+	{
+	  res = d*d;
+//      cout << '[' << res << ' ';
+	  res=sqrt(res);
+//      cout << res << ' ' << r.l1_norm() << ']';
+//      r.print(cout);
+	  conv = control().check (iter, criterion());
+	  if (conv != SolverControl::iterate)
+	    break;
+	}
       x.add(additional_data.omega,d);
       print_vectors(iter,x,r,d);
     }
@@ -281,7 +306,7 @@ SolverRichardson<VECTOR>::print_vectors(const unsigned int,
 
 
 template<class VECTOR>
-inline double
+inline typename VECTOR::value_type
 SolverRichardson<VECTOR>::criterion()
 {
   return res;

@@ -19,11 +19,15 @@ template class Vector<double>;
 template Vector<double>& Vector<double>::operator=(const Vector<float>&);
 template double Vector<double>::operator*(const Vector<float>&) const;
 template double Vector<double>::operator*(const Vector<double>&) const;
+template void Vector<double>::reinit(const Vector<double>&, bool);
+template void Vector<double>::reinit(const Vector<float>&, bool);
 
 template class Vector<float>;
 template Vector<float>& Vector<float>::operator=(const Vector<double>&);
 template float Vector<float>::operator*(const Vector<float>&) const;
 template float Vector<float>::operator*(const Vector<double>&) const;
+template void Vector<float>::reinit(const Vector<double>&, bool);
+template void Vector<float>::reinit(const Vector<float>&, bool);
 
 // see the .h file for why these functions are disabled.
 // template Vector<float>::Vector (const Vector<double>& v);

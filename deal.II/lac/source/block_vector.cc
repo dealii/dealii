@@ -15,7 +15,16 @@
 
 // explicit instantiations
 template class BlockVector<double>;
+template BlockVector<double>& BlockVector<double>::operator=(
+  const BlockVector<float>&);
+template void BlockVector<double>::reinit(const BlockVector<double>&, bool);
+template void BlockVector<double>::reinit(const BlockVector<float>&, bool);
+
 template class BlockVector<float>;
+template BlockVector<float>& BlockVector<float>::operator=(
+  const BlockVector<double>&);
+template void BlockVector<float>::reinit(const BlockVector<double>&, bool);
+template void BlockVector<float>::reinit(const BlockVector<float>&, bool);
 
 namespace BlockVectorIterators
 {

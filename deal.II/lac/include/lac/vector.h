@@ -76,7 +76,11 @@ class Vector
 				     /**
 				      * Copy-Constructor. Dimension set to
 				      * that of V, all components are copied
-				      * from V
+				      * from V.
+				      *
+				      * We would like to make this
+				      * constructor explicit, but STL
+				      * insists on using it implicitly.
 				      */
     Vector (const Vector<Number>& V);
 
@@ -102,7 +106,7 @@ class Vector
 				      * Constructor. Set dimension to @p{n} and
 				      * initialize all elements with zero.
 				      */
-    Vector (const unsigned int n);
+    explicit Vector (const unsigned int n);
 
 				     /**
 				      * Initialize the vector with a
@@ -160,7 +164,8 @@ class Vector
 				      * this function is the same as calling
 				      * @p{reinit (V.size(), fast)}.
 				      */
-    void reinit (const Vector<Number> &V,
+    template <typename Number2>
+    void reinit (const Vector<Number2> &V,
 		 const bool            fast=false);
 
 				     /**
@@ -535,6 +540,8 @@ class Vector
 				      * Pointer to the array of components.
 				      */
     Number *val;
+
+    template <typename Number2> friend class Vector;    
 };
 
 

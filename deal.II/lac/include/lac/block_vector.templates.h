@@ -96,7 +96,8 @@ void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const BlockVector<Number>& v,
+template <typename Number2>
+void BlockVector<Number>::reinit (const BlockVector<Number2>& v,
 					   const bool fast)
 {
   block_indices = v.block_indices;
@@ -493,7 +494,7 @@ BlockVector<Number>::operator = (const BlockVector<Number>& v)
 template <typename Number>
 template<typename Number2>
 BlockVector<Number>&
-BlockVector<Number>::operator = (const BlockVector< Number2>& v)
+BlockVector<Number>::operator = (const BlockVector<Number2>& v)
 {
   Assert (num_blocks == v.num_blocks,
 	  ExcDimensionMismatch(num_blocks, v.num_blocks));
