@@ -99,6 +99,18 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code
+       class="member">SparseMatrix::vmult</code>-type functions
+       <code>vmult</code>, <code>Tvmult</code>, <code>vmult_add</code>, and
+       <code>Tvmult_add</code> take two different template arguments for input
+       and output vectors, but were only instantiated in case the arguments
+       were the same, and could also not be compiled if they weren't. Both
+       problems are now fixed.
+       <br> 
+       (WB 2004/06/22)
+       </p>
+
+  <li> <p>
        Improved: The <code class="class">CompressedSparsityPattern</code>
        class used one of the C++ standard containers to store the column
        indices of nonzero entries in a sparse matrix. This proved to be
