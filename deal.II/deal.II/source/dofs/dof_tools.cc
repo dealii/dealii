@@ -755,6 +755,18 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 	  ==
 	  fine_fe.base_element (fine_fe.component_to_base(fine_component)),
 	  ExcFiniteElementsDontMatch());
+
+#ifdef DEBUG
+				   // if in debug mode, check whether
+				   // the coarse grid is indeed
+				   // coarser everywhere than the fine
+				   // grid
+  for (typename DoFHandler<dim>::active_cell_iterator cell=coarse_grid.begin_active();
+       cell != coarse_grid.end(); ++cell)
+    Assert (cell->level() <= coarse_to_fine_grid_map[cell]->level(),
+	    ExcGridNotCoarser());
+#endif
+
   
 
 /*
