@@ -245,15 +245,9 @@ struct SparseDirectMA27::DetachedModeData
             int ret = read (client_server_pipe[0],
                             reinterpret_cast<char *> (t) + count,
                             sizeof(T) * N - count);
-            if (ret < 0)
-              {
-                std::cerr << "****** error " << ret << " on server side!"
-                          << " errno=" << errno
-                          << std::endl;
-                abort ();
-              }
-            else
-              count += ret;
+            AssertThrow (ret >= 0,
+                         ExcReadError(ret, errno));
+            count += ret;
           };
       };
     
