@@ -813,7 +813,17 @@ class DoFTools
 				      * it shall be counted as. Having
 				      * the same number entered
 				      * several times sums up several
-				      * components as the same.
+				      * components as the same. One of
+				      * the applications of this
+				      * argument is when you want to
+				      * form block matrices and
+				      * vectors, but want to pack
+				      * several components into the
+				      * same block (for example, when
+				      * you have @p{dim} velocities
+				      * and one pressure, to put all
+				      * velocities into one block, and
+				      * the pressure into another).
 				      *
 				      * The result is returned in
 				      * @p{dofs_per_component}.
