@@ -187,6 +187,16 @@ MGTransferPrebuilt<float>::copy_to_mg (
   MGLevelObject<Vector<float> >&,
   const BlockVector<double>&) const;
 template void
+MGTransferPrebuilt<float>::copy_to_mg (
+  const MGDoFHandler<deal_II_dimension>&,
+  MGLevelObject<Vector<float> >&,
+  const Vector<float>&) const;
+template void
+MGTransferPrebuilt<float>::copy_to_mg (
+  const MGDoFHandler<deal_II_dimension>&,
+  MGLevelObject<Vector<float> >&,
+  const BlockVector<float>&) const;
+template void
 MGTransferPrebuilt<float>::copy_from_mg (
   const MGDoFHandler<deal_II_dimension>&,
   Vector<double>&,
@@ -195,6 +205,16 @@ template void
 MGTransferPrebuilt<float>::copy_from_mg (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
+  const MGLevelObject<Vector<float> >&) const;
+template void
+MGTransferPrebuilt<float>::copy_from_mg (
+  const MGDoFHandler<deal_II_dimension>&,
+  Vector<float>&,
+  const MGLevelObject<Vector<float> >&) const;
+template void
+MGTransferPrebuilt<float>::copy_from_mg (
+  const MGDoFHandler<deal_II_dimension>&,
+  BlockVector<float>&,
   const MGLevelObject<Vector<float> >&) const;
 
 template void
