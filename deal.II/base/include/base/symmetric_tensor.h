@@ -14,6 +14,9 @@
 #define __deal2__symmetric_tensor_h
 
 
+#include <base/tensor.h>
+
+
 template <int rank, int dim> class SymmetricTensor;
 template <int dim> class SymmetricTensor<2,dim>;
 
