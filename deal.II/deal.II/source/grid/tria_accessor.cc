@@ -137,6 +137,31 @@ void LineAccessor<dim>::set_user_flag () const {
 
 
 template <int dim>
+void LineAccessor<dim>::set_user_pointer (void *p) const {
+  Assert (used(), ExcCellNotUsed());
+  tria->levels[present_level]->lines.user_pointers[present_index] = p;
+};
+
+
+
+template <int dim>
+void LineAccessor<dim>::clear_user_pointer () const {
+  Assert (used(), ExcCellNotUsed());
+  tria->levels[present_level]->lines.user_pointers[present_index] = 0;
+};
+
+
+
+template <int dim>
+void * LineAccessor<dim>::user_pointer () const {
+  Assert (used(), ExcCellNotUsed());
+  return tria->levels[present_level]->lines.user_pointers[present_index];
+};
+
+  
+
+
+template <int dim>
 void LineAccessor<dim>::clear_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->lines.user_flags[present_index] = false;
@@ -350,6 +375,30 @@ template <int dim>
 void QuadAccessor<dim>::clear_user_flag () const {
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->quads.user_flags[present_index] = false;
+};
+
+
+
+template <int dim>
+void QuadAccessor<dim>::set_user_pointer (void *p) const {
+  Assert (used(), ExcCellNotUsed());
+  tria->levels[present_level]->quads.user_pointers[present_index] = p;
+};
+
+
+
+template <int dim>
+void QuadAccessor<dim>::clear_user_pointer () const {
+  Assert (used(), ExcCellNotUsed());
+  tria->levels[present_level]->quads.user_pointers[present_index] = 0;
+};
+
+
+
+template <int dim>
+void * QuadAccessor<dim>::user_pointer () const {
+  Assert (used(), ExcCellNotUsed());
+  return tria->levels[present_level]->quads.user_pointers[present_index];
 };
 
 

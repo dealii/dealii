@@ -261,6 +261,14 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 					  * which cell it belongs to.
 					  */
 	vector<unsigned char> material_id;
+
+					 /**
+					  * Pointer which is not used by the
+					  * library but may be accessed an set
+					  * by the user to handle data local to
+					  * a line/quad/etc.
+					  */
+	vector<void*> user_pointers;
     };
     
   public:
@@ -371,6 +379,15 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					  * which cell it belongs to.
 					  */
 	vector<unsigned char> material_id;
+
+    
+					 /**
+					  * Pointer which is not used by the
+					  * library but may be accessed an set
+					  * by the user to handle data local to
+					  * a line/quad/etc.
+					  */
+	vector<void*> user_pointers;
     };
     
   public:

@@ -332,6 +332,24 @@ class LineAccessor :  public TriaAccessor<dim> {
     void clear_user_flag () const;
 
 				     /**
+				      * Set the user pointer of this line
+				      * to #p#.
+				      */
+    void set_user_pointer (void *p) const;
+
+				     /**
+				      * Reset the user pointer of this line
+				      * to a #NULL# pointer.
+				      */
+    void clear_user_pointer () const;
+
+				     /**
+				      * Access the value of the user pointer
+				      * of this line.
+				      */
+    void * user_pointer () const;
+    
+				     /**
 				      *  Return a pointer to the #i#th
 				      *  child.
 				      */
@@ -572,6 +590,24 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      *  Clear the user flag.
 				      */
     void clear_user_flag () const;
+
+				     /**
+				      * Set the user pointer of this line
+				      * to #p#.
+				      */
+    void set_user_pointer (void *p) const;
+
+				     /**
+				      * Reset the user pointer of this line
+				      * to a #NULL# pointer.
+				      */
+    void clear_user_pointer () const;
+
+				     /**
+				      * Access the value of the user pointer
+				      * of this line.
+				      */
+    void * user_pointer () const;
 
 				     /**
 				      *  Return a pointer to the #i#th

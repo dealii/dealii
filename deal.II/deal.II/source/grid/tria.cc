@@ -156,6 +156,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
       next_free_line->set (Line (cells[cell].vertices[0], cells[cell].vertices[1]));
       next_free_line->set_used_flag ();
       next_free_line->set_material_id (cells[cell].material_id);
+      next_free_line->clear_user_pointer ();
       
 				       // note that this cell
 				       // is adjacent to these vertices
@@ -419,6 +420,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	{
 	  line->set (Line(i->first.first, i->first.second));
 	  line->set_used_flag ();
+	  line->clear_user_pointer ();
 	  i->second = line;
 	};
     };
@@ -447,7 +449,8 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 			  lines[3]->index()));
 	  
 	  cell->set_used_flag ();
-	  cell->set_material_id (cells[c].material_id);	  
+	  cell->set_material_id (cells[c].material_id);
+	  cell->clear_user_pointer ();
 					   // note that this cell is adjacent
 					   // to the four lines
 	  for (unsigned int line=0; line<4; ++line)
@@ -2227,11 +2230,13 @@ void Triangulation<1>::execute_refinement () {
 	      ++next_unused_cell;
 	    first_child = next_unused_cell;
 	    first_child->set_used_flag ();
+	    first_child->clear_user_pointer ();
 	    ++next_unused_cell;
 	    Assert (next_unused_cell->used() == false,
 		    ExcCellShouldBeUnused());
 	    second_child = next_unused_cell;
 	    second_child->set_used_flag ();
+	    second_child->clear_user_pointer ();
 
 					     // insert first child
 	    cell->set_children (first_child->index());
@@ -2711,11 +2716,13 @@ void Triangulation<2>::execute_refinement () {
 						  new_vertices[2*nb+1]));
 			new_lines[nb*2]->set_used_flag ();
 			new_lines[nb*2]->clear_children ();
+			new_lines[nb*2]->clear_user_pointer ();
 			
 			new_lines[nb*2+1]->set(Line(new_vertices[2*nb+1],
 						    new_vertices[(2*nb+2)%8]));
 			new_lines[nb*2+1]->set_used_flag ();
 			new_lines[nb*2+1]->clear_children ();
+			new_lines[nb*2+1]->clear_user_pointer ();
 		      } else {
 			new_lines[nb*2+1] = next_unused_line;
 			++next_unused_line;
@@ -2727,11 +2734,13 @@ void Triangulation<2>::execute_refinement () {
 						    new_vertices[2*nb]));
 			new_lines[nb*2]->set_used_flag ();
 			new_lines[nb*2]->clear_children ();
+			new_lines[nb*2]->clear_user_pointer ();
 
 			new_lines[nb*2+1]->set(Line(new_vertices[(2*nb+2)%8],
 						    new_vertices[2*nb+1]));
 			new_lines[nb*2+1]->set_used_flag ();
-			new_lines[nb*2+1]->clear_children ();			
+			new_lines[nb*2+1]->clear_children ();
+			new_lines[nb*2+1]->clear_user_pointer ();
 		      };
 		  };
 	      };
@@ -2766,6 +2775,7 @@ void Triangulation<2>::execute_refinement () {
 				   new_vertices[8]));
 	    new_lines[8]->set_used_flag ();
 	    new_lines[8]->clear_children ();
+	    new_lines[8]->clear_user_pointer ();
 	    
 	    while (next_unused_line->used() == true)
 	      ++next_unused_line;
@@ -2774,6 +2784,7 @@ void Triangulation<2>::execute_refinement () {
 				   new_vertices[5]));
 	    new_lines[9]->set_used_flag ();
 	    new_lines[9]->clear_children ();
+	    new_lines[9]->clear_user_pointer ();
 
 	    while (next_unused_line->used() == true)
 	      ++next_unused_line;
@@ -2782,7 +2793,8 @@ void Triangulation<2>::execute_refinement () {
 				    new_vertices[8]));
 	    new_lines[10]->set_used_flag ();
 	    new_lines[10]->clear_children ();
-
+	    new_lines[10]->clear_user_pointer ();
+	    
 	    while (next_unused_line->used() == true)
 	      ++next_unused_line;
 	    new_lines[11] = next_unused_line;
@@ -2790,7 +2802,7 @@ void Triangulation<2>::execute_refinement () {
 				    new_vertices[3]));
 	    new_lines[11]->set_used_flag ();
 	    new_lines[11]->clear_children ();
-
+	    new_lines[11]->clear_user_pointer ();
 					     // set the boundary indicators of
 					     // the outer cells.
 	    new_lines[0]->set_boundary_indicator (cell->line(0)->boundary_indicator());
@@ -2834,25 +2846,28 @@ void Triangulation<2>::execute_refinement () {
 				   new_lines[10]->index(), new_lines[7]->index()));
 	    subcells[0]->set_used_flag();
 	    subcells[0]->clear_children();
-
+	    subcells[0]->clear_user_pointer ();
 
 	    subcells[1]->set (Quad(new_lines[1]->index(),  new_lines[2]->index(),
 				   new_lines[11]->index(), new_lines[8]->index()));
 	    subcells[1]->set_used_flag();
 	    subcells[1]->clear_children();
+	    subcells[1]->clear_user_pointer ();
 
 
 	    subcells[2]->set (Quad(new_lines[11]->index(),  new_lines[3]->index(),
 				   new_lines[4]->index(), new_lines[9]->index()));
 	    subcells[2]->set_used_flag();
 	    subcells[2]->clear_children();
-
+	    subcells[2]->clear_user_pointer ();
+	    
 
 	    subcells[3]->set (Quad(new_lines[10]->index(),  new_lines[9]->index(),
 				   new_lines[5]->index(), new_lines[6]->index()));
 	    subcells[3]->set_used_flag();
 	    subcells[3]->clear_children();
-
+	    subcells[3]->clear_user_pointer ();
+	    
 					     // finally set neighborship info of
 					     // external cells
 					     // (neighbor_mapping is the mapping
@@ -3415,6 +3430,15 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
 				   // second of the second line of the
 				   // first child
   vertices_used[cell->child(0)->line(1)->vertex_index(1)] = false;
+
+				   // clear user pointers, to avoid that
+				   // they may appear at unwanted places
+				   // later on...
+  cell->child(0)->line(1)->clear_user_pointer();
+  cell->child(0)->line(2)->clear_user_pointer();
+  cell->child(2)->line(0)->clear_user_pointer();
+  cell->child(2)->line(3)->clear_user_pointer();
+  
 				   // delete the four interior lines
   cell->child(0)->line(1)->clear_used_flag();
   cell->child(0)->line(2)->clear_used_flag();
@@ -3438,14 +3462,21 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
 					 // delete the two subfaces
 	for (unsigned int subface=0;
 	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-	  cell->face(face)->child(subface)->clear_used_flag ();
+	  {
+	    cell->face(face)->child(subface)->clear_user_pointer ();
+	    cell->face(face)->child(subface)->clear_used_flag ();
+	  };
 	
 	cell->face(face)->clear_children();
       };
   
 				   // invalidate children
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    cell->child(child)->clear_used_flag();
+    {
+      cell->child(child)->clear_user_pointer();
+      cell->child(child)->clear_used_flag();
+    };
+  
   
 				   // delete pointer to children
   cell->set_children (-1);
@@ -3608,6 +3639,10 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines) {
       lines.material_id.insert (lines.material_id.end(),
 				new_size-lines.material_id.size(),
 				255);
+
+      lines.user_pointers.reserve (new_size);
+      lines.user_pointers.insert (lines.user_pointers.end(),
+				  new_size-lines.user_pointers.size(), 0);
     };
 };
 
@@ -3639,6 +3674,8 @@ void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (lines.lines.size(), lines.children.size()));
   Assert (lines.lines.size() == lines.material_id.size(),
 	  ExcMemoryInexact (lines.lines.size(), lines.material_id.size()));
+  Assert (lines.lines.size() == lines.user_pointers.size(),
+	  ExcMemoryInexact (lines.lines.size(), lines.user_pointers.size()));
 
   TriangulationLevel<0>::monitor_memory (true_dimension);
 };
@@ -3674,6 +3711,10 @@ void TriangulationLevel<2>::reserve_space (const unsigned int new_quads) {
       quads.material_id.insert (quads.material_id.end(),
 				new_size-quads.material_id.size(),
 				255);
+
+      quads.user_pointers.reserve (new_size);
+      quads.user_pointers.insert (quads.user_pointers.end(),
+				  new_size-quads.user_pointers.size(), 0);
     };
 };
 
@@ -3704,6 +3745,8 @@ void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (quads.quads.size(), quads.children.size()));
   Assert (quads.quads.size() == quads.material_id.size(),
 	  ExcMemoryInexact (quads.quads.size(), quads.material_id.size()));
+  Assert (quads.quads.size() == quads.user_pointers.size(),
+	  ExcMemoryInexact (quads.quads.size(), quads.user_pointers.size()));
 
   TriangulationLevel<1>::monitor_memory (true_dimension);
 };

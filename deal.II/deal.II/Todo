@@ -123,6 +123,9 @@ Review the restruction matrices. I'm not really sure about their
   elements and they are not implemented at all for quadratic ones.
 
 
+Document the user pointer interface of the triangulation.
+
+
 
 DEAL:
 Is dvector::operator= (double) really useful or does it make more
