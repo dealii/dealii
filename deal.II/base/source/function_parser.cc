@@ -70,7 +70,9 @@ unsigned int SplitString(const std::string& input,
 template <int dim>
 FunctionParser<dim>::FunctionParser(const unsigned int n_components,
 				    const double       initial_time)
-  : Function<dim>(n_components, initial_time)
+                :
+                Function<dim>(n_components, initial_time),
+                fp (0)
 { 
   fp = new fparser::FunctionParser[n_components];
 }
