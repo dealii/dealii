@@ -10,6 +10,7 @@
 
 
 #include <grid/tria_boundary.h>
+#include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <cmath>
