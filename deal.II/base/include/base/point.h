@@ -30,16 +30,19 @@
  * you use double <tt>f(Point<dim> &p)</tt>.
  *
  * <tt>Point</tt> also serves as a starting point for the implementation of
- * the geometrical primitives like <tt>Polyhedron</tt>, <tt>Triangle</tt>,
- * etc.
+ * the geometrical primitives like cells, edges, or faces.
  *
- * <tt>Point</tt>s can also be thought of as vectors, i.e. points in a vector
- * space without an obvious meaning. For instance, it may be suitable to let
- * the gradient of a function be a <tt>point</tt> vector: <tt>Point<dim>
- * gradient_of_f (const Point<dim> &x)</tt>. <tt>Point</tt>s have all
- * functionality for this, e.g. scalar products, addition etc. However, you
- * should also consider using the simpler <tt>Tensor<1,dim></tt> class, which
- * seems more suited to gradients.
+ * Within deal.II, we use the <tt>Point</tt> class mainly to denote the points
+ * that make up geometric objects. As such, they have a small number of
+ * additional operations over general tensors of rank 1 for which we use the
+ * <tt>Tensor<1,dim></tt> class. In particular, there is a distance() function
+ * to compute the Euclidian distance between two points in space.
+ *
+ * The <tt>Point</tt> class is really only used where the coordinates of an
+ * object can be thought to possess the dimension of a length. For all other
+ * uses, such as the gradient of a scalar function (which is a tensor of rank
+ * 1, or vector, with as many elements as a point object, but with different
+ * physical units), we use the <tt>Tensor<1,dim></tt> class.
  *
  * @author Wolfgang Bangerth, 1997
  */
