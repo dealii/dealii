@@ -8,6 +8,7 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <basic/forward-declarations.h>
+#include <lac/forward-declarations.h>
 
 #include <vector>
 
@@ -684,13 +685,20 @@ class TimeStepBase : public Subscriptor
 
 /**
  * Specialization of #TimeStepBase# which addresses some aspects of grid handling.
- * In particular, this class is though to make handling of grids available that
+ * In particular, this class is thought to make handling of grids available that
  * are adaptively refined on each time step separately or with a loose coupling
  * between time steps. It also takes care of deleting and rebuilding grids when
  * memory resources are a point, through the #sleep# and #wake_up# functions
  * declared in the base class.
  *
- * @author Wolfgang Bangerth, 1999
+ * In ddition to that, it offers a function which do some rather hairy refinement
+ * rules for time dependent problems. trying to avoid to much change in the grids
+ * between subsequent time levels, while also trying to retain the freedom of
+ * refining each grid separately. There are lots of flags and numbers controlling
+ * this function, which might drastically change the behaviour of the function -- see
+ * the description of the flags for further information.
+ *
+ * @author Wolfgang Bangerth, 1999; large parts taken from the wave program, by Wolfgang Bangerth 1998
  */
 template <int dim>
 class TimeStepBase_Tria :  public TimeStepBase
@@ -698,7 +706,9 @@ class TimeStepBase_Tria :  public TimeStepBase
   public:
 				     // forward declaration
     struct Flags;
-
+    struct RefinementFlags;
+    struct RefinementData;
+    
 				     /**
 				      * Default constructor. Does nothing but
 				      * throws an exception. We need to have
@@ -728,10 +738,18 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * the lifetime of the coarse grid
 				      * is longer than it is needed by
 				      * this object.
+				      *
+				      * You need to give the general flags
+				      * structure to this function since it
+				      * is needed anyway; the refinement
+				      * flags can be omitted if you do
+				      * not intend to call the refinement
+				      * function of this class.
 				      */
     TimeStepBase_Tria (const double              time,
 		       const Triangulation<dim> &coarse_grid,
-		       const Flags              &flags);
+		       const Flags              &flags,
+		       const RefinementFlags    &refinement_flags = RefinementFlags());
 
 				     /**
 				      * Destructor. At present, this does
@@ -804,6 +822,33 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      */
     virtual void sleep (const unsigned);
 
+				     /**
+				      * Do the refinement according to the
+				      * flags passed to the constructor of this
+				      * object and the data passed to this
+				      * function. For a description of the
+				      * working of this function refer to the
+				      * general documentation of this class.
+				      *
+				      * In fact, this function does not
+				      * actually refine or coarsen the
+				      * triangulation, but only sets the
+				      * respective flags. This is done because
+				      * usually you will not need the grid
+				      * immediately afterwards but only
+				      * in the next sweep, so it suffices
+				      * to store the flags and rebuild it
+				      * the next time we need it. Also, it
+				      * may be that the next time step
+				      * would like to add or delete some
+				      * flags, so we have to wait anyway
+				      * with the use of this grid.
+				      *
+				      * The function is made virtual so
+				      * that you can overload it if needed.
+				      */
+    virtual void refine_grid (const RefinementData &data);
+    
   protected:
     
 				     /**
@@ -840,6 +885,14 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      */
     const Flags flags;
 
+				     /**
+				      * Flags controlling the refinement
+				      * process; see the documentation of the
+				      * respective structure for more
+				      * information.
+				      */
+    const RefinementFlags refinement_flags;
+
   private:
 				     /**
 				      * Vectors holding the refinement and
@@ -866,7 +919,12 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * rebuilt using the saved flags.
 				      */
     void restore_grid ();
+    void mirror_refinement_flags (typename Triangulation<dim>::cell_iterator &new_cell,
+				  typename Triangulation<dim>::cell_iterator &old_cell);
+    
+    void adapt_grids (Triangulation<dim> &tria1, Triangulation<dim> &tria2);
 };
+
 
 
 
@@ -884,26 +942,10 @@ struct TimeStepBase_Tria<dim>::Flags
 				      * fields for a description of the
 				      * meaning of the parameters.
 				      */
-    Flags (const unsigned int max_refinement_level,
-	   const bool         delete_and_rebuild_tria,
+    Flags (const bool         delete_and_rebuild_tria,
 	   const unsigned int wakeup_level_to_build_grid,
 	   const unsigned int sleep_level_to_delete_grid);
     
-				     /**
-				      * Maximum level of a cell in the
-				      * triangulation of a time level. If it
-				      * is set to zero, then no limit is imposed
-				      * on the number of refinements a coarse
-				      * grid cell may undergo. Usually, this
-				      * field is used, if for some reason you
-				      * want to limit refinement in an
-				      * adaptive process, for example to avoid
-				      * overly large numbers of cells or to
-				      * compare with grids which have a certain
-				      * number of refinements.
-				      */
-    const unsigned int max_refinement_level;
-
 				     /**
 				      * This flag determines whether the
 				      * #sleep# and #wake_up# functions shall
@@ -957,6 +999,170 @@ struct TimeStepBase_Tria<dim>::Flags
     DeclException0 (ExcInternalError);
 };
 
+
+
+/**
+ * Terminology:
+ * Correction: change the number of cells on this grid according to a criterion
+ *     that the number of cells may be only a certain fraction more or less
+ *     then the number of cells on the previous grid.
+ * Adaption: flag some cells such that there are no to grave differences.
+ */
+template <int dim>
+struct TimeStepBase_Tria<dim>::RefinementFlags
+{
+				     /**
+				      * Constructor. The default values are
+				      * chosen such that almost no restriction
+				      * on the mesh refinement is imposed.
+				      */
+    RefinementFlags (const unsigned int max_refinement_level  = 0,
+		     const double cell_number_corridor_top    = (1<<dim),
+		     const double cell_number_corridor_bottom = 1,
+		     const unsigned int cell_number_correction_steps = 0);
+    
+				     /**
+				      * Maximum level of a cell in the
+				      * triangulation of a time level. If it
+				      * is set to zero, then no limit is imposed
+				      * on the number of refinements a coarse
+				      * grid cell may undergo. Usually, this
+				      * field is used, if for some reason you
+				      * want to limit refinement in an
+				      * adaptive process, for example to avoid
+				      * overly large numbers of cells or to
+				      * compare with grids which have a certain
+				      * number of refinements.
+				      */
+    const unsigned int  max_refinement_level;
+
+				     /**
+				      * First sweep to perform cell number
+				      * correction steps on; for sweeps
+				      * before, cells are only flagged and
+				      * no number-correction to previous grids
+				      * is performed.
+				      */
+    const unsigned int  first_sweep_with_correction;
+
+
+				     /**
+				      * Apply cell number correction with the
+				      * previous time level only if there are
+				      * more than this number of cells.
+				      */
+    const unsigned int  min_cells_for_correction;
+    
+				     /**
+				      * Fraction by which the number of cells
+				      * on a time level may differ from the
+				      * number on the previous time level
+				      * (first: top deviation, second: bottom
+				      * deviation).
+				      */
+    const double        cell_number_corridor_top, cell_number_corridor_bottom;
+
+    const vector<vector<pair<unsigned int,double> > > correction_relaxations;
+    
+				     /**
+				      * Number of iterations to be performed
+				      * to adjust the number of cells on a
+				      * time level to those on the previous
+				      * one.
+				      */
+    const unsigned int  cell_number_correction_steps;
+
+				     /**
+				      * Flag all cells which are flagged on this
+				      * timestep for refinement on the previous
+				      * one also. This is useful in case the
+				      * error indicator was computed by
+				      * integration over time-space cells, but
+				      * are now associated to a grid on a
+				      * discrete time level. Since the error
+				      * contribution comes from both grids,
+				      * however, it is appropriate to refine
+				      * both grids.
+				      *
+				      * Since the previous grid does not mirror
+				      * the flags to the one before it, this
+				      * does not lead to an almost infinite
+				      * growth of cell numbers. You should
+				      * use this flag with cell number
+				      * correction switched on only, however.
+				      *
+				      * Mirroring is done after cell number
+				      * correction is done, but before grid
+				      * adaption, so the cell number on
+				      * this grid is not noticably influenced
+				      * by the cells flagged additionally on
+				      * the previous grid.
+				      */
+    const bool          mirror_flags_to_previous_grid;
+
+    const bool          adapt_grids;
+    
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidValue,
+		    int,
+		    << "The following value does not fulfil the requirements: " << arg1);
+};
+
+
+
+template <int dim>
+struct TimeStepBase_Tria<dim>::RefinementData 
+{
+				     /**
+				      * Constructor
+				      */
+    RefinementData (const Vector<float> &criteria,
+		    const double         refinement_threshold,
+		    const double         coarsening_threshold=0);
+    
+				     /**
+				      * Vector of values indicating the
+				      * error per cell or some other
+				      * quantity used to determine which cells
+				      * are to be refined and which are to be
+				      * coarsened.
+				      *
+				      * The vector contains exactly one value
+				      * per active cell, in the usual order
+				      * in which active cells are sorted in
+				      * loops over cells. It is assumed that
+				      * all values in this vector have a
+				      * nonnegative value.
+				      */
+    const Vector<float> &criteria;
+
+				     /**
+				      * Threshold for refinement: cells having
+				      * a larger value will be refined (at least
+				      * in the first round; subsequent steps
+				      * of the refinement process may flag
+				      * other cells as well or remove the
+				      * flag from cells with a criterion higher
+				      * than this threshold).
+				      */
+    const double         refinement_threshold;
+
+				     /**
+				      * Same threshold for coarsening: cells
+				      * with a smaller threshold will be
+				      * coarsened if possible.
+				      */
+    const double         coarsening_threshold;
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidValue,
+		    int,
+		    << "The following value does not fulfil the requirements: " << arg1);
+};
 
 
 
