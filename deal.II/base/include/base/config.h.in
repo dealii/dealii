@@ -230,8 +230,31 @@
  * The constants defined here are a subset of the @p{M_XXX} constants sometimes
  * declared in the system include file @p{math.h}, but without the 
  * prefix @p{M_}.
+ *
+ * In addition to that, we declare @p{invalid_unsigned_int} to be the
+ * largest unsigned integer representable; this value is widely used in
+ * the library as a marker for an invalid index, an invalid size of an
+ * array, and similar purposes.
  */
 namespace deal_II_numbers {
+                                             /**
+                                              * Representation of the
+                                              * largest number that
+                                              * can be put into an
+                                              * unsigned integer. This
+                                              * value is widely used
+                                              * throughout the library
+                                              * as a marker for an
+                                              * invalid unsigned
+                                              * integer value, such as
+                                              * an invalid array
+                                              * index, an invalid
+                                              * array size, and the
+                                              * like.
+                                              */
+  static const unsigned int 
+    invalid_unsigned_int = static_cast<unsigned int> (-1);
+
                                              /**
                                               * e
                                               */

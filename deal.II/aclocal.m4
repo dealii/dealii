@@ -2630,6 +2630,40 @@ AC_DEFUN(DEAL_II_CHECK_SFINAE_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Old versions of gcc had a problem with arrays inside ?: 
+dnl expressions: they decayed too quickly to pointers. This then
+dnl leads to erroneous warnings :-(
+dnl
+dnl Usage: DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG, dnl
+[
+  AC_MSG_CHECKING(for array assignment in conditional bug)
+  AC_LANG(C++)
+  CXXFLAGS="-W -Wall -Werror"
+  AC_TRY_COMPILE(
+    [
+    ],
+    [
+  const int x[2][2] = {{1,1},{1,1}};
+  const int (&y)[2] = (1 ? x[0] : x[1]);
+  return y[0];
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG, 1, 
+                     [Defined if the compiler has a problem with
+	              assigning arrays in conditionals])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl The boost::shared_ptr class has a templated assignment operator
 dnl but no assignment operator matching the default operator
 dnl signature (this if for boost 1.29 at least). So when using
