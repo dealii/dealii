@@ -193,15 +193,19 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 			  for (unsigned int c=0; c<fe.get_fe().n_components(); ++c)
 			    {
 			      if (fe.get_fe().system_to_component_index(i).first == c)
-				Assert ((sub.shape_value(i,k) ==
-					 sub.shape_value_component(i,k,c))
-					&&
-					(sub.shape_grad(i,k) ==
-					 sub.shape_grad_component(i,k,c))
-					&&
-					(sub.shape_2nd_derivative(i,k) ==
-					 sub.shape_2nd_derivative_component(i,k,c)),
-					ExcInternalError())
+				{
+				  const double v1 = sub.shape_value(i,k),
+					       v2 = sub.shape_value_component(i,k,c);
+				  Assert (v1 == v2, ExcInternalError());
+
+				  const Tensor<1,dim> g1 = sub.shape_grad(i,k),
+						      g2 = sub.shape_grad_component(i,k,c);
+				  Assert (g1 == g2, ExcInternalError());
+
+				  const Tensor<2,dim> s1 = sub.shape_2nd_derivative(i,k),
+						      s2 = sub.shape_2nd_derivative_component(i,k,c);
+				  Assert (s1 == s2, ExcInternalError());
+				}       
 			      else
 				Assert ((sub.shape_value_component(i,k,c) == 0) &&
 					(sub.shape_grad_component(i,k,c) == Tensor<1,dim>()) &&
