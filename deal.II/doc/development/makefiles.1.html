@@ -63,8 +63,14 @@
            Name and version of the C++ compiler. Possible
 	   names presently include <code>egcs1.1</code>,
 	   <code>gcc2.95</code>, <code>gcc2.96</code>,
-           <code>gcc2.97</code>, <code>ibm_xlc</code>.
-	   Note that the naming of this variable is historical, since
+           <code>gcc2.97</code>, <code>gcc3.0</code>,
+           <code>ibm_xlc</code>, <code>MIPSpro</code>. Not all of
+           these compilers are actually supported (see the 
+           <a href="../readme.html" target="body">ReadMe file</a> for a
+           list of supported compilers and platforms), it is only a list of
+           recognized compilers.
+	   Note that the naming of this variable is historical (it
+           should read <code>CXX-VERSION</code>), since
            it is also used even if the compiler is not the GNU C++
            compiler.
            </p>
@@ -85,7 +91,7 @@
            Name and version of the Fortran 77 compiler. Possible
 	   names presently include <code>egcs1.1</code>,
 	   <code>gcc2.95</code>, <code>gcc2.96</code>,
-           <code>gcc2.97</code>, <code>SunF77</code>,
+           <code>gcc2.97</code>, <code>gcc3.0</code>, <code>SunF77</code>,
 	   <code>AIXF77</code>, <code>MIPSproF77</code>;
 	   there may be others in the future, if we have access to
            other systems

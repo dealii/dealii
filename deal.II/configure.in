@@ -89,6 +89,10 @@ if test "$GXX" = yes ; then
 	AC_MSG_RESULT(compiler is gcc-2.97)
 	GXX_VERSION=gcc2.97
 	;;
+    *3.0*)
+	AC_MSG_RESULT(compiler is gcc-3.0)
+	GXX_VERSION=gcc3.0
+	;;
     *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
 	dnl These compilers are too old to support a useful subset
 	dnl of modern C++, so we don't support them
@@ -510,6 +514,10 @@ if test "x$F77" != "x" ; then
       *2.97*)
 	  AC_MSG_RESULT(compiler is gcc-2.97)
 	  F77_VERSION=gcc2.97
+	  ;;
+      *3.0*)
+	  AC_MSG_RESULT(compiler is gcc-3.0)
+	  F77_VERSION=gcc3.0
 	  ;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
 	  dnl These compilers are too old to support a useful subset
