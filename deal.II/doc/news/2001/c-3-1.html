@@ -314,6 +314,17 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: The vertex numbers written by the <code
+       class="class">GridOut</code>::<code
+       class="member">write_ucd_faces</code> function are now also
+       1-based. This, to be consistent with the vertex numbers given
+       by the <code class="class">GridOut</code>::<code
+       class="member">write_ucd</code> function.
+       <br>
+       (RH 2001/04/20)
+       </p>
+
+  <li> <p>
        Extended: the <code
        class="class">DerivativeApproximation</code> class now also
        works in 3d, as the spectral norm of a symmetric 3x3 matrix can

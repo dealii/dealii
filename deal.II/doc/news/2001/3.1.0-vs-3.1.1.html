@@ -15,6 +15,17 @@
 
 <ol>
   <li> <p>
+       Fixed: The vertex numbers written by the <code
+       class="class">GridOut</code>::<code
+       class="member">write_ucd_faces</code> function are now also
+       1-based. This, to be consistent with the vertex numbers given
+       by the <code class="class">GridOut</code>::<code
+       class="member">write_ucd</code> function.
+       <br>
+       (RH 2001/04/20)
+       </p>
+
+  <li> <p>
        Fixed: the <code
        class="member">DoFRenumbering::Cuthill_McKee</code> function
        did not work correctly when giving the <code
