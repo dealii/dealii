@@ -242,6 +242,19 @@ class CosineFunction : public Function<dim>
     virtual void laplacian_list (const typename std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
 				 const unsigned int              component = 0) const;
+
+				     /**
+				      * Gradient at a single point.
+				      */
+    virtual Tensor<2,dim> hessian (const Point<dim>   &p,
+				   const unsigned int  component = 0) const;
+
+				     /**
+				      * Gradients at multiple points.
+				      */
+    virtual void hessian_list (const typename std::vector<Point<dim> > &points,
+			       typename std::vector<Tensor<2,dim> >    &hessians,
+			       const unsigned int              component = 0) const;
 };
 
 

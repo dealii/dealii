@@ -12,6 +12,7 @@
 //----------------------------  function_lib.cc  ---------------------------
 
 
+#include <base/tensor.h>
 #include <base/point.h>
 #include <base/function_lib.h>
 
@@ -515,6 +516,110 @@ CosineFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &poi
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
+	}
+    }
+}
+
+template<int dim>
+Tensor<2,dim>
+CosineFunction<dim>::hessian (const Point<dim>   &p,
+			       const unsigned int) const
+{
+  const double pi2 = M_PI_2*M_PI_2;
+
+  Tensor<2,dim> result;
+  switch(dim)
+    {
+      case 1:
+	    result[0][0] = -pi2* cos(M_PI_2*p(0));
+	    break;
+      case 2:
+	if (true)
+	  {
+	    const double coco = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
+	    const double sisi = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1));
+	    result[0][0] = coco;
+	    result[1][1] = coco;
+	    result[0][1] = sisi;
+	    result[1][0] = sisi;
+	  }
+	break;
+      case 3:
+	if (true)
+	  {
+	    const double cococo = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+	    const double sisico = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+	    const double sicosi = pi2*sin(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+	    const double cosisi = pi2*cos(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+
+	    result[0][0] = cococo;
+	    result[1][1] = cococo;
+	    result[2][2] = cococo;
+	    result[0][1] = sisico;
+	    result[1][0] = sisico;
+	    result[0][2] = sicosi;
+	    result[2][0] = sicosi;
+	    result[1][2] = cosisi;
+	    result[2][1] = cosisi;
+	  }
+	break;
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+  return result;
+}
+
+template<int dim>
+void
+CosineFunction<dim>::hessian_list (const typename std::vector<Point<dim> > &points,
+				    typename std::vector<Tensor<2,dim> >    &hessians,
+				    const unsigned int) const
+{
+  Assert (hessians.size() == points.size(),
+	  ExcDimensionMismatch(hessians.size(), points.size()));
+
+  const double pi2 = M_PI_2*M_PI_2;
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<dim>& p = points[i];
+      switch(dim)
+	{
+	  case 1:
+		hessians[i][0][0] = -pi2* cos(M_PI_2*p(0));
+		break;
+	  case 2:
+	    if (true)
+	      {
+		const double coco = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
+		const double sisi = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1));
+		hessians[i][0][0] = coco;
+		hessians[i][1][1] = coco;
+		hessians[i][0][1] = sisi;
+		hessians[i][1][0] = sisi;
+	      }
+	    break;
+	  case 3:
+	    if (true)
+	      {
+		const double cococo = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+		const double sisico = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+		const double sicosi = pi2*sin(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+		const double cosisi = pi2*cos(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+
+		hessians[i][0][0] = cococo;
+		hessians[i][1][1] = cococo;
+		hessians[i][2][2] = cococo;
+		hessians[i][0][1] = sisico;
+		hessians[i][1][0] = sisico;
+		hessians[i][0][2] = sicosi;
+		hessians[i][2][0] = sicosi;
+		hessians[i][1][2] = cosisi;
+		hessians[i][2][1] = cosisi;
+	      }
+	    break;
+	  default:
+	    Assert(false, ExcNotImplemented());
 	}
     }
 }
