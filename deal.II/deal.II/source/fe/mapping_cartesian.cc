@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -136,26 +136,6 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 {
   const UpdateFlags update_flags(data.current_update_flags());
 
-  const unsigned int npts = quadrature_points.size ();
-
-  const typename QProjector<dim>::DataSetDescriptor offset
-    = (face_no == invalid_face_number
-       ?
-       QProjector<dim>::DataSetDescriptor::cell()
-       :
-       (sub_no == invalid_face_number
-        ?
-					 // called from FEFaceValues
-        QProjector<dim>::DataSetDescriptor::face (face_no,
-                                                  cell->face_orientation(face_no),
-                                                  quadrature_points.size())
-        :
-					 // called from FESubfaceValues
-        QProjector<dim>::DataSetDescriptor::sub_face (face_no, sub_no,
-                                                      cell->face_orientation(face_no),
-                                                      quadrature_points.size())
-        ));
-  
                                    // some more sanity checks
   if (face_no != invalid_face_number)
     {
@@ -213,9 +193,28 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 				   // each direction
   if (update_flags & update_q_points)
     {
-      Assert (quadrature_points.size() == npts,
-	      ExcDimensionMismatch(quadrature_points.size(), npts));
-      for (unsigned int i=0; i<npts; ++i)
+      const typename QProjector<dim>::DataSetDescriptor offset
+	= (face_no == invalid_face_number
+	   ?
+	   QProjector<dim>::DataSetDescriptor::cell()
+	   :
+	   (sub_no == invalid_face_number
+	    ?
+					     // called from FEFaceValues
+	    QProjector<dim>::DataSetDescriptor::face (face_no,
+						      cell->face_orientation(face_no),
+						      quadrature_points.size())
+	    :
+					     // called from FESubfaceValues
+	    QProjector<dim>::DataSetDescriptor::sub_face (face_no, sub_no,
+							  cell->face_orientation(face_no),
+							  quadrature_points.size())
+	   ));
+
+//This assertion was nonsense, since we let npts = quadrature_points.size() above
+//      Assert (quadrature_points.size() == npts,
+//	      ExcDimensionMismatch(quadrature_points.size(), npts));
+      for (unsigned int i=0; i<quadrature_points.size(); ++i)
 	{
 	  quadrature_points[i] = start;
 	  for (unsigned int d=0; d<dim; ++d)
@@ -234,8 +233,11 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 				   // value
   if (update_flags & update_normal_vectors)
     {
-      Assert (normal_vectors.size() == npts,
-	      ExcDimensionMismatch(normal_vectors.size(), npts));
+// We would like to have an assertion like this, but if
+// we do not compute quadrature points, npts is zero.
+      
+//      Assert (normal_vectors.size() == npts,
+//	      ExcDimensionMismatch(normal_vectors.size(), npts));
       Assert (face_no < GeometryInfo<dim>::faces_per_cell,
               ExcInternalError());
       

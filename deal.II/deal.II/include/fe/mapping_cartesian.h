@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,7 +27,8 @@
  * Mapping of an axis-parallel cell.
  *
  * This class maps the unit cell to a grid cell with surfaces parallel
- * to the coordinate lines/planes. It is specifically developed for
+ * to the coordinate lines/planes. The mapping is therefore a scaling
+ * along the coordinate directions. It is specifically developed for
  * cartesian meshes. Apply this mapping to a general mesh to get
  * strange results.
  *
@@ -37,37 +38,21 @@ template <int dim>
 class MappingCartesian : public Mapping<dim>
 {
   public:
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Quadrature<dim>& quadrature) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,
 		      const Quadrature<dim-1>& quadrature) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual void
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>& quadrature,
@@ -75,10 +60,6 @@ class MappingCartesian : public Mapping<dim>
 		    std::vector<Point<dim> >        &quadrature_points,
 		    std::vector<double>             &JxW_values) const ;
 
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual void
     fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
 			 const unsigned int face_no,
@@ -88,11 +69,6 @@ class MappingCartesian : public Mapping<dim>
 			 std::vector<double>             &JxW_values,
 			 std::vector<Tensor<1,dim> >        &boundary_form,
 			 std::vector<Point<dim> >        &normal_vectors) const ;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual void
     fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
 			    const unsigned int face_no,
@@ -104,53 +80,30 @@ class MappingCartesian : public Mapping<dim>
 			    std::vector<Tensor<1,dim> >        &boundary_form,
 			    std::vector<Point<dim> >        &normal_vectors) const ;
 
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual void
     transform_covariant (Tensor<1,dim>          *begin,
 			 Tensor<1,dim>          *end,
 			 const Tensor<1,dim>    *src,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual void
     transform_covariant (Tensor<2,dim>          *begin,
 			 Tensor<2,dim>          *end,
 			 const Tensor<2,dim>    *src,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual void
     transform_contravariant (Tensor<1,dim>          *begin,
 			     Tensor<1,dim>          *end,
 			     const Tensor<1,dim>    *src,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
     virtual void
     transform_contravariant (Tensor<2,dim>          *begin,
 			     Tensor<2,dim>          *end,
 			     const Tensor<2,dim>    *src,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
 
-				     /**
-				      * Transforms the point @p{p} on
-				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns @p{p_real}.
-				      */
     virtual Point<dim>
     transform_unit_to_real_cell (
       const typename Triangulation<dim>::cell_iterator &cell,
@@ -171,16 +124,7 @@ class MappingCartesian : public Mapping<dim>
       const typename Triangulation<dim>::cell_iterator &cell,
       const Point<dim>                                 &p) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags) const;
-    
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
+    virtual UpdateFlags update_once (const UpdateFlags) const;    
     virtual UpdateFlags update_each (const UpdateFlags) const;
     
 				     /**
@@ -195,7 +139,7 @@ class MappingCartesian : public Mapping<dim>
   protected:
 				     /** 
 				      * Storage for internal data of
-				      * d-linear transformation.
+				      * the scaling.
 				      */
     class InternalData : public Mapping<dim>::InternalDataBase
     {
@@ -216,22 +160,22 @@ class MappingCartesian : public Mapping<dim>
 					 /**
 					  * Length of the cell in
 					  * different coordinate
-					  * directions, @p{h_x},
-					  * @p{h_y}, @p{h_z}.
+					  * directions, <i>h<sub>x</sub></i>,
+					  * <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
 					  */
 	Tensor<1,dim> length;
 
 					 /**
 					  * Vector of all quadrature
 					  * points. Especially, all
-					  * points of all faces.
+					  * points on all faces.
 					  */
 	std::vector<Point<dim> > quadrature_points;
     };
     
 				     /**
 				      * Do the computation for the
-				      * @p{fill_*} functions.
+				      * <tt>fill_*</tt> functions.
 				      */
     void compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
 		       const unsigned int face_no,
@@ -253,6 +197,7 @@ class MappingCartesian : public Mapping<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
+/// @if NoDoc
 
 template <> void MappingCartesian<1>::fill_fe_face_values (
   const DoFHandler<1>::cell_iterator &,
@@ -275,6 +220,6 @@ template <> void MappingCartesian<1>::fill_fe_subface_values (
   std::vector<Tensor<1,1> >&,
   std::vector<Point<1> >&) const;
 
-  
+/// @endif  
 
 #endif
