@@ -68,7 +68,7 @@ foreach $filename (@ARGV) {
 		    }
 		}
 		
-		die "---External reference `$internal_ref' not found in file $filename\n"
+		die "---External reference `$external_file#$external_ref' not found in file $filename\n"
 		    unless $found;
 		next;
 	    }
