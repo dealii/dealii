@@ -197,6 +197,10 @@ class GridIn
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcInvalidDBMeshFormat);
+				     /**
+				      * Exception
+				      */
     DeclException1 (ExcInvalidDBMESHInput,
 		    string,
 		    << "The string <" << arg1 << "> is not recognized at the present"
