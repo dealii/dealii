@@ -15,6 +15,7 @@
 #include <lac/solver_gmres.h>
 #include <lac/solver_bicgstab.h>
 #include <lac/solver_richardson.h>
+#include <lac/solver_qmrs.h>
 #include <lac/precondition.h>
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
@@ -39,6 +40,7 @@ main()
   SolverGMRES<SparseMatrix<float> , Vector<double>  > gmres(control, mem,20);
   SolverBicgstab<SparseMatrix<float> , Vector<double>  > bicgstab(control, mem);
   SolverRichardson<SparseMatrix<float> , Vector<double>  > rich(control, mem);
+  SolverQMRS<SparseMatrix<float> , Vector<double>  > qmrs(control, mem);
 
   for (unsigned int size=4; size <= 40; size *= 3)
     {
@@ -77,28 +79,33 @@ main()
       deallog << "SOR-diff:" << res*res << endl;
       
       deallog.push("no");
-
-      check_method(cg,A,u,f,prec_no);
-      check_method(bicgstab,A,u,f,prec_no);
-      check_method(gmres,A,u,f,prec_no);
-
+      {
+	check_method(cg,A,u,f,prec_no);
+	check_method(bicgstab,A,u,f,prec_no);
+	check_method(gmres,A,u,f,prec_no);
+	check_method(qmrs,A,u,f,prec_no);
+      };
       deallog.pop();
+      
       deallog.push("ssor");      
-
-      check_method(rich,A,u,f,prec_ssor);
-      check_method(cg,A,u,f,prec_ssor);
-//      testproblem.gnuplot_print(cout, u);
-      check_method(bicgstab,A,u,f,prec_ssor);
-      check_method(gmres,A,u,f,prec_ssor);
-
+      {
+	check_method(rich,A,u,f,prec_ssor);
+	check_method(cg,A,u,f,prec_ssor);
+	check_method(bicgstab,A,u,f,prec_ssor);
+	check_method(gmres,A,u,f,prec_ssor);
+	check_method(qmrs,A,u,f,prec_ssor);
+      };
       deallog.pop();
+
       deallog.push("sor");      
-
-      check_method(rich,A,u,f,prec_sor);
-      check_method(cg,A,u,f,prec_sor);
-      check_method(bicgstab,A,u,f,prec_sor);
-      check_method(gmres,A,u,f,prec_sor);
-
+      {
+	check_method(rich,A,u,f,prec_sor);
+	check_method(cg,A,u,f,prec_sor);
+	check_method(bicgstab,A,u,f,prec_sor);
+	check_method(gmres,A,u,f,prec_sor);
+	check_method(qmrs,A,u,f,prec_sor);
+      };
       deallog.pop();
-    }
-}
+    };
+};
+
