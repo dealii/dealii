@@ -36,39 +36,39 @@ help:
 
 
 baseg:
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/base && $(MAKE) $(MAKEOPTIONS) libg
 
 baseo:
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libo
+	cd $D/base && $(MAKE) $(MAKEOPTIONS) libo
 
 lacg: baseg contrib
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libg
 
 laco: baseo contrib
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libo
+	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libo
 
 1dg: baseg lacg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1dg
 
 2dg: baseg lacg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2dg
 
 3dg: baseg lacg
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3dg
 
 1do:baseo laco
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1d
 
 2do:baseo laco
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2d
 
 3do: baseo laco
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3d
 
 deps: 
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd $D/base && $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd $D/lac && $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 
 base: baseg baseo
 lac: lacg laco
@@ -93,11 +93,11 @@ optimized: deps
 # when HSL functions are used, we also compile the detached_ma27 program
 # which itself uses the optimized base library
 contrib: $(subst no,,$(subst yes,baseo,$(USE_CONTRIB_HSL)))
-	cd $D/contrib ; $(MAKE)
+	cd $D/contrib && $(MAKE)
 
 
 online-doc:
-	cd $D/doc ; $(MAKE)
+	cd $D/doc && $(MAKE)
 	@echo
 	@echo
 	@echo =======================================================
@@ -128,32 +128,32 @@ clean: clean-contrib clean-base clean-lac clean-dealII clean-doc clean-examples 
 	-rm -f TODO common/TAGS
 
 clean-contrib:
-	cd $D/contrib ; $(MAKE) clean
+	cd $D/contrib && $(MAKE) clean
 
 clean-base:
-	cd $D/base ; $(MAKE) clean
+	cd $D/base && $(MAKE) clean
 
 clean-lac:
-	cd $D/lac ; $(MAKE) clean
+	cd $D/lac && $(MAKE) clean
 
 clean-dealII:
-	cd $D/deal.II ; $(MAKE) clean
+	cd $D/deal.II && $(MAKE) clean
 
 clean-doc:
-	cd $D/doc ; $(MAKE) clean
+	cd $D/doc && $(MAKE) clean
 
 clean-examples:
-	cd $D/examples ; $(MAKE) clean
+	cd $D/examples && $(MAKE) clean
 
 clean-lib:
-	cd $D/lib ; $(MAKE) clean
+	cd $D/lib && $(MAKE) clean
 
 # if that directory exists, go into 'tests' and clean up there as well
 clean-tests:
 	-cd tests && $(MAKE) clean
 
 distclean: clean
-	cd lib ; $(MAKE) distclean
+	cd lib && $(MAKE) distclean
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc contrib \
