@@ -1688,7 +1688,7 @@ namespace LaplaceSolver
   };
 
 
-				   // @sect4{Computing edgel term error contributions - 1}
+				   // @sect4{Computing edge term error contributions - 1}
   
 				   // On the other hand, computation
 				   // of the edge terms for the error
@@ -1812,10 +1812,12 @@ namespace LaplaceSolver
   };
 
 
-  				   // @sect4{Computing edgel term
-  				   // error contributions - 2}
-				   // We are still missing the case of faces with hanging nodes. This is what is covered in this function:
-
+  				   // @sect4{Computing edge term error contributions - 2}
+  
+				   // We are still missing the case of
+				   // faces with hanging nodes. This
+				   // is what is covered in this
+				   // function:
   template <int dim>
   void WeightedResidual<dim>::
   integrate_over_irregular_face (const active_cell_iterator &cell,
