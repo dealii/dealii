@@ -2342,6 +2342,53 @@ AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Icc7 gets this wrong:
+dnl ----------------------
+dnl class O {
+dnl   class I {
+dnl 	class II {};
+dnl     };
+dnl   friend class I::II;
+dnl };
+dnl ----------------------
+dnl It complains in the friend declaration that I::II is not accessible.
+dnl This is bogus, since we don't need to have access to a class that we
+dnl want to grant friendship (friendship goes the other way round).
+dnl
+dnl We work around this problem, if we encounter it.
+dnl
+dnl Usage: DEAL_II_CHECK_NESTED_NESTED_FRIEND_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_NESTED_NESTED_FRIEND_BUG, dnl
+[
+  AC_MSG_CHECKING(for nested nested classes friends bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      class O {
+          class I {
+      	class II {};
+          };
+          friend class I::II;
+      };
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_NESTED_NESTED_FRIEND_BUG, 1, 
+                     [Defined if the compiler does not allow to make a class
+                      a friend to which we do not have access.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Many compilers get this wrong (see Section 14.7.3.1, number (4)):
 dnl ---------------------------------
 dnl   template <int dim> struct T {
