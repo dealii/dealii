@@ -1,5 +1,5 @@
 //---------------------  sparse_decomposition.templates.h  ----------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -162,7 +162,7 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl ()
 
 
 template <typename number>
-inline unsigned int
+unsigned int
 SparseLUDecomposition<number>::memory_consumption () const
 {
   unsigned int
