@@ -540,12 +540,14 @@ rm -f acconfig.link
 echo $ac_n "checking for test -L""... $ac_c" 1>&6
 echo "configure:542: checking for test -L" >&5
 ln -s Makefile acconfig.link
-if test -L acconfig.link ; then
+echo "test -L acconfig.link" > acconfig.test
+chmod 777 acconfig.test
+if eval ./acconfig.test ; then
   TEST_MINUS_L="test -L" ;
 else
   TEST_MINUS_L="bash test -L" ;
 fi
-rm acconfig.link
+rm -f acconfig.link acconfig.test
 echo "$ac_t""$TEST_MINUS_L" 1>&6
 
 
