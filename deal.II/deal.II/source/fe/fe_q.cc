@@ -435,16 +435,16 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
   this->poly_space.set_numbering(FE_Q_Helper::invert_numbering(
     lexicographic_to_hierarchic_numbering (*this, degree)));
 
+				   // finally fill in support points
+				   // on cell and face
+  initialize_unit_support_points ();
+  initialize_unit_face_support_points ();
+
 				   // compute constraint, embedding
 				   // and restriction matrices
   initialize_constraints ();
   initialize_embedding ();
   initialize_restriction ();
-
-				   // finally fill in support points
-				   // on cell and face
-  initialize_unit_support_points ();
-  initialize_unit_face_support_points ();
 }
 
 
@@ -1239,33 +1239,169 @@ FE_Q<2>::initialize_constraints ()
 #endif
 
 #if deal_II_dimension == 3
-
 template <>
 void
 FE_Q<3>::initialize_constraints ()
 {
-                                   // the algorithm for 2d is written
-                                   // in a way so that it can be
-                                   // extended to 3d as well. however,
-                                   // the weird numbering convention
-                                   // makes this really really hard,
-                                   // so we abandoned this project at
-                                   // one point. the plan is to change
-                                   // the numbering convention for the
-                                   // constraint matrices, and then
-                                   // the approach for 2d will be
-                                   // readily extendable to 3d as
-                                   // well, but until this happens we
-                                   // rather prefer to go back to the
-                                   // precomputed matrices in 3d
-  if (this->degree < Matrices::n_constraint_matrices+1)
-    {
-      this->interface_constraints
-        .TableBase<2,double>::reinit (this->interface_constraints_size());
-      this->interface_constraints.fill (Matrices::constraint_matrices[this->degree-1]);
-    }
-}
+    const unsigned int dim = 3;
 
+				   // This algorithm for the automatic generation 
+                                   // of the constraint
+                                   // matrices is different from the one
+                                   // implemented for the 2D elements. Hence
+                                   // it is only suited for standard Finite
+                                   // Elements with a Lagrangian basis.
+                                   // This algorithm consists of two parts. In
+                                   // the first part, the coordinates of the
+                                   // hanging nodes on the master element 
+                                   // will be determined. These points are
+                                   // constructed in a special order. First
+                                   // the hanging node in the mid of the coarser
+                                   // element is considered:
+                                   // Coarse      Fine
+                                   // +-----+     +--+--+ 
+                                   // |     |     |  |  |
+                                   // |  *  |     +--+--+
+                                   // |     |     |  |  |
+                                   // +-----+     +--+--+
+                                   // Then the coordinates of the hanging
+                                   // nodes at the midpoint of the outline of the 
+                                   // coarse element follow:
+                                   // Coarse      Fine
+                                   // +--*--+     +--+--+ 
+                                   // |     |     |  |  |
+                                   // *     *     +--+--+
+                                   // |     |     |  |  |
+                                   // +--*--+     +--+--+
+                                   // For Q1 that was it. But for higher order 
+                                   // elements some more constraints are required.
+                                   // Hanging nodes on the lines which are inside
+                                   // the coarse element:
+                                   // Coarse      Fine
+                                   // +-----+     +--+--+ 
+                                   // |  *  |     |  |  |
+                                   // | * * |     +--+--+
+                                   // |  *  |     |  |  |
+                                   // +-----+     +--+--+
+                                   // Hanging nodes on the outside lines:
+                                   // Coarse      Fine
+                                   // +-*-*-+     +--+--+ 
+                                   // *     *     |  |  |
+                                   // |     |     +--+--+
+                                   // *     *     |  |  |
+                                   // +-*-*-+     +--+--+
+                                   // And finally the interior nodes:
+                                   // Coarse      Fine
+                                   // +-----+     +--+--+ 
+                                   // | * * |     |  |  |
+                                   // |     |     +--+--+
+                                   // | * * |     |  |  |
+                                   // +-----+     +--+--+
+                                   // Once these points are known, it is pretty 
+                                   // easy to get the contribution of 
+                                   // each node on the coarse
+                                   // face to the value at the hanging nodes.
+                                   // This task is accomplished in the second 
+                                   // part of the algorithm
+
+    // Generate destination points.
+    std::vector<Point<dim-1> > constraint_points;
+    const std::vector<Point<dim-1> > &un_supp = get_unit_face_support_points ();
+    const unsigned int pnts = un_supp.size ();
+
+    // Add midpoint
+    constraint_points.push_back (Point<dim-1> (0.5, 0.5));
+
+    // Add midpoints of lines of "mother-face"
+    for (unsigned int face = 0; 
+	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
+    {
+	Point<dim-1> pnt_temp = un_supp[(face + 1) % 4];
+	pnt_temp *= 0.5;
+	pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
+	constraint_points.push_back (pnt_temp);
+    }
+
+    // Add nodes of lines interior in the "mother-face"
+    for (unsigned int face = 0; 
+	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
+    {
+	unsigned int line_offset = 4 + ((face + 1) % 4) * (degree-1);
+	for (unsigned int line_dof = 0; line_dof < degree-1; ++line_dof)
+	{
+	    Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
+	    pnt_temp *= 0.5;
+	    pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
+	    constraint_points.push_back (pnt_temp);
+	}
+    }
+
+    // DoFs on bordering lines
+    for (unsigned int line = 0; 
+	 line < GeometryInfo<dim>::lines_per_face; ++line)
+    {
+	// This face index runs through the two faces, which share the
+	// line "line" with the coarse element.
+	for (unsigned int face = 0; face < 2; ++face)
+	{
+	    unsigned int offset;
+	    unsigned int line_offset = 4 + (line * (degree-1));
+
+	    // Line 2 and 3 have a different ordering
+	    if (line < 2)
+		offset = ((line + face) % 4);
+	    else
+		offset = ((line + 1 - face) % 4);
+
+	    for (unsigned int line_dof = 0; line_dof < degree-1; ++line_dof)
+	    {
+		Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
+		pnt_temp *= 0.5;
+		pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (offset) * 0.5);
+		constraint_points.push_back (pnt_temp);
+	    }
+	}
+    }
+
+    // Create constraints for interior nodes
+    unsigned int dofs_per_face = (degree-1) * (degree-1);
+    for (unsigned int face = 0; 
+	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
+    {
+	unsigned int face_offset = 4 + (4 * (degree-1));
+	for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
+	{
+	    Point<dim-1> pnt_temp = un_supp[face_offset + face_dof];
+	    pnt_temp *= 0.5;
+	    pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
+	    constraint_points.push_back (pnt_temp);
+	}
+    }
+
+    // Now construct relation between destination (child)
+    // and source (mother) dofs.
+    std::vector<Polynomials::LagrangeEquidistant> v;
+    for (unsigned int i=0;i<=degree;++i)
+	v.push_back(Polynomials::LagrangeEquidistant(degree,i));
+    TensorProductPolynomials<dim-1>* poly_f;
+
+    poly_f = new TensorProductPolynomials<dim-1> (v);
+
+    unsigned int constraint_no = constraint_points.size ();
+    unsigned int indx = 0;
+    this->interface_constraints
+        .TableBase<2,double>::reinit (this->interface_constraints_size());
+
+    for (unsigned int j = 0; j < constraint_no; ++j)
+	for (unsigned i = 0; i < pnts; ++i)
+	{
+	    interface_constraints(j,i) = 
+		poly_f->compute_value(face_index_map [i], 
+				      constraint_points[j]);
+	    indx++;
+	}
+    delete poly_f;
+}
 #endif
 
 
