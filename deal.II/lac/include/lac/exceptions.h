@@ -29,6 +29,12 @@ namespace LACExceptions
   DeclException0 (ExcNotQuadratic);
 
 				   /**
+				    * Block indices of two block
+				    * objects are different.
+				    */
+  DeclException0(ExcDifferentBlockIndices);
+  
+				   /**
 				    * An error of a PETSc function was
 				    * encountered. Check the PETSc
 				    * documentation for details.

@@ -2065,7 +2065,7 @@ BlockVectorBase<VectorType>::
 operator == (const BlockVectorBase<VectorType2> &v) const
 {
   Assert (block_indices == v.block_indices,
-          ExcNotMatchingBlockSizes());
+          ExcDifferentBlockIndices());
   
   for (unsigned int i=0;i<n_blocks();++i)
     if ( ! (components[i] == v.components[i]))
