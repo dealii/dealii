@@ -32,13 +32,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3 style="color:red">Incompatibilities</h3>
 
 <ol>
-  <li> <p>
-  Changed: the template parameter of <code
-  class="class">MGTransferPrebuilt</code> is now the complete vector type, not
-  just the value type of the vector. This allows to operate on <code
-  class="class">Vector</code> as well as on <code
-  class="class">BlockVector</code>. Unfortunately, the untested class <code
-  class="class">MGTransferBlock</code> 
+  <li> <p> Changed: the template parameter of <code
+  class="class">MGTransferPrebuilt</code> is now the complete vector
+  type, not just the value type of the vector. This allows to operate
+  on <code class="class">Vector</code> as well as on <code
+  class="class">BlockVector</code>. Unfortunately, the untested class
+  <code class="class">MGTransferBlock</code> underwent some more
+  changes without testing, such that it should be used with high
+  caution.
   <br>
   (GK 2004/04/01)
   </p>
