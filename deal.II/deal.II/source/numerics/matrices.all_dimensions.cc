@@ -35,6 +35,8 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				    Vector<number>   &right_hand_side,
 				    const bool        preserve_symmetry)
 {
+				   // Require that diagonals are first
+				   // in each row
   Assert (matrix.get_sparsity_pattern().optimize_diagonal(),
 	  typename SparsityPattern::ExcDiagonalNotOptimized());
   Assert (matrix.n() == right_hand_side.size(),
@@ -84,7 +86,6 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       // we shall not set
 				       // matrix.global_entry(
 				       //     sparsity_rowstart[dof.first])
-//TODO[GK]: This is going to break when the diagonal element of the matrix is not stored
       const unsigned int last = sparsity_rowstart[dof_number+1];
       for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
 	matrix.global_entry(j) = 0.;
@@ -311,7 +312,6 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 					   // matrix so the diagonal
 					   // element is the first of
 					   // this row.
-//TODO[GK]: This is going to break when the diagonal element of the matrix is not stored
 	  const unsigned int 
 	    last  = local_sparsity.get_rowstart_indices()[block_index.second+1],
 	    first = (block_col == block_index.first ?
