@@ -55,7 +55,7 @@ class SparseMatrixEZ : public Subscriptor
 					 /**
 					  * Standard constructor. Sets
 					  * @p{column} to
-					  * @p{invalid_entry}.
+					  * @p{invalid}.
 					  */
 	Entry();
 
@@ -77,18 +77,55 @@ class SparseMatrixEZ : public Subscriptor
 					 /**
 					  * Comparison operator for finding.
 					  */
-	bool operator==(const Entry&) const;
+//	bool operator==(const Entry&) const;
 
 					 /**
 					  * Less than operator for sorting.
 					  */
-	bool operator < (const Entry&) const;
+//	bool operator < (const Entry&) const;
 					 /**
 					  * Non-existent column number.
 					  */
-	static const unsigned int invalid_entry = static_cast<unsigned int>(-1);
+	static const unsigned int invalid = static_cast<unsigned int>(-1);
     };
 
+				     /**
+				      * Structure for storing
+				      * information on a matrix
+				      * row. One object for each row
+				      * will be stored in the matrix.
+				      */
+    struct RowInfo
+    {
+					 /**
+					  * Constructor.
+					  */
+	RowInfo (unsigned int start = Entry::invalid);
+	
+					 /**
+					  * Index of first entry of
+					  * the row in the data field.
+					  */
+	unsigned int start;
+					 /**
+					  * Number of entries in this
+					  * row.
+					  */
+	unsigned short length;
+					 /**
+					  * Position of the diagonal
+					  * element relative tor the
+					  * start index.
+					  */
+	unsigned short diagonal;
+					 /**
+					  * Value for non-existing diagonal.
+					  */
+	static const unsigned short
+	invalid_diagonal = static_cast<unsigned short>(-1);
+    };
+    
+    
   public:
 				     /**
 				      * Type of matrix entries. In analogy to
@@ -120,12 +157,20 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * Constructor. Generates a
 				      * matrix of the given size,
-				      * ready to be filled. The optional parameters 
+				      * ready to be filled. The
+				      * optional parameters
+				      * @p{default_row_length} and
+				      * @p{default_increment} allow
+				      * for preallocating
+				      * memory. Providing these
+				      * properly is essential for an
+				      * efficient assembling of the
+				      * matrix.
 				      */
     explicit SparseMatrixEZ (unsigned int n_rows,
 			     unsigned int n_columns = n_rows,
-			     unsigned int default_row_length = Entry::invalid_entry,
-			     unsigned int default_increment = Entry::invalid_entry);
+			     unsigned int default_row_length = Entry::invalid,
+			     unsigned int default_increment = Entry::invalid);
     
 				     /**
 				      * Destructor. Free all memory, but do not
@@ -144,12 +189,20 @@ class SparseMatrixEZ : public Subscriptor
 				      * Reinitialize the sparse matrix
 				      * to the dimensions provided.
 				      * The matrix will have no
-				      * entries at this point.
+				      * entries at this point. The
+				      * optional parameters
+				      * @p{default_row_length} and
+				      * @p{default_increment} allow
+				      * for preallocating
+				      * memory. Providing these
+				      * properly is essential for an
+				      * efficient assembling of the
+				      * matrix.
 				      */
     virtual void reinit (unsigned int n_rows,
 			 unsigned int n_columns = n_rows,
-			 unsigned int default_row_length = Entry::invalid_entry,
-			 unsigned int default_increment = Entry::invalid_entry);
+			 unsigned int default_row_length = Entry::invalid,
+			 unsigned int default_increment = Entry::invalid);
 
 				     /**
 				      * Release all memory and return
@@ -541,67 +594,6 @@ class SparseMatrixEZ : public Subscriptor
 			    const number              om = 1.) const;
     
 				     /**
-				      * Perform SSOR preconditioning
-				      * in-place.  Apply the
-				      * preconditioner matrix without
-				      * copying to a second vector.
-				      * @p{omega} is the relaxation
-				      * parameter.
-				      */
-    template <typename somenumber>
-    void SSOR (Vector<somenumber> &v,
-	       const number        omega = 1.) const;
-
-				     /**
-				      * Perform an SOR preconditioning in-place.
-				      * The result is $v = (\omega D - L)^{-1} v$.
-				      * @p{omega} is the damping parameter.
-				      */
-    template <typename somenumber>
-    void SOR (Vector<somenumber> &v,
-	      const number        om = 1.) const;
-
-				     /**
-				      * Perform a transpose SOR preconditioning in-place.
-				      * The result is $v = (\omega D - L)^{-1} v$.
-				      * @p{omega} is the damping parameter.
-				      */
-    template <typename somenumber>
-    void TSOR (Vector<somenumber> &v,
-	      const number        om = 1.) const;
-
-				     /**
-				      * Do one SOR step on @p{v}.
-				      * Performs a direct SOR step
-				      * with right hand side @p{b}.
-				      */
-    template <typename somenumber>
-    void SOR_step (Vector<somenumber> &v,
-		   const Vector<somenumber> &b,
-		   const number        om = 1.) const;
-
-				     /**
-				      * Do one adjoint SOR step on
-				      * @p{v}.  Performs a direct TSOR
-				      * step with right hand side @p{b}.
-				      */
-    template <typename somenumber>
-    void TSOR_step (Vector<somenumber> &v,
-		    const Vector<somenumber> &b,
-		    const number        om = 1.) const;
-
-				     /**
-				      * Do one adjoint SSOR step on
-				      * @p{v}.  Performs a direct SSOR
-				      * step with right hand side @p{b}
-				      * by performing TSOR after SOR.
-				      */
-    template <typename somenumber>
-    void SSOR_step (Vector<somenumber> &v,
-		    const Vector<somenumber> &b,
-		    const number        om = 1.) const;
-
-				     /**
 				      * Print the matrix to the given
 				      * stream, using the format
 				      * @p{(line,col) value}, i.e. one
@@ -662,29 +654,19 @@ class SparseMatrixEZ : public Subscriptor
 				      * of this object.
 				      */
     unsigned int memory_consumption () const;
+
+				     /**
+				      * Exception for applying
+				      * inverse-type operators to
+				      * rectangular matrices.
+				      */
+    DeclException0(ExcNoSquareMatrix);
     
 				     /**
-				      * Exception
+				      * Exception for missing diagonal entry.
 				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The entry with index <" << arg1 << ',' << arg2
-		    << "> does not exist.");
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcMatrixNotSquare);
-
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcIteratorRange,
-		    int, int,
-		    << "The iterators denote a range of " << arg1
-		    << " elements, but the given number of rows was " << arg2);
+    DeclException0(ExcNoDiagonal);
     
-
   private:
 
 				     /**
@@ -694,6 +676,7 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     const Entry* locate (unsigned int row,
 			 unsigned int col) const;
+
 				     /**
 				      * Find an entry or generate it.
 				      */
@@ -776,10 +759,9 @@ class SparseMatrixEZ : public Subscriptor
     unsigned int n_columns;
 
 				     /**
-				      * Start of indices rows. Points
-				      * into the data field.
+				      * Info structure for each row.
 				      */
-    std::vector<unsigned int> row_start;
+    std::vector<RowInfo> row_info;
     
 				     /**
 				      * Data storage.
@@ -814,28 +796,34 @@ template <typename number>
 inline
 SparseMatrixEZ<number>::Entry::Entry()
 		:
-		column(invalid_entry),
+		column(invalid),
   value(0)
 {}
 
 
+// template <typename number>
+// inline
+// bool
+// SparseMatrixEZ<number>::Entry::operator==(const Entry& e) const
+// {
+//   return column == e.column;
+// }
+
+
+// template <typename number>
+// inline
+// bool
+// SparseMatrixEZ<number>::Entry::operator<(const Entry& e) const
+// {
+//   return column < e.column;
+// }
+
 template <typename number>
 inline
-bool
-SparseMatrixEZ<number>::Entry::operator==(const Entry& e) const
-{
-  return column == e.column;
-}
-
-
-template <typename number>
-inline
-bool
-SparseMatrixEZ<number>::Entry::operator<(const Entry& e) const
-{
-  return column < e.column;
-}
-
+SparseMatrixEZ<number>::RowInfo::RowInfo(unsigned int start)
+		:
+		start(start), length(0), diagonal(invalid_diagonal)
+{}
 
 
 //----------------------------------------------------------------------//
@@ -843,7 +831,7 @@ template <typename number>
 inline
 unsigned int SparseMatrixEZ<number>::m () const
 {
-  return row_start.size() - 1;
+  return row_info.size();
 };
 
 
@@ -864,13 +852,14 @@ const SparseMatrixEZ<number>::Entry* SparseMatrixEZ<number>::locate (
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
 
-  const unsigned int end = row_start[row+1];
-  for (unsigned int i=row_start[row];i<end;++i)
+  const RowInfo& r = row_info[row];
+  const unsigned int end = r.start + r.length;
+  for (unsigned int i=r.start;i<end;++i)
     {
       const Entry * const entry = &data[i];
       if (entry->column == col)
 	return entry;
-      if (entry->column == Entry::invalid_entry)
+      if (entry->column == Entry::invalid)
 	return 0;
     }
   return 0;
@@ -887,63 +876,82 @@ SparseMatrixEZ<number>::Entry* SparseMatrixEZ<number>::allocate (
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
 
-  const unsigned int end = row_start[row+1];
-  for (unsigned int i=row_start[row];i<end;++i)
-    {
-      Entry* entry = &data[i];
-				       // entry found
-      if (entry->column == col)
-	return entry;
-				       // entry does not exist,
-				       // create it
-      if (entry->column > col)
-	{
-					   // Save original entry
-	  Entry temp = data[i];
-					   // Insert new entry here to
-					   // make sure all entries
-					   // are ordered by column
-					   // index
-	  entry->column = col;
-	  entry->value = 0;
+  RowInfo& r = row_info[row];
+  const unsigned int end = r.start + r.length;
 
-					   // Move all entries in this
-					   // row up by one
-	  for (unsigned int j = i+1;j<end;++j)
-	    {
-	      Entry temp2 = data[j];
-	      data[j] = temp;
-	      temp = temp2;
-	      if (temp.column == Entry::invalid_entry)
-		break;
-	    }
-					   // Extend row if there is
-					   // still a valid entry left
-	  if (temp.column != Entry::invalid_entry)
-	    {
-					       // Insert new entries
-	      data.insert(data.begin()+end, increment, Entry());
-					       // Update starts of
-					       // following rows
-	      for (unsigned int r=row+1;r<row_start.size();++r)
-		row_start[r] += increment;
-					       // Insert missing entry
-	      data[end] = temp;
-	    }
-	  return entry;
+  unsigned int i = r.start;
+  if (r.diagonal != RowInfo::invalid_diagonal && col >= row)
+    i += r.diagonal;
+				   // Find position of entry
+  while (i<end && data[i].column < col) ++i;
+  
+  Entry* entry = &data[i];
+				   // entry found
+  if (entry->column == col)
+    return entry;
+
+				   // Now, we must insert the new
+				   // entry and move all successive
+				   // entries back.
+  
+				   // If no more space is available
+				   // for this row, insert new
+				   // elements into the vector.
+  if (row != row_info.size()-1)
+    {
+      if (end >= row_info[row+1].start)
+	{
+					   // Insert new entries
+	  data.insert(data.begin()+end, increment, Entry());
+	  entry = &data[i];
+					   // Update starts of
+					   // following rows
+	  for (unsigned int rn=row+1;rn<row_info.size();++rn)
+	    row_info[rn].start += increment;
+	}
+    } else {
+      if (end >= data.size())
+	{
+					   // Here, appending a block
+					   // does not increase
+					   // performance.
+	  data.push_back(Entry());
+	  entry = &data[i];
 	}
     }
-				   // Row is full, but entry not
-				   // found. Therefore, we must
-				   // extend again
-  data.insert(data.begin()+end, increment, Entry());
-				   // Update starts of
-				   // following rows
-  for (unsigned int r=row+1;r<row_start.size();++r)
-    row_start[r] += increment;
-				   // Insert missing entry
-  data[end].column = col;
-  return &data[end];
+				   // Save original entry
+  Entry temp = *entry;
+				   // Insert new entry here to
+				   // make sure all entries
+				   // are ordered by column
+				   // index
+  entry->column = col;
+  entry->value = 0;
+				   // Update row_info
+  ++r.length;
+  if (col == row)
+    r.diagonal = i - r.start;
+  else if (col<row && r.diagonal!= RowInfo::invalid_diagonal)
+    ++r.diagonal;
+
+  if (i == end)
+      return entry;
+  
+				   // Move all entries in this
+				   // row up by one
+  for (unsigned int j = i+1; j < end; ++j)
+    {
+				       // There should be no invalid
+				       // entry below end
+      Assert (data[j].column != Entry::invalid, ExcInternalError());
+      Entry temp2 = data[j];
+      data[j] = temp;
+      temp = temp2;
+    }
+  Assert (data[end].column == Entry::invalid, ExcInternalError());
+  data[end] = temp;
+
+  return entry;
 }
 
 

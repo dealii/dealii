@@ -30,13 +30,13 @@ class FDMatrix
 				      * Fill the matrix with values.
 				      */
     template <typename MATRIX>
-    void five_point(MATRIX&) const;
+    void five_point(MATRIX&, bool nonsymmetric = false) const;
 
 				     /**
 				      * Fill the matrix with values.
 				      */
     template <typename MATRIX>
-    void nine_point(MATRIX&) const;
+    void nine_point(MATRIX&, bool nonsymmetric = false) const;
 
     template <typename number>
     void gnuplot_print(std::ostream&, const Vector<number>&) const;
@@ -52,4 +52,3 @@ class FDMatrix
 				      */
     unsigned int ny;
 };
-

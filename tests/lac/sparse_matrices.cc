@@ -37,28 +37,31 @@ check_vmult_quadratic(const MATRIX& A,
   Vector<double> f(A.m());
   GrowingVectorMemory<> mem;
 
-  SolverControl control(20, 1.e-3, false);
+  SolverControl control(10, 1.e-13, false);
   SolverRichardson<> rich(control, mem, .01);
+  SolverRichardson<> prich(control, mem, 1.);
   PreconditionIdentity prec;
-
+  PreconditionJacobi<MATRIX> jacobi;
+  jacobi.initialize(A, .5);
+  PreconditionSOR<MATRIX> sor;
+  sor.initialize(A, 1.2);
+  PreconditionSSOR<MATRIX> ssor;
+  ssor.initialize(A, 1.2);
+  
   u = 0.;
   f = 1.;
 
-  try
-    {
-      rich.solve(A, u, f, prec);
-    }
-  catch (...)
-    {
-    }
+  try { rich.solve(A, u, f, prec); }    catch (...) {}
+  try { prich.solve(A, u, f, jacobi); } catch (...) {}
+  try { prich.solve(A, u, f, ssor); }   catch (...) {}
+  try { prich.solve(A, u, f, sor); }    catch (...) {}
+
+  u = 0.;
   deallog << "Transpose" << std::endl;
-  try
-    {
-      rich.Tsolve(A, u, f, prec);
-    }
-  catch (...)
-    {
-    }
+  try { rich.Tsolve(A, u, f, prec); }    catch (...) {}
+  try { prich.Tsolve(A, u, f, jacobi); } catch (...) {}
+  try { prich.Tsolve(A, u, f, ssor); }   catch (...) {}
+  try { prich.Tsolve(A, u, f, sor); }    catch (...) {}
   deallog.pop();
 }
 
@@ -72,13 +75,15 @@ int main()
 				   // Switch between regression test
 				   // and benchmark
 #ifdef DEBUG  
-  deallog.depth_console(0);
-  const unsigned int size = 10;
+  deallog.depth_console(3);
+  const unsigned int size = 5;
+  const unsigned int row_length = 3;
 #else
   deallog.depth_console(1000);
   deallog.log_execution_time(true);
   deallog.log_time_differences(true);
   const unsigned int size = 500;
+  const unsigned int row_length = 9;
 #endif
   
   FDMatrix testproblem (size, size);
@@ -90,12 +95,12 @@ int main()
   structure.compress();
   SparseMatrix<double>  A(structure);
   deallog << "Assemble" << std::endl;
-  testproblem.five_point(A);
+  testproblem.five_point(A, true);
   check_vmult_quadratic(A, "5-SparseMatrix<double>");
 
-  SparseMatrixEZ<double> E(dim,dim,5,1);
+  SparseMatrixEZ<double> E(dim,dim,row_length,2);
   deallog << "Assemble" << std::endl;
-  testproblem.five_point(E);
+  testproblem.five_point(E, true);
   check_vmult_quadratic(E, "5-SparseMatrixEZ<double>");
 
   A.clear();
@@ -109,7 +114,7 @@ int main()
   check_vmult_quadratic(A, "9-SparseMatrix<double>");
 
   E.clear();
-  E.reinit(dim,dim,9,2);
+  E.reinit(dim,dim,row_length,2);
   deallog << "Assemble" << std::endl;
   testproblem.nine_point(E);
   check_vmult_quadratic(E, "9-SparseMatrixEZ<double>");

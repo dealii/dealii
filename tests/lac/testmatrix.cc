@@ -114,7 +114,7 @@ FDMatrix::nine_point_structure(SparsityPattern& structure) const
 
 template<typename MATRIX>
 void
-FDMatrix::nine_point(MATRIX& A) const
+FDMatrix::nine_point(MATRIX& A, bool nonsymmetric) const
 {
    for(unsigned int i=0;i<=ny-2;i++)
     {
@@ -170,7 +170,7 @@ FDMatrix::nine_point(MATRIX& A) const
 
 template<typename MATRIX>
 void
-FDMatrix::five_point(MATRIX& A) const
+FDMatrix::five_point(MATRIX& A, bool nonsymmetric) const
 {
    for(unsigned int i=0;i<=ny-2;i++)
     {
@@ -178,10 +178,16 @@ FDMatrix::five_point(MATRIX& A) const
 	{
 					   // Number of the row to be entered
 	  unsigned int row = j+(nx-1)*i;
-	  A.set(row, row, 4.);
+	  if (nonsymmetric)
+	    A.set(row, row, 5.);
+	  else
+	    A.set(row, row, 4.);
 	  if (j>0)
 	    {
-	      A.set(row-1, row, -1.);
+	      if (nonsymmetric)
+		A.set(row-1, row, -2.);
+	      else
+		A.set(row-1, row, -1.);
 	      A.set(row, row-1, -1.);
 	    }
 	  if (j<nx-2)
