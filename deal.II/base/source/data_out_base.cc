@@ -1878,101 +1878,79 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 				   // note that we have to print
 				   // d=1..3 dimensions
   out << "POINTS " << n_nodes << " double" << std::endl;
-  for (unsigned int d=1; d<=3; ++d)
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
     {
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      
+      switch (dim)
 	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-					   // if we have nonzero values for
-					   // this coordinate
-	  if (d<=spacedim)
-	    {
-	      switch (dim)
+	  case 1:
+	  {
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      out << ((patch->vertices[1](0) * i / n_subdivisions) +
+		      (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
+		  << " 0 0\n";
+	    break;
+	  };
+		   
+	  case 2:
+	  {
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
 		{
-		  case 1:
-		  {
-		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		      out << ((patch->vertices[1](0) * i / n_subdivisions) +
-			      (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
-			  << ' ';
-		    break;
-		  };
-		   
-		  case 2:
-		  {
-		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-			{
-			  const double x_frac = i * 1./n_subdivisions,
-				       y_frac = j * 1./n_subdivisions;
-			  
-							   // compute coordinates for
-							   // this patch point
-			  out << (((patch->vertices[1](d-1) * x_frac) +
-				   (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-				  ((patch->vertices[2](d-1) * x_frac) +
-				   (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
-			      << ' ';
-			};
-		    break;
-		  };
-		   
-		  case 3:
-		  {
-		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-			for (unsigned int k=0; k<n_subdivisions+1; ++k)
-			  {
-							     // note the broken
-							     // design of hexahedra
-							     // in deal.II, where
-							     // first the z-component
-							     // is counted up, before
-							     // increasing the y-
-							     // coordinate
-			    const double x_frac = i * 1./n_subdivisions,
-					 y_frac = k * 1./n_subdivisions,
-					 z_frac = j * 1./n_subdivisions;
-			    
-							     // compute coordinates for
-							     // this patch point
-			    out << ((((patch->vertices[1](d-1) * x_frac) +
-				      (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-				     ((patch->vertices[2](d-1) * x_frac) +
-				      (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
-				    (((patch->vertices[5](d-1) * x_frac) +
-				      (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
-				     ((patch->vertices[6](d-1) * x_frac) +
-				      (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
-				<< ' ';
-			  };
-	      
-		    break;
-		  };
-		   
-		  default:
-			Assert (false, ExcNotImplemented());
+		  const double x_frac = i * 1./n_subdivisions,
+			       y_frac = j * 1./n_subdivisions;
+		      
+		  out << (((patch->vertices[1] * x_frac) +
+			   (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
+			  ((patch->vertices[2] * x_frac) +
+			   (patch->vertices[3] * (1-x_frac))) * y_frac)
+		      << " 0\n";
 		};
-	    }
-	  else
-					     // d>spacedim. write zeros instead
-	    {
-	      const unsigned int n_points
-		= static_cast<unsigned int>(pow (static_cast<double>(n_subdivisions+1), dim));
-	      for (unsigned int i=0; i<n_points; ++i)
-		out << "0 ";
-	    };
+	    break;
+	  };
+	       
+	  case 3:
+	  {
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		for (unsigned int k=0; k<n_subdivisions+1; ++k)
+		  {
+						     // note the broken
+						     // design of hexahedra
+						     // in deal.II, where
+						     // first the z-component
+						     // is counted up, before
+						     // increasing the y-
+						     // coordinate
+		    const double x_frac = i * 1./n_subdivisions,
+				 y_frac = k * 1./n_subdivisions,
+				 z_frac = j * 1./n_subdivisions;
+			
+						     // compute coordinates for
+						     // this patch point
+		    out << ((((patch->vertices[1] * x_frac) +
+			      (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
+			     ((patch->vertices[2] * x_frac) +
+			      (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
+			    (((patch->vertices[5] * x_frac) +
+			      (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
+			     ((patch->vertices[6] * x_frac) +
+			      (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac)
+			<< std::endl;
+		  };
+		
+	    break;
+	  };
+	       
+	  default:
+		Assert (false, ExcNotImplemented());
 	};
-      out << std::endl;
     };
 
-  out << std::endl;
-
 				   /////////////////////////////////
-				   // now for the cells. note that
-				   // vertices are counted from 1 onwards
+				   // now for the cells
   if (true)
     {
       out << "CELLS " << n_cells << ' '
@@ -1995,8 +1973,8 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 	      {
 		for (unsigned int i=0; i<n_subdivisions; ++i)
 		  out << "2 "
-		      << first_vertex_of_patch+i+1 << ' '
-		      << first_vertex_of_patch+i+1+1 << std::endl;
+		      << first_vertex_of_patch+i << ' '
+		      << first_vertex_of_patch+i+1 << std::endl;
 		break;
 	      };
 	       
@@ -2005,10 +1983,10 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 		for (unsigned int i=0; i<n_subdivisions; ++i)
 		  for (unsigned int j=0; j<n_subdivisions; ++j)
 		    out << "4 "
-			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << ' '
+			<< first_vertex_of_patch+i*(n_subdivisions+1)+j << ' '
+			<< first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << ' '
 			<< first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1 << ' '
-			<< first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1 << ' '
-			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
+			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1
 			<< std::endl;
 		break;
 	      };
@@ -2021,14 +1999,14 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 		      {
 			out << "8 "
 							   // note: vertex indices start with 1!
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
+			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k   << ' '
+			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << ' '
+			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << ' '
+			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k   << ' '
+			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1 << ' '
+			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << ' '
+			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << ' '
+			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1 << ' '
 			    << std::endl;
 		      };
 		break;
@@ -2059,11 +2037,11 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 		    Assert (false, ExcNotImplemented());
 	    };
 	};
-      out << std::endl;
 
 				       // next output the types of the
 				       // cells. since all cells are
 				       // the same, this is simple
+      out << "CELL_TYPES " << n_cells << std::endl;
       for (unsigned int i=0; i<n_cells; ++i)
 	switch (dim)
 	  {
@@ -2106,8 +2084,7 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
       copy(data_vectors[data_set].begin(),
 	   data_vectors[data_set].end(),
 	   std::ostream_iterator<double>(out, " "));
-      out << std::endl
-	  << std::endl;
+      out << std::endl;
     };
   
 				   // assert the stream is still ok
