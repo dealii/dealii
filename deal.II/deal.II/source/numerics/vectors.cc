@@ -43,10 +43,6 @@ using namespace std;
 
 
 
-//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
-static const MappingQ1<deal_II_dimension> mapping_q1;
-
-
 
 static inline double sqr (const double x)
 {
