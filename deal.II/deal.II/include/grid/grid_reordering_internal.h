@@ -696,6 +696,14 @@ namespace internal
                                           */
         std::vector<int> sheet_to_process;
 
+
+                                          /**
+					   * Which edges of the current 
+					   * cell have been oriented 
+					   * during the current iteration.
+					   * Is reset when moving on to 
+					   * the next cube.
+                                           */
         bool edge_orient_array[12];
 
                                          /**
