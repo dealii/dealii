@@ -32,8 +32,8 @@ void test (PETScWrappers::Vector &v)
     }
   v.compress ();
 
-                                   // then check the norm
-  Assert (v.l2_norm() == std::sqrt(norm), ExcInternalError());
+                                   // then check the norm  
+  Assert (fabs(v.l2_norm()-std::sqrt(norm))<1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
