@@ -108,7 +108,7 @@ bool Patterns::MultipleSelection::match (const string &test_string_list) const {
   list<string> split_list;
 
 				   // first split the input list
-  while (tmp.length())
+  while (tmp.length() != 0)
     {
       string name;
       name = tmp;
@@ -121,7 +121,8 @@ bool Patterns::MultipleSelection::match (const string &test_string_list) const {
       else
 	tmp = "";
       
-      while (name[0] == ' ')
+      while ((name.length() != 0) &&
+	     (name[0] == ' '))
 	name.erase (0,1);
       while (name[name.length()-1] == ' ')
 	name.erase (name.length()-1, 1);
@@ -141,8 +142,12 @@ bool Patterns::MultipleSelection::match (const string &test_string_list) const {
 	{
 	  if (*test_string == string(tmp, 0, tmp.find('|')))
 	    {
+						   // string found, quit
+						   // loop. don't change
+						   // tmp, since we don't
+						   // need it anymore.
 	      string_found = true;
-	      continue;
+	      break;
 	    };
 	  
 	  tmp.erase (0, tmp.find('|')+1);
@@ -167,7 +172,7 @@ string Patterns::MultipleSelection::description () const {
 
 Patterns::PatternBase *
 Patterns::MultipleSelection::clone () const {
-  return new Patterns::Selection(sequence);
+  return new Patterns::MultipleSelection(sequence);
 };
 
 
