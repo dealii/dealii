@@ -147,7 +147,7 @@ class TriaAccessor
 				      * way, no matter what the type of
 				      * number of these parameters is.
 				      */
-    typedef void* LocalData;
+    typedef void * LocalData;
     
 				     /**@ name Iterator address and state
 				      */
@@ -2354,7 +2354,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  boundary is defined by one
 				      *  face being on the
 				      *  boundary. Note that this does
-				      *  not catches where only one
+				      *  not catch cases where only one
 				      *  vertex of a quad or of a hex
 				      *  is at the boundary, or where
 				      *  only one line of a hex is at
@@ -2362,7 +2362,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  interiors of all faces are in
 				      *  the interior of the
 				      *  domain. For the latter case,
-				      *  the @p{Has_boundary_lines}
+				      *  the @p{has_boundary_lines}
 				      *  function is the right one to
 				      *  ask.
 				      */
@@ -2401,7 +2401,6 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  Clear the refinement flag.
 				      */
     void clear_refine_flag () const;
-
 
 				     /**
 				      *  Return whether the coarsen flag

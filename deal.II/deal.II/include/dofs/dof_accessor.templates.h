@@ -88,6 +88,24 @@ DoFAccessor<dim>::operator = (const DoFAccessor<dim> &da)
 
 /*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 
+
+
+template <int dim>
+inline
+DoFObjectAccessor<1,dim>::
+DoFObjectAccessor (const Triangulation<dim> *tria,
+                   const int                 level,
+                   const int                 index,
+                   const AccessorData       *local_data)
+                :
+                DoFAccessor<dim> (local_data),
+                DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,
+                                                                 level,
+                                                                 index)
+{}
+
+
+
 template <int dim>
 inline
 unsigned int
@@ -114,6 +132,7 @@ DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const
   return this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->get_fe().dofs_per_line+i];
 }
+
 
 
 template <int dim>
@@ -144,6 +163,7 @@ DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
+
 
 
 template <int dim>
@@ -192,6 +212,7 @@ DoFObjectAccessor<1,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
 }
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
@@ -210,6 +231,7 @@ DoFObjectAccessor<1,dim>::child (const unsigned int i) const
 }
 
 
+
 template <int dim>
 inline
 void
@@ -221,6 +243,22 @@ DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a)
 
 
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
+
+template <int dim>
+inline
+DoFObjectAccessor<2,dim>::
+DoFObjectAccessor (const Triangulation<dim> *tria,
+                   const int                 level,
+                   const int                 index,
+                   const AccessorData       *local_data)
+                :
+                DoFAccessor<dim> (local_data),
+                DoFObjectAccessor_Inheritance<2,dim>::BaseClass (tria,
+                                                                 level,
+                                                                 index)
+{}
+
+
 
 template <int dim>
 inline
@@ -305,6 +343,7 @@ DoFObjectAccessor<2,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
 }
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
@@ -320,6 +359,7 @@ DoFObjectAccessor<2,dim>::line (const unsigned int i) const
       this->dof_handler
     );
 }
+
 
 
 template <int dim>
@@ -340,6 +380,7 @@ DoFObjectAccessor<2,dim>::child (const unsigned int i) const
 }
 
 
+
 template <int dim>
 inline
 void
@@ -351,6 +392,22 @@ DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a)
 
 
 /*------------------------- Functions: DoFObjectAccessor<3,dim> -----------------------*/
+
+
+template <int dim>
+inline
+DoFObjectAccessor<3,dim>::
+DoFObjectAccessor (const Triangulation<dim> *tria,
+                   const int                 level,
+                   const int                 index,
+                   const AccessorData       *local_data)
+                :
+                DoFAccessor<dim> (local_data),
+                DoFObjectAccessor_Inheritance<3,dim>::BaseClass (tria,
+                                                                 level,
+                                                                 index)
+{}
+
 
 
 template <int dim>
@@ -372,6 +429,7 @@ DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const
 }
 
 
+
 template <int dim>
 inline
 unsigned int
@@ -391,6 +449,7 @@ DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
+
 
 
 template <int dim>
@@ -457,6 +516,7 @@ DoFObjectAccessor<3,dim>::line (const unsigned int i) const
 }
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<2,dim> >
@@ -472,6 +532,7 @@ DoFObjectAccessor<3,dim>::quad (const unsigned int i) const
       this->dof_handler
     );
 }
+
 
 
 template <int dim>
@@ -492,6 +553,7 @@ DoFObjectAccessor<3,dim>::child (const unsigned int i) const
 }
 
 
+
 template <int dim>
 void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
 {
@@ -501,6 +563,18 @@ void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
 
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
+
+
+template <int dim>
+inline
+DoFCellAccessor<1,dim>::
+DoFCellAccessor (const Triangulation<dim> *tria,
+                 const int                 level,
+                 const int                 index,
+                 const AccessorData       *local_data)
+                :
+                DoFObjectAccessor<dim, dim> (tria,level,index,local_data)
+{}
 
 
 template <int dim>

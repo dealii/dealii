@@ -269,9 +269,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
     DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int                 level,
 		       const int                 index,
-		       const AccessorData       *local_data) :
-		    DoFAccessor<dim> (local_data),
-      DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass (tria,level,index) {};
+		       const AccessorData       *local_data);
     
 				     /**
 				      * Index of the @p{i}th degree
@@ -523,9 +521,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
     DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int                 level,
 		       const int                 index,
-		       const AccessorData       *local_data) :
-		    DoFAccessor<dim> (local_data),
-      DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,level,index) {};
+		       const AccessorData       *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -711,9 +707,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
     DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int                 level,
 		       const int                 index,
-		       const AccessorData       *local_data) :
-		    DoFAccessor<dim> (local_data),
-      DoFObjectAccessor_Inheritance<2,dim>::BaseClass (tria,level,index) {};
+		       const AccessorData       *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -908,9 +902,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
     DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int                 level,
 		       const int                 index,
-		       const AccessorData       *local_data) :
-		    DoFAccessor<dim> (local_data),
-      DoFObjectAccessor_Inheritance<3,dim>::BaseClass (tria,level,index) {};
+		       const AccessorData       *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -1110,8 +1102,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
     DoFCellAccessor (const Triangulation<dim> *tria,
 		     const int                 level,
 		     const int                 index,
-		     const AccessorData       *local_data) :
-		    DoFObjectAccessor<dim, dim> (tria,level,index,local_data) {};
+		     const AccessorData       *local_data);
 
 				     /**
 				      * Return the @p{i}th neighbor as a DoF cell
@@ -1120,7 +1111,8 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * class returns a cell accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<dim> > neighbor (const unsigned int) const;
+    TriaIterator<dim,DoFCellAccessor<dim> >
+    neighbor (const unsigned int) const;
 
     				     /**
 				      * Return the @p{i}th child as a DoF cell
@@ -1129,7 +1121,8 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * class returns a cell accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<dim> > child (const unsigned int) const;
+    TriaIterator<dim,DoFCellAccessor<dim> >
+    child (const unsigned int) const;
 
     				     /**
 				      * Return an iterator to the @p{i}th face
@@ -1138,7 +1131,8 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * This function is not implemented in 1D,
 				      * and maps to DoFObjectAccessor<2, dim>::line in 2D.
 				      */
-    TriaIterator<dim, DoFObjectAccessor<dim-1, dim> > face (const unsigned int i) const;
+    TriaIterator<dim, DoFObjectAccessor<dim-1, dim> >
+    face (const unsigned int i) const;
 
 				     /**
 				      * Return the interpolation of the given
