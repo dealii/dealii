@@ -31,6 +31,10 @@ using namespace std;
 
 
 template <int dim, int spacedim>
+const unsigned int DataOutBase::Patch<dim,spacedim>::no_neighbor;
+
+
+template <int dim, int spacedim>
 DataOutBase::Patch<dim,spacedim>::Patch () :
 		me(no_neighbor),
 		n_subdivisions (1)
