@@ -1,18 +1,19 @@
 /* $Id$ */
 
 
-#include <grid/dof.h>
 #include <grid/tria.h>
-#include <fe/fe_lib.h>
+#include <grid/dof.h>
 #include <grid/tria_accessor.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <lac/dsmatrix.h>
+#include <grid/tria_boundary.h>
 #include <grid/dof_constraints.h>
 #include <basic/data_io.h>
+#include <fe/fe_lib.h>
+#include <fe/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
-#include <fe/quadrature_lib.h>
+#include <lac/dsmatrix.h>
 
 #include <fstream.h>
 #include <cmath>
@@ -43,9 +44,19 @@ class PoissonEquation :  public Equation<dim> {
 
 template <int dim>
 inline
-double PoissonEquation<dim>::right_hand_side (const Point<dim> &) const {
-				   // this yields as solution u=x^2+y^2+...=\vec x^2
-  return -2*dim;
+double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
+  switch (dim) 
+    {
+      case 1:
+	    return ((1-4*3.1415926536*3.1415926536) *
+		    cos(2*3.1415926536*p(0)));
+      case 2:
+	    return ((1-3.1415926536*3.1415926536) *
+		    cos(3.1415926536*p(0)) *
+		    cos(3.1415926536*p(1)));
+      default:
+	    return 0;
+    };
 };
 
 
@@ -58,8 +69,10 @@ void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
     for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
       {
 	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
-	  cell_matrix(i,j) += fe_values.shape_grad(i,point) *
-			      fe_values.shape_grad(j,point) *
+	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+			       fe_values.shape_grad(j,point) +
+			       fe_values.shape_value(i,point) *
+			       fe_values.shape_value(j,point)) *
 			      fe_values.JxW(point);
 	rhs[0](i) += fe_values.shape_value(i,point) *
 		     right_hand_side(fe_values.quadrature_point(point)) *
@@ -77,8 +90,10 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
     for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
       {
 	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
-	  cell_matrix(i,j) += fe_values.shape_grad(i,point) *
-			      fe_values.shape_grad(j,point) *
+	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+			       fe_values.shape_grad(j,point) +
+			       fe_values.shape_value(i,point) *
+			       fe_values.shape_value(j,point)) *
 			      fe_values.JxW(point);
 	rhs[0](i) += fe_values.shape_value(i,point) *
 		     right_hand_side(fe_values.quadrature_point(point)) *
@@ -96,11 +111,22 @@ int main () {
   ProblemBase<2>     problem(&tria, &dof);
   PoissonEquation<2> equation;
   QGauss4<2>         quadrature;
+
+  HyperBallBoundary<2> boundary(Point<2>(2,3), 4);
   
-  tria.create_hypercube();
-  tria.refine_global (1);
+  tria.create_hyper_ball(Point<2>(2,3),4);
+  tria.set_boundary (&boundary);
+  
+  tria.refine_global (5);
   dof.distribute_dofs (fe);
   problem.assemble (equation, quadrature, fe);
+
+  problem.solve ();
+
+  DataOut<2> out;
+  ofstream gnuplot("gnuplot.out.5");
+  problem.fill_data (out);
+  out.write_gnuplot (gnuplot);
   
   return 0;
 };
