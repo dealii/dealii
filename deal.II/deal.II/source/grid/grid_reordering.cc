@@ -1050,9 +1050,9 @@ void GridReordering<dim>::find_reordering (typename std::vector<Cell>           
       const unsigned int
 	new_cell_number = rotation_states.size()-1;
       const unsigned int
-	old_cell_number = find (new_cell_numbers.begin(),
-				new_cell_numbers.end(),
-				new_cell_number) - new_cell_numbers.begin();
+	old_cell_number = std::find (new_cell_numbers.begin(),
+				     new_cell_numbers.end(),
+				     new_cell_number) - new_cell_numbers.begin();
       Assert (old_cell_number < cells.size(), ExcInternalError());
 
       original_cells[old_cell_number].rotate (rotation_states.back());
@@ -1163,12 +1163,12 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
 				       // next_round_cells array,
 				       // which is needed for the next
 				       // loop iteration anyway
-      sort (new_next_round_cells.begin(), new_next_round_cells.end());
+      std::sort (new_next_round_cells.begin(), new_next_round_cells.end());
       next_round_cells.clear ();
       unique_copy (new_next_round_cells.begin(), new_next_round_cells.end(),
 		   back_inserter(next_round_cells));
     };
-  Assert (find (new_cell_numbers.begin(), new_cell_numbers.end(), invalid_cell_number)
+  Assert (std::find (new_cell_numbers.begin(), new_cell_numbers.end(), invalid_cell_number)
 	  ==
 	  new_cell_numbers.end(),
 	  ExcInternalError());

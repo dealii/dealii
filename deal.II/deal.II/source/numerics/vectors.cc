@@ -966,7 +966,8 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
   std::vector<std::vector<Tensor<1,dim> > > function_grads (n_q_points,
 							    std::vector<Tensor<1,dim> >(n_components));
   std::vector<double> weight_values (n_q_points);
-  std::vector<Vector<double> > weight_vectors (n_q_points, n_components);
+  std::vector<Vector<double> > weight_vectors (n_q_points, 
+					       Vector<double>(n_components));
   
   std::vector<Vector<double> >         psi_values (n_q_points,
 						   Vector<double>(n_components));
@@ -1097,9 +1098,9 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 			  psi_scalar[q] = psi_values[q].norm_sqr();
 
 						       // Integration on one cell
-		      diff = inner_product (psi_scalar.begin(), psi_scalar.end(),
-					    fe_values.get_JxW_values().begin(),
-					    0.0);
+		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+						 fe_values.get_JxW_values().begin(),
+						 0.0);
 		      if (norm == L2_norm)
 			diff=sqrt(diff);
  		      break;
@@ -1114,7 +1115,7 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 				psi_scalar[q] = 0;
 				// weighted scalar product
 				for (unsigned int i=0; i<n_components; ++i)
-				  psi_scalar[q] += fabs(psi_values[q](i))
+				  psi_scalar[q] += std::fabs(psi_values[q](i))
 						   * weight_vectors[q](i);
 			      }
 			  else // weight->n_components == 1
@@ -1144,7 +1145,7 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 				psi_scalar[q] = 0;
 				for (unsigned int i=0; i<n_components; ++i)
 				  {
-				    double newval = fabs(psi_values[q](i))
+				    double newval = std::fabs(psi_values[q](i))
 						    * weight_vectors[q](i);
 				    if (psi_scalar[q]<newval)
 				      psi_scalar[q] = newval;

@@ -204,7 +204,7 @@ Number BlockVector<Number>::l1_norm () const
 template <typename Number>
 Number BlockVector<Number>::l2_norm () const
 {
-  return sqrt(norm_sqr());
+  return std::sqrt(norm_sqr());
 }
 
 

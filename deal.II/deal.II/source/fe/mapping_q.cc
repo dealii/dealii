@@ -104,7 +104,7 @@ MappingQ<dim>::MappingQ (const unsigned int p):
 				   // shape functions of the Qp
 				   // mapping.
   renumber.resize(n_shape_functions,0);
-  std::vector<unsigned int> dpo(dim+1, 1);
+  std::vector<unsigned int> dpo(dim+1, static_cast<unsigned int>(1));
   for (unsigned int i=1; i<dpo.size(); ++i)
     dpo[i] = dpo[i-1]*(degree-1);
   FiniteElementData<dim> fe_data(dpo, 1);
@@ -460,8 +460,8 @@ MappingQ<dim>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &loq
 				   // at the outer rim should be
 				   // one. check this
   for (unsigned int unit_point=0; unit_point<loqvs.size(); ++unit_point)
-    Assert(fabs(std::accumulate(loqvs[unit_point].begin(),
-				loqvs[unit_point].end(),0.)-1)<1e-13,
+    Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
+				     loqvs[unit_point].end(),0.)-1)<1e-13,
 	   ExcInternalError());
   
 				   // TEST output

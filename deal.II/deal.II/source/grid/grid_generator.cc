@@ -334,15 +334,15 @@ GridGenerator::hyper_ball (Triangulation<2> &tria,
 				   // equilibrate cell sizes at
 				   // transition from the inner part
 				   // to the radial cells
-  const double a = 1./(1+sqrt(2.0));
-  const Point<2> vertices[8] = { p+Point<2>(-1,-1)*(radius/sqrt(2.0)),
-				   p+Point<2>(+1,-1)*(radius/sqrt(2.0)),
-				   p+Point<2>(-1,-1)*(radius/sqrt(2.0)*a),
-				   p+Point<2>(+1,-1)*(radius/sqrt(2.0)*a),
-				   p+Point<2>(-1,+1)*(radius/sqrt(2.0)*a),
-				   p+Point<2>(+1,+1)*(radius/sqrt(2.0)*a),
-				   p+Point<2>(-1,+1)*(radius/sqrt(2.0)),
-				   p+Point<2>(+1,+1)*(radius/sqrt(2.0)) };
+  const double a = 1./(1+std::sqrt(2.0));
+  const Point<2> vertices[8] = { p+Point<2>(-1,-1)*(radius/std::sqrt(2.0)),
+				   p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)),
+				   p+Point<2>(-1,-1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(-1,+1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)*a),
+				   p+Point<2>(-1,+1)*(radius/std::sqrt(2.0)),
+				   p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)) };
   
   const int cell_vertices[5][4] = {{0, 1, 3, 2},
 				   {0, 2, 4, 6},
@@ -389,8 +389,8 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
 				   // radii)
   const unsigned int N = (n_cells == 0 ?
 			  static_cast<unsigned int>
-			  (ceil((2*pi* (outer_radius + inner_radius)/2) /
-				(outer_radius - inner_radius))) :
+			  (std::ceil((2*pi* (outer_radius + inner_radius)/2) /
+				     (outer_radius - inner_radius))) :
 			  n_cells);
 
 				   // set up N vertices on the
@@ -402,8 +402,8 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
   std::vector<Point<2> > vertices(2*N);
   for (unsigned int i=0; i<N; ++i)
     {
-      vertices[i] = Point<2>( cos(2*pi * i/N),
-			      sin(2*pi * i/N)) * outer_radius;
+      vertices[i] = Point<2>( std::cos(2*pi * i/N),
+			      std::sin(2*pi * i/N)) * outer_radius;
       vertices[i+N] = vertices[i] * (inner_radius/outer_radius);
 
       vertices[i]   += center;
@@ -449,8 +449,8 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 				   // radii)
   const unsigned int N = (n_cells == 0 ?
 			  static_cast<unsigned int>
-			  (ceil((pi* (outer_radius + inner_radius)/2) /
-				(outer_radius - inner_radius))) :
+			  (std::ceil((pi* (outer_radius + inner_radius)/2) /
+				     (outer_radius - inner_radius))) :
 			  n_cells);
 
 				   // set up N+1 vertices on the
@@ -470,8 +470,8 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 				       // value of pi)
       vertices[i] =  Point<2>( ( (i==0) || (i==N) ?
 				 0 :
-				 cos(pi * i/N - pi/2) ),
-			       sin(pi * i/N - pi/2)) * outer_radius;
+				 std::cos(pi * i/N - pi/2) ),
+			       std::sin(pi * i/N - pi/2)) * outer_radius;
       vertices[i+N+1] = vertices[i] * (inner_radius/outer_radius);
 
       vertices[i]     += center;

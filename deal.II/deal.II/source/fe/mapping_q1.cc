@@ -409,9 +409,9 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 	  Tensor<1,dim> tangential;
 	  tangential[(nindex+1)%dim] = (normal_directions[i]%2) ? -1 : 1;
 	  data.unit_tangentials[i].resize(n_original_q_points);
-	  fill (data.unit_tangentials[i].begin(),
-		data.unit_tangentials[i].end(),
-		tangential);
+	  std::fill (data.unit_tangentials[i].begin(),
+		     data.unit_tangentials[i].end(),
+		     tangential);
 	  
 	  if (dim>2)
 	    {
@@ -479,9 +479,9 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
     {
       Assert (quadrature_points.size() == npts,
 	      ExcDimensionMismatch(quadrature_points.size(), npts));
-      fill(quadrature_points.begin(),
-	   quadrature_points.end(),
-	   Point<dim>());
+      std::fill(quadrature_points.begin(),
+		quadrature_points.end(),
+		Point<dim>());
     }
 
   if (update_flags & update_covariant_transformation)
@@ -494,9 +494,9 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
     {
       Assert (data.contravariant.size() == npts,
 	      ExcDimensionMismatch(data.contravariant.size(), npts));
-      fill(data.contravariant.begin(),
-	   data.contravariant.end(),
-	   Tensor<2,dim>());
+      std::fill(data.contravariant.begin(),
+		data.contravariant.end(),
+		Tensor<2,dim>());
     }
   
   if (update_flags & update_jacobian_grads)
@@ -679,8 +679,8 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 			  | update_JxW_values))
 	for (unsigned int i=0;i<boundary_forms.size();++i)
 	  {
-	    double f = sqrt(contract(boundary_forms[i],
-				     boundary_forms[i]));
+	    double f = std::sqrt(contract(boundary_forms[i],
+					  boundary_forms[i]));
 	    if (update_flags & update_JxW_values)
 	      {
 		JxW_values[i] = f * weights[i];

@@ -555,8 +555,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 				       // is at least two. if not so,
 				       // then clean triangulation and
 				       // exit with an exception
-      if ( ! (* (min_element(vertex_touch_count.begin(),
-			     vertex_touch_count.end())) >= 2))
+      if ( ! (* (std::min_element(vertex_touch_count.begin(),
+				  vertex_touch_count.end())) >= 2))
 	{
 					   // clear will only work if
 					   // there are no
@@ -1702,10 +1702,10 @@ void Triangulation<dim>::distort_random (const double factor,
       
 				       // first compute a random shift vector
       for (unsigned int d=0; d<dim; ++d)
-	shift_vector(d) = rand()*1.0/RAND_MAX;
+	shift_vector(d) = std::rand()*1.0/RAND_MAX;
 
       shift_vector *= factor * minimal_length[vertex] /
-		      sqrt(shift_vector.square());
+		      std::sqrt(shift_vector.square());
 
 				       // finally move the vertex
       vertices[vertex] += shift_vector;

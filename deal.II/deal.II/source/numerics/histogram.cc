@@ -169,11 +169,11 @@ void Histogram::evaluate (const typename std::vector<Vector<number> > &values,
 
       case logarithmic:
       {
-	const float delta = (log(max_value)-log(min_value))/n_intervals;
+	const float delta = (std::log(max_value)-std::log(min_value))/n_intervals;
 
 	for (unsigned int n=0; n<n_intervals; ++n)
-	  intervals[0].push_back (Interval(exp(log(min_value)+n*delta),
-					   exp(log(min_value)+(n+1)*delta)));
+	  intervals[0].push_back (Interval(std::exp(std::log(min_value)+n*delta),
+					   std::exp(std::log(min_value)+(n+1)*delta)));
 	
 	break;
       };

@@ -201,7 +201,7 @@ void ConstraintMatrix::close ()
     };
   
 				   // sort the lines
-  sort (lines.begin(), lines.end());
+  std::sort (lines.begin(), lines.end());
 
 #ifdef DEBUG
 				   // if in debug mode: check that no
@@ -218,9 +218,9 @@ void ConstraintMatrix::close ()
 	ConstraintLine test_line;
 	test_line.line = entry->first;
 	const std::vector<ConstraintLine>::const_iterator
-	  test_line_position = lower_bound (lines.begin(),
-					    lines.end(),
-					    test_line);
+	  test_line_position = std::lower_bound (lines.begin(),
+						 lines.end(),
+						 test_line);
 	Assert ((test_line_position == lines.end())
 		||
 		(test_line_position->line != entry->first),
@@ -939,9 +939,9 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
       ConstraintLine index_comparison;
       index_comparison.line = index;
       
-      return binary_search (lines.begin (),
-			    lines.end (),
-			    index_comparison);
+      return std::binary_search (lines.begin (),
+				 lines.end (),
+				 index_comparison);
     }
   else
     {

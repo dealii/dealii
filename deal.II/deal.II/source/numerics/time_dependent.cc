@@ -58,7 +58,7 @@ void
 TimeDependent::insert_timestep (const TimeStepBase *position,
 				TimeStepBase       *new_timestep) 
 {
-  Assert ((find(timesteps.begin(), timesteps.end(), position) != timesteps.end()) ||
+  Assert ((std::find(timesteps.begin(), timesteps.end(), position) != timesteps.end()) ||
 	  (position == 0),
 	  ExcInvalidPosition());
 
@@ -97,7 +97,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
       {
 					 // inner time step
 	std::vector<TimeStepBase*>::iterator insert_position
-	  = find(timesteps.begin(), timesteps.end(), position);
+	  = std::find(timesteps.begin(), timesteps.end(), position);
 	
 	(*(insert_position-1))->set_next_timestep (new_timestep);
 	new_timestep->set_previous_timestep (*(insert_position-1));
@@ -109,7 +109,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
 				   // array
   timesteps.insert ((position == 0 ?
 		     timesteps.end() :
-		     find(timesteps.begin(), timesteps.end(), position)),
+		     std::find(timesteps.begin(), timesteps.end(), position)),
 		    new_timestep);
 };
 

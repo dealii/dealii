@@ -653,7 +653,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 					   // diagonal entry.
 	  double max_diag_entry = 0;
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    if (fabs(cell_matrix(i,i)) > max_diag_entry)
+	    if (std::fabs(cell_matrix(i,i)) > max_diag_entry)
 	      max_diag_entry = fabs(cell_matrix(i,i));
 #endif  
 
@@ -669,7 +669,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 //TODO:[?] We assume here that shape functions that have support also on the boundary also have their support point on the boundary (by having their indices in dof_is_on_face set true). This is not true, however, e.g. for discontinuous elements.
 						   // compare here for relative
 						   // smallness
-		  Assert (fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
+		  Assert (std::fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
 			  ExcInternalError ());
 		};
 	  
@@ -680,7 +680,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	      {
 						   // compare here for relative
 						   // smallness
-		Assert (fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
+		Assert (std::fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
 			ExcInternalError());
 	      };
 	  mutex.release ();

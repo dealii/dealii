@@ -207,14 +207,14 @@ Number Vector<Number>::l1_norm () const
 		 eptr = ptr + (dim/4)*4;
   while (ptr!=eptr)
     {
-      sum0 += fabs(*ptr++);
-      sum1 += fabs(*ptr++);
-      sum2 += fabs(*ptr++);
-      sum3 += fabs(*ptr++);
+      sum0 += std::fabs(*ptr++);
+      sum1 += std::fabs(*ptr++);
+      sum2 += std::fabs(*ptr++);
+      sum3 += std::fabs(*ptr++);
     };
 				   // add up remaining elements
   while (ptr != end())
-    sum0 += fabs(*ptr++);
+    sum0 += std::fabs(*ptr++);
   
   return sum0+sum1+sum2+sum3;
 };
@@ -223,7 +223,7 @@ Number Vector<Number>::l1_norm () const
 template <typename Number>
 Number Vector<Number>::l2_norm () const
 {
-  return sqrt(norm_sqr());
+  return std::sqrt(norm_sqr());
 };
 
 
@@ -237,15 +237,15 @@ Number Vector<Number>::linfty_norm () const {
 	 max3=0.;
   for (unsigned int i=0; i<(dim/4); ++i) 
     {
-      if (max0<fabs(val[4*i]))   max0=fabs(val[4*i]);
-      if (max1<fabs(val[4*i+1])) max1=fabs(val[4*i+1]);
-      if (max2<fabs(val[4*i+2])) max2=fabs(val[4*i+2]);
-      if (max3<fabs(val[4*i+3])) max3=fabs(val[4*i+3]);
+      if (max0<std::fabs(val[4*i]))   max0=std::fabs(val[4*i]);
+      if (max1<std::fabs(val[4*i+1])) max1=std::fabs(val[4*i+1]);
+      if (max2<std::fabs(val[4*i+2])) max2=std::fabs(val[4*i+2]);
+      if (max3<std::fabs(val[4*i+3])) max3=std::fabs(val[4*i+3]);
     };
 				   // add up remaining elements
   for (unsigned int i=(dim/4)*4; i<dim; ++i)
-    if (max0<fabs(val[i]))
-      max0 = fabs(val[i]);
+    if (max0<std::fabs(val[i]))
+      max0 = std::fabs(val[i]);
 
   return std::max (std::max(max0, max1),
 		   std::max(max2, max3));
@@ -515,25 +515,13 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 
 
 template <typename Number>
-void Vector<Number>::print (FILE* f, const char* format) const
-{
-  Assert (dim!=0, ExcEmptyVector());
-  if (!format) format = " %5.2f";
-  for (unsigned int j=0;j<size();j++)
-    fprintf(f, format, val[j]);
-  fputc('\n',f);
-}
-
-
-
-template <typename Number>
 void Vector<Number>::print (const char* format) const
 {
   Assert (dim!=0, ExcEmptyVector());
   if (!format) format = " %5.2f";
   for (unsigned int j=0;j<size();j++)
-    printf (format, val[j]);
-  printf ("\n");
+    std::printf (format, val[j]);
+  std::printf ("\n");
 }
 
 
@@ -579,10 +567,10 @@ void Vector<Number>::block_write (std::ostream &out) const
   const unsigned int sz = size();
   char buf[16];
   
-  sprintf(buf, "%d", sz);
-  strcat(buf, "\n[");
+  std::sprintf(buf, "%d", sz);
+  std::strcat(buf, "\n[");
   
-  out.write(buf, strlen(buf));
+  out.write(buf, std::strlen(buf));
   out.write (reinterpret_cast<const char*>(begin()),
 	     reinterpret_cast<const char*>(end())
 	     - reinterpret_cast<const char*>(begin()));
@@ -607,7 +595,7 @@ void Vector<Number>::block_read (std::istream &in)
   
 
   in.getline(buf,16,'\n');
-  sz=atoi(buf);
+  sz=std::atoi(buf);
   
 				   // fast initialization, since the
 				   // data elements are overwritten anyway

@@ -108,7 +108,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 	number rowsum = 0;
 	for (unsigned int global_index=rowstart;
 	     global_index<rowstart+rowlength; ++global_index)
-	  rowsum += fabs(global_entry(global_index));
+	  rowsum += std::fabs(global_entry(global_index));
 
 	*diagonal_element += strengthen_diagonal * rowsum;
       };

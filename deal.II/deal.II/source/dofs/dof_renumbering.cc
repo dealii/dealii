@@ -169,11 +169,11 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler
 	    next_round_dofs.push_back (sparsity.get_column_numbers()[j]);
       
 				       // sort dof numbers
-      sort (next_round_dofs.begin(), next_round_dofs.end());
+      std::sort (next_round_dofs.begin(), next_round_dofs.end());
 
 				       // delete multiple entries
       std::vector<unsigned int>::iterator end_sorted;
-      end_sorted = unique (next_round_dofs.begin(), next_round_dofs.end());
+      end_sorted = std::unique (next_round_dofs.begin(), next_round_dofs.end());
       next_round_dofs.erase (end_sorted, next_round_dofs.end());
 
 				       // eliminate dofs which are
@@ -243,7 +243,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler
 				   // In any case, if not all DoFs
 				   // have been reached, renumbering
 				   // will not be possible
-  if (find (new_number.begin(), new_number.end(), DoFHandler<dim>::invalid_dof_index)
+  if (std::find (new_number.begin(), new_number.end(), DoFHandler<dim>::invalid_dof_index)
       !=
       new_number.end())
     Assert (false, ExcRenumberingIncomplete());
@@ -352,7 +352,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 	    next_round_dofs.push_back (sparsity.get_column_numbers()[j]);
       
 				       // sort dof numbers
-      sort (next_round_dofs.begin(), next_round_dofs.end());
+      std::sort (next_round_dofs.begin(), next_round_dofs.end());
 
 				       // delete multiple entries
       std::vector<unsigned int>::iterator end_sorted;
@@ -409,8 +409,8 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 
 #ifdef DEBUG
 				   //  test for all indices numbered
-  if (find (new_number.begin(), new_number.end(),
-	    DoFHandler<dim>::invalid_dof_index)
+  if (std::find (new_number.begin(), new_number.end(),
+		 DoFHandler<dim>::invalid_dof_index)
       !=
       new_number.end())
     Assert (false, ExcRenumberingIncomplete());
@@ -452,7 +452,7 @@ void DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handle
   Assert (component_order.size() == dof_handler.get_fe().n_components(),
 	  ExcInvalidComponentOrder());
   for (unsigned int i=0; i<dof_handler.get_fe().n_components(); ++i)
-    Assert (find (component_order.begin(), component_order.end(), i)
+    Assert (std::find (component_order.begin(), component_order.end(), i)
 	    != component_order.end(),
 	    ExcInvalidComponentOrder ());
 
@@ -498,10 +498,10 @@ void DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handle
 				   // entries
   for (unsigned int component=0; component<dof_handler.get_fe().n_components(); ++component)
     {
-      sort (component_to_dof_map[component].begin(),
-	    component_to_dof_map[component].end());
-      component_to_dof_map[component].erase (unique (component_to_dof_map[component].begin(),
-						     component_to_dof_map[component].end()),
+      std::sort (component_to_dof_map[component].begin(),
+		 component_to_dof_map[component].end());
+      component_to_dof_map[component].erase (std::unique (component_to_dof_map[component].begin(),
+							  component_to_dof_map[component].end()),
 					     component_to_dof_map[component].end());
     };
   
@@ -598,7 +598,7 @@ DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
   for(cell = cells.begin(); cell != cells.end(); ++cell)
     {
       (*cell)->get_dof_indices(cell_dofs);
-      sort(cell_dofs.begin(), cell_dofs.end());
+      std::sort(cell_dofs.begin(), cell_dofs.end());
 
       for (unsigned int i=0;i<n_cell_dofs;++i)
 	{
@@ -654,7 +654,7 @@ DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
       Assert ((*cell)->level() == (int) level, ExcInternalError());
 
       (*cell)->get_mg_dof_indices(cell_dofs);
-      sort(cell_dofs.begin(), cell_dofs.end());
+      std::sort(cell_dofs.begin(), cell_dofs.end());
 
       for (unsigned int i=0;i<n_cell_dofs;++i)
 	{
@@ -752,7 +752,7 @@ DoFRenumbering::random (DoFHandler<dim> &dof_handler)
   for (unsigned i=0; i<n_dofs; ++i)
     new_indices[i] = i;
   
-  random_shuffle (new_indices.begin(), new_indices.end());
+  std::random_shuffle (new_indices.begin(), new_indices.end());
   dof_handler.renumber_dofs(new_indices);  
 };
 

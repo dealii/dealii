@@ -142,14 +142,14 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 	  coordinate_axis /= h;
 
 	  const double alpha = std::atan2(coordinate_axis[1], coordinate_axis[0]);
-	  const double b = ((face_vertex_normals[0][1] * sin(alpha)
-			     +face_vertex_normals[0][0] * cos(alpha)) /
-			    (face_vertex_normals[0][1] * cos(alpha)
-			     -face_vertex_normals[0][0] * sin(alpha))),
-		       c = ((face_vertex_normals[1][1] * sin(alpha)
-			     +face_vertex_normals[1][0] * cos(alpha)) /
-			    (face_vertex_normals[1][1] * cos(alpha)
-			     -face_vertex_normals[1][0] * sin(alpha)));
+	  const double b = ((face_vertex_normals[0][1] * std::sin(alpha)
+			     +face_vertex_normals[0][0] * std::cos(alpha)) /
+			    (face_vertex_normals[0][1] * std::cos(alpha)
+			     -face_vertex_normals[0][0] * std::sin(alpha))),
+		       c = ((face_vertex_normals[1][1] * std::sin(alpha)
+			     +face_vertex_normals[1][0] * std::cos(alpha)) /
+			    (face_vertex_normals[1][1] * std::cos(alpha)
+			     -face_vertex_normals[1][0] * std::sin(alpha)));
 
 					   // next evaluate the so
 					   // determined cubic
@@ -164,10 +164,10 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 					   // scaling and shifting
 	  for (unsigned int i=0; i<2; ++i)
 	    {
-	      Point<2> real_point (cos(alpha) * new_unit_points[i][0]
-				   - sin(alpha) * new_unit_points[i][1],
-				   sin(alpha) * new_unit_points[i][0]
-				   + cos(alpha) * new_unit_points[i][1]);
+	      Point<2> real_point (std::cos(alpha) * new_unit_points[i][0]
+				   - std::sin(alpha) * new_unit_points[i][1],
+				   std::sin(alpha) * new_unit_points[i][0]
+				   + std::cos(alpha) * new_unit_points[i][1]);
 	      real_point *= h;
 	      real_point += line->vertex(0);
 	      a.push_back (real_point);

@@ -663,8 +663,8 @@ SparsityPattern::bandwidth () const
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
       if (colnums[j] != invalid_entry)
 	{
-	  if (static_cast<unsigned int>(abs(static_cast<int>(i-colnums[j]))) > b)
-	    b = abs(static_cast<signed int>(i-colnums[j]));
+	  if (static_cast<unsigned int>(std::abs(static_cast<int>(i-colnums[j]))) > b)
+	    b = std::abs(static_cast<signed int>(i-colnums[j]));
 	}
       else
 					 // leave if at the end of

@@ -171,7 +171,7 @@ template<class VECTOR>
 double
 SolverCG<VECTOR>::criterion()
 {
-  return sqrt(res2);
+  return std::sqrt(res2);
 }
 
 

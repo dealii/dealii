@@ -420,11 +420,6 @@ class Vector
 				     /**
 				      *  Output of vector in user-defined format.
 				      */
-    void print (FILE* fp, const char* format = 0) const;
-    
-				     /**
-				      *  Output of vector in user-defined format.
-				      */
     void print (const char* format = 0) const;
 
 				     /**

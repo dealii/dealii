@@ -666,7 +666,7 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &ma
 	};
 
       for (unsigned int n=0; n<n_solution_vectors; ++n)
-	(*errors[n])(present_cell) = sqrt((*errors[n])(present_cell));
+	(*errors[n])(present_cell) = std::sqrt((*errors[n])(present_cell));
     };
 };
 

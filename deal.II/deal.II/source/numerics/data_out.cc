@@ -315,7 +315,7 @@ void DataOut<dim>::build_some_patches (Data data)
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int cell_number = 0;
-  typename std::vector<DataOutBase::Patch<dim> >::iterator patch = patches.begin();
+  typename std::vector<typename DataOutBase::Patch<dim> >::iterator patch = patches.begin();
   typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread

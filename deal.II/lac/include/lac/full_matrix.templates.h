@@ -273,7 +273,7 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
       dst(i) = s;
       res += s*s;
     }
-  return sqrt(res);
+  return std::sqrt(res);
 }
 
 
@@ -595,7 +595,7 @@ number FullMatrix<number>::l1_norm () const
     {
       sum=0;
       for (unsigned int row=0; row<n_rows; ++row)
-	sum += fabs(el(row,col));
+	sum += std::fabs(el(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -615,7 +615,7 @@ number FullMatrix<number>::linfty_norm () const
     {
       sum=0;
       for (unsigned int col=0; col<n_cols; ++col)
-	sum += fabs(el(row,col));
+	sum += std::fabs(el(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -1074,7 +1074,7 @@ FullMatrix<number>::norm2 () const
   number s = 0.;
   for (unsigned int i=0;i<n_rows()*n_cols();++i)
     s += data()[i]*data()[i];
-  return sqrt(s);
+  return std::sqrt(s);
 }
 
 
@@ -1093,7 +1093,7 @@ FullMatrix<number>::relative_symmetry_norm2 () const
 	s += (*this)(i,j)*(*this)(i,j);
       }
   if (s!=0.)
-    return sqrt(a)/sqrt(s);
+    return std::sqrt(a)/std::sqrt(s);
   return 0;
 }
 
@@ -1323,13 +1323,13 @@ FullMatrix<number>::gauss_jordan()
   for (unsigned int j=0; j<n(); ++j)
     {
 				       // pivotsearch
-      number       max = fabs(el(j,j));
+      number       max = std::fabs(el(j,j));
       unsigned int r   = j;
       for (unsigned int i=j+1; i<n(); ++i)
 	{
-	  if (fabs(el(i,j)) > max)
+	  if (std::fabs(el(i,j)) > max)
 	    {
-	      max = fabs(el(i,j));
+	      max = std::fabs(el(i,j));
 	      r = i;
 	    }
 	}
@@ -1391,9 +1391,9 @@ FullMatrix<number>::householder(Vector<number2>& src)
     number2 sigma = 0;
     unsigned int i;
     for (i=j ; i<m() ; ++i) sigma += el(i,j)*el(i,j);
-    if (fabs(sigma) < 1.e-15) return;
+    if (std::fabs(sigma) < 1.e-15) return;
     number2 s = el(j,j);
-    s = (s<0) ? sqrt(sigma) : -sqrt(sigma);
+    s = (s<0) ? std::sqrt(sigma) : -std::sqrt(sigma);
     number2 dj = s;
 
     number2 beta = 1./(s*el(j,j)-sigma);
@@ -1432,7 +1432,7 @@ FullMatrix<number>::least_squares(Vector<number2>& dst, Vector<number2>& src)
 
   number2 sum = 0.;
   for (unsigned int i=n() ; i<m() ; ++i) sum += src(i) * src(i);
-  return sqrt(sum);
+  return std::sqrt(sum);
 }
 
 

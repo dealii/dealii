@@ -95,7 +95,7 @@ void GridRefinement::refine (Triangulation<dim>   &tria,
   const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (fabs(criteria(index)) >= threshold)
+    if (std::fabs(criteria(index)) >= threshold)
       cell->set_refine_flag();
 };
 
@@ -115,7 +115,7 @@ void GridRefinement::coarsen (Triangulation<dim>   &tria,
   const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (fabs(criteria(index)) <= threshold)
+    if (std::fabs(criteria(index)) <= threshold)
       cell->set_coarsen_flag();
 };
 

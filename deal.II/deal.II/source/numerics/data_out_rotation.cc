@@ -72,8 +72,8 @@ void DataOutRotation<dim>::build_some_patches (Data data)
   std::vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
-      angle_directions[i][0] = cos(2*pi*i/n_patches_per_circle);
-      angle_directions[i][1] = sin(2*pi*i/n_patches_per_circle);
+      angle_directions[i][0] = std::cos(2*pi*i/n_patches_per_circle);
+      angle_directions[i][1] = std::sin(2*pi*i/n_patches_per_circle);
     };
   
   
@@ -84,7 +84,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != dofs->end()); ++i)
     {
-      advance (patch, n_patches_per_circle);
+      std::advance (patch, n_patches_per_circle);
       ++cell_number;
       cell=next_cell(cell);
     }
@@ -271,7 +271,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				       // belonging to this thread.
       const int skip_threads = static_cast<signed int>(data.n_threads)-1;
       for (int i=0; (i<skip_threads) && (cell != dofs->end()); ++i)
-	advance (patch, n_patches_per_circle);
+	std::advance (patch, n_patches_per_circle);
 
 				       // however, cell and cell
 				       // number have not yet been

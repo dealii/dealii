@@ -106,9 +106,9 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
 
 				       // now sort the list of interior boundary
 				       // dofs and eliminate duplicates
-      sort (boundary_dofs.begin(), boundary_dofs.end());
-      boundary_dofs.erase (unique (boundary_dofs.begin(),
-				   boundary_dofs.end()),
+      std::sort (boundary_dofs.begin(), boundary_dofs.end());
+      boundary_dofs.erase (std::unique (boundary_dofs.begin(),
+					boundary_dofs.end()),
 			   boundary_dofs.end());
 
 				       // now finally copy the result

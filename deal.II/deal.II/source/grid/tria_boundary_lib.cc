@@ -40,12 +40,12 @@ HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>
   if (compute_radius_automatically)
     {
       const Point<dim> vertex_relative = line->vertex(0) - center;
-      r = sqrt(vertex_relative.square());
+      r = std::sqrt(vertex_relative.square());
     }
   else
     r=radius;
 				   // project to boundary
-  middle *= r / sqrt(middle.square());
+  middle *= r / std::sqrt(middle.square());
   
   middle += center;
   return middle;
@@ -81,12 +81,12 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
   if (compute_radius_automatically)
     {
       const Point<dim> vertex_relative = quad->vertex(0) - center;
-      r = sqrt(vertex_relative.square());
+      r = std::sqrt(vertex_relative.square());
     }
   else
     r=radius;
 				   // project to boundary
-  middle *= r / sqrt(middle.square());
+  middle *= r / std::sqrt(middle.square());
   
   middle += center;
   return middle;
@@ -131,7 +131,7 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
 
   const Point<dim> v0=p0-center,
 		   v1=p1-center;
-  const double length=sqrt((v1-v0).square());
+  const double length=std::sqrt((v1-v0).square());
   
   double eps=1e-14;
   double r=0;
@@ -143,14 +143,14 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
   else
     r=radius;
 
-  Assert(fabs(v0.square()-r*r)<eps, ExcInternalError());
-  Assert(fabs(v1.square()-r*r)<eps, ExcInternalError());
+  Assert(std::fabs(v0.square()-r*r)<eps, ExcInternalError());
+  Assert(std::fabs(v1.square()-r*r)<eps, ExcInternalError());
   
-  const double alpha=acos((v0*v1)/sqrt(v0.square()*v1.square()));
+  const double alpha=std::acos((v0*v1)/sqrt(v0.square()*v1.square()));
   const double d_alpha=alpha/(n+1);
   const Point<dim> pm=0.5*(v0+v1);
   
-  const double h=sqrt(pm.square());
+  const double h=std::sqrt(pm.square());
   
   double beta=0;
   unsigned int left_index=0, right_index=0;

@@ -178,7 +178,7 @@ bool TriaObjectAccessor<1, dim>::at_boundary () const
 template <int dim>
 double TriaObjectAccessor<1, dim>::diameter () const
 {
-  return sqrt((vertex(1)-vertex(0)).square());
+  return std::sqrt((vertex(1)-vertex(0)).square());
 };
 
 
@@ -202,7 +202,7 @@ Point<dim> TriaObjectAccessor<1, dim>::barycenter () const
 template <int dim>
 double TriaObjectAccessor<1, dim>::measure () const
 {
-  return sqrt((vertex(1)-vertex(0)).square());
+  return std::sqrt((vertex(1)-vertex(0)).square());
 };
 
 
@@ -379,8 +379,8 @@ bool TriaObjectAccessor<2, dim>::at_boundary () const
 template <int dim>
 double TriaObjectAccessor<2, dim>::diameter () const
 {
-  return sqrt(std::max((vertex(2)-vertex(0)).square(),
-		       (vertex(3)-vertex(1)).square()));
+  return std::sqrt(std::max((vertex(2)-vertex(0)).square(),
+			    (vertex(3)-vertex(1)).square()));
 };
 
 

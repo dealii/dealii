@@ -201,8 +201,8 @@ CompressedSparsityPattern::bandwidth () const
   for (unsigned int row=0; row<rows; ++row)
     for (std::set<unsigned int>::const_iterator i=column_indices[row].begin();
 	 i!=column_indices[row].end(); ++i)
-      if (static_cast<unsigned int>(abs(static_cast<int>(row-*i))) > b)
-	b = abs(static_cast<signed int>(row-*i));
+      if (static_cast<unsigned int>(std::abs(static_cast<int>(row-*i))) > b)
+	b = std::abs(static_cast<signed int>(row-*i));
 
   return b;
 };

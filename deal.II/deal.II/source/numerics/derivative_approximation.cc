@@ -78,7 +78,7 @@ DerivativeApproximation::Gradient<dim>::derivative_norm (const Derivative &d)
   double s = 0;
   for (unsigned int i=0; i<dim; ++i)
     s += d[i]*d[i];
-  return sqrt(s);
+  return std::sqrt(s);
 };
 
 
@@ -148,8 +148,8 @@ derivative_norm (const Derivative &d)
 				   // d_12=d_21=c
   const double radicand = ::sqr(d[0][0] - d[1][1]) + 4*::sqr(d[0][1]);
   const double eigenvalues[2]
-    = { 0.5*(d[0][0] + d[1][1] + sqrt(radicand)),
-	0.5*(d[0][0] + d[1][1] - sqrt(radicand))  };
+    = { 0.5*(d[0][0] + d[1][1] + std::sqrt(radicand)),
+	0.5*(d[0][0] + d[1][1] - std::sqrt(radicand))  };
   
   return std::max (std::fabs (eigenvalues[0]),
 		   std::fabs (eigenvalues[1]));
@@ -646,7 +646,7 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 					   // the centers of two
 					   // cells
 	  Point<dim>   y        = neighbor_center - this_center;
-	  const double distance = sqrt(y.square());
+	  const double distance = std::sqrt(y.square());
 					   // normalize y
 	  y /= distance;
 					   // *** note that unlike in

@@ -1558,7 +1558,7 @@ void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
   if (true)
     {
       std::vector<unsigned int> tmp(new_numbers);
-      sort (tmp.begin(), tmp.end());
+      std::sort (tmp.begin(), tmp.end());
       std::vector<unsigned int>::const_iterator p = tmp.begin();
       unsigned int                         i = 0;
       for (; p!=tmp.end(); ++p, ++i)
