@@ -457,6 +457,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       (update_flags & update_gradients)          ||
       (update_flags & update_second_derivatives) ||
       (update_flags & update_support_points)     ||
+      (update_flags & update_normal_vectors)     ||
       (update_flags & update_JxW_values))
     fe->fill_fe_face_values (cell,
 			     face_no,
