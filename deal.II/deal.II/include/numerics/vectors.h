@@ -122,9 +122,9 @@ enum NormType {
  *   projection of the trace of the function to the boundary is done
  *   with the @ref{VectorTools}@p{::project_boundary_values} (see
  *   below) function, which is called with a map of boundary functions
- *   in which all boundary indicators from zero to 254 (255 is used
- *   for other purposes, see the @ref{Triangulation} class
- *   documentation) point to the function to be projected. The
+ *   (@p{FunctionMap}) in which all boundary indicators from zero to
+ *   254 (255 is used for other purposes, see the @ref{Triangulation}
+ *   class documentation) point to the function to be projected. The
  *   projection to the boundary takes place using a second quadrature
  *   formula on the boundary given to the @p{project} function. The
  *   first quadrature formula is used to compute the right hand side
@@ -212,13 +212,15 @@ enum NormType {
  *   not get the nodal values of boundary nodes by interpolation but rather
  *   through the $L_2$-projection of the trace of the function to the boundary.
  *
- *   The projection takes place on all boundary parts with boundary indicators
- *   listed in the map of boundary functions. These boundary parts may or may
- *   not be continuous. For these boundary parts, the mass matrix is assembled
- *   using the @ref{MatrixTools}@p{::create_boundary_mass_matrix} function, as well as
- *   the appropriate right hand side. Then the resulting system of equations is
- *   solved using a simple CG method (without preconditioning), which is in most
- *   cases sufficient for the present purpose.
+ *   The projection takes place on all boundary parts with boundary
+ *   indicators listed in the map (@p{FunctionMap}) of boundary
+ *   functions. These boundary parts may or may not be continuous. For
+ *   these boundary parts, the mass matrix is assembled using the
+ *   @ref{MatrixTools}@p{::create_boundary_mass_matrix} function, as
+ *   well as the appropriate right hand side. Then the resulting
+ *   system of equations is solved using a simple CG method (without
+ *   preconditioning), which is in most cases sufficient for the
+ *   present purpose.
  *
  * @item Computing errors:
  *   The function @p{integrate_difference} performs the calculation of the error
@@ -296,6 +298,25 @@ enum NormType {
 class VectorTools
 {
   public:
+				     /**
+				      *	Declare a data type which denotes a
+				      *	mapping between a boundary indicator
+				      *	and the function denoting the boundary
+				      *	values on this part of the boundary.
+				      *	Only one boundary function may be given
+				      *	for each boundary indicator, which is
+				      *	guaranteed by the @p{map} data type.
+				      *	
+				      *	See the general documentation of this
+				      *	class for more detail.
+				      */
+// TODO: [WB] use one global declaration of FunctionMap, rather than one in every place
+    template<int dim>
+    struct FMap
+    {
+	typedef typename std::map<unsigned char,const Function<dim>*> FunctionMap;
+    };
+
 				     /**
 				      * Compute the interpolation of
 				      * @p{function} at the support
@@ -434,6 +455,8 @@ class VectorTools
 					const Function<dim>   &rhs,
 					Vector<double>        &rhs_vector);
 
+//TODO:[WB] Update interpolate_boundary_values for use of FunctionMap.
+//  keep both, the functions using and the functions not using a FunctionMap.
 				     /**
 				      * Prepare Dirichlet boundary conditions.
 				      * Make up the list of nodes subject
@@ -498,7 +521,6 @@ class VectorTools
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
 //TODO:[WB] Update project_boundary_values for more components
-//TODO:[WB] Replace FunctionMap
 				     /**
 				      * Project @p{function} to the boundary
 				      * of the domain, using the given quadrature
@@ -521,7 +543,7 @@ class VectorTools
     template <int dim>
     static void project_boundary_values (const Mapping<dim>       &mapping,
 					 const DoFHandler<dim>    &dof,
-					 const typename std::map<unsigned char,const Function<dim>*> &boundary_function,
+					 const FMap<dim>::FunctionMap &boundary_functions,
 					 const Quadrature<dim-1>  &q,
 					 std::map<unsigned int,double> &boundary_values);
     
@@ -532,7 +554,7 @@ class VectorTools
 				      */
     template <int dim>
     static void project_boundary_values (const DoFHandler<dim>    &dof,
-					 const typename std::map<unsigned char,const Function<dim>*> &boundary_function,
+					 const FMap<dim>::FunctionMap &boundary_function,
 					 const Quadrature<dim-1>  &q,
 					 std::map<unsigned int,double> &boundary_values);
     
