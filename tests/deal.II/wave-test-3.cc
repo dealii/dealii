@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000 by Wolfgang Bangerth
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -372,87 +372,16 @@ template <int dim> class TimeStep_Dual;
 template <int dim>
 class DualFunctional {
   public:
-				     /**
-				      * Constructor. Specify whether an
-				      * actual functional needs the primal
-				      * solution at all times or at the
-				      * endtime. Default is #false# is
-				      * both cases which means that the
-				      * functional is linear.
-				      */
     DualFunctional (const bool use_primal_problem            = false,
 		    const bool use_primal_problem_at_endtime = false);
-
-				     /**
-				      * Return that part of the dual functional
-				      * related to a delta function in time at
-				      * the end time.
-				      *
-				      * The default is to return zero.
-				      */
     virtual void compute_endtime_vectors (Vector<double> &final_u_bar,
 					  Vector<double> &final_v_bar);
-
-				     /**
-				      * Return that part of the dual functional
-				      * related to the regular time integral.
-				      *
-				      * The default is to return zero.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
-
-				     /**
-				      * Return whether this object uses
-				      * information from the primal problem
-				      * (i.e. whether it is nonlinear or not).
-				      * The necessary information is set in
-				      * the constructor.
-				      *
-				      * This function refers to all times.
-				      */
     bool use_primal_solutions () const;
-
-    				     /**
-				      * Return whether this object uses
-				      * information from the primal problem
-				      * (i.e. whether it is nonlinear or not).
-				      * The necessary information is set in
-				      * the constructor.
-				      *
-				      * This function refers to the solution
-				      * at the end time. There are functionals
-				      * which only evaluate at the endpoint
-				      * but are nonlinear anyway. For them it
-				      * is not necessary to reload the primal
-				      * data at other times than the end time.
-				      */
     bool use_primal_solutions_at_endtime () const;
-
-				     /**
-				      * Reset the functional to the present
-				      * time level. This function needs to be
-				      * called at each time level if the
-				      * functional is nonlinear and at the
-				      * endtime if the functional is nonlinear
-				      * only at the endtime.
-				      */
     virtual void reset (const TimeStep_Primal<dim> &primal_problem);
-
-				     /**
-				      * Reset the functional to the present
-				      * time level. This function needs to be
-				      * called at each time level. It resets
-				      * pointers to the dof handler, the
-				      * triangulation and several other
-				      * objects which are needed to compute
-				      * the dual functional.
-				      */
     virtual void reset (const TimeStep_Dual<dim> &dual_problem);
-
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcPrimalProblemNotRequested);
     
   protected:
@@ -481,165 +410,79 @@ class DualFunctional {
 };
 
 
-/**
- * Compute the dual functional which is approximately associated
- * with the end time energy in the high atmosphere above 4000km.
- * The energy in a domain $D$ is given by
- * $E_D = \int_D (v^2 + \nabla u a \nabla u)_{t=T}$ and the
- * associated functional for the error is approximately
- * $J(\Psi) = \int_D v_h(T) \psi + \nabla u_h(T) a \nabla \phi$.
- */
 template <int dim>
 class EndEnergy : public DualFunctional<dim> {
   public:
-				     /**
-				      * Constructor.
-				      */
     EndEnergy (const bool use_primal_problem_at_any_time = false);
 
   protected:
     enum PartOfDomain { low_atmosphere, high_atmosphere };
-
-				     /**
-				      * Compute the initial values of the
-				      * dual problem.
-				      */
     void compute_vectors (const PartOfDomain pod,
 			  Vector<double> &final_u_bar,
 			  Vector<double> &final_v_bar) const;
 };
 
 
-/**
- * Let the point value of $u$ at the origin integrated over time
- * be the goal.
- */
 template <int dim>
 class IntegratedValueAtOrigin : public EndEnergy<dim> {
   public:
-				     /**
-				      * Evaluate the dual functionals and
-				      * return the right hand side contributions
-				      * thereof for the present time step.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
-
-				     /**
-				      * Exception.
-				      */
     DeclException0 (ExcVertexNotFound);
 };
 
 
-/**
- * Dual function corresponding to the #EvaluateSeismicSignal# class.
- */
 template <int dim>
 class SeismicSignal : public DualFunctional<dim> {
   public:
-				     /**
-				      * Evaluate the dual functionals and
-				      * return the right hand side contributions
-				      * thereof for the present time step.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
 
 
-/**
- * Compute the dual problem associated with the functional
- * $J(\Psi) = \int u ds$ with the integral being over some
- * parts of the boundary.
- */
 template <int dim>
 class EarthSurface : public DualFunctional<dim> {
   public:
-				     /**
-				      * Evaluate the dual functionals and
-				      * return the right hand side contributions
-				      * thereof for the present time step.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
 
 
-/**
- * Compute $J(\Psi) = \int_0^0.25 u(x=2,y,t=2.2) dy.
- */
 template <int dim>
 class SplitSignal : public DualFunctional<dim> {
   public:
-				     /**
-				      * Evaluate the dual functionals and
-				      * return the right hand side contributions
-				      * thereof for the present time step.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
 
 
-/**
- * 1d test case, evaluating the region (-.5,.5) at the endtime. Intended for some
- * tests on split triangulations with one fine and one coarse region.
- */
 template <int dim>
 class SplitLine : public DualFunctional<dim> {
   public:
-				     /**
-				      * Compute the initial values of the
-				      * dual problem.
-				      */
     void compute_endtime_vectors (Vector<double> &final_u_bar,
 				  Vector<double> &final_v_bar);
 };
 
 
-/**
- * Compute $J(\Psi) = \int_{-0.6}^{-0.4} u(x,t=2.5) dx.
- */
 template <int dim>
 class OneBranch1d : public DualFunctional<dim> {
   public:
-				     /**
-				      * Evaluate the dual functionals and
-				      * return the right hand side contributions
-				      * thereof for the present time step.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
 
 
-/**
- * Compute $J(\Psi) = \int_{-0.1}^{0.1} u(x,t=2.4) dx.
- */
 template <int dim>
 class SecondCrossing : public DualFunctional<dim> {
   public:
-				     /**
-				      * Evaluate the dual functionals and
-				      * return the right hand side contributions
-				      * thereof for the present time step.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
 
 
-/**
- */
 template <int dim>
 class HuyghensWave : public DualFunctional<dim> {
   public:
-				     /**
-				      * Evaluate the dual functionals and
-				      * return the right hand side contributions
-				      * thereof for the present time step.
-				      */
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
@@ -647,17 +490,6 @@ class HuyghensWave : public DualFunctional<dim> {
 
 
 
-/**
- * This class provides a simple interface to do arbitrary evaluations of
- * the numerical solution. Concrete classes implementing evaluations
- * need access to the solution vectors #u# and #v# as well as to the
- * triangulation and the associated degrees of freedoms, which is what
- * this class provides. This way is chosen to separate the problem
- * classes which do the actual solution from the evaluation classes, since
- * they don't need to know much about the solution classes apart from
- * the solution itself. Thus, we reduce dependencies which speeds up
- * compilation and makes software engineering more simple.
- */
 template <int dim>
 class EvaluationBase {
   public:
@@ -2072,8 +1904,6 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
 
   for (; cell!=endc; ++cell, ++primal_cell)
     {
-				       // only consider cells in the specified
-				       // domain
       switch (pod)
 	{
 	  case low_atmosphere:
@@ -2092,17 +1922,11 @@ fe_values.reinit (cell);
       fe_values_primal.get_function_values (*v, local_v);
       fe_values_primal.get_function_grads (*u, local_u_grad);
 
-				       // get the coefficients at the
-				       // quadrature points
       density->value_list (fe_values.get_quadrature_points(),
 			   density_values);
       stiffness->value_list (fe_values.get_quadrature_points(),
 			     stiffness_values);
       
-				       // set up a vector of the gradients
-				       // of the finite element basis
-				       // functions on this face at the
-				       // quadrature points
       const vector<vector<Tensor<1,dim> > > &shape_grads = fe_values.get_shape_grads ();
       const FullMatrix<double>            &shape_values = fe_values.get_shape_values ();
       const vector<double>      &JxW_values (fe_values.get_JxW_values());
@@ -2200,9 +2024,6 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
       if (face=cell->face(face_no),
 	  (face->vertex(0)(1) == y_offset) &&
 	  (face->vertex(1)(1) == y_offset))
-					 // this is one of the faces we
-					 // are interested in, i.e. which
-					 // lie on the interesting line
 	{
 	  fe_face_values.reinit (cell, face_no);
 	  const FullMatrix<double>            &shape_values = fe_face_values.
@@ -2211,10 +2032,6 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 						 get_JxW_values());
 	  const vector<Point<dim> > &q_points (fe_face_values.get_quadrature_points());
 
-					   // now compute the local integral
-					   // \int w(x,t) phi_i(x,y,t) ds
-					   // through this line for each
-					   // of the basis functions
 	  vector<double> local_integral (dofs_per_cell, 0);
 	  for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	    for (unsigned int point=0; point<n_q_points; ++point)
@@ -2261,12 +2078,7 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
 	 ++face_no)
       if (face=cell->face(face_no),
 	  face->at_boundary())
-					 // this is one of the faces we
-					 // may be interested in
 	{
-					   // find out whether it is part of
-					   // the boundary portions we are
-					   // looking for
 	  const double x = face->center()(0),
 		       y = face->center()(1);
 
@@ -2274,13 +2086,10 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
 		  ((x>0) && (y<0) && (fabs(x+y)<500))))
 	    continue;
 
-					   // doubtful for higher
-					   // order elements!
 	  const double h = face->measure ();
 	  
 	  face->get_dof_indices (face_dof_indices);
 	  for (unsigned int shape_func=0; shape_func<face_dofs; ++shape_func)
-					     // also doubtful!
 	    j1(face_dof_indices[shape_func]) = h;
 	};
 };
@@ -2321,11 +2130,8 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
 	 ++face_no)
       if (cell->face(face_no)->center()(0) == 1.5)
-					 // this is one of the faces we
-					 // may be interested in
 	{
 	  face=cell->face(face_no);
-					   // check whether it really is
 	  bool wrong_face = face->center()(1) > 0.0625;
 	  if (!wrong_face)
 	    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
@@ -2348,8 +2154,6 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
 	      for (unsigned int j=0; j<n_q_points; ++j)
 		sum += shape_values(i,j)*JxW_values[j];
 
-					       // since we integrate over each face
-					       // twice, add only half of it
 	      j1(dof_indices[i]) += sum * time_step / 2;
 	    };
 	};
@@ -2422,7 +2226,6 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
   j1.reinit (dof->n_dofs());
   j2.reinit (dof->n_dofs());
   
-				   // take the time step right before 2.5
   if ((time<=2.5-time_step) || (time>2.5))
     return;
 
@@ -2449,8 +2252,6 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
 	      sum += shape_values(i,j)
 		     *JxW_values[j];
 	    
-					     // since we integrate over each face
-					     // twice, add only half of it
 	    j1(dof_indices[i]) += sum;
 	  };
       };
@@ -2469,7 +2270,6 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
   j1.reinit (dof->n_dofs());
   j2.reinit (dof->n_dofs());
   
-				   // take the time step right before 2.4
   if ((time<=2.4-time_step) || (time>2.4))
     return;
 
@@ -2525,13 +2325,10 @@ void HuyghensWave<dim>::compute_functionals (Vector<double> &j1,
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex) 
       if (cell->vertex(vertex) == evaluation_point)
 	{
-					   // step down the list of children
-					   // until we find a terminal cell
 	  DoFHandler<dim>::cell_iterator terminal_cell = cell;
 	  while (terminal_cell->has_children())
 	    terminal_cell = terminal_cell->child(vertex);
 	  
-					   // now terminal cell is the right one
 	  j1(cell->vertex_dof_index(vertex,0)) = time*time_step;
 	  point_found = true;
 
@@ -2542,7 +2339,6 @@ void HuyghensWave<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-// explicit specializations
 
 template class DualFunctional<2>;
 template class EndEnergy<2>;
@@ -2671,8 +2467,6 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
   
   for (; cell!=endc; ++cell)
     {
-				       // only consider cells in the specified
-				       // domain
       switch (pod)
 	{
 	  case low_atmosphere:
@@ -2694,7 +2488,6 @@ fe_values.reinit (cell);
       cell->get_dof_values (*u, local_u);
       cell->get_dof_values (*v, local_v);
 
-				       // compute mass matrix
       cell_matrix.clear ();
       density->value_list (fe_values.get_quadrature_points(),
 			   density_values);
@@ -2708,8 +2501,6 @@ fe_values.reinit (cell);
 
       total_energy += 1./2. * cell_matrix.matrix_norm_square (local_v);
 
-				       // now for the part with the laplace
-				       // matrix
       cell_matrix.clear ();
       stiffness->value_list (fe_values.get_quadrature_points(),
 			     stiffness_values);
@@ -2836,7 +2627,6 @@ double EvaluateSeismicSignal<dim>::evaluate () {
   
   for (; cell!=endc; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-				       // check if face is at top boundary
       if (cell->face(face)->center()(1) == 1.0)
 	{
 	  face_values.reinit (cell, face);
@@ -2851,7 +2641,6 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 			      JxW_values[point];
 	  u_integrated += local_integral;
 
-					   // output the t and x coordinate
 	  out << time
 	      << ' '
 	      << cell->face(face)->vertex(0)(0)
@@ -2925,12 +2714,9 @@ double EvaluateSplitSignal<dim>::evaluate () {
   
   for (; cell!=endc; ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-					 // this is one of the faces we
-					 // may be interested in
       if (cell->face(face_no)->center()(0) == 1.5)
 	{
 	  DoFHandler<dim>::face_iterator face=cell->face(face_no);
-					   // check whether it really is
 	  bool wrong_face = face->center()(1) > 0.0625;
 	  if (!wrong_face)
 	    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
@@ -2953,8 +2739,6 @@ double EvaluateSplitSignal<dim>::evaluate () {
 	  u_integrated += local_integral;
 	};
 
-				   // note that we integrate over each line twice, so
-				   // we divide the result by two
   if (time!=0)
     result += u_integrated*time_step / 2;
   
@@ -3149,13 +2933,10 @@ double EvaluateHuyghensWave<dim>::evaluate ()
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       if (cell->vertex(vertex) == evaluation_point)
 	{
-					   // step down the list of children
-					   // until we find a terminal cell
 	  DoFHandler<dim>::cell_iterator terminal_cell = cell;
 	  while (terminal_cell->has_children())
 	    terminal_cell = terminal_cell->child(vertex);
 	  
-					   // now terminal cell is the right one
 	  value_at_origin = (*u)(cell->vertex_dof_index(vertex,0));
 	  point_found = true;
 	  
@@ -3174,7 +2955,6 @@ double EvaluateHuyghensWave<dim>::evaluate ()
 };
 
 
-// explicit instantiations
 template class EvaluationBase<2>;
 template class EvaluateEnergyContent<2>;
 template class EvaluateIntegratedValueAtOrigin<2>;
@@ -3243,9 +3023,6 @@ deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
   
   start_sweep (sweep_no);
 
-				   // attach the present sweep_info object
-				   // to all the time steps. also for
-				   // the sweep_data object
   for (vector<TimeStepBase*>::iterator timestep=timesteps.begin();
        timestep!=timesteps.end(); ++timestep)
     {
@@ -3290,7 +3067,6 @@ void TimestepManager<dim>::refine_grids ()
 
 const unsigned int n_timesteps = timesteps.size();
       
-				       // first collect all the error indicators
   vector<Vector<float> > indicators (n_timesteps);
       
   for (unsigned int i=0; i<n_timesteps; ++i)
@@ -3298,8 +3074,6 @@ const unsigned int n_timesteps = timesteps.size();
       ->get_timestep_postprocess().get_tria_refinement_criteria (indicators[i]);
 
 
-// count the number of cells for some
-				   // statistics and other things
   unsigned int total_number_of_cells = 0;
   for (unsigned int i=0; i<timesteps.size(); ++i)
     total_number_of_cells += indicators[i].size();
@@ -3327,10 +3101,6 @@ if (parameters.produce_error_statistics)
 if (parameters.compare_indicators_globally)
     {
 
-				       // collect all indicators in one
-				       // array; delete the old data as soon
-				       // as possible, i.e. right after
-				       // copying
       Vector<float> all_indicators (total_number_of_cells);
       unsigned int next_index=0;
       for (unsigned int i=0; i<timesteps.size(); ++i)
@@ -3346,16 +3116,6 @@ if (parameters.compare_indicators_globally)
       Assert (next_index==all_indicators.size(),
 	      ExcInternalError());
 
-				       /////////////////////////////////////
-				       // now find the thresholds for
-				       // refinement and coarsening
-				       //
-      				       // let #all_indicators# be the list
-				       // of indicators sorted in *descending*
-				       // order. #partial_sums# is the list
-				       // of partial sums of #all_indicator#'s
-				       // elements from the first to the present
-				       // one.
       const double total_error = all_indicators.l1_norm();
 
       Vector<float> partial_sums(all_indicators.size());
@@ -3404,7 +3164,6 @@ if (parameters.compare_indicators_globally)
     }
 
   else
-				     // refine each time step individually
     {
       deallog << "    Refining each time step separately." << endl;
       
@@ -3420,8 +3179,6 @@ if (parameters.compare_indicators_globally)
 	    
 	  this_timestep->wake_up (0);
 
-					   // copy criteria and delete the old
-					   // vector
 	  Assert (indicators.size() > 0, ExcInternalError());
 	  Vector<float> criteria (indicators[0]);
 	  indicators.erase (indicators.begin());
@@ -3430,8 +3187,6 @@ if (parameters.compare_indicators_globally)
 	  
 	  Vector<float> partial_sums(criteria.size());
 
-					   // sort the largest errors to the
-					   // beginning of the vector
 	  sort (criteria.begin(), criteria.end(), greater<double>());
 	  partial_sum (criteria.begin(), criteria.end(),
 		       partial_sums.begin());
@@ -3477,7 +3232,6 @@ deallog << "    Got " << total_number_of_cells << " presently, expecting "
 template <int dim>
 void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const 
 {
-				   // write statistics
   if (true)
     {
       deallog << "    Writing statistics for whole sweep.";
@@ -3506,7 +3260,6 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
     };
 
 
-// write summary
   if (true)
     {
       deallog << "    Writing summary.";
@@ -3539,7 +3292,6 @@ void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack
 };
 
 
-//explicit instantiation
 template class TimestepManager<2>;
   
 /* $Id$ */
@@ -3692,9 +3444,6 @@ class Coefficients {
       public:
 	inline virtual double value (const Point<dim> &p,
 				     const unsigned int) const {
-					   // always let the kink be
-					   // in direction of the last
-					   // variable
 	  return 1+8*(p(dim-1)>1./5. ? 1. : 0.);
 	};
 	
@@ -3761,8 +3510,6 @@ class PreliminaryEarthModel : public Function<dim> {
 	inline virtual double value (const Point<dim> &p,
 				     const unsigned int) const {
 	  const double r=sqrt(p.square());
-					   // this data just ad hoc, not taken
-					   // from the PREM
 	  return 10+2.5*(2-r/6371)*(2-r/6371)+20*(r<2000 ? 1 : 0);
 	};
 	
@@ -3777,9 +3524,6 @@ class PreliminaryEarthModel : public Function<dim> {
 
 	virtual Tensor<1,dim> gradient (const Point<dim> &p,
 					const unsigned int) const {
-					   // gradient is derivative with
-					   // respect to r times a unit vector
-					   // in direction of p
 	  Tensor<1,dim> tmp(p);
 	  const double r=sqrt(p.square());	  
 	  tmp *= 1./r * 2*(10-5*r/6371);
@@ -3818,8 +3562,6 @@ class Distorted : public Function<dim> {
 
 	virtual Tensor<1,dim> gradient (const Point<dim> &,
 					const unsigned int) const {
-					   // return zero, since we don't know
-					   // how to do better (regularize?)
 	  return Tensor<1,dim>();
 	};
 	
@@ -3842,7 +3584,6 @@ class BoundaryValues {
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
-//	  if ((get_time()<0.4) && (p(0)==0))
 	  if (p(0)==0)
 	    return sin(pi*get_time()/0.4)*sin(pi*get_time()/0.4);
 	  else
@@ -3855,7 +3596,6 @@ class BoundaryValues {
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
-//	  if ((get_time()<0.4) && (p(0)==0))
 	  if (p(0)==0)
 	    return 2*pi/0.4*sin(pi*get_time()/0.4)*cos(pi*get_time()/0.4);
 	  else
@@ -3920,13 +3660,8 @@ class WaveFromLeftBottom_u : public Function<dim> {
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  const double r  = sqrt(p.square());
-					   // let the radius of
-					   // the excited site be
-					   // 50 km
 	  const double a  = 5000000;
 
-					   // let the period be
-					   // 60 seconds
 	  const double period = 60;
 
 	  if ((get_time()>=period) || (r>=a))
@@ -3943,12 +3678,7 @@ class WaveFromLeftBottom_u : public Function<dim> {
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  const double r  = sqrt(p.square());
-					   // let the radius of
-					   // the excited site be
-					   // 50 km
 	  const double a  = 5000000;
-					   // let the period be
-					   // 60 seconds
 	  const double period = 60;
 
 	  if ((get_time()>=period) || (r>=a))
@@ -4047,8 +3777,6 @@ void WaveParameters<dim>::delete_parameters ()
     delete coarse_grid;
   coarse_grid = 0;
 
-  				   // free memory used by the evaluation
-				   // objects
   for (typename list<EvaluationBase<dim>*>::iterator i=eval_list.begin();
        i!=eval_list.end(); ++i)
     delete *i;
@@ -4296,14 +4024,11 @@ void WaveParameters<1>::make_coarse_grid (const string &name) {
 					   cells,
 					   SubCellData());
 
-					 // refine two of the three cells
 	Triangulation<dim>::active_cell_iterator cell = coarse_grid->begin_active();
 	(++cell)->set_refine_flag ();
 	(++cell)->set_refine_flag ();
 	coarse_grid->execute_coarsening_and_refinement ();
 
-					 // refine the level 1 cells 
-					 // twice more
 	for (int k=0; k<2; ++k)
 	  {
 	    for (cell=coarse_grid->begin_active(); cell!=coarse_grid->end(); ++cell)
@@ -4380,9 +4105,6 @@ void WaveParameters<2>::make_coarse_grid (const string &name) {
 	    for (unsigned int i=0; i<6; ++i)
 	      {
 		boundary_info.boundary_lines.push_back (CellData<1>());
-						 // use Neumann boundary
-						 // conditions at top
-						 // and bottom of channel
 		boundary_info.boundary_lines.back().material_id = 1;
 	      };
 	    
@@ -4402,8 +4124,6 @@ void WaveParameters<2>::make_coarse_grid (const string &name) {
 
 	if (boundary_conditions == wave_from_left_bottom)
 	  {
-					     // use Neumann bc at left
-					     // (mirror condition)
 	    boundary_info.boundary_lines.push_back (CellData<1>());
 	    boundary_info.boundary_lines.back().material_id = 1;
 	    boundary_info.boundary_lines[0].vertices[0] = 0;
@@ -4493,13 +4213,11 @@ case square:
 
       case earth:
       {
-					 // create ball
 	GridGenerator::hyper_ball (*coarse_grid, Point<dim>(), 6371);
 
 	if (boundary)
 	  delete boundary;
 	
-					 // set all boundary to Neumann type
 	Triangulation<dim>::active_face_iterator face;
 	for (face=coarse_grid->begin_active_face();
 	     face != coarse_grid->end_face();
@@ -4509,8 +4227,6 @@ case square:
 
 	const Point<dim> origin;
 	boundary = new HyperBallBoundary<dim>(origin, 6371);
-					 // set boundary. note that only
-					 // id 1 is used
 	coarse_grid->set_boundary (1, *boundary);
 
 	coarse_grid->refine_global (initial_refinement);
@@ -4601,13 +4317,11 @@ void WaveParameters<3>::make_coarse_grid (const string &name) {
 
       case earth:
       {
-					 // create ball
 	GridGenerator::hyper_ball (*coarse_grid, Point<dim>(), 6371);
 
 	if (boundary)
 	  delete boundary;
 	
-					 // set all boundary to Neumann type
 	Triangulation<dim>::active_face_iterator face;
 	for (face=coarse_grid->begin_active_face();
 	     face != coarse_grid->end_face();
@@ -4617,8 +4331,6 @@ void WaveParameters<3>::make_coarse_grid (const string &name) {
 
 	const Point<dim> origin;
 	boundary = new HyperBallBoundary<dim>(origin, 6371);
-					 // set boundary. note that only
-					 // id 1 is used
 	coarse_grid->set_boundary (1, *boundary);
 
 	coarse_grid->refine_global (initial_refinement);
@@ -4744,9 +4456,6 @@ prm.declare_entry ("Refinement criterion", "energy estimator",
 
 template <int dim>
 void WaveParameters<dim>::parse_parameters (ParameterHandler &prm) {
-				   // declare some maps for convenience,
-				   // to avoid those annoying if then else
-				   // clauses...
   map<string,BoundaryConditions> boundary_conditions_list;
   boundary_conditions_list["wave from left"]        = wave_from_left;
   boundary_conditions_list["fast wave from left"]   = fast_wave_from_left;
@@ -4768,10 +4477,6 @@ void WaveParameters<dim>::parse_parameters (ParameterHandler &prm) {
 
 prm.enter_subsection ("Grid");
   initial_refinement = prm.get_integer ("Initial refinement");
-				   // don't make the grid here already, since
-				   // it may depend on the chosen boundary
-				   // conditions (which need some boundary
-				   // flags to be set), etc.
 
   prm.enter_subsection ("Refinement");
   {
@@ -4861,15 +4566,12 @@ if (prm.get("Refinement criterion")=="energy estimator")
 
   number_of_sweeps = prm.get_integer ("Sweeps");
 
-				   // now that we know everything, we can make
-				   // the grid
   prm.enter_subsection ("Grid");
   make_coarse_grid (prm.get("Coarse mesh"));
   prm.leave_subsection ();
 };
 
 
-// explicit instantiations
 template class WaveParameters<2>;
 /* $Id$ */
 
@@ -4897,7 +4599,6 @@ SweepData<dim>::~SweepData ()
 };
 
 
-// explicit instantiations
 template class SweepData<2>;
 /* $Id$ */
 
@@ -4966,7 +4667,6 @@ SweepInfo::Data::Data () :
 {};
 
 
-// explicit instantiations
 template 
 void SweepInfo::write_summary (const list<EvaluationBase<2>*> &eval_list,
 			       ostream &out) const;
@@ -5116,12 +4816,8 @@ TimeStep_Wave<dim>::~TimeStep_Wave ()
 template <int dim>
 void TimeStep_Wave<dim>::wake_up (const unsigned int wakeup_level) 
 {
-				   // only do something if we are
-				   // right at the beginning of a
-				   // time level
   if (wakeup_level==0)
     {
-				       // first make the dof handler
       Assert (dof_handler==0, ExcInternalError());
 
       sweep_info->get_timers().grid_generation.start();
@@ -5147,13 +4843,6 @@ constraints.clear ();
 	  case primal_problem:
 	  case dual_problem:
 	  {
-					     // assert that this function only
-					     // wakes up data members in the right
-					     // branch of the multiple inheritance
-					     // lattice, i.e. the dual problem
-					     // branch may only be woken up if the
-					     // dual problem is solved and vica
-					     // versa
 	    Assert (((next_action == primal_problem) &&
 		     (static_cast<const TimeStep_Wave<dim>*>(&get_timestep_primal())
 		      == this))
@@ -5163,10 +4852,6 @@ constraints.clear ();
 		      == this)),
 		    ExcInternalError());
 	    
-					     // if we are to extrapolate the old
-					     // solutions, we overwrite the previous
-					     // content of the vectors anyway, so
-					     // we can use the fast initialization
 	    u.reinit (dof_handler->n_dofs(),
 		      parameters.extrapolate_old_solutions && (timestep_no!=0));
 	    v.reinit (dof_handler->n_dofs(),
@@ -5177,7 +4862,6 @@ constraints.clear ();
 	  case postprocess:
 	  {
 	    sweep_info->get_timers().postprocessing.start();
-					     // reload data vectors from disk
 	    ifstream tmp_in(tmp_filename_base(branch_signature()).c_str());
 	    u.block_read (tmp_in);
 	    v.block_read (tmp_in);
@@ -5228,9 +4912,6 @@ void TimeStep_Wave<dim>::sleep (const unsigned int sleep_level)
 
       case 0:
       {
-					 // these are the data we don't need
-					 // any more right after the time step
-					 // do this action for the derived classes
 	constraints.clear ();
 	system_sparsity.reinit (0,0,0);
 	mass_matrix.reinit (system_sparsity);
@@ -5261,12 +4942,10 @@ unsigned int TimeStep_Wave<dim>::solve (const UserMatrix       &matrix,
   PrimitiveVectorMemory<>  memory;
   SolverCG<>               pcg(control,memory);
 
-				   // solve
   pcg.template solve<UserMatrix> (matrix, solution, rhs,
 				  PreconditionUseMatrix<UserMatrix>
 				  (matrix,
 				   &UserMatrix::precondition));
-				   // distribute solution
   constraints.distribute (solution);
 
   return control.last_step();
@@ -5276,20 +4955,15 @@ unsigned int TimeStep_Wave<dim>::solve (const UserMatrix       &matrix,
 template <int dim>
 void TimeStep_Wave<dim>::create_matrices () 
 {        
-				   // reinitialize sparsity and vector size
   system_sparsity.reinit (dof_handler->n_dofs(), dof_handler->n_dofs(),
 			  dof_handler->max_couplings_between_dofs());
-				   // build sparsity pattern and condense
-				   // with hanging nodes
   DoFTools::make_sparsity_pattern (*dof_handler, system_sparsity);
   constraints.condense (system_sparsity);
   system_sparsity.compress ();
       
-				       // reinit matrices
   laplace_matrix.reinit (system_sparsity);
   mass_matrix.reinit (system_sparsity);
 
-				   // now actually assemble the matrices
   const unsigned int dofs_per_cell       = fe.dofs_per_cell,
 		     n_q_points       = quadrature.n_quadrature_points;
 
@@ -5299,8 +4973,6 @@ void TimeStep_Wave<dim>::create_matrices ()
   vector<double> density_values   (n_q_points, 1.);
   vector<double> stiffness_values (n_q_points, 1.);
 
-				   // if a coefficient is constant, get
-				   // its value
   if (density_constant)
     fill_n (density_values.begin(), n_q_points,
 	    parameters.density->value(Point<dim>()));
@@ -5317,8 +4989,6 @@ FEValues<dim>  fe_values (fe, quadrature,
 					 update_q_points :
 					 0)));
 
-				   // indices of all the dofs on this
-				   // cell
   vector<unsigned int>    dof_indices_on_cell (dofs_per_cell);
   FullMatrix<double> cell_mass_matrix (dofs_per_cell, dofs_per_cell);
   FullMatrix<double> cell_laplace_matrix (dofs_per_cell, dofs_per_cell);
@@ -5336,9 +5006,6 @@ for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_acti
       const vector<vector<Tensor<1,dim> > > &shape_grads  = fe_values.get_shape_grads ();
       const vector<double>                  &JxW_values   = fe_values.get_JxW_values ();
 
-				       // if necessary: get the values of any
-				       // of the coefficients at the quadrature
-				       // points
       if (!density_constant || !stiffness_constant)
 	{
 	  const vector<Point<dim> > &quadrature_points = fe_values.get_quadrature_points ();
@@ -5350,7 +5017,6 @@ for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_acti
 					      stiffness_values);
 	};
       
-				       // now do the loop
       for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -5365,7 +5031,6 @@ for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_acti
 					   stiffness_values[q_point]);
 	    };
 
-				       // now transfer to global matrices
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  {
@@ -5441,8 +5106,6 @@ TimeStep_Wave<dim>::transfer_old_solutions (const typename DoFHandler<dim>::cell
 {
   if (!old_cell->has_children() && !new_cell->has_children()) 
     {
-				       // none of the children are active, so
-				       // recurse into the triangulation
       for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
 	transfer_old_solutions (old_cell->child(c),
 				new_cell->child(c),
@@ -5450,10 +5113,7 @@ TimeStep_Wave<dim>::transfer_old_solutions (const typename DoFHandler<dim>::cell
 				old_u, old_v);
     }
   else
-				     // one of the cells is active
     {
-				       // get values from
-				       // old cell and set on the new one
       Vector<double> cell_data (fe.dofs_per_cell);
 
       old_cell->get_interpolated_dof_values (old_grid_u, cell_data);
@@ -5543,7 +5203,6 @@ void TimeStep_Wave<dim>::StatisticData::write (ostream &out) const
 };
 
 
-// explicit instantiations
 template class TimeStepBase_Wave<2>;
 template class TimeStep_Wave<2>;
 /* $Id$ */
@@ -5583,26 +5242,13 @@ void TimeStep_Dual<dim>::do_initial_step () {
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs";
   
-				   // add up sweep-accumulated data. count
-				   // u and v as separate dofs
-				   //
-				   // do not add up cells, since this is already
-				   // done in the primal problem
   sweep_info->get_data().dual_dofs += dof_handler->n_dofs() * 2;
 
   Vector<double> tmp_u_bar, tmp_v_bar;
 
-				   // get evaluation of dual functional
-				   // at end time
   parameters.dual_functional->reset (*this);
   parameters.dual_functional->
     compute_endtime_vectors (tmp_u_bar, tmp_v_bar);
-				   // compute final values for the dual
-				   // problem by projection, i.e. by
-				   // inversion of the mass matrix; don't
-				   // do so if the solution will be zero
-				   // (inversion would not take long, but
-				   // assembling the matrices is expensive)
   u.reinit (tmp_u_bar.size());
   v.reinit (tmp_v_bar.size());
   if ((tmp_u_bar.linfty_norm() > 0) || (tmp_v_bar.linfty_norm() > 0))
@@ -5640,25 +5286,13 @@ void TimeStep_Dual<dim>::do_timestep ()
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs";
 
-				   // add up sweep-accumulated data. count
-				   // u and v as separate dofs
-				   //
-				   // do not add up cells, since this is already
-				   // done in the primal problem
   sweep_info->get_data().dual_dofs += dof_handler->n_dofs() * 2;
 
   const double time_step = get_forward_timestep ();
 
- 				   // Vectors holding the right hand sides of
- 				   // the two equations.
   Vector<double> right_hand_side1 (dof_handler->n_dofs());
   Vector<double> right_hand_side2 (dof_handler->n_dofs());
   
-				   // Vector holding a the values for
-				   // u and v of the previous time step.
-				   // these are used in case we want to
-				   // use extrapolation from the previous
-				   // time step to the present one
   Vector<double> old_u, old_v;
   if (parameters.extrapolate_old_solutions)
     {
@@ -5679,26 +5313,12 @@ void TimeStep_Dual<dim>::do_timestep ()
   constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
 	
   if (parameters.extrapolate_old_solutions)
-				     // solve with a hopefully good guess
-				     // as start vector
     {
       v  = old_v;
       v.add (time_step, old_u);
     };
-				   // in the other case, the wake_up
-				   // function of the base class has set
-				   // the solution vector's values to
-				   // zero already.
 
 
-// in 1d, do not set boundary conditions
-				   // at all
-				   //
-				   // note: in boundary_value_map, all entries
-				   // for dirichlet boundary nodes are set to
-				   // zero. we re-use them later, and because
-				   // zero is such a universal constant, we
-				   // don't even need to recompute the values!
   map<unsigned int,double> boundary_value_list;
   if (dim != 1)
     {
@@ -5722,26 +5342,12 @@ void TimeStep_Dual<dim>::do_timestep ()
       right_hand_side2.add (-parameters.theta*time_step, tmp);
     };
   constraints.condense (right_hand_side2);
-				   ///////////////////////////
-				   // This is not ok here, for two reasons:
-				   // 1. it assumes that for v the same
-				   //    bc hold as for u; build the list
-				   //    of bc for v separately, this way
-				   //    it only holds for u=v=0
-				   // 2. v has no boundary conditions at
-				   //    all!
-				   ///////////////////////////
   if (dim != 1)
-				     // note: the values in boundary_value_map
-				     // are already set for the first component
-				     // and have not been touched since.
     MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					     system_matrix, u,
 					     right_hand_side2);
   
   if (parameters.extrapolate_old_solutions)
-				     // solve with a hopefully good guess
-				     // as start vector
     {
       u  = v;
       u -= old_v;
@@ -5799,15 +5405,10 @@ void TimeStep_Dual<dim>::wake_up (const unsigned int wakeup_level)
 template <int dim>
 void TimeStep_Dual<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 					   Vector<double> &right_hand_side2) {
-				   // don't do some things for the initial
-				   // step since we don't need them there
   Assert (next_timestep != 0, ExcInternalError());
   
-				   // construct right hand side
   build_rhs (right_hand_side1, right_hand_side2);
 
-				   // compute contributions of error
-				   // functional to right hand sides
   Vector<double> dual1, dual2;
   parameters.dual_functional->reset (*this);
   parameters.dual_functional->compute_functionals (dual1, dual2);
@@ -5818,7 +5419,6 @@ void TimeStep_Dual<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 
   right_hand_side2.add (timestep, dual1);
 
-				   // condense right hand side in-place
   constraints.condense (right_hand_side1);
 };
 
@@ -5826,21 +5426,14 @@ void TimeStep_Dual<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 template <int dim>
 void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
 				    Vector<double> &right_hand_side2) {
-				   // select the TimeStep_Wave part in the
-				   // TimeStep_Primal branch
   const TimeStep_Dual<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
 
   Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
 	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
-				   // convenience typedef
   typedef DoFHandler<dim>::cell_iterator cell_iterator;
 
-				   // create this here and pass it to
-				   // the cellwise function since it
-				   // is expensive to create it for
-				   // every cell
   FEValues<dim> fe_values (fe, quadrature,
 			   UpdateFlags(update_values |
 				       update_gradients |
@@ -5867,11 +5460,8 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 			       FEValues<dim>        &fe_values,
 			       Vector<double>       &right_hand_side1,
 			       Vector<double>       &right_hand_side2) {
-				   // declare this type for convenience
   typedef DoFHandler<dim>::cell_iterator cell_iterator;
 
-				   // both cells have children, so
-				   // recurse into the tree
   if (old_cell->has_children() && new_cell->has_children()) 
     {
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -5884,16 +5474,12 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
     };
 
 
-// select the TimeStep_Wave part in the
-				   // TimeStep_Dual branch
   const TimeStep_Dual<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const double time_step = get_forward_timestep();
 
-				   // both cells are on the same refinement
-				   // level
   if (!old_cell->has_children() && !new_cell->has_children()) 
     {
       fe_values.reinit (old_cell);
@@ -5915,39 +5501,20 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 				density_values[point];
 
       Vector<double> tmp (dofs_per_cell);
-				       // this is the right hand side of the
-				       // first equation
-				       // for the theta scheme:
-				       //    rhs1 := Mv^1 + kMu^1
-				       //           -(1-theta)theta k^2 Av^1
       Vector<double> rhs1 (dofs_per_cell);
 
-				       // this is the part of the right hand side
-				       // of the second equation which depends
-				       // on the solutions of the previous time
-				       // step.
-				       // for the theta scheme:
-				       //    rhs2 := Mu^1-(1-theta)kAv^1
       Vector<double> rhs2 (dofs_per_cell);
 	    
-      				       // vector of values of the function on the
-				       // old grid restricted to one cell
       Vector<double> old_dof_values_v (dofs_per_cell);
-				       // vector of old u and v times the local
-				       // mass matrix
       Vector<double> local_M_u (dofs_per_cell);
       Vector<double> local_M_v (dofs_per_cell);
       Vector<double> local_A_v (dofs_per_cell);      
-				       // transfer v+k*u. Note that we need
-				       // old_dof_values_u again below
       old_cell->get_dof_values (previous_time_level.v, old_dof_values_v);
       cell_matrix.vmult (local_M_v, old_dof_values_v);
       
       old_cell->get_dof_values (previous_time_level.u, tmp);
       cell_matrix.vmult (local_M_u, tmp);
 
-				       // now for the part with the laplace
-				       // matrix
       cell_matrix.clear ();
       vector<double> stiffness_values(fe_values.n_quadrature_points);
       parameters.stiffness->value_list (fe_values.get_quadrature_points(),
@@ -5972,8 +5539,6 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 		time_step,
 		local_A_v);
 
-				       // transfer into the global
-				       // right hand side
       vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -5985,30 +5550,13 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       return;
     };
 
-				   // only old cell is refined
   if (old_cell->has_children() && !new_cell->has_children())
     {
-				       // this is the right hand side of the
-				       // first equation
-				       // for the theta scheme:
-				       //    rhs1 := Mv^0 + kMu^1
-				       //           -(1-theta)theta k^2 Av^1
       Vector<double> rhs1 (dofs_per_cell);
-				       // this is the part of the right hand side
-				       // of the second equation which depends
-				       // on the solutions of the previous time
-				       // step.
-				       // for the theta scheme:
-				       //    rhs2 := Mu^1-(1-theta)kAv^1
       Vector<double> rhs2 (dofs_per_cell);
 
-				       // collect the contributions of the
-				       // child cells (and possibly their
-				       // children as well)
       collect_from_children (old_cell, fe_values, rhs1, rhs2);
       
-				       // transfer into the global
-				       // right hand side
       vector<unsigned int> new_dof_indices (dofs_per_cell);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -6020,20 +5568,13 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       return;
     };
 
-  				   // only new cell is refined
   if (!old_cell->has_children() && new_cell->has_children())
     {
-				       // vector of values of the function
-				       // on the old grid restricted to
-				       // the large (old) cell
       Vector<double>  old_dof_values_u (dofs_per_cell);
       Vector<double>  old_dof_values_v (dofs_per_cell);
       old_cell->get_dof_values (previous_time_level.u, old_dof_values_u);
       old_cell->get_dof_values (previous_time_level.v, old_dof_values_v);
 
-				       // distribute the contribution of the
-				       // large old cell to the children on
-				       // the new cell
       distribute_to_children (new_cell, fe_values,
 			      old_dof_values_u, old_dof_values_v,
  			      right_hand_side1, right_hand_side2);
@@ -6051,14 +5592,8 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 					   FEValues<dim>  &fe_values,
 					   Vector<double> &rhs1,
 					   Vector<double> &rhs2) const {
-				   // maximal difference of levels between the
-				   // cell to which we write and the cells from
-				   // which we read. Default is one, but this is
-				   // increased with each level of recursion
   unsigned int level_difference = 1;  
   
-				   // select the TimeStep_Wave part in the
-				   // TimeStep_Primal branch
   const TimeStep_Dual<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
 
@@ -6067,30 +5602,14 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
-				       // these will hold the values of the
-				       // solution on the old grid, i.e. on
-				       // the small cells
   Vector<double>  local_old_dof_values_u (dofs_per_cell);
   Vector<double>  local_old_dof_values_v (dofs_per_cell);
 
-				       // same for the contributions to the
-				       // right hand sides of the projection
   Vector<double>  local_M_u (dofs_per_cell);
   Vector<double>  local_M_v (dofs_per_cell);
   Vector<double>  local_A_v (dofs_per_cell);
       
-				   // this is the right hand side of the
-				   // first equation
-				   // for the theta scheme:
-				   //    rhs1 := Mv^0 + kMu^1
-				   //           -(1-theta)theta k^2 Av^1
   Vector<double> child_rhs1 (dofs_per_cell);
-				   // this is the part of the right hand side
-				   // of the second equation which depends
-				   // on the solutions of the previous time
-				   // step.
-				   // for the theta scheme:
-				   //    rhs2 := Mu^1-(1-theta)kAv^1
   Vector<double> child_rhs2 (dofs_per_cell);
       
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
@@ -6100,9 +5619,6 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
       child_rhs1.clear ();
       child_rhs2.clear ();
       
-				       // if this child is further subdivided:
-				       // collect the contributions of the
-				       // children
       if (old_child->has_children())
 	{
 	  const unsigned int l = collect_from_children (old_child, fe_values,
@@ -6116,12 +5632,9 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
 	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
 
-					   // get solutions restricted to small
-					   // cell
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
 
-					   // compute M*(v+ku) on the small cell
 	  cell_matrix.clear ();
 	  vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
@@ -6137,8 +5650,6 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
-					   // now for the part with the laplace
-					   // matrix
 	  cell_matrix.clear ();
 	  vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
@@ -6164,9 +5675,6 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 			  local_A_v);
 	};
       
-				       // transfer the contribution of this
-				       // child cell to its parent cell
-				       // (#true# means: add up)
       fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
       fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
     };
@@ -6183,64 +5691,36 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 					    const Vector<double>  &old_dof_values_v,
 					    Vector<double>        &right_hand_side1,
 					    Vector<double>        &right_hand_side2) {
-				   // maximal difference of levels between the
-				   // cell to which we write and the cells from
-				   // which we read. Default is one, but this is
-				   // increased with each level of recursion
   unsigned int level_difference = 1;  
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const double time_step = get_forward_timestep();
 
   FullMatrix<double>    cell_matrix(dofs_per_cell, dofs_per_cell);
-				   // set up a vector which will hold the
-				   // restriction of the old
-				   // functions (u,v) to a childcell
   Vector<double> local_old_dof_values_u (dofs_per_cell);
   Vector<double> local_old_dof_values_v (dofs_per_cell);
 
-				   // vector of old u and v times the local
-				   // mass matrix (on the small cells
-				   // respectively)
   Vector<double> local_M_u (dofs_per_cell);
   Vector<double> local_M_v (dofs_per_cell);
   Vector<double> local_A_v (dofs_per_cell);
 
-				   // this is the right hand side of the
-				   // first equation
-				   // for the theta scheme:
-				   //    rhs1 := Mv^1 + kMu^1
-				   //           -(1-theta)theta k^2 Av^1
   Vector<double> rhs1 (dofs_per_cell);
 
-				   // this is the part of the right hand side
-				   // of the second equation which depends
-				   // on the solutions of the previous time
-				   // step.
-				   // for the theta scheme:
-				   //    rhs2 := Mu^1-(1-theta)kAv^1
   Vector<double> rhs2 (dofs_per_cell);
 	    
-				   // indices of the dofs of a cell on
-				   // the new grid
   vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
 
-// loop over the child cells
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
       const DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
-				       // get u and v on the childcells
       fe.prolongate(c).vmult (local_old_dof_values_u,
 				   old_dof_values_u);
       fe.prolongate(c).vmult (local_old_dof_values_v,
 				   old_dof_values_v);
 
       if (new_child->has_children())
-					 // cell on new grid is further refined
-					 // distribute data on this local cell
-					 // to its children
 	{
 	  const unsigned int l = distribute_to_children (new_child, fe_values,
 							 local_old_dof_values_u,
@@ -6250,15 +5730,12 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 	  level_difference = max (l+1, level_difference);
 	}
       else
-					 // child is not further refined
-					 // -> directly distribute data
 	{
 	  fe_values.reinit (new_child);
 	  const FullMatrix<double>             &values    = fe_values.get_shape_values();
 	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
 	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
 
-					   // transfer v+ku
 	  cell_matrix.clear ();
 	  vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
@@ -6274,8 +5751,6 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
-					   // now for the part with the laplace
-					   // matrix
 	  cell_matrix.clear ();
 	  vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
@@ -6300,8 +5775,6 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 		    time_step,
 		    local_A_v);
 	  
-					   // transfer into the global
-					   // right hand side
 	  new_child->get_dof_indices (new_dof_indices);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
@@ -6315,7 +5788,6 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 };
 
 
-// explicit instantiations
 template class TimeStep_Dual<2>;
 /* $Id$ */
 
@@ -6357,9 +5829,6 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 
   else
     {
-				       // can't estimate error
-				       // this way for the initial
-				       // time level
       if (timestep_no != 0)
 	estimate_error_dual ();
     };
@@ -6449,11 +5918,6 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 				      vector<bool>(),
 				      parameters.stiffness);
 
-				   // if we are at the first time step, we
-				   // try to adapt the mesh to the variable
-				   // v also, since in some cases only v.neq.0
-				   // and then the error indicator results in
-				   // zero on all cells
   if (((previous_timestep == 0) && (which_variables==0)) ||
       ((next_timestep     == 0) && (which_variables==1)  ))
     {
@@ -6484,8 +5948,6 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 						 (previous_timestep)->get_timestep_dual();
 
 
-// first clear the user pointers of
-				   // the cells we need
   if (true)
     {
       DoFHandler<dim>::active_cell_iterator
@@ -6496,12 +5958,8 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 	cell->clear_user_pointer();
     };
   
-				   // set up some matrices used by the
-				   // functions called in the sequel
   make_interpolation_matrices ();
 
-				   // then go recursively through the two
-				   // grids and collect the data
   if (true)
     {
       FEValues<dim> fe_values (dual_problem.fe,
@@ -6512,28 +5970,14 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 					   update_JxW_values |
 					   update_q_points));
 
-				       // get dof iterators for the primal
-				       // and dual dof handlers for the
-				       // present and the last time level.
-				       // since the coarse grids are the
-				       // same and since we only loop
-				       // over coarse grid cells here,
-				       // the cells over which we loop
-				       // match each other
       DoFHandler<dim>::cell_iterator
 	primal_cell     = primal_problem.dof_handler->begin(),
 	dual_cell       = dual_problem.dof_handler->begin(),
 	primal_cell_old = primal_problem_old.dof_handler->begin(),
 	dual_cell_old   = dual_problem_old.dof_handler->begin();
-				       // get last cell to loop over. note that
-				       // we only loop over the coarsest mesh
-				       // in this function
       const DoFHandler<dim>::cell_iterator
 	endc            = primal_problem.dof_handler->end(0);
 
-				       // loop over all corse grid cells, since
-				       // they are the same on the two time
-				       // levels
       for (; primal_cell!=endc; (++primal_cell, ++dual_cell,
 				 ++primal_cell_old, ++dual_cell_old))
 	estimate_error_dual (primal_cell, dual_cell,
@@ -6545,13 +5989,9 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 	      ::ExcInternalError());
     };
 
-				   // compute the sum of the errors
-				   // on the cells
   ErrorOnCell total_estimated_error;
 
 
-// now fill the data we collected to the
-				   // error_per_cell array
   Vector<float>::iterator i = estimated_error_per_cell.begin();
   DoFHandler<dim>::active_cell_iterator
     cell = primal_problem.dof_handler->begin_active();
@@ -6580,8 +6020,6 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
 						    CellwiseError  &cellwise_error,
 						    FEValues<dim>  &fe_values) const {
   
-				   // if both of the two cells have children:
-				   // recurse into the grid
   if (primal_cell->has_children() && primal_cell_old->has_children())
     {
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -6609,26 +6047,16 @@ const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
 			    dofs_per_cell_dual   = dual_fe.dofs_per_cell;  
 
 
-// none of the two cells has children
   if (!primal_cell->has_children() && !primal_cell_old->has_children())
     {
-				       // vector holding the solutions on
-				       // this time level. u and v will
-				       // hold the solution interpolated
-				       // up to the ansatz degree of the
-				       // dual problem.
       Vector<double> local_u(dofs_per_cell_dual), local_v(dofs_per_cell_dual);
       Vector<double> local_u_bar(dofs_per_cell_dual), local_v_bar(dofs_per_cell_dual);
 
-				       // same thing for old solutions
       Vector<double> local_u_old(dofs_per_cell_dual), local_v_old(dofs_per_cell_dual);
       Vector<double> local_u_bar_old(dofs_per_cell_dual), local_v_bar_old(dofs_per_cell_dual);
 
-				       // vectors to hold dof values on
-				       // the primal/dual cell (temporary)
       Vector<double> primal_tmp(dofs_per_cell_primal);
       
-				       // fill local solution vectors
       primal_cell->get_dof_values (primal_problem.u, primal_tmp);
       embedding_matrix.vmult (local_u, primal_tmp);
 
@@ -6639,9 +6067,6 @@ const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
       dual_cell->get_dof_values (dual_problem.v, local_v_bar);
 
 
-// fill local old solution vectors.
-				       // no problems here, since the two
-				       // cells are both unrefined
       primal_cell_old->get_dof_values (primal_problem_old.u, primal_tmp);
       embedding_matrix.vmult (local_u_old, primal_tmp);
 
@@ -6651,7 +6076,6 @@ const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
       dual_cell_old->get_dof_values (dual_problem_old.u, local_u_bar_old);
       dual_cell_old->get_dof_values (dual_problem_old.v, local_v_bar_old);
 
-				       // store the error on this cell
       primal_cell->set_user_pointer (cellwise_error.next_free_slot);
       *cellwise_error.next_free_slot = error_formula (dual_cell,
 						      local_u,     local_v,
@@ -6665,22 +6089,13 @@ const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
     };
 
 
-// only new cell has children. handle this
-				   // case by prolonging the solutions on the
-				   // old cell to its children and recursing
-				   // thereon
   if (!primal_cell_old->has_children() && primal_cell->has_children())
     {
       Vector<double> local_u_old(dofs_per_cell_dual), local_v_old(dofs_per_cell_dual);
       Vector<double> local_u_bar_old(dofs_per_cell_dual), local_v_bar_old(dofs_per_cell_dual);
 
-				       // vectors to hold dof values on
-				       // the primal/dual cell (temporary)
       Vector<double> primal_tmp(dofs_per_cell_primal);
       
-				       // fill local old solution vectors.
-				       // no problems here, since the two
-				       // cells are both unrefined
       primal_cell_old->get_dof_values (primal_problem_old.u, primal_tmp);
       embedding_matrix.vmult (local_u_old, primal_tmp);
   
@@ -6703,73 +6118,30 @@ compute_error_on_new_children (primal_cell, dual_cell,
     };
 
 
-// last possibility: new cell is not
-				   // refined, but old one is. in this case:
-				   // collect error on this cell from the
-				   // smaller ones on the old grid
-				   //
-				   // note that we have to perform the
-				   // interpolation of the dual solution
-				   // on the large cell of the new grid
-				   // and have to pass the interpolant
-				   // down to the children (which are
-				   // taken from the old grid)
   if (primal_cell_old->has_children() && !primal_cell->has_children())
     {
-				       // vector holding the solutions on
-				       // this time level. u and v will
-				       // hold the solution interpolated
-				       // up to the ansatz degree of the
-				       // dual problem.
       Vector<double> local_u(dofs_per_cell_dual), local_v(dofs_per_cell_dual);
       Vector<double> local_u_bar(dofs_per_cell_dual), local_v_bar(dofs_per_cell_dual);
       Vector<double> local_u_bar_old(dofs_per_cell_dual), local_v_bar_old(dofs_per_cell_dual);
       Vector<double> local_Ih_u_bar(dofs_per_cell_dual), local_Ih_v_bar(dofs_per_cell_dual);
       Vector<double> local_Ih_u_bar_old(dofs_per_cell_dual), local_Ih_v_bar_old(dofs_per_cell_dual);
       
-				       // vectors to hold dof values on
-				       // the primal/dual cell (temporary)
       Vector<double> primal_tmp(embedding_matrix.n());
       
-				       // fill local solution vectors
       primal_cell->get_dof_values (primal_problem.u, primal_tmp);
       embedding_matrix.vmult (local_u, primal_tmp);
       
       primal_cell->get_dof_values (primal_problem.v, primal_tmp);
       embedding_matrix.vmult (local_v, primal_tmp);
 
-				       // get the dual solution on the new
-				       // time level to allow its interpolation
       dual_cell->get_dof_values (dual_problem.u, local_u_bar);
       dual_cell->get_dof_values (dual_problem.v, local_v_bar);
 
-				       // now we have to get the interpolant
-				       // of the dual solution on the old
-				       // time level. Originally I wanted
-				       // to do the following
-				       //      dual_cell_old->get_dof_values
-				       //	(previous_time_level->u_bar,
-				       //	 local_u_bar_old
-				       //	);
-				       //      dual_cell_old->get_dof_values
-				       //	(previous_time_level->v_bar,
-				       //	 local_v_bar_old
-				       //	);
-				       //
-				       // However, this must fail since
-				       // dual_cell_old has children and
-				       // we can't access data values on
-				       // nonterminal cells...
-				       //
-				       // therefore, we use a new function
-				       // which does exactly this interpolation
       dual_cell_old->get_interpolated_dof_values (dual_problem_old.u,
 						  local_u_bar_old);
       dual_cell_old->get_interpolated_dof_values (dual_problem_old.v,
 						  local_v_bar_old);
 
-				       // compute the interpolant of w_bar and
-				       // w_bar_old on the large cell
       interpolation_matrix.vmult (local_Ih_u_bar, local_u_bar);
       interpolation_matrix.vmult (local_Ih_v_bar, local_v_bar);
       interpolation_matrix.vmult (local_Ih_u_bar_old, local_u_bar_old);
@@ -6813,9 +6185,6 @@ compute_error_on_new_children (const DoFHandler<dim>::cell_iterator &primal_cell
 
 for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
-      				       // we have the solutions on the
-				       // old (large) cell, we restrict it to
-				       // each of the small cells
       Vector<double> child_u_old(dofs_per_cell_dual), child_v_old(dofs_per_cell_dual);
       Vector<double> child_u_bar_old(dofs_per_cell_dual), child_v_bar_old(dofs_per_cell_dual);
 
@@ -6829,9 +6198,6 @@ for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
 	new_dual_child   = dual_cell->child(child);
 
       if (new_primal_child->has_children())
-					 // cell on new grid is further refined
-					 // distribute data on this local cell
-					 // to its children
 	compute_error_on_new_children (new_primal_child, new_dual_child,
 				       child_u_old,
 				       child_v_old,
@@ -6840,24 +6206,12 @@ for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
 				       cellwise_error,
 				       fe_values);
       else
-					 // we have reached the final level
-					 // -> gather the information from
-					 // the new cell and compute the
-					 // error
 	{
-					   // vector holding the solutions on
-					   // this time level. u and v will
-					   // hold the solution interpolated
-					   // up to the ansatz degree of the
-					   // dual problem.
 	  Vector<double> local_u(dofs_per_cell_dual), local_v(dofs_per_cell_dual);
 	  Vector<double> local_u_bar(dofs_per_cell_dual), local_v_bar(dofs_per_cell_dual);
 	  
-					   // vectors to hold dof values on
-					   // the primal/dual cell (temporary)
 	  Vector<double> primal_tmp(embedding_matrix.n());
 	  
-					   // fill local solution vectors
 	  new_primal_child->get_dof_values (primal_problem.u, primal_tmp);
 	  embedding_matrix.vmult (local_u, primal_tmp);
 	  
@@ -6906,9 +6260,6 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const DoFHandler<dim
   
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
-      				       // we have the solutions on the
-				       // new (large) cell, we restrict it to
-				       // each of the small cells
       Vector<double> child_u(dofs_per_cell_dual), child_v(dofs_per_cell_dual);
       Vector<double> child_u_bar(dofs_per_cell_dual), child_v_bar(dofs_per_cell_dual);
       Vector<double> child_Ih_u_bar(dofs_per_cell_dual), child_Ih_v_bar(dofs_per_cell_dual);
@@ -6928,8 +6279,6 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const DoFHandler<dim
 	old_dual_child   = dual_cell_old->child(child);
 
       if (old_primal_child->has_children())
-					 // the old cell was further
-					 // refined -> recurse into the tree
 	error_sum += collect_error_from_children (old_primal_child,
 						  old_dual_child,
 						  child_u,            child_v,
@@ -6938,19 +6287,12 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const DoFHandler<dim
 						  child_Ih_u_bar_old, child_Ih_v_bar_old,
 						  fe_values);
       else
-					 // the old cell was not further
-					 // refined -> go on here directly
 	{
 	  Vector<double> local_u_old(dofs_per_cell_dual), local_v_old(dofs_per_cell_dual);
 	  Vector<double> local_u_bar_old(dofs_per_cell_dual), local_v_bar_old(dofs_per_cell_dual);
 
-					   // vectors to hold dof values on
-					   // the primal/dual cell (temporary)
 	  Vector<double> primal_tmp(embedding_matrix.n());
       
-				       // fill local old solution vectors.
-				       // no problems here, since the two
-				       // cells are both unrefined
 	  old_primal_child->get_dof_values (primal_problem_old.u, primal_tmp);
 	  embedding_matrix.vmult (local_u_old, primal_tmp);
   
@@ -7038,15 +6380,10 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 					      const Vector<double>  &local_difference_v_bar_old,
 					      FEValues<dim>         &fe_values) const {
 
-				   // this will be used to sum up the
-				   // different parts of the error
-				   // identity on this cell
   ErrorOnCell error_on_cell;
 
   const unsigned int dofs_per_cell = get_timestep_dual().fe.dofs_per_cell;
   
-				   // two temporaries needed for the
-				   // calculation of the scalar products
   Vector<double> tmp1(dofs_per_cell);
   Vector<double> tmp2(dofs_per_cell);
 
@@ -7058,15 +6395,9 @@ vector<double> stiffness(fe_values.n_quadrature_points);
   parameters.stiffness->gradient_list (fe_values.get_quadrature_points(),
 				       grad_stiffness);
 
-				   // matrix for (phi_i, phi_j)
   FullMatrix<double> mass_matrix (tmp1.size(), tmp1.size());
-				   // matrix for (a\Delta phi_i, phi_j)
-//  FullMatrix<double> delta_matrix (tmp1.size(), tmp1.size());
-				   // matrix for (grad a . grad phi_i, phi_j)
-//  FullMatrix<double> grad_grad_matrix (tmp1.size(), tmp1.size());
   FullMatrix<double> laplace_matrix (tmp1.size(), tmp1.size());
   
-				   // first task: create matrices
   fe_values.reinit (cell);
   const FullMatrix<double>             &values    = fe_values.get_shape_values();
   const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
@@ -7086,22 +6417,11 @@ vector<double> stiffness(fe_values.n_quadrature_points);
 			      weights[point] *
 			      density_values[point];
 
-					   // compute laplacian of phi_i
-					   // by summing the trace of the
-					   // tensor of second derivatives
 	  double laplace_phi_i = 0;
 	  for (unsigned int t=0; t<dim; ++t)
 	    laplace_phi_i += second_derivatives[i][point][t][t];
 	  
-// 	  delta_matrix(i,j) += stiffness[point] *
-// 			       laplace_phi_i *
-// 			       values(j,point) *
-// 			       weights[point];
 
-// 	  grad_grad_matrix(i,j) += (grad_stiffness[point] *
-// 				    gradients[i][point]) *
-// 				   values(j,point) *
-// 				   weights[point];
 
 	  laplace_matrix(i,j) += (gradients[i][point] *
 				  gradients[j][point]) *
@@ -7110,35 +6430,18 @@ vector<double> stiffness(fe_values.n_quadrature_points);
 	};
 
 
-// ////////////////////////////////////
-				   // Compute the different contributions
-				   // separately. Note that the parts
-				   // 1 and 2a+2b together should give
-				   // a small quantity, since they form
-				   // the first domain residual, which is
-				   // small for elements of odd order.
 
 
-// ////////////////////////////////////
-				   // PART 1
-				   //
-				   // let #tmp_dual2# hold the contribution
-				   // 1/2 (1-I)(u_bar^n + u_bar^(n-1))
-				   // with I the interpolation operator
   tmp2  = local_difference_u_bar;
   tmp2 += local_difference_u_bar_old;
   tmp2.scale (1./2.);
   
-				   // let #tmp_dual1# hold
-				   // u^n - u^(n-1)
   tmp1  = local_u;
   tmp1 -= local_u_old;
   
   error_on_cell.part[0] = mass_matrix.matrix_scalar_product (tmp1, tmp2);
 
 
-// same thing for the second part
-				   // with v instead of u
   tmp2  = local_difference_v_bar;
   tmp2 += local_difference_v_bar_old;
   tmp2.scale (1./2.);
@@ -7149,11 +6452,6 @@ vector<double> stiffness(fe_values.n_quadrature_points);
   error_on_cell.part[1] = mass_matrix.matrix_scalar_product (tmp1, tmp2);
 
 
-// ////////////////////////////////
-				   // PART 2a
-				   //
-				   // let tmp2=(1-I)(u_bar^n+u_bar^(n-1))
-				   // let tmp1 = v^n+v^(n-1)
   tmp2  = local_difference_u_bar;
   tmp2 += local_difference_u_bar_old;
 
@@ -7164,11 +6462,6 @@ vector<double> stiffness(fe_values.n_quadrature_points);
 			    mass_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
-// ////////////////////////////////
-				   // PART 2b
-				   //
-				   // let tmp1 = v^n-v^(n-1)
-				   // let tmp2=u_bar^n - u_bar^(n-1)
   tmp1  = local_v;
   tmp1 -= local_v_old;
 
@@ -7179,11 +6472,6 @@ vector<double> stiffness(fe_values.n_quadrature_points);
 			    mass_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
-// ////////////////////////////////
-				   // PART 3a
-				   //
-				   // let tmp2=(1-I)(v_bar^n+v_bar^(n-1))
-				   // let tmp1 = u^n+u^(n-1)
   tmp2  = local_difference_v_bar;
   tmp2 += local_difference_v_bar_old;
 
@@ -7194,11 +6482,6 @@ vector<double> stiffness(fe_values.n_quadrature_points);
 			   laplace_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
-// ////////////////////////////////
-				   // PART 3b
-				   //
-				   // let tmp1 = u^n-u^(n-1)
-				   // let tmp2 = (v_bar^n - v_bar^(n-1))
   tmp1  = local_u;
   tmp1 -= local_u_old;
 
@@ -7209,93 +6492,29 @@ vector<double> stiffness(fe_values.n_quadrature_points);
 			   laplace_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
-// 				   // ///////////////////////////
-// 				   // PART 0:
-// 				   // tmp1 = u^n-u^(n-1)
-// 				   // tmp2 = 1/2 (1-I) (u_bar^n + u_bar^(n-1)
-//   tmp1  = local_u;
-//   tmp1 -= local_u_old;
-
-//   tmp2  = local_difference_u_bar;
-//   tmp2 += local_difference_u_bar_old;
-//   tmp2.scale (1./2.);
-
-//   error_on_cell.part[0] = -1. * mass_matrix.matrix_scalar_product (tmp1, tmp2);
-
-// 				   // ////////////////////////////
-// 				   // PART 1:
-// 				   // same as above, but with u and
-// 				   // v interchanged
-//   tmp1  = local_v;
-//   tmp1 -= local_v_old;
-
-//   tmp2  = local_difference_v_bar;
-//   tmp2 += local_difference_v_bar_old;
-//   tmp2.scale (1./2.);
-
-//   error_on_cell.part[1] = -1. * mass_matrix.matrix_scalar_product (tmp1, tmp2);
 
 
-// 				   // /////////////////////////////
-// 				   // PART 2:
-// 				   // tmp1 = v^n+v^(n-1)
-// 				   // tmp2 = (1-I) (u_bar^n + u_bar^(n-1))
-//   tmp1  = local_v;
-//   tmp1 += local_v_old;
-
-//   tmp2  = local_difference_u_bar;
-//   tmp2 += local_difference_u_bar_old;
-
-//   error_on_cell.part[2]  = mass_matrix.matrix_scalar_product (tmp1, tmp2);
-//   error_on_cell.part[2] *= get_backward_timestep() / 4;
-
-// 				   // //////////////////////////////
-// 				   // PART 3:
-// 				   // tmp1 = v^n-v^(n-1)
-// 				   // tmp2 = u_bar^n - u_bar^(n-1)
-//   tmp1  = local_v;
-//   tmp1 -= local_v_old;
-
-//   tmp2  = local_u_bar;
-//   tmp2 -= local_u_bar_old;
 
 
-//   error_on_cell.part[3]  = mass_matrix.matrix_scalar_product (tmp1, tmp2);
-//   error_on_cell.part[3] *= get_backward_timestep() / 12;
 
 
-// 				   // /////////////////////////////
-// 				   // PART 4 and 6:
-// 				   // tmp1 = u^n+u^(n-1)
-// 				   // tmp2 = (1-I) (v_bar^n + v_bar^(n-1))
-//   tmp1  = local_u;
-//   tmp1 += local_u_old;
-
-//   tmp2  = local_difference_v_bar;
-//   tmp2 += local_difference_v_bar_old;
-
-//   error_on_cell.part[4]  = delta_matrix.matrix_scalar_product (tmp1, tmp2);
-//   error_on_cell.part[4] *= get_backward_timestep() / 4;
-
-//   error_on_cell.part[6]  = grad_grad_matrix.matrix_scalar_product (tmp1, tmp2);
-//   error_on_cell.part[6] *= get_backward_timestep() / 12;
-
-// 				   // //////////////////////////////
-// 				   // PART 5 and 7:
-// 				   // tmp1 = u^n-u^(n-1)
-// 				   // tmp2 = v_bar^n - v_bar^(n-1)
-//   tmp1  = local_u;
-//   tmp1 -= local_u_old;
-
-//   tmp2  = local_v_bar;
-//   tmp2 -= local_v_bar_old;
 
 
-//   error_on_cell.part[5]  = delta_matrix.matrix_scalar_product (tmp1, tmp2);
-//   error_on_cell.part[5] *= get_backward_timestep() / 12;
 
-//   error_on_cell.part[7]  = grad_grad_matrix.matrix_scalar_product (tmp1, tmp2);
-//   error_on_cell.part[7] *= get_backward_timestep() / 12;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 return error_on_cell;
@@ -7318,17 +6537,6 @@ void TimeStep_ErrorEstimation<dim>::make_interpolation_matrices () {
       embedding_matrix(i,j) = primal_fe.shape_value (j, unit_support_points[i]);
 
 
-// construct the difference between the
-				   // identity and the interpolation operator
-				   // to the primal ansatz space. The
-				   // interpolation operator is to act from
-				   // and to the dual space (not as above
-				   // where it acted from one space into
-				   // the other), so we construct it by
-				   // first interpolating down to the
-				   // primal space and then back to the
-				   // dual space (by injection, using
-				   // the matrix constructed above)
   FullMatrix<double> inverse_interpolation (primal_fe.dofs_per_cell,
 					    dual_fe.dofs_per_cell);
   unit_support_points.resize (primal_fe.dofs_per_cell);
@@ -7342,10 +6550,8 @@ void TimeStep_ErrorEstimation<dim>::make_interpolation_matrices () {
   embedding_matrix.mmult (interpolation_matrix, inverse_interpolation);
   
   difference_matrix.reinit (dual_fe.dofs_per_cell, dual_fe.dofs_per_cell);
-				   // initialize with the unit matrix
   for (unsigned int i=0; i<dual_fe.dofs_per_cell; ++i)
     difference_matrix(i,i) = 1.;
-				   // compute difference
   difference_matrix.add (-1, interpolation_matrix);
 };
 
@@ -7408,7 +6614,6 @@ TimeStep_ErrorEstimation<dim>::CellwiseError::CellwiseError (const unsigned int 
 {};
 
 
-// explicit instantiations
 template class TimeStep_ErrorEstimation<2>;
 /* $Id$ */
 
@@ -7460,8 +6665,6 @@ void TimeStep<dim>::wake_up (const unsigned int wakeup_level)
 	    break;
 
       case grid_refinement:
-					     // do nothing except for waking
-					     // up the grid
 	    break;
 
       default:
@@ -7495,9 +6698,6 @@ void TimeStep<dim>::sleep (const unsigned int sleep_level)
 	    break;
 
       case grid_refinement:
-					     // save the flags since the grid
-					     // will be deleted next along with
-					     // the flags
 	    if (sleep_level == 1)
 	      save_refine_flags ();
 	    break;
@@ -7557,7 +6757,6 @@ void TimeStep<dim>::write_statistics (ostream &out) const
 };
 
 
-// explicit instantiations
 template class TimeStep<2>;
 /* $Id$ */
 
@@ -7589,12 +6788,8 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
     estimate_error ();
 
-				   // the error estimator has its own timer,
-				   // so start the postprocessing timer
-				   // only here
   sweep_info->get_timers().postprocessing.start();
 
-    				   // do the user evaluations
   statistic_data.evaluation_results.clear();
   for (typename list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
        i != parameters.eval_list.end(); ++i)
@@ -7603,7 +6798,6 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       statistic_data.evaluation_results.push_back ((*i)->evaluate());
     };
 
-				   // write data if requested
   if (((parameters.write_solution_strategy == WaveParameters<dim>::all_sweeps) ||
        ((parameters.write_solution_strategy == WaveParameters<dim>::last_sweep_only) &&
 	(sweep_no == parameters.number_of_sweeps-1)))
@@ -7625,11 +6819,8 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       out.add_data_vector (get_timestep_primal().u, "u");
       out.add_data_vector (get_timestep_primal().v, "v");
 
-				       // vectors holding the dual variables,
-				       // if needed
       Vector<double> u_bar, v_bar;
       
-				       // if dual problem was computed
       if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
 	  &&
 	  (sweep_no >= parameters.initial_energy_estimator_sweeps))
@@ -7638,26 +6829,17 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	  v_bar.reinit (get_timestep_primal().u.size());
 	  
 	  if (parameters.primal_fe == parameters.dual_fe)
-					     // if primal and dual solution
-					     // were computed using the same
-					     // ansatz, we may add the dual
-					     // solutions "as is"
 	    {
 	      u_bar = get_timestep_dual().u;
 	      v_bar = get_timestep_dual().v;
 	    }
 	  else
-					     // otherwise: first interpolate
-					     // the dual solutions to the
-					     // same degree
 	    interpolate_dual_solution (u_bar, v_bar);
 	  
 	  out.add_data_vector (u_bar, "dual_u");
 	  out.add_data_vector (v_bar, "dual_v");
 	};
 
-				       // add error vector if error
-				       // was computed
       Vector<double> estimated_error;
       if ((sweep_no<parameters.number_of_sweeps-1) ||
 	  (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
@@ -7701,24 +6883,16 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       sweep_data->data_out_stack->add_data_vector (get_timestep_primal().u, "u");
       sweep_data->data_out_stack->add_data_vector (get_timestep_primal().v, "v");
 
-				       // if dual problem was computed
       if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
 	  &&
 	  (sweep_no >= parameters.initial_energy_estimator_sweeps))
 	{
 	  if (parameters.primal_fe == parameters.dual_fe)
-					     // if primal and dual solution
-					     // were computed using the same
-					     // ansatz, we may add the dual
-					     // solutions "as is"
 	    {
 	      sweep_data->data_out_stack->add_data_vector (get_timestep_dual().u, "dual_u");
 	      sweep_data->data_out_stack->add_data_vector (get_timestep_dual().v, "dual_v");
 	    }
 	  else
-					     // otherwise: first interpolate
-					     // the dual solutions to the
-					     // same degree
 	    {
 	      Vector<double> u_bar(get_timestep_primal().dof_handler->n_dofs());
 	      Vector<double> v_bar(get_timestep_primal().dof_handler->n_dofs());
@@ -7730,8 +6904,6 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	    };
 	};
 
-				       // add error estimator if that was
-				       // computed
       if ((sweep_no < parameters.number_of_sweeps-1) ||
 	  (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
 	sweep_data->data_out_stack->add_data_vector (estimated_error_per_cell, "est_error");
@@ -7790,11 +6962,6 @@ void TimeStep_Postprocess<dim>::interpolate_dual_solution (Vector<double> &inter
   endc        = get_timestep_primal().dof_handler->end();
   dual_cell   = target.dof_handler->begin_active();
   
-				   // loop over all cells and set the vertex
-				   // values of the interpolated vector to
-				   // the vertex values of the dual solutions.
-				   // don't care that we set these values
-				   // more than once...
   for (; primal_cell != endc; ++primal_cell, ++dual_cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       {
@@ -7825,7 +6992,6 @@ void TimeStep_Postprocess<dim>::StatisticData::write (ostream &out) const
 };
 
 
-// explicit instantiations
 template class TimeStep_Postprocess<2>;
 /* $Id$ */
 
@@ -7866,12 +7032,9 @@ void TimeStep_Primal<dim>::do_initial_step ()
        << dof_handler->n_dofs() << " dofs";
 
 
-// add up sweep-accumulated data. count
-				   // u and v as separate dofs
   sweep_info->get_data().cells       += tria->n_active_cells();
   sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
 
-				   // use L2-projection for u0 and v0
 #if 2 == 1
   VectorTools::interpolate (*dof_handler, *parameters.initial_u, u);
   VectorTools::interpolate (*dof_handler, *parameters.initial_v, v);
@@ -7883,9 +7046,6 @@ void TimeStep_Primal<dim>::do_initial_step ()
 			     quadrature, *parameters.initial_v, v,
 			     false, quadrature_face, (dim==2 ? true : false));
 #endif
-				   // set energy to zero since we
-				   // don't want to assemble the matrices
-				   // needed for this
   statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
 							       dof_handler->n_dofs(),
 							       0,
@@ -7907,24 +7067,15 @@ void TimeStep_Primal<dim>::do_timestep ()
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs";
   
-				   // add up sweep-accumulated data. count
-				   // u and v as separate dofs
   sweep_info->get_data().cells       += tria->n_active_cells();
   sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
 
 
 const double time_step = get_backward_timestep ();
   
-				   // Vectors holding the right hand sides of
-				   // the two equations.
   Vector<double> right_hand_side1 (dof_handler->n_dofs());
   Vector<double> right_hand_side2 (dof_handler->n_dofs());
 
-				   // Vector holding a the values for
-				   // u and v of the previous time step.
-				   // these are used in case we want to
-				   // use extrapolation from the previous
-				   // time step to the present one
   Vector<double> old_u, old_v;
   if (parameters.extrapolate_old_solutions)
     {
@@ -7946,21 +7097,13 @@ assemble_vectors (right_hand_side1, right_hand_side2);
   constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
 	
   if (parameters.extrapolate_old_solutions)
-				     // solve with a hopefully good guess
-				     // as start vector
     {
       u  = old_u;
       u.add (time_step, old_v);
     };
 
-				   // in 1d, do not set boundary conditions
-				   // at all
   if (dim!=1) 
     {
-				       // in the other case, the wake_up
-				       // function of the base class has set
-				       // the solution vector's values to
-				       // zero already.
       parameters.boundary_values_u->set_time (time);
       parameters.boundary_values_v->set_time (time);
       
@@ -7986,8 +7129,6 @@ assemble_vectors (right_hand_side1, right_hand_side2);
   constraints.condense (right_hand_side2);
 
 
-// in 1d, do not set boundary conditions
-				   // at all
   if (dim != 1)
     {
       map<unsigned int,double> boundary_value_list;
@@ -8001,8 +7142,6 @@ assemble_vectors (right_hand_side1, right_hand_side2);
 
 
 if (parameters.extrapolate_old_solutions)
-				     // solve with a hopefully good guess
-				     // as start vector
     {
       v  = u;
       v -= old_u;
@@ -8060,13 +7199,9 @@ void TimeStep_Primal<dim>::wake_up (const unsigned int wakeup_level)
 template <int dim>
 void TimeStep_Primal<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 					     Vector<double> &right_hand_side2) {
-				   // don't do some things for the initial
-				   // step since we don't need them there
   Assert (timestep_no>=1, ExcInternalError());
   
-				   // construct right hand side
   build_rhs (right_hand_side1, right_hand_side2);
-				   // condense right hand side in-place
   constraints.condense (right_hand_side1);
 };
 
@@ -8074,21 +7209,14 @@ void TimeStep_Primal<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 template <int dim>
 void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
 				      Vector<double> &right_hand_side2) {
-				   // select the TimeStep_Wave part in the
-				   // TimeStep_Primal branch
   const TimeStep_Primal<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
 
   Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
 	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
-				   // convenience typedef
   typedef DoFHandler<dim>::cell_iterator cell_iterator;
 
-				   // create this here and pass it to
-				   // the cellwise function since it
-				   // is expensive to create it for
-				   // every cell
   FEValues<dim> fe_values (fe, quadrature,
 			   UpdateFlags(update_values |
 				       update_gradients |
@@ -8115,11 +7243,8 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 				 FEValues<dim>        &fe_values,
 				 Vector<double>       &right_hand_side1,
 				 Vector<double>       &right_hand_side2) {
-				   // declare this type for convenience
   typedef DoFHandler<dim>::cell_iterator cell_iterator;
   
-				   // both cells have children, so
-				   // recurse into the tree
   if (old_cell->has_children() && new_cell->has_children()) 
     {
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -8132,16 +7257,12 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
     };
 
 
-// select the TimeStep_Wave part in the
-				   // TimeStep_Primal branch
   const TimeStep_Primal<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const double time_step = get_backward_timestep();
 
-				   // both cells are on the same refinement
-				   // level
   if (!old_cell->has_children() && !new_cell->has_children()) 
     {
       fe_values.reinit (old_cell);
@@ -8151,7 +7272,6 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
       const vector<double>                 &weights   = fe_values.get_JxW_values ();
 
-				       // assemble mass matrix
       vector<double> density_values(fe_values.n_quadrature_points);
       parameters.density->value_list (fe_values.get_quadrature_points(),
 				      density_values);
@@ -8164,39 +7284,20 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 				density_values[point];
 
       Vector<double> tmp (dofs_per_cell);
-				       // this is the right hand side of the
-				       // first equation
-				       // for the theta scheme:
-				       //    rhs1 := Mu^0 + kMv^0
-				       //           -(1-theta)theta k^2 Au^0
       Vector<double> rhs1 (dofs_per_cell);
 
-				       // this is the part of the right hand side
-				       // of the second equation which depends
-				       // on the solutions of the previous time
-				       // step.
-				       // for the theta scheme:
-				       //    rhs2 := Mv^0-(1-theta)kA^0
       Vector<double> rhs2 (dofs_per_cell);
 	    
-      				       // vector of values of the function on the
-				       // old grid restricted to one cell
       Vector<double>     old_dof_values_u (dofs_per_cell);
-				       // vector of old u and v times the local
-				       // mass matrix
       Vector<double> local_M_u (dofs_per_cell);
       Vector<double> local_M_v (dofs_per_cell);
       Vector<double> local_A_u (dofs_per_cell);      
-				       // transfer u+k*v. Note that we need
-				       // old_dof_values_u again below
       old_cell->get_dof_values (previous_time_level.u, old_dof_values_u);
       cell_matrix.vmult (local_M_u, old_dof_values_u);
       
       old_cell->get_dof_values (previous_time_level.v, tmp);
       cell_matrix.vmult (local_M_v, tmp);
 
-				       // now for the part with the laplace
-				       // matrix
       cell_matrix.clear ();
       vector<double> stiffness_values(fe_values.n_quadrature_points);
       parameters.stiffness->value_list (fe_values.get_quadrature_points(),
@@ -8222,8 +7323,6 @@ rhs1 = local_M_u;
 		time_step,
 		local_A_u);
 
-				       // transfer into the global
-				       // right hand side
       vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -8235,31 +7334,14 @@ rhs1 = local_M_u;
       return;
     };
   
-				   // only old cell is refined
   if (old_cell->has_children() && !new_cell->has_children())
     {
-				       // this is the right hand side of the
-				       // first equation
-				       // for the theta scheme:
-				       //    rhs1 := Mu^0 + kMv^0
-				       //           -(1-theta)theta k^2 Au^0
       Vector<double> rhs1 (dofs_per_cell);
 
-				       // this is the part of the right hand side
-				       // of the second equation which depends
-				       // on the solutions of the previous time
-				       // step.
-				       // for the theta scheme:
-				       //    rhs2 := Mv^0-(1-theta)kA^0
       Vector<double> rhs2 (dofs_per_cell);
 
-				       // collect the contributions of the
-				       // child cells (and possibly their
-				       // children as well)
       collect_from_children (old_cell, fe_values, rhs1, rhs2);
 
-				       // transfer into the global
-				       // right hand side
       vector<unsigned int> new_dof_indices (dofs_per_cell);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -8271,20 +7353,13 @@ rhs1 = local_M_u;
       return;
     };
 
-  				   // only new cell is refined
   if (!old_cell->has_children() && new_cell->has_children())
     {
-				       // vector of values of the function
-				       // on the old grid restricted to
-				       // the large (old) cell
       Vector<double>  old_dof_values_u (dofs_per_cell);
       Vector<double>  old_dof_values_v (dofs_per_cell);
       old_cell->get_dof_values (previous_time_level.u, old_dof_values_u);
       old_cell->get_dof_values (previous_time_level.v, old_dof_values_v);
 
-				       // distribute the contribution of the
-				       // large old cell to the children on
-				       // the new cell
       distribute_to_children (new_cell, fe_values,
 			      old_dof_values_u, old_dof_values_v,
 			      right_hand_side1, right_hand_side2);
@@ -8302,14 +7377,8 @@ TimeStep_Primal<dim>::collect_from_children (const DoFHandler<dim>::cell_iterato
 					     FEValues<dim>  &fe_values,
 					     Vector<double> &rhs1,
 					     Vector<double> &rhs2) const {
-				   // maximal difference of levels between the
-				   // cell to which we write and the cells from
-				   // which we read. Default is one, but this is
-				   // increased with each level of recursion
   unsigned int level_difference = 1;  
   
-				   // select the TimeStep_Wave part in the
-				   // TimeStep_Primal branch
   const TimeStep_Primal<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
 
@@ -8319,30 +7388,14 @@ TimeStep_Primal<dim>::collect_from_children (const DoFHandler<dim>::cell_iterato
 
 FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   
-				   // these will hold the values of the
-				   // solution on the old grid, i.e. on
-				   // the small cells
   Vector<double>  local_old_dof_values_u (dofs_per_cell);
   Vector<double>  local_old_dof_values_v (dofs_per_cell);
   
-				   // same for the contributions to the
-				   // right hand sides of the projection
   Vector<double>  local_M_u (dofs_per_cell);
   Vector<double>  local_M_v (dofs_per_cell);
   Vector<double>  local_A_u (dofs_per_cell);
-				   // this is the right hand side of the
-				   // first equation
-				   // for the theta scheme:
-				   //    rhs1 := Mu^0 + kMv^0
-				   //           -(1-theta)theta k^2 Au^0
   Vector<double> child_rhs1 (dofs_per_cell);
 
-				   // this is the part of the right hand side
-				   // of the second equation which depends
-				   // on the solutions of the previous time
-				   // step.
-				   // for the theta scheme:
-				   //    rhs2 := Mv^0-(1-theta)kA^0
   Vector<double> child_rhs2 (dofs_per_cell);
 
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
@@ -8352,9 +7405,6 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
       child_rhs1.clear ();
       child_rhs2.clear ();
       
-				       // if this child is further subdivided:
-				       // collect the contributions of the
-				       // children
       if (old_child->has_children())
 	{
 	  const unsigned int l = collect_from_children (old_child, fe_values,
@@ -8368,12 +7418,9 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
 	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
 
-					   // get solutions restricted to small
-					   // cell
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
       
-					   // compute M*(u+kv) on the small cell
 	  cell_matrix.clear ();
 	  vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
@@ -8389,8 +7436,6 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
       
-					   // now for the part with the laplace
-					   // matrix
 	  cell_matrix.clear ();
 
 	  vector<double> stiffness_values(fe_values.n_quadrature_points);
@@ -8417,9 +7462,6 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 			  local_A_u);
 	};
       
-				       // transfer the contribution of this
-				       // child cell to its parent cell
-				       // (#true# means: add up)
       fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
       fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
     };
@@ -8436,64 +7478,36 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 					      const Vector<double>  &old_dof_values_v,
 					      Vector<double>        &right_hand_side1,
 					      Vector<double>        &right_hand_side2) {
-				   // maximal difference of levels between the
-				   // cell to which we write and the cells from
-				   // which we read. Default is one, but this is
-				   // increased with each level of recursion
   unsigned int level_difference = 1;  
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const double time_step = get_backward_timestep();
 
   FullMatrix<double>    cell_matrix(dofs_per_cell, dofs_per_cell);
-				   // set up a vector which will hold the
-				   // restriction of the old
-				   // functions (u,v) to a childcell
   Vector<double> local_old_dof_values_u (dofs_per_cell);
   Vector<double> local_old_dof_values_v (dofs_per_cell);
 
-				   // vector of old u and v times the local
-				   // mass matrix (on the small cells
-				   // respectively)
   Vector<double> local_M_u (dofs_per_cell);
   Vector<double> local_M_v (dofs_per_cell);
   Vector<double> local_A_u (dofs_per_cell);
 
-				   // this is the right hand side of the
-				   // first equation
-				   // for the theta scheme:
-				   //    rhs1 := Mu^0 + kMv^0
-				   //           -(1-theta)theta k^2 Au^0
   Vector<double> rhs1 (dofs_per_cell);
 
-				   // this is the part of the right hand side
-				   // of the second equation which depends
-				   // on the solutions of the previous time
-				   // step.
-				   // for the theta scheme:
-				   //    rhs2 := Mv^0-(1-theta)kA^0
   Vector<double> rhs2 (dofs_per_cell);
 	    
-				   // indices of the dofs of a cell on
-				   // the new grid
   vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
 
-// loop over the child cells
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
       const DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
-				       // get u and v on the childcells
       fe.prolongate(c).vmult (local_old_dof_values_u,
 			      old_dof_values_u);
       fe.prolongate(c).vmult (local_old_dof_values_v,
 			      old_dof_values_v);
 
       if (new_child->has_children())
-					 // cell on new grid is further refined
-					 // distribute data on this local cell
-					 // to its children
 	{
 	  const unsigned int l = distribute_to_children (new_child, fe_values,
 							 local_old_dof_values_u,
@@ -8503,15 +7517,12 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 	  level_difference = max (l+1, level_difference);
 	}
       else
-					 // child is not further refined
-					 // -> directly distribute data
 	{
 	  fe_values.reinit (new_child);
 	  const FullMatrix<double>             &values = fe_values.get_shape_values ();
 	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
 	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
 
-					   // transfer u+kv
 	  cell_matrix.clear ();
 	  vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
@@ -8527,8 +7538,6 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
-					   // now for the part with the laplace
-					   // matrix
 	  cell_matrix.clear ();
 	  vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
@@ -8553,8 +7562,6 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 		    time_step,
 		    local_A_u);
 	  
-					   // transfer into the global
-					   // right hand side
 	  new_child->get_dof_indices (new_dof_indices);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
@@ -8568,7 +7575,6 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 };
 
 
-// explicit instantiations
 template class TimeStep_Primal<2>;
 /* $Id$ */
 
@@ -8602,7 +7608,6 @@ void UserMatrix::precondition (Vector<double> &dst,
 #include <base/quadrature_lib.h>
 
 
-// static objects
 
 const FEQ1<2>   FEHelper<2>::fe_linear;
 const FEQ2<2>   FEHelper<2>::fe_quadratic_sub;
@@ -8723,7 +7728,6 @@ string int_to_string (const unsigned int i, const unsigned int digits) {
 };
 
 
-// explicit instantiations
 template class FEHelper<2>;
 
 
@@ -8772,14 +7776,10 @@ template <int dim>
 void WaveProblem<dim>::run (ParameterHandler &prm) 
 {
   parse_parameters (prm);
-//  prm.print_parameters (logfile, Text);
 
 
-////////////////////////////////
-				   // Set up the time step objects
   TimestepManager<dim> timestep_manager (parameters);
   if (true) {
-				     // push back initial level
     timestep_manager.add_timestep (new TimeStep<dim>(0, parameters));
     double       time = 0;
     unsigned int step_no = 0;
@@ -8789,19 +7789,12 @@ void WaveProblem<dim>::run (ParameterHandler &prm)
       {
 	++step_no;
 	
-					 // if on last time step
-					 // allow last time step to
-					 // be at most 10% longer than
-					 // initially wanted
 	if (time+parameters.time_step*1.1 >= parameters.end_time)
 	  local_time_step = parameters.end_time-time;
 	else
-					   // equilibrate time step size
-					   // of the two last time steps
 	  if (time+2*parameters.time_step >= parameters.end_time)
 	    local_time_step = (parameters.end_time-time)/2;
 	  else
-					     // regular time step
 	    local_time_step = parameters.time_step;
 	
 	time += local_time_step;
@@ -8811,9 +7804,6 @@ void WaveProblem<dim>::run (ParameterHandler &prm)
   };
 
 
-////////////////////////////////////
-				   // actually do the work (or rather:
-				   // let the work be done)
   for (unsigned int sweep=0; sweep<parameters.number_of_sweeps; ++sweep)
     timestep_manager.run_sweep (sweep);
 };
@@ -8821,7 +7811,6 @@ void WaveProblem<dim>::run (ParameterHandler &prm)
 
 int main ()
 {
-				   // no additional output to console
   deallog.attach(logfile);
   logfile.setf(ios::fixed);
   logfile.precision (3);
@@ -8845,7 +7834,6 @@ int main ()
 	   << "Aborting!" << endl
 	   << "----------------------------------------------------"
 	   << endl;
-				       // abort
       return 1;
     };
 
@@ -8862,7 +7850,6 @@ int main ()
 	   << "Aborting!" << endl
 	   << "----------------------------------------------------"
 	   << endl;
-				       // abort
       return 2;
     }
   catch (...) 
@@ -8874,7 +7861,6 @@ int main ()
 	   << "Aborting!" << endl
 	   << "----------------------------------------------------"
 	   << endl;
-				       // abort
       return 3;
     };
 
