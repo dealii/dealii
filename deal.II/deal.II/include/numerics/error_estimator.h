@@ -165,13 +165,25 @@ class KellyErrorEstimator {
 				      * coefficient, but there is a default
 				      * value which denotes the constant
 				      * coefficient with value one.
+				      *
+				      * You must give the component if the
+				      * finite element in use by the #dof#
+				      * object has more than one component.
+				      * This number shall be between zero
+				      * and the number of components within
+				      * the finite element. If the finite
+				      * element has only one component,
+				      * then the parameter selecting the
+				      * component shall be zero, which is
+				      * also the default value.
 				      */
     static void estimate (const DoFHandler<dim>    &dof,
 			  const Quadrature<dim-1>  &quadrature,
 			  const FunctionMap        &neumann_bc,
 			  const Vector<double>     &solution,
 			  Vector<float>            &error,
-			  const Function<dim>      *coefficient = 0);
+			  const Function<dim>      *coefficient = 0,
+			  const unsigned int        selected_component = 0);
 
 				     /**
 				      * Exception
@@ -185,7 +197,15 @@ class KellyErrorEstimator {
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
-
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidComponent,
+		    int, int,
+		    << "The component you gave (" << arg1 << ") "
+		    << "is invalid with respect to the number "
+		    << "of components in the finite element "
+		    << "(" << arg2 << ")");
   private:
 				     /**
 				      * Declare a data type to represent the
@@ -227,6 +247,8 @@ class KellyErrorEstimator {
 					     FEFaceValues<dim>   &fe_face_values_neighbor,
 					     FaceIntegrals       &face_integrals,
 					     const Vector<double>&solution,
+					     const unsigned int   n_components,
+					     const unsigned int   selected_component,
 					     const Function<dim> *coefficient);
 
 				     /**
@@ -244,7 +266,9 @@ class KellyErrorEstimator {
 					       FESubfaceValues<dim> &fe_subface_values,
 					       FaceIntegrals        &face_integrals,
 					       const Vector<double> &solution,
-					       const Function<dim> *coefficient);
+					       const unsigned int    n_components,
+					       const unsigned int    selected_component,
+					       const Function<dim>  *coefficient);
 };
 
 

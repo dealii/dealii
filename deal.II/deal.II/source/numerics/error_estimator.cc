@@ -33,7 +33,8 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1> &,
 				       const FunctionMap &,
 				       const Vector<double> &,
 				       Vector<float> &,
-				       const Function<1> *) {
+				       const Function<1> *,
+				       const unsigned int) {
   Assert(false, ExcNotImplemented());
 };
 
@@ -46,10 +47,13 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>    &dof,
 					 const FunctionMap        &neumann_bc,
 					 const Vector<double>     &solution,
 					 Vector<float>            &error,
-					 const Function<dim> *coefficient)
+					 const Function<dim>      *coefficient,
+					 const unsigned int        selected_component)
 {
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
+  Assert (selected_component < dof.get_fe().n_components,
+	  ExcInvalidComponent (selected_component, dof.get_fe().n_components));
 
 				   // create a map of integrals indexed by
 				   // the corresponding face. In this map
@@ -143,6 +147,8 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>    &dof,
 				       fe_face_values_neighbor,
 				       face_integrals,
 				       solution,
+				       dof.get_fe().n_components,
+				       selected_component,
 				       coefficient);
 	else
 					   // otherwise we need to do some
@@ -154,6 +160,8 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>    &dof,
 					 fe_face_values_cell,
 					 fe_subface_values,
 					 face_integrals, solution,
+					 dof.get_fe().n_components,
+					 selected_component,
 					 coefficient);
       };
 
@@ -195,6 +203,8 @@ void KellyErrorEstimator<1>::integrate_over_regular_face (const active_cell_iter
 							  FEFaceValues<1>        &,
 							  FaceIntegrals          &,
 							  const Vector<double>   &,
+							  const unsigned int      ,
+							  const unsigned int      ,
 							  const Function<1>      *) {
   Assert (false, ExcInternalError());
 };
@@ -210,6 +220,8 @@ integrate_over_irregular_face (const active_cell_iterator &,
 			       FESubfaceValues<1>         &,
 			       FaceIntegrals              &,
 			       const Vector<double>       &,
+			       const unsigned int          ,
+			       const unsigned int          ,
 			       const Function<1>          *) {
   Assert (false, ExcInternalError());
 };
@@ -228,6 +240,8 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 			     FEFaceValues<dim>          &fe_face_values_neighbor,
 			     FaceIntegrals              &face_integrals,
 			     const Vector<double>       &solution,
+			     const unsigned int          n_components,
+			     const unsigned int          selected_component,
 			     const Function<dim>        *coefficient) {
   const DoFHandler<dim>::face_iterator face = cell->face(face_no);
   
@@ -243,7 +257,17 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				   // let psi be a short name for
 				   // [a grad u_h]
   vector<Tensor<1,dim> > psi(n_q_points);
-  fe_face_values_cell.get_function_grads (solution, psi);
+  if (n_components == 1)
+    fe_face_values_cell.get_function_grads (solution, psi);
+  else
+    {
+      vector<vector<Tensor<1,dim> > > tmp (n_components,
+					   psi);
+      fe_face_values_cell.get_function_grads (solution, tmp);
+
+      psi.swap (tmp[selected_component]);
+    };
+  
   
   
 				   // now compute over the other side of
@@ -277,7 +301,16 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				       // the finite element solution
 				       // restricted to the neighbor cell
       vector<Tensor<1,dim> > neighbor_psi (n_q_points);
-      fe_face_values_neighbor.get_function_grads (solution, neighbor_psi);
+      if (n_components == 1)
+	fe_face_values_neighbor.get_function_grads (solution, neighbor_psi);
+      else
+	{
+	  vector<vector<Tensor<1,dim> > > tmp (n_components,
+					       neighbor_psi);
+	  fe_face_values_neighbor.get_function_grads (solution, tmp);
+	  neighbor_psi.swap (tmp[selected_component]);
+	};
+
       
 				       // compute the jump in the gradients
       transform (psi.begin(), psi.end(),
@@ -380,6 +413,8 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 			       FESubfaceValues<dim>       &fe_subface_values,
 			       FaceIntegrals              &face_integrals,
 			       const Vector<double>       &solution,
+			       const unsigned int          n_components,
+			       const unsigned int          selected_component,
 			       const Function<dim>        *coefficient) {
   const DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
   Assert (neighbor.state() == valid, ExcInternalError());
@@ -423,14 +458,30 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 				       // store the gradient of the solution
 				       // in psi
       fe_subface_values.reinit (cell, face_no, subface_no);
-      fe_subface_values.get_function_grads (solution, psi);
+      if (n_components == 1)
+	fe_subface_values.get_function_grads (solution, psi);
+      else
+	{
+	  vector<vector<Tensor<1,dim> > > tmp (n_components,
+					       psi);
+	  fe_subface_values.get_function_grads (solution, tmp);
+	  psi.swap (tmp[selected_component]);
+	};
 
 				       // restrict the finite element on the
 				       // neighbor cell to the common #subface#.
 				       // store the gradient in #neighbor_psi#
       vector<Tensor<1,dim> > neighbor_psi (n_q_points);
       fe_face_values.reinit (neighbor_child, neighbor_neighbor);
-      fe_face_values.get_function_grads (solution, neighbor_psi);
+      if (n_components == 1)
+	fe_face_values.get_function_grads (solution, neighbor_psi);
+      else
+	{
+	  vector<vector<Tensor<1,dim> > > tmp (n_components,
+					       neighbor_psi);
+	  fe_face_values.get_function_grads (solution, tmp);
+	  neighbor_psi.swap (tmp[selected_component]);
+	};
       
 				       // compute the jump in the gradients
       transform (psi.begin(), psi.end(),
