@@ -15,3 +15,7 @@ Use the commented-out version in PreconditionBlock::invert_diagblocks
 
 
 GrowingVectorMemory is not thread-safe. Use a Mutex to fix this.
+
+
+Implement "use the length of the computed orthogonal residual" in the
+  BiCGStab method.
