@@ -24,8 +24,8 @@
 // forward declaration
 template <unsigned int N, typename T> class TableBase;
 template <unsigned int N, typename T> class Table;
-template <typename T1> class Table<1,T1>;
-template <typename T1> class Table<2,T1>;
+template <typename T> class Table<1,T>;
+template <typename T> class Table<2,T>;
 template <typename T> class Table<3,T>;
 template <typename T> class Table<4,T>;
 template <typename T> class Table<5,T>;
@@ -449,7 +449,7 @@ namespace TableBaseAccessors
                                        // work around bugs in some
                                        // compilers
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG      
-      template <typename T1> friend class Table<N+1,T1>;
+      template <int N1, typename T1> friend class Table;
       template <unsigned int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
 #else
@@ -599,7 +599,7 @@ namespace TableBaseAccessors
                                        // work around bugs in some
                                        // compilers
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
-      template <typename T1> friend class Table<N+1,T1>;
+      template <unsigned int N1, typename T1> friend class Table;
       template <unsigned int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
 #else
