@@ -121,6 +121,8 @@ namespace PETScWrappers
                              const unsigned int n_nonzero_per_row,
                              const bool         is_symmetric)
     {
+      Assert (local_rows < m, ExcLocalRowsTooLarge (local_rows, m));
+      
                                        // use the call sequence indicating only
                                        // a maximal number of elements per row
                                        // for all rows globally
@@ -132,7 +134,9 @@ namespace PETScWrappers
                                        // local_rows as they do for local_size
                                        // on parallel vectors
       const int ierr
-        = MatCreateMPIAIJ(communicator, local_rows, local_rows, m, n,
+        = MatCreateMPIAIJ(communicator,
+			  local_rows, std::min(local_rows, n),
+			  m, n,
                           n_nonzero_per_row, 0, 0, 0,
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -155,6 +159,8 @@ namespace PETScWrappers
                              const std::vector<unsigned int> &row_lengths,
                              const bool         is_symmetric)
     {
+      Assert (local_rows < m, ExcLocalRowsTooLarge (local_rows, m));
+
       Assert (row_lengths.size() == m,
               ExcDimensionMismatch (row_lengths.size(), m));
     
@@ -176,7 +182,9 @@ namespace PETScWrappers
                                        // local_rows as they do for local_size
                                        // on parallel vectors
       const int ierr
-        = MatCreateMPIAIJ(communicator, local_rows, local_rows, m, n,
+        = MatCreateMPIAIJ(communicator,
+			  local_rows, local_rows,
+			  m, std::min(local_rows, n),
                           0, &int_row_lengths[0], 0, 0,
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));

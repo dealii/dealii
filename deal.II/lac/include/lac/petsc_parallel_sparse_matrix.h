@@ -171,7 +171,21 @@ namespace PETScWrappers
                      const std::vector<unsigned int> &row_lengths,
                      const bool                       is_symmetric = false);
 
+					 /**
+					  * Exception
+					  */
+	DeclException2 (ExcLocalRowsTooLarge,
+			int, int,
+			<< "The number of local rows " << arg1
+			<< " must be larger than the total number of rows " << arg2);
+	
       private:
+
+                                         /**
+                                          * Copy of the communicator object to
+                                          * be used for this parallel vector.
+                                          */
+        MPI_Comm communicator;
 
                                          /**
                                           * Do the actual work for the
@@ -194,13 +208,6 @@ namespace PETScWrappers
                         const unsigned int               local_rows,
                         const std::vector<unsigned int> &row_lengths,
                         const bool                       is_symmetric = false);
-
-      private:
-                                         /**
-                                          * Copy of the communicator object to
-                                          * be used for this parallel vector.
-                                          */
-        MPI_Comm communicator;
     };
 
   }
