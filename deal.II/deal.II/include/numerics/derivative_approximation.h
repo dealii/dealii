@@ -180,11 +180,11 @@ class DerivativeApproximation
 				      * computed. It defaults to the
 				      * first component.
 				      */
-    template <int dim>
+    template <int dim, class InputVector>
     static void
     approximate_gradient (const Mapping<dim>    &mapping,
 			  const DoFHandler<dim> &dof,
-			  const Vector<double>  &solution,
+			  const InputVector     &solution,
 			  Vector<float>         &derivative_norm,
 			  const unsigned int     component = 0);
 
@@ -193,10 +193,10 @@ class DerivativeApproximation
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    template <int dim>
+    template <int dim, class InputVector>
     static void
     approximate_gradient (const DoFHandler<dim> &dof,
-			  const Vector<double>  &solution,
+			  const InputVector     &solution,
 			  Vector<float>         &derivative_norm,
 			  const unsigned int     component = 0);
     
@@ -222,11 +222,11 @@ class DerivativeApproximation
 				      * computed. It defaults to the
 				      * first component.
 				      */
-    template <int dim>
+    template <int dim, class InputVector>
     static void
     approximate_second_derivative (const Mapping<dim>    &mapping,
 				   const DoFHandler<dim> &dof,
-				   const Vector<double>  &solution,
+				   const InputVector     &solution,
 				   Vector<float>         &derivative_norm,
 				   const unsigned int     component = 0);
     
@@ -235,10 +235,10 @@ class DerivativeApproximation
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    template <int dim>
+    template <int dim, class InputVector>
     static void
     approximate_second_derivative (const DoFHandler<dim> &dof,
-				   const Vector<double>  &solution,
+				   const InputVector     &solution,
 				   Vector<float>         &derivative_norm,
 				   const unsigned int     component = 0);
 
@@ -306,9 +306,10 @@ class DerivativeApproximation
 					  * field at the center of each
 					  * cell).
 					  */
+	template <class InputVector>
 	static ProjectedDerivative
 	get_projected_derivative (const FEValues<dim>  &fe_values,
-				  const Vector<double> &solution,
+				  const InputVector    &solution,
 				  const unsigned int    component);
     
 					 /**
@@ -386,9 +387,10 @@ class DerivativeApproximation
 					  * field at the center of each
 					  * cell).
 					  */
+	template <class InputVector>
 	static ProjectedDerivative
 	get_projected_derivative (const FEValues<dim>  &fe_values,
-				  const Vector<double> &solution,
+				  const InputVector    &solution,
 				  const unsigned int    component);
 	
 					 /**
@@ -452,11 +454,11 @@ class DerivativeApproximation
 				      * solution vector we are to work
 				      * on.
 				      */
-    template <class DerivativeDescription, int dim>
+    template <class DerivativeDescription, int dim, class InputVector>
     static void
     approximate_derivative (const Mapping<dim>    &mapping,
 			    const DoFHandler<dim> &dof,
-			    const Vector<double>  &solution,
+			    const InputVector     &solution,
 			    const unsigned int     component,
 			    Vector<float>         &derivative_norm);
 
@@ -466,11 +468,11 @@ class DerivativeApproximation
 				      * the range given by the third
 				      * parameter.
 				      */
-    template <class DerivativeDescription, int dim>
+    template <class DerivativeDescription, int dim, class InputVector>
     static void
     approximate (const Mapping<dim>    &mapping,
 		 const DoFHandler<dim> &dof,
-		 const Vector<double>  &solution,
+		 const InputVector     &solution,
 		 const unsigned int     component,
 		 const IndexInterval   &index_interval,
 		 Vector<float>         &derivative_norm);    
