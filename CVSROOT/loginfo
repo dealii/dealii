@@ -16,21 +16,21 @@
 # name and listing the modified file names.
 #
 #
-DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default-2000.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default-2000.html; chmod a+r $CVSROOT/LOG/default-2000.html
+DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default`date '+%Y'`.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default`date '+%Y'`.html; chmod a+r $CVSROOT/LOG/default`date '+%Y'`.html
 #
 # The various DEAL libraries
 #
-^deal.II/base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base-2000.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base-2000.html; chmod a+r $CVSROOT/LOG/base-2000.html
+^deal.II/base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base`date '+%Y'`.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base`date '+%Y'`.html; chmod a+r $CVSROOT/LOG/base`date '+%Y'`.html
 #
-^reports.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/reports-2000.html > /tmp/Treports; mv /tmp/Treports $CVSROOT/LOG/reports-2000.html; chmod a+r $CVSROOT/LOG/reports-2000.html
+^reports.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/reports`date '+%Y'`.html > /tmp/Treports; mv /tmp/Treports $CVSROOT/LOG/reports`date '+%Y'`.html; chmod a+r $CVSROOT/LOG/reports`date '+%Y'`.html
 #
-^tests.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/tests-2000.html > /tmp/Ttests; mv /tmp/Ttests $CVSROOT/LOG/tests-2000.html; chmod a+r $CVSROOT/LOG/tests-2000.html
+^tests.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/tests`date '+%Y'`.html > /tmp/Ttests; mv /tmp/Ttests $CVSROOT/LOG/tests`date '+%Y'`.html; chmod a+r $CVSROOT/LOG/tests`date '+%Y'`.html
 #
-^deal.II/lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac-2000.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac-2000.html; chmod a+r $CVSROOT/LOG/lac-2000.html
+^deal.II/lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac`date '+%Y'`.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac`date '+%Y'`.html; chmod a+r $CVSROOT/LOG/lac`date '+%Y'`.html
 #
-^deal.II/deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal-2000.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal-2000.html; chmod a+r $CVSROOT/LOG/deal-2000.html
+^deal.II/deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal`date '+%Y'`.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal`date '+%Y'`.html; chmod a+r $CVSROOT/LOG/deal`date '+%Y'`.html
 #
-^deal.II/doc.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/doc-2000.html > /tmp/Tdoc; mv /tmp/Tdoc $CVSROOT/LOG/doc-2000.html; chmod a+r $CVSROOT/LOG/doc-2000.html
+^deal.II/doc.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/doc`date '+%Y'`.html > /tmp/Tdoc; mv /tmp/Tdoc $CVSROOT/LOG/doc`date '+%Y'`.html; chmod a+r $CVSROOT/LOG/doc`date '+%Y'`.html
 
 
 
