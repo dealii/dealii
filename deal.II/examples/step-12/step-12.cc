@@ -295,10 +295,10 @@ void DGTransportEquation<dim>::assemble_cell_term(
       {
 	for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	  u_v_matrix(i,j) -= beta[point]*grad_v[i][point]*
-			      v(j,point) *
+			      v[j][point] *
 			      JxW[point];
 	
-	cell_vector(i) += rhs[point] *v(i,point) * JxW[point];
+	cell_vector(i) += rhs[point] * v[i][point] * JxW[point];
       }
 }
 
@@ -356,8 +356,8 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	    u_v_matrix(i,j) += beta_n *
-			       v(j,point) *
-			       v(i,point) *
+			       v[j][point] *
+			       v[i][point] *
 			       JxW[point];
       else
 					 // and the term $(\beta\cdot
@@ -366,7 +366,7 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  cell_vector(i) -= beta_n *
 			    g[point] *
-			    v(i,point) *
+			    v[i][point] *
 			    JxW[point];
     }
 }
@@ -444,8 +444,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	    u_v_matrix(i,j) += beta_n *
-			       v(j,point) *
-			       v(i,point) *
+			       v[j][point] *
+			       v[i][point] *
 			       JxW[point];
       else
 					 // and the
@@ -455,8 +455,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    un_v_matrix(i,k) += beta_n *
-				v_neighbor(k,point) *
-				v(i,point) *
+				v_neighbor[k][point] *
+				v[i][point] *
 				JxW[point];
     }
 }
@@ -506,8 +506,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	      u_v_matrix(i,j) += beta_n *
-				 v(j,point) *
-				 v(i,point) *
+				 v[j][point] *
+				 v[i][point] *
 				 JxW[point];
 
 					   // We additionally assemble
@@ -517,8 +517,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	      u_vn_matrix(k,j) -= beta_n *
-				  v(j,point) *
-				  v_neighbor(k,point) *
+				  v[j][point] *
+				  v_neighbor[k][point] *
 				  JxW[point];
 	}
       else
@@ -528,8 +528,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
 	      un_v_matrix(i,l) += beta_n *
-				  v_neighbor(l,point) *
-				  v(i,point) *
+				  v_neighbor[l][point] *
+				  v[i][point] *
 				  JxW[point];
 
 					   // And this is another new
@@ -539,8 +539,8 @@ void DGTransportEquation<dim>::assemble_face_term2(
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
 	      un_vn_matrix(k,l) -= beta_n *
-				   v_neighbor(l,point) *
-				   v_neighbor(k,point) *
+				   v_neighbor[l][point] *
+				   v_neighbor[k][point] *
 				   JxW[point];
 	}
     }
