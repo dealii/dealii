@@ -420,17 +420,18 @@ class KellyErrorEstimator
 				      * of the domain with the number n,
 				      * satisfying
 				      * #n=this_thread (mod n_threads)#
-				      * This enumeration is choosen to
+				      * This enumeration is chosen to
 				      * generate a random distribution
 				      * of all cells.
 				      *
-				      * This function is only needed in
-				      * two or three dimensions.
-				      * The Errorestimator in one dimension
-				      * is implemented seperatly.
+				      * This function is only needed
+				      * in two or three dimensions.
+				      * The error estimator in one
+				      * dimension is implemented
+				      * seperatly.
 				      */
-    static void * estimate_some (Data &data,
-				 const unsigned int this_thread);
+    static void estimate_some (Data &data,
+			       const unsigned int this_thread);
     				
 				     /**
 				      * Actually do the computation on a face

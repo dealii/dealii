@@ -129,11 +129,12 @@ inline static double sqr (const double x) {
 #if deal_II_dimension == 1
 
 template <>
-void * KellyErrorEstimator<1>::estimate_some (Data &,const unsigned int )
+void KellyErrorEstimator<1>::estimate_some (Data &, const unsigned int)
 {
   Assert (false, ExcInternalError() );
-  return 0;
 }
+
+
 
 template <>
 void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
@@ -289,8 +290,8 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
 
 
 template <int dim>
-void * KellyErrorEstimator<dim>::estimate_some (Data               &data,
-						const unsigned int  this_thread) 
+void KellyErrorEstimator<dim>::estimate_some (Data               &data,
+					      const unsigned int  this_thread) 
 {
   
 				   // make up a fe face values object for the
@@ -399,8 +400,9 @@ void * KellyErrorEstimator<dim>::estimate_some (Data               &data,
 				       // next cell in this thread
       for (unsigned int t=0;((t<data.n_threads)&&(cell!=data.endc));++t,++cell) {};
     };
-  return 0;
-}
+};
+
+
 
 template <int dim>
 void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
