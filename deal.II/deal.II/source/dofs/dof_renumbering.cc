@@ -37,6 +37,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cmath>
 
 
 // for whatever reason, the random_shuffle function used below needs
@@ -1025,8 +1026,8 @@ struct ClockCells
 	
 	const Point<dim> v1 = c1->center() - center;
 	const Point<dim> v2 = c2->center() - center;
-	const double s1 = atan2(v1(0), v1(1));
-	const double s2 = atan2(v2(0), v2(1));
+	const double s1 = std::atan2(v1(0), v1(1));
+	const double s2 = std::atan2(v2(0), v2(1));
 	return ( counter ? (s1>s2) : (s2>s1));
       }
 };
