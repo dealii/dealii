@@ -37,6 +37,10 @@ s/-?\d\.\d+e-1\d+/0.00/g;
 
 s/(\.\d\d)\d+/\1/g;
 
+# Zeroes are zero
+
+s/-0\.00/0.00/g;
+
 # Residual values
 
 s/value.*//;
