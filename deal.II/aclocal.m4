@@ -41,8 +41,15 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
       *2.95*)
-  	AC_MSG_RESULT(C++ compiler is gcc-2.95)
   	GXX_VERSION=gcc2.95
+        case "$GXX_VERSION_STRING" in
+	  *version\ 2.95.0*) GXX_VERSION_DETAILED=gcc2.95.0 ;;
+	  *version\ 2.95.1*) GXX_VERSION_DETAILED=gcc2.95.1 ;;
+	  *version\ 2.95.2*) GXX_VERSION_DETAILED=gcc2.95.2 ;;
+	  *version\ 2.95.3*) GXX_VERSION_DETAILED=gcc2.95.3 ;;
+	  *version\ 2.95.4*) GXX_VERSION_DETAILED=gcc2.95.4 ;;
+	  *)                 GXX_VERSION_DETAILED=gcc2.95.x ;;
+        esac
   	;;
       *2.96*)
   	AC_MSG_ERROR(C++ compiler reports faulty gcc 2.96. Please install a new compiler)
@@ -53,32 +60,63 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	GXX_VERSION=gcc2.97
   	;;
       *version\ 3.0*)
-  	AC_MSG_RESULT(C++ compiler is gcc-3.0)
   	GXX_VERSION=gcc3.0
+        case "$GXX_VERSION_STRING" in
+	  *version\ 3.0.0*) GXX_VERSION_DETAILED=gcc3.0.0 ;;
+	  *version\ 3.0.1*) GXX_VERSION_DETAILED=gcc3.0.1 ;;
+	  *version\ 3.0.2*) GXX_VERSION_DETAILED=gcc3.0.2 ;;
+	  *version\ 3.0.3*) GXX_VERSION_DETAILED=gcc3.0.3 ;;
+	  *version\ 3.0.4*) GXX_VERSION_DETAILED=gcc3.0.4 ;;
+	  *)                GXX_VERSION_DETAILED=gcc3.0.x ;;
+        esac
   	;;
       *version\ 3.1*)
-  	AC_MSG_RESULT(C++ compiler is gcc-3.1)
   	GXX_VERSION=gcc3.1
+        case "$GXX_VERSION_STRING" in
+	  *version\ 3.1.0*) GXX_VERSION_DETAILED=gcc3.1.0 ;;
+	  *version\ 3.1.1*) GXX_VERSION_DETAILED=gcc3.1.1 ;;
+	  *)                GXX_VERSION_DETAILED=gcc3.1.x ;;
+        esac
   	;;
       *version\ 3.2*)
-  	AC_MSG_RESULT(C++ compiler is gcc-3.2)
   	GXX_VERSION=gcc3.2
+        case "$GXX_VERSION_STRING" in
+	  *version\ 3.2.0*) GXX_VERSION_DETAILED=gcc3.2.0 ;;
+	  *version\ 3.2.1*) GXX_VERSION_DETAILED=gcc3.2.1 ;;
+	  *version\ 3.2.2*) GXX_VERSION_DETAILED=gcc3.2.2 ;;
+	  *version\ 3.2.3*) GXX_VERSION_DETAILED=gcc3.2.3 ;;
+	  *)                GXX_VERSION_DETAILED=gcc3.2.x ;;
+        esac
   	;;
       *version\ 3.3*)
-  	AC_MSG_RESULT(C++ compiler is gcc-3.3)
   	GXX_VERSION=gcc3.3
+        case "$GXX_VERSION_STRING" in
+	  *version\ 3.3.0*) GXX_VERSION_DETAILED=gcc3.3.0 ;;
+	  *version\ 3.3.1*) GXX_VERSION_DETAILED=gcc3.3.1 ;;
+	  *version\ 3.3.2*) GXX_VERSION_DETAILED=gcc3.3.2 ;;
+	  *version\ 3.3.3*) GXX_VERSION_DETAILED=gcc3.3.3 ;;
+	  *version\ 3.3.4*) GXX_VERSION_DETAILED=gcc3.3.4 ;;
+	  *)                GXX_VERSION_DETAILED=gcc3.3.x ;;
+        esac
   	;;
       *version\ 3.4*)
-  	AC_MSG_RESULT(C++ compiler is gcc-3.4)
+        case "$GXX_VERSION_STRING" in
+	  *version\ 3.4.0*) GXX_VERSION_DETAILED=gcc3.4.0 ;;
+	  *version\ 3.4.1*) GXX_VERSION_DETAILED=gcc3.4.1 ;;
+	  *version\ 3.4.2*) GXX_VERSION_DETAILED=gcc3.4.2 ;;
+	  *version\ 3.4.3*) GXX_VERSION_DETAILED=gcc3.4.3 ;;
+	  *version\ 3.4.4*) GXX_VERSION_DETAILED=gcc3.4.4 ;;
+	  *)                GXX_VERSION_DETAILED=gcc3.4.x ;;
+        esac
   	GXX_VERSION=gcc3.4
   	;;
-      *version\ 3.5*)
-  	AC_MSG_RESULT(C++ compiler is gcc-3.5)
-  	GXX_VERSION=gcc3.5
-  	;;
       *version\ 4.0*)
-  	AC_MSG_RESULT(C++ compiler is gcc-4.0)
   	GXX_VERSION=gcc4.0
+        case "$GXX_VERSION_STRING" in
+	  *version\ 4.0.0*) GXX_VERSION_DETAILED=gcc4.0.0 ;;
+	  *version\ 4.0.1*) GXX_VERSION_DETAILED=gcc4.0.1 ;;
+	  *)                GXX_VERSION_DETAILED=gcc4.0.x ;;
+        esac
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
@@ -91,6 +129,9 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	GXX_VERSION=gcc-other
   	;;
     esac
+    AC_MSG_RESULT([C++ compiler is $GXX_VERSION (subversion $GXX_VERSION_DETAILED)])
+
+
   else
     dnl Check other (non-gcc) compilers
   
@@ -105,6 +146,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
       dnl high...
       AC_MSG_RESULT(C++ compiler is IBM xlC)
       GXX_VERSION=ibm_xlc
+      GXX_VERSION_DETAILED=$GXX_VERSION
     else
   
       dnl Check whether we are dealing with the MIPSpro C++ compiler
@@ -117,24 +159,29 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             AC_MSG_RESULT(C++ compiler is $mips_pro)
             AC_MSG_ERROR(This compiler is not supported)
             GXX_VERSION=MIPSpro7.3
+            GXX_VERSION_DETAILED=$GXX_VERSION
             ;;
           *7.4)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.4)
             AC_MSG_ERROR(This compiler is not supported. Use MIPSPro compiler 7.4x)
             GXX_VERSION=MIPSpro7.4
+            GXX_VERSION_DETAILED=$GXX_VERSION
             ;;
           *7.41* | *7.42* | *7.43* | *7.44*)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.4x)
             GXX_VERSION=MIPSpro7.4x
+            GXX_VERSION_DETAILED=$GXX_VERSION
             ;;
           *"7.5"*)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.5)
             GXX_VERSION=MIPSpro7.5
+            GXX_VERSION_DETAILED=$GXX_VERSION
             ;;
           *)
             AC_MSG_RESULT(C++ compiler is unknown version but accepted MIPSpro compiler version)
             GXX_VERSION=MIPSpro-other
-            ;;
+            GXX_VERSION_DETAILED=$GXX_VERSION
+	    ;;
         esac
       else
   
@@ -170,6 +217,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             AC_MSG_RESULT(C++ compiler is Intel ICC)
             GXX_VERSION=intel_icc
           fi fi fi fi
+          GXX_VERSION_DETAILED=$GXX_VERSION
         else
   
           dnl Or DEC's cxx compiler?
@@ -177,6 +225,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           if test "x$is_dec_cxx" != "x" ; then
             AC_MSG_RESULT(C++ compiler is Compaq cxx)
             GXX_VERSION=compaq_cxx
+            GXX_VERSION_DETAILED=$GXX_VERSION
           else
   
       	    dnl Sun Workshop?
@@ -184,6 +233,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             if test "x$is_sun_cc" != "x" ; then
               AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
               GXX_VERSION=sun_workshop
+              GXX_VERSION_DETAILED=$GXX_VERSION
             else
   
   	      dnl Sun Forte?
@@ -191,6 +241,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
               if test "x$is_sun_forte_cc" != "x" ; then
                 AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
                 GXX_VERSION=sun_forte
+                GXX_VERSION_DETAILED=$GXX_VERSION
               else
   
   	        dnl Portland Group C++?
@@ -198,21 +249,24 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	        if test "x$is_pgcc" != "x" ; then
   	          AC_MSG_RESULT(C++ compiler is Portland Group C++)
   	          GXX_VERSION=portland_group
-  	        else
+    	          GXX_VERSION_DETAILED=$GXX_VERSION
+                else
   
   	          dnl HP aCC?
   	          is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
   	          if test "x$is_aCC" != "x" ; then
   	            AC_MSG_RESULT(C++ compiler is HP aCC)
   	            GXX_VERSION=hp_aCC
-  	          else
+  	            GXX_VERSION_DETAILED=$GXX_VERSION
+                  else
   
   	            dnl Borland C++
   	            is_bcc="`($CXX -h 2>&1) | grep 'Borland'`"
   	            if test "x$is_bcc" != "x" ; then
   	              AC_MSG_RESULT(C++ compiler is Borland C++)
   	              GXX_VERSION=borland_bcc
-  	            else
+  	              GXX_VERSION_DETAILED=$GXX_VERSION
+                    else
   
   	              dnl KAI C++? It seems as if the documented options
 		      dnl -V and --version are not always supported, so give
@@ -228,11 +282,13 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	              if test "x$is_kai_cc" != "x" ; then
   	                AC_MSG_RESULT(C++ compiler is KAI C++)
   	                GXX_VERSION=kai_cc
-  	              else
+   	                GXX_VERSION_DETAILED=$GXX_VERSION
+                      else
   
                         dnl  Aw, nothing suitable found...
                         AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
                         GXX_VERSION=unknown_cc
+                        GXX_VERSION_DETAILED=$GXX_VERSION
                       fi
                     fi
                   fi

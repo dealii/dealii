@@ -15,6 +15,7 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>CC=$(CC)</code>' >> $@
 	@echo '<li><code>F77=$(F77)</code>' >> $@
 	@echo '<li><code>GXX-VERSION=$(GXX-VERSION)</code>' >> $@
+	@echo '<li><code>GXX-VERSION-DETAILED=$(GXX-VERSION-DETAILED)</code>' >> $@
 	@echo '<li><code>CC-VERSION=$(CC-VERSION)</code>' >> $@
 	@echo '<li><code>F77-VERSION=$(F77-VERSION)</code>' >> $@
 	@echo '<li><code>SHLIBLD=$(SHLIBLD)</code>' >> $@
