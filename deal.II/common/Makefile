@@ -72,10 +72,10 @@ all:
 	cd ../base ; $(MAKE) $(MAKEOPTIONS) lib
 	cd ../lac ; $(MAKE) $(MAKEOPTIONS) libg
 	cd ../lac ; $(MAKE) $(MAKEOPTIONS) lib
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
-	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
 	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
 	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 2d
+	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
+	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
 	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 	cd ../deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
