@@ -1388,32 +1388,114 @@ FE_Q<3>::initialize_constraints ()
     poly_f = new TensorProductPolynomials<dim-1> (v);
 
     unsigned int constraint_no = constraint_points.size ();
-    unsigned int indx = 0;
     this->interface_constraints
         .TableBase<2,double>::reinit (this->interface_constraints_size());
 
     for (unsigned int j = 0; j < constraint_no; ++j)
+    {
+	double interval = (double) (degree * 2);
+	bool mirror[dim - 1];
+	Point<dim-1> constraint_point;
+
+	for (unsigned int k = 0; k < dim - 1; ++k)
+	{
+	                           // Eliminate FP errors in constraint 
+	                           // points. Due to their
+	                           // origin, they must all be fractions 
+ 	                           // of the unit interval. If
+	                           // we have polynomial degree 4, the 
+	                           // refined element has 8 intervals.
+	                           // Hence the coordinates must be 
+	                           // 0, 0.125, 0.25, 0.375 etc. 
+	                           // Now the coordinates of the 
+	                           // constraint points will be multiplied
+	                           // by the inverse of the interval 
+	                           // size (in the example by 8).
+	                           // After that the coordinates must 
+	                           // be integral numbers. Hence a
+	                           // normal truncation is performed and 
+	                           // the coordinates will be scaled
+	                           // back. The equal treatment of 
+	                           // all coordinates should eliminate
+	                           // any FP errors.
+	    int coord_int = (int) (constraint_points[j](k) * interval + 0.25);
+	    constraint_point(k) = (double) coord_int / interval;
+
+	                           // The following lines of code 
+	                           // should eliminate the problems
+	                           // with the Constraint-Matrix, 
+                                   // which appeared for P>=4. The
+	                           // Constraint-Matrix class 
+	                           // complained about different 
+	                           // constraints for the same 
+	                           // entry of the Constraint-Matrix.
+	                           // Actually this difference 
+	                           // could be attributed to FP
+	                           // errors, as it was in the 
+	                           // range of 1.0e-16. These errors
+	                           // originate in the loss of 
+	                           // symmetry in the FP approximation
+	                           // of the shape-functions. 
+	                           // Considering a 3rd order shape
+	                           // function in 1D, we have 
+	                           // N0(x)=N3(1-x) and N1(x)=N2(1-x).
+	                           // For higher order polynomials 
+	                           // the FP approximations of
+	                           // the shape functions do not 
+	                           // satisfy these equations any more!
+	                           // Thus in the following code 
+	                           // everything is computed in the 
+	                           // interval x \in [0..0.5], 
+	                           // which is sufficient to express
+	                           // all values that could come 
+	                           // out from a computation of any
+	                           // shape function in the full 
+	                           // interval [0..1]. If x > 0.5
+	                           // the computation is done for 
+	                           // 1-x with the shape function 
+	                           // N_{p-n} instead of N_n. 
+	                           // Hence symmetry is preserved and
+	                           // everything works fine ...
+	    if (constraint_point(k) > 0.5)
+	    {
+		constraint_point(k) = 1.0 - constraint_point(k);
+		mirror[k] = true;
+	    }
+	    else
+		mirror[k] = false;
+	}
+
 	for (unsigned i = 0; i < pnts; ++i)
 	{
-	    interface_constraints(j,i) = 
-		poly_f->compute_value(face_index_map [i], 
-				      constraint_points[j]);
+	    unsigned int indices[2],
+		new_index;
 
-					   // if the value is small up
-					   // to round-off, then
-					   // simply set it to zero to
-					   // avoid unwanted fill-in
-					   // of the constraint
-					   // matrices (which would
-					   // then increase the number
-					   // of other DoFs a
-					   // constrained DoF would
-					   // couple to)
+	    // poly_f->compute_index (face_index_map [i], indices);
+	    indices[0] = face_index_map[i] % (degree + 1);
+	    indices[1] = face_index_map[i] / (degree + 1);
+	    for (unsigned int k = 0; k < dim - 1; ++k)
+		if (mirror[k])
+		    indices[k] = degree - indices[k];
+	    new_index = indices[1] * (degree + 1) + indices[0];
+
+	    interface_constraints(j,i) = 
+		poly_f->compute_value(new_index, 
+				      constraint_point);
+	    
+				   // if the value is small up
+				   // to round-off, then
+				   // simply set it to zero to
+				   // avoid unwanted fill-in
+				   // of the constraint
+				   // matrices (which would
+				   // then increase the number
+				   // of other DoFs a
+				   // constrained DoF would
+				   // couple to)
 	    if (std::fabs(interface_constraints(j,i)) < 1e-14)
 		interface_constraints(j,i) = 0;
-
-	    indx++;
 	}
+    }
     delete poly_f;
 }
 #endif
