@@ -82,6 +82,7 @@ interpolation?
 Think about the problem pointed at in the documentation of
   FiniteElementBase::restriction.
 
+
 Implement the random distortion in Triangulation for hanging nodes
   also. Hanging nodes need to be reset to the correct mean value
   at the end, which is simple for 2D but difficult for 3D. Maybe take
@@ -178,3 +179,5 @@ Remove the hack in Make_forward_declarations when using gcc2.95. See
 Move the TriaNumberCache into the Triangulation class once the
   compiler supports this (gcc2.95 does not allow this at present)
   
+
+Fix vectors.cc to not use HUGE_VAL (GK)
