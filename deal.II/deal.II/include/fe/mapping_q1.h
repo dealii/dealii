@@ -38,6 +38,11 @@ class MappingQ1 : public Mapping<dim>
 {
   public:
 				     /**
+				      * Default constructor.
+				      */
+    MappingQ1 ();
+    
+				     /**
 				      * Transforms the point @p{p} on
 				      * the unit cell to the point
 				      * @p{p_real} on the real cell

@@ -39,6 +39,7 @@ MappingQ1<dim>::InternalData::InternalData (const unsigned int n_shape_functions
 {}
 
 
+
 template<int dim> inline
 double
 MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
@@ -87,6 +88,12 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 		       shape_derivatives.size()));
   return shape_derivatives [qpoint*n_shape_functions + shape_nr];
 }
+
+
+
+template <int dim>
+MappingQ1<dim>::MappingQ1 ()
+{};
 
 
 
