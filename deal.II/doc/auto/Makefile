@@ -39,7 +39,7 @@ kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 
 KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
-#KDOCFLAGS   = /home/people/wolf/var/kdoc/kdoc-2.a33/bin/kdoc -a -p \
+#KDOCFLAGS   = /home/people/wolf/var/kdoc/kdoc2/bin/kdoc -a -p \
 #              --html-logo=../../../pictures/deal.II_3.0_2.150.jpg
 ifeq ($(shell uname),SunOS)
 DOCPP = /home/people/wolf/Config/doc++/bin/doc++
