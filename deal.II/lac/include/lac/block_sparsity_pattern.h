@@ -44,6 +44,18 @@
  * that all sub-matrices in a column have to have the same number of
  * columns.
  *
+ *
+ * \section{On template instantiations}
+ *
+ * Member functions of this class are either implemented in this file
+ * or in a file of the same name with suffix ``.templates.h''. For the
+ * most common combinations of the template parameters, instantiations
+ * of this class are provided in a file with suffix ``.cc'' in the
+ * ``source'' directory. If you need an instantiation that is not
+ * listed there, you have to include this file along with the
+ * corresponding ``.templates.h'' file and instantiate the respective
+ * class yourself.
+ *
  * @author Wolfgang Bangerth, 2000
  */
 template <int rows, int columns=rows>
@@ -270,68 +282,6 @@ class BlockSparsityPattern : public Subscriptor
 /*---------------------- Template functions -----------------------------------*/
 
 
-template <int rows, int columns>
-BlockSparsityPattern<rows,columns>::BlockSparsityPattern () 
-{
-  Assert (rows>0,    ExcInvalidSize (rows));
-  Assert (columns>0, ExcInvalidSize (columns));
-};
-
-  
-
-template <int rows, int columns>
-BlockSparsityPattern<rows,columns> &
-BlockSparsityPattern<rows,columns>::operator = (const BlockSparsityPattern<rows,columns> &bsp)
-{
-				   // copy objects
-  for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<columns; ++j)
-      sub_objects[i][j] = bsp.sub_objects[i][j];
-				   // update index objects
-  collect_size ();
-};
-
-  
-
-
-template <int rows, int columns>
-void
-BlockSparsityPattern<rows,columns>::collect_sizes ()
-{
-  vector<unsigned int> row_sizes (rows);
-  vector<unsigned int> col_sizes (columns);
-
-				   // first find out the row sizes
-				   // from the first block column
-  for (unsigned int r=0; r<rows; ++r)
-    row_sizes[r] = sub_objects[r][0].n_rows();
-				   // then check that the following
-				   // block columns have the same
-				   // sizes
-  for (unsigned int c=1; c<columns; ++c)
-    for (unsigned int r=0; r<rows; ++r)
-      Assert (row_sizes[r] == sub_objects[r][c].n_rows(),
-	      ExcIncompatibleRowNumbers (r,0,r,c));
-
-				   // finally initialize the row
-				   // indices with this array
-  row_indices.reinit (row_sizes);
-  
-  
-				   // then do the same with the columns
-  for (unsigned int c=0; c<columns; ++c)
-    col_sizes[c] = sub_objects[0][c].n_cols();
-  for (unsigned int r=1; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      Assert (col_sizes[c] == sub_objects[r][c].n_cols(),
-	      ExcIncompatibleRowNumbers (0,c,r,c));
-
-				   // finally initialize the row
-				   // indices with this array
-  column_indices.reinit (col_sizes);
-};
-
-
 
 template <int rows, int columns>
 inline
@@ -358,50 +308,6 @@ BlockSparsityPattern<rows,columns>::block (const unsigned int row,
 template <int rows, int columns>
 inline
 void
-BlockSparsityPattern<rows,columns>::compress ()
-{
-  for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<columns; ++j)
-      sub_objects[i][j].compress ();
-};
-
-
-
-template <int rows, int columns>
-bool
-BlockSparsityPattern<rows,columns>::empty () const
-{
-  for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<columns; ++j)
-      if (sub_objects[i][j].empty () == false)
-	return false;
-  return true;
-};
-
-
-
-template <int rows, int columns>
-unsigned int
-BlockSparsityPattern<rows,columns>::max_entries_per_row () const
-{
-  unsigned int max_entries = 0;
-  for (unsigned int block_row=0; block_row<rows; ++block_row)
-    {
-      unsigned int this_row = 0;
-      for (unsigned int c=0; c<columns; ++c)
-	this_row += sub_objects[block_row][c].max_entries_per_row ();
-
-      if (this_row > max_entries)
-	max_entries = this_row;
-    };
-  return max_entries;
-};
-
-
-
-template <int rows, int columns>
-inline
-void
 BlockSparsityPattern<rows,columns>::add (const unsigned int i,
 					 const unsigned int j)
 {
@@ -413,62 +319,6 @@ BlockSparsityPattern<rows,columns>::add (const unsigned int i,
     col_index = column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first].add (row_index.second,
 						     col_index.second);
-};
-
-
-
-template <int rows, int columns>
-unsigned int
-BlockSparsityPattern<rows,columns>::n_rows () const
-{
-				   // only count in first column, since
-				   // all rows should be equivalent
-  unsigned int count = 0;
-  for (unsigned int r=0; r<rows; ++r)
-    count += sub_objects[r][0].n_rows();
-  return count;
-};
-
-
-
-template <int rows, int columns>
-unsigned int
-BlockSparsityPattern<rows,columns>::n_cols () const
-{
-				   // only count in first row, since
-				   // all rows should be equivalent
-  unsigned int count = 0;
-  for (unsigned int c=0; c<columns; ++c)
-    count += sub_objects[0][c].n_cols();
-  return count;
-};
-
-
-
-
-
-template <int rows, int columns>
-unsigned int
-BlockSparsityPattern<rows,columns>::n_nonzero_elements () const
-{
-  unsigned int count = 0;
-  for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<columns; ++j)
-      count += sub_objects[i][j].n_nonzero_elements ();
-  return count;
-};
-
-
-
-template <int rows, int columns>
-bool
-BlockSparsityPattern<rows,columns>::is_compressed () const
-{
-  for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<columns; ++j)
-      if (sub_objects[i][j].is_compressed () == false)
-	return false;
-  return true;
 };
 
 

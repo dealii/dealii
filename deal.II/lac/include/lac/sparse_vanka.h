@@ -110,6 +110,18 @@
  * whether this might pose some problems in the inversion of the local matrices.
  * Maybe someone would like to check this.
  *
+ *
+ * \section{On template instantiations}
+ *
+ * Member functions of this class are either implemented in this file
+ * or in a file of the same name with suffix ``.templates.h''. For the
+ * most common combinations of the template parameters, instantiations
+ * of this class are provided in a file with suffix ``.cc'' in the
+ * ``source'' directory. If you need an instantiation that is not
+ * listed there, you have to include this file along with the
+ * corresponding ``.templates.h'' file and instantiate the respective
+ * class yourself.
+ *
  * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000
  */
 template<typename number>

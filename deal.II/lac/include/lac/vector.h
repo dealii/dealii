@@ -28,6 +28,18 @@
  * As opposed to the array of the C++ standard library called #vector#, this class implements
  * an element of a vector space suitable for numerical computations.
  *
+ *
+ * \section{On template instantiations}
+ *
+ * Member functions of this class are either implemented in this file
+ * or in a file of the same name with suffix ``.templates.h''. For the
+ * most common combinations of the template parameters, instantiations
+ * of this class are provided in a file with suffix ``.cc'' in the
+ * ``source'' directory. If you need an instantiation that is not
+ * listed there, you have to include this file along with the
+ * corresponding ``.templates.h'' file and instantiate the respective
+ * class yourself.
+ *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>

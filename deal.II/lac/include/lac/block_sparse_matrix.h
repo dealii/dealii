@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 2000 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,23 @@
 
 
 
+/**
+ * Blocked sparse matrix.
+ *
+ *
+ * \section{On template instantiations}
+ *
+ * Member functions of this class are either implemented in this file
+ * or in a file of the same name with suffix ``.templates.h''. For the
+ * most common combinations of the template parameters, instantiations
+ * of this class are provided in a file with suffix ``.cc'' in the
+ * ``source'' directory. If you need an instantiation that is not
+ * listed there, you have to include this file along with the
+ * corresponding ``.templates.h'' file and instantiate the respective
+ * class yourself.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
 template <typename number, int  rows, int columns=rows>
 class BlockSparseMatrix : public Subscriptor
 {
@@ -382,60 +399,6 @@ class BlockSparseMatrix : public Subscriptor
 /* ------------------------- Template functions ---------------------- */
 
 
-template <typename number, int  rows, int columns>
-BlockSparseMatrix<number,rows,columns>::BlockSparseMatrix () :
-		sparsity_pattern (0)
-{};
-
-
-
-template <typename number, int  rows, int columns>
-BlockSparseMatrix<number,rows,columns>::
-BlockSparseMatrix (const BlockSparsityPattern<rows,columns> &sparsity)
-{
-  reinit (sparsity);
-};
-
-
-
-template <typename number, int  rows, int columns>
-BlockSparseMatrix<number,rows,columns> &
-BlockSparseMatrix<number,rows,columns>::
-operator = (const BlockSparseMatrix<number,rows,columns> &m) 
-{
-  *sparsity_pattern = *m.sparsity_pattern;
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      block(r,c) = m.block(r,c);
-};
-
- 
-
-template <typename number, int  rows, int columns>
-void
-BlockSparseMatrix<number,rows,columns>::reinit ()
-{
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      block(r,c).reinit ();
-};
-
-
-
-template <typename number, int  rows, int columns>
-void
-BlockSparseMatrix<number,rows,columns>::reinit (const BlockSparsityPattern<rows,columns> &sparsity)
-{
-  sparsity_pattern = &sparsity;
-  
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      block(r,c).reinit (sparsity.block(r,c));
-};
-
-
-
-
 template <typename number, int rows, int columns>
 inline
 SparseMatrix<number> &
@@ -465,31 +428,7 @@ BlockSparseMatrix<number,rows,columns>::block (const unsigned int row,
 
 
 template <typename number, int  rows, int columns>
-void
-BlockSparseMatrix<number,rows,columns>::clear () 
-{
-  sparsity_pattern = 0;
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      block(r,c).clear ();
-};
-
-
-
-template <typename number, int  rows, int columns>
-bool
-BlockSparseMatrix<number,rows,columns>::empty () const
-{
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      if (block(r,c).empty () == false)
-	return false;
-  return true;
-};
-
-
-
-template <typename number, int  rows, int columns>
+inline
 unsigned int
 BlockSparseMatrix<number,rows,columns>::m () const
 {
@@ -499,6 +438,7 @@ BlockSparseMatrix<number,rows,columns>::m () const
 
 
 template <typename number, int  rows, int columns>
+inline
 unsigned int
 BlockSparseMatrix<number,rows,columns>::n () const
 {
@@ -508,15 +448,7 @@ BlockSparseMatrix<number,rows,columns>::n () const
 
 
 template <typename number, int  rows, int columns>
-unsigned int
-BlockSparseMatrix<number,rows,columns>::n_nonzero_elements () const
-{
-  return sparsity_pattern->n_nonzero_elements ();
-};
-
-
-
-template <typename number, int  rows, int columns>
+inline
 void
 BlockSparseMatrix<number,rows,columns>::set (const unsigned int i,
 					     const unsigned int j,
@@ -533,6 +465,7 @@ BlockSparseMatrix<number,rows,columns>::set (const unsigned int i,
 
 
 template <typename number, int  rows, int columns>
+inline
 void
 BlockSparseMatrix<number,rows,columns>::add (const unsigned int i,
 					     const unsigned int j,
@@ -545,6 +478,22 @@ BlockSparseMatrix<number,rows,columns>::add (const unsigned int i,
 					      col_index.second,
 					      value);
 };
+
+
+
+template <typename number, int  rows, int columns>
+inline
+number
+BlockSparseMatrix<number,rows,columns>::operator () (const unsigned int i,
+						     const unsigned int j) const
+{
+  const pair<unsigned int,unsigned int>
+    row_index = sparsity_pattern->row_indices.global_to_local (i),
+    col_index = sparsity_pattern->column_indices.global_to_local (j);
+  return block(row_index.first,col_index.first) (row_index.second,
+						 col_index.second);
+};
+
 
 
 
@@ -575,19 +524,6 @@ add_scaled (const number factor,
       block(r,c).add_scaled (factor, matrix.block(r,c));
 };
 
-
-
-template <typename number, int  rows, int columns>
-number
-BlockSparseMatrix<number,rows,columns>::operator () (const unsigned int i,
-						     const unsigned int j) const
-{
-  const pair<unsigned int,unsigned int>
-    row_index = sparsity_pattern->row_indices.global_to_local (i),
-    col_index = sparsity_pattern->column_indices.global_to_local (j);
-  return block(row_index.first,col_index.first) (row_index.second,
-						 col_index.second);
-};
 
 
 
@@ -696,15 +632,6 @@ matrix_scalar_product (const BlockVector<rows,somenumber>    &u,
       result += block(row,col).matrix_scalar_product (u.block(row),
 						      v.block(col));
   return result;
-};
-
-
-
-template <typename number, int  rows, int columns>
-const BlockSparsityPattern<rows,columns> &
-BlockSparseMatrix<number,rows,columns>::get_sparsity_pattern () const
-{
-  return *sparsity_pattern;
 };
 
 
