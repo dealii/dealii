@@ -266,6 +266,13 @@ sub processClass
 # parse out // comments, except where in a string or 
 	s#//.*$##g unless m#"[^"]+".*//# || m#^\s*///#;
 
+
+	# if we find a "template <whatever>" on a single line,
+        # concatenate it with the next line
+        if ( /^\s*(template\s*<(([-\w,_\s]|<([-\w,+\s])+>)+)>\s*)\n/ ) {
+	    $_ = $1 . " " . <IN>;
+	}
+
 	$line = $_;
 
 	if ( /^\s*\}\s*;\s*(\/\/.*)?$/ )
@@ -566,9 +573,11 @@ sub processClass
 
 	#### Member Function
 
-	elsif ( /^\s*((template\s*<[^>]*>\s*\n?\s*)?[^\(]*)\s+([^\s\(]+)\s*\((.*)(\/\/.*)?$/ ) 
+	elsif ( /^\s*([^\(]*)\s+([^\s\(]+)\s*\((.*)(\/\/.*)?$/ ) 
 	{
-		processMethod( $1, $3, $4 );
+	    # note that the return type may contain
+	    # template <whatever>!
+		processMethod( $1, $2, $3 );
 	}
 
     }
