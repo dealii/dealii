@@ -2,7 +2,7 @@
 //    petsc_03a.cc,v 1.4 2003/07/03 10:31:46 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2004 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
