@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,7 +65,7 @@
  * @verbatim
  * Parameter_Handler prm;
  * prm.declare_entry ("solver", "none",
- *                    Patterns::Sequence(SolverSelector::get_solver_names()));
+ *                    Patterns::Selection(SolverSelector<>::get_solver_names()));
  * ...
  * @endverbatim
  * Assuming that in the users parameter file there exists the line
