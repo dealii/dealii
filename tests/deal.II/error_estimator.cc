@@ -73,7 +73,7 @@ template <int dim>
 void
 check ()
 {
-  CosineFunction<dim> function;
+  Functions::CosineFunction<dim> function;
   
   Triangulation<dim> tr;  
   if (dim==2)
