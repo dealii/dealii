@@ -11,6 +11,7 @@
 #include <lac/forward_declarations.h>
 
 #include <vector>
+#include <map>
 
 
 /**
@@ -203,6 +204,23 @@ class SparseVanka
 				      * selected diagonal elements.
 				      */
     void compute_inverses ();
+
+				     /**
+				      * Compute the inverse of the
+				      * block located at position
+				      * #row#. Since the map is used
+				      * quite often, it is generated
+				      * only once in the caller of
+				      * this function and passed to
+				      * this function which first
+				      * clears it. Reusing the map
+				      * makes the process
+				      * significantly faster than in
+				      * the case where this function
+				      * re-creates it each time.
+				      */
+    void compute_inverse (const unsigned int               row,
+			  map<unsigned int, unsigned int> &local_index);
 };
 
 
