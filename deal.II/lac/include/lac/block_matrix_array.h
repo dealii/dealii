@@ -228,18 +228,31 @@ BlockMatrixArray<MATRIX>::vmult_add (BlockVector<VECTOR>& dst,
   Assert (src.n_blocks() == block_cols,
 	  ExcDimensionMismatch(src.n_blocks(), block_cols));
 
+  static Vector<VECTOR> aux;
+  
   typename vector<Entry>::const_iterator m = entries.begin();
   typename vector<Entry>::const_iterator end = entries.end();
   
   for (; m != end ; ++m)
     {
-      Assert (m->prefix==1., ExcNotImplemented());
-      if (m->transpose)
-	m->matrix->Tvmult_add(dst.block(m->row),
+      if (m->prefix==1.)
+	{
+	  if (m->transpose)
+	    m->matrix->Tvmult_add(dst.block(m->row),
+				  src.block(m->col));
+	  else
+	    m->matrix->vmult_add(dst.block(m->row),
+				 src.block(m->col));
+	} else {
+	  aux.reinit(dst.block(m->row));
+	  if (m->transpose)
+	    m->matrix->Tvmult(aux,
 			      src.block(m->col));
-      else
-	m->matrix->vmult_add(dst.block(m->row),
+	  else
+	    m->matrix->vmult(aux,
 			     src.block(m->col));
+	  dst.block(m->row).add (m->prefix, aux);
+	}
     }
 }
 
@@ -275,15 +288,28 @@ BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<VECTOR>& dst,
   typename vector<Entry>::const_iterator m = entries.begin();
   typename vector<Entry>::const_iterator end = entries.end();
   
+  static Vector<VECTOR> aux;
+  
   for (; m != end ; ++m)
     {
-      Assert (m->prefix==1., ExcNotImplemented());
-      if (m->transpose)
-	m->matrix->vmult_add(dst.block(m->col),
-			     src.block(m->row));
-      else
-	m->matrix->Tvmult_add(dst.block(m->col),
-			      src.block(m->row));
+      if (m->prefix==1.)
+	{
+	  if (m->transpose)
+	    m->matrix->vmult_add(dst.block(m->row),
+				  src.block(m->col));
+	  else
+	    m->matrix->Tvmult_add(dst.block(m->row),
+				 src.block(m->col));
+	} else {
+	  aux.reinit(dst.block(m->row));
+	  if (m->transpose)
+	    m->matrix->vmult(aux,
+			      src.block(m->col));
+	  else
+	    m->matrix->Tvmult(aux,
+			     src.block(m->col));
+	  dst.block(m->row).add (m->prefix, aux);
+	}
     }
 }
 
