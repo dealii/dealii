@@ -44,7 +44,6 @@ FEQ1Mapping<1>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 
 
 template <>
-inline
 double
 FEQ1Mapping<1>::shape_value_transform (const unsigned int i,
 				       const Point<1>     &p) const
@@ -61,7 +60,6 @@ FEQ1Mapping<1>::shape_value_transform (const unsigned int i,
 
 
 template <>
-inline
 Tensor<1,1>
 FEQ1Mapping<1>::shape_grad_transform(const unsigned int i,
 				     const Point<1>&) const
@@ -159,7 +157,6 @@ FEQ1Mapping<2>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 
 
 template <>
-inline
 double
 FEQ1Mapping<2>::shape_value_transform (const unsigned int i,
 				       const Point<2>& p) const
@@ -177,7 +174,6 @@ FEQ1Mapping<2>::shape_value_transform (const unsigned int i,
 
 
 template <>
-inline
 Tensor<1,2>
 FEQ1Mapping<2>::shape_grad_transform (const unsigned int i,
 				      const Point<2>& p) const
@@ -325,7 +321,6 @@ FEQ1Mapping<3>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 
 
 template <>
-inline
 double
 FEQ1Mapping<3>::shape_value_transform (const unsigned int i,
 				       const Point<3>& p) const
@@ -347,7 +342,6 @@ FEQ1Mapping<3>::shape_value_transform (const unsigned int i,
 
 
 template <>
-inline
 Tensor<1,3>
 FEQ1Mapping<3>::shape_grad_transform (const unsigned int i,
 				      const Point<3>& p) const
