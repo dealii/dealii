@@ -12,10 +12,25 @@
 //----------------------------  grid_generator.cc  ---------------------------
 
 
+#include <base/quadrature_lib.h>
+#include <base/thread_management.h>
+#include <lac/vector.h>
+#include <lac/vector_memory.h>
+#include <lac/filtered_matrix.h>
+#include <lac/precondition.h>
+#include <lac/solver_cg.h>
+#include <lac/sparse_matrix.h>
 #include <grid/grid_generator.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+#include <fe/mapping_q1.h>
+#include <fe/fe_q.h>
+#include <numerics/matrices.h>
+
 #include <cmath>
 
 
@@ -723,6 +738,104 @@ void GridGenerator::hyper_shell (Triangulation<3>   &,
 #endif
 
 
+template <int dim>
+void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
+					    const std::map<unsigned int,Point<dim> > &new_points)
+{
+				   // first provide everything that is
+				   // needed for solving a Laplace
+				   // equation.  
+  MappingQ1<dim> mapping_q1;  
+  FE_Q<dim> q1(1);
+  
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(q1);
+  SparsityPattern sparsity_pattern (dof_handler.n_dofs (), dof_handler.n_dofs (),
+				    dof_handler.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
+  sparsity_pattern.compress ();
+  
+  SparseMatrix<double> S(sparsity_pattern);
+  
+  QGauss4<dim> quadrature;
+  
+  MatrixCreator<dim>::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
+
+				   // set up the boundary values for
+				   // the laplace problem
+  std::vector<std::map<unsigned int,double> > m(dim);
+  typename std::map<unsigned int,Point<dim> >::const_iterator map_iter;
+
+				   // fill these maps using the data
+				   // given by new_points
+  typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
+				 endc=dof_handler.end();
+  typename DoFHandler<dim>::face_iterator face;
+  for (; cell!=endc; ++cell)
+    {
+      if (cell->at_boundary())
+	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+	  {
+	    face=cell->face(face_no);
+	    if (face->at_boundary())
+	      for (unsigned int vertex_no=0;
+		   vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
+		{
+		  const unsigned int vertex_index=face->vertex_index(vertex_no);
+		  map_iter=new_points.find(vertex_index);
+		  for (unsigned int i=0; i<dim; ++i)
+		    m[i].insert(pair<unsigned int,double> (
+		      face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
+		}
+	  }
+    }
+  
+				   // solve the dim problems with
+				   // different right hand sides.
+  std::vector<Vector<double> > us(dim, Vector<double> (dof_handler.n_dofs()));
+  
+				   // solve linear systems in parallel
+  Threads::ThreadManager thread_manager;
+  for (unsigned int i=0; i<dim; ++i)
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate (&GridGenerator::laplace_solve)
+		    .collect_args (S, m[i], us[i]));
+  thread_manager.wait ();
+  
+				   // change the coordinates of the
+				   // points of the triangulation
+				   // according to the computed values
+  for (cell=dof_handler.begin_active(); cell!=endc; ++cell)
+    for (unsigned int vertex_no=0;
+	 vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
+      {
+	Point<dim> &v=cell->vertex(vertex_no);
+	const unsigned int dof_index=cell->vertex_dof_index(vertex_no, 0);
+	for (unsigned int i=0; i<dim; ++i)
+	  v(i)=us[i](dof_index);
+      }
+}
+
+
+void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
+				   const std::map<unsigned int,double> &m,
+				   Vector<double> &u)
+{
+  const unsigned int n_dofs=S.n();
+  FilteredMatrix<SparseMatrix<double> > SF (S);
+  SolverControl control (1000, 1.e-10, false, false);
+  PrimitiveVectorMemory<Vector<double> > mem;
+  SolverCG<Vector<double> > solver (control, mem);
+  PreconditionJacobi<FilteredMatrix<SparseMatrix<double> > > prec;
+  Vector<double> f(n_dofs);
+  
+  SF.add_constraints(m);
+  prec.initialize (SF);
+  SF.apply_constraints (f, true);
+  solver.solve(SF, u, f, prec);
+}
+
+
 // explicit instantiations
 template void
 GridGenerator::hyper_rectangle (Triangulation<deal_II_dimension> &,
@@ -733,4 +846,8 @@ template void
 GridGenerator::hyper_cube (Triangulation<deal_II_dimension> &,
 			   const double,
 			   const double);
+
+template void
+GridGenerator::laplace_transformation (Triangulation<deal_II_dimension> &,
+				       const std::map<unsigned int,Point<deal_II_dimension> > &);
 

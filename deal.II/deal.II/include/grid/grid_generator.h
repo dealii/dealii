@@ -15,10 +15,13 @@
 
 
 #include <base/exceptions.h>
-
 template <int dim> class Point;
 template <int dim> class Triangulation;
+template <typename number> class Vector;
+template <typename number> class SparseMatrix;
 
+
+#include <map>
 
 /**
  * This class offers triangulations of some standard domains such as hypercubes,
@@ -95,7 +98,7 @@ template <int dim> class Triangulation;
  *      of the eight child-cubes from one of their neighbors.
  * @end{itemize}
  *
- * @author Wolfgang Bangerth, 1998, 1999. Slit domain by Stefan Nauber, 1999
+ * @author Wolfgang Bangerth, 1998, 1999. Slit domain by Stefan Nauber, 1999. Laplace transformation by Ralf Hartmann, 2001.
  */
 class GridGenerator
 {
@@ -302,6 +305,30 @@ class GridGenerator
 				  const double        inner_radius,
 				  const double        outer_radius,
 				  const unsigned int  n_cells = 0);
+
+
+				     /**
+				      * This function transformes the
+				      * @p{Triangulation} @p{tria}
+				      * smoothly to a domain that is
+				      * described by the boundary
+				      * points in the map
+				      * @p{new_points}. This map maps
+				      * the point indices to the
+				      * boundary points in the
+				      * transformed domain.
+				      *
+				      * Note, that the
+				      * @p{Triangulation} is changed
+				      * in-place, therefore you don't
+				      * need to keep two
+				      * triangulations, but the given
+				      * triangulation is changed
+				      * (overwritten).
+				      */
+    template <int dim>
+    static void laplace_transformation (Triangulation<dim> &tria,
+					const std::map<unsigned int,Point<dim> > &new_points);
     
 				     /**
 				      * Exception
@@ -317,6 +344,17 @@ class GridGenerator
 				      */
     template <int dim>
     static void colorize_hyper_rectangle (Triangulation<dim> &tria);
+
+				     /**
+				      * Multiply called by the
+				      * @p{laplace_transformation}
+				      * function. Solves the Laplace
+				      * equation for one of the
+				      * @p{dim} dimension.
+				      */
+    static void laplace_solve (const SparseMatrix<double> &S,
+			       const std::map<unsigned int,double> &m,
+			       Vector<double> &u);
 };
 
 
