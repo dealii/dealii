@@ -845,7 +845,7 @@ class SparseMatrixEZ : public Subscriptor
     				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidIndex,
+    DeclException2 (ExcInvalidEntry,
 		    int, int,
 		    << "The entry with index <" << arg1 << ',' << arg2
 		    << "> does not exist.");
