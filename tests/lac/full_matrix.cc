@@ -24,6 +24,12 @@
 int
 main ()
 {
+  ofstream logfile("full_matrix.output");
+  logfile.setf(ios::fixed);
+  logfile.precision(3);
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  
   FullMatrix<double> A(5,5), C(5,5), D(5,5), H(5,5);
   D(0,0) = 1.;
   D(1,1) = 2.;
@@ -42,34 +48,65 @@ main ()
       C(i+1,i) = sin(i+1);
       C(i,i+1) = -sin(i+1);
 
+      C.print_formatted (logfile);
+      deallog << "l1-norm: " << C.l1_norm() << endl;
+      D = C;
+      D.gauss_jordan();
+      D.print_formatted (logfile);
+      deallog << "linfty-norm: " << D.linfty_norm() << endl
+	      << "Frobenius-norm: " << D.norm2() << endl;
+
 				       // Rotate original matrix
       A.mmult(H,C);
       C.Tmmult(A,H);
     }
 
-  A.print_formatted (cout);
+  A.print_formatted (logfile);
 
   Vector<double> u(5);
   GrowingVectorMemory<Vector<double> > mem;
   
   SolverControl control (500,1.e-8, false, true);
   
-  {
-    u = 1.;
-    EigenPower<Vector<double> >
-      von_Mises(control, mem, 0.);
-    double eigen = 0.;
-    von_Mises.solve(eigen, A, u);
-    deallog << "Eigenvalue: " << eigen << endl;
-  }
-  {
-    u = 1.;
-    EigenPower<Vector<double> >
-      von_Mises(control, mem, -4.);
-    double eigen = 0.;
-    von_Mises.solve(eigen, A, u);
-    deallog << "Eigenvalue: " << eigen << endl;
-  }
+  if (true)
+    {
+      u = 1.;
+      EigenPower<Vector<double> >
+	von_Mises(control, mem, 0.);
+      double eigen = 0.;
+      von_Mises.solve(eigen, A, u);
+      deallog << "Eigenvalue: " << eigen << endl;
+    }
+  if (true)
+    {
+      u = 1.;
+      EigenPower<Vector<double> >
+	von_Mises(control, mem, -4.);
+      double eigen = 0.;
+      von_Mises.solve(eigen, A, u);
+      deallog << "Eigenvalue: " << eigen << endl;
+    }
+  H = A;
+  H.gauss_jordan();
+  H.print_formatted (logfile);
+  if (true)
+    {
+      u = 1.;
+      EigenPower<Vector<double> >
+	von_Mises(control, mem, 0.);
+      double eigen = 0.;
+      von_Mises.solve(eigen, H, u);
+      deallog << "Eigenvalue: " << eigen << endl;
+    }
+  if (true)
+    {
+      u = 1.;
+      EigenPower<Vector<double> >
+	von_Mises(control, mem, -4.);
+      double eigen = 0.;
+      von_Mises.solve(eigen, H, u);
+      deallog << "Eigenvalue: " << eigen << endl;
+    }   
 }
 
       
