@@ -108,10 +108,29 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     else
   
       dnl Check whether we are dealing with the MIPSpro C++ compiler
-      is_mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
-      if test "x$is_mips_pro" != "x" ; then
-        AC_MSG_RESULT(C++ compiler is MIPSpro C++ compiler)
-        GXX_VERSION=MIPSpro
+      mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
+      if test "x$mips_pro" != "x" ; then
+        case "$mips_pro" in
+          *"7.0"* | *"7.1"* | *"7.2"* | *"7.3"*)
+            dnl MIPSpro 7.3 does not support standard C++, therefore it is not
+            dnl able to compile deal.II. Previous compiler versions neither.
+            AC_MSG_RESULT(C++ compiler is $mips_pro)
+            AC_MSG_ERROR(This compiler is not supported)
+            GXX_VERSION=MIPSpro7.3
+            ;;
+          *"7.4"*)
+            AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.4)
+            GXX_VERSION=MIPSpro7.4
+            ;;
+          *"7.5"*)
+            AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.5)
+            GXX_VERSION=MIPSpro7.5
+            ;;
+          *)
+            AC_MSG_RESULT(C++ compiler is unknown version but accepted MIPSpro compiler version)
+            GXX_VERSION=MIPSpro-other
+            ;;
+        esac
       else
   
         dnl Intel's ICC C++ compiler? On Linux, it uses -V, on Windows
@@ -375,11 +394,32 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           LDFLAGSPIC="-fPIC"
           ;;
   
-      MIPSpro)
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -LANG:std"
-          CXXFLAGSO="$CXXFLAGS -LANG:alias_const=ON -LANG:std -w"
+      MIPSpro*)
+          dnl Disable some compiler warnings, as they trigger some warnings in
+          dnl system and compiler include files
+          dnl cc-1429 CC: WARNING File = /usr/include/internal/stdlib_core.h, Line = 128
+          dnl The type "long long" is nonstandard.
+          dnl cc-1066 CC: WARNING File = /usr/include/CC/stl_ctype.h, Line = 28
+          dnl The indicated enumeration value is out of "int" range.
+          dnl cc-1485 CC: WARNING File = /usr/include/CC/iomanip, Line = 122
+          dnl This form for taking the address of a member function is nonstandard.
+          CXXFLAGSG="$CXXFLAGS -DDEBUG -LANG:std -ansiW -woff 1429,1066,1485"
+          dnl Disable some compiler warnings, that warn about variables
+          dnl which are used in Assert templates but not in optimized mode
+          dnl cc-1174 CC: full_matrix.templates.h, Line = 1461
+          dnl The variable "typical_diagonal_element" was declared but never referenced.
+          dnl cc-1552 CC: WARNING File = source/data_out_base.cc, Line = 3493
+          dnl The variable "ierr" is set but never used.
+          CXXFLAGSO="$CXXFLAGS -O2 -LANG:std -woff 1174,1552"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
+          dnl Avoid output of prelinker: although manpages tell that -quiet_prelinker
+          dnl should work, it is not accepted (CC ERROR parsing -quiet_prelinker:  unknown flag)
+          dnl LDFLAGS="$LDFLAGS -quiet_prelinker"
+          dnl
+          dnl Always link with math library: The -lm option must be at the end of the
+          dnl linker command, therefore it cannot be included into LDFLAGS
+          LIBS="$LIBS -lm"
           ;;
   
       intel_icc*)
