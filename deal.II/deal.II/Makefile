@@ -89,17 +89,6 @@ lib/3d/o/%.o :
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 
-# special rules for exceptional files. they simply take too long to compile!
-lib/3d/o/q1_mapping.jacobians_3d.o:
-	@echo =====deal.II====3d====opt==spec==$(MT)== $(<:source/%=%)
-	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
-
-ifeq ($(GXX-Version),gcc2.95)
-lib/2d/o/fe_lib.quartic_2d.o:
-	@echo =====deal.II====2d====opt==spec==$(MT)== $(<:source/%=%)
-	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=2 -c $< -o $@
-endif
-
 
 
 # rules how to make the libraries themselves
