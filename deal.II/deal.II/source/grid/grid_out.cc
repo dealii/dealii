@@ -379,11 +379,16 @@ void GridOut::write_xfig (const Triangulation<dim>&,
 
 #else
 
+//TODO:[GK] Write boundary faces
+//TODO:[GK] Obey parameters
+//TODO:[GK] Flip y-axis?
 template <int dim>
 void GridOut::write_xfig (const Triangulation<dim>& tria,
 			  std::ostream&             out,
 			  const Mapping<dim>*       mapping)
 {
+  const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
+  const unsigned int nf = GeometryInfo<dim>::faces_per_cell;
 				   // The following text was copied
 				   // from an existing XFig file.
   out << "#FIG 3.2\nLandscape\nCenter\nInches" << std::endl
@@ -413,23 +418,24 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 					 // some style parameters
 	  << " 0 0 -1 0 0 "
 					 // number of points
-	  << '5' << std::endl;
+	  << nv+1 << std::endl;
 
 				       // For each point, write scaled
 				       // and shifted coordinates
 				       // multiplied by 1200
 				       // (dots/inch)
-      const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
       for (unsigned int k=0;k<=nv;++k)
 	{
 	  const Point<dim>& p = cell->vertex(k % nv);
 	  for (unsigned int d=0;d<dim;++d)
 	    {
-	      out << '\t'
-		  << 1200 * (p(d)-xfig_flags.offset(d)) * xfig_flags.scaling(d);
+	      int val = (int)(1200 * xfig_flags.scaling(d) *
+			      (p(d)-xfig_flags.offset(d)));
+	      out << '\t' << val;
 	    }
 	  out << std::endl;
 	}
+				       // Now write boundary edges
     }
 }
 #endif
