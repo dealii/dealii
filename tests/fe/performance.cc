@@ -10,16 +10,21 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
-#include <fe/fe_lib.lagrange.h>
-#include <fe/fe_lib.dg.h>
+#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
+#include <fe/mapping_cartesian.h>
+#include <fe/mapping_q1.h>
+#include <fe/mapping_q.h>
 #include <fe/fe_values.h>
 #include <vector>
 #include <fstream>
+#include <strstream>
 #include <string>
 
 template <int dim>
 void performance (Triangulation<dim>& tr,
+		  const Mapping<dim>& mapping,
 		  const FiniteElement<dim>& fe,
 		  const Quadrature<dim>& quadrature,
 		  UpdateFlags flags)
@@ -30,7 +35,7 @@ void performance (Triangulation<dim>& tr,
 
   deallog << "Create FEValues" << endl;
   
-  FEValues<dim> val (fe, quadrature, flags);
+  FEValues<dim> val (mapping, fe, quadrature, flags);
 
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   DoFHandler<dim>::active_cell_iterator end = dof.end();
@@ -43,45 +48,82 @@ void performance (Triangulation<dim>& tr,
   deallog << "End" << endl;
 }
 
+template <int dim>
+void loop (vector<FiniteElement<dim> *> elements,
+	    const Mapping<dim>& mapping,
+	    Triangulation<dim>& tr)
+{
+  QGauss<dim> gauss (4);
+  
+  FiniteElement<dim>** elementp = elements.begin ();
+  FiniteElement<dim>** end = elements.end ();
+
+  for (;elementp != end; ++elementp)
+    {
+      const FiniteElement<dim>& element = **elementp;
+
+      char dofs[20];
+      ostrstream ost (dofs, 19);
+      ost << element.n_dofs_per_cell() << ends;
+      
+      deallog.push(dofs);
+      
+      deallog.push("points");
+      performance (tr, mapping, element, gauss, update_q_points);
+      deallog.pop();
+  
+      deallog.push("values");
+      performance (tr, mapping, element, gauss, update_values);
+      deallog.pop();
+  
+      deallog.push("grads-");
+      performance (tr, mapping, element, gauss, update_gradients);
+      deallog.pop();
+  
+      deallog.push("2nd---");
+      performance (tr, mapping, element, gauss, update_second_derivatives);
+      deallog.pop();
+  
+      deallog.push("matrix");
+      performance (tr, mapping, element, gauss, update_q_points
+		   | update_JxW_values
+		   | update_values
+		   | update_gradients);
+      deallog.pop();
+
+      deallog.push("all---");
+      performance (tr, mapping, element, gauss, update_q_points
+		   | update_JxW_values
+		   | update_values
+		   | update_gradients
+		   | update_second_derivatives);
+      deallog.pop();
+      deallog.pop();
+    }
+}
+
 int main ()
 {
+  ofstream of ("performance.log");
+  deallog.attach (of);
   deallog.log_execution_time(true);
+  deallog.log_time_differences(true);
   Triangulation<2> tr;
   GridGenerator::hyper_ball (tr);
-  tr.refine_global (9);
+  tr.refine_global (8);
   
-  QGauss<2> gauss (3);
-  
-  FEQ2<2> element;
+  MappingCartesian<2> cartesian;
+  MappingQ1<2> mapping;
+  MappingQ<2> mappingq1(1);
+  MappingQ<2> mappingq2(2);
+  vector<FiniteElement<2>*> el2d;
+  el2d.push_back (new FE_Q<2> (1));
+  el2d.push_back (new FE_Q<2> (2));
+  el2d.push_back (new FE_Q<2> (3));
+  el2d.push_back (new FE_Q<2> (4));
 
-  deallog.push("points");
-  performance (tr, element, gauss, update_q_points);
-  deallog.pop();
-  
-  deallog.push("values");
-  performance (tr, element, gauss, update_values);
-  deallog.pop();
-  
-  deallog.push("grads-");
-  performance (tr, element, gauss, update_gradients);
-  deallog.pop();
-  
-  deallog.push("2nd---");
-  performance (tr, element, gauss, update_second_derivatives);
-  deallog.pop();
-
-  deallog.push("matrix");
-  performance (tr, element, gauss, UpdateFlags (update_q_points
-	       | update_JxW_values
-	       | update_values
-	       | update_gradients));
-  deallog.pop();
-
-  deallog.push("all---");
-  performance (tr, element, gauss, UpdateFlags (update_q_points
-	       | update_JxW_values
-	       | update_values
-	       | update_gradients
-	       | update_second_derivatives));
-  deallog.pop();
+  loop (el2d, cartesian, tr);
+  loop (el2d, mapping, tr);
+  loop (el2d, mappingq1, tr);
+  loop (el2d, mappingq2, tr);
 }

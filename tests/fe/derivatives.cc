@@ -10,9 +10,10 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
-#include <fe/fe_lib.lagrange.h>
-#include <fe/fe_lib.dg.h>
+#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 #include <vector>
 #include <fstream>
@@ -22,8 +23,9 @@ char fname[50];
 
 template<int dim>
 inline void
-plot_derivatives(FiniteElement<dim>& finel,
-		 const char* name)
+plot_derivatives(Mapping<dim>& mapping,
+		     FiniteElement<dim>& finel,
+		     const char* name)
 {
   deallog.push (name);
   
@@ -37,8 +39,8 @@ plot_derivatives(FiniteElement<dim>& finel,
 
   QTrapez<dim> q;
 //  QIterated<dim> q(q_trapez, div);
-  FEValues<dim> fe(finel, q, UpdateFlags(update_gradients
-					 | update_second_derivatives));
+  FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_gradients
+						  | update_second_derivatives));
   fe.reinit(c);
 
   unsigned int k=0;
@@ -68,17 +70,18 @@ plot_derivatives(FiniteElement<dim>& finel,
 template<int dim>
 void plot_FE_Q_shape_functions()
 {
-  FEQ1<dim> q1;
-  plot_derivatives(q1, "Q1");
+  MappingQ1<dim> m;
+  FE_Q<dim> q1(1);
+  plot_derivatives(m, q1, "Q1");
 //  plot_face_shape_functions(m, q1, "Q1");
-  FEQ2<dim> q2;
-  plot_derivatives(q2, "Q2");
+  FE_Q<dim> q2(2);
+  plot_derivatives(m, q2, "Q2");
 //  plot_face_shape_functions(m, q2, "Q2");
-  FEQ3<dim> q3;
-  plot_derivatives(q3, "Q3");
+  FE_Q<dim> q3(3);
+  plot_derivatives(m, q3, "Q3");
 //  plot_face_shape_functions(m, q3, "Q3");
-  FEQ4<dim> q4;
-  plot_derivatives(q4, "Q4");
+  FE_Q<dim> q4(4);
+  plot_derivatives(m, q4, "Q4");
 //  plot_face_shape_functions(m, q4, "Q4");
 //    FE_Q<dim> q5(5);
 //    plot_derivatives(m, q5, "Q5");
@@ -98,17 +101,18 @@ void plot_FE_Q_shape_functions()
 template<int dim>
 void plot_FE_DGQ_shape_functions()
 {
-  FEDG_Q1<dim> q1;
-  plot_derivatives(q1, "DGQ1");
+  MappingQ1<dim> m;
+  FE_DGQ<dim> q1(1);
+  plot_derivatives(m, q1, "DGQ1");
 //  plot_face_shape_functions(m, q1, "DGQ1");
-  FEDG_Q2<dim> q2;
-  plot_derivatives(q2, "DGQ2");
+  FE_DGQ<dim> q2(2);
+  plot_derivatives(m, q2, "DGQ2");
 //  plot_face_shape_functions(m, q2, "DGQ2");
-  FEDG_Q3<dim> q3;
-  plot_derivatives(q3, "DGQ3");
+  FE_DGQ<dim> q3(3);
+  plot_derivatives(m, q3, "DGQ3");
 //  plot_face_shape_functions(m, q3, "DGQ3");
-  FEDG_Q4<dim> q4;
-  plot_derivatives(q4, "DGQ4");
+  FE_DGQ<dim> q4(4);
+  plot_derivatives(m, q4, "DGQ4");
 //  plot_face_shape_functions(m, q4, "DGQ4");
 //    FE_DGQ<dim> q5(5);
 //    plot_derivatives(m, q5, "DGQ5");
@@ -144,7 +148,15 @@ main()
   deallog.push ("3d");
 //  plot_FE_Q_shape_functions<3>();
   deallog.pop ();
-   return 0;
+  
+
+				   // FESystem test.
+  MappingQ1<2> m;
+  FESystem<2> q2_q3(FE_Q<2>(2), 1,
+		    FE_Q<2>(3), 1);
+//  plot_derivatives(m, q2_q3, "Q2_Q3");
+  
+  return 0;
 }
 
 

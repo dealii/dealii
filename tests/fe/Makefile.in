@@ -23,10 +23,14 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs.g   = $(lib-deal2-3d.g) $(lib-deal2-2d.g) $(lib-deal2-1d.g) \
+libs.g   = $(lib-deal2-1d.g) \
+           $(lib-deal2-2d.g) \
+           $(lib-deal2-3d.g) \
            $(lib-lac.g)      \
            $(lib-base.g)
-libs     = $(lib-deal2-3d.o) $(lib-deal2-2d.o) $(lib-deal2-1d.o) \
+libs     = $(lib-deal2-1d.o) \
+           $(lib-deal2-2d.o) \
+           $(lib-deal2-3d.o) \
            $(lib-lac.o)      \
            $(lib-base.o)
 
@@ -76,29 +80,94 @@ all: check
 #
 ############################################################
 
-show_shapes-cc-files = show_shapes.cc
+fe_data_test-cc-files = fe_data_test.cc
 
 ifeq ($(debug-mode),on)
-show_shapes-o-files = $(show_shapes-cc-files:.cc=.go)
+fe_data_test-o-files = $(fe_data_test-cc-files:.cc=.go)
 else
-show_shapes-o-files = $(show_shapes-cc-files:.cc=.o)
+fe_data_test-o-files = $(fe_data_test-cc-files:.cc=.o)
 endif
 
-show_shapes: $(show_shapes-o-files) $(libraries)
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
+fe_data_test: $(fe_data_test-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
 
 ############################################################
 
-show_transform-cc-files = show_transform.cc
+shapes-cc-files = shapes.cc
 
 ifeq ($(debug-mode),on)
-show_transform-o-files = $(show_transform-cc-files:.cc=.go)
+shapes-o-files = $(shapes-cc-files:.cc=.go)
 else
-show_transform-o-files = $(show_transform-cc-files:.cc=.o)
+shapes-o-files = $(shapes-cc-files:.cc=.o)
 endif
 
-show_transform: $(show_transform-o-files) $(libraries)
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
+shapes: $(shapes-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
+
+############################################################
+
+derivatives-cc-files = derivatives.cc
+
+ifeq ($(debug-mode),on)
+derivatives-o-files = $(derivatives-cc-files:.cc=.go)
+else
+derivatives-o-files = $(derivatives-cc-files:.cc=.o)
+endif
+
+derivatives: $(derivatives-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
+
+############################################################
+
+embedding-cc-files = embedding.cc
+
+ifeq ($(debug-mode),on)
+embedding-o-files = $(embedding-cc-files:.cc=.go)
+else
+embedding-o-files = $(embedding-cc-files:.cc=.o)
+endif
+
+embedding: $(embedding-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
+
+############################################################
+
+interpolation-cc-files = interpolation.cc
+
+ifeq ($(debug-mode),on)
+interpolation-o-files = $(interpolation-cc-files:.cc=.go)
+else
+interpolation-o-files = $(interpolation-cc-files:.cc=.o)
+endif
+
+interpolation: $(interpolation-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
+
+############################################################
+
+mapping-cc-files = mapping.cc
+
+ifeq ($(debug-mode),on)
+mapping-o-files = $(mapping-cc-files:.cc=.go)
+else
+mapping-o-files = $(mapping-cc-files:.cc=.o)
+endif
+
+mapping: $(mapping-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
+
+############################################################
+
+internals-cc-files = internals.cc
+
+ifeq ($(debug-mode),on)
+internals-o-files = $(internals-cc-files:.cc=.go)
+else
+internals-o-files = $(internals-cc-files:.cc=.o)
+endif
+
+internals: $(internals-o-files) $(libraries)
+	@$(CXX) $(flags) -o $@ $^
 
 ############################################################
 
@@ -114,44 +183,22 @@ performance: $(performance-o-files) $(libraries)
 	@$(CXX) $(flags) -o $@ $^
 
 ############################################################
-
-derivatives-cc-files = derivatives.cc
-
-ifeq ($(debug-mode),on)
-derivatives-o-files = $(derivatives-cc-files:.cc=.go)
-else
-derivatives-o-files = $(derivatives-cc-files:.cc=.o)
-endif
-
-derivatives: $(derivatives-o-files) $(libraries)
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
-
-internals-cc-files = internals.cc
-
-ifeq ($(debug-mode),on)
-internals-o-files = $(internals-cc-files:.cc=.go)
-else
-internals-o-files = $(internals-cc-files:.cc=.o)
-endif
-
-internals: $(internals-o-files) $(libraries)
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
 # Continue with other targets if needed
 ############################################################
 
-check: show_transform show_shapes
+check: fe_data_test mapping shapes
 	@echo Running programs
-	@./show_transform
-	@./show_shapes
+	./fe_data_test
+	@perl -pi -e 's/JobId.*//;' fe_data_test.dat
+	./mapping
+	@perl -pi -e 's/JobId.*//;' mapping.dat
+	./shapes
 	@echo Checking results
 	$(MAKE) dodiff
 
 %.check: %.dat
-	diff $@ $<
+	@diff $@ed $<
+	@touch $@
 
 dat = $(wildcard *.dat)
 check = $(dat:.dat=.check)
@@ -164,22 +211,22 @@ dodiff: $(check)
 ############################################################
 
 clean:
-	rm -f *.o *.go
+	rm -f *.o *.go *.inp *.gpl *.eps *.gnuplot *.dat
 
 veryclean: clean
-	rm -f show_shapes show_transform *.inp *.gpl *.eps *.gnuplot *.dat
+	rm -f fe_data_test mapping shapes
 
 ############################################################
 # Automatic generation of dependencies
 ############################################################
 
-all-cc-files = $(show_shapes-cc-files) $(show_transform-cc-files)
+all-cc-files = $(fe_data_test-cc-files) $(mapping-cc-files) $(shapes-cc-files)
 
-Make.depend: $(all-cc-files)
-	@echo =====Dependecies=== Make.depend
+Makefile.depend: $(all-cc-files)
+	@echo =====Dependecies=== Makefile.depend
 	@$(CXX) $(flags) $^ -M > $@
-	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
+	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 
-include Make.depend
+include Makefile.depend
 
 .PHONY: clean veryclean check

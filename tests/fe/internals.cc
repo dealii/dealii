@@ -10,8 +10,8 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
-#include <fe/fe_lib.lagrange.h>
-#include <fe/fe_lib.dg.h>
+#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 #include <fe/fe_values.h>
 #include <vector>
 #include <fstream>
@@ -30,22 +30,26 @@ check_support (FiniteElement<dim>& finel, const char* name)
   cout << name << '<' << dim << '>' << " cell support points" << endl;
   
   vector<Point<dim> > cell_points (finel.dofs_per_cell);
-  vector<Point<dim> > face_points (finel.dofs_per_face);
-  
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  finel.get_support_points (cell, cell_points);
+  finel.get_unit_support_points (cell_points);
 
   for (unsigned int k=0;k<cell_points.size();++k)
     cout << setprecision(3) << cell_points[k] << endl;
   
+  vector<Point<dim-1> > face_points;
+  finel.get_unit_face_support_points (face_points);
+  const vector<double> dummy_weights (face_points.size());
+  
+  Quadrature<dim-1> q(face_points, dummy_weights);
+  QProjector<dim> qp(q, false);
+  
+  unsigned int j=0;
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
     {
       cout << name << '<' << dim << '>' << " face " << i << " support points" << endl;
-      DoFHandler<dim>::active_face_iterator face = cell->face(i);
-      finel.get_face_support_points (face, face_points);
-      
+        
       for (unsigned int k=0;k<face_points.size();++k)
-	cout << setprecision(3) << face_points[k] << endl;
+	cout << setprecision(3) << qp.point(j++)
+	     << endl;
     }
 }
 
@@ -66,24 +70,30 @@ check_matrices (FiniteElement<dim>& fe, const char* name)
 }
 
 
-#define CHECK_S(EL,dim) { FE ## EL<dim> EL; check_support(EL, #EL); }
-#define CHECK_M(EL,dim) { FE ## EL<dim> EL; check_matrices(EL, #EL); }
-#define CHECK_ALL(EL,dim) { FE ## EL<dim> EL; check_support(EL, #EL); check_matrices(EL,#EL); }
+#define CHECK_S(EL,deg,dim)   { FE_ ## EL<dim> EL(deg); check_support(EL, #EL #deg); }
+#define CHECK_M(EL,deg,dim)   { FE_ ## EL<dim> EL(deg); check_matrices(EL, #EL #deg); }
+#define CHECK_ALL(EL,deg,dim) { FE_ ## EL<dim> EL(deg); check_support(EL, #EL #deg); check_matrices(EL,#EL #deg); }
 
 int
 main()
 {
-  CHECK_M(DG_Q0,2);
-  CHECK_M(DG_Q1,2);
-  CHECK_M(DG_Q2,2);
-  CHECK_M(DG_Q3,2);
-  CHECK_ALL(Q1,2);
-  CHECK_ALL(Q2,2);
-  CHECK_ALL(Q3,2);
-  CHECK_ALL(Q4,2);
-  CHECK_ALL(Q1,3);
-  CHECK_ALL(Q2,3);
-  CHECK_M(DG_Q0,3);
-  CHECK_M(DG_Q1,3);  
+  CHECK_M(DGQ,0,2);
+  CHECK_M(DGQ,1,2);
+  CHECK_M(DGQ,2,2);
+  CHECK_M(DGQ,3,2);
+  CHECK_M(DGQ,4,2);
+  CHECK_ALL(Q,1,2);
+  CHECK_ALL(Q,2,2);
+  CHECK_ALL(Q,3,2);
+  CHECK_ALL(Q,4,2);
+  CHECK_M(DGQ,0,3);
+  CHECK_M(DGQ,1,3);
+  CHECK_M(DGQ,2,3);
+  CHECK_M(DGQ,3,3);
+  CHECK_M(DGQ,4,3);
+  CHECK_ALL(Q,1,3);
+  CHECK_ALL(Q,2,3);
+//  CHECK_ALL(Q,3,2);
+//  CHECK_ALL(Q,4,2);
   return 0;
 }
