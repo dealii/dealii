@@ -5,5 +5,5 @@ PROJECT_NAME = "deal.II base library"
 INPUT    = headers/base/ ../../base/include/base/
 
 HTML_OUTPUT      = base
-LATEX_OUTPUT     = latex/base
+LATEX_OUTPUT     = LaTeX/base
 GENERATE_TAGFILE = base.tag

@@ -6,5 +6,5 @@ INPUT    = headers/lac/ ../../lac/include/lac/
 TAGFILES = base.tag=../base
 
 HTML_OUTPUT      = lac
-LATEX_OUTPUT     = latex/lac
+LATEX_OUTPUT     = LaTeX/lac
 GENERATE_TAGFILE = lac.tag

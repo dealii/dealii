@@ -11,5 +11,5 @@ INPUT    = headers/deal.II/ \
 TAGFILES = base.tag=../base lac.tag=../lac
 
 HTML_OUTPUT      = deal.II
-LATEX_OUTPUT     = latex/deal.II
+LATEX_OUTPUT     = LaTeX/deal.II
 GENERATE_TAGFILE = deal.tag
