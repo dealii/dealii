@@ -22,7 +22,8 @@
 // for all polynomial degrees. the array is thus empty. unfortunately, some
 // compilers dislike empty initializers for arrays of unknown size
 // (particularly the hp compiler), so we simply initialize a single element
-// with a null pointer
+// with a null pointer. in fact, the compiler behavior is supported by clause
+// 8.5.1/4
 template <>
 const double * const 
 FE_Q<2>::Matrices::constraint_matrices[] = { 0 };
