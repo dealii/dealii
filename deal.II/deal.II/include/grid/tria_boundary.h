@@ -26,6 +26,9 @@ template <> struct BoundaryHelper<2> {
     typedef const Point<2> *PointArray[GeometryInfo<2>::vertices_per_face];
 };
 
+template <> struct BoundaryHelper<3> {
+    typedef const Point<3> *PointArray[GeometryInfo<3>::vertices_per_face];
+};
 
 
 /**
@@ -61,9 +64,17 @@ class Boundary {
   public:
 				     /**
 				      *  Typedef an array of the needed number
-				      *  of old points.
+				      *  of old points to compute the new
+				      *  middle point of a face. This does not
+				      *  make much sense in 1D, so we set the
+				      *  array size to a dummy value.
 				      */
     typedef typename BoundaryHelper<dim>::PointArray PointArray;
+// this is the way it should be, but egcs throws an internal compiler error
+// on this, so we invented the above workaround    
+//    typedef const Point<dim>* PointArray[((dim==1) ?
+//					  1 :
+//					  GeometryInfo<dim>::vertices_per_face)];
     
 				     /**
 				      *  This function calculates the position
