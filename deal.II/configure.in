@@ -149,10 +149,6 @@ AC_SUBST(GXX_VERSION)
 
 
 
-dnl    Find path to perl
-AC_PATH_PROG(PERL, perl)
-
-
 
 dnl -------------------------------------------------------------
 dnl Set compiler flags to their default values. They will be 
@@ -235,6 +231,7 @@ case "$target" in
    dnl On Alpha, use the special treatment
    alpha*-osf*)
 	CXXFLAGS="-ggdb $CXXFLAGSG"
+        AC_LANG_CPLUSPLUS
 	AC_TRY_COMPILE(
 	  [
 #include <string>
@@ -282,6 +279,90 @@ dnl condition is not satisfied. Check this for debug and optimized mode
 dnl compiler flags, and define `DISABLE_ASSERT_THROW' if necessary.
 DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG")
 DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO")
+
+
+
+dnl Find path to a Fortran 77 compiler. By default try to find a
+dnl vendor compiler which is usually names `f77', and only if that could
+dnl not be found, use `g77' instead. The reasoning is that usually vendor
+dnl compilers are much better adapted to the system at hand, and since
+dnl Fortran code is often used for efficiency reasons, this is
+dnl important. Likewise, if external Fortran code is imported, it is
+dnl usually code that is well tested and does not need much debugging, so
+dnl good optimizations are helpful again.
+AC_PATH_PROG(F77,f77)
+if test "x$F77" = "x" ; then
+    dnl Could not find an executable names `f77'. Try `g77'
+    AC_PATH_PROG(F77,g77)
+fi
+dnl It is possible that no Fortran 77 compiler was found. Don't care,
+dnl it may be that we don't need one (but we check below, when we must
+dnl have it).
+
+dnl Next try to find out something about the name and version of the compiler
+F77_VERSION_STRING=`($F77 -v 2>&1)`
+if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
+  dnl Yes, this is a GNU g77 version. find out the right version
+  G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
+  case "$G77_VERSION_STRING" in
+    *"egcs-1.1"*)
+	AC_MSG_RESULT(compiler is egcs-1.1)
+	F77_VERSION=egcs1.1
+	;;
+    *2.95*)
+	AC_MSG_RESULT(compiler is gcc-2.95)
+	F77_VERSION=gcc2.95
+	;;
+    *2.96*)
+	AC_MSG_RESULT(compiler is gcc-2.96)
+	F77_VERSION=gcc2.96
+	;;
+    *2.97*)
+	AC_MSG_RESULT(compiler is gcc-2.97)
+	F77_VERSION=gcc2.97
+	;;
+    *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
+	dnl These compilers are too old to support a useful subset
+	dnl of modern C++, so we don't support them
+	AC_MSG_RESULT(compiler is $G77_VERSION_STRING)
+	AC_MSG_ERROR(compiler is not supported)
+	;;
+    *)
+	AC_MSG_RESULT(compiler is unknown but accepted gcc version)
+	F77_VERSION=other
+	;;
+  esac
+
+  dnl For g77 versions, it is simple which flags to use since we already
+  dnl know them mostly from the C++ compiler
+  F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
+  F77FLAGSO="$FFLAGS -O2"
+
+  dnl Some flags can only be set for some compilers as others either
+  dnl did not accept them or were buggy on them (see the explanation
+  dnl for CXXFLAGS for an explanation of some of these cases)
+  if test "x$F77_VERSION" != "xegcs1.1" ; then
+    F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
+  fi
+
+  dnl Then we have to set the set of libraries we have to link with
+  dnl when linking C++ and Fortran code with the C++ compiler. For
+  dnl g77, this is only libg2c
+  F77LDFLAGS=-lg2c
+
+else
+  dnl No GNU g77 version, something else. Don't set anything
+  F77_VERSION
+fi
+AC_SUBST(F77_VERSION)
+AC_SUBST(F77FLAGSO)
+AC_SUBST(F77FLAGSG)
+AC_SUBST(F77LDFLAGS)
+
+
+dnl    Find path to perl
+AC_PATH_PROG(PERL, perl)
+AC_SUBST(PERL)
 
 
 
@@ -469,8 +550,9 @@ DEAL_II_CHECK_ISNAN
 
 
 dnl -------------------------------------------------------------
-dnl Last check: test whether CXXFLAGS are ok
+dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
 dnl -------------------------------------------------------------
+AC_LANG_CPLUSPLUS
 CXXFLAGS="$CXXFLAGSG"
 AC_MSG_CHECKING(for consistency of CXXFLAGSG flags)
 AC_TRY_COMPILE(
@@ -496,6 +578,38 @@ AC_TRY_COMPILE(
     AC_MSG_ERROR(invalid combination of flags!)
     exit 1;
   ])
+
+
+dnl     Err, well -- we'd like to have checked these flags, but autoconf
+dnl     has a problem here: when writing the compile file, a newline is
+dnl     missing, leading to an error when executing ./configure. So:
+dnl     while this is not fixed in autoconf, disable the respective tests
+dnl AC_LANG_FORTRAN77
+dnl FFLAGS="$F77FLAGSG"
+dnl AC_MSG_CHECKING(for consistency of F77FLAGSG flags)
+dnl AC_TRY_COMPILE(
+dnl   [],
+dnl   [],
+dnl   [
+dnl     AC_MSG_RESULT(yes)
+dnl   ],
+dnl   [
+dnl     AC_MSG_ERROR(invalid combination of flags!)
+dnl     exit 1;
+dnl   ])
+dnl 
+dnl FFLAGS="$F77FLAGSO"
+dnl AC_MSG_CHECKING(for consistency of F77FLAGSO flags)
+dnl AC_TRY_COMPILE(
+dnl   [],
+dnl   [],
+dnl   [
+dnl     AC_MSG_RESULT(yes)
+dnl   ],
+dnl   [
+dnl     AC_MSG_ERROR(invalid combination of flags!)
+dnl     exit 1;
+dnl   ])
 
 
 

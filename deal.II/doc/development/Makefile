@@ -14,6 +14,8 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>CXX=$(CXX)</code>' >> $@
 	@echo '<li><code>CC=$(CC)</code>' >> $@
 	@echo '<li><code>GXX-VERSION=$(GXX-VERSION)</code>' >> $@
+	@echo '<li><code>F77=$(F77)</code>' >> $@
+	@echo '<li><code>F77-VERSION=$(F77-VERSION)</code>' >> $@
 	@echo '<li><code>PERL=$(PERL)</code>' >> $@
 	@echo '<li><code>DEAL_II_MAJOR=$(DEAL_II_MAJOR)</code>' >> $@
 	@echo '<li><code>DEAL_II_MINOR=$(DEAL_II_MINOR)</code>' >> $@
@@ -37,7 +39,10 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>INCLUDE=$(INCLUDE)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.g=$(CXXFLAGS.g)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.o=$(CXXFLAGS.o)</code>' >> $@
+	@echo '<li><code>F77FLAGS.g=$(F77FLAGS.g)</code>' >> $@
+	@echo '<li><code>F77FLAGS.o=$(F77FLAGS.o)</code>' >> $@
 	@echo '<li><code>LDFLAGS=$(LDFLAGS)</code>' >> $@
+	@echo '<li><code>F77LDFLAGS=$(F77LDFLAGS)</code>' >> $@
 	@echo '<li><code>LIBS=$(LIBS)</code>' >> $@
 	@echo '<li><code>ACE_ROOT=$(ACE_ROOT)</code>' >> $@
 	@echo '<li><code>lib-ACE=$(lib-ACE)</code>' >> $@

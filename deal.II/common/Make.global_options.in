@@ -23,6 +23,9 @@ CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
 LDFLAGS              = @LDFLAGS@
+F77                  = @F77@
+F77-VERSION          = @F77_VERSION@
+F77LDFLAGS           = @F77LDFLAGS@
 LIBS                 = @LIBS@
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
@@ -81,6 +84,10 @@ INCLUDE           += $(addprefix -I, $(include-path-base) \
 # compiler flags for debug and optimized mode
 CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)
 CXXFLAGS.o   = @DEFS@ @CXXFLAGSO@  $(INCLUDE)
+
+F77FLAGS.g   = @DEFS@ @F77FLAGSG@  $(INCLUDE)
+F77FLAGS.o   = @DEFS@ @F77FLAGSO@  $(INCLUDE)
+
 
 
 # if multithread support in the library is requested, then set the

@@ -60,7 +60,27 @@
 
       <dt> <code>GXX-VERSION</code> </dt>
       <dd> <p>
-           Version of the GNU C++ compiler if that is used
+           Version of the GNU C++ compiler if that is used. Possible
+	   names presently include <code>egcs1.1</code>,
+	   <code>gcc2.95</code>, <code>gcc2.96</code>, and <code>gcc2.97</code>
+           </p>
+      </dd>
+
+
+      <dt> <code>F77</code> </dt>
+      <dd> <p>
+           Executable name of the F77 compiler; often, no Fortran
+           compiler is needed, in which case the variable may be empty if
+           none was found
+           </p>
+      </dd>
+
+
+      <dt> <code>F77-VERSION</code> </dt>
+      <dd> <p>
+           Name and version of the Fortran 77 compiler. Possible
+	   names presently include <code>egcs1.1</code>,
+	   <code>gcc2.95</code>, <code>gcc2.96</code>, and <code>gcc2.97</code>
            </p>
       </dd>
 
@@ -215,14 +235,27 @@
     <dl>
       <dt> <code>CXXFLAGS.g</code> </dt>
       <dd> <p>
-           Compiler flags for debug mode
+           C++ compiler flags for debug mode
            </p>
       </dd>
 
 
       <dt> <code>CXXFLAGS.o</code> </dt>
       <dd> <p>
-           Compiler flags for optimized mode
+           C++ compiler flags for optimized mode
+           </p>
+      </dd>
+
+      <dt> <code>F77FLAGS.g</code> </dt>
+      <dd> <p>
+           Fortran 77 compiler flags for debug mode
+           </p>
+      </dd>
+
+
+      <dt> <code>F77FLAGS.o</code> </dt>
+      <dd> <p>
+           Fortran 77 compiler flags for optimized mode
            </p>
       </dd>
     </dl>
@@ -238,12 +271,24 @@
            </p>
       </dd>
 
+      <dt> <code>F77LDFLAGS</code> </dt>
+      <dd> <p>
+           Linker flags when linking Fortran 77 code into the
+           executable where the main part is C++. This includes
+           libraries as <code>libg2c</code> for g77, or vendor libraries
+           </p>
+      </dd>
+
+
       <dt> <code>LIBS</code> </dt>
       <dd> <p>
-           Additional libraries found by configure
+           Additional libraries found by configure and needed to be
+           linked with based on the flags given to
+           <code>./configure</code>, e.g. BLAS or LAPACK
            </p>
       </dd>
     </dl>
+
 
     <li><h4>Variables in multithreading mode</h4>
  
