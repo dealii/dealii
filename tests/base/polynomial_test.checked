@@ -3,75 +3,61 @@ DEAL::LagrangeEquidistant polynoms:
 DEAL::Polynomial p of order 1
 DEAL:: p_0(0.00000)   ok
 DEAL:: p_0(1.00000)   ok
-
 DEAL:: p_1(0.00000)   ok
 DEAL:: p_1(1.00000)   ok
-
 DEAL::Polynomial p of order 2
 DEAL:: p_0(0.00000)   ok
-DEAL:: p_0(1.00000)   ok
 DEAL:: p_0(0.500000)   ok
-
+DEAL:: p_0(1.00000)   ok
 DEAL:: p_1(0.00000)   ok
-DEAL:: p_1(1.00000)   ok
 DEAL:: p_1(0.500000)   ok
-
+DEAL:: p_1(1.00000)   ok
 DEAL:: p_2(0.00000)   ok
-DEAL:: p_2(1.00000)   ok
 DEAL:: p_2(0.500000)   ok
-
+DEAL:: p_2(1.00000)   ok
 DEAL::Polynomial p of order 3
 DEAL:: p_0(0.00000)   ok
-DEAL:: p_0(1.00000)   ok
 DEAL:: p_0(0.333333)   ok
 DEAL:: p_0(0.666667)   ok
-
+DEAL:: p_0(1.00000)   ok
 DEAL:: p_1(0.00000)   ok
-DEAL:: p_1(1.00000)   ok
 DEAL:: p_1(0.333333)   ok
 DEAL:: p_1(0.666667)   ok
-
+DEAL:: p_1(1.00000)   ok
 DEAL:: p_2(0.00000)   ok
-DEAL:: p_2(1.00000)   ok
 DEAL:: p_2(0.333333)   ok
 DEAL:: p_2(0.666667)   ok
-
+DEAL:: p_2(1.00000)   ok
 DEAL:: p_3(0.00000)   ok
-DEAL:: p_3(1.00000)   ok
 DEAL:: p_3(0.333333)   ok
 DEAL:: p_3(0.666667)   ok
-
+DEAL:: p_3(1.00000)   ok
 DEAL::Polynomial p of order 4
 DEAL:: p_0(0.00000)   ok
-DEAL:: p_0(1.00000)   ok
 DEAL:: p_0(0.250000)   ok
 DEAL:: p_0(0.500000)   ok
 DEAL:: p_0(0.750000)   ok
-
+DEAL:: p_0(1.00000)   ok
 DEAL:: p_1(0.00000)   ok
-DEAL:: p_1(1.00000)   ok
 DEAL:: p_1(0.250000)   ok
 DEAL:: p_1(0.500000)   ok
 DEAL:: p_1(0.750000)   ok
-
+DEAL:: p_1(1.00000)   ok
 DEAL:: p_2(0.00000)   ok
-DEAL:: p_2(1.00000)   ok
 DEAL:: p_2(0.250000)   ok
 DEAL:: p_2(0.500000)   ok
 DEAL:: p_2(0.750000)   ok
-
+DEAL:: p_2(1.00000)   ok
 DEAL:: p_3(0.00000)   ok
-DEAL:: p_3(1.00000)   ok
 DEAL:: p_3(0.250000)   ok
 DEAL:: p_3(0.500000)   ok
 DEAL:: p_3(0.750000)   ok
-
+DEAL:: p_3(1.00000)   ok
 DEAL:: p_4(0.00000)   ok
-DEAL:: p_4(1.00000)   ok
 DEAL:: p_4(0.250000)   ok
 DEAL:: p_4(0.500000)   ok
 DEAL:: p_4(0.750000)   ok
-
+DEAL:: p_4(1.00000)   ok
 
 DEAL::Test derivatives computed by the Horner scheme:
 DEAL::x=0.00000,    all derivatives: ok

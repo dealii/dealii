@@ -47,39 +47,23 @@ int main(int, char)
 	  LagrangeEquidistant polynom(order, s_point);
 
 					   // support points in vertices
-	  if (order>0)
-	    for (unsigned int i=0; i<=1; ++i)
-	      {
-		double x=i;
-		polynom.value(x, values);
-		deallog << " p_" << s_point << "(" << x << ")";
-//		deallog << "=" << values[0];
-		if (equals_delta_ij(values[0], s_point, i))
-		  deallog << "   ok";
-		else
-		  deallog << "   false";
-		deallog << endl;
-	      }
-					   // support points on line
-	  if (order>1)
-	    for (unsigned int i=1; i<order; ++i)
-	      {
-		double x=static_cast<double>(i)/order;
-		polynom.value(x, values);
-		deallog << " p_" << s_point << "(" << x << ")";
-//		deallog << "=" << values[0];
-		if (equals_delta_ij(values[0], s_point, i+1))
-		  deallog << "   ok";
-		else
-		  deallog << "   false";
-		deallog << endl;
-	      }
-	  deallog << endl;
+	  for (unsigned int i=0; i<=order; ++i)
+	    {
+	      double x=static_cast<double>(i)/order;
+	      polynom.value(x, values);
+	      deallog << " p_" << s_point << "(" << x << ")";
+//	      deallog << "=" << values[0];
+	      if (equals_delta_ij(values[0], s_point, i))
+		deallog << "   ok";
+	      else
+		deallog << "   false";
+	      deallog << endl;
+	    }
 	}
     }
 
   deallog << endl << "Test derivatives computed by the Horner scheme:" << endl;
-  LagrangeEquidistant pol(4, 3);
+  LagrangeEquidistant pol(4, 2);
   vector<double> v_horner(6);
   for (unsigned int i=0; i<=10; ++i)
     {
@@ -87,8 +71,8 @@ int main(int, char)
       deallog << "x=" << xi << ",    all derivatives: ";
       vector<double> v_exact(6);
       
-      v_exact[0]=64.0*xi*xi*xi*xi-128.0*xi*xi*xi+76.0*xi*xi-12.0*xi;
       v_exact[1]=256.0*xi*xi*xi-384.0*xi*xi+152.0*xi-12.0;
+      v_exact[0]=64.0*xi*xi*xi*xi-128.0*xi*xi*xi+76.0*xi*xi-12.0*xi;
       v_exact[2]=768.0*xi*xi-768.0*xi+152.0;
       v_exact[3]=1536*xi-768;
       v_exact[4]=1536;

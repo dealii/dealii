@@ -36,7 +36,7 @@ class Polynomial
 				      * Returns the values and the
 				      * derivatives of the @p{Polynomial}
 				      * at point @p{x}. @p{values[i],
-				      * i=0,...,values.size()}
+				      * i=0,...,values.size()-1}
 				      * includes the @p{i}th
 				      * derivative.
 				      *
@@ -61,11 +61,11 @@ class Polynomial
 /**
  * Class of Lagrange polynomials with equidistant interpolation
  * points. The polynomial of order @p{n} has got @p{n+1} interpolation
- * points. The interpolation points are x=0, x=1 and x=intermediate
- * points in ]0,1[ in ascending order. This order gives an index to
- * each interpolation point.  A Lagrangian polynomial equals 1 at one
- * interpolation point that is called `support point', and 0 at all other
- * interpolation points.
+ * points. The interpolation points are sorted in ascending
+ * order. This order gives an index to each interpolation point.  A
+ * Lagrangian polynomial equals 1 at one interpolation point that is
+ * then called `support point', and 0 at all other interpolation
+ * points.
  *
  * @author Ralf Hartmann, 2000
  */

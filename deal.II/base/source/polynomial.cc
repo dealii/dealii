@@ -88,13 +88,13 @@ vector<double> LagrangeEquidistant::compute_coefficients(unsigned int n, unsigne
 		      break;
 		case 1:
 		      a[0]=0.;
-		      a[1]=-1.;		      
-		      a[2]=2.;
+		      a[1]=4.;		      
+		      a[2]=-4.;
 		      break;
 		case 2:
 		      a[0]=0.;
-		      a[1]=4.;		      
-		      a[2]=-4.;
+		      a[1]=-1.;		      
+		      a[2]=2.;
 		      break;
 		default:
 		      Assert(false, ExcInternalError());
@@ -111,21 +111,21 @@ vector<double> LagrangeEquidistant::compute_coefficients(unsigned int n, unsigne
 		      break;
 		case 1:
 		      a[0]=0.;
-		      a[1]=1.;		      
-		      a[2]=-9.0/2.0;
-		      a[3]=9.0/2.0;
-		      break;
-		case 2:
-		      a[0]=0.;
 		      a[1]=9.0;		      
 		      a[2]=-45.0/2.0;
 		      a[3]=27.0/2.0;
 		      break;
-		case 3:
+		case 2:
 		      a[0]=0.;
 		      a[1]=-9.0/2.0;		      
 		      a[2]=18.0;
 		      a[3]=-27.0/2.0;
+		      break;
+		case 3:
+		      a[0]=0.;
+		      a[1]=1.;		      
+		      a[2]=-9.0/2.0;
+		      a[3]=9.0/2.0;
 		      break;
 		default:
 		      Assert(false, ExcInternalError());
@@ -143,31 +143,31 @@ vector<double> LagrangeEquidistant::compute_coefficients(unsigned int n, unsigne
 		      break;
 		case 1:
 		      a[0]=0.;
-		      a[1]=-1.;
-		      a[2]=22.0/3.0;
-		      a[3]=-16.0;
-		      a[4]=32.0/3.0;
-		      break;
-		case 2:
-		      a[0]=0.;
 		      a[1]=16.0;
 		      a[2]=-208.0/3.0;
 		      a[3]=96.0;
 		      a[4]=-128.0/3.0;
 		      break;
-		case 3:
+		case 2:
 		      a[0]=0.;
 		      a[1]=-12.0;
 		      a[2]=76.0;
 		      a[3]=-128.0;
 		      a[4]=64.0;
 		      break;
-		case 4:
+		case 3:
 		      a[0]=0.;
 		      a[1]=16.0/3.0;
 		      a[2]=-112.0/3.0;
 		      a[3]=224.0/3.0;
 		      a[4]=-128.0/3.0;
+		      break;
+		case 4:
+		      a[0]=0.;
+		      a[1]=-1.;
+		      a[2]=22.0/3.0;
+		      a[3]=-16.0;
+		      a[4]=32.0/3.0;
 		      break;
 		default:
 		      Assert(false, ExcInternalError());
