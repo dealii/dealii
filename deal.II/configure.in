@@ -23,12 +23,11 @@ dnl clearing the cache
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 
-dnl Version numbers
+AC_INIT([deal.II], [], [dealii@dealii.org])
 
-DEAL_II_VERSION="`cat Version`"
 AC_REVISION($Revision$)
 AC_PREREQ(2.50)
-AC_INIT(deal.II, $DEAL_II_VERSION, dealii@dealii.org)
+
 
 dnl Where the output config file is located
 AC_CONFIG_HEADER(base/include/base/config.h)
@@ -46,6 +45,9 @@ dnl -------------------------------------------------------------
 dnl    Set the path to the deal.II libraries to `pwd`
 DEAL2_DIR=`pwd`
 AC_SUBST(DEAL2_DIR)
+
+dnl Version numbers
+DEAL_II_VERSION="`cat Version`"
 
 dnl    Set major and minor version numbers of the deal.II library,
 dnl    both as preprocessor variables and in Makefiles
