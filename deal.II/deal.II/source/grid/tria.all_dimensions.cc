@@ -31,6 +31,40 @@
  */
 
 
+template <>
+void CellData<1>::rotate (unsigned int)
+{
+  Assert (false, ExcNotPossible());
+};
+
+
+
+template <>
+void CellData<2>::rotate (unsigned int times)
+{
+  while (times != 0)
+    {
+      const unsigned int x = vertices[0];
+      vertices[0] = vertices[1];
+      vertices[1] = vertices[2];
+      vertices[2] = vertices[3];
+      vertices[3] = x;
+
+      --times;
+    };
+};
+
+
+
+template <>
+void CellData<3>::rotate (unsigned int)
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
 bool SubCellData::check_consistency (const unsigned int dim) const
 {
   switch (dim) 

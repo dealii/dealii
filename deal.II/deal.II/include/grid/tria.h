@@ -35,9 +35,10 @@ template <int dim> class MGDoFHandler;
 
 
 /**
- *  Structure which is passed to the @ref{Triangulation}@p{<dim>::create_triangulation}
- *  function. It contains all data needed to construct a cell, namely the
- *  indices of the vertices and the material indicator.
+ *  Structure which is passed to the
+ *  @ref{Triangulation}@p{<dim>::create_triangulation} function. It
+ *  contains all data needed to construct a cell, namely the indices
+ *  of the vertices and the material indicator.
  */
 template <int dim>
 struct CellData
@@ -48,6 +49,33 @@ struct CellData
     int           vertices[1 << dim];
 #endif
     unsigned char material_id;
+
+				     /**
+				      * Rotate the cell as many times
+				      * as is given by the
+				      * argument. Rotation is done by
+				      * rotating the vertices. Note
+				      * that rotation is not possible
+				      * in 1d, and that there are four
+				      * possible orientations of a
+				      * cell in 2d, which are numbered
+				      * counter-clockwise. The
+				      * function is presently not
+				      * implemented for 3d.
+				      */
+    void rotate (const unsigned int times);
+
+				     /**
+				      * Rotations are not possible in 1d.
+				      */
+    DeclException0 (ExcNotPossible);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidRotation,
+		    int,
+		    << "The requested number of rotations, " << arg1
+		    << " is not possible in the present space dimension.");
 };
 
 
