@@ -252,12 +252,16 @@ class SparseMatrixEZ : public Subscriptor
 		       const unsigned short          index);
 	  
                                          /**
-                                          * Prefix increment.
+                                          * Prefix increment. This
+                                          * always returns a valid
+                                          * entry or @p{end()}.
                                           */
 	const_iterator& operator++ ();
 
                                          /**
-                                          * Postfix increment.
+                                          * Postfix increment. This
+                                          * always returns a valid
+                                          * entry or @p{end()}.
                                           */
 	const_iterator& operator++ (int);
 
@@ -1164,6 +1168,9 @@ SparseMatrixEZ<number>::const_iterator::operator++ ()
   if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
     {
       accessor.a_index = 0;
+
+				       // Do this loop to avoid
+				       // elements in empty rows
       do
 	{
 	  ++accessor.a_row;
