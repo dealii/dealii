@@ -1050,22 +1050,87 @@ DoFTools::extract_dofs (const DoFHandler<dim>      &dof,
   Assert(selected_dofs.size() == dof.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
 
+                                   // two special cases: no component
+                                   // is selected, and all components
+                                   // are selected, both rather
+                                   // stupid, but easy to catch
+  if (std::count (component_select.begin(), component_select.end(), true)
+      == 0)
+    {
+      std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
+      return;
+    };
+  if (std::count (component_select.begin(), component_select.end(), true)
+      == static_cast<signed int>(component_select.size()))
+    {
+      std::fill_n (selected_dofs.begin(), dof.n_dofs(), true);
+      return;
+    };
+  
+  
 				   // preset all values by false
-  fill_n (selected_dofs.begin(), dof.n_dofs(), false);
+  std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
+
+                                   // next set up a table for the
+                                   // degrees of freedom on each of
+                                   // the cells whether it is
+                                   // something interesting or not
+  std::vector<bool> local_selected_dofs (fe.dofs_per_cell, false);
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    if (fe.is_primitive(i))
+      local_selected_dofs[i]
+        = component_select[fe.system_to_component_index(i).first];
+    else
+                                       // if this shape function is
+                                       // not primitive, then we have
+                                       // to work harder. we have to
+                                       // find out whether _any_ of
+                                       // the vector components of
+                                       // this element is selected or
+                                       // not
+                                       //
+                                       // to do so, get the first and
+                                       // last vector components of
+                                       // the base element to which
+                                       // the local dof with index i
+                                       // belongs
+      {
+        unsigned int first_comp = 0;
+        const unsigned int this_base = fe.system_to_base_index(i).first.first;
+        const unsigned int this_multiplicity
+          = fe.system_to_base_index(i).first.second;
+        
+        for (unsigned int b=0; b<this_base; ++b)
+          first_comp += fe.base_element(b).n_components() *
+                        fe.element_multiplicity(b);
+        for (unsigned int m=0; m<this_multiplicity; ++m)
+          first_comp += fe.base_element(this_base).n_components();
+        const unsigned int end_comp = first_comp +
+                                      fe.base_element(this_base).n_components();
+
+        Assert (first_comp < fe.n_components(), ExcInternalError());
+        Assert (end_comp <= fe.n_components(),  ExcInternalError());
+
+                                         // now check whether any of
+                                         // the components in between
+                                         // is set
+        for (unsigned int c=first_comp; c<end_comp; ++c)
+          if (component_select[c] == true)
+            {
+              local_selected_dofs[i] = true;
+              break;
+            };
+      };  
   
+                                   // then loop over all cells and do
+                                   // the work
   std::vector<unsigned int> indices(fe.dofs_per_cell);
-  
   typename DoFHandler<dim>::active_cell_iterator c;
-  for (c = dof.begin_active() ; c != dof.end() ; ++ c)
+  for (c=dof.begin_active(); c!=dof.end(); ++ c)
     {
       c->get_dof_indices(indices);
-      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	{
-	  const unsigned int component = fe.system_to_component_index(i).first;
-
-	  if (component_select[component] == true)
-	    selected_dofs[indices[i]] = true;
-	}
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        selected_dofs[indices[i]] = local_selected_dofs[i];
     }
 }
 
@@ -1084,21 +1149,86 @@ DoFTools::extract_level_dofs(const unsigned int       level,
   Assert(selected_dofs.size() == dof.n_dofs(level),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs(level)));
 
-				   // preset all values by false
-  fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
+                                   // two special cases: no component
+                                   // is selected, and all components
+                                   // are selected, both rather
+                                   // stupid, but easy to catch
+  if (std::count (component_select.begin(), component_select.end(), true)
+      == 0)
+    {
+      std::fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
+      return;
+    };
+  if (std::count (component_select.begin(), component_select.end(), true)
+      == static_cast<signed int>(component_select.size()))
+    {
+      std::fill_n (selected_dofs.begin(), dof.n_dofs(level), true);
+      return;
+    };
 
-  std::vector<unsigned int> indices(fe.dofs_per_cell);
-  
+    				   // preset all values by false
+  std::fill_n (selected_dofs.begin(), dof.n_dofs(level), false);
+
+                                   // next set up a table for the
+                                   // degrees of freedom on each of
+                                   // the cells whether it is
+                                   // something interesting or not
+  std::vector<bool> local_selected_dofs (fe.dofs_per_cell, false);
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    if (fe.is_primitive(i))
+      local_selected_dofs[i]
+        = component_select[fe.system_to_component_index(i).first];
+    else
+                                       // if this shape function is
+                                       // not primitive, then we have
+                                       // to work harder. we have to
+                                       // find out whether _any_ of
+                                       // the vector components of
+                                       // this element is selected or
+                                       // not
+                                       //
+                                       // to do so, get the first and
+                                       // last vector components of
+                                       // the base element to which
+                                       // the local dof with index i
+                                       // belongs
+      {
+        unsigned int first_comp = 0;
+        const unsigned int this_base = fe.system_to_base_index(i).first.first;
+        const unsigned int this_multiplicity
+          = fe.system_to_base_index(i).first.second;
+        
+        for (unsigned int b=0; b<this_base; ++b)
+          first_comp += fe.base_element(b).n_components() *
+                        fe.element_multiplicity(b);
+        for (unsigned int m=0; m<this_multiplicity; ++m)
+          first_comp += fe.base_element(this_base).n_components();
+        const unsigned int end_comp = first_comp +
+                                      fe.base_element(this_base).n_components();
+
+        Assert (first_comp < fe.n_components(), ExcInternalError());
+        Assert (end_comp <= fe.n_components(),  ExcInternalError());
+
+                                         // now check whether any of
+                                         // the components in between
+                                         // is set
+        for (unsigned int c=first_comp; c<end_comp; ++c)
+          if (component_select[c] == true)
+            {
+              local_selected_dofs[i] = true;
+              break;
+            };
+      };
+
+                                   // then loop over all cells and do
+                                   // work
+  std::vector<unsigned int> indices(fe.dofs_per_cell);  
   typename MGDoFHandler<dim>::cell_iterator c;
   for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
     {
       c->get_mg_dof_indices(indices);
-      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	{
-	  const unsigned int component = fe.system_to_component_index(i).first;
-	  if (component_select[component]  == true)
-	    selected_dofs[indices[i]] = true;
-	}
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        selected_dofs[indices[i]] = local_selected_dofs[i];
     }
 }
 #endif
@@ -1399,8 +1529,9 @@ DoFTools::extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
 
 template <int dim>
 void
-DoFTools::count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
-				    std::vector<unsigned int> &dofs_per_component)
+DoFTools::
+count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
+                          std::vector<unsigned int> &dofs_per_component)
 {
   const unsigned int n_components = dof_handler.get_fe().n_components();
   dofs_per_component.resize (n_components);
@@ -1418,17 +1549,19 @@ DoFTools::count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
 				   // otherwise determine the number
 				   // of dofs in each component
 				   // separately. do so in parallel
-  std::vector<std::vector<bool> > dofs_in_component (n_components,
-						     std::vector<bool>(dof_handler.n_dofs(),
-								       false));
-  std::vector<std::vector<bool> > component_select (n_components,
-						    std::vector<bool>(n_components, false));
+  std::vector<std::vector<bool> >
+    dofs_in_component (n_components,
+                       std::vector<bool>(dof_handler.n_dofs(), false));
+  std::vector<std::vector<bool> >
+    component_select (n_components,
+                      std::vector<bool>(n_components, false));
   Threads::ThreadManager thread_manager;
   for (unsigned int i=0; i<n_components; ++i)
     {
       void (*fun_ptr) (const DoFHandler<dim>      &,
 		       const std::vector<bool>    &,
-		       std::vector<bool>          &) = &DoFTools::template extract_dofs<dim>;
+		       std::vector<bool>          &)
+        = &DoFTools::template extract_dofs<dim>;
       component_select[i][i] = true;
       Threads::spawn (thread_manager,
 		      Threads::encapsulate (fun_ptr)
@@ -1443,10 +1576,15 @@ DoFTools::count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
 				       dofs_in_component[i].end(),
 				       true);
 
-				   // finally sanity check
-  Assert (std::accumulate (dofs_per_component.begin(), dofs_per_component.end(), 0U)
-	  ==
-	  dof_handler.n_dofs(),
+				   // finally sanity check. this is
+				   // only valid if the finite element
+				   // is actually primitive, so
+				   // exclude other elements from this
+  Assert (!dof_handler.get_fe().is_primitive()
+          ||
+          (std::accumulate (dofs_per_component.begin(),
+                            dofs_per_component.end(), 0U)
+           == dof_handler.n_dofs()),
 	  ExcInternalError());
 	  
 };

@@ -559,25 +559,53 @@ class DoFTools
 				   const unsigned int     component = 0);
 
 				     /**
-				      * Extract the indices of the degrees
-				      * of freedom belonging to certain
-				      * components. The bit vector @p{select}
-				      * defines, which components of an
-				      * @ref{FESystem} are to be extracted
-				      * from the @ref{DoFHandler} @p{dof}. The
-				      * respective entries in @p{selected_dofs}
-				      * are then flagged @p{true}, while all
-				      * others are set to @p{false}.
+				      * Extract the indices of the
+				      * degrees of freedom belonging
+				      * to certain vector components
+				      * of a vector-valued finite
+				      * element. The bit vector
+				      * @p{select} defines, which
+				      * components of an
+				      * @ref{FESystem} are to be
+				      * extracted from the
+				      * @ref{DoFHandler} @p{dof}. The
+				      * entries in @p{selected_dofs}
+				      * corresponding to degrees of
+				      * freedom belonging to these
+				      * components are then flagged
+				      * @p{true}, while all others are
+				      * set to @p{false}.
 				      *
-				      * The size of @p{component_select}
-				      * shall equal the number of
-				      * components in the finite
-				      * element used by @p{dof}. The
-				      * size of @p{selected_dofs} shall
-				      * equal
+				      * The size of
+				      * @p{component_select} shall
+				      * equal the number of components
+				      * in the finite element used by
+				      * @p{dof}. The size of
+				      * @p{selected_dofs} shall equal
 				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
 				      * overwritten.
+				      *
+				      * If the finite element under
+				      * consideration is not
+				      * primitive, that is some or all
+				      * of its shape functions are
+				      * non-zero in more than one
+				      * vector component (which holds,
+				      * for example, for Nedelec or
+				      * Raviart-Thomas elements), then
+				      * shape functions cannot be
+				      * associated with a single
+				      * vector component. In this
+				      * case, if @em{one} shape vector
+				      * component of this element is
+				      * flagged in
+				      * @p{component_select}, then
+				      * this is equivalent to
+				      * selecting @em{all} vector
+				      * components corresponding to
+				      * this non-primitive base
+				      * element.
 				      */
     template <int dim>
     static void
@@ -705,8 +733,8 @@ class DoFTools
 				      * number belong to each
 				      * components. If the number of
 				      * components the finite element
-				      * has (i.e. you only have one
-				      * scalar variable), then the
+				      * has is one (i.e. you only have
+				      * one scalar variable), then the
 				      * number in this component
 				      * obviously equals the total
 				      * number of degrees of
@@ -714,6 +742,23 @@ class DoFTools
 				      * the DoFs in all the components
 				      * needs to equal the total
 				      * number.
+				      *
+				      * However, the last statement
+				      * does not hold true if the
+				      * finite element is not
+				      * primitive, i.e. some or all of
+				      * its shape functions are
+				      * non-zero in more than one
+				      * vector component. This
+				      * applies, for example, to the
+				      * Nedelec or Raviart-Thomas
+				      * elements. In this case, a
+				      * degree of freedom is counted
+				      * in each component in which it
+				      * is non-zero, so that the sum
+				      * mentioned above is greater
+				      * than the total number of
+				      * degrees of freedom.
 				      *
 				      * The result is returned in the
 				      * last argument.
