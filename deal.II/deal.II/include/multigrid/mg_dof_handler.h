@@ -186,21 +186,18 @@ class MGDoFHandler : public DoFHandler<dim>
     virtual ~MGDoFHandler ();
     
 				     /**
-				      * Go through the triangulation and
-				      * distribute the degrees of freedoms
-				      * needed for the given finite element
-				      * according to the given distribution
-				      * method. We first call the @ref{DoFHandler}'s
-				      * function and then distribute the
+				      * Go through the triangulation
+				      * and distribute the degrees of
+				      * freedoms needed for the given
+				      * finite element according to
+				      * the given distribution
+				      * method. We first call the
+				      * @ref{DoFHandler}'s function
+				      * and then distribute the
 				      * levelwise numbers.
 				      *
-				      * A copy of the transferred finite
-				      * element is stored.
-				      *
-				      * This function uses the user flags of the
-				      * triangulation object, so make sure you
-				      * don't need them after calling this
-				      * function, or if so store them.
+				      * A copy of the transferred
+				      * finite element is stored.
 				      */
     virtual void distribute_dofs (const FiniteElement<dim> &, 
 				  const unsigned int offset = 0);
