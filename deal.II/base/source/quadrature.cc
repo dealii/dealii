@@ -711,5 +711,6 @@ template class Quadrature<3>;
 template class QIterated<1>;
 template class QIterated<2>;
 template class QIterated<3>;
+template class QProjector<1>;
 template class QProjector<2>;
 template class QProjector<3>;
