@@ -409,7 +409,7 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
   for (;cell != end; ++cell)
     {
 	// If depth is not encoded, write finest level only
-	if (!xfig_flags.level_depth && !cell->is_active())
+	if (!xfig_flags.level_depth && !cell->active())
 	    continue;
 				       // Code for polygon
       out << "2 3  "
