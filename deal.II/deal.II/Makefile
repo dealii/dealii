@@ -32,5 +32,5 @@ TAGS:
 	etags include/*/* source/*/*
 
 
-.PHONY: all deal.II doc examples
+.PHONY: all deal.II doc examples TAGS
 .PHONY: clean lib-clean doc-clean examples-clean source-clean
