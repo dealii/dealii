@@ -388,8 +388,8 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 			  const Mapping<dim>*       mapping)
 {
   const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
-  const unsigned int nf = GeometryInfo<dim>::faces_per_cell;
-				   // The following text was copied
+
+  				   // The following text was copied
 				   // from an existing XFig file.
   out << "#FIG 3.2\nLandscape\nCenter\nInches" << std::endl
       << "A4\n100.00\nSingle" << std::endl
@@ -438,6 +438,7 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 				       // Now write boundary edges
     }
 }
+
 #endif
 
 
@@ -514,6 +515,8 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 	++index;
       };	  
 }
+
+
 
 #if deal_II_dimension==1
 
