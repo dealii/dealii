@@ -263,16 +263,10 @@ class FE_Q : public FiniteElement<dim>
 				      * shape function numbering on first face.
 				      */
     std::vector<unsigned int> face_renumber;
-    
-				     /**
-				      * Vector of one-dimensional
-				      * polynomials used.
-				      */
-    std::vector<LagrangeEquidistant> polynomials;
 
 				     /**
-				      * Implementation of the tensor
-				      * product of polynomials.
+				      * Pointer to the tensor
+				      * product polynomials.
 				      */
     TensorProductPolynomials<dim>* poly;
 

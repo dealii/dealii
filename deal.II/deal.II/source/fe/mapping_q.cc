@@ -45,7 +45,6 @@ MappingQ<1>::MappingQ (unsigned int):
 		degree(1),
 		n_inner(0),
 		n_outer(0),
-		polynomials(0),
 		tensor_pols(0),
 		n_shape_functions(2),
 		renumber(0),
@@ -80,7 +79,6 @@ MappingQ<dim>::MappingQ (unsigned int p):
 		n_inner(power(degree-1, dim)),
 		n_outer((dim==2) ? 4+4*(degree-1)
 			:8+12*(degree-1)+6*(degree-1)*(degree-1)),
-		polynomials(p+1),
 		tensor_pols(0),
 		n_shape_functions(0),
 		renumber(0),
@@ -91,14 +89,11 @@ MappingQ<dim>::MappingQ (unsigned int p):
 				   // polynomials used as shape
 				   // functions for the Qp mapping of
 				   // cells at the boundary.
-  std::vector<SmartPointer<Polynomial<double> > > pol_pointers(p+1);
-  for (unsigned int i=0; i<=p; ++i)
-    {
-      LagrangeEquidistant lagrange_pol(p, i);
-      polynomials[i] = lagrange_pol;
-      pol_pointers[i] = &(polynomials[i]);
-    }
-  tensor_pols = new TensorProductPolynomials<dim> (pol_pointers);
+  std::vector<LagrangeEquidistant> v;
+  for (unsigned int i=0;i<=degree;++i)
+    v.push_back(LagrangeEquidistant(degree,i));
+
+  tensor_pols = new TensorProductPolynomials<dim> (v);
   n_shape_functions=tensor_pols->n_tensor_product_polynomials();
   Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
   

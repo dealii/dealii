@@ -52,31 +52,25 @@ FE_DGQ<dim>::InternalData::~InternalData ()
 
 
 template <int dim>
-FE_DGQ<dim>::FE_DGQ (unsigned int degree)
-		:
+FE_DGQ<dim>::FE_DGQ (unsigned int degree):
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1), dummy),
 				      degree(degree),
-				      polynomials(degree+1),
 				      poly(0)
 {
-  std::vector<SmartPointer<Polynomial<double> > > v(degree+1);
   if (degree==0)
     {
-      std::vector<double> coeff(1);
-      coeff[0] = 1.;
-      polynomials[0] = Polynomial<double> (coeff);
-      v[0] = &(polynomials[0]);
-    } else {
+      std::vector<Polynomial<double> > v(
+	1, Polynomial<double> (std::vector<double> (1,1.)));
+      poly = new TensorProductPolynomials<dim> (v);
+    }
+  else
+    {
+      std::vector<LagrangeEquidistant> v;
       for (unsigned int i=0;i<=degree;++i)
-	{
-	  LagrangeEquidistant p(degree, i);
-	  polynomials[i] = p;
-	  v[i] = &(polynomials[i]);
-	}
+	v.push_back(LagrangeEquidistant(degree,i));
+      poly = new TensorProductPolynomials<dim> (v);
     }
   
-  poly = new TensorProductPolynomials<dim> (v);
-
   Assert (degree <= 10, ExcNotImplemented());
   
   std::vector<unsigned int> right;

@@ -47,15 +47,11 @@ FE_Q<dim>::FE_Q (unsigned int degree)
 		degree(degree),
 		renumber(dofs_per_cell, 0),
 		face_renumber(dofs_per_face, 0),
-		polynomials(degree+1),
 		poly(0)
 {
-  std::vector<SmartPointer<Polynomial<double> > > v(degree+1);
+  std::vector<LagrangeEquidistant> v;
   for (unsigned int i=0;i<=degree;++i)
-    {
-      polynomials[i] = LagrangeEquidistant(degree,i);
-      v[i] = &(polynomials[i]);
-    };
+    v.push_back(LagrangeEquidistant(degree,i));
   
   poly = new TensorProductPolynomials<dim> (v);
   build_renumbering (*this, degree, renumber);

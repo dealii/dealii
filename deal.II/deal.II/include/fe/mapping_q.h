@@ -426,15 +426,6 @@ class MappingQ : public MappingQ1<dim>
 				      */
     const unsigned int n_outer;
     
-    
-				     /**
-				      * Vector of one-dimensional
-				      * polynomials used as shape
-				      * functions for the Qp mapping
-				      * of cell at the boundary.
-				      */
-    std::vector<LagrangeEquidistant> polynomials;
-
 				     /**
 				      * Pointer to the
 				      * @p{dim}-dimensional tensor

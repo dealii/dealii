@@ -188,14 +188,8 @@ class FE_DGQ : public FiniteElement<dim>
     const unsigned int degree;
 
 				     /**
-				      * Vector of one-dimensional
-				      * polynomials used.
-				      */
-    std::vector<Polynomial<double> > polynomials;
-
-				     /**
-				      * Implementation of the tensor
-				      * product of polynomials.
+				      * Pointer to the tensor
+				      * product polynomials.
 				      */
     TensorProductPolynomials<dim>* poly;
 
