@@ -1168,7 +1168,8 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
       unique_copy (new_next_round_cells.begin(), new_next_round_cells.end(),
 		   back_inserter(next_round_cells));
     };
-  Assert (std::find (new_cell_numbers.begin(), new_cell_numbers.end(), invalid_cell_number)
+  Assert (std::find (new_cell_numbers.begin(), new_cell_numbers.end(),
+		     invalid_cell_number)
 	  ==
 	  new_cell_numbers.end(),
 	  ExcInternalError());
@@ -1190,7 +1191,11 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
       Assert (cells[c].cell_no == c, ExcInternalError());
 
       for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
+	{
+	  Assert (cells[c].neighbors[n] < new_cell_numbers.size(),
+		  ExcInternalError());
+	  cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
+	};
     };
 
   for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
