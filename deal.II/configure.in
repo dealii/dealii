@@ -60,8 +60,15 @@ AC_PATH_PROG(CC,$CC)
 dnl Find the right C++ compiler. Note that for historical reasons, the
 dnl compiler name and version is in the name GXX_VERSION, even if the
 dnl compiler is not GCC.
+dnl
+dnl Note that on MIPS systems, the AC_PROG_CXX call erroneously sets
+dnl -g in CXXFLAGS, which is not exactly what we want, so we store
+dnl the old value temporarily
+OLDCXXFLAGS="$CXXFLAGS"
 AC_PROG_CXX
+CXXFLAGS="$OLDCXXFLAGS"
 AC_PATH_PROG(CXX,$CXX) 
+
 if test "$GXX" = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
@@ -90,7 +97,7 @@ if test "$GXX" = yes ; then
 	;;
     *)
 	AC_MSG_RESULT(compiler is unknown but accepted gcc version)
-	GXX_VERSION=other
+	GXX_VERSION=gcc-other
 	;;
   esac
 else
@@ -106,9 +113,18 @@ else
     AC_MSG_RESULT(compiler is IBM xlC)
     GXX_VERSION=ibm_xlc
   else
-    AC_MSG_ERROR(No configuration options for this C++ compiler
-                 supported at present)
-    exit 1
+
+    # Check whether we are dealing with the MIPSpro C++ compiler
+    is_mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
+    if test "x$is_mips_pro" != "x" ; then
+      AC_MSG_RESULT(compiler is MIPSpro C++ compiler)
+      GXX_VERSION=MIPSpro
+    else
+
+      dnl  Aw, nothing suitable found...
+      AC_MSG_ERROR(Unrecognized compiler, sorry)
+      exit 1
+    fi
   fi
 fi
 AC_SUBST(GXX_VERSION)
@@ -141,21 +157,12 @@ case "$target" in
 esac
 
 
-dnl Set compile flags accordingly
+dnl Output results; set compile flags accordingly further below
 if test $enableshared = yes ; then
   AC_MSG_RESULT(configuring for shared libraries)
-  CFLAGS="$CFLAGS -fPIC"
-  CXXFLAGS="$CXXFLAGS -fPIC"
-  LDFLAGS="$LDFLAGS -fPIC"
-
   lib_suffix=.so;
 else
   AC_MSG_RESULT(configuring for static libraries)
-dnl Define these variables so they are not filled with default values later
-  CFLAGS="$CFLAGS "
-  CXXFLAGS="$CXXFLAGS "
-  LDFLAGS="$LDFLAGS "
-
   lib_suffix=.a;
 fi
 
@@ -174,7 +181,6 @@ dnl
 dnl CXXFLAGSO are the flags for optimized mode
 dnl CXXFLAGSG are the flags for debug mode
 dnl -------------------------------------------------------------
-
 if test "$GXX" = yes ; then
   CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
   CXXFLAGSG="$CXXFLAGS -DDEBUG -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
@@ -227,22 +233,29 @@ if test "$GXX" = yes ; then
 else
 
   if test "x$GXX_VERSION" = "xibm_xlc" ; then
-	CXXFLAGSG="$CXXFLAGS -g -check=bounds -info=all -qrtti=all"
+	CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all"
 	CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all"
   else
 
-    dnl Other compiler
+    if test "x$GXX_VERSION" = "xMIPSpro" ; then
+        CXXFLAGSG="$CXXFLAGS -DDEBUG -LANG:std"
+        CXXFLAGSO="$CXXFLAGS -LANG:alias_const=ON -LANG:std -w"
 
-    dnl For DECs cxx we should use the following options:
-    dnl   CXXFLAGSO: -ansi_alias -O3
-    dnl   CXXFLAGSG: -std strict_ansi_errors -w0
-    dnl if necessary: -shared, -pthread 
-    dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
-    dnl                -pch? -noimplicit_include?
+    else
 
-    AC_MSG_ERROR(No compiler options for this C++ compiler
-                 specified at present)
-    exit 1
+      dnl Other compiler
+
+      dnl For DECs cxx we should use the following options:
+      dnl   CXXFLAGSO: -ansi_alias -O3
+      dnl   CXXFLAGSG: -std strict_ansi_errors -w0
+      dnl if necessary: -shared, -pthread 
+      dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
+      dnl                -pch? -noimplicit_include?
+
+      AC_MSG_ERROR(No compiler options for this C++ compiler
+                   specified at present)
+      exit 1
+    fi
   fi
 fi
 
@@ -306,6 +319,32 @@ else
   dnl Non-gcc compilers use -g instead of -ggdb
   CXXFLAGSG="-g $CXXFLAGSG"
 fi
+
+
+
+dnl Next set flags for shared libraries, if so needed. This is simple,
+dnl as most compilers want to see -fPIC. Some others need -KPIC, however
+if test $enableshared = yes ; then
+  case "$GXX_VERSION" in
+        *egcs* | *gcc* | *ibm_xlc*)
+                CFLAGS="$CFLAGS -fPIC"
+                CXXFLAGSG="$CXXFLAGSG -fPIC"
+                CXXFLAGSO="$CXXFLAGSO -fPIC"
+                LDFLAGS="$LDFLAGS -fPIC"
+                ;;
+        *MIPSpro*)
+                CFLAGS="$CFLAGS -KPIC"
+                CXXFLAGSG="$CXXFLAGSG -KPIC"
+                CXXFLAGSO="$CXXFLAGSO -KPIC"
+                LDFLAGS="$LDFLAGS -KPIC"
+                ;;
+
+        *)
+                AC_MSG_ERROR(No shared lib options for this compiler specified)
+                exit 1
+  esac
+fi
+
 
 
 
@@ -457,7 +496,7 @@ if test "x$F77" != "x" ; then
 	  ;;
       *)
 	  AC_MSG_RESULT(compiler is unknown but accepted gcc version)
-	  F77_VERSION=other
+	  F77_VERSION=gcc-other
 	  ;;
     esac
 
