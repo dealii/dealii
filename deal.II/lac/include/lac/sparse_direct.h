@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,63 +31,62 @@
 /**
  * This class provides an interface to the sparse direct solver MA27
  * from the Harwell Subroutine Library. MA27 is a direct solver
- * specialized for sparse symmetric indefinite systems of linear equations and
- * uses a modified form of Gauss elimination. It is included in the
- * Harwell Subroutine Library (see
- * @url{http://www.cse.clrc.ac.uk/Activity/HSL}) and is written in
- * Fortran. The present class only transforms the data stored in
- * @ref{SparseMatrix} objects into the form which is required by the
- * functions resembling MA27, calls these Fortran functions, and
- * interprets some of the returned values indicating error codes,
- * etc. It also manages allocation of the right amount of temporary
- * storage required by these functions.
+ * specialized for sparse symmetric indefinite systems of linear
+ * equations and uses a modified form of Gauss elimination. It is
+ * included in the <a
+ * href="http://www.cse.clrc.ac.uk/Activity/HSL">Harwell Subroutine
+ * Library</a> and is written in Fortran. The present class only
+ * transforms the data stored in SparseMatrix objects into the
+ * form which is required by the functions resembling MA27, calls
+ * these Fortran functions, and interprets some of the returned values
+ * indicating error codes, etc. It also manages allocation of the
+ * right amount of temporary storage required by these functions.
  *
  * For a description of the steps necessary for the installation of
  * HSL subroutines, read the section on external libraries in the
- * deal.II ReadMe file.
+ * <tt>deal.II</tt> ReadMe file.
  *
- * @sect3{Interface and Method}
+ * @section SPDMA1 Interface and Method
  *
- * For the meaning of the three functions @p{initialize},
- * @p{factorize}, and @p{solve}, as well as for the method used in
- * MA27, please see the documentation of these functions, which can be
- * obtained from @url{http://www.cse.clrc.ac.uk/Activity/HSL}. In
- * practice, one will most often call the second @p{solve} function,
- * which solves the linear system for a given right hand sidem but one
- * can as well call the three functions separately if, for example,
- * one would like to solve the same matrix for several right hand side
- * vectors; the MA27 solver can do this efficiently, as it computes a
- * decomposition of the matrix, so that subsequent solves only amount
- * to a forward-backward substitution which is significantly less
- * costly than the decomposition process.
+ * For the meaning of the three functions initialize(), factorize(),
+ * and solve(), as well as for the method used in MA27, please see the
+ * <a href="http://www.cse.clrc.ac.uk/Activity/HSL">documentation</a>
+ * of these functions. In practice, you will most often call the
+ * second solve() function, which solves the linear system for a
+ * given right hand sidem but one can as well call the three functions
+ * separately if, for example, one would like to solve the same matrix
+ * for several right hand side vectors; the MA27 solver can do this
+ * efficiently, as it computes a decomposition of the matrix, so that
+ * subsequent solves only amount to a forward-backward substitution
+ * which is significantly less costly than the decomposition process.
  *
  *
- * @sect3{Parameters to the constructor}
+ * @section SPDMA2 Parameters to the constructor
  *
  * The constructor of this class takes several arguments. The meaning
  * is the following: the MA27 functions require the user to allocate
  * and pass a certain amount of memory for temporary variables or for
  * data to be passed to subsequent functions. The sizes of these
- * arrays are denoted by the variables @p{LIW1}, @p{LIW2}, and @p{LA},
- * where @p{LIW1} denotes the size of the @p{IW} array in the call to
- * @p{MA27A}, while @p{LIW2} is the array size in the call to
- * @p{MA27B}. The documentation of the MA27 functions gives ways to
+ * arrays are denoted by the variables <tt>LIW1</tt>, <tt>LIW2</tt>, and <tt>LA</tt>,
+ * where <tt>LIW1</tt> denotes the size of the <tt>IW</tt> array in the call to
+ * <tt>MA27A</tt>, while <tt>LIW2</tt> is the array size in the call to
+ * <tt>MA27B</tt>. The documentation of the MA27 functions gives ways to
  * obtain estimates for their values, e.g. by evaluating values
  * returned by functions called before. However, the documentation
- * only states that the values have to be @em{at least as large} as
+ * only states that the values have to be <b>at least</b> as large as
  * the estimates, a hint that is not very useful oftentimes (in my
  * humble opinion, the lack of dynamic memory allocation mechanism is
  * a good reason not to program in Fortran 77...).
  *
  * In our experience, it is often necessary to go beyond the proposed
- * values (most often for @p{LA}, but also for @p{LIW1}). The first
+ * values (most often for <tt>LA</tt>, but also for <tt>LIW1</tt>). The first
  * three parameters of the constructor denote by which factor the
  * initial estimates shall be increased. The default values are 1.2
  * (the documentation recommends this value, 1, and 1.5, values which
- * have often worked for us. Note that the value of @p{LIW} is only
+ * have often worked for us. Note that the value of <tt>LIW</tt> is only
  * changed in the second call if the recommended value times
- * @p{LIW_factor_2} is larger than the array size already is from the
- * call to @p{MA27A}; otherwise, @p{LIW_factor_2} is ignored.
+ * <tt>LIW_factor_2</tt> is larger than the array size already is from the
+ * call to <tt>MA27A</tt>; otherwise, <tt>LIW_factor_2</tt> is ignored.
  *
  * If the values thus constructed fail to work, we try to restart the
  * called function with larger values until the calls succeed. The
@@ -95,15 +94,15 @@
  * factor we shall increase the array sizes. If the increment factors
  * are less than or equal to one, then we only try to call the
  * respective calls to the functions once and abort by throwing an
- * error. Note that the @p{MA27C} function writes out an error message
- * if the value of @p{LA} is too small and gives an indication to
+ * error. Note that the <tt>MA27C</tt> function writes out an error message
+ * if the value of <tt>LA</tt> is too small and gives an indication to
  * which size it should be increased. However, most often the
  * indicated value is far too small and can not be relied upon.
  *
  *
- * @sect3{Note on parallelization}
+ * @section SPDMA3 Note on parallelization
  *
- * @sect4{Synchronisation}
+ * @subsection SPDMA4 Synchronisation
  * 
  * Due to the use of global variables through COMMON blocks, the calls
  * to the sparse direct solver routines are not multithreading-safe,
@@ -115,25 +114,24 @@
  * in different parts of your program, and may not want to use a
  * global variable for locking, this class has a lock as static member
  * variable, which may be accessed using the
- * @p{get_synchronisation_lock} function. Note however, that this
- * class does not perform the synchronisation for you within its
- * member functions. The reason is that you will usually want to
- * synchronise over the calls to @p{initialize} and @p{factorize},
- * since there should probably not be a call to one of these function
- * with another matrix between the calls for one matrix. (The author
- * does not really know whether this is true, but it is probably safe
- * to assume that.) Since such cross-function synchronisation can only
- * be performed from outside, it is left to the user of this class to
- * do so.
+ * get_synchronisation_lock() function. Note however, that this class
+ * does not perform the synchronisation for you within its member
+ * functions. The reason is that you will usually want to synchronise
+ * over the calls to initialize() and factorize(), since there should
+ * probably not be a call to one of these function with another matrix
+ * between the calls for one matrix. (The author does not really know
+ * whether this is true, but it is probably safe to assume that.)
+ * Since such cross-function synchronisation can only be performed
+ * from outside, it is left to the user of this class to do so.
  *
- * @sect4{Detached mode}
+ * @subsection SPDMA5 Detached mode
  *
- * As an alternative, you can call the function @p{set_detached_mode}
+ * As an alternative, you can call the function set_detached_mode()
  * right after calling the constructor. This lets the program fork, so
  * that we now have two programs that communicate via pipes.  The
  * forked copy of the program then actually replaces itself by a
- * program called @p{detached_ma27}, that is started in its place
- * through the @p{execv} system call. Now everytime you call one of
+ * program called <tt>detached_ma27</tt>, that is started in its place
+ * through the <tt>execv</tt> system call. Now everytime you call one of
  * the functions of this class, it relays the data to the other
  * program and lets it execute the respective function. The results
  * are then transfered back. Since the MA27 functions are only called
@@ -151,7 +149,7 @@
  * of a factor).
  *
  * Since no more synchronisation is necessary, the
- * @p{get_synchronisation_lock} returns a reference to a member
+ * get_synchronisation_lock() returns a reference to a member
  * variable when the detached mode is set. Thus, you need not change
  * your program: you can still acquire and release the lock as before,
  * it will only have no effect now, since different objects of this
@@ -161,10 +159,10 @@
  * you probably wanted.
  *
  * 
- * @sect4{Internals of the detached mode}
+ * @subsection SPDMA6 Internals of the detached mode
  *
  * The program that actually runs the detached solver is called
- * @p{detached_ma27}, and will show up under this name in the process
+ * <tt>detached_ma27</tt>, and will show up under this name in the process
  * list. It communicates with the main program through a pipe.
  *
  * Since the solver and the main program are two separated processes,
@@ -174,7 +172,7 @@
  * just not get any new jobs, but will happily wait until the end of
  * times. For this reason, the detached solver has a second thread
  * running in parallel that simply checks in regular intervals whether
- * the main program is still alive, using the @p{ps} program. If this
+ * the main program is still alive, using the <tt>ps</tt> program. If this
  * is no longer the case, the detached solver exits as well.
  *
  * Since the intervals between two such checks are a couple of second,
@@ -215,8 +213,8 @@ class SparseDirectMA27 : public Subscriptor
                                       * is).
                                       *
                                       * This function must not be
-                                      * called after @p{initialize}
-                                      * (or the two-argument @p{solve}
+                                      * called after initialize()
+                                      * (or the two-argument solve()
                                       * function has been called. If
                                       * it is to be called, then only
                                       * right after construction of
@@ -264,7 +262,7 @@ class SparseDirectMA27 : public Subscriptor
 				      *
 				      * If the initialization step has
 				      * not been performed yet, then
-				      * the @p{initialize} function is
+				      * the initialize() function is
 				      * called at the beginning of
 				      * this function.
 				      */
@@ -290,7 +288,7 @@ class SparseDirectMA27 : public Subscriptor
 				      * happened before, strange
 				      * things will happen. Note that
 				      * we can't actually call the
-				      * @p{factorize} function from
+				      * factorize() function from
 				      * here if it has not yet been
 				      * called, since we have no
 				      * access to the actual matrix.
@@ -389,7 +387,7 @@ class SparseDirectMA27 : public Subscriptor
 
                                      /**
                                       * Store whether
-                                      * @p{set_detached_mode} has been
+                                      * set_detached_mode() has been
                                       * called.
                                       */
     bool detached_mode;
@@ -459,7 +457,7 @@ class SparseDirectMA27 : public Subscriptor
     std::vector<double>       A;
 
 				     /**
-				      * Length of the @p{A} array.
+				      * Length of the <tt>A</tt> array.
 				      */
     unsigned int         LA;
     
@@ -508,7 +506,7 @@ class SparseDirectMA27 : public Subscriptor
     mutable Threads::ThreadMutex non_static_synchronisation_lock;
     
 				     /**
-				      * Fill the @p{A} array from the
+				      * Fill the <tt>A</tt> array from the
 				      * symmetric part of the given
 				      * matrix.
 				      */
@@ -594,42 +592,40 @@ class SparseDirectMA27 : public Subscriptor
 /**
  * This class provides an interface to the sparse direct solver MA47
  * from the Harwell Subroutine Library. MA47 is a direct solver
- * specialized for sparse symmetric indefinite systems of linear equations and
- * uses a frontal elimination method. It is included in the Harwell
- * Subroutine Library (see
- * @url{http://www.cse.clrc.ac.uk/Activity/HSL}) and is written in
- * Fortran. The present class only transforms the data stored in
- * @ref{SparseMatrix} objects into the form which is required by the
- * functions resembling MA47, calls these Fortran functions, and
- * interprets some of the returned values indicating error codes,
- * etc. It also manages allocation of the right amount of temporary
- * storage required by these functions.
+ * specialized for sparse symmetric indefinite systems of linear
+ * equations and uses a frontal elimination method. It is included in
+ * the <a href="http://www.cse.clrc.ac.uk/Activity/HSL">Harwell
+ * Subroutine Library</a> and is written in Fortran. The present class
+ * only transforms the data stored in SparseMatrix objects into
+ * the form which is required by the functions resembling MA47, calls
+ * these Fortran functions, and interprets some of the returned values
+ * indicating error codes, etc. It also manages allocation of the
+ * right amount of temporary storage required by these functions.
  *
  *
- * @sect3{Interface and Method}
+ * @section SPDMA47a Interface and Method
  *
- * For the meaning of the three functions @p{initialize},
- * @p{factorize}, and @p{solve}, as well as for the method used in
- * MA47, please see the documentation of these functions, which can be
- * obtained from @url{http://www.cse.clrc.ac.uk/Activity/HSL}. In
- * practice, one will most often call the second @p{solve} function,
- * which solves the linear system for a given right hand sidem but one
- * can as well call the three functions separately if, for example,
- * one would like to solve the same matrix for several right hand side
- * vectors; the MA47 solver can do this efficiently, as it computes a
- * decomposition of the matrix, so that subsequent solves only amount
- * to a forward-backward substitution which is significantly less
- * costly than the decomposition process.
+ * For the meaning of the three functions initialize(), factorize(),
+ * and solve(), as well as for the method used in MA47, please see the
+ * <a href="http://www.cse.clrc.ac.uk/Activity/HSL">documentation</a>
+ * of these functions. In practice, one will most often call the
+ * second solve() function, which solves the linear system for a given
+ * right hand sidem but one can as well call the three functions
+ * separately if, for example, one would like to solve the same matrix
+ * for several right hand side vectors; the MA47 solver can do this
+ * efficiently, as it computes a decomposition of the matrix, so that
+ * subsequent solves only amount to a forward-backward substitution
+ * which is significantly less costly than the decomposition process.
  *
  *
- * @sect3{Parameters to the constructor}
+ * @section SPDMA47b Parameters to the constructor
  *
  * The constructor of this class takes several arguments. Their
  * meaning is equivalent to those of the constructor of the
  * @ref{SparseDirectMA27} class; see there for more information.
  *
  *
- * @sect3{Note on parallelization}
+ * @section SPDMA47c Note on parallelization
  *
  * Due to the use of global variables through COMMON blocks, the calls
  * to the sparse direct solver routines is not multithreading-capable,
@@ -641,16 +637,15 @@ class SparseDirectMA27 : public Subscriptor
  * in different parts of your program, and may not want to use a
  * global variable for locking, this class has a lock as static member
  * variable, which may be accessed using the
- * @p{get_synchronisation_lock} function. Note however, that this
- * class does not perform the synchronisation for you within its
- * member functions. The reason is that you will usually want to
- * synchronise over the calls to @p{initialize} and @p{factorize},
- * since there should probably not be a call to one of these function
- * with another matrix between the calls for one matrix. (The author
- * does not really know whether this is true, but it is probably safe
- * to assume that.) Since such cross-function synchronisation can only
- * be performed from outside, it is left to the user of this class to
- * do so.
+ * get_synchronisation_lock() function. Note however, that this class
+ * does not perform the synchronisation for you within its member
+ * functions. The reason is that you will usually want to synchronise
+ * over the calls to initialize() and factorize(), since there should
+ * probably not be a call to one of these function with another matrix
+ * between the calls for one matrix. (The author does not really know
+ * whether this is true, but it is probably safe to assume that.)
+ * Since such cross-function synchronisation can only be performed
+ * from outside, it is left to the user of this class to do so.
  *
  * A detached mode as for MA27 has not yet been implemented for this
  * class.
@@ -668,7 +663,7 @@ class SparseDirectMA47 : public Subscriptor
 				      *
 				      * This function already calls
 				      * the initialization function
-				      * @p{MA47ID} to set up some
+				      * <tt>MA47ID</tt> to set up some
 				      * values.
 				      */
     SparseDirectMA47 (const double LIW_factor_1 = 1.4,
@@ -717,7 +712,7 @@ class SparseDirectMA47 : public Subscriptor
 				      *
 				      * If the initialization step has
 				      * not been performed yet, then
-				      * the @p{initialize} function is
+				      * the initialize() function is
 				      * called at the beginning of
 				      * this function.
 				      */
@@ -743,7 +738,7 @@ class SparseDirectMA47 : public Subscriptor
 				      * happened before, strange
 				      * things will happen. Note that
 				      * we can't actually call the
-				      * @p{factorize} function from
+				      * factorize() function from
 				      * here if it has not yet been
 				      * called, since we have no
 				      * access to the actual matrix.
@@ -866,7 +861,7 @@ class SparseDirectMA47 : public Subscriptor
     unsigned int n_nonzero_elements;
 
 				     /**
-				      * Control values set by @p{MA47ID}.
+				      * Control values set by <tt>MA47ID</tt>.
 				      */
     double       CNTL[2];
     unsigned int ICNTL[7];
@@ -893,7 +888,7 @@ class SparseDirectMA47 : public Subscriptor
     std::vector<double>       A;
 
 				     /**
-				      * Length of the @p{A} array.
+				      * Length of the <tt>A</tt> array.
 				      */
     unsigned int         LA;
     
@@ -918,21 +913,21 @@ class SparseDirectMA47 : public Subscriptor
     static Threads::ThreadMutex synchronisation_lock;
     
 				     /**
-				      * Fill the @p{A} array from the
+				      * Fill the <tt>A</tt> array from the
 				      * symmetric part of the given
 				      * matrix.
 				      */
     void fill_A (const SparseMatrix<double> &matrix);
 
                                      /**
-                                      * Call the @p{ma47id} function
+                                      * Call the <tt>ma47id</tt> function
                                       * with the given args.
                                       */
     void call_ma47id (double       *CNTL,
                       unsigned int *ICNTL);
 
                                      /**
-                                      * Call the @p{ma47ad} function
+                                      * Call the <tt>ma47ad</tt> function
                                       * with the given args.
                                       */
     void call_ma47ad (const unsigned int *n_rows,
@@ -946,7 +941,7 @@ class SparseDirectMA47 : public Subscriptor
                       int                *INFO);
 
                                      /**
-                                      * Call the @p{ma47bd} function
+                                      * Call the <tt>ma47bd</tt> function
                                       * with the given args.
                                       */
     void call_ma47bd (const unsigned int *n_rows,
@@ -963,7 +958,7 @@ class SparseDirectMA47 : public Subscriptor
                       int                *INFO);
 
                                      /**
-                                      * Call the @p{ma47bd} function
+                                      * Call the <tt>ma47bd</tt> function
                                       * with the given args.
                                       */
     void call_ma47cd (const unsigned int *n_rows,

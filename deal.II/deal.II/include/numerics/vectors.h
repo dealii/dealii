@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,36 +34,36 @@ template <int dim> class DoFHandler;
 class ConstraintMatrix;
 
 
-
+//TODO: Move documentation of functions to the functions!
+//TODO: (Re)move the basic course on Sobolev spaces
 
 /**
- * Provide a class which offers some operations on vectors. Amoung these are
- * assemblage of standard vectors, integration of the difference of a
- * finite element solution and a continuous function,
- * interpolations and projections of continuous functions to the finite
- * element space and other operations.
+ * Provide a class which offers some operations on vectors. Amoung
+ * these are assembling of standard vectors, integration of the
+ * difference of a finite element solution and a continuous function,
+ * interpolations and projections of continuous functions to the
+ * finite element space and other operations.
  *
- * There exist two versions of almost each function. One with a
- * @ref{Mapping} argument and one without. If a code uses a mapping
- * different from @ref{MappingQ1} the functions @em{with} mapping
- * argument should be used. Code that uses only @ref{MappingQ1} may
- * also use the functions @em{without} @ref{Mapping} argument. Each of
- * these latter functions create a @ref{MappingQ1} object and just
- * call the respective functions with that object as mapping
- * argument. The functions without @ref{Mapping} argument still exist
- * to ensure backward compatibility. Nevertheless it is advised to
- * change the user's codes to store a specific @ref{Mapping} object
- * and to use the functions that take this @p{Mapping} object as
- * argument. This gives the possibility to easily extend the user
- * codes to work also on mappings of higher degree, this just by
- * exchanging @ref{MappingQ1} by, for example, a @ref{MappingQ} or
- * another @ref{Mapping} object of interest.
+ * @note There exist two versions of almost each function. One with a
+ * Mapping argument and one without. If a code uses a mapping
+ * different from MappingQ1 the functions <b>with</b> mapping argument
+ * should be used. Code that uses only MappingQ1 may also use the
+ * functions without Mapping argument. Each of these latter functions
+ * create a MappingQ1 object and just call the respective functions
+ * with that object as mapping argument. The functions without Mapping
+ * argument still exist to ensure backward compatibility. Nevertheless
+ * it is advised to change the user's codes to store a specific
+ * Mapping object and to use the functions that take this Mapping
+ * object as argument. This gives the possibility to easily extend the
+ * user codes to work also on mappings of higher degree, this just by
+ * exchanging MappingQ1 by, for example, a MappingQ or another Mapping
+ * object of interest.
  *
- * @sect3{Description of operations}
+ * @section VectorTools1 Description of operations
  *
  * This collection of methods offers the following operations:
- * @begin{itemize}
- * @item Interpolation: assign each degree of freedom in the vector to be
+ * <ul>
+ * <li> Interpolation: assign each degree of freedom in the vector to be
  *   the value of the function given as argument. This is identical to
  *   saying that the resulting finite element function (which is
  *   isomorphic to the output vector) has exact function values in all
@@ -85,7 +85,7 @@ class ConstraintMatrix;
  *   given function may be, taking into account that a virtual function has
  *   to be called.
  *
- * @item Projection: compute the $L_2$-projection of the given function onto
+ * <li> Projection: compute the <i>L<sup>2</sup></i>-projection of the given function onto
  *   the finite element space. This is done through the solution of the
  *   linear system of equations $M v = f$ where $M$ is the mass matrix
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ and
@@ -94,44 +94,47 @@ class ConstraintMatrix;
  *
  *   In order to get proper results, it may necessary to treat
  *   boundary conditions right. Below are listed some cases where this
- *   may be needed.  If needed, this is done by $L_2$-projection of
+ *   may be needed.  If needed, this is done by <i>L<sup>2</sup></i>-projection of
  *   the trace of the given function onto the finite element space
  *   restricted to the boundary of the domain, then taking this
  *   information and using it to eliminate the boundary nodes from the
  *   mass matrix of the whole domain, using the
- *   @ref{MatrixTools}@p{::apply_boundary_values} function. The
- *   projection of the trace of the function to the boundary is done
- *   with the @ref{VectorTools}@p{::project_boundary_values} (see
- *   below) function, which is called with a map of boundary functions
- *   (@ref{FunctioMap}@p{::FunctionMap}) in which all boundary
- *   indicators from zero to 254 (255 is used for other purposes, see
- *   the @ref{Triangulation} class documentation) point to the
- *   function to be projected. The projection to the boundary takes
- *   place using a second quadrature formula on the boundary given to
- *   the @p{project} function. The first quadrature formula is used to
- *   compute the right hand side and for numerical quadrature of the
- *   mass matrix.
+ *   MatrixTools::apply_boundary_values() function. The projection of
+ *   the trace of the function to the boundary is done with the
+ *   VectorTools::project_boundary_values() (see below) function,
+ *   which is called with a map of boundary functions FunctioMap in
+ *   which all boundary indicators from zero to 254 (255 is used for
+ *   other purposes, see the Triangulation class documentation) point
+ *   to the function to be projected. The projection to the boundary
+ *   takes place using a second quadrature formula on the boundary
+ *   given to the project() function. The first quadrature formula is
+ *   used to compute the right hand side and for numerical quadrature
+ *   of the mass matrix.
  *
- *   The projection of the boundary values first, then eliminating them from
- *   the global system of equations is not needed usually. It may be necessary
- *   if you want to enforce special restrictions on the boundary values of the
- *   projected function, for example in time dependent problems: you may want
- *   to project the initial values but need consistency with the boundary
- *   values for later times. Since the latter are projected onto the boundary
- *   in each time step, it is necessary that we also project the boundary
- *   values of the initial values, before projecting them to the whole domain.
+ *   The projection of the boundary values first, then eliminating
+ *   them from the global system of equations is not needed
+ *   usually. It may be necessary if you want to enforce special
+ *   restrictions on the boundary values of the projected function,
+ *   for example in time dependent problems: you may want to project
+ *   the initial values but need consistency with the boundary values
+ *   for later times. Since the latter are projected onto the boundary
+ *   in each time step, it is necessary that we also project the
+ *   boundary values of the initial values, before projecting them to
+ *   the whole domain.
  *
- *   Obviously, the results of the two schemes for projection are different.
- *   Usually, when projecting to the boundary first, the $L_2$-norm of the
- *   difference between original function and projection over the whole domain
- *   will be larger (factors of five have been observed) while the $L_2$-norm
- *   of the error integrated over the boundary should of course be less. The
- *   reverse should also hold if no projection to the boundary is performed.
+ *   Obviously, the results of the two schemes for projection are
+ *   different.  Usually, when projecting to the boundary first, the
+ *   <i>L<sup>2</sup></i>-norm of the difference between original
+ *   function and projection over the whole domain will be larger
+ *   (factors of five have been observed) while the
+ *   <i>L<sup>2</sup></i>-norm of the error integrated over the
+ *   boundary should of course be less. The reverse should also hold
+ *   if no projection to the boundary is performed.
  *
- *   The selection whether the projection to the boundary first is needed is
- *   done with the @p{project_to_boundary_first} flag passed to the function.
- *   If @p{false} is given, the additional quadrature formula for faces is
- *   ignored.
+ *   The selection whether the projection to the boundary first is
+ *   needed is done with the <tt>project_to_boundary_first</tt> flag
+ *   passed to the function.  If @p{false} is given, the additional
+ *   quadrature formula for faces is ignored.
  *
  *   You should be aware of the fact that if no projection to the boundary
  *   is requested, a function with zero boundary values may not have zero
@@ -201,7 +204,7 @@ class ConstraintMatrix;
  *   The @p{project_boundary_values} function acts similar to the
  *   @p{interpolate_boundary_values} function, apart from the fact that it does
  *   not get the nodal values of boundary nodes by interpolation but rather
- *   through the $L_2$-projection of the trace of the function to the boundary.
+ *   through the <i>L<sup>2</sup></i>-projection of the trace of the function to the boundary.
  *
  *   The projection takes place on all boundary parts with boundary
  *   indicators listed in the map (@ref{FunctioMap}@p{::FunctionMap})
@@ -258,13 +261,14 @@ class ConstraintMatrix;
  *   use of the wrong quadrature formula may show a significantly wrong result
  *   and care should be taken to chose the right formula.
  *
- *   The $H_1$ seminorm is the $L_2$ norm of the gradient of the
- *   difference. The square of the full $H_1$ norm is the sum of the
- *   square of seminorm and the square of the $L_2$ norm.
+ *   The <i>H<sup>1</sup></i> seminorm is the <i>L<sup>2</sup></i>
+ *   norm of the gradient of the difference. The square of the full
+ *   <i>H<sup>1</sup></i> norm is the sum of the square of seminorm
+ *   and the square of the <i>L<sup>2</sup></i> norm.
  * 
- *   To get the @em{global} $L_1$ error, you have to sum up the
+ *   To get the global <i>L<sup>1</sup></i> error, you have to sum up the
  *   entries in @p{difference}, e.g. using
- *   @ref{Vector}@p{<double>::l1_norm} function.  For the global $L_2$
+ *   @ref{Vector}@p{<double>::l1_norm} function.  For the global <i>L<sup>2</sup></i>
  *   difference, you have to sum up the squares of the entries and
  *   take the root of the sum, e.g. using
  *   @ref{Vector}@p{<double>::l2_norm}.  These two operations
@@ -276,8 +280,8 @@ class ConstraintMatrix;
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
  *   using the @ref{Vector}@p{<double>::linfty_norm} function.
  *
- *   For the global $H_1$ norm and seminorm, the same rule applies as for the
- *   $L_2$ norm: compute the $l_2$ norm of the cell error vector.
+ *   For the global <i>H<sup>1</sup></i> norm and seminorm, the same rule applies as for the
+ *   <i>L<sup>2</sup></i> norm: compute the $l_2$ norm of the cell error vector.
  * @end{itemize}
  *
  * All functions use the finite element given to the @ref{DoFHandler} object the last
@@ -294,67 +298,68 @@ class VectorTools
 				     /**
 				      *  Denote which norm/integral is
 				      *  to be computed by the
-				      *  @p{integrate_difference}
+				      *  integrate_difference()
 				      *  function of this class. The
 				      *  following possibilities are
 				      *  implemented:
-				      *  @begin{itemize}
-				      * @item @p{mean}: the function
-				      *    or difference of functions
-				      *    is integrated on each cell.
-				      *  @item @p{L1_norm}: the
-				      *  absolute value of the
-				      *  function is integrated.
-				      * @item @p{L2_norm}: the square
-				      * of the function is integrated
-				      * and the the square root of the
-				      * result is computed on each
-				      * cell.
-				      * @item @p{Lp_norm}: the
-				      * absolute value to the pth
-				      * power is integrated and the
-				      * pth root is computed on each
-				      * cell. The exponent @p{p} is
-				      * the last parameter of the
-				      * function.
-				      *  @item @p{Linfty_norm}: the
-				      *  maximum absolute value of the
-				      *  function.
-				      * @item @p{H1_seminorm}: the
-				      *    square of the function
-				      *    gradient is integrated on
-				      *    each cell; afterwards the
-				      *    root is taken of this
-				      *    value.
-				      * @item @p{W1p_seminorm}: this
-				      * is the @p{Lp_norm} of the
-				      * gradient.
-				      * @item @p{H1_norm}: the square
-				      *    of the function plus the
-				      *    square of the function
-				      *    gradient is integrated on
-				      *    each cell; afterwards the
-				      *    root is taken of
-				      *    this. I.e. the square of
-				      *    this norm is the square of
-				      *    the @p{L2_norm} plus the
-				      *    square of the
-				      *    @p{H1_seminorm}.
-				      *  @end{itemize}
-				      * @item @p{W1p_norm}: like
-				      * @p{H1_norm}, but for
-				      * @p{Lp_norm} instead of
-				      * @p{L2_norm}
 				     */
     enum NormType {
+					   /**
+					    * The function or
+					    * difference of functions
+					    * is integrated on each
+					    * cell.
+					    */
 	  mean,
+					   /**
+					    * The absolute value of
+					    * the function is
+					    * integrated.
+					    */
 	  L1_norm,
+					   /**
+					    * The square of the
+					    * function is integrated
+					    * and the the square root
+					    * of the result is
+					    * computed on each cell.
+					    */
 	  L2_norm,
+					   /**
+					    * The maximum absolute
+					    * value of the function.
+					    */
 	  Linfty_norm,
+					   /**
+					    * #L2_norm of the gradient.
+					    */
 	  H1_seminorm,
+					   /**
+					    * The square of this norm
+					    * is the square of the
+					    * #L2_norm plus the square
+					    * of the #H1_seminorm.
+					    */
 	  H1_norm,
+					   /**
+					    * The absolute value to
+					    * the <i>p</i>th power is
+					    * integrated and the pth
+					    * root is computed on each
+					    * cell. The exponent
+					    * <i>p</i> is the last
+					    * parameter of the
+					    * function.
+					    */
 	  Lp_norm,
+					   /**
+					    * #Lp_norm of the gradient.
+					    */
 	  W1p_seminorm,
+					   /**
+					    * same as #H1_norm for
+					    * <i>L<sup>p</sup></i>.
+					    */
 	  W1p_norm
     };
     
@@ -387,8 +392,8 @@ class VectorTools
     
 				     /**
 				      * Calls the @p{interpolate}
-				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * function above with
+				      * <tt>mapping=MappingQ1@<dim>@()</tt>.
 				      */
     template <int dim, class VECTOR>
     static void interpolate (const DoFHandler<dim> &dof,
@@ -489,7 +494,7 @@ class VectorTools
 				     /**
 				      * Calls the @p{project}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim>
     static void project (const DoFHandler<dim>    &dof,
@@ -520,7 +525,7 @@ class VectorTools
 				     /**
 				      * Calls the @p{create_right_hand_side}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim>
     static void create_right_hand_side (const DoFHandler<dim> &dof,
@@ -564,7 +569,7 @@ class VectorTools
 				      * Calls the
 				      * @p{create_boundary_right_hand_side}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim>
     static void create_boundary_right_hand_side (const DoFHandler<dim>   &dof,
@@ -695,7 +700,7 @@ class VectorTools
 				      * Calls the other
 				      * @p{interpolate_boundary_values}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim>
     static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
@@ -708,7 +713,7 @@ class VectorTools
 				      * Calls the other
 				      * @p{interpolate_boundary_values}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim>
     static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
@@ -760,7 +765,7 @@ class VectorTools
 				     /**
 				      * Calls the @p{project_boundary_values}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim>
     static void project_boundary_values (const DoFHandler<dim>    &dof,
@@ -827,7 +832,7 @@ class VectorTools
 				     /**
 				      * Calls the @p{integrate_difference}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim, class InVector, class OutVector>
     static void integrate_difference (const DoFHandler<dim> &dof,
@@ -924,7 +929,7 @@ class VectorTools
 				     /**
 				      * Calls the @p{compute_mean_value}
 				      * function, see above, with
-				      * @p{mapping=MappingQ1<dim>()}.
+				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
     template <int dim, class InVector>
     static double compute_mean_value (const DoFHandler<dim> &dof,

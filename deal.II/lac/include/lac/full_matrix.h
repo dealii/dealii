@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,31 +36,21 @@ template<typename number> class Vector;
  *
  * Implementation of a classical rectangular scheme of numbers. The
  * data type of the entries is provided in the template argument
- * @p{number}.  The interface is quite fat and in fact has grown every
+ * <tt>number</tt>.  The interface is quite fat and in fact has grown every
  * time a new feature was needed. So, a lot of functions are provided.
  *
  * Since the instantiation of this template is quite an effort,
  * standard versions are precompiled into the library. These include
- * all combinations of @p{float} and @p{double} for matrices and
+ * all combinations of <tt>float</tt> and <tt>double</tt> for matrices and
  * vectors. If you need more data types, the implementation of
- * non-inline functions is in @p{fullmatrix.templates.h}. Driver files
+ * non-inline functions is in <tt>fullmatrix.templates.h</tt>. Driver files
  * are in the source tree.
  *
  * Internal calculations are usually done with the accuracy of the
  * vector argument to functions. If there is no argument with a number
  * type, the matrix number type is used.
  *
- *
- * @sect2{On template instantiations}
- *
- * Member functions of this class are either implemented in this file
- * or in a file of the same name with suffix ``.templates.h''. For the
- * most common combinations of the template parameters, instantiations
- * of this class are provided in a file with suffix ``.cc'' in the
- * ``source'' directory. If you need an instantiation that is not
- * listed there, you have to include this file along with the
- * corresponding ``.templates.h'' file and instantiate the respective
- * class yourself.
+ * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2001
  */
@@ -170,7 +160,7 @@ class FullMatrix : public Table<2,number>
                                           */
 	bool operator == (const const_iterator&) const;
                                          /**
-                                          * Inverse of @p{==}.
+                                          * Inverse of <tt>==</tt>.
                                           */
 	bool operator != (const const_iterator&) const;
 
@@ -196,13 +186,13 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Constructor. Initialize the
 				      * matrix as a square matrix with
-				      * dimension @p{n}.
+				      * dimension <tt>n</tt>.
 				      *
 				      * In order to avoid the implicit
 				      * conversion of integers and
 				      * other types to a matrix, this
 				      * constructor is declared
-				      * @p{explicit}.
+				      * <tt>explicit</tt>.
 				      *
 				      * By default, no memory is
 				      * allocated.
@@ -226,10 +216,10 @@ class FullMatrix : public Table<2,number>
 				      * by value rather than by
 				      * reference. Unfortunately, we
 				      * can't mark this copy
-				      * constructor @p{explicit},
+				      * constructor <tt>explicit</tt>,
 				      * since that prevents the use of
 				      * this class in containers, such
-				      * as @p{std::vector}. The
+				      * as <tt>std::vector</tt>. The
 				      * responsibility to check
 				      * performance of programs must
 				      * therefore remain with the
@@ -263,7 +253,7 @@ class FullMatrix : public Table<2,number>
 				      * matrix classes. This
 				      * assignment operator uses
 				      * iterators of the class
-				      * @p{MATRIX}. Therefore, sparse
+				      * MATRIX. Therefore, sparse
 				      * matrices are possible sources.
 				      */
     template <class MATRIX>
@@ -284,19 +274,19 @@ class FullMatrix : public Table<2,number>
 				      * Fill rectangular block.
 				      *
 				      * A rectangular block of the
-				      * matrix @p{src} is copied into
-				      * @p{this}. The upper left
+				      * matrix <tt>src</tt> is copied into
+				      * <tt>this</tt>. The upper left
 				      * corner of the block being
 				      * copied is
-				      * @p{(src_offset_i,src_offset_j)}.
+				      * <tt>(src_offset_i,src_offset_j)</tt>.
 				      * The upper left corner of the
 				      * copied block is
-				      * @p{(dst_offset_i,dst_offset_j)}.
+				      * <tt>(dst_offset_i,dst_offset_j)</tt>.
 				      * The size of the rectangular
 				      * block being copied is the
 				      * maximum size possible,
 				      * determined either by the size
-				      * of @p{this} or @p{src}.
+				      * of <tt>this</tt> or <tt>src</tt>.
 				      */
     template<typename number2>
     void fill (const FullMatrix<number2> &src,
@@ -317,17 +307,17 @@ class FullMatrix : public Table<2,number>
 				      * Fill with permutation of
 				      * another matrix.
 				      *
-				      * The matrix @p{src} is copied
+				      * The matrix <tt>src</tt> is copied
 				      * into the target. The two
-				      * permutation @p{p_r} and
-				      * @p{p_c} operate in a way, such
-				      * that @p{result(i,j) =
-				      * src(p_r[i], p_c[j])}.
+				      * permutation <tt>p_r</tt> and
+				      * <tt>p_c</tt> operate in a way, such
+				      * that <tt>result(i,j) =
+				      * src(p_r[i], p_c[j])</tt>.
 				      *
 				      * The vectors may also be a
 				      * selection from a larger set of
 				      * integers, if the matrix
-				      * @p{src} is bigger. It is also
+				      * <tt>src</tt> is bigger. It is also
 				      * possible to duplicate rows or
 				      * columns by this method.
 				      */
@@ -375,12 +365,12 @@ class FullMatrix : public Table<2,number>
     
 				     /**
 				      * STL-like iterator with the
-				      * first entry of row @p{r}.
+				      * first entry of row <tt>r</tt>.
 				      */
     const_iterator begin (const unsigned int r) const;
 
 				     /**
-				      * Final iterator of row @p{r}.
+				      * Final iterator of row <tt>r</tt>.
 				      */
     const_iterator end (const unsigned int r) const;
     
@@ -398,7 +388,7 @@ class FullMatrix : public Table<2,number>
     
 				     /**
 				      * Weighted addition. The matrix
-				      * @p{s*B} is added to @p{this}.
+				      * <tt>s*B</tt> is added to <tt>this</tt>.
 				      *
 				      * $A += sB$
 				      */
@@ -408,7 +398,7 @@ class FullMatrix : public Table<2,number>
 
 				     /**
 				      * Weighted addition of the
-				      * transpose of @p{B} to @p{this}.
+				      * transpose of <tt>B</tt> to <tt>this</tt>.
 				      *
 				      * $A += s B^T$
 				      */
@@ -420,9 +410,9 @@ class FullMatrix : public Table<2,number>
 				      * Matrix-matrix-multiplication.
 				      *
 				      * The optional parameter
-				      * @p{adding} determines, whether the
-				      * result is stored in @p{C} or added
-				      * to @p{C}.
+				      * <tt>adding</tt> determines, whether the
+				      * result is stored in <tt>C</tt> or added
+				      * to <tt>C</tt>.
 				      *
 				      * if (adding)
 				      *  $C += A*B$
@@ -430,8 +420,8 @@ class FullMatrix : public Table<2,number>
 				      * if (!adding)
 				      *  $C = A*B$
 				      *
-				      * Assumes that @p{A} and @p{B} have
-				      * compatible sizes and that @p{C}
+				      * Assumes that <tt>A</tt> and <tt>B</tt> have
+				      * compatible sizes and that <tt>C</tt>
 				      * already has the right size.
 				      */
     template<typename number2>
@@ -441,12 +431,12 @@ class FullMatrix : public Table<2,number>
     
 				     /**
 				      * Matrix-matrix-multiplication using
-				      * transpose of @p{this}.
+				      * transpose of <tt>this</tt>.
 				      *
 				      * The optional parameter
-				      * @p{adding} determines, whether the
-				      * result is stored in @p{C} or added
-				      * to @p{C}.
+				      * <tt>adding</tt> determines, whether the
+				      * result is stored in <tt>C</tt> or added
+				      * to <tt>C</tt>.
 				      *
 				      * if (adding)
 				      *  $C += A^T*B$
@@ -454,8 +444,8 @@ class FullMatrix : public Table<2,number>
 				      * if (!adding)
 				      *  $C = A^T*B$
 				      *
-				      * Assumes that @p{A} and @p{B} have
-				      * compatible sizes and that @p{C}
+				      * Assumes that <tt>A</tt> and <tt>B</tt> have
+				      * compatible sizes and that <tt>C</tt>
 				      * already has the right size.
 				      */
     template<typename number2>
@@ -467,9 +457,9 @@ class FullMatrix : public Table<2,number>
 				      * Matrix-vector-multiplication.
 				      *
 				      * The optional parameter
-				      * @p{adding} determines, whether the
-				      * result is stored in @p{w} or added
-				      * to @p{w}.
+				      * <tt>adding</tt> determines, whether the
+				      * result is stored in <tt>w</tt> or added
+				      * to <tt>w</tt>.
 				      *
 				      * if (adding)
 				      *  $w += A*v$
@@ -485,7 +475,7 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Transpose
 				      * matrix-vector-multiplication.
-				      * See @p{vmult} above.
+				      * See vmult() above.
 				      */
     template<typename number2>
     void Tvmult (Vector<number2>       &w,
@@ -494,28 +484,29 @@ class FullMatrix : public Table<2,number>
 
 				     /**
 				      * Return the square of the norm
-				      * of the vector @p{v} with respect
-				      * to the norm induced by this
-				      * matrix,
-				      * i.e. $\left(v,Mv\right)$. This
-				      * is useful, e.g. in the finite
+				      * of the vector <tt>v</tt> with
+				      * respect to the norm induced by
+				      * this matrix,
+				      * i.e. <i>(v,Mv)</i>. This is
+				      * useful, e.g. in the finite
 				      * element context, where the
-				      * $L_2$ norm of a function
-				      * equals the matrix norm with
-				      * respect to the mass matrix of
-				      * the vector representing the
-				      * nodal values of the finite
-				      * element function.
+				      * <i>L<sup>2</sup></i> norm of a
+				      * function equals the matrix
+				      * norm with respect to the mass
+				      * matrix of the vector
+				      * representing the nodal values
+				      * of the finite element
+				      * function.
 				      *
 				      * Obviously, the matrix needs to
-				      * be square for this operation.
+				      * be quadratic for this operation.
 				      */
     template<typename number2>
     number2 matrix_norm_square (const Vector<number2> &v) const;
 
 				     /**
 				      * Build the matrix scalar product
-				      * @p{u^T M v}. This function is mostly
+				      * <tt>u^T M v</tt>. This function is mostly
 				      * useful when building the cellwise
 				      * scalar product of two functions in
 				      * the finite element context.
@@ -531,7 +522,7 @@ class FullMatrix : public Table<2,number>
 				      * transpose, $A = \frac 12(A+A^T)$.
 				      *
 				      * Obviously the matrix must be
-				      * square for this operation.
+				      * quadratic for this operation.
 				      */
     void symmetrize ();
     
@@ -600,8 +591,8 @@ class FullMatrix : public Table<2,number>
 				      * the indefinite case.
 				      *
 				      * The numerical effort to invert
-				      * an @p{n x n} matrix is of the
-				      * order @p{n**3}.
+				      * an <tt>n x n</tt> matrix is of the
+				      * order <tt>n**3</tt>.
 				      */
     void gauss_jordan ();
 
@@ -613,15 +604,15 @@ class FullMatrix : public Table<2,number>
                                       * higher dimensions the
                                       * numerical work explodes.
                                       * Obviously, the matrix needs to
-                                      * be square for this function.
+                                      * be quadratic for this function.
                                       */
     double determinant () const;
 
 				     /**
 				      * Assign the inverse of the
 				      * given matrix to
-				      * @p{*this}. This function is
-				      * hardcoded for square matrices
+				      * <tt>*this</tt>. This function is
+				      * hardcoded for quadratic matrices
 				      * of dimension one to four,
 				      * since the amount of code
 				      * needed grows quickly.  For
@@ -636,11 +627,11 @@ class FullMatrix : public Table<2,number>
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
-				      * the @p{src} vector by the
+				      * the <tt>src</tt> vector by the
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * damping factor @p{omega}.
+				      * damping factor <tt>omega</tt>.
 				      */
     template <typename somenumber>
     void precondition_Jacobi (Vector<somenumber>       &dst,
@@ -711,9 +702,9 @@ class FullMatrix : public Table<2,number>
     void diagadd (const number s);
 
 				     /**
-				      * $w=b-A*v$.
+				      * <i>w=b-A*v</i>.
 				      * Residual calculation , returns
-				      * the $l_2$-norm $|w|$.
+				      * the <i>l<sub>2</sub></i>-norm |<i>w</i>|.
 				      */
     template<typename number2, typename number3>
     double residual (Vector<number2>       &w,
@@ -728,10 +719,10 @@ class FullMatrix : public Table<2,number>
 				      *
 				      * If the matrix has more columns
 				      * than rows, this function only
-				      * operates on the left square
+				      * operates on the left quadratic
 				      * submatrix. If there are more
-				      * rows, the upper square part of
-				      * the matrix is considered.
+				      * rows, the upper quadratic part
+				      * of the matrix is considered.
 				      *
 				      * Note that this function does
 				      * not fit into this class at
@@ -747,14 +738,14 @@ class FullMatrix : public Table<2,number>
 				      * more. Conversely, if these
 				      * functions have a meaning on
 				      * this object, then the
-				      * @p{forward} function has no
+				      * forward() function has no
 				      * meaning. This bifacial
 				      * property of this class is
 				      * probably a design mistake and
 				      * may once go away by separating
-				      * the @p{forward} and
-				      * @p{backward} functions into a
-				      * class of their own.
+				      * the forward() and backward()
+				      * functions into a class of
+				      * their own.
 				      */
     template<typename number2>
     void forward (Vector<number2>       &dst,
@@ -764,7 +755,7 @@ class FullMatrix : public Table<2,number>
 				      * Backward elimination of upper
 				      * triangle.
 				      *
-				      * @ref forward
+				      * See forward()
 				      */
     template<typename number2>
     void backward (Vector<number2>       &dst,
@@ -818,12 +809,12 @@ class FullMatrix : public Table<2,number>
 				      *
 				      * The parameters allow for a
 				      * flexible setting of the output
-				      * format: @p{precision} and
-				      * @p{scientific} are used to
+				      * format: <tt>precision</tt> and
+				      * <tt>scientific</tt> are used to
 				      * determine the number format,
-				      * where @p{scientific} = @p{false}
+				      * where <tt>scientific</tt> = <tt>false</tt>
 				      * means fixed point notation.  A
-				      * zero entry for @p{width} makes
+				      * zero entry for <tt>width</tt> makes
 				      * the function compute a width,
 				      * but it may be changed to a
 				      * positive value, if output is
@@ -839,8 +830,8 @@ class FullMatrix : public Table<2,number>
 				      * readable output, even
 				      * integers.
 				      *
-				      * This function
-				      * may produce @em{large} amounts of
+				      * @attention This function
+				      * may produce <b>large</b> amounts of
 				      * output if applied to a large matrix!
 				      */
     void print_formatted (std::ostream       &out,

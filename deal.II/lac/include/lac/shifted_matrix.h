@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,8 +24,9 @@
 /**
  * Matrix with shifted diagonal values.
  *
- * Given a matrix p{A}, this class implements a matrix-vector product with
- * @p{A+\sigma I}, where sigma is a provided shift parameter.
+ * Given a matrix <tt>A</tt>, this class implements a matrix-vector
+ * product with <i>A+s I</i>, where <i>s</i> is a provided shift
+ * parameter.
  *
  * @author Guido Kanschat, 2000, 2001
  */
@@ -34,8 +35,8 @@ class ShiftedMatrix
 {
   public:
 				     /**
-				      * Constructor.
-				      * Provide the base matrix and a shift parameter.
+				      * Constructor.  Provide the base
+				      * matrix and a shift parameter.
 				      */
     ShiftedMatrix (const MATRIX& A, const double sigma);
 
@@ -82,9 +83,9 @@ class ShiftedMatrix
 /**
  * Matrix with shifted diagonal values with respect to a certain scalar product.
  *
- * Given a matrix @p{A}, this class implements a matrix-vector product
- * with @p{A+\sigma M}, where sigma is a provided shift parameter and
- * @p{M} is the matrix representing the identity
+ * Given a matrix <tt>A</tt>, this class implements a matrix-vector product
+ * with <i>A+s M</i>, where <i>s</i> is a provided shift parameter and
+ * <tt>M</tt> is the matrix representing the identity
  *
  * @author Guido Kanschat, 2001
  */

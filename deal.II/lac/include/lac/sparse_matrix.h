@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,18 +30,8 @@ template<typename number> class FullMatrix;
 /**
  * Sparse matrix.
  *
- *
- * @sect2{On template instantiations}
- *
- * Member functions of this class are either implemented in this file
- * or in a file of the same name with suffix ``.templates.h''. For the
- * most common combinations of the template parameters, instantiations
- * of this class are provided in a file with suffix ``.cc'' in the
- * ``source'' directory. If you need an instantiation that is not
- * listed there, you have to include this file along with the
- * corresponding ``.templates.h'' file and instantiate the respective
- * class yourself.
- *
+ * @ref Instantiations some
+ 
  * @author several, 1994-2003
  */
 template <typename number>
@@ -155,7 +145,7 @@ class SparseMatrix : public virtual Subscriptor
                                           */
 	bool operator == (const const_iterator&) const;
                                          /**
-                                          * Inverse of @p{==}.
+                                          * Inverse of <tt>==</tt>.
                                           */
 	bool operator != (const const_iterator&) const;
 
@@ -197,7 +187,7 @@ class SparseMatrix : public virtual Subscriptor
 				      *
 				      * You have to initialize
 				      * the matrix before usage with
-				      * @p{reinit(SparsityPattern)}.
+				      * reinit(const SparsityPattern&).
 				      */
     SparseMatrix ();
 
@@ -206,12 +196,12 @@ class SparseMatrix : public virtual Subscriptor
 				      * only allowed to be called if the matrix
 				      * to be copied is empty. This is for the
 				      * same reason as for the
-				      * @p{SparsityPattern}, see there for the
+				      * SparsityPattern, see there for the
 				      * details.
 				      *
 				      * If you really want to copy a whole
 				      * matrix, you can do so by using the
-				      * @p{copy_from} function.
+				      * copy_from() function.
 				      */
     SparseMatrix (const SparseMatrix &);
 
@@ -221,16 +211,17 @@ class SparseMatrix : public virtual Subscriptor
 				      * represent the sparsity pattern
 				      * of this matrix. You can change
 				      * the sparsity pattern later on
-				      * by calling the @p{reinit}
-				      * function.
+				      * by calling the reinit(const
+				      * SparsityPattern&) function.
 				      *
 				      * You have to make sure that the
 				      * lifetime of the sparsity
 				      * structure is at least as long
 				      * as that of this matrix or as
-				      * long as @p{reinit} is not
+				      * long as reinit(const
+				      * SparsityPattern&) is not
 				      * called with a new sparsity
-				      * structure.
+				      * pattern.
 				      *
 				      * The constructor is marked
 				      * explicit so as to disallow
@@ -259,8 +250,8 @@ class SparseMatrix : public virtual Subscriptor
 				      * Reinitialize the object but
 				      * keep to the sparsity pattern
 				      * previously used.  This may be
-				      * necessary if you @p{reinit}'d
-				      * the sparsity structure and
+				      * necessary if the sparsity
+				      * structure has changed and you
 				      * want to update the size of the
 				      * matrix.
 				      *
@@ -298,8 +289,10 @@ class SparseMatrix : public virtual Subscriptor
 				      * lifetime of the sparsity
 				      * structure is at least as long
 				      * as that of this matrix or as
-				      * long as @p{reinit} is not called
-				      * with a new sparsity structure.
+				      * long as reinit(const
+				      * SparsityPattern &) is not
+				      * called with a new sparsity
+				      * structure.
 				      *
 				      * The elements of the matrix are
 				      * set to zero by this function.
@@ -320,7 +313,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * Return whether the object is
 				      * empty. It is empty if either
 				      * both dimensions are zero or no
-				      * @p{SparsityPattern} is
+				      * SparsityPattern is
 				      * associated.
 				      */
     bool empty () const;
@@ -358,8 +351,8 @@ class SparseMatrix : public virtual Subscriptor
 				      * matrix.
 				      *
 				      * Note, that this function does
-				      * (in contrary to the
-				      * @p{n_nonzero_elements}) NOT
+				      * (in contrary to
+				      * n_nonzero_elements()) not
 				      * count all entries of the
 				      * sparsity pattern but only the
 				      * ones that are nonzero.
@@ -367,10 +360,12 @@ class SparseMatrix : public virtual Subscriptor
     unsigned int n_actually_nonzero_elements () const;
     
 				     /**
-				      * Set the element @p{(i,j)} to @p{value}.
-				      * Throws an error if the entry does
-				      * not exist. Still, it is allowed to store
-				      * zero values in non-existent fields.
+				      * Set the element (<i>i,j</i>)
+				      * to <tt>value</tt>. Throws an
+				      * error if the entry does not
+				      * exist. Still, it is allowed to
+				      * store zero values in
+				      * non-existent fields.
 				      */
     void set (const unsigned int i, const unsigned int j,
 	      const number value);
@@ -388,9 +383,9 @@ class SparseMatrix : public virtual Subscriptor
     SparseMatrix & operator /= (const number factor);
     
 				     /**
-				      * Add @p{value} to the element
-				      * @p{(i,j)}.  Throws an error if
-				      * the entry does not
+				      * Add <tt>value</tt> to the
+				      * element (<i>i,j</i>).  Throws
+				      * an error if the entry does not
 				      * exist. Still, it is allowed to
 				      * store zero values in
 				      * non-existent fields.
@@ -420,9 +415,8 @@ class SparseMatrix : public virtual Subscriptor
 				      * in the
 				      * symmetrization. Symmetrization
 				      * of the sparsity pattern can be
-				      * obtain by the
-				      * @ref{SparsityPattern}@p{::symmetrize}
-				      * function.
+				      * obtain by
+				      * SparsityPattern::symmetrize().
 				      */
     void symmetrize ();
     
@@ -437,11 +431,11 @@ class SparseMatrix : public virtual Subscriptor
 				      * cheaper. Since this operation
 				      * is notheless not for free, we
 				      * do not make it available
-				      * through @p{operator =}, since
-				      * this may lead to unwanted
-				      * usage, e.g. in copy arguments
-				      * to functions, which should
-				      * really be arguments by
+				      * through <tt>operator =</tt>,
+				      * since this may lead to
+				      * unwanted usage, e.g. in copy
+				      * arguments to functions, which
+				      * should really be arguments by
 				      * reference.
 				      *
 				      * The source matrix may be a matrix
@@ -450,7 +444,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * data type of this matrix.
 				      *
 				      * The function returns a reference to
-				      * @p{this}.
+				      * <tt>*this</tt>.
 				      */
     template <typename somenumber>
     SparseMatrix<number> &
@@ -459,7 +453,7 @@ class SparseMatrix : public virtual Subscriptor
 				     /**
 				      * This function is complete
 				      * analogous to the
-				      * @ref{SparsityPattern}@p{::copy_from}
+				      * SparsityPattern::copy_from()
 				      * function in that it allows to
 				      * initialize a whole matrix in
 				      * one step. See there for more
@@ -473,12 +467,14 @@ class SparseMatrix : public virtual Subscriptor
 				      * cited function is that the
 				      * objects which the inner
 				      * iterator points to need to be
-				      * of type @p{std::pair<unsigned int, value},
-				      * where @p{value}
-				      * needs to be convertible to the
-				      * element type of this class, as
-				      * specified by the @p{number}
-				      * template argument.
+				      * of type <tt>std::pair<unsigned
+				      * int, value</tt>, where
+				      * <tt>value</tt> needs to be
+				      * convertible to the element
+				      * type of this class, as
+				      * specified by the
+				      * <tt>number</tt> template
+				      * argument.
 				      *
 				      * Previous content of the matrix
 				      * is overwritten. Note that the
@@ -506,13 +502,13 @@ class SparseMatrix : public virtual Subscriptor
     void copy_from (const FullMatrix<somenumber> &matrix);
     
 				     /**
-				      * Add @p{matrix} scaled by
-				      * @p{factor} to this matrix. The
-				      * function throws an error if
-				      * the sparsity patterns of the
-				      * two involved matrices do not
-				      * point to the same object,
-				      * since in this case the
+				      * Add <tt>matrix</tt> scaled by
+				      * <tt>factor</tt> to this
+				      * matrix. The function throws an
+				      * error if the sparsity patterns
+				      * of the two involved matrices
+				      * do not point to the same
+				      * object, since in this case the
 				      * operation is cheaper.
 				      *
 				      * The source matrix may be a matrix
@@ -526,7 +522,7 @@ class SparseMatrix : public virtual Subscriptor
     
 				     /**
 				      * Return the value of the entry
-				      * (i,j).  This may be an
+				      * (<i>i,j</i>).  This may be an
 				      * expensive operation and you
 				      * should always take care where
 				      * to call this function.  In
@@ -539,41 +535,55 @@ class SparseMatrix : public virtual Subscriptor
 				      * that returns zero instead (for
 				      * entries that are not in the
 				      * sparsity pattern of the
-				      * matrix), use the @p{el}
+				      * matrix), use the el()
 				      * function.
+				      *
+				      * @deprecated Consider using
+				      * const_iterator instead, since
+				      * it is tailored better to a
+				      * sparse matrix structure.
 				      */
     number operator () (const unsigned int i,
 			const unsigned int j) const;
 
 				     /**
 				      * This function is mostly like
-				      * @p{operator()} in that it
+				      * operator()() in that it
 				      * returns the value of the
-				      * matrix entry @p{(i,j)}. The only
-				      * difference is that if this
-				      * entry does not exist in the
-				      * sparsity pattern, then instead
-				      * of raising an exception, zero
-				      * is returned. While this may be
+				      * matrix entry (<i>i,j</i>). The
+				      * only difference is that if
+				      * this entry does not exist in
+				      * the sparsity pattern, then
+				      * instead of raising an
+				      * exception, zero is
+				      * returned. While this may be
 				      * convenient in some cases, note
 				      * that it is simple to write
 				      * algorithms that are slow
 				      * compared to an optimal
 				      * solution, since the sparsity
 				      * of the matrix is not used.
+				      *
+				      * @deprecated Consider using
+				      * const_iterator instead, since
+				      * it is tailored better to a
+				      * sparse matrix structure.
 				      */
     number el (const unsigned int i,
 	       const unsigned int j) const;
 
 				     /**
-				      * Return the main diagonal element in
-				      * the @p{i}th row. This function throws an
-				      * error if the matrix is not square.
+				      * Return the main diagonal
+				      * element in the <i>i</i>th
+				      * row. This function throws an
+				      * error if the matrix is not
+				      * quadratic (see
+				      * SparsityPattern::optimize_diagonal()).
 				      *
 				      * This function is considerably
-				      * faster than the @p{operator()},
-				      * since for square matrices, the
-				      * diagonal entry is always the
+				      * faster than the operator()(),
+				      * since for quadratic matrices, the
+				      * diagonal entry may be the
 				      * first to be stored in each row
 				      * and access therefore does not
 				      * involve searching for the
@@ -591,22 +601,30 @@ class SparseMatrix : public virtual Subscriptor
 				     /**
 				      * Access to values in internal
 				      * mode.  Returns the value of
-				      * the @p{index}th entry in
-				      * @p{row}. Here, @p{index} refers to
-				      * the internal representation of
-				      * the matrix, not the column. Be
-				      * sure to understand what you are
-				      * doing here.
+				      * the <tt>index</tt>th entry in
+				      * <tt>row</tt>. Here,
+				      * <tt>index</tt> refers to the
+				      * internal representation of the
+				      * matrix, not the column. Be
+				      * sure to understand what you
+				      * are doing here.
+				      *
+				      * @deprecated Use const_iterator
+				      * instead!
 				      */
     number raw_entry (const unsigned int row,
 		      const unsigned int index) const;
     
     				     /**
+				      * @internal
+				      * @deprecated Use const_iterator
+				      * instead!
+				      *
 				      * This is for hackers. Get
-				      * access to the @p{i}th element of
+				      * access to the <i>i</i>th element of
 				      * this matrix. The elements are
 				      * stored in a consecutive way,
-				      * refer to the @p{SparsityPattern}
+				      * refer to the SparsityPattern
 				      * class for more details.
 				      *
 				      * You should use this interface
@@ -624,6 +642,10 @@ class SparseMatrix : public virtual Subscriptor
     number global_entry (const unsigned int i) const;
 
 				     /**
+				      * @internal
+				      * @deprecated Use const_iterator
+				      * instead!
+				      *
 				      * Same as above, but with write
 				      * access.  You certainly know
 				      * what you do?
@@ -632,8 +654,8 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Matrix-vector multiplication:
-				      * let $dst = M*src$ with $M$
-				      * being this matrix.
+				      * let <i>dst = M*src</i> with
+				      * <i>M</i> being this matrix.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,
@@ -641,11 +663,11 @@ class SparseMatrix : public virtual Subscriptor
     
 				     /**
 				      * Matrix-vector multiplication:
-				      * let $dst = M^T*src$ with $M$
-				      * being this matrix. This
-				      * function does the same as
-				      * @p{vmult} but takes the
-				      * transposed matrix.
+				      * let <i>dst = M<sup>T</sup>*src</i> with
+				      * <i>M</i> being this
+				      * matrix. This function does the
+				      * same as vmult() but takes
+				      * the transposed matrix.
 				      */
     template <typename somenumber>
     void Tvmult (Vector<somenumber>       &dst,
@@ -653,8 +675,9 @@ class SparseMatrix : public virtual Subscriptor
   
 				     /**
 				      * Adding Matrix-vector
-				      * multiplication. Add $M*src$ on
-				      * $dst$ with $M$ being this
+				      * multiplication. Add
+				      * <i>M*src</i> on <i>dst</i>
+				      * with <i>M</i> being this
 				      * matrix.
 				      */
     template <typename somenumber>
@@ -663,11 +686,13 @@ class SparseMatrix : public virtual Subscriptor
     
 				     /**
 				      * Adding Matrix-vector
-				      * multiplication. Add $M^T*src$
-				      * to $dst$ with $M$ being this
-				      * matrix. This function does the
-				      * same as @p{vmult_add} but takes
-				      * the transposed matrix.
+				      * multiplication. Add
+				      * <i>M<sup>T</sup>*src</i> to
+				      * <i>dst</i> with <i>M</i> being
+				      * this matrix. This function
+				      * does the same as vmult_add()
+				      * but takes the transposed
+				      * matrix.
 				      */
     template <typename somenumber>
     void Tvmult_add (Vector<somenumber>       &dst,
@@ -689,7 +714,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * element function.
 				      *
 				      * Obviously, the matrix needs to
-				      * be square for this operation.
+				      * be quadratic for this operation.
 				      */
     template <typename somenumber>
     somenumber matrix_norm_square (const Vector<somenumber> &v) const;
@@ -731,13 +756,12 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Compute the residual of an
-				      * equation @p{Mx=b}, where the
-				      * residual is defined to be
-				      * @p{r=b-Mx} with @p{x} typically
-				      * being an approximate of the
-				      * true solution of the
-				      * equation. Write the residual
-				      * into @p{dst}. The l2 norm of
+				      * equation <i>Mx=b</i>, where
+				      * the residual is defined to be
+				      * <i>r=b-Mx</i>. Write the
+				      * residual into
+				      * <tt>dst</tt>. The
+				      * <i>l<sub>2</sub></i> norm of
 				      * the residual vector is
 				      * returned.
 				      */
@@ -750,11 +774,11 @@ class SparseMatrix : public virtual Subscriptor
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
-				      * the @p{src} vector by the
+				      * the <tt>src</tt> vector by the
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * damping factor @p{omega}.
+				      * relaxation factor <tt>omega</tt>.
 				      */
     template <typename somenumber>
     void precondition_Jacobi (Vector<somenumber>       &dst,
@@ -763,7 +787,7 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Apply SSOR preconditioning to
-				      * @p{src}.
+				      * <tt>src</tt>.
 				      */
     template <typename somenumber>
     void precondition_SSOR (Vector<somenumber>       &dst,
@@ -771,9 +795,8 @@ class SparseMatrix : public virtual Subscriptor
 			    const number              om = 1.) const;
 
 				     /**
-				      * Apply SOR preconditioning matrix to @p{src}.
-				      * The result of this method is
-				      * $dst = (om D - L)^{-1} src$.
+				      * Apply SOR preconditioning
+				      * matrix to <tt>src</tt>.
 				      */
     template <typename somenumber>
     void precondition_SOR (Vector<somenumber>       &dst,
@@ -781,9 +804,9 @@ class SparseMatrix : public virtual Subscriptor
  			   const number              om = 1.) const;
     
 				     /**
-				      * Apply transpose SOR preconditioning matrix to @p{src}.
-				      * The result of this method is
-				      * $dst = (om D - U)^{-1} src$.
+				      * Apply transpose SOR
+				      * preconditioning matrix to
+				      * <tt>src</tt>.
 				      */
     template <typename somenumber>
     void precondition_TSOR (Vector<somenumber>       &dst,
@@ -795,7 +818,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * in-place.  Apply the
 				      * preconditioner matrix without
 				      * copying to a second vector.
-				      * @p{omega} is the relaxation
+				      * <tt>omega</tt> is the relaxation
 				      * parameter.
 				      */
     template <typename somenumber>
@@ -803,18 +826,19 @@ class SparseMatrix : public virtual Subscriptor
 	       const number        omega = 1.) const;
 
 				     /**
-				      * Perform an SOR preconditioning in-place.
-				      * The result is $v = (\omega D - L)^{-1} v$.
-				      * @p{omega} is the damping parameter.
+				      * Perform an SOR preconditioning
+				      * in-place.  <tt>omega</tt> is
+				      * the relaxation parameter.
 				      */
     template <typename somenumber>
     void SOR (Vector<somenumber> &v,
 	      const number        om = 1.) const;
 
 				     /**
-				      * Perform a transpose SOR preconditioning in-place.
-				      * The result is $v = (\omega D - L)^{-1} v$.
-				      * @p{omega} is the damping parameter.
+				      * Perform a transpose SOR
+				      * preconditioning in-place.
+				      * <tt>omega</tt> is the
+				      * relaxation parameter.
 				      */
     template <typename somenumber>
     void TSOR (Vector<somenumber> &v,
@@ -826,16 +850,16 @@ class SparseMatrix : public virtual Subscriptor
 				      *
 				      * The standard SOR method is
 				      * applied in the order
-				      * prescribed by @p{permutation},
+				      * prescribed by <tt>permutation</tt>,
 				      * that is, first the row
-				      * @p{permutation[0]}, then
-				      * @p{permutation[1]} and so
+				      * <tt>permutation[0]</tt>, then
+				      * <tt>permutation[1]</tt> and so
 				      * on. For efficiency reasons,
 				      * the permutation as well as its
 				      * inverse are required.
 				      *
-				      * @p{omega} is the relaxation
-				      * parameter.
+				      * <tt>omega</tt> is the
+				      * relaxation parameter.
 				      */
     template <typename somenumber>
     void PSOR (Vector<somenumber> &v,
@@ -849,16 +873,19 @@ class SparseMatrix : public virtual Subscriptor
 				      *
 				      * The transposed SOR method is
 				      * applied in the order
-				      * prescribed by @p{permutation},
-				      * that is, first the row
-				      * @p{permutation[m()-1]}, then
-				      * @p{permutation[m()-2]} and so
-				      * on. For efficiency reasons,
-				      * the permutation as well as its
-				      * inverse are required.
+				      * prescribed by
+				      * <tt>permutation</tt>, that is,
+				      * first the row
+				      * <tt>permutation[m()-1]</tt>,
+				      * then
+				      * <tt>permutation[m()-2]</tt>
+				      * and so on. For efficiency
+				      * reasons, the permutation as
+				      * well as its inverse are
+				      * required.
 				      *
-				      * @p{omega} is the relaxation
-				      * parameter.
+				      * <tt>omega</tt> is the
+				      * relaxation parameter.
 				      */
     template <typename somenumber>
     void TPSOR (Vector<somenumber> &v,
@@ -867,9 +894,10 @@ class SparseMatrix : public virtual Subscriptor
 	      const number        om = 1.) const;
 
 				     /**
-				      * Do one SOR step on @p{v}.
+				      * Do one SOR step on <tt>v</tt>.
 				      * Performs a direct SOR step
-				      * with right hand side @p{b}.
+				      * with right hand side
+				      * <tt>b</tt>.
 				      */
     template <typename somenumber>
     void SOR_step (Vector<somenumber> &v,
@@ -878,8 +906,9 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Do one adjoint SOR step on
-				      * @p{v}.  Performs a direct TSOR
-				      * step with right hand side @p{b}.
+				      * <tt>v</tt>.  Performs a direct
+				      * TSOR step with right hand side
+				      * <tt>b</tt>.
 				      */
     template <typename somenumber>
     void TSOR_step (Vector<somenumber> &v,
@@ -887,10 +916,11 @@ class SparseMatrix : public virtual Subscriptor
 		    const number        om = 1.) const;
 
 				     /**
-				      * Do one adjoint SSOR step on
-				      * @p{v}.  Performs a direct SSOR
-				      * step with right hand side @p{b}
-				      * by performing TSOR after SOR.
+				      * Do one SSOR step on
+				      * <tt>v</tt>.  Performs a direct
+				      * SSOR step with right hand side
+				      * <tt>b</tt> by performing TSOR
+				      * after SOR.
 				      */
     template <typename somenumber>
     void SSOR_step (Vector<somenumber> &v,
@@ -903,11 +933,11 @@ class SparseMatrix : public virtual Subscriptor
 				      * pattern of this matrix.
 				      *
 				      * Though the return value is
-				      * declared @p{const}, you should
-				      * be aware that it may change if
-				      * you call any nonconstant
-				      * function of objects which
-				      * operate on it.
+				      * declared <tt>const</tt>, you
+				      * should be aware that it may
+				      * change if you call any
+				      * nonconstant function of
+				      * objects which operate on it.
 				      */
     const SparsityPattern & get_sparsity_pattern () const;
 
@@ -924,21 +954,22 @@ class SparseMatrix : public virtual Subscriptor
     
 				     /**
 				      * STL-like iterator with the
-				      * first entry of row @p{r}.
+				      * first entry of row <tt>r</tt>.
 				      */
     const_iterator begin (const unsigned int r) const;
 
 				     /**
-				      * Final iterator of row @p{r}.
+				      * Final iterator of row
+				      * <tt>r</tt>.
 				      */
     const_iterator end (const unsigned int r) const;
     
 				     /**
 				      * Print the matrix to the given
 				      * stream, using the format
-				      * @p{(line,col) value}, i.e. one
-				      * nonzero entry of the matrix
-				      * per line.
+				      * <tt>(line,col) value</tt>,
+				      * i.e. one nonzero entry of the
+				      * matrix per line.
 				      */
     void print (std::ostream &out) const;
 
@@ -956,14 +987,15 @@ class SparseMatrix : public virtual Subscriptor
 				      *
 				      * The parameters allow for a
 				      * flexible setting of the output
-				      * format: @p{precision} and
-				      * @p{scientific} are used to
-				      * determine the number format,
-				      * where @p{scientific} = @p{false}
-				      * means fixed point notation.  A
-				      * zero entry for @p{width} makes
-				      * the function compute a width,
-				      * but it may be changed to a
+				      * format: <tt>precision</tt> and
+				      * <tt>scientific</tt> are used
+				      * to determine the number
+				      * format, where <tt>scientific =
+				      * false</tt> means fixed point
+				      * notation.  A zero entry for
+				      * <tt>width</tt> makes the
+				      * function compute a width, but
+				      * it may be changed to a
 				      * positive value, if output is
 				      * crude.
 				      *
@@ -977,9 +1009,10 @@ class SparseMatrix : public virtual Subscriptor
 				      * readable output, even
 				      * integers.
 				      *
-				      * This function
-				      * may produce @em{large} amounts of
-				      * output if applied to a large matrix!
+				      * @attention This function may
+				      * produce <b>large</b> amounts
+				      * of output if applied to a
+				      * large matrix!
 				      */
     void print_formatted (std::ostream       &out,
 			  const unsigned int  precision   = 3,
@@ -1012,12 +1045,11 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Read data that has previously
-				      * been written by
-				      * @p{block_write} en block from
-				      * a file. This is done using the
-				      * inverse operations to the
-				      * above function, so it is
-				      * reasonably fast because the
+				      * been written by block_write()
+				      * from a file. This is done
+				      * using the inverse operations
+				      * to the above function, so it
+				      * is reasonably fast because the
 				      * bitstream is not interpreted
 				      * except for a few numbers up
 				      * front.
@@ -1027,12 +1059,11 @@ class SparseMatrix : public virtual Subscriptor
 				      * contents are lost. Note,
 				      * however, that no checks are
 				      * performed whether new data and
-				      * the underlying
-				      * @ref{SparsityPattern} object
-				      * fit together. It is your
-				      * responsibility to make sure
-				      * that the sparsity pattern and
-				      * the data to be read match.
+				      * the underlying SparsityPattern
+				      * object fit together. It is
+				      * your responsibility to make
+				      * sure that the sparsity pattern
+				      * and the data to be read match.
 				      *
 				      * A primitive form of error
 				      * checking is performed which
@@ -1047,7 +1078,8 @@ class SparseMatrix : public virtual Subscriptor
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
-				      * of this object.
+				      * of this object. See
+				      * MemoryConsumption.
 				      */
     unsigned int memory_consumption () const;
     
@@ -1099,7 +1131,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * matrix. In order to guarantee
 				      * that it is not deleted while
 				      * still in use, we subscribe to
-				      * it using the @p{SmartPointer}
+				      * it using the SmartPointer
 				      * class.
 				      */
     SmartPointer<const SparsityPattern> cols;
@@ -1119,24 +1151,24 @@ class SparseMatrix : public virtual Subscriptor
     number *val;
 
 				     /**
-				      * Allocated size of
-				      * @p{val}. This can be larger
-				      * than the actually used part if
-				      * the size of the matrix was
-				      * reduced somewhen in the past
-				      * by associating a sparsity
-				      * pattern with a smaller size to
-				      * this object, using the
-				      * @p{reinit} function.
+				      * Allocated size of #val. This
+				      * can be larger than the
+				      * actually used part if the size
+				      * of the matrix was reduced
+				      * somewhen in the past by
+				      * associating a sparsity pattern
+				      * with a smaller size to this
+				      * object, using the reinit()
+				      * function.
 				      */
     unsigned int max_len;
 
 				     /**
-				      * Version of @p{vmult} which only
+				      * Version of vmult() which only
 				      * performs its actions on the
 				      * region defined by
-				      * @p{[begin_row,end_row)}. This
-				      * function is called by @p{vmult}
+				      * <tt>[begin_row,end_row)</tt>. This
+				      * function is called by vmult()
 				      * in the case of enabled
 				      * multithreading.
 				      */
@@ -1148,12 +1180,12 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Version of
-				      * @p{matrix_norm_square} which
+				      * matrix_norm_square() which
 				      * only performs its actions on
 				      * the region defined by
-				      * @p{[begin_row,end_row)}. This
+				      * <tt>[begin_row,end_row)</tt>. This
 				      * function is called by
-				      * @p{matrix_norm_square} in the
+				      * matrix_norm_square() in the
 				      * case of enabled
 				      * multithreading.
 				      */
@@ -1165,12 +1197,12 @@ class SparseMatrix : public virtual Subscriptor
 
     				     /**
 				      * Version of
-				      * @p{matrix_scalar_product} which
+				      * matrix_scalar_product() which
 				      * only performs its actions on
 				      * the region defined by
-				      * @p{[begin_row,end_row)}. This
+				      * <tt>[begin_row,end_row)</tt>. This
 				      * function is called by
-				      * @p{matrix_scalar_product} in the
+				      * matrix_scalar_product() in the
 				      * case of enabled
 				      * multithreading.
 				      */
@@ -1182,15 +1214,16 @@ class SparseMatrix : public virtual Subscriptor
 					 somenumber               *partial_sum) const;
 
 				     /**
-				      * Version of @p{residual} which
+				      * Version of residual() which
 				      * only performs its actions on
 				      * the region defined by
-				      * @p{[begin_row,end_row)} (these
-				      * numbers are the components of
-				      * @p{interval}). This function is
-				      * called by @p{residual} in the
-				      * case of enabled
-				      * multithreading.
+				      * <tt>[begin_row,end_row)</tt>
+				      * (these numbers are the
+				      * components of
+				      * <tt>interval</tt>). This
+				      * function is called by
+				      * residual() in the case of
+				      * enabled multithreading.
 				      */
     template <typename somenumber>
     void threaded_residual (Vector<somenumber>       &dst,
@@ -1347,7 +1380,7 @@ number SparseMatrix<number>::diag_element (const unsigned int i) const
   Assert (i<m(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
-				   // row of a square matrix is the main
+				   // row of a quadratic matrix is the main
 				   // diagonal
   return val[cols->rowstart[i]];
 }
@@ -1363,7 +1396,7 @@ number & SparseMatrix<number>::diag_element (const unsigned int i)
   Assert (i<m(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
-				   // row of a square matrix is the main
+				   // row of a quadratic matrix is the main
 				   // diagonal
   return val[cols->rowstart[i]];
 }

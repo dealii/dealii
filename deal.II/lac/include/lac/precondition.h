@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,7 +49,7 @@ class PreconditionIdentity : public Subscriptor
 				      * preconditioner. Since this is
 				      * the identity, this function is
 				      * the same as
-				      * @ref{vmult}.
+				      * vmult().
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
@@ -64,7 +64,7 @@ class PreconditionIdentity : public Subscriptor
 				      * preconditioner, adding. Since this is
 				      * the identity, this function is
 				      * the same as
-				      * @ref{vmult}.
+				      * vmult_add().
 				      */
     template<class VECTOR>
     void Tvmult_add (VECTOR&, const VECTOR&) const;
@@ -82,35 +82,36 @@ class PreconditionIdentity : public Subscriptor
  * classes.
  *
  * It seems that all builtin preconditioners have a relaxation
- * parameter, so please use @p{PreconditionRelaxation} for these.
+ * parameter, so please use PreconditionRelaxation for these.
  *
- * @sect3{Use}
+ * @section PrecUMU Usage
+ *
  * You will usually not want to create a named object of this type,
  * although possible. The most common use is like this:
- * @begin{verbatim}
+ * @code
  *    SolverGMRES<SparseMatrix<double>,
  *                Vector<double> >      gmres(control,memory,500);
  *
  *    gmres.solve (matrix, solution, right_hand_side,
  *		   PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
  *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi));
- * @end{verbatim}
+ * @endcode
  * This creates an unnamed object to be passed as the fourth parameter to
- * the solver function of the @p{SolverGMRES} class. It assumes that the
- * @p{SparseMatrix} class has a function @p{precondition_Jacobi} taking two
- * vectors (source and destination) as parameters. (Actually, there is no
+ * the solver function of the SolverGMRES class. It assumes that the
+ * SparseMatrix class has a function <tt>precondition_Jacobi</tt> taking two
+ * vectors (source and destination) as parameters (Actually, there is no
  * function like that, the existing function takes a third parameter,
  * denoting the relaxation parameter; this example is therefore only meant to
- * illustrate the general idea.)
+ * illustrate the general idea).
  *
  * Note that due to the default template parameters, the above example
  * could be written shorter as follows:
- * @begin{verbatim}
+ * @code
  *    ...
  *    gmres.solve (matrix, solution, right_hand_side,
  *		   PreconditionUseMatrix<>
  *		     (matrix,&SparseMatrix<double>::template precondition_Jacobi));
- * @end{verbatim}
+ * @endcode
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
@@ -216,12 +217,13 @@ class PreconditionRelaxation : public Subscriptor
 
 
 /**
- * Jacobi preconditioner using matrix built-in function.  The MATRIX
- * class used is required to have a function
- * @p{precondition_Jacobi(VECTOR&, const VECTOR&, double}
+ * Jacobi preconditioner using matrix built-in function.  The
+ * <tt>MATRIX</tt> class used is required to have a function
+ * <tt>precondition_Jacobi(VECTOR&, const VECTOR&, double</tt>)
  *
- * @sect2{Usage example}
- * @begin{itemize}
+ * @section PrecJU Usage
+ *
+ * @code
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -237,7 +239,7 @@ class PreconditionRelaxation : public Subscriptor
  * precondition.initialize (A, .6);
  *
  * solver.solve (A, x, b, precondition);
- * @end{itemize}
+ * @endcode
  *
  * @author Guido Kanschat, 2000
  */
@@ -255,7 +257,7 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 				      * preconditioner. Since this is
 				      * a symmetric preconditioner,
 				      * this function is the same as
-				      * @ref{vmult}.
+				      * vmult().
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
@@ -265,12 +267,12 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 /**
  * SOR preconditioner using matrix built-in function.  The MATRIX
  * class used is required to have functions
- * @p{precondition_SOR(VECTOR&, const VECTOR&, double)} and
- * @p{precondition_TSOR(VECTOR&, const VECTOR&, double)}.
+ * <tt>precondition_SOR(VECTOR&, const VECTOR&, double)</tt> and
+ * <tt>precondition_TSOR(VECTOR&, const VECTOR&, double)</tt>.
  *
  *
- * @sect2{Usage example}
- * @begin{itemize}
+ * @section PrexSORU Usage
+ * @code
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -286,7 +288,7 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
  * precondition.initialize (A, .6);
  *
  * solver.solve (A, x, b, precondition);
- * @end{itemize}
+ * @endcode
  *
  * @author Guido Kanschat, 2000
  */
@@ -311,13 +313,13 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
 
 
 /**
- * SSOR preconditioner using matrix built-in function.  The MATRIX
- * class used is required to have a function
- * @p{precondition_SSOR(VECTOR&, const VECTOR&, double}
+ * SSOR preconditioner using matrix built-in function.  The
+ * <tt>MATRIX</tt> class used is required to have a function
+ * <tt>precondition_SSOR(VECTOR&, const VECTOR&, double)</tt>
  *
  *
- * @sect2{Usage example}
- * @begin{itemize}
+ * @section PrexSSORU Usage
+ * @code
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -333,7 +335,7 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
  * precondition.initialize (A, .6);
  *
  * solver.solve (A, x, b, precondition);
- * @end{itemize}
+ * @endcode
  *
  * @author Guido Kanschat, 2000
  */
@@ -352,7 +354,7 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      * preconditioner. Since this is
 				      * a symmetric preconditioner,
 				      * this function is the same as
-				      * @ref{vmult}.
+				      * vmult().
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
@@ -360,14 +362,14 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 
 
 /**
- * Permuted SOR preconditioner using matrix built-in function.  The MATRIX
- * class used is required to have functions
- * @p{PSOR(VECTOR&, const VECTOR&, double)} and
- * @p{TPSOR(VECTOR&, const VECTOR&, double)}.
+ * Permuted SOR preconditioner using matrix built-in function.  The
+ * <tt>MATRIX</tt> class used is required to have functions
+ * <tt>PSOR(VECTOR&, const VECTOR&, double)</tt> and
+ * <tt>TPSOR(VECTOR&, const VECTOR&, double)</tt>.
  *
  *
- * @sect2{Usage example}
- * @begin{itemize}
+ * @section PrecPSORU Usage
+ * @code
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -388,7 +390,7 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
  * precondition.initialize (A, permutation, inverse_permutation, .6);
  *
  * solver.solve (A, x, b, precondition);
- * @end{itemize}
+ * @endcode
  *
  * @author Guido Kanschat, 2003
  */
@@ -453,21 +455,21 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
  * inverse of the matrix. Naturally, this solver needs another
  * preconditionig method.
  *
- * Usually, the use of @p{ReductionControl} is preferred over the use of
- * the basic @p{SolverControl} in defining this solver.
+ * Usually, the use of ReductionControl is preferred over the use of
+ * the basic SolverControl in defining this solver.
  *
- * @sect2{Usage example}
+ * @section PrecItU Usage
  *
- * Krylov space methods like @ref{SolverCG} or @ref{SolverBicgstab}
+ * Krylov space methods like SolverCG or SolverBicgstab
  * become inefficient if soution down to machine accuracy is
  * needed. This is due to the fact, that round-off errors spoil the
  * orthogonality of the vector sequences. Therefore, a nested
  * iteration of two methods is proposed: The outer method is
- * @ref{SolverRichardson}, since it is robust with respect to round-of
+ * SolverRichardson, since it is robust with respect to round-of
  * errors. The inner loop is an appropriate Krylov space method, since
  * it is fast.
  *
- * @begin{itemize}
+ * @code
  *     // Declare related objects
  *
  * SparseMatrix<double> A;
@@ -487,10 +489,10 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
  * SolverRichardson<Vector<double> > outer_iteration;
  *
  * outer_iteration.solve (A, x, b, precondition);
- * @end{itemize}
+ * @endcode
  *
  * Each time we call the inner loop, reduction of the residual by a
- * factor @p{1.e-2} is attempted. Since the right hand side vector of
+ * factor <tt>1.e-2</tt> is attempted. Since the right hand side vector of
  * the inner iteration is the residual of the outer loop, the relative
  * errors are far from machine accuracy, even if the errors of the
  * outer loop are in the range of machine accuracy.
@@ -548,8 +550,8 @@ class PreconditionLACSolver : public Subscriptor
  * with the matrix-vector product $PA$. It needs an auxiliary vector for that.
  *
  * By this time, this is considered a temporary object to be plugged
- * into eigenvalue solvers. Therefore, no @p{SmartPointer} is used for
- * @p{A} and @p{P}.
+ * into eigenvalue solvers. Therefore, no SmartPointer is used for
+ * <tt>A</tt> and <tt>P</tt>.
  *
  * @author Guido Kanschat, 2000
  */

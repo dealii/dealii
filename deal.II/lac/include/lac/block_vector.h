@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -103,7 +103,7 @@ namespace internal
                                       * of other classes.
                                       *
                                       * This is for the use of
-                                      * @p{const_iterator}s.
+                                      * const_iterator.
                                       */
     template <typename number>
     struct Types<number,true>
@@ -112,7 +112,7 @@ namespace internal
                                           * Type of the vector
                                           * underlying the block vector
                                           * used in
-                                          * @p{const_iterators}. There,
+                                          * const_iterator. There,
                                           * the vector must be
                                           * constant.
                                           */
@@ -121,7 +121,7 @@ namespace internal
                                          /**
                                           * Type of the block vector
                                           * used in
-                                          * @p{const_iterator}s. There,
+                                          * const_iterator. There,
                                           * the block vector must be
                                           * constant.
                                           */
@@ -142,8 +142,8 @@ namespace internal
                                       * class for block vectors. Since
                                       * we do not want to have two
                                       * classes for non-const
-                                      * @p{iterator}s and
-                                      * @p{const_iterator}s, we take a
+                                      * iterator and
+                                      * const_iterator, we take a
                                       * second template argument which
                                       * denotes whether the vector we
                                       * point into is a constant object
@@ -255,11 +255,11 @@ namespace internal
                                           * the element pointed to.
                                           *
                                           * Depending on the value of
-                                          * the @p{constness} template
+                                          * the <tt>constness</tt> template
                                           * argument of this class,
                                           * the first argument of this
                                           * constructor is either is a
-                                          * @p{const} or non-@p{const}
+                                          * const or non-const
                                           * reference.
                                           */
         Iterator (BlockVectorType    &parent,
@@ -307,20 +307,20 @@ namespace internal
                                          /**
                                           * Dereferencing operator. If
                                           * the template argument
-                                          * @p{constness} is @p{true},
+                                          * <tt>constness</tt> is <tt>true</tt>,
                                           * then no writing to the
                                           * result is possible, making
-                                          * this a @p{const_iterator}.
+                                          * this a const_iterator.
                                           */
         reference operator * () const;
 
                                          /**
                                           * Dereferencing operator. If
                                           * the template argument
-                                          * @p{constness} is @p{true},
+                                          * <tt>constness</tt> is <tt>true</tt>,
                                           * then no writing to the
                                           * result is possible, making
-                                          * this a @p{const_iterator}.
+                                          * this a const_iterator.
                                           */ 
         pointer operator -> () const;
 
@@ -333,18 +333,17 @@ namespace internal
         reference operator [] (const difference_type d) const;
       
                                          /**
-                                          * Prefix @p{++} operator:
-                                          * @p{++i}. This operator
+                                          * Prefix increment operator. This operator
                                           * advances the iterator to
                                           * the next element and
                                           * returns a reference to
-                                          * @p{*this}.
+                                          * <tt>*this</tt>.
                                           */
         Iterator & operator ++ ();
 
                                          /**
-                                          * Postfix @p{++} operator:
-                                          * @p{i++}. This operator
+                                          * Postfix increment
+                                          * operator. This operator
                                           * advances the iterator to
                                           * the next element and
                                           * returns a copy of the old
@@ -353,18 +352,17 @@ namespace internal
         Iterator operator ++ (int);
 
                                          /**
-                                          * Prefix @p{--} operator:
-                                          * @p{--i}. This operator
+                                          * Prefix decrement operator. This operator
                                           * retracts the iterator to
                                           * the previous element and
                                           * returns a reference to
-                                          * @p{*this}.
+                                          * <tt>*this</tt>.
                                           */
         Iterator & operator -- ();
 
                                          /**
-                                          * Postfix @p{--} operator:
-                                          * @p{i--}. This operator
+                                          * Postfix decrement
+                                          * operator. This operator
                                           * retracts the iterator to
                                           * the previous element and
                                           * returns a copy of the old
@@ -493,14 +491,14 @@ namespace internal
         Iterator operator - (const difference_type &d) const;
 
                                          /**
-                                          * Move the iterator @p{d}
+                                          * Move the iterator <tt>d</tt>
                                           * elements forward at once,
                                           * and return the result.
                                           */
         Iterator & operator += (const difference_type &d);
 
                                          /**
-                                          * Move the iterator @p{d}
+                                          * Move the iterator <tt>d</tt>
                                           * elements backward at once,
                                           * and return the result.
                                           */
@@ -521,10 +519,10 @@ namespace internal
                                           * vector object to which
                                           * this iterator
                                           * points. Depending on the
-                                          * value of the @p{constness}
+                                          * value of the <tt>constness</tt>
                                           * template argument of this
-                                          * class, this is a @p{const}
-                                          * or non-@p{const} pointer.
+                                          * class, this is a <tt>const</tt>
+                                          * or non-<tt>const</tt> pointer.
                                           */
         BlockVectorType *parent;
 
@@ -601,41 +599,33 @@ namespace internal
  * A vector composed of several blocks each representing a vector of
  * its own.
  *
- * The @p{BlockVector} is a collection of normal LAC-@ref{Vector}s. Each of
+ * The BlockVector is a collection of normal LAC-@ref{Vector}s. Each of
  * the vectors inside can have a different size. The special case of a
  * block vector with constant block size is supported by constructor
- * and @p{reinit} functions.
+ * and reinit() functions.
  *
- * The functionality of @p{BlockVector} includes everything a
- * @p{Vector} can do, plus the access to a single @p{Vector} inside
- * the @p{BlockVector} by @p{block(i)}. It also has a complete random
- * access iterator, just as the LAC-@ref{Vector} class or the standard
- * C++ library template @p{std::vector}. Therefore, all algorithms
- * working on iterators also work with objects of this class.
+ * The functionality of BlockVector includes everything a Vector can
+ * do, plus the access to a single Vector inside the BlockVector by
+ * block(i). It also has a complete random access iterator, just as
+ * the LAC Vector class or the standard C++ library template
+ * <tt>std::vector</tt>. Therefore, all algorithms working on
+ * iterators also work with objects of this class.
  *
  *
- * @sect3{Accessing individual blocks, and resizing vectors}
+ * @section BlockVectorAccess Accessing individual blocks, and resizing vectors
  *
  * Apart from using this object as a whole, you can use each block
- * separately as a @ref{Vector}, using the @p{block} function.  There
+ * separately as a Vector, using the block() function.  There
  * is a single caveat: if you have changed the size of one of several
- * block, you must call the function @ref{collect_sizes} of the block
+ * block, you must call the function collect_sizes() of the block
  * vector to update its internal structures.
  *
- * Warning: If you change the sizes of single blocks without calling
- * @ref{collect_sizes}, results may be unpredictable. The debug
- * version does not check consistency here for performance reasons!
- * 
- * @sect3{On template instantiations}
+ * @attention Warning: If you change the sizes of single blocks
+ * without calling collect_sizes(), results may be unpredictable. The
+ * debug version does not check consistency here for performance
+ * reasons!
  *
- * Member functions of this class are either implemented in this file
- * or in a file of the same name with suffix ``.templates.h''. For the
- * most common combinations of the template parameters, instantiations
- * of this class are provided in a file with suffix ``.cc'' in the
- * ``source'' directory. If you need an instantiation that is not
- * listed there, you have to include this file along with the
- * corresponding ``.templates.h'' file and instantiate the respective
- * class yourself.
+ * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002
  */
@@ -646,10 +636,12 @@ class BlockVector
 				     /*
 				      * Declare standard types used in
 				      * all containers. These types
-				      * parallel those in the @p{C++}
-				      * standard libraries
-				      * @p{vector<...>} class. This
-				      * includes iterator types.
+				      * parallel those in the
+				      * <tt>C++</tt> standard
+				      * libraries
+				      * <tt>std::vector<...></tt>
+				      * class. This includes iterator
+				      * types.
 				      */
     typedef Number                  value_type;
     typedef value_type             *pointer;
@@ -667,12 +659,12 @@ class BlockVector
 				      *  any arguments, it generates
 				      *  an objetct with no
 				      *  blocks. Given one argument,
-				      *  it initializes @p{num_blocks}
+				      *  it initializes <tt>num_blocks</tt>
 				      *  blocks, but these blocks have
 				      *  size zero. The third variant
 				      *  finally initializes all
 				      *  blocks to the same size
-				      *  @p{block_size}.
+				      *  <tt>block_size</tt>.
 				      *
 				      *  Confer the other constructor
 				      *  further down if you intend to
@@ -698,7 +690,7 @@ class BlockVector
 // 				      * Copy constructor taking a BlockVector of
 // 				      * another data type. This will fail if
 // 				      * there is no conversion path from
-// 				      * @p{OtherNumber} to @p{Number}. Note that
+// 				      * <tt>OtherNumber</tt> to <tt>Number</tt>. Note that
 // 				      * you may lose accuracy when copying
 // 				      * to a BlockVector with data elements with
 // 				      * less accuracy.
@@ -709,16 +701,16 @@ class BlockVector
     
 				     /**
 				      * Constructor. Set the number of
-				      * blocks to @p{n.size()} and
+				      * blocks to <tt>n.size()</tt> and
 				      * initialize each block with
-				      * @p{n[i]} zero elements.
+				      * <tt>n[i]</tt> zero elements.
 				      */
     BlockVector (const std::vector<unsigned int> &n);
 
 				     /**
 				      * Constructor. Set the number of
 				      * blocks to
-				      * @p{n.size()}. Initialize the
+				      * <tt>n.size()</tt>. Initialize the
 				      * vector with the elements
 				      * pointed to by the range of
 				      * iterators given as second and
@@ -727,7 +719,7 @@ class BlockVector
 				      * constructor is in complete
 				      * analogy to the respective
 				      * constructor of the
-				      * @p{std::vector} class, but the
+				      * <tt>std::vector</tt> class, but the
 				      * first argument is needed in
 				      * order to know how to subdivide
 				      * the block vector into
@@ -745,10 +737,10 @@ class BlockVector
 
 				     /**
 				      * Reinitialize the BlockVector to
-				      * contain @p{num_blocks} blocks of
-				      * size @p{block_size} each.
+				      * contain <tt>num_blocks</tt> blocks of
+				      * size <tt>block_size</tt> each.
 				      *
-				      * If @p{fast==false}, the vector
+				      * If <tt>fast==false</tt>, the vector
 				      * is filled with zeros.
 				      */
     void reinit (const unsigned int num_blocks,
@@ -758,14 +750,14 @@ class BlockVector
 				     /**
 				      * Reinitialize the BlockVector
 				      * such that it contains
-				      * @p{N.size()} blocks. Each
+				      * <tt>N.size()</tt> blocks. Each
 				      * Block is reinitialized to
-				      * dimension @p{N[i]}.
+				      * dimension <tt>N[i]</tt>.
 				      *
 				      * If the number of blocks is the
 				      * same as before this function
 				      * was called, all vectors remain
-				      * the same and @p{reinit} is
+				      * the same and reinit() is
 				      * called for each vector. While
 				      * reinitailizing a usual vector
 				      * can consume a lot of time,
@@ -773,18 +765,18 @@ class BlockVector
 				      * has a potential to slow down a
 				      * program considerably.
 				      *
-				      * If @p{fast==false}, the vector
+				      * If <tt>fast==false</tt>, the vector
 				      * is filled with zeros.
 				      *
 				      * Note that you must call this
-				      * (or the other @p{reinit}
+				      * (or the other reinit()
 				      * functions) function, rather
-				      * than calling the @p{reinit}
+				      * than calling the reinit()
 				      * functions of an individual
 				      * block, to allow the block
 				      * vector to update its caches of
 				      * vector sizes. If you call
-				      * @p{reinit} of one of the
+				      * reinit() of one of the
 				      * blocks, then subsequent
 				      * actions of this object may
 				      * yield unpredictable results
@@ -796,24 +788,24 @@ class BlockVector
     
 				     /**
 				      * Change the dimension to that
-				      * of the vector @p{V}. The same
+				      * of the vector <tt>V</tt>. The same
 				      * applies as for the other
-				      * @p{reinit} function.
+				      * reinit() function.
 				      *
-				      * The elements of @p{V} are not
+				      * The elements of <tt>V</tt> are not
 				      * copied, i.e.  this function is
-				      * the same as calling @p{reinit
-				      * (V.size(), fast)}.
+				      * the same as calling <tt>reinit
+				      * (V.size(), fast)</tt>.
 				      *
 				      * Note that you must call this
-				      * (or the other @p{reinit}
+				      * (or the other reinit()
 				      * functions) function, rather
-				      * than calling the @p{reinit}
+				      * than calling the reinit()
 				      * functions of an individual
 				      * block, to allow the block
 				      * vector to update its caches of
 				      * vector sizes. If you call
-				      * @p{reinit} of one of the
+				      * reinit() of one of the
 				      * blocks, then subsequent
 				      * actions of this object may
 				      * yield unpredictable results
@@ -826,10 +818,10 @@ class BlockVector
     
 				     /**
 				      * Set all entries to zero. Equivalent to
-				      * @p{v = 0}, but more obvious and faster.
+				      * <tt>v = 0</tt>, but more obvious and faster.
 				      * Note that this function does not change
 				      * the size of the vector, unlike the
-				      * STL's @p{vector<>::clear} function.
+				      * STL's <tt>vector<>::clear</tt> function.
 				      */
     void clear ();
 
@@ -849,7 +841,7 @@ class BlockVector
 				     /**
 				      * Swap the contents of this
 				      * vector and the other vector
-				      * @p{v}. One could do this
+				      * <tt>v</tt>. One could do this
 				      * operation with a temporary
 				      * variable and copying over the
 				      * data elements, but this
@@ -869,11 +861,11 @@ class BlockVector
 				      * exchanged, too.
 				      *
 				      * This function is analog to the
-				      * the @p{swap} function of all C++
+				      * the swap() function of all C++
 				      * standard containers. Also,
 				      * there is a global function
-				      * @p{swap(u,v)} that simply calls
-				      * @p{u.swap(v)}, again in analogy
+				      * swap(u,v) that simply calls
+				      * <tt>u.swap(v)</tt>, again in analogy
 				      * to standard functions.
 				      */
     void swap (BlockVector<Number> &v);
@@ -1026,29 +1018,29 @@ class BlockVector
 				     //@{
 				     /**
 				      * Addition operator.
-				      * Fast equivalent to @p{U.add(1, V)}.
+				      * Fast equivalent to <tt>U.add(1, V)</tt>.
 				      */
     BlockVector<Number> &
     operator += (const BlockVector<Number> &V);
 
     				     /**
 				      * Subtraction operator.
-				      * Fast equivalent to @p{U.add(-1, V)}.
+				      * Fast equivalent to <tt>U.add(-1, V)</tt>.
 				      */
     BlockVector<Number> &
     operator -= (const BlockVector<Number> &V);
 
 				     /**
 				      * $U(0-DIM)+=s$.
-				      * Addition of @p{s} to all components. Note
-				      * that @p{s} is a scalar and not a vector.
+				      * Addition of <tt>s</tt> to all components. Note
+				      * that <tt>s</tt> is a scalar and not a vector.
 				      */
     void add (const Number s);
     
 				     /**
 				      * U+=V.
 				      * Simple vector addition, equal to the
-				      * @p{operator +=}.
+				      * <tt>operator +=</tt>.
 				      */
     void add (const BlockVector<Number>& V);
     
@@ -1101,8 +1093,8 @@ class BlockVector
 				      * This function is deprecated
 				      * and will be removed in a
 				      * future version. Use
-				      * @p{operator *=} and
-				      * @p{operator /=} instead.
+				      * <tt>operator *=</tt> and
+				      * <tt>operator /=</tt> instead.
 				      */
     void scale (const Number factor);
     
@@ -1123,7 +1115,7 @@ class BlockVector
 				     /**
 				      * Multiply each element of this
 				      * vector by the corresponding
-				      * element of @p{v}.
+				      * element of <tt>v</tt>.
 				      */
     template<typename Number2>
     void scale (const BlockVector<Number2>& v);
@@ -1220,7 +1212,7 @@ class BlockVector
 				     /**
 				      * The number of blocks. This
 				      * number is redundant to
-				      * @p{components.size()} and stored
+				      * <tt>components.size()</tt> and stored
 				      * here for convenience.
 				      */
     unsigned int num_blocks;
@@ -1852,10 +1844,11 @@ namespace internal
  */
 
 /**
- * Global function @p{swap} which overloads the default implementation
+ * Global function which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
+ * @relates BlockVector
  * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>
