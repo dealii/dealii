@@ -49,7 +49,7 @@ class FunctionDerivative : public Function<dim>
 
 				     /**
 				      * Constructor. Provided are the
-				      * function to compute
+				      * functions to compute
 				      * derivatives of, the direction
 				      * vector of the differentiation
 				      * and the step size @p{h} of the
@@ -61,7 +61,7 @@ class FunctionDerivative : public Function<dim>
     
 				     /**
 				      * Constructor. Provided are the
-				      * function to compute
+				      * functions to compute
 				      * derivatives of and the
 				      * direction vector of the
 				      * differentiation in each
@@ -90,9 +90,10 @@ class FunctionDerivative : public Function<dim>
 				      *
 				      * Formulas implemented right now
 				      * are first order backward Euler
-				      * (@p{UpwindEuler}), second order
-				      * symmetric Euler (@p{Euler}) and
-				      * a symmetric fourth order formula
+				      * (@p{UpwindEuler}), second
+				      * order symmetric Euler
+				      * (@p{Euler}) and a symmetric
+				      * fourth order formula
 				      * (@p{FourthOrder}).
 				      */
     void set_formula (DifferenceFormula formula = Euler);
@@ -104,7 +105,8 @@ class FunctionDerivative : public Function<dim>
 			  const unsigned int  component = 0) const;
     
 				     /**
-				      * Function values at multiple points.
+				      * Function values at multiple
+				      * points.
 				      */
     virtual void value_list (const typename std::vector<Point<dim> > &points,
 			     std::vector<double>                     &values,
@@ -127,8 +129,12 @@ class FunctionDerivative : public Function<dim>
 				      * value.
 				      */
     unsigned int memory_consumption () const;
-    
+
+				     /**
+				      * Exception.
+				      */
     DeclException0(ExcInvalidFormula);
+    
   private:
 				     /**
 				      * Function for differentiation.
@@ -136,7 +142,8 @@ class FunctionDerivative : public Function<dim>
     const Function<dim>& f;
 
 				     /**
-				      * Step size of the difference formula.
+				      * Step size of the difference
+				      * formula.
 				      */
     double h;
 				     /**
