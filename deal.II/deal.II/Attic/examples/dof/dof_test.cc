@@ -9,6 +9,7 @@
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
+#include <grid/grid_generator.h>
 #include <lac/sparsematrix.h>
 #include <base/parameter_handler.h>
 #include <grid/dof_constraints.h>
@@ -199,7 +200,7 @@ void TestCases<dim>::create_new (const unsigned int) {
   if (tria != 0) delete tria;
 
   tria = new Triangulation<dim>();
-  tria->create_hypercube();
+  GridGenerator::hyper_cube(*tria);
 
   dof = new DoFHandler<dim> (tria);
 };

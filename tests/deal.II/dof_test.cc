@@ -8,6 +8,7 @@
 
 #include <grid/dof.h>
 #include <grid/tria.h>
+#include <grid/grid_generator.h>
 #include <fe/fe_lib.lagrange.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
@@ -198,7 +199,7 @@ void TestCases<dim>::create_new () {
   if (tria != 0) delete tria;
 
   tria = new Triangulation<dim>();
-  tria->create_hypercube();
+  GridGenerator::hyper_cube(*tria);
 
   dof = new DoFHandler<dim> (tria);
 };

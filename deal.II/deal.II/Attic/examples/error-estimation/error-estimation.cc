@@ -9,6 +9,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof_constraints.h>
+#include <grid/grid_generator.h>
 #include <base/function.h>
 #include <basic/data_io.h>
 #include <base/parameter_handler.h>
@@ -412,7 +413,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << "Making initial grid... " << endl;
   const unsigned int start_level(prm.get_integer("Initial refinement"));
   tria->set_boundary (boundary);
-  tria->create_hyper_ball ();
+  GridGenerator::hyper_ball (*tria);
   tria->refine_global (start_level);
 
   if (prm.get("Test case")=="Gauss shape")

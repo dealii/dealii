@@ -15,6 +15,7 @@
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof.h>
+#include <grid/grid_generator.h>
 #include <fe/fe_values.h>
 #include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>
@@ -27,7 +28,7 @@
 
 int main () {
   Triangulation<2> tria;
-  tria.create_hypercube (0,1);
+  GridGenerator::hyper_cube (tria,0,1);
   tria.begin_active()->vertex(2)(0) = 2;
 
   FELinear<2> fe;

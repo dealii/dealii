@@ -11,6 +11,7 @@
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
+#include <grid/grid_generator.h>
 #include <basic/data_io.h>
 #include <base/function.h>
 #include <fe/fe_lib.lagrange.h>
@@ -173,7 +174,7 @@ void NonlinearProblem<dim>::run () {
   dirichlet_bc[0] = &boundary_values;
 
 
-  tria->create_hypercube ();
+  GridGenerator::hypercube (*tria);
   tria->refine_global (4);
 
   for (unsigned int refinement_step=0; refinement_step<10; ++refinement_step)

@@ -7,6 +7,7 @@
 #include <numerics/mg_smoother.h>
 #include <grid/tria.h>
 #include <grid/mg_dof.h>
+#include <grid/grid_generator.h>
 #include <fe/fe_lib.lagrange.h>
 
 main()
@@ -15,7 +16,7 @@ main()
   MGDoFHandler<2> dof(&tr);
   FELinear<2> fe;
   
-  tr.create_hypercube(-1.,1.);
+  GridGenerator::hyper_cube(tr,-1.,1.);
   tr.refine_global(3);
   dof.distribute_dofs(fe);
 }

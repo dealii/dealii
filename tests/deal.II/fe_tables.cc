@@ -15,6 +15,7 @@
 #include <grid/tria_boundary.h>
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
+#include <grid/grid_generator.h>
 #include <iomanip>
 #include <base/logstream.h>
 
@@ -32,7 +33,7 @@ inline void
 print_fe_statistics(const FiniteElement<dim>& fe)
 {
   Triangulation<dim> tr;
-  tr.create_hypercube(-1,1);
+  GridGenerator::hyper_cube(tr,-1,1);
   DoFHandler<dim> dof(&tr);
   dof.distribute_dofs(fe);
   StraightBoundary<dim> boundary;

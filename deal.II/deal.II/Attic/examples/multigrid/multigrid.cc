@@ -9,6 +9,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof_constraints.h>
+#include <grid/grid_generator.h>
 #include <base/function.h>
 #include <basic/data_io.h>
 #include <fe/fe_lib.lagrange.h>
@@ -426,7 +427,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   cout << ">" << endl;
   
   cout << "    Making grid... ";
-  tria->create_hypercube ();
+  GridGenerator::hyper_cube (*tria);
   tria->refine_global (level+1);
   tria->begin_active()->set_refine_flag();
   (++(++(tria->begin_active())))->set_refine_flag();

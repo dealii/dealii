@@ -6,6 +6,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
+#include <grid/grid_generator.h>
 #include <fstream>
 #include <string>
 #include <cmath>
@@ -159,7 +160,7 @@ void test (const int test_case) {
   cout << "Running testcase " << test_case
        << " in " << dim << " dimensions." << endl;
   Triangulation<dim> tria;
-  tria.create_hypercube();
+  GridGenerator::hyper_cube(tria);
   
   if ((dim==1) && ((test_case==2) || (test_case==3)))
     {

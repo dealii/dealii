@@ -9,6 +9,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof_constraints.h>
+#include <grid/grid_generator.h>
 #include <base/function.h>
 #include <basic/data_io.h>
 #include <fe/fe_lib.lagrange.h>
@@ -266,7 +267,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   cout << ">" << endl;
   
   cout << "    Making grid... ";
-  tria->create_hyper_ball ();
+  GridGenerator::hyper_ball (*tria);
   HyperBallBoundary<dim> boundary_description;
   tria->set_boundary (&boundary_description);
   tria->begin_active()->set_refine_flag();

@@ -466,33 +466,12 @@ class TriaDimensionInfo<3> {
  *
  *  There are several possibilities to create a triangulation:
  *  \begin{itemize}
- *    \item Hypercube triangulations: a hypercube triangulation is a
- *       domain which is the tensor product of an interval $[a,b]$ in
- *       the given number of spatial dimensions. If you want to create such
- *       a domain, which is a common test case for model problems, call
- *       #Triangulation<dim>::create_hypercube (a,b)#, which produces a
- *       hypercube domain triangulated with exactly one element. You can
- *       get tensor product meshes by successive refinement of this cell.
- *
- *    \item Other standard regions: you can get the generalized L-shape domain
- *      using the #Triangulation<dim>::create_L_region (a,b)# function, which
- *      is the hypercube with the interval $[a,b]$ without the hypercube
- *      made out of the interval $[(a+b)/2,b]$. Let, for example, be $a=-1$
- *      and $b=1$, then the hpyer-L in two dimensions is the region
- *      $[-1,1]^2 - [0,1]^2$. To create a hyper-L in one dimension results in
- *      an error.
- *
- *      You get the circle or ball (or generalized: hyperball) around origin
- *      #p# and with radius #r# by calling
- *      #Triangulation<dim>::create_hyper_ball (p, r)#. The circle is triangulated
- *       by five cells, the ball by seven cells. The diameter of the center cell is
- *       chosen so that the aspect ratio of the boundary cells after one refinement
- *       is minimized in some way. To create a hyperball in one dimension results in
- *       an error.
- *
- *       Do not forget to attach a suitable
- *       boundary approximation object if you want the triangulation to be refined
- *       at the outer boundaries.
+ *    \item The most common domains, such as hypercubes (i.e. lines, squares,
+ *       cubes, etc), hyperballs (circles, balls, ...) and some other, more
+ *       weird domains such as the L-shape region and higher dimensional
+ *       generalizations and others, are provided by the #GridGenerator#
+ *       class which takes a triangulation and fills it by a division
+ *       of the required domain.
  *   
  *     \item Reading in a triangulation: By using an object of the #DataIn#
  *        class, you can read in fairly general triangulations. See there for
@@ -1597,50 +1576,6 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     void create_triangulation (const vector<Point<dim> >    &vertices,
 			       const vector<CellData<dim> > &cells,
 			       const SubCellData            &subcelldata);
-    
-				     /**
-				      * Initialize the triangulation with a
-				      * hypercube (line in 1D, square in 2D, etc)
-				      * consisting of exactly one cell. The
-				      * hypercube volume is the tensor product
-				      * of the intervall $[left,right]$ in the
-				      * present number of dimensions, where
-				      * the limits are given as arguments. They
-				      * default to zero and unity, then producing
-				      * the unit hypercube.
-				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
-				      */
-    void create_hypercube (const double left = 0.,
-			   const double right= 1.);
-
-    				     /**
-				      * Initialize the triangulation with a
-				      * hyper-L consisting of exactly #2^dim-1#
-				      * cells. See the general documentation for a
-				      * description of the L-region. The limits
-				      * default to minus unity and unity.
-				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
-				      */
-    void create_hyper_L (const double left = -1.,
-			 const double right= 1.);
-
-				     /**
-				      * Initialize the triangulation with a
-				      * hyperball, i.e. a circle or a ball.
-				      * See the general documentation for a
-				      * more concise description. The center of
-				      * the hyperball default to the origin,
-				      * the radius defaults to unity.
-				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
-				      */
-    void create_hyper_ball (const Point<dim> &center = Point<dim>(),
-			    const double radius = 1.);
 
 				     /**
 				      * Distort the grid by randomly moving

@@ -5,6 +5,7 @@
 
 #include "poisson.h"
 #include <lac/vector.h>
+#include <grid/grid_generator.h>
 
 
 
@@ -348,7 +349,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
       {
 	    static const Point<dim> origin;
 	    boundary = new HyperBallBoundary<dim>(origin, 1.);
-	    tria->create_hyper_ball (origin, 1.);
+	    GridGenerator::hyper_ball (*tria, origin, 1.);
 	    tria->set_boundary (boundary);
 	    break;
       };
@@ -356,7 +357,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 					     // set the boundary function
       {
 	    boundary = new CurvedLine<dim>();
-	    tria->create_hypercube ();
+	    GridGenerator::hyper_cube (*tria);
 	    tria->set_boundary (boundary);
 	    break;
       };
@@ -368,12 +369,12 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
       case 5:
 	    boundary = new StraightBoundary<dim>();
 	    tria->set_boundary (boundary);
-	    tria->create_hypercube ();
+	    GridGenerator::hyper_cube (*tria);
 	    break;
       case 6:
 	    boundary = new StraightBoundary<dim>();
 	    tria->set_boundary (boundary);
-	    tria->create_hypercube ();
+	    GridGenerator::hyper_cube (*tria);
 	    tria->refine_global (1);
 	    for (unsigned int i=0; i<5; ++i)
 	      {
@@ -385,7 +386,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
       case 7:
 	    boundary = new StraightBoundary<dim>();
 	    tria->set_boundary (boundary);
-	    tria->create_hyper_L ();
+	    GridGenerator::hyper_L (*tria);
 	    break;
       default:
 	    return false;
@@ -405,7 +406,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 
 template <int dim>
 void PoissonProblem<dim>::make_zoom_in_grid () {
-  tria->create_hypercube ();
+  GridGenerator::hyper_cube (*tria);
 				   // refine first cell
   tria->begin_active()->set_refine_flag();
   tria->execute_coarsening_and_refinement ();
@@ -432,7 +433,7 @@ void PoissonProblem<dim>::make_zoom_in_grid () {
 
 template <int dim>
 void PoissonProblem<dim>::make_random_grid () {
-  tria->create_hypercube ();
+  GridGenerator::hyper_cube (*tria);
   tria->refine_global (1);
 	
   Triangulation<dim>::active_cell_iterator cell, endc;
