@@ -127,7 +127,7 @@ int main()
 	    {
 	      mgstruct[i].reinit(mgdof.n_dofs(i), mgdof.n_dofs(i),
 				 mgdof.max_couplings_between_dofs());
-	      MGDoFTools::make_sparsity_pattern(mgdof, i, mgstruct[i]);
+	      MGDoFTools::make_sparsity_pattern(mgdof, mgstruct[i], i);
 	      mgstruct[i].compress();
 	      
 	      mgA[i].reinit(mgstruct[i]);
