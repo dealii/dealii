@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -907,9 +907,17 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 << "set "
                 << ptr->first
                 << std::setw(longest_name-ptr->first.length()+1) << " "
-                << "= " << value
-                << std::setw(longest_value-value.length()+1) << " "
-                << "# ";
+                << "= " << value;
+
+                                             // if we are going to write some
+                                             // text after this, then add a
+                                             // comment marker and align it
+                                             // properly
+            if ((pd->entries[ptr->first].documentation.length() != 0)
+                ||
+                (value != pd->entries[ptr->first].value))
+              out << std::setw(longest_value-value.length()+1) << " "
+                  << "# ";
 
                                              // if there is
                                              // documentation, then
@@ -918,15 +926,21 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                              // always looked up in
                                              // the Defaults tree
             if (pd->entries[ptr->first].documentation.length() != 0)
-              out << pd->entries[ptr->first].documentation << ", ";
+              out << pd->entries[ptr->first].documentation;
             
                                              // finally print the
                                              // default value, but
                                              // only if it differs
                                              // from the actual value
             if (value != pd->entries[ptr->first].value)
-              out << "default: " << pd->entries[ptr->first].value
-                  << std::endl;
+              {
+                if (pd->entries[ptr->first].documentation.length() != 0)
+                  out << ", ";
+                
+                out << "default: " << pd->entries[ptr->first].value;
+              }
+            
+            out << std::endl;
           }
         
         break;
