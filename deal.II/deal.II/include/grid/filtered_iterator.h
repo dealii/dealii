@@ -1,4 +1,4 @@
-//------------------------ filtered_iterator.h -----------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//------------------------ filtered_iterator.h -----------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__filtered_iterator_h
 #define __deal2__filtered_iterator_h
 

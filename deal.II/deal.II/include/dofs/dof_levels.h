@@ -1,4 +1,4 @@
-//----------------------------  dof_levels.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  dof_levels.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__dof_levels_h
 #define __deal2__dof_levels_h
 

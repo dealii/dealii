@@ -1,4 +1,4 @@
-//----------------------------  error_estimator.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  error_estimator.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__error_estimator_h
 #define __deal2__error_estimator_h
 

@@ -1,4 +1,4 @@
-//----------------------------  tria_iterator.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  tria_iterator.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__tria_iterator_h
 #define __deal2__tria_iterator_h
 

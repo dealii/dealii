@@ -1,4 +1,4 @@
-//----------------------------  grid_tools.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  grid_tools.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__grid_tools_H
 #define __deal2__grid_tools_H
 

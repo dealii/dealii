@@ -1,4 +1,4 @@
-//----------------------------  mapping_Cartesian.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mapping_Cartesian.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__mapping_cartesian_h
 #define __deal2__mapping_cartesian_h
 

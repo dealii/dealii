@@ -1,4 +1,4 @@
-//----------------------------  fe_update_flags.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  fe_update_flags.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__fe_update_flags_h
 #define __deal2__fe_update_flags_h
 

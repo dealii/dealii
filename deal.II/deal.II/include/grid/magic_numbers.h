@@ -1,4 +1,4 @@
-//----------------------------  magic_numbers.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  magic_numbers.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__magic_numbers_h
 #define __deal2__magic_numbers_h
 

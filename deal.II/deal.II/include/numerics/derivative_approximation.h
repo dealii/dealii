@@ -1,4 +1,4 @@
-//----------------------------  gradient_estimator.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  gradient_estimator.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__gradient_estimator_h
 #define __deal2__gradient_estimator_h
 
