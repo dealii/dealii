@@ -53,6 +53,13 @@ class MultithreadInfo
 				      * system.  It is one if
 				      * detection is not implemented
 				      * or failed.
+				      *
+				      * If it is one, although you
+				      * are on a multi-processor
+				      * machine, please refer to the
+				      * documentation in
+				      * <tt>multithread_info.cc</tt>
+				      * near to the #error directive.
 				      */
     const unsigned int n_cpus;
 
