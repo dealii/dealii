@@ -179,7 +179,8 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Fixed: The <code>GridRefinement::refine_fixed_fraction</code>
+       Fixed: The <code
+       class="member">GridRefinement::refine_fixed_fraction</code>
        function sometimes had problems when indicators vary over
        several orders of magnitude, due to roundoff. This is now
        fixed. 
@@ -188,7 +189,8 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code>DoFTools::extract_subdomain_dofs</code> selects
+       New: <code
+       class="member">DoFTools::extract_subdomain_dofs</code> selects
        those degrees of freedom which are located on cells with a
        specified subdomain id.
        <br>
@@ -200,8 +202,10 @@ documentation, etc</a>.
        <em>subdomain_id</em> which can be used in parallel
        computations to identify which cells are handled on which
        processor. These flags are read and set using the functions
-       <code>cell->subdomain_id()</code> and
-       <code>cell->set_subdomain_id(new_id)</code>. The subdomain ids
+       <code
+       class="member">cell->subdomain_id()</code> and
+       <code
+       class="member">cell->set_subdomain_id(new_id)</code>. The subdomain ids
        are unsigned integers, so should be sufficiently large also for
        larger numbers of subdomains.
        <br>
