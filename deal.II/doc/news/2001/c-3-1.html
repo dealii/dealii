@@ -112,6 +112,19 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: The <code class="class">CellAccessor</code> now has a function
+       <code class="member">has_boundary_lines</code> that mostly has
+       the same semantics that <code class="member">at_boundary</code>
+       has, but also covers the case that a hexahedron in 3d may be at
+       the boundary only by one line, rather than by a whole face. In
+       that case, <code class="member">at_boundary</code> reports
+       false, while <code class="member">has_boundary_lines</code>
+       reports true.
+       <br>
+       (WB 2001/02/21)
+       </p>
+
+  <li> <p>
        New: There is now a function
        <code class="member">ConstraintMatrix::merge</code> that merges
        the constraints represented by two constraint matrices into one
