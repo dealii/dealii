@@ -69,7 +69,6 @@
  * \begin{verbatim}
  *   SparseILU<double> ilu (ilu_sparsity);
  *   ilu.decompose (global_matrix);
- *   global_matrix.set_preconditioner (ilu);
  *
  *   somesolver.solve (A, x, f,
  *                     PreconditionUseMatrix<SparseILU<double>,Vector<double> >
