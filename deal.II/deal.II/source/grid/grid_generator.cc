@@ -795,7 +795,7 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 		  const unsigned int vertex_index=face->vertex_index(vertex_no);
 		  map_iter=new_points.find(vertex_index);
 		  for (unsigned int i=0; i<dim; ++i)
-		    m[i].insert(pair<unsigned int,double> (
+		    m[i].insert(std::pair<unsigned int,double> (
 		      face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
 		}
 	  }
