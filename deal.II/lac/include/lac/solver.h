@@ -39,7 +39,7 @@ class SolverControl;
  * class, they are rather intended to form a `signature' which a concrete
  * class has to conform to.
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  * class Matrix
  * {
  *   public:
@@ -95,7 +95,7 @@ class SolverControl;
  *     void equ (double a, const Vector& x,
  *               double b, const Vector& z);
  * };
- * \end{verbatim}
+ * @end{verbatim}
  *
  *
  * @sect3{AdditionalData}
@@ -109,7 +109,7 @@ class SolverControl;
  * an argument as a default @p{AdditionalData} is set by default. 
  *
  * Now the generating of a solver looks like
- * \begin{verbatim}
+ * @begin{verbatim}
  *                               // GMRES with 50 tmp vectors
  * SolverGMRES solver_gmres (solver_control, vector_memory,
  *                           SolverGMRES::AdditionalData(50));
@@ -120,7 +120,7 @@ class SolverControl;
  *
  *                               // CG with default AdditionalData
  * SolverCG solver_cg (solver_control, vector_memory);
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Using a unified constructor parameter list for all solvers was introduced when the
  * @p{SolverSelector} class was written; the unified interface enabled us to use this

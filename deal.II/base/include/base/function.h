@@ -35,7 +35,7 @@ template<typename number> class Vector;
  *
  * Access to function objects therefore is through the following
  * methods:
- * \begin{verbatim}
+ * @begin{verbatim}
  *                 // access to one component at one point
  *   double value        (const Point<dim>   &p,
  *                        const unsigned int  component = 0) const;
@@ -43,11 +43,11 @@ template<typename number> class Vector;
  *                 // return all components at one point
  *   void   vector_value (const Point<dim>   &p,
  *                        Vector<double>     &value) const;
- * \end{verbatim}
+ * @end{verbatim}
  *
  * For more efficiency, there are other functions returning one or all
  * components at a list of points at once:
- * \begin{verbatim}
+ * @begin{verbatim}
  *                 // access to one component at several points
  *   void   value_list (const vector<Point<dim> >  &point_list,
  *                      vector<double>             &value_list,
@@ -56,7 +56,7 @@ template<typename number> class Vector;
  *                 // return all components at several points
  *   void   vector_value_list (const vector<Point<dim> >    &point_list,
  *                             vector<Vector<double> >      &value_list) const;
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Furthermore, there are functions returning the gradient of the
  * function at one or several points.
@@ -87,7 +87,7 @@ template<typename number> class Vector;
  * Support for time dependant functions can be found in the base
  * class @p{FunctionTime}.
  *
- * {\bf Note}: if the functions you are dealing with have sizes which
+ * @em{Note}: if the functions you are dealing with have sizes which
  * are a priori known (for example, @p{dim} elements), you might
  * consider using the @p{TensorFunction} class instead.
  *

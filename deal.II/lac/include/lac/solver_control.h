@@ -41,14 +41,14 @@ class ParameterHandler;
  * solver is in.
  *
  * The possible values of State are
- * \begin{itemize}
- * \item @p{iterate = 0}: continue the iteration.
- * \item @p{success}: the goal is reached, the iterative method can terminate
+ * @begin{itemize}
+ * @item @p{iterate = 0}: continue the iteration.
+ * @item @p{success}: the goal is reached, the iterative method can terminate
  *       successfully.
- * \item @p{failure}: the iterative method should stop because convergence 
+ * @item @p{failure}: the iterative method should stop because convergence 
  *       could not be achieved or at least was not achieved within the given
  *       maximal number of iterations.
- * \end{itemize}
+ * @end{itemize}
  */
 class SolverControl : public Subscriptor
 {

@@ -150,7 +150,7 @@ class Assembler : public DoFCellAccessor<dim>
 				      * Structure to be passed upon
 				      * construction of an assembler object
 				      * through the iterator object. See
-				      * \Ref{TriaRawIterator} for a discussion
+				      * @ref{TriaRawIterator} for a discussion
 				      * of this mechanism.
 				      */
     struct AssemblerData {

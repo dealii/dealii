@@ -30,18 +30,18 @@
  *
  * @p{SmartPointer} does NOT implement any memory handling! Especially,
  * deleting a @p{SmartPointer} does not delete the object. Writing
- * \begin{verbatim}
+ * @begin{verbatim}
  * SmartPointer<T> t = new T;
- * \end{verbatim}
+ * @end{verbatim}
  * is a sure way to program a memory leak! The secure version is
- * \begin{verbatim}
+ * @begin{verbatim}
  * T* p = new T;
  * {
  *   SmartPointer<T> t = p;
  *   ...
  * }
  * delete p;
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Note that a smart pointer can handle @p{const}ness of an object, i.e.
  * a @p{SmartPointer<const ABC>} really behaves as if it were a pointer to

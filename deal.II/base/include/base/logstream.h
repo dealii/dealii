@@ -24,11 +24,11 @@
 /**
  * A class that simplifies the process of execution logging. It does so by
  * providing
- * \begin{itemize}
- * \item a push and pop mechanism for prefixes, and
- * \item the possibility of distributing information to files and the
+ * @begin{itemize}
+ * @item a push and pop mechanism for prefixes, and
+ * @item the possibility of distributing information to files and the
  *   console.
- * \end{itemize}
+ * @end{itemize}
  *
  * The usual usage of this class is through the pregenerated object
  * @p{deallog}. Typical steps are

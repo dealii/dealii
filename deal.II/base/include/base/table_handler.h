@@ -133,7 +133,7 @@ class TableEntry : public TableEntryBase
  * aligned to the right (the default was @p{centered}) and the precision of
  * the square roots are set to be 6 (instead of 4 as default).
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  * TableHandler table();
  *
  * for (unsigned int i=1; i<=n; ++i)
@@ -154,7 +154,7 @@ class TableEntry : public TableEntryBase
  * ofstream out_file("number_table.tex");
  * table.write_tex(out_file);
  * out_file.close();
- * \end{verbatim}
+ * @end{verbatim}
  *
  * @author Ralf Hartmann, 1999
  */

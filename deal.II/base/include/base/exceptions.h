@@ -32,7 +32,7 @@
  *  @p{DeclException} macro family.
  *
  *
- *  @sect2{General overview of the exception handling mechanism in @p{deal.II}}
+ *  @sect2{General overview of the exception handling mechanism in deal.II}
  *
  *  The error handling mechanism in @p{deal.II} is generally used in two ways.
  *  The first uses error checking in debug mode only and is useful for programs
@@ -62,10 +62,10 @@
  *  Both modes use exception classes, which need to have special features
  *  additionally to the @p{C++} standard's @p{exception} class. Such a class
  *  is declared by the following lines of code:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     DeclException2 (ExcDomain, int, int,
  *                     << "Index= " << arg1 << "Upper Bound= " << arg2);
- *  \end{verbatim}
+ *  @end{verbatim}
  *  This declares an exception class named @p{ExcDomain}, which
  *  has two variables as additional information (named
  *  @p{arg1} and @p{arg2} by default) and which outputs the
@@ -87,18 +87,18 @@
  *
  *  To use the exception mechanism for debug mode error checking, write lines
  *  like the following in your source code:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    Assert (n<dim, ExcDomain(n,dim));
- *  \end{verbatim}
+ *  @end{verbatim}
  *  which by macro expansion does the following:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    #ifdef DEBUG
  *        if (!cond)
  *              issue error of class ExcDomain(n,dim)
  *    #else
  *        do nothing
  *    #endif
- *  \end{verbatim}
+ *  @end{verbatim}
  *  i.e. it issues an error only if the preprocessor variable
  *  @p{DEBUG} is set and if the given condition (in this case
  *  @p{n<dim} is violated.
@@ -111,7 +111,7 @@
  *  @sect3{How it works internally}
  *  If the @p{DEBUG} preprocessor directive is set, the call @p{Assert (cond, exc);}
  *  is converted by the preprocessor into the sequence
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    if (!(cond))
  *      __IssueError_Assert (__FILE__,
  *                           __LINE__,
@@ -119,7 +119,7 @@
  *                           #cond,
  *                           #exc,
  *                           &exc);
- *  \end{verbatim}
+ *  @end{verbatim}
  *  i.e. if the given condition is violated, then the file and
  *  line in which the exception occured as well as
  *  the condition itself and the call sequence of the
@@ -155,9 +155,9 @@
  *  than that the program flow should not have reached a certain point,
  *  e.g. a @p{default} section of a @p{switch} statement. In this case,
  *  raise the exception by the following construct:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    Assert (false, ExcInternalError());
- *  \end{verbatim}
+ *  @end{verbatim}
  *
  *
  *  @sect2{Use of run-time exceptions}
@@ -165,12 +165,12 @@
  *  For this mode, the standard @p{C++} @p{throw} and @p{catch} concept exists. We
  *  want to keep to this, but want to extend it a bit. In general, the
  *  structure is the same, i.e. you normally raise and exception by
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    if (!cond)
  *      throw ExcSomething();
- *  \end{verbatim}
+ *  @end{verbatim}
  *  and catch it using the statement
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    try {
  *      do_something ();
  *    }
@@ -180,7 +180,7 @@
  *           << endl;
  *      do_something_to_reciver ();
  *    };
- *  \end{verbatim}
+ *  @end{verbatim}
  *  @p{exception} is a standard @p{C++} class providing basic functionality for
  *  exceptions, such as the virtual function @p{what()} which returns some
  *  information on the exception itself. This information is useful if an
@@ -194,7 +194,7 @@
  *  done using the @p{DeclExceptionN} macros, but putting the right information,
  *  which is the same as explained above for the @p{Assert} expansion, requires
  *  some work if one would want to write it down each time:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    if (!cond)
  *      {
  *        ExcSomething e(additional information);
@@ -203,21 +203,21 @@
  *                     "name of condition as a string");
  *        throw e;
  *      };
- *  \end{verbatim}
+ *  @end{verbatim}
  *
  *  For this purpose, the macro @p{AssertThrow} was invented. It does mainly
  *  the same job as does the @p{Assert} macro, but it does not kill the
  *  program, it rather throws an exception as shown above. The mode of usage
  *  is
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    AssertThrow (cond, ExcSomething(additional information));
- *  \end{verbatim}
+ *  @end{verbatim}
  *  The condition to be checked is incorporated into the macro in order to
  *  allow passing the violated condition as a string. The expansion of the
  *  @p{AssertThrow} macro is not affected by the @p{DEBUG} preprocessor variable.
  *
  *
- *  @sect2{Description of the @p{DeclExceptionN} macro family}
+ *  @sect2{Description of the DeclExceptionN macro family}
  *
  *  Declare an exception class without any additional parameters.
  *  There is a whole family of @p{DeclException?} macros
@@ -225,12 +225,12 @@
  *  parameters (0 to 5 presently).
  *  
  *  The syntax is as follows:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    DeclException2 (ExcDomain,
  *                    int,
  *                    int,
  *                    << " i=" << arg1 << ", m=" << arg2);
- *  \end{verbatim}
+ *  @end{verbatim}
  *  The first is the name of the exception class to be created.
  *  The next arguments are the types of the parameters (in this
  *  case there are two type names needed) and finally the output
@@ -238,7 +238,7 @@
  *  
  *  The syntax of the output sequence is a bit weird but gets
  *  clear once you see how this macro is defined:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *  class name : public ExceptionBase {
  *    public:
  *      name (const type1 a1, const type2 a2) :
@@ -250,17 +250,17 @@
  *      type1 arg1;
  *      type2 arg2;
  *  };
- *  \end{verbatim}
+ *  @end{verbatim}
  *   
  *  If declared as specified, you can later use this exception class
  *  in the following manner:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    int i=5;
  *    int m=3;
  *    Assert (i<m, MyExc2(i,m));
- *  \end{verbatim}
+ *  @end{verbatim}
  *  and the output if the condition fails will be
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    --------------------------------------------------------
  *    An error occurred in line <301> of file <exc-test.cc>.
  *    The violated condition was: 
@@ -270,7 +270,7 @@
  *    Additional Information: 
  *      i=5, m=3
  *    --------------------------------------------------------
- *  \end{verbatim}
+ *  @end{verbatim}
  *  
  *  Obviously for the @p{DeclException0(name)} macro, no types and
  *  also no output sequence is allowed.
@@ -414,14 +414,14 @@ void __IssueError_Throw (const char *file,
 #ifdef DEBUG  ////////////////////////////////////////
 
 /**
- *  This is the main routine in the exception mechanism for debug mode
- *  error checking. See the
- *  @p{ExceptionBase} class for more information.
+ * This is the main routine in the exception mechanism for debug mode
+ * error checking. It assert that a certain condition is fulfilled,
+ * otherwise issues an error and aborts the program.
  *
- *  @memo Assert that a certain condition is fulfilled, otherwise
- *   issue an error and abort the program.
- *  @see ExceptionBase
- *  @author Wolfgang Bangerth, November 1997, extensions 1998
+ * See the @p{ExceptionBase} class for more information.
+ *
+ * @see ExceptionBase
+ * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #define Assert(cond, exc)                                         \
   {                                                               \
@@ -440,18 +440,18 @@ void __IssueError_Throw (const char *file,
 
 
 /**
- *  This is the main routine in the exception mechanism for run-time mode
- *  error checking. See the
- *  @p{ExceptionBase} class for more information.
+ * This is the main routine in the exception mechanism for run-time
+ * mode error checking. It assert that a certain condition is
+ * fulfilled, otherwise issues an error and aborts the program.
  *
- *  @memo Assert that a certain condition is fulfilled, otherwise
- *   throw an exception
- *  @see ExceptionBase
- *  @author Wolfgang Bangerth, November 1997, extensions 1998
+ * The configuration parameter NO_THROW can be used to disable this
+ * feature.  This should not be done on a regular basis, but gcc
+ * 2.95.2 on DEC Alpha stops compiling here.
  *
- *  The configuration parameter NO_THROW can be used to disable this feature.
- *  This should not be done on a regular basis, but gcc 2.95.2 on DEC Alpha
- *  stops compiling here.
+ * See the @p{ExceptionBase} class for more information.
+ *
+ * @see ExceptionBase
+ * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #ifndef NO_THROW
 #define AssertThrow(cond, exc)                                   \

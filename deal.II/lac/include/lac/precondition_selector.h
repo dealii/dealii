@@ -33,7 +33,7 @@
  *
  * @sect3{Usage}
  * The simplest use of this class is the following:
- * \begin{verbatim}
+ * @begin{verbatim}
  *                                  // generate a @p{SolverControl} and
  *                                  // a @p{VectorMemory}
  * SolverControl control;
@@ -51,9 +51,9 @@
  *                                  // call the @p{solve} function with this
  *                                  // preconditioning as last argument
  * solver.solve(A,x,b,preconditioning);
- * \end{verbatim}
+ * @end{verbatim}
  * The same example where also the @p{SolverSelector} class is used reads
- * \begin{verbatim}
+ * @begin{verbatim}
  *                                  // generate a @p{SolverControl} and
  *                                  // a @p{VectorMemory}
  * SolverControl control;
@@ -69,7 +69,7 @@
  * preconditioning.use_matrix(A);
  *
  * solver_selector.solve(A,x,b,preconditioning);
- * \end{verbatim}
+ * @end{verbatim}
  * Now the use of the @p{SolverSelector} in combination with the @p{PreconditionSelector}
  * allows the user to select both, the solver and the preconditioner, at the
  * beginning of his program and each time the

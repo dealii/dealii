@@ -128,10 +128,10 @@ class ParameterHandler;
  *
  * Given the lines as described above, a cut through this data in Gnuplot
  * can then be achieved like this:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   set data style lines
  *   splot [:][:][0:] "T" using 1:2:($3==.5 ? $4 : -1)
- * \end{verbatim}
+ * @end{verbatim}
  * This command plots data in x- and y-direction unbounded, but in z-direction
  * only those data points which are above the x-y-plane (we assume here a
  * positive solution, if it has negative values, you might want to decrease the
@@ -156,9 +156,9 @@ class ParameterHandler;
  *
  * The output uses two different povray-objects:
 
- * \begin{itemize}
+ * @begin{itemize}
  *
- * \item @p{BICUBIC_PATCH}
+ * @item @p{BICUBIC_PATCH}
  * A @p{bicubic_patch} is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
  * while the other 12 points pull and stretch the patch into shape.
@@ -166,7 +166,7 @@ class ParameterHandler;
  * subdivisions has to be 3 to provide the patch with 16 points.
  * A bicubic patch is not exact but generates very smooth images.
  *
- * \item @p{MESH}
+ * @item @p{MESH}
  * The mesh object is used to store large number of triangles.
  * Every square of the patch data is split into one upper-left and one 
  * lower-right triangle. If the number of subdivisions is three, 32 triangle
@@ -174,7 +174,7 @@ class ParameterHandler;
  * 
  * Using the smooth flag povray interpolates the normals on the triangles,
  * imitating a curved surface
- * \end{itemize}
+ * @end{itemize}
  *
  * All objects get one texture definition called Tex. This texture has to be
  * declared somewhere before the object data. This may be in an external 
@@ -186,9 +186,9 @@ class ParameterHandler;
  *
  * You need povray (>=3.0) to render the scene. The minimum options for povray
  * are:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   povray +I<inputfile> +W<horiz. size> +H<ver. size> +L<include path>
- * \end{verbatim}
+ * @end{verbatim}
  * If the external file "data.inc" is used, the path to this file has to be
  * included in the povray options.
  *
@@ -285,7 +285,7 @@ class DataOutBase
 				      * @p{n_subdivision} = 4 because
 				      * the number of cells is
 				      * equal to @p{2^dim}.
-				      * \begin{verbatim}
+				      * @begin{verbatim}
 				      *  __ __ __ __
 				      * |  |  |  |  |
 				      * |__|__|__|__| 
@@ -295,7 +295,7 @@ class DataOutBase
 				      * |__|__|__|__| 
 				      * |  |  |  |  |
 				      * |__|__|__|__|
-				      * \end{verbatim}
+				      * @end{verbatim}
 				      * @author Wolfgang Bangerth
 				      */
     template <int dim>
@@ -361,7 +361,7 @@ class DataOutBase
 					  * @p{(0, 3, 1,2)} in 2d, and 
 					  * @p{(0, 4, 3, 7, 1, 5, 2, 6)}
 					  * in 3d as following:
-					  * \begin{verbatim}
+					  * @begin{verbatim}
 					  *  
 					  *      7________6
 					  *      /       /|
@@ -372,7 +372,7 @@ class DataOutBase
 					  *   |  /    |  /
 					  *   | /     | /
 					  *  0|/______1/
-					  * \end{verbatim}
+					  * @end{verbatim}
 					  * 
 					  * For exemple in 2d: If
 					  * @p{subdivisions==2} the
@@ -380,7 +380,7 @@ class DataOutBase
 					  * given by the following
 					  * numeration:
 					  *
-					  * \begin{verbatim}
+					  * @begin{verbatim}
 					  *  2 ____5 ____8
 					  *   |     |     |
 					  *   |     |     | 
@@ -390,7 +390,7 @@ class DataOutBase
 					  *   |     |     | 
 					  *   |     |     | 
 					  *  0|____3|____6|
-					  * \end{verbatim}
+					  * @end{verbatim}
 					  *
 					  * Since the number of data vectors
 					  * is usually the same for all
@@ -642,7 +642,7 @@ class DataOutBase
 					  * Gnuplot-default of 0 is
 					  * the following:
 					  *
-					  * \begin{verbatim}
+					  * @begin{verbatim}
 					  *  
 					  *          3________7
 					  *          /       /|
@@ -654,7 +654,7 @@ class DataOutBase
 					  *       | /     | /
 					  *      1|/______5/
 					  *
-					  * \end{verbatim}
+					  * @end{verbatim}
 					  */
 	double turn_angle;
 
@@ -1080,7 +1080,7 @@ class DataOutBase
  * presently implemented.
  *
  * Usage is as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *                               // within function declaring parameters:
  *   ...
  *   prm.enter_subsection ("Output format options");
@@ -1096,7 +1096,7 @@ class DataOutBase
  *   out.parse_parameters (prm);
  *   prm.leave_subsection ();
  *   ...
- * \end{verbatim}
+ * @end{verbatim}
  * Note that in the present example, the class @p{DataOut} was used. However, any
  * other class derived from @p{DataOut_Interface} would work alike.
  *
@@ -1228,13 +1228,13 @@ class DataOutInterface : private DataOutBase
 				      * suffix with a given output format
 				      * usually has. At present the following
 				      * formats are defined:
-				      * \begin{itemize}
-				      * \item @p{ucd}: @p{.inp}
-				      * \item @p{gnuplot}: @p{.gnuplot}
-				      * \item @p{povray}: @p{.pov}
-				      * \item @p{eps}: @p{.eps}
-				      * \item @p{gmv}: @p{.gmv}.
-				      * \end{itemize}
+				      * @begin{itemize}
+				      * @item @p{ucd}: @p{.inp}
+				      * @item @p{gnuplot}: @p{.gnuplot}
+				      * @item @p{povray}: @p{.pov}
+				      * @item @p{eps}: @p{.eps}
+				      * @item @p{gmv}: @p{.gmv}.
+				      * @end{itemize}
 				      *
 				      * If this function is called
 				      * with no argument or @p{default_format}, the

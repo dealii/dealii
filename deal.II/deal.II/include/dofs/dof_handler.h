@@ -34,7 +34,7 @@ template <int dim> class Triangulation;
 
 /**
  * Define some types which differ between the dimensions. This class
- * is analogous to the \Ref{TriaDimensionInfo} class hierarchy.
+ * is analogous to the @ref{TriaDimensionInfo} class hierarchy.
  * 
  * @see DoFDimensionInfo<1>
  * @see DoFDimensionInfo<2>
@@ -46,7 +46,7 @@ class DoFDimensionInfo;
 /**
  * Define some types for the DoF handling in one dimension.
  *
- * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
 class DoFDimensionInfo<1> {
   public:
@@ -75,7 +75,7 @@ class DoFDimensionInfo<1> {
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
 class DoFDimensionInfo<2> {
   public:
@@ -104,7 +104,7 @@ class DoFDimensionInfo<2> {
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<3>}.
+ * The types have the same meaning as those declared in @ref{TriaDimensionInfo<3>}.
  */
 class DoFDimensionInfo<3> {
   public:
@@ -143,7 +143,7 @@ class DoFDimensionInfo<3> {
  * also refer to all degrees of freedom and some kind of condensation
  * is needed to restrict the systems of equations to the unconstrained
  * degrees of freedom only. The actual layout of storage of the indices
- * is described in the \Ref{DoFLevel} class documentation.
+ * is described in the @ref{DoFLevel} class documentation.
  *
  * Finally it offers a starting point for the assemblage of the matrices
  * by offering @p{begin()} and @p{end()} functions which return iterators
@@ -1189,7 +1189,7 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Analogous to the
-				      * @p{levels[]} tree of the \Ref{Triangulation}
+				      * @p{levels[]} tree of the @ref{Triangulation}
 				      * objects.
 				      */
     vector<DoFLevel<dim>*>    levels;

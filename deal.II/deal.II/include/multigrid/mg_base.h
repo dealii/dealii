@@ -263,7 +263,7 @@ class MGTransferBase : public Subscriptor
  * Basic class for preconditioning by multigrid.
  *
  * The functionality of the multigrid method is restricted to defect
- * correction. It is {\bf not} iterative and the start solution is
+ * correction. It is @em{not} iterative and the start solution is
  * always zero. Since by this $u^E_l$ and $u^A_l$ (see report on
  * multigrid) are always zero, restriction is simplified a lot and
  * maybe even the seam condition on grids is oblivious. Still, I am

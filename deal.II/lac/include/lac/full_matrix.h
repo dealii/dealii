@@ -546,7 +546,7 @@ class FullMatrix : public Subscriptor
 				      * when the function exits.
 				      *
 				      * You should be aware that this function
-				      * may produce {\bf large} amounts of
+				      * may produce @em{large} amounts of
 				      * output if applied to a large matrix!
 				      * Be careful with it.
 				      */

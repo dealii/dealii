@@ -126,11 +126,11 @@ class TriaDimensionInfo;
  *  @p{raw_line_iterator} objects operate on all lines, used or not.
  *
  *  Since we are in one dimension, the following identities are declared:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    typedef raw_line_iterator    raw_cell_iterator;
  *    typedef line_iterator        cell_iterator;
  *    typedef active_line_iterator active_cell_iterator;
- *  \end{verbatim}
+ *  @end{verbatim}
  *
  *  To enable the declaration of @p{begin_quad} and the like in
  *  @p{Triangulation<1>}, the @p{quad_iterator}s are declared as
@@ -189,7 +189,7 @@ class TriaDimensionInfo<1> {
  *  certainly make any involuntary use visible.
  *
  *  Since we are in two dimension, the following identities are declared:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    typedef raw_quad_iterator    raw_cell_iterator;
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
@@ -197,7 +197,7 @@ class TriaDimensionInfo<1> {
  *    typedef raw_line_iterator    raw_face_iterator;
  *    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;    
- *  \end{verbatim}
+ *  @end{verbatim}
  */
 template <>
 class TriaDimensionInfo<2> {
@@ -231,7 +231,7 @@ class TriaDimensionInfo<2> {
  *  For the declarations of the data types, more or less the same holds
  *  as for lower dimensions (see @p{TriaDimensionInfo<[12]>}). The
  *  dimension specific data types are here, since we are in three dimensions:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    typedef raw_hex_iterator    raw_cell_iterator;
  *    typedef hex_iterator        cell_iterator;
  *    typedef active_hex_iterator active_cell_iterator;
@@ -239,7 +239,7 @@ class TriaDimensionInfo<2> {
  *    typedef raw_quad_iterator    raw_face_iterator;
  *    typedef quad_iterator        face_iterator;
  *    typedef active_quad_iterator active_face_iterator;    
- *  \end{verbatim}
+ *  @end{verbatim}
  */
 template <>
 class TriaDimensionInfo<3> {
@@ -466,7 +466,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  data is spread over quite a lot of arrays and other places. However,
  *  there are ways powerful enough to work on these data structures
  *  without knowing their exact relations. This is done through the
- *  concept of iterators (see the STL documentation and \Ref{TriaRawIterator}).
+ *  concept of iterators (see the STL documentation and @ref{TriaRawIterator}).
  *  In order to make things as easy and dimension independent as possible,
  *  use of class local typedefs is made, see below.
  *  
@@ -497,13 +497,13 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  @p{dim}>=2).
  *
  *  Additionaly, for @p{dim}==1, the following identities hold:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    typedef raw_line_iterator    raw_cell_iterator;
  *    typedef line_iterator        cell_iterator;
  *    typedef active_line_iterator active_cell_iterator;
- *  \end{verbatim}
+ *  @end{verbatim}
  *  while for @p{dim}==2
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *    typedef quad_line_iterator   raw_cell_iterator;    
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
@@ -511,7 +511,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    typedef raw_line_iterator    raw_face_iterator;
  *    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;    
- *  \end{verbatim}
+ *  @end{verbatim}
  *
  *  By using the cell iterators, you can write code nearly independent of
  *  the spatial dimension. The same applies for substructure iterators,
@@ -525,9 +525,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *  Usage of these iterators works mostly like with the STL iterators. Some
  *  examples taken from the @p{Triangulation} source code follow.
- *  \begin{itemize}
- *  \item @em{Counting the number of cells on a specific level}
- *    \begin{verbatim}
+ *  @begin{itemize}
+ *  @item @em{Counting the number of cells on a specific level}
+ *    @begin{verbatim}
  *     template <int dim>
  *     int Triangulation<dim>::n_cells (const int level) const {
  *        cell_iterator cell = begin (level),
@@ -537,9 +537,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *          ++n;
  *        return n;
  *      };
- *    \end{verbatim}
+ *    @end{verbatim}
  *    Another way which uses the STL @p{distance} function would be to write
- *    \begin{verbatim}
+ *    @begin{verbatim}
  *      template <int dim>
  *      int Triangulation<dim>::n_cells (const int level) const {
  *        int n=0;
@@ -550,10 +550,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *                  n);
  *        return n;
  *      };  
- *    \end{verbatim}
+ *    @end{verbatim}
  *    
- *  \item @em{Refining all cells of a triangulation}
- *    \begin{verbatim}
+ *  @item @em{Refining all cells of a triangulation}
+ *    @begin{verbatim}
  *      template <int dim>
  *      void Triangulation<dim>::refine_global () {
  *        active_cell_iterator cell = begin_active(),
@@ -563,15 +563,15 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *          cell->set_refine_flag ();
  *        execute_coarsening_and_refinement ();
  *      };
- *    \end{verbatim}
- *  \end{itemize}
+ *    @end{verbatim}
+ *  @end{itemize}
  *
  *
  *  @sect3{Usage}
  *
  *  Usage of a @p{Triangulation} is mainly done through the use of iterators.
  *  An example probably shows best how to use it:
- *  \begin{verbatim}
+ *  @begin{verbatim}
  *  void main () {
  *    Triangulation<2> tria;
  *
@@ -608,26 +608,26 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    ofstream out("grid.1");
  *    GridOut::write_gnuplot (tria, out);
  *  };  
- *  \end{verbatim}
+ *  @end{verbatim}
  *
  *  
  *  @sect3{Creating a triangulation}
  *
  *  There are several possibilities to create a triangulation:
- *  \begin{itemize}
- *    \item The most common domains, such as hypercubes (i.e. lines, squares,
+ *  @begin{itemize}
+ *    @item The most common domains, such as hypercubes (i.e. lines, squares,
  *       cubes, etc), hyper-balls (circles, balls, ...) and some other, more
  *       weird domains such as the L-shape region and higher dimensional
  *       generalizations and others, are provided by the @p{GridGenerator}
  *       class which takes a triangulation and fills it by a division
  *       of the required domain.
  *   
- *     \item Reading in a triangulation: By using an object of the @p{DataIn}
+ *     @item Reading in a triangulation: By using an object of the @p{DataIn}
  *        class, you can read in fairly general triangulations. See there for
  *        more information. The mentioned class uses the interface described
  *        directly below to transfer the data into the triangulation.
  *
- *     \item Explicitely creating a triangulation: you can create a triangulation
+ *     @item Explicitely creating a triangulation: you can create a triangulation
  *        by providing a list of vertices and a list of cells. Each such cell
  *        consists of a vector storing the indices of the vertices of this cell
  *        in the vertex list. To see how this works, you can take a look at the
@@ -660,12 +660,12 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *        There are more subtle conditions which must be imposed upon the
  *        vertex numbering within cells. See the documentation for the
- *        \Ref{DataIn} class for more details on this. They do not only
+ *        @ref{DataIn} class for more details on this. They do not only
  *        hold for the data read from an UCD or any other input file, but
  *        also for the data passed to the
  *        @p{Triangulation<dim>::create_triangulation (2)} function.
  *
- *     \item Copying a triangulation: when computing on time dependant meshes
+ *     @item Copying a triangulation: when computing on time dependant meshes
  *        of when using adaptive refinement, you will often want to create a
  *        new triangulation to be the same as another one. This is facilitated
  *        by the @p{copy_triangulation} function.
@@ -679,7 +679,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        operation but guaranteeing some parallelity in the two triangulations
  *        seems more important since usually data will have to be transferred
  *        between the grids.
- *   \end{itemize}
+ *   @end{itemize}
  *
  *   The material id for each cell must be specified upon construction of
  *   a triangulation. (There is a special section on material identifier and
@@ -789,8 +789,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   There are two variations of these functions, which rely on @p{refine} and
  *   coarsen by computing the thresholds from other information:
- *   \begin{itemize}
- *   \item @p{refine_and_coarsen_fixed_number}: this function takes a vector as
+ *   @begin{itemize}
+ *   @item @p{refine_and_coarsen_fixed_number}: this function takes a vector as
  *     above and two values between zero and one denoting the fractions of cells to
  *     be refined and coarsened. For this purpose, it sorts the criteria per cell
  *     and takes the threshold to be the one belonging to the cell with the
@@ -813,7 +813,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     want to chose a smaller value to avoid overrefinement in regions which
  *     do not contribute much to the error.
  *
- *   \item @p{refine_and_coarsen_fixed_fraction}: this function computes the
+ *   @item @p{refine_and_coarsen_fixed_fraction}: this function computes the
  *     threshold such that the number of cells getting flagged for refinement
  *     makes up for a certain fraction of the total error. If this fraction is 50
  *     per cent, for example, the threshold is computed such that the cells with
@@ -843,7 +843,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     @p{coarsen}.
  *
  *     A typical value for the fraction of the total error is 0.5.
- *   \end{itemize}
+ *   @end{itemize}
  *
  *   For a more thorough discussion of advantages and disadvantages of the
  *   different strategies for refinement, see the paper of R. Becker and
@@ -887,12 +887,12 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   The parameter taken by the constructor is an integer which may be composed
  *   bitwise by the constants defined in the @p{enum MeshSmoothing}. The meaning
  *   of these constants is explained in the following:
- *   \begin{itemize}
- *   \item @p{limit_level_difference_at_vertices}:
+ *   @begin{itemize}
+ *   @item @p{limit_level_difference_at_vertices}:
  *     It can be shown, that degradation of approximation occurs if the
  *     triangulation contains vertices which are member of cells with levels
  *     differing by more than one. One such example is the following:
- *     \begin{verbatim}
+ *     @begin{verbatim}
  *       |     |     |     |
  *       x-----x-----x--x--x--
  *       |     |     |  |  |
@@ -907,7 +907,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       |           |     |
  *       |           |     |
  *       x-----------x-----x--
- *     \end{verbatim}
+ *     @end{verbatim}
  *     It seems that in two space dimensions, the maximum jump in levels between
  *     cells sharing a common vertex is two (as in the example above). This is
  *     not true if more than four cells meet at a vertex. It is not uncommon
@@ -932,7 +932,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     @p{limit_level_difference_at_vertices}, situations as the above one are
  *     eliminated by also marking the lower left cell for refinement.
  *
- *   \item @p{eliminate_unrefined_islands}:
+ *   @item @p{eliminate_unrefined_islands}:
  *     Single cells which are not refined and are surrounded by cells which are
  *     refined usually also lead to a sharp decline in approximation properties
  *     locally. The reason is that the nodes on the faces between unrefined and
@@ -951,7 +951,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     name of the flag may indicate. However, no better name came to mind to
  *     the author by now.
  *
- *   \item @p{eliminate_refined_*_islands}:
+ *   @item @p{eliminate_refined_*_islands}:
  *     This algorithm seeks for isolated cells which are refined or flagged
  *     for refinement. This definition is unlike that for
  *     @p{eliminate_unrefined_islands}, which would mean that an island is
@@ -983,12 +983,12 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     refines the mesh according to a criterion associated with a boundary
  *     integral or if one has rough boundary data.
  *
- *   \item @p{do_not_produce_unrefined_islands}:
+ *   @item @p{do_not_produce_unrefined_islands}:
  *     This flag prevents the occurrence of unrefined islands. In more detail:
  *     It prohibits the coarsening of a cell if 'most of the neighbors' will
  *     be refined after the step.
  *
- * \item @p{patch_level_1}:
+ * @item @p{patch_level_1}:
  *     Ensures patch level 1. As result the triangulation consists of
  *     patches, i.e. of cells that are refined once. It follows that
  *     if at least one of the children of a cell is or will be refined
@@ -998,21 +998,21 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     @p{eliminate_refined_boundary_islands} will be ignored as they will
  *     be fulfilled automatically.
  *
- *   \item @p{smoothing_on_refinement}:
+ *   @item @p{smoothing_on_refinement}:
  *     This flag sums up all smoothing algorithms which may be performed upon
  *     refinement by flagging some more cells for refinement.
  *
- *   \item @p{smoothing_on_coarsening}:
+ *   @item @p{smoothing_on_coarsening}:
  *     This flag sums up all smoothing algorithms which may be performed upon
  *     coarsening by flagging some more cells for coarsening.
  *
- *   \item @p{maximum_smoothing}:
+ *   @item @p{maximum_smoothing}:
  *     This flag includes all the above ones and therefore combines all
  *     smoothing algorithms implemented.
  *
- *   \item @p{none}:
+ *   @item @p{none}:
  *     Select no smoothing at all.
- *   \end{itemize}
+ *   @end{itemize}
  *
  *
  *   @sect3{Material and boundary information}
@@ -1059,7 +1059,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   It is possible to reconstruct a grid from its refinement history, which
  *   can be stored and loaded through the @p{save_refine_flags} and
  *   @p{load_refine_flags} functions. Normally, the code will look like this:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *                                 // open output file
  *     ofstream history("mesh.history");
  *                                 // do 10 refinement steps
@@ -1070,10 +1070,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       tria.save_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
  *     };        
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   If you want to re-create the grid from the stored information, you write:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *                                 // open input file
  *     ifstream history("mesh.history");
  *                                 // do 10 refinement steps
@@ -1081,7 +1081,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       tria.load_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
  *     };        
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   The same scheme is employed for coarsening and the coarsening flags.
  *
@@ -1161,11 +1161,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   component. If a new vertex is created on a side or face at the
  *   boundary, this function is used to compute where it will be
  *   placed. The boundary indicator of the face will be used to
- *   determine the proper component. See \Ref{Boundary} for the
+ *   determine the proper component. See @ref{Boundary} for the
  *   details. Usage with the @p{Triangulation} object is then like this
  *   (let @p{Ball} be a class derived from @p{Boundary<2>}):
  * 
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     void main () {
  *       Triangulation<2> tria;
  *                                        // set the boundary function
@@ -1192,7 +1192,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *           tria.execute_coarsening_and_refinement();
  *         };
  *     };            
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   You should take note of one caveat: if you have concave
  *   boundaries, you must make sure that a new boundary vertex does
@@ -1223,8 +1223,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   decides which additional cells to flag for refinement by looking
  *   at the old grid and the refinement flags for each cell.
  *
- *   \begin{itemize}
- *   \item @em{Regularization:} The algorithm walks over all cells checking
+ *   @begin{itemize}
+ *   @item @em{Regularization:} The algorithm walks over all cells checking
  *     whether the present cell is flagged for refinement and a neighbor of the
  *     present cell is refined once less than the present one. If so, flag the
  *     neighbor for refinement. Because of the induction above, there may be no
@@ -1238,9 +1238,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     on lower levels, but if these induce more refinement needed, this is
  *     performed later on when we visit them in out backward running loop.
  *
- *   \item @em{Smoothing:}
- *     \begin{itemize}
- *     \item @p{limit_level_difference_at_vertices}:
+ *   @item @em{Smoothing:}
+ *     @begin{itemize}
+ *     @item @p{limit_level_difference_at_vertices}:
  *       First a list is set up which stores for each vertex
  *       the highest level one of the adjacent cells belongs to. Now, since we did
  *       smoothing in the previous refinement steps also, each cell may only have
@@ -1254,7 +1254,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       refinement, but these are on lower levels, as above, which is why we
  *       may do all kinds of additional flagging in one loop only.
  *
- *     \item @p{eliminate_unrefined_islands}:
+ *     @item @p{eliminate_unrefined_islands}:
  *       For each cell we count the number of neighbors which are refined or
  *       flagged for refinement. If this exceeds the total number of neighbors
  *       (which is the number of faces minus the number of faces of this cell
@@ -1263,7 +1263,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       will need refinement, we will need additional loops of regularization
  *       and smoothing over all cells until nothing changes any more.
  *
- *     \item @p{eliminate_refined_*_islands}:
+ *     @item @p{eliminate_refined_*_islands}:
  *       This one does much the same as the above one, but for coarsening. If
  *       a cell is flagged for refinement or if all of its children are active
  *       and if the number of neighbors which are either active and not flagged
@@ -1277,8 +1277,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       of this classes description.
  *
  *       The same applies as above: several loops may be necessary.
- *     \end{itemize}
- *   \end{itemize}
+ *     @end{itemize}
+ *   @end{itemize}
  *
  *   Regularization and smoothing are a bit complementary in that we check
  *   whether we need to set additional refinement flags when being on a cell
@@ -1297,7 +1297,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   2D. The direction of a line is the direction of point 0 towards point 1. We
  *   define, that allowed cells contain of lines of which the direction is
  *   as follows:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *          2
  *      3--->---2
  *      |       |
@@ -1305,7 +1305,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      |       |
  *      0--->---1
  *          0
- *   \end{verbatim}
+ *   @end{verbatim}
  *   The number of the vertices and lines is also indicated. This orientation of
  *   lines has to be checked/generated upon construction of a grid and is
  *   preserved upon refinement.
@@ -1323,14 +1323,14 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   When explicit coordinates are required for points in a cell (e.g for
  *   quadrature formulae or the point of definition of trial functions), we
  *   define the following coordinate system for the unit cell:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *    y^   3-------2
  *     |   |       |
  *     |   |       |
  *     |   |       |
  *     |   0-------1
  *     *-------------->x
- *   \end{verbatim}
+ *   @end{verbatim}
  *   with vertex 0 being the origin of the coordinate system, vertex 1 having
  *   coordinates @p{(1,0)}, vertex 2 at @p{(1,1)} and vertex 3 at @p{(0,1)}.
  *
@@ -1341,7 +1341,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   faces of hexahedra in three space dimensions. Before giving these 
  *   conventions we declare the following sketch to be the standard way of
  *   drawing 3d pictures of hexahedra:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *         *-------*        *-------*
  *        /|       |       /       /|
  *       / |       |      /       / |
@@ -1352,7 +1352,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     | /       /      |       | /
  *     |/       /       |       |/
  *     *-------*        *-------*
- *   \end{verbatim}
+ *   @end{verbatim}
  *   The left part of the picture shows the left, bottom and back face of the
  *   cube, while the right one shall be the top, right and front face. You may
  *   recover the whole cube by moving the two parts together into one.
@@ -1363,7 +1363,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   the vertices on a quadrilateral. The vertices on the back face are numbered
  *   similarly by moving the front face to the back (no turning, no twisting, 
  *   just a shift):
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *         7-------6        7-------6
  *        /|       |       /       /|
  *       / |       |      /       / |
@@ -1374,14 +1374,14 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     | /       /      |       | /
  *     |/       /       |       |/
  *     0-------1        0-------1
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   @sect4{Lines}
  *
  *   Here, the same holds as for the vertices: the lines of the front face are
  *   numbered as for the quadrilateral, for the back face they are just shifted.
  *   Finally, the four lines connecting front and back face are numbered:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *         *---6---*        *---6---*
  *        /|       |       /       /|
  *      11 |       5      11     10 5
@@ -1392,10 +1392,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     3 8       9      3       | 9
  *     |/       /       |       |/
  *     *---0---*        *---0---*
- *   \end{verbatim}
+ *   @end{verbatim}
  *   The directions of the front and back lines is as for the respective faces, while
  *   the connecting lines always point to the back:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *         *--->---*        *--->---*
  *        /|       |       /       /|
  *       ^ |       ^      ^       ^ ^
@@ -1406,13 +1406,13 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     ^ ^       ^      ^       | ^
  *     |/       /       |       |/
  *     *--->---*        *--->---*
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   @sect4{Faces}
  *
  *   The faces are numbered in the same order as the lines were numbered: front
  *   face, back face, then the four side faces:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *         *-------*        *-------*
  *        /|       |       /       /|
  *       / |   1   |      /   4   / |
@@ -1423,13 +1423,13 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     | /   2   /      |   0   | /
  *     |/       /       |       |/
  *     *-------*        *-------*
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   The direction of the faces is determined by the numbers the lines have within
  *   a given face. This is like follows:
- *   \begin{itemize}
- *   \item Faces 0 and 1:
- *    \begin{verbatim}
+ *   @begin{itemize}
+ *   @item Faces 0 and 1:
+ *    @begin{verbatim}
  *          *---2---*        *-------*
  *         /|       |       /       /|
  *        / |       1      /       / |
@@ -1440,10 +1440,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      | /       /      3       | /
  *      |/       /       |       |/
  *      *-------*        *---0---*
- *    \end{verbatim}
+ *    @end{verbatim}
  * 
- *   \item Faces 2 and 4:
- *    \begin{verbatim}
+ *   @item Faces 2 and 4:
+ *    @begin{verbatim}
  *          *-------*        *---2---*
  *         /|       |       /       /|
  *        / |       |      3       1 |
@@ -1454,10 +1454,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      | 3       1      |       | /
  *      |/       /       |       |/
  *      *---0---*        *-------*
- *    \end{verbatim} 
+ *    @end{verbatim} 
  * 
- *   \item Faces 3 and 5:
- *    \begin{verbatim}
+ *   @item Faces 3 and 5:
+ *    @begin{verbatim}
  *          *-------*        *-------*
  *         /|       |       /       /|
  *        2 1       |      /       2 1
@@ -1468,30 +1468,30 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      | 0       /      |       | 0
  *      |/       /       |       |/
  *      *-------*        *-------*
- *    \end{verbatim}
- *   \end{itemize}
+ *    @end{verbatim}
+ *   @end{itemize}
  * 
  *   Due to this numbering, the following lines are identical:
- *   \begin{itemize}
- *   \item Line 0 of face 0, and line 0 of face 2;
- *   \item Line 1 of face 0, and line 3 of face 3;
- *   \item Line 2 of face 0, and line 0 of face 4;
- *   \item Line 3 of face 0, and line 3 of face 5;
- *   \item Line 0 of face 1, and line 2 of face 2;
- *   \item Line 1 of face 1, and line 1 of face 3;
- *   \item Line 2 of face 1, and line 2 of face 4;
- *   \item Line 3 of face 1, and line 1 of face 5;
- *   \item Line 3 of face 2, and line 0 of face 5;
- *   \item Line 1 of face 2, and line 0 of face 3;
- *   \item Line 1 of face 4, and line 2 of face 3;
- *   \item Line 3 of face 4, and line 2 of face 5.
- *   \end{itemize}
+ *   @begin{itemize}
+ *   @item Line 0 of face 0, and line 0 of face 2;
+ *   @item Line 1 of face 0, and line 3 of face 3;
+ *   @item Line 2 of face 0, and line 0 of face 4;
+ *   @item Line 3 of face 0, and line 3 of face 5;
+ *   @item Line 0 of face 1, and line 2 of face 2;
+ *   @item Line 1 of face 1, and line 1 of face 3;
+ *   @item Line 2 of face 1, and line 2 of face 4;
+ *   @item Line 3 of face 1, and line 1 of face 5;
+ *   @item Line 3 of face 2, and line 0 of face 5;
+ *   @item Line 1 of face 2, and line 0 of face 3;
+ *   @item Line 1 of face 4, and line 2 of face 3;
+ *   @item Line 3 of face 4, and line 2 of face 5.
+ *   @end{itemize}
  *
  *
  *   @sect4{Children}
  *
  *   The eight children of a cell are numbered as follows:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *         *-------*        *-------*
  *        /| 7   6 |       / 7   6 /|
  *       /7|       |      /       /6|
@@ -1502,18 +1502,18 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     |0/       /      |       |1/
  *     |/0    1 /       | 0   1 |/
  *     *-------*        *-------*
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   Taking into account the orientation of the faces, the following
  *   children are adjacent to the respective faces:
- *   \begin{itemize}
- *   \item Face 0: children 0, 1, 2, 3;
- *   \item Face 1: children 4, 5, 6, 7;
- *   \item Face 2: children 0, 1, 5, 4;
- *   \item Face 3: children 1, 5, 6, 2;
- *   \item Face 4: children 3, 2, 6, 7;
- *   \item Face 5: children 0, 4, 7, 3.
- *   \end{itemize}
+ *   @begin{itemize}
+ *   @item Face 0: children 0, 1, 2, 3;
+ *   @item Face 1: children 4, 5, 6, 7;
+ *   @item Face 2: children 0, 1, 5, 4;
+ *   @item Face 3: children 1, 5, 6, 2;
+ *   @item Face 4: children 3, 2, 6, 7;
+ *   @item Face 5: children 0, 4, 7, 3.
+ *   @end{itemize}
  *   You can get these numbers using the @p{GeometryInfo<3>::child_cell_on_face}
  *   function. Each child is adjacent to the vertex with the same number.
  *
@@ -1522,7 +1522,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   We define the following coordinate system for the explicit coordinates of
  *   the vertices of the unit cell:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *                         7-------6        7-------6
  *                        /|       |       /       /|
  *                       / |       |      /       / |
@@ -1533,7 +1533,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    | /              | /       /      |       | /
  *    |/               |/       /       |       |/
  *    *------>x        0-------1        0-------1
- *   \end{verbatim}
+ *   @end{verbatim}
  *   This convention in conjunction with the numbering of the vertices is a bit
  *   unfortunate, since the vertices 0 through 3 have the coordinates @p{(x,0,z)}
  *   with @p{x} and @p{z} being the same as the @p{x} and @p{y} coordinates of a quad
@@ -1542,16 +1542,16 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   By the convention laid down as above, the vertices have the following
  *   coordinates:
- *   \begin{itemize}
- *      \item Vertex 0: @p{(0,0,0)};
- *      \item Vertex 1: @p{(1,0,0)};
- *      \item Vertex 2: @p{(1,0,1)};
- *      \item Vertex 3: @p{(0,0,1)};
- *      \item Vertex 4: @p{(0,1,0)};
- *      \item Vertex 5: @p{(1,1,0)};
- *      \item Vertex 6: @p{(1,1,1)};
- *      \item Vertex 7: @p{(0,1,1)}.
- *   \end{itemize}
+ *   @begin{itemize}
+ *      @item Vertex 0: @p{(0,0,0)};
+ *      @item Vertex 1: @p{(1,0,0)};
+ *      @item Vertex 2: @p{(1,0,1)};
+ *      @item Vertex 3: @p{(0,0,1)};
+ *      @item Vertex 4: @p{(0,1,0)};
+ *      @item Vertex 5: @p{(1,1,0)};
+ *      @item Vertex 6: @p{(1,1,1)};
+ *      @item Vertex 7: @p{(0,1,1)}.
+ *   @end{itemize}
  *
  *
  *   @sect3{Warning}

@@ -82,7 +82,7 @@ template <typename number> class Vector;
  * This little example is taken from a program doing parameter optimization.
  * The Lagrange multiplier is the third component of the finite element
  * used. The system is solved by the GMRES method.
- * \begin{verbatim}
+ * @begin{verbatim}
  *                        // tag the Lagrange multiplier variable
  *    vector<bool> signature(3);
  *    signature[0] = signature[1] = false;
@@ -102,7 +102,7 @@ template <typename number> class Vector;
  *			  // solve
  *    gmres.solve (global_matrix, solution, right_hand_side,
  *	           vanka);
- * \end{verbatim}
+ * @end{verbatim}
  *
  *
  * @sect4{Implementor's remark}
@@ -395,8 +395,8 @@ class SparseVanka
  * blocks equals the interval @p{[0,N)}, where @p{N} is the number of
  * degrees of freedom of the system of equations.
  *
- * \begin{itemize}
- * \item @p{index_intervals}:
+ * @begin{itemize}
+ * @item @p{index_intervals}:
  *    Here, we chose the blocks to be intervals @p{[a_i,a_{i+1})},
  *    i.e. consecutive degrees of freedom are usually also within the
  *    same block. This is a reasonable strategy, if the degrees of
@@ -424,7 +424,7 @@ class SparseVanka
  *    preconditioner useless if the degrees of freedom are numbered by
  *    component, i.e. all Lagrange multipliers en bloc.
  *
- * \item @p{adaptive}: This strategy is a bit more clever in cases where
+ * @item @p{adaptive}: This strategy is a bit more clever in cases where
  *    the Langrange DoFs are clustered, as in the example above. It
  *    works as follows: it first groups the Lagrange DoFs into blocks,
  *    using the same strategy as above. However, instead of grouping
@@ -446,7 +446,7 @@ class SparseVanka
  *    does not differ much. However, unlike the first strategy, the
  *    performance of the second strategy does not deteriorate if the
  *    DoFs are renumbered by component.
- * \end{itemize}
+ * @end{itemize}
  *
  *
  * @sect3{Typical results}
@@ -459,14 +459,14 @@ class SparseVanka
  * @p{SparseBlockVanka} with @p{n_blocks==1}), the following numbers of
  * iterations is needed to solver the linear system in each nonlinear
  * step:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   101 68 64 53 35 21
- * \end{verbatim}
+ * @end{verbatim}
  *
  * With four blocks, we need the following numbers of iterations
- * \begin{verbatim}
+ * @begin{verbatim}
  *   124 88 83 66 44 28
- * \end{verbatim}
+ * @end{verbatim}
  * As can be seen, more iterations are needed. However, in terms of
  * computing time, the first version needs 72 seconds wall time (and
  * 79 seconds CPU time, which is more than wall time since some other

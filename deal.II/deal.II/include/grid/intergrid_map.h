@@ -23,18 +23,18 @@ template <class T> class SmartPointer;
  *
  * Usually, the two grids will be refined differently. Then, the value
  * returned for an iterator on the source grid will be either:
- * \begin{itemize}
- *   \item The same cell on the destination grid, if it exists there;
- *   \item The most refined cell of the destination grid from which the
+ * @begin{itemize}
+ *   @item The same cell on the destination grid, if it exists there;
+ *   @item The most refined cell of the destination grid from which the
  *      pendant of the source cell could be obtained by refinement. This
  *      cell is always active and has a refinement level less than that
  *      of the source cell.
- * \end{itemize}
+ * @end{itemize}
  * Keys for this map are all cells on the source grid, whether active or
  * not.
  *
  * For example, consider these two one-dimensional grids:
- * \begin{verbatim}
+ * @begin{verbatim}
  * Grid 1:
  *   x--x--x-----x-----------x
  *    1  2    3        4 
@@ -42,18 +42,18 @@ template <class T> class SmartPointer;
  * Grid 2:
  *   x-----x-----x-----x-----x
  *      1     2     3     4
- * \end{verbatim}
+ * @end{verbatim}
  * (Cell numbers are only given as an example and will not correspond
  * to real cell iterator's indices.) The mapping from grid 1 to grid 2
  * will then be as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *    Cell on grid 1         Cell on grid 2
  *          1  ------------------>  1
  *          2  ------------------>  1
  *          3  ------------------>  2
  *          4  ------------------>  mother cell of cells 3 and 4
  *                                  (a non-active cell, not shown here)
- * \end{verbatim}
+ * @end{verbatim}
  * Besides the mappings shown here, the non-active cells on grid 1 are also
  * valid keys. For example, the mapping for the mother cell of cells 1 and 2
  * on the first grid will point to cell 1 on the second grid.
@@ -73,7 +73,7 @@ template <class T> class SmartPointer;
  * @sect2{Usage}
  *
  * In practice, use of this class is as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *                   // have two grids, which are derived from the
  *                   // same coarse grid
  *   Triangulation<dim> tria1, tria2;
@@ -95,7 +95,7 @@ template <class T> class SmartPointer;
  *                    // corresponding to @p{cell} (which is one of
  *                    // dof_handler_1
  *     f( grid_1_to_2_map[cell]);
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Note that the template parameters to this class have to be given as
  * @p{InterGridMap<DoFHandler,2>}, i.e. the dimension is given explicitely and

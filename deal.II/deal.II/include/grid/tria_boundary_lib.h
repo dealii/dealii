@@ -18,7 +18,7 @@
 
 
 /**
- *   Specialisation of \Ref{Boundary}<dim>, which places the new point on
+ *   Specialisation of @ref{Boundary}<dim>, which places the new point on
  *   the boundary of a ball in arbitrary dimension. It works by projecting
  *   the point in the middle of the old points onto the ball. The middle is
  *   defined as the arithmetic mean of the points. 

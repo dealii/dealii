@@ -28,7 +28,7 @@ template <typename number> class SparseMatrix;
  * The following picture will illustrate the relation between the
  * @p{SparsityPattern} an the @p{SparseMatrix}.
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  *  SparsityPattern:                               \
  *                                                 |
  *              _________________________          |
@@ -58,9 +58,9 @@ template <typename number> class SparseMatrix;
  *   /_________colnums[0]                          |
  *                                                 |                    
  *                                                /                    
- * \end{verbatim}
+ * @end{verbatim}
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  * For row = 0
  *   
  * it exists: (0| 3) = colnums[0]
@@ -74,9 +74,9 @@ template <typename number> class SparseMatrix;
  *            (1| 4) = colnums[5]
  * ....
  *
- * \end{verbatim}
+ * @end{verbatim}
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  * SparseMatrix:                                  \
  *                                                 |
  *              _____________________________      |
@@ -85,7 +85,7 @@ template <typename number> class SparseMatrix;
  *                                                 |
  *                                                 |
  *                                                /
- * \end{verbatim}
+ * @end{verbatim}
  *
  * If you want to get the @p{3} you need to get its position in the
  * table above and its value by returning the value of the element on

@@ -40,19 +40,21 @@ enum OutputStyle {
  * Declare some regexps which
  * may be used to define patterns.
  */ 
-struct Patterns {
+struct Patterns
+{
   public:
 				     /**
 				      * Base class to declare common
 				      * interface.
 				      */
-    class PatternBase {
+    class PatternBase
+    {
       public:
 					 /**
 					  * Make destructor of this and all
 					  * derived classes virtual.
 					  */
-	virtual ~PatternBase () {};
+	virtual ~PatternBase ();
 	
 					 /**
 					  * Return true if the given string
@@ -80,7 +82,8 @@ struct Patterns {
 				      * Test for the string being an
 				      * integer.
 				      */
-    class Integer : public PatternBase {
+    class Integer : public PatternBase
+    {
       public:
 	virtual bool match (const string &test_string) const;
 	virtual string description () const;
@@ -90,7 +93,8 @@ struct Patterns {
 				     /**
 				      * Test for the string being a double.
 				      */
-    class Double : public PatternBase {
+    class Double : public PatternBase
+    {
       public:
 	virtual bool match (const string &test_string) const;
 	virtual string description () const;
@@ -109,7 +113,8 @@ struct Patterns {
 				      * signs do not matter and are
 				      * eliminated.
 				      */
-    class Selection : public PatternBase {
+    class Selection : public PatternBase
+    {
       public:
 	Selection (const string &seq);
 	virtual bool match (const string &test_string) const;
@@ -134,7 +139,8 @@ struct Patterns {
 				      * However, commas are not allowed inside
 				      * the values given to the constructor.
 				      */
-    class MultipleSelection : public PatternBase {
+    class MultipleSelection : public PatternBase
+    {
       public:
 	MultipleSelection (const string &seq);
 	virtual bool match (const string &test_string) const;
@@ -155,7 +161,8 @@ struct Patterns {
 				      * "true" or "false". This is mapped
 				      * to the @p{Selection} class.
 				      */
-    class Bool : public Selection {
+    class Bool : public Selection
+    {
       public:
 	Bool ();
 	virtual PatternBase * clone () const;
@@ -165,7 +172,8 @@ struct Patterns {
 				      * Always returns true when testing a
 				      * string.
 				      */
-    class Anything : public PatternBase {
+    class Anything : public PatternBase
+    {
       public:
 					 /**
 					  * Allow for at least one non-virtual
@@ -186,10 +194,10 @@ struct Patterns {
  *   which provides at run-time for program parameters such as time step sizes,
  *   geometries, right hand sides etc. The input for the program is given in files,
  *   streams or strings in memory using text like
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     set Time step size = 0.3
  *     set Geometry       = [0,1]x[0,3]
- *   \end{verbatim}
+ *   @end{verbatim}
  *   Input may be sorted into subsection trees in order to give the input a logical
  *   structure.
  *
@@ -199,7 +207,7 @@ struct Patterns {
  *   In order to use the facilities of a @p{ParameterHandler} object, one first has
  *   to make known the different entries the input file may or may not contain. This
  *   is done in the following way:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     ...
  *     ParameterHandler prm;
  *     prm.declare_entry ("Time step size",
@@ -209,7 +217,7 @@ struct Patterns {
  *                       "[0,1]x[0,1]",
  *                       Patterns::Anything());
  *     ...
- *   \end{verbatim}
+ *   @end{verbatim}
  *   Each entry is declared using the function @p{declare_entry}. The first parameter is
  *   the name of the entry (in short: the entry). The second is the default answer to
  *   be taken in case the entry is not specified in the input file. The third parameter
@@ -220,7 +228,7 @@ struct Patterns {
  *   input parameters for linear solver routines should be classified in a subsection
  *   named @p{Linear solver} or any other suitable name. This is accomplished in the
  *   following way:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     ...
  *       LinEq eq;
  *       eq.declare_parameters (prm);
@@ -237,12 +245,12 @@ struct Patterns {
  *       ...
  *       prm.leave_subsection ();
  *     };
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   Subsections may be nested. For example a nonlinear solver may have a linear solver
  *   as member object. Then the function call tree would be something like (if the class
  *   @p{NonLinEq} has a member variables @p{eq} of type @p{LinEq}):
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       prm.declare_entry ("Nonlinear method",
@@ -251,7 +259,7 @@ struct Patterns {
  *       eq.declare_parameters (prm);
  *       prm.leave_subsection ();
  *     };
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   For class member functions which declare the different entries we propose to use the
  *   common name @p{declare_parameters}. In normal cases this method can be @p{static} since the
@@ -260,7 +268,7 @@ struct Patterns {
  *   a class has two or more member variables of the same type both of which should have
  *   their own parameters, this parent class' method @p{declare_parameters} is responsible to
  *   group them into different subsections:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       prm.enter_subsection ("Linear solver 1");
@@ -272,13 +280,13 @@ struct Patterns {
  *       prm.leave_subsection ();
  *       prm.leave_subsection ();
  *     };	
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *
  *   @sect3{Input files and special characters}
  *
  *   For the first example above the input file would look like the following:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     ...
  *     subsection Nonlinear solver
  *       set Nonlinear method = Gradient
@@ -288,14 +296,14 @@ struct Patterns {
  *       end
  *     end
  *     ...                       # other stuff
- *   \end{verbatim}
+ *   @end{verbatim}
  *   The words @p{subsection}, @p{set} and @p{end} may be either written in lowercase or uppercase
  *   letters. Leading and trailing whitespace is removed, multiple whitespace is condensed into
  *   only one. Since the latter applies also to the name of an entry, an entry name will not
  *   be recognised if in the declaration multiple whitespace is used.
  *
  *   In entry names and values the following characters are not allowed: @p{#}, @p{\{}, 
- *   @p{\}}, @p{|}. Their use is reserved for the \ref{MultipleParameterLoop} class.
+ *   @p{\}}, @p{|}. Their use is reserved for the @ref{MultipleParameterLoop} class.
  *   
  *   Comments starting with \# are skipped.
  *   
@@ -310,7 +318,7 @@ struct Patterns {
  *   In order to read input you can use three possibilities: reading from an @p{istream} object,
  *   reading from a file of which the name is given and reading from a string in memory in
  *   which the lines are separated by @p{\n} characters. These possibilites are used as follows:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     ParameterHandler prm;
  *     ...
  *     // declaration of entries
@@ -322,7 +330,7 @@ struct Patterns {
  *     char *in = "set Time step size = 0.3 \n ...";
  *     prm.read_input (in);
  *     ...
- *   \end{verbatim}
+ *   @end{verbatim}
  *   You can use several sources of input successively. Entries which are changed more than
  *   once will be overwritten everytime they are used. It is suggested to let the name of
  *   parameter input end in @p{.prm}.
@@ -338,14 +346,14 @@ struct Patterns {
  *   
  *   Each class gets its data out of a @p{ParameterHandler} object by calling the @p{get (...)}
  *   member functions like this:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *      void NonLinEq::get_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       string method = prm.get ("Nonlinear method");
  *       eq.get_parameters (prm);
  *       prm.leave_subsection ();
  *     };
- *   \end{verbatim}
+ *   @end{verbatim}
  *   @p{get()} returns the value of the given entry. If the entry was not specified in the input
  *   source(s), the default value is returned. You have to enter and leave subsections
  *   exactly as you did when declaring subsection. You may chose the order in which to
@@ -396,19 +404,19 @@ struct Patterns {
  *
  *   @sect3{Possible future extensions}
  *   
- *   \begin{itemize}
- *   \item Allow long input lines to be broken by appending a backslash character
+ *   @begin{itemize}
+ *   @item Allow long input lines to be broken by appending a backslash character
  *     (just like C macros and shell input).
- *   \item Provide an @p{input filename} command for the input file to enable users to put the
+ *   @item Provide an @p{input filename} command for the input file to enable users to put the
  *     most common parameters into separate files.
- *   \end{itemize}  
+ *   @end{itemize}  
  *
  *
  *   
  *   @sect3{Worked Example}
  *
  *   This is the code:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     #include <iostream>
  *     #include "../include/parameter_handler.h"
  *     
@@ -539,11 +547,11 @@ struct Patterns {
  *            << "Getting parameters:" << endl;
  *       p.get_parameters (prm);
  *     };
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   
  *   This is the input file (named "prmtest.prm"):
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *                                 # first declare the types of equations
  *     set Equation 1 = Poisson
  *     set Equation 2 = Navier-Stokes
@@ -563,10 +571,10 @@ struct Patterns {
  *         set Maximum number of iterations = 100
  *       end
  *     end
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   And here is the ouput of the program:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     Line 8:
  *         The entry value
  *             Gauss-Seidel
@@ -603,17 +611,13 @@ struct Patterns {
  *       Problem: outfile=out
  *                eq1=Poisson, eq2=Navier-Stokes
  *                Matrix1=Sparse, Matrix2=Full
- *   \end{verbatim}
+ *   @end{verbatim}
  *
  *   
  *   @sect3{References}
  *
  *   This class is inspired by the @p{MenuSystem} class of @p{DiffPack}.
  *
- *   @memo  This class provides a standard interface to an input file
- *   which provides at run-time for program parameters such as time step sizes,
- *   geometries, right hand sides etc.
- *   
  *   @author Wolfgang Bangerth, October 1997, revised February 1998
  *   @see MultipleParameterLoop
  */
@@ -892,24 +896,24 @@ class ParameterHandler
  *   variant entry values and performs a loop over all combinations of parameters.
  *
  *   Variant entry values are given like this:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     set Time step size = { 0.1 | 0.2 | 0.3 }
- *   \end{verbatim}
+ *   @end{verbatim}
  *   The loop will then perform three runs of the program, one for each value
  *   of @p{Time step size}, while all other parameters are as specified or with their
  *   default value. If there are several variant entry values in the input a loop is
  *   performed for each combination of variant values:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     set Time step size = { 0.1 | 0.2 }
  *     set Solver         = { CG  | GMRES }
- *   \end{verbatim}
+ *   @end{verbatim}
  *   will result in four runs of the programs, with time step 0.1 and 0.2 for each
  *   of the two solvers.
  *
  *   Opposite to a variant entry, an array entry looks like this:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     set Output file = ofile.{{ 1 | 2 | 3 | 4 }}
- *   \end{verbatim}
+ *   @end{verbatim}
  *   This indicates that if there are variant entries producing a total of four
  *   different runs will write their results to the files @p{ofile.1}, @p{ofile.2},
  *   @p{ofile.3} and @p{ofile.4}, respectively. Array entries do not generate multiple
@@ -937,7 +941,7 @@ class ParameterHandler
  *   the different parameter sets are set, a new instance of a user class is created
  *   which is then called. Taking the classes of the example for the
  *   @p{ParameterHandler} class, the extended program would look like this:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     class HelperClass : public MultipleParameterLoop::UserClass {
  *       public:
  *         HelperClass ();
@@ -983,7 +987,7 @@ class ParameterHandler
  *       prm.read_input ("prmtest.prm");
  *       prm.loop (h);
  *     };    
- *   \end{verbatim}
+ *   @end{verbatim}
  *         
  *   As can be seen, first a new helper class has to be set up. This must contain
  *   a virtual constructor for a problem class. You can also derive your problem
@@ -1005,7 +1009,7 @@ class ParameterHandler
  *   @p{MultipleParameterLoop} class, the entries have to be declared in the same way
  *   as for the @p{ParameterHandler} class. Then the input has to be read. Finally
  *   the loop is called. This executes the following steps:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     for each combination
  *       {
  *         UserObject.create_new (runNo);
@@ -1014,7 +1018,7 @@ class ParameterHandler
  *  
  *         UserObject.run (*this);
  *       };
- *   \end{verbatim}
+ *   @end{verbatim}
  *   @p{UserObject} is the parameter to the @p{loop} function. @p{create_new} is given the number
  *   of the run (starting from one) to enable naming output files differently for each
  *   run.
@@ -1037,7 +1041,7 @@ class ParameterHandler
  *   
  *   Given the above extensions to the example program for the @p{ParameterHandler} and the
  *   following input file
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     set Equation 1 = Poisson
  *     set Equation 2 = Navier-Stokes
  *     set Output file= results.{{ 1 | 2 | 3 | 4 | 5 | 6 }}
@@ -1057,9 +1061,9 @@ class ParameterHandler
  *         set Maximum number of iterations = 100
  *       end
  *     end
- *   \end{verbatim}
+ *   @end{verbatim}
  *   this is the output:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     LinEq: Method=CG, MaxIterations=10
  *     LinEq: Method=BiCGStab, MaxIterations=100
  *     Problem: outfile=results.1
@@ -1090,7 +1094,7 @@ class ParameterHandler
  *     Problem: outfile=results.6
  *              eq1=Poisson, eq2=Navier-Stokes
  *              Matrix1=Sparse, Matrix2=Full
- *   \end{verbatim}
+ *   @end{verbatim}
  *   Since @p{create_new} gets the number of the run it would also be possible to output
  *   the number of the run.
  *   
@@ -1098,15 +1102,12 @@ class ParameterHandler
  *   @sect3{References}
  *   This class is inspired by the @p{Multipleloop} class of @p{DiffPack}.
  *
- *   @memo  This class provides an interface to an input file which provides at
- *   run-time for multiple program parameters sets. The class performs a loop over
- *   all combinations of parameter sets.
- *   
  *   @author Wolfgang Bangerth, October 1997
  *   @version 1.0
  *   @see ParameterHandler
  */
-class MultipleParameterLoop : public ParameterHandler {
+class MultipleParameterLoop : public ParameterHandler
+{
   public:
 				     /**
 				      * This is the class the helper class or the

@@ -82,7 +82,7 @@ class DoFLevel<1>
   public:
 				     /**
 				      * Store the global indices of the degrees
-				      * of freedom. See \Ref{DoFLevel} for
+				      * of freedom. See @ref{DoFLevel} for
 				      * detailed information.
 				      */
     vector<unsigned int> line_dofs;
@@ -91,13 +91,13 @@ class DoFLevel<1>
 
 /**
  * Store the indices of the degrees of freedom which are located on quads.
- * See \Ref{DoFLevel<1>} for more information.
+ * See @ref{DoFLevel<1>} for more information.
  */
 class DoFLevel<2> : public DoFLevel<1> {
   public:
 				     /**
 				      * Store the global indices of the degrees
-				      * of freedom. See \Ref{DoFLevel} for
+				      * of freedom. See @ref{DoFLevel} for
 				      * detailed information.
 				      */
     vector<unsigned int> quad_dofs;
@@ -106,13 +106,13 @@ class DoFLevel<2> : public DoFLevel<1> {
 
 /**
  * Store the indices of the degrees of freedom which are located on hexhedra.
- * See \Ref{DoFLevel<1>} for more information.
+ * See @ref{DoFLevel<1>} for more information.
  */
 class DoFLevel<3> : public DoFLevel<2> {
   public:
 				     /**
 				      * Store the global indices of the degrees
-				      * of freedom. See \Ref{DoFLevel} for
+				      * of freedom. See @ref{DoFLevel} for
 				      * detailed information.
 				      */
     vector<unsigned int> hex_dofs;

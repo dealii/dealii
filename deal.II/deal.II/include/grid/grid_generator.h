@@ -24,8 +24,8 @@ template <int dim> class Triangulation;
  * This class offers triangulations of some standard domains such as hypercubes,
  * hyperball and the like. Following is a list of domains that can be generated
  * by the functions of this class:
- * \begin{itemize}
- *    \item Hypercube triangulations: a hypercube triangulation is a
+ * @begin{itemize}
+ *    @item Hypercube triangulations: a hypercube triangulation is a
  *       domain which is the tensor product of an interval $[a,b]$ in
  *       the given number of spatial dimensions. If you want to create such
  *       a domain, which is a common test case for model problems, call
@@ -33,7 +33,7 @@ template <int dim> class Triangulation;
  *       hypercube domain triangulated with exactly one element. You can
  *       get tensor product meshes by successive refinement of this cell.
  *
- *    \item Generalized L-shape domain:
+ *    @item Generalized L-shape domain:
  *      using the @p{GridGenerator::hyper_L (tria, a,b)} function produces
  *      the hypercube with the interval $[a,b]$ without the hypercube
  *      made out of the interval $[(a+b)/2,b]$. Let, for example, be $a=-1$
@@ -41,7 +41,7 @@ template <int dim> class Triangulation;
  *      $[-1,1]^2 - [0,1]^2$. To create a hyper-L in one dimension results in
  *      an error. The function is also implemented for three space dimensions.
  *
- *    \item Hyper balls:
+ *    @item Hyper balls:
  *      You get the circle or ball (or generalized: hyperball) around origin
  *      @p{p} and with radius @p{r} by calling
  *      @p{GridGenerator::hyper_ball (tria, p, r)}. The circle is triangulated
@@ -54,7 +54,7 @@ template <int dim> class Triangulation;
  *      to the triangulation object you passed to this function if you later want
  *      the triangulation to be refined at the outer boundaries.
  *
- *    \item Hyper shell: A hyper shell is the region between two hyper
+ *    @item Hyper shell: A hyper shell is the region between two hyper
  *      sphere with the same origin. Therefore, it is a ring in two
  *      spatial dimensions. To triangulation it, call the function
  *      @pGridGenerator::hyper_shell (tria, origin, inner_radius, outer_radius, N)},
@@ -75,14 +75,14 @@ template <int dim> class Triangulation;
  *      suitable boundary class is provided as @p{HyperSphereBoundary}
  *      in the library.
  *
- * \item Slit domain: The slit domain is a variant of the hyper cube
+ * @item Slit domain: The slit domain is a variant of the hyper cube
  *      domain. In two spatial dimensions, it is a square into which a slit
  *      is sawed; if the initial square is though to be composed of four
  *      smaller squares, then two of them are not connected even though
  *      they are neighboring each other. Analogously, into the cube in
  *      three spatial dimensions, a half-plane is sawed, disconnecting four
  *      of the eight child-cubes from one of their neighbors.
- * \end{itemize}
+ * @end{itemize}
  *
  * @author Wolfgang Bangerth, 1998, 1999. Slit domain by Stefan Nauber, 1999
  */

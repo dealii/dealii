@@ -26,7 +26,7 @@
  *
  * The algorithm used by this class is as follows (indices run from @p{0}
  * to @p{N-1}):
- * \begin{verbatim}
+ * @begin{verbatim}
  * copy original matrix into a[i,j]
  * 
  * for i=1..N-1
@@ -38,7 +38,7 @@
  *     for j=k+1..N-1
  *      if (a[i,j] exists & a[k,j] exists)
  *        a[i,j] -= a[i,k] * a[k,j]
- * \end{verbatim}
+ * @end{verbatim}
  * Using this algorithm, we store the decomposition as a sparse matrix, for
  * which the user has to give a sparsity pattern and which is why this
  * class is derived from the @p{SparseMatrix}. Since it is not a matrix in
@@ -73,14 +73,14 @@
  * matrix, you can do so by calling the solver function using the following
  * sequence, for example (@p{ilu_sparsity} is some sparsity pattern to be used
  * for the decomposition, which you have to create beforehand):
- * \begin{verbatim}
+ * @begin{verbatim}
  *   SparseILU<double> ilu (ilu_sparsity);
  *   ilu.decompose (global_matrix);
  *
  *   somesolver.solve (A, x, f,
  *                     PreconditionUseMatrix<SparseILU<double>,Vector<double> >
  * 	                      (ilu,&SparseILU<double>::template apply_decomposition<double>));
- * \end{verbatim}
+ * @end{verbatim}
  *
  *
  * @sect2{On template instantiations}

@@ -67,14 +67,14 @@ class PreconditionIdentity
  * @sect3{Use}
  * You will usually not want to create a named object of this type,
  * although possible. The most common use is like this:
- * \begin{verbatim}
+ * @begin{verbatim}
  *    SolverGMRES<SparseMatrix<double>,
  *                Vector<double> >      gmres(control,memory,500);
  *
  *    gmres.solve (matrix, solution, right_hand_side,
  *		   PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
  *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi));
- * \end{verbatim}
+ * @end{verbatim}
  * This creates an unnamed object to be passed as the fourth parameter to
  * the solver function of the @p{SolverGMRES} class. It assumes that the
  * @p{SparseMatrix} class has a function @p{precondition_Jacobi} taking two
@@ -85,12 +85,12 @@ class PreconditionIdentity
  *
  * Note that due to the default template parameters, the above example
  * could be written shorter as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *    ...
  *    gmres.solve (matrix, solution, right_hand_side,
  *		   PreconditionUseMatrix<>
  *		     (matrix,&SparseMatrix<double>::template precondition_Jacobi));
- * \end{verbatim}
+ * @end{verbatim}
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */

@@ -26,7 +26,7 @@
  *
  * Use of this class is as you might expect by looking at the member
  * functions:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   Time timer;
  *   timer.start ();
  *
@@ -39,7 +39,7 @@
  *
  *   // reset timer for the next thing it shall do
  *   timer.reset();
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Alternatively, you can also restart the timer instead of resetting
  * it. The times between successive calls to @p{start/stop} will then be

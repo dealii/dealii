@@ -131,10 +131,10 @@ class DoFTools
 				      * equations,
 				      *
 				      *
-				      * \begin{verbatim}
+				      * @begin{verbatim}
 				      * -\Delta \vec u + \nabla p = 0,
 				      * \div u                    = 0
-				      * \end{verbatim}
+				      * @end{verbatim}
 				      *
 				      * in two space dimensions,
 				      * using stable Q2/Q1 mixed
@@ -146,11 +146,11 @@ class DoFTools
 				      * following pattern of
 				      * couplings:
 				      *
-				      * \begin{verbatim}
+				      * @begin{verbatim}
 				      *   1 0 1
 				      *   0 1 1
 				      *   1 1 0
-				      * \end{verbatim}
+				      * @end{verbatim}
 				      * where "1" indicates that two
 				      * variables (i.e. components of
 				      * the @p{FESystem}) couple in the

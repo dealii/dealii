@@ -35,14 +35,14 @@
  * @sect3{Ways to generate the intervals}
  *
  * At present, the following schemes for interval spacing are implemented:
- * \begin{itemize}
- * \item Linear spacing: The intervals are distributed in constant steps
+ * @begin{itemize}
+ * @item Linear spacing: The intervals are distributed in constant steps
  *    between the minimum and maximum values of the data.
- * \item Logaritmic spacing: The intervals are distributed in constant
+ * @item Logaritmic spacing: The intervals are distributed in constant
  *    steps between the minimum and maximum values of the logs of the values.
  *    This scheme is only useful if the data has only positive values.
  *    Negative and zero values are sorted into the leftmost interval.
- * \end{itemize}
+ * @end{itemize}
  *
  * To keep programs extendible, you can use the two functions
  * @p{get_interval_spacing_names} and @p{parse_interval_spacing}, which always

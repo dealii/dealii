@@ -811,7 +811,7 @@ class FiniteElementBase : public Subscriptor,
  * The order of the twelve lines and the four child faces can be extracted
  * from the following sketch, where the overall order of the different
  * dof groups is depicted:
- * \begin{verbatim}
+ * @begin{verbatim}
  *    *--13--3--14--*
  *    |      |      |
  *    16 20  7  19  12
@@ -821,13 +821,13 @@ class FiniteElementBase : public Subscriptor,
  *    15 17  5  18  11
  *    |      |      |
  *    *--9---1--10--*
- * \end{verbatim}
+ * @end{verbatim}
  * It should be noted that the face as shown here is in the standard form,
  * i.e. with vertex zero at the bottom left, and the other vertices numbered
  * counter clockwise. This explains the numbering of the lines labeled 13 and
  * 14, as well as those labeled 15 and 16. The dofs on the lines need to
  * be numbered in the direction of the lines, which is as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *    *-->---*-->---*
  *    |      |      |
  *    ^      ^      ^ 
@@ -837,7 +837,7 @@ class FiniteElementBase : public Subscriptor,
  *    ^      ^      ^ 
  *    |      |      |
  *    *-->---*-->---*
- * \end{verbatim}
+ * @end{verbatim}
  * The orientation of the quads should be obvious.
  *
  * The faces of a hexahedron are arranged in a way such that
@@ -871,7 +871,7 @@ class FiniteElementBase : public Subscriptor,
  * face of two cells need not match exactly, if one of the cells is
  * refined and the two cells are at the boundary. To understand this,
  * look at the following sketch:
- * \begin{verbatim}
+ * @begin{verbatim}
  *         *---------*---------*
  *        /         /         /|
  *       /         /         / |
@@ -883,7 +883,7 @@ class FiniteElementBase : public Subscriptor,
  *     |         |         | /
  *     |         |         |/
  *     *---------*---------*
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Assume the two top faces represent the boundary of the
  * triangulation; assume further that the boundary of the original
@@ -893,7 +893,7 @@ class FiniteElementBase : public Subscriptor,
  * children of this line will not take the same place as their mother
  * line did (this is not properly drawable using only ASCII characters,
  * use some imagination):
- * \begin{verbatim}
+ * @begin{verbatim}
  *       ..*--.*---..*---------*
  *      *----*----* /         /|
  *      :    :    :/         / |
@@ -905,7 +905,7 @@ class FiniteElementBase : public Subscriptor,
  *     |    |    |         | /
  *     |    |    |         |/
  *     *----*----*---------*
- * \end{verbatim}
+ * @end{verbatim}
  * While this is the case with boundary faces in two spatial
  * dimensions also, it here leads to the fact that the four child
  * faces of the common face of the two cells will not coincide with
@@ -973,8 +973,8 @@ class FiniteElementBase : public Subscriptor,
  * There is no guarantee that this list is complete; in fact, doubts are in
  * place that that be so.
  *
- * \begin{itemize}
- * \item Lagrange elements: at several places in the library, use is made of the
+ * @begin{itemize}
+ * @item Lagrange elements: at several places in the library, use is made of the
  *   assumption that the basis functions of a finite element corresponds to a
  *   function value (as opposed to derivatives or the like, as used in the
  *   Hermitean finite element class or in the quintic Argyris element). It is
@@ -998,7 +998,7 @@ class FiniteElementBase : public Subscriptor,
  *   the degrees of freedom denote function values and not derivatives or
  *   the like.
  *
- * \item Vanishing of basis functions on faces: when projecting a function
+ * @item Vanishing of basis functions on faces: when projecting a function
  *   to the boundary, use if made of the assumption that all basis functions
  *   on a cell adjacent to the boundary vanish on the boundary except for those
  *   on the boundary face itself. For Lagrange elements this is true, but it
@@ -1020,7 +1020,7 @@ class FiniteElementBase : public Subscriptor,
  *   the assumption does not hold, then the distribution has to happen
  *   with all nodes on the small and the large cells. This is not
  *   implemented in the @p{DoFHandler} class as of now.
- * \end{itemize}
+ * @end{itemize}
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -1122,7 +1122,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * of the fields to actually compute.
 				      *
 				      * Refer to the documentation of the
-				      * \Ref{FEValues} class for a definition
+				      * @ref{FEValues} class for a definition
 				      * of the Jacobi matrix and of the various
 				      * structures to be filled.
 				      *

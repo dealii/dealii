@@ -120,8 +120,8 @@ template <int dim> class FESubfaceValues;
  *  
  *  If the face is at the boundary, i.e. there is no neighboring cell to which
  *  the jump in the gradiend could be computed, there are two possibilities:
- *  \begin{itemize}
- *  \item The face belongs to a Dirichlet boundary. Then the face is not
+ *  @begin{itemize}
+ *  @item The face belongs to a Dirichlet boundary. Then the face is not
  *    considered, which can be justified looking at a dual problem technique and
  *    should hold exactly if the boundary can be approximated exactly by the
  *    finite element used (i.e. it is a linear boundary for linear finite elements,
@@ -138,15 +138,15 @@ template <int dim> class FESubfaceValues;
  *    store a zero for this face, which makes summing up the contributions of
  *    the different faces to the cells easier.
  *
- *  \item The face belongs to a Neumann boundary.  In this case, the
+ *  @item The face belongs to a Neumann boundary.  In this case, the
  *    contribution of the face $F\in\partial K$ looks like
  *    $$ \int_F \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds $$
  *    where $g$ is the Neumann boundary function. If the finite element is
  *    vector-valued, then obviously the function denoting the Neumann boundary
  *    conditions needs to be vector-valued as well.
  *
- *  \item No other boundary conditions are considered.
- *  \end{itemize}
+ *  @item No other boundary conditions are considered.
+ *  @end{itemize}
  *  The object describing the boundary conditions is obtained from the
  *  triangulation.
  *

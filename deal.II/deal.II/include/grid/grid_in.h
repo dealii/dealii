@@ -43,7 +43,7 @@ template <int dim> class Triangulation;
  *
  * Material indicators are accepted to denote the material id of cells and
  * to denote boundary part indication for lines in 2D. Read the according
- * sections in the documentation of the \Ref{Triangulation} class for
+ * sections in the documentation of the @ref{Triangulation} class for
  * further details.
  *
  *
@@ -58,20 +58,20 @@ template <int dim> class Triangulation;
  * In two dimensions, another difficulty occurs, which has to do with the sense
  * of a quadrilateral. A quad consists of four lines which have a direction,
  * which is per definitionem as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   3-->--2
  *   |     |
  *   ^     ^
  *   |     |
  *   0-->--1
- * \end{verbatim}
+ * @end{verbatim}
  * Now, two adjacent cells must have a vertex numbering such that the direction
  * of the common side is the same. For example, the following two quads
- * \begin{verbatim}
+ * @begin{verbatim}
  *   3---4---5
  *   |   |   |
  *   0---1---2
- * \end{verbatim}
+ * @end{verbatim}
  * may be characterised by the vertex numbers (0 1 4 3) and (1 2 5 4), since
  * the middle line would get the direction @p{1->4} when viewed from both cells.
  * The numbering (0 1 4 3) and (5 4 1 2) would not be allowed, since the left
@@ -86,7 +86,7 @@ template <int dim> class Triangulation;
  * There are more ambiguous cases, where the triangulation may not know what
  * to do at all without the use of very sophisticated algorithms. On such example
  * is the following:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   9---10-----11
  *   |   |    / |
  *   6---7---8  |
@@ -94,10 +94,10 @@ template <int dim> class Triangulation;
  *   3---4---5  |
  *   |   |    \ |
  *   0---1------2
- * \end{verbatim}
+ * @end{verbatim}
  * Assume that you had numbered the vertices in the cells at the left boundary
  * in a way, that the following line directions are induced:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   9->-10-----11
  *   ^   ^    / |
  *   6->-7---8  |
@@ -105,7 +105,7 @@ template <int dim> class Triangulation;
  *   3->-4---5  |
  *   ^   ^    \ |
  *   0->-1------2
- * \end{verbatim}
+ * @end{verbatim}
  * (This could for example be done by using the indices (0 1 4 3), (3 4 7 6),
  * (6 7 10 9) for the three cells). Now, you will not find a way of giving
  * indices for the right cells, without introducing either ambiguity for

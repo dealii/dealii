@@ -36,10 +36,10 @@
  * coarsening is much more complicated to organize 
  * (see further documentation below) than interpolation while pure refinement,
  * @p{SolutionTransfer} offers two possible usages.
- * \begin{itemize}
- * \item If the grid will only be purely refined
+ * @begin{itemize}
+ * @item If the grid will only be purely refined
  * (i.e. not locally coarsened) then use @p{SolutionTransfer} as follows
- * \begin{verbatim}
+ * @begin{verbatim}
  * SolutionTransfer<dim, double> soltrans(*dof_handler);
  * soltrans.prepare_for_pure_refinement();
  *                                     // some refinement e.g.
@@ -51,10 +51,10 @@
  *                                     // more functions
  * soltrans.refine_interpolate(sol2, interpolated_sol2);
  * ...
- * \end{verbatim}
- * \item If the grid will be coarsenend and refined
+ * @end{verbatim}
+ * @item If the grid will be coarsenend and refined
  * then use @p{SolutionTransfer} as follows
- * \begin{verbatim}
+ * @begin{verbatim}
  * SolutionTransfer<dim, double> soltrans(*dof_handler);
  *                                     // some refinement e.g.
  * tria->refine_and_coarsen_fixed_fraction(error_indicator, 0.3, 0.05);
@@ -64,7 +64,7 @@
  * tria->execute_coarsening_and_refinement ();
  * dof_handler->distribute_dofs (fe);
  * soltrans.interpolate(solution, interpolated_solution);
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Multiple calling of the function 
  * @p{interpolate (const Vector<number> &in, Vector<number> &out)}
@@ -74,7 +74,7 @@
  * and using the respective @p{prepare_for_coarsening_and_refinement} function 
  * taking several vectors as input before actually refining and coarsening the
  * triangulation (see there).
- * \end{itemize}
+ * @end{itemize}
  *
  * For deleting all stored data in @p{SolutionTransfer} and reinitializing it
  * use the @p{clear()} function.
@@ -88,8 +88,8 @@
  *
  * @sect3{Implementation}
  *
- * \begin{itemize}
- * \item Solution transfer while pure refinement. Assume that we have got a
+ * @begin{itemize}
+ * @item Solution transfer while pure refinement. Assume that we have got a
  * solution vector on the current (original) grid.
  * Each entry of this vector belongs to one of the
  * DoFs of the discretisation. If we now refine the grid then the calling of
@@ -110,7 +110,7 @@
  * The @p{refine_interpolate(in,out)} function can be called multiplely for
  * arbitrary many discrete functions (solution vectors) on the original grid. 
  *
- * \item Solution transfer while coarsening and refinement. After 
+ * @item Solution transfer while coarsening and refinement. After 
  * calling @p{Triangulation::prepare_coarsening_and_refinement} the
  * coarsen flags of either all or none of the children of a 
  * (father-)cell are set. While coarsening 
@@ -153,7 +153,7 @@
  * of the @p{prepare_for_coarsening_and_refinement(all_in)} function. Hence 
  * @p{interpolate(all_in, all_out)} can (in contrast to 
  * @p{refine_interpolate(in, out)}) only be called once.
- * \end{itemize}
+ * @end{itemize}
  *
  * @author Ralf Hartmann, 1999
  */

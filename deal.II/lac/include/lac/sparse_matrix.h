@@ -637,7 +637,7 @@ class SparseMatrix : public Subscriptor
 				      * integers.
 				      *
 				      * This function
-				      * may produce {\bf large} amounts of
+				      * may produce @em{large} amounts of
 				      * output if applied to a large matrix!
 				      * Be careful with it.
 				      */

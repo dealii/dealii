@@ -190,7 +190,7 @@ class MGDoFObjectAccessor<0, dim>
 /**
  * Grant access to the degrees of freedom located on lines.
  * This class follows mainly the route laid out by the accessor library
- * declared in the triangulation library (\Ref{TriaAccessor}). It enables
+ * declared in the triangulation library (@ref{TriaAccessor}). It enables
  * the user to access the degrees of freedom on the lines (there are similar
  * versions for the DoFs on quads, etc), where the dimension of the underlying
  * triangulation does not really matter (i.e. this accessor works with the
@@ -199,7 +199,7 @@ class MGDoFObjectAccessor<0, dim>
  *
  * @sect3{Usage}
  *
- * The \Ref{DoFDimensionInfo} classes inherited by the \Ref{DoFHandler} classes
+ * The @ref{DoFDimensionInfo} classes inherited by the @ref{DoFHandler} classes
  * declare typedefs to iterators using the accessors declared in this class
  * hierarchy tree. Usage is best to happens through these typedefs, since they
  * are more secure to changes in the class naming and template interface as well

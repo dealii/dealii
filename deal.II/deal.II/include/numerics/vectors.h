@@ -31,13 +31,13 @@ class ConstraintMatrix;
 /**
  *  Denote which norm/integral is to be computed. The following possibilities
  *  are implemented:
- *  \begin{itemize}
- *  \item @p{mean}: the function or difference of functions is integrated
+ *  @begin{itemize}
+ *  @item @p{mean}: the function or difference of functions is integrated
  *    on each cell.
- *  \item @p{L1_norm}: the absolute value of the function is integrated.
- *  \item @p{L2_norm}: the square of the function is integrated on each
+ *  @item @p{L1_norm}: the absolute value of the function is integrated.
+ *  @item @p{L2_norm}: the square of the function is integrated on each
  *    cell; afterwards the root is taken of this value.
- *  \end{itemize}
+ *  @end{itemize}
  */
 enum NormType {
       mean,
@@ -60,8 +60,8 @@ enum NormType {
  * @sect3{Description of operations}
  *
  * This collection of methods offers the following operations:
- * \begin{itemize}
- * \item Interpolation: assign each degree of freedom in the vector to be
+ * @begin{itemize}
+ * @item Interpolation: assign each degree of freedom in the vector to be
  *   created the value of the function given as argument. This is identical
  *   to saying that the resulting finite element function (which is isomorphic
  *   to the output vector) has exact function values in all off-points of
@@ -82,7 +82,7 @@ enum NormType {
  *   given function may be, taking into account that a virtual function has
  *   to be called.
  *
- * \item Projection: compute the $L_2$-projection of the given function onto
+ * @item Projection: compute the $L_2$-projection of the given function onto
  *   the finite element space. This is done through the solution of the
  *   linear system of equations $M v = f$ where $M$ is the mass matrix
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ and
@@ -142,19 +142,19 @@ enum NormType {
  *   too efficient, but sufficient in many cases and simple to implement. This
  *   detail may change in the future.
  *
- * \item Creation of right hand side vectors:
+ * @item Creation of right hand side vectors:
  *   The @p{create_right_hand_side} function computes the vector
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
  *   @p{MatrixCreator::create_*} functions which take a right hand side do,
  *   but without assembling a matrix.
  *
- * \item Interpolation of boundary values:
+ * @item Interpolation of boundary values:
  *   The @p{MatrixTools::apply_boundary_values} function takes a list
  *   of boundary nodes and their values. You can get such a list by interpolation
  *   of a boundary function using the @p{interpolate_boundary_values} function.
  *   To use it, you have to
  *   specify a list of pairs of boundary indicators (of type @p{unsigned char};
- *   see the section in the documentation of the \Ref{Triangulation} class for more
+ *   see the section in the documentation of the @ref{Triangulation} class for more
  *   details) and the according functions denoting the dirichlet boundary values
  *   of the nodes on boundary faces with this boundary indicator.
  *
@@ -183,7 +183,7 @@ enum NormType {
  *   index 1 in the map. The respective boundary functions are then evaluated at
  *   the place of the respective boundary point.
  *
- * \item Projection of boundary values:
+ * @item Projection of boundary values:
  *   The @p{project_boundary_values} function acts similar to the
  *   @p{interpolate_boundary_values} function, apart from the fact that it does
  *   not get the nodal values of boundary nodes by interpolation but rather
@@ -197,7 +197,7 @@ enum NormType {
  *   solved using a simple CG method (without preconditioning), which is in most
  *   cases sufficient for the present purpose.
  *
- * \item Computing errors:
+ * @item Computing errors:
  *   The function @p{integrate_difference} performs the calculation of the error
  *   between the finite element solution and a given (continuous) reference
  *   function in different norms. The integration is performed using a given
@@ -255,7 +255,7 @@ enum NormType {
  *
  *   For the global $H_1$ norm and seminorm, the same rule applies as for the
  *   $L_2$ norm: compute the $l_2$ norm of the cell error vector.
- * \end{itemize}
+ * @end{itemize}
  *
  * All functions use the finite element given to the @p{DoFHandler} object the last
  * time that the degrees of freedom were distributed over the triangulation. Also,

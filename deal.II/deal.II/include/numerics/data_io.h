@@ -152,15 +152,15 @@ class EpsOutputData;
  * Vectors are added as usual by @p{add_data_vector}. Then one has to
  * decide, wether to produce a 2D or 3D plot. This is done by setting
  * @p{height_info} to 
- * \begin{description} 
- *   \item[NoHeight] for 2D-Output (or Top-View thats the same by no
+ * @begin{itemize} 
+ *   @item @em{NoHeight} for 2D-Output (or Top-View thats the same by no
  *     turning is done) or to
- *   \item[HeightVector] for 3D-Output. You have to attach a
+ *   @item @em{HeightVector} for 3D-Output. You have to attach a
  *     @p{dof_data_vector} to actually get 3D. If you don't then output
  *     will be generated in 2D.
- *   \item[DefaultHeight] is 3D if there is a @p{dof_data_vector} and 2D if
+ *   @item @em{DefaultHeight} is 3D if there is a @p{dof_data_vector} and 2D if
  *     none is present.
- * \end{description}
+ * @end{itemize}
  * For 3D-Output one has to set @p{azimuth} and @p{elevation} for the
  * angle of view and @p{height_vector} to the number of the @p{dof_data}
  * vector that provides the height information to be used. The default
@@ -169,32 +169,32 @@ class EpsOutputData;
  *
  * The cells can be shaded in four different modes, controlled by the
  * attribute @p{cell_shading}:
- * \begin{enumerate}
- *   \item[NoShading] provides transparent shading.
- *   \item[ShadingVector] uses a cell vector to do shading. The number
+ * @begin{enumerate}
+ *   @item @em{NoShading} provides transparent shading.
+ *   @item @em{ShadingVector} uses a cell vector to do shading. The number
  *     of the cell vector to be uses is provided in @p{cell_vector}. To
  *     scale the cell vector there is the method @p{color}. It is called
  *     with the actual value of the cell, the maximum and the minimum
  *     value of a cell in the cell vector. It returns three values for
  *     red, green and blue. If there no @p{cell_data} vector than there is
  *     transparent shading.
- *   \item[LightShaded] just shades the plot. This is controlled by
+ *   @item @em{LightShaded} just shades the plot. This is controlled by
  *     the vector @p{light} which stores the direction of the light 
  *     beams. This is done only if there is height information.
- *   \item[DefaultShading] is controlled by presence of different
+ *   @item @em{DefaultShading} is controlled by presence of different
  *     vectors. If there no height information then do no
  *     shading. Otherwise if there is @p{cell_data} use this for shading.
  *     Otherwise do light shading.
- * \end{enumerate}
+ * @end{enumerate}
  *
  * Finnaly one can choose to mark the cell boundaries by setting
  * @p{cell_boundary_shading}. It can take one of four values:
- * \begin{itemize}
- *   \item NoBoundary for no cell boundaries,
- *   \item DefaultBoundary or
- *   \item BlackBoundary for black cell boundaries,
- *   \item WhiteBoundary for white cell boundaries, 
- * \end{itemize}
+ * @begin{itemize}
+ *   @item NoBoundary for no cell boundaries,
+ *   @item DefaultBoundary or
+ *   @item BlackBoundary for black cell boundaries,
+ *   @item WhiteBoundary for white cell boundaries, 
+ * @end{itemize}
  *
  * Another interesting feature is that you can write multiple
  * eps-pictures to one file by just doing several invocations of
@@ -349,14 +349,14 @@ class DataOut_Old {
 				      * suffix with a given output format
 				      * usually has. At present the following
 				      * formats are defined:
-				      * \begin{itemize}
-				      * \item @p{ucd}: @p{.inp}
-				      * \item @p{gnuplot} and @p{gnuplot_draft}:
+				      * @begin{itemize}
+				      * @item @p{ucd}: @p{.inp}
+				      * @item @p{gnuplot} and @p{gnuplot_draft}:
 				      *    @p{.gnuplot}
-				      * \item @p{povray_mesh}: @p{.pov}
-				      * \item @p{eps}: @p{.eps}
-				      * \item @p{gmv}: @p{.gmv}.
-				      * \end{itemize}
+				      * @item @p{povray_mesh}: @p{.pov}
+				      * @item @p{eps}: @p{.eps}
+				      * @item @p{gmv}: @p{.gmv}.
+				      * @end{itemize}
 				      *
 				      * Since this function does not need data
 				      * from this object, it is static and can

@@ -21,7 +21,14 @@
 #include <list>
 
 
-bool Patterns::Integer::match (const string &test_string) const {
+
+Patterns::PatternBase::~PatternBase ()
+{};
+
+
+
+bool Patterns::Integer::match (const string &test_string) const
+{
   istrstream str(test_string.c_str());
   int i;
   if (str >> i) return true;
@@ -29,18 +36,24 @@ bool Patterns::Integer::match (const string &test_string) const {
 };
 
 
-string Patterns::Integer::description () const {
+
+string Patterns::Integer::description () const
+{
   return "[Integer]";
 };
 
 
+
 Patterns::PatternBase *
-Patterns::Integer::clone () const {
+Patterns::Integer::clone () const
+{
   return new Patterns::Integer();
 };
 
 
-bool Patterns::Double::match (const string &test_string) const {
+
+bool Patterns::Double::match (const string &test_string) const
+{
   istrstream str(test_string.c_str());
   double d;
   if (str >> d) return true;
@@ -48,7 +61,9 @@ bool Patterns::Double::match (const string &test_string) const {
 };
 
 
-string Patterns::Double::description () const {
+
+string Patterns::Double::description () const
+{
   return "[Integer]";
 };
 
@@ -59,7 +74,9 @@ Patterns::Double::clone () const {
 };
 
 
-Patterns::Selection::Selection (const string &seq) {
+
+Patterns::Selection::Selection (const string &seq)
+{
   sequence = seq;
 
   while (sequence.find(" |") != string::npos)
@@ -69,7 +86,9 @@ Patterns::Selection::Selection (const string &seq) {
 };
 
 
-bool Patterns::Selection::match (const string &test_string) const {
+
+bool Patterns::Selection::match (const string &test_string) const
+{
   vector<string> choices;
   string tmp(sequence);
 				   // check the different possibilities
@@ -89,18 +108,24 @@ bool Patterns::Selection::match (const string &test_string) const {
 };
 
 
-string Patterns::Selection::description () const {
+
+string Patterns::Selection::description () const
+{
   return sequence;
 };
 
 
+
 Patterns::PatternBase *
-Patterns::Selection::clone () const {
+Patterns::Selection::clone () const
+{
   return new Patterns::Selection(sequence);
 };
 
 
-Patterns::MultipleSelection::MultipleSelection (const string &seq) {
+
+Patterns::MultipleSelection::MultipleSelection (const string &seq)
+{
   Assert (seq.find (",") == string::npos, ExcCommasNotAllowed(seq.find(",")));
   
   sequence = seq;
@@ -111,7 +136,9 @@ Patterns::MultipleSelection::MultipleSelection (const string &seq) {
 };
 
 
-bool Patterns::MultipleSelection::match (const string &test_string_list) const {
+
+bool Patterns::MultipleSelection::match (const string &test_string_list) const
+{
   string tmp = test_string_list;
   list<string> split_list;
 
@@ -139,7 +166,7 @@ bool Patterns::MultipleSelection::match (const string &test_string_list) const {
     };
 
 
-// check the different possibilities
+				   // check the different possibilities
   for (list<string>::const_iterator test_string = split_list.begin();
        test_string != split_list.end(); ++test_string) 
     {
@@ -173,15 +200,20 @@ bool Patterns::MultipleSelection::match (const string &test_string_list) const {
 };
 
 
-string Patterns::MultipleSelection::description () const {
+
+string Patterns::MultipleSelection::description () const
+{
   return sequence;
 };
 
 
+
 Patterns::PatternBase *
-Patterns::MultipleSelection::clone () const {
+Patterns::MultipleSelection::clone () const
+{
   return new Patterns::MultipleSelection(sequence);
 };
+
 
 
 Patterns::Bool::Bool () :
@@ -189,40 +221,54 @@ Patterns::Bool::Bool () :
 {};
 
 
+
 Patterns::PatternBase *
-Patterns::Bool::clone () const {
+Patterns::Bool::clone () const
+{
   return new Patterns::Bool();
 };
+
 
 
 Patterns::Anything::Anything ()
 {};
 
 
-bool Patterns::Anything::match (const string &) const {
+
+bool Patterns::Anything::match (const string &) const
+{
   return true;
 };
 
 
-string Patterns::Anything::description () const {
+
+string Patterns::Anything::description () const
+{
   return "[Anything]";
 };
 
 
+
 Patterns::PatternBase *
-Patterns::Anything::clone () const {
+Patterns::Anything::clone () const
+{
   return new Patterns::Anything();
 };
+
 
 
 ParameterHandler::ParameterHandler () :
 		status(true) {};
 
 
-ParameterHandler::~ParameterHandler () {};
+
+ParameterHandler::~ParameterHandler ()
+{};
 
 
-bool ParameterHandler::read_input (istream &input) {
+
+bool ParameterHandler::read_input (istream &input)
+{
   AssertThrow (input, ExcIO());
 
   string line;
@@ -237,6 +283,7 @@ bool ParameterHandler::read_input (istream &input) {
 
   return status;
 };
+
 
 
 bool ParameterHandler::read_input (const string &filename)
@@ -262,7 +309,9 @@ bool ParameterHandler::read_input (const string &filename)
 }
 
 
-bool ParameterHandler::read_input_from_string (const char *s) {
+
+bool ParameterHandler::read_input_from_string (const char *s)
+{
 				   // if empty string then exit
 				   // with success
   if ((s == 0) || ((*s) == 0)) return true;
@@ -293,7 +342,9 @@ bool ParameterHandler::read_input_from_string (const char *s) {
 };
 
 
-void ParameterHandler::clear () {
+
+void ParameterHandler::clear ()
+{
   status = true;
 
   subsection_path.clear ();
@@ -316,9 +367,11 @@ void ParameterHandler::clear () {
 };
 
 
+
 bool ParameterHandler::declare_entry (const string &entry,
 				      const string &default_value,
-				      const Patterns::PatternBase &pattern) {
+				      const Patterns::PatternBase &pattern)
+{
   Section* p = get_present_defaults_subsection ();
 
 				   // assertions:
@@ -344,7 +397,9 @@ bool ParameterHandler::declare_entry (const string &entry,
 };
 
 
-void ParameterHandler::enter_subsection (const string &subsection) {
+
+void ParameterHandler::enter_subsection (const string &subsection)
+{
   Section* pd = get_present_defaults_subsection ();
 
 				   // does subsection already exist?
@@ -364,7 +419,9 @@ void ParameterHandler::enter_subsection (const string &subsection) {
 };
 
 
-bool ParameterHandler::leave_subsection () {
+
+bool ParameterHandler::leave_subsection ()
+{
 				   // assert there is a subsection that
 				   // we may leave
 				   // (use assert since this is a logical
@@ -381,7 +438,9 @@ bool ParameterHandler::leave_subsection () {
 };
 
 
-const string & ParameterHandler::get (const string &entry_string) const {
+
+const string & ParameterHandler::get (const string &entry_string) const
+{
   const Section* pd = get_present_defaults_subsection ();
   const Section* pc = get_present_changed_subsection ();
 
@@ -410,7 +469,9 @@ const string & ParameterHandler::get (const string &entry_string) const {
 };
 
 
-long int ParameterHandler::get_integer (const string &entry_string) const {
+
+long int ParameterHandler::get_integer (const string &entry_string) const
+{
   string s = get (entry_string);
   char *endptr;
   long int i = strtol (s.c_str(), &endptr, 10);
@@ -422,7 +483,9 @@ long int ParameterHandler::get_integer (const string &entry_string) const {
 };
 
 
-double ParameterHandler::get_double (const string &entry_string) const {
+
+double ParameterHandler::get_double (const string &entry_string) const
+{
   string s = get (entry_string);
   char *endptr;
   double d = strtod (s.c_str(), &endptr);
@@ -434,7 +497,9 @@ double ParameterHandler::get_double (const string &entry_string) const {
 };
 
 
-bool ParameterHandler::get_bool (const string &entry_string) const {
+
+bool ParameterHandler::get_bool (const string &entry_string) const
+{
   string s = get(entry_string);
 
   AssertThrow ((s=="true") || (s=="false"), ExcConversionError(s));
@@ -445,7 +510,9 @@ bool ParameterHandler::get_bool (const string &entry_string) const {
 };
 
 
-ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
+
+ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style)
+{
 				   // assert that only known formats are
 				   // given as "style"
   Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
@@ -486,9 +553,11 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
 };
 
 
+
 void ParameterHandler::print_parameters_section (ostream           &out,
 						 const OutputStyle  style,
-						 const unsigned int indent_level) {
+						 const unsigned int indent_level)
+{
 				   // assert that only known formats are
 				   // given as "style"
   Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
@@ -560,7 +629,7 @@ void ParameterHandler::print_parameters_section (ostream           &out,
     };
 
 
-// now transverse subsections tree
+				   // now transverse subsections tree
   map<string, Section*>::const_iterator ptrss;
   for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
     {
@@ -611,7 +680,10 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 };
 
 
-bool ParameterHandler::scan_line (string line, const unsigned int lineno) {
+
+bool ParameterHandler::scan_line (string line,
+				  const unsigned int lineno)
+{
 				   // if there is a comment, delete it
   if (line.find('#') != string::npos)
     line.erase (line.find("#"), string::npos);
@@ -741,7 +813,9 @@ bool ParameterHandler::scan_line (string line, const unsigned int lineno) {
 };
 
 
-ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () {
+
+ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection ()
+{
   Section* sec = &defaults;
   vector<string>::const_iterator SecName = subsection_path.begin();
     
@@ -755,7 +829,9 @@ ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () 
 };
 
 
-const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () const {
+
+const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () const
+{
   Section* sec = const_cast<Section*>(&defaults); // not nice, but needs to be and
 				   // after all: we do not change @p{sec}
   vector<string>::const_iterator SecName = subsection_path.begin();
@@ -770,7 +846,9 @@ const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsecti
 };
 
 
-ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
+
+ParameterHandler::Section* ParameterHandler::get_present_changed_subsection ()
+{
   Section* sec = &changed_entries;
   vector<string>::iterator SecName = subsection_path.begin();
     
@@ -784,7 +862,9 @@ ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
 };
 
 
-const ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () const {
+
+const ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () const
+{
   Section* sec = const_cast<Section*>(&changed_entries); // same as in get_present_default_s...
   vector<string>::const_iterator SecName = subsection_path.begin();
     
@@ -811,14 +891,20 @@ subsections.clear ();
 };
 
 
+
 MultipleParameterLoop::MultipleParameterLoop() :
-		n_branches(0) {};
+		n_branches(0)
+{};
 
 
-MultipleParameterLoop::~MultipleParameterLoop () {};
+
+MultipleParameterLoop::~MultipleParameterLoop ()
+{};
 
 
-bool MultipleParameterLoop::read_input (istream &input) {
+
+bool MultipleParameterLoop::read_input (istream &input)
+{
   AssertThrow (input, ExcIO());
 
   bool x = ParameterHandler::read_input (input);
@@ -826,6 +912,7 @@ bool MultipleParameterLoop::read_input (istream &input) {
     init_branches ();
   return x;
 };
+
 
 
 bool MultipleParameterLoop::read_input (const string &filename)
@@ -838,14 +925,18 @@ bool MultipleParameterLoop::read_input (const string &filename)
 };
 
 
-bool MultipleParameterLoop::read_input_from_string (const char *s) {
+
+bool MultipleParameterLoop::read_input_from_string (const char *s)
+{
   bool x = ParameterHandler::read_input (s);
   init_branches ();
   return x;
 };
 
 
-void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc) {
+
+void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc)
+{
   for (int run_no=0; run_no<n_branches; ++run_no) 
     {
 				       // give create_new one-based numbers
@@ -856,7 +947,9 @@ void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc) {
 };
 
 
-void MultipleParameterLoop::init_branches () {
+
+void MultipleParameterLoop::init_branches ()
+{
   multiple_choices.clear ();
   
   ParameterHandler::Section *sec;
@@ -902,7 +995,7 @@ void MultipleParameterLoop::init_branches () {
 	     << "        " << n_branches << " variant runs that will be performed." << endl;
 
 
-// do a first run on filling the values to
+				   // do a first run on filling the values to
 				   // check for the conformance with the regexp
 				   // (afterwards, this will be lost in the whole
 				   // other output)
@@ -911,7 +1004,9 @@ void MultipleParameterLoop::init_branches () {
 };
 
 
-void MultipleParameterLoop::init_branches_section (const ParameterHandler::Section &sec) {
+
+void MultipleParameterLoop::init_branches_section (const ParameterHandler::Section &sec)
+{
 				   // check all entries in the present subsection
 				   // whether it is a multiple entry
   Section::EntryType::const_iterator e;
@@ -922,7 +1017,7 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
 					e->second.first));
 
 
-// transverse subsections
+				   // transverse subsections
   map<string, Section*>::const_iterator s;
   for (s = sec.subsections.begin(); s != sec.subsections.end(); ++s) 
     {
@@ -933,7 +1028,9 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
 };
 
 
-void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
+
+void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
+{
   int possibilities = 1;
   
   vector<Entry>::iterator choice;
@@ -1002,13 +1099,17 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
 };
 
 
+
 MultipleParameterLoop::Entry::Entry (const vector<string> &ssp,
 				     const string& Name,
 				     const string& Value) :
-    subsection_path (ssp), entry_name(Name), entry_value(Value) {};
+    subsection_path (ssp), entry_name(Name), entry_value(Value)
+{};
 
 
-void MultipleParameterLoop::Entry::split_different_values () {
+
+void MultipleParameterLoop::Entry::split_different_values ()
+{
 				   // split string into three parts:
 				   // part before the opening "{",
 				   // the selection itself, final

@@ -35,7 +35,7 @@ template <int dim> class DoFHandler;
  * vectors which will later be written to a file in some format. Instead of
  * pondering about the different functions, an example is probably the best
  * way:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   ...
  *   ...   // compute solution, which is of type Vector<double>
  *   ...   // and contains nodal values
@@ -58,7 +58,7 @@ template <int dim> class DoFHandler;
  *   data_out.write_xxx (output_file);
  *
  *   data_out.clear();
- * \end{verbatim}
+ * @end{verbatim}
  *
  * @p{attach_dof_handler} tells this class that all future operations are to take
  * place with the @p{DoFHandler} object and the triangulation it lives on. We then

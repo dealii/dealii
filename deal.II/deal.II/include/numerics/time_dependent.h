@@ -70,7 +70,7 @@
  * perform another sweep on these refined meshes. A total run will therefore
  * often be a sequence of several sweeps. The global setup therefore looks
  * like this:
- * \begin{verbatim}
+ * @begin{verbatim}
  *    for sweep=0 to n_sweeps-1
  *    {
  *      for i=0 to n_timesteps-1
@@ -98,7 +98,7 @@
  *        notify timestep i of the end of the sweep, e.g. for cleanups,
  *        deletion of temporary files, etc.
  *    }
- * \end{verbatim}
+ * @end{verbatim}
  * The user may specify that a loop shall run forward or backward (the latter
  * being needed for the solution of global dual problems, for example).
  *
@@ -117,7 +117,7 @@
  * data of the last two time steps, the following pseudocode described
  * what the centeral loop function of this class will do when we move
  * from timestep @p{n-1} to timestep @p{n}:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   wake up timestep n+1 with signal 1
  *   wake up timestep n with signal 0
  *   do computation on timestep n
@@ -126,7 +126,7 @@
  *   let timestep n-2 sleep with signal 2
  *
  *   move from n to n+1
- * \end{verbatim}
+ * @end{verbatim}
  * The signal number here denotes the distance of the timestep being sent
  * the signal to the timestep where computations are done on. The calls to
  * the @p{wake_up} and @p{sleep} functions with signal 0 could in principle
@@ -148,14 +148,14 @@
  *
  * From the given sketch above, it is clear that each time step object sees
  * the following sequence of events:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   wake up with signal 1
  *   wake up signal 0
  *   do computation
  *   sleep with signal 0
  *   sleep with signal 1
  *   sleep with signal 2
- * \end{verbatim}
+ * @end{verbatim}
  * This pattern is repeated for each loop in each sweep.
  *
  * For the different loops within each sweep, the numbers of timesteps
@@ -180,7 +180,7 @@
  *
  * The main loop of a program using this class will usually look like
  * the following one, taken modified from the wave program:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   template <int dim>
  *   void TimeDependent_Wave<dim>::run_sweep (const unsigned int sweep_no)
  *   {
@@ -209,7 +209,7 @@
  *     for (unsigned int sweep=0; sweep<number_of_sweeps; ++sweep)
  *       timestep_manager.run_sweep (sweep);
  *   };
- * \end{verbatim}
+ * @end{verbatim}
  * Here, @p{timestep_manager} is an object of type @p{TimeDependent_Wave}, which
  * is a class derived from @p{TimeDependent}. @p{start_sweep}, 
  * @p{solve_primal_problem}, @p{solve_dual_problem}, @p{postprocess} and @p{end_sweep}
@@ -217,7 +217,7 @@
  * timesteps within this object and call the respective function on each of
  * these objects. For example, here are two of the functions as they are
  * implemented by the library:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   void TimeDependent::start_sweep (const unsigned int s) 
  *   {
  *     sweep_no = s;
@@ -248,7 +248,7 @@
  *   	        timestepping_data_primal,
  *   	        forward);
  *   };
- * \end{verbatim}
+ * @end{verbatim}
  * The latter function shows rather clear how most of the loops are
  * invoked (@p{solve_primal_problem}, @p{solve_dual_problem}, @p{postprocess},
  * @p{refine_grids} and @p{write_statistics} all have this form, where the
@@ -269,7 +269,7 @@
  * the @p{C++} standard library, it is possible to do neat tricks, like
  * the following, also taken from the wave program, in this case from
  * the function @p{refine_grids}:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   ...
  *   compute the thresholds for refinement
  *   ...
@@ -280,7 +280,7 @@
  *	                                                       bottom_threshold)),
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
- * \end{verbatim}
+ * @end{verbatim}
  * @p{TimeStepBase_Wave<dim>::refine_grid} is a function taking an argument, unlike
  * all the other functions used above within the loops. However, in this special
  * case the parameter was the same for all timesteps and known before the loop
@@ -293,7 +293,7 @@
  * brevity we have omitted the parts that deal with backward running loops
  * as well as the checks whether wake-up and sleep operations act on timesteps
  * outside @p{0..n_timesteps-1}.
- * \begin{verbatim}
+ * @begin{verbatim}
  *   template <typename InitFunctionObject, typename LoopFunctionObject>
  *   void TimeDependent::do_loop (InitFunctionObject      init_function,
  *   			     LoopFunctionObject      loop_function,
@@ -335,7 +335,7 @@
  *       for (int look_back=0; look_back<=timestepping_data.look_back; ++look_back)
  *         timesteps[step-look_back]->sleep(look_back);
  *   };
- * \end{verbatim}
+ * @end{verbatim}
  *
  *
  * @author Wolfgang Bangerth, 1999
@@ -485,10 +485,10 @@ class TimeDependent
 				      *
 				      * This mechanism usually will result
 				      * in a set-up loop like this
-				      * \begin{verbatim}
+				      * @begin{verbatim}
 				      * for (i=0; i<N; ++i)
 				      *   manager.add_timestep(new MyTimeStep());
-				      * \end{verbatim}
+				      * @end{verbatim}
 				      */
     void add_timestep (TimeStepBase *new_timestep);
 
@@ -1459,24 +1459,24 @@ struct TimeStepBase_Tria<dim>::Flags
 /**
  * This structure is used to tell the @p{TimeStepBase_Tria} class how grids should
  * be refined. Before we explain all the different variables, fist some terminology:
- * \begin{itemize}
- * \item Correction: after having flagged some cells of the triangulation for
+ * @begin{itemize}
+ * @item Correction: after having flagged some cells of the triangulation for
  *   following some given criterion, we may want to change the number of flagged
  *   cells on this grid according to another criterion that the number of cells
  *   may be only a certain fraction more or less then the number of cells on
  *   the previous grid. This change of refinement flags will be called
  *   "correction" in the sequel.
- * \item Adaption: in order to make the change between one grid and the next not
+ * @item Adaption: in order to make the change between one grid and the next not
  *   to large, we may want to flag some additional cells on one of the two
  *   grids such that there are not too grave differences. This process will
  *   be called "adaption".
- * \end{itemize}
+ * @end{itemize}
  *
  *
  * @sect3{Description of flags}
  *
- * \begin{itemize}
- * \item @p{max_refinement_level}: Cut the refinement of cells at a given level.
+ * @begin{itemize}
+ * @item @p{max_refinement_level}: Cut the refinement of cells at a given level.
  *   This flag does not influence the flagging of cells, so not more cells
  *   on the coarser levels are flagged than usual. Rather, the flags are all
  *   set, but when it comes to the actual refinement, the maximum refinement
@@ -1486,7 +1486,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   refinement with adaptive refinement when you don't want the latter
  *   to refine more than the global refinement.
  *
- * \item @p{first_sweep_with_correction}: When using cell number correction
+ * @item @p{first_sweep_with_correction}: When using cell number correction
  *   as defined above, it may be worth while to start with this only in
  *   later sweeps, not already in the first one. If this variable is
  *   zero, then start with the first sweep, else with a higher one. The
@@ -1495,18 +1495,18 @@ struct TimeStepBase_Tria<dim>::Flags
  *   the sweeps where we start to be interested in the actual results of
  *   the computations.
  *
- * \item @p{min_cells_for_correction}: If we want a more free process of
+ * @item @p{min_cells_for_correction}: If we want a more free process of
  *   grid development, we may want to impose less rules for grids with few
  *   cells also. This variable sets a lower bound for the cell number of
  *   grids where corrections are to be performed.
  *
- * \item @p{cell_number_corridor_top}: Fraction of the number of cells by
+ * @item @p{cell_number_corridor_top}: Fraction of the number of cells by
  *   which the number of cells of one grid may be higher than that on the
  *   previous grid. Common values are 10 per cent (i.e. 0.1). The naming
  *   of the variable results from the goal to define a target corridor
  *   for the number of cells after refinement has taken place.
  *
- * \item @p{cell_number_corridor_bottom}: Fraction of the number of cells by
+ * @item @p{cell_number_corridor_bottom}: Fraction of the number of cells by
  *   which the number of cells of one grid may be lower than that on the
  *   previous grid. Common values are 5 per cent (i.e. 0.05). Usually this
  *   number will be smaller than @p{cell_number_corridor_top} since an
@@ -1520,7 +1520,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   direction is reversed, so the two values defining the cell number
  *   corridor should be about equal.
  *
- * \item @p{correction_relaxations}: This is a list of pairs of number with the
+ * @item @p{correction_relaxations}: This is a list of pairs of number with the
  *   following meaning: just as for @p{min_cells_for_correction}, it may be
  *   worth while to reduce the requirements upon grids if the have few cells.
  *   The present variable stores a list of cell numbers along with some values
@@ -1541,7 +1541,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   can use as a default value. It is an empty list and thus defines no
  *   relaxations.
  *
- * \item @p{cell_number_correction_steps}: Usually, if you want the number of
+ * @item @p{cell_number_correction_steps}: Usually, if you want the number of
  *   cells to be corrected, the target corridor for the cell number is computed
  *   and some additional cells are flagged or flags are removed. But since
  *   the cell number resulting after flagging and deflagging can not be
@@ -1552,7 +1552,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   regularly. Setting the variable to zero will result in no correction
  *   steps at all.
  *
- * \item @p{mirror_flags_to_previous_grid}: If a cell on the present grid is
+ * @item @p{mirror_flags_to_previous_grid}: If a cell on the present grid is
  *   flagged for refinement, also flag the corresponding cell on the previous
  *   grid. This is useful if, for example, error indicators are computed for
  *   space-time cells, but are stored for the second grid only. Now, since the
@@ -1560,7 +1560,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   may be useful to flag both if necessary. This is done if the present
  *   variable is set.
  *
- * \item @p{adapt_grids}: adapt the present grid to the previous one in the sense
+ * @item @p{adapt_grids}: adapt the present grid to the previous one in the sense
  *   defined above. What is actually done here is the following: if going from
  *   the previous to the present grid would result in double refinement or
  *   double coarsening of some cells, then we try to flag these cells for
@@ -1574,7 +1574,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   by looping iteratively through all grids, back and forth, until nothing
  *   changes anymore, which is obviously impossible if there are many time steps
  *   with very large grids.
- * \end{itemize}
+ * @end{itemize}
  */
 template <int dim>
 struct TimeStepBase_Tria<dim>::RefinementFlags

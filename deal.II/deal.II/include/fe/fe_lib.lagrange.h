@@ -137,23 +137,23 @@ class FEQ1 : public FEQ1Mapping<dim>
  * to the real cell is implemented.
  *
  * The numbering of the degrees of freedom is as follows:
- * \begin{itemize}
- * \item 1D case:
- *   \begin{verbatim}
+ * @begin{itemize}
+ * @item 1D case:
+ *   @begin{verbatim}
  *      0---2---1
- *   \end{verbatim}
+ *   @end{verbatim}
  *
- * \item 2D case:
- *   \begin{verbatim}
+ * @item 2D case:
+ *   @begin{verbatim}
  *      3---6---2
  *      |       |
  *      7   8   5
  *      |       |
  *      0---4---1
- *   \end{verbatim}
+ *   @end{verbatim}
  *
- * \item 3D case:
- *   \begin{verbatim}
+ * @item 3D case:
+ *   @begin{verbatim}
  *         7--14---6        7--14---6
  *        /|       |       /       /|
  *      19 |       13     19      1813
@@ -175,41 +175,41 @@ class FEQ1 : public FEQ1Mapping<dim>
  *     | /  22   /      |       | /
  *     |/       /       |       |/
  *     *-------*        *-------* 
- *   \end{verbatim}
+ *   @end{verbatim}
  *   The center vertex has number 26.
  *
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
- *   \begin{itemize}
- *   \item Index 0: @p{[0, 0, 0]};
- *   \item Index 1: @p{[1, 0, 0]};
- *   \item Index 2: @p{[1, 0, 1]};
- *   \item Index 3: @p{[0, 0, 1]};
- *   \item Index 4: @p{[0, 1, 0]};
- *   \item Index 5: @p{[1, 1, 0]};
- *   \item Index 6: @p{[1, 1, 1]};
- *   \item Index 7: @p{[0, 1, 1]};
- *   \item Index 8: @p{[1/2, 0, 0]};
- *   \item Index 9: @p{[1, 0, 1/2]};
- *   \item Index 10: @p{[1/2, 0, 1]};
- *   \item Index 11: @p{[0, 0, 1/2]};
- *   \item Index 12: @p{[1/2, 1, 0]};
- *   \item Index 13: @p{[1, 1, 1/2]};
- *   \item Index 14: @p{[1/2, 1, 1]};
- *   \item Index 15: @p{[0, 1, 1/2]};
- *   \item Index 16: @p{[0, 1/2, 0]};
- *   \item Index 17: @p{[1, 1/2, 0]};
- *   \item Index 18: @p{[1, 1/2, 1]};
- *   \item Index 19: @p{[0, 1/2, 1]};
- *   \item Index 20: @p{[1/2, 0, 1/2]};
- *   \item Index 21: @p{[1/2, 1, 1/2]};
- *   \item Index 22: @p{[1/2, 1/2, 0]};
- *   \item Index 23: @p{[1, 1/2, 1/2]};
- *   \item Index 24: @p{[1/2, 1/2, 1]};
- *   \item Index 25: @p{[0, 1/2, 1/2]};
- *   \item Index 26: @p{[1/2, 1/2, 1/2]}; 
- *   \end{itemize}
- * \end{itemize}
+ *   @begin{itemize}
+ *   @item Index 0: @p{[0, 0, 0]};
+ *   @item Index 1: @p{[1, 0, 0]};
+ *   @item Index 2: @p{[1, 0, 1]};
+ *   @item Index 3: @p{[0, 0, 1]};
+ *   @item Index 4: @p{[0, 1, 0]};
+ *   @item Index 5: @p{[1, 1, 0]};
+ *   @item Index 6: @p{[1, 1, 1]};
+ *   @item Index 7: @p{[0, 1, 1]};
+ *   @item Index 8: @p{[1/2, 0, 0]};
+ *   @item Index 9: @p{[1, 0, 1/2]};
+ *   @item Index 10: @p{[1/2, 0, 1]};
+ *   @item Index 11: @p{[0, 0, 1/2]};
+ *   @item Index 12: @p{[1/2, 1, 0]};
+ *   @item Index 13: @p{[1, 1, 1/2]};
+ *   @item Index 14: @p{[1/2, 1, 1]};
+ *   @item Index 15: @p{[0, 1, 1/2]};
+ *   @item Index 16: @p{[0, 1/2, 0]};
+ *   @item Index 17: @p{[1, 1/2, 0]};
+ *   @item Index 18: @p{[1, 1/2, 1]};
+ *   @item Index 19: @p{[0, 1/2, 1]};
+ *   @item Index 20: @p{[1/2, 0, 1/2]};
+ *   @item Index 21: @p{[1/2, 1, 1/2]};
+ *   @item Index 22: @p{[1/2, 1/2, 0]};
+ *   @item Index 23: @p{[1, 1/2, 1/2]};
+ *   @item Index 24: @p{[1/2, 1/2, 1]};
+ *   @item Index 25: @p{[0, 1/2, 1/2]};
+ *   @item Index 26: @p{[1/2, 1/2, 1/2]}; 
+ *   @end{itemize}
+ * @end{itemize}
  *
  * @author Wolfgang Bangerth, 1998, 1999
  */
@@ -314,12 +314,12 @@ class FEQ2 : public FEQ1Mapping<dim>
  * to the real cell is implemented.
  *
  * The numbering of degrees of freedom in one spatial dimension is as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   0--2--3--1
- * \end{verbatim}
+ * @end{verbatim}
  *
  * The numbering of degrees of freedom in two spatial dimension is as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   3--8--9--2
  *   |        |
  *   11 15 14 7
@@ -327,7 +327,7 @@ class FEQ2 : public FEQ1Mapping<dim>
  *   10 12 13 6
  *   |        |
  *   0--4--5--1
- * \end{verbatim}
+ * @end{verbatim}
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line and the counterclockwise numbering of the interior degrees of
  * freedom.
@@ -435,12 +435,12 @@ class FEQ3 : public FEQ1Mapping<dim>
  * to the real cell is implemented.
  *
  * The numbering of degrees of freedom in one spatial dimension is as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   0--2--3--4--1
- * \end{verbatim}
+ * @end{verbatim}
  *
  * The numbering of degrees of freedom in two spatial dimension is as follows:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   3--10-11-12-2
  *   |           |
  *   15 19 22 18 9
@@ -450,7 +450,7 @@ class FEQ3 : public FEQ1Mapping<dim>
  *   13 16 20 17 7
  *   |           |
  *   0--4--5--6--1
- * \end{verbatim}
+ * @end{verbatim}
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line and the numbering of the interior degrees of
  * freedom.

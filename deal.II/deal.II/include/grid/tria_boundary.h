@@ -27,17 +27,17 @@ template <int dim> class Triangulation;
  *   When a triangulation creates a new vertex on the boundary of the
  *   domain, it determines the new vertex' coordinates through the
  *   following code (here in two dimensions):
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     ...
  *     Point<2> new_vertex = boundary.get_new_point_on_line (line);
  *     ...
- *   \end{verbatim}
+ *   @end{verbatim}
  *   @p{line} denotes the line at the boundary that shall be refined
  *   and for which we seek the common point of the two child lines.
  *
  *   In 3D, a new vertex may be placed on the middle of a line or on
  *   the middle of a side. Respectively, the library calls
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     ...
  *     Point<3> new_line_vertices[4]
  *       = { boundary.get_new_point_on_line (face->line(0)),
@@ -45,14 +45,14 @@ template <int dim> class Triangulation;
  *           boundary.get_new_point_on_line (face->line(2)),
  *           boundary.get_new_point_on_line (face->line(3))  };
  *     ...
- *   \end{verbatim}
+ *   @end{verbatim}
  *   to get the four midpoints of the lines bounding the quad at the
  *   boundary, and after that
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     ...
  *     Point<3> new_quad_vertex = boundary.get_new_point_on_quad (face);
  *     ...
- *   \end{verbatim}
+ *   @end{verbatim}
  *   to get the midpoint of the face. It is guaranteed that this order
  *   (first lines, then faces) holds, so you can use information from
  *   the children of the four lines of a face, since these already exist
@@ -124,7 +124,7 @@ class Boundary : public Subscriptor {
 
 
 /**
- *   Specialisation of \Ref{Boundary}<dim>, which places the new point right
+ *   Specialisation of @ref{Boundary}<dim>, which places the new point right
  *   into the middle of the given points. The middle is defined as the
  *   arithmetic mean of the points.
  *

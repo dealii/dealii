@@ -115,7 +115,7 @@
  * however be noted that the support of basis functions get quite
  * complicated in the presence of hanging nodes, as the following figure
  * depicts:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   *-----------------*--------*----
  *   |                /|\       |
  *   |              /..|.\      |
@@ -129,7 +129,7 @@
  *   | /...............|.....\  |
  *   |/................|.......\|
  *   *-----------------o--------*-----
- * \end{verbatim}
+ * @end{verbatim}
  * The dotted area is the support of the basis function associated with the
  * bottom middle vertex (denoted by @p{o}) after the hanging node in the center
  * of the `picture' was eliminated. This strange structure of the support
@@ -164,7 +164,7 @@
  * When using one of the usual quadrature formulae, a common problem is
  * that some of the quadrature points lie on the interfaces of the
  * triangles. For this reason, there is a family of quadrature formulae
- * defined below, names \ref{QCrissCross1} and higher order, which
+ * defined below, names @ref{QCrissCross1} and higher order, which
  * resemble the quadrature formulae used on triangular domains, but
  * taken four-fold, i.e. for each of the four subtriangles.
  *

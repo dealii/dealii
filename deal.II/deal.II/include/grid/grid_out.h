@@ -35,18 +35,18 @@ template <int dim> class Triangulation;
  *
  * @sect3{Usage}
  * Usage is simple: either you use the direct form
- * \begin{verbatim}
+ * @begin{verbatim}
  *   ofstream output_file("some_filename");
  *   GridOut().write_gnuplot (tria, output_file);
- * \end{verbatim}
+ * @end{verbatim}
  * if you know which format you want to have, or if you want the format to be
  * a runtime parameter, you can write
- * \begin{verbatim}
+ * @begin{verbatim}
  *   GridOut::OutputFormat grid_format =
  *                   GridOut::parse_output_format(get_format_name_from_somewhere());
  *   ofstream output_file("some_filename" + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
- * \end{verbatim}
+ * @end{verbatim}
  * The function @p{get_output_format_names()} provides a list of possible names of
  * output formats in a string that is understandable by the @p{ParameterHandler} class.
  *
@@ -70,14 +70,14 @@ template <int dim> class Triangulation;
  * set of parameters for each supported output format. These are collected
  * in structures @p{EpsFlags}, @p{GnuplotFlags}, etc and you can set your preferred
  * flags like this:
- * \begin{verbatim}
+ * @begin{verbatim}
  *   GridOut grid_out;
  *   GridOut::UcdFlags ucd_flags;
  *   ...    // set some fields in ucd_flags
  *   grid_out.set_flags (ucd_flags);
  *   ...
  *   ...    // write some file with data_out
- * \end{verbatim}
+ * @end{verbatim}
  * The respective output function then use the so-set flags. By default, they
  * are set to reasonable values as described above and in the documentation
  * of the different flags structures. Resetting the flags can
@@ -336,9 +336,9 @@ class GridOut
 				      * this feature is the following:
 				      * if you use the GNUPLOT
 				      * command (for a 2d grid here)
-				      * \begin{verbatim}
+				      * @begin{verbatim}
 				      * splot [:][:][2.5:3.5] "grid_file.gnuplot" *
-				      * \end{verbatim}
+				      * @end{verbatim}
 				      * then the
 				      * whole x- and y-range will be
 				      * plotted, i.e. the whole grid,
@@ -503,11 +503,11 @@ class GridOut
 				      * suffix with a given output format
 				      * usually has. At present the following
 				      * formats are defined:
-				      * \begin{itemize}
-				      * \item @p{gnuplot}: @p{.gnuplot}
-				      * \item @p{ucd}: @p{.inp}
-				      * \item @p{eps}: @p{.eps}.
-				      * \end{itemize}
+				      * @begin{itemize}
+				      * @item @p{gnuplot}: @p{.gnuplot}
+				      * @item @p{ucd}: @p{.inp}
+				      * @item @p{eps}: @p{.eps}.
+				      * @end{itemize}
 				      *
 				      * Since this function does not need data
 				      * from this object, it is static and can

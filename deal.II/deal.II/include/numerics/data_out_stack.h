@@ -66,7 +66,7 @@ template <int dim> class DoFHandler;
  * which is suitable for quadratic finite elements in space, for
  * example.
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  *   DataOutStack<dim> data_out_stack;
  *
  *                                  // first declare the vectors
@@ -94,7 +94,7 @@ template <int dim> class DoFHandler;
  *       data_out_stack.build_patches (2);
  *       data_out_stack.finish_parameter_value ();
  *     };
- * \end{verbatim}
+ * @end{verbatim}
  *
  * @author Wolfgang Bangerth, 1999
  */

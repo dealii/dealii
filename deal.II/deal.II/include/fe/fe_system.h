@@ -45,14 +45,14 @@
  * For example, for the bicubic element in one space dimension, and for
  * two subobjects grouped together by this class, the ordering for
  * the system @p{s=(u,v)} is:
- * \begin{itemize}
- * \item First vertex: @p{u0, v0 = s0, s1}
- * \item Second vertex: @p{u1, v1 = s2, s3}
- * \item First degree of freedom on the line (=cell):
+ * @begin{itemize}
+ * @item First vertex: @p{u0, v0 = s0, s1}
+ * @item Second vertex: @p{u1, v1 = s2, s3}
+ * @item First degree of freedom on the line (=cell):
  *   @p{u2, v2 = s3, s4}
- * \item Second degree of freedom on the line:
+ * @item Second degree of freedom on the line:
  *   @p{u3, v3 = s5, s6}.
- * \end{itemize}
+ * @end{itemize}
  *
  * In the most cases, the composed element behaves as if it were a usual element
  * with more degrees of freedom. However the underlying structure is visible in

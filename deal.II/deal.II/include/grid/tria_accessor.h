@@ -37,7 +37,7 @@ class Hexahedron;
 
 /**
  *   Implements the accessor class descibed in the documentation of
- *   the iterator classes (see \Ref{TriaRawIterator}.
+ *   the iterator classes (see @ref{TriaRawIterator}.
  *
  *   This class offers only the basic functionality (stores the necessary
  *   data members, offers comparison operators and the like), but has no
@@ -158,7 +158,7 @@ class TriaAccessor
 				      *  Return the state of the iterator.
 				      *  For the different states an accessor 
 				      *  can be in, refer to the
-				      *  \Ref{TriaRawIterator} documentation.
+				      *  @ref{TriaRawIterator} documentation.
 				      */
     IteratorState state () const;
 
@@ -1035,7 +1035,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  a quad. The @p{i}th vertex is the common
 				      *  one of line @p{i} and @p{(i+3)%4}. See also
 				      *  the introduced convention
-				      *  (\Ref{Triangulation}).
+				      *  (@ref{Triangulation}).
 				      */ 
     int vertex_index (const unsigned int i) const;
 
@@ -1751,7 +1751,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
  *
  * The following refers to any space dimension:
  * 
- * This class allows access to a {\bf cell}, which is a line in 1D and a quad in
+ * This class allows access to a @em{cell}, which is a line in 1D and a quad in
  * 2D. Cells have more functionality than lines or quads by themselves, for
  * example they can be flagged for refinement, they have neighbors, they have
  * the possibility to check whether they are at the boundary etc. This class

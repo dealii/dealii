@@ -24,7 +24,7 @@ template <int celldim, int dim> class MGDoFObjectAccessor;
 
 /**
  * Define some types which differ between the dimensions. This class
- * is analogous to the \Ref{TriaDimensionInfo} class hierarchy.
+ * is analogous to the @ref{TriaDimensionInfo} class hierarchy.
  * 
  * @see MGDoFDimensionInfo<1>
  * @see MGDoFDimensionInfo<2>
@@ -36,7 +36,7 @@ class MGDoFDimensionInfo;
 /**
  * Define some types for the DoF handling in one dimension.
  *
- * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
 class MGDoFDimensionInfo<1> {
   public:
@@ -65,7 +65,7 @@ class MGDoFDimensionInfo<1> {
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
 class MGDoFDimensionInfo<2> {
   public:
@@ -94,7 +94,7 @@ class MGDoFDimensionInfo<2> {
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
 class MGDoFDimensionInfo<3> {
   public:

@@ -48,8 +48,8 @@ template <int n_blocks> class BlockIndices;
  * sparsity pattern of the condensed matrix is made out of the large sparsity
  * pattern and the constraints. After that the global matrix is assembled and
  * finally condensed. To do these steps, you have (at least) two possibilities:
- * \begin{itemize}
- * \item Use two different sparsity patterns and two different matrices: you
+ * @begin{itemize}
+ * @item Use two different sparsity patterns and two different matrices: you
  *   may eliminate the lines and rows connected with a constraint and create
  *   a totally new sparsity pattern and a new system matrix. This has the
  *   advantage that the resulting system of equations is free from artifacts
@@ -61,7 +61,7 @@ template <int n_blocks> class BlockIndices;
  *   @em{all} entries of the matrix have to be copied, not only those which are
  *   subject to constraints.
  *
- * \item Use only one sparsity pattern and one matrix: doing it this way, the
+ * @item Use only one sparsity pattern and one matrix: doing it this way, the
  *   condense functions add nonzero entries to the sparsity pattern of the
  *   large matrix (with constrained nodes in it) where the condensation process
  *   of the matrix will create additional nonzero elements. In the condensation
@@ -84,7 +84,7 @@ template <int n_blocks> class BlockIndices;
  *   consumption for those iterative solution methods using a larger number of
  *   auxiliary vectors (e.g. methods using explicite orthogonalization
  *   procedures).
- * \end{itemize}
+ * @end{itemize}
  *
  * Usually, the second way is chosen since memory consumption upon construction
  * of a second matrix rules out the first possibility.

@@ -124,18 +124,18 @@
     <p>
     In order to allow better structured output for long comments, we
     have extended <acronym>kdoc</acronym> to understand the following
-    tags inside comments (since they are LaTeX, they are understood by
-    the LaTeX output of Doc++ automatically):
+    tags inside comments, which are partly borrowed from LaTeX like
+    languages: 
     <ul>
     <li> <em>Itemized lists:</em>
          <p>
 	 By writing comments like the following,
 	 <code><pre>
 	   /**
-	    * \begin{itemize}
-	    *   \item foo
-	    *   \item bar
-	    * \end{itemize}
+	    * @begin{itemize}
+	    *   @item foo
+	    *   @item bar
+	    * @end{itemize}
 	    */
 	 </pre></code>
 	 you can get itemized lists both in the online and printed
@@ -145,18 +145,24 @@
 	 <li> bar
 	 </ul> 
 	 </p>
+	 
+	 <p>
+	 Likewise, you can get numbered lists by using the tags
+	 <code>@begin{enumerate}</code> and
+	 <code>@end{enumerate}</code> along with <code>@item</code>s. 
+	 </p>
 
     <li> <em>Verbatim output:</em>
          <p>
 	 If you write comments like this,
 	 <code><pre>
 	   /**
-	    * \begin{verbatim}
+	    * @begin{verbatim}
 	    *   void foobar ()
 	    *   {
 	    *     i = 0;
 	    *   };
-	    * \end{verbatim}
+	    * @end{verbatim}
 	    */
 	 </pre></code>
 	 you will get the lines between the verbatim environment with
@@ -212,16 +218,7 @@
     notably the example programs is not really supported, and we
     consider ways to convert them to SGML along with most other
     documentation, since SGML is readily convertible into many other
-    formats, for Postscript.
-    </p>
-
-    <p>
-    Switching to SGML would also include replacing the LaTeX-like
-    layout extensions described above by their DocBook SGML
-    alikes. However, since this is not imminent, you need not care
-    about this at present. However, if you have spare time to pass, it
-    would be a valuable goal to invent a way to, for example, convert
-    the example programs to DocBook SGML.
+    formats, for example Postscript.
     </p>
 
 

@@ -46,19 +46,19 @@ template <int dim> class Equation;
  *
  * The @p{assemble} member function does the assemblage of the system matrix and
  * the given number of right hand sides. It does the following steps:
- * \begin{itemize}
- *   \item Initialize solution vector with zero entries.
- *   \item Create sparsity pattern of the system matrix and condense it with
+ * @begin{itemize}
+ *   @item Initialize solution vector with zero entries.
+ *   @item Create sparsity pattern of the system matrix and condense it with
  *     the constraints induced by hanging nodes.
- *   \item Initialize an assembler object.
- *   \item Loop over all cells and assemble matrix and vectors using the given
+ *   @item Initialize an assembler object.
+ *   @item Loop over all cells and assemble matrix and vectors using the given
  *     quadrature formula and the equation object which contains the weak
  *     formulation of the equation.
- *   \item Apply Dirichlet boundary conditions. See the section on boundary
+ *   @item Apply Dirichlet boundary conditions. See the section on boundary
  *     conditions for more details.
- *   \item Condense the system matrix and right hand side with the constraints
+ *   @item Condense the system matrix and right hand side with the constraints
  *     induced by hanging nodes.
- * \end{itemize}
+ * @end{itemize}
  *
  * The @p{assemble} function needs an object describing the boundary of the domain,
  * since for higher order finite elements, we may be tempted to use curved faces
@@ -80,7 +80,7 @@ template <int dim> class Equation;
  * During assemblage of matrices and right hand side, use is made of dirichlet
  * boundary conditions (in short: bc) specified to the @p{assemble} function. You
  * can specify a list of pairs of boundary indicators (of type @p{unsigned char};
- * see the section in the documentation of the \Ref{Triangulation} class for more
+ * see the section in the documentation of the @ref{Triangulation} class for more
  * details) and the according functions denoting the dirichlet boundary values
  * of the nodes on boundary faces with this boundary indicator.
  *

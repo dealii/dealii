@@ -40,20 +40,20 @@ template <int dim> class Triangulation;
  *   iterators an iterator of this class provides a @p{->} operator, i.e. you can
  *   write statements like @p{i->set_refine_flag ();}.
  *   
- *   {\bf Note:} Please read the documentation about the prefix and the
+ *   @em{Note:} Please read the documentation about the prefix and the
  *   postfix @p{++} operators in this and the derived classes!
  *   
  *   @sect3{Purpose}
  *
  *   @p{iterators} are used whenever a loop over all lines, quads, cells etc.
  *   is to be performed. These loops can then be coded like this:
- *   \begin{verbatim}
+ *   @begin{verbatim}
  *     cell_iterator i   = tria.begin();
  *     cell_iterator end = tria.end();
  *     for (; i!=end; ++i)
  *       if (cell->at_boundary())
  *         cell->set_refine_flag();
- *   \end{verbatim}
+ *   @end{verbatim}
  *   Note the usage of @p{++i} instead of @p{i++} since this does not involve
  *   temporaries and copying. You should also really use a fixed value
  *   @p{end} rather than coding @p{for (; i!=tria.end(); ++i)}, since
@@ -105,7 +105,7 @@ template <int dim> class Triangulation;
  *   input and bidirectional iterators as stated by the C++ standard and
  *   the STL documentation. It is therefore possible to use the functions
  *   from the @em{algorithm section} of the C++ standard, e.g. @p{count_if}
- *   (see the documentation for \Ref{Triangulation} for an example) and
+ *   (see the documentation for @ref{Triangulation} for an example) and
  *   several others.
  *   
  *
@@ -117,7 +117,7 @@ template <int dim> class Triangulation;
  *   also do not want to destroy the ordering induced by the numbering
  *   in the vectors). Therefore not all raw iterators point to valid objects.
  *   
- *   There are two derived versions of this class: \Ref{TriaIterator}
+ *   There are two derived versions of this class: @ref{TriaIterator}
  *   objects, which only loop over used (valid) cells and
  *   @p{TriaActiveIterator} objects
  *   which only loop over active cells (not refined).
@@ -129,30 +129,30 @@ template <int dim> class Triangulation;
  *   only becomes useful when assigned an @p{Accessor} (the second template
  *   parameter), which really does the access to data. An @p{Accessor} has to
  *   fulfil some requirements:
- *   \begin{itemize}
- *     \item It must have two members named @p{present_level} and @p{present_index}
+ *   @begin{itemize}
+ *     @item It must have two members named @p{present_level} and @p{present_index}
  *       storing the address of the element in the triangulation presently
  *       pointed to. Furthermore, the three @p{Tria{Raw| |Active}Iterator} classes
  *       have to be friends to the accessor or these data members must be public.
- *     \item It must have a constructor which takes 1. a @p{Triangulation<dim>*},
+ *     @item It must have a constructor which takes 1. a @p{Triangulation<dim>*},
  *       2. and 3. and integer, denoting the initial level and index.
- *     \item For the @p{TriaIterator} and the @p{TriaActiveIterator} class, it must
+ *     @item For the @p{TriaIterator} and the @p{TriaActiveIterator} class, it must
  *       have a member function @p{bool used()}, for the latter a member function
  *       @p{bool active()}.
- *     \item It must have void operators @p{++} and @p{--}.
- *     \item It must declare a local @p{typedef} @p{AccessorData} which states
+ *     @item It must have void operators @p{++} and @p{--}.
+ *     @item It must declare a local @p{typedef} @p{AccessorData} which states
  *       the data type the accessor expects to get passed as fourth constructor
  *       argument. By declaring a local data type, the respective iterator
  *       class may type-safely enforce that data type to be one of its own
  *       constructor argument types. If an accessor class does not need
  *       additional data, this type shall be @p{void}.
- *   \end{itemize}
+ *   @end{itemize}
  *   Then the iterator is able to do what it is supposed to. All of the necessary
  *   functions are implemented in the @p{Accessor} base class, but you may write
  *   your own version (non-virtual, since we use templates) to add functionality.
  *
  *   There is a standard implementation, using classes which are derived from
- *   \Ref{TriaAccessor}. These classes point to @p{Line}s, @p{Quad}s and the like.
+ *   @ref{TriaAccessor}. These classes point to @p{Line}s, @p{Quad}s and the like.
  *   For advanced use of the iterator classes, derive classes from
  *   @p{{Line|Quad|Cell}Accessor} which also dereference data structures in other
  *   objects, e.g. in a finite element context. An iterator with such an accessor
@@ -252,11 +252,11 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
 				      * Through this constructor, it is also
 				      * possible to construct object for
 				      * derived iterators:
-				      * \begin{verbatim}
+				      * @begin{verbatim}
 				      * DoFCellAccessor dof_accessor;
 				      * Triangulation::active_cell_iterator cell
 				      *   = accessor;
-				      * \end{verbatim}
+				      * @end{verbatim}
 				      */
     TriaRawIterator (const Accessor &a);
     
@@ -500,7 +500,7 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
 
 
 /**
- *   This specialization of \Ref{TriaRawIterator} provides access only to the
+ *   This specialization of @ref{TriaRawIterator} provides access only to the
  *   @em{used} lines, quads, cells, etc.
  */
 template <int dim, typename Accessor>
@@ -645,7 +645,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
 
 
 /**
- *   This specialization of \Ref{TriaIterator} provides access only to the
+ *   This specialization of @ref{TriaIterator} provides access only to the
  *   @em{active} lines, quads, cells, etc. An active cell is a cell which is not
  *   refined and thus a cell on which calculations on the finest level are done.
  */

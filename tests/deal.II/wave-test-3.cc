@@ -1224,127 +1224,127 @@ template <int dim> class EvaluationBase;
  *
  * \subsection{Subsection #Grid#}
  * \begin{itemize}
- * \item #Coarse mesh#: Names a grid to be taken as a coarse grid. The following
+ * @item #Coarse mesh#: Names a grid to be taken as a coarse grid. The following
  *    names are allowed:
  *    \begin{itemize}
- *    \item #uniform channel#: The domain is $[0,3]\times[0,1]$, triangulated
+ *    @item #uniform channel#: The domain is $[0,3]\times[0,1]$, triangulated
  *        by three cells. Left and right boundary are of Dirichlet type, top
  *        and bottom boundary are of homogeneous Neumann type.
- *    \item #split channel bottom#: As above, but the lower half is refined once
+ *    @item #split channel bottom#: As above, but the lower half is refined once
  *        more than the top half.
- *    \item #split channel {left | right}#: Same as #uniform channel#, but with
+ *    @item #split channel {left | right}#: Same as #uniform channel#, but with
  *        cells on the left or right, according to the last word, more refined
  *        than on the other side.
- *    \item #square#: $[-1,1]\times[-1,1]$.
- *    \item #seismic square#: same as #square#, but with Neumann boundary
+ *    @item #square#: $[-1,1]\times[-1,1]$.
+ *    @item #seismic square#: same as #square#, but with Neumann boundary
  *        at top.
- *    \item #temperature-square#: Square with size $400,000,000$ (we use the
+ *    @item #temperature-square#: Square with size $400,000,000$ (we use the
  *        cgs system, so this amounts to 4000 km).
- *    \item #temperature-testcase#: As above, but with a sequence of
+ *    @item #temperature-testcase#: As above, but with a sequence of
  *        continuously growing cells set atop to avoid the implementation of
  *        absorbing boundary conditions. The left boundary is of Neumann
  *        type (mirror boundary).
- *    \item #random#: Unit square, but randomly refined to test for correctness
+ *    @item #random#: Unit square, but randomly refined to test for correctness
  *        of the time stepping scheme.
- *    \item #earth#: Circle with radius 6371 (measured in km).
- *    \end{itemize}
- * \item #Initial refinement#: States how often the grid named by the above
+ *    @item #earth#: Circle with radius 6371 (measured in km).
+ *    @begin{itemize}
+ * @item #Initial refinement#: States how often the grid named by the above
  *    parameter shall be globally refined to form the coarse mesh.
- * \item #Maximum refinement#: maximum refinement level a cell may attain.
+ * @item #Maximum refinement#: maximum refinement level a cell may attain.
  *    Cells with such a refinement level are flagged as others are, but they
  *    are not refined any more; it is therefore not necessary to lower the
  *    fraction of cells to be refined in order to avoid the refinement of a
  *    similar number of cells with a lower level number.
  *
  *    The default to this value is zero, meaning no limit.
- * \item #Refinement fraction#: Upon refinement, those cells are refined which
+ * @item #Refinement fraction#: Upon refinement, those cells are refined which
  *    together make up for a given fraction of the total error. This parameter
  *    gives that fraction. Default is #0.95#.
- * \item #Coarsening fraction#: Similar as above, gives the fraction of the
+ * @item #Coarsening fraction#: Similar as above, gives the fraction of the
  *    total error for which the cells shall be coarsened. Default is #0.03#.
- * \item #Top cell number deviation#: Denotes a fraction by which the number of
+ * @item #Top cell number deviation#: Denotes a fraction by which the number of
  *    cells on a time level may be higher than the number of cells on the
  *    previous time level. This and the next two parameters help to avoid
  *    to much differing grids on the time levels and try to smooth the numbers
  *    of cells as a function of time. The default value is #0.1#.
- * \item #Bottom cell number deviation#: Denotes the fraction by which the
+ * @item #Bottom cell number deviation#: Denotes the fraction by which the
  *    number of cells on a time level may be lower than on the previous time
  *    level. Default is #0.03#.
- * \item #Cell number correction steps#: Usually, the goal denoted by the two
+ * @item #Cell number correction steps#: Usually, the goal denoted by the two
  *    parameters above cannot be reached directly because the number of cells
  *    is modified by grid regularization etc. The goal can therefore only be
  *    reached by an iterative process. This parameter tells how many iterations
  *    of this process shall be done. Default is #2#.
- * \end{itemize}
+ * @begin{itemize}
  *
  * \subsection{Subsection #Equation data#}
  * \begin{itemize}
- * \item #Coefficient#: Names for the different coefficients for the Laplace
+ * @item #Coefficient#: Names for the different coefficients for the Laplace
  *    like part of the wave operator. Allowed values are:
  *    \begin{itemize}
- *    \item #unit#: Constant one.
- *    \item #kink#: One for $y<\frac 13$, 4 otherwise.
- *    \item #gradient#: $1+8*y^2$.
- *    \item #tube#: $0.2$ for $|x|<0.2$, one otherwise.
- *    \item #temperature VAL81#: Coefficient computed from the temperature
+ *    @item #unit#: Constant one.
+ *    @item #kink#: One for $y<\frac 13$, 4 otherwise.
+ *    @item #gradient#: $1+8*y^2$.
+ *    @item #tube#: $0.2$ for $|x|<0.2$, one otherwise.
+ *    @item #temperature VAL81#: Coefficient computed from the temperature
  *        field given by Varnazza, Avrett, Loeser 1981.
- *    \item #temperature kolmogorov#: Broadened temperature spectrum.
- *    \item #temperature undisturbed#: Quiet atmosphere.
- *    \item #temperature monochromatic 20s#: Temperature as computed with
+ *    @item #temperature kolmogorov#: Broadened temperature spectrum.
+ *    @item #temperature undisturbed#: Quiet atmosphere.
+ *    @item #temperature monochromatic 20s#: Temperature as computed with
  *        shock waves with $T=20s$.
- *    \item #temperature monochromatic 40s#: Temperature as computed with
+ *    @item #temperature monochromatic 40s#: Temperature as computed with
  *        shock waves with $T=40s$.
- *    \end{itemize}
- * \item #Initial u#: Names for the initial value for the amplitude. Allowed
+ *    @begin{itemize}
+ * @item #Initial u#: Names for the initial value for the amplitude. Allowed
  *    names are:
  *    \begin{itemize}
- *    \item #zero#: $u_0=0$.
- *    \item #eigenmode#: $u_0=sin(2\pi x)sin(2\pi y)$.
- *    \item #bump#: $u_0=(1-\frac{\vec x^2}{a^2})e^{-\frac{\vec x^2}{a^2}}$
+ *    @item #zero#: $u_0=0$.
+ *    @item #eigenmode#: $u_0=sin(2\pi x)sin(2\pi y)$.
+ *    @item #bump#: $u_0=(1-\frac{\vec x^2}{a^2})e^{-\frac{\vec x^2}{a^2}}$
  *        for $|\vec x|<a$ and $u_0=0$ otherwise. $a=0.1$
- *    \item #center-kink#: $u_0=r/a$ for $r<a$, $u_0=2-r/a$ for $a<r<2a$,
+ *    @item #center-kink#: $u_0=r/a$ for $r<a$, $u_0=2-r/a$ for $a<r<2a$,
  *        $u=0$ otherwise. $a=0.1$, $r=|\vec x|$.
- *    \item #shifted bump#: Same as #bump# but the center of the bump is
+ *    @item #shifted bump#: Same as #bump# but the center of the bump is
  *        located at $x=0.5, y=0$.
- *    \item #tube#: $u_0=1$ for $|x|<0.2, zero otherwise.
- *    \end{itemize}
- * \item #Initial v#: Names for the initial value for the amplitude. Allowed
+ *    @item #tube#: $u_0=1$ for $|x|<0.2, zero otherwise.
+ *    @begin{itemize}
+ * @item #Initial v#: Names for the initial value for the amplitude. Allowed
  *    names are the same as above.
- * \item #Boundary#: Names for the boundary functions. The boundary values
+ * @item #Boundary#: Names for the boundary functions. The boundary values
  *    for $u$ and $v$ are always set together. The boundary values apply only
  *    to those boundary parts which are of Dirichlet type. Allowed names are:
  *    \begin{itemize}
- *    \item #zero#: Homogeneous boundary values.
- *    \item #wave from left#: For $t<T=0.4$ we set $u=sin^2(\pi \frac tT)$ at
+ *    @item #zero#: Homogeneous boundary values.
+ *    @item #wave from left#: For $t<T=0.4$ we set $u=sin^2(\pi \frac tT)$ at
  *        the boundary where $x=0$.
- *    \item #wave from left center#: For $t<T=0.4$ and $0.4<y<0.6$ we set
+ *    @item #wave from left center#: For $t<T=0.4$ and $0.4<y<0.6$ we set
  *        $u=sin^2(\pi \frac tT) (y-0.4) (0.6-y)$ at
  *        the boundary where $x=0$.
- *    \item #wave from left bottom#: For $t<T=60s$ and $r=|\vec x|<a=5000000cm=50km$
+ *    @item #wave from left bottom#: For $t<T=60s$ and $r=|\vec x|<a=5000000cm=50km$
  *        let $u=(cos(\pi/2 r/a) sin(\pi t/T))^2$.
  *        This boundary condition is only suited to the temperature domains. 
- *    \end{itemize}
- * \end{itemize}
+ *    @begin{itemize}
+ * @begin{itemize}
  *
  * \subsection{Subsection #Time stepping#}
  * \begin{itemize}
- * \item #Primal method#: Time stepping method for the primal problem.
+ * @item #Primal method#: Time stepping method for the primal problem.
  *     Allowed values are:
  *     \begin{itemize}
- *     \item #theta#: Use the $\theta$ scheme with the $\theta$-parameter
+ *     @item #theta#: Use the $\theta$ scheme with the $\theta$-parameter
  *         as given below.
- *     \item #fractional step#: Use the fractional step $\theta$ scheme.
- *     \end{itemize}
- * \item #Dual method#: Time stepping method for the dual problem. Allowed
+ *     @item #fractional step#: Use the fractional step $\theta$ scheme.
+ *     @begin{itemize}
+ * @item #Dual method#: Time stepping method for the dual problem. Allowed
  *     values are the same as above. Note that the fractional step scheme
  *     is not implemented for right hand sides not equal to zero, i.e. the
  *     fractional step scheme will fail of the error functional evaluates
  *     to non-zero at times not equal to the end time.
- * \item #Theta#: $\theta$ parameter for the $\theta$ time stepping scheme.
+ * @item #Theta#: $\theta$ parameter for the $\theta$ time stepping scheme.
  *     $\theta=1/2$ denotes the Crank-Nicolson scheme.
- * \item #Time step#: Selfdocumenting.
- * \item #End time#: Selfdocumenting.
- * \end{itemize}
+ * @item #Time step#: Selfdocumenting.
+ * @item #End time#: Selfdocumenting.
+ * @begin{itemize}
  */
 template <int dim>
 class WaveParameters

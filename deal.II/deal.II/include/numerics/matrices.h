@@ -57,8 +57,8 @@ template <int dim> class Equation;
  * @sect3{Supported matrices}
  *
  * At present there are functions to create the following matrices:
- * \begin{itemize}
- * \item @p{create_mass_matrix}: create the matrix with entries
+ * @begin{itemize}
+ * @item @p{create_mass_matrix}: create the matrix with entries
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$. Here, the $\phi_i$
  *   are the basis functions of the finite element space given.
  *   This function uses the @p{MassMatrix} class.
@@ -92,7 +92,7 @@ template <int dim> class Equation;
  *   parameters, you need to pass a function object representing the
  *   respective number of components.
  *
- * \item @p{create_laplace_matrix}: there are two versions of this; the
+ * @item @p{create_laplace_matrix}: there are two versions of this; the
  *   one which takes the @p{Function<dim>} object creates
  *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$,
  *   $a$ being the given function, while the other one assumes that
@@ -104,7 +104,7 @@ template <int dim> class Equation;
  *   If the finite element in use presently has more than only one
  *   component, this function may not be overly useful and presently
  *   throws an error.
- * \end{itemize}
+ * @end{itemize}
  *
  * All created matrices are `raw': they are not condensed, i.e. hanging
  * nodes are not eliminated. The reason is that you may want to add
@@ -518,8 +518,8 @@ class MatrixTools : public MatrixCreator<dim>
  *
  * The useful use of this object is therefore probable one of the following
  * cases:
- * \begin{itemize}
- * \item Mass lumping: use an @p{Assembler} object and a special quadrature
+ * @begin{itemize}
+ * @item Mass lumping: use an @p{Assembler} object and a special quadrature
  *   formula to voluntarily evaluate the mass matrix incorrect. For example
  *   by using the trapezoidal formula, the mass matrix will become a
  *   diagonal (at least if no hanging nodes are considered). However, there
@@ -527,7 +527,7 @@ class MatrixTools : public MatrixCreator<dim>
  *   scaling the diagonal elements of the unit matrix by the area element
  *   of the respective cell.
  *
- * \item Nonconstant coefficient: if the coefficient varies considerably over
+ * @item Nonconstant coefficient: if the coefficient varies considerably over
  *   each element, there is no way around this class. However, there are many
  *   cases where it is sufficient to assume that the function be constant on
  *   each cell (taking on its mean value throughout the cell for example, or
@@ -539,7 +539,7 @@ class MatrixTools : public MatrixCreator<dim>
  *   if the density or other mechanical properties vary with the space
  *   coordinate.
  *
- * \item Simple plugging together of system matrices: if the system matrix has
+ * @item Simple plugging together of system matrices: if the system matrix has
  *    the form $s_{ij} = m_{ij} + \alpha a_{ij}$, for example, with $M$ and
  *    $A$ being the mass and laplace matrix, respectively (this matrix $S$
  *    occurs in the discretization of the heat and the wave equation, amoung
@@ -550,7 +550,7 @@ class MatrixTools : public MatrixCreator<dim>
  *    justifyable to quickly try something out. In the further process it
  *    may be useful to replace this behaviour by more sophisticated methods,
  *    however.
- * \end{itemize}
+ * @end{itemize}
  */
 template <int dim>
 class MassMatrix :  public Equation<dim> {

@@ -143,17 +143,17 @@ template <int dim> class Quadrature;
  *  @sect3{Member functions}
  *
  *  The functions of this class fall into different cathegories:
- *  \begin{itemize}
- *  \item @p{shape_value}, @p{shape_grad}, etc: return one of the values
+ *  @begin{itemize}
+ *  @item @p{shape_value}, @p{shape_grad}, etc: return one of the values
  *    of this object at a time. In many cases you will want to get
  *    a whole bunch at a time for performance or convenience reasons,
  *    then use the @p{get_*} functions.
  *   
- *  \item @p{get_shape_values}, @p{get_shape_grads}, etc: these return
+ *  @item @p{get_shape_values}, @p{get_shape_grads}, etc: these return
  *    a reference to a whole field. Usually these fields contain
  *    the values of all trial functions at all quadrature points.
  *
- *  \item @p{get_function_values}, @p{get_function_grads}, @p{...}: these
+ *  @item @p{get_function_values}, @p{get_function_grads}, @p{...}: these
  *    functions offer a simple way to avoid the detour of the
  *    trial functions, if you have a finite element solution (resp. the
  *    vector of values associated with the different trial functions.)
@@ -178,11 +178,11 @@ template <int dim> class Quadrature;
  *    other involved instance between the @p{reinit} and the @p{get_function_*}
  *    functions are called.
  *
- *  \item @p{reinit}: initialize the @p{FEValues} object for a certain cell.
+ *  @item @p{reinit}: initialize the @p{FEValues} object for a certain cell.
  *    This function is not in the present class but only in the derived
  *    classes and has a variable call syntax. 
  *    See the docs for the derived classes for more information.
- * \end{itemize}
+ * @end{itemize}
  *
  *
  * @sect3{Implementational issues}
@@ -1133,8 +1133,8 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  * cells is more refined than the other.
  *
  * To this end, there seem to be two ways which may be applicable:
- * \begin{itemize}
- * \item Prolong the coarser cell to the finer refinement level: we could
+ * @begin{itemize}
+ * @item Prolong the coarser cell to the finer refinement level: we could
  *   compute the prolongation of the finite element functions to the
  *   child cells and consider the subface a face of one of the child cells.
  *   This approach seems clear and rather simple to implement, however it
@@ -1151,7 +1151,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  *   programming style. Apart from that, we already have iterators, why
  *   shouldn't we use them?
  *   
- * \item Use 'different' quadrature formulae: this second approach is the
+ * @item Use 'different' quadrature formulae: this second approach is the
  *   way we chose here. The idea is to evaluate the finite element trial
  *   functions on the two cells restricted to the face in question separately,
  *   by restricting the trial functions on the less refined cell to its
@@ -1181,7 +1181,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  *   quadrature formula projected to the common face, but using the original
  *   quadrature formula. This way, the locations of the quadrature points
  *   on both sides of the common face match each other.
- * \end{itemize}
+ * @end{itemize}
  *
  * For a use of this mechanism, take a look of the code in the error
  * estimation hierarchy, since there often the jump of a finite element
