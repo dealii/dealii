@@ -1011,4 +1011,54 @@ invert (const Tensor<2,dim> &t)
 };
 
 
+
+/**
+ * Multiplication of a tensor of general rank with a scalar double
+ * from the right.
+ */
+template <int rank, int dim>
+inline
+Tensor<rank,dim>
+operator * (const Tensor<rank,dim> &t,
+	    const double            factor)
+{
+  Tensor<rank,dim> tt = t;
+  tt *= factor;
+  return tt;
+};
+
+
+
+/**
+ * Multiplication of a tensor of general rank with a scalar double
+ * from the left.
+ */
+template <int rank, int dim>
+inline
+Tensor<rank,dim>
+operator * (const double            factor,
+	    const Tensor<rank,dim> &t)
+{
+  Tensor<rank,dim> tt = t;
+  tt *= factor;
+  return tt;
+};
+
+
+
+/**
+ * Division of a tensor of general rank by a scalar double.
+ */
+template <int rank, int dim>
+inline
+Tensor<rank,dim>
+operator / (const Tensor<rank,dim> &t,
+	    const double            factor)
+{
+  Tensor<rank,dim> tt = t;
+  tt /= factor;
+  return tt;
+};
+
+
 #endif

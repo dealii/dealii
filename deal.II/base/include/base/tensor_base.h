@@ -85,7 +85,6 @@ class Tensor<1,dim>
 
     typedef double value_type;
     
-//TODO:[WB] Do we need this overflow? Maybe there is use for a zero-size Tensor?    
 				     /**
 				      * Declare an array type which can
 				      * be used to initialize statically
@@ -107,87 +106,99 @@ class Tensor<1,dim>
     explicit Tensor (const bool initialize = true);
 
 				     /**
-				      * Copy constructor, where the data is
-				      * copied from a C-style array.
+				      * Copy constructor, where the
+				      * data is copied from a C-style
+				      * array.
 				      */
     Tensor (const array_type &initializer);
     
     				     /**
-				      *  Copy constructor.
+				      * Copy constructor.
 				      */
     Tensor (const Tensor<1,dim> &);
 
 				     /**
-				      *  Read access to the @p{index}th coordinate.
+				      * Read access to the @p{index}th
+				      * coordinate.
 				      *
-				      * Note that the derived @p{Point} class also
-				      * provides access through the @p{()}
-				      * operator for backcompatibility.
+				      * Note that the derived
+				      * @p{Point} class also provides
+				      * access through the @p{()}
+				      * operator for
+				      * backcompatibility.
 				      */
     double   operator [] (const unsigned int index) const;
 
     				     /**
-				      *  Read and write access to the @p{index}th
-				      *  coordinate.
+				      * Read and write access to the
+				      * @p{index}th coordinate.
 				      *
-				      * Note that the derived @p{Point} class also
-				      * provides access through the @p{()}
-				      * operator for backcompatibility.
+				      * Note that the derived
+				      * @p{Point} class also provides
+				      * access through the @p{()}
+				      * operator for
+				      * backcompatibility.
 				      */
     double & operator [] (const unsigned int index);
 
 				     /**
-				      *  Assignment operator.
+				      * Assignment operator.
 				      */
     Tensor<1,dim> & operator = (const Tensor<1,dim> &);
 
 				     /**
-				      *  Test for equality of two points.
+				      * Test for equality of two points.
 				      */
     bool operator == (const Tensor<1,dim> &) const;
 
     				     /**
-				      *  Test for inequality of two points.
+				      * Test for inequality of two points.
 				      */
     bool operator != (const Tensor<1,dim> &) const;
 
 				     /**
-				      *  Add another vector, i.e. move this point by
-				      *  the given offset.
+				      * Add another vector, i.e. move
+				      * this point by the given
+				      * offset.
 				      */
     Tensor<1,dim> & operator += (const Tensor<1,dim> &);
 				     /**
-				      *  Subtract another vector.
+				      * Subtract another vector.
 				      */
     Tensor<1,dim> & operator -= (const Tensor<1,dim> &);
 
 				     /**
-				      *  Scale the vector by @p{factor}, i.e. multiply
-				      *  all coordinates by @p{factor}.
+				      * Scale the vector by
+				      * @p{factor}, i.e. multiply all
+				      * coordinates by @p{factor}.
 				      */
     Tensor<1,dim> & operator *= (const double &factor);
 
 				     /**
-				      *  Scale the vector by @p{1/factor}.
+				      * Scale the vector by @p{1/factor}.
 				      */
     Tensor<1,dim> & operator /= (const double &factor);
 
 				     /**
-				      *  Returns the scalar product of two vectors.
+				      * Returns the scalar product of
+				      * two vectors.
 				      */
     double          operator * (const Tensor<1,dim> &) const;
 
 				     /**
-				      *  Add two tensors. If possible, use
-				      *  @p{operator +=} instead since this does not
-				      *  need to copy a point at least once.
+				      * Add two tensors. If possible,
+				      * use @p{operator +=} instead
+				      * since this does not need to
+				      * copy a point at least once.
 				      */
     Tensor<1,dim>   operator + (const Tensor<1,dim> &) const;
 
 				     /**
-				      *  Subtract two tensors. If possible, use
-				      *  @p{operator +=} instead since this does not
-				      *  need to copy a point at least once.
+				      * Subtract two tensors. If
+				      * possible, use @p{operator +=}
+				      * instead since this does not
+				      * need to copy a point at least
+				      * once.
 				      */
     Tensor<1,dim>   operator - (const Tensor<1,dim> &) const;
 
@@ -222,12 +233,13 @@ class Tensor<1,dim>
 
   private:
 				     /**
-				      * Store the values in a simple array.
-				      * For @p{dim==0} store one element, because
-				      * otherways the compiler would choke.
-				      * We catch this case in the constructor
-				      * to disallow the creation of such
-				      * an object.
+				      * Store the values in a simple
+				      * array.  For @p{dim==0} store
+				      * one element, because otherways
+				      * the compiler would choke.  We
+				      * catch this case in the
+				      * constructor to disallow the
+				      * creation of such an object.
 				      */
     double values[(dim!=0) ? (dim) : 1];
 
@@ -552,4 +564,58 @@ std::ostream & operator << (std::ostream &out, const Tensor<1,1> &p)
 };
 
 
+
+/**
+ * Multiplication of a tensor of rank 1 with a scalar double from the right.
+ */
+template <int dim>
+inline
+Tensor<1,dim>
+operator * (const Tensor<1,dim> &t,
+	    const double         factor)
+{
+  Tensor<1,dim> tt;
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = t[d] * factor;
+  return tt;
+};
+
+
+
+/**
+ * Multiplication of a tensor of rank 1 with a scalar double from the left.
+ */
+template <int dim>
+inline
+Tensor<1,dim>
+operator * (const double         factor,
+	    const Tensor<1,dim> &t)
+{
+  Tensor<1,dim> tt;
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = t[d] * factor;
+  return tt;
+};
+
+
+
+/**
+ * Division of a tensor of rank 1 by a scalar double.
+ */
+template <int dim>
+inline
+Tensor<1,dim>
+operator / (const Tensor<1,dim> &t,
+	    const double         factor)
+{
+  Tensor<1,dim> tt;
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = t[d] / factor;
+  return tt;
+};
+
+
+
 #endif
+
+
