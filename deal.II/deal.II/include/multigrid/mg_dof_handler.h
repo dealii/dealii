@@ -1281,6 +1281,18 @@ template <>
 MGDoFDimensionInfo<3>::active_face_iterator
 MGDoFHandler<3>::last_active_face (const unsigned int) const;
 
+
+template <>
+void MGDoFHandler<1>::renumber_dofs (const unsigned int  level,
+				     const std::vector<unsigned int>  &new_numbers);
+template <>
+void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
+				     const std::vector<unsigned int>  &new_numbers);
+template <>
+void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
+				     const std::vector<unsigned int>  &new_numbers);
+
+
 /*----------------------------   mg_dof.h     ---------------------------*/
 
 #endif

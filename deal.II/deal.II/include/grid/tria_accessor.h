@@ -2058,6 +2058,10 @@ template <> void CellAccessor<3>::set_material_id (const unsigned char mat_id) c
 template <> bool CellAccessor<3>::point_inside (const Point<3> &) const;
 template <> bool CellAccessor<1>::has_boundary_lines () const;
 
+template <> double TriaObjectAccessor<2, 2>::measure () const;
+template <> double TriaObjectAccessor<2, 3>::measure () const;
+template <> double TriaObjectAccessor<3, 3>::measure () const;
+
 
 
 // include more templates in debug and optimized mode
