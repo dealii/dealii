@@ -1366,9 +1366,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   vector (pointing into or out of the cell) is implied by the
  *   direction of its bounding lines: if you look onto a face and the
  *   lines are numbered in counter-clockwise sense, then the normal is
- *   pointing towards you. Thus, faces 0, 2, and 5 have normals that
+ *   pointing towards you. Thus, faces 1, 2, and 5 have normals that
  *   point into the cell in standard face orientation, while the
- *   normals of faces 1, 3, and 4 point outward. Note that opposite
+ *   normals of faces 0, 3, and 4 point outward. Note that opposite
  *   faces have parallel normal vectors.
  *
  *   However, it turns out that a significant number of meshes cannot
