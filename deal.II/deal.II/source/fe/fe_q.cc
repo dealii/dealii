@@ -31,361 +31,383 @@
 
 // namespace for some functions that are used in this file. they are
 // specific to numbering conventions used for the FE_Q element, and
-// are thus not very interesting to the outside world
-namespace
+// are thus not very interesting to the outside world. we'd like to
+// simply put them into an anonymous namespace, but that triggers an
+// odd error with icc which can't compile this small snippet if the
+// function is static:
+// --------------------
+// template <int> struct int2type {};
+// 
+// namespace {    
+//   static void SYMBOL (const int2type<1> & ) {}
+// }
+// 
+// template <int dim> void g() {
+//   SYMBOL(int2type<dim>());
+// }
+//
+// template void g<1>();
+// --------------------
+// the function needs to be static because of another icc bug, though.
+// work around this by packing everything into a namespace of its own
+// and have the anonymous namespace inside
+namespace FE_Q_Helper
 {
-				   // auxiliary type to allow for some
-				   // kind of explicit template
-				   // specialization of the following
-				   // functions
-  template <int dim> struct int2type {};
+  namespace
+  {
+				     // auxiliary type to allow for some
+				     // kind of explicit template
+				     // specialization of the following
+				     // functions
+    template <int dim> struct int2type {};
 
-				   // given a permutation array,
-				   // compute and return the inverse
-				   // permutation
+				     // given a permutation array,
+				     // compute and return the inverse
+				     // permutation
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
+    static
 #endif
-  std::vector<unsigned int>
-  invert_numbering (const std::vector<unsigned int> &in)
-  {
-    std::vector<unsigned int> out (in.size());
-    for (unsigned int i=0; i<in.size(); ++i)
-      out[in[i]]=i;
-    return out;
-  }
+    std::vector<unsigned int>
+    invert_numbering (const std::vector<unsigned int> &in)
+    {
+      std::vector<unsigned int> out (in.size());
+      for (unsigned int i=0; i<in.size(); ++i)
+	out[in[i]]=i;
+      return out;
+    }
 
 
-				   // given an integer N, compute its
-				   // integer square root (if it
-				   // exists, otherwise give up)
+				     // given an integer N, compute its
+				     // integer square root (if it
+				     // exists, otherwise give up)
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  unsigned int int_sqrt (const unsigned int N)
-  {
-    for (unsigned int i=0; i<=N; ++i)
-      if (i*i == N)
-	return i;
-    Assert (false, ExcInternalError());
-    return deal_II_numbers::invalid_unsigned_int;
-  }
+    unsigned int int_sqrt (const unsigned int N)
+    {
+      for (unsigned int i=0; i<=N; ++i)
+	if (i*i == N)
+	  return i;
+      Assert (false, ExcInternalError());
+      return deal_II_numbers::invalid_unsigned_int;
+    }
 
 
-				   // given an integer N, compute its
-				   // integer cube root (if it
-				   // exists, otherwise give up)
+				     // given an integer N, compute its
+				     // integer cube root (if it
+				     // exists, otherwise give up)
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  unsigned int int_cuberoot (const unsigned int N)
-  {
-    for (unsigned int i=0; i<=N; ++i)
-      if (i*i*i == N)
-	return i;
-    Assert (false, ExcInternalError());
-    return deal_II_numbers::invalid_unsigned_int;
-  }
+    unsigned int int_cuberoot (const unsigned int N)
+    {
+      for (unsigned int i=0; i<=N; ++i)
+	if (i*i*i == N)
+	  return i;
+      Assert (false, ExcInternalError());
+      return deal_II_numbers::invalid_unsigned_int;
+    }
 
 
-				   // given N, generate i=0...N-1
-				   // equidistant points in the
-				   // interior of the interval [0,1]
+				     // given N, generate i=0...N-1
+				     // equidistant points in the
+				     // interior of the interval [0,1]
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  Point<1>
-  generate_unit_point (const unsigned int i,
-		       const unsigned int N,
-		       const int2type<1>  )
-  {
-    Assert (i<N, ExcInternalError());
-    const double h = 1./(N-1);
-    return Point<1>(i*h);
-  }
+    Point<1>
+    generate_unit_point (const unsigned int i,
+			 const unsigned int N,
+			 const int2type<1>  )
+    {
+      Assert (i<N, ExcInternalError());
+      const double h = 1./(N-1);
+      return Point<1>(i*h);
+    }
   
     
-				   // given N, generate i=0...N-1
-				   // equidistant points in the domain
-				   // [0,1]^2
+				     // given N, generate i=0...N-1
+				     // equidistant points in the domain
+				     // [0,1]^2
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  Point<2>
-  generate_unit_point (const unsigned int i,
-		       const unsigned int N,
-		       const int2type<2>  )
-  {
-    Assert (i<N, ExcInternalError());
-    Assert (N>=4, ExcInternalError());
+    Point<2>
+    generate_unit_point (const unsigned int i,
+			 const unsigned int N,
+			 const int2type<2>  )
+    {
+      Assert (i<N, ExcInternalError());
+      Assert (N>=4, ExcInternalError());
     
-    const unsigned int N1d = int_sqrt(N);
-    const double h = 1./(N1d-1);
+      const unsigned int N1d = int_sqrt(N);
+      const double h = 1./(N1d-1);
 
-    return Point<2> (i%N1d * h,
-		     i/N1d * h);
-  }
-
-  
-
-				   // given N, generate i=0...N-1
-				   // equidistant points in the domain
-				   // [0,1]^3
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
-#endif
-  Point<3>
-  generate_unit_point (const unsigned int i,
-		       const unsigned int N,
-		       const int2type<3>  )
-  {
-    Assert (i<N, ExcInternalError());
-    Assert (N>=8, ExcInternalError());
-    
-    const unsigned int N1d = int_cuberoot(N);
-    const double h = 1./(N1d-1);
-
-    return Point<3> (i%N1d * h,
-		     (i/N1d)%N1d * h,
-		     i/(N1d*N1d) * h);
-  }
+      return Point<2> (i%N1d * h,
+		       i/N1d * h);
+    }
 
   
 
-				   // given N, generate i=0...N-1
-				   // equidistant points in the
-				   // interior of the interval [0,1]
+				     // given N, generate i=0...N-1
+				     // equidistant points in the domain
+				     // [0,1]^3
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  Point<1>
-  generate_face_unit_point (const unsigned int i,
-			    const unsigned int N,
-			    const int2type<1>  )
-  {
-    Assert (i<N, ExcInternalError());
-    const double h = 1./(N+1);
-    return Point<1>((1+i)*h);
-  }
-  
+    Point<3>
+    generate_unit_point (const unsigned int i,
+			 const unsigned int N,
+			 const int2type<3>  )
+    {
+      Assert (i<N, ExcInternalError());
+      Assert (N>=8, ExcInternalError());
     
-				   // given N, generate i=0...N-1
-				   // equidistant points in the domain
-				   // [0,1]^2, but excluding the four
-				   // vertices (since we don't have to
-				   // consider shape functions on
-				   // child cells that are located on
-				   // existing vertices)
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
-#endif
-  Point<2>
-  generate_face_unit_point (const unsigned int i,
-			    const unsigned int N,
-			    const int2type<2>  )
-  {
-    Assert (i<N, ExcInternalError());
-    
-    const unsigned int N1d = int_sqrt(N+4);    
-    const double h = 1./(N1d+1);
-    
-				     // i gives the index in the list
-				     // of points excluding the four
-				     // vertices. convert this into an
-				     // index for all N1d**2 points
-				     //
-				     // we do so by
-				     // - adding one if the point is
-				     // beyond the lower left vertex
-				     // (actually, all points are)
+      const unsigned int N1d = int_cuberoot(N);
+      const double h = 1./(N1d-1);
 
-				     // - adding one if the point is
-				     // beyond the lower right one
-				     // - adding one if it is beyond
-				     // the upper left one
-				     // - not adding one for the upper
-				     // right vertex, since no point
-				     // can be beyond that one anyway
-				     // :-)
-    const unsigned int true_i = (1
-				 +
-				 (i >= N1d-2 ? 1 : 0)
-				 +
-				 (i >= N1d*(N1d-1)-2 ? 1 : 0));
-    return Point<2> ((true_i%N1d)*h,
-		     (true_i/N1d)*h);
-  }
+      return Point<3> (i%N1d * h,
+		       (i/N1d)%N1d * h,
+		       i/(N1d*N1d) * h);
+    }
+
   
 
-
-				   // return whether shape function j,
-				   // as given in the numbering
-				   // specific to the computation of
-				   // the constraint matrix, is active
-				   // on the given subface
+				     // given N, generate i=0...N-1
+				     // equidistant points in the
+				     // interior of the interval [0,1]
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  bool
-  constraint_function_is_active_on_child (const unsigned int          j,
-					  const unsigned int          subface,
-					  const FiniteElementData<2> &fe_data)
-  {
-				     // note that in our weird
-				     // numbering, the zeroth function
-				     // is the one associated with the
-				     // center node, then come the
-				     // ones on subface 0, then those
-				     // on subface 1. the initial one
-				     // is active on both subfaces,
-				     // all other ones only on one of
-				     // the subfaces
-    return !(((j>=1) && (j<1+fe_data.dofs_per_line) && (subface == 1)) ||
-	     ((j>=1+fe_data.dofs_per_line) && (subface == 0)));
-  }
-
-
-
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
-#endif
-  bool
-  constraint_function_is_active_on_child (const unsigned int          j,
-					  const unsigned int          subface,
-					  const FiniteElementData<3> &fe_data)
-  {
-				     // in 3d: in our weird numbering,
-				     // the zeroth function is the one
-				     // associated with the center
-				     // node, then come the four edge
-				     // midpoints, then the ones on
-				     // the 12 edges then those on
-				     // subfaces. some are active on
-				     // more than one child
-
-    if (j < 5)
-				       // one one of the five vertices
-      {
-	switch (j)
-	  {
-	    case 0: return true;
-	    case 1: return (subface == 0) || (subface == 1);
-	    case 2: return (subface == 1) || (subface == 2);
-	    case 3: return (subface == 2) || (subface == 3);
-	    case 4: return (subface == 3) || (subface == 0);
-	  }
-      }
-    else if (j < 5 + 12*fe_data.dofs_per_line)
-				       // one one of the 12 lines
-      {
-	const unsigned int line = (j-5)/fe_data.dofs_per_line;
-	Assert (line<12, ExcInternalError());
-
-	switch (line)
-	  {
-	    case 0: return (subface == 0) || (subface == 1);
-	    case 1: return (subface == 1) || (subface == 2);
-	    case 2: return (subface == 2) || (subface == 3);
-	    case 3: return (subface == 3) || (subface == 0);
-	    case 4: return (subface == 0);
-	    case 5: return (subface == 1);
-	    case 6: return (subface == 1);
-	    case 7: return (subface == 2);
-	    case 8: return (subface == 3);
-	    case 9: return (subface == 2);
-	    case 10: return (subface == 0);
-	    case 11: return (subface == 2);
-	  }
-      }
-    else
-				       // interior
-      {
-	const unsigned int quad = (j-5-12*fe_data.dofs_per_line)/fe_data.dofs_per_quad;
-	Assert (quad<4, ExcInternalError());
-	return quad == subface;
-      }
+    Point<1>
+    generate_face_unit_point (const unsigned int i,
+			      const unsigned int N,
+			      const int2type<1>  )
+    {
+      Assert (i<N, ExcInternalError());
+      const double h = 1./(N+1);
+      return Point<1>((1+i)*h);
+    }
+  
     
-    Assert (false, ExcInternalError());
-    return deal_II_numbers::invalid_unsigned_int;
-  }
-
-
-				   // given index j in the weird
-				   // constraint numbering, compute
-				   // its index in the polynomials
-				   // space of a given subface
+				     // given N, generate i=0...N-1
+				     // equidistant points in the domain
+				     // [0,1]^2, but excluding the four
+				     // vertices (since we don't have to
+				     // consider shape functions on
+				     // child cells that are located on
+				     // existing vertices)
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  unsigned int
-  constraint_get_local_j (const unsigned int          j,
-			  const unsigned int          subface,
-			  const FiniteElementData<2> &fe_data)
-  {
-				     // the zeroth shape function is a
-				     // little special, since it has
-				     // index N on subface 0 and index
-				     // 0 on subface 1
+    Point<2>
+    generate_face_unit_point (const unsigned int i,
+			      const unsigned int N,
+			      const int2type<2>  )
+    {
+      Assert (i<N, ExcInternalError());
+    
+      const unsigned int N1d = int_sqrt(N+4);    
+      const double h = 1./(N1d+1);
+    
+				       // i gives the index in the list
+				       // of points excluding the four
+				       // vertices. convert this into an
+				       // index for all N1d**2 points
+				       //
+				       // we do so by
+				       // - adding one if the point is
+				       // beyond the lower left vertex
+				       // (actually, all points are)
+
+				       // - adding one if the point is
+				       // beyond the lower right one
+				       // - adding one if it is beyond
+				       // the upper left one
+				       // - not adding one for the upper
+				       // right vertex, since no point
+				       // can be beyond that one anyway
+				       // :-)
+      const unsigned int true_i = (1
+				   +
+				   (i >= N1d-2 ? 1 : 0)
+				   +
+				   (i >= N1d*(N1d-1)-2 ? 1 : 0));
+      return Point<2> ((true_i%N1d)*h,
+		       (true_i/N1d)*h);
+    }
+  
+
+
+				     // return whether shape function j,
+				     // as given in the numbering
+				     // specific to the computation of
+				     // the constraint matrix, is active
+				     // on the given subface
+#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
+    static
+#endif
+    bool
+    constraint_function_is_active_on_child (const unsigned int          j,
+					    const unsigned int          subface,
+					    const FiniteElementData<2> &fe_data)
+    {
+				       // note that in our weird
+				       // numbering, the zeroth function
+				       // is the one associated with the
+				       // center node, then come the
+				       // ones on subface 0, then those
+				       // on subface 1. the initial one
+				       // is active on both subfaces,
+				       // all other ones only on one of
+				       // the subfaces
+      return !(((j>=1) && (j<1+fe_data.dofs_per_line) && (subface == 1)) ||
+	       ((j>=1+fe_data.dofs_per_line) && (subface == 0)));
+    }
+
+
+
+#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
+    static
+#endif
+    bool
+    constraint_function_is_active_on_child (const unsigned int          j,
+					    const unsigned int          subface,
+					    const FiniteElementData<3> &fe_data)
+    {
+				       // in 3d: in our weird numbering,
+				       // the zeroth function is the one
+				       // associated with the center
+				       // node, then come the four edge
+				       // midpoints, then the ones on
+				       // the 12 edges then those on
+				       // subfaces. some are active on
+				       // more than one child
+
+      if (j < 5)
+					 // one one of the five vertices
+	{
+	  switch (j)
+	    {
+	      case 0: return true;
+	      case 1: return (subface == 0) || (subface == 1);
+	      case 2: return (subface == 1) || (subface == 2);
+	      case 3: return (subface == 2) || (subface == 3);
+	      case 4: return (subface == 3) || (subface == 0);
+	    }
+	}
+      else if (j < 5 + 12*fe_data.dofs_per_line)
+					 // one one of the 12 lines
+	{
+	  const unsigned int line = (j-5)/fe_data.dofs_per_line;
+	  Assert (line<12, ExcInternalError());
+
+	  switch (line)
+	    {
+	      case 0: return (subface == 0) || (subface == 1);
+	      case 1: return (subface == 1) || (subface == 2);
+	      case 2: return (subface == 2) || (subface == 3);
+	      case 3: return (subface == 3) || (subface == 0);
+	      case 4: return (subface == 0);
+	      case 5: return (subface == 1);
+	      case 6: return (subface == 1);
+	      case 7: return (subface == 2);
+	      case 8: return (subface == 3);
+	      case 9: return (subface == 2);
+	      case 10: return (subface == 0);
+	      case 11: return (subface == 2);
+	    }
+	}
+      else
+					 // interior
+	{
+	  const unsigned int quad = (j-5-12*fe_data.dofs_per_line)/fe_data.dofs_per_quad;
+	  Assert (quad<4, ExcInternalError());
+	  return quad == subface;
+	}
+    
+      Assert (false, ExcInternalError());
+      return deal_II_numbers::invalid_unsigned_int;
+    }
+
+
+				     // given index j in the weird
+				     // constraint numbering, compute
+				     // its index in the polynomials
+				     // space of a given subface
+#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
+    static
+#endif
+    unsigned int
+    constraint_get_local_j (const unsigned int          j,
+			    const unsigned int          subface,
+			    const FiniteElementData<2> &fe_data)
+    {
+				       // the zeroth shape function is a
+				       // little special, since it has
+				       // index N on subface 0 and index
+				       // 0 on subface 1
 	  
-    return (subface == 0 ?
-	    (j == 0 ? 1+fe_data.dofs_per_line : j) :
-	    (j == 0 ? 0 : j-fe_data.dofs_per_line));
-  }
+      return (subface == 0 ?
+	      (j == 0 ? 1+fe_data.dofs_per_line : j) :
+	      (j == 0 ? 0 : j-fe_data.dofs_per_line));
+    }
   
 
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  unsigned int
-  constraint_get_local_j (const unsigned int          /*j*/,
-			  const unsigned int          /*subface*/,
-			  const FiniteElementData<3> &/*fe_data*/)
-  {
-    Assert (false, ExcNotImplemented());
+    unsigned int
+    constraint_get_local_j (const unsigned int          /*j*/,
+			    const unsigned int          /*subface*/,
+			    const FiniteElementData<3> &/*fe_data*/)
+    {
+      Assert (false, ExcNotImplemented());
 //    const unsigned int N1d = 2+fe_data.dofs_per_line;
-    return deal_II_numbers::invalid_unsigned_int;
-  }
+      return deal_II_numbers::invalid_unsigned_int;
+    }
 
 
 
-				   // in the constraint numbering:
-				   // return true if the support point
-				   // of shape function j and
-				   // evaluation point i coincide. to
-				   // make things simpler, also pass
-				   // the subface on which j is
-				   // located
+				     // in the constraint numbering:
+				     // return true if the support point
+				     // of shape function j and
+				     // evaluation point i coincide. to
+				     // make things simpler, also pass
+				     // the subface on which j is
+				     // located
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  bool
-  constraint_is_support_point (const unsigned int          i,
-			       const unsigned int          j,
-			       const unsigned int          subface,
-			       const FiniteElementData<2> &fe_data)
-  {
-    return ((subface == 0) && (((j==0) && (i==fe_data.dofs_per_line))
-			       ||
-			       ((j!=0) && (i==j-1))))
-		      ||
-	   ((subface == 1) && (((j==0) && (i==fe_data.dofs_per_line))
-			       ||
-			       ((j!=0) && (i==j))));
-  }
+    bool
+    constraint_is_support_point (const unsigned int          i,
+				 const unsigned int          j,
+				 const unsigned int          subface,
+				 const FiniteElementData<2> &fe_data)
+    {
+      return ((subface == 0) && (((j==0) && (i==fe_data.dofs_per_line))
+				 ||
+				 ((j!=0) && (i==j-1))))
+			||
+			((subface == 1) && (((j==0) && (i==fe_data.dofs_per_line))
+					    ||
+					    ((j!=0) && (i==j))));
+    }
   
 
 #if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-  static
+    static
 #endif
-  bool
-  constraint_is_support_point (const unsigned int          /*i*/,
-			       const unsigned int          /*j*/,
-			       const unsigned int          /*subface*/,
-			       const FiniteElementData<3> &/*fe_data*/)
-  {
-    Assert (false, ExcNotImplemented());
-    return false;
-  }  
+    bool
+    constraint_is_support_point (const unsigned int          /*i*/,
+				 const unsigned int          /*j*/,
+				 const unsigned int          /*subface*/,
+				 const FiniteElementData<3> &/*fe_data*/)
+    {
+      Assert (false, ExcNotImplemented());
+      return false;
+    }  
+  }
 }
 
 
@@ -400,7 +422,7 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 								    std::vector<bool>(1,true))),
                 degree(degree),
                 renumber(lexicographic_to_hierarchic_numbering (*this, degree)),
-		renumber_inverse(invert_numbering (renumber)),
+		renumber_inverse(FE_Q_Helper::invert_numbering (renumber)),
 		face_renumber(face_lexicographic_to_hierarchic_numbering (degree)),
 		polynomial_space(Polynomials::LagrangeEquidistant::generate_complete_basis(degree))
 {
@@ -571,8 +593,9 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
                                        // generate a point on this
                                        // cell and evaluate the
                                        // shape functions there
-      const Point<dim> p = generate_unit_point (j, this->dofs_per_cell,
-                                                int2type<dim>());
+      const Point<dim>
+	p = FE_Q_Helper::generate_unit_point (j, this->dofs_per_cell,
+					      FE_Q_Helper::int2type<dim>());
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
         cell_interpolation(renumber[j],renumber[i])
           = polynomial_space.compute_value (i, p);
@@ -1063,7 +1086,7 @@ FE_Q<2>::initialize_constraints ()
   FullMatrix<double> subface_interpolation (n_small_functions, n_small_functions);
 
   const std::vector<unsigned int>
-    face_renumber_inverse (invert_numbering(face_renumber));
+    face_renumber_inverse (FE_Q_Helper::invert_numbering(face_renumber));
   
   for (unsigned int i=0; i<n_small_functions; ++i)
     {
@@ -1092,8 +1115,9 @@ FE_Q<2>::initialize_constraints ()
 				       // the four vertices of the
 				       // face. the function we call
 				       // takes care of all this
-      const Point<dim-1> p_face = generate_face_unit_point (i, n_small_functions,
-							    int2type<dim-1>());
+      const Point<dim-1> p_face
+	= FE_Q_Helper::generate_face_unit_point (i, n_small_functions,
+						 FE_Q_Helper::int2type<dim-1>());
 
 				       // evaluate the big face
 				       // shape function at this
@@ -1175,7 +1199,9 @@ FE_Q<2>::initialize_constraints ()
 					   // remain zero, and we
 					   // simply go on with the
 					   // next entry
-	  if (! constraint_function_is_active_on_child (j, subface, *this))
+	  if (!
+	      FE_Q_Helper::
+	      constraint_function_is_active_on_child (j, subface, *this))
 	    continue;
 	    
 					   // otherwise: compute the
@@ -1192,7 +1218,7 @@ FE_Q<2>::initialize_constraints ()
 					   // that is specialized for
 					   // this
 	  const unsigned int local_j
-	    = constraint_get_local_j (j, subface, *this);
+	    = FE_Q_Helper::constraint_get_local_j (j, subface, *this);
 
 					   // so evaluate this shape
 					   // function there. now,
@@ -1221,7 +1247,7 @@ FE_Q<2>::initialize_constraints ()
 					   // the constraint matrices,
 					   // which we want to keep as
 					   // small as possible.)
-	  if (constraint_is_support_point (i, j, subface, *this))
+	  if (FE_Q_Helper::constraint_is_support_point (i, j, subface, *this))
 	    subface_interpolation(i, j) = 1.;
 	  else
 	    subface_interpolation(i, j) = 0.;
@@ -1330,8 +1356,9 @@ FE_Q<dim>::initialize_embedding ()
 					   // the child cell and
 					   // evaluate the shape
 					   // functions there
-	  const Point<dim> p_subcell = generate_unit_point (j, this->dofs_per_cell,
-							    int2type<dim>());
+	  const Point<dim> p_subcell
+	    = FE_Q_Helper::generate_unit_point (j, this->dofs_per_cell,
+						FE_Q_Helper::int2type<dim>());
 	  const Point<dim> p_cell =
 	    GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child);
 
@@ -1494,8 +1521,9 @@ FE_Q<dim>::initialize_restriction ()
     this->restriction[c].reinit (this->dofs_per_cell, this->dofs_per_cell);
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
-      const Point<dim> p_cell = generate_unit_point (i, this->dofs_per_cell,
-                                                     int2type<dim>());
+      const Point<dim> p_cell
+	= FE_Q_Helper::generate_unit_point (i, this->dofs_per_cell,
+					    FE_Q_Helper::int2type<dim>());
       unsigned int mother_dof = 0;
       for (; mother_dof<this->dofs_per_cell; ++mother_dof)
         {
