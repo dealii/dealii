@@ -1,5 +1,5 @@
-//----------------------------  polynomial.cc  ---------------------------
-//      $Id$                 */
+//----------------------------  polynomial.cc  -----------------------
+//      $Id$   
 //    Version: $Name$
 //
 //    Copyright (C) 2000 by the deal.II authors
@@ -9,10 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------   polynomial.cc     -----------------------
+//----------------------------   polynomial.cc  ----------------------
 
 
-#include<base/polynomial.h>
+#include <base/polynomial.h>
 
 
 Polynomial::Polynomial(const vector<double> &a):

@@ -1,9 +1,18 @@
-/*----------------------------   polynomial.h     ---------------------------*/
-/*      $Id$                 */
-/*                Ralf Hartmann, University of Heidelberg                */
-#ifndef __polynomial_H
-#define __polynomial_H
-/*----------------------------   polynomial.h     ---------------------------*/
+//----------------------------  polynomial.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  polynomial.h  ---------------------------
+#ifndef __deal2__polynomial_H
+#define __deal2__polynomial_H
+
 
 
 #include <base/exceptions.h>
@@ -89,7 +98,4 @@ class LagrangeEquidistant: public Polynomial
 
 
 
-/*----------------------------   polynomial.h     ---------------------------*/
-/* end of #ifndef __polynomial_H */
 #endif
-/*----------------------------   polynomial.h     ---------------------------*/
