@@ -11,6 +11,7 @@
 #include <basic/dof_tools.h>
 #include <lac/sparsematrix.h>
 
+#include <algorithm>
 
 
 template <int dim>
@@ -112,7 +113,7 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>&,
 
 #endif
 
-//TODO: Reinsert the last assertion: could not find max_element (G->W)
+
 
 template <int dim>
 void
@@ -127,9 +128,9 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 	  ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs()));
   Assert (sparsity.n_cols() == dof.n_boundary_dofs(),
 	  ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs()));
-//  Assert (*max_element(dof_to_boundary_mapping.begin(),
-//		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
-//	  ExcInternalError());
+  Assert (*max_element(dof_to_boundary_mapping.begin(),
+		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
+	  ExcInternalError());
 
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
   vector<int> dofs_on_this_face(dofs_per_face);
@@ -142,9 +143,9 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 					 // make sure all dof indices have a
 					 // boundary index
-//	Assert (*min_element(dofs_on_this_face.begin(),
-//			     dofs_on_this_face.end()) >=0,
-//		ExcInternalError());
+	Assert (*min_element(dofs_on_this_face.begin(),
+			     dofs_on_this_face.end()) >=0,
+		ExcInternalError());
 	
 					 // make sparsity pattern for this cell
 	for (unsigned int i=0; i<dofs_per_face; ++i)
@@ -171,9 +172,9 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 	  ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs(boundary_indicators)));
   Assert (sparsity.n_cols() == dof.n_boundary_dofs(boundary_indicators),
 	  ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs(boundary_indicators)));
-//  Assert (*max_element(dof_to_boundary_mapping.begin(),
-//		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
-//	  ExcInternalError());
+  Assert (*max_element(dof_to_boundary_mapping.begin(),
+		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
+	  ExcInternalError());
 
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
   vector<int> dofs_on_this_face(dofs_per_face);
@@ -187,9 +188,9 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 					 // make sure all dof indices have a
 					 // boundary index
-//	Assert (*min_element(dofs_on_this_face.begin(),
-//			     dofs_on_this_face.end()) >=0,
-//		ExcInternalError());
+	Assert (*min_element(dofs_on_this_face.begin(),
+			     dofs_on_this_face.end()) >=0,
+		ExcInternalError());
 					 // make sparsity pattern for this cell
 	for (unsigned int i=0; i<dofs_per_face; ++i)
 	  for (unsigned int j=0; j<dofs_per_face; ++j)
