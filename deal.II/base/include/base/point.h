@@ -135,6 +135,12 @@ class Point : public Tensor<1,dim>
 				      *  the square of the norm.
 				      */
     double              square () const;
+    
+				     /**
+				      * Returns the distance of @p{this} 
+				      * point to the point @p{p}.
+				      */
+    double distance (const Point<dim> &p) const;
 
 
 				     /**
@@ -308,8 +314,6 @@ double Point<dim>::operator * (const Point<dim> &p) const
 };
 
 
-
-
 template <int dim>
 inline
 double Point<dim>::square () const 
@@ -320,6 +324,20 @@ double Point<dim>::square () const
   return q;
 };
 
+
+template <int dim>
+inline
+double Point<dim>::distance (const Point<dim> &p) const
+{
+  double sum=0;
+  for (unsigned int i=0; i<dim; ++i)
+    {
+      const double diff=values[i]-p(i);
+      sum += diff*diff;
+    }
+  
+  return sqrt(sum);
+}
 
 
 template <int dim>
