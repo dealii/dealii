@@ -221,18 +221,10 @@ QProjector<dim>::QProjector (const Quadrature<dim-1> &quadrature,
     project_to_faces (quadrature, quadrature_points);
 
   const unsigned int n = GeometryInfo<dim>::faces_per_cell
-    * (sub ? GeometryInfo<dim>::subfaces_per_face : 1);
-
-// WB: Can we keep it that simple for non-symmetric formulae?
-// Otherwise we'll have to include the weights in the project* functions.
-// This may pose a problem anyway, since we do not want to switch endpoints
-// in Gauss-Radau formulae.
-// GK: I don't see the problem. The project* functions copy the points
-// consecutively, so do we do with the weights here.
-
+			 * (sub ? GeometryInfo<dim>::subfaces_per_face : 1);
   unsigned int k=0;
-  for (unsigned int i=0;i<n;++i)
-    for (unsigned int j=0;j<quadrature.n_quadrature_points;++j)
+  for (unsigned int i=0; i<n; ++i)
+    for (unsigned int j=0; j<quadrature.n_quadrature_points; ++j)
       weights[k++] = quadrature.weight(j);
 }
 
@@ -246,8 +238,6 @@ void QProjector<1>::project_to_face (const Quadrature<0> &,
 }
 
 
-//TODO: [?] Replace code reduplication for opposite faces.
-// We need a variable then, telling whether the constant value is 0 or 1
 
 template <>
 void QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
@@ -424,9 +414,10 @@ void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
   Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
 
 
-				   // for all faces and subfaces: first project
-				   // onto the first subface of each face, then
-				   // move it to the right place
+				   // for all faces and subfaces:
+				   // first project onto the first
+				   // subface of each face, then move
+				   // it to the right place
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
     switch (face_no)
       {
@@ -698,9 +689,10 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
       for (unsigned int copy=0; copy<n_copies; ++copy)
 	for (unsigned int q_point=0; q_point<base_quadrature.n_quadrature_points; ++q_point)
 	  {
-					     // skip the left point of this copy
-					     // since we have already entered it the
-					     // last time
+					     // skip the left point of
+					     // this copy since we
+					     // have already entered
+					     // it the last time
 	    if ((copy > 0) &&
 		(base_quadrature.point(q_point) == Point<1>(0.0)))
 	      continue;
@@ -709,9 +701,11 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 						     +
 						     (1.0*copy)/n_copies);
 
-					     // if this is the rightmost point of
-					     // one of the non-last copies: give
-					     // it the double weight
+					     // if this is the
+					     // rightmost point of one
+					     // of the non-last
+					     // copies: give it the
+					     // double weight
 	    if ((copy != n_copies-1) &&
 		(base_quadrature.point(q_point) == Point<1>(1.0)))
 	      weights[next_point] = double_point_weight;
@@ -733,8 +727,8 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 
 
 
-// construct higher dimensional quadrature formula by tensor product of lower
-// dimensional iterated quadrature formulae
+// construct higher dimensional quadrature formula by tensor product
+// of lower dimensional iterated quadrature formulae
 template <int dim>
 QIterated<dim>::QIterated (const Quadrature<1> &base_quadrature,
 			   const unsigned int   N) :
