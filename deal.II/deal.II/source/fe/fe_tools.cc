@@ -689,18 +689,19 @@ FETools::lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
 	      }
 	}
 
-      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::hexes_per_cell); ++i)
-	{
-	  unsigned int index = fe.first_hex_index;
-	  
-	  for (unsigned int jz = 1; jz<degree; jz++)
-	    for (unsigned int jy = 1; jy<degree; jy++)
-	      for (unsigned int jx = 1; jx<degree; jx++)
-		{
-		  const unsigned int tensorindex = jx + jy*n + jz*n*n;
-		  l2h[tensorindex]=index++;
-		}  
-	} 
+      if (GeometryInfo<dim>::hexes_per_cell > 0)
+	for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::hexes_per_cell); ++i)
+	  {
+	    unsigned int index = fe.first_hex_index;
+	    
+	    for (unsigned int jz = 1; jz<degree; jz++)
+	      for (unsigned int jy = 1; jy<degree; jy++)
+		for (unsigned int jx = 1; jx<degree; jx++)
+		  {
+		    const unsigned int tensorindex = jx + jy*n + jz*n*n;
+		    l2h[tensorindex]=index++;
+		  }  
+	  } 
     }
 };
 
