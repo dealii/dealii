@@ -13,9 +13,6 @@
 #ifndef __deal2__solver_qmrs_h
 #define __deal2__solver_qmrs_h
 
-
-//TODO: Check for programming errors!!!
-
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <base/logstream.h>
