@@ -457,7 +457,6 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
   interpolate(dof1, u1, dof2, constraints, u3);
 
   const unsigned int dofs_per_cell  = dof2.get_fe().dofs_per_cell;
-  const Triangulation<dim> &tria=dof1.get_tria();
   Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
 
 				   // make sure that each cell on the
@@ -473,7 +472,7 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
   } 
 
 				   // then traverse grid bottom up
-  for (unsigned int level=0; level<tria.n_levels()-1; ++level)
+  for (unsigned int level=0; level<dof1.get_tria().n_levels()-1; ++level)
     {
       typename DoFHandler<dim>::cell_iterator cell=dof2.begin(level),
 					      endc=dof2.end(level);
