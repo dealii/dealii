@@ -992,13 +992,16 @@ fi
 
 
 
-
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
   enableshared=$enableval
 else
-  enableshared=yes
+  if test $OS = AIX ; then
+      enableshared=no ;
+    else
+      enableshared=yes ;
+    fi
 fi
 
 if test $enableshared = yes ; then
