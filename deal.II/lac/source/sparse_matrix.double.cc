@@ -45,6 +45,8 @@ template class SparseMatrix<TYPEMAT>;
 #undef TYPEMAT
 
 
+// instantiate a few more functions. this whole mess in this file (and the
+// other sparse_matrix.* files) really needs to be cleaned up a little
 template void SparseMatrix<double>::
 vmult (Vector<double> &, const Vector<float> &) const;
 template void SparseMatrix<double>::
