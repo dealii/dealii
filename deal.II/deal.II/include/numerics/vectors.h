@@ -34,6 +34,15 @@ class ConstraintMatrix;
  *  @item @p{L1_norm}: the absolute value of the function is integrated.
  *  @item @p{L2_norm}: the square of the function is integrated on each
  *    cell; afterwards the root is taken of this value.
+ *  @item @p{Linfty_norm}: the maximum absolute value of the function.
+ *  @item @p{H1_seminorm}: the square of the function gradient is
+ *    integrated on each cell; afterwards the root is taken of this
+ *  value.
+ *  @item @p{H1_norm}: the square of the function plus the square of
+ *    the function gradient is integrated on each cell; afterwards the
+ *    root is taken of this. I.e. the square of this norm is the
+ *    square of the @p{L2_norm} plus the square of the
+ *    @p{H1_seminorm}.
  *  @end{itemize}
  */
 enum NormType {
@@ -53,21 +62,37 @@ enum NormType {
  * interpolations and projections of continuous functions to the finite
  * element space and other operations.
  *
+ * There exist two versions of almost each function. One with a
+ * @ref{Mapping} argument and one without. If a code uses a mapping
+ * different from @ref{MappingQ1} the functions @em{with} mapping
+ * argument should be used. Code that uses only @ref{MappingQ1} may
+ * also use the functions @em{without} @ref{Mapping} argument. Each of
+ * these latter functions create a @ref{MappingQ1} object and just
+ * call the respective functions with that object as mapping
+ * argument. The functions without @ref{Mapping} argument still exist
+ * to ensure backward compatibility. Nevertheless it is advised to
+ * change the user's codes to store a specific @ref{Mapping} object
+ * and to use the functions that take this @p{Mapping} object as
+ * argument. This gives the possibility to easily extend the user
+ * codes to work also on mappings of higher degree, this just by
+ * exchanging @ref{MappingQ1} by, for example, a @ref{MappingQ} or
+ * another @ref{Mapping} object of interest.
  *
  * @sect3{Description of operations}
  *
  * This collection of methods offers the following operations:
  * @begin{itemize}
  * @item Interpolation: assign each degree of freedom in the vector to be
- *   created the value of the function given as argument. This is identical
- *   to saying that the resulting finite element function (which is isomorphic
- *   to the output vector) has exact function values in all off-points of
- *   trial functions. The off-point of an trial function is the point where
- *   it assumes its nominal value, e.g. for linear trial functions the
- *   off-points are th corners of an element. This function therefore relies
- *   on the assumption that a finite element is used for which the degrees
- *   of freedom are function values (Lagrange elements) rather than gradients,
- *   normal derivatives, second derivatives, etc (Hermite elements, quintic
+ *   the value of the function given as argument. This is identical to
+ *   saying that the resulting finite element function (which is
+ *   isomorphic to the output vector) has exact function values in all
+ *   support points of trial functions. The support point of a trial
+ *   function is the point where its value equals one, e.g. for linear
+ *   trial functions the support points are four corners of an
+ *   element. This function therefore relies on the assumption that a
+ *   finite element is used for which the degrees of freedom are
+ *   function values (Lagrange elements) rather than gradients, normal
+ *   derivatives, second derivatives, etc (Hermite elements, quintic
  *   Argyris element, etc.).
  *
  *   It seems inevitable that some values of the vector to be created are set
@@ -86,23 +111,24 @@ enum NormType {
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then is
  *   the projection.
  *
- *   In order to get proper results, it may necessary to treat boundary
- *   conditions right. Below are listed some cases where this may be needed.
- *   If needed, this is done by $L_2$-projection of the trace of the
- *   given function onto the finite element space restricted to the boundary
- *   of the domain, then taking this information and using it to eliminate
- *   the boundary nodes from the mass matrix of the whole domain, using the
- *   @ref{MatrixTools}@p{::apply_boundary_values} function. The projection of the
- *   trace of the function to the boundary is done with the
- *   @ref{VectorTools}@p{::project_boundary_values} (see below) function, which is
- *   called with a map of boundary functions in which all boundary indicators
- *   from zero to 254 (255 is used for other purposes, see the @ref{Triangulation}
- *   class documentation) point to the function to be projected. The projection
- *   to the boundary takes place using a second quadrature formula on the
- *   boundary given to the @p{project} function. The first quadrature formula is
- *   used to compute the right hand side, while the global projection is done by
- *   exact integration of the mass matrix instead of evaluating it by a quadrature
- *   formula. This is faster in this case and more accurate.
+ *   In order to get proper results, it may necessary to treat
+ *   boundary conditions right. Below are listed some cases where this
+ *   may be needed.  If needed, this is done by $L_2$-projection of
+ *   the trace of the given function onto the finite element space
+ *   restricted to the boundary of the domain, then taking this
+ *   information and using it to eliminate the boundary nodes from the
+ *   mass matrix of the whole domain, using the
+ *   @ref{MatrixTools}@p{::apply_boundary_values} function. The
+ *   projection of the trace of the function to the boundary is done
+ *   with the @ref{VectorTools}@p{::project_boundary_values} (see
+ *   below) function, which is called with a map of boundary functions
+ *   in which all boundary indicators from zero to 254 (255 is used
+ *   for other purposes, see the @ref{Triangulation} class
+ *   documentation) point to the function to be projected. The
+ *   projection to the boundary takes place using a second quadrature
+ *   formula on the boundary given to the @p{project} function. The
+ *   first quadrature formula is used to compute the right hand side
+ *   and for numerical quadrature of the mass matrix.
  *
  *   The projection of the boundary values first, then eliminating them from
  *   the global system of equations is not needed usually. It may be necessary
@@ -162,7 +188,7 @@ enum NormType {
  *   Within this function, boundary values are interpolated, i.e. a node is given
  *   the point value of the boundary function. In some cases, it may be necessary
  *   to use the L2-projection of the boundary function or any other method. For
- *   this purpose to the @ref{VectorTools}@p{::project_boundary_values}
+ *   this purpose we refer to the @ref{VectorTools}@p{::project_boundary_values}
  *   function below.
  *
  *   You should be aware that the boundary function may be evaluated at nodes
@@ -188,7 +214,7 @@ enum NormType {
  *
  *   The projection takes place on all boundary parts with boundary indicators
  *   listed in the map of boundary functions. These boundary parts may or may
- *   not be contiguous. For these boundary parts, the mass matrix is assembled
+ *   not be continuous. For these boundary parts, the mass matrix is assembled
  *   using the @ref{MatrixTools}@p{::create_boundary_mass_matrix} function, as well as
  *   the appropriate right hand side. Then the resulting system of equations is
  *   solved using a simple CG method (without preconditioning), which is in most
@@ -201,18 +227,21 @@ enum NormType {
  *   quadrature formulae and assumes that the given finite element objects equals
  *   that used for the computation of the solution.
  * 
- *   The result ist stored in a vector (named @p{difference}), where each entry
- *   equals the given norm of the difference on one cell. The order of entries
+ *   The result is stored in a vector (named @p{difference}), where each entry
+ *   equals the given norm of the difference on a cell. The order of entries
  *   is the same as a @p{cell_iterator} takes when started with @p{begin_active} and
  *   promoted with the @p{++} operator.
  * 
- *   You can use the @p{distribute_cell_to_dof_vector} function of the @ref{DoFHandler}
- *   class to convert cell based data to a data vector with values on the degrees
- *   of freedom, which can then be attached to a @ref{DataOut} object to be printed.
+ *   You can use the @p{distribute_cell_to_dof_vector} function of the
+ *   @ref{DoFHandler} class to convert cell based data to a data
+ *   vector with values on the degrees of freedom, which can then be
+ *   added to a @ref{DataOut} object to be printed. But also you can
+ *   add a cell based data vector itself to a @ref{DataOut} object,
+ *   see the @p{DataOut::add_data_vector} functions.
  * 
  *   Presently, there is the possibility to compute the following values from the
  *   difference, on each cell: @p{mean}, @p{L1_norm}, @p{L2_norm}, @p{Linfty_norm},
- *   @p{H1_seminorm}.
+ *   @p{H1_seminorm} and @p{H1_norm}, see @p{NormType}.
  *   For the mean difference value, the reference function minus the numerical
  *   solution is computed, not the other way round.
  *
@@ -221,7 +250,7 @@ enum NormType {
  *   quadrature formula parameter. This will in some cases not be too good
  *   an approximation, since for example the Gauss quadrature formulae do
  *   not evaluate the difference at the end or corner points of the cells.
- *   You may want to chose a quadrature formula with more quadrature points
+ *   You may want to choose a quadrature formula with more quadrature points
  *   or one with another distribution of the quadrature points in this case.
  *   You should also take into account the superconvergence properties of finite
  *   elements in some points: for example in 1D, the standard finite element
@@ -231,12 +260,13 @@ enum NormType {
  *   be located at the vertices or at the center of the cell, which would make
  *   it plausible to use the Simpson quadrature rule. On the other hand, there
  *   may be superconvergence at Gauss integration points. These examples are not
- *   intended as a rule of thumb, rather they are though to illustrate that the
+ *   intended as a rule of thumb, rather they are thought to illustrate that the
  *   use of the wrong quadrature formula may show a significantly wrong result
- *   a nd care should be taken to chose the right formula.
+ *   and care should be taken to chose the right formula.
  *
- *   The $H_1$ seminorm is the $L_2$ norm of the gradient of the difference. The
- *   full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
+ *   The $H_1$ seminorm is the $L_2$ norm of the gradient of the
+ *   difference. The square of the full $H_1$ norm is the sum of the
+ *   square of seminorm and the square of the $L_2$ norm.
  * 
  *   To get the @em{global} $L_1$ error, you have to sum up the
  *   entries in @p{difference}, e.g. using
@@ -261,7 +291,7 @@ enum NormType {
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
  *
- * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000
+ * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000, 2001
  */
 class VectorTools
 {
@@ -334,24 +364,41 @@ class VectorTools
 				      * boundary first, but that you must if you
 				      * want to do so.
 				      *
-				      * This function needs the mass matrix
-				      * of the finite element space on the
-				      * present grid. To this end, the mass
-				      * matrix is assembled exactly using the
-				      * @p{create_mass_matrix} function in the
-				      * @ref{MatrixTools} collection. This function
-				      * uses the @p{get_local_mass_matrix}
-				      * function of the finite element; however,
-				      * this function is not supported by all
-				      * finite elements, in which case we
-				      * resort to numerical quadrature using the
-				      * given quadrature rule; you should
-				      * therefore make sure that the given
-				      * quadrature formula is also sufficient
-				      * for the integration of the mass matrix.
+				      * This function needs the mass
+				      * matrix of the finite element
+				      * space on the present grid. To
+				      * this end, the mass matrix is
+				      * assembled exactly using the
+				      * @p{create_mass_matrix}
+				      * function in the
+				      * @ref{MatrixTools}
+				      * collection. This function
+				      * performs numerical quadrature
+				      * using the given quadrature
+				      * rule; you should therefore
+				      * make sure that the given
+				      * quadrature formula is also
+				      * sufficient for the integration
+				      * of the mass matrix.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
+				      */
+    template <int dim>
+    static void project (const Mapping<dim>       &mapping,
+			 const DoFHandler<dim>    &dof,
+			 const ConstraintMatrix   &constraints,
+			 const Quadrature<dim>    &quadrature,
+			 const Function<dim>      &function,
+			 Vector<double>           &vec,
+			 const bool                enforce_zero_boundary = false,
+			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim-1>(),
+			 const bool                project_to_boundary_first = false);
+
+				     /**
+				      * Calls the @p{project}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
 				      */
     template <int dim>
     static void project (const DoFHandler<dim>    &dof,
@@ -470,6 +517,18 @@ class VectorTools
 				      *
 				      * See the general documentation of this
 				      * class for further information.
+				      */
+    template <int dim>
+    static void project_boundary_values (const Mapping<dim>       &mapping,
+					 const DoFHandler<dim>    &dof,
+					 const typename std::map<unsigned char,const Function<dim>*> &boundary_function,
+					 const Quadrature<dim-1>  &q,
+					 std::map<unsigned int,double> &boundary_values);
+    
+				     /**
+				      * Calls the @p{project_boundary_values}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
 				      */
     template <int dim>
     static void project_boundary_values (const DoFHandler<dim>    &dof,

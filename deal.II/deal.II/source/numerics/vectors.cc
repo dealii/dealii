@@ -292,7 +292,8 @@ VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
 #if deal_II_dimension == 1
 
 template <>
-void VectorTools::project (const DoFHandler<1>    &,
+void VectorTools::project (const Mapping<1>       &,
+			   const DoFHandler<1>    &,
 			   const ConstraintMatrix &,
 			   const Quadrature<1>    &,
 			   const Function<1>      &,
@@ -310,11 +311,13 @@ void VectorTools::project (const DoFHandler<1>    &,
   Assert (false, ExcNotImplemented());
 };
 
+
 #endif
 
 
 template <int dim>
-void VectorTools::project (const DoFHandler<dim>    &dof,
+void VectorTools::project (const Mapping<dim>       &mapping,
+			   const DoFHandler<dim>    &dof,
 			   const ConstraintMatrix   &constraints,
 			   const Quadrature<dim>    &quadrature,
 			   const Function<dim>      &function,
@@ -403,9 +406,9 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
   SparseMatrix<double> mass_matrix (sparsity);
   Vector<double> tmp (mass_matrix.n());
 
-  MatrixCreator<dim>::create_mass_matrix (dof, quadrature, mass_matrix);
+  MatrixCreator<dim>::create_mass_matrix (mapping, dof, quadrature, mass_matrix);
   
-  VectorTools::create_right_hand_side (mapping_q1, dof, quadrature, function, tmp);
+  VectorTools::create_right_hand_side (mapping, dof, quadrature, function, tmp);
 
   constraints.condense (mass_matrix);
   constraints.condense (tmp);
@@ -426,6 +429,23 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 				   // distribute solution
   constraints.distribute (vec);
 };
+
+
+template <int dim>
+void VectorTools::project (const DoFHandler<dim>    &dof,
+			   const ConstraintMatrix   &constraints,
+			   const Quadrature<dim>    &quadrature,
+			   const Function<dim>      &function,
+			   Vector<double>           &vec,
+			   const bool                enforce_zero_boundary,
+			   const Quadrature<dim-1>  &q_boundary,
+			   const bool                project_to_boundary_first)
+{
+  static const MappingQ1<dim> mapping;
+  project(mapping, dof, constraints, quadrature, function, vec,
+	  enforce_zero_boundary, q_boundary, project_to_boundary_first);
+}
+
 
 
 
@@ -533,7 +553,8 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 
 template <>
 void
-VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
+VectorTools::interpolate_boundary_values (const Mapping<1>         &,
+					  const DoFHandler<1>      &dof,
 					  const unsigned char       boundary_component,
 					  const Function<1>        &boundary_function,
 					  std::map<unsigned int,double> &boundary_values,
@@ -731,7 +752,8 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
 
 template <int dim>
 void
-VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
+VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
+				      const DoFHandler<dim>    &dof,
 				      const std::map<unsigned char,const Function<dim>*> &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
@@ -788,9 +810,9 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
   Vector<double>       rhs(sparsity.n_rows());
 
 
-  MatrixTools<dim>::create_boundary_mass_matrix (dof, q, 
-						 mass_matrix, boundary_functions,
-						 rhs, dof_to_boundary_mapping);
+  MatrixCreator<dim>::create_boundary_mass_matrix (mapping, dof, q, 
+						   mass_matrix, boundary_functions,
+						   rhs, dof_to_boundary_mapping);
 
 				   // same thing as above: if dim>=3 we need
 				   // to consider constraints
@@ -820,6 +842,18 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				       // thus in the solution vector
       boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
 };
+
+
+template <int dim>
+void
+VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
+				      const std::map<unsigned char,const Function<dim>*> &boundary_functions,
+				      const Quadrature<dim-1>  &q,
+				      std::map<unsigned int,double> &boundary_values)
+{
+  static const MappingQ1<dim> mapping;
+  project_boundary_values(mapping, dof, boundary_functions, q, boundary_values);
+}
 
 
 
