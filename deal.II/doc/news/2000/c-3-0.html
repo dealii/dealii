@@ -55,13 +55,16 @@
   allows to re-use an object without deleting the <code
   class="class">DoFHandler</code>
 
-  <li> New: <code class="class">class DoFPrintSolverStep</code> prints intermediate
-  vectors of a solver as finite element functions using
+  <li> New: <code class="class">class DoFPrintSolverStep</code> prints
+  intermediate vectors of a solver as finite element functions using
   <code class="class">DataOut</code>.
 
   <li> New: <code class="class">class GradientEstimator</code>
   estimates the norm of the gradient on each cell from finite
   difference approximations. 
+
+  <li> New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
+  allows to use different discretization grids for different variables.
 </ol>
 
 <hr>

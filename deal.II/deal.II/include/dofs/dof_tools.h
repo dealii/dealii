@@ -53,7 +53,7 @@
  * other basis functions on a cell adjacent to the boundary vanish at the
  * boundary itself, except for those which are located on the boundary.
  *
- * @author Wolfgang Bangerth and others, 1998, 1999
+ * @author Wolfgang Bangerth and others, 1998, 1999, 2000
  */
 class DoFTools
 {
@@ -372,7 +372,220 @@ class DoFTools
 		       const vector<bool>      &select,
 		       vector<bool>            &selected_dofs);
 
-
+				     /**
+				      * This function can be used when
+				      * different variables shall be
+				      * discritized on different
+				      * grids, where one grid is
+				      * coarser than the other. This
+				      * idea might seem nonsensical at
+				      * first, but has reasonable
+				      * applications in inverse
+				      * (parameter estimation)
+				      * problems, where there might
+				      * not be enough information to
+				      * recover the parameter on the
+				      * same grid as the state
+				      * variable; furthermore, the
+				      * smoothness properties of state
+				      * variable and parameter might
+				      * not be too much related, so
+				      * using different grids might be
+				      * an alternative to using
+				      * stronger regularization of the
+				      * problem.
+				      *
+				      * The basic idea of this
+				      * function is explained in the
+				      * following. Let us, for
+				      * convenience, denote by
+				      * ``parameter grid'' the coarser
+				      * of the two grids, and by
+				      * ``state grid'' the finer of
+				      * the two. We furthermore assume
+				      * that the finer grid can be
+				      * obtained by refinement of the
+				      * coarser one, i.e. the fine
+				      * grid is at least as much
+				      * refined as the coarse grid at
+				      * each point of the
+				      * domain. Then, each shape
+				      * function on the coarse grid
+				      * can be represented as a linear
+				      * combination of shape functions
+				      * on the fine grid (assuming
+				      * identical ansatz
+				      * spaces). Thus, if we
+				      * discretize as usual, using
+				      * shape functions on the fine
+				      * grid, we can consider the
+				      * restriction that the parameter
+				      * variable shall in fact be
+				      * discretized by shape functions
+				      * on the coarse grid as a
+				      * constraint. These constraints
+				      * are linear and happen to have
+				      * the form managed by the
+				      * ``ConstraintMatrix'' class.
+				      *
+				      * The construction of these
+				      * constraints is done as
+				      * follows: for each of the
+				      * degrees of freedom (i.e. shape
+				      * functions) on the coarse grid,
+				      * we compute its representation
+				      * on the fine grid, i.e. how the
+				      * linear combination of shape
+				      * functions on the fine grid
+				      * looks like that resembles the
+				      * shape function on the coarse
+				      * grid. From this information,
+				      * we can then compute the
+				      * constraints which have to hold
+				      * if a solution of a linear
+				      * equation on the fine grid
+				      * shall be representable on the
+				      * coarse grid. The exact
+				      * algorithm how these
+				      * constraints can be computed is
+				      * rather complicated and is best
+				      * understood by reading the
+				      * source code, which contains
+				      * many comments.
+				      *
+				      * Before explaining the use of
+				      * this function, we would like
+				      * to state that the total number
+				      * of degrees of freedom used for
+				      * the discretization is not
+				      * reduced by the use of this
+				      * function, i.e. even though we
+				      * discretize one variable on a
+				      * coarser grid, the total number
+				      * of degrees of freedom is that
+				      * of the fine grid. This seems
+				      * to be counter-productive,
+				      * since it does not give us a
+				      * benefit from using a coarser
+				      * grid. The reason why it may be
+				      * useful to choose this approach
+				      * nonetheless is three-fold:
+				      * first, as stated above, there
+				      * might not be enough
+				      * information to recover a
+				      * parameter on a fine grid,
+				      * i.e. we chose to discretize it
+				      * on the coarse grid not to save
+				      * DoFs, but for other
+				      * reasons. Second, the
+				      * ``ConstraintMatrix'' includes
+				      * the constraints into the
+				      * linear system of equations, by
+				      * which constrained nodes become
+				      * dummy nodes; we may therefore
+				      * exclude them from the linear
+				      * algebra, for example by
+				      * sorting them to the back of
+				      * the DoF numbers and simply
+				      * calling the solver for the
+				      * upper left block of the matrix
+				      * which works on the
+				      * non-constrained nodes only,
+				      * thus actually realizing the
+				      * savings in numerical effort
+				      * from the reduced number of
+				      * actual degrees of freedom. The
+				      * third reason is that for some
+				      * or other reason we have chosen
+				      * to use two different grids, it
+				      * may be actually quite
+				      * difficult to write a function
+				      * that assembles the system
+				      * matrix for finite element
+				      * spaces on different grids;
+				      * using the approach of
+				      * constraints as with this
+				      * function allows to use
+				      * standard techniques when
+				      * discretizing on only one grid
+				      * (the finer one) without having
+				      * to take care of the fact that
+				      * one or several of the variable
+				      * actually belong to different
+				      * grids.
+				      *
+				      * The use of this function is as
+				      * follows: it accepts as
+				      * parameters two DoF Handlers,
+				      * the first of which refers to
+				      * the coarse grid and the second
+				      * of which is the fine grid. On
+				      * both, a finite element is
+				      * represented by the DoF handler
+				      * objects, which will usually
+				      * have several components, which
+				      * may belong to different finite
+				      * elements. The second and
+				      * fourth parameter of this
+				      * function therefore state which
+				      * variable on the coarse grid
+				      * shall be used to restrict the
+				      * stated component on the fine
+				      * grid. Of course, the finite
+				      * elements used for the
+				      * respective components on the
+				      * two grids need to be the
+				      * same. An example may clarify
+				      * this: consider the parameter
+				      * estimation mentioned briefly
+				      * above; there, on the fine grid
+				      * the whole discretization is
+				      * done, thus the variables are
+				      * ``u'', ``q'', and the Lagrange
+				      * multiplier ``lambda'', which
+				      * are discretized using
+				      * continuous linear, piecewise
+				      * constant discontinuous, and
+				      * continuous linear elements,
+				      * respectively. Only the
+				      * parameter ``q'' shall be
+				      * represented on the coarse
+				      * grid, thus the DoFHandler
+				      * object on the coarse grid
+				      * represents only one variable,
+				      * discretized using piecewise
+				      * constant discontinuous
+				      * elements. Then, the parameter
+				      * denoting the component on the
+				      * coarse grid would be zero (the
+				      * only possible choice, since
+				      * the variable on the coarse
+				      * grid is scalar), and one on
+				      * the fine grid (corresponding
+				      * to the variable ``q''; zero
+				      * would be ``u'', two would be
+				      * ``lambda''). Furthermore, an
+				      * object of type #IntergridMap#
+				      * is needed; this could in
+				      * principle be generated by the
+				      * function itself from the two
+				      * DoFHandler objects, but since
+				      * it is probably available
+				      * anyway in programs that use
+				      * this function, we shall use it
+				      * instead of re-generating
+				      * it. Finally, the computed
+				      * constraints are entered into a
+				      * variable of type
+				      * #ConstraintMatrix#; the
+				      * constraints are added,
+				      * i.e. previous contents which
+				      * may have, for example, be
+				      * obtained from hanging nodes,
+				      * are not deleted, so that you
+				      * only need one object of this
+				      * type.
+				      */
     template <int dim>
     static void
     compute_intergrid_constraints (const DoFHandler<dim>              &coarse_grid,
