@@ -1311,11 +1311,11 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 		{
 		  const unsigned int vertex_index=face->vertex_index(vertex_no);
 		  map_iter=new_points.find(vertex_index);
-		  Assert(map_iter!=map_end, ExcInternalError());
-		  
-		  for (unsigned int i=0; i<dim; ++i)
-		    m[i].insert(std::pair<unsigned int,double> (
-				  face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
+
+		  if (map_iter!=map_end)
+		    for (unsigned int i=0; i<dim; ++i)
+		      m[i].insert(std::pair<unsigned int,double> (
+				    face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
 		}
 	  }
     }
