@@ -23,4 +23,20 @@ AC_ARG_WITH(deal,
     fi)
 AC_SUBST(DEAL2_DIR)
 
+
+dnl Check whether we can use "test -L" and if not substitute it with
+dnl "bash test -L". Unfortunately, the systems where either works seem
+dnl mutually exclusive
+rm -f acconfig.link
+AC_MSG_CHECKING(for test -L)
+ln -s Makefile acconfig.link
+if test -L acconfig.link ; then
+  TEST_MINUS_L="test -L" ;
+else
+  TEST_MINUS_L="bash test -L" ;
+fi
+rm acconfig.link
+AC_MSG_RESULT($TEST_MINUS_L)
+AC_SUBST(TEST_MINUS_L)
+
 AC_OUTPUT(Makefile.paths)

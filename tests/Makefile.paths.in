@@ -2,3 +2,5 @@
 # which are changed by the ./configure file.
 
 D = @DEAL2_DIR@
+
+TEST_MINUS_L = @TEST_MINUS_L@
