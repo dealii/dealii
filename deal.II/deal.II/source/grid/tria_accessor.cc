@@ -1572,6 +1572,17 @@ bool CellAccessor<1>::point_inside (const Point<1> &p) const
   return (vertex(0)[0] <= p[0]) && (p[0] <= vertex(1)[0]);
 }
 
+
+template <>
+std::pair<unsigned int, unsigned int>
+CellAccessor<1>::neighbor_of_coarser_neighbor (const unsigned int) const
+{
+  Assert(false, ExcImpossibleInDim(1));
+  return std::make_pair (static_cast<unsigned int>(-1),
+			 static_cast<unsigned int>(-1));
+}
+
+
 #endif
 
 
@@ -1807,7 +1818,7 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
 
 
 template <int dim>
-pair<unsigned int, unsigned int>
+std::pair<unsigned int, unsigned int>
 CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) const
 {
 				   // make sure that the neighbor is
@@ -1842,7 +1853,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
   if (face_guess->has_children())
     for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face; ++subface_no)
       if (face_guess->child(subface_no)==this_face)
-	return pair<unsigned int,unsigned int> (face_no_guess, subface_no);
+	return std::make_pair (face_no_guess, subface_no);
 
 				     // if the guess was false, then
 				     // we need to loop over all faces
@@ -1857,7 +1868,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 	  if (face->has_children())
 	    for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face; ++subface_no)
 	      if (face->child(subface_no)==this_face)
-		return pair<unsigned int,unsigned int> (face_no, subface_no);
+		return std::make_pair (face_no, subface_no);
 	}
     }
   
@@ -1865,8 +1876,8 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 				   // since then we did not find
 				   // our way back...
   Assert (false, ExcInternalError());
-  return pair<unsigned int,unsigned int> (static_cast<unsigned int>(-1),
-					  static_cast<unsigned int>(-1));
+  return std::make_pair (static_cast<unsigned int>(-1),
+			 static_cast<unsigned int>(-1));
 };
 
 

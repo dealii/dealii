@@ -1883,9 +1883,13 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * pair of numbers, face_no and
 				      * subface_no, with the following
 				      * property:
-				      * @p{cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell}.
+				      * @p{cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)}.
+				      *
+				      * This function is impossible
+				      * for @p{dim==1}.
 				      */
-    std::pair<unsigned int, unsigned int> neighbor_of_coarser_neighbor (const unsigned int neighbor) const;
+    std::pair<unsigned int, unsigned int>
+    neighbor_of_coarser_neighbor (const unsigned int neighbor) const;
     
 				     /**
 				      *  Return whether the @p{i}th
