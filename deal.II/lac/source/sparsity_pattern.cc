@@ -496,7 +496,6 @@ SparsityPattern::max_entries_per_row () const
 
 
 
-inline
 unsigned int
 SparsityPattern::operator () (const unsigned int i,
 			      const unsigned int j) const
