@@ -477,23 +477,31 @@ TriaIterator<dim,TriaObjectAccessor<1, dim> >
 TriaObjectAccessor<3, dim>::line (const unsigned int i) const {
   Assert (used(), ExcCellNotUsed());
   Assert (i<12, ExcIndexRange (i,0,12));
-  
+
+				   // egcs 1.1.2 gets into trouble if we
+				   // omit the this-> here, if one tries to
+				   // inline this function into another
+				   // function where the variable name
+				   // quad is also used.. It then complains
+				   // that the name look-up for
+				   // for-loop-variables has changed. using
+				   // this-> as here works around the problem
   if (i<4)
-    return quad(0)->line(i);
+    return this->quad(0)->line(i);
   else
     if (i<8)
-      return quad(1)->line(i-4);
+      return this->quad(1)->line(i-4);
     else
       switch (i) 
 	{
 	  case 8:
-		return quad(2)->line(3);
+		return this->quad(2)->line(3);
 	  case 9:
-		return quad(2)->line(1);
+		return this->quad(2)->line(1);
 	  case 10:
-		return quad(4)->line(1);
+		return this->quad(4)->line(1);
 	  case 11:
-		return quad(4)->line(3);
+		return this->quad(4)->line(3);
 	};
   Assert (false, ExcIndexRange(i,0,12));
   return TriaIterator<dim,TriaObjectAccessor<1, dim> >(tria, -1, -1, 0);
