@@ -98,7 +98,10 @@ resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
 
 clean: clean-base clean-lac clean-deal.II clean-fe clean-bits
+	-rm -f abort.o
+
 distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits
+	-rm -f abort.o
 
 clean-base:
 	cd base ; $(MAKE) clean
