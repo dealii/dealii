@@ -1707,7 +1707,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      * Exception
 				      */
     DeclException1 (ExcInvalidValue,
-		    int,
+		    double,
 		    << "The following value does not fulfil the requirements: " << arg1);
 };
 
