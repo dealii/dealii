@@ -52,7 +52,7 @@ clean:
 ../lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 ifneq (1,${recursive-make-fwd-decl})
 	@echo ============================ Remaking Makefile
-	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files)               \
+	@perl $D/common/scripts/Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files)               \
 		| perl -p -e 's!^.*\((.*\.(g?o))\):!../lib/$$2/$$1:!g;' \
 		> ../lib/Makefile.dep
 else

@@ -87,7 +87,7 @@ clean:
 ../lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 ifneq (1,${recursive-make-fwd-decl})
 	@echo ============================ Remaking Makefile
-	@perl ../Make_dep.pl ../lib/libbase $(INCLUDE) $(cc-files) \
+	@perl $D/common/scripts/Make_dep.pl ../lib/libbase $(INCLUDE) $(cc-files) \
 		| perl -p -e 's!^.*\((.*\.(g?o))\):!../lib/$$2/$$1:!g;' \
 		| perl -p -e 's!(.*data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2!g;' \
 		> ../lib/Makefile.dep
