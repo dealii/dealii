@@ -55,3 +55,6 @@ Let an empty dfmatrix assume it has dimensions zero rather than one!
 
 Is dvector::operator= (double) really useful or does it make more
   confusion than it helps?
+
+
+Give mia::State a much better name, same for Control ! :-]]]
