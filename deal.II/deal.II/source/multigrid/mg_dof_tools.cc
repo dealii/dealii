@@ -451,20 +451,17 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
                         const std::vector<bool>& selected,
 			const std::vector<unsigned int>& target_component)
 {
-  const unsigned int ncomp = mg_dof.get_fe().n_components();
-
   Assert (selected.size() == target_component.size(),
 	  ExcDimensionMismatch(selected.size(), target_component.size()));
   
 				   // Compute the number of blocks needed
-  if (DEBUG)
-    {
-      const unsigned int n_selected
-	= std::accumulate(selected.begin(),
-			  selected.end(),
-			  0U);
-      Assert(n_selected == 1, ExcDimensionMismatch(n_selected, 1));
-    }
+#ifdef DEBUG
+  const unsigned int n_selected
+    = std::accumulate(selected.begin(),
+		      selected.end(),
+		      0U);
+  Assert(n_selected == 1, ExcDimensionMismatch(n_selected, 1));
+#endif
   
   unsigned int selected_block = 0;
   while (!selected[selected_block])
