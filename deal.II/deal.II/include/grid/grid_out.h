@@ -400,24 +400,28 @@ namespace GridOutFlags
   struct XFig
   {
 				       /**
-					* Method for filling cells
-					*/
-      unsigned int fill_style;
-				       /**
-					* Draw boundary lines.
+					* Draw boundary lines. Default is true.
 					*/
       bool draw_boundary;
 				       /**
-					* Change color depending on level.
+					* Change color depending on
+					* level. Default is false, therefore,
+					* color is coded by material or
+					* boundary id.
 					*/
       bool level_color;
 				       /**
-					* Code level to depth.
+					* Code level to depth. Default is
+					* true. If false, color depends on
+					* material or boundary id.
+					*
+					* Depth of the object is 900-level, if
+					* this value is true.
 					*/
       bool level_depth;
 				       /**
 					* Additional points for curved
-					* boundaries.
+					* boundaries. Default is none.
 					*/
       unsigned int n_boundary_face_points;
 
@@ -435,6 +439,26 @@ namespace GridOutFlags
 					* each direction.
 					*/
       Point<2> offset;
+				       /**
+					* Style for filling cells. Default is
+					* solid fill (20). This value is
+					* forwarded unchanged into the
+					* corresponding field
+					* <tt>fill_style</tt> of the polyline
+					* object of XFig.
+					*/
+      int fill_style;
+                                       /**
+					* Style for drawing border lines of
+					* polygons. Defaults to solid (0) and
+					* is forwarded to XFig.
+					*/
+      int line_style;
+                                       /**
+					* Style for drawing lines at the
+					* boundary. Defaults to solid (0).
+					*/
+      int boundary_style;
       
 				       /**
 					* Constructor.
@@ -526,7 +550,7 @@ namespace GridOutFlags
  * as usual.
  *
  *
- * @author Wolfgang Bangerth, 1999; postscript format based on an implementation by Stefan Nauber, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2003; postscript format based on an implementation by Stefan Nauber, 1999
  */
 class GridOut 
 {
@@ -733,7 +757,28 @@ class GridOut
 		    const Mapping<1>       *mapping=0);
 
 				     /**
-				      * Write XFig-file.
+				      * Write two-dimensional XFig-file.
+				      *
+				      * This function writes all grid cells as
+				      * polygons and optionally boundary
+				      * lines. Several parameters can be
+				      * adjusted by the XFigFlags control
+				      * object.
+				      *
+				      * If levels are coded to depth, the
+				      * complete grid hierarchy is plotted
+				      * with fine cells before their
+				      * parents. This way, levels can be
+				      * switched on and off in xfig by
+				      * selecting levels.
+				      *
+				      * Polygons are either at depth 900-level
+				      * or at 900+@p material_id, depending on
+				      * the flag @p level_depth. Accordingly,
+				      * boundary edges are at depth 800-level
+				      * or at 800+@p boundary_id. Therefore,
+				      * boundary edges are alway in front of
+				      * cells.
 				      */
     template <int dim>
     void write_xfig (const Triangulation<dim> &tria,

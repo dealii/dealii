@@ -408,16 +408,20 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 
   for (;cell != end; ++cell)
     {
+	// If depth is not encoded, write finest level only
+	if (!xfig_flags.level_depth && !cell->is_active())
+	    continue;
 				       // Code for polygon
-      out << "2 3 "
-					 // with solid black line thickness 1
-	  << " 0 1 0 ";
+      out << "2 3  "
+					 // with black line thickness 1
+	  << xfig_flags.line_style
+	  <<" 1 0 ";
 					 // Fill color
       if (xfig_flags.level_color)
 	out << cell->level() + 8;
       else
 	out << cell->material_id() + 1;
-				       // Depth, unused, solid fill
+				       // Depth, unused, fill
       out << ' '
 	  << (xfig_flags.level_depth
 	      ? (900-cell->level())
@@ -455,8 +459,9 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 	      {
 						 // Code for polyline
 		out << "2 1 "
-						   // with solid line thickness 3
-		    << " 0 3 ";
+						   // with line thickness 3
+		    << xfig_flags.boundary_style
+		    << " 3 ";
 		out << (1 + (unsigned int) bi);
 						 // Fill color
 		out << " -1 ";

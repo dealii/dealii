@@ -115,12 +115,15 @@ namespace GridOutFlags
 
 
   XFig::XFig ()
-		  : fill_style (20), // filled
+		  :
     draw_boundary(true),
     level_color(false),
     level_depth(true),
     n_boundary_face_points(0),
-    scaling(1.,1.)
+    scaling(1.,1.),
+    fill_style (20),
+    line_style(0),
+    boundary_style(0)
   {}
 }  // end namespace GridOutFlags
 
