@@ -75,13 +75,24 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
-#if deal_II_dimension == 2
+#if deal_II_dimension == 1
 
 template <>
 void
-HyperBallBoundary<2>::get_intermediate_points_on_line (
-  const Triangulation<2>::line_iterator &line,
-  std::vector<Point<2> > &points) const
+HyperBallBoundary<1>::get_intermediate_points_on_line (
+  const Triangulation<1>::line_iterator &line,
+  std::vector<Point<1> > &points) const
+{
+  Assert(false, ExcInternalError());
+}
+
+#else
+
+template <int dim>
+void
+HyperBallBoundary<dim>::get_intermediate_points_on_line (
+  const typename Triangulation<dim>::line_iterator &line,
+  typename std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -89,41 +100,67 @@ HyperBallBoundary<2>::get_intermediate_points_on_line (
     points[0]=get_new_point_on_line(line);
   else
     {
-      Point<2> v0=line->vertex(0)-center,
-	       v1=line->vertex(1)-center;
+      Point<dim> v0=line->vertex(0)-center,
+		 v1=line->vertex(1)-center;
+      const double length=sqrt((v1-v0).square());
+
       double eps=1e-14;
       Assert(fabs(v0.square()-radius*radius)<eps, ExcInternalError());
       Assert(fabs(v1.square()-radius*radius)<eps, ExcInternalError());
       
-      double alpha=acos((v0*v1)/sqrt(v0.square()*v1.square()))/(n+1);
+      const double alpha=acos((v0*v1)/sqrt(v0.square()*v1.square()));
+      const double d_alpha=alpha/(n+1);
+      const Point<dim> pm=StraightBoundary<dim>::get_new_point_on_line (line)-center;
 
-      Tensor<2,2> S;
-      S[0][0]=cos(alpha);
-      S[1][0]=sin(alpha);
-      S[0][1]=-S[1][0];
-      S[1][1]=S[0][0];
+      const double h=sqrt(pm.square());
 
-      contract(points[0], S, v0);
-      for (unsigned int i=1; i<n; ++i)
-	contract(points[i], S, points[i-1]);
+      double beta=0;
+      unsigned int left_index=0, right_index=0;
+      if ((n+1)%2==0)
+	{
+					   // if the number of
+					   // parts is even insert
+					   // the midpoint
+	  left_index=(n-1)/2;
+	  right_index=left_index;
+	  points[left_index]=pm;
+	  --left_index;
+	  ++right_index;
+	  beta=d_alpha;
+	}
+      else
+	{
+	  beta=(n/2+1)*d_alpha-alpha/2.;
+	  right_index=n/2;
+	  left_index=n/2-1;
+	}
+      
+				       // n even:  m=n/2,
+				       // n odd:   m=(n-1)/2
+      const unsigned int m=n/2;
+      for (unsigned int i=0; i<m ; ++i, ++right_index, --left_index, beta+=d_alpha)
+	{
+	  Assert(right_index<n, ExcInternalError());
+	  Assert(left_index+1>=1, ExcInternalError());
+	  
+	  double d=h*tan(beta);
+  	  points[right_index]=pm+d/length*(v1-v0);
+  	  points[left_index]=pm-d/length*(v1-v0);
+	}
+      
 
+				       // project the points from the
+				       // straight line to the
+				       // HyperBallBoundary
       for (unsigned int i=0; i<n; ++i)
-	points[i]+=center;
+	{
+	  points[i] *= radius / sqrt(points[i].square());
+	  points[i] += center;
+	}
     }
 }
 
 #endif
-
-
-template <int dim>
-void
-HyperBallBoundary<dim>::get_intermediate_points_on_line (
-  const typename Triangulation<dim>::line_iterator &,
-  typename std::vector<Point<dim> > &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
 
 #if deal_II_dimension == 3
 
