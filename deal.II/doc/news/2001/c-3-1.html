@@ -318,6 +318,20 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: A <code class="class">typedef FunctionMap</code> was
+       declared in at least four places previously (in classes <code
+       class="class">DoFHandler</code>, <code
+       class="class">MatrixTools</code>, <code
+       class="class">VectorTools</code>, and <code
+       class="class">KellyErrorEstimator</code>). It is now unified in
+       one place and is called <code
+       class="class">FunctionMap<dim>::type</code> (it is a local
+       typedef in a class called <code class="class">FunctionMap</code>).
+       <br>
+       (WB 2001/04/09)
+       </p>
+       
+  <li> <p>
        Fixed: When using Neuman boundary functions in the 
        <code class="class">KellyErrorEstimator</code> class, it was
        assumed that the function object had <code
