@@ -1017,14 +1017,14 @@ class FEValuesBase : protected FEValuesData<dim>
                                       * this, and introducing a base
                                       * class of iterators and making
                                       * a function virtual penalizes
-                                      * @em{all} users of the
+                                      * <em>all</em> users of the
                                       * iterators, which are basically
                                       * intended as very fast accessor
                                       * functions. So we do not want
                                       * to do this. Rather, what we do
                                       * here is making the functions
                                       * we need virtual only for use
-                                      * with @em{this class}. The idea
+                                      * with <em>this class</em>. The idea
                                       * is the following: have a
                                       * common base class which
                                       * declares some pure virtual
