@@ -2,7 +2,7 @@
 # Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -27,10 +27,11 @@ quadrature_test.exe: quadrature_test.go    $(libraries)
 reference.exe      : reference.go abort.go $(libraries)
 tensor.exe         : tensor.go             $(libraries)
 timer.exe          : timer.go              $(libraries)
+vector2d.exe       : vector2d.go           $(libraries)
 auto_derivative_function.exe        : auto_derivative_function.go            $(libraries)
 
 
-tests = logtest reference quadrature_test tensor timer polynomial1d polynomial_test auto_derivative_function
+tests = logtest reference quadrature_test tensor timer polynomial1d polynomial_test auto_derivative_function vector2d
 
 ############################################################
 

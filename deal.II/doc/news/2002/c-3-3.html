@@ -68,6 +68,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       New: The <code class="class">vector2d</code> class now not only
+       allows access to elements through the <code
+       class="member">operator()(unsingned int,unsigned int)</code>
+       (i.e. matrix or Fortran style access), but also through nested
+       brackets via an <code class="member">operator[]</code>
+       (i.e. like to a two-dimensional C-style array).
+       <br>
+       (WB 2002/03/08)
+       </p> 
+
+  <li> <p>
        Changed: The function <code class="class">MultithreadInfo</code>::
        <code class="member">get_n_cpus</code> now reports the proper number
        of CPUs when running on Silicon Graphics.
