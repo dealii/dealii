@@ -223,8 +223,9 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 	    default:
 		  Assert (false, ExcNotImplemented());
 	  };
+				       // note: vertex numbers are 1-base
 	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
-	  out << face->vertex_index(vertex) << ' ';
+	  out << face->vertex_index(vertex)+1 << ' ';
 	out << std::endl;
 
 	++index;
