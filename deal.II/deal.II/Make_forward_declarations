@@ -1,0 +1,57 @@
+# call this script with a list of files it shall process for
+# class and struct declarations.
+
+
+#fill list of files to be processed
+while ($ARGV[0]) {
+    @input_files = (@input_files, shift);
+}
+
+
+foreach $file (@input_files) {
+    parse_class_declarations ($file);
+};
+
+
+
+
+
+
+
+sub parse_class_declarations {
+    local ($filename) = $_[0];
+    
+    open (FILE, $filename);
+    while (<FILE>) {
+
+	# if the lines contains a "template" at the 
+	# beginning and no semicolon at the end: join it
+	# with the next line.
+	if ( /^\s*template/ && !/;\s*$/ ) {
+	    s/\n//;
+	    $_ = $_ . " " . <FILE>;
+	}
+
+	if ( /^\s*((template\s*<(([-\w,_\s]|<([-\w_,+\s])+>)+)>\s*)?(class|struct))(.*)/ ) {
+	    # this is the declaration of a class, possibly a template
+	    $basepart = $1;
+	    $rest     = $7;
+
+	    # test whether it is a forward declaration or something else.
+	    # $rest contains the name of the class and what comes after that
+	    #
+	    # first extract the name of the class
+	    $rest =~ /([\w_]+(\s*<(([-\w,_\s]|<([-\w,+\s])+>)+)>)?)(.*)/;
+
+	    $name = $1;
+	    $rest = $6;
+
+	    # we look for declarations, where after the name comes a colon
+	    # or an open-brace
+	    if ($rest =~ /^\s*[:\{;]/) {
+#		print "$_";
+		print "$basepart $name;\n";
+	    }
+	}
+    }
+}
