@@ -369,10 +369,6 @@ void DataOut<dim>::build_some_patches (Data data)
     {
       Assert (patch != this->patches.end(), ExcInternalError());
 
-				       // Insert cell-patch pair into
-				       // map for neighbors
-      data.patch_map->insert(typename PatchMap::value_type(cell, patch));
-      
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 	patch->vertices[vertex] = cell->vertex(vertex);
       
@@ -430,7 +426,78 @@ void DataOut<dim>::build_some_patches (Data data)
 		} 
 	    };
 	};
-      				       // next cell (patch) in this thread
+
+                                       // now fill the neighbors fields
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        {
+                                           // let's look up whether
+                                           // the neighbor behind that
+                                           // face is noted in the
+                                           // table of cells which we
+                                           // treat. this can only
+                                           // happen if the neighbor
+                                           // exists, and is on the
+                                           // same level as this cell,
+                                           // but it may also happen
+                                           // that the neighbor is not
+                                           // a member of the range of
+                                           // cells over which we loop
+          if (cell->at_boundary(f)
+              ||
+              (cell->neighbor(f)->level() != cell->level()))
+            continue;
+
+          const typename DoFHandler<dim>::cell_iterator
+            neighbor = cell->neighbor(f);
+          if ((*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()]
+              ==
+              ::DataOutBase::Patch<dim>::no_neighbor)
+            continue;
+
+                                           // now, there is a
+                                           // neighbor, so get its
+                                           // patch number and set it
+                                           // for the neighbor index
+          const unsigned int neighbor_patch_index
+            = this->patches[(*data.cell_to_patch_index_map)
+                            [neighbor->level()][neighbor->index()]].patch_index;
+          
+//TODO:[GK] Shouldn't we use the deal.II (i.e. the unnatural) numbering of the neighbors here as well rather than some new numbering scheme?
+
+	  switch (dim)
+	    {
+	      case 1:
+		    patch->neighbors[f] = neighbor_patch_index;
+		    break;
+		    
+	      case 2:
+                    switch (f)
+                      {
+                        case 0: patch->neighbors[2] = neighbor_patch_index; break;
+                        case 1: patch->neighbors[1] = neighbor_patch_index; break;
+                        case 2: patch->neighbors[3] = neighbor_patch_index; break;
+                        case 3: patch->neighbors[0] = neighbor_patch_index; break;
+                      }
+                    break;
+	      case 3:
+                    switch (f)
+                      {
+                        case 0: patch->neighbors[2] = neighbor_patch_index; break;
+                        case 1: patch->neighbors[3] = neighbor_patch_index; break;
+                        case 2: patch->neighbors[4] = neighbor_patch_index; break;
+                        case 3: patch->neighbors[1] = neighbor_patch_index; break;
+                        case 4: patch->neighbors[5] = neighbor_patch_index; break;
+                        case 5: patch->neighbors[0] = neighbor_patch_index; break;
+                      }
+                    break;
+
+	      default:
+                    Assert(false, ExcNotImplemented());
+	    }          
+        };
+      
+      				       // next cell (patch) in this
+      				       // thread
       for (unsigned int i=0;
 	   (i<data.n_threads)&&(cell != this->dofs->end()); ++i)
 	{
@@ -483,34 +550,33 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
     };
   
 				   // first count the cells we want to
-				   // create patches of and make sure
-				   // there is enough memory for that
+				   // create patches of. also fill the
+				   // // object that maps the cell
+				   // indices to the patch numbers, as
+				   // this will be needed for
+				   // generation of neighborship
+				   // information
+  std::vector<std::vector<unsigned int> > cell_to_patch_index_map;
+  cell_to_patch_index_map.resize (this->dofs->get_tria().n_levels());
+  for (unsigned int l=0; l<this->dofs->get_tria().n_levels(); ++l)
+    cell_to_patch_index_map[l].resize (this->dofs->get_tria().n_cells(l),
+                                       ::DataOutBase::Patch<dim>::no_neighbor);
+                                  
   unsigned int n_patches = 0;
   for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
        cell != this->dofs->end();
        cell = next_cell(cell))
-    ++n_patches;
-
-  
-  PatchMap patch_map;
-    
-  std::vector<Data> thread_data(n_threads);
-
-				   // init data for the threads
-  for (unsigned int i=0;i<n_threads;++i)
     {
-      thread_data[i].n_threads      = n_threads;
-      thread_data[i].this_thread    = i;
-      thread_data[i].n_components   = n_components;
-      thread_data[i].n_datasets     = n_datasets;
-      thread_data[i].n_subdivisions = n_subdivisions;
-      thread_data[i].patch_map      = &patch_map;
-      thread_data[i].patch_values.resize (n_q_points);
-      thread_data[i].patch_values_system.resize (n_q_points);
+      Assert (static_cast<unsigned int>(cell->level()) <
+              cell_to_patch_index_map.size(),
+              ExcInternalError());
+      Assert (static_cast<unsigned int>(cell->index()) <
+              cell_to_patch_index_map[cell->level()].size(),
+              ExcInternalError());
       
-      for (unsigned int k=0; k<n_q_points; ++k)
-	thread_data[i].patch_values_system[k].reinit(n_components);
-    }
+      cell_to_patch_index_map[cell->level()][cell->index()] = n_patches;
+      ++n_patches;
+    };
 
 				   // create the patches with default
 				   // values. allocate as many patches
@@ -519,104 +585,42 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // or similar operations are used
 				   // which would regularly overflow
 				   // the allocated amount of memory
+                                   //
+                                   // then number the patches
+                                   // consecutively
   ::DataOutBase::Patch<dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
   this->patches.insert (this->patches.end(), n_patches, default_patch);
 
-#ifdef DEAL_II_USE_MT
+  for (unsigned int i=0; i<this->patches.size(); ++i)
+    this->patches[i].patch_index = i;
+  
+
+				   // init data for the threads    
+  std::vector<Data> thread_data(n_threads);
+  for (unsigned int i=0;i<n_threads;++i)
+    {
+      thread_data[i].n_threads      = n_threads;
+      thread_data[i].this_thread    = i;
+      thread_data[i].n_components   = n_components;
+      thread_data[i].n_datasets     = n_datasets;
+      thread_data[i].n_subdivisions = n_subdivisions;
+      thread_data[i].patch_values.resize (n_q_points);
+      thread_data[i].patch_values_system.resize (n_q_points);
+
+      thread_data[i].cell_to_patch_index_map = &cell_to_patch_index_map;
+      
+      for (unsigned int k=0; k<n_q_points; ++k)
+	thread_data[i].patch_values_system[k].reinit(n_components);
+    }
 
   Threads::ThreadManager thread_manager;  
-  for (unsigned int l=0;l<n_threads;++l)
+  for (unsigned int l=0; l<n_threads; ++l)
     Threads::spawn (thread_manager,
 		    Threads::encapsulate (&DataOut<dim>::build_some_patches)
 		    .collect_args (this, thread_data[l]));
   thread_manager.wait();
-  
-				   // just one thread
-#else
-  build_some_patches(thread_data[0]);
-#endif
-//TODO: New code for neighbors: Parallelize?
-
-				   // First, number patches
-				   // consecutively.
-  unsigned int patch_no = 0;
-  for (typename std::vector< ::DataOutBase::Patch<dim> >::iterator
-	 patch = this->patches.begin(); patch != this->patches.end(); ++patch)
-    patch->me = patch_no++;
-
-				   // Traverse the map of cells
-				   // created in build_some_patches
-				   // and enter numbers of neighboring
-				   // patches on the same level.
-  for (typename PatchMap::iterator map_entry = patch_map.begin();
-       map_entry != patch_map.end();
-       ++map_entry)
-    {
-      const typename DoFHandler<dim>::cell_iterator
-	cell = map_entry->first;
-      const typename std::vector< ::DataOutBase::Patch<dim> >::iterator
-	patch = map_entry->second;
-
-				       // loop over all faces and see
-				       // whether there's a cell
-				       // behind that for which we
-				       // need to set neighbor
-				       // information
-      for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
-	{
-					   // we can't do anything if
-					   // - there is no neighbor
-					   // - the neighbor is coarser
-					   // - or the cell behind the
-					   //   face is refined, i.e. is
-					   //   not inserted into the map
-	  if (cell->at_boundary(i) ||
-	      (cell->level() != cell->neighbor(i)->level()) ||
-	      (patch_map.find(cell->neighbor(i)) == patch_map.end()))
-	    continue;
-
-					   // if there is a neighbor,
-					   // get its patch...
-	  const typename
-	    std::vector< ::DataOutBase::Patch<dim> >::iterator
-	    neighbor_patch = patch_map.find(cell->neighbor(i))->second;
-					   // ...and set its neighbor
-					   // pointer set
-//TODO:[GK] Shouldn't we use the deal.II (i.e. the unnatural) numbering of the neighbors here as well rather than some new numbering scheme?
-	  switch (dim)
-	    {
-	      case 1:
-		    patch->neighbors[i] = neighbor_patch->me;
-		    break;
-		    
-	      case 2:
-		switch (i)
-		  {
-		    case 0: patch->neighbors[2] = neighbor_patch->me; break;
-		    case 1: patch->neighbors[1] = neighbor_patch->me; break;
-		    case 2: patch->neighbors[3] = neighbor_patch->me; break;
-		    case 3: patch->neighbors[0] = neighbor_patch->me; break;
-		  }
-		break;
-	      case 3:
-		switch (i)
-		  {
-		    case 0: patch->neighbors[2] = neighbor_patch->me; break;
-		    case 1: patch->neighbors[3] = neighbor_patch->me; break;
-		    case 2: patch->neighbors[4] = neighbor_patch->me; break;
-		    case 3: patch->neighbors[1] = neighbor_patch->me; break;
-		    case 4: patch->neighbors[5] = neighbor_patch->me; break;
-		    case 5: patch->neighbors[0] = neighbor_patch->me; break;
-		  }
-		break;
-
-	      default:
-		Assert(false, ExcNotImplemented());
-	    }
-	}
-    }
 };
 
 

@@ -406,13 +406,16 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * Declare an entry in the list of
 				      * data elements.
 				      */
-    struct DataEntry {
+    struct DataEntry
+    {
 					 /**
-					  * Constructor. If no arguments are
-					  * given, an invalid object is
-					  * constructed (we need a constructor
-					  * with no explicit arguments for
-					  * STL classes).
+					  * Constructor. If no
+					  * arguments are given, an
+					  * invalid object is
+					  * constructed (we need a
+					  * constructor with no
+					  * explicit arguments for STL
+					  * classes).
 					  */
 	DataEntry (const Vector<double>           *data = 0,
 		   const std::vector<std::string> &names = std::vector<std::string>());
@@ -424,9 +427,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 		   const std::vector<std::string> &names = std::vector<std::string>());
 
 					 /**
-					  * Determine an estimate for the
-					  * memory consumption (in bytes)
-					  * of this object.
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object.
 					  */
 	unsigned int memory_consumption () const;
 	
@@ -437,21 +440,22 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * pointed to remains with
 					  * the caller of this class.
 					  */
-      const Vector<double> *single_data;
+        const Vector<double> *single_data;
 
-				       /**
-					* Pointer to a block vector of
-					* data.  Either this pointer
-					* or the previous is used,
-					* depending on the stored
-					* vector type.
-					*/
-      const BlockVector<double>* block_data;
+                                         /**
+                                          * Pointer to a block vector of
+                                          * data.  Either this pointer
+                                          * or the previous is used,
+                                          * depending on the stored
+                                          * vector type.
+                                          */
+        const BlockVector<double>* block_data;
 
-				       /**
-					* True if stored vector is a block vector.
-					*/
-      bool has_block;
+                                         /**
+                                          * True if stored vector is a
+                                          * block vector.
+                                          */
+        bool has_block;
 
 					 /**
 					  * Names of the components of this
@@ -638,23 +642,24 @@ class DataOut : public DataOut_DoFData<dim,dim>
 		    << "The number of subdivisions per patch, " << arg1
 		    << ", is not valid.");
     
-				     /**
-				      * Define a map from cell
-				      * iterators to patch iterators
-				      * for finding neighbors.
-				      */
-    typedef std::map<typename DoFHandler<dim>::cell_iterator,
-      typename std::vector< ::DataOutBase::Patch<dim> >::iterator>
-      PatchMap;
-    
   private:
 				     /**
 				      * All data needed in one thread
 				      * is gathered in the struct
-				      * Data.
-				      * The data is handled globally
-				      * to avoid allocation of memory
-				      * in the threads.
+				      * Data.  The data is handled
+				      * globally to avoid allocation
+				      * of memory in the threads.
+				      *
+				      * The @p{index_to_patch_map} is
+				      * an array that stores for index
+				      * @p{[i][j]} the number of the
+				      * patch that associated with the
+				      * cell with index @p{j} on level
+				      * @p{i}. This information is set
+				      * up prior to generation of the
+				      * patches, and is needed to
+				      * generate neighborship
+				      * information.
 				      */
     struct Data 
     {
@@ -665,9 +670,8 @@ class DataOut : public DataOut_DoFData<dim,dim>
 	unsigned int n_subdivisions;
 	std::vector<double>          patch_values;
 	std::vector<Vector<double> > patch_values_system;
-	PatchMap* patch_map;
-	Data ()
-	  {}
+
+        std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
     };
 				     /**
 				      * Builds every @p{n_threads}'s
