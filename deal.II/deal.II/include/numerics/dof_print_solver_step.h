@@ -32,8 +32,7 @@
  * @author Guido Kanschat, 2000
  */
 template<int dim, class SOLVER, class VECTOR = Vector<double> >
-class DoFPrintSolverStep :
-  public SOLVER
+class DoFPrintSolverStep : public SOLVER
 {
   public:
 				     /**
@@ -58,9 +57,9 @@ class DoFPrintSolverStep :
 				      * iterative method.
 				      */
     virtual void print_vectors (const unsigned int step,
-				 const VECTOR& x,
-				 const VECTOR& r,
-				 const VECTOR& d) const;
+				const VECTOR& x,
+				const VECTOR& r,
+				const VECTOR& d) const;
   private:
 				     /**
 				      * Output object.
