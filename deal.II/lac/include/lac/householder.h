@@ -90,26 +90,39 @@ Householder<number>::Householder(const FullMatrix<number2>& M)
   {
     number2 sigma = 0;
     unsigned int i;
-    for (i=j ; i<m() ; ++i) sigma += this->el(i,j)*this->el(i,j);
+				     // sigma = ||v||^2
+    for (i=j ; i<m() ; ++i)
+      sigma += this->el(i,j)*this->el(i,j);
+				     // We are ready if the column is
+				     // empty. Are we?
     if (std::fabs(sigma) < 1.e-15) return;
-    number2 s = this->el(j,j);
-    s = (s<0) ? std::sqrt(sigma) : -std::sqrt(sigma);
-    number2 dj = s;
-
-    number2 beta = 1./(s*this->el(j,j)-sigma);
-    this->el(j,j) -= s;
     
+    number2 s = (this->el(j,j) < 0) ? std::sqrt(sigma) : -std::sqrt(sigma);
+				     // 
+    number2 beta = std::sqrt(1./(sigma-s*this->el(j,j)));
+
+				     // Make column j the Householder
+				     // vector, store first entry in
+				     // diagonal
+    diagonal[j] = beta*(this->el(j,j) - s);
+    this->el(j,j) = s;
+
+    for (i=j+1 ; i<m() ; ++i)
+      this->el(i,j) *= beta;
+
+
+				     // For all subsequent columns do
+				     // the Householder reflexion
     for (unsigned int k=j+1 ; k<n() ; ++k)
     {
-      number2 sum = 0.;
-      for (i=j ; i<m() ; ++i) sum += this->el(i,j)*this->el(i,k);
-      sum *= beta;
+      number2 sum = diagonal[j]*this->el(j,k);
+      for (i=j+1 ; i<m() ; ++i)
+	sum += this->el(i,j)*this->el(i,k);
 
-      for (i=j ; i<m() ; ++i) this->el(i,k) += sum*this->el(i,j);
-    }
-
-    diagonal[j] = this->el(j,j);
-    this->el(j,j) = dj;    
+      this->el(j,k) -= sum*this->diagonal[j];
+      for (i=j+1 ; i<m() ; ++i)
+	this->el(i,k) -= sum*this->el(i,j);
+    }    
   }
 }
 
@@ -123,18 +136,19 @@ Householder<number>::least_squares (Vector<number2>& dst,
 //  Assert (!this->empty(), ExcEmptyMatrix());
   
 				   // m > n, m = src.n, n = dst.n
-  
+
+				   // Multiply Q_n ... Q_2 Q_1 src
+				   // Where Q_i = I-v_i v_i^T
   for (unsigned int j=0;j<n();++j)
     {
+				       // sum = v_i^T src
       number2 sum = diagonal[j]*src(j);
       for (unsigned int i=j+1 ; i<m() ; ++i)
 	sum += this->el(i,j)*src(i);
-// F*** what is beta???
-//      sum *= beta;
-
-      src(j) += sum*diagonal[j];
+				       // src -= v * sum
+      src(j) -= sum*diagonal[j];
       for (unsigned int i=j+1 ; i<m() ; ++i)
-	src(i) += sum*this->el(i,j);
+	src(i) -= sum*this->el(i,j);
     }
   
   backward(dst, src);
