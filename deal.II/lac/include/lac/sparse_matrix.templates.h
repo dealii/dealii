@@ -117,7 +117,7 @@ SparseMatrix<number>::reinit ()
     };
 
   const unsigned int N = cols->n_nonzero_elements();
-  if (N > max_len)
+  if (N > max_len || max_len == 0)
     {
       if (val) delete[] val;
       val = new number[N];
