@@ -107,13 +107,13 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 
 				     /**
 				      * Declare a nested class which
-				      * will hold static definitions of
-				      * various matrices such as
-				      * constraint and embedding
-				      * matrices. The definition of
-				      * the various static fields are
-				      * in the files <tt>fe_dgq_[123]d.cc</tt>
-				      * in the source directory.
+				      * will hold static definitions
+				      * of various matrices such as
+				      * embedding matrices. The
+				      * definition of the various
+				      * static fields are in the files
+				      * <tt>fe_dgq_[123]d.cc</tt> in
+				      * the source directory.
 				      */
     struct Matrices
     {
