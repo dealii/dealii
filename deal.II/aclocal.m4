@@ -1502,7 +1502,7 @@ AC_DEFUN(DEAL_II_CHECK_RAND_R, dnl
 #include <cstdlib>
 	],
 	[
-unsigned int seed = 0;
+int seed = 0;
 int i=rand_r(&i);
 	],
 	[
@@ -1743,7 +1743,7 @@ dnl
 dnl /* ----------------------------------------------- */
 dnl /* Problem 14: Access control. Friendship is not   */
 dnl /* granted although explicitly declared.           */
-dnl template <int N, int M> class T      {    void bar ();  };
+dnl template <int N, int M> class T      {    int bar ();  };
 dnl 
 dnl template <int M>        class T<1,M> { 
 dnl   private:
@@ -1751,8 +1751,8 @@ dnl     static int i;
 dnl     template <int N1, int N2> friend class T;
 dnl };
 dnl 
-dnl template <int N,int M> void T<N,M>::bar () { 
-dnl   T<N-1,M>::i; 
+dnl template <int N,int M> int T<N,M>::bar () { 
+dnl   return T<N-1,M>::i; 
 dnl };
 dnl 
 dnl template class T<2,1> ; 
@@ -1771,16 +1771,17 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS, dnl
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
-	template <int N, int M> class T      {    void bar ();  };
+	template <int N, int M> struct T      {    int bar ();  };
 
-	template <int M>        class T<1,M> { 
+	template <int M>        struct T<1,M> { 
+            T ();
 	  private:
 	    static int i;
 	    template <int N1, int N2> friend class T;
 	};
 
-	template <int N,int M> void T<N,M>::bar () { 
-	  T<N-1,M>::i; 
+	template <int N,int M> int T<N,M>::bar () { 
+	  return T<N-1,M>::i; 
 	};
 
 	template class T<2,1> ; 
@@ -1811,7 +1812,7 @@ dnl /* ----------------------------------------------- */
 dnl struct X
 dnl {
 dnl     template <typename T2>
-dnl     X operator = (T2 &){};
+dnl     X operator = (T2 &) { return X(); };
 dnl };
 dnl 
 dnl template X X::operator=<float> (float &);
@@ -1835,7 +1836,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
 	struct X
 	{
 	    template <typename T2>
-	    X operator = (T2 &){};
+	    X operator = (T2 &) { return X(); };
 	};
 
 	template X X::operator=<float> (float &);
@@ -2040,7 +2041,7 @@ template <typename P> class Y {
 };
 
 template <typename T> class X<1,T> {
-    X () { Y<T>::i; };     // access private field
+    int f () { return Y<T>::i; };     // access private field
 };
 
 template class X<1,int>;
@@ -2151,7 +2152,7 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG, dnl
 	};
 
 	template <template <int> class T>
-	void X<T>::foo (type t) {};
+	void X<T>::foo (type) {};
 
 	template struct X<TT>;
     ],
@@ -2369,8 +2370,8 @@ AC_DEFUN(DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG, dnl
 
 	void f()
 	{
-	  long double *p1, *p2;
-	  double *p3;
+	  long double *p1=0, *p2=0;
+	  double *p3=0;
 	  copy (p1, p2, p3);
 	  p3 = copy (p1, p2, p3);
 	};
@@ -2414,9 +2415,10 @@ AC_DEFUN(DEAL_II_CHECK_FUNPTR_TEMPLATE_TEMPLATE_BUG, dnl
       void f(T<dim>);
 
       template <int dim, template <int> class T>
-      void g() 
+      void* g() 
       {
         void (*p) (T<dim>) = &f<dim,T>;
+        return (void*)p;
       }
 
       template void g<2,X> ();
@@ -2827,7 +2829,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_NUMERIC_LIMITS, dnl
 #include <limits>
     ],
     [
-	unsigned int i = std::numeric_limits<unsigned int>::min();
+	return std::numeric_limits<unsigned int>::min();
     ],
     [
       AC_MSG_RESULT(yes)
