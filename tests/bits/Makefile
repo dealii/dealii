@@ -51,7 +51,8 @@ tests_x = anna_? \
 	  full_matrix_vector_* \
 	  solver_selector \
 	  deal_solver_* \
-	  vector_*
+	  vector_* \
+	  subdomain_ids_*
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += petsc_*
