@@ -258,6 +258,7 @@ if test "$GXX" = yes ; then
 	;;
   esac
 
+  DEAL_II_CHECK_ADVANCE_WARNING
 else
 
   if test "x$GXX_VERSION" = "xibm_xlc" ; then

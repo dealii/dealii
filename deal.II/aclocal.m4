@@ -475,3 +475,35 @@ AC_DEFUN(DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS, dnl
     fi
   fi
 )
+
+
+
+dnl gcc versions up to 2.95.3 had a problem with the std::advance function,
+dnl when the number of steps forward was given by an unsigned number, since
+dnl a comparison >=0 was performed on this number which leads to a warning
+dnl that this comparison is always true. This is, at the best, annoying
+dnl since it crops up at several places where std::advance is called from
+dnl inside the library. Check whether the present version of the compiler
+dnl has this problem
+AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="$CXXFLAGSG -Werror"
+  AC_MSG_CHECKING(for std::advance warning)
+  AC_TRY_COMPILE(
+	[
+#include <map>
+#include <vector>
+	],
+	[
+  std::map<unsigned int, double> m;
+  std::vector<std::pair<unsigned int, double> > v;
+  v.insert (v.end(), m.begin(), m.end());
+	],
+	[
+	  AC_MSG_RESULT(yes)
+	],
+	[
+	  AC_MSG_RESULT(no)
+	]
+  )
+)
