@@ -26,3 +26,4 @@
 # spread out over the entire source repository.
 newdeal &base &lac &deal.II &projects
 justdeal &base &lac &deal.II
+mg reports/multigrid
