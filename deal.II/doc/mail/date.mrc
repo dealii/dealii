@@ -25,7 +25,7 @@ deal.II Mailinglist
 <!-- End of main index page -->
 
 <IdxPgEnd>
-<ADDRESS><A HREF="mailto:deal@iwr.uni-heidelberg.de">The deal.II mailing list</ADDRESS>
+<ADDRESS><A HREF="http://www.dealII.uni-hd.de/mail.html">The deal.II mailing list</ADDRESS>
 </BODY>
 </HTML>
 </IdxPgEnd>
@@ -49,7 +49,7 @@ deal.II Mailinglist
 <!-- End of thread index page -->
 
 <TIdxPgEnd>
-<ADDRESS><A HREF="mailto:deal@iwr.uni-heidelberg.de">The deal.II mailing list</ADDRESS>
+<ADDRESS><A HREF="http://www.dealII.uni-hd.de/mail.html">The deal.II mailing list</ADDRESS>
 </BODY>
 </HTML>
 </TIdxPgEnd>
@@ -71,7 +71,7 @@ deal.II Mailinglist
 
 <MsgPgEnd>
 <HR>
-<ADDRESS><A HREF="mailto:deal@iwr.uni-heidelberg.de">The deal.II mailing list</ADDRESS>
+<ADDRESS><A HREF="http://www.dealII.uni-hd.de/mail.html">The deal.II mailing list</ADDRESS>
 </BODY>
 </HTML>
 </MsgPgEnd>
