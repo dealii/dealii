@@ -701,6 +701,12 @@ class TimeStepBase : public Subscriptor
 				      * should really overload the function.
 				      */
     virtual void postprocess_timestep ();
+
+				     /**
+				      * Return the time value of this time
+				      * step.
+				      */
+    double get_time () const;
     
 				     /**
 				      * Compute the time difference to the
