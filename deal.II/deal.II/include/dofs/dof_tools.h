@@ -16,14 +16,18 @@
 
 #include <base/exceptions.h>
 #include <vector>
+#include <map>
 
 class SparsityPattern;
 template <typename number> class Vector;
 template <typename number> class FullMatrix;
+template <int dim> class Function;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
 template <template <int> class GridClass, int dim> class InterGridMap;
+
+
 
 /**
  * This is a collection of functions operating on, and manipulating
@@ -34,6 +38,7 @@ template <template <int> class GridClass, int dim> class InterGridMap;
  *
  * All member functions are static, so there is no need to create an
  * object of class @ref{DoFTools}.
+ *
  *
  * @sect3{Setting up sparsity patterns}
  *
@@ -56,6 +61,80 @@ template <template <int> class GridClass, int dim> class InterGridMap;
  * on the boundary and the basis functions thereon. It is assumed that all
  * other basis functions on a cell adjacent to the boundary vanish at the
  * boundary itself, except for those which are located on the boundary.
+ *
+ *
+ *
+ * @sect3{DoF numberings on boundaries}
+ *
+ * When projecting the traces of functions to the boundary or parts
+ * thereof, one needs to build matrices and vectors with the degrees
+ * of freedom on the boundary. What is needed in this case is a
+ * numbering of the boundary degrees of freedom, starting from zero on
+ * and not considering the degrees of freedom in the interior. The
+ * @p{map_dof_to_boundary_indices} function does exactly this, by
+ * providing a vector with as many entries as there are degrees of
+ * freedom on the whole domain, with each entry being the number in
+ * the numbering of the boundary or
+ * @ref{DoFHandler}@p{::invalid_dof_index} if the dof is not on the
+ * boundary. You should always use this function to get the mapping
+ * between local (boundary) and the global numbers, for example to
+ * build the mass matrix on the boundary, or to get the global index
+ * of a degree of freedom if we want to use the solution of the
+ * projection onto the boundary to eliminate the boundary degrees of
+ * freedom from the global matrix.
+ *
+ * The algorithm to provide this numbering mapping is simple, but you
+ * should not rely on it since it may be changed sometimes: we loop
+ * over all faces, check whether it is on the boundary, if so get the
+ * global numbers of the degrees of freedom on that face, and for each
+ * of these we give a subsequent boundary number if none has already
+ * been given to this dof. But it should be emphasized again that you
+ * should not try to use this internal knowledge about the used
+ * algorithm, you are better off if you just accept the mapping `as
+ * is'.
+ *
+ * Actually, there are two @p{map_dof_to_boundary_indices} functions,
+ * one producing a numbering for all boundary degrees of freedom and
+ * one producing a numbering for only parts of the boundary, namely
+ * those parts for which the boundary indicator is listed in a set of
+ * indicators given to the function. The latter case is needed if, for
+ * example, we would only want to project the boundary values for the
+ * Dirichlet part of the boundary, not for the other boundary
+ * conditions. You then give the function a list of boundary
+ * indicators referring to Dirichlet parts on which the projection is
+ * to be performed. The parts of the boundary on which you want to
+ * project need not be contiguous; however, it is not guaranteed that
+ * the indices of each of the boundary parts are continuous, i.e. the
+ * indices of degrees of freedom on different parts may be intermixed.
+ *
+ * Degrees of freedom on the boundary but not on one of the specified
+ * boundary parts are given the index @p{invalid_dof_index}, as if
+ * they were in the interior. If no boundary indicator was given or if
+ * no face of a cell has a boundary indicator contained in the given
+ * list, the vector of new indices consists solely of
+ * @p{invalid_dof_index}s.
+ *
+ * The question what a degree of freedom on the boundary is, is not so
+ * easy.  It should really be a degree of freedom of which the
+ * respective basis function has nonzero values on the boundary. At
+ * least for Lagrange elements this definition is equal to the
+ * statement that the off-point of the trial function, i.e. the point
+ * where the function assumes its nominal value (for Lagrange elements
+ * this is the point where it has the function value @p{1}), is
+ * located on the boundary. We do not check this directly, the
+ * criterion is rather defined through the information the finite
+ * element class gives: the @ref{FiniteElementBase} class defines the
+ * numbers of basis functions per vertex, per line, and so on and the
+ * basis functions are numbered after this information; a basis
+ * function is to be considered to be on the face of a cell (and thus
+ * on the boundary if the cell is at the boundary) according to its
+ * belonging to a vertex, line, etc but not to the cell. The finite
+ * element uses the same cell-wise numbering so that we can say that
+ * if a degree of freedom was numbered as one of the dofs on lines, we
+ * assume that it is located on the line. Where the off-point actually
+ * is, is a secret of the finite element (well, you can ask it, but we
+ * don't do it here) and not relevant in this context.
+ *
  *
  * @author Wolfgang Bangerth and others, 1998, 1999, 2000
  */
@@ -698,6 +777,58 @@ class DoFTools
 				   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				   ConstraintMatrix                   &constraints);
 
+				     /**
+				      * Create a mapping from degree
+				      * of freedom indices to the
+				      * index of that degree of
+				      * freedom on the boundary. After
+				      * this operation, @p{mapping[dof]}
+				      * gives the index of the the
+				      * degree of freedom with global
+				      * number @p{dof} in the list of
+				      * degrees of freedom on the
+				      * boundary.  If the degree of
+				      * freedom requested is not on
+				      * the boundary, the value of
+				      * @p{mapping[dof]} is
+				      * @p{invalid_dof_index}. This
+				      * function is mainly used when
+				      * setting up matrices and
+				      * vectors on the boundary from
+				      * the trial functions, which
+				      * have global numbers, while the
+				      * matrices and vectors use
+				      * numbers of the trial functions
+				      * local to the boundary.
+				      *
+				      * Prior content of @p{mapping} is deleted.
+				      *
+				      * This function is not
+				      * implemented for one
+				      * dimension. See the general doc
+				      * of this class for more
+				      * information on boundary
+				      * treatment.
+				      */
+    template <int dim>
+    static void
+    map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
+				 vector<unsigned int>  &mapping);
+
+				     /**
+				      * Same as the previous function, except
+				      * that only selected parts of the
+				      * boundary are considered.
+				      *
+				      * See the general doc of this class for
+				      * more information.
+				      */
+    template <int dim>
+    static void
+    map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
+				 const map<unsigned char,const Function<dim>*> &boundary_indicators,
+				 vector<unsigned int>  &mapping);
+    
 				   
 				     /**
 				      * Exception
@@ -727,6 +858,14 @@ class DoFTools
 				      * Exception
 				      */
     DeclException0 (ExcGridsDontMatch);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoFESelected);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidBoundaryIndicator);
 };
 
 

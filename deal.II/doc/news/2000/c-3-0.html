@@ -403,6 +403,17 @@
 
 <ol>
   <li> <p>
+       Changed: The 
+       <code class="member">map_dof_to_boundary_index</code>
+       functions have been moved from the <code class="class">DoFHandler</code>
+       to the <code class="class">DoFTools</code> class, in order to
+       further remove code from the big classes which is necessarily
+       needed there.
+       <br>
+       (WB 2000/08/25)
+       </p>
+
+  <li> <p>
        New: there is now a class <code class="class">DataOutRotation</code>
        that can be used to output data which has been computed
        exploiting rotational symmetry, on the original domain. Thus,

@@ -1475,6 +1475,101 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 
 
 
+#if deal_II_dimension == 1
+
+template <>
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
+					    vector<unsigned int> &)
+{
+  Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
+					    const map<unsigned char,const Function<1>*> &,
+					    vector<unsigned int> &)
+{
+  Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+};
+
+
+#else
+
+
+template <int dim>
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
+					    vector<unsigned int>  &mapping)
+{
+  Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
+
+  mapping.clear ();
+  mapping.insert (mapping.end(), dof_handler.n_dofs(),
+		  DoFHandler<dim>::invalid_dof_index);
+  
+  const unsigned int dofs_per_face = dof_handler.get_fe().dofs_per_face;
+  vector<unsigned int> dofs_on_face(dofs_per_face);
+  unsigned int next_boundary_index = 0;
+  
+  typename DoFHandler<dim>::active_face_iterator face = dof_handler.begin_active_face(),
+						 endf = dof_handler.end_face();
+  for (; face!=endf; ++face)
+    if (face->at_boundary()) 
+      {
+	face->get_dof_indices (dofs_on_face);
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  if (mapping[dofs_on_face[i]] == DoFHandler<dim>::invalid_dof_index)
+	    mapping[dofs_on_face[i]] = next_boundary_index++;
+      };
+
+  Assert (next_boundary_index == dof_handler.n_boundary_dofs(),
+	  ExcInternalError());
+};
+
+
+
+template <int dim>
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
+					    const map<unsigned char,const Function<dim>*> &boundary_indicators,
+					    vector<unsigned int>  &mapping)
+{
+  Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
+  Assert (boundary_indicators.find(255) == boundary_indicators.end(),
+	  ExcInvalidBoundaryIndicator());
+
+  mapping.clear ();
+  mapping.insert (mapping.end(), dof_handler.n_dofs(),
+		  DoFHandler<dim>::invalid_dof_index);
+
+				   // return if there is nothing to do
+  if (boundary_indicators.size() == 0)
+    return;
+  
+  const unsigned int dofs_per_face = dof_handler.get_fe().dofs_per_face;
+  vector<unsigned int> dofs_on_face(dofs_per_face);
+  unsigned int next_boundary_index = 0;
+  
+  typename DoFHandler<dim>::active_face_iterator face = dof_handler.begin_active_face(),
+						 endf = dof_handler.end_face();
+  for (; face!=endf; ++face)
+    if (boundary_indicators.find(face->boundary_indicator()) !=
+	boundary_indicators.end())
+      {
+	face->get_dof_indices (dofs_on_face);
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  if (mapping[dofs_on_face[i]] == DoFHandler<dim>::invalid_dof_index)
+	    mapping[dofs_on_face[i]] = next_boundary_index++;
+      };
+
+  Assert (next_boundary_index == dof_handler.n_boundary_dofs(boundary_indicators),
+	  ExcInternalError());
+};
+
+#endif
+
 
 
 // explicit instantiations
@@ -1562,3 +1657,20 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<deal_II_dimension> &,
 					 const unsigned int                   ,
 					 const InterGridMap<DoFHandler,deal_II_dimension> &,
 					 ConstraintMatrix                    &);
+
+
+
+#if deal_II_dimension != 1
+
+template
+void
+DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
+				       vector<unsigned int> &);
+
+template
+void
+DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
+				       const map<unsigned char,const Function<deal_II_dimension>*> &,
+				       vector<unsigned int> &);
+
+#endif 

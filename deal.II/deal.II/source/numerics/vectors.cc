@@ -36,15 +36,19 @@
 #include <cmath>
 
 
-inline double sqr (const double x) {
+static inline double sqr (const double x)
+{
   return x*x;
 };
 
 
+
 template <int dim>
-inline double sqr_point (const Tensor<1,dim> &p) {
+inline double sqr_point (const Tensor<1,dim> &p)
+{
   return p * p;
 };
+
 
 
 template <int dim>
@@ -278,6 +282,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 }
 
 
+
 template <int dim> void
 VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
 			  const DoFHandler<dim>           &dof_2,
@@ -454,6 +459,7 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 };
 
 
+
 template <int dim>
 void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 					  const Quadrature<dim>    &quadrature,
@@ -539,6 +545,7 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 	}
     }
 };
+
 
 
 #if deal_II_dimension == 1
@@ -700,10 +707,11 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 }
 
 
+
 template <int dim>
 void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
-				      const map<unsigned char,const Function<dim>*>        &boundary_functions,
+				      const map<unsigned char,const Function<dim>*> &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      map<unsigned int,double> &boundary_values)
 {
@@ -711,7 +719,8 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 	  ExcComponentMismatch());
   
   vector<unsigned int> dof_to_boundary_mapping;
-  dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
+  DoFTools::map_dof_to_boundary_indices (dof, boundary_functions,
+					 dof_to_boundary_mapping);
   
 				   // set up sparsity structure
   SparsityPattern sparsity(dof.n_boundary_dofs(boundary_functions),
@@ -778,6 +787,7 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				       // thus in the solution vector
       boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
 };
+
 
 
 template <int dim>
@@ -1185,6 +1195,7 @@ double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension> &dof
 					const Quadrature<deal_II_dimension> &quadrature,
 					Vector<double>        &v,
 					const unsigned int component);
+
 
 
 
