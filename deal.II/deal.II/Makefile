@@ -10,11 +10,11 @@ D=..
 default: 2dg 2d
 
 1dg: lib/libdeal_II_1d.g.a 
-1d :lib/libdeal_II_1d.a
+1d : lib/libdeal_II_1d.a
 2dg: lib/libdeal_II_2d.g.a 
-2d :lib/libdeal_II_2d.a
+2d : lib/libdeal_II_2d.a
 3dg: lib/libdeal_II_3d.g.a 
-3d :lib/libdeal_II_3d.a
+3d : lib/libdeal_II_3d.a
 
 
 # create lists of file names. note that we need several output
