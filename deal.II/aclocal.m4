@@ -1352,7 +1352,7 @@ AC_DEFUN(DEAL_II_HAVE_PRETTY_FUNCTION, dnl
     	],
         [
           AC_MSG_RESULT(not available)
-	  x="(not available)"
+	  x="\"(not available)\""
         ]) 
       AC_DEFINE_UNQUOTED(__PRETTY_FUNCTION__, $x, 
                 [If already available, do not define at all. Otherwise, define
