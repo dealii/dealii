@@ -1,5 +1,10 @@
 # Makefile,v 1.8 1999/04/15 17:36:14 wolf Exp
 
+
+# Let ./configure insert whether MG shall be documented
+multigrid = @enablemultigrid@
+
+
 # specify which are the include files that a specific documentation libary
 # depends upon
 kdoc.base     = $(shell echo ../../base/include/base/*.h)
