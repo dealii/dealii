@@ -770,11 +770,11 @@ namespace StandardExceptions
 				    *
 				    * When throwing this exception,
 				    * you can give a message as a
-				    * string or @p{char*} as argument
-				    * to the exception that is then
+				    * @p{char*} as argument to the
+				    * exception that is then
 				    * displayed.
 				    */
-  DeclException1 (ExcMessage, string,
+  DeclException1 (ExcMessage, char*,
 		  << arg1);
 };
 
