@@ -362,8 +362,14 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
 
 template <int dim>
 TimeStepBase_Tria<dim>::~TimeStepBase_Tria () 
-{  
-  Assert (tria!=0, ExcInternalError());
+{
+  if (!flags.delete_and_rebuild_tria)
+    {
+      tria->unsubscribe ();
+      delete tria;
+    }
+  else
+    Assert (tria==0, ExcInternalError());
 
   coarse_grid.unsubscribe();
 };
