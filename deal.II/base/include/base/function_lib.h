@@ -1,5 +1,5 @@
 /*----------------------------   function_lib.h     ---------------------------*/
-/*      $Id$                 */
+/*      $Id$               */
 /* Copyright Guido Kanschat, University of Minnesota, 1999                     */
 #ifndef __function_lib_H
 #define __function_lib_H
@@ -16,6 +16,7 @@
  * product of $x_i^2-1$.
  *
  * Together with the function, its derivatives and Laplacian are defined.
+ *
  * @author: Guido Kanschat, 1999
  */
 template<int dim>
@@ -58,8 +59,8 @@ class PillowFunction : Function<dim>
 				      * Laplacian at multiple points.
 				      */
     void laplacian_list(const vector<Point<dim> > &points,
-		   vector<double>            &values,
-		   const unsigned int         component = 0) const;
+			vector<double>            &values,
+			const unsigned int         component = 0) const;
 };
 
 
