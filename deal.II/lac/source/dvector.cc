@@ -144,7 +144,87 @@ double dVector::norm_sqr () const
     sum0 += val[i] * val[i];
   
   return sum0+sum1+sum2+sum3;
-}
+};
+
+
+
+double dVector::mean_value () const
+{
+  double sum0 = 0,
+	 sum1 = 0,
+	 sum2 = 0,
+	 sum3 = 0;
+
+				   // use modern processors better by
+				   // allowing pipelined commands to be
+				   // executed in parallel
+  for (unsigned int i=0; i<(dim/4); ++i) 
+    {
+      sum0 += val[4*i];
+      sum1 += val[4*i+1];
+      sum2 += val[4*i+2];
+      sum3 += val[4*i+3];
+    };
+				   // add up remaining elements
+  for (unsigned int i=(dim/4)*4; i<dim; ++i)
+    sum0 += val[i];
+  
+  return (sum0+sum1+sum2+sum3)/n();
+};
+
+
+
+double dVector::l1_norm () const
+{
+  double sum0 = 0,
+	 sum1 = 0,
+	 sum2 = 0,
+	 sum3 = 0;
+
+				   // use modern processors better by
+				   // allowing pipelined commands to be
+				   // executed in parallel
+  for (unsigned int i=0; i<(dim/4); ++i) 
+    {
+      sum0 += fabs(val[4*i]);
+      sum1 += fabs(val[4*i+1]);
+      sum2 += fabs(val[4*i+2]);
+      sum3 += fabs(val[4*i+3]);
+    };
+				   // add up remaining elements
+  for (unsigned int i=(dim/4)*4; i<dim; ++i)
+    sum0 += fabs(val[i]);
+  
+  return sum0+sum1+sum2+sum3;
+};
+
+
+
+double dVector::l2_norm () const
+{
+  double sum0 = 0,
+	 sum1 = 0,
+	 sum2 = 0,
+	 sum3 = 0;
+
+				   // use modern processors better by
+				   // allowing pipelined commands to be
+				   // executed in parallel
+  for (unsigned int i=0; i<(dim/4); ++i) 
+    {
+      sum0 += val[4*i] * val[4*i];
+      sum1 += val[4*i+1] * val[4*i+1];
+      sum2 += val[4*i+2] * val[4*i+2];
+      sum3 += val[4*i+3] * val[4*i+3];
+    };
+				   // add up remaining elements
+  for (unsigned int i=(dim/4)*4; i<dim; ++i)
+    sum0 += val[i] * val[i];
+  
+  return sqrt(sum0+sum1+sum2+sum3);
+};
+
+
 
 
 

@@ -95,9 +95,29 @@ class dVector : public VectorBase
     double operator* (const dVector& V) const;
 
 				     /**
-				      * Return square of the norm.
+				      * Return square of the l2-norm.
 				      */
     double norm_sqr () const;
+
+				     /**
+				      * Return the mean value of the elements of
+				      * this vector.
+				      */
+    double mean_value () const;
+
+				     /**
+				      * Return the l1-norm of the vector, i.e.
+				      * the sum of the absolute values.
+				      */
+    double l1_norm () const;
+
+				     /**
+				      * Return the l2-norm of the vector, i.e.
+				      * the square root of the sum of the
+				      * squares of the elements.
+				      */
+    double l2_norm () const;
+    
     
 				     /**
 				      * Change  Dimension. <p>
