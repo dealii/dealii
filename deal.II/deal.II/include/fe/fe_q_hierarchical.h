@@ -576,7 +576,6 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 						std::vector<unsigned int> &numbering);
 
 
-  // not sure if needed
 				     /**
 				      * Initialize the
 				      * @p{unit_support_points} field
@@ -586,7 +585,6 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 				      */
     void initialize_unit_support_points ();
 
-  // not sure if needed
 				     /**
 				      * Initialize the
 				      * @p{unit_face_support_points} field
