@@ -441,23 +441,50 @@ DoFCellAccessor<1>::face (const unsigned int) const {
 template <>
 void
 DoFCellAccessor<1>::get_dof_values (const dVector &values,
-				    dVector       &dof_values) const {
+				    dVector       &local_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
-  Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
-
+  Assert (active(), ExcNotActive());
+  
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  vector<double>::iterator next_dof_value=dof_values.begin();
+  vector<double>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(vertex_dof_index(vertex,d));
+      *next_lcoal_value++ = values(vertex_dof_index(vertex,d));
   for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next_dof_value++ = values(dof_index(d));
+    *next_local_value++ = values(dof_index(d));
 };
+
+
+
+template <>
+void
+DoFCellAccessor<1>::set_dof_values (const dVector &local_values,
+				    dVector       &values) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+	  ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+  Assert (active(), ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
+  vector<double>::const_iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+       values(vertex_dof_index(vertex,d)) = *next_local_value++;
+  for (unsigned int d=0; d<dofs_per_line; ++d)
+    values(dof_index(d)) = *next_local_value++;
+};
+
+
 
 #endif
 
@@ -476,27 +503,58 @@ DoFCellAccessor<2>::face (const unsigned int i) const {
 template <>
 void
 DoFCellAccessor<2>::get_dof_values (const dVector &values,
-				    dVector       &dof_values) const {
+				    dVector       &local_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
-  Assert (dof_values.size() == dof_handler->get_fe().total_dofs,
+  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
-
+  Assert (active(), ExcNotActive());
+  
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  vector<double>::iterator next_dof_value=dof_values.begin();
+  vector<double>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(vertex_dof_index(vertex,d));
+      *next_local_value++ = values(vertex_dof_index(vertex,d));
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next_dof_value++ = values(this->line(line)->dof_index(d));
+      *next_local_value++ = values(this->line(line)->dof_index(d));
   for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next_dof_value++ = values(dof_index(d));
+    *next_local_value++ = values(dof_index(d));
 };
+
+
+
+template <>
+void
+DoFCellAccessor<2>::set_dof_values (const dVector &local_values,
+				    dVector       &values) const {
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().total_dofs,
+	  ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+  Assert (active(), ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
+  vector<double>::const_iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      values(vertex_dof_index(vertex,d)) = *next_local_value++;
+  for (unsigned int line=0; line<4; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      values(this->line(line)->dof_index(d)) = *next_local_value++;
+  for (unsigned int d=0; d<dofs_per_quad; ++d)
+    values(dof_index(d)) = *next_local_value++;
+};
+
+
 
 #endif
 
@@ -550,6 +608,41 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
 	  for (unsigned int i=0; i<total_dofs; ++i)
 	    if (tmp2(i) != 0)
 	      interpolated_values(i) = tmp2(i);
+	};
+    };
+};
+
+
+
+template <int dim>
+void
+DoFCellAccessor<dim>::set_dof_values_by_interpolation (const dVector &local_values,
+						       dVector       &values) const {
+  const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
+  
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (local_values.size() == total_dofs,
+	  ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+
+  if (!has_children())
+				     // if this cell has no children: simply
+				     // set the values on this cell
+    set_dof_values (local_values, values);
+  else
+				     // otherwise distribute them to the children
+    {
+      dVector tmp(total_dofs);
+      
+      for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
+	   ++child)
+	{
+					   // prolong the given data
+					   // to the present cell
+	  dof_handler->get_fe().prolongate(child).vmult (tmp, local_values);
+	  this->child(child)->set_dof_values_by_interpolation (tmp, values);
 	};
     };
 };

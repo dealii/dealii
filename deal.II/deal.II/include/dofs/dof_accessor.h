@@ -586,7 +586,7 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
     face (const unsigned int i) const;
 
     				     /**
-				      * Return the value of the given vector
+				      * Return the values of the given vector
 				      * restricted to the dofs of this
 				      * cell in the standard ordering: dofs
 				      * on vertex 0, dofs on vertex 1, etc,
@@ -594,10 +594,12 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * dofs on quad 0, etc.
 				      *
 				      * It is assumed that the vector already
-				      * has the right size beforehand.
+				      * has the right size beforehand. This
+				      * function is only callable for active
+				      * cells.
 				      */
     void get_dof_values (const dVector &values,
-			 dVector       &dof_values) const;
+			 dVector       &local_values) const;
 
 				     /**
 				      * Return the interpolation of the given
@@ -614,17 +616,122 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * class to compute the interpolation
 				      * from the children to the present cell.
 				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand.
+				      * It is assumed that both vectors already
+				      * have the right size beforehand. This
+				      * function assumes the existence of an
+				      * interpolation from child cells to the
+				      * mother cell, denoted by the restriction
+				      * matrices of the finite element class.
+				      * Futhermore, this interpolation should
+				      * be possible for each child alone, i.e.
+				      * it should be possible to compute the
+				      * restriction by writing values obtained
+				      * from each child directly into the output
+				      * vector, without, for example, computing
+				      * an average over all children.
+				      * These properties, however, do not exist
+				      * for all elements; an example is the
+				      * DG(0) element, which represents
+				      * piecewise constant elements: for these
+				      * the restriction to mother cell could
+				      * be the average of the values of the
+				      * children, maybe weighted by the measure
+				      * of each child. It is not yet decided
+				      * what the this function does in these
+				      * cases.
 				      */
     void get_interpolated_dof_values (const dVector &values,
 				      dVector       &interpolated_values) const;
-    
 
+				     /**
+				      * This function is the counterpart to
+				      * #get_dof_values#: it takes a vector
+				      * of values for the degrees of freedom
+				      * of the cell pointed to by this iterator
+				      * and writes these values into the global
+				      * data vector #values#. This function
+				      * is only callable for active cells.
+				      *
+				      * Note that for continuous finite
+				      * elements, calling this function affects
+				      * the dof values on neighboring cells as
+				      * well. It may also violate continuity
+				      * requirements for hanging nodes, if
+				      * neighboring cells are less refined than
+				      * the present one. These requirements
+				      * are not taken care of and must be
+				      * enforced by the user afterwards.
+				      *
+				      * It is assumed that both vectors already
+				      * have the right size beforehand.
+				      */				       
+    void set_dof_values (const dVector &local_values,
+			 dVector       &values) const;
+
+				     /**
+				      * This, again, is the counterpart to
+				      * #get_interpolated_dof_values#: you
+				      * specify the dof values on a cell and
+				      * these are interpolated to the children
+				      * of the present cell and set on the
+				      * terminal cells.
+				      *
+				      * In principle, it works as follows: if
+				      * the cell pointed to by this object is
+				      * terminal, then the dof values are set
+				      * in the global data vector by calling
+				      * the #set_dof_values# function;
+				      * otherwise, the values are prolonged
+				      * to each of the children and this
+				      * function is called for each of them.
+				      *
+				      * Using the #get_interpolated_dof_values#
+				      * and this function, you can compute the
+				      * interpolation of a finite element
+				      * function to a coarser grid by first
+				      * getting the interpolated solution on a
+				      * cell of the coarse grid and afterwards
+				      * redistributing it using this function.
+				      *
+				      * Note that for continuous finite
+				      * elements, calling this function affects
+				      * the dof values on neighboring cells as
+				      * well. It may also violate continuity
+				      * requirements for hanging nodes, if
+				      * neighboring cells are less refined than
+				      * the present one, or if their children are
+				      * less refined than the children of this
+				      * cell. These requirements
+				      * are not taken care of and must be
+				      * enforced by the user afterwards.
+				      *
+				      * It is assumed that both vectors already
+				      * have the right size beforehand. This
+				      * function relies on the existence of a
+				      * natural interpolation property of
+				      * finite element spaces of a cell to
+				      * its children, denoted by the
+				      * prolongation matrices of finite element
+				      * classes. For some elements, the spaces
+				      * on coarse and fine grids are not nested,
+				      * in which case the interpolation to a
+				      * child is not the identity; refer to the
+				      * documentation of the respective finite
+				      * element class for a description of what
+				      * the prolongation matrices represent in
+				      * this case.
+				      */
+    void set_dof_values_by_interpolation (const dVector &local_values,
+					  dVector       &values) const;
+    
     				     /**
 				      *  Exception
 				      */
     DeclException0 (ExcNotUsefulForThisDimension);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotActive);
 };
 
 
