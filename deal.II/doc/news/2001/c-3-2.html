@@ -108,6 +108,17 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: when an assertion fails in the <code
+       class="member">Assert()</code> function, the program is usually
+       aborted. Don't abort it any more if there is an active C++
+       somewhere since we would lose its message if we aborted the
+       program. In that case only report the error and write out an
+       indication why we do not abort the program any more.
+       <br>
+       (WB 2002/01/09)
+       </p>
+
+  <li> <p>
        New: <code class="class">ExcFileNotOpen</code> can be used
        after initializing an <code class="class">fstream</code>
        object. This allows to avoid some cryptic <code

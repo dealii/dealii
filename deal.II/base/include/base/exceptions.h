@@ -144,11 +144,12 @@
  *  normally created using the @p{DeclException (...)} macro
  *  family.
  *
- *  After printing all this information, @p{abort()} is called.
- *  This terminates the program, which is the right thing to do for
- *  this kind of error checking since it is used to detect programming
- *  errors rather than run-time errors; a program can, by definition,
- *  not recover from programming errors.
+ *  After printing all this information, @p{abort()} is called (with
+ *  one exception, see the end of this section). This terminates the
+ *  program, which is the right thing to do for this kind of error
+ *  checking since it is used to detect programming errors rather than
+ *  run-time errors; a program can, by definition, not recover from
+ *  programming errors.
  *
  *  If the preprocessor variable @p{DEBUG} is not set, then nothing
  *  happens, i.e. the @p{Assert} macro is expanded to @p{{}}.
@@ -160,6 +161,24 @@
  *  @begin{verbatim}
  *    Assert (false, ExcInternalError());
  *  @end{verbatim}
+ *
+ *  As mentioned above, the program is terminated once a call to
+ *  @p{Assert} fails. However, there is one case where we do not want
+ *  to do this, namely when a C++ exception is active. The usual case
+ *  where this happens is that someone throws an exception through the
+ *  @p{AssertThrow} mechanism (see below) which, while the stack is
+ *  unwound, leads to the destruction of other objects in stack frames
+ *  above. If other objects refer to the objects being thus destroyed,
+ *  some destructors raise an exception through @p{Assert}. If we
+ *  would abort the program then, we would only ever see the message
+ *  that an object is being destroyed which is still referenced from
+ *  somewhere, but we would never see the original exception that
+ *  triggered this. (You can see it in the debugger by putting a break
+ *  point on the function @p{__throw}, but you cannot see it from the
+ *  program itself.) In that case, we use a C++ standard library
+ *  function to detect the presence of another active exception and do
+ *  not terminate the program to allow that the thrown exception
+ *  propagates to some place where its message can be displayed.
  *
  *
  *  @sect2{Use of run-time exceptions}
@@ -404,8 +423,24 @@ void __IssueError_Assert (const char *file,
   e.PrintInfo (std::cerr);
   std::cerr << "--------------------------------------------------------"
 	    << std::endl;
-  
-  std::abort ();
+
+				   // abort the program now since
+				   // something has gone horribly
+				   // wrong. however, there is one
+				   // case where we do not want to do
+				   // that, namely when another
+				   // exception, possibly thrown by
+				   // AssertThrow is active, since in
+				   // that case we will not come to
+				   // see the original exception. in
+				   // that case indicate that the
+				   // program is not aborted due to
+				   // this reason
+  if (std::uncaught_exception() == true)
+    std::cerr << "******** Program is not aborted since another exception is active! ********"
+	      << std::endl;
+  else
+    std::abort ();
 };
 
 
