@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -677,13 +677,13 @@ namespace internal
  * namespace.
  *
  *
- * @sect3{Comparison with the Tensor class}
+ * @section TableComp Comparison with the Tensor class
  *
- * In some way, this class is similar to the @ref{Tensor} class, in
+ * In some way, this class is similar to the Tensor class, in
  * that it templatizes on the number of dimensions. However, there are
- * two major differences. The first is that the @ref{Tensor} class
- * stores only numeric values (as <tt>double</tt>s), while the <tt>Table</tt>
- * class stores arbitrary objects. The second is that the @ref{Tensor}
+ * two major differences. The first is that the Tensor class
+ * stores only numeric values (as <tt>double</tt>s), while the Table
+ * class stores arbitrary objects. The second is that the Tensor
  * class has fixed dimensions, also give as a template argument, while
  * this class can handle arbitrary dimensions, which may also be
  * different between different indices.
@@ -691,7 +691,7 @@ namespace internal
  * This has two consequences. First, since the size is not known at
  * compile time, it has to do explicit memory allocating. Second, the
  * layout of individual elements is not known at compile time, so
- * access is slower than for the @ref{Tensor} class where the number
+ * access is slower than for the Tensor class where the number
  * of elements are their location is known at compile time and the
  * compiler can optimize with this knowledge (for example when
  * unrolling loops). On the other hand, this class is of course more
@@ -821,7 +821,7 @@ class TableBase : public Subscriptor
                                       * checking is performed, i.e.,
                                       * it is assumed that the input
                                       * array <tt>entries</tt> contains
-                                      * <tt>n_rows()*n_cols()</tt>
+                                      * n_rows()*n_cols()
                                       * elements, and that the layout
                                       * refers to the desired shape of
                                       * this table. The only check we
@@ -907,11 +907,14 @@ class TableBase : public Subscriptor
     const T & el (const TableIndices<N> &indices) const;
   
                                      /**
+* @deprecated This function accesses data directly and should not be used!
+				      *
                                       * Direct read-only access to
                                       * data field. Used by
-                                      * @ref{FullMatrix} (there even
-                                      * with a cast from const),
-                                      * otherwise, keep away!
+                                      * <tt>FullMatrix</tt> of the LAC
+                                      * sublibrary (there even with a
+                                      * cast from const), otherwise,
+                                      * keep away!
                                       */
     const T* data () const;
     
