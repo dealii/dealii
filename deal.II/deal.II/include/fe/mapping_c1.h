@@ -24,8 +24,12 @@
  * cubic mapping of the boundary differently: @ref{MappingQ} chooses
  * them such that they interpolate the boundary, while this class
  * chooses them such that the discretized boundary is globally
- * continuous.
+ * continuously differentiable.
  *  
+ * To use this class, make sure that the
+ * @ref{Boundary}::@p{get_normals_at_vertices} function is implemented
+ * for the users boundary object.
+ *
  * @author Wolfgang Bangerth, 2001
  */
 template <int dim>
@@ -95,6 +99,25 @@ class MappingC1 : public MappingQ<dim>
     add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
 			    typename std::vector<Point<dim> > &a) const;
 };
+
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> void MappingC1<1>::add_line_support_points (
+  const Triangulation<1>::cell_iterator &,
+  std::vector<Point<1> > &) const;
+template <> void MappingC1<2>::add_line_support_points (
+  const Triangulation<2>::cell_iterator &cell,
+  std::vector<Point<2> > &a) const;
+
+template <> void MappingC1<1>::add_quad_support_points (
+  const Triangulation<1>::cell_iterator &,
+  std::vector<Point<1> > &) const;
+template <> void MappingC1<2>::add_quad_support_points (
+  const Triangulation<2>::cell_iterator &,
+  std::vector<Point<2> > &) const;
+
+
 
 
 #endif
