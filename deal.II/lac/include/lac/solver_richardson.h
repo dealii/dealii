@@ -31,9 +31,11 @@ class SolverRichardson : public Solver<Matrix, Vector> {
 				     /**
 				      * Solve $Ax=b$ for $x$.
 				      */
-    virtual ReturnState solve (const Matrix &A,
-			       Vector       &x,
-			       const Vector &b);
+    template<class Preconditioner>
+    ReturnState solve (const Matrix &A,
+		       Vector       &x,
+		       const Vector &b,
+		       const Preconditioner& precondition);
 
 				     /**
 				      * Set the damping-coefficient.
@@ -81,10 +83,13 @@ class SolverRichardson : public Solver<Matrix, Vector> {
 
 
 template<class Matrix,class Vector>
+template<class Preconditioner>
 Solver<Matrix,Vector>::ReturnState 
 SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
-				Vector       &x,
-				const Vector &b) {
+					Vector       &x,
+					const Vector &b,
+					const Preconditioner& precondition)
+{
   SolverControl::State conv=SolverControl::iterate;
 
 				   // Memory allocation
@@ -103,7 +108,7 @@ SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
       if (conv != SolverControl::iterate)
 	break;
 
-      A.precondition(d,r);
+      precondition(d,r);
       x.add(omega,d);
     }
 

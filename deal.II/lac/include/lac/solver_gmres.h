@@ -45,9 +45,11 @@
  * computational speed against memory. One of the few other
  * possibilities is to use a good preconditioner.
  *
- * @author Original implementation by the DEAL authors; adapted, cleaned and documented by Wolfgang Bangerth */
+ * @author Wolfgang Bangerth
+ */
 template<class Matrix, class Vector>
-class SolverGMRES : public Solver<Matrix, Vector> {
+class SolverGMRES : public Solver<Matrix, Vector>
+{
   public:
 				     /**
 				      * Constructor.
@@ -59,9 +61,11 @@ class SolverGMRES : public Solver<Matrix, Vector> {
 				     /**
 				      * Solver method.
 				      */
-    virtual ReturnState solve (const Matrix &A,
-			       Vector       &x,
-			       const Vector &b);
+    template<class Preconditioner>
+    ReturnState solve (const Matrix &A,
+		       Vector       &x,
+		       const Vector &b,
+		       const Preconditioner& precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
 		    int,
@@ -137,10 +141,12 @@ SolverGMRES<Matrix,Vector>::givens_rotation (Vector &h,
 
 
 template<class Matrix, class Vector>
+template<class Preconditioner>
 Solver<Matrix,Vector>::ReturnState
 SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 				   Vector      & x,
-				   const Vector& b)
+				   const Vector& b,
+				   const Preconditioner& precondition)
 {
 				   // this code was written by the fathers of
 				   // DEAL. I take absolutely no guarantees
@@ -219,7 +225,7 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
       if (left_precondition)
 	{
 	  A.residual(p,x,b);
-	  A.precondition(v,p);
+	  precondition(v,p);
 	} else {
 	  A.residual(v,x,b);
 	};
@@ -259,9 +265,9 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 	  if (left_precondition)
 	    {
 	      A.vmult(p, *tmp_vectors[inner_iteration]);
-	      A.precondition(vv,p);
+	      precondition(vv,p);
 	    } else {
-	      A.precondition(p,*tmp_vectors[inner_iteration]);
+	      precondition(p,*tmp_vectors[inner_iteration]);
 	      A.vmult(vv,p);
 	    };
 	  
@@ -324,7 +330,7 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 	  p = 0.;
 	  for (unsigned int i=0; i<dim; ++i)
 	    p.add(h(i), *tmp_vectors[i]);
-	  A.precondition(v,p);
+	  precondition(v,p);
 	  x.add(1.,v);
 	};
 

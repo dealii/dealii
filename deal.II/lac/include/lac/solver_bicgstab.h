@@ -25,9 +25,11 @@ class SolverBicgstab //<Matrix,Vector>
 				     /**
 				      * Solve primal problem only.
 				      */
-    virtual ReturnState solve (const Matrix &A,
-			       Vector       &x,
-			       const Vector &b);
+    template<class Preconditioner>
+    ReturnState solve (const Matrix &A,
+		       Vector       &x,
+		       const Vector &b,
+		       const Preconditioner& precondition);
 
   protected:
 				     /**
@@ -121,7 +123,8 @@ class SolverBicgstab //<Matrix,Vector>
 				     /**
 				      * The iteration loop itself.
 				      */
-    ReturnState iterate();
+    template<class Preconditioner>
+    ReturnState iterate(const Preconditioner& precondition);
   
 };
 
@@ -135,7 +138,8 @@ SolverBicgstab<Matrix, Vector>::SolverBicgstab(SolverControl &cn,
 {}
 
 
-template<class Matrix, class Vector> double
+template<class Matrix, class Vector>
+double
 SolverBicgstab<Matrix, Vector>::criterion()
 {
   res = MA->residual(*Vt, *Vx, *Vb);
@@ -143,7 +147,8 @@ SolverBicgstab<Matrix, Vector>::criterion()
 }
 
 
-template < class Matrix, class Vector > SolverControl::State
+template < class Matrix, class Vector >
+SolverControl::State
 SolverBicgstab<Matrix, Vector>::start()
 {
   res = MA->residual(*Vr, *Vx, *Vb);
@@ -154,8 +159,10 @@ SolverBicgstab<Matrix, Vector>::start()
   return state;
 }
 
-template<class Matrix, class Vector> Solver<Matrix,Vector>::ReturnState
-SolverBicgstab<Matrix, Vector>::iterate()
+template<class Matrix, class Vector>
+template<class Preconditioner>
+Solver<Matrix,Vector>::ReturnState
+SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
 {
   SolverControl::State state = SolverControl::iterate;
   alpha = omega = rho = 1.;
@@ -175,7 +182,7 @@ SolverBicgstab<Matrix, Vector>::iterate()
       beta   = rhobar * alpha / (rho * omega);
       rho    = rhobar;
       p.sadd(beta, 1., r, -beta*omega, v);
-      MA->precondition(y,p);
+      precondition(y,p);
       MA->vmult(v,y);
       rhobar = rbar * v;
 
@@ -183,7 +190,7 @@ SolverBicgstab<Matrix, Vector>::iterate()
     
       alpha = rho/rhobar;
       s.equ(1., r, -alpha, v);
-      MA->precondition(z,s);
+      precondition(z,s);
       MA->vmult(t,z);
       rhobar = t*s;
       omega = rhobar/(t*t);
@@ -198,10 +205,13 @@ SolverBicgstab<Matrix, Vector>::iterate()
 }
 
 
-template<class Matrix, class Vector> Solver<Matrix,Vector>::ReturnState
+template<class Matrix, class Vector>
+template<class Preconditioner>
+Solver<Matrix,Vector>::ReturnState
 SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
 				      Vector       &x,
-				      const Vector &b)
+				      const Vector &b,
+				      const Preconditioner& precondition)
 {
   deallog.push("Bicgstab");
   Vr    = memory.alloc(); Vr->reinit(x);
@@ -225,7 +235,7 @@ SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
     {
       deallog << "Go!" << endl;
       if (start() == SolverControl::success) break;  
-      state = iterate();
+      state = iterate(precondition);
     }
   while (state == breakdown);
 

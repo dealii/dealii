@@ -13,7 +13,11 @@ template <class Vector> class VectorMemory;
 
 
 /**
- * Base class for iterative solvers. This class defines possible
+ * Base class for iterative solvers.
+ *
+ * HAS TO BE UPDATED!
+ *
+ * This class defines possible
  * return states of linear solvers and provides interfaces to a memory
  * pool and the control object.
  *
@@ -115,20 +119,18 @@ class Solver
 				      * object.
 				      */
     Solver (SolverControl &, VectorMemory<Vector> &);
-    
+
 				     /**
-				      * Destructor.  This one is virtual,
-				      * overload it in derived classes if
-				      * necessary.
+				      * Solver procedure.  This is in
+				      * fact only a template for the
+				      * solve-function to be
+				      * implemented in derived classes
 				      */
-    virtual ~Solver() {}
-    
-				     /**
-				      * Solver procedure.
-				      */
-    virtual ReturnState solve (const Matrix &A,
-			       Vector &x,
-			       const Vector &b) = 0;
+    template<class Preconditioner>
+    ReturnState solve (const Matrix &A,
+		       Vector &x,
+		       const Vector &b,
+		       const Preconditioner& precondition) const;
     
 				     /**
 				      * Access to control object.

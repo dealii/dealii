@@ -17,7 +17,8 @@
  * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
 template<class Matrix, class Vector>
-class SolverPCG : public Solver<Matrix,Vector> {
+class SolverPCG : public Solver<Matrix,Vector>
+{
   public:
 
 				     /**
@@ -29,9 +30,11 @@ class SolverPCG : public Solver<Matrix,Vector> {
 				     /**
 				      * Solver method.
 				      */
-    virtual ReturnState solve (const Matrix &A,
-			       Vector       &x,
-			       const Vector &b);
+    template<class Preconditioner>
+    ReturnState solve (const Matrix &A,
+		       Vector       &x,
+		       const Vector &b,
+		       const Preconditioner& precondition);
 
   protected:
 				     /**
@@ -76,10 +79,13 @@ double SolverPCG<Matrix,Vector>::criterion()
 
 
 template<class Matrix, class Vector>
+template<class Preconditioner>
 Solver<Matrix,Vector>::ReturnState 
 SolverPCG<Matrix,Vector>::solve (const Matrix &A,
 				 Vector       &x,
-				 const Vector &b) {
+				 const Vector &b,
+				 const Preconditioner& precondition)
+{
   SolverControl::State conv=SolverControl::iterate;
   
 				   // Memory allocation
@@ -117,7 +123,7 @@ SolverPCG<Matrix,Vector>::solve (const Matrix &A,
     };
   
   g.scale(-1.);
-  A.precondition(h,g);
+  precondition(h,g);
  
   d.equ(-1.,h);
  
@@ -137,7 +143,7 @@ SolverPCG<Matrix,Vector>::solve (const Matrix &A,
       conv = control().check(it,res);
       if (conv) break;
       
-      A.precondition(h,g);
+      precondition(h,g);
       
       beta = gh;
       gh   = g*h;
