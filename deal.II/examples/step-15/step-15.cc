@@ -61,15 +61,15 @@ class MinimizationProblem
     MinimizationProblem  ();
     ~MinimizationProblem  ();
     void run ();
+    void output_results (const unsigned int cycle) const;
     
   private:
     void setup_system ();
-    void assemble_step (const bool p);
+    void assemble_step ();
     double line_search (const Vector<double> & update) const;
     void do_step ();
     void initialize ();
     void refine_grid ();
-    void output_results (const unsigned int cycle) const;
 
     static double energy (const DoFHandler<dim> &dof_handler,
                           const Vector<double>  &function);
@@ -105,13 +105,19 @@ class InitializationValues : public Function<1>
 double InitializationValues::value (const Point<1> &p,
                                     const unsigned int) const 
 {
-  return std::pow(p(0), 1.);
+  const double base = std::pow(p(0), 1./3.);
+  const double random = 2.*rand()/RAND_MAX-1;
+  if (base+.1*random < 0 )
+    return 0;
+  else
+    return base+.1*random;
 }
 
 
 
 template <int dim>
-MinimizationProblem<dim>::MinimizationProblem () :
+MinimizationProblem<dim>::MinimizationProblem ()
+                :
                 fe (1),
 		dof_handler (triangulation)
 {}
@@ -157,10 +163,9 @@ double gradient_power (const Tensor<1,dim> &v,
 
 
 template <int dim>
-void MinimizationProblem<dim>::assemble_step (const bool p) 
+void MinimizationProblem<dim>::assemble_step ()
 {
-  if (p)
-    matrix.reinit (sparsity_pattern);
+  matrix.reinit (sparsity_pattern);
   residual.reinit (dof_handler.n_dofs());
   
   QGauss3<dim>  quadrature_formula;
@@ -207,45 +212,13 @@ void MinimizationProblem<dim>::assemble_step (const bool p)
           
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             {
-              if (p)
               for (unsigned int j=0; j<dofs_per_cell; ++j)
-                {
-//                   cell_matrix(i,j)
-//                     += (30.* x_minus_u3 * x_minus_u3 *
-//                         gradient_power (u_prime, 4) *
-//                         (fe_values.shape_grad(i,q_point)    *
-//                          fe_values.shape_grad(j,q_point))   *
-//                         fe_values.JxW(q_point));
-
-//                   cell_matrix(i,j)
-//                     += (-36. * x_minus_u3 * u * u
-//                         *
-//                         gradient_power(u_prime, 4)
-//                         *                        
-//                         (fe_values.shape_value(i,q_point)    *
-//                          (fe_values.shape_grad(j,q_point)   *
-//                           u_prime)
-//                          +
-//                          fe_values.shape_value(j,q_point)    *
-//                          (fe_values.shape_grad(i,q_point)   *
-//                           u_prime)
-//                          )*
-//                         fe_values.JxW(q_point));
-
-//                   cell_matrix(i,j)
-//                     += ((30.* std::pow(u,4.) - 12*x*u)
-//                          *
-//                          gradient_power(u_prime, 6)
-//                         *                        
-//                         (fe_values.shape_value(i,q_point)    *
-//                          fe_values.shape_value(j,q_point))   *
-//                         fe_values.JxW(q_point));
-                  cell_matrix(i,j)
-                    += (fe_values.shape_grad(i,q_point) *
-                        fe_values.shape_grad(j,q_point)) *
-                    fe_values.JxW(q_point);
-                  
-                };
+                cell_matrix(i,j)
+                  += (fe_values.shape_grad(i,q_point) *
+                      fe_values.shape_grad(j,q_point) * cell->diameter() * cell->diameter() +
+                      fe_values.shape_value(i,q_point) *
+                      fe_values.shape_value(j,q_point)) *
+                  fe_values.JxW(q_point);
               
               cell_rhs(i) += -((6. * x_minus_u3 *
                                 gradient_power (local_solution_grads[q_point],
@@ -261,22 +234,21 @@ void MinimizationProblem<dim>::assemble_step (const bool p)
                                 )
                                *
                                fe_values.JxW(q_point));
-            };
-        };
+            }
+        }
       
 
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
-          if (p)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
 	  
 	  residual(local_dof_indices[i]) += cell_rhs(i);
-	};
-    };
+	}
+    }
 
   hanging_node_constraints.condense (matrix);
   hanging_node_constraints.condense (residual);
@@ -304,26 +276,50 @@ template <int dim>
 double
 MinimizationProblem<dim>::line_search (const Vector<double> &update) const
 {
-  double alpha = 0.01;
-  double optimal_energy = energy (dof_handler, present_solution);
+  double alpha = 0.;
   Vector<double> tmp (present_solution.size());
   
-  for (double a=.01; a<=10; a*=1.5)
+  for (unsigned int step=0; step<5; ++step)
     {
       tmp = present_solution;
-      tmp.add (a, update);
-      const double e = energy(dof_handler, tmp);
+      tmp.add (alpha, update);
+      const double f_s = energy (dof_handler, tmp);
+      
+      const double dalpha = (alpha != 0 ? alpha/100 : 0.01);
+      
+      tmp = present_solution;
+      tmp.add (alpha+dalpha, update);
+      const double f_s_plus = energy (dof_handler, tmp);
 
-      std::cout << "XX" << a << ' ' << e << std::endl;
-      if (e < optimal_energy)
+      tmp = present_solution;
+      tmp.add (alpha-dalpha, update);
+      const double f_s_minus = energy (dof_handler, tmp);
+
+      const double f_s_prime       = (f_s_plus-f_s_minus) / (2*dalpha);
+      const double f_s_doubleprime = ((f_s_plus-2*f_s+f_s_minus) /
+                                      (dalpha*dalpha));
+
+      if (std::fabs(f_s_prime) < 1e-7*std::fabs(f_s))
+        break;
+
+      if (std::fabs(f_s_doubleprime) < 1e-7*std::fabs(f_s_prime))
+        break;
+
+      double step_length = -f_s_prime / f_s_doubleprime;
+      for (unsigned int i=0; i<3; ++i)
         {
-          optimal_energy = e;
-          alpha = a;
+          tmp = present_solution;
+          tmp.add (alpha+step_length, update);
+          const double e = energy (dof_handler, tmp);
+          
+          if (e >= f_s)
+            step_length /= 2;
+          else
+            break;
         }
+      alpha += step_length;
     }
 
-  std::cout << "  Step length : " << alpha << ' ' << optimal_energy << std::endl;
-  
   return alpha;
 }
 
@@ -333,35 +329,46 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
 template <int dim>
 void MinimizationProblem<dim>::do_step ()
 {          
-  assemble_step (true);
+  assemble_step ();
 
   Vector<double> update (present_solution.size());
   {
-    SolverControl           solver_control (1000,
-                                            1e-3*residual.l2_norm());
+    SolverControl           solver_control (residual.size(),
+                                            1e-2*residual.l2_norm());
     PrimitiveVectorMemory<> vector_memory;
     SolverCG<>              solver (solver_control, vector_memory);
     
     PreconditionSSOR<> preconditioner;
-    preconditioner.initialize(matrix, 1.2);
+    preconditioner.initialize(matrix);
 
     solver.solve (matrix, update, residual,
                   preconditioner);
     hanging_node_constraints.distribute (update);
   }
-  
-  present_solution.add (line_search (update), update);
+
+  const double step_length = line_search (update);
+  present_solution.add (step_length, update);
 }
 
 
-template <int dim>
-void MinimizationProblem<dim>::initialize () 
+template <>
+void MinimizationProblem<1>::initialize () 
 {
   dof_handler.distribute_dofs (fe);
   present_solution.reinit (dof_handler.n_dofs());
   VectorTools::interpolate (dof_handler,
                             InitializationValues(),
                             present_solution);
+  DoFHandler<1>::cell_iterator cell;
+  cell = dof_handler.begin(0);
+  while (cell->has_children())
+    cell = cell->child(0);
+  present_solution(cell->vertex_dof_index(0,0)) = 0;
+  
+  cell = dof_handler.begin(0);
+  while (cell->has_children())
+    cell = cell->child(1);
+  present_solution(cell->vertex_dof_index(1,0)) = 1;
 }
 
 
@@ -441,7 +448,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
                    gradient_power (local_solution_grads[q_point],
                                    6) *
                    fe_values.JxW (q_point));
-    };
+    }
   
   return energy;
 }
@@ -483,36 +490,27 @@ void MinimizationProblem<dim>::run ()
   triangulation.refine_global (4);
   initialize ();
 
-  for (unsigned int refinement_cycle=0; refinement_cycle<5;
-       ++refinement_cycle)
+  double last_energy = energy (dof_handler, present_solution);
+  
+  while (true)
     {
-      std::cout << "Cycle " << refinement_cycle << ':' << std::endl;
-
-      std::cout << "   Number of active cells:       "
-		<< triangulation.n_active_cells()
-		<< std::endl;
-
       setup_system ();
 
       unsigned int iteration=0;
       for (; iteration<5; ++iteration)
-        {
-          do_step ();
+        do_step ();
 
-          if (residual.l2_norm() < 1.e-4)
-            break;
-        };
-      output_results (refinement_cycle);
+      const double this_energy = energy (dof_handler, present_solution);
+      std::cout << "   Energy: " << this_energy << std::endl;
 
-      std::cout << "   Iterations            :       "
-		<< iteration
-                << std::endl;
-      std::cout << "   Energy                :       "
-		<< energy (dof_handler, present_solution)
-		<< std::endl;
-      
+      if ((last_energy-this_energy) < 1e-5*last_energy)
+        break;
+
+      last_energy = this_energy;
+
       refine_grid ();
-    };
+    }
+  std::cout << std::endl;
 }
 
     
@@ -522,8 +520,14 @@ int main ()
     {
       deallog.depth_console (0);
 
-      MinimizationProblem<1> minimization_problem_1d;
-      minimization_problem_1d.run ();
+      for (unsigned int realization=0; realization<100; ++realization)
+        {
+          std::cout << "Realization " << realization << ":" << std::endl;
+  
+          MinimizationProblem<1> minimization_problem_1d;
+          minimization_problem_1d.run ();
+          minimization_problem_1d.output_results (realization);
+        }
     }
   catch (std::exception &exc)
     {
@@ -547,6 +551,6 @@ int main ()
 		<< "----------------------------------------------------"
 		<< std::endl;
       return 1;
-    };
+    }
   return 0;
 }
