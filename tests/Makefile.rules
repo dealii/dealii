@@ -35,7 +35,7 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 %.exe :
 	@echo =====linking======= $@
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
+	$(CXX) $(LDFLAGS) $(flags:-Kc++eh,) -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -77,9 +77,9 @@ endif
 	@echo '=====Checking======' $<
 	@perl -pi $(normalize)  $<
 	@if test "x$(verbose)" = "xon" ; then \
-		cmd="diff $< $(patsubst %.output,%.checked, $<)" ; \
+		cmd="diff -w $< $(patsubst %.output,%.checked, $<)" ; \
 	 else \
-		cmd="diff $< $(patsubst %.output,%.checked, $<) > /dev/null" ; \
+		cmd="diff -w $< $(patsubst %.output,%.checked, $<) > /dev/null" ; \
 	 fi ; \
 	 if eval $$cmd ; then \
 		echo '=====OK============' $@ ; \
