@@ -511,7 +511,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 	      break;
 	case backward:
 	      init_function (static_cast<typename InitFunctionObject::argument_type>
-			     (timesteps[n_timesteps-step]));
+			     (timesteps[n_timesteps-step-1]));
 	      break;
       };
   
@@ -546,8 +546,8 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 		    timesteps[step+look_ahead]->wake_up(look_ahead);
 		  break;
 	    case backward:
-		  if (n_timesteps >= (step+look_ahead))
-		    timesteps[n_timesteps-(step+look_ahead)]->wake_up(look_ahead);
+		  if (n_timesteps > (step+look_ahead))
+		    timesteps[n_timesteps-(step+look_ahead)-1]->wake_up(look_ahead);
 		  break;
 	  };
       
@@ -561,7 +561,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 		break;
 	  case backward:
 		loop_function (static_cast<typename LoopFunctionObject::argument_type>
-			       (timesteps[n_timesteps-step]));
+			       (timesteps[n_timesteps-step-1]));
 		break;
 	};
       
@@ -575,8 +575,8 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 		    timesteps[step-look_back]->sleep(look_back);
 		  break;
 	    case backward:
-		  if (n_timesteps-(step-look_back) < n_timesteps)
-		    timesteps[n_timesteps-(step-look_back)]->sleep(look_back);
+		  if (n_timesteps-(step-look_back) <= n_timesteps)
+		    timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
 		  break;
 	  };
     };
@@ -595,10 +595,10 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 		  timesteps[step-look_back]->sleep(look_back);
 		break;
 	  case backward:
-		if ((step-look_back > 0)
+		if ((step-look_back >= 0)
 		    &&
-		    ((step-look_back) <= static_cast<int>(n_timesteps)))
-		  timesteps[n_timesteps-(step-look_back)]->sleep(look_back);
+		    (step-look_back < static_cast<int>(n_timesteps)))
+		  timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
 		break;
 	};
 };
