@@ -2305,7 +2305,7 @@ void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &p
 template <int dim, int spacedim>
 void DataOutBase::write_tecplot (const typename std::vector<Patch<dim,spacedim> > &patches,
 				 const std::vector<std::string>          &data_names,
-				 const TecplotFlags                      &flags,
+				 const TecplotFlags                      &/*flags*/,
 				 std::ostream                            &out)
 {
   AssertThrow (out, ExcIO());
