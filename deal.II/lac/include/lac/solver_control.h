@@ -170,9 +170,7 @@ class SolverControl : public Subscriptor
  * class) is reduced by a given factor. This is useful in cases where
  * you don't want to solve exactly, but rather want to gain two digits.
  */
-class ReductionControl
-  :
-  public SolverControl
+class ReductionControl : public SolverControl
 {
   public:
 				     /**
