@@ -239,6 +239,22 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
     TriaRawIterator (const TriaRawIterator &);
 
 				     /**
+				      * Construct an iterator from the given
+				      * accessor; the given accessor needs not
+				      * be of the same type as the accessor of
+				      * this class is, but it needs to be
+				      * convertible.
+				      *
+				      * Through this constructor, it is also
+				      * possible to construct object for
+				      * derived iterators:
+				      * #DoFCellAccessor dof_accessor;
+				      * Triangulation::active_cell_iterator cell
+				      *   = accessor; #.
+				      */
+    TriaRawIterator (const Accessor &a);
+    
+				     /**
 				      *  Proper constructor, initialized
 				      *  with the triangulation, the
 				      *  level and index of the object
@@ -454,12 +470,20 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
     Accessor accessor;
 
 
-				     // actually, I don't know why we need these
-				     // classes to be friends, since they are
-				     // derived classes anyway. but gcc and
-				     // even egcs1.1.1 don't get it right
-    friend class TriaIterator<dim,Accessor>;
-    friend class TriaActiveIterator<dim,Accessor>;
+				     /**
+				      * Make all other iterator class templates
+				      * friends of this class. This is
+				      * necessary for the implementation of
+				      * conversion constructors.
+				      */
+    template <typename SomeAccessor>
+    friend class TriaRawIterator<dim,SomeAccessor>;
+
+    template <typename SomeAccessor>
+    friend class TriaIterator<dim,SomeAccessor>;
+
+    template <typename SomeAccessor>
+    friend class TriaActiveIterator<dim,SomeAccessor>;
 };
 
 
@@ -538,6 +562,15 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
 				      */
     template <typename OtherAccessor>
     TriaIterator (const TriaIterator<dim,OtherAccessor> &i);
+
+				     /**
+				      * Similar conversion operator to the above
+				      * one, but does a check whether the
+				      * iterator points to a used element,
+				      * which is necessary for raw iterators.
+				      */
+    template <typename OtherAccessor>
+    TriaIterator (const TriaRawIterator<dim,OtherAccessor> &i);
 
     				     /**
 				      *  Assignment operator.
@@ -688,6 +721,19 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
     template <typename OtherAccessor>
     TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i);
 
+				     /**
+				      * Similar conversion operator to the above
+				      * one, but does a check whether the
+				      * iterator points to a used element,
+				      * and is active, which is necessary for
+				      * raw iterators. Since usual iterators
+				      * are also raw iterators, this constructor
+				      * works also for parameters of type
+				      * #TriaIterator<dim,OtherAccessor>#.
+				      */
+    template <typename OtherAccessor>
+    TriaActiveIterator (const TriaRawIterator<dim,OtherAccessor> &i);
+
     				     /**
 				      *  Assignment operator.
 				      */
@@ -767,6 +813,14 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 
 
 /*----------------------- Inline functions -------------------*/
+
+
+
+template <int dim, typename Accessor>
+inline
+TriaRawIterator<dim,Accessor>::TriaRawIterator (const Accessor &a) :
+		accessor (a)
+{};
 
 
 
@@ -887,9 +941,51 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,OtherAccessor> 
 template <int dim, typename Accessor>
 template <typename OtherAccessor>
 inline
+TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccessor> &i)
+		: TriaRawIterator<dim,Accessor> (static_cast<TriaRawIterator<dim,OtherAccessor> >(i))
+{
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // used() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end)
+    Assert (accessor.used(),
+	    ExcAssignmentOfUnusedObject());
+#endif
+};
+
+
+
+template <int dim, typename Accessor>
+template <typename OtherAccessor>
+inline
 TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i)
 		: TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
 {};
+
+
+
+template <int dim, typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,OtherAccessor> &i)
+		: TriaIterator<dim,Accessor> (i)
+{
+#ifdef DEBUG
+				   // do this like this, because:
+				   // if we write
+				   // "Assert (past_the_end || used)"
+				   // has_children() is called anyway, even if
+				   // state==past_the_end, and will then
+				   // throw the exception!
+  if (state() != past_the_end) 
+    Assert (accessor.has_children()==false,
+	    ExcAssignmentOfInactiveObject());
+#endif
+};
 
 
 
