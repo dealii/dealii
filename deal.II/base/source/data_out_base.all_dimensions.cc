@@ -327,6 +327,25 @@ DataOutBase::GmvFlags::memory_consumption () const
 
 
 
+void DataOutBase::VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
+{};
+
+
+
+void DataOutBase::VtkFlags::parse_parameters (ParameterHandler &/*prm*/)
+{};
+
+
+unsigned int
+DataOutBase::VtkFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
+
 unsigned int DataOutBase::memory_consumption ()
 {
   return 0;

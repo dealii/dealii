@@ -266,6 +266,14 @@ class ParameterHandler;
  * (bi-,tri-)linear elements.
  *
  *
+ * @sect3{VTK format}
+ *
+ * This is the file format used by the Visualization Toolkit (VTK, see
+ * @url{http://www.kitware.com/vtk.html}), as
+ * described in their manual, section 14.3. It is similar to the GMV
+ * format, see there for more information.
+ *
+ *
  * @sect2{Output parameters}
  *
  * All functions take a parameter which is a structure of type @p{XFlags}, where
@@ -995,6 +1003,63 @@ class DataOutBase
 	unsigned int memory_consumption () const;
     };
 
+    				     /**
+				      * Flags describing the details
+				      * of output in VTK format. At
+				      * present no flags are
+				      * implemented.
+				      */
+    struct VtkFlags 
+    {
+      private:
+					 /**
+					  * Dummy entry to suppress compiler
+					  * warnings when copying an empty
+					  * structure. Remove this member
+					  * when adding the first flag to
+					  * this structure (and remove the
+					  * @p{private} as well).
+					  */
+	int dummy;
+
+      public:
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * @p{declare_parameters} and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{std::map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
+    };
+
 				     /**
 				      * Write the given list of patches
 				      * to the output stream in ucd
@@ -1058,6 +1123,19 @@ class DataOutBase
     static void write_gmv (const typename std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const GmvFlags                          &flags,
+			   std::ostream                            &out);
+
+    				     /**
+				      * Write the given list of
+				      * patches to the output stream
+				      * in vtk format. See the general
+				      * documentation for more
+				      * information on the parameters.
+				      */
+    template <int dim, int spacedim>
+    static void write_vtk (const typename std::vector<Patch<dim,spacedim> > &patches,
+			   const std::vector<std::string>          &data_names,
+			   const VtkFlags                          &flags,
 			   std::ostream                            &out);
 
 				     /**
@@ -1127,7 +1205,8 @@ class DataOutBase
 				      * coordinates, one height value)
 				      * to the direction of sight.
 				      */
-    class EpsCell2d {
+    class EpsCell2d
+    {
       public:
 	
 					 /**
@@ -1172,6 +1251,11 @@ class DataOutBase
 				      * from the main thread, and is
 				      * thus moved into this separate
 				      * function.
+				      *
+				      * Note that because of the close
+				      * similarity of the two formats,
+				      * this function is also used by
+				      * the Vtk output function.
 				      */
     template <int dim, int spacedim>
     static void
@@ -1299,96 +1383,122 @@ class DataOutInterface : private DataOutBase
 {
   public:
 				     /**
-				      * Provide a data type specifying the
-				      * presently supported output formats.
+				      * Provide a data type specifying
+				      * the presently supported output
+				      * formats.
 				      */
-    enum OutputFormat { default_format, ucd, gnuplot, povray, eps, gmv };
+    enum OutputFormat { default_format, ucd, gnuplot, povray, eps, gmv, vtk };
 
 				     /**
-				      * Obtain data through the @p{get_patches}
-				      * function and write it to @p{out} in
-				      * UCD format.
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in UCD
+				      * format.
 				      */
     void write_ucd (std::ostream &out) const;
 
 				     /**
-				      * Obtain data through the @p{get_patches}
-				      * function and write it to @p{out} in
-				      * GNUPLOT format.
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in GNUPLOT
+				      * format.
 				      */
     void write_gnuplot (std::ostream &out) const;
 
     				     /**
-				      * Obtain data through the @p{get_patches}
-				      * function and write it to @p{out} in
-				      * POVRAY format.
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in POVRAY
+				      * format.
 				      */
     void write_povray (std::ostream &out) const;
 
 				     /**
-				      * Obtain data through the @p{get_patches}
-				      * function and write it to @p{out} in
-				      * EPS format.
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in EPS
+				      * format.
 				      */
     void write_eps (std::ostream &out) const;
 
     				     /**
-				      * Obtain data through the @p{get_patches}
-				      * function and write it to @p{out} in
-				      * GMV format.
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in GMV
+				      * format.
 				      */
     void write_gmv (std::ostream &out) const;
 
+    				     /**
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in Vtk
+				      * format.
+				      */
+    void write_vtk (std::ostream &out) const;
+
 				     /**
-				      * Write data and grid to @p{out} according
-				      * to the given data format. This function
-				      * simply calls the appropriate
-				      * @p{write_*} function. If no output format is
-				      * requested, the @p{default_format} is written.
+				      * Write data and grid to @p{out}
+				      * according to the given data
+				      * format. This function simply
+				      * calls the appropriate
+				      * @p{write_*} function. If no
+				      * output format is requested,
+				      * the @p{default_format} is
+				      * written.
 				      *
-				      * An error occurs if no format is provided and
-				      * the default format is @p{default_format}.
+				      * An error occurs if no format
+				      * is provided and the default
+				      * format is @p{default_format}.
 				      */
     void write (std::ostream       &out,
 		const OutputFormat  output_format = default_format) const;
 
 				     /**
-				      * Set the default format. The value set here
-				      * is used anytime, output for format @p{default_format} is
+				      * Set the default format. The
+				      * value set here is used
+				      * anytime, output for format
+				      * @p{default_format} is
 				      * requested.
 				      */
-    void set_default_format(const OutputFormat default_format);
+    void set_default_format (const OutputFormat default_format);
 
 				     /**
-				      * Set the flags to be used for output
-				      * in UCD format.
+				      * Set the flags to be used for
+				      * output in UCD format.
 				      */
     void set_flags (const UcdFlags &ucd_flags);
 
     				     /**
-				      * Set the flags to be used for output
-				      * in GNUPLOT format.
+				      * Set the flags to be used for
+				      * output in GNUPLOT format.
 				      */
     void set_flags (const GnuplotFlags &gnuplot_flags);
 
     				     /**
-				      * Set the flags to be used for output
-				      * in POVRAY format.
+				      * Set the flags to be used for
+				      * output in POVRAY format.
 				      */
     void set_flags (const PovrayFlags &povray_flags);
 
     				     /**
-				      * Set the flags to be used for output
-				      * in EPS output.
+				      * Set the flags to be used for
+				      * output in EPS output.
 				      */
     void set_flags (const EpsFlags &eps_flags);
 
     				     /**
-				      * Set the flags to be used for output
-				      * in GMV format.
+				      * Set the flags to be used for
+				      * output in GMV format.
 				      */
     void set_flags (const GmvFlags &gmv_flags);
 
+    				     /**
+				      * Set the flags to be used for
+				      * output in GMV format.
+				      */
+    void set_flags (const VtkFlags &vtk_flags);
+    
 
 				     /**
 				      * Provide a function which tells us which
@@ -1400,82 +1510,97 @@ class DataOutInterface : private DataOutBase
 				      * @item @p{gnuplot}: @p{.gnuplot}
 				      * @item @p{povray}: @p{.pov}
 				      * @item @p{eps}: @p{.eps}
-				      * @item @p{gmv}: @p{.gmv}.
+				      * @item @p{gmv}: @p{.gmv}
+				      * @item @p{vtk}: @p{.vtk}.
 				      * @end{itemize}
 				      *
 				      * If this function is called
-				      * with no argument or @p{default_format}, the
-				      * suffix for the
-				      * @p{default_format} is returned.
+				      * with no argument or
+				      * @p{default_format}, the suffix
+				      * for the @p{default_format} is
+				      * returned.
 				      */
     std::string default_suffix (const OutputFormat output_format = default_format) const;
 
 				     /**
-				      * Return the @p{OutputFormat} value
-				      * corresponding to the given string. If
-				      * the string does not match any known
-				      * format, an exception is thrown.
+				      * Return the @p{OutputFormat}
+				      * value corresponding to the
+				      * given string. If the string
+				      * does not match any known
+				      * format, an exception is
+				      * thrown.
 				      *
-				      * Since this function does not need data
-				      * from this object, it is static and can
-				      * thus be called without creating an
-				      * object of this class. Its main purpose
-				      * is to allow a program to use any
-				      * implemented output format without the
-				      * need to extend the program's parser
-				      * each time a new format is implemented.
+				      * Since this function does not
+				      * need data from this object, it
+				      * is static and can thus be
+				      * called without creating an
+				      * object of this class. Its main
+				      * purpose is to allow a program
+				      * to use any implemented output
+				      * format without the need to
+				      * extend the program's parser
+				      * each time a new format is
+				      * implemented.
 				      *
-				      * To get a list of presently available
-				      * format names, e.g. to give it to the
-				      * @p{ParameterHandler} class, use the
-				      * function @p{get_output_format_names ()}.
+				      * To get a list of presently
+				      * available format names,
+				      * e.g. to give it to the
+				      * @p{ParameterHandler} class,
+				      * use the function
+				      * @p{get_output_format_names
+				      * ()}.
 				      */
     static OutputFormat parse_output_format (const std::string &format_name);
 
 				     /**
-				      * Return a list of implemented output
-				      * formats. The different names are
-				      * separated by vertical bar signs (@p{`|'})
-				      * as used by the @p{ParameterHandler}
-				      * classes.
+				      * Return a list of implemented
+				      * output formats. The different
+				      * names are separated by
+				      * vertical bar signs (@p{`|'})
+				      * as used by the
+				      * @p{ParameterHandler} classes.
 				      */
     static std::string get_output_format_names ();
 
 				     /**
-				      * Declare parameters for all output
-				      * formats by declaring subsections
-				      * within the parameter file for each
-				      * output format and call the
-				      * respective @p{declare_parameters}
-				      * functions of the flag classes for
-				      * each output format.
+				      * Declare parameters for all
+				      * output formats by declaring
+				      * subsections within the
+				      * parameter file for each output
+				      * format and call the respective
+				      * @p{declare_parameters}
+				      * functions of the flag classes
+				      * for each output format.
 				      *
-				      * Some of the declared subsections
-				      * may not contain entries, if the
-				      * respective format does not
-				      * export any flags.
+				      * Some of the declared
+				      * subsections may not contain
+				      * entries, if the respective
+				      * format does not export any
+				      * flags.
 				      *
-				      * Note that the top-level parameters
-				      * denoting the number of subdivisions
-				      * per patch and the output format
-				      * are not declared, since they are
-				      * only passed to virtual functions
-				      * and are not stored inside objects
-				      * of this type. You have to
-				      * declare them yourself.
+				      * Note that the top-level
+				      * parameters denoting the number
+				      * of subdivisions per patch and
+				      * the output format are not
+				      * declared, since they are only
+				      * passed to virtual functions
+				      * and are not stored inside
+				      * objects of this type. You have
+				      * to declare them yourself.
 				      */
     static void declare_parameters (ParameterHandler &prm);
 
 				     /**
-				      * Read the parameters declared in
-				      * @p{declare_parameters} and set the
-				      * flags for the output formats
-				      * accordingly.
+				      * Read the parameters declared
+				      * in @p{declare_parameters} and
+				      * set the flags for the output
+				      * formats accordingly.
 				      *
-				      * The flags thus obtained overwrite
-				      * all previous contents of the flag
-				      * objects as default-constructed or
-				      * set by the @p{set_flags} function.
+				      * The flags thus obtained
+				      * overwrite all previous
+				      * contents of the flag objects
+				      * as default-constructed or set
+				      * by the @p{set_flags} function.
 				      */
     void parse_parameters (ParameterHandler &prm);
     
@@ -1504,24 +1629,27 @@ class DataOutInterface : private DataOutBase
     
   protected:
 				     /**
-				      * This is the abstract function through
-				      * which derived classes propagate
-				      * preprocessed data in the form of
-				      * @p{Patch} structures (declared in
-				      * the base class @p{DataOutBase}) to
-				      * the actual output function. You
-				      * need to overload this function to
-				      * allow the output functions to
-				      * know what they shall print.
+				      * This is the abstract function
+				      * through which derived classes
+				      * propagate preprocessed data in
+				      * the form of @p{Patch}
+				      * structures (declared in the
+				      * base class @p{DataOutBase}) to
+				      * the actual output
+				      * function. You need to overload
+				      * this function to allow the
+				      * output functions to know what
+				      * they shall print.
 				      */
     virtual const typename std::vector<typename DataOutBase::Patch<dim,spacedim> > &
     get_patches () const = 0;
 
 				     /**
-				      * Abstract virtual function through
-				      * which the names of data sets are
-				      * obtained by the output functions
-				      * of the base class.
+				      * Abstract virtual function
+				      * through which the names of
+				      * data sets are obtained by the
+				      * output functions of the base
+				      * class.
 				      */
     virtual std::vector<std::string> get_dataset_names () const = 0;
 
@@ -1537,41 +1665,55 @@ class DataOutInterface : private DataOutBase
     OutputFormat default_fmt;
     
 				     /**
-				      * Flags to be used upon output of UCD
-				      * data. Can be changed by using the
-				      * @p{set_flags} function.
+				      * Flags to be used upon output
+				      * of UCD data. Can be changed by
+				      * using the @p{set_flags}
+				      * function.
 				      */
     UcdFlags     ucd_flags;
 
 				     /**
-				      * Flags to be used upon output of GNUPLOT
-				      * data. Can be changed by using the
+				      * Flags to be used upon output
+				      * of GNUPLOT data. Can be
+				      * changed by using the
 				      * @p{set_flags} function.
 				      */
     GnuplotFlags gnuplot_flags;
 
     				     /**
-				      * Flags to be used upon output of POVRAY
-				      * data. Can be changed by using the
-				      * @p{set_flags} function.
+				      * Flags to be used upon output
+				      * of POVRAY data. Can be changed
+				      * by using the @p{set_flags}
+				      * function.
 				      */
     PovrayFlags povray_flags;
 
 				     /**
-				      * Flags to be used upon output of EPS
-				      * data in one space dimension. Can be
-				      * changed by using the @p{set_flags}
+				      * Flags to be used upon output
+				      * of EPS data in one space
+				      * dimension. Can be changed by
+				      * using the @p{set_flags}
 				      * function.
 				      */
     EpsFlags     eps_flags;    
 
 				     /**
-				      * Flags to be used upon output of gmv
-				      * data in one space dimension. Can be
-				      * changed by using the @p{set_flags}
+				      * Flags to be used upon output
+				      * of gmv data in one space
+				      * dimension. Can be changed by
+				      * using the @p{set_flags}
 				      * function.
 				      */
     GmvFlags     gmv_flags;
+
+				     /**
+				      * Flags to be used upon output
+				      * of vtk data in one space
+				      * dimension. Can be changed by
+				      * using the @p{set_flags}
+				      * function.
+				      */
+    VtkFlags     vtk_flags;
 };
 
 

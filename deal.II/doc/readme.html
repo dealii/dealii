@@ -154,6 +154,8 @@
            GNUPLOT, 
 	   <a href="http://www-xdiv.lanl.gov/XCM/gmv/" target="_top">GMV
  	                              (general mesh viewer)</a>, 
+           <a href="http://www.kitware.com/vtk.html"
+           target="_top">Visualization Toolkit (Vtk)</a>,
 	   <a href="http://www.avs.com" target="_top">AVS Explorer</a>,
 	   <a href="http://www.povray.org" target="_top">Povray</a>,
            and directly to Encapsulated Postscript. GNUPLOT and a
@@ -164,14 +166,17 @@
            Unix flavors.
 	   </p>
     </ul>
-    <p>
 
+    <p>
     In case you didn't find your favorite graphics format above it
     might be of interest that it is quite simple to add it to the list
     of supported ones (take a look at
     base/include/base/data_out_base.h and
     base/source/data_out_base.cc to see how output formats are
-    implemented).
+    implemented), as only a simple intermediate format needs to be
+    converted into a graphics format, without references to cells,
+    nodes, types of finite elements, and the like.
+    </p>
 
 
 
