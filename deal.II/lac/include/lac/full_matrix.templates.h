@@ -1342,7 +1342,7 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
       }
 
       default:
-	    Assert (false, ExcNotImplemented(dim_range));
+	    AssertThrow (false, ExcNotImplemented(dim_range));
     };    
 };
   
