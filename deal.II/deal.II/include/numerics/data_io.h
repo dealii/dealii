@@ -305,10 +305,10 @@ class DataIn {
  * (EPS) without the need for another graphics tool.
  * #write_epsgrid# writes just the 2d grid - This is obsolete and
  * should be removed. The functionality is provided through #write_eps#
- * and #eps_output_data# now. 
+ * and #EpsOutputData# now. 
  * #write_eps# can use one data vector for height information and one
  * cell vector for shading information. Control is done through an
- * object of class #eps_output_data# as follows.
+ * object of class #EpsOutputData# as follows.
  *
  * Vectors are added as usual by #add_data_vector#. Then one has to
  * decide, wether to produce a 2D or 3D plot. This is done by setting
@@ -453,7 +453,7 @@ class DataOut {
 				    * default constructed object is used.
 				    */
     void write_eps (ostream &out,
-		    const eps_output_data &EOD = eps_output_data()) const;
+		    const EpsOutputData &eod = EpsOutputData()) const;
 
 				   /**
 				    * Write grid in Encapsulated
@@ -665,7 +665,7 @@ class DataOut {
 				      * Class of data for vertices
 				      * for eps output.
 				      */
-    class eps_vertex_data{
+    class EpsVertexData{
       public:
 				       /**
 					* Coordinates
@@ -678,14 +678,14 @@ class DataOut {
 					* Default Constructor;
 					* needed for STL.
 					*/
-        eps_vertex_data()
+        EpsVertexData()
 	  {};
       
 				       /**
 					* Constructor that takes three
 					* coordinate values as argument.
 					*/
-        eps_vertex_data(double a, double b, double c):x(a),y(b),z(c)
+        EpsVertexData(double a, double b, double c):x(a),y(b),z(c)
 	  {};
       
 				       /**
@@ -701,13 +701,13 @@ class DataOut {
 				      * projection and output. Because of this all
 				      * output data is put into a STL multiset.
 				      */
-    class eps_cell_data{
+    class EpsCellData{
       public:
 	
 					 /**
 					  * STL-vector of vertices
 					  */
-	vector<eps_vertex_data> vertices;
+	EpsVertexData vertices[4];
 	
 					 /**
 					  * Color values
@@ -725,7 +725,7 @@ class DataOut {
 					  * Comparison operator for
 					  * sorting
 					  */
-	bool operator < (const eps_cell_data &) const;
+	bool operator < (const EpsCellData &) const;
     };
 };
 
@@ -735,26 +735,26 @@ class DataOut {
 				  * documentation of class DataOut for
 				  * description.
 				  */
-class eps_output_data{
+class EpsOutputData{
   public:
 				     /** 
 				      * Different types of
 				      * colorization
 				      */
-    typedef enum {None,Vector,Shaded,Black,White} color_type;
+    typedef enum {None,Vector,Shaded,Black,White} ColorType;
     
 				     /**
 				      * Type of height information 
 				      */
-    color_type height_type;
+    ColorType height_type;
 				     /**
 				      * Cell shading
 				      */
-    color_type cell_type;
+    ColorType cell_type;
 				     /**
 				      * Boundary color
 				      */
-    color_type cell_boundary_type;
+    ColorType cell_boundary_type;
 
 				     /**
 				      * Vector with height information
@@ -782,7 +782,7 @@ class eps_output_data{
 				     /**
 				      * Default constructor
 				      */
-    eps_output_data();
+    EpsOutputData();
 
 				     /**
 				      * Color scaling

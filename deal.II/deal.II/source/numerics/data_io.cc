@@ -1107,7 +1107,7 @@ void DataOut<2>::write_epsgrid (ostream &out) const {
 
 
 template <>
-void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
+void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
 
   {
@@ -1135,27 +1135,28 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 				    // copying them to a multiset.
 				    // Perform the necessary turn.
    DoFHandler<2>::active_cell_iterator endc = dofs->end();
-   unsigned cell_index=0;
-   multiset<DataOut<2>::eps_cell_data> cells;
-   multiset<DataOut<2>::eps_cell_data> cells2;
+   multiset<DataOut<2>::EpsCellData> cells;
+   multiset<DataOut<2>::EpsCellData> cells2;
    
-   bool cell_data_p = ((cell_data.size())>0) && (EOD.cell_type == EOD.Vector);
+   bool cell_data_p = ((cell_data.size())>0) && (eod.cell_type == EpsOutputData::Vector);
 
-   for(DoFHandler<2>::active_cell_iterator cell=dofs->begin_active();
-       cell!=endc; ++cell, ++cell_index)
+   unsigned cell_index;
+   DoFHandler<2>::active_cell_iterator cell;
+   for(cell_index=0, cell=dofs->begin_active(); 
+       cell!=endc; 
+       ++cell, ++cell_index)
      {
-       eps_cell_data cd;
-       cd.vertices.resize(4);
-       for (unsigned int i=0; i<4; i++)
+       EpsCellData cd;
+       for (unsigned int i=0; i<4; ++i)
 	 {
 	   (cd.vertices[i]).x=cell->vertex(i)(0);
 	   (cd.vertices[i]).y=cell->vertex(i)(1);
-	   switch (EOD.height_type)
+	   switch (eod.height_type)
 	     {
-	       case EOD.Vector:
-		     (cd.vertices[i]).z=(*dof_data[EOD.height_vector].data)(cell->vertex_dof_index(i,0)); 
+	       case EpsOutputData::Vector:
+		     (cd.vertices[i]).z=(*dof_data[eod.height_vector].data)(cell->vertex_dof_index(i,0)); 
 		     break;
-	       case EOD.None:
+	       case EpsOutputData::None:
 		     (cd.vertices[i]).z=0;
 		     break;
 	       default:
@@ -1163,11 +1164,11 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 	     };
 	       
 	 };
-       if (EOD.height_type==EOD.Vector)
-	 cd.turn(EOD.azimuth,EOD.elevation);
+       if (eod.height_type==EpsOutputData::Vector)
+	 cd.turn(eod.azimuth,eod.elevation);
 
        if (cell_data_p)
-	 cd.red=(*cell_data[EOD.cell_vector].data)(cell_index);
+	 cd.red=(*cell_data[eod.cell_vector].data)(cell_index);
        cells.insert(cd);
      };
 
@@ -1175,8 +1176,6 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 				    // multiset cells. First we look
 				    // for extrema.
    
-
-   double xvv,yvv,cvv;
    double xmin=cells.begin()->vertices[0].x;
    double xmax=xmin;
    double ymin=cells.begin()->vertices[0].y;
@@ -1184,11 +1183,12 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
    float cell_vector_min=cells.begin()->red; 
    float cell_vector_max=cell_vector_min;
 
-   for(typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells.begin();
+   for(typename multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
        c!=cells.end(); ++c, ++cell_index)
      {
-       for (unsigned int i=0; i<4; i++)
+       for (unsigned int i=0; i<4; ++i)
 	 {
+	   double xvv,yvv;
 	   xvv=c->vertices[i].x;
 	   xmin=(xmin < xvv ? xmin : xvv);
 	   xmax=(xmax > xvv ? xmax : xvv);
@@ -1199,6 +1199,7 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 	 }
        if (cell_data_p) 
 	 {
+	   double cvv;
 	   cvv = c->red;
 	   cell_vector_max = (cell_vector_max > cvv ? cell_vector_max : cvv);
 	   cell_vector_min = (cell_vector_min < cvv ? cell_vector_min : cvv);
@@ -1209,15 +1210,15 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 
 				    // If we want shaded output we can
 				    // do the shading now.
-   if (EOD.cell_type==EOD.Shaded)
+   if (eod.cell_type==EpsOutputData::Shaded)
      {
        double spann1[3], spann2[3], normal[3];
        double light_norm, normal_norm;
        float color;
 
-       for (typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells.begin();c!=cells.end();c++)
+       for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();c!=cells.end();++c)
 	 {
-	   eps_cell_data cd(*c);
+	   EpsCellData cd(*c);
 
 	   spann1[0]=spann2[0]=cd.vertices[0].x;
 	   spann1[1]=spann2[1]=cd.vertices[0].y;
@@ -1236,9 +1237,9 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 	   normal[2] = spann1[0]*spann2[1]-spann1[1]*spann2[0];
 
 	   normal_norm = sqrt(normal[0]*normal[0]+normal[1]*normal[1]+normal[2]*normal[2]);
-	   light_norm = sqrt(EOD.light[0]*EOD.light[0]+EOD.light[1]*EOD.light[1]+EOD.light[2]*EOD.light[2]);
+	   light_norm = sqrt(eod.light[0]*eod.light[0]+eod.light[1]*eod.light[1]+eod.light[2]*eod.light[2]);
 
-	   color = EOD.light[0]*normal[0]+EOD.light[1]*normal[1]+EOD.light[2]*normal[2];
+	   color = eod.light[0]*normal[0]+eod.light[1]*normal[1]+eod.light[2]*normal[2];
 	   color /= light_norm * normal_norm;
 	   
 	   cd.red=color;
@@ -1260,34 +1261,31 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 				    // this so that it is in the range
 				    // between 0 and 1.
 
-   double xscale = 300 / (xmax-xmin);
-   double yscale = 300 / (ymax-ymin);
-   double scale = (xscale < yscale ? xscale : yscale);
+   const double scale = 300 / (xmax-xmin > ymax-ymin ? xmax-xmin : ymax-ymin);
    
    cells.clear();
 
-
-   for (typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells2.begin();
+   for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells2.begin();
 	c!=cells2.end(); ++c)
      {
-       eps_cell_data cd (*c);
-       for (unsigned int i=0; i<4; i++)
+       EpsCellData cd (*c);
+       for (unsigned int i=0; i<4; ++i)
 	 {
 	   cd.vertices[i].x=(cd.vertices[i].x-xmin)*scale;
 	   cd.vertices[i].y=(cd.vertices[i].y-ymin)*scale;
 	 };
 
        if (cell_data_p)
-	 EOD.color(cd.red,cell_vector_max,cell_vector_min,cd.red,cd.green,cd.blue);
+	 eod.color(cd.red,cell_vector_max,cell_vector_min,cd.red,cd.green,cd.blue);
 
        cells.insert(cd);
      };
 
 
 				    //  Now we are ready to output...
-   cell_data_p = cell_data_p || (EOD.cell_type==EOD.Shaded);
+   cell_data_p = cell_data_p || (eod.cell_type==EpsOutputData::Shaded);
 
-   for (typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells.begin();
+   for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
 	c!=cells.end(); ++c)
      {
        if (cell_data_p)
@@ -1300,15 +1298,15 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 	       << " closepath fill" << endl;
 	 };
 
-       if (EOD.cell_boundary_type == EOD.Black || 
-	   EOD.cell_boundary_type == EOD.White) 
+       if (eod.cell_boundary_type == EpsOutputData::Black || 
+	   eod.cell_boundary_type == EpsOutputData::White) 
 	 {
-	   switch (EOD.cell_boundary_type)
+	   switch (eod.cell_boundary_type)
 	     {
-	       case EOD.Black: 
+	       case EpsOutputData::Black: 
 		     out << "0";
 		     break;
-	       case EOD.White:
+	       case EpsOutputData::White:
 		     out << "1";
 		     break;
 	       default:
@@ -1338,8 +1336,8 @@ void DataOut<dim>::write_epsgrid (ostream &/*out*/) const {
 
 
 template <int dim>
-void DataOut<dim>::write_eps (ostream &/*out*/,
-			      const eps_output_data &/*EOD*/) const {
+void DataOut<dim>::write_eps (ostream &,
+			      const EpsOutputData &) const{
 				   // this is for all other dimensions that
 				   // are not explicitely specialized
   Assert (false, ExcNotImplemented());
@@ -1438,13 +1436,13 @@ string DataOut<dim>::get_output_format_names () {
 
 
 template<int dim>
-bool DataOut<dim>::eps_cell_data::operator < (const eps_cell_data &other) const
+bool DataOut<dim>::EpsCellData::operator < (const EpsCellData &other) const
 {
   double maxz = vertices[0].z, 
          othermaxz = other.vertices[0].z;
   unsigned i;
 
-  for (i=1; i<4; i++)
+  for (i=1; i<4; ++i)
     { 
       maxz = (maxz > vertices[i].z ? maxz : vertices[i].z);
       othermaxz = (othermaxz > other.vertices[i].z ? othermaxz : other.vertices[i].z);
@@ -1456,7 +1454,7 @@ bool DataOut<dim>::eps_cell_data::operator < (const eps_cell_data &other) const
 
 
 template <int dim>
-void DataOut<dim>::eps_vertex_data::turn(double azi, double ele)
+void DataOut<dim>::EpsVertexData::turn(double azi, double ele)
 {
   double nx,ny,nz;
 
@@ -1488,14 +1486,14 @@ void DataOut<dim>::eps_vertex_data::turn(double azi, double ele)
 
 
 template <int dim>
-void DataOut<dim>::eps_cell_data::turn(double azi, double ele)
+void DataOut<dim>::EpsCellData::turn(double azi, double ele)
 {
-  for (unsigned i=0; i<4; i++)
+  for (unsigned i=0; i<4; ++i)
     vertices[i].turn(azi,ele);
 };
 
 
-eps_output_data::eps_output_data()
+EpsOutputData::EpsOutputData()
 		: height_type(None),
 		  cell_type(None),
 		  cell_boundary_type (Black),
@@ -1536,7 +1534,7 @@ eps_output_data::eps_output_data()
 //     { 0                                (3) - (4)
 //     { ( 4*x-  xmin-3*xmax)/(xmax-xmin) (4) - (5)
 
-void eps_output_data::color(const float x, const float xmax, const float xmin, 
+void EpsOutputData::color(const float x, const float xmax, const float xmin, 
 			    float &r, float &g, float &b) const
 {
   float sum   =   xmax+  xmin;
