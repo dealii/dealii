@@ -305,6 +305,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 					   // matrix so the diagonal
 					   // element is the first of
 					   // this row.
+//TODO[GK]: This is going to break when the diagonal element of the matrix is not stored
 	  const unsigned int 
 	    last  = local_sparsity.get_rowstart_indices()[block_index.second+1],
 	    first = (block_col == block_index.first ?
