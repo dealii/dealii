@@ -43,17 +43,17 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 				   // we don't support anything else
 				   // as well
   static const MappingQ1<dim> mapping;
-  FEFaceValues<dim> fe_patch_values (mapping, dofs->get_fe(),
+  FEFaceValues<dim> fe_patch_values (mapping, this->dofs->get_fe(),
 				     patch_points, update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int face_number = 0;
-  typename std::vector<DataOutBase::Patch<dim-1,dim> >::iterator patch = patches.begin();
+  typename std::vector<DataOutBase::Patch<dim-1,dim> >::iterator patch = this->patches.begin();
   FaceDescriptor face=first_face();
 
 				   // get first face in this thread
-  for (unsigned int i=0; (i<data.this_thread)&&(face.first != dofs->end()); ++i)
+  for (unsigned int i=0; (i<data.this_thread)&&(face.first != this->dofs->end()); ++i)
     {
       ++patch;
       ++face_number;
@@ -62,9 +62,9 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 
   				   // now loop over all cells and
 				   // actually create the patches
-  for (; face.first != dofs->end();)
+  for (; face.first != this->dofs->end();)
     {
-      Assert (patch != patches.end(), ExcInternalError());
+      Assert (patch != this->patches.end(), ExcInternalError());
       
       for (unsigned int vertex=0; vertex<GeometryInfo<dim-1>::vertices_per_cell; ++vertex)
 	patch->vertices[vertex] = face.first->face(face.second)->vertex(vertex);
@@ -74,15 +74,15 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	  fe_patch_values.reinit (face.first, face.second);
 	  
 					   // first fill dof_data
-	  for (unsigned int dataset=0; dataset<dof_data.size(); ++dataset)
+	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 	    {
 	      if (data.n_components == 1)
 		{
-		  if (dof_data[dataset].has_block)
-		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+		  if (this->dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
 							 data.patch_values);
 		  else
-		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
 							 data.patch_values);
 
 		  for (unsigned int q=0; q<n_q_points; ++q)
@@ -91,11 +91,11 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	      else
 						 // system of components
 		{
-		  if (dof_data[dataset].has_block)
-		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+		  if (this->dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
 							 data.patch_values_system);
 		  else
-		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
 							 data.patch_values_system);
 
 		  for (unsigned int component=0; component<data.n_components;
@@ -107,25 +107,25 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	    };
 
 					   // then do the cell data
-	  for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
+	  for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
 	    {
-	      if (cell_data[dataset].has_block)
+	      if (this->cell_data[dataset].has_block)
 		{
-		  const double value = (*cell_data[dataset].block_data)(face_number);
+		  const double value = (*this->cell_data[dataset].block_data)(face_number);
 		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
 		      value;
 		} else {
-		  const double value = (*cell_data[dataset].single_data)(face_number);
+		  const double value = (*this->cell_data[dataset].single_data)(face_number);
 		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
 		      value;
 		} 
 	    };
 	};
       				       // next cell (patch) in this thread
       for (unsigned int i=0;
-	   (i<data.n_threads)&&(face.first != dofs->end()); ++i)
+	   (i<data.n_threads)&&(face.first != this->dofs->end()); ++i)
 	{
 	  ++patch;
 	  ++face_number;
@@ -145,7 +145,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   typedef DataOut_DoFData<dim,dim+1> BaseClass;
-  Assert (dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
+  Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
 #ifdef DEAL_II_USE_MT
   const unsigned int n_threads = n_threads_;
@@ -166,15 +166,15 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
   QIterated<dim-1> patch_points (q_trapez, n_subdivisions);
 
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
-  const unsigned int n_components   = dofs->get_fe().n_components();
-  const unsigned int n_datasets     = dof_data.size() * n_components +
-				      cell_data.size();
+  const unsigned int n_components   = this->dofs->get_fe().n_components();
+  const unsigned int n_datasets     = this->dof_data.size() * n_components +
+				      this->cell_data.size();
   
 				   // clear the patches array
   if (true)
     {
       std::vector<DataOutBase::Patch<dim-1,dim> > dummy;
-      patches.swap (dummy);
+      this->patches.swap (dummy);
     };
   
 				   // first count the cells we want to
@@ -182,7 +182,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
 				   // there is enough memory for that
   unsigned int n_patches = 0;
   for (FaceDescriptor face=first_face();
-       face.first != dofs->end();
+       face.first != this->dofs->end();
        face = next_face(face))
     ++n_patches;
 
@@ -210,7 +210,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
   DataOutBase::Patch<dim-1,dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
-  patches.insert (patches.end(), n_patches, default_patch);
+  this->patches.insert (patches.end(), n_patches, default_patch);
 
 #ifdef DEAL_II_USE_MT
 
@@ -235,8 +235,8 @@ DataOutFaces<dim>::first_face ()
 {
 				   // simply find first active cell
 				   // with a face on the boundary
-  typename DoFHandler<dim>::active_cell_iterator cell = dofs->begin_active();
-  for (; cell != dofs->end(); ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell = this->dofs->begin_active();
+  for (; cell != this->dofs->end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->at_boundary())
 	return FaceDescriptor(cell, f);
@@ -280,7 +280,7 @@ DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
   ++active_cell;
 
 				   // while there are active cells
-  while (active_cell != dofs->end())
+  while (active_cell != this->dofs->end())
     {
 				       // check all the faces of this
 				       // active cell
@@ -299,7 +299,7 @@ DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
 
 				   // we fell off the edge, so return
 				   // with invalid pointer
-  face.first  = dofs->end();
+  face.first  = this->dofs->end();
   face.second = 0;
   return face;
 };

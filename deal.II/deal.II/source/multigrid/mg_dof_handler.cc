@@ -777,9 +777,9 @@ MGDoFHandler<3>::last_active_face (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
 MGDoFHandler<dim>::begin_raw_line (const unsigned int level) const {
-  return raw_line_iterator (tria,
-			    tria->begin_raw_line(level)->level(),
-			    tria->begin_raw_line(level)->index(),
+  return raw_line_iterator (this->tria,
+			    this->tria->begin_raw_line(level)->level(),
+			    this->tria->begin_raw_line(level)->index(),
 			    this);
 };
 
@@ -787,9 +787,9 @@ MGDoFHandler<dim>::begin_raw_line (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::line_iterator
 MGDoFHandler<dim>::begin_line (const unsigned int level) const {
-  return line_iterator (tria,
-			tria->begin_line(level)->level(),
-			tria->begin_line(level)->index(),
+  return line_iterator (this->tria,
+			this->tria->begin_line(level)->level(),
+			this->tria->begin_line(level)->index(),
 			this);
 };
 
@@ -797,9 +797,9 @@ MGDoFHandler<dim>::begin_line (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::active_line_iterator
 MGDoFHandler<dim>::begin_active_line (const unsigned int level) const {
-  return active_line_iterator (tria,
-			       tria->begin_active_line(level)->level(),
-			       tria->begin_active_line(level)->index(),
+  return active_line_iterator (this->tria,
+			       this->tria->begin_active_line(level)->level(),
+			       this->tria->begin_active_line(level)->index(),
 			       this);
 };
 
@@ -807,9 +807,9 @@ MGDoFHandler<dim>::begin_active_line (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
 MGDoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
-  return raw_quad_iterator (tria,
-			    tria->begin_raw_quad(level)->level(),
-			    tria->begin_raw_quad(level)->index(),
+  return raw_quad_iterator (this->tria,
+			    this->tria->begin_raw_quad(level)->level(),
+			    this->tria->begin_raw_quad(level)->index(),
 			    this);
 };
 
@@ -817,9 +817,9 @@ MGDoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::quad_iterator
 MGDoFHandler<dim>::begin_quad (const unsigned int level) const {
-  return quad_iterator (tria,
-			tria->begin_quad(level)->level(),
-			tria->begin_quad(level)->index(),
+  return quad_iterator (this->tria,
+			this->tria->begin_quad(level)->level(),
+			this->tria->begin_quad(level)->index(),
 			this);
 };
 
@@ -827,9 +827,9 @@ MGDoFHandler<dim>::begin_quad (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::active_quad_iterator
 MGDoFHandler<dim>::begin_active_quad (const unsigned int level) const {
-  return active_quad_iterator (tria,
-			       tria->begin_active_quad(level)->level(),
-			       tria->begin_active_quad(level)->index(),
+  return active_quad_iterator (this->tria,
+			       this->tria->begin_active_quad(level)->level(),
+			       this->tria->begin_active_quad(level)->index(),
 			       this);
 };
 
@@ -837,9 +837,9 @@ MGDoFHandler<dim>::begin_active_quad (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::raw_hex_iterator
 MGDoFHandler<dim>::begin_raw_hex (const unsigned int level) const {
-  return raw_hex_iterator (tria,
-			   tria->begin_raw_hex(level)->level(),
-			   tria->begin_raw_hex(level)->index(),
+  return raw_hex_iterator (this->tria,
+			   this->tria->begin_raw_hex(level)->level(),
+			   this->tria->begin_raw_hex(level)->index(),
 			   this);
 };
 
@@ -847,9 +847,9 @@ MGDoFHandler<dim>::begin_raw_hex (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::hex_iterator
 MGDoFHandler<dim>::begin_hex (const unsigned int level) const {
-  return hex_iterator (tria,
-		       tria->begin_hex(level)->level(),
-		       tria->begin_hex(level)->index(),
+  return hex_iterator (this->tria,
+		       this->tria->begin_hex(level)->level(),
+		       this->tria->begin_hex(level)->index(),
 		       this);
 };
 
@@ -857,9 +857,9 @@ MGDoFHandler<dim>::begin_hex (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::active_hex_iterator
 MGDoFHandler<dim>::begin_active_hex (const unsigned int level) const {
-  return active_hex_iterator (tria,
-			      tria->begin_active_hex(level)->level(),
-			      tria->begin_active_hex(level)->index(),
+  return active_hex_iterator (this->tria,
+			      this->tria->begin_active_hex(level)->level(),
+			      this->tria->begin_active_hex(level)->index(),
 			      this);
 };
 
@@ -867,21 +867,21 @@ MGDoFHandler<dim>::begin_active_hex (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
 MGDoFHandler<dim>::end_line () const {
-  return raw_line_iterator (tria, -1, -1, this);
+  return raw_line_iterator (this->tria, -1, -1, this);
 };
 
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
 MGDoFHandler<dim>::end_quad () const {
-  return raw_quad_iterator (tria, -1, -1, this);
+  return raw_quad_iterator (this->tria, -1, -1, this);
 };
 
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_hex_iterator
 MGDoFHandler<dim>::end_hex () const {
-  return raw_hex_iterator (tria, -1, -1, this);
+  return raw_hex_iterator (this->tria, -1, -1, this);
 };
 
 
@@ -1023,9 +1023,9 @@ MGDoFHandler<dim>::end_active_hex (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
 MGDoFHandler<dim>::last_raw_line (const unsigned int level) const {
-  return raw_line_iterator (tria,
-			    tria->last_raw_line(level)->level(),
-			    tria->last_raw_line(level)->index(),
+  return raw_line_iterator (this->tria,
+			    this->tria->last_raw_line(level)->level(),
+			    this->tria->last_raw_line(level)->index(),
 			    this);
 };
 
@@ -1033,9 +1033,9 @@ MGDoFHandler<dim>::last_raw_line (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::line_iterator
 MGDoFHandler<dim>::last_line (const unsigned int level) const {
-  return line_iterator (tria,
-			tria->last_line(level)->level(),
-			tria->last_line(level)->index(),
+  return line_iterator (this->tria,
+			this->tria->last_line(level)->level(),
+			this->tria->last_line(level)->index(),
 			this);
 };
 
@@ -1043,9 +1043,9 @@ MGDoFHandler<dim>::last_line (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::active_line_iterator
 MGDoFHandler<dim>::last_active_line (const unsigned int level) const {
-  return active_line_iterator (tria,
-			       tria->last_active_line(level)->level(),
-			       tria->last_active_line(level)->index(),
+  return active_line_iterator (this->tria,
+			       this->tria->last_active_line(level)->level(),
+			       this->tria->last_active_line(level)->index(),
 			       this);
 };
 
@@ -1053,9 +1053,9 @@ MGDoFHandler<dim>::last_active_line (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
 MGDoFHandler<dim>::last_raw_quad (const unsigned int level) const {
-  return raw_quad_iterator (tria,
-			    tria->last_raw_quad(level)->level(),
-			    tria->last_raw_quad(level)->index(),
+  return raw_quad_iterator (this->tria,
+			    this->tria->last_raw_quad(level)->level(),
+			    this->tria->last_raw_quad(level)->index(),
 			    this);
 };
 
@@ -1063,9 +1063,9 @@ MGDoFHandler<dim>::last_raw_quad (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::quad_iterator
 MGDoFHandler<dim>::last_quad (const unsigned int level) const {
-  return quad_iterator (tria,
-			tria->last_quad(level)->level(),
-			tria->last_quad(level)->index(),
+  return quad_iterator (this->tria,
+			this->tria->last_quad(level)->level(),
+			this->tria->last_quad(level)->index(),
 			this);
 };
 
@@ -1073,9 +1073,9 @@ MGDoFHandler<dim>::last_quad (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::active_quad_iterator
 MGDoFHandler<dim>::last_active_quad (const unsigned int level) const {
-  return active_quad_iterator (tria,
-			       tria->last_active_quad(level)->level(),
-			       tria->last_active_quad(level)->index(),
+  return active_quad_iterator (this->tria,
+			       this->tria->last_active_quad(level)->level(),
+			       this->tria->last_active_quad(level)->index(),
 			       this);
 };
 
@@ -1083,9 +1083,9 @@ MGDoFHandler<dim>::last_active_quad (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::raw_hex_iterator
 MGDoFHandler<dim>::last_raw_hex (const unsigned int level) const {
-  return raw_hex_iterator (tria,
-			   tria->last_raw_hex(level)->level(),
-			   tria->last_raw_hex(level)->index(),
+  return raw_hex_iterator (this->tria,
+			   this->tria->last_raw_hex(level)->level(),
+			   this->tria->last_raw_hex(level)->index(),
 			   this);
 };
 
@@ -1093,9 +1093,9 @@ MGDoFHandler<dim>::last_raw_hex (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::hex_iterator
 MGDoFHandler<dim>::last_hex (const unsigned int level) const {
-  return hex_iterator (tria,
-		       tria->last_hex(level)->level(),
-		       tria->last_hex(level)->index(),
+  return hex_iterator (this->tria,
+		       this->tria->last_hex(level)->level(),
+		       this->tria->last_hex(level)->index(),
 		       this);
 };
 
@@ -1103,9 +1103,9 @@ MGDoFHandler<dim>::last_hex (const unsigned int level) const {
 template <int dim>
 typename MGDoFHandler<dim>::active_hex_iterator
 MGDoFHandler<dim>::last_active_hex (const unsigned int level) const {
-  return active_hex_iterator (tria,
-			      tria->last_active_hex(level)->level(),
-			      tria->last_active_hex(level)->index(),
+  return active_hex_iterator (this->tria,
+			      this->tria->last_active_hex(level)->level(),
+			      this->tria->last_active_hex(level)->index(),
 			      this);
 };
 
@@ -1186,15 +1186,15 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
 
 				   // reserve space for the MG dof numbers
   reserve_space ();
-  mg_used_dofs.resize (tria->n_levels(), 0);
+  mg_used_dofs.resize (this->tria->n_levels(), 0);
 
 				   // clear user flags because we will
 				   // need them
-  tria->clear_user_flags ();
+  this->tria->clear_user_flags ();
 
 				   // now distribute indices on each level
 				   // separately
-  for (unsigned int level=0; level<tria->n_levels(); ++level)
+  for (unsigned int level=0; level<this->tria->n_levels(); ++level)
     {
       unsigned int next_free_dof = offset;
       cell_iterator cell = begin(level),
@@ -1269,18 +1269,18 @@ template <>
 unsigned int
 MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
 					  unsigned int   next_free_dof) {
-  if (selected_fe->dofs_per_vertex > 0)
+  if (this->selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
     for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
       if (cell->mg_vertex_dof_index(vertex, 0) == DoFHandler<2>::invalid_dof_index)
-	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
+	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
 	  cell->set_mg_vertex_dof_index (vertex, d, next_free_dof++);
     
   				   // for the four sides
-  if (selected_fe->dofs_per_line > 0)
+  if (this->selected_fe->dofs_per_line > 0)
     for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
       {
 	line_iterator line = cell->line(side);
@@ -1290,13 +1290,13 @@ MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // numbered (check only first dof)
 	if (line->mg_dof_index(0) == DoFHandler<2>::invalid_dof_index)
 					   // if not: distribute dofs
-	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
+	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
 	    line->set_mg_dof_index (d, next_free_dof++);	    
       };
 
 
 				   // dofs of quad
-  if (selected_fe->dofs_per_quad > 0)
+  if (this->selected_fe->dofs_per_quad > 0)
     for (unsigned int d=0; d<selected_fe->dofs_per_quad; ++d)
       cell->set_mg_dof_index (d, next_free_dof++);
 
@@ -1442,10 +1442,10 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 				     // the present level
     if ((i->get_coarsest_level() <= level) &&
 	(i->get_finest_level() >= level))
-      for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
-	i->set_index (level, d, selected_fe->dofs_per_vertex,
+      for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
+	i->set_index (level, d, this->selected_fe->dofs_per_vertex,
 		      new_numbers[i->get_index (level, d,
-						selected_fe->dofs_per_vertex)]);
+						this->selected_fe->dofs_per_vertex)]);
   
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
@@ -1587,8 +1587,8 @@ template <>
 void MGDoFHandler<2>::reserve_space () {
   const unsigned int dim = 2;
   
-  Assert (selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
-  Assert (tria->n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
+  Assert (this->selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
+  Assert (this->tria->n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
   
 				   ////////////////////////////
 				   // DESTRUCTION
@@ -1599,15 +1599,15 @@ void MGDoFHandler<2>::reserve_space () {
   
 				   // first allocate space for the
 				   // lines and quads on each level
-  for (unsigned int i=0; i<tria->n_levels(); ++i) 
+  for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
     {
       mg_levels.push_back (new DoFLevel<2>);
 
-      mg_levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
-							  selected_fe->dofs_per_line,
+      mg_levels.back()->line_dofs = std::vector<unsigned int> (this->tria->levels[i]->lines.lines.size() *
+							  this->selected_fe->dofs_per_line,
 							  DoFHandler<2>::invalid_dof_index);
-      mg_levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
-							  selected_fe->dofs_per_quad,
+      mg_levels.back()->quad_dofs = std::vector<unsigned int> (this->tria->levels[i]->quads.quads.size() *
+							  this->selected_fe->dofs_per_quad,
 							  DoFHandler<2>::invalid_dof_index);
     };
 
@@ -1624,9 +1624,9 @@ void MGDoFHandler<2>::reserve_space () {
 				   // over all cells and storing the
 				   // maximum and minimum level each
 				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (tria->vertices.size());
+  mg_vertex_dofs.resize (this->tria->vertices.size());
 
-  std::vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
+  std::vector<unsigned int> min_level (this->tria->vertices.size(), tria->n_levels());
   std::vector<unsigned int> max_level (tria->vertices.size(), 0);
 
   Triangulation<dim>::cell_iterator cell = tria->begin(),
@@ -1652,7 +1652,7 @@ void MGDoFHandler<2>::reserve_space () {
 
       mg_vertex_dofs[vertex].init (min_level[vertex],
 				   max_level[vertex],
-				   selected_fe->dofs_per_vertex);
+				   this->selected_fe->dofs_per_vertex);
     };
 };
 

@@ -997,8 +997,8 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccesso
 				   // used() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end)
-    Assert (accessor.used(),
+  if (this->state() != IteratorState::past_the_end)
+    Assert (this->accessor.used(),
 	    ExcAssignmentOfUnusedObject());
 #endif
 };
@@ -1027,8 +1027,8 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end) 
-    Assert (accessor.has_children()==false,
+  if (this->state() != IteratorState::past_the_end) 
+    Assert (this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif
 };

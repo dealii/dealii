@@ -205,9 +205,9 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   
 				   // Memory allocation
   Vr  = this->memory.alloc();
-  Vp  = memory.alloc();
-  Vz  = memory.alloc();
-  VAp = memory.alloc();
+  Vp  = this->memory.alloc();
+  Vz  = this->memory.alloc();
+  VAp = this->memory.alloc();
 				   // define some aliases for simpler access
   VECTOR& g  = *Vr; 
   VECTOR& h  = *Vp; 

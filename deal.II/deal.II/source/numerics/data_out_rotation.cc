@@ -48,7 +48,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				   // we don't support anything else
 				   // as well
   static const MappingQ1<dim> mapping;
-  FEValues<dim> fe_patch_values (mapping, dofs->get_fe(),
+  FEValues<dim> fe_patch_values (mapping, this->dofs->get_fe(),
 				 patch_points, update_values);
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
@@ -78,11 +78,11 @@ void DataOutRotation<dim>::build_some_patches (Data data)
   
   
   unsigned int cell_number = 0;
-  typename std::vector<DataOutBase::Patch<dim+1> >::iterator patch = patches.begin();
+  typename std::vector<DataOutBase::Patch<dim+1> >::iterator patch = this->patches.begin();
   typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
-  for (unsigned int i=0; (i<data.this_thread)&&(cell != dofs->end()); ++i)
+  for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
     {
       std::advance (patch, n_patches_per_circle);
       ++cell_number;
@@ -91,11 +91,11 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 
   				   // now loop over all cells and
 				   // actually create the patches
-  for (; cell != dofs->end(); )
+  for (; cell != this->dofs->end(); )
     {
       for (unsigned int angle=0; angle<n_patches_per_circle; ++angle, ++patch)
 	{
-	  Assert (patch != patches.end(), ExcInternalError());
+	  Assert (patch != this->patches.end(), ExcInternalError());
 	  
 
 					   // first compute the
@@ -161,15 +161,15 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 	      fe_patch_values.reinit (cell);
 	      
 					       // first fill dof_data
-	      for (unsigned int dataset=0; dataset<dof_data.size(); ++dataset)
+	      for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 		{
 		  if (data.n_components == 1)
 		    {
-		      if (dof_data[dataset].has_block)
-			fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+		      if (this->dof_data[dataset].has_block)
+			fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
 							     data.patch_values);
 		      else
-			fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+			fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
 							     data.patch_values);
 
 		      switch (dim)
@@ -200,11 +200,11 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 		  else
 						     // system of components
 		    {
-		      if (dof_data[dataset].has_block)
-			fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+		      if (this->dof_data[dataset].has_block)
+			fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
 							     data.patch_values_system);
 		      else
-			fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+			fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
 							     data.patch_values_system);
 
 		      for (unsigned int component=0; component<data.n_components;
@@ -239,17 +239,17 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 		};
 		  
 					       // then do the cell data
-	      for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
+	      for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
 		{
-		  const double value = cell_data[dataset].has_block ?
-		    (*cell_data[dataset].block_data)(cell_number) :
+		  const double value = this->cell_data[dataset].has_block ?
+		    (*this->cell_data[dataset].block_data)(cell_number) :
 		    (*cell_data[dataset].single_data)(cell_number);
 		  switch (dim)
 		    {
 		      case 1:
 			    for (unsigned int x=0; x<n_points; ++x)
 			      for (unsigned int y=0; y<n_points; ++y)
-				patch->data(dataset+dof_data.size()*data.n_components,
+				patch->data(dataset+this->dof_data.size()*data.n_components,
 					    x*n_points +
 					    y)
 				  = value;
@@ -259,7 +259,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 			    for (unsigned int x=0; x<n_points; ++x)
 			      for (unsigned int y=0; y<n_points; ++y)
 				for (unsigned int z=0; z<n_points; ++z)
-				  patch->data(dataset+dof_data.size()*data.n_components,
+				  patch->data(dataset+this->dof_data.size()*data.n_components,
 					      x*n_points*n_points +
 					      y*n_points +
 					      z)
@@ -282,13 +282,13 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				       // threads, not the ones
 				       // belonging to this thread.
       const int skip_threads = static_cast<signed int>(data.n_threads)-1;
-      for (int i=0; (i<skip_threads) && (cell != dofs->end()); ++i)
+      for (int i=0; (i<skip_threads) && (cell != this->dofs->end()); ++i)
 	std::advance (patch, n_patches_per_circle);
 
 				       // however, cell and cell
 				       // number have not yet been
 				       // increased
-      for (unsigned int i=0; (i<data.n_threads) && (cell != dofs->end()); ++i)
+      for (unsigned int i=0; (i<data.n_threads) && (cell != this->dofs->end()); ++i)
 	{
 	  ++cell_number;
 	  cell=next_cell(cell);
@@ -323,7 +323,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   typedef DataOut_DoFData<dim,dim+1> BaseClass;
-  Assert (dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
+  Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
 #ifdef DEAL_II_USE_MT
   const unsigned int n_threads = n_threads_;
@@ -344,15 +344,15 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
 
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
-  const unsigned int n_components   = dofs->get_fe().n_components();
-  const unsigned int n_datasets     = dof_data.size() * n_components +
-				      cell_data.size();
+  const unsigned int n_components   = this->dofs->get_fe().n_components();
+  const unsigned int n_datasets     = this->dof_data.size() * n_components +
+				      this->cell_data.size();
   
 				   // clear the patches array
   if (true)
     {
       std::vector<DataOutBase::Patch<dim+1> > dummy;
-      patches.swap (dummy);
+      this->patches.swap (dummy);
     };
   
 				   // first count the cells we want to
@@ -360,7 +360,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 				   // there is enough memory for that
   unsigned int n_patches = 0;
   for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
-       cell != dofs->end();
+       cell != this->dofs->end();
        cell = next_cell(cell))
     ++n_patches;
 				   // then also take into account that
@@ -396,7 +396,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets,
 			     n_q_points * (n_subdivisions+1));
-  patches.insert (patches.end(), n_patches, default_patch);
+  this->patches.insert (patches.end(), n_patches, default_patch);
 
 #ifdef DEAL_II_USE_MT
 
@@ -418,7 +418,7 @@ template <int dim>
 typename DoFHandler<dim>::cell_iterator
 DataOutRotation<dim>::first_cell () 
 {
-  return dofs->begin_active ();
+  return this->dofs->begin_active ();
 };
 
 

@@ -346,17 +346,17 @@ void DataOut<dim>::build_some_patches (Data data)
 				   // we don't support anything else
 				   // as well
   static const MappingQ1<dim> mapping;
-  FEValues<dim> fe_patch_values (mapping, dofs->get_fe(),
+  FEValues<dim> fe_patch_values (mapping, this->dofs->get_fe(),
 				 patch_points, update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int cell_number = 0;
-  typename std::vector<typename DataOutBase::Patch<dim> >::iterator patch = patches.begin();
+  typename std::vector<typename DataOutBase::Patch<dim> >::iterator patch = this->patches.begin();
   typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
-  for (unsigned int i=0; (i<data.this_thread)&&(cell != dofs->end()); ++i)
+  for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
     {
       ++patch;
       ++cell_number;
@@ -365,9 +365,9 @@ void DataOut<dim>::build_some_patches (Data data)
 
   				   // now loop over all cells and
 				   // actually create the patches
-  for (;cell != dofs->end();)
+  for (;cell != this->dofs->end();)
     {
-      Assert (patch != patches.end(), ExcInternalError());
+      Assert (patch != this->patches.end(), ExcInternalError());
 
 				       // Insert cell-patch pair into
 				       // map for neighbors
@@ -381,15 +381,15 @@ void DataOut<dim>::build_some_patches (Data data)
 	  fe_patch_values.reinit (cell);
 	  
 					   // first fill dof_data
-	  for (unsigned int dataset=0; dataset<dof_data.size(); ++dataset)
+	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 	    {
 	      if (data.n_components == 1)
 		{
-		  if (dof_data[dataset].has_block)
-		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+		  if (this->dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
 							 data.patch_values);
 		  else
-		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
 							 data.patch_values);
 
 		  for (unsigned int q=0; q<n_q_points; ++q)
@@ -398,11 +398,11 @@ void DataOut<dim>::build_some_patches (Data data)
 	      else
 						 // system of components
 		{
-		  if (dof_data[dataset].has_block)
-		    fe_patch_values.get_function_values (*dof_data[dataset].block_data,
+		  if (this->dof_data[dataset].has_block)
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
 							 data.patch_values_system);
 		  else
-		    fe_patch_values.get_function_values (*dof_data[dataset].single_data,
+		    fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
 							 data.patch_values_system);
 
 		  for (unsigned int component=0; component<data.n_components;
@@ -414,25 +414,25 @@ void DataOut<dim>::build_some_patches (Data data)
 	    };
 
 					   // then do the cell data
-	  for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
+	  for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
 	    {
-	      if (cell_data[dataset].has_block)
+	      if (this->cell_data[dataset].has_block)
 		{
-		  const double value = (*cell_data[dataset].block_data)(cell_number);
+		  const double value = (*this->cell_data[dataset].block_data)(cell_number);
 		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
 		      value;
 		} else {
-		  const double value = (*cell_data[dataset].single_data)(cell_number);
+		  const double value = (*this->cell_data[dataset].single_data)(cell_number);
 		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset+dof_data.size()*data.n_components,q) =
+		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
 		      value;
 		} 
 	    };
 	};
       				       // next cell (patch) in this thread
       for (unsigned int i=0;
-	   (i<data.n_threads)&&(cell != dofs->end()); ++i)
+	   (i<data.n_threads)&&(cell != this->dofs->end()); ++i)
 	{
 	  ++patch;
 	  ++cell_number;
@@ -450,7 +450,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   typedef DataOut_DoFData<dim,dim> BaseClass;
-  Assert (dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
+  Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
 #ifdef DEAL_II_USE_MT
   const unsigned int n_threads = n_threads_;
@@ -471,15 +471,15 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
 
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
-  const unsigned int n_components   = dofs->get_fe().n_components();
-  const unsigned int n_datasets     = dof_data.size() * n_components +
-				      cell_data.size();
+  const unsigned int n_components   = this->dofs->get_fe().n_components();
+  const unsigned int n_datasets     = this->dof_data.size() * n_components +
+				      this->cell_data.size();
   
 				   // clear the patches array
   if (true)
     {
       typename std::vector<DataOutBase::Patch<dim> > dummy;
-      patches.swap (dummy);
+      this->patches.swap (dummy);
     };
   
 				   // first count the cells we want to
@@ -487,7 +487,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // there is enough memory for that
   unsigned int n_patches = 0;
   for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
-       cell != dofs->end();
+       cell != this->dofs->end();
        cell = next_cell(cell))
     ++n_patches;
 
@@ -522,7 +522,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
   DataOutBase::Patch<dim>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
-  patches.insert (patches.end(), n_patches, default_patch);
+  this->patches.insert (patches.end(), n_patches, default_patch);
 
 #ifdef DEAL_II_USE_MT
 
@@ -624,7 +624,7 @@ template <int dim>
 typename DoFHandler<dim>::cell_iterator
 DataOut<dim>::first_cell () 
 {
-  return dofs->begin_active ();
+  return this->dofs->begin_active ();
 };
 
 

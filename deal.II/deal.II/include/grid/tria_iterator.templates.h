@@ -186,7 +186,7 @@ TriaIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) 
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
   if (this->state() != IteratorState::past_the_end) 
-    Assert (accessor.used(),
+    Assert (this->accessor.used(),
 	    ExcAssignmentOfUnusedObject());
 #endif  
   return *this;
@@ -334,7 +334,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
   if (this->state() != IteratorState::past_the_end) 
-    Assert (accessor.used() && accessor.has_children()==false,
+    Assert (this->accessor.used() && accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
   return *this;
@@ -354,7 +354,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
   if (this->state() != IteratorState::past_the_end) 
-    Assert (accessor.has_children()==false,
+    Assert (this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
   return *this;

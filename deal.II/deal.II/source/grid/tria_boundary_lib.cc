@@ -500,7 +500,7 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 				   // to the plane part of the
 				   // boundary
   const Point<dim> line_center = line->center();
-  if (line_center(0) == center(0))
+  if (this->line_this->center(0) == center(0))
     return line_center;
   else
     return HyperBallBoundary<dim>::get_new_point_on_line (line);
@@ -529,7 +529,7 @@ HalfHyperBallBoundary<dim>::
 get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const 
 {
   const Point<dim> quad_center = quad->center();
-  if (quad_center(0) == center(0))
+  if (this->quad_this->center(0) == center(0))
     return quad_center;
   else
     return HyperBallBoundary<dim>::get_new_point_on_quad (quad);
@@ -548,7 +548,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 				   // to the plane part of the
 				   // boundary
   const Point<dim> line_center = line->center();
-  if (line_center(0) == center(0))
+  if (this->line_this->center(0) == center(0))
     return StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
   else
     return HyperBallBoundary<dim>::get_intermediate_points_on_line (line, points);
@@ -567,7 +567,7 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 				   // to the plane part of the
 				   // boundary
   const Point<dim> quad_center = quad->center();
-  if (quad_center(0) == center(0))
+  if (this->quad_this->center(0) == center(0))
     StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
   else
     HyperBallBoundary<dim>::get_intermediate_points_on_quad (quad, points);
@@ -614,7 +614,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 				   // to the plane part of the
 				   // boundary
   const Point<dim> quad_center = face->center();
-  if (quad_center(0) == center(0))
+  if (this->quad_this->center(0) == center(0))
     StraightBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
   else
     HyperBallBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
@@ -629,7 +629,7 @@ template <int dim>
 HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center) :
 		HyperBallBoundary<dim>(center, 0.)
 {
-  compute_radius_automatically=true;
+  this->compute_radius_automatically=true;
 };
 
 

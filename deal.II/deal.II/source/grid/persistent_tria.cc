@@ -59,8 +59,8 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 				   // first save flags
   refine_flags.push_back (std::vector<bool>());
   coarsen_flags.push_back (std::vector<bool>());
-  save_refine_flags (refine_flags.back());
-  save_coarsen_flags (coarsen_flags.back());
+  this->save_refine_flags (refine_flags.back());
+  this->save_coarsen_flags (coarsen_flags.back());
 
 				   // then refine triangulation
   Triangulation<dim>::execute_coarsening_and_refinement ();
@@ -95,8 +95,8 @@ PersistentTriangulation<dim>::restore (const unsigned int step) {
       Assert(step<refine_flags.size()+1,
 	     ExcDimensionMismatch(step, refine_flags.size()+1));
       
-      load_refine_flags  (refine_flags[step-1]);
-      load_coarsen_flags (coarsen_flags[step-1]);
+      this->load_refine_flags  (refine_flags[step-1]);
+      this->load_coarsen_flags (coarsen_flags[step-1]);
 
       Triangulation<dim>::execute_coarsening_and_refinement ();
     };
@@ -116,7 +116,7 @@ template <int dim>
 void
 PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_grid) 
 {
-  clear ();
+  this->clear ();
   coarse_grid  = &old_grid;
   refine_flags.clear ();
   coarsen_flags.clear ();
@@ -145,9 +145,9 @@ PersistentTriangulation<dim>::write_flags(std::ostream &out) const
 
   for (unsigned int i=0; i<n_flag_levels; ++i)
     {
-      write_bool_vector (mn_tria_refine_flags_begin, refine_flags[i],
+      this->write_bool_vector (mn_tria_refine_flags_begin, refine_flags[i],
 			 mn_tria_refine_flags_end, out);
-      write_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags[i],
+      this->write_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags[i],
 			 mn_tria_coarsen_flags_end, out);
     }
   
@@ -176,9 +176,9 @@ PersistentTriangulation<dim>::read_flags(std::istream &in)
     {
       refine_flags.push_back (std::vector<bool>());
       coarsen_flags.push_back (std::vector<bool>());
-      read_bool_vector (mn_tria_refine_flags_begin, refine_flags.back(),
+      this->read_bool_vector (mn_tria_refine_flags_begin, refine_flags.back(),
 			mn_tria_refine_flags_end, in);
-      read_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags.back(),
+      this->read_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags.back(),
 			mn_tria_coarsen_flags_end, in);
     }
   
