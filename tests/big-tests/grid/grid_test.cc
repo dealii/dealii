@@ -26,17 +26,32 @@ template <int dim>
 class Ball :
   public StraightBoundary<dim> {
   public:
-      virtual Point<dim> in_between (const PointArray &neighbors) const {
-	Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const {
+      Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line(line);
+      
+      for (int i=0; i<dim; ++i)
+	middle(i) -= .5;
+      middle *= sqrt(dim) / (sqrt(middle.square())*2);
+      for (int i=0; i<dim; ++i)
+	middle(i) += .5;
+      
+      return middle;
+    };
 
-	for (int i=0; i<dim; ++i)
-	  middle(i) -= .5;
-	middle *= sqrt(dim) / (sqrt(middle.square())*2);
-	for (int i=0; i<dim; ++i)
-	  middle(i) += .5;
-	
-	return middle;
-      };
+    
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const {
+      Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
+      
+      for (int i=0; i<dim; ++i)
+	middle(i) -= .5;
+      middle *= sqrt(dim) / (sqrt(middle.square())*2);
+      for (int i=0; i<dim; ++i)
+	middle(i) += .5;
+      
+      return middle;
+    };
 };
 
 
@@ -44,14 +59,79 @@ template <int dim>
 class CurvedLine :
   public StraightBoundary<dim> {
   public:
-      virtual Point<dim> in_between (const PointArray &neighbors) const;
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
 
 
 
 template <int dim>
-Point<dim> CurvedLine<dim>::in_between (const PointArray &neighbors) const  {
-  Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
+Point<dim>
+CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+
+				   // if the line is at the top of bottom
+				   // face: do a special treatment on
+				   // this line. Note that if the
+				   // z-value of the midpoint is either
+				   // 0 or 1, then the z-values of all
+				   // vertices of the line is like that
+  if (((middle(2) == 0) || (middle(2) == 1))
+				       // find out, if the line is in the
+				       // interior of the top or bottom face
+				       // of the domain, or at the edge.
+				       // lines at the edge need to undergo
+				       // the usual treatment, while for
+				       // interior lines taking the midpoint
+				       // is sufficient
+				       //
+				       // note: the trick with the boundary
+				       // id was invented after the above was
+				       // written, so we are not very strict
+				       // here with using these flags
+      && (line->boundary_indicator() == 1))
+    return middle;
+
+
+  double x=middle(0),
+	 y=middle(1);
+  
+  if (y<x)
+    if (y<1-x)
+      middle(1) = 0.04*sin(6*3.141592*middle(0));
+    else
+      middle(0) = 1+0.04*sin(6*3.141592*middle(1));
+  
+  else
+    if (y<1-x)
+      middle(0) = 0.04*sin(6*3.141592*middle(1));
+    else
+      middle(1) = 1+0.04*sin(6*3.141592*middle(0));
+  
+  return middle;
+};
+
+
+
+template <int dim>
+Point<dim>
+CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
+
+				   // if the face is at the top of bottom
+				   // face: do not move the midpoint in
+				   // x/y direction. Note that if the
+				   // z-value of the midpoint is either
+				   // 0 or 1, then the z-values of all
+				   // vertices of the quad is like that
+  if ((middle(2) == 0) || (middle(2) == 1))
+    return middle;
+  
   double x=middle(0),
 	 y=middle(1);
   
@@ -126,6 +206,9 @@ void test (const int test_case) {
       case 2:
       case 3:
       {
+	tria.begin_active()->face(2)->set_boundary_indicator(1);
+	tria.begin_active()->face(4)->set_boundary_indicator(1);
+	
 					 // set the boundary function
 	Ball<dim>       ball;
 	CurvedLine<dim> curved_line;
