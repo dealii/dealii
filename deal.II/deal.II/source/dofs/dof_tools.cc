@@ -816,6 +816,13 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
   const unsigned int coarse_dofs_per_cell_component
     = coarse_fe.base_element(coarse_fe.component_to_base(coarse_component)).dofs_per_cell;
   
+
+				   // Try to find out whether the
+				   // grids stem from the same coarse
+				   // grid. This is a rather crude
+				   // test, but better than nothing
+  Assert (coarse_grid.get_tria().n_cells(0) == fine_grid.get_tria().n_cells(0),
+	  ExcGridsDontMatch());
   
 				   // check whether component numbers
 				   // are valid
