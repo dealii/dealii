@@ -2979,11 +2979,15 @@ void Triangulation<dim>::execute_coarsening () {
 				   // delete some cells if their neighbors
 				   // have already been deleted (if the latter
 				   // are on a higher level for example)
-  for (cell = last(levels.size()-2); cell!=endc; --cell)
-    if (cell->user_flag_set())
-				       // use a separate function, since this
-				       // is dimension specific
-      delete_cell (cell);
+				   //
+				   // if there is only one level, there can not
+				   // be anything to do
+  if (levels.size() >= 2)
+    for (cell = last(levels.size()-2); cell!=endc; --cell)
+      if (cell->user_flag_set())
+					 // use a separate function, since this
+					 // is dimension specific
+	delete_cell (cell);
   				   // in principle no user flags should be
 				   // set any more at this point
 #if DEBUG
@@ -3318,31 +3322,32 @@ bool Triangulation<dim>::prepare_coarsening () {
 					   // are only set for refined flags
 					   // which do not exist on the
 					   // highest level.
-	  for (cell=last(levels.size()-2); cell!=endc; --cell)
-	    if (cell->user_flag_set())
-					       // cell is flagged for coarsening
-	      for (unsigned int child=0;
-		   child<GeometryInfo<dim>::children_per_cell; ++child)
-		for (unsigned int neighbor=0;
-		     neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
-						   // for all neighbors of all
-						   // children: if they are
-						   // refined more often than
-						   // the child and are not
-						   // flagged for coarsening,
-						   // we can't coarsen this cell
-		  {
-		    cell_iterator child_neighbor = cell->child(child)->
-						   neighbor(neighbor);
-		    if ((child_neighbor.state() == valid) &&
-			(child_neighbor->level() == cell->level()+1) &&
-			(child_neighbor->active() == false) &&
-			(child_neighbor->user_flag_set() == false))
-		      {
-			cell->clear_user_flag();
-			flags_changed_in_this_loop = true;
-		      };
-		  };
+	  if (levels.size()>=2)
+	    for (cell=last(levels.size()-2); cell!=endc; --cell)
+	      if (cell->user_flag_set())
+						 // cell is flagged for coarsening
+		for (unsigned int child=0;
+		     child<GeometryInfo<dim>::children_per_cell; ++child)
+		  for (unsigned int neighbor=0;
+		       neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
+						     // for all neighbors of all
+						     // children: if they are
+						     // refined more often than
+						     // the child and are not
+						     // flagged for coarsening,
+						     // we can't coarsen this cell
+		    {
+		      cell_iterator child_neighbor = cell->child(child)->
+						     neighbor(neighbor);
+		      if ((child_neighbor.state() == valid) &&
+			  (child_neighbor->level() == cell->level()+1) &&
+			  (child_neighbor->active() == false) &&
+			  (child_neighbor->user_flag_set() == false))
+			{
+			  cell->clear_user_flag();
+			  flags_changed_in_this_loop = true;
+			};
+		    };
 	}
       while (flags_changed_in_this_loop);
     };
