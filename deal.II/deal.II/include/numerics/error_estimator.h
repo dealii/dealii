@@ -271,14 +271,16 @@ class KellyErrorEstimator
     DeclException0 (ExcInvalidBoundaryFunction);
 
 
-private:
+  private:
 
 
 				     /**
-				      * Declare a data type to represent the
-				      * mapping between faces and integrated
-				      * jumps of gradients. See the general
-				      * doc of this class for more information.
+				      * Declare a data type to
+				      * represent the mapping between
+				      * faces and integrated jumps of
+				      * gradients. See the general
+				      * documentation of this class
+				      * for more information.
 				      */
     typedef map<typename DoFHandler<dim>::face_iterator,double> FaceIntegrals;
 
