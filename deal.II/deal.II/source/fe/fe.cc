@@ -118,10 +118,6 @@ FiniteElementBase (const FiniteElementData<dim> &fe_data,
                 face_system_to_component_table(this->dofs_per_face),
                 system_to_base_table(this->dofs_per_cell),
                 face_system_to_base_table(this->dofs_per_face),		
-                component_to_system_table(this->components,
-                                          std::vector<unsigned>(this->dofs_per_cell)),
-		face_component_to_system_table(this->components,
-                                               std::vector<unsigned>(this->dofs_per_face)),
                 component_to_base_table (this->components,
                                          std::make_pair(0U, 0U)),
                 restriction_is_additive_flags(restriction_is_additive_flags),
@@ -198,13 +194,11 @@ FiniteElementBase (const FiniteElementData<dim> &fe_data,
     {
       system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
       system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
-      component_to_system_table[0][j] = j;
     }
   for (unsigned int j=0 ; j<this->dofs_per_face ; ++j)
     {
       face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
       face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
-      face_component_to_system_table[0][j] = j;
     }
 };
 
@@ -394,8 +388,6 @@ FiniteElementBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (face_system_to_component_table) +
 	  MemoryConsumption::memory_consumption (system_to_base_table) +
 	  MemoryConsumption::memory_consumption (face_system_to_base_table) +	  
-	  MemoryConsumption::memory_consumption (component_to_system_table) +
-	  MemoryConsumption::memory_consumption (face_component_to_system_table) +
 	  MemoryConsumption::memory_consumption (component_to_base_table) +
 	  MemoryConsumption::memory_consumption (restriction_is_additive_flags) +
 	  MemoryConsumption::memory_consumption (nonzero_components) +

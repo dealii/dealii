@@ -1865,8 +1865,14 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
   for (unsigned int local_coarse_dof=0;
        local_coarse_dof<coarse_dofs_per_cell_component;
        ++local_coarse_dof)
-    parameter_dofs[local_coarse_dof]
-      (fine_fe.component_to_system_index (fine_component,local_coarse_dof)) = 1.;
+    for (unsigned int fine_dof=0; fine_dof<fine_fe.dofs_per_cell; ++fine_dof)
+      if (fine_fe.system_to_component_index(fine_dof)
+          ==
+          std::make_pair (fine_component, local_coarse_dof))
+        {
+          parameter_dofs[local_coarse_dof](fine_dof) = 1.;
+          break;
+        };
 
 
 				   // find out how many DoFs there are

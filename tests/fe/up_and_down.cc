@@ -206,19 +206,19 @@ void test ()
                                            // with scalar and Nedelec
                                            // elements, to make things
                                            // really difficult
-//           (dim != 1 ?
-//            new FESystem<dim>(FE_Nedelec<dim>(1), 2)
-//            : 0),
-//           (dim != 1 ?
-//            new FESystem<dim>(FE_Nedelec<dim>(1), 2,
-//                              FE_Q<dim> (2), 2)
-//            : 0),
-//           (dim != 1 ?
-//            new FESystem<dim>(FE_Nedelec<dim>(1), 2,
-//                              FE_DGQ<dim> (2), 2,
-//                              FESystem<dim>(FE_Nedelec<dim>(1), 2,
-//                                            FE_Q<dim> (2), 2), 2)
-//            : 0),          
+          (dim != 1 ?
+           new FESystem<dim>(FE_Nedelec<dim>(1), 2)
+           : 0),
+          (dim != 1 ?
+           new FESystem<dim>(FE_Nedelec<dim>(1), 2,
+                             FE_Q<dim> (2), 2)
+           : 0),
+          (dim != 1 ?
+           new FESystem<dim>(FE_Nedelec<dim>(1), 2,
+                             FE_DGQ<dim> (2), 2,
+                             FESystem<dim>(FE_Nedelec<dim>(1), 2,
+                                           FE_Q<dim> (2), 2), 2)
+           : 0),          
     };
   
   for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)

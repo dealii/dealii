@@ -696,45 +696,6 @@ class FiniteElementBase : public Subscriptor,
 				      */
     bool operator == (const FiniteElementBase<dim> &) const;
 
-				     /**
-				      * Given a vector component and
-				      * an index of a shape function
-				      * within the shape functions
-				      * corresponding to this vector
-				      * component, return the index of
-				      * this shape function within the
-				      * shape functions of this
-				      * element. If this is a scalar
-				      * element, then the given
-				      * component may only be zero,
-				      * and the given component index
-				      * is also the return value.
-				      *
-				      * If the finite element is
-				      * vector-valued and has
-				      * non-primitive shape functions,
-				      * i.e. some of its shape
-				      * functions are non-zero in more
-				      * than just one vector
-				      * component, then this function
-				      * cannot be used since shape
-				      * functions are no more
-				      * associated with individual
-				      * vector components, and an
-				      * exception of type
-				      * @p{ExcFENotPrimitive} is
-				      * thrown.
-				      */
-    unsigned int component_to_system_index (const unsigned int component,
-					    const unsigned int component_index) const;
-  
-				     /**
-				      * Same as above, but compute the
-				      * data from the index of a shape
-				      * function on a face.
-				      */
-    unsigned int face_component_to_system_index (const unsigned int component,
-						 const unsigned int component_index) const;
 
 				     /**
 				      * Compute vector component and
@@ -1214,37 +1175,6 @@ class FiniteElementBase : public Subscriptor,
     face_system_to_base_table;
     
 				     /**
-				      * Map between component and
-				      * linear dofs: For each pair of
-				      * vector component and index
-				      * within this component, store
-				      * the global dof number in the
-				      * composed element. If the
-				      * element is scalar, then the
-				      * outer (component) index can
-				      * only be zero, and the inner
-				      * index is equal to the stored
-				      * value.
-				      *
-				      * If the element is not
-				      * primitive, i.e. there are
-				      * shape functions that are
-				      * non-zero in more than one
-				      * vector-component, then this
-				      * function is obviously useless,
-				      * and all entries will be
-				      * invalid.
-				      */
-    std::vector< std::vector<unsigned int> > component_to_system_table;
-
-				     /**
-				      * Map between component and
-				      * linear dofs on a face. Same
-				      * applies as above.
-				      */
-    std::vector< std::vector<unsigned int> > face_component_to_system_table;
-    
-				     /**
 				      * The base element establishing
 				      * a component.
 				      *
@@ -1542,23 +1472,6 @@ FiniteElementData<dim>::n_components () const
 };
 
 
-template <int dim>
-inline
-unsigned int
-FiniteElementBase<dim>::component_to_system_index (const unsigned int component,
-						   const unsigned int component_index) const
-{
-  Assert(component<this->n_components(),
-	 ExcIndexRange(component, 0, this->n_components()));
-  Assert(component_index<component_to_system_table[component].size(),
-	 ExcIndexRange(component_index, 0,
-		       component_to_system_table[component].size()));
-  Assert (is_primitive(),
-	  typename FiniteElementBase<dim>::ExcFENotPrimitive());
-  
-  return component_to_system_table[component][component_index];
-}
-
 
 template <int dim>  
 inline
@@ -1573,22 +1486,6 @@ FiniteElementBase<dim>::system_to_component_index (const unsigned int index) con
 }
 
 
-template <int dim>
-inline
-unsigned int
-FiniteElementBase<dim>::face_component_to_system_index (const unsigned int component,
-							const unsigned int component_index) const
-{
-  Assert(component<this->n_components(),
-	 ExcIndexRange(component, 0, this->n_components()));
-  Assert(component_index<face_component_to_system_table[component].size(),
-	 ExcIndexRange(component_index, 0,
-		       face_component_to_system_table[component].size()));
-  Assert (is_primitive(),
-	  typename FiniteElementBase<dim>::ExcFENotPrimitive());
-
-  return face_component_to_system_table[component][component_index];
-}
 
 
 template <int dim>  
