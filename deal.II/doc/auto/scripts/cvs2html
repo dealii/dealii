@@ -891,8 +891,8 @@ for ($dd=0;$dd<=$#alldirs;$dd++)
         else
         {
           $showdir = ".. Parent Dir";
-          $up = dirname ($currentdir) . "\n";
-          if ($up eq ".\n")
+          $up = dirname ($currentdir);
+          if ($up eq ".")
           {
             $refname = "/";
           }
