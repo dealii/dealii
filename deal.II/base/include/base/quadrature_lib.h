@@ -21,7 +21,11 @@
  * Gauss-Legendre quadrature of arbitrary order.
  *
  * The coefficients of these quadrature rules are computed by the
- * function found in @p{Numerical Recipies}.
+ * function found in @p{Numerical Recipies}. For lower order
+ * quadrature rules, the use of this class is thus equivalent to the
+ * use of the @ref{QGauss1} through @ref{QGauss7} classes, for which
+ * the coefficients are hardcoded, but this class can provide higher
+ * order formulae as well.
  *
  * @author Guido Kanschat, 2001
  */
