@@ -20,15 +20,20 @@
 
   <ol>
   <li> <a href="#compiler">How do I change the compiler?</a>
-  <li> <a href="#gcc296">I cannot compile <acronym>deal.II</acronym> with <tt>gcc 2.96</tt>!</a>
+  <li> <a href="#gcc296">I cannot compile <acronym>deal.II</acronym>
+       with gcc version 2.96!</a>
   <li> <a href="#triangles">Can I use/implement triangles/tetrahedra
        in <acronym>deal.II</acronym>?</a> 
   <li> <a href="#problem-types">Can I solve problem XXX with
        <acronym>deal.II</acronym>?</a>
+  <li> <a href="#problem-howto">How do I solve problem XXX with
+       <acronym>deal.II</acronym>?</a>
+  <li> <a href="#contribute">I want to contribute to the development
+       of <acronym>deal.II</acronym>!</a>
   </ol>
 
 
-  <h4><a name="compiler"></a>How do I change the compiler?</h4>
+  <h3><a name="compiler"></a>How do I change the compiler?</h3>
 
   <p>
   <acronym>deal.II</acronym> can be compiled by a number of compilers
@@ -40,17 +45,25 @@
   section</a> in the <a href="http:readme.html">readme file</a>.
   </p>
 
-  <h4><a name="gcc296"></a>I cannot compile <acronym>deal.II</acronym>
-  with <tt>gcc 2.96</tt>!</h4>
+
+  <h3><a name="gcc296"></a>I cannot compile <acronym>deal.II</acronym>
+  with gcc version 2.96!</h3>
 
   <p>
-  You cannot. Version 2.96 has never been an officially published
-  version of gcc. You can either use Version 2.95.2 or 3.X.
+  You can't, this version of gcc simply does not work with
+  <acronym>deal.II</acronym>. Also note that version 2.96 is not an
+  officially released version of gcc, but something that RedHat hacked
+  together from the gcc sources. Simply use either gcc 2.95.2 or 3.X.
+  </p>
+
+  <p>
+  RedHat provides updates to gcc version 3.0, and downgrades to gcc
+  version 2.95, both of which work with <acronym>deal.II</acronym>.
   </p>
   
 
-  <h4><a name="triangles"></a>Can I use/implement
-  triangles/tetrahedra in <acronym>deal.II</acronym>?</h4>
+  <h3><a name="triangles"></a>Can I use/implement
+  triangles/tetrahedra in <acronym>deal.II</acronym>?</h3>
 
   <p>
   No, you cannot do either. The basic data structures are too much
@@ -63,8 +76,8 @@
 
 
 
-  <h4><a name="problem-types"></a>Can I solve problem XXX
-  with <acronym>deal.II</acronym>?</h4>
+  <h3><a name="problem-types"></a>Can I solve problem XXX
+  with <acronym>deal.II</acronym>?</h3>
 
   <p>
   The simple answer is: if it can be written as a PDE, then this is
@@ -112,6 +125,100 @@
   Probably, many other problem types are solved by the many users
   which we do not know of directly. If someone would like to have his
   project added to this page, just contact us.
+  </p>
+
+
+  <h3><a name="problem-howto"></a>How do I solve problem XXX
+  with <acronym>deal.II</acronym>?</h3>
+
+  <p>
+  There is no general rule on how to attack implementing a program to
+  solve your particular problem. However, the way most often taken is
+  to look at one of the 
+  <a href="tutorial/chapter-2.step-by-step/index.html"
+  target="_top">example programs from the tutorial</a> and modify it
+  such that it solves your equation. This way, a number of problems
+  can be solved at relatively small effort.
+  </p>
+
+  <p>
+  If your class of problem does not allow taking and modifying one of
+  the examples programs, then you have to write something up
+  yourself. The example programs may nevertheless be a good guide on
+  how to program with <acronym>deal.II</acronym>.
+  </p>
+
+
+  <h3><a name="contribute"></a>I want to contribute to the development
+      of <acronym>deal.II</acronym>!</h3>
+
+  <p>
+  <acronym>deal.II</acronym> is Open Source -- this not only implies
+  that you as everyone else has access to the source codes, it also
+  implies a certain development model: whoever would like to
+  contribute to the further development is invited to do so!
+  </p>
+
+  <p>
+  This model follows a small number of simple rules. The first and
+  basic one is that if you have something that might be of interest to
+  others as well, you are invited to send it to the list for possible
+  inclusion into the library and use by others as well. Such additions
+  useful to others are, for example: 
+  <ul>
+  <li> new backends for output in a new graphical format;
+  <li> input filters for some kind of data;
+  <li> tool classes that do something that might be interesting to use
+       in other programs as well.
+  </ul>
+  In general, once you start to use something you wrote for one
+  project in a second project, this is something that would make up a
+  good addition to the entire library!
+  </p>
+
+  <p>
+  If you consider providing some code for inclusing into the library,
+  these are the simple rules of gaining reputation in the Open Source
+  community: 
+  <ul>
+  <li> your reputation grows with the number and complexity of your
+       contributions;
+  <li> your reputation with the maintainers of the library also grows
+       with the degree of conformance of your proposed additions with
+       the administrative rules stated below;
+  <li> originators of code are credited full authorship.
+  </ul>
+  </p>
+
+  <p>
+  In order to allow that a library remains a consistent piece of
+  software, there are a number of administrative rules:
+  <ul>
+  <li> there are a number of maintainers that decide what goes into
+       the library;
+  <li> maintainers are benevolent, i.e. in general they want your
+       addition to become part of the library;
+  <li> however, they have to evaluate additions with respect to some
+       criteria, among which are
+       <ul>
+       <li> value for others;
+       <li> whether it fits into the general framework (meaning that
+            if your contribution requires the installation of some
+            obscure other library that people do not usually have, then
+            that must be discussed; alternatively, a way must be provided
+            to disable your contribution on machines that do not have this
+            lib); 
+       <li> completeness and amount of documentation;
+       <li> existence and completeness of error checking through
+            assertions.
+       </ul>
+  </ul>
+  </p>
+
+  <p>
+  However, again: the basic rule is that if you think your addition is
+  interesting to others, there most probably is a way to get it into
+  the library!
   </p>
 
 </body>
