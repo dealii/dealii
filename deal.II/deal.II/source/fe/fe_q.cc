@@ -59,9 +59,6 @@ namespace
 				   // given an integer N, compute its
 				   // integer square root (if it
 				   // exists, otherwise give up)
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   unsigned int int_sqrt (const unsigned int N)
   {
     for (unsigned int i=0; i<=N; ++i)
@@ -75,9 +72,6 @@ namespace
 				   // given an integer N, compute its
 				   // integer cube root (if it
 				   // exists, otherwise give up)
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   unsigned int int_cuberoot (const unsigned int N)
   {
     for (unsigned int i=0; i<=N; ++i)
@@ -91,9 +85,6 @@ namespace
 				   // given N, generate i=0...N-1
 				   // equidistant points in the
 				   // interior of the interval [0,1]
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   Point<1>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
@@ -108,9 +99,6 @@ namespace
 				   // given N, generate i=0...N-1
 				   // equidistant points in the domain
 				   // [0,1]^2
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   Point<2>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
@@ -131,9 +119,6 @@ namespace
 				   // given N, generate i=0...N-1
 				   // equidistant points in the domain
 				   // [0,1]^3
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   Point<3>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
@@ -155,9 +140,6 @@ namespace
 				   // given N, generate i=0...N-1
 				   // equidistant points in the
 				   // interior of the interval [0,1]
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   Point<1>
   generate_face_unit_point (const unsigned int i,
 			    const unsigned int N,
@@ -176,9 +158,6 @@ namespace
 				   // consider shape functions on
 				   // child cells that are located on
 				   // existing vertices)
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   Point<2>
   generate_face_unit_point (const unsigned int i,
 			    const unsigned int N,
@@ -223,9 +202,6 @@ namespace
 				   // specific to the computation of
 				   // the constraint matrix, is active
 				   // on the given subface
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   bool
   constraint_function_is_active_on_child (const unsigned int          j,
 					  const unsigned int          subface,
@@ -246,9 +222,6 @@ namespace
 
 
 
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   bool
   constraint_function_is_active_on_child (const unsigned int          j,
 					  const unsigned int          subface,
@@ -314,9 +287,6 @@ namespace
 				   // constraint numbering, compute
 				   // its index in the polynomials
 				   // space of a given subface
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   unsigned int
   constraint_get_local_j (const unsigned int          j,
 			  const unsigned int          subface,
@@ -333,9 +303,6 @@ namespace
   }
   
 
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   unsigned int
   constraint_get_local_j (const unsigned int          /*j*/,
 			  const unsigned int          /*subface*/,
@@ -355,9 +322,6 @@ namespace
 				   // make things simpler, also pass
 				   // the subface on which j is
 				   // located
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   bool
   constraint_is_support_point (const unsigned int          i,
 			       const unsigned int          j,
@@ -374,9 +338,6 @@ namespace
   }
   
 
-#ifdef DEAL_II_ANON_NAMESPACE_BUG
-  static
-#endif
   bool
   constraint_is_support_point (const unsigned int          /*i*/,
 			       const unsigned int          /*j*/,
