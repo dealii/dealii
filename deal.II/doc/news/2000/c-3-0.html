@@ -410,11 +410,11 @@
        <code class="member">update_gradients</code> is missing in the
        <code class="class">UpdateFlags</code> of a used <code
        class="class">FEValues</code>. Adding this assertion uncovered
-       an error in <code
-       class="member">DataOut<dim>::build_some_patches</code> that is
-       now also fixed; an error that would have occured after the
-       implementation of new <code class="class">FiniteElements</code>
-       whose shape values depend on the geometry of the real cell.
+       several other errors which are now also fixed; these errors
+       were dormant, since the values of finite elements are always
+       computed for the presently available Lagrange elements, but
+       would have been activated once there are other classes of
+       elements. 
        <br>
        (Ralf Hartmann 2000/07/20)
        </p>
