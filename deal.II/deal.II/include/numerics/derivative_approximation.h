@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -175,10 +175,14 @@ class DerivativeApproximation
 				      * approximated gradient.
 				      *
 				      * The last parameter denotes the
-				      * solution component, for which
-				      * the gradient is to be
-				      * computed. It defaults to the
-				      * first component.
+				      * solution component, for which the
+				      * gradient is to be computed. It
+				      * defaults to the first component. For
+				      * scalar elements, this is the only
+				      * valid choice; for vector-valued ones,
+				      * any component between zero and the
+				      * number of vector components can be
+				      * given here.
 				      */
     template <int dim, class InputVector>
     static void
@@ -220,7 +224,12 @@ class DerivativeApproximation
 				      * solution component, for which
 				      * the gradient is to be
 				      * computed. It defaults to the
-				      * first component.
+				      * first component. For
+				      * scalar elements, this is the only
+				      * valid choice; for vector-valued ones,
+				      * any component between zero and the
+				      * number of vector components can be
+				      * given here.
 				      */
     template <int dim, class InputVector>
     static void
