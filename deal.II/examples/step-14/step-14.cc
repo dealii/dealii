@@ -364,6 +364,7 @@ namespace Evaluation
 				     // cells, so we still have to
 				     // compute the mean value. Once
 				     // this is done, report the status:
+    point_derivative /= evaluation_point_hits;
     std::cout << "   Point x-derivative=" << point_derivative
 	      << std::endl;
   };
