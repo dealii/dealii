@@ -15,7 +15,9 @@
 #include <grid/geometry_info.h>
 #include <base/quadrature.h>
 #include <base/memory_consumption.h>
+
 #include <cmath>
+#include <iterator>
 
 
 template <>
@@ -233,6 +235,23 @@ Quadrature<dim>::memory_consumption () const
 
 
 //----------------------------------------------------------------------//
+
+
+
+Quadrature<2> revert (const Quadrature<2> &q) 
+{
+  std::vector<Point<2> > q_points (q.n_quadrature_points);
+  std::vector<double>    weights (q.n_quadrature_points);
+  for (unsigned int i=0; i<q.n_quadrature_points; ++i)
+    {
+      q_points[i][0] = q.point(i)[1];
+      q_points[i][1] = q.point(i)[0];
+
+      weights[i] = q.weight(i);
+    }
+
+  return Quadrature<2> (q_points, weights);
+}
 
 
 template <>
@@ -591,31 +610,97 @@ QProjector<1>::project_to_all_faces (const Quadrature<0> &)
 
 
 
-template <int dim>
-Quadrature<dim>
-QProjector<dim>::project_to_all_faces (const SubQuadrature &quadrature)
+template <>
+Quadrature<2>
+QProjector<2>::project_to_all_faces (const SubQuadrature &quadrature)
 {
+  const unsigned int dim = 2;
+  
   const unsigned int n_points = quadrature.n_quadrature_points,
 		     n_faces  = GeometryInfo<dim>::faces_per_cell;
 
 				   // first fix quadrature points
-  std::vector<Point<dim> > q_points (n_points * n_faces);
+  std::vector<Point<dim> > q_points;
+  q_points.reserve(n_points * n_faces);
   std::vector <Point<dim> > help(n_points);
   
-				   // project to each face and copy
+				   // project to each face and append
 				   // results
   for (unsigned int face=0; face<n_faces; ++face)
     {
       project_to_face(quadrature, face, help);
-      std::copy (help.begin(), help.end(), q_points.begin()+n_points*face);
+      std::copy (help.begin(), help.end(),
+                 std::back_inserter (q_points));
     }
 
 				   // next copy over weights
-  std::vector<double> weights (n_points * n_faces);
+  std::vector<double> weights;
+  weights.reserve (n_points * n_faces);
   for (unsigned int face=0; face<n_faces; ++face)
     std::copy (quadrature.get_weights().begin(),
-	       quadrature.get_weights().end(),
-	       weights.begin()+n_points*face);
+               quadrature.get_weights().end(),
+               std::back_inserter (weights));
+
+  Assert (q_points.size() == n_points * n_faces,
+          ExcInternalError());
+  Assert (weights.size() == n_points * n_faces,
+          ExcInternalError());  
+  
+  return Quadrature<dim>(q_points, weights);
+}
+
+
+
+template <>
+Quadrature<3>
+QProjector<3>::project_to_all_faces (const SubQuadrature &quadrature)
+{
+  const unsigned int dim = 3;
+  
+  const SubQuadrature q_reverted = revert (quadrature);
+  
+  const unsigned int n_points = quadrature.n_quadrature_points,
+		     n_faces  = GeometryInfo<dim>::faces_per_cell;
+
+				   // first fix quadrature points
+  std::vector<Point<dim> > q_points;
+  q_points.reserve(n_points * n_faces * 2);
+  std::vector <Point<dim> > help(n_points);
+  
+				   // project to each face and append
+				   // results
+  for (unsigned int face=0; face<n_faces; ++face)
+    {
+      project_to_face(quadrature, face, help);
+      std::copy (help.begin(), help.end(),
+                 std::back_inserter (q_points));
+    }
+
+				   // next copy over weights
+  std::vector<double> weights;
+  weights.reserve (n_points * n_faces * 2);
+  for (unsigned int face=0; face<n_faces; ++face)
+    std::copy (quadrature.get_weights().begin(),
+               quadrature.get_weights().end(),
+               std::back_inserter (weights));
+
+                                   // then do same for other
+                                   // orientation of faces
+  for (unsigned int face=0; face<n_faces; ++face)
+    {
+      project_to_face(q_reverted, face, help);
+      std::copy (help.begin(), help.end(),
+                 std::back_inserter (q_points));
+    }
+  for (unsigned int face=0; face<n_faces; ++face)
+    std::copy (q_reverted.get_weights().begin(),
+               q_reverted.get_weights().end(),
+               std::back_inserter (weights));
+
+  Assert (q_points.size() == n_points * n_faces * 2,
+          ExcInternalError());
+  Assert (weights.size() == n_points * n_faces * 2,
+          ExcInternalError());  
   
   return Quadrature<dim>(q_points, weights);
 }
@@ -632,16 +717,19 @@ QProjector<1>::project_to_all_subfaces (const Quadrature<0> &)
 
 
 
-template <int dim>
-Quadrature<dim>
-QProjector<dim>::project_to_all_subfaces (const SubQuadrature &quadrature)
+template <>
+Quadrature<2>
+QProjector<2>::project_to_all_subfaces (const SubQuadrature &quadrature)
 {
+  const unsigned int dim = 2;
+  
   const unsigned int n_points          = quadrature.n_quadrature_points,
 		     n_faces           = GeometryInfo<dim>::faces_per_cell,
 		     subfaces_per_face = GeometryInfo<dim>::subfaces_per_face;
   
 				   // first fix quadrature points
-  std::vector<Point<dim> > q_points (n_points * n_faces * subfaces_per_face);
+  std::vector<Point<dim> > q_points;
+  q_points.reserve (n_points * n_faces * subfaces_per_face);
   std::vector <Point<dim> > help(n_points);
   
 				   // project to each face and copy
@@ -651,16 +739,83 @@ QProjector<dim>::project_to_all_subfaces (const SubQuadrature &quadrature)
       {
 	project_to_subface(quadrature, face, subface, help);
 	std::copy (help.begin(), help.end(),
-		   q_points.begin()+n_points*(face*subfaces_per_face+subface));
+                   std::back_inserter (q_points));
       };
 
 				   // next copy over weights
-  std::vector<double> weights (n_points * n_faces * subfaces_per_face);
+  std::vector<double> weights;
+  weights.reserve (n_points * n_faces * subfaces_per_face);
   for (unsigned int face=0; face<n_faces; ++face)
     for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
       std::copy (quadrature.get_weights().begin(),
-		 quadrature.get_weights().end(),
-		 weights.begin()+n_points*(face*subfaces_per_face+subface));
+                 quadrature.get_weights().end(),
+                 std::back_inserter (weights));
+
+  Assert (q_points.size() == n_points * n_faces * subfaces_per_face,
+          ExcInternalError());
+  Assert (weights.size() == n_points * n_faces * subfaces_per_face,
+          ExcInternalError());
+  
+  return Quadrature<dim>(q_points, weights);
+}
+
+
+
+template <>
+Quadrature<3>
+QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
+{
+  const unsigned int dim = 3;
+  
+  const SubQuadrature q_reverted = revert (quadrature);
+
+  const unsigned int n_points          = quadrature.n_quadrature_points,
+		     n_faces           = GeometryInfo<dim>::faces_per_cell,
+		     subfaces_per_face = GeometryInfo<dim>::subfaces_per_face;
+  
+				   // first fix quadrature points
+  std::vector<Point<dim> > q_points;
+  q_points.reserve (n_points * n_faces * subfaces_per_face * 2);
+  std::vector <Point<dim> > help(n_points);
+  
+				   // project to each face and copy
+				   // results
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+      {
+	project_to_subface(quadrature, face, subface, help);
+	std::copy (help.begin(), help.end(),
+                   std::back_inserter (q_points));
+      }
+
+				   // next copy over weights
+  std::vector<double> weights;
+  weights.reserve (n_points * n_faces * subfaces_per_face * 2);
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+      std::copy (quadrature.get_weights().begin(),
+                 quadrature.get_weights().end(),
+                 std::back_inserter (weights));
+
+                                   // do same with other orientation
+                                   // of faces
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+      {
+	project_to_subface(q_reverted, face, subface, help);
+	std::copy (help.begin(), help.end(),
+                   std::back_inserter (q_points));
+      };
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+      std::copy (q_reverted.get_weights().begin(),
+                 q_reverted.get_weights().end(),
+                 std::back_inserter (weights));
+
+  Assert (q_points.size() == n_points * n_faces * subfaces_per_face * 2,
+          ExcInternalError());
+  Assert (weights.size() == n_points * n_faces * subfaces_per_face * 2,
+          ExcInternalError());  
   
   return Quadrature<dim>(q_points, weights);
 }
