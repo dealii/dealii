@@ -393,11 +393,11 @@ QSimpson<dim>::QSimpson () :
 
 template <int dim>
 QMilne<dim>::QMilne () :
-		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
+		Quadrature<dim> (QMilne<dim-1>(), QMilne<1>()){};
 
 template <int dim>
 QWeddle<dim>::QWeddle () :
-		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
+		Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>()){};
 
 
 // explicite specialization
