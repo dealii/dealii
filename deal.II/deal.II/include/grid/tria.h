@@ -1736,10 +1736,11 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  This triangulation must be empty
 				      *  beforehand.
 				      *
-				      *  The function is made #virtual# since
-				      *  some derived classes might want to
-				      *  disable the functionality of this
-				      *  function.
+				      *  The function is made
+				      *  #virtual# since some derived
+				      *  classes might want to disable
+				      *  or extend the functionality
+				      *  of this function.
 				      */
     virtual void copy_triangulation (const Triangulation<dim> &old_tria);
 
