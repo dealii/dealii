@@ -1,7 +1,7 @@
 # Generated automatically from Makefile.in by configure.
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 ############################################################
 
 ############################################################

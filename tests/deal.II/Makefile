@@ -1,7 +1,7 @@
 # Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 ############################################################
 
 ############################################################
