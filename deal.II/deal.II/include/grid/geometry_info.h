@@ -31,7 +31,8 @@
  */
 template <int dim>
 struct GeometryInfo
-{};
+{
+};
 
 
 
