@@ -26,6 +26,7 @@
 #include <lac/sparse_matrix.h>
 #include <base/parameter_handler.h>
 #include <dofs/dof_constraints.h>
+#include <dofs/dof_tools.h>
 #include <grid/grid_out.h>
 #include <base/logstream.h>
 
@@ -267,7 +268,7 @@ int main ()
 	  dof.distribute_dofs (*fe);
       
 	  ConstraintMatrix constraints;
-	  dof.make_hanging_node_constraints (constraints);
+	  DoFTools::make_hanging_node_constraints (dof, constraints);
 	  constraints.close ();
       
 	  constraints.print (logfile);

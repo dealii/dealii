@@ -88,7 +88,7 @@ int main()
 	  dof.distribute_dofs(*fe);
 
 	  ConstraintMatrix hanging_nodes;
-	  dof.make_hanging_node_constraints(hanging_nodes);
+	  DoFTools::make_hanging_node_constraints(dof, hanging_nodes);
 	  hanging_nodes.close();
 
 	  const unsigned int size = dof.n_dofs();

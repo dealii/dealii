@@ -25,11 +25,12 @@
 #include <fe/fe_values.h>
 #include <numerics/multigrid.h>
 #include <numerics/mg_smoother.h>
-MGSmoother* smoother_object;
 #include <numerics/multigrid.templates.h>
 #include <dofs/dof_tools.h>
 
 #include <fstream>
+
+MGSmoother* smoother_object;
 
 // Does anybody know why cmath does not do this?
 
@@ -106,7 +107,7 @@ int main()
 	  DoFTools::make_sparsity_pattern(dof, structure);
 
 	  ConstraintMatrix hanging_nodes;
-	  dof.make_hanging_node_constraints(hanging_nodes);
+	  DoFTools::make_hanging_node_constraints (dof, hanging_nodes);
 	  hanging_nodes.close();
 	  hanging_nodes.condense(structure);
 
