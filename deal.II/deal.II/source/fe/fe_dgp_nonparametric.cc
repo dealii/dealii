@@ -41,6 +41,10 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
 //    else
 //      for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
 //        this->prolongation[i].reinit(0,0);
+                                   // since not implemented, set to
+                                   // "empty"
+  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+    prolongation[i].reinit(0, 0);
 
                                    // restriction can be defined
                                    // through projection for
