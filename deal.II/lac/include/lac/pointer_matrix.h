@@ -44,33 +44,75 @@ class PointerMatrixBase : public Subscriptor
 				      * the destructor of the derived
 				      * class is called.
 				      */
-  virtual ~PointerMatrixBase ();
+    virtual ~PointerMatrixBase ();
 
-				   /**
-				    * Matrix-vector product.
-				    */
-  virtual void vmult (VECTOR& dst,
-		      const VECTOR& src) const = 0;
+				     /**
+				      * Find out if two matrices point
+				      * to the same object.
+				      */
+    bool operator == (const PointerMatrixBase<VECTOR>&) const;
+    
+				     /**
+				      * Find out if two matrices do
+				      * not point to the same object.
+				      */
+    bool operator != (const PointerMatrixBase<VECTOR>&) const;
+    
+				     /**
+				      * Find out if this pointer is
+				      * less.
+				      */
+    bool operator < (const PointerMatrixBase<VECTOR>&) const;
+    
+				     /**
+				      * Find out if this pointer is
+				      * less or equal.
+				      */
+    bool operator <= (const PointerMatrixBase<VECTOR>&) const;
+    
+				     /**
+				      * Find out if this pointer is
+				      * greater.
+				      */
+    bool operator > (const PointerMatrixBase<VECTOR>&) const;
+    
+				     /**
+				      * Find out if this pointer is
+				      * greater or equal.
+				      */
+    bool operator >= (const PointerMatrixBase<VECTOR>&) const;
+    
+    
+				     /**
+				      * Matrix-vector product.
+				      */
+    virtual void vmult (VECTOR& dst,
+			const VECTOR& src) const = 0;
+    
+				     /**
+				      * Tranposed matrix-vector product.
+				      */
+    virtual void Tvmult (VECTOR& dst,
+			 const VECTOR& src) const = 0;
+    
+				     /**
+				      * Matrix-vector product, adding to
+				      * @p dst.
+				      */
+    virtual void vmult_add (VECTOR& dst,
+			    const VECTOR& src) const = 0;
+    
+				     /**
+				      * Tranposed matrix-vector product,
+				      * adding to @p dst.
+				      */
+    virtual void Tvmult_add (VECTOR& dst,
+			     const VECTOR& src) const = 0;
 
-				   /**
-				    * Tranposed matrix-vector product.
-				    */
-  virtual void Tvmult (VECTOR& dst,
-		       const VECTOR& src) const = 0;
-
-				   /**
-				    * Matrix-vector product, adding to
-				    * @p dst.
-				    */
-  virtual void vmult_add (VECTOR& dst,
-			  const VECTOR& src) const = 0;
-
-				   /**
-				    * Tranposed matrix-vector product,
-				    * adding to @p dst.
-				    */
-  virtual void Tvmult_add (VECTOR& dst,
-			   const VECTOR& src) const = 0;
+				     /**
+				      * Get the pointer for comparison.
+				      */
+    virtual const void* get() const = 0;
 };
 
 /**
@@ -86,63 +128,69 @@ class PointerMatrixBase : public Subscriptor
 template<class MATRIX, class VECTOR>
 class PointerMatrix : public PointerMatrixBase<VECTOR>
 {
-public:
-				   /**
-				    * Constructor.  The pointer in the
-				    * argument is stored in this
-				    * class. As usual, the lifetime of
-				    * <tt>*M</tt> must be longer than the
-				    * one of the @p PointerMatrix.
-				    *
-				    * If @p M is zero, no matrix is stored.
-				    */
-  PointerMatrix (const MATRIX* M=0);
-
+  public:
+				     /**
+				      * Constructor.  The pointer in the
+				      * argument is stored in this
+				      * class. As usual, the lifetime of
+				      * <tt>*M</tt> must be longer than the
+				      * one of the @p PointerMatrix.
+				      *
+				      * If @p M is zero, no matrix is stored.
+				      */
+    PointerMatrix (const MATRIX* M=0);
+    
 				     /**
 				      * Return whether the object is
 				      * empty. 
 				      */
-  bool empty () const;
+    bool empty () const;
+    
+				     /**
+				      * Assign a new matrix
+				      * pointer. Deletes the old pointer
+				      * and releases its matrix.
+				      * @see SmartPointer
+				      */
+    const PointerMatrix& operator= (const MATRIX* M);
+    
+				     /**
+				      * Matrix-vector product.
+				      */
+    virtual void vmult (VECTOR& dst,
+			const VECTOR& src) const;
+    
+				     /**
+				      * Tranposed matrix-vector product.
+				      */
+    virtual void Tvmult (VECTOR& dst,
+			 const VECTOR& src) const;
+    
+				     /**
+				      * Matrix-vector product, adding to
+				      * @p dst.
+				      */
+    virtual void vmult_add (VECTOR& dst,
+			    const VECTOR& src) const;
+    
+				     /**
+				      * Tranposed matrix-vector product,
+				      * adding to @p dst.
+				      */
+    virtual void Tvmult_add (VECTOR& dst,
+			     const VECTOR& src) const;
+    
+  private:
+				     /**
+				      * Return the address of the
+				      * matrix for comparison.
+				      */
+    virtual const void* get() const;
 
-				   /**
-				    * Assign a new matrix
-				    * pointer. Deletes the old pointer
-				    * and releases its matrix.
-				    * @see SmartPointer
-				    */
-  const PointerMatrix& operator= (const MATRIX* M);
-  
-				   /**
-				    * Matrix-vector product.
-				    */
-  virtual void vmult (VECTOR& dst,
-		      const VECTOR& src) const;
-
-				   /**
-				    * Tranposed matrix-vector product.
-				    */
-  virtual void Tvmult (VECTOR& dst,
-		       const VECTOR& src) const;
-
-				   /**
-				    * Matrix-vector product, adding to
-				    * @p dst.
-				    */
-  virtual void vmult_add (VECTOR& dst,
-			  const VECTOR& src) const;
-  
-				   /**
-				    * Tranposed matrix-vector product,
-				    * adding to @p dst.
-				    */
-  virtual void Tvmult_add (VECTOR& dst,
-			   const VECTOR& src) const;
-  
-private:
-				   /**
-				    * The pointer to the actual matrix.
-				    */
-  SmartPointer<const MATRIX> m;
+				     /**
+				      * The pointer to the actual matrix.
+				      */
+    SmartPointer<const MATRIX> m;
 };
 
 
@@ -172,6 +220,67 @@ template<class VECTOR>
 inline 
 PointerMatrixBase<VECTOR>::~PointerMatrixBase ()
 {}
+
+
+
+template<class VECTOR>
+inline
+bool
+PointerMatrixBase<VECTOR>::operator == (const PointerMatrixBase<VECTOR>& other) const
+{
+  return (get() == other.get());
+}
+
+
+
+template<class VECTOR>
+inline
+bool
+PointerMatrixBase<VECTOR>::operator != (const PointerMatrixBase<VECTOR>& other) const
+{
+  return (get() != other.get());
+}
+
+
+
+template<class VECTOR>
+inline
+bool
+PointerMatrixBase<VECTOR>::operator < (const PointerMatrixBase<VECTOR>& other) const
+{
+  return (get() < other.get());
+}
+
+
+
+template<class VECTOR>
+inline
+bool
+PointerMatrixBase<VECTOR>::operator <= (const PointerMatrixBase<VECTOR>& other) const
+{
+  return (get() <= other.get());
+}
+
+
+
+template<class VECTOR>
+inline
+bool
+PointerMatrixBase<VECTOR>::operator > (const PointerMatrixBase<VECTOR>& other) const
+{
+  return (get() > other.get());
+}
+
+
+
+template<class VECTOR>
+inline
+bool
+PointerMatrixBase<VECTOR>::operator >= (const PointerMatrixBase<VECTOR>& other) const
+{
+  return (get() >= other.get());
+}
+
 
 
 template<class MATRIX, class VECTOR>
@@ -237,6 +346,13 @@ PointerMatrix<MATRIX, VECTOR>::Tvmult_add (VECTOR& dst,
   m->Tvmult_add (dst, src);
 }
 
+
+template<class MATRIX, class VECTOR>
+inline const void*
+PointerMatrix<MATRIX, VECTOR>::get () const
+{
+  return m;
+}
 
 
 #endif
