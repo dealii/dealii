@@ -287,6 +287,10 @@ void TestCases<dim>::run (ParameterHandler &prm) {
        << "    Unconstrained matrix bandwidth= " << unconstrained_bandwidth << endl
        << "    Constrained matrix bandwidth  = " << sparsity.bandwidth()
        << endl << endl;
+
+				   // release the lock that dof has to the
+				   // finite element object
+  dof->clear ();
 };
 
 

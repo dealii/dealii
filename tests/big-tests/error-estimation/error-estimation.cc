@@ -518,11 +518,11 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   
       DataOut<dim> out;
       fill_data (out);
-      out.add_data_vector (l2_error_per_dof, "L2-Error");
-      out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
-      out.add_data_vector (h1_error_per_dof, "H1-Error");
-      out.add_data_vector (estimated_error_per_dof, "Estimated Error");
-      out.add_data_vector (error_ratio, "Ratio True:Estimated Error");
+      out.add_data_vector (l2_error_per_dof, "L2_Error");
+      out.add_data_vector (linfty_error_per_dof, "Linfty_Error");
+      out.add_data_vector (h1_error_per_dof, "H1_Error");
+      out.add_data_vector (estimated_error_per_dof, "Estimated_Error");
+      out.add_data_vector (error_ratio, "Ratio_True_to_Estimated_Error");
       string filename = prm.get ("Output base filename");
       switch (refine_mode) 
 	{

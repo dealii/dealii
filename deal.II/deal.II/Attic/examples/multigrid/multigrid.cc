@@ -569,11 +569,11 @@ int PoissonProblem<dim>::run (const unsigned int level) {
       out.attach_dof_handler (*dof);
 
       out.add_data_vector (solution, "u");
-      out.add_data_vector (l1_error_per_dof, "L1-Error");
-      out.add_data_vector (l2_error_per_dof, "L2-Error");
-      out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
-      out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
-      out.add_data_vector (h1_error_per_dof, "H1-Error");
+      out.add_data_vector (l1_error_per_dof, "L1_Error");
+      out.add_data_vector (l2_error_per_dof, "L2_Error");
+      out.add_data_vector (linfty_error_per_dof, "Linfty_Error");
+      out.add_data_vector (h1_seminorm_error_per_dof, "H1_seminorm_Error");
+      out.add_data_vector (h1_error_per_dof, "H1_Error");
       out.write_ucd (o);
       o.close ();
     }
