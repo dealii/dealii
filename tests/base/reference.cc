@@ -40,7 +40,27 @@ int main()
   std::ofstream logfile("reference.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+
+                                   // we do something rather weird in
+                                   // this file: bind the buffer of
+                                   // cerr to the log file, so that
+                                   // the output of the Assert* macros
+                                   // that are written to std::cerr
+                                   // end up in the logfiles.
+                                   //
+                                   // so make sure we store a pointer
+                                   // to the old buffer, switch to the
+                                   // buffer of the logfile, and at
+                                   // the end of main() switch
+                                   // back. note that if we don't
+                                   // switch back, we get a segfault
+                                   // later on in the destruction of
+                                   // std::cerr, since it tries to do
+                                   // something with its buffer, but
+                                   // that is already gone by then
+  std::basic_streambuf<char> *old_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(logfile.rdbuf());
+  
   Test a("A");
   const Test b("B");
   SmartPointer<Test>       r=&a;
@@ -71,5 +91,7 @@ int main()
     Test d("D");
     r = &d;
   }
+
+  std::cerr.rdbuf(old_cerr_buf);
 }
 

@@ -154,6 +154,10 @@ int main ()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
+
+                                   // do the same weird stuff as in
+                                   // tests/base/reference.cc
+  std::basic_streambuf<char> *old_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(logfile.rdbuf());
   
   try
@@ -185,7 +189,6 @@ int main ()
       return 3;
     };
   
-  
-  return 0;
+  std::cerr.rdbuf(old_cerr_buf);
 }
 
