@@ -129,13 +129,6 @@ Unify lots of code of the two Cuthill-McKee dof renumbering functions
   of numbers. Simple task.
 
 
-In 'KellyErrorEstimator' add new argument 'const vector<double> weight_
-components' for using the error indicators of all components of a 
-system in a linear combination. This vector must have the size of the
-number of components and includes the weights. This could replace the 
-old argument 'const unsigned int selected_component'.
-
-
 Update documentation on Boundaries in Triangulation<dim> (Guido!)
 
 
