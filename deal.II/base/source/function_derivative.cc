@@ -56,8 +56,6 @@ FunctionDerivative<dim>::set_formula (DifferenceFormula form)
   formula = form;
 }
 
-//TODO:[?] Discussion on an efficient implementation of Point additions.
-
 template <int dim>
 double
 FunctionDerivative<dim>::value (const Point<dim>   &p,
@@ -88,7 +86,10 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 using namespace std;
 #endif
 
-//TODO:[?] Optimize construction of vectors thread-safe
+//TODO:[WB] Optimize construction of vectors thread-safe
+// Right now, vectors are allocated each time value_list is called.
+// This costs a lot of time and should be replaced by a static object,
+// but that would not be thread-safe anymore.
 
 template <int dim>
 void
