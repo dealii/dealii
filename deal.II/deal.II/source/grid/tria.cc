@@ -1504,10 +1504,20 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // Assert that only exterior
 				       // lines are given a boundary
 				       // indicator
-      AssertThrow (line->boundary_indicator() == 0,
+      AssertThrow (line->at_boundary(),
 		   ExcInteriorLineCantBeBoundary());
- 		    
-      line -> set_boundary_indicator (boundary_line->material_id);
+
+                                       // and make sure that we don't
+                                       // attempt to reset the
+                                       // boundary indicator to a
+                                       // different than the
+                                       // previously set value
+      if (line->boundary_indicator() != 0)
+        AssertThrow (line->boundary_indicator() ==
+                     boundary_line->material_id,
+                     ExcMessage ("Duplicate boundary lines are only allowed "
+                                 "if they carry the same boundary indicator."));
+      line->set_boundary_indicator (boundary_line->material_id);
     };       
 
 
@@ -1618,8 +1628,19 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 
 				       // check whether this face is
 				       // really an exterior one
-      AssertThrow(quad->boundary_indicator()==0,
+      AssertThrow(quad->at_boundary(),
 		  ExcInteriorQuadCantBeBoundary());
+
+                                       // and make sure that we don't
+                                       // attempt to reset the
+                                       // boundary indicator to a
+                                       // different than the
+                                       // previously set value
+      if (quad->boundary_indicator() != 0)
+        AssertThrow (quad->boundary_indicator() ==
+                     boundary_quad->material_id,
+                     ExcMessage ("Duplicate boundary quads are only allowed "
+                                 "if they carry the same boundary indicator."));
       quad->set_boundary_indicator (boundary_quad->material_id); 
     };
         						    			       
