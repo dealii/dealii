@@ -1,0 +1,8 @@
+
+DEAL::Gauss2 is exact for polynomials of degree 3
+DEAL::Gauss3 is exact for polynomials of degree 5
+DEAL::Gauss4 is exact for polynomials of degree 7
+DEAL::Gauss5 is exact for polynomials of degree 9
+DEAL::Gauss6 is exact for polynomials of degree 11
+DEAL::Gauss7 is exact for polynomials of degree 13
+DEAL::Gauss8 is exact for polynomials of degree 0

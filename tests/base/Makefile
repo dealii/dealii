@@ -49,7 +49,7 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 
 
-all: logtest.check reference.check tensor.check
+all: logtest.check reference.check tensor.check quadrature_test.check
 exe: $(all:.check=.testcase)
 output: $(all:.check=.output)
 ############################################################
@@ -111,6 +111,21 @@ reference.testcase: $(reference-o-files) $(libraries)
 	@$(CXX) $(flags) -o $@ $^
 
 
+############################################################
+
+
+quadrature_test-cc-files = quadrature_test.cc
+
+ifeq ($(debug-mode),on)
+quadrature_test-o-files = $(quadrature_test-cc-files:.cc=.go)
+else
+quadrature_test-o-files = $(quadrature_test-cc-files:.cc=.o)
+endif
+
+quadrature_test.testcase: $(quadrature_test-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
 
 ############################################################
 # Continue with other targets if needed
@@ -169,3 +184,6 @@ Make.depend: $(all-cc-files)
 	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 
 include Make.depend
+
+
+
