@@ -14,8 +14,6 @@
 #define __deal2__sparse_ilu_templates_h
 
 
-/*----------------------------   matrix_decompositions.templates.h     ---------------------------*/
-
 
 #include <lac/vector.h>
 #include <lac/sparse_ilu.h>
@@ -341,7 +339,7 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 };
 
 
-/*----------------------------   matrix_decompositions.templates.h     ---------------------------*/
+/*----------------------------   sparse_ilu.templates.h     ---------------------------*/
 
 #endif
-/*----------------------------   matrix_decompositions.templates.h     ---------------------------*/
+/*----------------------------   sparse_ilu.templates.h     ---------------------------*/
