@@ -18,13 +18,12 @@
 
 
 /**
- * This class gives a unified framework for implementing a
- * FiniteElement class based on a polynomial space like a
- * @p TensorProductSpace or a @p PolynomialSpace.
+ * This class gives a unified framework for the implementation of
+ * FiniteElement classes based on a polynomial spaces like the
+ * TensorProductPolynomials or a PolynomialSpace classes.
  *
  * Every class that implements following functions can be used as
- * template parameter @p POLY. Example classes are @p
- * TensorProductSpace and @p PolynomialSpace.
+ * template parameter POLY.
  *
  * @code
  * double compute_value (const unsigned int i,
@@ -36,12 +35,21 @@
  * Tensor<2,dim> compute_grad_grad (const unsigned int i,
  *                                  const Point<dim> &p) const;
  * @endcode
+ * Example classes are TensorProductPolynomials, PolynomialSpace or
+ * PolynomialsP.
  *
  * This class is not a fully implemented FiniteElement class. Instead
  * there are several pure virtual functions declared in the
  * FiniteElement and FiniteElementBase classes which cannot
  * implemented by this class but are left for implementation in
  * derived classes.
+ *
+ * Furthermore, this class assumes that shape functions of the
+ * FiniteElement under consideration do <em>not</em> depend on the
+ * actual shape of the cells in real space, i.e. update_once()
+ * includes update_values. For FiniteElements whose shape functions
+ * depend on the cells in real space, the update_once() and
+ * update_each() functions must be overloaded.
  *
  * Todos:
  * - checke dim of POLY
@@ -63,32 +71,30 @@ class FE_Poly : public FiniteElement<dim>
 
 				     /**
 				      * Return the value of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
+				      * <tt>i</tt>th shape function at
+				      * the point <tt>p</tt>. See the
+				      * FiniteElementBase base class
+				      * for more information about the
+				      * semantics of this function.
 				      */
     virtual double shape_value (const unsigned int i,
 			        const Point<dim> &p) const;
     
 				     /**
 				      * Return the value of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
-				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
+				      * <tt>component</tt>th vector
+				      * component of the <tt>i</tt>th
+				      * shape function at the point
+				      * <tt>p</tt>. See the
+				      * FiniteElementBase base class
+				      * for more information about the
+				      * semantics of this function.
 				      *
 				      * Since this element is scalar,
 				      * the returned value is the same
 				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
+				      * <tt>_component</tt> suffix
+				      * were called, provided that the
 				      * specified component is zero.
 				      */
     virtual double shape_value_component (const unsigned int i,
@@ -97,32 +103,30 @@ class FE_Poly : public FiniteElement<dim>
 
 				     /**
 				      * Return the gradient of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
+				      * <tt>i</tt>th shape function at
+				      * the point <tt>p</tt>. See the
+				      * FiniteElementBase base class
+				      * for more information about the
+				      * semantics of this function.
 				      */
     virtual Tensor<1,dim> shape_grad (const unsigned int  i,
 				      const Point<dim>   &p) const;
 
 				     /**
 				      * Return the gradient of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
-				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
+				      * <tt>component</tt>th vector
+				      * component of the <tt>i</tt>th
+				      * shape function at the point
+				      * <tt>p</tt>. See the
+				      * FiniteElementBase base class
+				      * for more information about the
+				      * semantics of this function.
 				      *
 				      * Since this element is scalar,
 				      * the returned value is the same
 				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
+				      * <tt>_component</tt> suffix
+				      * were called, provided that the
 				      * specified component is zero.
 				      */
     virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
@@ -131,33 +135,32 @@ class FE_Poly : public FiniteElement<dim>
 
 				     /**
 				      * Return the tensor of second
-				      * derivatives of the @p{i}th
-				      * shape function at point @p{p}
-				      * on the unit cell. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
+				      * derivatives of the
+				      * <tt>i</tt>th shape function at
+				      * point <tt>p</tt> on the unit
+				      * cell. See the
+				      * FiniteElementBase base class
+				      * for more information about the
+				      * semantics of this function.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim> &p) const;
 
 				     /**
 				      * Return the second derivative
-				      * of the @p{component}th vector
-				      * component of the @p{i}th shape
-				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
+				      * of the <tt>component</tt>th
+				      * vector component of the
+				      * <tt>i</tt>th shape function at
+				      * the point <tt>p</tt>. See the
+				      * FiniteElementBase base class
+				      * for more information about the
+				      * semantics of this function.
 				      *
 				      * Since this element is scalar,
 				      * the returned value is the same
 				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
+				      * <tt>_component</tt> suffix
+				      * were called, provided that the
 				      * specified component is zero.
 				      */
     virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
@@ -175,8 +178,9 @@ class FE_Poly : public FiniteElement<dim>
 				     /**
 				      * Access to base element
 				      * objects. Since this element is
-				      * scalar, @p{base_element(0)} is
-				      * @p{this}, and all other
+				      * scalar,
+				      * <tt>base_element(0)</tt> is
+				      * <tt>this</tt>, and all other
 				      * indices throw an error.
 				      */
     virtual const FiniteElement<dim> &
@@ -184,9 +188,9 @@ class FE_Poly : public FiniteElement<dim>
 
                                      /**
                                       * Multiplicity of base element
-                                      * @p{index}. Since this is a
-                                      * scalar element,
-                                      * @p{element_multiplicity(0)}
+                                      * <tt>index</tt>. Since this is
+                                      * a scalar element,
+                                      * <tt>element_multiplicity(0)</tt>
                                       * returns one, and all other
                                       * indices will throw an error.
                                       */
@@ -208,8 +212,7 @@ class FE_Poly : public FiniteElement<dim>
 
 				     /**
 				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
+				      * function in FiniteElement.
 				      */
     virtual void
     fill_fe_values (const Mapping<dim> &mapping,
@@ -221,8 +224,7 @@ class FE_Poly : public FiniteElement<dim>
     
 				     /**
 				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
+				      * function in FiniteElement.
 				      */
     virtual void
     fill_fe_face_values (const Mapping<dim> &mapping,
@@ -235,8 +237,7 @@ class FE_Poly : public FiniteElement<dim>
     
 				     /**
 				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
+				      * function in FiniteElement.
 				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim> &mapping,
@@ -253,60 +254,74 @@ class FE_Poly : public FiniteElement<dim>
 				      * Determine the values that need
 				      * to be computed on the unit
 				      * cell to be able to compute all
-				      * values required by @p{flags}.
+				      * values required by
+				      * <tt>flags</tt>.
 				      *
 				      * For the purpuse of this
 				      * function, refer to the
 				      * documentation in
-				      * @p{FiniteElement}.
+				      * FiniteElement.
 				      *
-				      * The effect in this element is
-				      * as follows: if
-				      * @p{update_values} is set in
-				      * @p{flags}, copy it to the
-				      * result. All other flags of the
-				      * result are cleared, since
-				      * everything else must be
+				      * This class assumes that shape
+				      * functions of this
+				      * FiniteElement do <em>not</em>
+				      * depend on the actual shape of
+				      * the cells in real
+				      * space. Therefore, the effect
+				      * in this element is as follows:
+				      * if <tt>update_values</tt> is
+				      * set in <tt>flags</tt>, copy it
+				      * to the result. All other flags
+				      * of the result are cleared,
+				      * since everything else must be
 				      * computed for each cell.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
   
 				     /**
 				      * Determine the values that need
-				      * to be computed on every
-				      * cell to be able to compute all
-				      * values required by @p{flags}.
+				      * to be computed on every cell
+				      * to be able to compute all
+				      * values required by
+				      * <tt>flags</tt>.
 				      *
 				      * For the purpuse of this
 				      * function, refer to the
 				      * documentation in
-				      * @p{FiniteElement}.
+				      * FiniteElement.
+				      *
+				      * This class assumes that shape
+				      * functions of this
+				      * FiniteElement do <em>not</em>
+				      * depend on the actual shape of
+				      * the cells in real
+				      * space.
 				      *
 				      * The effect in this element is
 				      * as follows:
 				      * @begin{itemize}
-				      * @item if @p{update_gradients}
-				      * is set, the result will
-				      * contain @p{update_gradients}
-				      * and
-				      * @p{update_covariant_transformation}.
+
+				      * @item if
+				      * <tt>update_gradients</tt> is
+				      * set, the result will contain
+				      * <tt>update_gradients</tt> and
+				      * <tt>update_covariant_transformation</tt>.
 				      * The latter is required to
 				      * transform the gradient on the
 				      * unit cell to the real
 				      * cell. Remark, that the action
 				      * required by
-				      * @p{update_covariant_transformation}
+				      * <tt>update_covariant_transformation</tt>
 				      * is actually performed by the
-				      * @p{Mapping} object used in
+				      * Mapping object used in
 				      * conjunction with this finite
-				      * element.
-				      * @item if
-				      * @p{update_second_derivatives}
+				      * element.  @item if
+				      * <tt>update_second_derivatives</tt>
 				      * is set, the result will
 				      * contain
-				      * @p{update_second_derivatives}
+				      * <tt>update_second_derivatives</tt>
 				      * and
-				      * @p{update_covariant_transformation}.
+				      * <tt>update_covariant_transformation</tt>.
 				      * The rationale is the same as
 				      * above and no higher
 				      * derivatives of the
@@ -314,6 +329,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * since we use difference
 				      * quotients for the actual
 				      * computation.
+				      *
 				      * @end{itemize}
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
@@ -374,7 +390,9 @@ class FE_Poly : public FiniteElement<dim>
     };
 
                                      /**
-                                      * The polynomial space.
+                                      * The polynomial space. Its type
+                                      * is given by the template
+                                      * parameter POLY.
                                       */    
     POLY poly_space;
 };
