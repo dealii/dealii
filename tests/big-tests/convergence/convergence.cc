@@ -13,7 +13,7 @@
 #include <fe/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
-
+#include <numerics/vectors.h>
 
 #include <map.h>
 #include <fstream.h>
@@ -267,27 +267,42 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   QGauss3<dim>  q;
   
   cout << "    Calculating L1 error... ";
-  integrate_difference (sol, l1_error_per_cell, q, fe, L1_norm);
+  VectorTools<dim>::integrate_difference (*dof_handler,
+					  solution, sol,
+					  l1_error_per_cell,
+					  q, fe, L1_norm);
   cout << l1_error_per_cell.l1_norm() << endl;
   l1_error.push_back (l1_error_per_cell.l1_norm());
 
   cout << "    Calculating L2 error... ";
-  integrate_difference (sol, l2_error_per_cell, q, fe, L2_norm);
+  VectorTools<dim>::integrate_difference (*dof_handler,
+					  solution, sol,
+					  l2_error_per_cell,
+					  q, fe, L2_norm);
   cout << l2_error_per_cell.l2_norm() << endl;
   l2_error.push_back (l2_error_per_cell.l2_norm());
 
   cout << "    Calculating L-infinity error... ";
-  integrate_difference (sol, linfty_error_per_cell, q, fe, Linfty_norm);
+  VectorTools<dim>::integrate_difference (*dof_handler,
+					  solution, sol,
+					  linfty_error_per_cell,
+					  q, fe, Linfty_norm);
   cout << linfty_error_per_cell.linfty_norm() << endl;
   linfty_error.push_back (linfty_error_per_cell.linfty_norm());
   
   cout << "    Calculating H1-seminorm error... ";
-  integrate_difference (sol, h1_seminorm_error_per_cell, q, fe, H1_seminorm);
+  VectorTools<dim>::integrate_difference (*dof_handler,
+					  solution, sol,
+					  h1_seminorm_error_per_cell,
+					  q, fe, H1_seminorm);
   cout << h1_seminorm_error_per_cell.l2_norm() << endl;
   h1_seminorm_error.push_back (h1_seminorm_error_per_cell.l2_norm());
 
   cout << "    Calculating H1 error... ";
-  integrate_difference (sol, h1_error_per_cell, q, fe, H1_norm);
+  VectorTools<dim>::integrate_difference (*dof_handler,
+					  solution, sol,
+					  h1_error_per_cell,
+					  q, fe, H1_norm);
   cout << h1_error_per_cell.l2_norm() << endl;
   h1_error.push_back (h1_error_per_cell.l2_norm());
 
