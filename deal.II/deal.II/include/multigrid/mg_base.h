@@ -163,6 +163,32 @@ class MGMatrix : public MGMatrixBase<VECTOR>,
 
 
 /**
+ * Base class for coarse grid solvers.  This defines the virtual
+ * parenthesis operator, being the interface used by multigrid
+ * methods. Any implementation will be done by derived classes.
+ *
+ * @author Guido Kanschat, 2002
+ */
+template <class VECTOR>
+class MGCoarseGrid : public Subscriptor
+{
+  public:
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~MGCoarseGrid ();
+
+				     /**
+				      * Solver method implemented by
+				      * derived classes.
+				      */
+    virtual void operator() (const unsigned int   level,
+			     VECTOR       &dst,
+			     const VECTOR &src) const = 0;
+};
+
+
+/**
  * Coarse grid solver using LAC iterative methods.
  * This is a little wrapper, transforming a triplet of iterative
  * solver, matrix and preconditioner into a coarse grid solver.
@@ -174,7 +200,7 @@ class MGMatrix : public MGMatrixBase<VECTOR>,
  * @author Guido Kanschat, 1999
  */
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR = Vector<double> >
-class MGCoarseGridLACIteration :  public Subscriptor
+class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 {
   public:
 				     /**
