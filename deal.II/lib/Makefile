@@ -40,7 +40,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   # really is too bad, so we have to conditionalize things.
   lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
   lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
-ifeq (DEAL_II_PETSC_VERSION_MINOR,1)
+ifeq ($(DEAL_II_PETSC_VERSION_MINOR),1)
   xlib-ksp=libpetscsles
 else
   xlib-ksp=libpetscksp
