@@ -47,6 +47,15 @@ ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 
 
 
+inline
+bool
+ConstraintMatrix::ConstraintLine::operator == (const ConstraintLine &a) const
+{
+  return line == a.line;
+};
+
+
+
 unsigned int
 ConstraintMatrix::ConstraintLine::memory_consumption () const
 {
@@ -260,6 +269,25 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 	   line!=other_constraints.lines.end(); ++line)
 	AssertThrow (this_dofs.find (line->line) == this_dofs.end(),
 		     ExcDoFIsConstrainedFromBothObjects (line->line));
+
+				       // finally check the following:
+				       // while we allow that in this
+				       // object nodes are constrained
+				       // to other nodes that are
+				       // constrained in the given
+				       // argument, we do not allow
+				       // the reverse, i.e. the nodes
+				       // to which the constraints in
+				       // the other object hold may
+				       // not be constrained here
+      for (std::vector<ConstraintLine>::const_iterator
+	     line=other_constraints.lines.begin();
+	   line!=other_constraints.lines.end(); ++line)
+	for (std::vector<std::pair<unsigned int,double> >::const_iterator
+	     e=line->entries.begin();
+	   e!=line->entries.end(); ++e)
+	  AssertThrow (this_dofs.find (e->first) == this_dofs.end(),
+		       ExcDoFIsConstrainedToConstrainedDoF (e->first));
     };
 
 				   // store the previous state with
@@ -267,7 +295,122 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
   const bool object_was_sorted = sorted;
   sorted = false;
 
-				   // append new lines at the end
+
+				   // first action is to fold into the
+				   // present object possible
+				   // constraints in the second
+				   // object. for this, loop over all
+				   // constraints and replace the
+				   // constraint lines with a new one
+				   // where constraints are replaced
+				   // if necessary. use the same tmp
+				   // object over again to avoid
+				   // excessive memory allocation
+  std::vector<std::pair<unsigned int,double> > tmp;
+  std::vector<std::vector<ConstraintLine>::const_iterator> tmp_other_lines;
+  for (std::vector<ConstraintLine>::iterator line=lines.begin();
+       line!=lines.end(); ++line) 
+    {
+				       // copy the line of old object
+				       // modulo dofs constrained in
+				       // the second object. for this
+				       // purpose, first search the
+				       // respective constraint line
+				       // (if any, otherwise a null
+				       // pointer) in the other object
+				       // for each of the entries in
+				       // this line
+				       //
+				       // store whether we have to
+				       // resolve entries, since if
+				       // not there is no need to copy
+				       // the line one-to-one
+      tmp.resize (0);
+      tmp_other_lines.resize (0);
+      tmp_other_lines.resize (line->entries.size());
+      
+      bool entries_to_resolve = false;
+      
+      for (unsigned int i=0; i<line->entries.size(); ++i)
+	{
+	  if (other_constraints.sorted == true)
+	    {
+	      ConstraintLine index_comparison;
+	      index_comparison.line = line->entries[i].first;
+//TODO:[WB] we should use a binary search, since we are sure that the array is sorted
+	      tmp_other_lines[i] =
+		std::find (other_constraints.lines.begin (),
+			   other_constraints.lines.end (),
+			   index_comparison);
+	    }
+	  else
+	    {
+	      tmp_other_lines[i] = other_constraints.lines.end ();
+	      for (std::vector<ConstraintLine>::const_iterator
+		     p=other_constraints.lines.begin();
+		   p!=other_constraints.lines.end(); ++p)
+		if (p->line == line->entries[i].first)
+		  {
+		    tmp_other_lines[i] = p;
+		    break;
+		  };	      
+	    };
+	  
+	  if (tmp_other_lines[i] != other_constraints.lines.end ())
+	    entries_to_resolve = true;
+	};
+  
+
+				       // now we have for each entry
+				       // in the present line whether
+				       // it needs to be resolved
+				       // using the new object, and if
+				       // so which constraint line to
+				       // use. first check whether we
+				       // have to resolve anything at
+				       // all, otherwise leave the
+				       // line as is
+      if (entries_to_resolve == false)
+	continue;
+
+				       // something to resolve, so go
+				       // about it
+      for (unsigned int i=0; i<line->entries.size(); ++i)
+	{
+					   // if the present dof is not
+					   // constrained, then simply
+					   // copy it over
+	  if (tmp_other_lines[i] == other_constraints.lines.end())
+	    tmp.push_back(line->entries[i]);
+	  else
+					     // otherwise resolve
+					     // further constraints by
+					     // replacing the old
+					     // entry by a sequence of
+					     // new entries taken from
+					     // the other object, but
+					     // with multiplied
+					     // weights
+	    {
+	      Assert (tmp_other_lines[i]->line == line->entries[i].first,
+		      ExcInternalError());
+	      
+	      const double weight = line->entries[i].second;
+	      for (std::vector<std::pair<unsigned int, double> >::const_iterator
+		     j=tmp_other_lines[i]->entries.begin();
+		   j!=tmp_other_lines[i]->entries.end(); ++j)
+		tmp.push_back (make_pair(j->first, j->second*weight));
+	    };
+	};
+				       // finally exchange old and
+				       // newly resolved line
+      line->entries.swap (tmp);
+    };
+  
+      
+  
+				   // next action: append new lines at
+				   // the end
   lines.insert (lines.end(),
 		other_constraints.lines.begin(),
 		other_constraints.lines.end());
@@ -935,7 +1078,6 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
 {
   if (sorted == true)
     {
-      
       ConstraintLine index_comparison;
       index_comparison.line = index;
       
