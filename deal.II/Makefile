@@ -2,8 +2,14 @@
 #
 # Makefile for the whole library
 
-# include global options and pathes
-include common/Make.global_options
+# include global options and pathes. there's one exception where we don't want
+# that, namely for build tests: in that case, the makefile is called before we
+# have even run ./configure, so we can't include this file, but the target
+# then called doesn't need the variables defined in there doesn't need them
+# anyway and calls ./configure first
+ifneq ($(BUILDTEST),yes)
+  include common/Make.global_options
+endif
 
 
 help:
@@ -177,9 +183,95 @@ distclean: clean \
 	cd lib && $(MAKE) distclean
 	-cd tests && $(MAKE) distclean
 
+
+
+# #############################################################################
+# targets for build tests. these targets are supposed to be called for regular
+# build tests that send their results back home to our build test server. note
+# that this target is supposed to be called right after checking out a version
+# from our CVS server, so at this time, common/Make.global_options doesn't
+# exist yet (and isn't included at the top of this file, due to a
+# conditional), and we first have to set up all this stuff.
+#
+# the way this target works is that it first generates a bunch of lines for
+# the output file that will ultimately be sent home. it then calls ./configure
+# and stashes away both the output and the return value. if ./configure
+# succeeds, we extract a little more information concluding the
+# header. irrespective of this, we then append the output of ./configure to
+# the log file. if the call to ./configure failed, we send the result back
+# home and exit.
+#
+# if ./configure succeeded, we then go on to the build-test-do target, which
+# actually compiles something, and when we come back from there we send the
+# whole thing over to the server
+build-test:
+	echo AUTOMATED DEAL.II BUILD TEST          | tee    build-test-log
+	echo BEGIN HEADER `date -u '+%Y-%m-%d %T'`                | tee -a build-test-log
+	echo DEAL_II_VERSION=`cat Version`         | tee -a build-test-log
+	echo USER=$(USER)                          | tee -a build-test-log
+	echo SYSTEM=`contrib/config/config.guess`  | tee -a build-test-log
+	echo HOST=`hostname`.`dnsdomainname`       | tee -a build-test-log
+	echo BUILDTESTFLAGS=$(BUILDTESTFLAGS)      | tee -a build-test-log
+	echo BUILDTESTNOTE=$(BUILDTESTNOTE)        | tee -a build-test-log
+	(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
+	if test -f common/Make.global_options ; then \
+	   grep GXX-VERSION common/Make.global_options ; \
+	   grep CC-VERSION common/Make.global_options ; \
+	   grep F77-VERSION common/Make.global_options ; \
+	   grep enable-multithreading common/Make.global_options ; \
+	   grep with-multithreading common/Make.global_options ; \
+	   grep USE_CONTRIB_PETSC common/Make.global_options ; \
+	   grep USE_CONTRIB_METIS common/Make.global_options ; \
+	   grep USE_CONTRIB_HSL common/Make.global_options ; \
+	   grep USE_CONTRIB_UMFPACK common/Make.global_options ; \
+	 fi    | tee -a build-test-log
+	echo END HEADER `date -u '+%Y-%m-%d %T'`             | tee -a build-test-log
+	echo                                  | tee -a build-test-log
+	echo BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'` | tee -a build-test-log
+	cat build-test-config                 | tee -a build-test-log
+	echo END CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`   | tee -a build-test-log
+	echo                                  | tee -a build-test-log
+	if ! test -f common/Make.global_options ; then \
+	  mail build-failure@dealii.org < build-test-log 2>&1 ; \
+	  exit ; \
+	 fi
+	if (($(MAKE) BUILDTEST= build-test-do 2>&1) | tee -a build-test-log) ; then \
+	   mail build-success@dealii.org < build-test-log 2>&1 ; \
+         else \
+	   mail build-failure@dealii.org < build-test-log 2>&1 ; \
+	 fi
+
+
+# target to do the actual compilation tests for an automated build test. build
+# the library, the example programs, and the doxygen example programs. if the
+# testsuite has been checked out, run that, too, and send the results to the
+# testsuite server
+build-test-do:
+	echo BEGIN MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
+	$(MAKE) all
+	echo END MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
+	echo 
+	echo BEGIN MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
+	cd examples ; $(MAKE)
+	echo END MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
+	echo 
+	echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
+	cd doc/doxygen ; $(MAKE)
+	echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
+	echo 
+	if test -d tests ; then \
+	   echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
+	   cd tests ; $(MAKE) report+mail ; \
+	   echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
+	   echo ; \
+	 fi
+
+
+
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
 	clean-doc clean-examples clean-lib clean-tests clean-common-scripts \
 	distclean \
+	build-test build-test-do \
 	TAGS TODO
