@@ -152,7 +152,7 @@ class Tensor
     void unroll(Vector<double> & result) const;
 
 
-/**
+				     /**
 				      * Reset all values to zero.
 				      */
     void clear ();
@@ -362,11 +362,18 @@ DeclException1 (ExcInvalidTensorIndex,
 		<< "Invalid tensor index " << arg1);
 
 
+/**
+ * Contract a tensor of rank 2 with a tensor of rank 1. The result is
+ * #dest[i] = sum_j src1[i][j] src2[j]#.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 inline
 void contract (Tensor<1,dim>       &dest,
 	       const Tensor<2,dim> &src1,
-	       const Tensor<1,dim> &src2) {
+	       const Tensor<1,dim> &src2)
+{
   dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -374,11 +381,19 @@ void contract (Tensor<1,dim>       &dest,
 };
 
 
+
+/**
+ * Contract a tensor of rank 2 with a tensor of rank 2. The result is
+ * #dest[i][k] = sum_j src1[i][j] src2[j][k]#.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 inline
 void contract (Tensor<2,dim>       &dest,
 	       const Tensor<2,dim> &src1,
-	       const Tensor<2,dim> &src2) {
+	       const Tensor<2,dim> &src2)
+{
   dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -387,11 +402,26 @@ void contract (Tensor<2,dim>       &dest,
 };
 
 
+
+/**
+ * Contract a tensor of rank 2 with a tensor of rank 2. The
+ * contraction is performed over index #index1# of the first tensor,
+ * and #index2# of the second tensor. Thus, if #index1==2#,
+ * #index2==1#, the result is the usual contraction, but if for
+ * example #index1==1#, #index2==2#, then the result is
+ * #dest[i][k] = sum_j src1[j][i] src2[k][j]#.
+ *
+ * Note that the number of the index is counted from 1 on, not from
+ * zero as usual.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 inline
 void contract (Tensor<2,dim>       &dest,
 	       const Tensor<2,dim> &src1,   const unsigned int index1,
-	       const Tensor<2,dim> &src2,   const unsigned int index2) {
+	       const Tensor<2,dim> &src2,   const unsigned int index2)
+{
   dest.clear ();
 
   switch (index1)
@@ -443,11 +473,23 @@ void contract (Tensor<2,dim>       &dest,
 };
 
 
+
+/**
+ * Contract a tensor of rank 3 with a tensor of rank 1. The
+ * contraction is performed over index #index1# of the first
+ * tensor.
+ *
+ * Note that the number of the index is counted from 1 on, not from
+ * zero as usual.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 inline
 void contract (Tensor<2,dim>       &dest,
 	       const Tensor<3,dim> &src1,   const unsigned int index1,
-	       const Tensor<1,dim> &src2) {
+	       const Tensor<1,dim> &src2)
+{
   dest.clear ();
 
   switch (index1)
@@ -479,11 +521,19 @@ void contract (Tensor<2,dim>       &dest,
 };
 
 
+
+/**
+ * Contract a tensor of rank 3 with a tensor of rank 2. The result is
+ * #dest[i][j][l] = sum_k src1[i][j][k] src2[k][l]#.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 inline
 void contract (Tensor<3,dim>       &dest,
 	       const Tensor<3,dim> &src1,
-	       const Tensor<2,dim> &src2) {
+	       const Tensor<2,dim> &src2)
+{
   dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -493,11 +543,19 @@ void contract (Tensor<3,dim>       &dest,
 };
 
 
+
+/**
+ * Contract a tensor of rank 2 with a tensor of rank 3. The result is
+ * #dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]#.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 inline
 void contract (Tensor<3,dim>       &dest,
 	       const Tensor<2,dim> &src1,
-	       const Tensor<3,dim> &src2) {
+	       const Tensor<3,dim> &src2)
+{
   dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -507,11 +565,18 @@ void contract (Tensor<3,dim>       &dest,
 };
 
 
+/**
+ * Contract a tensor of rank 3 with a tensor of rank 3. The result is
+ * #dest[i][j][k][l] = sum_m src1[i][j][m] src2[m][k][l]#.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 inline
 void contract (Tensor<4,dim>       &dest,
 	       const Tensor<3,dim> &src1,
-	       const Tensor<3,dim> &src2) {
+	       const Tensor<3,dim> &src2)
+{
   dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -522,31 +587,69 @@ void contract (Tensor<4,dim>       &dest,
 };
 
 
+/**
+ * Compute the determinant of a tensor of arbitrary rank and dimension
+ * one. Since this is a number, the return value is, of course, the
+ * number itself.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int rank>
 inline
-double determinant (const Tensor<rank,1> &t) {
+double determinant (const Tensor<rank,1> &t)
+{
 				   // determinant of tensors of
-				   // dimension one and arbitrary rank can
-				   // be computed by recursion
+				   // dimension one and arbitrary rank
+				   // can be computed by recursion. we
+				   // need therefore not try to access
+				   // the number itself, which is
+				   // difficult since it needs #rank#
+				   // indirections, which is not
+				   // computable in the general
+				   // template
   return determinant(t[0]);
 };
 
 
+
+/**
+ * Compute the determinant of a tensor of rank one and dimension
+ * one. Since this is a number, the return value is, of course, the
+ * number itself.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 inline
-double determinant (const Tensor<1,1> &t) {
+double determinant (const Tensor<1,1> &t)
+{
   return t[0];
 };
 
 
+
+/**
+ * Compute the determinant of a tensor or rank 2, here for #dim==2#.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 inline
-double determinant (const Tensor<2,2> &t) {
+double determinant (const Tensor<2,2> &t)
+{
   return ((t[0][0] * t[1][1]) -
 	  (t[1][0] * t[0][1]));
 };
 
 
+
+
+/**
+ * Compute the determinant of a tensor or rank 2, here for #dim==3#.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 inline
-double determinant (const Tensor<2,3> &t) {
+double determinant (const Tensor<2,3> &t)
+{
 				   // get this using Maple:
 				   // with(linalg);
 				   // a := matrix(3,3);
