@@ -109,7 +109,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::memory_consumption () const
 {
   return (sizeof (vector) +
-	  MemoryConsumption::memory_consumption (names));
+	  MemoryConsumption::memory_consumption (this->names));
 }
 
 
