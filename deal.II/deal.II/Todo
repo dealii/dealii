@@ -48,6 +48,25 @@ Use the C++ standard string classes instead of the libg++ String
   class.
 
 
+Invent a FEFaceValues class representing the restriction of a FE to
+  the face of a cell. Use this mechanism for the calculation of
+  dirichlet bc and for contour integrals, either around the domain
+  or around a cell. Remove the FE::face_ansatz_points function.
+
+
+Let the FE objects take DoF-iterators rather than Tria-iterators.
+
+Check usage of vectors: functions should assume that the objects have
+  the right size already.
+
+Set dirichlet bc to the solution vector after solving (setting it
+  beforehand is not enough, the search directions for CG contain
+  components in the directions of these nodes, even if they are not
+  coupled to the other dofs. Strange.)
+
+
+
+
 
 
 
