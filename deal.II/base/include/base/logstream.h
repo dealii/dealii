@@ -33,21 +33,21 @@
  * A class that simplifies the process of execution logging. It does so by
  * providing
  * <ul>
- * @item a push and pop mechanism for prefixes, and
- * @item the possibility of distributing information to files and the
+ * <li> a push and pop mechanism for prefixes, and
+ * <li> the possibility of distributing information to files and the
  *   console.
  * </ul>
  *
  * The usual usage of this class is through the pregenerated object
  * <tt>deallog</tt>. Typical steps are
  * <ul>
- * @item <tt>deallog.attach(std::ostream)</tt>: write logging information into a file.
- * @item <tt>deallog.depth_console(n)</tt>: restrict output on screen to outer loops.
- * @item Before entering a new phase of your program, e.g. a new loop,
+ * <li> <tt>deallog.attach(std::ostream)</tt>: write logging information into a file.
+ * <li> <tt>deallog.depth_console(n)</tt>: restrict output on screen to outer loops.
+ * <li> Before entering a new phase of your program, e.g. a new loop,
  *       <tt>deallog.push("loopname")</tt>.
- * @item <tt>deallog << anything << std::endl;</tt> to write logging information
+ * <li> <tt>deallog << anything << std::endl;</tt> to write logging information
  *       (Usage of <tt>std::endl</tt> is mandatory!).
- * @item <tt>deallog.pop()</tt> when leaving that stage entered with <tt>push</tt>.
+ * <li> <tt>deallog.pop()</tt> when leaving that stage entered with <tt>push</tt>.
  * </ul>
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003

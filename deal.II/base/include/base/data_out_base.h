@@ -198,7 +198,7 @@ class ParameterHandler;
  * The output uses two different povray-objects:
  *
  * <ul>
- * @item <tt>BICUBIC_PATCH</tt>
+ * <li> <tt>BICUBIC_PATCH</tt>
  * A <tt>bicubic_patch</tt> is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
  * while the other 12 points pull and stretch the patch into shape.
@@ -206,7 +206,7 @@ class ParameterHandler;
  * subdivisions has to be 3 to provide the patch with 16 points.
  * A bicubic patch is not exact but generates very smooth images.
  *
- * @item <tt>MESH</tt>
+ * <li> <tt>MESH</tt>
  * The mesh object is used to store large number of triangles.
  * Every square of the patch data is split into one upper-left and one 
  * lower-right triangle. If the number of subdivisions is three, 32 triangle
@@ -1877,13 +1877,13 @@ class DataOutInterface : private DataOutBase
 				      * usually has. At present the following
 				      * formats are defined:
 				      * <ul>
-				      * @item <tt>dx</tt>: <tt>.dx</tt>
-				      * @item <tt>ucd</tt>: <tt>.inp</tt>
-				      * @item <tt>gnuplot</tt>: <tt>.gnuplot</tt>
-				      * @item <tt>povray</tt>: <tt>.pov</tt>
-				      * @item <tt>eps</tt>: <tt>.eps</tt>
-				      * @item <tt>gmv</tt>: <tt>.gmv</tt>
-				      * @item <tt>vtk</tt>: <tt>.vtk</tt>.
+				      * <li> <tt>dx</tt>: <tt>.dx</tt>
+				      * <li> <tt>ucd</tt>: <tt>.inp</tt>
+				      * <li> <tt>gnuplot</tt>: <tt>.gnuplot</tt>
+				      * <li> <tt>povray</tt>: <tt>.pov</tt>
+				      * <li> <tt>eps</tt>: <tt>.eps</tt>
+				      * <li> <tt>gmv</tt>: <tt>.gmv</tt>
+				      * <li> <tt>vtk</tt>: <tt>.vtk</tt>.
 				      * </ul>
 				      *
 				      * If this function is called
