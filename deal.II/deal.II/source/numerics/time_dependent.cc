@@ -88,6 +88,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
 	  = find(timesteps.begin(), timesteps.end(), position);
 	
 	(*(insert_position-1))->set_next_timestep (new_timestep);
+	new_timestep->set_previous_timestep (*(insert_position-1));
 	new_timestep->set_next_timestep (*insert_position);
 	(*insert_position)->set_previous_timestep (new_timestep);
       };
