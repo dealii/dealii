@@ -616,35 +616,6 @@ class SparseMatrix : public Subscriptor
     SparseMatrix<number> & copy_from (const SparseMatrix<somenumber> &source);
 
 				     /**
-				      * Generate ILU.
-				      * The matrix entries will contain the
-				      * incomplete LU-factorization of
-				      * the matrix #source#. Having a matrix
-				      * #source# and a matrix structure object
-				      * #struct#, the code for generating
-				      * an ILU factorization reads
-				      * \begin{verbatim}
-				      * SparseMatrix<float> ilu(struct);
-				      * ilu.ILU(source);
-				      * \end{verbatim}
-				      *
-				      * If additional side diagonals are
-				      * needed (ILU(n)-algorithm), you have to
-				      * construct a second matrix structure:
-				      * \begin{verbatim}
-				      * SparseMatrixStruct ilustruct(struct,n);
-				      * SparseMatrix<float> ilu(ilustruct);
-				      * ilu.ILU(source);
-				      * \end{verbatim}
-				      *
-				      * After generating the ILU-decomposition,
-				      * it can be applied to a vector by
-				      * #backward_forward#.
-				      */
-    template <typename somenumber>
-    SparseMatrix<number> & ILU (const SparseMatrix<somenumber> &source);
-
-				     /**
 				      * Add #matrix# scaled by #factor# to this
 				      * matrix. The function throws an error
 				      * if the sparsity patterns of the two
@@ -734,13 +705,6 @@ class SparseMatrix : public Subscriptor
     template <typename somenumber>
     void Tvmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
   
-				     /**
-				      * Do backward-forward solution of a
-				      * previously generated ILU.
-				      */
-    template <typename somenumber>
-    void backward_forward (Vector<somenumber>& v);
-    
 				     /**
 				      * Return the norm of the vector $v$ with
 				      * respect to the norm induced by this
@@ -914,17 +878,12 @@ class SparseMatrix : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNoILU);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidConstructorCall);
     
   private:
     SmartPointer<const SparseMatrixStruct> cols;
     number* val;
     unsigned int max_len;
-    bool is_ilu;
     
 
 				     // make all other sparse matrices

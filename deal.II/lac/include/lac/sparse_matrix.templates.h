@@ -21,8 +21,7 @@ template <typename number>
 SparseMatrix<number>::SparseMatrix () :
 		cols(0),
 		val(0),
-		max_len(0),
-		is_ilu(false)
+		max_len(0)
 {};
 
 
@@ -44,8 +43,7 @@ template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c) :
 		cols(&c),
 		val(0),
-		max_len(0),
-		is_ilu(false)
+		max_len(0)
 {
   reinit();
 };
@@ -84,8 +82,6 @@ SparseMatrix<number>::reinit ()
 
   if (val)
     fill_n (&val[0], cols->vec_len, 0);
-
-  is_ilu = false;
 }
 
 
@@ -108,7 +104,6 @@ SparseMatrix<number>::clear ()
   if (val) delete[] val;
   val = 0;
   max_len = 0;
-  is_ilu = false;
 };
 
 
@@ -147,7 +142,6 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
   copy (&matrix.val[0], &matrix.val[cols->vec_len],
 	&val[0]);
   
-  is_ilu = false;
   return *this;
 };
 
@@ -169,7 +163,6 @@ SparseMatrix<number>::add_scaled (const number factor,
 
   while (val_ptr != end_ptr)
     *val_ptr++ += factor * *matrix_ptr++;
-  is_ilu = false;
 };
 
 
