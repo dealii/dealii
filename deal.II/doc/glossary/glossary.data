@@ -1,0 +1,4 @@
+active cell: a triangulation cell that is not refined further
+
+locally finest level: all active cells, i.e. the finest cell at each
+point of the domain
