@@ -135,66 +135,80 @@ class DataOut_DoFData : public DataOutInterface<dim>
     virtual ~DataOut_DoFData ();
 
     				     /**
-				      * Designate a dof handler to be used
-				      * to extract geometry data and the
-				      * mapping between nodes and node values.
+				      * Designate a dof handler to be
+				      * used to extract geometry data
+				      * and the mapping between nodes
+				      * and node values.
 				      */
     void attach_dof_handler (const DoFHandler<dim> &);
 
 				     /**
-				      * Add a data vector together with its
-				      * name and the physical unit
-				      * (for example meter, kelvin, etc). By
-				      * default, "<dimensionless>" is assumed
+				      * Add a data vector together
+				      * with its name and the physical
+				      * unit (for example meter,
+				      * kelvin, etc). By default,
+				      * "<dimensionless>" is assumed
 				      * for the units.
 				      *
-				      * A pointer to the vector is stored, so
-				      * you have to make sure the vector
-				      * exists at that address at least as
-				      * long as you call the
-				      * @p{write_*} functions.
+				      * A pointer to the vector is
+				      * stored, so you have to make
+				      * sure the vector exists at that
+				      * address at least as long as
+				      * you call the @p{write_*}
+				      * functions.
 				      *
-				      * It is assumed that the vector has the
-				      * same number of components as there are
-				      * degrees of freedom in the dof handler,
-				      * in which case it is assumed to be a
-				      * vector storing nodal data; or the size
-				      * may be the number of active cells on
-				      * the present grid, in which case it is
-				      * assumed to be a cell data vector.
+				      * It is assumed that the vector
+				      * has the same number of
+				      * components as there are
+				      * degrees of freedom in the dof
+				      * handler, in which case it is
+				      * assumed to be a vector storing
+				      * nodal data; or the size may be
+				      * the number of active cells on
+				      * the present grid, in which
+				      * case it is assumed to be a
+				      * cell data vector.
 				      *
-				      * If it is a vector holding DoF data,
-				      * the names given shall be one for each
-				      * component, if the finite element in
-				      * use is composed of several subelements.
-				      * If it is a finite element composed of
-				      * only one subelement, then there is
-				      * another function following which takes
-				      * a single name instead of a vector of
+				      * If it is a vector holding DoF
+				      * data, the names given shall be
+				      * one for each component, if the
+				      * finite element in use is
+				      * composed of several
+				      * subelements.  If it is a
+				      * finite element composed of
+				      * only one subelement, then
+				      * there is another function
+				      * following which takes a single
+				      * name instead of a vector of
 				      * names.
 				      *
-				      * The names of a data vector shall
-				      * only contain characters which are
-				      * letters, underscore and a few other
-				      * ones. Refer to the @p{ExcInvalidCharacter}
-				      * exception declared in this class to
-				      * see which characters are valid and which
-				      * are not.
+				      * The names of a data vector
+				      * shall only contain characters
+				      * which are letters, underscore
+				      * and a few other ones. Refer to
+				      * the @p{ExcInvalidCharacter}
+				      * exception declared in this
+				      * class to see which characters
+				      * are valid and which are not.
 				      */
     void add_data_vector (const Vector<double> &data,
 			  const vector<string> &names);
 
 				     /**
-				      * This function is an abbreviation to the
-				      * above one, intended for use with finite
-				      * elements that are not composed of
-				      * subelements. In this case, only one
-				      * name per data vector needs to be given,
-				      * which is what this function takes. It
-				      * simply relays its arguments after a
-				      * conversion of the @p{name} to a vector
-				      * of strings, to the other
-				      * @p{add_data_vector} function above.
+				      * This function is an
+				      * abbreviation to the above one,
+				      * intended for use with finite
+				      * elements that are not composed
+				      * of subelements. In this case,
+				      * only one name per data vector
+				      * needs to be given, which is
+				      * what this function takes. It
+				      * simply relays its arguments
+				      * after a conversion of the
+				      * @p{name} to a vector of
+				      * strings, to the other
+				      * @p{add_data_vector} function
+				      * above.
 				      *
 				      * If @p{data} is a vector with
 				      * multiple components this
@@ -214,20 +228,48 @@ class DataOut_DoFData : public DataOutInterface<dim>
 				      * without supplying the DoF
 				      * handler again. Therefore, the
 				      * @p{DataOut} object can be used
-				      * in an algebraic context.
+				      * in an algebraic context. Note
+				      * that besides the data vectors
+				      * also the patches already
+				      * computed are deleted.
 				      */
     void clear_data_vectors ();
-    
-				      
+
 				     /**
-				      * Release the pointers to the data
-				      * vectors and the DoF handler. You have to set all data
-				      * entries again using the
-				      * @p{add_data_vector} function. The pointer
-				      * to the dof handler is cleared as well,
-				      * along with all other data. In effect,
-				      * this function resets everything to a
-				      * virgin state.  */
+				      * Release pointers to all input
+				      * data elements, i.e. pointers
+				      * to data vectors and to the DoF
+				      * handler object. This function
+				      * may be useful when you have
+				      * called the @p{build_patches}
+				      * function of derived class,
+				      * since then the patches are
+				      * built and the input data is no
+				      * more needed, nor is there a
+				      * need to reference it. You can
+				      * then output the patches
+				      * detached from the main thread
+				      * and need not make sure anymore
+				      * that the DoF handler object
+				      * and vectors must not be
+				      * deleted before the output
+				      * thread is finished.
+				      */
+    void clear_input_data_references ();
+
+				     /**
+				      * Release the pointers to the
+				      * data vectors and the DoF
+				      * handler. You have to set all
+				      * data entries again using the
+				      * @p{add_data_vector}
+				      * function. The pointer to the
+				      * dof handler is cleared as
+				      * well, along with all other
+				      * data. In effect, this function
+				      * resets everything to a virgin
+				      * state.
+				      */
     virtual void clear ();
 
 				     /**
@@ -356,7 +398,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
  * base classes. You can give a parameter to the function which determines
  * how many subdivisions in each coordinate direction are to be performed,
  * i.e. of how many subcells each patch shall consist. Default is one, but
- * for quadratic elementsyou may want to choose two, for cubic elements three,
+ * for quadratic elements you may want to choose two, for cubic elements three,
  * and so on.
  *
  * Note that after having called @p{build_patches} once, you can call one or
