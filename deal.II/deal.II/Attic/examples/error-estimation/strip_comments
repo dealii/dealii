@@ -1,1 +1,1 @@
-perl -pi -e 'if (/^[^#].*/) { }' *.inp
+perl -pi -e 's/^#.*$\\n//g' *.inp

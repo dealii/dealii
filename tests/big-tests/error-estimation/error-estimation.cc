@@ -462,7 +462,8 @@ int main () {
   PoissonProblem<2> problem;
 
   problem.run (2, PoissonProblem<2>::global);
-//  problem.run (2, PoissonProblem<2>::true_error);
+  problem.run (2, PoissonProblem<2>::true_error);
+  problem.run (2, PoissonProblem<2>::error_estimator);
 
   return 0;
 };
