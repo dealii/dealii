@@ -4966,6 +4966,30 @@ void Triangulation<3>::execute_refinement () {
 
 
 				   ///////////////////////////////////////////
+				   // Before we start with the actual
+				   // refinement, we do some sanity checks if
+				   // in debug mode. especially, we try to
+				   // catch the notorious problem with
+				   // lines being twice refined, i.e. there
+				   // are cells adjacent at one line ("around
+				   // the edge", but not at a face), with
+				   // two cells differing by more than one
+				   // refinement level
+				   //
+				   // this check is very simple to implement
+				   // here, since we have all lines flagged if
+				   // they shall be refined
+#ifdef DEBUG
+  for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+    if (!cell->refine_flag_set())
+      for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	if (cell->line(line)->has_children())
+	  for (unsigned int c=0; c<2; ++c)
+	    Assert (cell->line(line)->child(c)->user_flag_set() == false,
+		    ExcInternalError());
+#endif
+
+				   ///////////////////////////////////////////
 				   // Do refinement on every level
 				   //
 				   // To make life a bit easier, we first
@@ -6126,59 +6150,87 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 				       // flag the cell for refinement
       for (active_cell_iterator cell=last_active(); cell!=end(); --cell)
 	for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-	  if (cell->line(line)->has_children())
-	    {
-					       // if this line is refined, its
-					       // children should not have
-					       // further children
-					       //
-					       // however, if any of the
-					       // children is flagged for
-					       // further refinement, we need
-					       // to refine this cell also
-					       // (at least, if the cell is
-					       // not already flagged)
-	      bool offending_line_found = false;
-	      
-	      for (unsigned int c=0; c<2; ++c)
+	  {
+	    if (cell->line(line)->has_children())
+	      {
+						 // if this line is refined, its
+						 // children should not have
+						 // further children
+						 //
+						 // however, if any of the
+						 // children is flagged for
+						 // further refinement, we need
+						 // to refine this cell also
+						 // (at least, if the cell is
+						 // not already flagged)
+		bool offending_line_found = false;
+		
+		for (unsigned int c=0; c<2; ++c)
+		  {
+		    Assert (cell->line(line)->child(c)->has_children() == false,
+			    ExcInternalError());
+		    
+		    if (cell->line(line)->child(c)->user_flag_set () &&
+			!cell->refine_flag_set())
+		      {
+							 // tag this cell for
+							 // refinement
+			cell->clear_coarsen_flag ();
+			cell->set_refine_flag();
+			
+							 // note that we have
+							 // changed the grid
+			offending_line_found = true;
+			
+							 // it may save us several
+							 // loop iterations if we
+							 // flag all lines of
+							 // this cell now (and not
+							 // at the outset of the
+							 // next iteration) for
+							 // refinement
+			for (unsigned int line=0;
+			     line<GeometryInfo<dim>::lines_per_cell; ++line)
+			  if (!cell->line(line)->has_children())
+			    cell->line(line)->set_user_flag();
+			
+			break;
+		      };
+		  };
+
+		if (offending_line_found)
+		  {
+		    mesh_changed = true;
+		    break;
+		  };
+	      };
+
+						 // there is another thing here:
+						 // if any of the lines if refined,
+						 // we may not coarsen this cell.
+						 // this also holds true if the
+						 // line is not yet refined, but
+						 // will be
+						 //
+						 // this is not totally true,
+						 // since the neighbors' children
+						 // may also be all coarsened,
+						 // but we do not catch these
+						 // aspects here; in effect, we
+						 // disallow to coarsen sharp
+						 // edges where the refinement
+						 // level decreases from each cell
+						 // to the next
+	    if (cell->line(line)->has_children() ||
+		cell->line(line)->user_flag_set())
+	      if (cell->coarsen_flag_set())
 		{
-		  Assert (cell->line(line)->child(c)->has_children() == false,
-			  ExcInternalError());
-
-		  if (cell->line(line)->child(c)->user_flag_set () &&
-		      !cell->refine_flag_set())
-		    {
-						       // tag this cell for
-						       // refinement
-		      cell->set_refine_flag();
-
-						       // note that we have
-						       // changed the grid
-		      offending_line_found = true;
-
-						       // it may save us several
-						       // loop iterations if we
-						       // flag all lines of
-						       // this cell now (and not
-						       // at the outset of the
-						       // next iteration) for
-						       // refinement
-		      for (unsigned int line=0;
-			   line<GeometryInfo<dim>::lines_per_cell; ++line)
-			if (!cell->line(line)->has_children())
-			  cell->line(line)->set_user_flag();
-		      
-		      break;
-		    };
-		};
-
-	      if (offending_line_found)
-		{
+		  cell->clear_coarsen_flag ();
 		  mesh_changed = true;
+		  
 		  break;
 		};
-	      
-	    };
+	  };
     }
   while (mesh_changed == true);
 };
@@ -7070,6 +7122,16 @@ void Triangulation<3>::delete_cell (cell_iterator &cell) {
 	make_pair(cell->line(9), false),
 	make_pair(cell->line(10), false),
 	make_pair(cell->line(11), false)  };
+				   // if in debug mode: make sure that
+				   // none of the lines of this cell is
+				   // twice refined; else, deleting this
+				   // cell's children will result
+				   // in an invalid state
+  for (unsigned int line=0; line<12; ++line)
+    for (unsigned int c=0; c<2; ++c)
+      Assert (!cell->line(line)->child(c)->has_children(),
+	      ExcInternalError());
+
 				   // next make a map out of this for simpler
 				   // access to the flag associated with a
 				   // line
