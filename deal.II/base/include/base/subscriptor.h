@@ -66,6 +66,17 @@ class Subscriptor
 				      * Unsubscribes a user from the object.
 				      */
     void unsubscribe () const;
+
+				     /**
+				      * Return the present number of
+				      * subscriptions to this object.
+				      * This allows to use this class
+				      * for reference counted lifetime
+				      * determination where the last one
+				      * to unsubscribe also deletes the
+				      * object.
+				      */
+    unsigned int n_subscriptions () const;
     
 				     /**
 				      * Exception:

@@ -38,3 +38,9 @@ void Subscriptor::unsubscribe () const {
   Assert (counter>0, NotUsed());
   --counter;
 };
+
+
+unsigned int Subscriptor::n_subscriptions () const 
+{
+  return counter;
+};
