@@ -68,6 +68,38 @@ namespace PETScWrappers
  * does not reflect that only these columns are stored locally, but it
  * reflects the fact that these are the columns for which the elements of
  * incoming vectors are stored locally.
+ *
+ * To make things even more complicated, PETSc needs a very good estimate of
+ * the number of elements to be stored in each row to be efficient. Otherwise
+ * it spends most of the time with allocating small chunks of memory, a
+ * process that can slow down programs to a crawl if it happens to often. As
+ * if a good estimate of the number of entries per row isn't even, it even
+ * needs to split this as follows: for each row it owns, it needs an estimate
+ * for the number of elements in this row that fall into the columns that are
+ * set apart for this process (see above), and the number of elements that are
+ * in the rest of the columns.
+ *
+ * Since in general this information is not readily available, most of the
+ * initializing functions of this class assume that all of the number of
+ * elements you give as an argument to @p n_nonzero_per_row or by @p
+ * row_lengths fall into the columns "owned" by this process, and none into
+ * the other ones. This is a fair guess for most of the rows, since in a good
+ * domain partitioning, nodes only interact with nodes that are within the
+ * same subdomain. It does not hold for nodes on the interfaces of subdomain,
+ * however, and for the rows corresponding to these nodes, PETSc will have to
+ * allocate additional memory, a costly process.
+ *
+ * The only way to avoid this is to tell PETSc where the actual entries of the
+ * matrix will be. For this, there are constructors and reinit() functions of
+ * this class that take a CompressedSparsityPattern object containing all this
+ * information. While in the general case it is sufficient if the constructors
+ * and reinit() functions know the number of local rows and columns, the
+ * functions getting a sparsity pattern also need to know the number of local
+ * rows (@p local_rows_per_process) and columns (@p local_columns_per_process)
+ * for all other processes, in order to compute which parts of the matrix are
+ * which. Thus, it is not sufficient to just count the number of degrees of
+ * freedom that belong to a particular process, but you have to have the
+ * numbers for all processes available at all processes.
  * 
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
@@ -197,7 +229,8 @@ namespace PETScWrappers
                                           * provided @p communicator.
                                           *
                                           * For the meaning of the @p
-                                          * local_row and @p local_columns
+                                          * local_rows_per_process and @p
+                                          * local_columns_per_process
                                           * parameters, see the class
                                           * documentation.
                                           * 
@@ -247,8 +280,9 @@ namespace PETScWrappers
                                           */
         SparseMatrix (const MPI_Comm                  &communicator,
                       const CompressedSparsityPattern &sparsity_pattern,
-                      const unsigned int               local_rows,
-                      const unsigned int               local_columns,
+                      const std::vector<unsigned int>  local_rows_per_process,
+                      const std::vector<unsigned int>  local_columns_per_process,
+                      const unsigned int               this_process,
                       const bool                       preset_nonzero_locations = false);
 
                                          /**
@@ -353,8 +387,9 @@ namespace PETScWrappers
                                           */
         void reinit (const MPI_Comm                  &communicator,
                      const CompressedSparsityPattern &sparsity_pattern,
-                     const unsigned int               local_rows,
-                     const unsigned int               local_columns,
+                     const std::vector<unsigned int>  local_rows_per_process,
+                     const std::vector<unsigned int>  local_columns_per_process,
+                     const unsigned int               this_process,
                      const bool                       preset_nonzero_locations = false);
         
                                          /**
@@ -371,7 +406,14 @@ namespace PETScWrappers
 			int, int,
 			<< "The number of local rows " << arg1
 			<< " must be larger than the total number of rows " << arg2);
-	
+                                         /**
+                                          * Exception
+                                          */
+        DeclException2 (ExcInvalidSizes,
+                        int, int,
+                        << "The sizes " << arg1 << " and " << arg2
+                        << " are supposed to match, but don't.");
+        
       private:
 
                                          /**
@@ -409,8 +451,9 @@ namespace PETScWrappers
                                           * Same as previous functions.
                                           */
         void do_reinit (const CompressedSparsityPattern &sparsity_pattern,
-                        const unsigned int               local_rows,
-                        const unsigned int               local_columns,
+                        const std::vector<unsigned int>  local_rows_per_process,
+                        const std::vector<unsigned int>  local_columns_per_process,
+                        const unsigned int               this_process,
                         const bool                       preset_nonzero_locations);
     };
 

@@ -72,13 +72,15 @@ namespace PETScWrappers
     SparseMatrix::
     SparseMatrix (const MPI_Comm                  &communicator,
                   const CompressedSparsityPattern &sparsity_pattern,
-                  const unsigned int               local_rows,
-                  const unsigned int               local_columns,
+                  const std::vector<unsigned int>  local_rows_per_process,
+                  const std::vector<unsigned int>  local_columns_per_process,
+                  const unsigned int               this_process,
                   const bool                       preset_nonzero_locations)
                     :
                     communicator (communicator)
     {
-      do_reinit (sparsity_pattern, local_rows, local_columns,
+      do_reinit (sparsity_pattern, local_rows_per_process,
+                 local_columns_per_process, this_process,
                  preset_nonzero_locations);
     }
     
@@ -140,8 +142,9 @@ namespace PETScWrappers
     SparseMatrix::
     reinit (const MPI_Comm                  &communicator,
             const CompressedSparsityPattern &sparsity_pattern,
-            const unsigned int               local_rows,
-            const unsigned int               local_columns,
+            const std::vector<unsigned int>  local_rows_per_process,
+            const std::vector<unsigned int>  local_columns_per_process,
+            const unsigned int               this_process,
             const bool                       preset_nonzero_locations)
     {
       this->communicator = communicator;
@@ -151,7 +154,8 @@ namespace PETScWrappers
       const int ierr = MatDestroy (matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));    
 
-      do_reinit (sparsity_pattern, local_rows, local_columns,
+      do_reinit (sparsity_pattern, local_rows_per_process,
+                 local_columns_per_process, this_process,
                  preset_nonzero_locations);
     }
 
@@ -205,7 +209,7 @@ namespace PETScWrappers
 				       // For the case that
 				       // local_columns is smaller
 				       // than one of the row lengths
-				       // MatCreateMPIAIJ throughs an
+				       // MatCreateMPIAIJ throws an
 				       // error. In this case use a
 				       // PETScWrappers::SparseMatrix
       for (unsigned int i=0; i<row_lengths.size(); ++i)
@@ -244,21 +248,72 @@ namespace PETScWrappers
 
 
     void
-    SparseMatrix::do_reinit (const CompressedSparsityPattern &sparsity_pattern,
-                             const unsigned int               local_rows,
-                             const unsigned int               local_columns,
-                             const bool preset_nonzero_locations)
+    SparseMatrix::
+    do_reinit (const CompressedSparsityPattern &sparsity_pattern,
+               const std::vector<unsigned int>  local_rows_per_process,
+               const std::vector<unsigned int>  local_columns_per_process,
+               const unsigned int               this_process,
+               const bool                       preset_nonzero_locations)
     {
-      std::vector<unsigned int> row_lengths (sparsity_pattern.n_rows());
-      for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
-        row_lengths[i] = sparsity_pattern.row_length (i);
+      Assert (local_rows_per_process.size() == local_columns_per_process.size(),
+              ExcInvalidSizes (local_rows_per_process.size(),
+                               local_columns_per_process.size()));
+      Assert (this_process < local_rows_per_process.size(),
+              ExcInternalError());
+                                       // for each row that we own locally, we
+                                       // have to count how many of the
+                                       // entries in the sparsity pattern lie
+                                       // in the column area we have locally,
+                                       // and how many arent. for this, we
+                                       // first have to know which areas are
+                                       // ours
+      unsigned int local_row_start = 0;
+      unsigned int local_col_start = 0;
+      for (unsigned int p=0; p<this_process; ++p)
+        {
+          local_row_start += local_rows_per_process[p];
+          local_col_start += local_columns_per_process[p];
+        }
+      const unsigned int
+        local_row_end = local_row_start + local_rows_per_process[this_process];
+      const unsigned int
+        local_col_end = local_col_start + local_columns_per_process[this_process];
 
-      do_reinit (sparsity_pattern.n_rows(),
-                 sparsity_pattern.n_cols(),
-                 local_rows,
-                 local_columns,
-                 row_lengths, false);
+                                       // then count the elements in- and
+                                       // out-of-window for the rows we own
+      std::vector<int> row_lengths_in_window (local_row_end - local_row_start);
+      std::vector<int> row_lengths_out_of_window (local_row_end - local_row_start);
+      for (unsigned int row = local_row_start; row<local_row_end; ++row)
+        for (unsigned int c=0; c<sparsity_pattern.row_length(row); ++c)
+          {
+            const unsigned int column = sparsity_pattern.column_number(row,c);
+            
+            if ((column >= local_col_start) &&
+                (column < local_col_end))
+              ++row_lengths_in_window[row-local_row_start];
+            else
+              ++row_lengths_out_of_window[row-local_row_start];
+          }
 
+
+                                       // create the matrix. completely
+                                       // confusingly, PETSc wants us to pass
+                                       // arrays for the local number of
+                                       // elements that starts with zero for
+                                       // the first _local_ row, i.e. it
+                                       // doesn't index into an array for
+                                       // _all_ rows.
+      const int ierr
+        = MatCreateMPIAIJ(communicator,
+			  local_rows_per_process[this_process],
+                          local_columns_per_process[this_process],
+			  sparsity_pattern.n_rows(),
+                          sparsity_pattern.n_cols(),
+                          0, &row_lengths_in_window[0],
+                          0, &row_lengths_out_of_window[0],
+                          &matrix);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      
                                        // next preset the exact given matrix
                                        // entries with zeros, if the user
                                        // requested so. this doesn't avoid any
@@ -278,14 +333,14 @@ namespace PETScWrappers
           std::vector<PetscScalar> row_values;
           for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
             {
-              row_entries.resize (row_lengths[i]);
-              row_values.resize (row_lengths[i], 0.0);
-              for (unsigned int j=0; j<row_lengths[i]; ++j)
+              row_entries.resize (sparsity_pattern.row_length(i));
+              row_values.resize (sparsity_pattern.row_length(i), 0.0);
+              for (unsigned int j=0; j<sparsity_pattern.row_length(i); ++j)
                 row_entries[j] = sparsity_pattern.column_number (i,j);
               
               const int int_row = i;
               MatSetValues (matrix, 1, &int_row,
-                            row_lengths[i], &row_entries[0],
+                            sparsity_pattern.row_length(i), &row_entries[0],
                             &row_values[0], INSERT_VALUES);
             }
           compress ();
