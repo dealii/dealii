@@ -141,7 +141,7 @@ namespace GridOutFlags
 					* Default: @p{false}.
 					*/
       bool write_cell_numbers;
-      
+
 				       /**
 					* This is the number of
 					* points on a boundary face,
@@ -291,7 +291,7 @@ namespace GridOutFlags
 					* number written is
 					* @p{level.index}.
 					*/
-      bool plot_cell_numbers;
+      bool write_cell_numbers;
       
 				       /**
 					* Constructor.
@@ -301,7 +301,7 @@ namespace GridOutFlags
 	   const double       line_width = 0.5,
 	   const bool         color_lines_on_user_flag = false,
 	   const unsigned int n_boundary_face_points = 2,
-	   const bool         plot_cell_numbers = false);
+	   const bool         write_cell_numbers = false);
   };
   
 				   /**

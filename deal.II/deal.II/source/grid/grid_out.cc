@@ -1011,7 +1011,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				       // it is reverse engineered
 				       // from what GNUPLOT uses in
 				       // its output
-      if ((dim == 2) && (eps_flags_2.plot_cell_numbers == true))
+      if ((dim == 2) && (eps_flags_2.write_cell_numbers == true))
 	{
 	  out << ("/R {rmoveto} bind def\n"
 		  "/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n"
@@ -1047,7 +1047,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 
 				   // finally write the cell numbers
 				   // in 2d, if that is desired
-  if ((dim == 2) && (eps_flags_2.plot_cell_numbers == true))
+  if ((dim == 2) && (eps_flags_2.write_cell_numbers == true))
     {
       out << "(Helvetica) findfont 140 scalefont setfont"
 	  << std::endl;
