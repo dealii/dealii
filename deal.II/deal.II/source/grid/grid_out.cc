@@ -31,25 +31,18 @@ template <int dim>
 void GridOut::write_ucd (const Triangulation<dim> &tria,
 			 std::ostream             &out) 
 {
-//TODO:[WB] In GridOut::write_ucd, a vector of vertices is built along with
-//    another vector stating which of these are used. These are actually
-//    the same arrays as exist already in the triangulation, but I did not
-//    want to write just another access function. However, someone should
-//    take a look whether re-building these arrays is a large waste of
-//    computing time and memory, or whether it is justifiable.
-  
   AssertThrow (out, ExcIO());
 
-  typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
-  const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
+				   // get the positions of the
+				   // vertices and whether they are
+				   // used.
+  const std::vector<Point<dim> > &vertices    = tria.get_vertices();
+  const std::vector<bool>        &vertex_used = tria.get_used_vertices();
+  
+  const unsigned int n_vertices = tria.n_used_vertices();
 
-				   // first loop over all cells to
-				   // find out the vertices which
-				   // are in use. copy them for fast
-				   // output
-  std::vector<Point<dim> > vertices (tria.n_vertices());
-  std::vector<bool> vertex_used (tria.n_vertices(), false);
-  unsigned int        n_vertices = 0;
+  typename Triangulation<dim>::active_cell_iterator       cell=tria.begin_active();
+  const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
 
   for (cell=tria.begin_active(); cell!=endc; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
