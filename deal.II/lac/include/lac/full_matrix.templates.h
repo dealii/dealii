@@ -26,29 +26,33 @@
 #include <algorithm>
 
 template <typename number>
-FullMatrix<number>::FullMatrix (const unsigned int n) :
-		vector2d<number> (n)
+FullMatrix<number>::FullMatrix (const unsigned int n)
+                :
+                Table<2,number> (n,n)
 {}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int m,
 				const unsigned int n) :
-		vector2d<number> (m, n)
+		Table<2,number> (m, n)
 {}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int m,
-				const unsigned int n,
-				const number* entries) :
-		vector2d<number> (m, n, entries)
-{}
+                                const unsigned int n,
+                                const number* entries)
+                :
+                Table<2,number> (m, n)
+{
+  this->fill (entries);
+}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const FullMatrix &m) :
-		vector2d<number> (m)
+		Table<2,number> (m)
 {}
 
 
@@ -56,7 +60,7 @@ template <typename number>
 FullMatrix<number>&
 FullMatrix<number>::operator = (const FullMatrix<number>& M)
 {
-  vector2d<number>::operator=(M);
+  Table<2,number>::operator=(M);
   return *this;
 }
 
@@ -66,7 +70,7 @@ template <typename number2>
 FullMatrix<number>&
 FullMatrix<number>::operator = (const FullMatrix<number2>& M)
 {
-  vector2d<number>::operator=(M);
+  Table<2,number>::operator=(M);
   return *this;
 }
 
@@ -1561,8 +1565,8 @@ template <typename number>
 unsigned int
 FullMatrix<number>::memory_consumption () const
 {
-  return sizeof(*this) - sizeof (vector2d<number>)
-    + vector2d<number>::memory_consumption();
+  return sizeof(*this) - sizeof (Table<2,number>)
+    + Table<2,number>::memory_consumption();
 };
 
 

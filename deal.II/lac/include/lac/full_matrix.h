@@ -18,7 +18,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
-#include <base/vector2d.h>
+#include <base/table.h>
 
 #include <vector>
 
@@ -61,7 +61,7 @@ template<typename number> class Vector;
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2001
  */
 template<typename number>
-class FullMatrix : public vector2d<number>
+class FullMatrix : public Table<2,number>
 {
   public:
 				     /**
@@ -753,7 +753,7 @@ template <typename number2>
 inline
 void FullMatrix<number>::fill (const number2* src)
 {
-  vector2d<number>::fill(src);
+  Table<2,number>::fill(src);
 }
 
 
