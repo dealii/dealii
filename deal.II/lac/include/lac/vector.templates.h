@@ -89,14 +89,14 @@ Vector<Number>::Vector (const PETScWrappers::VectorBase &v)
                                        // get a representation of the vector
                                        // and copy it
       PetscScalar *start_ptr;
-      int ierr = VecGetArray (v, &start_ptr);
+      int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
       AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
       
       std::copy (start_ptr, start_ptr+dim, begin());
 
                                        // restore the representation of the
                                        // vector
-      ierr = VecRestoreArray (v, &start_ptr);
+      ierr = VecRestoreArray (static_cast<const Vec&>(v), &start_ptr);
       AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));      
     }
 }
