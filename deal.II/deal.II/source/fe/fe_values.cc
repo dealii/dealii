@@ -60,6 +60,30 @@ double FEValues<dim>::shape_value (const unsigned int i,
 
 
 template <int dim>
+void FEValues<dim>::get_function_values (const dVector  &fe_function,
+					 vector<double> &values) const {
+  Assert (values.size() == n_quadrature_points,
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  vector<double> dof_values (total_dofs, 0);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  fill_n (values.begin(), n_quadrature_points, 0);
+
+				   // add up contributions of ansatz
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      values[point] += (dof_values[shape_func] *
+			shape_values(shape_func, point));
+};
+
+
+
+template <int dim>
 const Point<dim> &
 FEValues<dim>::shape_grad (const unsigned int i,
 			   const unsigned int j) const {
@@ -68,6 +92,30 @@ FEValues<dim>::shape_grad (const unsigned int i,
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
 
   return shape_gradients[i][j];
+};
+
+
+
+template <int dim>
+void FEValues<dim>::get_function_grads (const dVector       &fe_function,
+					vector<Point<dim> > &gradients) const {
+  Assert (gradients.size() == n_quadrature_points,
+	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  vector<double> dof_values (total_dofs, 0);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  fill_n (gradients.begin(), n_quadrature_points, Point<dim>());
+
+				   // add up contributions of ansatz
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      gradients[point] += (dof_values[shape_func] *
+			   shape_gradients[shape_func][point]);
 };
 
 
@@ -106,6 +154,7 @@ template <int dim>
 void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 			    const FiniteElement<dim>                      &fe,
 			    const Boundary<dim>                           &boundary) {
+  present_cell = cell;
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians) ||
@@ -209,13 +258,6 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		case 0:
 		      global_unit_quadrature_points[face][p]
 			= Point<dim>(unit_quadrature_points[p](0),0);
-		      cout << "  face=" << face << ", p=" << p
-			   << ",  uqp[p]=" << unit_quadrature_points[p]
-			   << ", guqp[face][p]="
-			   << global_unit_quadrature_points[face][p]
-			   << ", ??="
-			   << Point<dim>(unit_quadrature_points[p](0),0)
-			   << endl;
 		      break;	   
 		case 1:
 		      global_unit_quadrature_points[face][p]
@@ -249,7 +291,8 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
     for (unsigned int i=0; i<fe.total_dofs; ++i)
       for (unsigned int j=0; j<n_quadrature_points; ++j) 
 	{
-	  shape_values[face](i,j) = fe.shape_value(i, global_unit_quadrature_points[face][j]);
+	  shape_values[face](i,j)
+	    = fe.shape_value(i, global_unit_quadrature_points[face][j]);
 	  unit_shape_gradients[face][i][j]
 	    = fe.shape_grad(i, global_unit_quadrature_points[face][j]);
 	};
@@ -271,6 +314,30 @@ double FEFaceValues<dim>::shape_value (const unsigned int i,
 
 
 template <int dim>
+void FEFaceValues<dim>::get_function_values (const dVector  &fe_function,
+					     vector<double> &values) const {
+  Assert (values.size() == n_quadrature_points,
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  vector<double> dof_values (total_dofs, 0);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  fill_n (values.begin(), n_quadrature_points, 0);
+
+				   // add up contributions of ansatz
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      values[point] += (dof_values[shape_func] *
+			shape_values[selected_face](shape_func, point));
+};
+
+
+
+template <int dim>
 const Point<dim> &
 FEFaceValues<dim>::shape_grad (const unsigned int i,
 			       const unsigned int j) const {
@@ -278,7 +345,8 @@ FEFaceValues<dim>::shape_grad (const unsigned int i,
 	  ExcInvalidIndex (i, shape_values[selected_face].m()));
   Assert (j<shape_values[selected_face].n(),
 	  ExcInvalidIndex (j, shape_values[selected_face].n()));
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (update_flags & update_gradients,
+	  ExcAccessToUninitializedField());
 
   return shape_gradients[i][j];
 };
@@ -286,9 +354,34 @@ FEFaceValues<dim>::shape_grad (const unsigned int i,
 
 
 template <int dim>
+void FEFaceValues<dim>::get_function_grads (const dVector       &fe_function,
+					    vector<Point<dim> > &gradients) const {
+  Assert (gradients.size() == n_quadrature_points,
+	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  vector<double> dof_values (total_dofs, 0);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  fill_n (gradients.begin(), n_quadrature_points, Point<dim>());
+
+				   // add up contributions of ansatz
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      gradients[point] += (dof_values[shape_func] *
+			   shape_gradients[shape_func][point]);
+};
+
+
+
+template <int dim>
 const Point<dim> & FEFaceValues<dim>::quadrature_point (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
-  Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
+  Assert (update_flags & update_q_points,
+	  ExcAccessToUninitializedField());
   
   return quadrature_points[i];
 };
@@ -298,7 +391,8 @@ const Point<dim> & FEFaceValues<dim>::quadrature_point (const unsigned int i) co
 template <int dim>
 const Point<dim> & FEFaceValues<dim>::ansatz_point (const unsigned int i) const {
   Assert (i<ansatz_points.size(), ExcInvalidIndex(i, ansatz_points.size()));
-  Assert (update_flags & update_ansatz_points, ExcAccessToUninitializedField());
+  Assert (update_flags & update_ansatz_points,
+	  ExcAccessToUninitializedField());
   
   return ansatz_points[i];
 };
@@ -308,7 +402,8 @@ const Point<dim> & FEFaceValues<dim>::ansatz_point (const unsigned int i) const 
 template <int dim>
 const Point<dim> & FEFaceValues<dim>::normal_vector (const unsigned int i) const {
   Assert (i<normal_vectors.size(), ExcInvalidIndex(i, normal_vectors.size()));
-  Assert (update_flags & update_normal_vectors, ExcAccessToUninitializedField());
+  Assert (update_flags & update_normal_vectors,
+	  ExcAccessToUninitializedField());
   
   return normal_vectors[i];
 };
@@ -318,7 +413,8 @@ const Point<dim> & FEFaceValues<dim>::normal_vector (const unsigned int i) const
 template <int dim>
 double FEFaceValues<dim>::JxW (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
-  Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  Assert (update_flags & update_JxW_values,
+	  ExcAccessToUninitializedField());
   
   return JxW_values[i];
 };
@@ -331,8 +427,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				const unsigned int                             face_no,
 				const FiniteElement<dim>                      &fe,
 				const Boundary<dim>                           &boundary) {
-  cout << "ATTENTION: update_flags all set to " << (update_flags=255) << endl;
-  
+  present_cell  = cell;
   selected_face = face_no;
 				   // fill jacobi matrices and real
 				   // quadrature points
@@ -363,19 +458,19 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       Assert (update_flags & update_jacobians, ExcCannotInitializeField());
       
       for (unsigned int i=0; i<fe.total_dofs; ++i)
-	for (unsigned int j=0; j<n_quadrature_points; ++j)
-	  for (unsigned int s=0; s<dim; ++s)
-	    {
-	      shape_gradients[i][j](s) = 0;
-	      
+	for (unsigned int j=0; j<n_quadrature_points; ++j) 
+	  {
+	    shape_gradients[i][j] = Point<dim>();
+	    
+	    for (unsigned int s=0; s<dim; ++s)
 					       // (grad psi)_s =
 					       // (grad_{\xi\eta})_b J_{bs}
 					       // with J_{bs}=(d\xi_b)/(dx_s)
 	      for (unsigned int b=0; b<dim; ++b)
 		shape_gradients[i][j](s)
-		  +=
-		  unit_shape_gradients[face_no][i][j](b) * jacobi_matrices[j](b,s);
-	    };
+		  += (unit_shape_gradients[face_no][i][j](b) *
+		      jacobi_matrices[j](b,s));
+	  };
     };
   
   
@@ -386,45 +481,11 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // determinant
   if (update_flags & update_JxW_values) 
     {
-      Assert (update_flags & update_jacobians, ExcCannotInitializeField());
+      Assert (update_flags & update_jacobians,
+	      ExcCannotInitializeField());
       for (unsigned int i=0; i<n_quadrature_points; ++i)
 	JxW_values[i] = weights[i] * face_jacobi_determinants[i];
     };
-
-  cout << "----------------------------------------" << endl;
-  cout << "cell vertices: \n";
-  for (unsigned int i=0; i<2*dim; ++i)
-    cout << "  " << cell->vertex(i) << endl;
-  cout << "face no= " << face_no << endl;
-
-				   /*
-  cout << "----------------------------------------" << endl;
-  cout << "Unit face quadrature points:\n";
-  for (unsigned i=0; i<unit_quadrature_points.size(); ++i)
-    cout << "  " << unit_quadrature_points[i];
-  cout << endl;
-				   */
-  cout << "----------------------------------------" << endl;
-  cout << "Unit global quadrature points:\n";
-  for (unsigned int face=0; face<2*dim; ++face)
-    {
-      cout << "  face=" << face << endl;
-      for (unsigned int i=0; i<unit_quadrature_points.size(); ++i)
-	cout << global_unit_quadrature_points[face][i] << endl;
-    };
-				   /*
-  cout << "----------------------------------------" << endl;
-  cout << "shape values: \n";
-  for (unsigned int i=0; i<2*dim; ++i) 
-    {
-      cout << "face=" << i << endl;
-      shape_values[i].print_formatted(cout);
-    };
-  cout << endl;
-				   */
-  
-  cout << "----------------------------------------" << endl;
-  Assert (false,ExcAccessToUninitializedField());
 };
 
 

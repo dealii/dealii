@@ -61,6 +61,48 @@ template <int dim> class Quadrature;
   passed through the constructor. In debug mode, the accessor functions, which
   return values from the different fields, check whether the required field
   was initialized, thus avoiding use of unitialized data.
+
+
+  {\bf Member functions}
+
+  The functions of this class fall into different cathegories:
+  \begin{itemize}
+  \item #shape_value#, #shape_grad#, etc: return one of the values
+    of this object at a time. In many cases you will want to get
+    a whole bunch at a time for performance or convenience reasons,
+    then use the #get_*# functions.
+    
+  \item #get_shape_values#, #get_shape_grads#, etc: these return
+    a reference to a whole field. Usually these fields contain
+    the values of all ansatz functions at all quadrature points.
+
+  \item #get_function_values#, #get_function_gradients#: these
+    two functions offer a simple way to avoid the detour of the
+    ansatz functions, if you have a finite solution (resp. the
+    vector of values associated with the different ansatz functions.)
+    Then you may want to get information from the restriction of
+    the finite element function to a certain cell, e.g. the values
+    of the function at the quadrature points or the values of its
+    gradient. These two functions provide the information needed:
+    you pass it a vector holding the finite element solution and the
+    functions return the values or gradients of the finite element
+    function restricted to the cell which was given last time the
+    #reinit# function was given.
+    
+    Though possible in principle, these functions do not call the
+    #reinit# function, you have to do so yourself beforehand. On the
+    other hand, a copy of the cell iterator is stored which was used
+    last time the #reinit# function was called. This frees us from
+    the need to pass the cell iterator again to these two functions,
+    which guarantees that the cell used here is in sync with that used
+    for the #reinit# function. You should, however, make sure that
+    nothing substantial happens to the #DoFHandler# object or any
+    other involved instance between the #reinit# and the #get_function_*#
+    functions are called.
+
+  \item #reinit#: initialize the #FEValues# object for a certain cell.
+    See above for more information.
+  \end{itemize}
   */
 template <int dim>
 class FEValues {
@@ -113,6 +155,19 @@ class FEValues {
     const dFMatrix & get_shape_values () const;
     
 				     /**
+				      * Return the values of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * #cell# at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #values# object already has the
+				      * right size.
+				      */
+    void get_function_values (const dVector      &fe_function,
+			      vector<double>     &values) const;
+
+				     /**
 				      * Return the gradient of the #i#th shape
 				      * function at the #j# quadrature point.
 				      * If you want to get the derivative in
@@ -137,6 +192,19 @@ class FEValues {
 				      */
     const vector<vector<Point<dim> > > & get_shape_grads () const;
     
+				     /**
+				      * Return the gradients of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * #cell# at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #gradients# object already has the
+				      * right size.
+				      */
+    void get_function_grads (const dVector       &fe_function,
+			     vector<Point<dim> > &gradients) const;
+
 				     /**
 				      * Return the position of the #i#th
 				      * quadrature point in real space.
@@ -225,6 +293,13 @@ class FEValues {
 				      * Exception
 				      */
     DeclException0 (ExcCannotInitializeField);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongVectorSize,
+		    int, int,
+		    << "Vector has wrong size " << arg1
+		    << ", expected size " << arg2);
     
   private:
 				     /**
@@ -319,6 +394,15 @@ class FEValues {
 				      * the reinit function.
 				      */
     UpdateFlags         update_flags;
+
+				     /**
+				      * Store the cell selected last time
+				      * the #reinit# function was called
+				      * to make access
+				      * to the #get_function_*# functions
+				      * safer.
+				      */
+    DoFHandler<dim>::cell_iterator present_cell;
 };
 
 
@@ -451,7 +535,20 @@ class FEFaceValues {
 				      * documentation for the matrix itself.
 				      */
     const dFMatrix & get_shape_values () const;
-    
+
+				     /**
+				      * Return the values of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * #cell# at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #values# object already has the
+				      * right size.
+				      */
+    void get_function_values (const dVector      &fe_function,
+			      vector<double>     &values) const;
+
 				     /**
 				      * Return the gradient of the #i#th shape
 				      * function at the #j# quadrature point.
@@ -477,6 +574,19 @@ class FEFaceValues {
 				      */
     const vector<vector<Point<dim> > > & get_shape_grads () const;
     
+				     /**
+				      * Return the gradients of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * #cell# at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #gradients# object already has the
+				      * right size.
+				      */
+    void get_function_grads (const dVector       &fe_function,
+			     vector<Point<dim> > &gradients) const;
+
 				     /**
 				      * Return the position of the #i#th
 				      * quadrature point in real space.
@@ -604,7 +714,13 @@ class FEFaceValues {
 				      * Exception
 				      */
     DeclException0 (ExcNotImplemented);
-    
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongVectorSize,
+		    int, int,
+		    << "Vector has wrong size " << arg1
+		    << ", expected size " << arg2);
   private:
 				     /**
 				      * Store the values of the shape functions
@@ -743,6 +859,15 @@ class FEFaceValues {
 				      * the reinit function.
 				      */
     UpdateFlags          update_flags;
+
+				     /**
+				      * Store the cell selected last time
+				      * the #reinit# function was called
+				      * to make access
+				      * to the #get_function_*# functions
+				      * safer.
+				      */
+    DoFHandler<dim>::cell_iterator present_cell;
 
 				     /**
 				      * Store the number of the face selected
