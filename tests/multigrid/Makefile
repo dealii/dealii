@@ -1,7 +1,7 @@
 # Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -22,7 +22,7 @@ default: run-tests
 
 ############################################################
 
-mg1.exe                       : mg1.go     $(lib-2d)           $(libraries)
+mg1.exe                       : mg1.g.$(OBJEXT)     $(lib-2d)           $(libraries)
 
 tests = mg1
 

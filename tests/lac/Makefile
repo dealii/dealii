@@ -20,19 +20,19 @@ default: run-tests
 
 ############################################################
 
-block_matrices.exe        : block_matrices.go                               $(libraries)
-block_vector.exe          : block_vector.go          abort.go               $(libraries)
-block_vector_iterator.exe : block_vector_iterator.go                        $(libraries)
-full_matrix.exe           : full_matrix.go                                  $(libraries)
-matrix_out.exe            : matrix_out.go                                   $(libraries)
-solver.exe                : solver.go                         testmatrix.go $(libraries)
-sparse_matrices.exe       : sparse_matrices.go                testmatrix.go $(libraries)
-sparse_matrices.opt.exe   : sparse_matrices.o                 testmatrix.o  $(libraries_o)
-sparsity_pattern.exe      : sparsity_pattern.go               testmatrix.go $(libraries)
-sparse_ilu.exe            : sparse_ilu.go                     testmatrix.go $(libraries)
-vector-vector.exe         : vector-vector.go                                $(libraries)
-#mgbase.exe               : mgbase.go                                       $(libraries)
-#mg.exe                   : mg.go                             testmatrix.go $(libraries)
+block_matrices.exe        : block_matrices.g.$(OBJEXT)                  $(libraries)
+block_vector.exe          : block_vector.g.$(OBJEXT) abort.g.$(OBJEXT)  $(libraries)
+block_vector_iterator.exe : block_vector_iterator.g.$(OBJEXT)           $(libraries)
+full_matrix.exe           : full_matrix.g.$(OBJEXT)                     $(libraries)
+matrix_out.exe            : matrix_out.g.$(OBJEXT)                      $(libraries)
+solver.exe                : solver.g.$(OBJEXT)   testmatrix.g.$(OBJEXT) $(libraries)
+sparse_matrices.exe       : sparse_matrices.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
+sparse_matrices.opt.exe   : sparse_matrices.$(OBJEXT) testmatrix.$(OBJEXT) $(libraries_o)
+sparsity_pattern.exe      : sparsity_pattern.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
+sparse_ilu.exe            : sparse_ilu.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
+vector-vector.exe         : vector-vector.g.$(OBJEXT)                   $(libraries)
+#mgbase.exe               : mgbase.g.$(OBJEXT)                          $(libraries)
+#mg.exe                   : mg.g.$(OBJEXT) testmatrix.g.$(OBJEXT)       $(libraries)
 
 
 tests = $(sort \

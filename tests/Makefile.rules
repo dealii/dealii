@@ -24,11 +24,11 @@ ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
 flags += -Wno-missing-noreturn
 endif
 
-%.go : %.cc Makefile
+%.g.$(OBJEXT) : %.cc Makefile
 	@echo =====debug========= $<
 	@$(CXX) $(flags) -c $< -o $@
 
-%.o : %.cc Makefile
+%.$(OBJEXT) : %.cc Makefile
 	@echo =====optimized===== $<
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 %.exe :
@@ -128,7 +128,7 @@ run-tests: $(tests:%=%.OK)
 ############################################################
 
 clean:
-	-rm -f Makefile.depend *.o *.go *.output *~
+	-rm -f Makefile.depend *.$(OBJEXT) *.g.$(OBJEXT) *.output *~
 
 veryclean: clean
 	-rm -f *.exe *.testcase *.inp *.gpl *.eps *.gnuplot
@@ -144,7 +144,7 @@ show-tests:
 Makefile.depend: $(shell echo *.cc)
 	@echo =====Dependencies== $@
 	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
-	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
+	@perl -pi -e 's/(^[^.]+)\.$(OBJEXT):/\1.$(OBJEXT) \1.g.$(OBJEXT):/;' $@
 
 
 .PHONY: report show-tests
