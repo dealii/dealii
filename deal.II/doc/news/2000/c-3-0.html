@@ -373,14 +373,19 @@
 
 <ol>
 
-  <li> <p> 
+  <li> <p>
        Fix: Include missing assertions in <code
-       class="member">FEValuesBase::get_function_*</code>. This
-       uncovers an error in <code
-       class="member">DataOut<dim>::build_some_patches</code> that
-       would have occured (at the latest) after the implementation of
-       new <code class="class">FiniteElements</code> which shape
-       values dependent on the geometry of the real cell.
+       class="member">FEValuesBase::get_function_*</code>. If an <code
+       class="class">ExcAccessToUninitializedField</code> is thrown
+       then probably an <code class="member">update_values</code> or
+       <code class="member">update_gradients</code> is missing in the
+       <code class="class">UpdateFlags</code> of an used <code
+       class="class">FEValues</code>.  These assertions already
+       uncovered an error in <code
+       class="member">DataOut<dim>::build_some_patches</code>; an
+       error that would have occured after the implementation of new
+       <code class="class">FiniteElements</code> whose shape values
+       depend on the geometry of the real cell.
        <br>
        (Ralf Hartmann 2000/07/20)
        </p>
