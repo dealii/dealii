@@ -58,10 +58,29 @@ public:
     double operator() ();
 
   private:
-    
+
+				     /**
+				      * Value of the user time when #start#
+				      * was called the last time or when the
+				      * object was created and no #stop# was
+				      * issued in between.
+				      */
     double              start_time;
+
+				     /**
+				      * Accumulated time for all previous
+				      * #start#/#stop# cycles. The time for
+				      * the present cycle is not included.
+				      */
     double              cumulative_time;
-    static const double overtime;
+
+				     /**
+				      * Number of times that the counter
+				      * had an overflow. We need to adjust the
+				      * total time by this number times the
+				      * number of seconds after which an
+				      * overflow occurs.
+				      */
     unsigned int        overflow;
 
 				     /**
@@ -69,7 +88,14 @@ public:
 				      * running.
 				      */
     bool                running;
-    
+
+				     /**
+				      * Return #cumulative_time# plus the
+				      * number of overflows times the number
+				      * of seconds per overflow. Do not include
+				      * the time since the last overflow
+				      * occured.
+				      */
     double full_time() const;
 };
 

@@ -7,20 +7,12 @@
 #include <sys/time.h>
 
 
-#ifndef TIMER
-#define TIMER static_cast<double>(clock())
-#endif
 
-#ifndef DIVIDE
-#define DIVIDE CLOCKS_PER_SEC
-#endif
-#ifndef OVER_TIME
-#define OVER_TIME 4294967296./DIVIDE
-#endif
+// maybe use times() instead of clock()?
 
 
+const double overtime = 4294967296./CLOCKS_PER_SEC;
 
-const double Timer::overtime = OVER_TIME;
 
 
 Timer::Timer()
@@ -33,14 +25,16 @@ Timer::Timer()
 void Timer::start () {
   running    = true;
   overflow   = 0;
-  start_time = TIMER / DIVIDE;
+  start_time = static_cast<double>(clock()) /
+	       CLOCKS_PER_SEC;
 };
 
 
 
 double Timer::stop () {
   running = false;
-  double dtime =  TIMER / DIVIDE - start_time;
+  double dtime =  (static_cast<double>(clock()) / CLOCKS_PER_SEC -
+		   start_time);
   if (dtime < 0) {
     overflow++;
   };
@@ -52,16 +46,16 @@ double Timer::stop () {
 
 
 double Timer::operator() () {
-  if (running) {
-    const double dtime =  TIMER / DIVIDE - start_time;
-    if (dtime < 0) {
-      overflow++;
-    };
-    
-    return dtime + full_time();
-  };
-  
-  return full_time();
+  if (running)
+    {
+      const double dtime =  static_cast<double>(clock()) / CLOCKS_PER_SEC - start_time;
+      if (dtime < 0)
+	overflow++;
+
+      return dtime + full_time();
+    }
+  else
+    return full_time();
 };
 
 
