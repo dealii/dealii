@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <link href="../audio.css" rel="StyleSheet" title="deal.II Homepage" media="aural">
+    <title>The deal.II Homepage - Makefiles</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II"></head>
+  <body>
+
+
+    <h2>Writing Documentation</h2>
+
+    <p>
+    It is our firm belief that software can only be successful if it
+    is properly documented. Too many academic software projects die
+    prematurely once their creators leave the university or the
+    workgroup in which the software was developed since with their
+    creators also knowledge of internal structures, interfaces, and
+    the valuable bag of tricks leaves, a gap that can not be closed by
+    reading sources, trial-and-error, and guessing.
+    </p>
+
+    <p>
+    The <acronym>deal.II</acronym> project has therefore from its
+    infancy adopted a policy that every aspect of the interface
+    needs to be well-documented before its inclusion into the
+    source tree. Since we have found that it is impossible to keep
+    documentation up-to-date if it is not written directly into the
+    program code, we write the documentation directly at the place of
+    declaration of a function or class and use automatic tools to
+    extract this information from the files and process it into HTML
+    for our web-pages, or LaTeX for printing.
+    </p>
+
+    <p>
+    In addition to the API documentation, we maintain a series of
+    <a href="../tutorial/chapter-2.step-by-step/index.html" target="_top">
+    well-documented example programs</a>, which also follow a certain
+    ``literate programming'' style in that the explanations of what
+    is happening are integrated into the program source by means of
+    comments, and are extracted by small scripts.
+    </p>
+
+    <p>
+    This document first explains the basics of 
+    <a href="#API" target="body">documenting the API</a> and then of
+    <a href="#examples" target="body">writing example programs</a>.
+    </p>
+
+
+    <a name="API">
+    <h3>Writing API documentation</h3>
+
+    <p>
+    In order to extract documentation from the header files of the
+    project, we use a modified version of 
+    <a href="http://www.ph.unimelb.edu.au/~ssk/kde/kdoc/" target="_top">kdoc</a>,
+    written by Sirtaj Singh Kang,
+    which is one of the documentation tools of the
+    <a href="http://www.kde.org" target="_top">KDE</a>
+    project. It requires that documentation is written in a form which
+    closely follows the 
+    <a href="http://java.sun.com/products/jdk/javadoc/index.html" target="_top">
+    JavaDoc</a> standard, with some small additions which we will
+    explain below. The patched version of kdoc is included into the
+    library and can be found in the
+    <code>deal.II/doc/auto/script/kdoc</code> directory.
+    </p>
+
+    <p>
+    Alternatively, one can use
+    <a href="http://www.linuxsupportline.com/~doc++/">Doc++</a> to
+    create a LaTeX document from the sources which can then be
+    printed. Due to the size of the resulting file (at present 1500+
+    pages, with tendencies to further growth), you will not want to do
+    that regularly, though.
+    </p>
+
+
+    <h4>Basic layout of documentation</h4>
+
+    <p>
+    Basically, every declaration, whether class or member
+    function/variable declaration, may be preceded by a comment of the
+    following form:
+    <code>
+    <pre>
+      /**
+       * This is an example documentation.
+       *
+       * @author Wolfgang Bangerth, 2000
+       */
+      class TestClass 
+      {
+        public:
+                 /**
+		  * Constructor
+		  */
+          TestClass (); 
+
+                 /**
+		  * Example function
+		  */
+          virtual void test () const = 0;
+
+                 /**
+		  * Member variable
+		  */
+          const unsigned int abc;
+      };
+    </pre>
+    </code>
+    <acronym>kdoc</acronym> will then generate a page for the class
+    <code>TestClass</code> and document each of the member functions
+    and variables. The content of the <code>@author</code> tag will be
+    included into the online documentation of the class.
+    </p>
+
+    
+    <h4>Extended Layout</h4>
+
+    <p>
+    In order to allow better structured output for long comments, we
+    have extended <acronym>kdoc</acronym> to understand the following
+    tags inside comments (since they are LaTeX, they are understood by
+    the LaTeX output of Doc++ automatically):
+    <ul>
+    <li> <em>Itemized lists:</em>
+         <p>
+	 By writing comments like the following,
+	 <code><pre>
+	   /**
+	    * \begin{itemize}
+	    *   \item foo
+	    *   \item bar
+	    * \end{itemize}
+	    */
+	 </pre></code>
+	 you can get itemized lists both in the online and printed
+	 documentation:
+	 <ul>
+	 <li> foo
+	 <li> bar
+	 </ul> 
+	 </p>
+
+    <li> <em>Verbatim output:</em>
+         <p>
+	 If you write comments like this,
+	 <code><pre>
+	   /**
+	    * \begin{verbatim}
+	    *   void foobar ()
+	    *   {
+	    *     i = 0;
+	    *   };
+	    * \end{verbatim}
+	    */
+	 </pre></code>
+	 you will get the lines between the verbatim environment with
+	 the same formatting and in typewriter font:
+	 <code><pre>
+     void foobar ()
+     {
+       i = 0;
+     };
+	 </pre></code>
+	 This is useful if you want to include small sample code snippets
+	 into your documentation. In particular, it is important that
+	 the formatting is preserved, which is not the case for all
+	 other text.
+	 </p>
+
+    <li> <em>Typewriter font:</em>
+         <p>
+	 One would often like to use a typewriter font for variable,
+	 function, or class names. For this, Doc++ has the special
+	 sequence <code>#...#</code>, which generates output in which
+	 the content inside the <code>#</code> characters is set in
+	 typewriter font. We have extended kdoc for this feature as well.
+	 </p>
+
+	 <p>
+	 As a convention, we always enclose variable and function
+	 names into <code>#...#</code> in order to give them a visible
+	 distinction.
+	 </p>
+
+    <li> <em>Sections:</em>
+         <p>
+	 Sections can be generated using 
+	 <code>\section{...}, \subsection{...},
+	 \subsubsection{...}</code> tags.
+	 </p>
+    </ul>
+    </p>
+
+
+
+    <h4>Future directions</h4>
+
+    <p>
+    In the not-so-far future, we hope to be able to switch to 
+    <a href="http://www.ph.unimelb.edu.au/~ssk/kde/kdoc/" target="_top">kdoc2</a>,
+    which offers a much nicer output and a greatly improved parser. At
+    present, this program is still in alpha stage, but once stable we
+    will use for the generation of documentation. In particular, we
+    will then start thinking about using kdoc also for the generation
+    of printable documentation, through its SGML backend.
+    </p>
+
+    <p>
+    Speaking of SGML, we are considering switching to SGML
+    altogether. At present, printing of some documentation, most
+    notably the example programs is not really supported, and we
+    consider ways to convert them to SGML along with most other
+    documentation, since SGML is readily convertible into many other
+    formats, for example HTML and Postscript.
+    </p>
+
+    <p>
+    Switching to SGML would also include replacing the LaTeX-like
+    layout extensions described above by their SGML alikes. However,
+    since this is not imminent, you need not care about this at
+    present.
+    </p>
+
+
+    <a name="examples">
+    <h3>Writing example programs</h3>
+
+
+
+    <hr>
+    
+    <address>
+      <a href="mailto:deal@hermes.iwr.uni-heidelberg.de">The deal.II group</a></address>
+
+  </body>
+</html>
+
