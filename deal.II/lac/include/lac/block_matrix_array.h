@@ -473,11 +473,6 @@ class BlockTrianglePrecondition
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<number>::enter;
-
-				     /**
-				      * Make function of base class available.
-				      */
     BlockMatrixArray<number>::print_latex;
 
 				     /**
