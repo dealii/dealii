@@ -79,6 +79,8 @@ void GridRefinement::refine (Triangulation<dim>   &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
+  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+	  ExcInvalidParameterValue());  
 
 				   // nothing to do; especially we
 				   // do not want to flag with zero
@@ -105,6 +107,8 @@ void GridRefinement::coarsen (Triangulation<dim>   &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
+  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+	  ExcInvalidParameterValue());
 
   Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
@@ -128,6 +132,8 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim>   &tria,
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
+  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+	  ExcInvalidParameterValue());
 
   const int refine_cells=static_cast<int>(top_fraction*criteria.size());
   const int coarsen_cells=static_cast<int>(bottom_fraction*criteria.size());
@@ -167,6 +173,8 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
+  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+	  ExcInvalidParameterValue());
 
 				   // let tmp be the cellwise square of the
 				   // error, which is what we have to sum
@@ -250,6 +258,8 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim>   &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
+  Assert (*min_element(criteria.begin(), criteria.end()) >= 0,
+	  ExcInvalidParameterValue());
   
 				   // get an increasing order on
 				   // the error indicator
