@@ -620,11 +620,16 @@ class DataOut {
     void write_ucd_faces (ostream &out,
 			  const unsigned int starting_index) const;
 
-    class eps_vertex_data{
+    class eps_vertex_data
+    {
       public:
-        double x,y,z;
-        eps_vertex_data(){};
-        eps_vertex_data(double a, double b, double c):x(a),y(b),z(c) {};
+        double x;
+	double y;
+	double z;
+        eps_vertex_data()
+	  {};
+        eps_vertex_data(double a, double b, double c):x(a),y(b),z(c)
+	  {};
         void turn(double azi, double ele);
     };
                                      /** 
