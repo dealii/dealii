@@ -13,6 +13,7 @@
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
+#include <grid/grid_refinement.h>
 #include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
@@ -404,8 +405,9 @@ void LaplaceProblem<dim>::refine_grid ()
 				      solution,
 				      estimated_error_per_cell);
 
-  triangulation.refine_and_coarsen_fixed_number (estimated_error_per_cell,
-						 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						   estimated_error_per_cell,
+						   0.3, 0.03);
   triangulation.execute_coarsening_and_refinement ();
 };
 

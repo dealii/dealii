@@ -45,6 +45,15 @@
 				 // instead of ``grid_in.h'':
 #include <grid/grid_out.h>
 
+				 // In order to refine our grids
+				 // locally, we need a function from
+				 // the library that decides which
+				 // cells to flag for refinement or
+				 // coarsening based on the error
+				 // indicators we have computed. This
+				 // function is defined here:
+#include <grid/grid_refinement.h>
+
 				 // When using locally refined grids,
 				 // we will get so-called ``hanging
 				 // nodes''. However, the standard
@@ -760,8 +769,20 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // over-refinement may have taken
 				   // place. Thus a small, non-zero
 				   // value is appropriate here.
-  triangulation.refine_and_coarsen_fixed_number (estimated_error_per_cell,
-						 0.3, 0.03);
+				   //
+				   // The following function now takes
+				   // these refinement indicators and
+				   // flags some cells of the
+				   // triangulation for refinement or
+				   // coarsening using the method
+				   // described above. It is from a
+				   // class that implements
+				   // several different algorithms to
+				   // refine a triangulation based on
+				   // cellwise error indicators.
+  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						   estimated_error_per_cell,
+						   0.3, 0.03);
 
 				   // After the previous function has
 				   // exited, some cells are flagged

@@ -11,6 +11,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary_lib.h>
 #include <grid/tria_iterator.h>
+#include <grid/grid_refinement.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_handler.h>
@@ -623,14 +624,18 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 		tria->set_all_refine_flags ();
 		break;
 	  case true_error:
-		tria->refine_and_coarsen_fixed_number (h1_error_per_cell,
-						       prm.get_double("Refinement fraction"),
-						       prm.get_double("Coarsening fraction"));
+		GridRefinement::
+		  refine_and_coarsen_fixed_number (*tria,
+						   h1_error_per_cell,
+						   prm.get_double("Refinement fraction"),
+						   prm.get_double("Coarsening fraction"));
 		break;
 	  case error_estimator:
-		tria->refine_and_coarsen_fixed_number (estimated_error_per_cell,
-						       prm.get_double("Refinement fraction"),
-						       prm.get_double("Coarsening fraction"));
+		GridRefinement::
+		  refine_and_coarsen_fixed_number (*tria,
+						   estimated_error_per_cell,
+						   prm.get_double("Refinement fraction"),
+						   prm.get_double("Coarsening fraction"));
 		break;
 	};
 

@@ -29,12 +29,12 @@ template <int dim> class Triangulation;
  *       domain which is the tensor product of an interval $[a,b]$ in
  *       the given number of spatial dimensions. If you want to create such
  *       a domain, which is a common test case for model problems, call
- *       @p{GridGenerator::hyper_cube (tria, a,b)}, which produces a
+ *       @ref{GridGenerator}@p{::hyper_cube (tria, a,b)}, which produces a
  *       hypercube domain triangulated with exactly one element. You can
  *       get tensor product meshes by successive refinement of this cell.
  *
  *    @item Generalized L-shape domain:
- *      using the @p{GridGenerator::hyper_L (tria, a,b)} function produces
+ *      using the @ref{GridGenerator}@p{::hyper_L (tria, a,b)} function produces
  *      the hypercube with the interval $[a,b]$ without the hypercube
  *      made out of the interval $[(a+b)/2,b]$. Let, for example, be $a=-1$
  *      and $b=1$, then the hpyer-L in two dimensions is the region
@@ -44,7 +44,7 @@ template <int dim> class Triangulation;
  *    @item Hyper balls:
  *      You get the circle or ball (or generalized: hyperball) around origin
  *      @p{p} and with radius @p{r} by calling
- *      @p{GridGenerator::hyper_ball (tria, p, r)}. The circle is triangulated
+ *      @ref{GridGenerator}@p{::hyper_ball (tria, p, r)}. The circle is triangulated
  *      by five cells, the ball by seven cells. The diameter of the center cell is
  *      chosen so that the aspect ratio of the boundary cells after one refinement
  *      is minimized in some way. To create a hyperball in one dimension results in
@@ -57,7 +57,7 @@ template <int dim> class Triangulation;
  *    @item Hyper shell: A hyper shell is the region between two hyper
  *      sphere with the same origin. Therefore, it is a ring in two
  *      spatial dimensions. To triangulation it, call the function
- *      @pGridGenerator::hyper_shell (tria, origin, inner_radius, outer_radius, N)},
+ *      @ref{GridGenerator}@p{::hyper_shell (tria, origin, inner_radius, outer_radius, N)},
  *      where the center of the spheres as well as
  *      the inner and outer radius of the two spheres are given as
  *      shown.
@@ -72,7 +72,7 @@ template <int dim> class Triangulation;
  *      used in the radial direction.
  *
  *      You need to attach a boundary object to the triangulation. A
- *      suitable boundary class is provided as @p{HyperSphereBoundary}
+ *      suitable boundary class is provided as @ref{HyperSphereBoundary}
  *      in the library.
  *
  * @item Slit domain: The slit domain is a variant of the hyper cube
@@ -90,18 +90,23 @@ class GridGenerator
 {
   public:
     				     /**
-				      * Initialize the given triangulation with a
-				      * hypercube (line in 1D, square in 2D, etc)
-				      * consisting of exactly one cell. The
-				      * hypercube volume is the tensor product
-				      * of the intervall $[left,right]$ in the
-				      * present number of dimensions, where
-				      * the limits are given as arguments. They
-				      * default to zero and unity, then producing
-				      * the unit hypercube.
+				      * Initialize the given
+				      * triangulation with a hypercube
+				      * (line in 1D, square in 2D,
+				      * etc) consisting of exactly one
+				      * cell. The hypercube volume is
+				      * the tensor product of the
+				      * intervall $[left,right]$ in
+				      * the present number of
+				      * dimensions, where the limits
+				      * are given as arguments. They
+				      * default to zero and unity,
+				      * then producing the unit
+				      * hypercube.
 				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
+				      * The triangulation needs to be
+				      * void upon calling this
+				      * function.
 				      */
     template <int dim>
     static void hyper_cube (Triangulation<dim> &tria,
@@ -136,15 +141,19 @@ class GridGenerator
 				     bool                colorize = false);
 
 				     /**
-				      * Initialize the given triangulation with a
-				      * hyperball, i.e. a circle or a ball.
-				      * See the general documentation for a
-				      * more concise description. The center of
-				      * the hyperball default to the origin,
-				      * the radius defaults to unity.
+				      * Initialize the given
+				      * triangulation with a
+				      * hyperball, i.e. a circle or a
+				      * ball.  See the general
+				      * documentation for a more
+				      * concise description. The
+				      * center of the hyperball
+				      * default to the origin, the
+				      * radius defaults to unity.
 				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
+				      * The triangulation needs to be
+				      * void upon calling this
+				      * function.
 				      */    
     template <int dim>
     static void hyper_ball (Triangulation<dim> &tria,
@@ -152,14 +161,18 @@ class GridGenerator
 			    const double        radius = 1.);
 
 				     /**
-				      * Initialize the given triangulation with a
-				      * hyper-L consisting of exactly @p{2^dim-1}
-				      * cells. See the general documentation for a
-				      * description of the L-region. The limits
-				      * default to minus unity and unity.
+				      * Initialize the given
+				      * triangulation with a hyper-L
+				      * consisting of exactly
+				      * @p{2^dim-1} cells. See the
+				      * general documentation for a
+				      * description of the
+				      * L-region. The limits default
+				      * to minus unity and unity.
 				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
+				      * The triangulation needs to be
+				      * void upon calling this
+				      * function.
 				      */
     template <int dim>
     static void hyper_L (Triangulation<dim> &tria,
@@ -170,7 +183,8 @@ class GridGenerator
 				      * Initialize the given
 				      * Triangulation with a hypercube
 				      * with a slit. The slit goes
-				      * from @p{(x=0,y=-1)} to @p{(0,0)} in 2d.
+				      * from @p{(x=0,y=-1)} to
+				      * @p{(0,0)} in 2d.
 				      *
 				      * The triangulation needs to be void
 				      * upon calling this function.
@@ -196,8 +210,9 @@ class GridGenerator
 				      * the resulting elements have
 				      * the least aspect ratio.
 				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
+				      * The triangulation needs to be
+				      * void upon calling this
+				      * function.
 				      */
     template <int dim>
     static void hyper_shell (Triangulation<dim> &tria,

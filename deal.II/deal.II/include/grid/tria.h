@@ -34,12 +34,13 @@ template <int dim> class MGDoFHandler;
 
 
 /**
- *  Structure which is passed to the @p{Triangulation<dim>::create_triangulation}
+ *  Structure which is passed to the @ref{Triangulation}@p{<dim>::create_triangulation}
  *  function. It contains all data needed to construct a cell, namely the
  *  indices of the vertices and the material indicator.
  */
 template <int dim>
-struct CellData {
+struct CellData
+{
 #if !((__GNUC__==2) && (__GNUC_MINOR__==95))
     int           vertices[GeometryInfo<dim>::vertices_per_cell];
 #else
@@ -50,7 +51,7 @@ struct CellData {
 
 
 /**
- *  Structure to be passed to the @p{Triangulation<dim>::create_triangulation}
+ *  Structure to be passed to the @ref{Triangulation}@p{<dim>::create_triangulation}
  *  function to describe boundary information.
  *
  *  This structure is the same for all dimensions, since we use an input
@@ -343,7 +344,7 @@ struct TriaNumberCache<1>
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
  * specialization stores the numbers of quads. Due to the inheritance
- * from the base class @p{TriaNumberCache<1>}, the numbers of lines
+ * from the base class @ref{TriaNumberCache<1>}, the numbers of lines
  * are also within this class.
  *
  * In the old days, whenever one wanted to access one of these
@@ -396,7 +397,7 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
  * specialization stores the numbers of hexes. Due to the inheritance
- * from the base class @p{TriaNumberCache<2>}, the numbers of lines
+ * from the base class @ref{TriaNumberCache<2>}, the numbers of lines
  * and quads are also within this class.
  *
  * In the old days, whenever one wanted to access one of these
@@ -453,7 +454,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  form a region in @p{dim} spatial dimensions.
  *
  *  This class is written to be as independent of the dimension as possible
- *  (thus the complex construction of the @p{TriangulationLevel} classes) to
+ *  (thus the complex construction of the @ref{TriangulationLevel} classes) to
  *  allow code-sharing, to allow reducing the need to mirror changes in the code
  *  for one dimension to the code for other dimensions. Nonetheless, some of
  *  the functions are dependent of the dimension and there only exist
@@ -471,31 +472,33 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  In order to make things as easy and dimension independent as possible,
  *  use of class local typedefs is made, see below.
  *  
- *  In the base class @p{TriaDimensionInfo}, a @p{Cell} is typedef'd to be whatever
+ *  In the base class @ref{TriaDimensionInfo}, a @p{Cell} is typedef'd to be whatever
  *  is reasonable for a cell in the respective dimension, i.e. a @p{Line} in
  *  one dimension, a @p{Quad} in two dimensions, and so on.
  *
  *  The @p{Triangulation} class provides iterator which enable looping over all
  *  lines, cells,
  *  etc without knowing the exact representation used to describe them. Their
- *  names are typedefs in the @p{TriaDimensionInfo} base class (thus making them
+ *  names are typedefs in the @ref{TriaDimensionInfo} base class (thus making them
  *  local types to this class) and are as follows:
  *
- *  @p{raw_line_iterator}: loop over all lines, used or not (declared for
+ *  @begin{itemize}
+ *  @item @p{raw_line_iterator}: loop over all lines, used or not (declared for
  *  all dimensions).
  *  
- *  @p{line_iterator}: loop over all used lines (declared for all dimensions).
+ *  @item @p{line_iterator}: loop over all used lines (declared for all dimensions).
  *
- *  @p{active_line_iterator}: loop over all active lines (declared for all
+ *  @item @p{active_line_iterator}: loop over all active lines (declared for all
  *  dimensions).
  *
- *  @p{raw_quad_iterator}: loop over all quads, used or not (declared only
+ *  @item @p{raw_quad_iterator}: loop over all quads, used or not (declared only
  *  for @p{dim>=2}).
  *  
- *  @p{quad_iterator}: loop over all quads (declared only for @p{dim}>=2).
+ *  @item @p{quad_iterator}: loop over all quads (declared only for @p{dim}>=2).
  *
- *  @p{active_quad_iterator}: loop over all active quads (declared only for
+ *  @item @p{active_quad_iterator}: loop over all active quads (declared only for
  *  @p{dim}>=2).
+ *  @end{itemize}
  *
  *  Additionaly, for @p{dim}==1, the following identities hold:
  *  @begin{verbatim}
@@ -619,11 +622,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    @item The most common domains, such as hypercubes (i.e. lines, squares,
  *       cubes, etc), hyper-balls (circles, balls, ...) and some other, more
  *       weird domains such as the L-shape region and higher dimensional
- *       generalizations and others, are provided by the @p{GridGenerator}
+ *       generalizations and others, are provided by the @ref{GridGenerator}
  *       class which takes a triangulation and fills it by a division
  *       of the required domain.
  *   
- *     @item Reading in a triangulation: By using an object of the @p{GridIn}
+ *     @item Reading in a triangulation: By using an object of the @ref{GridIn}
  *        class, you can read in fairly general triangulations. See there for
  *        more information. The mentioned class uses the interface described
  *        directly below to transfer the data into the triangulation.
@@ -632,7 +635,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        by providing a list of vertices and a list of cells. Each such cell
  *        consists of a vector storing the indices of the vertices of this cell
  *        in the vertex list. To see how this works, you can take a look at the
- *        @p{GridIn<dim>::read_*} functions. The appropriate function to be
+ *        @ref{GridIn}@p{<dim>::read_*} functions. The appropriate function to be
  *        called is @p{Triangulation<dim>::create_triangulation (2)}.
  *
  *        Creating the hierarchical information needed for this library from
@@ -777,86 +780,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   they do exactly these things). There are more advanced functions,
  *   however, which are more suitable for automatic generation of hierarchical
  *   grids in the context of a-posteriori error estimation and adaptive finite
- *   elements.
- *
- *   The central function to this is
- *   @p{refine (const Vector<float> &criterion, const double threshold)}: it takes a
- *   vector of values, one per active cell, which denote the criterion according
- *   to which the triangulation is to be refined. It marks all cells for which
- *   the criterion is greater than the threshold being given as the second
- *   argument. Analogously,
- *   @p{coarsen (const Vector<float> &criterion, const double threshold)} flags those
- *   cells for coarsening for which the criterion is less than the threshold.
- *
- *   There are two variations of these functions, which rely on @p{refine} and
- *   coarsen by computing the thresholds from other information:
- *   @begin{itemize}
- *   @item @p{refine_and_coarsen_fixed_number}: this function takes a vector as
- *     above and two values between zero and one denoting the fractions of cells to
- *     be refined and coarsened. For this purpose, it sorts the criteria per cell
- *     and takes the threshold to be the one belonging to the cell with the
- *     @p{fraction times n_active_cells} highest criterion. For example, if
- *     the fraction is $0.3$, the threshold is computed to a value such that
- *     30 per cent of cells have a criterion higher than the threshold and are
- *     thus flagged for refinement. The flagging for refinement is done through
- *     the central @p{refine} function. For coarsening, the same holds.
- *
- *     The sorting of criteria is not done actually, since we only need one
- *     value, in the example above the criterion of the cell which is at
- *     30 per cent in the sorted list of cells. The order of cells with higher
- *     and of those with lower criteria is irrelevant. Getting this value is
- *     accomplished by the @p{nth_element} function of the @p{C++} standard
- *     library, which takes only linear time in the number of elements, rather
- *     than @p{N log N} for sorting all values.
- *
- *     A typical value for the fraction of cells to be refined is 0.3.
- *     However, for singular functions or singular error functionals, you may
- *     want to chose a smaller value to avoid overrefinement in regions which
- *     do not contribute much to the error.
- *
- *   @item @p{refine_and_coarsen_fixed_fraction}: this function computes the
- *     threshold such that the number of cells getting flagged for refinement
- *     makes up for a certain fraction of the total error. If this fraction is 50
- *     per cent, for example, the threshold is computed such that the cells with
- *     a criterion greater than the threshold together account for half of the
- *     total error. The definition of the fraction is a bit counterintuitive, since
- *     the total error is the sum over all cells of the local contribution
- *     squared. We define that the fraction $\alpha$ be such that those
- *     elements with the greatest error are refined for which the condition
- *     $\sum \eta_K^2 \le \alpha\eta^2$ holds. Note that $\alpha$ is not
- *     squared. The sum runs over the mentioned
- *     cells, $\eta_K$ are the local error indicators and $\eta$ is the global
- *     indicator with $\eta^2 = \sum \eta_K^2$, with here the sum running over
- *     all cells.
- *
- *     For the bottom fraction the same holds: the threshold for coarsening is
- *     computed such that the cells with criterion less than the threshold
- *     together make up for the fraction of the total error specified.
- *
- *     This strategy is more suited for singular functions and error
- *     functionals, but may lead to very slow convergence of the grid
- *     if only few cells are refined in each step.
- *
- *     From the point of view of implementation, this time we really need to
- *     sort the array of criteria.
- *     Just like the other strategy described above, this function only
- *     computes the threshold values and then passes over to @p{refine} and
- *     @p{coarsen}.
- *
- *     A typical value for the fraction of the total error is 0.5.
- *   @end{itemize}
- *
- *   For a more thorough discussion of advantages and disadvantages of the
- *   different strategies for refinement, see the paper of R. Becker and
- *   R. Rannacher titled "A Feed-Back Approach to Error Control in Finite
- *   Element Methods: Basic Analysis and Examples".
- *
- *   It is assumed that the criterion is a value in a certain norm over each
- *   element, such that the square of the total error is the sum over the
- *   squares of the criteria on the cells. The criteria shall be positive.
- *
- *   You can suppress coarsening or refining by giving zero as the fraction
- *   for one of the operations.
+ *   elements. These functions can be found in the @ref{GridRefinement} class.
  *
  *
  *   @sect3{Smoothing of a triangulation}
@@ -993,7 +917,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     Ensures patch level 1. As result the triangulation consists of
  *     patches, i.e. of cells that are refined once. It follows that
  *     if at least one of the children of a cell is or will be refined
- *     than all children need to be refined. If the @p{path_level_1} flag
+ *     than all children need to be refined. If the @p{patch_level_1} flag
  *     is set, than the flags @p{eliminate_unrefined_islands},
  *     @p{eliminate_refined_inner_islands} and
  *     @p{eliminate_refined_boundary_islands} will be ignored as they will
@@ -1111,7 +1035,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   used if an algorithm walks over all cells and needs information whether
  *   another cell, e.g. a neighbor, has already been processed. It can also
  *   be used to flag the lines subject to constraints in 2D, as for example the
- *   functions in the @p{DoFHandler} classes do.
+ *   functions in the @ref{DoFHandler} classes do.
  *
  *   There are two functions, @p{save_user_flags} and @p{load_user_flags} which
  *   write and read these flags to and from a stream. Unlike
@@ -1164,7 +1088,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   placed. The boundary indicator of the face will be used to
  *   determine the proper component. See @ref{Boundary} for the
  *   details. Usage with the @p{Triangulation} object is then like this
- *   (let @p{Ball} be a class derived from @p{Boundary<2>}):
+ *   (let @p{Ball} be a class derived from @ref{Boundary}@p{<2>}):
  * 
  *   @begin{verbatim}
  *     void main () {
@@ -1515,7 +1439,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   @item Face 4: children 3, 2, 6, 7;
  *   @item Face 5: children 0, 4, 7, 3.
  *   @end{itemize}
- *   You can get these numbers using the @p{GeometryInfo<3>::child_cell_on_face}
+ *   You can get these numbers using the @ref{GeometryInfo<3>}@p{::child_cell_on_face}
  *   function. Each child is adjacent to the vertex with the same number.
  *
  *
@@ -1571,8 +1495,10 @@ class Triangulation : public TriaDimensionInfo<dim>,
 {
   private:
 				     /**
-				      * Default boundary object. This declaration is used
-				      * for the default argument in @p{set_boundary}.
+				      * Default boundary object. This
+				      * declaration is used for the
+				      * default argument in
+				      * @p{set_boundary}.
 				      */
     static const StraightBoundary<dim>& straight_boundary;
 
@@ -1583,7 +1509,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * for mesh smoothing
 				      * algorithms. The meaning of
 				      * these flags is documented in
-				      * the @p{Triangulation} class.
+				      * the @ref{Triangulation} class.
 				      */
     enum MeshSmoothing
     {
@@ -1661,7 +1587,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *
 				      * Note that this operation is only allowed
 				      * if no subscriptions to this object exist
-				      * any more, such as @p{DoFHandler} objects
+				      * any more, such as @ref{DoFHandler} objects
 				      * using it.
 				      */
     void clear ();
@@ -1699,7 +1625,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * copied and MUST persist until
 				      * the triangulation is
 				      * destroyed. Otherwise, the
-				      * @p{Subscriptor} class will issue
+				      * @ref{Subscriptor} class will issue
 				      * @p{ExcObjectInUse}.  This is
 				      * also true for triangulations
 				      * generated from this one by
@@ -1724,62 +1650,75 @@ class Triangulation : public TriaDimensionInfo<dim>,
 		       const Boundary<dim> &boundary_object = straight_boundary);
 
 				     /**
-				      * Return a constant reference to a boundary
-				      * object used for this triangulation.
-				      * Number is the same as in @p{set_boundary}
+				      * Return a constant reference to
+				      * a boundary object used for
+				      * this triangulation.  Number is
+				      * the same as in
+				      * @p{set_boundary}
 				      */
     const Boundary<dim> & get_boundary (unsigned int number) const;
     
 				     /**
-				      *  Copy a triangulation. This operation is
-				      *  not cheap, so you should be careful
-				      *  with using this. We do not implement
-				      *  this function as a copy constructor,
-				      *  since it makes it easier to maintain
-				      *  collections of triangulations if you
-				      *  can assign them values later on.
+				      *  Copy a triangulation. This
+				      *  operation is not cheap, so
+				      *  you should be careful with
+				      *  using this. We do not
+				      *  implement this function as a
+				      *  copy constructor, since it
+				      *  makes it easier to maintain
+				      *  collections of triangulations
+				      *  if you can assign them values
+				      *  later on.
 				      *
-				      *  Keep in mind that this function also
-				      *  copies the pointer to the boundary
-				      *  descriptor previously set by the
-				      *  @p{set_boundary} function. You must
-				      *  therefore also guarantee that the
-				      *  boundary objects has a lifetime at
-				      *  least as long as the copied
-				      *  triangulation.
+				      *  Keep in mind that this
+				      *  function also copies the
+				      *  pointer to the boundary
+				      *  descriptor previously set by
+				      *  the @p{set_boundary}
+				      *  function. You must therefore
+				      *  also guarantee that the
+				      *  boundary objects has a
+				      *  lifetime at least as long as
+				      *  the copied triangulation.
 				      *
-				      *  This triangulation must be empty
-				      *  beforehand.
+				      *  This triangulation must be
+				      *  empty beforehand.
 				      *
 				      *  The function is made
-				      *  @p{virtual} since some derived
-				      *  classes might want to disable
-				      *  or extend the functionality
-				      *  of this function.
+				      *  @p{virtual} since some
+				      *  derived classes might want to
+				      *  disable or extend the
+				      *  functionality of this
+				      *  function.
 				      */
     virtual void copy_triangulation (const Triangulation<dim> &old_tria);
 
 				     /**
-				      * Create a triangulation from a list
-				      * of vertices and a list of cells, each of
-				      * the latter being a list of @p{1<<dim}
-				      * vertex indices. The triangulation must
-				      * be empty upon calling this function and
-				      * the cell list should be useful (connected
-				      * domain, etc.).
+				      * Create a triangulation from a
+				      * list of vertices and a list of
+				      * cells, each of the latter
+				      * being a list of @p{1<<dim}
+				      * vertex indices. The
+				      * triangulation must be empty
+				      * upon calling this function and
+				      * the cell list should be useful
+				      * (connected domain, etc.).
 				      *
-				      * Material data for the cells is given
-				      * within the @p{cells} array, while boundary
+				      * Material data for the cells is
+				      * given within the @p{cells}
+				      * array, while boundary
 				      * information is given in the
 				      * @p{subcelldata} field.
 				      *
-				      * The numbering of vertices within the
-				      * @p{cells} array is subject to some
-				      * constraints; see the general class
+				      * The numbering of vertices
+				      * within the @p{cells} array is
+				      * subject to some constraints;
+				      * see the general class
 				      * documentation for this.
 				      *
-				      * This function is made @p{virtual} to allow
-				      * derived classes to set up some data
+				      * This function is made
+				      * @p{virtual} to allow derived
+				      * classes to set up some data
 				      * structures as well.
 				      */
     virtual void create_triangulation (const vector<Point<dim> >    &vertices,
@@ -1787,18 +1726,21 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				       const SubCellData            &subcelldata);
 
 				     /**
-				      * Distort the grid by randomly moving
-				      * around all the vertices of the grid.
-				      * The direction of moving is random,
-				      * while the length of the shift vector
-				      * has a value of @p{factor} times the
-				      * minimal length of the active lines
-				      * adjacent to this vertex. Note that
-				      * @p{factor} should obviously be well
-				      * below @p{0.5}.
+				      * Distort the grid by randomly
+				      * moving around all the vertices
+				      * of the grid.  The direction of
+				      * moving is random, while the
+				      * length of the shift vector has
+				      * a value of @p{factor} times
+				      * the minimal length of the
+				      * active lines adjacent to this
+				      * vertex. Note that @p{factor}
+				      * should obviously be well below
+				      * @p{0.5}.
 				      *
-				      * If @p{keep_boundary} is set to @p{true}
-				      * (which is the default), then boundary
+				      * If @p{keep_boundary} is set to
+				      * @p{true} (which is the
+				      * default), then boundary
 				      * vertices are not moved.
 				      */
     void distort_random (const double factor,
@@ -1810,140 +1752,40 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      */
 				     /*@{*/
 				     /**
-				      *  Flag all active cells for refinement.
-				      *  This will refine
-				      *  all cells of all levels which are not
-				      *  already refined (i.e. only cells are
-				      *  refined which do not yet have
-				      *  children). The cells are only flagged,
-				      *  not refined, thus you have the chance
-				      *  to save the refinement flags.
+				      *  Flag all active cells for
+				      *  refinement.  This will refine
+				      *  all cells of all levels which
+				      *  are not already refined
+				      *  (i.e. only cells are refined
+				      *  which do not yet have
+				      *  children). The cells are only
+				      *  flagged, not refined, thus
+				      *  you have the chance to save
+				      *  the refinement flags.
 				      */
     void set_all_refine_flags ();
 
 				     /**
-				      *  Refine all cells @p{times} times, by
-				      *  alternatingly calling @p{refine_global()}
-				      *  and @p{execute_coarsening_and_refinement()}.
-				      *  This function actually starts the
-				      *  refinement process, so you have no way
-				      *  to store the refinement flags unless
-				      *  you overload the
+				      *  Refine all cells @p{times}
+				      *  times, by alternatingly
+				      *  calling
+				      *  @p{set_all_refine_flags()}
+				      *  and
+				      *  @p{execute_coarsening_and_refinement()}.
+				      *  This function actually starts
+				      *  the refinement process, so
+				      *  you have no way to store the
+				      *  refinement flags unless you
+				      *  overload the
 				      *  @p{execute_coarsening_and_refinement}
 				      *  function.
 				      */
     void refine_global (const unsigned int times);
 
 				     /**
-				      * Refine the triangulation according to
-				      * the given criteria. The criterion is a
-				      * @p{double} value for each cell which
-				      * determines which cells are to be refined
-				      * by comparison with the threshold: if the
-				      * value for a cell is larger than the
-				      * threshold, the cell is flagged for
-				      * refinement. It is your duty to guarantee
-				      * that the threshold value is in a
-				      * resonable range. Please note that the
-				      * @p{criteria} array may contain negative
-				      * values (sometimes, error estimators
-				      * are evaluated in a way which produces
-				      * positive and negative values), but the
-				      * comparison with @p{threshold} is done only
-				      * on the absolute values of the criteria.
-				      *
-				      * The cells are only flagged for
-				      * refinement, they are not actually
-				      * refined. To do so, you have to call the
-				      * @p{execute_coarsening_and_refinement} function.
-				      *
-				      * There are more sophisticated strategies
-				      * for mesh refinement; refer to the
-				      * following functions and to the general
-				      * doc for this class for more information.
-				      *
-				      * Note that this function takes a vector
-				      * of @p{float}s, rather than the usual
-				      * @p{double}s, since accuracy is not so
-				      * much needed here and saving memory may
-				      * be a good goal when using many cells.
-				      */
-    template <typename number>
-    void refine (const Vector<number> &criteria,
-		 const double         threshold);
-
-				     /**
-				      * Analogue to the @p{refine} function:
-				      * flag all cells for coarsening for
-				      * which the absolute value of the
-				      * criterion is less than the
-				      * given threshold.
-				      *
-				      * Note that this function takes a vector
-				      * of @p{float}s, rather than the usual
-				      * @p{double}s, since accuracy is not so
-				      * much needed here and saving memory may
-				      * be a good goal when using many cells.
-				      */
-    template <typename number>
-    void coarsen (const Vector<number> &criteria,
-		  const double         threshold);
-    
-				     /**
-				      * Refine the triangulation by refining
-				      * a certain fraction @p{top_fraction_of_cells}
-				      * with the highest error. Likewise coarsen
-				      * the fraction @p{bottom_fraction_of_cells}
-				      * with the least error. To actually
-				      * perform the refinement, call
-				      * @p{execute_coarsening_and_refinement}.
-				      *
-				      * @p{fraction_of_cells} shall be a value
-				      * between zero and one.
-				      *
-				      * Refer to the general doc of this class
-				      * for more information.
-				      *
-				      * Note that this function takes a vector
-				      * of @p{float}s, rather than the usual
-				      * @p{double}s, since accuracy is not so
-				      * much needed here and saving memory may
-				      * be a good goal when using many cells.
-				      */
-    template <typename number>
-    void refine_and_coarsen_fixed_number (const Vector<number> &criteria,
-					  const double         top_fraction_of_cells,
-					  const double         bottom_fraction_of_cells);
-
-				     /**
-				      * Refine the triangulation by flagging
-				      * those cells which make up a certain
-				      * @p{top_fraction} of the total error.
-				      * Likewise, coarsen all cells which
-				      * make up only @p{bottom_fraction}.
-				      * To actually perform the refinement, call
-				      * @p{execute_coarsening_and_refinement}.
-				      *
-				      * @p{*_fraction} shall be a values
-				      * between zero and one.
-				      *
-				      * Refer to the general doc of this class
-				      * for more information.
-				      *
-				      * Note that this function takes a vector
-				      * of @p{float}s, rather than the usual
-				      * @p{double}s, since accuracy is not so
-				      * much needed here and saving memory may
-				      * be a good goal when using many cells.
-				      */
-    template<typename number>
-    void refine_and_coarsen_fixed_fraction (const Vector<number> &criteria,
-					    const double         top_fraction,
-					    const double         bottom_fraction);
-
-				     /**
-				      * Execute both refinement and coarsening
-				      * of the triangulation.
+				      * Execute both refinement and
+				      * coarsening of the
+				      * triangulation.
 				      *
 				      * The function resets all
 				      * refinement and coarsening
@@ -1953,60 +1795,72 @@ class Triangulation : public TriaDimensionInfo<dim>,
                                       * See the general docs for more
                                       * information.
 				      *
-				      * Note that this function is @p{virtual} to
-				      * allow derived classes to insert hooks,
-				      * such as saving refinement flags and the
-				      * like.
+				      * Note that this function is
+				      * @p{virtual} to allow derived
+				      * classes to insert hooks, such
+				      * as saving refinement flags and
+				      * the like.
 				      */
     virtual void execute_coarsening_and_refinement ();
     
 				     /**
-				      * Do both preparation for refinement and
-				      * coarsening as well as mesh smoothing.
+				      * Do both preparation for
+				      * refinement and coarsening as
+				      * well as mesh smoothing.
 				      *
-				      * Regarding the refinement process it fixes
-				      * the closure of the refinement in @p{dim>=2}
-				      * (make sure that no two cells are
-				      * adjacent with a refinement level
-				      * differing with more than one), etc.
-				      * It performs some mesh smoothing if
-				      * the according flag was given to the
-				      * constructor of this class.
-				      * The function returns whether additional
-				      * cells have been flagged for refinement.
-				      *  
-				      * See the general doc of this class for
-				      * more information on smoothing upon
+				      * Regarding the refinement
+				      * process it fixes the closure
+				      * of the refinement in
+				      * @p{dim>=2} (make sure that no
+				      * two cells are adjacent with a
+				      * refinement level differing
+				      * with more than one), etc.  It
+				      * performs some mesh smoothing
+				      * if the according flag was
+				      * given to the constructor of
+				      * this class.  The function
+				      * returns whether additional
+				      * cells have been flagged for
 				      * refinement.
+				      *  
+				      * See the general doc of this
+				      * class for more information on
+				      * smoothing upon refinement.
 				      *
-				      * This part of the function is mostly
-				      * dimension independent. However, for some
-				      * dimension dependent things, it calls
+				      * This part of the function is
+				      * mostly dimension
+				      * independent. However, for some
+				      * dimension dependent things, it
+				      * calls
 				      * @p{prepare_refinement_dim_dependent}.
 				      *
-				      * Regarding the coarsening part, flagging
-				      * and deflagging cells in preparation 
-				      * of the actual coarsening step are
-				      * done. This includes deleting coarsen
-                                      * flags from cells which may not be
-                                      * deleted (e.g. because one neighbor is
-                                      * more refined than the cell), doing
-                                      * some smoothing, etc.
+				      * Regarding the coarsening part,
+				      * flagging and deflagging cells
+				      * in preparation of the actual
+				      * coarsening step are done. This
+				      * includes deleting coarsen 
+				      * flags from cells which may not
+				      * be deleted (e.g. because one
+				      * neighbor is more refined
+				      * than the cell), doing some
+				      * smoothing, etc.
 				      *
-				      * The effect is that only those cells
-				      * are flagged for coarsening which
-				      * will actually be coarsened. This
-				      * includes the fact that all flagged
-				      * cells belong to parent cells of which
-				      * all children are flagged.
+				      * The effect is that only those
+				      * cells are flagged for
+				      * coarsening which will actually
+				      * be coarsened. This includes
+				      * the fact that all flagged
+				      * cells belong to parent cells
+				      * of which all children are
+				      * flagged.
 				      *
-				      * The function returns whether some
-				      * cells' flagging has been changed in
-				      * the process.
+				      * The function returns whether
+				      * some cells' flagging has been
+				      * changed in the process.
 				      *
-				      * This function uses the user flags, so
-				      * store them if you still need them
-				      * afterwards.
+				      * This function uses the user
+				      * flags, so store them if you
+				      * still need them afterwards.
 				      */
     bool prepare_coarsening_and_refinement ();
     
@@ -2017,9 +1871,10 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      */
     				     /*@{*/
 				     /**
-				      *  Save the addresses of the cells which
-				      *  are flagged for refinement to @p{out}.
-				      *  For usage, read the general
+				      *  Save the addresses of the
+				      *  cells which are flagged for
+				      *  refinement to @p{out}.  For
+				      *  usage, read the general
 				      *  documentation for this class.
 				      */
     void save_refine_flags (ostream &out) const;
@@ -3004,17 +2859,6 @@ class Triangulation : public TriaDimensionInfo<dim>,
 		    int,
 		    << "You tried to do something on level " << arg1
 		    << ", but this level is empty.");
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidVectorSize,
-		    int, int,
-		    << "The given vector has " << arg1
-		    << " elements, but " << arg2 << " were expected.");
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidParameterValue);
 				     /**
 				      * Exception
 				      */

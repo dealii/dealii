@@ -16,6 +16,7 @@
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
+#include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
@@ -800,8 +801,9 @@ void ElasticProblem<dim>::refine_grid ()
 				      solution,
 				      estimated_error_per_cell);
 
-  triangulation.refine_and_coarsen_fixed_number (estimated_error_per_cell,
-						 0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						   estimated_error_per_cell,
+						   0.3, 0.03);
 
   triangulation.execute_coarsening_and_refinement ();
 };
@@ -983,7 +985,7 @@ void ElasticProblem<dim>::run ()
 					   // cell as well, and the
 					   // call to
 					   // ``refine_and_coarsen_fixed_number''
-					   // of the ``triangulation''
+					   // on the ``triangulation''
 					   // object will not flag any
 					   // cells for refinement
 					   // (why should it if the
@@ -1011,7 +1013,27 @@ void ElasticProblem<dim>::run ()
 					   // it needs to be able to
 					   // see the right hand
 					   // side. Thus, we refine
-					   // twice globally.
+					   // twice globally. (Note
+					   // that the
+					   // ``refine_global''
+					   // function is not part of
+					   // the ``GridRefinement''
+					   // class in which
+					   // ``refine_and_coarsen_fixed_number''
+					   // is declared, for
+					   // example. The reason is
+					   // first that it is not an
+					   // algorithm that computed
+					   // refinement flags from
+					   // indicators, but more
+					   // importantly that it
+					   // actually performs the
+					   // refinement, in contrast
+					   // to the functions in
+					   // ``GridRefinement'' that
+					   // only flag cells without
+					   // actually refining the
+					   // grid.)
 	  triangulation.refine_global (2);
 	}
       else

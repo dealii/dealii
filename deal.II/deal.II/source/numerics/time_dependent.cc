@@ -16,6 +16,7 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/grid_refinement.h>
 #include <lac/vector.h>
 
 #ifdef DEAL_II_USE_MT
@@ -711,8 +712,8 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 
 
 				   // actually flag cells the first time
-  tria->refine (criteria, refinement_threshold);
-  tria->coarsen (criteria, coarsening_threshold);
+  GridRefinement::refine (*tria, criteria, refinement_threshold);
+  GridRefinement::coarsen (*tria, criteria, coarsening_threshold);
 
 				   // store this number for the following
 				   // since its computation is rather
@@ -996,8 +997,8 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 
 
 					 // flag cells finally
-	tria->refine (criteria, refinement_threshold);
-	tria->coarsen (criteria, coarsening_threshold);
+	GridRefinement::refine (*tria, criteria, refinement_threshold);
+	GridRefinement::coarsen (*tria, criteria, coarsening_threshold);
       };
   
 				   // if step number is greater than

@@ -12,6 +12,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <grid/grid_generator.h>
+#include <grid/grid_refinement.h>
 #include <numerics/data_out.h>
 #include <base/function.h>
 #include <fe/fe_lib.lagrange.h>
@@ -235,7 +236,7 @@ void NonlinearProblem<dim>::run () {
 		   KellyErrorEstimator<dim>::FunctionMap(),
 		   solution,
 		   error_indicator);
-      tria->refine_and_coarsen_fixed_number (error_indicator, 0.3, 0);
+      GridRefinement::refine_and_coarsen_fixed_number (*tria, error_indicator, 0.3, 0);
       tria->execute_coarsening_and_refinement ();
     };
   
