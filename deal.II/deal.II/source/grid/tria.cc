@@ -1323,7 +1323,7 @@ void Triangulation<dim>::refine_global (const unsigned int times) {
   for (unsigned int i=0; i<times; ++i)
     {
       set_all_refine_flags();
-      execute_refinement ();
+      execute_coarsening_and_refinement ();
     };
 };
 
