@@ -3778,56 +3778,52 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
     {
       case ProblemDescription::dual_weighted_error_estimator:
       {
-	using namespace LaplaceSolver;
 	solver
-	  = new WeightedResidual<dim> (triangulation,
-				       primal_fe,
-				       dual_fe,
-				       quadrature,
-				       face_quadrature,
-				       descriptor.data->get_right_hand_side(),
-				       descriptor.data->get_boundary_values(),
-				       *descriptor.dual_functional);
+	  = new LaplaceSolver::WeightedResidual<dim> (triangulation,
+						      primal_fe,
+						      dual_fe,
+						      quadrature,
+						      face_quadrature,
+						      descriptor.data->get_right_hand_side(),
+						      descriptor.data->get_boundary_values(),
+						      *descriptor.dual_functional);
 	break;
       };
        
       case ProblemDescription::global_refinement:
       {
-	using namespace LaplaceSolver;
 	solver
-	  = new RefinementGlobal<dim> (triangulation,
-				       primal_fe,
-				       quadrature,
-				       face_quadrature,
-				       descriptor.data->get_right_hand_side(),
-				       descriptor.data->get_boundary_values());
+	  = new LaplaceSolver::RefinementGlobal<dim> (triangulation,
+						      primal_fe,
+						      quadrature,
+						      face_quadrature,
+						      descriptor.data->get_right_hand_side(),
+						      descriptor.data->get_boundary_values());
 	break;
       };
        
       case ProblemDescription::kelly_indicator:
       {
-	using namespace LaplaceSolver;
 	solver
-	  = new RefinementKelly<dim> (triangulation,
-				      primal_fe,
-				      quadrature,
-				      face_quadrature,
-				      descriptor.data->get_right_hand_side(),
-				      descriptor.data->get_boundary_values());
+	  = new LaplaceSolver::RefinementKelly<dim> (triangulation,
+						     primal_fe,
+						     quadrature,
+						     face_quadrature,
+						     descriptor.data->get_right_hand_side(),
+						     descriptor.data->get_boundary_values());
 	break;
       };
 
       case ProblemDescription::weighted_kelly_indicator:
       {
-	using namespace LaplaceSolver;
 	solver
-	  = new RefinementWeightedKelly<dim> (triangulation,
-					      primal_fe,
-					      quadrature,
-					      face_quadrature,
-					      descriptor.data->get_right_hand_side(),
-					      descriptor.data->get_boundary_values(),
-					      *descriptor.kelly_weight);
+	  = new LaplaceSolver::RefinementWeightedKelly<dim> (triangulation,
+							     primal_fe,
+							     quadrature,
+							     face_quadrature,
+							     descriptor.data->get_right_hand_side(),
+							     descriptor.data->get_boundary_values(),
+							     *descriptor.kelly_weight);
 	break;
       };
 	    
