@@ -68,6 +68,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The <code class="member">DataOut_DoFData::merge_patches</code>
+       now takes a second parameter that indicates a shift for each
+       vertex of the given patches to be merged. This is sometimes
+       nice if one wants to generate "exploded" views of a collection
+       of subdomains.
+       <br>
+       (WB 2002/06/30)
+       </p>
+
+  <li> <p> 
        Fixed: The <code class="member">FETools::extrapolate</code>
        function operates on patches of cells, but didn't check whether
        the grid is at least refined once everywhere. If this was not
