@@ -1107,7 +1107,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   afterwards.
  *
  *
- *   \subsection{User flags}
+ *   \subsection{User flags and data}
  *
  *   A triangulation offers one bit per line, quad, etc for user data.
  *   This field can be
@@ -1142,22 +1142,23 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   It is recommended that a functions using the flags states so in its
  *   documentation.
  *
- *   There is another set of user data, namely a #void *#, for each line, quad,
- *   etc. Just like the user flags, this field is not available for vertices,
- *   which does no harm since the vertices have a unique and continuous number
- *   unlike the structured objects lines and quads. You can access these user
- *   pointers through the functions #user_pointer()#, #clear_user_pointer()#
- *   and #set_user_pointer(p)# in the accessor classes.
+ *   There is another set of user data, namely a #void *#, for each
+ *   line, quad, etc. You can access these user pointers through the
+ *   functions #user_pointer()#, #clear_user_pointer()# and
+ *   #set_user_pointer(p)# in the accessor classes. These pointers are
+ *   neither used nor changed by the library and are @p NULL by
+ *   default. Thus, their handling is the sole responsibility of the
+ *   application program.  Especially, the pointers are not inherited
+ *   to children upon refinement. Still, after a remeshing they are
+ *   available on all cells, where they were set on the previous mesh.
  *
- *   You should not rely on any specific value for the user pointer if you
- *   haven't set it yourself before. In special, the pointers are not inherited
- *   upon refinement. In principle, all user pointers should be #NULL# pointers
- *   at the time a line, quad, etc comes into life. #NULL# pointers are always
- *   a good choice, since they raise an exception when being dereferenced.
  *   The usual warning about the missing type safety of #void# pointers are
  *   obviously in place here; responsibility for correctness of types etc
  *   lies entirely with the user of the pointer.
  *
+ *   Just like the user flags, this field is not available for vertices,
+ *   which does no harm since the vertices have a unique and continuous number
+ *   unlike the structured objects lines and quads. 
  *
  *   \subsection{Boundary approximation}
  *
