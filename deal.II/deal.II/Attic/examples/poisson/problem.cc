@@ -6,7 +6,7 @@
 #include "poisson.h"
 #include <lac/vector.h>
 #include <grid/grid_generator.h>
-
+#include <basic/data_out.h>
 
 
 template <int dim>
@@ -236,6 +236,13 @@ PoissonProblem<dim>::PoissonProblem () :
 
 
 
+template <int dim>
+PoissonProblem<dim>::~PoissonProblem () 
+{
+  clear ();
+};
+
+
 
 template <int dim>
 void PoissonProblem<dim>::clear () {  
@@ -244,6 +251,13 @@ void PoissonProblem<dim>::clear () {
     dof = 0;
   };
 
+  if (boundary != 0)
+    {
+      tria->set_boundary (0);
+      delete boundary;
+      boundary = 0;
+    };
+  
   if (tria != 0) {
     delete tria;
     tria = 0;
@@ -267,12 +281,6 @@ void PoissonProblem<dim>::clear () {
       boundary_values = 0;
     };
 
-  if (boundary != 0)
-    {
-      delete boundary;
-      boundary = 0;
-    };
-  
   ProblemBase<dim>::clear ();
 };
 
@@ -407,6 +415,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 template <int dim>
 void PoissonProblem<dim>::make_zoom_in_grid () {
   GridGenerator::hyper_cube (*tria);
+  
 				   // refine first cell
   tria->begin_active()->set_refine_flag();
   tria->execute_coarsening_and_refinement ();
@@ -414,7 +423,7 @@ void PoissonProblem<dim>::make_zoom_in_grid () {
 				   // on coarsest level
   tria->begin_active()->set_refine_flag ();
   tria->execute_coarsening_and_refinement ();
-  
+
   Triangulation<dim>::active_cell_iterator cell;
   for (int i=0; i<(dim==3 ? 5 : 17); ++i) 
     {
@@ -555,7 +564,9 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   DataOut<dim> out;
   string o_filename = prm.get ("Output file");
   ofstream gnuplot(o_filename.c_str());
-  fill_data (out);
+  out.attach_dof_handler (*dof_handler);
+  out.add_data_vector (solution, "solution");
+  out.build_patches ();
   out.write_gnuplot (gnuplot);
   gnuplot.close ();
 
@@ -570,4 +581,4 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 
 
 
-template class PoissonProblem<2>;
+template class PoissonProblem<3>;

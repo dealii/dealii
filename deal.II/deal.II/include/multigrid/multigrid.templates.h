@@ -47,7 +47,7 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
     ofstream of("CT");
     DataOut<2> out;
     out.attach_dof_handler(*dofs);
-    out.add_data_vector(src,"solution","m");
+    out.add_data_vector(src,"solution");
     out.write_gnuplot(of,1);
   }
 
@@ -120,7 +120,7 @@ MG<dim>::copy_from_mg(Vector<number>& dst) const
     ofstream of("CF");
     DataOut<2> out;
     out.attach_dof_handler(*dofs);
-    out.add_data_vector(dst,"solution","m");
+    out.add_data_vector(dst,"solution");
     out.write_gnuplot(of,1);
   }
 }

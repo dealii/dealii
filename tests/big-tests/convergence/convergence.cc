@@ -11,7 +11,7 @@
 #include <grid/dof_constraints.h>
 #include <grid/grid_generator.h>
 #include <base/function.h>
-#include <basic/data_io.h>
+#include <basic/data_out.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.criss_cross.h>
 #include <base/quadrature_lib.h>
@@ -269,7 +269,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   cout << "    Making grid... ";
   GridGenerator::hyper_ball (*tria);
   HyperBallBoundary<dim> boundary_description;
-  tria->set_boundary (&boundary_description);
+  tria->set_boundary (0, boundary_description);
   tria->begin_active()->set_refine_flag();
   (++(++(tria->begin_active())))->set_refine_flag();
   tria->execute_coarsening_and_refinement ();

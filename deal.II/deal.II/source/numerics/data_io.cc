@@ -173,13 +173,13 @@ void DataIn<dim>::read_ucd (istream &in) {
 
 
 template <int dim>
-DataOut<dim>::DataEntry::DataEntry () :
+DataOut_Old<dim>::DataEntry::DataEntry () :
 		data(0), name(""), units("") {};
 
 
 
 template <int dim>
-DataOut<dim>::DataEntry::DataEntry (const Vector<double> *data,
+DataOut_Old<dim>::DataEntry::DataEntry (const Vector<double> *data,
 				    const string name,
 				    const string units) :
 			data(data), name(name), units(units) {};
@@ -188,20 +188,20 @@ DataOut<dim>::DataEntry::DataEntry (const Vector<double> *data,
 
 
 template <int dim>
-DataOut<dim>::DataOut () :
+DataOut_Old<dim>::DataOut_Old () :
 		dofs(0) {};
 
 
 
 template <int dim>
-void DataOut<dim>::attach_dof_handler (const DoFHandler<dim> &d) {
+void DataOut_Old<dim>::attach_dof_handler (const DoFHandler<dim> &d) {
   dofs = &d;
 };
 
 
 
 template <int dim>
-void DataOut<dim>::add_data_vector (const Vector<double> &vec,
+void DataOut_Old<dim>::add_data_vector (const Vector<double> &vec,
 				    const string  &name,
 				    const string  &units) {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
@@ -230,7 +230,7 @@ void DataOut<dim>::add_data_vector (const Vector<double> &vec,
 
 
 template <int dim>
-void DataOut<dim>::clear_data_vectors () {
+void DataOut_Old<dim>::clear_data_vectors () {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
 };
@@ -238,7 +238,7 @@ void DataOut<dim>::clear_data_vectors () {
 
 
 template <int dim>
-void DataOut<dim>::write_ucd (ostream &out) const {
+void DataOut_Old<dim>::write_ucd (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
   Assert (dofs->get_fe().dofs_per_vertex==1,
 	  ExcIncorrectDofsPerVertex());
@@ -457,7 +457,7 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 #if deal_II_dimension == 1
 
 template <>
-unsigned int DataOut<1>::n_boundary_faces () const {
+unsigned int DataOut_Old<1>::n_boundary_faces () const {
   return 0;
 };
 
@@ -466,7 +466,7 @@ unsigned int DataOut<1>::n_boundary_faces () const {
 
 
 template <int dim>
-unsigned int DataOut<dim>::n_boundary_faces () const {
+unsigned int DataOut_Old<dim>::n_boundary_faces () const {
   typename DoFHandler<dim>::active_face_iterator face, endf;
   unsigned long int n_faces = 0;
 
@@ -485,7 +485,7 @@ unsigned int DataOut<dim>::n_boundary_faces () const {
 #if deal_II_dimension == 1
 
 template <>
-void DataOut<1>::write_ucd_faces (ostream &, const unsigned int) const {
+void DataOut_Old<1>::write_ucd_faces (ostream &, const unsigned int) const {
   return;
 };
 
@@ -493,7 +493,7 @@ void DataOut<1>::write_ucd_faces (ostream &, const unsigned int) const {
 
 
 template <int dim>
-void DataOut<dim>::write_ucd_faces (ostream &out,
+void DataOut_Old<dim>::write_ucd_faces (ostream &out,
 				    const unsigned int starting_index) const {
   typename DoFHandler<dim>::active_face_iterator face, endf;
   unsigned int index=starting_index;
@@ -528,7 +528,7 @@ void DataOut<dim>::write_ucd_faces (ostream &out,
 
 
 template <int dim>
-void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
+void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
   Assert ((1<=dim) && (dim<=3), ExcNotImplemented());
@@ -710,7 +710,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 
 
 template <int dim>
-void DataOut<dim>::write_gnuplot_draft (ostream &out) const
+void DataOut_Old<dim>::write_gnuplot_draft (ostream &out) const
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
   Assert ((1<=dim) && (dim<=3), ExcNotImplemented());
@@ -916,7 +916,7 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 #if deal_II_dimension == 2
 
 template <>
-void DataOut<2>::write_povray_mesh (ostream &out) const {
+void DataOut_Old<2>::write_povray_mesh (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
 
   				   // write preamble
@@ -1023,7 +1023,7 @@ void DataOut<2>::write_povray_mesh (ostream &out) const {
 
 
 template <int dim>
-void DataOut<dim>::write_povray_mesh (ostream &) const {
+void DataOut_Old<dim>::write_povray_mesh (ostream &) const {
 				   // this is for all other dimensions that
 				   // are not explicitely specialized
   Assert (false, ExcNotImplemented());
@@ -1035,7 +1035,7 @@ void DataOut<dim>::write_povray_mesh (ostream &) const {
 #if deal_II_dimension == 2
 
 template <>
-void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
+void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
 
   {
@@ -1063,8 +1063,8 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 				    // copying them to a multiset.
 				    // Perform the necessary turn.
    const DoFHandler<2>::active_cell_iterator endc = dofs->end();
-   multiset<DataOut<2>::EpsCellData> cells;
-   multiset<DataOut<2>::EpsCellData> cells2;
+   multiset<DataOut_Old<2>::EpsCellData> cells;
+   multiset<DataOut_Old<2>::EpsCellData> cells2;
    
    bool height_data_p = (
                           ((dof_data.size())>0) 
@@ -1140,7 +1140,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
    float cell_vector_min=cells.begin()->red; 
    float cell_vector_max=cell_vector_min;
 
-   for(multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
+   for(multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells.begin();
        c!=cells.end(); ++c, ++cell_index)
      {
        for (unsigned int i=0; i<4; ++i)
@@ -1173,7 +1173,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
        double light_norm, normal_norm;
        float color;
 
-       for (multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();c!=cells.end();++c)
+       for (multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells.begin();c!=cells.end();++c)
 	 {
 	   EpsCellData cd(*c);
 
@@ -1229,7 +1229,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
    const double scale = 300 / (xmax-xmin > ymax-ymin ? xmax-xmin : ymax-ymin);
    
-   for (multiset<DataOut<2>::EpsCellData>::iterator c=cells2.begin();
+   for (multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells2.begin();
 	c!=cells2.end(); ++c)
      {
        EpsCellData cd (*c);
@@ -1247,7 +1247,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
 
 				    //  Now we are ready to output...
-   for (multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
+   for (multiset<DataOut_Old<2>::EpsCellData>::iterator c=cells.begin();
 	c!=cells.end(); ++c)
      {
        if (cell_data_p || cell_shade_p)
@@ -1290,7 +1290,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
 
 template <int dim>
-void DataOut<dim>::write_eps (ostream &,
+void DataOut_Old<dim>::write_eps (ostream &,
 			      const EpsOutputData &) const{
 				   // this is for all other dimensions that
 				   // are not explicitely specialized
@@ -1301,7 +1301,7 @@ void DataOut<dim>::write_eps (ostream &,
 
 
 template <int dim>
-void DataOut<dim>::write_gmv (ostream &out) const
+void DataOut_Old<dim>::write_gmv (ostream &out) const
 {
 				   // this function is mostly copied from
 				   // the ucd format function
@@ -1525,7 +1525,7 @@ void DataOut<dim>::write_gmv (ostream &out) const
 
 
 template <int dim>
-void DataOut<dim>::write (ostream &out,
+void DataOut_Old<dim>::write (ostream &out,
 			  const OutputFormat output_format) const {
   switch (output_format) 
     {
@@ -1561,7 +1561,7 @@ void DataOut<dim>::write (ostream &out,
 
 
 template <int dim>
-string DataOut<dim>::default_suffix (const OutputFormat output_format) 
+string DataOut_Old<dim>::default_suffix (const OutputFormat output_format) 
 {
   switch (output_format) 
     {
@@ -1590,8 +1590,8 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format)
 
 
 template <int dim>
-DataOut<dim>::OutputFormat
-DataOut<dim>::parse_output_format (const string &format_name) {
+DataOut_Old<dim>::OutputFormat
+DataOut_Old<dim>::parse_output_format (const string &format_name) {
   if (format_name == "ucd")
     return ucd;
 
@@ -1618,14 +1618,14 @@ DataOut<dim>::parse_output_format (const string &format_name) {
 
 
 template <int dim>
-string DataOut<dim>::get_output_format_names () {
+string DataOut_Old<dim>::get_output_format_names () {
   return "ucd|gnuplot|gnuplot draft|povray mesh|eps|gmv";
 };
 
 
 
 template<int dim>
-bool DataOut<dim>::EpsCellData::operator < (const EpsCellData &other) const
+bool DataOut_Old<dim>::EpsCellData::operator < (const EpsCellData &other) const
 {
   double maxz = vertices[0].z, 
          othermaxz = other.vertices[0].z;
@@ -1643,7 +1643,7 @@ bool DataOut<dim>::EpsCellData::operator < (const EpsCellData &other) const
 
 
 template <int dim>
-void DataOut<dim>::EpsVertexData::turn(double azi, double ele)
+void DataOut_Old<dim>::EpsVertexData::turn(double azi, double ele)
 {
   double nx,ny,nz;
 
@@ -1675,7 +1675,7 @@ void DataOut<dim>::EpsVertexData::turn(double azi, double ele)
 
 
 template <int dim>
-void DataOut<dim>::EpsCellData::turn(double azi, double ele)
+void DataOut_Old<dim>::EpsCellData::turn(double azi, double ele)
 {
   for (unsigned i=0; i<4; ++i)
     vertices[i].turn(azi,ele);
@@ -1782,4 +1782,4 @@ void EpsOutputData::color(const float x,
 //explicit instantiations
 
 template class DataIn<deal_II_dimension>;
-template class DataOut<deal_II_dimension>;
+template class DataOut_Old<deal_II_dimension>;

@@ -11,7 +11,7 @@
 #include <grid/dof_constraints.h>
 #include <fe/fe_update_flags.h>
 #include <map>
-
+#include <string>
 
 
 
@@ -170,7 +170,7 @@ class ProblemBase {
 				      * vectors directly to the #DataOut#
 				      * object.
 				      *
-				      * Solution name and physical units are
+				      * The solution name are
 				      * derived by calling the virtual
 				      * function #get_solution_name#.
 				      */
@@ -178,16 +178,13 @@ class ProblemBase {
 
 
 				     /**
-				      * Return solution name and
-				      * physical units as a pair of
-				      * #char*#. The default implementation
-				      * returns #make_pair ("solution","")#,
-				      * which results in "<dimensionless>"
-				      * upon output.
+				      * Return the name of the solution as a
+				      * #string#. The default implementation
+				      * returns #"solution"#.
 				      * Overload this function, if you
 				      * want anything else.
 				      */
-    virtual pair<char*,char*> get_solution_name () const;
+    virtual string get_solution_name () const;
 
 				     /**
 				      * Exception

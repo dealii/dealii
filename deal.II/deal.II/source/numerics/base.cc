@@ -8,7 +8,7 @@
 #include <numerics/vectors.h>
 #include <grid/dof_constraints.h>
 #include <grid/tria_iterator.h>
-#include <basic/data_io.h>
+#include <basic/data_out.h>
 #include <base/function.h>
 #include <fe/fe.h>
 #include <base/quadrature.h>
@@ -159,19 +159,17 @@ template <int dim>
 void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
-  out.clear_data_vectors ();
+  out.clear ();
   out.attach_dof_handler (*dof_handler);
 
-  pair<char*,char*> solution_name = get_solution_name ();
-  out.add_data_vector (solution,
-		       solution_name.first, solution_name.second);
+  out.add_data_vector (solution, get_solution_name());
 };
 
 
 
 template <int dim>
-pair<char*,char*> ProblemBase<dim>::get_solution_name () const {
-  return pair<char*,char*>("solution", "<dimensionless>");
+string ProblemBase<dim>::get_solution_name () const {
+  return "solution";
 };
 
 

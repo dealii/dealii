@@ -182,6 +182,8 @@ class DataIn {
 
 
 /**
+ * This class is deprecated. Use the #DataOut class instead.
+ *
  * This class implements an output mechanism for grid and simulation data
  * in several formats.
  * At present it supports output in UCD (unstructured cell data) and
@@ -237,7 +239,7 @@ class DataIn {
  * want to see plus one. For example #using 1:4# would mean to plot the
  * third data vector.
  *
- * For more than one dimension, the #DataOut<dim>::write_gnuplot()# somehow
+ * For more than one dimension, the #DataOut_Old<dim>::write_gnuplot()# somehow
  * duplicates the functionality of the #Triangulation<dim>::print_gnuplot()#
  * functions. These, however, offer more functionality in some respect.
  * The grid is represented as a sequence of lines, where each cell is
@@ -376,7 +378,7 @@ class DataIn {
  * @author Wolfgang Bangerth, Guido Kanschat, Stefan Nauber, 1998, 1999
  */
 template <int dim>  
-class DataOut {
+class DataOut_Old {
   public:
 				     /**
 				      * Provide a data type specifying the
@@ -387,7 +389,7 @@ class DataOut {
 				     /**
 				      * Constructor
 				      */
-    DataOut ();
+    DataOut_Old ();
     
 				     /**
 				      * Designate a dof handler to be used
@@ -761,7 +763,7 @@ class DataOut {
 
 /**
  * Structure for the control of encapsulated postscript output. See
- * general documentation of class #DataOut# for description.
+ * general documentation of class #DataOut_Old# for description.
  *
  * @author Stefan Nauber
  */

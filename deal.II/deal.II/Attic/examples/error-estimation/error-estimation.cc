@@ -11,7 +11,7 @@
 #include <grid/dof_constraints.h>
 #include <grid/grid_generator.h>
 #include <base/function.h>
-#include <basic/data_io.h>
+#include <basic/data_out.h>
 #include <basic/grid_out.h>
 #include <base/parameter_handler.h>
 #include <fe/fe_lib.lagrange.h>
@@ -413,7 +413,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
        << "=======================================" << endl;
   cout << "Making initial grid... " << endl;
   const unsigned int start_level(prm.get_integer("Initial refinement"));
-  tria->set_boundary (boundary);
+  tria->set_boundary (0, *boundary);
   GridGenerator::hyper_ball (*tria);
   tria->refine_global (start_level);
 
@@ -630,7 +630,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   filename += "finest_mesh.gnuplot";
   cout << "    Writing finest grid to <" << filename << ">... " << endl;
   ofstream finest_mesh (filename.c_str());
-  GridOut::write_gnuplot (tria, finest_mesh);
+  GridOut().write_gnuplot (*tria, finest_mesh);
   finest_mesh.close();
 
   print_history (prm, refine_mode);

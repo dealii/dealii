@@ -247,7 +247,7 @@ void test (const int test_case) {
     };
   
   
-  GridOut::write_gnuplot (tria, cout);
+  GridOut().write_gnuplot (tria, cout);
     
   cout << "     Total number of cells        = " << tria.n_cells() << endl
        << "     Total number of active cells = " << tria.n_active_cells() << endl;

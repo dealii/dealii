@@ -255,7 +255,7 @@ int main () {
 	  
 	  Triangulation<3> tria;
 	  make_tria (tria, step);
-	  GridOut::write_gnuplot (tria, cout);
+	  GridOut().write_gnuplot (tria, cout);
 	  
 	  DoFHandler<3> dof (&tria);
 	  dof.distribute_dofs (*fe);
