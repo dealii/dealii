@@ -25,7 +25,9 @@
  * Several vectors of data. 
  *
  * The BlockVector is a collection of normal LAC-@p{Vector}s. Each of
- * the vectors inside can have a different size.
+ * the vectors inside can have a different size. The special case of a
+ * block vector with constant block size is supported by constructor
+ * and reinit functions.
  *
  * The functionality of @p{BlockVector} includes everything a @p{Vector}
  * can do, plus the access to a single @p{Vector} inside the
@@ -43,7 +45,7 @@
  * corresponding ``.templates.h'' file and instantiate the respective
  * class yourself.
  *
- * @author Guido Kanschat, 1999; Wolfgang Bangerth, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000
  */
 template <typename Number>
 class BlockVector
@@ -69,9 +71,26 @@ class BlockVector
     typedef size_t size_type;
 
 				     /**
-				      *  Dummy-Constructor. Dimension=0
+				      *  Constructor. There are three
+				      *  ways to use this
+				      *  constructor. First, without
+				      *  any arguments, it generates
+				      *  an objetct with no
+				      *  blocks. Given one argument,
+				      *  it initializes @p{num_blocks}
+				      *  blocks, but these blocks have
+				      *  size zero. The third variant
+				      *  finally initializes all
+				      *  blocks to the same size
+				      *  @p{block_size}.
+				      *
+				      *  Confer the other constructor
+				      *  further down if you intend to
+				      *  use blocks of different
+				      *  sizes.
 				      */
-    BlockVector (unsigned int num_blocks = 0);
+    BlockVector (unsigned int num_blocks = 0,
+		 unsigned int block_size = 0);
     
 				     /**
 				      * Copy-Constructor. Dimension set to
@@ -111,6 +130,18 @@ class BlockVector
 				      */
     ~BlockVector ();
 
+				   /**
+				    * Reinitialize the BlockVector to
+				    * contain @p{num_blocks} blocks of
+				    * size @p{block_size} each.
+				    *
+				    * If @p{fast==false}, the vector
+				    * is filled with zeros.
+				    */
+  void reinit (const unsigned int num_blocks,
+	       const unsigned int block_size,
+	       const bool fast = false);
+  
 				     /**
 				      * Reinitialize the BlockVector
 				      * such that it contains
@@ -129,8 +160,8 @@ class BlockVector
 				      * has a potential to slow down a
 				      * program considerably.
 				      *
-				      * On @p{fast==false}, the vector is filled by
-				      * zeros.
+				      * If @p{fast==false}, the vector
+				      * is filled with zeros.
 				      */ 
     void reinit (const vector<unsigned int> &N,
 		 const bool                  fast=false);

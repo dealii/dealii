@@ -37,7 +37,7 @@ class BlockIndices
 				      * @p{n_blocks} blocks and set
 				      * all block sizes to zero.
 				      */
-    BlockIndices (const unsigned int n_blocks);
+    BlockIndices (const unsigned int n_blocks = 0);
 
 				     /**
 				      * Constructor. Initialize the

@@ -20,17 +20,16 @@
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (unsigned int num_blocks)
-  : components(num_blocks),
-    block_indices(num_blocks),
-    num_blocks(num_blocks)
-{}
+BlockVector<Number>::BlockVector (unsigned int n_blocks,
+				  unsigned int block_size)
+{
+  reinit (n_blocks, block_size);
+}
 
 
 
 template <typename Number>
 BlockVector<Number>::BlockVector (const vector<unsigned int> &n)
-  : block_indices(num_blocks)
 {
   reinit (n, false);
 }
@@ -63,6 +62,16 @@ BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
 //       copy (v.begin(), v.end(), begin());
 //     }
 // }
+
+
+template <typename Number>
+void BlockVector<Number>::reinit (const unsigned int n_bl,
+				  const unsigned int bl_sz,
+				  const bool                  fast)
+{
+  vector<unsigned int> n(n_bl, bl_sz);
+  reinit(n, fast);
+}
 
 
 template <typename Number>
