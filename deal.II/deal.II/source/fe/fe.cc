@@ -59,7 +59,7 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
   for (unsigned int d=0; d<dim; ++d)
     {
       Point<dim> shift;
-//TODO: unify the places where the finite differencing step length is used      
+//TODO:[GK] unify the places where the finite differencing step length is used      
       shift (d) = 1.e-6;
 
 				       // generate points and FEValues
@@ -344,7 +344,7 @@ compute_2nd (const Mapping<dim>                   &mapping,
 	    const Tensor<1,dim>& left
 	      = fe_internal.differences[d1+dim]->shape_grad(shape, q);
 
-//TODO: unify the places where the finite differencing step length is used      
+//TODO:[GK] unify the places where the finite differencing step length is used      
 					     // compute the second
 					     // derivative from a
 					     // symmetric difference
