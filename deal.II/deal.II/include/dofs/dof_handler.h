@@ -596,7 +596,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * constraint nodes.
 				      *
 				      * Since this method does not make sense in
-				      * one dimension, the functions returns
+				      * one dimension, the function returns
 				      * immediately after clearing the
 				      * constraint matrix.
 				      * For more than one dimension, the matrix
