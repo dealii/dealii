@@ -1134,7 +1134,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 				    // Make output values local by
 				    // copying them to a multiset.
 				    // Perform the necessary turn.
-   DoFHandler<2>::active_cell_iterator endc = dofs->end();
+   const DoFHandler<2>::active_cell_iterator endc = dofs->end();
    multiset<DataOut<2>::EpsCellData> cells;
    multiset<DataOut<2>::EpsCellData> cells2;
    
@@ -1248,9 +1248,18 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
 	   cells2.insert(cd);
 	 };
+
+					// since we don't need #cells# any
+					// more, delete it now
+       cells.clear ();
      }
-   else
-     cells2=cells;
+   else 
+				      // copy #cells# to #cells2#. since
+				      // we don't need #cells# any
+				      // more, we use a trick for copying
+				      // that is significantly faster
+     cells2.swap (cells);
+   
 
 
 				    // Next we have to shift and scale
@@ -1263,8 +1272,6 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
    const double scale = 300 / (xmax-xmin > ymax-ymin ? xmax-xmin : ymax-ymin);
    
-   cells.clear();
-
    for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells2.begin();
 	c!=cells2.end(); ++c)
      {
