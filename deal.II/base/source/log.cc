@@ -18,8 +18,8 @@
 
 // include sys/resource.h for rusage(). Mac OS X needs sys/time.h then
 // as well (strange), so include that, too.
-#include <sys/resource.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <iostream>
