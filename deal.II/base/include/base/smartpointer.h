@@ -161,7 +161,7 @@ class SmartPointer
 				      * used by this class. Note in
 				      * particular, that this only
 				      * includes the amount of memory
-				      * used by @it{this} object, not
+				      * used by @em{this} object, not
 				      * by the object pointed to.
 				      */
     unsigned int memory_consumption () const;
