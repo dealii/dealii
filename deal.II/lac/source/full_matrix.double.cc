@@ -28,6 +28,7 @@ template void FullMatrix<TYPEMAT>::Tadd (const TYPEMAT, const FullMatrix<TYPEMAT
 template void FullMatrix<TYPEMAT>::mmult (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;
 template void FullMatrix<TYPEMAT>::Tmmult (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;
 template void FullMatrix<TYPEMAT>::add_diag (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::invert (const FullMatrix<TYPEMAT2>&);
 
 
 #define TYPEVEC double

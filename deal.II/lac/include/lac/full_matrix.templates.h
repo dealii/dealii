@@ -53,6 +53,25 @@ FullMatrix<number>::FullMatrix (const FullMatrix &m) :
 
 
 template <typename number>
+FullMatrix<number>&
+FullMatrix<number>::operator = (const FullMatrix<number>& M)
+{
+  vector2d<number>::operator=(M);
+  return *this;
+}
+
+
+template <typename number>
+template <typename number2>
+FullMatrix<number>&
+FullMatrix<number>::operator = (const FullMatrix<number2>& M)
+{
+  vector2d<number>::operator=(M);
+  return *this;
+}
+
+
+template <typename number>
 bool
 FullMatrix<number>::all_zero () const
 {
@@ -1126,8 +1145,9 @@ FullMatrix<number>::relative_symmetry_norm2 () const
 
 
 template <typename number>
+template <typename number2>
 void
-FullMatrix<number>::invert (const FullMatrix<number> &M)
+FullMatrix<number>::invert (const FullMatrix<number2> &M)
 {
   Assert (data() != 0, ExcEmptyMatrix());
   

@@ -118,6 +118,16 @@ class FullMatrix : public vector2d<number>
 		const unsigned int cols,
 		const number* entries);
 
+				     /**
+				      * Assignment operator.
+				      */
+    FullMatrix<number>& operator = (const FullMatrix<number>&);
+    
+				     /**
+				      * Variable assignment operator.
+				      */
+    template<typename number2>
+    FullMatrix<number>& operator = (const FullMatrix<number2>&);
     
 				     /**
 				      * Comparison operator. Be
@@ -448,7 +458,8 @@ class FullMatrix : public vector2d<number>
 				      * @ref{gauss_jordan} is invoked
 				      * implicitly.
 				      */
-    void invert (const FullMatrix<number> &M);
+    template <typename number2>
+    void invert (const FullMatrix<number2> &M);
 
 				     /**
 				      * Apply the Jacobi
