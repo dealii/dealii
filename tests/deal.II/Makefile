@@ -52,7 +52,7 @@ endif
 # rule to make executables
 %.testcase: %.cc $(libraries)
 	@echo ============================ Compiling Testcase:   $<
-	@$(CXX) $(flags) $< -o $@ $(shell grep $(lib-tag) $< | perl -pe 's/.*=//;') $(libs)
+	@$(CXX) $(flags) $< -o $@ $(shell grep $(lib-tag) $< | perl -pe 's/.*=//;') $(libraries)
 
 
 
