@@ -401,7 +401,7 @@ Point<2> TriaObjectAccessor<2, 2>::barycenter () const
 {
 				   // the evaluation of the formulae
 				   // is a bit tricky when done dimension
-				   // independant, so we write this function
+				   // independently, so we write this function
 				   // for 2D and 3D separately
 /*
   Get the computation of the barycenter by this little Maple script. We
@@ -478,7 +478,7 @@ double TriaObjectAccessor<2, 2>::measure () const
 {
 				   // the evaluation of the formulae
 				   // is a bit tricky when done dimension
-				   // independant, so we write this function
+				   // independently, so we write this function
 				   // for 2D and 3D separately
 /*
   Get the computation of the measure by this little Maple script. We
@@ -530,7 +530,7 @@ Point<3> TriaObjectAccessor<2, 3>::barycenter () const
 {
 				   // the evaluation of the formulae
 				   // is a bit tricky when done dimension
-				   // independant, so we write this function
+				   // independently, so we write this function
 				   // for 2D and 3D separately
 /*
   To compute the barycenter, we first have to find out the size of
@@ -586,7 +586,7 @@ double TriaObjectAccessor<2, 3>::measure () const
 {
 				   // the evaluation of the formulae
 				   // is a bit tricky when done dimension
-				   // independant, so we write this function
+				   // independently, so we write this function
 				   // for 2D and 3D separately
 				   //
 				   // for documentation, see the barycenter
@@ -1512,12 +1512,20 @@ double TriaObjectAccessor<3, 3>::measure () const
        x[2]*z[7]/12.0+x[2]*y[6]*z[5]/12.0+y[6]*x[7]*z[2]/12.0-y[6]*x[3]*z[7]/12.0-x[7]
        *y[4]*z[3]/12.0-x[6]*y[4]*z[7]/12.0-x[5]*y[1]*z[4]/12.0+x[6]*y[7]*z[4]/12.0+x
        [7]*y[3]*z[4]/12.0-z[1]*x[5]*y[6]/12.0+x[3]*y[4]*z[7]/12.0+x[5]*y[6]*z[4]/12.0;
-  
-  return s3+x[5]*y[4]*z[1]/12.0-x[5]*y[4]*z[6]/12.0-x[3]*y[7]*z[4]/12.0+x[6]*
+
+				   // the vertices entered into the
+				   // above field and the vertices
+				   // used by the maple script use
+				   // different orderings (i.e. one is
+				   // the inside-out orientation of
+				   // the other one). the measure is
+				   // thus negative. Thus take the
+				   // absolute value of the result
+  return std::abs(s3+x[5]*y[4]*z[1]/12.0-x[5]*y[4]*z[6]/12.0-x[3]*y[7]*z[4]/12.0+x[6]*
     y[3]*z[7]/12.0-y[1]*x[6]*z[5]/12.0-z[5]*x[1]*y[4]/12.0+z[5]*x[6]*y[4]/12.0+z[5]
     *x[4]*y[1]/12.0-z[5]*x[4]*y[6]/12.0-x[6]*y[7]*z[3]/12.0-x[4]*y[3]*z[7]/12.0+x
     [4]*y[7]*z[3]/12.0-x[1]*y[5]*z[6]/12.0-y[6]*x[7]*z[4]/12.0-y[1]*x[2]*z[6]/12.0-
-    y[2]*x[3]*z[6]/12.0+s2+s1+x[2]*y[0]*z[3]/12.0;
+    y[2]*x[3]*z[6]/12.0+s2+s1+x[2]*y[0]*z[3]/12.0);
 };
 
 #endif
