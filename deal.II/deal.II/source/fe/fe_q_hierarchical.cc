@@ -51,8 +51,9 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     renumber_inverse[renumber[i]]=i;
 
-                                  // build the dofs_subcell, dofs_cell 
-                                  // matrices for use in building prolongation,                                   // restriction, and constraint matrices.
+				   // build the dofs_subcell, dofs_cell 
+				   // matrices for use in building prolongation,
+                                   // restriction, and constraint matrices.
   const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
 
   for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
