@@ -31,7 +31,6 @@
  *
  * @author Wolfgang Bangerth, 1998, 1999
  */
-
 template <int dim>
 class FEQ1 : public FELinearMapping<dim> {
   public:

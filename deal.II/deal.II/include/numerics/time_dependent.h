@@ -17,14 +17,14 @@
 
 
 /**
- * This class provides an abstract interface to time dependent method in that
+ * This class provides an abstract interface to time dependent problems in that
  * it addresses some of the most annoying aspects of this class of problems:
  * data management. These problems frequently need large amounts of computer
  * ressources, most notably computing time, main memory and disk space.
  * Main memory reduction is often the most pressing need, methods to implement
  * it are almost always quite messy, though, quickly leading to code that
  * stores and reloads data at places scattered all over the program, and
- * which becomes unmaintanable sometimes. The present class tries to offer
+ * which becomes unmaintainable sometimes. The present class tries to offer
  * a more structured interface, albeit simple, which emerged in my mind after
  * messing with my wave equation simulation for several months.
  *
@@ -42,7 +42,7 @@
  *
  * The general structure of a time dependent problem solver using a timestepping
  * scheme is about the following: we have a collection of time step objects
- * on which we solve out problem subsequently. In order to do so, we need
+ * on which we solve our problem subsequently. In order to do so, we need
  * knowledge of the data on zero or several previous timesteps (when using single
  * or multiple step methods, that is) and maybe also some data of time steps
  * ahead (for example the computational grid on these). Dependening on the
@@ -62,24 +62,32 @@
  * like this:
  * \begin{verbatim}
  *    for sweep=0 to n_sweeps-1
+ *    {
+ *      for i=0 to n_timesteps-1
+ *        initialize timestep i for this sweep, e.g. for setting up
+ *        data structures, creating temporary files, etc.
+ *   
  *      for i=0 to n_timesteps-1
  *        prepare timestep i for loop 0
  *      for i=0 to n_timesteps-1
  *        perform loop 0 on timestep i   (e.g. solve primal problem)
  *
- *    for sweep=0 to n_sweeps-1
  *      for i=0 to n_timesteps-1
  *        prepare timestep i for loop 1
  *      for i=0 to n_timesteps-1
  *        perform loop 1 on timestep i   (e.g. solve dual problem)
  *
- *    for sweep=0 to n_sweeps-1
  *      for i=0 to n_timesteps-1
  *        prepare timestep i for loop 2
  *      for i=0 to n_timesteps-1
  *        perform loop 2 on timestep i   (e.g. compute error information)
  *
- *    ...
+ *      ...
+ *
+ *      for i=0 to n_timesteps-1
+ *        notify timestep i of the end of the sweep, e.g. for cleanups,
+ *        deletion of temporary files, etc.
+ *    }
  * \end{verbatim}
  * The user may specify that a loop shall run forward or backward (the latter
  * being needed for the solution of global dual problems, for example).
@@ -160,7 +168,164 @@
  *
  * \subsection{Implementation}
  *
- * Still to be written.
+ * The main loop of a program using this class will usually look like
+ * the following one, taken modified from the wave program:
+ * \begin{verbatim}
+ *   template <int dim>
+ *   void TimeDependent_Wave<dim>::run_sweep (const unsigned int sweep_no)
+ *   {
+ *     start_sweep (sweep_no);
+ *   
+ *     solve_primal_problem ();
+ *   
+ *     if (compute_dual_problem)
+ *       solve_dual_problem ();
+ *     
+ *     postprocess ();
+ *   
+ *     if (sweep_no != number_of_sweeps-1)
+ *       refine_grids ();
+ *   
+ *     write_statistics ();
+ *   
+ *     end_sweep ();
+ *   };
+ *   
+ *   
+ *   
+ *   template <int dim>
+ *   void WaveProblem<dim>::run () 
+ *   {
+ *     for (unsigned int sweep=0; sweep<number_of_sweeps; ++sweep)
+ *       timestep_manager.run_sweep (sweep);
+ *   };
+ * \end{verbatim}
+ * Here, #timestep_manager# is an object of type #TimeDependent_Wave#, which
+ * is a class derived from #TimeDependent#. #start_sweep#, 
+ * #solve_primal_problem#, #solve_dual_problem#, #postprocess# and #end_sweep#
+ * are functions inherited from this class. They all do a loop over all 
+ * timesteps within this object and call the respective function on each of
+ * these objects. For example, here are two of the functions as they are
+ * implemented by the library:
+ * \begin{verbatim}
+ *   void TimeDependent::start_sweep (const unsigned int s) 
+ *   {
+ *     sweep_no = s;
+ *   
+ *   				   // reset the number each
+ *   				   // time step has, since some time
+ *   				   // steps might have been added since
+ *   				   // the last time we visited them
+ *   				   //
+ *   				   // also set the sweep we will
+ *   				   // process in the sequel
+ *     for (unsigned int step=0; step<timesteps.size(); ++step)
+ *       {
+ *         timesteps[step]->set_timestep_no (step);
+ *         timesteps[step]->set_sweep_no (sweep_no);
+ *       };
+ *   
+ *     for (unsigned int step=0; step<timesteps.size(); ++step)
+ *       timesteps[step]->start_sweep ();
+ *   };
+ *   
+ *   
+ *   void
+ *   TimeDependent::solve_primal_problem () 
+ *   {
+ *     do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
+ *              mem_fun(&TimeStepBase::solve_primal_problem),
+ *   	        timestepping_data_primal,
+ *   	        forward);
+ *   };
+ * \end{verbatim}
+ * The latter function shows rather clear how most of the loops are
+ * invoked (#solve_primal_problem#, #solve_dual_problem#, #postprocess#,
+ * #refine_grids# and #write_statistics# all have this form, where the
+ * latter two give functions of the derived timestep class, rather than
+ * from the base class). The function #TimeStepBase::init_for_primal_problem#
+ * and the respective ones for the other operations defined by that class
+ * are only used to store the type of operation which the loop presently
+ * performed will do.
+ *
+ * As can be seen, most of the work is done by the #do_loop# function of
+ * this class, which takes the addresses of two functions which are used
+ * to initialize all timestep objects for the loop and to actually perform
+ * some action. The next parameter gives some information on the look-ahead
+ * and look-back and the last one denotes in which direction the loop is
+ * to be run.
+ *
+ * Using function pointers through the #mem_fun# functions provided by
+ * the #C++# standard library, it is possible to do neat tricks, like
+ * the following, also taken from the wave program, in this case from
+ * the function #refine_grids#:
+ * \begin{verbatim}
+ *   ...
+ *   compute the thresholds for refinement
+ *   ...
+ *
+ *   do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
+ *            bind2nd (mem_fun1 (&TimeStepBase_Wave<dim>::refine_grid),
+ *		       TimeStepBase_Tria<dim>::RefinementData (top_threshold,
+ *	                                                       bottom_threshold)),
+ *            TimeDependent::TimeSteppingData (0,1),
+ *            TimeDependent::forward);
+ * \end{verbatim}
+ * #TimeStepBase_Wave<dim>::refine_grid# is a function taking an argument, unlike
+ * all the other functions used above within the loops. However, in this special
+ * case the parameter was the same for all timesteps and known before the loop
+ * was started, so we fixed it and made a function object which to the outside
+ * world does not take parameters.
+ *
+ * Since it is the central function of this class, we finally present a
+ * stripped down version of the #do_loop# method, which is shown in order
+ * to provide a better understanding of the internals of this class. For
+ * brevity we have omitted the parts that deal with backward running loops
+ * as well as the checks whether wake-up and sleep operations act on timesteps
+ * outside #0..n_timesteps-1#.
+ * \begin{verbatim}
+ *   template <typename InitFunctionObject, typename LoopFunctionObject>
+ *   void TimeDependent::do_loop (InitFunctionObject      init_function,
+ *   			     LoopFunctionObject      loop_function,
+ *   			     const TimeSteppingData &timestepping_data,
+ *   			     const Direction         direction)
+ *   {
+ *   				   // initialize the time steps for
+ *   				   // a round of this loop
+ *     for (unsigned int step=0; step<n_timesteps; ++step)
+ *       init_function (static_cast<typename InitFunctionObject::argument_type>
+ *   		   (timesteps[step]));
+ *   
+ *   				   // wake up the first few time levels
+ *     for (int step=-timestepping_data.look_ahead; step<0; ++step)
+ *       for (int look_ahead=0; look_ahead<=timestepping_data.look_ahead; ++look_ahead)
+ *         timesteps[step+look_ahead]->wake_up(look_ahead);
+ *     
+ *     
+ *     for (unsigned int step=0; step<n_timesteps; ++step)
+ *       {
+ *   				       // first thing: wake up the
+ *   				       // timesteps ahead as necessary
+ *         for (unsigned int look_ahead=0;
+ *   	   look_ahead<=timestepping_data.look_ahead; ++look_ahead)
+ *   	timesteps[step+look_ahead]->wake_up(look_ahead);
+ *         
+ *         
+ *   				       // actually do the work
+ *         loop_function (static_cast<typename LoopFunctionObject::argument_type>
+ *   		     (timesteps[step]));
+ *         
+ *   				       // let the timesteps behind sleep
+ *         for (unsigned int look_back=0; look_back<=timestepping_data.look_back; ++look_back)
+ *   	timesteps[step-look_back]->sleep(look_back);
+ *       };
+ *   
+ *   				   // make the last few timesteps sleep
+ *     for (int step=n_timesteps; n_timesteps+timestepping_data.look_back; ++step)
+ *       for (int look_back=0; look_back<=timestepping_data.look_back; ++look_back)
+ *         timesteps[step-look_back]->sleep(look_back);
+ *   };
+ * \end{verbatim}
  *
  *
  * @author Wolfgang Bangerth, 1999
@@ -492,132 +657,6 @@ class TimeDependent
 
 
 
-template <typename InitFunctionObject, typename LoopFunctionObject>
-void TimeDependent::do_loop (InitFunctionObject      init_function,
-			     LoopFunctionObject      loop_function,
-			     const TimeSteppingData &timestepping_data,
-			     const Direction         direction)
-{
-				   // the following functions looks quite
-				   // disrupted due to the recurring switches
-				   // for forward and backward running loops.
-				   //
-				   // I chose to switch at every place where
-				   // it is needed, since it is so easy
-				   // to overlook something when you change
-				   // some code at one place when it needs
-				   // to be changed at a second place, here
-				   // for the other direction, also.
-  
-  const unsigned int n_timesteps = timesteps.size();
-
-				   // initialize the time steps for
-				   // a round of this loop
-  for (unsigned int step=0; step<n_timesteps; ++step)
-    switch (direction)
-      {
-	case forward:
-	      init_function (static_cast<typename InitFunctionObject::argument_type>
-			     (timesteps[step]));
-	      break;
-	case backward:
-	      init_function (static_cast<typename InitFunctionObject::argument_type>
-			     (timesteps[n_timesteps-step-1]));
-	      break;
-      };
-  
-
-				   // wake up the first few time levels
-  for (int step=-timestepping_data.look_ahead; step<0; ++step)
-    for (int look_ahead=0;
-	 look_ahead<=static_cast<int>(timestepping_data.look_ahead); ++look_ahead)
-      switch (direction)
-	{
-	  case forward:
-		if (step+look_ahead >= 0)
-		  timesteps[step+look_ahead]->wake_up(look_ahead);
-		break;
-	  case backward:
-		if (n_timesteps-(step+look_ahead) < n_timesteps)
-		  timesteps[n_timesteps-(step+look_ahead)]->wake_up(look_ahead);
-		break;
-	};
-  
-  
-  for (unsigned int step=0; step<n_timesteps; ++step)
-    {
-				       // first thing: wake up the
-				       // timesteps ahead as necessary
-      for (unsigned int look_ahead=0;
-	   look_ahead<=timestepping_data.look_ahead; ++look_ahead)
-	switch (direction)
-	  {
-	    case forward:
-		  if (step+look_ahead < n_timesteps)
-		    timesteps[step+look_ahead]->wake_up(look_ahead);
-		  break;
-	    case backward:
-		  if (n_timesteps > (step+look_ahead))
-		    timesteps[n_timesteps-(step+look_ahead)-1]->wake_up(look_ahead);
-		  break;
-	  };
-      
-      
-				       // actually do the work
-      switch (direction)
-	{
-	  case forward:
-		loop_function (static_cast<typename LoopFunctionObject::argument_type>
-			       (timesteps[step]));
-		break;
-	  case backward:
-		loop_function (static_cast<typename LoopFunctionObject::argument_type>
-			       (timesteps[n_timesteps-step-1]));
-		break;
-	};
-      
-				       // let the timesteps behind sleep
-      for (unsigned int look_back=0;
-	   look_back<=timestepping_data.look_back; ++look_back)
-	switch (direction)
-	  {
-	    case forward:
-		  if (step>=look_back)
-		    timesteps[step-look_back]->sleep(look_back);
-		  break;
-	    case backward:
-		  if (n_timesteps-(step-look_back) <= n_timesteps)
-		    timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
-		  break;
-	  };
-    };
-
-				   // make the last few timesteps sleep
-  for (int step=n_timesteps;
-       step<static_cast<int>(n_timesteps+timestepping_data.look_back); ++step)
-    for (int look_back=0;
-	 look_back<=static_cast<int>(timestepping_data.look_back); ++look_back)
-      switch (direction)
-	{
-	  case forward:
-		if ((step-look_back >= 0)
-		    &&
-		    (step-look_back < static_cast<int>(n_timesteps)))
-		  timesteps[step-look_back]->sleep(look_back);
-		break;
-	  case backward:
-		if ((step-look_back >= 0)
-		    &&
-		    (step-look_back < static_cast<int>(n_timesteps)))
-		  timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
-		break;
-	};
-};
-
-
-
-
-
 
 
 
@@ -731,7 +770,10 @@ class TimeStepBase : public Subscriptor
 				     /**
 				      * This is the analogon to the above
 				      * function, but it is called at the
-				      * end of a sweep.
+				      * end of a sweep. You will usually want
+				      * to do clean-ups in this function,
+				      * such as deleting temporary files
+				      * and the like.
 				      */
     virtual void end_sweep ();
     
@@ -827,7 +869,20 @@ class TimeStepBase : public Subscriptor
 				      * is appropriate in most cases since
 				      * if there is no previous time step
 				      * you will need special treatment
-				      * anyway.
+				      * anyway and this way no invalid
+				      * value is returned which could lead
+				      * to wrong but unnoticed results of
+				      * your computation. (The only sensible
+				      * value to return in that case would
+				      * not be zero, since valid computation
+				      * can be done with that, but would
+				      * be a denormalized value such as #NaN#.
+				      * However, there is not much difference
+				      * in finding that the results of a
+				      * computation are all denormalized values
+				      * or in getting an exception; in the
+				      * latter case you at least get the exact
+				      * place where your problem lies.)
 				      */
     double get_backward_timestep () const;
 
@@ -840,11 +895,6 @@ class TimeStepBase : public Subscriptor
 				      */
     double get_forward_timestep () const;
     
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcGridNotDeleted);
-
 				     /**
 				      * Exception
 				      */
@@ -961,15 +1011,15 @@ class TimeStepBase : public Subscriptor
 
 
 /**
- * Specialization of #TimeStepBase# which addresses some aspects of grid handling.
+ * Specialisation of #TimeStepBase# which addresses some aspects of grid handling.
  * In particular, this class is thought to make handling of grids available that
  * are adaptively refined on each time step separately or with a loose coupling
  * between time steps. It also takes care of deleting and rebuilding grids when
  * memory resources are a point, through the #sleep# and #wake_up# functions
  * declared in the base class.
  *
- * In addition to that, it offers a function which do some rather hairy refinement
- * rules for time dependent problems. trying to avoid to much change in the grids
+ * In addition to that, it offers functions which do some rather hairy refinement
+ * rules for time dependent problems, trying to avoid too much change in the grids
  * between subsequent time levels, while also trying to retain the freedom of
  * refining each grid separately. There are lots of flags and numbers controlling
  * this function, which might drastically change the behaviour of the function -- see
@@ -988,7 +1038,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 
 				     /**
 				      * Extension of the enum in the base
-				      * cass denoting the next action to be
+				      * class denoting the next action to be
 				      * done.
 				      */
     enum SolutionState {
@@ -1165,6 +1215,11 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * are also stored.
 				      */
     void save_refine_flags ();
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcGridNotDeleted);
 
   protected:
     
@@ -1613,6 +1668,134 @@ struct TimeStepBase_Tria<dim>::RefinementData
 		    int,
 		    << "The following value does not fulfil the requirements: " << arg1);
 };
+
+
+
+
+/*----------------------------- template functions ------------------------------*/
+
+template <typename InitFunctionObject, typename LoopFunctionObject>
+void TimeDependent::do_loop (InitFunctionObject      init_function,
+			     LoopFunctionObject      loop_function,
+			     const TimeSteppingData &timestepping_data,
+			     const Direction         direction)
+{
+				   // the following functions looks quite
+				   // disrupted due to the recurring switches
+				   // for forward and backward running loops.
+				   //
+				   // I chose to switch at every place where
+				   // it is needed, since it is so easy
+				   // to overlook something when you change
+				   // some code at one place when it needs
+				   // to be changed at a second place, here
+				   // for the other direction, also.
+  
+  const unsigned int n_timesteps = timesteps.size();
+
+				   // initialize the time steps for
+				   // a round of this loop
+  for (unsigned int step=0; step<n_timesteps; ++step)
+    switch (direction)
+      {
+	case forward:
+	      init_function (static_cast<typename InitFunctionObject::argument_type>
+			     (timesteps[step]));
+	      break;
+	case backward:
+	      init_function (static_cast<typename InitFunctionObject::argument_type>
+			     (timesteps[n_timesteps-step-1]));
+	      break;
+      };
+  
+
+				   // wake up the first few time levels
+  for (int step=-timestepping_data.look_ahead; step<0; ++step)
+    for (int look_ahead=0;
+	 look_ahead<=static_cast<int>(timestepping_data.look_ahead); ++look_ahead)
+      switch (direction)
+	{
+	  case forward:
+		if (step+look_ahead >= 0)
+		  timesteps[step+look_ahead]->wake_up(look_ahead);
+		break;
+	  case backward:
+		if (n_timesteps-(step+look_ahead) < n_timesteps)
+		  timesteps[n_timesteps-(step+look_ahead)]->wake_up(look_ahead);
+		break;
+	};
+  
+  
+  for (unsigned int step=0; step<n_timesteps; ++step)
+    {
+				       // first thing: wake up the
+				       // timesteps ahead as necessary
+      for (unsigned int look_ahead=0;
+	   look_ahead<=timestepping_data.look_ahead; ++look_ahead)
+	switch (direction)
+	  {
+	    case forward:
+		  if (step+look_ahead < n_timesteps)
+		    timesteps[step+look_ahead]->wake_up(look_ahead);
+		  break;
+	    case backward:
+		  if (n_timesteps > (step+look_ahead))
+		    timesteps[n_timesteps-(step+look_ahead)-1]->wake_up(look_ahead);
+		  break;
+	  };
+      
+      
+				       // actually do the work
+      switch (direction)
+	{
+	  case forward:
+		loop_function (static_cast<typename LoopFunctionObject::argument_type>
+			       (timesteps[step]));
+		break;
+	  case backward:
+		loop_function (static_cast<typename LoopFunctionObject::argument_type>
+			       (timesteps[n_timesteps-step-1]));
+		break;
+	};
+      
+				       // let the timesteps behind sleep
+      for (unsigned int look_back=0;
+	   look_back<=timestepping_data.look_back; ++look_back)
+	switch (direction)
+	  {
+	    case forward:
+		  if (step>=look_back)
+		    timesteps[step-look_back]->sleep(look_back);
+		  break;
+	    case backward:
+		  if (n_timesteps-(step-look_back) <= n_timesteps)
+		    timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
+		  break;
+	  };
+    };
+
+				   // make the last few timesteps sleep
+  for (int step=n_timesteps;
+       step<static_cast<int>(n_timesteps+timestepping_data.look_back); ++step)
+    for (int look_back=0;
+	 look_back<=static_cast<int>(timestepping_data.look_back); ++look_back)
+      switch (direction)
+	{
+	  case forward:
+		if ((step-look_back >= 0)
+		    &&
+		    (step-look_back < static_cast<int>(n_timesteps)))
+		  timesteps[step-look_back]->sleep(look_back);
+		break;
+	  case backward:
+		if ((step-look_back >= 0)
+		    &&
+		    (step-look_back < static_cast<int>(n_timesteps)))
+		  timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
+		break;
+	};
+};
+
 
 
 
