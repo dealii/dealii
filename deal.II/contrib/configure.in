@@ -1,0 +1,37 @@
+dnl $Id$
+dnl
+dnl configure script for the /contrib subdirectory
+dnl
+dnl author: Wolfgang Bangerth, 2000
+dnl
+
+
+define([AC_CACHE_LOAD], )dnl
+define([AC_CACHE_SAVE], )dnl
+AC_REVISION($Revision$)
+AC_INIT(kdoc)
+
+
+dnl    Set the path to the deal.II/contrib directory
+DEAL2_CONTRIB_DIR=`pwd`
+
+
+
+dnl    configure the kdoc package to tell it to install itself
+dnl    into deal.II/contrib/kdoc. This is a kludge, but it seems
+dnl    impossible to set the target path using AC_PREFIX_DEFAULT(kdoc)
+dnl    and then call AC_CONFIG_SUBDIRS(kdoc/src), as the target
+dnl    path is not propagated
+cd kdoc/src
+./configure --prefix=$DEAL2_CONTRIB_DIR/kdoc
+cd $DEAL2_CONTRIB_DIR
+
+
+
+dnl -------------------------------------------------------------
+dnl Output results
+dnl -------------------------------------------------------------
+
+dnl    At present there are no output files. nonetheless, autoconf
+dnl    requires this statement
+AC_OUTPUT()

@@ -363,8 +363,9 @@ dnl -------------------------------------------------------------
 dnl Configure other packages
 dnl -------------------------------------------------------------
 
-dnl    Configure the `tests' directory, if that is installed.
-AC_CONFIG_SUBDIRS(tests)
+dnl    Configure the `tests' directory, if that is installed. also
+dnl    configure the programs in the contrib directory
+AC_CONFIG_SUBDIRS(tests contrib)
 
 
 
