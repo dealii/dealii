@@ -869,10 +869,22 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
         AC_MSG_RESULT(PowerPC64)
 	case $GXX_VERSION in
 	  gcc*)
+	      dnl Tune for this processor
 	      CXXFLAGSG="$CXXFLAGSG -maix64"
 	      CXXFLAGSO="$CXXFLAGSO -maix64 -mpowerpc64 -mcpu=powerpc64 -mtune=powerpc64"
+
+	      dnl On this stupid system, we get TOC overflows if we use the
+	      dnl standard flags, so restrict TOC entries to the absolute minimal
+	      CXXFLAGSG="$CXXFLAGSG -mminimal-toc"
+	      CXXFLAGSO="$CXXFLAGSO -mminimal-toc"
+
+	      dnl When generating 64-bit code, we need to pass respective flags when
+	      dnl linking (also for static libs)
 	      AR="$AR -X 64"
 	      LDFLAGS="$LDFLAGS -maix64"
+
+	      dnl And we must always link with pthreads
+	      LIBS="$LIBS -lpthread
               ;;
         esac
 	;;
