@@ -148,7 +148,7 @@ veryclean: clean
 # Automatic generation of dependencies
 ############################################################
 
-all-cc-files = $(solver-cc-files) $(mgbase-cc-files) $(mg-cc-files) $(benchmark-cc-files)
+all-cc-files = $(wildcard *.cc)
 
 Make.depend: $(all-cc-files)
 	@echo =====Dependecies=== Make.depend

@@ -41,13 +41,13 @@ class MGSmootherLAC
   public MGSmootherBase
 {
   private:
-    SmartPointer<MGMatrix<SparseMatrix<float> > >matrices;
+    SmartPointer<MGMatrix<SparseMatrix<double> > >matrices;
   public:
-    MGSmootherLAC(MGMatrix<SparseMatrix<float> >&);
+    MGSmootherLAC(MGMatrix<SparseMatrix<double> >&);
     
     virtual void smooth (const unsigned int level,
-			 Vector<float> &u,
-			 const Vector<float> &rhs) const;
+			 Vector<double> &u,
+			 const Vector<double> &rhs) const;
     
 };
 
@@ -107,7 +107,7 @@ main()
 	  
 	  u = 0.;
 	  vector<SparseMatrixStruct> mgstruct(tr.n_levels());
-	  MGMatrix<SparseMatrix<float> > mgA(0,tr.n_levels()-1);
+	  MGMatrix<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
 	  for (unsigned int i=0;i<tr.n_levels();++i)
 	    {
 	      mgstruct[i].reinit(mgdof.n_dofs(i), mgdof.n_dofs(i),
@@ -120,11 +120,11 @@ main()
 	  equation.build_mgmatrix(mgA, mgdof, quadrature);
 	  
 	  SolverControl cgcontrol(10,0., false, false);
-	  PrimitiveVectorMemory<Vector<float> > cgmem;
-	  SolverCG<SparseMatrix<float>, Vector<float> > cgsolver(cgcontrol, cgmem);
-	  PreconditionIdentity<Vector<float> > cgprec;
-	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<float>, Vector<float> >,
-	    SparseMatrix<float>, PreconditionIdentity<Vector<float> > >
+	  PrimitiveVectorMemory<Vector<double> > cgmem;
+	  SolverCG<SparseMatrix<double>, Vector<double> > cgsolver(cgcontrol, cgmem);
+	  PreconditionIdentity<Vector<double> > cgprec;
+	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<double>, Vector<double> >,
+	    SparseMatrix<double>, PreconditionIdentity<Vector<double> > >
 	    coarse(cgsolver, mgA[0], cgprec);
 	  
 	  MGSmootherLAC smoother(mgA);
@@ -149,21 +149,21 @@ RHSFunction<dim>::operator() (const Point<dim>&) const
   return 1.;
 }
 
-MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<float> >& matrix)
+MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<double> >& matrix)
 		:
 		matrices(&matrix)
 {}
 
 void
 MGSmootherLAC::smooth (const unsigned int level,
-		       Vector<float> &u,
-		       const Vector<float> &rhs) const
+		       Vector<double> &u,
+		       const Vector<double> &rhs) const
 {
-  SolverControl control(1,1.e-300,false,false);
-  PrimitiveVectorMemory<Vector<float> > mem;
-  SolverRichardson<SparseMatrix<float> , Vector<float>  > rich(control, mem);
-  PreconditionRelaxation<SparseMatrix<float> , Vector<float> >
-    prec((*matrices)[level], &SparseMatrix<float> ::template precondition_SSOR<float>, 1.);
+  SolverControl control(2,1.e-300,false,false);
+  PrimitiveVectorMemory<Vector<double> > mem;
+  SolverRichardson<SparseMatrix<double> , Vector<double>  > rich(control, mem);
+  PreconditionRelaxation<SparseMatrix<double> , Vector<double> >
+    prec((*matrices)[level], &SparseMatrix<double> ::template precondition_SSOR<double>, 1.);
 
   rich.solve((*matrices)[level], u, rhs, prec);
 }

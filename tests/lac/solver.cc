@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparsematrix.h>
@@ -32,13 +33,13 @@ main()
   deallog.attach(logfile);
   
   PrimitiveVectorMemory<Vector<double>  > mem;
-  SolverControl control(100, 1.e-5, true);
+  SolverControl control(50, 1.e-5, true);
   SolverCG<SparseMatrix<float> , Vector<double>  > cg(control, mem);
   SolverGMRES<SparseMatrix<float> , Vector<double>  > gmres(control, mem,20);
   SolverBicgstab<SparseMatrix<float> , Vector<double>  > bicgstab(control, mem);
   SolverRichardson<SparseMatrix<float> , Vector<double>  > rich(control, mem);
 
-  for (unsigned int size=10; size <= 10; size *= 10)
+  for (unsigned int size=4; size <= 40; size *= 3)
     {
       deallog << "Size " << size << endl;
       
@@ -61,6 +62,18 @@ main()
       
       Vector<double>  f(dim);
       Vector<double>  u(dim);
+      Vector<double> res(dim);
+
+      f = 1.;
+      u = 1.;
+      
+      A.residual(res,u,f);
+      A.SOR(res);
+      res.add(1.,u);
+      A.SOR_step(u,f);
+      res.add(-1.,u);
+    
+      deallog << "SOR-diff:" << res*res << endl;
       
       deallog.push("no");
 

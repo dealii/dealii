@@ -10,11 +10,11 @@ class TransferTest
   public MGTransferBase
 {
     virtual void prolongate(unsigned l,
-			    Vector<float>& dst,
-			    const Vector<float>& src) const;
+			    Vector<double>& dst,
+			    const Vector<double>& src) const;
     virtual void restrict(unsigned l,
-			  Vector<float>& dst,
-			  const Vector<float>& src) const;
+			  Vector<double>& dst,
+			  const Vector<double>& src) const;
     friend class MGBase;
 };
 
@@ -24,8 +24,8 @@ class SmoothTest
 {
   public:
         virtual void smooth (const unsigned int  level,
-			     Vector<float>      &u,
-			     const Vector<float>& rhs) const;
+			     Vector<double>      &u,
+			     const Vector<double>& rhs) const;
 };
 
 class MGCoarseGridTest
@@ -34,8 +34,8 @@ class MGCoarseGridTest
 {
   public:
     virtual void operator () (unsigned int level,
-			      Vector<float>& dst,
-			      const Vector<float>& src) const ;
+			      Vector<double>& dst,
+			      const Vector<double>& src) const ;
 };
 
 
@@ -48,7 +48,7 @@ class MGTest
 
   public:
     MGTest(TransferTest& t, SmoothTest& sm, MGCoarseGridTest& cs)
-		    : MGBase(t, 9, 3),
+		    : MGBase(t, 3, 9),
 		      smoother(sm),
 		      solver(cs)
       {
@@ -59,10 +59,10 @@ class MGTest
 	  }
       }
     
-    virtual void level_residual(unsigned level,
-				Vector<float>& dst,
-				const Vector<float>& src,
-				const Vector<float>& rhs);
+    virtual void level_vmult(unsigned level,
+				Vector<double>& dst,
+				const Vector<double>& src,
+				const Vector<double>& rhs);
     
     void doit()
       {
@@ -83,41 +83,41 @@ main()
 
 void
 TransferTest::prolongate(unsigned l,
-			 Vector<float>&,
-			 const Vector<float>&) const
+			 Vector<double>&,
+			 const Vector<double>&) const
 {
   cout << "Prolongating " << l-1 << " to " << l << endl;
 }
 
 void
 TransferTest::restrict(unsigned l,
-		       Vector<float>&,
-		       const Vector<float>&) const
+		       Vector<double>&,
+		       const Vector<double>&) const
 {
   cout << "Restricting  " << l << " to " << l-1 << endl;
 }
 
 void
 SmoothTest::smooth (const unsigned int  level,
-		    Vector<float>      &,
-		    const Vector<float>&) const
+		    Vector<double>      &,
+		    const Vector<double>&) const
 {
   cout << "Smoothing on " << level << endl;
 }
 
 void
-MGTest::level_residual(unsigned l,
-		       Vector<float>&,
-		       const Vector<float>&,
-		       const Vector<float>&)
+MGTest::level_vmult(unsigned l,
+		       Vector<double>&,
+		       const Vector<double>&,
+		       const Vector<double>&)
 {
   cout << "Residual on  " << l << endl;
 }
 
 void
 MGCoarseGridTest::operator() (unsigned int level,
-			      Vector<float>&,
-			      const Vector<float>&) const
+			      Vector<double>&,
+			      const Vector<double>&) const
 {
   cout << "Solving on   " << level << endl;
 }

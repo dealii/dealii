@@ -46,7 +46,7 @@ Helmholtz::build_mgmatrix(MGMatrix<MATRIX>& A,
 		  double u = fe.shape_value(j,k);
 		  
 		  elmat(i,j) += fe.JxW(k) *
-				(1.*u*v + du*dv)
+				(0.1*u*v + du*dv)
 				;
 		}
 	    }

@@ -118,7 +118,7 @@ FDMGTransfer::FDMGTransfer(unsigned int nx, unsigned int ny,
 
 void
 FDMGTransfer::build_matrix(unsigned int nx, unsigned int ny,
-			   SparseMatrixStruct& structure, SparseMatrix<float>& matrix)
+			   SparseMatrixStruct& structure, SparseMatrix<double>& matrix)
 {
   structure.reinit((nx-1)*(ny-1),(2*nx-1)*(2*ny-1),9);
   
@@ -210,8 +210,8 @@ FDMGTransfer::build_matrix(unsigned int nx, unsigned int ny,
 
 void
 FDMGTransfer::prolongate (const unsigned int   to_level,
-			  Vector<float>       &dst,
-			  const Vector<float> &src) const
+			  Vector<double>       &dst,
+			  const Vector<double> &src) const
 {
   Assert((to_level>0) && (to_level<=matrices.size()),
 	 ExcIndexRange(to_level, 0, matrices.size()+1));
@@ -222,8 +222,8 @@ FDMGTransfer::prolongate (const unsigned int   to_level,
 
 void
 FDMGTransfer::restrict (const unsigned int   from_level,
-	 		Vector<float>       &dst,
-			const Vector<float> &src) const
+	 		Vector<double>       &dst,
+			const Vector<double> &src) const
 {
   Assert((from_level>0) && (from_level<=matrices.size()),
 	 ExcIndexRange(from_level, 0, matrices.size()+1));
