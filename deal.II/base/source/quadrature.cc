@@ -10,6 +10,49 @@ Quadrature<dim>::Quadrature (const unsigned int n_q) :
 		weights (n_q, 0) {};
 
 
+template <>
+Quadrature<1>::Quadrature (const Quadrature<0> &,
+			   const Quadrature<1> &) {
+  Assert (false, ExcInternalError());
+};
+
+
+
+template <int dim>
+Quadrature<dim>::Quadrature (const Quadrature<dim-1> &q1,
+			     const Quadrature<1>     &q2) :
+		n_quadrature_points (q1.n_quadrature_points *
+				     q2.n_quadrature_points),
+		quadrature_points (n_quadrature_points),
+		weights (n_quadrature_points, 0)
+{
+  unsigned int present_index = 0;
+  for (unsigned int i=0; i<q1.n_quadrature_points; ++i)
+    for (unsigned int j=0; j<q2.n_quadrature_points; ++j)
+      {
+					 // compose coordinates of
+					 // new quadrature point by tensor
+					 // product in the last component
+	for (unsigned int d=0; d<dim-1; ++d)
+	  quadrature_points[present_index](d)
+	    = q1.quad_point(i)(d);
+	quadrature_points[present_index](dim-1)
+	  = q2.quad_point(j)(0);
+					       
+	weights[present_index] = q1.weight(i) * q2.weight(j);
+
+	++present_index;
+      };
+
+#ifdef DEBUG
+  double sum = 0;
+  for (unsigned int i=0; i<n_quadrature_points; ++i)
+    sum += weights[i];
+  Assert (sum==1, ExcInternalError());
+#endif
+};
+
+
 
 template <int dim>
 Quadrature<dim>::~Quadrature () {};

@@ -1,5 +1,5 @@
 /*----------------------------   quadrature.h     ---------------------------*/
-/*      <Id:>                 */
+/*      $Id$                 */
 #ifndef __quadrature_H
 #define __quadrature_H
 /*----------------------------   quadrature.h     ---------------------------*/
@@ -25,6 +25,12 @@
  * third order exact. In general, a formula of order #n# exactly
  * integrates polynomials of order #2n-1#.
  *
+ * Most integration formulae in more than one space dimension are tensor
+ * products of quadrature formulae in one space dimension, or more
+ * generally the tensor product of a formula in #(dim-1)# dimensions and
+ * one in one dimension. There is a special constructor to generate a
+ * quadrature formula from two others.
+ *
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -39,6 +45,15 @@ class Quadrature {
 				      * Constructor.
 				      */
     Quadrature (const unsigned int n_quadrature_points);
+
+				     /**
+				      * Build this quadrature formula as the
+				      * tensor product of a formula in a
+				      * dimension one less than the present and
+				      * a formula in one dimension.
+				      */
+    Quadrature (const Quadrature<dim-1> &,
+		const Quadrature<1>     &);
     
 				     /**
 				      * Virtual destructor needed, since someone
@@ -78,7 +93,11 @@ class Quadrature {
 		    int, int,
 		    << "The index " << arg1
 		    << " is out of range, it should be less than " << arg2);
-
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
+    
   protected:
 				     /**
 				      * List of quadrature points. To be filled
