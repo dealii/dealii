@@ -1585,8 +1585,29 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * declaration is used for the
 				      * default argument in
 				      * @p{set_boundary}.
+				      *
+				      * The proper way would have been
+				      * to use a static object here,
+				      * rather than a pointer to an
+				      * object. However, we have to
+				      * work around a bug in gcc2.95,
+				      * where the compiler tries to
+				      * instantiate @p{Triangulation}
+				      * while instantiating
+				      * @p{Boundary} (which it needs
+				      * to do, since local typedefs
+				      * are involved), but then tries
+				      * to in turn instantiate
+				      * @p{StraightBoundary} because
+				      * of this member variable. This
+				      * is not needed since the member
+				      * variable is a static one, but
+				      * the compiler tries anyway and
+				      * finds that it can't since the
+				      * base class @p{Boundary} is not
+				      * yet complete...
 				      */
-    static const StraightBoundary<dim> straight_boundary;
+    static const StraightBoundary<dim> *straight_boundary;
 
   public:
     
@@ -1733,7 +1754,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * straight line.
 				      */
     void set_boundary (unsigned int         number,
-		       const Boundary<dim> &boundary_object = straight_boundary);
+		       const Boundary<dim> &boundary_object = *straight_boundary);
 
 				     /**
 				      * Return a constant reference to
