@@ -252,7 +252,7 @@ template <int dim>
 std::vector<unsigned int>
 FE_DGQ<dim>::get_dpo_vector(unsigned int deg)
 {
-  std::vector<unsigned int> dpo(dim+1, 0);
+  std::vector<unsigned int> dpo(dim+1, static_cast<unsigned int>(0));
   dpo[dim] = ++deg;
   for (unsigned int i=1;i<dim;++i)
     dpo[dim] *= deg;

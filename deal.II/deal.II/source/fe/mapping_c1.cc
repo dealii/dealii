@@ -142,14 +142,14 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 	  coordinate_axis /= h;
 
 	  const double alpha = std::atan2(coordinate_axis[1], coordinate_axis[0]);
-	  const double b = ((face_vertex_normals[0][1] * sin(alpha)
-			     +face_vertex_normals[0][0] * cos(alpha)) /
-			    (face_vertex_normals[0][1] * cos(alpha)
-			     -face_vertex_normals[0][0] * sin(alpha))),
-		       c = ((face_vertex_normals[1][1] * sin(alpha)
-			     +face_vertex_normals[1][0] * cos(alpha)) /
-			    (face_vertex_normals[1][1] * cos(alpha)
-			     -face_vertex_normals[1][0] * sin(alpha)));
+	  const double b = ((face_vertex_normals[0][1] * std::sin(alpha)
+			     +face_vertex_normals[0][0] * std::cos(alpha)) /
+			    (face_vertex_normals[0][1] * std::cos(alpha)
+			     -face_vertex_normals[0][0] * std::sin(alpha))),
+		       c = ((face_vertex_normals[1][1] * std::sin(alpha)
+			     +face_vertex_normals[1][0] * std::cos(alpha)) /
+			    (face_vertex_normals[1][1] * std::cos(alpha)
+			     -face_vertex_normals[1][0] * std::sin(alpha)));
 
 					   // next evaluate the so
 					   // determined cubic
