@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,13 +55,23 @@ template <int dim> class FESystem;
 template <int dim>
 class FiniteElement : public FiniteElementBase<dim>
 {
-  private:
-				     /**
-				      * Copy constructor prohibited.
-				      */
-    FiniteElement(const FESystem<dim>&);
-
   public:
+                                     /**
+                                      * Copy constructor. This one is declared
+                                      * as a public constructor to avoid
+                                      * certain compiler errors when a copy
+                                      * constructor is required even if it is
+                                      * not executed (for example when binding
+                                      * a temporary object to a constant
+                                      * reference). However, if you try to
+                                      * actually call it, it will throw an
+                                      * exception, since copying finite
+                                      * element objects is not really
+                                      * supported. If you want to copy such an
+                                      * object, use the @p{clone} function.
+                                      */
+    FiniteElement (const FiniteElement &);
+    
 				     /**
 				      * Constructor
 				      */

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -621,11 +621,28 @@ compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_com
 template <int dim>
 FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data,
 				   const std::vector<bool> &restriction_is_additive_flags,
-				   const std::vector<std::vector<bool> > &nonzero_components) :
+				   const std::vector<std::vector<bool> > &nonzero_components)
+                :
 		FiniteElementBase<dim> (fe_data,
 					restriction_is_additive_flags,
 					nonzero_components)
 {}
+
+
+
+template <int dim>
+FiniteElement<dim>::FiniteElement (const FiniteElement<dim> &)
+                :
+                FiniteElementBase<dim> (FiniteElementData<dim>(),
+                                        std::vector<bool> (),
+                                        std::vector<std::vector<bool> >())
+{
+  Assert (false,
+          ExcMessage ("Finite element objects don't support copying "
+                      "semantics through the copy constructor. If "
+                      "you want to copy a finite element, use the "
+                      "clone() function."));
+}
 
 
 
