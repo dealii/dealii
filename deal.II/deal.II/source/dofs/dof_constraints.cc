@@ -917,13 +917,12 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 	    {
 	      const SparsityPattern &
 		block_sparsity = sparsity.block(block_row, block_col);
-	      
-	      const unsigned int
-		first = block_sparsity.get_rowstart_indices()[block_index.second],
-		last  = block_sparsity.get_rowstart_indices()[block_index.second+1];
-	      for (unsigned int j=first; j<last; ++j)
+
+              for (SparsityPattern::const_iterator
+                     entry = block_sparsity.begin(block_index.second);
+                   entry != block_sparsity.end(block_index.second); ++entry)
 						 // end of row reached?
-		if (block_sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+		if (entry->column() == SparsityPattern::invalid_entry)
 		  {
 						     // nothing more
 						     // to do
@@ -932,8 +931,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 		else
 		  {
 		    const unsigned int global_col
-		      = index_mapping.local_to_global(block_col,
-						      block_sparsity.get_column_numbers()[j]);
+		      = index_mapping.local_to_global(block_col, entry->column());
 		    
 		    if (distribute[global_col] != -1)
 						       // distribute entry at regular
@@ -941,13 +939,12 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 						       // global_col
 		      {
 			for (unsigned int q=0;
-			     q!=lines[distribute[global_col]]
-					    .entries.size(); ++q)
+			     q!=lines[distribute[global_col]].entries.size(); ++q)
 			  sparsity.add (row,
-					lines[distribute[global_col]].entries[q].first);
-		      };
-		  };
-	    };
+                                        lines[distribute[global_col]].entries[q].first);
+		      }
+		  }
+	    }
 	}
       else
 	{
@@ -961,13 +958,11 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 	      const SparsityPattern &
 		block_sparsity = sparsity.block(block_row,block_col);
 	      
-	      const unsigned int
-		first = block_sparsity.get_rowstart_indices()[block_index.second],
-		last  = block_sparsity.get_rowstart_indices()[block_index.second+1];
-      
-	      for (unsigned int j=first; j<last; ++j)
+              for (SparsityPattern::const_iterator
+                     entry = block_sparsity.begin(block_index.second);
+                   entry != block_sparsity.end(block_index.second); ++entry)
 						 // end of row reached?
-		if (block_sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+		if (entry->column() == SparsityPattern::invalid_entry)
 		  {
 						     // nothing more to do
 		    break;
@@ -975,8 +970,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 		else
 		  {
 		    const unsigned int global_col
-		      = index_mapping.local_to_global (block_col,
-						       block_sparsity.get_column_numbers()[j]);
+		      = index_mapping.local_to_global (block_col, entry->column());
 		    
 		    if (distribute[global_col] == -1)
 						       // distribute entry at irregular
@@ -984,8 +978,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 						       // global_col.
 		      {
 			for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
-			  sparsity.add (lines[distribute[row]].entries[q].first,
-					global_col);
+			  sparsity.add (lines[distribute[row]].entries[q].first, global_col);
 		      }
 		    else
 						       // distribute entry at irregular
@@ -996,11 +989,11 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 			  for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
 			    sparsity.add (lines[distribute[row]].entries[p].first,
 					  lines[distribute[global_col]].entries[q].first);
-		      };
-		  };
-	    };
-	};
-    };
+		      }
+		  }
+	    }
+	}
+    }
   
   sparsity.compress();
 }
