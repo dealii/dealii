@@ -176,6 +176,15 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Fixed: The <code class="member">GridGenerator::cylinder_shell</code>
+       function generated cells that were all inside-out, i.e. had negative
+       Jacobians. In usual finite element computations this simply leads to
+       all components of the linear system being negated, so it is not
+       harmful. It is fixed now anyway.
+       <br> 
+       (WB 2004/06/07)
+       </p>
 </ol>
 
 <hr>
