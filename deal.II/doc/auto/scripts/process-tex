@@ -1,0 +1,10 @@
+while (<>) {
+    goto END_HEADER  if /begin.document./;
+}
+
+
+END_HEADER:
+
+while (<>) {
+    print unless (/end\{document\}/);
+}
