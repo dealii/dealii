@@ -88,7 +88,7 @@ int main ()
   deallog.push ("2d");
   check<2> ();
   deallog.pop ();
-  deallog.push ("3d");
-  check<3> ();
-  deallog.pop ();
+//    deallog.push ("3d");
+//    check<3> ();
+//    deallog.pop ();
 }

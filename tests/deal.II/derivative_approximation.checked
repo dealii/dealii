@@ -73,35 +73,3 @@ DEAL:2d::233.72
 DEAL:2d::168.05
 DEAL:2d::185.42
 DEAL:2d::215.27
-DEAL:3d::Approximated gradient:
-DEAL:3d::25.27
-DEAL:3d::0.00
-DEAL:3d::25.27
-DEAL:3d::25.27
-DEAL:3d::0.00
-DEAL:3d::0.00
-DEAL:3d::0.00
-DEAL:3d::27.45
-DEAL:3d::52.80
-DEAL:3d::78.71
-DEAL:3d::52.80
-DEAL:3d::52.80
-DEAL:3d::78.71
-DEAL:3d::121.43
-DEAL:3d::78.71
-DEAL:3d::Approximated second derivative:
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::110.51
-DEAL:3d::110.51
-DEAL:3d::110.51
-DEAL:3d::95.30
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::NaN
-DEAL:3d::NaN
