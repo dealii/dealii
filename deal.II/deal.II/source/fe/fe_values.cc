@@ -76,7 +76,10 @@ void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
 				   // get function values of dofs
 				   // on this cell
   Vector<double> dof_values (total_dofs);
-  present_cell->get_dof_values (fe_function, dof_values);
+  if (present_cell->active())
+    present_cell->get_dof_values (fe_function, dof_values);
+  else
+    present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   fill_n (values.begin(), n_quadrature_points, 0);
@@ -105,8 +108,11 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
 				   // get function values of dofs
 				   // on this cell
   Vector<double> dof_values (total_dofs);
-  present_cell->get_dof_values (fe_function, dof_values);
-
+  if (present_cell->active())
+    present_cell->get_dof_values (fe_function, dof_values);
+  else
+    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  
 				   // initialize with zero
   for (unsigned i=0;i<values.size();++i)
     fill_n (values[i].begin(), values[i].size(), 0);
@@ -149,7 +155,10 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>   &fe_function,
 				   // get function values of dofs
 				   // on this cell
   Vector<double> dof_values (total_dofs);
-  present_cell->get_dof_values (fe_function, dof_values);
+  if (present_cell->active())
+    present_cell->get_dof_values (fe_function, dof_values);
+  else
+    present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   fill_n (gradients.begin(), n_quadrature_points, Tensor<1,dim>());
@@ -180,7 +189,10 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>            &fe_
 				   // get function values of dofs
 				   // on this cell
   Vector<double> dof_values (total_dofs);
-  present_cell->get_dof_values (fe_function, dof_values);
+  if (present_cell->active())
+    present_cell->get_dof_values (fe_function, dof_values);
+  else
+    present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   for (unsigned i=0;i<gradients.size();++i)
@@ -226,7 +238,10 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe
 				   // get function values of dofs
 				   // on this cell
   Vector<double> dof_values (total_dofs);
-  present_cell->get_dof_values (fe_function, dof_values);
+  if (present_cell->active())
+    present_cell->get_dof_values (fe_function, dof_values);
+  else
+    present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
   fill_n (second_derivatives.begin(), n_quadrature_points, Tensor<2,dim>());

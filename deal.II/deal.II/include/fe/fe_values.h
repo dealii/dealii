@@ -284,6 +284,10 @@ class FEValuesBase
 				      * of the derived class was called,
 				      * at the quadrature points.
 				      *
+				      * If the present cell is not an active
+				      * one the interpolated function values
+				      * are returned.
+				      *
 				      * To get values of
 				      * multi-component elements,
 				      * there is another
@@ -340,6 +344,10 @@ class FEValuesBase
 				      * by #fe_function# restricted to
 				      * #cell# at the quadrature points.
 				      *
+				      * If the present cell is not an active
+				      * one the interpolated function values
+				      * are returned.
+				      *
 				      * The function assumes that the
 				      * #gradients# object already has the
 				      * right size.
@@ -352,6 +360,10 @@ class FEValuesBase
 				      * element function characterized
 				      * by #fe_function# restricted to
 				      * #cell# at the quadrature points.
+				      *
+				      * If the present cell is not an active
+				      * one the interpolated function values
+				      * are returned.
 				      *
 				      * The function assumes that the
 				      * #gradients# object already has the
