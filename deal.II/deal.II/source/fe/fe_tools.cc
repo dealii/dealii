@@ -478,6 +478,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 {
   const unsigned int nc = GeometryInfo<dim>::children_per_cell;
   const unsigned int n  = fe.dofs_per_cell;
+  const unsigned int nd = fe.n_components();
   const unsigned int degree = fe.degree;
   
   for (unsigned int i=0;i<nc;++i)
@@ -529,12 +530,13 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 				    * children.
 				    */
   fine.reinit(dof_fine.begin_active());
-  FullMatrix<number> A(nq, n);
-  for (unsigned int i=0;i<nq;++i)
-    for (unsigned int j=0;j<n;++j)
-      A(i,j) = fine.shape_value(j,i);
+  FullMatrix<number> A(nq*nd, n);
+  for (unsigned int d=0;d<nd;++d)
+    for (unsigned int k=0;k<nq;++k)
+      for (unsigned int j=0;j<n;++j)
+	A(k*nd+d,j) = fine.shape_value_component(j,k,d);
   
-  Vector<number> v_coarse(nq);
+  Vector<number> v_coarse(nq*nd);
   Vector<number> v_fine(n);
   
   unsigned int cell_number = 0;
@@ -559,8 +561,9 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 					   // function values of the
 					   // coarse grid function in
 					   // each quadrature point.
-	  for (unsigned int k=0;k<nq;++k)
-	    v_coarse(k) = coarse.shape_value(i,k);
+	  for (unsigned int d=0;d<nd;++d)
+	    for (unsigned int k=0;k<nq;++k)
+	      v_coarse(k*nd+d) = coarse.shape_value_component(i,k,d);
 
 					   // Copy the matrix and
 					   // solve the least squares
