@@ -1119,7 +1119,7 @@ class DataOutBase
  * Additionally, objects of this class have a default format, which
  * can be set by the parameter "Output format" of the parameter
  * file. Within a program, this can be changed by the member function
- * #set_format#. Using this default format, it is possible to leave
+ * #set_default_format#. Using this default format, it is possible to leave
  * the format selection completely to the parameter file. A suitable
  * suffix for the output file name can be obtained by #default_suffix#
  * without arguments.
@@ -1134,7 +1134,7 @@ class DataOutInterface : private DataOutBase
 				      * Provide a data type specifying the
 				      * presently supported output formats.
 				      */
-    enum OutputFormat { nil, ucd, gnuplot, povray, eps, gmv };
+    enum OutputFormat { default_format, ucd, gnuplot, povray, eps, gmv };
 
 				     /**
 				      * Obtain data through the #get_patches#
@@ -1179,16 +1179,16 @@ class DataOutInterface : private DataOutBase
 				      * requested, the #default_format# is written.
 				      *
 				      * An error occurs if no format is provided and
-				      * the default format is #nil#.
+				      * the default format is #default_format#.
 				      */
-    void write (ostream &out, const OutputFormat output_format = nil) const;
+    void write (ostream &out, const OutputFormat output_format = default_format) const;
 
 				     /**
 				      * Set the default format. The value set here
-				      * is used anytime, output for format #nil# is
+				      * is used anytime, output for format #default_format# is
 				      * requested.
 				      */
-    void set_format(const OutputFormat default_format);
+    void set_default_format(const OutputFormat default_format);
 
 				     /**
 				      * Set the flags to be used for output
@@ -1235,11 +1235,11 @@ class DataOutInterface : private DataOutBase
 				      * \end{itemize}
 				      *
 				      * If this function is called
-				      * with no argument or #nil#, the
+				      * with no argument or #default_format#, the
 				      * suffix for the
 				      * #default_format# is returned.
 				      */
-    string default_suffix (const OutputFormat output_format = nil);
+    string default_suffix (const OutputFormat output_format = default_format);
 
 				     /**
 				      * Return the #OutputFormat# value
@@ -1340,11 +1340,11 @@ class DataOutInterface : private DataOutBase
   private:
 				     /**
 				      * Standard output format.
-				      * Use this format, if output format nil is
+				      * Use this format, if output format default_format is
 				      * requested. It can be changed by the #set_format#
 				      * function or in a parameter file.
 				      */
-    OutputFormat default_format;
+    OutputFormat default_fmt;
     
 				     /**
 				      * Flags to be used upon output of UCD

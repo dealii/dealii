@@ -1730,8 +1730,8 @@ template <int dim>
 void DataOutInterface<dim>::write (ostream &out,
 				   OutputFormat output_format) const
 {
-  if (output_format == nil)
-    output_format = default_format;
+  if (output_format == default_format)
+    output_format = default_fmt;
   
   switch (output_format) 
     {
@@ -1763,9 +1763,10 @@ void DataOutInterface<dim>::write (ostream &out,
 
 
 template <int dim>
-void DataOutInterface<dim>::set_format(OutputFormat fmt)
+void DataOutInterface<dim>::set_default_format(OutputFormat fmt)
 {
-  default_format = fmt;
+  Assert(fmt != default_format, ExcNotImplemented());
+  default_fmt = fmt;
 }
 
 
@@ -1813,8 +1814,8 @@ void DataOutInterface<dim>::set_flags (const GmvFlags &flags)
 template <int dim>
 string DataOutInterface<dim>::default_suffix (OutputFormat output_format) 
 {
-  if (output_format == nil)
-    output_format = default_format;
+  if (output_format == default_format)
+    output_format = default_fmt;
   
   switch (output_format) 
     {
@@ -1909,7 +1910,7 @@ template <int dim>
 void DataOutInterface<dim>::parse_parameters (ParameterHandler &prm) 
 {
   const string& output_name = prm.get ("Output format");
-  default_format = parse_output_format (output_name);
+  default_fmt = parse_output_format (output_name);
 
   prm.enter_subsection ("UCD output parameters");
   ucd_flags.parse_parameters (prm);
