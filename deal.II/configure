@@ -8901,12 +8901,56 @@ _ACEOF
 if test "${with_umfpack+set}" = set; then
   withval="$with_umfpack"
 
-  echo "$as_me:$LINENO: checking UmfPack library" >&5
-echo $ECHO_N "checking UmfPack library... $ECHO_C" >&6
   if test "x$withval" != "xyes" ; then
-    echo "$as_me:$LINENO: result: external version not yet supported" >&5
-echo "${ECHO_T}external version not yet supported" >&6
+    as_ac_File=`echo "ac_cv_file_$withval/Lib/libumfpack.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $withval/Lib/libumfpack.a" >&5
+echo $ECHO_N "checking for $withval/Lib/libumfpack.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withval/Lib/libumfpack.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  UMFPACK_LIB=$withval/Lib/libumfpack.a
+fi
+
+    as_ac_File=`echo "ac_cv_file_$withval/Include/umfpack.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $withval/Include/umfpack.h" >&5
+echo $ECHO_N "checking for $withval/Include/umfpack.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withval/Include/umfpack.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  UMFPACK_INCLUDE_DIR=-I$withval/Include
+else
+  UMFPACK_LIB=""
+fi
+
   else
+    echo "$as_me:$LINENO: checking UmfPack library" >&5
+echo $ECHO_N "checking UmfPack library... $ECHO_C" >&6
     UMFPACK_LIB='$(LIBDIR)/liblac_umfpack$(lib-suffix)'
     UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
     USE_CONTRIB_UMFPACK='yes'

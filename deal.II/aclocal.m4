@@ -4308,10 +4308,14 @@ dnl What to do if UMFPack is selected
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
-  AC_MSG_CHECKING(UmfPack library)
   if test "x$1" != "xyes" ; then
-    AC_MSG_RESULT(external version not yet supported)
+    AC_CHECK_FILE($1/Lib/libumfpack.a,
+	UMFPACK_LIB=$1/Lib/libumfpack.a)
+    AC_CHECK_FILE($1/Include/umfpack.h,
+	UMFPACK_INCLUDE_DIR=-I$1/Include,
+	UMFPACK_LIB="")
   else
+    AC_MSG_CHECKING(UmfPack library)
     UMFPACK_LIB='$(LIBDIR)/liblac_umfpack$(lib-suffix)'
     UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
     USE_CONTRIB_UMFPACK='yes'
