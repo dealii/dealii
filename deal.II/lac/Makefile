@@ -4,7 +4,7 @@
 all: lac
 
 clean: source-clean
-	rm -f *~ include/*~ include/*/*~ lib/lib*
+	rm -f *~ include/*~ include/*/*~ lib/lib* lib/Makefile.dep
 
 lac:
 	cd source ; make
