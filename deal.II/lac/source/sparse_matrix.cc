@@ -551,7 +551,7 @@ unsigned int
 SparseMatrixStruct::n_nonzero_elements () const {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (compressed, ExcNotCompressed());
-  return colnums[rows]-colnums[0];
+  return rowstart[rows]-rowstart[0];
 };
 
 
