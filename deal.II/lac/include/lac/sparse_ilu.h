@@ -80,7 +80,7 @@ class SparseILU : public SparseLUDecomposition<number>
                                       */
     SparseILU (const SparsityPattern &sparsity);
     
-    typedef SparseLUDecomposition<number>::AdditionalData AdditionalData;
+    typedef typename SparseLUDecomposition<number>::AdditionalData AdditionalData;
 
 				     /**
 				      * Perform the incomplete LU
