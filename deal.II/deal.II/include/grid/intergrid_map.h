@@ -114,7 +114,7 @@ class InterGridMap
 {
   public:
 
-#ifdef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF
+#ifdef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
 				     // helper class
     struct GridClass_dim : public GridClass<dim>
     {
