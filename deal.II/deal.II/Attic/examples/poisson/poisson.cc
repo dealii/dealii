@@ -1,196 +1,23 @@
 /* $Id$ */
 
 
-#include <grid/tria.h>
-#include <grid/dof.h>
-#include <grid/tria_accessor.h>
-#include <grid/dof_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary.h>
-#include <grid/dof_constraints.h>
-#include <basic/data_io.h>
-#include <basic/function.h>
-#include <fe/fe_lib.h>
-#include <fe/quadrature_lib.h>
-#include <numerics/base.h>
-#include <numerics/assembler.h>
-#include <lac/dsmatrix.h>
-
-
-#include <map.h>
-#include <fstream.h>
-#include <cmath>
-extern "C" {
-#  include <stdlib.h>
-}
-
-extern TriaActiveIterator<1,CellAccessor<1> > x;
-extern TriaActiveIterator<2,CellAccessor<2> > y;
-extern TriaRawIterator<1,DoFLineAccessor<1,LineAccessor<1> > > z;
+#include "poisson.h"
 
 
 
-template <int dim>
-class PoissonEquation :  public Equation<dim> {
-  public:
-    PoissonEquation () :
-		    Equation<dim>(1) {};
-
-    virtual void assemble (dFMatrix            &cell_matrix,
-			   dVector             &rhs,
-			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
-    double right_hand_side (const Point<dim> &) const;
-};
-
-
-
-template <int dim>
-inline
-double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
-  const double pi = 3.1415926536;
-  switch (dim) 
+int main (int argc, char **argv) {
+  if (argc!=2) 
     {
-      case 1:
-//	    return ((1-4*3.1415926536*3.1415926536) *
-//		    cos(2*3.1415926536*p(0)));
-	    return p(0)*p(0)*p(0)-3./2.*p(0)*p(0)-6*p(0)+3;
-      case 2:
-//	    return ((1-3.1415926536*3.1415926536) *
-//		    cos(3.1415926536*p(0)) *
-//		    cos(3.1415926536*p(1)));
-//	    return (p(0)*p(0)*p(0)+p(1)*p(1)*p(1)
-//		    - 3./2.*(p(0)*p(0)+p(1)*p(1))
-//		    - 6*(p(0)+p(1))
-//		    + 6);
-	    return (-2.0*cos(pi*p(0)/2)*p(1)*sin(pi*p(1)) +
-		    2.0*p(0)*sin(pi*p(0)/2)*pi*p(1)*sin(pi*p(1)) +
-		    5.0/4.0*p(0)*p(0)*cos(pi*p(0)/2)*pi*pi*p(1)*sin(pi*p(1)) -
-		    2.0*p(0)*p(0)*cos(pi*p(0)/2)*cos(pi*p(1))*pi);
-      default:
-	    return 0;
+      cout << "Usage: poisson parameterfile" << endl << endl;
+      return 1;
     };
-};
 
+  PoissonProblem<2> poisson;
+  MultipleParameterLoop input_data;
 
-
-void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
-				   dVector             &rhs,
-				   const FEValues<1>   &fe_values,
-				   const Triangulation<1>::cell_iterator &) const {
-  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-      {
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
-	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
-			       fe_values.shape_grad(j,point) +
-			       fe_values.shape_value(i,point) *
-			       fe_values.shape_value(j,point)) *
-			      fe_values.JxW(point);
-	rhs(i) += fe_values.shape_value(i,point) *
-		  right_hand_side(fe_values.quadrature_point(point)) *
-		  fe_values.JxW(point);
-      };
-};
-
-
-
-void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
-				   dVector             &rhs,
-				   const FEValues<2>   &fe_values,
-				   const Triangulation<2>::cell_iterator &) const {
-  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-      {
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
-	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
-			       fe_values.shape_grad(j,point)/* +
-			       fe_values.shape_value(i,point) *
-			       fe_values.shape_value(j,point)*/) *
-			      fe_values.JxW(point);
-	rhs(i) += fe_values.shape_value(i,point) *
-		  right_hand_side(fe_values.quadrature_point(point)) *
-		  fe_values.JxW(point);
-      };
-};
-
-  
-
-
-int main () {
-  Triangulation<2>   tria;
-  DoFHandler<2>      dof(&tria);
-  FELinear<2>        fe;
-  ProblemBase<2>     problem;
-  problem.set_tria_and_dof (&tria, &dof);
-  PoissonEquation<2> equation;
-  QGauss4<2>         quadrature;
-
-				   
-  cout << "Making grid..." << endl;
-  
-  tria.create_hypercube ();
-//  HyperBallBoundary<2> boundary(Point<2>(2,3), 4);
-//  tria.create_hyper_ball(Point<2>(2,3),4);
-//  tria.set_boundary (&boundary);
-  
-//  tria.refine_global (1);
-//  (--tria.last_active())->set_refine_flag();
-//  tria.execute_refinement ();
-//  tria.begin_active(2)->set_refine_flag();
-//  tria.execute_refinement ();
-//  tria.refine_global (5);
-
-
-  const unsigned int dim=2;
-  tria.refine_global (1);
-	
-  Triangulation<dim>::active_cell_iterator cell, endc;
-  for (int i=0; i<12; ++i) 
-    {
-      int n_levels = tria.n_levels();
-      cell = tria.begin_active();
-      endc = tria.end();
-      
-      for (; cell!=endc; ++cell) 
-	{
-	  double r      = rand()*1.0/RAND_MAX,
-		 weight = 1.*
-			  (cell->level()*cell->level()) /
-			  (n_levels*n_levels);
-	  
-	  if (r <= 0.5*weight)
-	    cell->set_refine_flag ();
-	};
-      
-      tria.execute_refinement ();
-    };
-  tria.refine_global (1);
-
-
-  cout << "Distributing dofs... "; 
-  dof.distribute_dofs (fe);
-  cout << dof.n_dofs() << " degrees of freedom." << endl;
-
-  cout << "Assembling matrices..." << endl;
-  FEValues<2>::UpdateStruct update_flags;
-  update_flags.q_points  = update_flags.gradients  = true;
-  update_flags.jacobians = update_flags.JxW_values = true;
-  
-  ProblemBase<2>::DirichletBC dirichlet_bc;
-  ZeroFunction<2> zero;
-  dirichlet_bc[0] = &zero;
-  problem.assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
-
-  cout << "Solving..." << endl;
-  problem.solve ();
-
-  cout << "Printing..." << endl;
-  DataOut<2> out;
-  ofstream gnuplot("gnuplot.out.5");
-  problem.fill_data (out); 
-  out.write_gnuplot (gnuplot);
-  gnuplot.close ();
+  poisson.declare_parameters(input_data);
+  input_data.read_input (argv[1]);
+  input_data.loop (poisson);
   
   return 0;
 };
