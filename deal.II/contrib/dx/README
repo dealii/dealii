@@ -1,8 +1,15 @@
 ==================================================
-= Networks for IBM Data Explorer
+= Networks for IBM Open Visualization Data Explorer
 ==================================================
 
-Structure:
+Information on OpenDX:
+
+
+http://www.research.ibm.com/dx/
+
+==================================================
+
+Structure of this directory:
 
 single: visualization for files with all components in a
   single data vector
