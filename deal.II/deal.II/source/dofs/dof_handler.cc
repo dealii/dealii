@@ -1465,6 +1465,53 @@ unsigned int DoFHandler<2>::max_transfer_entries (const unsigned int max_level_d
 
 
 
+template <int dim>
+void DoFHandler<dim>::distribute_cell_to_dof_vector (const vector<double> &cell_data,
+						     dVector              &dof_data) const {
+  Assert (cell_data.size()==tria->n_active_cells(),
+	  ExcWrongSize (cell_data.size(), tria->n_active_cells()));
+
+				   // assign the right size to the output vector
+  dof_data.reinit (n_dofs());
+				   // count how often we have added a value
+				   // in the sum for each dof
+  vector<unsigned char> touch_count (n_dofs(), 0);
+
+  active_cell_iterator cell = begin_active(),
+		       endc = end();
+  unsigned int present_cell = 0;
+  vector<int> dof_indices;
+  const unsigned int total_dofs = selected_fe->total_dofs;
+  
+  for (; cell!=endc; ++cell, ++present_cell) 
+    {
+      dof_indices.resize (0);
+      cell->get_dof_indices (dof_indices);
+      for (unsigned int i=0; i<total_dofs; ++i)
+	{
+					   // sum up contribution of the
+					   // present_cell to this dof
+	  dof_data(dof_indices[i]) += cell_data[present_cell];
+					   // note that we added another
+					   // summand
+	  ++touch_count[dof_indices[i]];
+	};
+    };
+
+				   // compute the mean value on all the
+				   // dofs by dividing with the number
+				   // of summands.
+  for (unsigned int i=0; i<n_dofs(); ++i)
+    {
+      Assert (touch_count[i]!=0, ExcInternalError());
+      dof_data(i) /=  touch_count[i];
+    };
+};
+
+
+
+
+
 void DoFHandler<1>::reserve_space (const FiniteElement<1> &fe) {
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
                                    // delete all levels and set them up

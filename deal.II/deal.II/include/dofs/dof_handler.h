@@ -27,6 +27,7 @@ template <int dim, class Accessor> class TriaActiveIterator;
 
 template <int dim> class Triangulation;
 
+class dVector;
 class dSMatrix;
 class dSMatrixStruct;
 class ConstraintMatrix;
@@ -601,7 +602,24 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * the transfer process.
 				      */
     unsigned int max_transfer_entries (const unsigned int max_level_diff) const;
-    
+
+				     /**
+				      * Take a vector of values which live on
+				      * cells (e.g. an error per cell) and
+				      * distribute it to the dofs in such a
+				      * way that a finite element field results,
+				      * which can then be further processed,
+				      * e.g. for output.
+				      *
+				      * It is assumed that the number of
+				      * elements in #cell_data# equals the
+				      * number of active cells. The size of
+				      * #dof_data# is adjusted to the right
+				      * size.
+				      */
+    void distribute_cell_to_dof_vector (const vector<double> &cell_data,
+					dVector              &dof_data) const;
+
 				     /**
 				      *  @name Cell iterator functions
 				      */
@@ -1034,6 +1052,13 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      *  Exception
 				      */
     DeclException0 (ExcFunctionNotUseful);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongSize,
+		    int, int,
+		    << "The dimension " << arg1 << " of the vector is wrong. "
+		    << "It should be " << arg2);
     
   protected:
 				     /**
