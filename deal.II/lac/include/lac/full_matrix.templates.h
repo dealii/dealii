@@ -459,6 +459,24 @@ void FullMatrix<number>::backward (Vector<number2>& dst, const Vector<number2>& 
 
 
 template <typename number>
+FullMatrix<number>&
+FullMatrix<number>::operator = (const FullMatrix<number>& m) 
+{
+  reinit(m);
+
+  number *             p = &val[0];
+  const number *      vp = &m.val[0];
+  const number * const e = &val[dim_image*dim_range];
+
+  while (p!=e)
+    *p++ = *vp++;
+
+  return *this;
+}
+
+
+
+template <typename number>
 template <typename number2>
 FullMatrix<number>&
 FullMatrix<number>::operator = (const FullMatrix<number2>& m) 

@@ -143,8 +143,22 @@ class FullMatrix
 				     /**
 				      * Assignment operator.
 				      * Copy all elements of #src#
-				      into the matrix. The size is
-				      adjusted if needed.
+				      * into the matrix. The size is
+				      * adjusted if needed.
+				      *
+				      * We can't use the other, templatized
+				      * version since if we don't declare
+				      * this one, the compiler will happily
+				      * generate a predefined copy
+				      * operator which is not what we want.
+				      */
+    FullMatrix<number>& operator = (const FullMatrix<number>& src);
+
+				     /**
+				      * Assignment operator.
+				      * Copy all elements of #src#
+				      * into the matrix. The size is
+				      * adjusted if needed.
 				      */
     template<typename number2>
     FullMatrix<number>& operator = (const FullMatrix<number2>& src);
