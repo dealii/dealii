@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,6 +73,44 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
   return middle;
 };
 
+
+template <>
+void
+HyperBallBoundary<2>::get_intermediate_points_on_line (
+  const Triangulation<2>::line_iterator &line,
+  vector<Point<2> > &points) const
+{
+  const unsigned int n=points.size();
+  Assert(n>0, ExcInternalError());
+  if (n==1)
+    points[0]=get_new_point_on_line(line);
+  else
+    {
+      Point<2> v0=line->vertex(0)-center,
+	       v1=line->vertex(1)-center;
+      double alpha0=atan(v0(1)/v0(0)),
+	     alpha1=atan(v1(1)/v1(0));
+      double dalpha=(alpha1-alpha0)/(n+1);
+      double alpha=alpha0+dalpha;
+
+      for (unsigned int i=0; i<n; ++i, alpha+=dalpha)
+	{
+	  points[i](0)=radius*cos(alpha)+center(0);
+	  points[i](1)=radius*sin(alpha)+center(1);
+	}
+    }
+}
+
+
+
+template <int dim>
+void
+HyperBallBoundary<dim>::get_intermediate_points_on_line (
+  const typename Triangulation<dim>::line_iterator &,
+  vector<Point<dim> > &) const
+{
+  Assert(false, ExcNotImplemented());
+}
 
 
 template <int dim>

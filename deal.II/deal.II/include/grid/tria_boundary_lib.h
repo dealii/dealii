@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@
  *   @ref{Boundary}, which would seem natural, since this way we can use the
  *   @ref{StraightBoundary}@p{<dim>::in_between(neighbors)} function.
  *
- * @author Wolfgang Bangerth, 1998
+ *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
 template <int dim>
 class HyperBallBoundary : public StraightBoundary<dim>
@@ -57,6 +57,17 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      */
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+
+				     /**
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      *
+				      * Only implemented for @p{dim=2}.
+				      */
+    virtual void
+    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				     vector<Point<dim> > &points) const;
 
 				     /**
 				      * Return the center of the ball.

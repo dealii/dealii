@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,6 +30,16 @@ Boundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_it
 {
   Assert (false, ExcPureVirtualFunctionCalled());
   return Point<dim>();
+};
+
+
+template <int dim>
+void
+Boundary<dim>::get_intermediate_points_on_line (
+  const typename Triangulation<dim>::line_iterator &,
+  vector<Point<dim> > &) const
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
 };
 
 
@@ -68,6 +78,21 @@ StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>:
 };
 
 #endif
+
+
+template <int dim>
+void
+StraightBoundary<dim>::get_intermediate_points_on_line (
+  const typename Triangulation<dim>::line_iterator &line,
+  vector<Point<dim> > &points) const
+{
+  const unsigned int n=points.size();
+  Assert(n>0, ExcInternalError());
+  const double part=1./(n+1);
+  double position=part;
+  for (unsigned int i=0; i<n; ++i, position+=part)
+    points[i]=(1-position)*line->vertex(0) + position*line->vertex(1);
+};
 
 
 // explicit instantiations

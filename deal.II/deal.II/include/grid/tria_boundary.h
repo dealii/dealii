@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,7 +65,7 @@
  *   @ref{HyperBallBoundary} creating a hyperball with given radius
  *   around a given center point.
  *
- *   @author Wolfgang Bangerth, 1999
+ *   @author Wolfgang Bangerth, 1999, Ralf Hartmann, 2001
  */
 template <int dim>
 class Boundary : public Subscriptor
@@ -116,6 +116,30 @@ class Boundary : public Subscriptor
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
 				     /**
+				      * Return intermediate points
+				      * on the boundary line.
+				      *
+				      * The number of points requested
+				      * is given by the size of the
+				      * vector @p{points}. It is the
+				      * task of the derived classes to
+				      * arrange the points in
+				      * approximately equal distances.
+				      *
+				      * This function is needed by the
+				      * @p{MappingQ} class. As this
+				      * function is not needed for Q1
+				      * mappings, it is not made pure
+				      * virtual, to avoid the need to
+				      * overload it.  The default
+				      * implementation throws an error
+				      * in any case, however.
+				      */
+    virtual void
+    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				     vector<Point<dim> > &points) const;
+    
+				     /**
 				      * Exception.
 				      */
     DeclException0 (ExcPureVirtualFunctionCalled);
@@ -132,6 +156,8 @@ class Boundary : public Subscriptor
  *   placing new points in the middle of old ones, it rather assumes that the
  *   boundary of the domain is given by the polygon/polyhedron defined by the
  *   boundary of the initial coarse triangulation.
+ *
+ *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
 template <int dim>
 class StraightBoundary : public Boundary<dim> {
@@ -160,6 +186,22 @@ class StraightBoundary : public Boundary<dim> {
 				      */
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+
+				     /**
+				      * Gives @p{n=points.size()}
+				      * points that splits the
+				      * p{StraightBoundary} line into
+				      * p{n+1} partitions of equal
+				      * lengths.
+				      *
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      */
+    virtual void
+    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				     vector<Point<dim> > &points) const;
+
 };
 
 
