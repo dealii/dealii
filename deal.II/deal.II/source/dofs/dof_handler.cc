@@ -28,6 +28,7 @@ DoFHandler<dim>::~DoFHandler () {
 
 
 
+
 DoFHandler<1>::raw_cell_iterator
 DoFHandler<1>::begin_raw (const unsigned int level) const {
   return begin_raw_line (level);
@@ -172,8 +173,10 @@ DoFHandler<2>::last_active (const unsigned int level) const {
 
 
 //------------------------------------------------------------------
-DoFHandler<1>::raw_cell_iterator
-DoFHandler<1>::begin_raw_line (const unsigned int level) const {
+
+template <int dim>
+typename DoFHandler<dim>::raw_line_iterator
+DoFHandler<dim>::begin_raw_line (const unsigned int level) const {
   return raw_line_iterator (tria,
 			    tria->begin_raw_line(level)->level(),
 			    tria->begin_raw_line(level)->index(),
@@ -182,18 +185,9 @@ DoFHandler<1>::begin_raw_line (const unsigned int level) const {
 
 
 
-DoFHandler<2>::raw_line_iterator
-DoFHandler<2>::begin_raw_line (const unsigned int level) const {
-  return raw_line_iterator (tria,
-			    tria->begin_raw_line(level)->level(),
-			    tria->begin_raw_line(level)->index(),
-			    this);
-};
-
-
-
-DoFHandler<1>::line_iterator
-DoFHandler<1>::begin_line (const unsigned int level) const {
+template <int dim>
+typename DoFHandler<dim>::line_iterator
+DoFHandler<dim>::begin_line (const unsigned int level) const {
   return line_iterator (tria,
 			tria->begin_line(level)->level(),
 			tria->begin_line(level)->index(),
@@ -202,18 +196,9 @@ DoFHandler<1>::begin_line (const unsigned int level) const {
 
 
 
-DoFHandler<2>::line_iterator
-DoFHandler<2>::begin_line (const unsigned int level) const {
-  return line_iterator (tria,
-			tria->begin_line(level)->level(),
-			tria->begin_line(level)->index(),
-			this);
-};
-
-
-
-DoFHandler<1>::active_line_iterator
-DoFHandler<1>::begin_active_line (const unsigned int level) const {
+template <int dim>
+typename DoFHandler<dim>::active_line_iterator
+DoFHandler<dim>::begin_active_line (const unsigned int level) const {
   return active_line_iterator (tria,
 			       tria->begin_active_line(level)->level(),
 			       tria->begin_active_line(level)->index(),
@@ -222,18 +207,17 @@ DoFHandler<1>::begin_active_line (const unsigned int level) const {
 
 
 
-DoFHandler<2>::active_line_iterator
-DoFHandler<2>::begin_active_line (const unsigned int level) const {
-  return active_line_iterator (tria,
-			       tria->begin_active_line(level)->level(),
-			       tria->begin_active_line(level)->index(),
-			       this);
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::begin_raw_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
 };
 
 
 
-DoFHandler<2>::raw_quad_iterator
-DoFHandler<2>::begin_raw_quad (const unsigned int level) const {
+template <int dim>
+typename DoFHandler<dim>::raw_quad_iterator
+DoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
   return raw_quad_iterator (tria,
 			    tria->begin_raw_quad(level)->level(),
 			    tria->begin_raw_quad(level)->index(),
@@ -242,8 +226,17 @@ DoFHandler<2>::begin_raw_quad (const unsigned int level) const {
 
 
 
-DoFHandler<2>::quad_iterator
-DoFHandler<2>::begin_quad (const unsigned int level) const {
+DoFHandler<1>::quad_iterator
+DoFHandler<1>::begin_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <int dim>
+typename DoFHandler<dim>::quad_iterator
+DoFHandler<dim>::begin_quad (const unsigned int level) const {
   return quad_iterator (tria,
 			tria->begin_quad(level)->level(),
 			tria->begin_quad(level)->index(),
@@ -252,8 +245,17 @@ DoFHandler<2>::begin_quad (const unsigned int level) const {
 
 
 
-DoFHandler<2>::active_quad_iterator
-DoFHandler<2>::begin_active_quad (const unsigned int level) const {
+DoFHandler<1>::active_quad_iterator
+DoFHandler<1>::begin_active_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <int dim>
+typename DoFHandler<dim>::active_quad_iterator
+DoFHandler<dim>::begin_active_quad (const unsigned int level) const {
   return active_quad_iterator (tria,
 			       tria->begin_active_quad(level)->level(),
 			       tria->begin_active_quad(level)->index(),
@@ -262,30 +264,34 @@ DoFHandler<2>::begin_active_quad (const unsigned int level) const {
 
 
 
-DoFHandler<1>::raw_line_iterator
-DoFHandler<1>::end_line () const {
+template <int dim>
+typename DoFHandler<dim>::raw_line_iterator
+DoFHandler<dim>::end_line () const {
   return raw_line_iterator (tria, -1, -1, this);
 };
 
 
 
-DoFHandler<2>::raw_line_iterator
-DoFHandler<2>::end_line () const {
-  return raw_line_iterator (tria, -1, -1, this);
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::end_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
 };
 
 
 
-DoFHandler<2>::raw_quad_iterator
-DoFHandler<2>::end_quad () const {
+template <int dim>
+typename DoFHandler<dim>::raw_quad_iterator
+DoFHandler<dim>::end_quad () const {
   return raw_quad_iterator (tria, -1, -1, this);
 };
 
 
 
 
-DoFHandler<1>::raw_line_iterator
-DoFHandler<1>::last_raw_line (const unsigned int level) const {
+template <int dim>
+typename DoFHandler<dim>::raw_line_iterator
+DoFHandler<dim>::last_raw_line (const unsigned int level) const {
   return raw_line_iterator (tria,
 			    tria->last_raw_line(level)->level(),
 			    tria->last_raw_line(level)->index(),
@@ -294,18 +300,9 @@ DoFHandler<1>::last_raw_line (const unsigned int level) const {
 
 
 
-DoFHandler<2>::raw_line_iterator
-DoFHandler<2>::last_raw_line (const unsigned int level) const {
-  return raw_line_iterator (tria,
-			    tria->last_raw_line(level)->level(),
-			    tria->last_raw_line(level)->index(),
-			    this);
-};
-
-
-
-DoFHandler<1>::line_iterator
-DoFHandler<1>::last_line (const unsigned int level) const {
+template <int dim>
+typename DoFHandler<dim>::line_iterator
+DoFHandler<dim>::last_line (const unsigned int level) const {
   return line_iterator (tria,
 			tria->last_line(level)->level(),
 			tria->last_line(level)->index(),
@@ -314,18 +311,9 @@ DoFHandler<1>::last_line (const unsigned int level) const {
 
 
 
-DoFHandler<2>::line_iterator
-DoFHandler<2>::last_line (const unsigned int level) const {
-  return line_iterator (tria,
-			tria->last_line(level)->level(),
-			tria->last_line(level)->index(),
-			this);
-};
-
-
-
-DoFHandler<1>::active_line_iterator
-DoFHandler<1>::last_active_line (const unsigned int level) const {
+template <int dim>
+typename DoFHandler<dim>::active_line_iterator
+DoFHandler<dim>::last_active_line (const unsigned int level) const {
   return active_line_iterator (tria,
 			       tria->last_active_line(level)->level(),
 			       tria->last_active_line(level)->index(),
@@ -334,18 +322,16 @@ DoFHandler<1>::last_active_line (const unsigned int level) const {
 
 
 
-DoFHandler<2>::active_line_iterator
-DoFHandler<2>::last_active_line (const unsigned int level) const {
-  return active_line_iterator (tria,
-			       tria->last_active_line(level)->level(),
-			       tria->last_active_line(level)->index(),
-			       this);
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::last_raw_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
 };
 
 
-
-DoFHandler<2>::raw_quad_iterator
-DoFHandler<2>::last_raw_quad (const unsigned int level) const {
+template <int dim>
+typename DoFHandler<dim>::raw_quad_iterator
+DoFHandler<dim>::last_raw_quad (const unsigned int level) const {
   return raw_quad_iterator (tria,
 			    tria->last_raw_quad(level)->level(),
 			    tria->last_raw_quad(level)->index(),
@@ -355,8 +341,17 @@ DoFHandler<2>::last_raw_quad (const unsigned int level) const {
 
 
 
-DoFHandler<2>::quad_iterator
-DoFHandler<2>::last_quad (const unsigned int level) const {
+DoFHandler<1>::quad_iterator
+DoFHandler<1>::last_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <int dim>
+typename DoFHandler<dim>::quad_iterator
+DoFHandler<dim>::last_quad (const unsigned int level) const {
   return quad_iterator (tria,
 			tria->last_quad(level)->level(),
 			tria->last_quad(level)->index(),
@@ -366,8 +361,17 @@ DoFHandler<2>::last_quad (const unsigned int level) const {
 
 
 
-DoFHandler<2>::active_quad_iterator
-DoFHandler<2>::last_active_quad (const unsigned int level) const {
+DoFHandler<1>::active_quad_iterator
+DoFHandler<1>::last_active_quad (const unsigned int) const {
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <int dim>
+typename DoFHandler<dim>::active_quad_iterator
+DoFHandler<dim>::last_active_quad (const unsigned int level) const {
   return active_quad_iterator (tria,
 			       tria->last_active_quad(level)->level(),
 			       tria->last_active_quad(level)->index(),
@@ -377,64 +381,74 @@ DoFHandler<2>::last_active_quad (const unsigned int level) const {
 
 
 
-DoFHandler<1>::raw_line_iterator
-DoFHandler<1>::last_raw_line () const {
+template <int dim>
+typename DoFHandler<dim>::raw_line_iterator
+DoFHandler<dim>::last_raw_line () const {
   return last_raw_line (levels.size()-1);
 };
 
 
 
-DoFHandler<2>::raw_line_iterator
-DoFHandler<2>::last_raw_line () const {
-  return last_raw_line (levels.size()-1);
+DoFHandler<1>::raw_quad_iterator
+DoFHandler<1>::last_raw_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
 };
 
 
 
-DoFHandler<2>::raw_quad_iterator
-DoFHandler<2>::last_raw_quad () const {
+template <int dim>
+typename DoFHandler<dim>::raw_quad_iterator
+DoFHandler<dim>::last_raw_quad () const {
   return last_raw_quad (levels.size()-1);
 };
 
 
 
-DoFHandler<1>::line_iterator
-DoFHandler<1>::last_line () const {
+template <int dim>
+typename DoFHandler<dim>::line_iterator
+DoFHandler<dim>::last_line () const {
   return last_line (levels.size()-1);
 };
 
 
 
-DoFHandler<2>::line_iterator
-DoFHandler<2>::last_line () const {
-  return last_line (levels.size()-1);
+DoFHandler<1>::quad_iterator
+DoFHandler<1>::last_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
 };
 
 
 
-DoFHandler<2>::quad_iterator
-DoFHandler<2>::last_quad () const {
+template <int dim>
+typename DoFHandler<dim>::quad_iterator
+DoFHandler<dim>::last_quad () const {
   return last_quad (levels.size()-1);
 };
 
 
 
-DoFHandler<1>::active_line_iterator
-DoFHandler<1>::last_active_line () const {
+template <int dim>
+typename DoFHandler<dim>::active_line_iterator
+DoFHandler<dim>::last_active_line () const {
   return last_active_line (levels.size()-1);
 };
 
 
 
-DoFHandler<2>::active_line_iterator
-DoFHandler<2>::last_active_line () const {
-  return last_active_line (levels.size()-1);
+
+DoFHandler<1>::active_quad_iterator
+DoFHandler<1>::last_active_quad () const {
+  Assert (false, ExcNotImplemented());
+  return 0;
 };
 
 
 
-DoFHandler<2>::active_quad_iterator
-DoFHandler<2>::last_active_quad () const {
+template <int dim>
+typename DoFHandler<dim>::active_quad_iterator
+DoFHandler<dim>::last_active_quad () const {
   return last_active_quad (levels.size()-1);
 };
 

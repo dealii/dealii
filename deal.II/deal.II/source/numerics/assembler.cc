@@ -15,51 +15,29 @@ Equation<dim>::Equation (const unsigned int n_equations) :
 
 
 
-void Equation<1>::assemble (dFMatrix          &,
-			    dVector           &,
-			    const FEValues<1> &,
-			    const Triangulation<1>::cell_iterator &) const {
+template <int dim>
+void Equation<dim>::assemble (dFMatrix          &,
+			      dVector           &,
+			      const FEValues<dim> &,
+			      const typename Triangulation<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
 
 
-void Equation<2>::assemble (dFMatrix          &,
-			    dVector           &,
-			    const FEValues<2> &,
-			    const Triangulation<2>::cell_iterator &) const {
+template <int dim>
+void Equation<dim>::assemble (dFMatrix          &,
+			      const FEValues<dim> &,
+			      const typename Triangulation<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
 
 
-void Equation<1>::assemble (dFMatrix          &,
-			    const FEValues<1> &,
-			    const Triangulation<1>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
-};
-
-
-
-void Equation<2>::assemble (dFMatrix          &,
-			    const FEValues<2> &,
-			    const Triangulation<2>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
-};
-
-
-
-void Equation<1>::assemble (dVector           &,
-			    const FEValues<1> &,
-			    const Triangulation<1>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
-};
-
-
-
-void Equation<2>::assemble (dVector           &,
-			    const FEValues<2> &,
-			    const Triangulation<2>::cell_iterator &) const {
+template <int dim>
+void Equation<dim>::assemble (dVector           &,
+			      const FEValues<dim> &,
+			      const typename Triangulation<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 

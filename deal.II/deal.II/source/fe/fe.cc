@@ -85,9 +85,9 @@ double FEValues<dim>::JxW (const unsigned int i) const {
 
 
 
-void FEValues<1>::reinit (const Triangulation<1>::cell_iterator &cell,
-			  const FiniteElement<1>                &fe) {
-  const unsigned int dim=1;
+template <int dim>
+void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+			    const FiniteElement<dim>                         &fe) {
 				   // fill jacobi matrices and real
 				   //quadrature points
   fe.fill_fe_values (cell,
@@ -122,37 +122,6 @@ void FEValues<1>::reinit (const Triangulation<1>::cell_iterator &cell,
 
 
 
-void FEValues<2>::reinit (const Triangulation<2>::cell_iterator &cell,
-			  const FiniteElement<2>                &fe) {
-  const unsigned int dim=2;
-				   // fill jacobi matrices and real
-				   //quadrature points
-  fe.fill_fe_values (cell,
-		     unit_quadrature_points,
-		     jacobi_matrices,
-		     quadrature_points);
-				   // compute gradients on real element
-  for (unsigned int i=0; i<fe.total_dofs; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j)
-      for (unsigned int s=0; s<dim; ++s)
-	{
-	  shape_gradients[i][j](s) = 0;
-
-					   // (grad psi)_s =
-					   // (grad_{\xi\eta})_b J_{bs}
-					   // with J_{bs}=(d\xi_b)/(dx_s)
-	  for (unsigned int b=0; b<dim; ++b)
-	    shape_gradients[i][j](s)
-	      +=
-	      unit_shape_gradients[i][j](b) * jacobi_matrices[j](b,s);
-	};
-  
-				   // refer to the general doc for
-				   // why we take the inverse of the
-				   // determinant
-  for (unsigned int i=0; i<n_quadrature_points; ++i)
-    JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
-};
 
 
 
@@ -225,19 +194,12 @@ Point<dim> FiniteElementBase<dim>::shape_grad (const unsigned int,
 
 
 
-void FiniteElementBase<1>::fill_fe_values (const Triangulation<1>::cell_iterator &,
-					   const vector<Point<1> > &,
-					   vector<dFMatrix> &,
-					   vector<Point<1> > &) const {
-  Assert (false, ExcPureFunctionCalled());
-};
 
-
-
-void FiniteElementBase<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
-					   const vector<Point<2> > &,
-					   vector<dFMatrix> &,
-					   vector<Point<2> > &) const {
+template <int dim>
+void FiniteElementBase<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator &,
+					     const vector<Point<dim> > &,
+					     vector<dFMatrix> &,
+					     vector<Point<dim> > &) const {
   Assert (false, ExcPureFunctionCalled());
 };
 
@@ -259,7 +221,7 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 				       vector<dFMatrix>  &jacobians,
 				       vector<Point<1> > &points) const {
 				   // local mesh width
-  double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
+  const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
 
   for (unsigned int i=0; i<points.size(); ++i) 
     {

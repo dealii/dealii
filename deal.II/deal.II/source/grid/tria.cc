@@ -403,7 +403,7 @@ void Triangulation<2>::create_hypercube (const double left,
   for (unsigned int j=0; j<4; ++j)
     cells[0].push_back (cell_vertices[0][j]);
   
-  create_triangulation (vector<Point<2> >(&vertices[0], &vertices[8]),
+  create_triangulation (vector<Point<2> >(&vertices[0], &vertices[4]),
 			cells);
 };
 
@@ -908,24 +908,9 @@ Triangulation<2>::last_active (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<1>::raw_line_iterator
-Triangulation<1>::begin_raw_line (unsigned int level) const {
-  Assert (level<levels.size(),
-	  ExcInvalidLevel(level));
-
-				   // does this level have cells?
-  if (levels[level]->lines.lines.size() == 0)
-    return end();
-  
-  return raw_cell_iterator ((Triangulation<1>*)this,
-			    level,
-			    0);
-};
-
-
-
-TriaDimensionInfo<2>::raw_line_iterator
-Triangulation<2>::begin_raw_line (unsigned int level) const {
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_line_iterator
+Triangulation<dim>::begin_raw_line (unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
 
@@ -933,30 +918,42 @@ Triangulation<2>::begin_raw_line (unsigned int level) const {
   if (levels[level]->lines.lines.size() == 0)
     return end_line();
   
-  return raw_line_iterator ((Triangulation<2>*)this,
+  return raw_line_iterator ((Triangulation<dim>*)this,
 			    level,
 			    0);
 };
 
 
 
-TriaDimensionInfo<2>::raw_quad_iterator
-Triangulation<2>::begin_raw_quad (unsigned int level) const {
+
+TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::begin_raw_quad (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_quad_iterator
+Triangulation<dim>::begin_raw_quad (unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
   
   if (levels[level]->quads.quads.size() == 0)
     return end_quad();
   
-  return raw_quad_iterator ((Triangulation<2>*)this,
+  return raw_quad_iterator ((Triangulation<dim>*)this,
 			    level,
 			    0);
 };
 
 
 
-TriaDimensionInfo<1>::line_iterator
-Triangulation<1>::begin_line (unsigned int level) const {
+
+template <int dim>
+typename TriaDimensionInfo<dim>::line_iterator
+Triangulation<dim>::begin_line (unsigned int level) const {
   				   // level is checked in begin_raw
   raw_line_iterator ri = begin_raw_line (level);
   if (ri.state() != valid)
@@ -969,22 +966,18 @@ Triangulation<1>::begin_line (unsigned int level) const {
 
 
 
-TriaDimensionInfo<2>::line_iterator
-Triangulation<2>::begin_line (unsigned int level) const {
-  				   // level is checked in begin_raw
-  raw_line_iterator ri = begin_raw_line (level);
-  if (ri.state() != valid)
-    return ri;
-  while (ri->used() == false)
-    if ((++ri).state() != valid)
-      return ri;
-  return ri;
+
+TriaDimensionInfo<1>::quad_iterator
+Triangulation<1>::begin_quad (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::quad_iterator
-Triangulation<2>::begin_quad (unsigned int level) const {
+template <int dim>
+typename TriaDimensionInfo<dim>::quad_iterator
+Triangulation<dim>::begin_quad (unsigned int level) const {
   				   // level is checked in begin_raw
   raw_quad_iterator ri = begin_raw_quad (level);
   if (ri.state() != valid)
@@ -997,8 +990,10 @@ Triangulation<2>::begin_quad (unsigned int level) const {
 
 
 
-TriaDimensionInfo<1>::active_line_iterator
-Triangulation<1>::begin_active_line (unsigned int level) const {
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_line_iterator
+Triangulation<dim>::begin_active_line (unsigned int level) const {
   				   // level is checked in begin_raw
   line_iterator i = begin_line (level);
   if (i.state() != valid)
@@ -1011,22 +1006,17 @@ Triangulation<1>::begin_active_line (unsigned int level) const {
 
 
 
-TriaDimensionInfo<2>::active_line_iterator
-Triangulation<2>::begin_active_line (unsigned int level) const {
-  				   // level is checked in begin_raw
-  line_iterator i = begin_line (level);
-  if (i.state() != valid)
-    return i;
-  while (i->has_children())
-    if ((++i).state() != valid)
-      return i;
-  return i;
+TriaDimensionInfo<1>::active_quad_iterator
+Triangulation<1>::begin_active_quad (unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::active_quad_iterator
-Triangulation<2>::begin_active_quad (unsigned int level) const {
+template <int dim>
+typename TriaDimensionInfo<dim>::active_quad_iterator
+Triangulation<dim>::begin_active_quad (unsigned int level) const {
   				   // level is checked in begin_raw
   quad_iterator i = begin(level);
   if (i.state() != valid)
@@ -1039,92 +1029,99 @@ Triangulation<2>::begin_active_quad (unsigned int level) const {
 
 
 
-TriaDimensionInfo<1>::raw_line_iterator
-Triangulation<1>::end_line () const {
-  return raw_line_iterator ((Triangulation<1>*)this,
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_line_iterator
+Triangulation<dim>::end_line () const {
+  return raw_line_iterator ((Triangulation<dim>*)this,
 			    -1,
 			    -1);
 };
 
 
 
-TriaDimensionInfo<2>::raw_line_iterator
-Triangulation<2>::end_line () const {
-  return raw_line_iterator ((Triangulation<2>*)this,
+
+TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::end_quad () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_quad_iterator
+Triangulation<dim>::end_quad () const {
+  return raw_quad_iterator ((Triangulation<dim>*)this,
 			    -1,
 			    -1);
 };
 
 
 
-TriaDimensionInfo<2>::raw_quad_iterator
-Triangulation<2>::end_quad () const {
-  return raw_quad_iterator ((Triangulation<2>*)this,
-			    -1,
-			    -1);
-};
-
-
-
-TriaDimensionInfo<1>::raw_line_iterator
-Triangulation<1>::last_raw_line (const unsigned int level) const {
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_line_iterator
+Triangulation<dim>::last_raw_line (const unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
   
-  return raw_line_iterator ((Triangulation<1>*)this,
+  return raw_line_iterator ((Triangulation<dim>*)this,
 			    level,
 			    levels[level]->lines.lines.size()-1);
 };
 
 
 
-TriaDimensionInfo<2>::raw_line_iterator
-Triangulation<2>::last_raw_line (const unsigned int level) const {
-  Assert (level<levels.size(),
-	  ExcInvalidLevel(level));
-  
-  return raw_line_iterator ((Triangulation<2>*)this,
-			    level,
-			    levels[level]->lines.lines.size()-1);
+
+
+TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::last_raw_quad (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::raw_quad_iterator
-Triangulation<2>::last_raw_quad (const unsigned int level) const {
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_quad_iterator
+Triangulation<dim>::last_raw_quad (const unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
   
-  return raw_quad_iterator ((Triangulation<2>*)this,
+  return raw_quad_iterator ((Triangulation<dim>*)this,
 			    level,
 			    levels[level]->quads.quads.size()-1);
 };
 
 
 
-TriaDimensionInfo<1>::raw_line_iterator
-Triangulation<1>::last_raw_line () const {
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_line_iterator
+Triangulation<dim>::last_raw_line () const {
   return last_raw_line (levels.size()-1);
 };
 
 
 
-TriaDimensionInfo<2>::raw_line_iterator
-Triangulation<2>::last_raw_line () const {
-  return last_raw_line (levels.size()-1);
+
+TriaDimensionInfo<1>::raw_quad_iterator
+Triangulation<1>::last_raw_quad () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::raw_quad_iterator
-Triangulation<2>::last_raw_quad () const {
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_quad_iterator
+Triangulation<dim>::last_raw_quad () const {
   return last_raw_quad (levels.size()-1);
 };
 
 
 
-TriaDimensionInfo<1>::line_iterator
-Triangulation<1>::last_line (const unsigned int level) const {
+template <int dim>
+typename TriaDimensionInfo<dim>::line_iterator
+Triangulation<dim>::last_line (const unsigned int level) const {
   				   // level is checked in begin_raw
   raw_line_iterator ri = last_raw_line(level);
   if (ri->used()==true)
@@ -1137,22 +1134,18 @@ Triangulation<1>::last_line (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<2>::line_iterator
-Triangulation<2>::last_line (const unsigned int level) const {
-  				   // level is checked in begin_raw
-  raw_line_iterator ri = last_raw_line(level);
-  if (ri->used()==true)
-    return ri;
-  while ((--ri).state() == valid)
-    if (ri->used()==true)
-      return ri;
-  return ri;
+
+TriaDimensionInfo<1>::quad_iterator
+Triangulation<1>::last_quad (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::quad_iterator
-Triangulation<2>::last_quad (const unsigned int level) const {
+template <int dim>
+typename TriaDimensionInfo<dim>::quad_iterator
+Triangulation<dim>::last_quad (const unsigned int level) const {
   				   // level is checked in begin_raw
   raw_quad_iterator ri = last_raw_quad(level);
   if (ri->used()==true)
@@ -1165,29 +1158,35 @@ Triangulation<2>::last_quad (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<1>::line_iterator
-Triangulation<1>::last_line () const {
+template <int dim>
+typename TriaDimensionInfo<dim>::line_iterator
+Triangulation<dim>::last_line () const {
   return last_line (levels.size()-1);
 };
 
 
 
-TriaDimensionInfo<2>::line_iterator
-Triangulation<2>::last_line () const {
-  return last_line (levels.size()-1);
+TriaDimensionInfo<1>::quad_iterator
+Triangulation<1>::last_quad () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::quad_iterator
-Triangulation<2>::last_quad () const {
+
+template <int dim>
+typename TriaDimensionInfo<dim>::quad_iterator
+Triangulation<dim>::last_quad () const {
   return last_quad (levels.size()-1);
 };
 
 
 
-TriaDimensionInfo<1>::active_line_iterator
-Triangulation<1>::last_active_line (const unsigned int level) const {
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_line_iterator
+Triangulation<dim>::last_active_line (const unsigned int level) const {
 				   // level is checked in begin_raw
   line_iterator i = last_line(level);
   if (i->has_children()==false)
@@ -1200,22 +1199,18 @@ Triangulation<1>::last_active_line (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<2>::active_line_iterator
-Triangulation<2>::last_active_line (const unsigned int level) const {
-				   // level is checked in begin_raw
-  line_iterator i = last_line(level);
-  if (i->has_children()==false)
-    return i;
-  while ((--i).state() == valid)
-    if (i->has_children()==false)
-      return i;
-  return i;
+TriaDimensionInfo<1>::active_quad_iterator
+Triangulation<1>::last_active_quad (const unsigned int) const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::active_quad_iterator
-Triangulation<2>::last_active_quad (const unsigned int level) const {
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_quad_iterator
+Triangulation<dim>::last_active_quad (const unsigned int level) const {
 				   // level is checked in begin_raw
   quad_iterator i = last_quad(level);
   if (i->has_children()==false)
@@ -1229,22 +1224,26 @@ Triangulation<2>::last_active_quad (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<1>::active_line_iterator
-Triangulation<1>::last_active_line () const {
+template <int dim>
+typename TriaDimensionInfo<dim>::active_line_iterator
+Triangulation<dim>::last_active_line () const {
   return last_active_line (levels.size()-1);
 };
 
 
 
-TriaDimensionInfo<2>::active_line_iterator
-Triangulation<2>::last_active_line () const {
-  return last_active_line (levels.size()-1);
+TriaDimensionInfo<1>::active_quad_iterator
+Triangulation<1>::last_active_quad () const {
+  Assert (false, ExcFunctionNotUseful());
+  return 0;
 };
 
 
 
-TriaDimensionInfo<2>::active_quad_iterator
-Triangulation<2>::last_active_quad () const {
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_quad_iterator
+Triangulation<dim>::last_active_quad () const {
   return last_active_quad (levels.size()-1);
 };
 

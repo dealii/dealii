@@ -36,7 +36,7 @@ examples: $(cc-files:.cc=)
 
 grid/grid_test: grid/grid_test.o $(LIBFILES)
 	@echo ================= Linking $@
-	@$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
+	@$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS.g)
 
 dof/dof_test: dof/dof_test.o $(LIBFILES.g)
 	@echo ================= Linking $@
