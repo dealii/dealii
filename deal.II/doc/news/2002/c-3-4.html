@@ -34,9 +34,35 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: <acronym>deal.II</acronym> now uses a new threading
+       scheme. The new scheme is simpler to use, and in particular
+       more flexible in some cases where only one thread is started,
+       or where a thread is completely detached, since we got rid of
+       the <code>ThreadManager</code> class and now only store handles
+       to individual threads (which can be discarded, or added to a
+       <code>ThreadGroup</code> variable that is able to wait for a
+       whole set of threads at once.
+       <br>
+       The new scheme also implements a much needed feature: calling
+       functions on a new thread that return values. Previously, such
+       functions needed to be written in a way that they return their
+       return value through an additional reference parameter. This
+       was inflexible if one wanted to call functions that already
+       exist. This restriction is now lifted: such functions can be
+       called, and the return value can be accessed once the thread
+       has finished.
+       <br>
+       Some documentation for the new scheme can be found
+       <a href="../../reports/new-threads/index.html" target="body">on this
+       page</a>.
+       <br>
+       (WB 2003/02/06)
+       </p>
+
+  <li> <p> 
        New: <acronym>deal.II</acronym> now makes use of some parts of
        the <a href="http://www.boost.org/">boost</a> library, which is
-       supposed to be a testground for the next generation C++ stanard
+       supposed to be a testground for the next generation C++ standard
        library. The parts which we use are now in
        <code>contrib/boost/include/boost_local/</code> and can be
        referenced from within your programs. The directory contains
@@ -140,7 +166,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <code>DEAL_II_USE_MT</code>, when <code>--with-multithreading</code> was
        given as argument to <code>./configure</code>. Tests in the code
        therefore looked like <code>#ifdef DEAL_II_USE_MT</code>. This has been
-       changed so that the variable is always defined, but its value is now equal to 1
+       changed so that the variable is always defined, but its value is now
+       equal to <code>1</code> 
        when multithreading was requested, and zero otherwise. The reason for
        this is that you can now write <code>if (DEAL_II_USE_MT && ...)</code>
        conditions, and need not interleave if-else clauses from regular code
@@ -407,14 +434,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Changed: In POSIX mode, when the <code class="member">ThreadManager</code>
-       class created a new thread through <code class="member">pthread_create</code>, 
-       it only checked for the error code and aborted if it was non-zero. Now, it
-       checks whether the error code is <code class="member">EAGAIN</code> and simply 
-       retries the call if this is the case. This may, in rare cases, lead to a
-       deadlock or an infinite loop, but will usually just wait until the respective
-       resources for thread creation are available from the operating system and will
-       then succeed.
+       Changed: In POSIX mode, when the <code
+       class="member">ThreadManager</code> class created a new thread through
+       <code class="member">pthread_create</code>, it only checked for the
+       error code and aborted if it was non-zero. Now, it checks whether the
+       error code is <code class="member">EAGAIN</code> and simply retries the
+       call if this is the case. This may, in rare cases, lead to a deadlock or
+       an infinite loop, but will usually just wait until the respective
+       resources for thread creation are available from the operating system
+       and will then succeed.
        <br>
        (WB 2002/11/13)
        </p>
@@ -498,7 +526,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Extended: Previously, the <code class="class">Threads::PosixThreadBarrier</code>
+       Extended: Previously, the <code
+       class="class">Threads::PosixThreadBarrier</code>
        class could not be used at all (they threw exceptions), if your system
        did not have the respective POSIX functions. This restriction is lifted
        for the special case that you give one as the number of parties that
@@ -920,7 +949,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p> 
        Changed: The <code class="member">FEValues::get_cell</code> and
        <code class="member">FEValues::get_face</code> functions have
-       been removed, since they limited our inability to use this
+       been removed, since they limited our ability to use this
        class for other types of DoFHandlers, for example future
        extensions for hp elements.
        <br>
