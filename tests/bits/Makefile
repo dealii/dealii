@@ -60,7 +60,8 @@ tests_x = anna_? \
 	  apply_boundary_values_* \
 	  error_estimator_* \
 	  cylinder_shell_* \
-	  grid_in_*
+	  grid_in_* \
+	  compressed_sparsity_pattern_*
 
 # tests for the hp branch:
 #	  fe_collection_*
