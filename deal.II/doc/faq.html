@@ -75,9 +75,11 @@
 
   <p>
   You can't, this version of gcc simply does not work with
-  <acronym>deal.II</acronym>, or at least did not. Post-3.4 versions of 
-  <acronym>deal.II</acronym> will contain fixes for this problem, but versions
-  up to and including 3.4 cannot be compiled with gcc 2.96.
+  <acronym>deal.II</acronym>, or at least did not. <acronym>deal.II</acronym>
+  version 4.0 will contain fixes to allow compilation, but versions
+  up to and including 3.4 cannot be compiled with gcc 2.96. Furthermore, later
+  versions don't support this compiler any more at all, and will tell you so
+  during configuration.
   </p>
 
   <p>
@@ -88,8 +90,10 @@
   get hold of such a system (initially, the main development of
   <acronym>deal.II</acronym> was done in Germany, which is SuSE country, not
   Red Hat). Also note that version 2.96 is not an officially 
-  released version of gcc. Simply use either gcc 2.95 or 3.X. Also note that we
-  have reports that gcc 2.96 may miscompile parts of the library, see
+  released version of gcc. Simply use either gcc 2.95 or 3.X. The reason we
+  finally decided not to support this compiler is that we 
+  have reports that gcc 2.96 may miscompile parts of the library, see for
+  example 
   <a href="http://www.dealii.org/mail/msg00837.html" target="body">this
   message</a>. We have also found that some of the example programs return
   wrong values or go into infinite loops if compiled with this version of gcc.
