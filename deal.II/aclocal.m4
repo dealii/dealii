@@ -209,11 +209,14 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 		isnan (d);
 	    ],
 	    [
+	  	dnl We found a flag by which isnan is defined; store
+		dnl this flag and exit the loop
 		deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
 		break;
 	    ],
 	    [
-	])
+                dnl The flag didn't work, don't do nothing.
+	    ])
 	done
 
 	dnl if no such flag was found, then abort ./configure since
