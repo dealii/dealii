@@ -71,7 +71,7 @@ $(LIBDIR)/liblac.g.so: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/Makefile.dep
+	-rm -f *~ include/*~ include/*/*~ Makefile.dep
 
 
 #Rule to generate the dependency file. This file is
@@ -79,13 +79,13 @@ clean:
 #one of the cc-/h-files changed. Make detects whether
 #to remake this file upon inclusion at the bottom
 #of this file.
-lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/lac" $(cc-files) \
-		> lib/Makefile.dep
+		> Makefile.dep
 
 # include all the dependencies
-include lib/Makefile.dep
+include Makefile.dep
 
 # include a rule which tells how to remake the forward declarations file
 include $D/common/scripts/forward_declarations

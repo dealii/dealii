@@ -98,7 +98,7 @@ $(LIBDIR)/libbase.g.so: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/Makefile.dep
+	-rm -f *~ include/*~ include/*/*~ Makefile.dep
 
 
 #Rule to generate the dependency file. This file is
@@ -110,15 +110,15 @@ clean:
 #note that here we translate file names with data_out_base
 #to three file names with the dimension for which we compile
 #appended
-lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
 		| $(PERL) -p -e 's!(.*/base/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
-		> lib/Makefile.dep
+		> Makefile.dep
 
 
 # include all the dependencies
-include lib/Makefile.dep
+include Makefile.dep
 
 # include a rule which tells how to remake the forward declarations file
 include $D/common/scripts/forward_declarations

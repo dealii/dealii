@@ -151,16 +151,16 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 #one of the cc-/h-files changed. Make detects whether
 #to remake this file upon inclusion at the bottom
 #of this file.
-lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!(\.g?o):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
-		> lib/Makefile.dep
+		> Makefile.dep
 
 # include all the dependencies
-include lib/Makefile.dep
+include Makefile.dep
 
 # include a rule which tells how to remake the forward declarations file
 include $D/common/scripts/forward_declarations
@@ -171,7 +171,7 @@ include $D/common/scripts/forward_declarations
 ################### some clean-up rules
 
 clean: 
-	-rm -f *~ */*~ */*/*~
+	-rm -f *~ */*~ */*/*~ Makefile.dep
 	cd lib ; $(MAKE) clean
 
 
