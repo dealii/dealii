@@ -28,3 +28,9 @@ Revert istrstream(p.c_str()) to istrstream(p) when possible
 
 QGauss8 seems not to be correct. It evaluates integrals only up to
 appr. 1e-11 and not as the other quadratures up to 2e-16.
+
+
+Change <iostream> to <ostream> in grid/point.h and
+  grid/tria_iterator.h when this becomes possible.
+
+
