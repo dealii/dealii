@@ -11,7 +11,7 @@ target   = multigrid
 # the archives ./Obj.a and ./Obj.g.a. By default, the debug version
 # is used to link. It you don't like that, change the following
 # variable to "off"
-debug-mode = off
+debug-mode = on
 
 # If you want your program to be linked with extra object or library
 # files, specify them here:
