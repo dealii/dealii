@@ -184,7 +184,7 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  Assert (cell1->at_boundary(face) ||
 		  cell1->neighbor(face)->level() == cell1->level(),
-		  ExcHangingNodesNotAllowed());
+		  ExcHangingNodesNotAllowed(0));
       
       cell1->get_dof_values(u1, u1_local);
       interpolation_matrix.vmult(u2_local, u1_local);
@@ -249,7 +249,7 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  Assert (cell->at_boundary(face) ||
 		  cell->neighbor(face)->level() == cell->level(),
-		  ExcHangingNodesNotAllowed());
+		  ExcHangingNodesNotAllowed(0));
 
       cell->get_dof_values(u1, u1_local);
       interpolation_matrix.vmult(u1_int_local, u1_local);
@@ -337,7 +337,7 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  Assert (cell->at_boundary(face) ||
 		  cell->neighbor(face)->level() == cell->level(),
-		  ExcHangingNodesNotAllowed());
+		  ExcHangingNodesNotAllowed(0));
 
       cell->get_dof_values(u1, u1_local);
       difference_matrix.vmult(u1_diff_local, u1_local);
