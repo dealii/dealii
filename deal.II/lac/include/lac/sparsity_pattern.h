@@ -1558,12 +1558,22 @@ namespace internals
               ExcIteratorPastEnd());
   
       ++accessor.a_index;
-      if (accessor.a_index >=
-          accessor.sparsity_pattern->row_length(accessor.a_row))
+
+                                       // if at end of line: cycle until we
+                                       // find a row with a nonzero number of
+                                       // entries
+      while (accessor.a_index >=
+             accessor.sparsity_pattern->row_length(accessor.a_row))
         {
           accessor.a_index = 0;
-          accessor.a_row++;
+          ++accessor.a_row;
+
+                                           // if we happened to find the end
+                                           // of the matrix, then stop here
+          if (accessor.a_row == accessor.sparsity_pattern->n_rows())
+            break;
         }
+
       return *this;
     }
 
@@ -1579,12 +1589,22 @@ namespace internals
       const Iterator iter=*this;
   
       ++accessor.a_index;
-      if (accessor.a_index >=
-          accessor.sparsity_pattern->row_length(accessor.a_row))
+
+                                       // if at end of line: cycle until we
+                                       // find a row with a nonzero number of
+                                       // entries
+      while (accessor.a_index >=
+             accessor.sparsity_pattern->row_length(accessor.a_row))
         {
           accessor.a_index = 0;
-          accessor.a_row++;
+          ++accessor.a_row;
+
+                                           // if we happened to find the end
+                                           // of the matrix, then stop here
+          if (accessor.a_row == accessor.sparsity_pattern->n_rows())
+            break;
         }
+
       return iter;
     }
 
