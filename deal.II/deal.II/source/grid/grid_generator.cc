@@ -536,10 +536,29 @@ void GridGenerator::hyper_L<> (Triangulation<3> &tria,
 };
 
 
+
 template <>
 void GridGenerator::hyper_ball<> (Triangulation<3> &tria,
 				  const Point<3> &p,
-				  const double radius) {
+				  const double radius)
+{
+				   // this function used to be
+				   // implemented by the code below,
+				   // but it turned out that it didn't
+				   // work as expected: there were
+				   // faces that we used in both
+				   // orientations, leading the
+				   // triangulation function to
+				   // believe that the faces were
+				   // external, even though they were
+				   // in fact internal to the
+				   // ball. this leads to strange
+				   // results.
+				   //
+				   // since we haven't found a working
+				   // enumeration of cell vertices and
+				   // faces, this function is disabled
+				   // altogether
   Assert(false, ExcNotImplemented());
   
   const double a = 1./(1+sqrt(3)); // equilibrate cell sizes at transition
@@ -550,7 +569,7 @@ void GridGenerator::hyper_ball<> (Triangulation<3> &tria,
     = {
 				     // first the vertices of the inner
 				     // cell
-    p+Point<3>(-1,-1,-1)*(radius/sqrt(3)*a),
+      p+Point<3>(-1,-1,-1)*(radius/sqrt(3)*a),
       p+Point<3>(+1,-1,-1)*(radius/sqrt(3)*a),
       p+Point<3>(+1,+1,-1)*(radius/sqrt(3)*a),
       p+Point<3>(-1,+1,-1)*(radius/sqrt(3)*a),
