@@ -1116,6 +1116,13 @@ class DataOutBase
  * the formats presently implemented. User programs need therefore not
  * be changed whenever a new format is implemented.
  *
+ * Additionally, objects of this class have a default format, which
+ * can be set by the parameter "Output format" of the parameter
+ * file. Within a program, this can be changed by the member function
+ * #set_format#. Using this default format, it is possible to leave
+ * the format selection completely to the parameter file. A suitable
+ * suffic for the output file name can be obtained by #default_suffix#
+ * without arguments.
  *
  * @author Wolfgang Bangerth, 1999
  */
@@ -1127,7 +1134,7 @@ class DataOutInterface : private DataOutBase
 				      * Provide a data type specifying the
 				      * presently supported output formats.
 				      */
-    enum OutputFormat { ucd, gnuplot, povray, eps, gmv };
+    enum OutputFormat { nil, ucd, gnuplot, povray, eps, gmv };
 
 				     /**
 				      * Obtain data through the #get_patches#
@@ -1168,10 +1175,21 @@ class DataOutInterface : private DataOutBase
 				      * Write data and grid to #out# according
 				      * to the given data format. This function
 				      * simply calls the appropriate
-				      * #write_*# function.
+				      * #write_*# function. If no output format is
+				      * requested, the #default_format# is written.
+				      *
+				      * An error occurs if no format is provided and
+				      * the default format is #nil#.
 				      */
-    void write (ostream &out, const OutputFormat output_format) const;
-    
+    void write (ostream &out, const OutputFormat output_format = nil) const;
+
+				     /**
+				      * Set the default format. The value set here
+				      * is used anytime, output for format #nil# is
+				      * requested.
+				      */
+    void set_format(const OutputFormat default_format);
+
 				     /**
 				      * Set the flags to be used for output
 				      * in UCD format.
@@ -1216,12 +1234,12 @@ class DataOutInterface : private DataOutBase
 				      * \item #gmv#: #.gmv#.
 				      * \end{itemize}
 				      *
-				      * Since this function does not need data
-				      * from this object, it is static and can
-				      * thus be called without creating an
-				      * object of this class.
+				      * If this function is called
+				      * with no argument or #nil#, the
+				      * suffix for the
+				      * #default_format# is returned.
 				      */
-    static string default_suffix (const OutputFormat output_format);
+    string default_suffix (const OutputFormat output_format = nil);
 
 				     /**
 				      * Return the #OutputFormat# value
@@ -1320,6 +1338,14 @@ class DataOutInterface : private DataOutBase
     virtual vector<string> get_dataset_names () const = 0;
 
   private:
+				     /**
+				      * Standard output format.
+				      * Use this format, if output format nil is
+				      * requested. It can be changed by the #set_format#
+				      * function or in a parameter file.
+				      */
+    OutputFormat default_format;
+    
 				     /**
 				      * Flags to be used upon output of UCD
 				      * data. Can be changed by using the

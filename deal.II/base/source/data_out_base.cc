@@ -1728,7 +1728,11 @@ void DataOutInterface<dim>::write_gmv (ostream &out) const
 
 template <int dim>
 void DataOutInterface<dim>::write (ostream &out,
-				   const OutputFormat output_format) const {
+				   OutputFormat output_format) const
+{
+  if (output_format == nil)
+    output_format = default_format;
+  
   switch (output_format) 
     {
       case ucd:
@@ -1756,6 +1760,11 @@ void DataOutInterface<dim>::write (ostream &out,
     };
 };
 
+template <int dim>
+void DataOutInterface<dim>::set_format(OutputFormat fmt)
+{
+  default_format = fmt;
+}
 
 
 template <int dim>
@@ -1799,8 +1808,11 @@ void DataOutInterface<dim>::set_flags (const GmvFlags &flags)
 
 
 template <int dim>
-string DataOutInterface<dim>::default_suffix (const OutputFormat output_format) 
+string DataOutInterface<dim>::default_suffix (OutputFormat output_format) 
 {
+  if (output_format == nil)
+    output_format = default_format;
+  
   switch (output_format) 
     {
       case ucd:
@@ -1853,64 +1865,68 @@ DataOutInterface<dim>::parse_output_format (const string &format_name) {
 
 
 template <int dim>
-string DataOutInterface<dim>::get_output_format_names () {
+string DataOutInterface<dim>::get_output_format_names ()
+{
   return "ucd|gnuplot|povray|eps|gmv";
-};
+}
 
 
 
 template <int dim>
 void DataOutInterface<dim>::declare_parameters (ParameterHandler &prm) 
 {
+  prm.declare_entry ("Output format", "gnuplot",
+		     Patterns::Selection (get_output_format_names ()));
+
   prm.enter_subsection ("UCD output parameters");
   UcdFlags::declare_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
   
   prm.enter_subsection ("Gnuplot output parameters");
   GnuplotFlags::declare_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
 
   prm.enter_subsection ("Povray output parameters");
   PovrayFlags::declare_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
 
   prm.enter_subsection ("Eps output parameters");
   EpsFlags::declare_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
 
   prm.enter_subsection ("Gmv output parameters");
   GmvFlags::declare_parameters (prm);
-  prm.leave_subsection();
-};
+  prm.leave_subsection ();
+}
 
 
 
 template <int dim>
 void DataOutInterface<dim>::parse_parameters (ParameterHandler &prm) 
 {
+  const string& output_name = prm.get ("Output format");
+  default_format = parse_output_format (output_name);
+
   prm.enter_subsection ("UCD output parameters");
   ucd_flags.parse_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
   
   prm.enter_subsection ("Gnuplot output parameters");
   gnuplot_flags.parse_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
 
   prm.enter_subsection ("Povray output parameters");
   povray_flags.parse_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
 
   prm.enter_subsection ("Eps output parameters");
   eps_flags.parse_parameters (prm);
-  prm.leave_subsection();
+  prm.leave_subsection ();
 
   prm.enter_subsection ("Gmv output parameters");
   gmv_flags.parse_parameters (prm);
-  prm.leave_subsection();
-};
-
-
-
+  prm.leave_subsection ();
+}
 
 
   
