@@ -23,6 +23,11 @@ template <int rank, int dim> class SymmetricTensor;
 
 namespace internal
 {
+                                   /**
+                                    * A namespace for classes that are
+                                    * internal to how the SymmetricTensor
+                                    * class works.
+                                    */
   namespace SymmetricTensor
   {
                                      /**
