@@ -90,7 +90,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
 
 template <int dim>
 void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_function,
-					     vector< Vector<double> > &values) const
+					     vector< vector<double> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongNoOfComponents());
@@ -113,7 +113,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
-      values[point](fe->system_to_component_index(shape_func).first)
+      values[point][fe->system_to_component_index(shape_func).first]
 	+= (dof_values(shape_func) * shape_values[selected_dataset](shape_func, point));
 };
 
@@ -160,6 +160,38 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>   &fe_function,
       };
 };
 
+template <int dim>
+void FEValuesBase<dim>::get_function_grads (const Vector<double>            &fe_function,
+					    vector<vector<Tensor<1,dim> > > &gradients) const
+{
+  Assert (n_quadrature_points == gradients.size(),
+	  ExcWrongNoOfComponents());
+  Assert (selected_dataset<shape_values.size(),
+	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+  for (unsigned i=0;i<gradients.size();++i)
+    Assert (gradients[i].size() == fe->n_components,
+	    ExcWrongVectorSize(gradients.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  Vector<double> dof_values (total_dofs);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  for (unsigned i=0;i<gradients.size();++i)
+    fill_n (gradients[i].begin(), gradients[i].size(), Tensor<1,dim>());
+
+				   // add up contributions of trial
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      {
+	Tensor<1,dim> tmp(shape_gradients[shape_func][point]);
+	tmp *= dof_values(shape_func);
+	gradients[point][fe->system_to_component_index(shape_func).first]
+	  += tmp;
+      };
+};
 
 
 template <int dim>

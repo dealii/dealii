@@ -296,16 +296,16 @@ class FEValuesBase {
     void get_function_values (const Vector<double> &fe_function,
 			      vector<double>       &values) const;
 
-				   /**
-				    * Access to vector valued finite element functions.
-				    *
-				    * This function does the same as
-				    * the other #get_function_values#,
-				    * but applied to multi-component
-				    * elements.
-				    */
+				     /**
+				      * Access to vector valued finite element functions.
+				      *
+				      * This function does the same as
+				      * the other #get_function_values#,
+				      * but applied to multi-component
+				      * elements.
+				      */
     void get_function_values (const Vector<double>    &fe_function,
-			      vector<Vector<double> > &values) const;
+			      vector<vector<double> > &values) const;
 
     				     /**
 				      * Return the gradient of the #i#th shape
@@ -344,6 +344,24 @@ class FEValuesBase {
 				      */
     void get_function_grads (const Vector<double>   &fe_function,
 			     vector<Tensor<1,dim> > &gradients) const;
+
+				     /**
+				      * Return the gradients of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * #cell# at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #gradients# object already has the
+				      * right size.
+				      *
+				      * This function does the same as
+				      * the other #get_function_values#,
+				      * but applied to multi-component
+				      * elements.
+				      */
+    void get_function_grads (const Vector<double>   &fe_function,
+			     vector<vector<Tensor<1,dim> > > &gradients) const;
 
     				     /**
 				      * Return the 2nd derivatives of
