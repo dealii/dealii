@@ -125,6 +125,18 @@ CompressedSparsityPattern::add (const unsigned int i,
 };
 
 
+bool 
+CompressedSparsityPattern::exists (const unsigned int i,
+				   const unsigned int j) const
+{
+  Assert (i<rows, ExcInvalidIndex(i,rows));
+  Assert (j<cols, ExcInvalidIndex(j,cols));
+//TODO: Ask Wolfgang on how to use column_indices
+  Assert(false, ExcNotImplemented());
+  return true;
+}
+
+
 
 void
 CompressedSparsityPattern::symmetrize () 

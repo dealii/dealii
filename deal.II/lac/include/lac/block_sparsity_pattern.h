@@ -284,6 +284,12 @@ class BlockSparsityPatternBase : public Subscriptor
     unsigned int n_cols () const;
 
 				     /**
+				      * Check if a value at a certain
+				      * position may be non-zero.
+				      */
+    bool exists (const unsigned int i, const unsigned int j) const;
+    
+				     /**
 				      * Return the number of nonzero
 				      * elements of this
 				      * matrix. Actually, it returns
@@ -553,6 +559,24 @@ BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
     col_index = column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first]->add (row_index.second,
 						      col_index.second);
+};
+
+
+
+template <class SparsityPatternBase>
+inline
+bool
+BlockSparsityPatternBase<SparsityPatternBase>::exists (const unsigned int i,
+						       const unsigned int j) const
+{
+				   // if you get an error here, are
+				   // you sure you called
+				   // @p{collect_sizes()} before?
+  const std::pair<unsigned int,unsigned int>
+    row_index = row_indices.global_to_local (i),
+    col_index = column_indices.global_to_local (j);
+  return sub_objects[row_index.first][col_index.first]->exists (row_index.second,
+								col_index.second);
 };
 
 

@@ -620,6 +620,22 @@ SparsityPattern::add (const unsigned int i,
 };
 
 
+bool
+SparsityPattern::exists (const unsigned int i,
+			 const unsigned int j) const
+{
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
+  Assert (i<rows, ExcIndexRange(i,0,rows));
+  Assert (j<cols, ExcIndexRange(j,0,cols));
+
+  for (unsigned int k=rowstart[i]; k<rowstart[i+1]; k++)
+    {
+				       // entry already exists
+      if (colnums[k] == j) return true;
+    }
+  return false;
+}
+
 
 void
 SparsityPattern::symmetrize () 

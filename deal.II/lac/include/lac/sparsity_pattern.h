@@ -576,6 +576,13 @@ class SparsityPattern : public Subscriptor
 				      */
     unsigned int n_cols () const;
 
+    				     /**
+				      * Check if a value at a certain
+				      * position may be non-zero.
+				      */
+    bool exists (const unsigned int i, const unsigned int j) const;
+    
+
 				     /**
 				      * Number of entries in a specific row.
 				      */
