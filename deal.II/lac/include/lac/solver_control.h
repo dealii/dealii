@@ -73,15 +73,17 @@ class SolverControl : public Subscriptor
 				      * tolerance to determine success
 				      * of the iteration.
 				      *
-				      * @p{log_history} specifies whether
-				      * the history (i.e. the value to
-				      * be checked and the number of
-				      * the iteration step) shall be
-				      * printed to @p{deallog} stream.
-				      * Default is: do not print. Similarly,
-				      *  @p{log_result}
-				      * specifies the whether the final result is logged
-				      * to @p{deallog}. Default is yes.
+				      * @p{log_history} specifies
+				      * whether the history (i.e. the
+				      * value to be checked and the
+				      * number of the iteration step)
+				      * shall be printed to
+				      * @p{deallog} stream.  Default
+				      * is: do not print. Similarly,
+				      * @p{log_result} specifies the
+				      * whether the final result is
+				      * logged to @p{deallog}. Default
+				      * is yes.
 				      */
     SolverControl (const unsigned int n = 100,
 		   const double tol = 1.e-10,
@@ -128,12 +130,14 @@ class SolverControl : public Subscriptor
 				      * @p{last_value()} and
 				      * @p{last_step()}.
 				      *
-				      * Derived classes may overload this
-				      * function, e.g. to log the convergence
-				      * indicators (@p{check_value}) or to do
+				      * Derived classes may overload
+				      * this function, e.g. to log the
+				      * convergence indicators
+				      * (@p{check_value}) or to do
 				      * other computations.
 				      */
-    virtual State check (const unsigned int step, const double check_value);
+    virtual State check (const unsigned int step,
+			 const double check_value);
 
 				     /**
 				      * Return the convergence value of last
@@ -163,6 +167,23 @@ class SolverControl : public Subscriptor
 				      * @p{ReturnState} @p{failure} if
 				      * @p{residual>failure_residual} with
 				      * @p{failure_residual:=rel_failure_residual*first_residual}.
+				      *
+				      * If a failure criterion was set
+				      * using this method, then the
+				      * iteration is also aborted if
+				      * the residual becomes a
+				      * denormalized value
+				      * (@p{NaN}). Note, however, that
+				      * this check is only performed
+				      * if the @p{isnan} function is
+				      * provided by the operating
+				      * system, which is not always
+				      * the case. The @p{configure}
+				      * scripts checks for this and
+				      * sets the flag @p{HAVE_ISNAN}
+				      * in the file
+				      * @p{Make.global_options} is
+				      * this function was found.
 				      */
     void set_failure_criterion (const double rel_failure_residual);
 
