@@ -501,7 +501,7 @@ ConstRowAccessor (const vector2d<T>  &parent,
 
 template <typename T>
 inline
-T
+typename vector2d<T>::ConstRowAccessor::const_reference
 vector2d<T>::ConstRowAccessor::
 operator [] (const unsigned int column) const
 {
@@ -547,7 +547,7 @@ NonConstRowAccessor (vector2d<T>        &parent,
 
 template <typename T>
 inline
-T &
+typename vector2d<T>::NonConstRowAccessor::reference
 vector2d<T>::NonConstRowAccessor::
 operator [] (const unsigned int column) const
 {
