@@ -670,6 +670,16 @@ namespace Evaluation
 				   // preprocessor, is as already
 				   // explained in the step-5 example
 				   // program.
+				   //
+				   // Also note that we have to prefix
+				   // ``this->'' to access a member
+				   // variable of the template
+				   // dependent base class. The reason
+				   // here, and further down in the
+				   // program is the same as the one
+				   // described in the step-7 example
+				   // program (look for ``two-stage
+				   // name lookup'' there).
   template <int dim>
   void
   SolutionOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
