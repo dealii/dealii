@@ -116,11 +116,21 @@ class PreconditionRichardson : public Subscriptor
     PreconditionRichardson(const AdditionalData = AdditionalData());
 
 				     /**
-				      * Change the relaxaton parameter
-				      * in a way consistent with other
-				      * preconditioners.
+				      * Change the relaxaton parameter.
 				      */
     void initialize (const AdditionalData parameters);
+
+				     /**
+				      * Change the relaxaton parameter
+				      * in a way consistent with other
+				      * preconditioners. The matrix
+				      * argument is ignored and here
+				      * just for compatibility with
+				      * more complex preconditioners.
+				      */
+    template <class MATRIX>
+    void initialize (const MATRIX&,
+		     const AdditionalData parameters);
 
 				     /**
 				      * Apply preconditioner.
@@ -751,6 +761,17 @@ PreconditionRichardson::PreconditionRichardson (
 
 inline void
 PreconditionRichardson::initialize (
+  const PreconditionRichardson::AdditionalData parameters)
+{
+  relaxation = parameters.relaxation;
+}
+
+
+
+template <class MATRIX>
+inline void
+PreconditionRichardson::initialize (
+  const MATRIX&,
   const PreconditionRichardson::AdditionalData parameters)
 {
   relaxation = parameters.relaxation;
