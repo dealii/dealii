@@ -69,6 +69,15 @@ class dSMatrix;
  *   the assemblage is much faster. However, no coefficient can be
  *   given.
  *
+ *   Note that the effect of the two ways of setting up the mass
+ *   matrix is not the same if you use finite elements which are
+ *   composed of several subelements. In this case, using the
+ *   quadrature free way (without coefficient) results in a matrix
+ *   which does not couple the subelements, as described in the
+ *   #FESystem::get_local_mass_matrix# documentation, while the
+ *   way using quadrature sets up the full matrix, i.e. with the
+ *   cross coupling of shape functions belonging to different subelements.
+ *
  * \item #create_laplace_matrix#: there are two versions of this; the
  *   one which takes the #Function<dim># object creates
  *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$,
@@ -172,7 +181,10 @@ class MatrixCreator {
 				      * If the coefficient is constant, it
 				      * may be more adequate to use the
 				      * functions assembling the mass matrix
-				      * without quadrature.
+				      * without quadrature. However, the
+				      * two functions have different effects
+				      * for finite elements composed of
+				      * several subobjects.
 				      * 
 				      * See the general doc of this class
 				      * for more information.
@@ -193,7 +205,10 @@ class MatrixCreator {
 				      * If the coefficient is constant, it
 				      * may be more adequate to use the
 				      * functions assembling the mass matrix
-				      * without quadrature.
+				      * without quadrature. However, the
+				      * two functions have different effects
+				      * for finite elements composed of
+				      * several subobjects.
 				      * 
 				      * See the general doc of this class
 				      * for more information.
@@ -222,6 +237,9 @@ class MatrixCreator {
 				      * previously in the matrix, so if you want
 				      * the pure mass matrix, you have to clear
 				      * the matrix beforehand.
+				      * 
+				      * See the general doc of this class
+				      * for more information.
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const FiniteElement<dim> &fe,
