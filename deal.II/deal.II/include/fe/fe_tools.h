@@ -112,6 +112,11 @@ class FETools
 					const FiniteElement<dim> &fe2,
 					FullMatrix<number> &difference_matrix);
 
+				     /**
+				      * Compute the local
+				      * $L^2$-projection matrix from
+				      * fe1 to fe2.
+				      */
     template <int dim, typename number>
     static void get_projection_matrix(const FiniteElement<dim> &fe1,
 				      const FiniteElement<dim> &fe2,
@@ -334,8 +339,28 @@ class FETools
 					 const InVector&         z1,
 					 const DoFHandler<dim>&  dof2,
 					 const ConstraintMatrix& constraints2,
-					 OutVector&              z1_difference);    
-
+					 OutVector&              z1_difference);
+    
+				     /**
+				      * $L^2$ projection for
+				      * discontinuous
+				      * elements. Operates the same
+				      * direction as interpolate.
+				      *
+				      * The global projection can be
+				      * computed by local matrices if
+				      * the finite element spaces are
+				      * discontinuous. With continuous
+				      * elements, this is impossible,
+				      * since a global mass matrix
+				      * must be inverted.
+				      */
+    template <int dim, class InVector, class OutVector>
+    static void project_dg (const DoFHandler<dim>& dof1,
+			    const InVector&        u1,
+			    const DoFHandler<dim>& dof2,
+			    OutVector&             u2);
+    
 				     /**
 				      * Gives the patchwise
 				      * extrapolation of a @p{dof1}
