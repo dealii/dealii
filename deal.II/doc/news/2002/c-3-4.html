@@ -34,6 +34,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: Since <code>math.h</code> only defines the values of PI or E (as
+       <code>M_PI</code> and <code>M_E</code>) when certain defines are set (on
+       Linux, these are <code>__USE_BSD</code> or <code>__USE_XOPEN</code>),
+       portable programs usually defined these constants themselves. In
+       <acronym>deal.II</acronym>, this happened at 6 different places. To
+       avoid this in the future, <code>base/config.h</code> now exports a
+       namespace <code>deal_II_numbers</code> that defines these two, and a
+       number of other numerical constants.
+       <br>
+       (WB 2002/09/12)
+       </p>
+
+  <li> <p> 
        New: <code>base/config.h</code> now exports the
        <acronym>deal.II</acronym> base directory through the
        <code>DEAL_II_PATH</code> preprocessor variable.
