@@ -129,7 +129,7 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const bool         compute_ansatz_points,
 				       vector<Point<1> > &q_points,
 				       const bool         compute_q_points,
-				       const Boundary<1> &) const {
+				       const Boundary<1> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -153,19 +153,8 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				   // belong to vertex one, the second ones
 				   // to vertex two, all following are
 				   // equally spaced along the line
-  if (compute_ansatz_points) 
-    {
-      unsigned int next = 0;
-				       // first the dofs in the vertices
-      for (unsigned int vertex=0; vertex<2; vertex++) 
-	for (unsigned int i=0; i<dofs_per_vertex; ++i)
-	  ansatz_points[next++] = cell->vertex(vertex);
-      
-				       // now dofs on line
-      for (unsigned int i=0; i<dofs_per_line; ++i) 
-	ansatz_points[next++] = cell->vertex(0) +
-				Point<1>((i+1.0)/(total_dofs+1.0)*h);
-    };
+  if (compute_ansatz_points)
+    get_ansatz_points (cell, boundary, ansatz_points);
 };
 
 
@@ -307,6 +296,42 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
     get_normal_vectors (cell, face_no, subface_no,
 			unit_points, normal_vectors);
 };
+
+
+
+
+void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
+					  const Boundary<1> &,
+					  vector<Point<1> > &ansatz_points) const {
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+				   // compute ansatz points. The first ones
+				   // belong to vertex one, the second ones
+				   // to vertex two, all following are
+				   // equally spaced along the line
+  unsigned int next = 0;
+				   // local mesh width
+  const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
+				   // first the dofs in the vertices
+  for (unsigned int vertex=0; vertex<2; vertex++) 
+    for (unsigned int i=0; i<dofs_per_vertex; ++i)
+      ansatz_points[next++] = cell->vertex(vertex);
+  
+				   // now dofs on line
+  for (unsigned int i=0; i<dofs_per_line; ++i) 
+    ansatz_points[next++] = cell->vertex(0) +
+			    Point<1>((i+1.0)/(total_dofs+1.0)*h);
+};
+
+
+
+template <int dim>
+void FiniteElement<dim>::get_ansatz_points (const DoFHandler<dim>::cell_iterator &,
+					    const Boundary<dim> &,
+					    vector<Point<dim> > &) const {
+  Assert (false, ExcPureFunctionCalled());
+};
+
 
 
 /*------------------------------- Explicit Instantiations -------------*/

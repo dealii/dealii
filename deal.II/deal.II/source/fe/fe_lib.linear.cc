@@ -3,6 +3,7 @@
 #include <fe/fe_lib.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
+#include <grid/geometry_info.h>
 #include <algorithm>
 
 
@@ -85,6 +86,14 @@ void FELinear<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				    jacobians, compute_jacobians,
 				    ansatz_points, compute_ansatz_points,
 				    q_points, compute_q_points, boundary);
+};
+
+
+
+void FELinear<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
+				     const Boundary<1>  &boundary,
+				     vector<Point<1> >  &ansatz_points) const {
+  FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
 };
 
 
@@ -269,7 +278,7 @@ void FELinear<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				    const bool           compute_ansatz_points,
 				    vector<Point<dim> > &q_points,
 				    const bool           compute_q_points,
-				    const Boundary<dim> &) const {
+				    const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -277,11 +286,10 @@ void FELinear<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
   Assert (ansatz_points.size() == total_dofs,
 	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
   
-  const unsigned int n_vertices=(1<<dim);
   unsigned int n_points=unit_points.size();
 
-  Point<dim> vertices[n_vertices];
-  for (unsigned int l=0; l<n_vertices; ++l)
+  Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
+  for (unsigned int l=0; l<GeometryInfo<dim>::vertices_per_cell; ++l)
     vertices[l] = cell->vertex(l);
   
 
@@ -299,7 +307,7 @@ void FELinear<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				       // N_j(xi_l) be the value of the associated
 				       // basis function at xi_l, then
 				       // x_l(xi_l) = sum_j p_j N_j(xi_l)
-      for (unsigned int j=0; j<n_vertices; ++j) 
+      for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j) 
 	for (unsigned int l=0; l<n_points; ++l) 
 	  q_points[l] += vertices[j] * shape_value(j, unit_points[l]);
     };
@@ -329,7 +337,7 @@ void FELinear<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
       for (unsigned int l=0; l<n_points; ++l) 
 	{
 	  M.clear ();
-	  for (unsigned int s=0; s<n_vertices; ++s)
+	  for (unsigned int s=0; s<GeometryInfo<dim>::vertices_per_cell; ++s)
 	    {
 					       // we want a linear transform and
 					       // if we prepend the class name in
@@ -348,11 +356,22 @@ void FELinear<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 
 				   // compute ansatz points, which are
 				   // the corners for linear elements
-  if (compute_ansatz_points) 
-    for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
-      ansatz_points[vertex] = vertices[vertex];
+  if (compute_ansatz_points)
+    get_ansatz_points (cell, boundary, ansatz_points);
 };
 
+
+
+template <int dim>
+void FELinear<dim>::get_ansatz_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				       const Boundary<dim>  &,
+				       vector<Point<dim> >  &ansatz_points) const {
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension (ansatz_points.size(), 1<<(dim-1)));
+  
+  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+    ansatz_points[vertex] = cell->vertex(vertex);
+};
 
 
 
@@ -360,10 +379,12 @@ template <int dim>
 void FELinear<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &face,
 					    const Boundary<dim>  &,
 					    vector<Point<dim> >  &ansatz_points) const {
-  Assert (ansatz_points.size() == (1<<(dim-1)),
-	  ExcWrongFieldDimension (ansatz_points.size(), 1<<(dim-1)));
+  Assert ((ansatz_points.size() == dofs_per_face) &&
+	  (ansatz_points.size() == GeometryInfo<dim>::vertices_per_face),
+	  ExcWrongFieldDimension (ansatz_points.size(),
+				  GeometryInfo<dim>::vertices_per_face));
 
-  for (unsigned int vertex=0; vertex<(1<<(dim-1)); ++vertex)
+  for (unsigned int vertex=0; vertex<dofs_per_face; ++vertex)
     ansatz_points[vertex] = face->vertex(vertex);
 };
 
@@ -498,6 +519,14 @@ void FEQuadratic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 
 
 
+void FEQuadratic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
+					const Boundary<1>  &boundary,
+					vector<Point<1> >  &ansatz_points) const {
+  FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
+};
+
+
+
 void FEQuadratic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
 					     const Boundary<1>  &,
 					     vector<Point<1> >  &) const {
@@ -610,6 +639,15 @@ void FEQuadratic<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 
 
 template <int dim>
+void FEQuadratic<dim>::get_ansatz_points (const typename DoFHandler<dim>::cell_iterator &,
+					  const Boundary<dim>  &,
+					  vector<Point<dim> >  &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
 void FEQuadratic<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &,
 					       const Boundary<dim>  &,
 					       vector<Point<dim> >  &) const {
@@ -687,6 +725,14 @@ void FECubic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				    jacobians, compute_jacobians,
 				    ansatz_points, compute_ansatz_points,
 				    q_points, compute_q_points, boundary);
+};
+
+
+
+void FECubic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
+				    const Boundary<1>  &boundary,
+				    vector<Point<1> >  &ansatz_points) const {
+  FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
 };
 
 
@@ -784,6 +830,15 @@ void FECubic<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
   Assert (ansatz_points.size() == total_dofs,
 	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
 
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void FECubic<dim>::get_ansatz_points (const typename DoFHandler<dim>::cell_iterator &,
+				      const Boundary<dim>  &,
+				      vector<Point<dim> >  &) const {
   Assert (false, ExcNotImplemented());
 };
 
