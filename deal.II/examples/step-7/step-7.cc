@@ -551,9 +551,10 @@ class LaplaceProblem
 				     // text format or in tex
 				     // format. Here we don't only use
 				     // the ``TableHandler'' but we
-				     // use the ``ConvergenceTable''
-				     // that additionally evaluates
-				     // rates of convergence.
+				     // use the derived class
+				     // ``ConvergenceTable'' that
+				     // additionally evaluates rates
+				     // of convergence.
     ConvergenceTable                        convergence_table;
 };
 
@@ -1071,26 +1072,26 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
   convergence_table.add_value("L2", L2_error);
   convergence_table.add_value("H1", H1_error);
   convergence_table.add_value("Linfty", Linfty_error);
-				   // You may set the precision the
-				   // values will be written in for
-				   // output.
+				   // You may set the precision with
+				   // which the values will be written
+				   // upon output.
   convergence_table.set_precision("L2", 3);
   convergence_table.set_precision("H1", 3);
   convergence_table.set_precision("Linfty", 3);
 				   // The default notation is fixed
 				   // point. For the columns you'd
-				   // like to have scientific notation
+				   // like to see in scientific notation
 				   // set the `scientific_flag' `true'
-				   // by
+				   // by the following lines:
   convergence_table.set_scientific("L2", true);
   convergence_table.set_scientific("H1", true);
   convergence_table.set_scientific("Linfty", true);
 				   // For the output of a table into a
-				   // tex file the default captions of
+				   // LaTeX file, the default captions of
 				   // the columns are the keys given
 				   // as argument to the ``add_value''
 				   // functions.  If you'd like to
-				   // have tex caption that differ
+				   // have TeX captions that differ
 				   // from the default ones you can
 				   // specify them by the following.
   convergence_table.set_tex_caption("cells", "\\# cells");
@@ -1100,12 +1101,15 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
   convergence_table.set_tex_caption("Linfty", "$L^\\infty$-error");
 				   // Note, that `\\' is reduced to
 				   // `\' by the compiler such that the
-				   // real tex caption is e.g.
+				   // real TeX caption is e.g.
 				   // `$L^\infty$-error'.
 				   //
-				   // The default tex format of each column
-				   // of the table is `c' (centered). To
-				   // specify a different (e.g. `right') one sets
+				   // The default TeX format of each
+				   // column of the table is `c'
+				   // (centered). To specify a
+				   // different (e.g. `right') one,
+				   // the following function may be
+				   // used:
   convergence_table.set_tex_format("cells", "r");
   convergence_table.set_tex_format("dofs", "r");
 };
@@ -1283,30 +1287,33 @@ void LaplaceProblem<dim>::run ()
 				   // and the captions may not be printed
 				   // directly above the specific columns.
   convergence_table.write_text(cout);
-				   // Output of the table in a tex file.
-				   // The (nice) formatted table
-				   // can be looked at after
-				   // calling 'latex whole_table' and
-				   // e.g. 'xdvi whole_table'.
+				   // The table can also be written into a tex file.
+				   // The (nicely) formatted table
+				   // can be viewed at after
+				   // calling `latex whole_table' and
+				   // e.g. `xdvi whole_table'.
   if (true)
     {
       ofstream table_file("whole_table.tex");
       convergence_table.write_tex(table_file);
       table_file.close();
     }
-				   // You can merge some columns to a super
-				   // column by
+				   // In case you want the same
+				   // caption for several columns, you
+				   // can merge some columns to a
+				   // super column by
   convergence_table.add_column_to_supercolumn("cycle", "n cells");
   convergence_table.add_column_to_supercolumn("cells", "n cells");
-				   // You don't need to output always
+				   // You don't always need to output
 				   // all columns. Also you don't need
 				   // to restrict the order of the
 				   // columns in the table to the
 				   // order the columns were
 				   // originally added during the run.
-				   // Select and Re-order the columns by
-				   // adding the columns or the supercolumns
-				   // to a new string vector.
+				   // Select and re-order the columns
+				   // by adding the columns or the
+				   // supercolumns to a new string
+				   // vector.
   vector<string> new_order;
   new_order.push_back("n cells");
   new_order.push_back("H1");
@@ -1314,6 +1321,19 @@ void LaplaceProblem<dim>::run ()
 				   // and call
   convergence_table.set_column_order (new_order);
 
+				   // In case of global refinement, it
+				   // might be of interest to also
+				   // output the convergence
+				   // rates. This may be done by the
+				   // functionality the
+				   // ``ConvergenceTable'' offers over
+				   // the regular
+				   // ``TableHandler''. However, we do
+				   // it only for global refinement,
+				   // since for adaptive refinement
+				   // the determination of something
+				   // like an order of convergence is
+				   // somewhat more involved.
   if (refinement_mode==global_refinement)
     {
 				       // For everything that happened to
@@ -1325,7 +1345,7 @@ void LaplaceProblem<dim>::run ()
 				       // from the `TableHandler' but it
 				       // offers the additional
 				       // functionality of automatically
-				       // evaluating the convergence rates
+				       // evaluating convergence rates
       convergence_table.evaluate_convergence_rates(
 	"L2", ConvergenceTable::reduction_rate);
 				       // and/or the order of convergence.
@@ -1339,9 +1359,11 @@ void LaplaceProblem<dim>::run ()
 				       // merged with the original
 				       // column (in our example the
 				       // `L2' and the `H1' column) to
-				       // a supercolumn
+				       // a supercolumn.
     }
 
+				   // Finally, the convergence chart
+				   // is written:
   convergence_table.write_text(cout);
 
   if (true)
