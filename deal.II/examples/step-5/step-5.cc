@@ -15,7 +15,6 @@
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
-#include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
