@@ -9,6 +9,7 @@
 
 #if deal_II_dimension == 1
 
+template <>
 void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<1>   &fe_values,
@@ -32,6 +33,7 @@ void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
 
 #if deal_II_dimension == 2
 
+template <>
 void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<2>   &fe_values,

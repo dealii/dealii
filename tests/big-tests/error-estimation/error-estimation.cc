@@ -306,8 +306,8 @@ PoissonProblem<dim>::PoissonProblem () :
 
 template <int dim>
 void PoissonProblem<dim>::clear () {
-  if (tria != 0)              { delete tria;              tria = 0;              };
   if (dof != 0)               { delete dof;               dof = 0;               };
+  if (tria != 0)              { delete tria;              tria = 0;              };
   if (rhs != 0)               { delete rhs;               rhs = 0;               };
   if (solution_function != 0) { delete solution_function; solution_function = 0; };
   if (coefficient != 0)       { delete coefficient;       coefficient = 0;       };

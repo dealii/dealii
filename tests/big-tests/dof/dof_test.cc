@@ -99,8 +99,8 @@ TestCases<dim>::TestCases () :
 
 template <int dim>
 void TestCases<dim>::create_new (const unsigned int) {
-  if (tria != 0) delete tria;
   if (dof  != 0) delete dof;
+  if (tria != 0) delete tria;
 
   tria = new Triangulation<dim>();
   tria->create_hypercube();

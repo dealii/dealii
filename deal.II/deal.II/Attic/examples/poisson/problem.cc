@@ -163,16 +163,17 @@ PoissonProblem<dim>::PoissonProblem () :
 
 
 template <int dim>
-void PoissonProblem<dim>::clear () {
-  if (tria != 0) {
-    delete tria;
-    tria = 0;
-  };
-  
+void PoissonProblem<dim>::clear () {  
   if (dof != 0) {
     delete dof;
     dof = 0;
   };
+
+  if (tria != 0) {
+    delete tria;
+    tria = 0;
+  };
+
 
   if (rhs != 0) 
     {
