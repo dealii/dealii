@@ -386,6 +386,17 @@ class LineAccessor :  public TriaAccessor<dim> {
     bool has_children () const;
 
 				     /**
+				      * Return the number of times that this
+				      * cell is refined. Note that not all
+				      * its children are refined that often
+				      * (which is why we prepend #max_#), 
+				      * the returned number is rather the
+				      * maximum number of refinement in
+				      * any branch of children of this object.
+				      */
+    unsigned int max_refinement_depth () const;
+    
+				     /**
 				      * Return the boundary indicator of this
 				      * line. Since boundary data is only useful
 				      * for structures with a dimension less
@@ -715,6 +726,17 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      */
     bool has_children () const;
 
+				     /**
+				      * Return the number of times that this
+				      * cell is refined. Note that not all
+				      * its children are refined that often
+				      * (which is why we prepend #max_#), 
+				      * the returned number is rather the
+				      * maximum number of refinement in
+				      * any branch of children of this object.
+				      */
+    unsigned int max_refinement_depth () const;
+    
 				     /**
 				      * Return the boundary indicator of this
 				      * quad. Since boundary data is only useful
@@ -1074,6 +1096,17 @@ class HexAccessor :  public TriaAccessor<dim> {
 				      */
     bool has_children () const;
 
+				     /**
+				      * Return the number of times that this
+				      * cell is refined. Note that not all
+				      * its children are refined that often
+				      * (which is why we prepend #max_#), 
+				      * the returned number is rather the
+				      * maximum number of refinement in
+				      * any branch of children of this object.
+				      */
+    unsigned int max_refinement_depth () const;    
+    
 				     /**
 				      * Return the boundary indicator of this
 				      * hex. Since boundary data is only useful

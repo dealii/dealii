@@ -681,14 +681,6 @@ void HexAccessor<dim>::clear_children () const {
 
 
 template <int dim>
-bool HexAccessor<dim>::has_children () const {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
-  return (tria->levels[present_level]->hexes.children[present_index] != -1);
-};
-
-
-
-template <int dim>
 unsigned char HexAccessor<dim>::boundary_indicator () const {
   Assert (dim<4, ExcNotUsefulForThisDimension());
   Assert (used(), ExcCellNotUsed());

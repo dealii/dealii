@@ -171,6 +171,22 @@ LineAccessor<dim>::has_children () const {
 
 template <int dim>
 inline
+unsigned int
+LineAccessor<dim>::max_refinement_depth () const
+{
+  if (!has_children())
+    return 0;
+
+  const unsigned int depths[2] = { child(0)->max_refinement_depth() + 1,
+				   child(1)->max_refinement_depth() + 1  };
+  return max (depths[0], depths[1]);
+};
+      
+	    
+
+
+template <int dim>
+inline
 void
 LineAccessor<dim>::operator ++ () {
   ++present_index;
@@ -327,6 +343,24 @@ bool
 QuadAccessor<dim>::has_children () const {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->quads.children[present_index] != -1);
+};
+
+
+
+template <int dim>
+inline
+unsigned int
+QuadAccessor<dim>::max_refinement_depth () const
+{
+  if (!has_children())
+    return 0;
+
+  const unsigned int depths[4] = { child(0)->max_refinement_depth() + 1,
+				   child(1)->max_refinement_depth() + 1,
+				   child(2)->max_refinement_depth() + 1,
+				   child(3)->max_refinement_depth() + 1 };
+  return max (max (depths[0], depths[1]),
+	      max (depths[2], depths[3]));
 };
 
 
@@ -537,6 +571,37 @@ int HexAccessor<dim>::child_index (unsigned int i) const {
   return tria->levels[present_level]->hexes.children[present_index]+i;
 };
 
+
+
+template <int dim>
+bool HexAccessor<dim>::has_children () const {
+  Assert (state() == valid, ExcDereferenceInvalidObject());
+  return (tria->levels[present_level]->hexes.children[present_index] != -1);
+};
+
+
+
+template <int dim>
+inline
+unsigned int
+HexAccessor<dim>::max_refinement_depth () const
+{
+  if (!has_children())
+    return 0;
+
+  const unsigned int depths[8] = { child(0)->max_refinement_depth() + 1,
+				   child(1)->max_refinement_depth() + 1,
+				   child(2)->max_refinement_depth() + 1,
+				   child(3)->max_refinement_depth() + 1,
+				   child(4)->max_refinement_depth() + 1,
+				   child(5)->max_refinement_depth() + 1,
+				   child(6)->max_refinement_depth() + 1,
+				   child(7)->max_refinement_depth() + 1  };
+  return max (max (max (depths[0], depths[1]),
+		   max (depths[2], depths[3])),
+	      max (max (depths[4], depths[5]),
+		   max (depths[6], depths[7])));
+};
 
 
 
