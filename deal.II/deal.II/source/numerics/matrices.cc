@@ -313,19 +313,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 #if deal_II_dimension == 1
 
 template <>
-void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>       &,
-						    const Quadrature<0>       &,
-						    SparseMatrix<double>      &,
-						    const FunctionMap<1>::type&,
-						    Vector<double>            &,
-						    std::vector<unsigned int> &,
-						    const Function<1>         *)
-{
-  Assert (false, ExcNotImplemented());
-};
-
-
-template <>
 void MatrixCreator<1>::create_boundary_mass_matrix (const Mapping<1>          &,
 						    const DoFHandler<1>       &,
 						    const Quadrature<0>       &,
@@ -335,6 +322,9 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const Mapping<1>          &,
 						    std::vector<unsigned int> &,
 						    const Function<1>         *)
 {
+				   // what would that be in 1d? the
+				   // identity matrix on tehe boundary
+				   // dofs?
   Assert (false, ExcNotImplemented());
 };
 
@@ -459,30 +449,34 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 				   // the name
   std::vector<double>          coefficient_values_scalar (fe_values.n_quadrature_points);
   std::vector<Vector<double> > coefficient_values_system (fe_values.n_quadrature_points,
-						     Vector<double>(n_components));
+							  Vector<double>(n_components));
 
   std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
   std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
-					     Vector<double>(n_components));
+						  Vector<double>(n_components));
 
   std::vector<unsigned int> dofs (dofs_per_cell);
   std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
-  std::set<int> dofs_on_face;
 
-  DoFHandler<dim>::active_cell_iterator cell = range.first;
+				   // for each dof on the cell, have a
+				   // flag whether it is on the face
+  std::vector<bool>         dof_is_on_face(dofs_per_cell);
+
+  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 				       // check if this face is on that part of
 				       // the boundary we are interested in
-      if (boundary_functions.find(cell->face(face)->boundary_indicator()) != boundary_functions.end())
+      if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+	  boundary_functions.end())
 	{
 	  cell_matrix.clear ();
 	  cell_vector.clear ();
 	  
 	  fe_values.reinit (cell, face);
 
-	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-	  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
+	  const FullMatrix<double>  &values  = fe_values.get_shape_values ();
+	  const std::vector<double> &weights = fe_values.get_JxW_values ();
 
 	  if (fe_is_system)
 					     // FE has several components
@@ -623,9 +617,16 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	  cell->get_dof_indices (dofs);
 	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
 
-  	  dofs_on_face.clear ();
-	  dofs_on_face.insert (dofs_on_face_vector.begin(),
-			       dofs_on_face_vector.end());
+					   // check for each of the
+					   // dofs on this cell
+					   // whether it is on the
+					   // face
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
+					   dofs_on_face_vector.end(),
+					   dofs[i])
+				 !=
+				 dofs_on_face_vector.end());
 	  
 #ifdef DEBUG
 					   // in debug mode: compute an element
@@ -655,22 +656,17 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	    if (fabs(cell_matrix(i,i)) > max_diag_entry)
 	      max_diag_entry = fabs(cell_matrix(i,i));
 #endif  
-//TODO: [WB] check this place for more efficient alternatives
-//in the innermost loop, we traverse a set twice in "find", but
-//this could be made much faster, e.g. by first building a vector<bool>
-//that already stores the result of find beforehand
-// (then remove dofs_on_face altogether)
+
 	  mutex.acquire ();
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if ((dofs_on_face.find(dofs[i]) != dofs_on_face.end()) &&
-		  (dofs_on_face.find(dofs[j]) != dofs_on_face.end()))
+	      if (dof_is_on_face[i] && dof_is_on_face[j])
 		matrix.add(dof_to_boundary_mapping[dofs[i]],
 			   dof_to_boundary_mapping[dofs[j]],
 			   cell_matrix(i,j));
 	      else
 		{
-//TODO:[?] We assume here that shape functions that have support also on the boundary also have their support point on the boundary (by having their indices in dofs_on_face). This is not true, however, e.g. for discontinuous elements.
+//TODO:[?] We assume here that shape functions that have support also on the boundary also have their support point on the boundary (by having their indices in dof_is_on_face set true). This is not true, however, e.g. for discontinuous elements.
 						   // compare here for relative
 						   // smallness
 		  Assert (fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
@@ -678,7 +674,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 		};
 	  
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    if (dofs_on_face.find(dofs[j]) != dofs_on_face.end())
+	    if (dof_is_on_face[j])
 	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
 	    else
 	      {
