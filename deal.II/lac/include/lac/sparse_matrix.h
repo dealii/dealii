@@ -1971,7 +1971,7 @@ namespace internals
                                            // if we happened to find the end
                                            // of the matrix, then stop here
           if (accessor.a_row == accessor.matrix->m())
-            return *this;
+            break;
         }
       
       return *this;
@@ -2001,7 +2001,7 @@ namespace internals
                                            // if we happened to find the end
                                            // of the matrix, then stop here
           if (accessor.a_row == accessor.matrix->m())
-            return iter;
+            break;
         }
 
       return iter;
