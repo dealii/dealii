@@ -41,7 +41,12 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	dnl gcc 2.96 is so broken that there is no way to support it.
 	dnl thus, kick out user and ask him to up- or downgrade to
 	dnl some other gcc version
-	AC_MSG_ERROR(gcc 2.96 is not supported. Please read the deal.II FAQs.)
+	AC_MSG_RESULT( )
+	AC_MSG_RESULT(--------------------------------------------------------)
+	AC_MSG_RESULT(gcc 2.96 is not supported. Please read the deal.II FAQs.)
+	AC_MSG_RESULT(--------------------------------------------------------)
+	AC_MSG_RESULT( )
+	exit 1
   	;;
       *2.97*)
   	AC_MSG_RESULT(C++ compiler is gcc-2.97)
@@ -165,7 +170,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
                         dnl  Aw, nothing suitable found...
                         AC_MSG_ERROR(Unrecognized compiler, sorry)
                         exit 1
-                      fi	
+                      fi
                     fi
                   fi
                 fi
