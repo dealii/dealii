@@ -3240,10 +3240,6 @@ class Triangulation : public TriaDimensionInfo<dim>,
     template <int dim1, int dim2>
     friend class TriaObjectAccessor;
     
-    template <int N> friend class TriaObjectAccessor<1, N>;
-    template <int N> friend class TriaObjectAccessor<2, N>;
-    template <int N> friend class TriaObjectAccessor<3, N>;
-    
     friend class CellAccessor<dim>;
     
     friend class TriaRawIterator<1,TriaObjectAccessor<1, 1> >;
