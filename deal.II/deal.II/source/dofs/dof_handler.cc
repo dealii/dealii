@@ -1601,22 +1601,27 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 	    max_couplings=19*selected_fe->dofs_per_vertex +
 			  28*selected_fe->dofs_per_line +
 			  8*selected_fe->dofs_per_quad;
+	    break;
       case 5:
 	    max_couplings=21*selected_fe->dofs_per_vertex +
 			  31*selected_fe->dofs_per_line +
 			  9*selected_fe->dofs_per_quad;
+	    break;
       case 6:
 	    max_couplings=28*selected_fe->dofs_per_vertex +
 			  42*selected_fe->dofs_per_line +
 			  12*selected_fe->dofs_per_quad;
+	    break;
       case 7:
 	    max_couplings=30*selected_fe->dofs_per_vertex +
 			  45*selected_fe->dofs_per_line +
 			  13*selected_fe->dofs_per_quad;
+	    break;
       case 8:
 	    max_couplings=37*selected_fe->dofs_per_vertex +
 			  56*selected_fe->dofs_per_line +
 			  16*selected_fe->dofs_per_quad;
+	    break;
       default:
 	    Assert (false, ExcNotImplemented());
 	    max_couplings=0;
