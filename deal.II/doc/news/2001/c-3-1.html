@@ -307,7 +307,6 @@ documentation, etc</a>.
        (GK 2001/03/05)
        </p>
 
-
   <li> <p>
        Changed: Sort the quadrature points of each <code
        class="class">Quadrature&lt;1&gt;</code> in ascending order. This
@@ -332,6 +331,17 @@ documentation, etc</a>.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       New: Classes <code class="class">Vector</code> and
+       <code class="class">BlockVector</code> now have member functions
+       <code class="member">operator*=</code> which scale the vectors
+       by a constant factor. These functions are aliases for the 
+       <code class="member">scale</code> member functions except that
+       they return a reference to themselves.
+       <br>
+       (WB 2001/08/14)
+       </p>
+
   <li> <p>
        New: There is now a function 
        <code class="member">FullMatrix::precondition_Jacobi</code>. The 
