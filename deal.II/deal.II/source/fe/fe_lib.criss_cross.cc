@@ -81,7 +81,62 @@
   perl -pi -e 's/.*= 0.0;\n//g;' prolongation_2d
 
 -----------------------------------------------------------------------------*/
-  
+
+
+/*--------------------------------------
+    # these are the basis functions differentiated with respect to
+  # xi and eta. we need them for the computation of the jacobi
+  # matrix, since we can't just differentiate a function.
+  phi_xi[0] := proc(x,y) if(y<1-x) then -1;  else 0; fi; end:
+  phi_xi[1] := proc(x,y) if(y<x)   then 1;   else 0; fi; end:
+  phi_xi[2] := proc(x,y) if(y>1-x) then 1;   else 0; fi; end:
+  phi_xi[3] := proc(x,y) if(y>x)   then -1;  else 0; fi; end:
+  phi_xi[4] := proc(x,y) 1 - phi_xi[0](x,y) - phi_xi[1](x,y)
+                           - phi_xi[2](x,y) - phi_xi[3](x,y) ; end:
+
+  phi_eta[0] := proc(x,y) if(y<1-x) then -1;  else 0; fi; end:
+  phi_eta[1] := proc(x,y) if(y<x)   then -1;  else 0; fi; end:
+  phi_eta[2] := proc(x,y) if(y>1-x) then 1;   else 0; fi; end:
+  phi_eta[3] := proc(x,y) if(y>x)   then 1;   else 0; fi; end:
+  phi_eta[4] := proc(x,y) 1 - phi_eta[0](x,y) - phi_eta[1](x,y)
+                            - phi_eta[2](x,y) - phi_eta[3](x,y) ; end:
+
+  # define an array of the ansatz points in real space; the first
+  # four are the vertices, the last one is the crossing point of
+  # the two diagonals
+  x := array(0..4);
+  y := array(0..4);
+
+  eq_sys := {(1-t)*x[0] + t*x[2] = (1-s)*x[1] + s*x[3],
+             (1-t)*y[0] + t*y[2] = (1-s)*y[1] + s*y[3]}:
+  solution := solve (eq_sys, {s,t});
+
+  # set last point in dependence of the first four
+  x[4] := subs (solution, (1-t)*x[0] + t*x[2]):
+  y[4] := subs (solution, (1-t)*y[0] + t*y[2]):
+
+  # this is the mapping from the unit cell to the real cell, only for
+  # completeness; we can't use it here, since phi[i] can't be
+  # differentiated
+  x_real := sum(x[s]*phi[s], s=0..4):
+  y_real := sum(y[s]*phi[s], s=0..4):
+
+  # correct form of the jacobi determinant:
+  #   detJ :=   diff(x_real,xi)*diff(y_real,eta)
+  #           - diff(x_real,eta)*diff(y_real,xi):
+  # better now:
+  detJ1 := proc(xi,eta) sum(x[s]*phi_xi[s](xi,eta), s=0..4); end:
+  detJ2 := proc(xi,eta) sum(y[s]*phi_eta[s](xi,eta), s=0..4); end:
+  detJ3 := proc(xi,eta) sum(x[s]*phi_eta[s](xi,eta), s=0..4); end:
+  detJ4 := proc(xi,eta) sum(y[s]*phi_xi[s](xi,eta), s=0..4); end:
+  detJ := proc(xi,eta)
+             detJ1(xi,eta) * detJ2(xi,eta) -
+	     detJ3(xi,eta) * detJ4(xi,eta);
+          end:
+----------------------------------------------------------*/
+
+
+
 
 #if deal_II_dimension == 1
 
