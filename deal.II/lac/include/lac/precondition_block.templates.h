@@ -141,6 +141,7 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
       if (store_diagonals)
 	var_diagonal.resize(1);
       var_inverse.resize(1);
+      var_inverse[0].reinit(blocksize);
 
       for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
 	for (unsigned int column_cell=0; column_cell<blocksize; ++column_cell)
