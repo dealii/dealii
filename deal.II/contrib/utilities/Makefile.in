@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -9,31 +9,31 @@
 
 D = @DEAL2_DIR@
 include $D/common/Make.global_options
-debug-mode = on
+debug-mode = off
 
-libraries = $(lib-deal2-1d.g) \
-            $(lib-deal2-2d.g) \
-            $(lib-deal2-3d.g) \
-            $(lib-lac.g)  \
-            $(lib-base.g)
+libraries = $(lib-deal2-1d.o) \
+            $(lib-deal2-2d.o) \
+            $(lib-deal2-3d.o) \
+            $(lib-lac.o)  \
+            $(lib-base.o)
 
 ############################################################
 # First how to create executables, including all necessary
 # flags:
 ############################################################
 
-flags     = $(CXXFLAGS.g)
+flags     = $(CXXFLAGS.o)
 
 ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
 flags += -Wno-missing-noreturn
 endif
 
-%.o : %.cc Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 %.g.o : %.cc Makefile
 	@echo =====debug========= $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 %.exe :
 	@echo =====linking======= $@
 	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
