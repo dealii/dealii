@@ -1603,7 +1603,7 @@ dnl /* ----------------------------------------------- */
 dnl struct X
 dnl {
 dnl     template <typename T2>
-dnl     X operator = (T2 &);
+dnl     X operator = (T2 &){};
 dnl };
 dnl 
 dnl template X X::operator=<float> (float &);
@@ -1627,7 +1627,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
 	struct X
 	{
 	    template <typename T2>
-	    X operator = (T2 &);
+	    X operator = (T2 &){};
 	};
 
 	template X X::operator=<float> (float &);
