@@ -461,8 +461,6 @@ namespace Threads
 	  return_values[i].second = end;
       };
     return return_values;
-  };
-  
-  
+  } 
  
-};   // end namespace Thread
+}   // end namespace Thread
