@@ -1,29 +1,25 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
+/* Author: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004 */
 
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2004 by the deal.II authors */
+/*    Copyright (C) 2000, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+
+                                 // First the usual assortment of header files
+                                 // we have already used in previous example
+                                 // programs:
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
-
-                                 // xxx
-#include <lac/petsc_vector.h>
-#include <lac/petsc_parallel_vector.h>
-#include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/petsc_solver.h>
-#include <lac/petsc_precondition.h>
-
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_refinement.h>
@@ -33,22 +29,57 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-
-                                 // xxx
-#include <dofs/dof_renumbering.h>
-
+#include <dofs/dof_constraints.h>
 #include <fe/fe_values.h>
 #include <fe/fe_system.h>
 #include <fe/fe_q.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
-#include <dofs/dof_constraints.h>
 #include <numerics/error_estimator.h>
 
-                                 // xxx
+                                 // And here come the things that we need
+                                 // particularly for this example program and
+                                 // that weren't in step-8. First, we are
+                                 // going to replace all linear algebra
+                                 // components that involve the (global)
+                                 // linear system by classes that wrap
+                                 // interfaces similar to our own linear
+                                 // algebra classes around what PETSc offers
+                                 // (PETSc is a library written in C, and
+                                 // deal.II comes with wrapper classes that
+                                 // provide the PETSc functionality with an
+                                 // interface that is similar to the interface
+                                 // we already had for our own linear algebra
+                                 // classes). In particular, we need vectors
+                                 // and matrices that are distributed across
+                                 // several processes in MPI programs (and
+                                 // simply map to sequential, local vectors
+                                 // and matrices if there is only a single
+                                 // process, i.e. if you are running on only
+                                 // one machine, and without MPI support):
+#include <lac/petsc_vector.h>
+#include <lac/petsc_parallel_vector.h>
+#include <lac/petsc_parallel_sparse_matrix.h>
+                                 // Then we also need interfaces for solvers
+                                 // and preconditioners that PETSc provides:
+#include <lac/petsc_solver.h>
+#include <lac/petsc_precondition.h>
+                                 // And in addition, we need some algorithms
+                                 // for partitioning our meshes so that they
+                                 // can be efficiently distributed across an
+                                 // MPI network. The partitioning algorithm is
+                                 // implemented in the ``GridTools'' class,
+                                 // and we need an additional include file for
+                                 // a function in ``DoFRenumbering'' that
+                                 // allows to sort the indices associated with
+                                 // degrees of freedom so that they are
+                                 // numbered according to the subdomain they
+                                 // are associated with:
 #include <grid/grid_tools.h>
+#include <dofs/dof_renumbering.h>
 
+                                 // And this is simply C++ again:
 #include <fstream>
 #include <iostream>
 
