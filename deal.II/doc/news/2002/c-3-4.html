@@ -105,6 +105,30 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> Change: The constructor of <code
+       class="class">DoFHandler</code> now takes a reference to a
+       <tt>const</tt> <code class="class">Triangulation</code>.
+       <br>
+       (RH 2002/06/12)
+       </p>
+
+  <li> <p> Change: The constructors of all <code
+       class="class">DoFAccessor</code>, <code
+       class="class">TriaAccessor</code> and <code
+       class="class">TriaIterator</code> classes now take pointers to
+       <tt>const</tt> <code class="class">Triangulation</code>s.
+       <br>
+       (RH 2002/06/12)
+       </p>
+
+  <li> <p> Change: <code
+       class="member">Triangulation::clear_user_flags</code> and <code
+       class="member">Triangulation::clear_user_pointers</code> are
+       now <tt>const</tt> functions.
+       <br>
+       (RH 2002/06/12)
+       </p>
+
   <li> <p> Fixed: In debug mode the <code
        class="member">MappingQ1::transform_real_to_unit_cell</code>
        function erroneously threw an assertion when used in 1 or 3
