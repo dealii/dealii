@@ -62,6 +62,14 @@ template <typename T> class Table<6,T>;
 					* inequality.
 					*/
       bool operator != (const TableIndicesBase<N> &other) const;
+
+                                       /**
+                                        * Sort the indices in ascending
+                                        * order. While this operation is not
+                                        * very useful for Table objects, it is
+                                        * used for the SymmetricTensor class.
+                                        */
+      void sort ();
       
     protected:
                                        /**
@@ -1883,6 +1891,42 @@ TableIndicesBase<N>::operator != (const TableIndicesBase<N> &other) const
 {
   return !(*this == other);
 }
+
+
+
+template <>
+inline
+void
+TableIndicesBase<1>::sort ()
+{}
+
+
+
+template <>
+inline
+void
+TableIndicesBase<2>::sort ()
+{
+  if (indices[1] < indices[0])
+    std::swap (indices[0], indices[1]);
+}
+
+
+
+template <>
+inline
+void
+TableIndicesBase<3>::sort ()
+{
+                                   // bubble sort for 3 elements
+  if (indices[1] < indices[0])
+    std::swap (indices[0], indices[1]);
+  if (indices[2] < indices[1])
+    std::swap (indices[1], indices[2]);
+  if (indices[1] < indices[0])
+    std::swap (indices[0], indices[1]);
+}
+
 
 
 
