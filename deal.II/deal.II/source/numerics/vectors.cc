@@ -1502,7 +1502,8 @@ VectorTools::point_difference (const DoFHandler<dim>& dof,
     endc = dof.end();
 
   std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
-  
+
+//TODO: replace this linear search over all cells by using a logarithmic: first find teh correct cell on the coarse grid, then loop recursively over its children
   for (;cell != endc; ++cell)
     {
       if (cell->point_inside(point))
