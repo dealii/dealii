@@ -804,6 +804,35 @@ void MinimizationProblem<dim>::do_step ()
 
 
 
+template <int dim>
+void
+MinimizationProblem<dim>::output_results () const
+{
+  DataOut<dim> data_out;
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (present_solution, "solution");
+  data_out.build_patches ();
+
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream filename;
+#else
+  std::ostrstream filename;
+#endif
+  filename << "solution-"
+           << run_number
+           << ".gnuplot"
+           << std::ends;
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ofstream out (filename.str().c_str());
+#else
+  std::ofstream out (filename.str());
+#endif
+
+  data_out.write_gnuplot (out);
+}
+
+
+
 template <>
 void MinimizationProblem<1>::refine_grid ()
 {
@@ -971,35 +1000,6 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
     }
   
   return energy;
-}
-
-
-
-template <int dim>
-void
-MinimizationProblem<dim>::output_results () const
-{
-  DataOut<dim> data_out;
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (present_solution, "solution");
-  data_out.build_patches ();
-
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ostringstream filename;
-#else
-  std::ostrstream filename;
-#endif
-  filename << "solution-"
-           << run_number
-           << ".gnuplot"
-           << std::ends;
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ofstream out (filename.str().c_str());
-#else
-  std::ofstream out (filename.str());
-#endif
-
-  data_out.write_gnuplot (out);
 }
 
 
