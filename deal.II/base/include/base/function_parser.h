@@ -250,7 +250,7 @@ class FunctionParser : public Function<dim>
   */
   void initialize(const std::string vars,
 		  const std::vector<std::string> expressions,
-		  const ConstMap constants = 0,
+		  const ConstMap constants,
 		  bool time_dependent = false,
 		  bool use_degrees = false);
   
@@ -287,7 +287,7 @@ class FunctionParser : public Function<dim>
   */
   void initialize(const std::string vars,
 		  const std::string expression,
-		  const ConstMap constants = 0,
+		  const ConstMap constants,
 		  bool time_dependent = false,
 		  bool use_degrees = false);
   
