@@ -249,6 +249,14 @@ class BlockSparseMatrix : public Subscriptor
 				      * be zero, it is counted anyway.
 				      */
     unsigned int n_nonzero_elements () const;
+
+				     /**
+				      * Return the number of actually
+				      * nonzero elements. Just counts
+				      * the number of actually nonzero
+				      * elements of all the blocks.
+				      */
+    unsigned int n_actually_nonzero_elements () const;
     
 				     /**
 				      * Set the element @p{(i,j)} to

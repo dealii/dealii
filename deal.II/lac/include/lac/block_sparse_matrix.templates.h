@@ -157,6 +157,19 @@ BlockSparseMatrix<number>::n_nonzero_elements () const
 
 
 template <typename number>
+unsigned int
+BlockSparseMatrix<number>::n_actually_nonzero_elements () const
+{
+  unsigned int count = 0;
+  for (unsigned int i=0; i<rows; ++i)
+    for (unsigned int j=0; j<columns; ++j)
+      count += sub_objects[i][j]->n_actually_nonzero_elements ();
+  return count;
+};
+
+
+
+template <typename number>
 const BlockSparsityPattern &
 BlockSparseMatrix<number>::get_sparsity_pattern () const
 {
