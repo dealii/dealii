@@ -40,6 +40,7 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   DataOutBase::PovrayFlags povrayflags;
   DataOutBase::UcdFlags ucdflags;
   DataOutBase::VtkFlags vtkflags;
+  DataOutBase::Deal_II_IntermediateFlags deal_II_intermediateflags;
   
   WRITE(dx);
 //  WRITE(eps);
@@ -49,6 +50,7 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
     WRITE(povray);
   WRITE(ucd);
   WRITE(vtk);
+  WRITE(deal_II_intermediate);
 }
 
 template<int dim>
