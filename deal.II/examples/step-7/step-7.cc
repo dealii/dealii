@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
+/* Author: Wolfgang Bangerth and Ralf Hartmann, University of Heidelberg, 2000 */
 
 				 // These first include files have all
 				 // been treated in previous examples,
@@ -50,6 +50,12 @@
 				 // mentioned in the introduction. It
 				 // comes from this file:
 #include <numerics/vectors.h>
+				 // We are going to use a
+				 // ``ConvergenceTable'' that collects
+				 // all important data during a run
+				 // and prints it at the end as a
+				 // table.
+#include <base/convergence_table.h>
 				 // And finally, we need to use the
 				 // ``FEFaceValues'' class, which is
 				 // declare in the same file as the
@@ -335,7 +341,7 @@ class LaplaceProblem
     void assemble_system ();
     void solve ();
     void refine_grid ();
-    void process_solution (const unsigned int cycle) const;
+    void process_solution (const unsigned int cycle);
 
     Triangulation<dim>                      triangulation;
     DoFHandler<dim>                         dof_handler;
@@ -532,6 +538,23 @@ class LaplaceProblem
     Vector<double>                          system_rhs;
 //.............
     RefinementMode                          refinement_mode;
+
+				     // For each refinement level some
+				     // important data (like the
+				     // number of cells, or the L2
+				     // error of the numerical
+				     // solution) is printed out. The
+				     // ``TableHandler'' can be used
+				     // to collect all this data and
+				     // to output it at the end of the
+				     // run as a table in a simple
+				     // text format or in tex
+				     // format. Here we don't only use
+				     // the ``TableHandler'' but we
+				     // use the ``ConvergenceTable''
+				     // that additionally evaluates
+				     // rates of convergence.
+    ConvergenceTable                        convergence_table;
 };
 
 
@@ -993,7 +1016,7 @@ void LaplaceProblem<dim>::refine_grid ()
 
 //...............
 template <int dim>
-void LaplaceProblem<dim>::process_solution (const unsigned int cycle) const
+void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 {
   Vector<float> difference_per_cell (triangulation.n_active_cells());
   
@@ -1020,19 +1043,71 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle) const
 				     QGauss3<dim>(),
 				     Linfty_norm);
   const double Linfty_error = difference_per_cell.linfty_norm();
+
+  const unsigned int n_active_cells=triangulation.n_active_cells();
+  const unsigned int n_dofs=dof_handler.n_dofs();
   
   cout << "Cycle " << cycle << ':' 
        << endl
        << "   Number of active cells:       "
-       << triangulation.n_active_cells()
+       << n_active_cells
        << endl
        << "   Number of degrees of freedom: "
-       << dof_handler.n_dofs()
+       << n_dofs
        << endl;
 
-  cout << "   L2     error: " << L2_error      << endl
-       << "   H1     error: " << H1_error      << endl
-       << "   Linfty error: " << Linfty_error  << endl;
+				   // Add the important data to the
+				   // ``TableHandler'' by giving the key
+				   // of the column and the value.
+				   // You don't need to define the keys
+				   // beforehand, just add the values,
+				   // and the column will be
+				   // introduced into the table in the
+				   // order the values are added the
+				   // first time.
+  convergence_table.add_value("cycle", cycle);
+  convergence_table.add_value("cells", n_active_cells);
+  convergence_table.add_value("dofs", n_dofs);
+  convergence_table.add_value("L2", L2_error);
+  convergence_table.add_value("H1", H1_error);
+  convergence_table.add_value("Linfty", Linfty_error);
+				   // You may set the precision the
+				   // values will be written in for
+				   // output.
+  convergence_table.set_precision("L2", 3);
+  convergence_table.set_precision("H1", 3);
+  convergence_table.set_precision("Linfty", 3);
+				   // The default notation is fixed
+				   // point. For the columns you'd
+				   // like to have scientific notation
+				   // set the `scientific_flag' `true'
+				   // by
+  convergence_table.set_scientific("L2", true);
+  convergence_table.set_scientific("H1", true);
+  convergence_table.set_scientific("Linfty", true);
+				   // For the output of a table into a
+				   // tex file the default captions of
+				   // the columns are the keys given
+				   // as argument to the ``add_value''
+				   // functions.  If you'd like to
+				   // have tex caption that differ
+				   // from the default ones you can
+				   // specify them by the following.
+  convergence_table.set_tex_caption("cells", "\\# cells");
+  convergence_table.set_tex_caption("dofs", "\\# dofs");
+  convergence_table.set_tex_caption("L2", "$L^2$-error");
+  convergence_table.set_tex_caption("H1", "$H^1$-error");
+  convergence_table.set_tex_caption("Linfty", "$L^\\infty$-error");
+				   // Note, that `\\' is reduced to
+				   // `\' by the compiler such that the
+				   // real tex caption is e.g.
+				   // `$L^\infty$-error'.
+				   //
+				   // The default tex format of each column
+				   // of the table is `c' (centered). To
+				   // specify a different (e.g. `right') one sets
+  convergence_table.set_tex_format("cells", "r");
+  convergence_table.set_tex_format("dofs", "r");
 };
 
 
@@ -1049,7 +1124,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle) const
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<9; ++cycle)
+  for (unsigned int cycle=0; cycle<6; ++cycle)
     {
 				       // The first action in each
 				       // iteration of the outer loop
@@ -1200,6 +1275,81 @@ void LaplaceProblem<dim>::run ()
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
   data_out.write_gmv (output);
+
+				   // In each cycle values were added to
+				   // the TableHandler. Now write the table
+				   // to #cout#. Note, that the output in
+				   // text format is a quite simple one
+				   // and the captions may not be printed
+				   // directly above the specific columns.
+  convergence_table.write_text(cout);
+				   // Output of the table in a tex file.
+				   // The (nice) formatted table
+				   // can be looked at after
+				   // calling 'latex whole_table' and
+				   // e.g. 'xdvi whole_table'.
+  if (true)
+    {
+      ofstream table_file("whole_table.tex");
+      convergence_table.write_tex(table_file);
+      table_file.close();
+    }
+				   // You can merge some columns to a super
+				   // column by
+  convergence_table.add_column_to_supercolumn("cycle", "n cells");
+  convergence_table.add_column_to_supercolumn("cells", "n cells");
+				   // You don't need to output always
+				   // all columns. Also you don't need
+				   // to restrict the order of the
+				   // columns in the table to the
+				   // order the columns were
+				   // originally added during the run.
+				   // Select and Re-order the columns by
+				   // adding the columns or the supercolumns
+				   // to a new string vector.
+  vector<string> new_order;
+  new_order.push_back("n cells");
+  new_order.push_back("H1");
+  new_order.push_back("L2");
+				   // and call
+  convergence_table.set_column_order (new_order);
+
+  if (refinement_mode==global_refinement)
+    {
+				       // For everything that happened to
+				       // the `ConvergenceTable' until
+				       // this point, it would have been
+				       // sufficient to use a simple
+				       // `TableHandler'. Indeed, the
+				       // `ConvergenceTable' is derived
+				       // from the `TableHandler' but it
+				       // offers the additional
+				       // functionality of automatically
+				       // evaluating the convergence rates
+      convergence_table.evaluate_convergence_rates(
+	"L2", ConvergenceTable::reduction_rate);
+				       // and/or the order of convergence.
+      convergence_table.evaluate_convergence_rates(
+	"L2", ConvergenceTable::reduction_rate_log2);
+      convergence_table.evaluate_convergence_rates(
+	"H1", ConvergenceTable::reduction_rate_log2);
+				       // Each of the last three
+				       // function calls produces an
+				       // additional column that is
+				       // merged with the original
+				       // column (in our example the
+				       // `L2' and the `H1' column) to
+				       // a supercolumn
+    }
+
+  convergence_table.write_text(cout);
+
+  if (true)
+    {
+      ofstream table_file("convergence_table.tex");
+      convergence_table.write_tex(table_file);
+      table_file.close();
+    }
 };
 
 
@@ -1211,7 +1361,8 @@ int main ()
       deallog.depth_console (0);
 
       FEQ1<2> fe;
-      LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::adaptive_refinement);
+//      LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::adaptive_refinement);
+      LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
       laplace_problem_2d.run ();
     }
   catch (exception &exc)
