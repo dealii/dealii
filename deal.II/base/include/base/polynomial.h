@@ -162,7 +162,7 @@ class LagrangeEquidistant: public Polynomial<double>
 
 
 /**
- * Legendre polynomials of arbitrary order
+ * Legendre polynomials of arbitrary order on @p{[-1,1]}.
  *
  * Constructing a Legendre polynomial of order @p{k}, the coefficients
  * will be computed by the three-term recursion formula.  The
@@ -185,12 +185,12 @@ private:
 				    * Vector with already computed
 				    * coefficients.
 				    */
-  static std::vector<vector<number> > coefficients
+  static std::vector<std::vector<number> > coefficients;
 
 				   /**
 				    * Compute coefficients recursively.
 				    */
-  static void compute_coeficients (unsigned int k);
+  static void compute_coefficients (unsigned int k);
 
 				   /**
 				    * Get coefficients for
@@ -199,7 +199,7 @@ private:
 				    * of @ref{Polynomial}.
 				    */
   static const std::vector<number>& get_coefficients (unsigned int k);
-}
+};
 
 
 #endif

@@ -18,6 +18,28 @@
 
 
 /**
+ * Gauﬂ-Legendre quadrature of arbitrary order.
+ *
+ * The coefficients of these quadrature rules are computed by the
+ * function found in @p{Numerical Recipies}.
+ *
+ * @author Guido Kanschat, 2001
+ */
+template <int dim>
+class QGauss : public Quadrature<dim>
+{
+  public:
+				   /**
+				    * Generate a formula with @p{p}
+				    * quadrature points (order @p{2p-1}).
+				    */
+    QGauss (unsigned int p);
+};
+
+
+
+
+/**
  *  2-Point-Gauss quadrature formula, exact for polynomials of degree 3.
  *
  *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
