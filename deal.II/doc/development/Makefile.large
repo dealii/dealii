@@ -47,7 +47,7 @@ include $D/common/Make.global_options
 # same base name as the `.cc' file.
 cc-files    = $(shell echo source/*.cc)
 o-files     = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.o)
-go-files    = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.go)
+go-files    = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.g.o)
 h-files     = $(wildcard include/*.h)
 lib-h-files = $(shell echo $(include-path-base)/base/*.h    \
                            $(include-path-lac)/lac/*.h      \
@@ -93,7 +93,7 @@ flags += -Ddeal_II_dimension=$(deal_II_dimension)
 
 # The following two rules define how to compile C++ files into object
 # files:
-lib/$(deal_II_dimension)d/%.go :
+lib/$(deal_II_dimension)d/%.g.o :
 	@echo =====waves=======$(deal_II_dimension)d====debug=====$(MT)== $(<F)
 	@$(CXX) $(flags) -c $< -o $@
 lib/$(deal_II_dimension)d/%.o :
@@ -120,7 +120,7 @@ clean: clean-lib clean-data
 	-rm -f *~ */*~ */*/*~ lib/Makefile.dep
 
 clean-lib:
-	-rm -f lib/?d/*.o lib/?d/*.go lib/$(target) lib/TAGS
+	-rm -f lib/?d/*.o lib/?d/*.g.o lib/$(target) lib/TAGS
 
 clean-data:
 	-rm -f $(clean-up-files)
