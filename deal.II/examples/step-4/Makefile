@@ -27,9 +27,10 @@ include $D/common/Make.global_options
 # get lists of files we need
 
 
-# list of libraries needed to link with
-libs     = -ldeal_II_2d  -llac -lbase
-libs.g   = -ldeal_II_2d.g -llac.g -lbase.g
+# list of libraries needed to link with. this example needs the 3d
+# part as well
+libs.o   = -ldeal_II_2d   -ldeal_II_2d   -llac -lbase
+libs.g   = -ldeal_II_2d.g -ldeal_II_3d.g -llac.g -lbase.g
 
 
 # check whether we use debug mode or not
@@ -37,7 +38,7 @@ ifeq ($(debug-mode),on)
   libraries = $(target).go $(libs.g)
   flags     = $(CXXFLAGS.g)
 else
-  libraries = $(target).go $(libs)
+  libraries = $(target).go $(libs.o)
   flags     = $(CXXFLAGS.o)
 endif
 
