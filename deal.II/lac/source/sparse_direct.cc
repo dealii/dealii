@@ -22,12 +22,6 @@
 #include <list>
 #include <typeinfo>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
-
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -313,24 +307,8 @@ void die (const std::string &text, const T1 t1, const T2 t2)
 extern "C"
 void monitor_child_liveness (const pid_t child_pid) 
 {
-// #ifdef HAVE_STD_STRINGSTREAM
-//   std::ostringstream s;
-//   s << "ps -p " << child_pid;
-//   const char * const command = s.str().c_str();
-// #else
-//   std::ostrstream s;
-//   s << "ps -p " << child_pid << std::ends;
-//   const char * const command = s.str();
-// #endif
-  
   while (true)
     {
-//       int ret = std::system (command);
-//       if (ret < 0)
-//         die ("Monitor process couldn't start 'ps'!");
-//       else
-//         if (ret != 0)
-//           die ("Child process seems to have died!");
       int ret = kill (child_pid, 0);
       if (ret != 0)
         if ((ret == -1) && (errno == ESRCH))
