@@ -93,6 +93,16 @@ const Point<dim> & FEValues<dim>::quadrature_point (const unsigned int i) const 
 
 
 template <int dim>
+const Point<dim> & FEValues<dim>::ansatz_point (const unsigned int i) const {
+  Assert (i<ansatz_points.size(), ExcInvalidIndex(i, ansatz_points.size()));
+  Assert (update_flags.update_ansatz_points, ExcAccessToUninitializedField());
+  
+  return ansatz_points[i];
+};
+
+
+
+template <int dim>
 double FEValues<dim>::JxW (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
   Assert (update_flags.update_JxW_values, ExcAccessToUninitializedField());
@@ -112,6 +122,8 @@ void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &ce
 		       unit_quadrature_points,
 		       jacobi_matrices,
 		       update_flags.update_jacobians,
+		       ansatz_points,
+		       update_flags.update_ansatz_points,
 		       quadrature_points,
 		       update_flags.update_q_points);
 
@@ -233,6 +245,8 @@ void FiniteElementBase<dim>::fill_fe_values (const typename Triangulation<dim>::
 					     vector<dFMatrix> &,
 					     const bool,
 					     vector<Point<dim> > &,
+					     const bool,
+					     vector<Point<dim> > &,
 					     const bool) const {
   Assert (false, ExcPureFunctionCalled());
 };
@@ -254,17 +268,39 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 				       const vector<Point<1> > &unit_points,
 				       vector<dFMatrix>  &jacobians,
 				       const bool         compute_jacobians,
-				       vector<Point<1> > &points,
-				       const bool         compute_points) const {
+				       vector<Point<1> > &ansatz_points,
+				       const bool         compute_ansatz_points,
+				       vector<Point<1> > &q_points,
+				       const bool         compute_q_points) const {
 				   // local mesh width
   const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
 
-  for (unsigned int i=0; i<points.size(); ++i) 
+  for (unsigned int i=0; i<q_points.size(); ++i) 
     {
       if (compute_jacobians)
 	jacobians[i](0,0) = 1./h;
-      if (compute_points)
-	points[i] = cell->vertex(0) + h*unit_points[i];
+      if (compute_q_points)
+	q_points[i] = cell->vertex(0) + h*unit_points[i];
+    };
+
+				   // compute ansatz points. The first ones
+				   // belong to vertex one, the second ones
+				   // to vertex two, all following are
+				   // equally spaced along the line
+  if (compute_ansatz_points) 
+    {
+      ansatz_points.erase (ansatz_points.begin(), ansatz_points.end());
+      ansatz_points.reserve (total_dofs);
+
+				       // first the dofs in the vertices
+      for (unsigned int vertex=0; vertex<2; vertex++) 
+	for (unsigned int i=0; i<dofs_per_vertex; ++i)
+	  ansatz_points.push_back (cell->vertex(vertex));
+      
+				       // now dofs on line
+      for (unsigned int i=0; i<dofs_per_line; ++i) 
+	ansatz_points.push_back (cell->vertex(0) +
+				 Point<1>((i+1.0)/(total_dofs+1.0)*h));
     };
 };
 
@@ -282,6 +318,8 @@ bool FiniteElement<2>::operator == (const FiniteElement<2> &f) const {
 void FiniteElement<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				       const vector<Point<2> > &,
 				       vector<dFMatrix> &,
+				       const bool,
+				       vector<Point<2> > &,
 				       const bool,
 				       vector<Point<2> > &,
 				       const bool) const {

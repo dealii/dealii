@@ -178,6 +178,31 @@ class FEValues {
 				      * quadrature points.
 				      */
     const vector<Point<dim> > & get_quadrature_points () const;
+
+				     /**
+				      * Return the point in real space where
+				      * the #i#th ansatz function is located
+				      * (location is in the sense of where it
+				      * assumes its nominal properties, e.g. at
+				      * the vertex of a cell, at the center of
+				      * a line, etc).
+				      *
+				      * This function is needed for the
+				      * interpolation problem: if we want to
+				      * transfer a continuous function to a
+				      * finite element function by interpolation
+				      * we have to take the continuous
+				      * function's value at the ansatz function
+				      * locations.
+				      */
+    const Point<dim> & ansatz_point (const unsigned int i) const;
+
+				     /**
+				      * Return a pointer to the vector of points
+				      * denoting the location of the ansatz
+				      * functions.
+				      */
+    const vector<Point<dim> > & get_ansatz_points () const;
     
 				     /**
 				      * Return the Jacobi determinant times
@@ -288,7 +313,16 @@ class FEValues {
 				      * points on the reference element.
 				      */
     vector<Point<dim> >  unit_quadrature_points;
-
+    
+				     /**
+				      * Array of points denoting the off-point
+				      * of the ansatz functions. In real space
+				      * (no-one seems to need the off-point
+				      * on the unit cell, so no function is
+				      * provided for this).
+				      */
+    vector<Point<dim> >  ansatz_points;
+    
 				     /**
 				      * Store the jacobi matrices at the
 				      * different quadrature points. This field
@@ -410,7 +444,9 @@ class FiniteElementBase {
     
 				     /**
 				      * Compute the Jacobian matrix and the
-				      * quadrature points from the given cell
+				      * quadrature points as well as the ansatz
+				      * function locations on the real cell in
+				      * real space from the given cell
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
@@ -419,11 +455,11 @@ class FiniteElementBase {
 				      * elements need different transformations
 				      * of the unit cell to a real cell.
 				      *
-				      * The computation of the two fields may
+				      * The computation of the three fields may
 				      * share some common code, which is why we
 				      * put it in one function. However, it may
 				      * not always be necessary to really
-				      * compute both fields, so there are two
+				      * compute all fields, so there are
 				      * bool flags which tell the function which
 				      * of the fields to actually compute.
 				      *
@@ -441,8 +477,10 @@ class FiniteElementBase {
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
-				 vector<Point<dim> > &points,
-				 const bool           compute_points) const;
+				 vector<Point<dim> > &ansatz_points,
+				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points) const;
     
 				     /**
 				      * Comparison operator. We also check for
@@ -609,7 +647,9 @@ class FiniteElement<1> : public FiniteElementBase<1> {
 
 				     /**
 				      * Compute the Jacobian matrix and the
-				      * quadrature points from the given cell
+				      * quadrature points as well as the ansatz
+				      * function locations on the real cell in
+				      * real space from the given cell
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
@@ -627,14 +667,18 @@ class FiniteElement<1> : public FiniteElementBase<1> {
 				      * of higher than first order with
 				      * non-equidistant integration points, e.g.
 				      * with an exponential dependence from the
-				      * distance to the origin.
+				      * distance to the origin. The standard
+				      * implementation distributes the dofs on
+				      * the line equidistantly.
 				      */
     virtual void fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				 const vector<Point<1> >               &unit_points,
 				 vector<dFMatrix>  &jacobians,
 				 const bool         compute_jacobians,
-				 vector<Point<1> > &points,
-				 const bool         compute_points) const;
+				 vector<Point<1> > &ansatz_points,
+				 const bool         compute_ansatz_points,
+				 vector<Point<1> > &q_points,
+				 const bool         compute_q_points) const;
 };
 
 
@@ -733,7 +777,9 @@ class FiniteElement<2> : public FiniteElementBase<2> {
 
 				     /**
 				      * Compute the Jacobian matrix and the
-				      * quadrature points from the given cell
+				      * quadrature points as well as the ansatz
+				      * function locations on the real cell in
+				      * real space from the given cell
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
@@ -755,8 +801,10 @@ class FiniteElement<2> : public FiniteElementBase<2> {
 				 const vector<Point<2> >               &unit_points,
 				 vector<dFMatrix>  &jacobians,
 				 const bool         compute_jacobians,
-				 vector<Point<2> > &points,
-				 const bool         compute_points) const;
+				 vector<Point<2> > &ansatz_points,
+				 const bool         compute_ansatz_points,
+				 vector<Point<2> > &q_points,
+				 const bool         compute_q_points) const;
 };
 
 
@@ -792,6 +840,16 @@ const vector<Point<dim> > &
 FEValues<dim>::get_quadrature_points () const {
   Assert (update_flags.update_q_points, ExcAccessToUninitializedField());
   return quadrature_points;
+};
+
+
+
+template <int dim>
+inline
+const vector<Point<dim> > &
+FEValues<dim>::get_ansatz_points () const {
+  Assert (update_flags.update_ansatz_points, ExcAccessToUninitializedField());
+  return ansatz_points;
 };
 
 

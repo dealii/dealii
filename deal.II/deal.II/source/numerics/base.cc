@@ -400,7 +400,10 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
 	vector<double>      dof_values;
 	
 	face->get_dof_indices (face_dofs);
+
 //physical location
+	Assert (false, ExcNotImplemented());
+
 	(*function_ptr).second->value_list (dof_locations, dof_values);
 
 					 // enter into list

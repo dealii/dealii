@@ -46,7 +46,9 @@ class FELinear : public FiniteElement<dim> {
 
 				     /**
 				      * Compute the Jacobian matrix and the
-				      * quadrature points from the given cell
+				      * quadrature points as well as the ansatz
+				      * function locations on the real cell in
+				      * real space from the given cell
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
@@ -71,8 +73,10 @@ class FELinear : public FiniteElement<dim> {
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
-				 vector<Point<dim> > &points,
-				 const bool           compute_points) const;
+				 vector<Point<dim> > &ansatz_points,
+				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points) const;
 };
 
 
@@ -107,7 +111,9 @@ class FEQuadratic : public FiniteElement<dim> {
 
 				     /**
 				      * Compute the Jacobian matrix and the
-				      * quadrature points from the given cell
+				      * quadrature points as well as the ansatz
+				      * function locations on the real cell in
+				      * real space from the given cell
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
@@ -132,8 +138,10 @@ class FEQuadratic : public FiniteElement<dim> {
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
-				 vector<Point<dim> > &points,
-				 const bool           compute_points) const;
+				 vector<Point<dim> > &ansatz_points,
+				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points) const;
 };
 
 
@@ -168,7 +176,9 @@ class FECubic : public FiniteElement<dim> {
 
 				     /**
 				      * Compute the Jacobian matrix and the
-				      * quadrature points from the given cell
+				      * quadrature points as well as the ansatz
+				      * function locations on the real cell in
+				      * real space from the given cell
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
@@ -193,8 +203,10 @@ class FECubic : public FiniteElement<dim> {
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
-				 vector<Point<dim> > &points,
-				 const bool           compute_points) const;
+				 vector<Point<dim> > &ansatz_points,
+				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &q_points,
+				 const bool           compute_q_points) const;
 };
 
 

@@ -80,12 +80,15 @@ void FELinear<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				  const vector<Point<1> >               &unit_points,
 				  vector<dFMatrix>  &jacobians,
 				  const bool         compute_jacobians,
-				  vector<Point<1> > &points,
-				  const bool         compute_points) const {
+				  vector<Point<1> > &ansatz_points,
+				  const bool         compute_ansatz_points,
+				  vector<Point<1> > &q_points,
+				  const bool         compute_q_points) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
-				    points, compute_points);
+				    ansatz_points, compute_ansatz_points,
+				    q_points, compute_q_points);
 };
 
 
@@ -232,8 +235,10 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				  const vector<Point<2> >               &unit_points,
 				  vector<dFMatrix>  &jacobians,
 				  const bool         compute_jacobians,
-				  vector<Point<2> > &points,
-				  const bool         compute_points) const {
+				  vector<Point<2> > &ansatz_points,
+				  const bool         compute_ansatz_points,
+				  vector<Point<2> > &q_points,
+				  const bool         compute_q_points) const {
   const unsigned int dim=2;
   const unsigned int n_vertices=4;
   unsigned int n_points=unit_points.size();
@@ -243,11 +248,11 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
     vertices[l] = cell->vertex(l);
   
 
-  if (compute_points) 
+  if (compute_q_points) 
     {
 				       // initialize points to zero
       for (unsigned int i=0; i<n_points; ++i)
-	points[i] = Point<dim> ();
+	q_points[i] = Point<dim> ();
       
 				       // note: let x_l be the vector of the
 				       // lth quadrature point in real space and
@@ -259,7 +264,7 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				       // x_l(xi_l) = sum_j p_j N_j(xi_l)
       for (unsigned int j=0; j<n_vertices; ++j) 
 	for (unsigned int l=0; l<n_points; ++l) 
-	  points[l] += vertices[j] * shape_value(j, unit_points[l]);
+	  q_points[l] += vertices[j] * shape_value(j, unit_points[l]);
     };
   
 
@@ -303,6 +308,12 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 	  jacobians[l].invert(M);
 	};
     };
+
+				   // compute ansatz points, which are
+				   // the corners for linear elements
+  if (compute_ansatz_points) 
+    for (unsigned int vertex=0; vertex<4; ++vertex)
+      ansatz_points[vertex] = vertices[vertex];
 };
 
 
@@ -319,12 +330,15 @@ void FEQuadratic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell
 				     const vector<Point<1> >               &unit_points,
 				     vector<dFMatrix>  &jacobians,
 				     const bool         compute_jacobians,
-				     vector<Point<1> > &points,
-				     const bool         compute_points) const {
+				     vector<Point<1> > &ansatz_points,
+				     const bool         compute_ansatz_points,
+				     vector<Point<1> > &q_points,
+				     const bool         compute_q_points) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
-				    points, compute_points);
+				    ansatz_points, compute_ansatz_points,
+				    q_points, compute_q_points);
 };
 
 
@@ -373,6 +387,8 @@ void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				     vector<dFMatrix>  &,
 				     const bool,
 				     vector<Point<2> > &,
+				     const bool,
+				     vector<Point<2> > &,
 				     const bool) const {
   Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
 };
@@ -391,12 +407,15 @@ void FECubic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				 const vector<Point<1> >               &unit_points,
 				 vector<dFMatrix>  &jacobians,
 				 const bool         compute_jacobians,
-				 vector<Point<1> > &points,
-				 const bool          compute_points) const {
+				 vector<Point<1> > &ansatz_points,
+				 const bool         compute_ansatz_points,
+				 vector<Point<1> > &q_points,
+				 const bool         compute_q_points) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
-				    points, compute_points);
+				    ansatz_points, compute_ansatz_points,
+				    q_points, compute_q_points);
 };
 
 
@@ -435,6 +454,8 @@ FECubic<dim>::shape_grad (const unsigned int i,
 void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				 const vector<Point<2> >               &,
 				 vector<dFMatrix>  &,
+				 const bool,
+				 vector<Point<2> > &,
 				 const bool,
 				 vector<Point<2> > &,
 				 const bool) const {
