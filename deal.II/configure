@@ -6668,8 +6668,8 @@ echo "${ECHO_T}F77 compiler is unkown. no flags set!" >&6
 	;;
 
     AIXF77)
-        F77FLAGSG="$FFLAGS -g"
-        F77FLAGSO="$FFLAGS -O3 -w"
+			        F77FLAGSG="$FFLAGS -g -qextname"
+        F77FLAGSO="$FFLAGS -O3 -w -qextname"
         F77LIBS="$F77LIBS -lxlf90"
 
         F77FLAGSPIC="unknown!"
@@ -7251,6 +7251,9 @@ echo "${ECHO_T}PowerPC64" >&6
 
 	      	      	      CXXFLAGSG="$CXXFLAGSG -mminimal-toc"
 	      CXXFLAGSO="$CXXFLAGSO -mminimal-toc"
+
+	      	      F77FLAGSG="$F77FLAGSG -q64"
+	      F77FLAGSO="$F77FLAGSO -q64"
 
 	      	      	      AR="$AR -X 64"
 	      LDFLAGS="$LDFLAGS -maix64"
