@@ -401,7 +401,7 @@ LSingularityFunction::laplacian_list (const vector<Point<2> > &points,
 //TODO: Implement derivatives
 
 Tensor<1,2>
-LSingularityFunction::gradient (const Point<2>   &/*p*/,
+LSingularityFunction::gradient (const Point<2>   &p,
 			       const unsigned int) const
 {
   Assert(false, ExcNotImplemented());
@@ -415,8 +415,8 @@ LSingularityFunction::gradient (const Point<2>   &/*p*/,
       return Tensor<1,2>(infty);
     }
   
-  double phi = atan2(y,-x)+M_PI;
-  double r2 = x*x+y*y;
+//  double phi = atan2(y,-x)+M_PI;
+//  double r2 = x*x+y*y;
 
   return Tensor<1,2>();
 }
