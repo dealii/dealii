@@ -272,7 +272,8 @@ dnl RANLIB is not available, so skip the second check that tries to get
 dnl the full path for the executable that was found in the first one.
 dnl We also check for AR, since on some systems we will want to pass different
 dnl flags to AR if for example both 32- and 64-bit binaries are supported
-AC_CHECK_PROG(AR,ar)
+AC_CHECK_PROG(AR,ar,ar)
+AC_PATH_PROG(AR,$AR)
 AC_PROG_RANLIB
 if test "$RANLIB" != ":" ; then
   AC_PATH_PROG(RANLIB,$RANLIB)
