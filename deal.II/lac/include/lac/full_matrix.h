@@ -90,7 +90,7 @@ class FullMatrix : public Subscriptor
 				      * huge amount of computing time for large
 				      * matrices!!
 				      */
-    explicit FullMatrix (const FullMatrix&);
+    FullMatrix (const FullMatrix&);
 
 				     /**
 				      * Destructor. Release all memory.
