@@ -31,13 +31,15 @@
 using namespace std;
 #endif
 
+
+// TODO: replace this by non-global object
 static MappingQ1<deal_II_dimension> mapping_q1;
 
 template <int dim>
 void
 FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
-			       unsigned int n_shapes,
-			       const UpdateFlags flags)
+			       const unsigned int n_shapes,
+			       const UpdateFlags  flags)
 {
   if (flags & update_values)
     shape_values.reinit(n_shapes, n_quadrature_points);
@@ -51,7 +53,7 @@ FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
 
   if (flags & update_second_derivatives)
     {      
-    shape_2nd_derivatives.resize(n_shapes);
+      shape_2nd_derivatives.resize(n_shapes);
       for (unsigned int i=0;i<n_shapes;++i)
 	shape_2nd_derivatives[i].resize(n_quadrature_points);
     }
@@ -94,6 +96,7 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 }
 
 
+
 template <int dim>
 FEValuesBase<dim>::~FEValuesBase ()
 {
@@ -111,6 +114,7 @@ FEValuesBase<dim>::~FEValuesBase ()
       delete tmp1;
     }
 }
+
 
 
 template <int dim>
@@ -196,6 +200,7 @@ FEValuesBase<dim>::get_shape_grads () const
 };
 
 
+
 template <int dim>
 const typename std::vector<typename std::vector<Tensor<2,dim> > > &
 FEValuesBase<dim>::get_shape_2nd_derivatives () const
@@ -203,6 +208,7 @@ FEValuesBase<dim>::get_shape_2nd_derivatives () const
   Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
   return shape_2nd_derivatives;
 };
+
 
 
 template <int dim>
@@ -214,6 +220,7 @@ FEValuesBase<dim>::get_quadrature_points () const
 };
 
 
+
 template <int dim>
 const std::vector<double> &
 FEValuesBase<dim>::get_JxW_values () const
@@ -221,6 +228,7 @@ FEValuesBase<dim>::get_JxW_values () const
   Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
   return JxW_values;
 }
+
 
 
 template <int dim>
@@ -296,6 +304,7 @@ void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_
 };
 
 
+
 template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe_function,
@@ -328,6 +337,7 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe
 	second_derivatives[point] += tmp;
       };
 };
+
 
 
 template <int dim>
@@ -398,6 +408,7 @@ template <int dim>
 unsigned int
 FEValuesBase<dim>::memory_consumption () const
 {
+//TODO: check whether this is up to date  
   return (MemoryConsumption::memory_consumption (shape_values) +
 	  MemoryConsumption::memory_consumption (shape_gradients) +
 	  MemoryConsumption::memory_consumption (shape_2nd_derivatives) +
@@ -411,6 +422,8 @@ FEValuesBase<dim>::memory_consumption () const
 
 /*------------------------------- FEValues -------------------------------*/
 
+
+// TODO: unify the two constructor bodies by calling a single function that does all the work
 template <int dim>
 FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 			 const FiniteElement<dim> &fe,
@@ -425,54 +438,113 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 				   fe),
 		quadrature (q)
 {
+				   // you can't compute normal vectors
+				   // on cells, only on faces
   Assert ((update_flags & update_normal_vectors) == false,
 	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
 
-  UpdateFlags flags = mapping.update_once (update_flags);
-  flags |= mapping.update_each (update_flags);
-  flags |= fe.update_once (update_flags);
-  flags |= fe.update_each (update_flags);
+				   // first find out which objects
+				   // need to be recomputed on each
+				   // cell we visit. this we have to
+				   // ask the finite element
+  const UpdateFlags flags = UpdateFlags(mapping.update_once (update_flags) |
+					mapping.update_each (update_flags) |
+					fe.update_once (update_flags)      |
+					fe.update_each (update_flags)      );
 
+				   // then get objects into which the
+				   // FE and the Mapping can store
+				   // intermediate data used across
+				   // calls to reinit
   mapping_data = mapping.get_data(flags, quadrature);
   fe_data      = fe.get_data(flags, mapping, quadrature);
 
-  UpdateFlags allflags = mapping_data->update_once | mapping_data->update_each;
-  allflags |= fe_data->update_once | fe_data->update_each;
+				   // maybe some of the flags passed
+				   // to the get_data functions
+				   // resulted in other flags to be
+				   // set, so collect them again.
+				   //
+				   // example: a FE might need to have
+				   // the covariant transform of the
+				   // mapping to compute its shape
+				   // values
+//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
+//  flags = fe.update_once(update_flags)  
+//  flags = mapping.update_once(flags)
+// if the mapping should depend on the fe to compute some things, then
+// we would need to iterate, and the one cycle here isn't sufficient!?  
+  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
+					   mapping_data->update_each |
+					   fe_data->update_once      |
+					   fe_data->update_each      );
 
+				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
 				allflags);
 };
 
 
+
 template <int dim>
 FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 			 const Quadrature<dim>    &q,
 			 const UpdateFlags         update_flags)
-  :
-  FEValuesBase<dim> (q.n_quadrature_points,
-		     fe.dofs_per_cell,
-		     1,
-		     update_flags,
-		     mapping_q1,
-		     fe),
-  quadrature (q)
+		:
+		FEValuesBase<dim> (q.n_quadrature_points,
+				   fe.dofs_per_cell,
+				   1,
+				   update_flags,
+				   mapping_q1,
+				   fe),
+                quadrature (q)
 {
+				   // you can't compute normal vectors
+				   // on cells, only on faces
   Assert ((update_flags & update_normal_vectors) == false,
 	  FEValuesBase<dim>::ExcInvalidUpdateFlag());
 
-  UpdateFlags flags = mapping_q1.update_once (update_flags);
-  flags |= mapping_q1.update_each (update_flags);
-  flags |= fe.update_once (update_flags);
-  flags |= fe.update_each (update_flags);
+				   // first find out which objects
+				   // need to be recomputed on each
+				   // cell we visit. this we have to
+				   // ask the finite element
+  const UpdateFlags flags = UpdateFlags(mapping->update_once (update_flags) |
+					mapping->update_each (update_flags) |
+					fe.update_once (update_flags)      |
+					fe.update_each (update_flags)      );
 
-  mapping_data = mapping_q1.get_data(flags, quadrature);
-  fe_data      = fe.get_data(flags, mapping_q1, quadrature);
+				   // then get objects into which the
+				   // FE and the Mapping can store
+				   // intermediate data used across
+				   // calls to reinit
+  mapping_data = mapping->get_data(flags, quadrature);
+  fe_data      = fe.get_data(flags, *mapping, quadrature);
 
+				   // maybe some of the flags passed
+				   // to the get_data functions
+				   // resulted in other flags to be
+				   // set, so collect them again.
+				   //
+				   // example: a FE might need to have
+				   // the covariant transform of the
+				   // mapping to compute its shape
+				   // values
+//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
+//  flags = fe.update_once(update_flags)  
+//  flags = mapping.update_once(flags)
+// if the mapping should depend on the fe to compute some things, then
+// we would need to iterate, and the one cycle here isn't sufficient!?  
+  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
+					   mapping_data->update_each |
+					   fe_data->update_once      |
+					   fe_data->update_each      );
+
+				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				flags);
+				allflags);
 }
+
 
 
 template <int dim>
@@ -508,6 +580,7 @@ template <int dim>
 unsigned int
 FEValues<dim>::memory_consumption () const
 {
+//TODO: check whether this is up to date  
   return FEValuesBase<dim>::memory_consumption ();
 };
 
@@ -523,15 +596,16 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const Mapping<dim> &mapping,      
 					 const FiniteElement<dim> &fe,
 					 const Quadrature<dim-1>& quadrature)
-  :
-  FEValuesBase<dim> (n_q_points,
-		     dofs_per_cell,
-		     n_faces_or_subfaces,
-		     update_flags,
-		     mapping,
-		     fe),
-  quadrature(quadrature)
+		:
+		FEValuesBase<dim> (n_q_points,
+				   dofs_per_cell,
+				   n_faces_or_subfaces,
+				   update_flags,
+				   mapping,
+				   fe),
+                quadrature(quadrature)
 {};
+
 
 
 template <int dim>
@@ -542,6 +616,7 @@ FEFaceValuesBase<dim>::get_normal_vectors () const
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   return normal_vectors;
 };
+
 
 
 template <int dim>
@@ -557,6 +632,7 @@ FEFaceValuesBase<dim>::get_boundary_forms () const
 /*------------------------------- FEFaceValues -------------------------------*/
 
 
+// TODO: unify the two constructor bodies by calling a single function that does all the work
 template <int dim>
 FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				 const FiniteElement<dim> &fe,
@@ -570,17 +646,42 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				       mapping,
 				       fe, quadrature)
 {
-  UpdateFlags flags = mapping.update_once (update_flags);
-  flags |= mapping.update_each (update_flags);
-  flags |= fe.update_once (update_flags);
-  flags |= fe.update_each (update_flags);
+				   // first find out which objects
+				   // need to be recomputed on each
+				   // cell we visit. this we have to
+				   // ask the finite element
+  const UpdateFlags flags = UpdateFlags(mapping.update_once (update_flags) |
+					mapping.update_each (update_flags) |
+					fe.update_once (update_flags)      |
+					fe.update_each (update_flags)      );
 
+				   // then get objects into which the
+				   // FE and the Mapping can store
+				   // intermediate data used across
+				   // calls to reinit
   mapping_data = mapping.get_face_data(flags, quadrature);
   fe_data      = fe.get_face_data(flags, mapping, quadrature);
 
-  UpdateFlags allflags = mapping_data->update_once | mapping_data->update_each;
-  allflags |= fe_data->update_once | fe_data->update_each;
+				   // maybe some of the flags passed
+				   // to the get_data functions
+				   // resulted in other flags to be
+				   // set, so collect them again.
+				   //
+				   // example: a FE might need to have
+				   // the covariant transform of the
+				   // mapping to compute its shape
+				   // values
+//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
+//  flags = fe.update_once(update_flags)  
+//  flags = mapping.update_once(flags)
+// if the mapping should depend on the fe to compute some things, then
+// we would need to iterate, and the one cycle here isn't sufficient!?  
+  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
+					   mapping_data->update_each |
+					   fe_data->update_once      |
+					   fe_data->update_each      );
 
+				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
 				allflags);
@@ -600,24 +701,51 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				       mapping_q1,
 				       fe, quadrature)
 {
-  UpdateFlags flags = mapping_q1.update_once (update_flags);
-  flags |= mapping_q1.update_each (update_flags);
-  flags |= fe.update_once (update_flags);
-  flags |= fe.update_each (update_flags);
+				   // first find out which objects
+				   // need to be recomputed on each
+				   // cell we visit. this we have to
+				   // ask the finite element
+  const UpdateFlags flags = UpdateFlags(mapping->update_once (update_flags) |
+					mapping->update_each (update_flags) |
+					fe.update_once (update_flags)      |
+					fe.update_each (update_flags)      );
 
-  mapping_data = mapping_q1.get_face_data(flags, quadrature);
-  fe_data      = fe.get_face_data(flags, mapping_q1, quadrature);
+				   // then get objects into which the
+				   // FE and the Mapping can store
+				   // intermediate data used across
+				   // calls to reinit
+  mapping_data = mapping->get_face_data(flags, quadrature);
+  fe_data      = fe.get_face_data(flags, *mapping, quadrature);
 
+				   // maybe some of the flags passed
+				   // to the get_data functions
+				   // resulted in other flags to be
+				   // set, so collect them again.
+				   //
+				   // example: a FE might need to have
+				   // the covariant transform of the
+				   // mapping to compute its shape
+				   // values
+//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
+//  flags = fe.update_once(update_flags)  
+//  flags = mapping.update_once(flags)
+// if the mapping should depend on the fe to compute some things, then
+// we would need to iterate, and the one cycle here isn't sufficient!?  
+  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
+					   mapping_data->update_each |
+					   fe_data->update_once      |
+					   fe_data->update_each      );
+
+				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				flags);
+				allflags);
 };
 
 
 
 template <int dim>
-void FEFaceValues<dim>::reinit (const typename
-				DoFHandler<dim>::cell_iterator &cell,
+void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				const unsigned int              face_no)
 {
 				   // assert that the finite elements
@@ -628,8 +756,8 @@ void FEFaceValues<dim>::reinit (const typename
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
-  present_cell  = cell;
-  present_face  = cell->face(face_no);
+  present_cell = cell;
+  present_face = cell->face(face_no);
 
   get_mapping().fill_fe_face_values(cell, face_no,
 				    quadrature,
@@ -651,6 +779,8 @@ void FEFaceValues<dim>::reinit (const typename
 /*------------------------------- FESubFaceValues -------------------------------*/
 
 
+// TODO: unify the two constructor bodies by calling a single function that does all the work
+// TODO: FESubfaceValues constructors are exactly the same as FEFaceValues constructors with exception of calling fe_sub_face_data instead of fe_face_data. Merge!
 template <int dim>
 FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				       const FiniteElement<dim> &fe,
@@ -659,22 +789,51 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
-				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
+				       GeometryInfo<dim>::faces_per_cell *
+				       GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
 				       mapping,
 				       fe, quadrature)
 {
-  UpdateFlags flags = mapping.update_once (update_flags);
-  flags |= mapping.update_each (update_flags);
-  flags |= fe.update_once (update_flags);
-  flags |= fe.update_each (update_flags);
+				   // first find out which objects
+				   // need to be recomputed on each
+				   // cell we visit. this we have to
+				   // ask the finite element
+  const UpdateFlags flags = UpdateFlags(mapping.update_once (update_flags) |
+					mapping.update_each (update_flags) |
+					fe.update_once (update_flags)      |
+					fe.update_each (update_flags)      );
 
-  mapping_data = mapping.get_subface_data(flags, quadrature);
-  fe_data      = fe.get_subface_data(flags, mapping, quadrature);
+				   // then get objects into which the
+				   // FE and the Mapping can store
+				   // intermediate data used across
+				   // calls to reinit
+  mapping_data = mapping.get_sub_face_data(flags, quadrature);
+  fe_data      = fe.get_sub_face_data(flags, mapping, quadrature);
 
+				   // maybe some of the flags passed
+				   // to the get_data functions
+				   // resulted in other flags to be
+				   // set, so collect them again.
+				   //
+				   // example: a FE might need to have
+				   // the covariant transform of the
+				   // mapping to compute its shape
+				   // values
+//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
+//  flags = fe.update_once(update_flags)  
+//  flags = mapping.update_once(flags)
+// if the mapping should depend on the fe to compute some things, then
+// we would need to iterate, and the one cycle here isn't sufficient!?  
+  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
+					   mapping_data->update_each |
+					   fe_data->update_once      |
+					   fe_data->update_each      );
+
+				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				flags);
+				allflags);
 }
 
 
@@ -686,22 +845,51 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
-				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
+				       GeometryInfo<dim>::faces_per_cell *
+				       GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
 				       mapping_q1,
 				       fe, quadrature)
 {
-  UpdateFlags flags = mapping_q1.update_once (update_flags);
-  flags |= mapping_q1.update_each (update_flags);
-  flags |= fe.update_once (update_flags);
-  flags |= fe.update_each (update_flags);
+				   // first find out which objects
+				   // need to be recomputed on each
+				   // cell we visit. this we have to
+				   // ask the finite element
+  const UpdateFlags flags = UpdateFlags(mapping->update_once (update_flags) |
+					mapping->update_each (update_flags) |
+					fe.update_once (update_flags)      |
+					fe.update_each (update_flags)      );
 
-  mapping_data = mapping_q1.get_subface_data(flags, quadrature);
-  fe_data      = fe.get_subface_data(flags, mapping_q1, quadrature);
+				   // then get objects into which the
+				   // FE and the Mapping can store
+				   // intermediate data used across
+				   // calls to reinit
+  mapping_data = mapping->get_sub_face_data(flags, quadrature);
+  fe_data      = fe.get_sub_face_data(flags, *mapping, quadrature);
 
+				   // maybe some of the flags passed
+				   // to the get_data functions
+				   // resulted in other flags to be
+				   // set, so collect them again.
+				   //
+				   // example: a FE might need to have
+				   // the covariant transform of the
+				   // mapping to compute its shape
+				   // values
+//TODO: why can't the flags be obtained in one cycle?, e.g. by calling
+//  flags = fe.update_once(update_flags)  
+//  flags = mapping.update_once(flags)
+// if the mapping should depend on the fe to compute some things, then
+// we would need to iterate, and the one cycle here isn't sufficient!?  
+  const UpdateFlags allflags = UpdateFlags(mapping_data->update_once |
+					   mapping_data->update_each |
+					   fe_data->update_once      |
+					   fe_data->update_each      );
+
+				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
-				flags);
+				allflags);
 }
 
 
