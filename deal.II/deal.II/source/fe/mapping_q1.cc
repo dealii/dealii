@@ -351,7 +351,7 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
       const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
       data.unit_tangentials.reinit(nfaces*(dim-1),
 				   n_original_q_points);
-      for (unsigned int i=0;i<nfaces;++i)
+      for (unsigned int i=0; i<nfaces; ++i)
 	{
 					   // Base index of the
 					   // non-zero entry of the
@@ -644,8 +644,8 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 			  | update_JxW_values))
 	for (unsigned int i=0;i<boundary_forms.size();++i)
 	  {
-	    double f = std::sqrt(contract(boundary_forms[i],
-					  boundary_forms[i]));
+	    const double f = std::sqrt(contract(boundary_forms[i],
+                                                boundary_forms[i]));
 	    if (update_flags & update_JxW_values)
 	      {
 		JxW_values[i] = f * weights[i];
@@ -653,10 +653,7 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 		  JxW_values[i]/=GeometryInfo<dim>::subfaces_per_face;
 	      }
 	    if (update_flags & update_normal_vectors)
-	      {
-		normal_vectors[i] = boundary_forms[i];
-		normal_vectors[i] /= f;
-	      }
+              normal_vectors[i] = boundary_forms[i] / f;
 	  }
     }
 }
