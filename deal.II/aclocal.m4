@@ -4309,11 +4309,12 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
   if test "x$1" != "xyes" ; then
-    AC_CHECK_FILE($1/Lib/libumfpack.a,
-	UMFPACK_LIB=$1/Lib/libumfpack.a)
-    AC_CHECK_FILE($1/Include/umfpack.h,
-	UMFPACK_INCLUDE_DIR=-I$1/Include,
-	UMFPACK_LIB="")
+    LDFLAGS="-L$1/UMFPACK/Lib -L$1/AMD/Lib"
+    AC_CHECK_LIB(amd, amd_info)
+    AC_CHECK_LIB(umfpack, umfpack_di_defaults)
+    AC_CHECK_FILE($1/UMFPACK/Include/umfpack.h,
+	UMFPACK_INCLUDE_DIR=-I$1/UMFPACK/Include,
+        AC_MSG_ERROR(UMFPack installation faulty))
   else
     AC_MSG_CHECKING(UmfPack library)
     UMFPACK_LIB='$(LIBDIR)/liblac_umfpack$(lib-suffix)'
@@ -4322,9 +4323,6 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
     AC_MSG_RESULT(using included version)
   fi
   AC_DEFINE(HAVE_UMFPACK,1,[UMFPACK is $1])
-  if test "x$with_blas" = "x" ; then
-    with_blas="yes"
-  fi
 ])
 
 

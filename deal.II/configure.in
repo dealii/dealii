@@ -121,9 +121,6 @@ AC_SUBST(CXXFLAGSG)
 AC_SUBST(CXXFLAGSO)
 AC_SUBST(CXXFLAGSPIC)
 AC_SUBST(SHLIBLD)
-AC_SUBST(LIBS)
-AC_SUBST(LDFLAGS)
-AC_SUBST(LDFLAGSPIC)
 AC_SUBST(OBJEXT)
 AC_SUBST(EXEEXT)
 
@@ -309,11 +306,40 @@ DEAL_II_CHECK_COMPAT_BLOCKER
 
 
 dnl -------------------------------------------------------------
-dnl                  Existence of additional libraries
+dnl                  Additional libraries
+dnl -------------------------------------------------------------
+dnl  Do this in two steps:
+dnl
+dnl   1) For each library required by another, make sure
+dnl      --with-library is set
+dnl
+dnl   2) Then check for libraries in reverse order to have them
+dnl      included in LIBS
+dnl
 dnl -------------------------------------------------------------
 
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring additional libs ----------------)
+
+if test "x$with_umfpack" != "x" ; then
+  if test "x$with_blas" = "x" ; then
+    with_blas="yes"
+  fi
+fi
+
+dnl -------------------------------------------------------------
+dnl Actually include libraries here.
+dnl -------------------------------------------------------------
+
+dnl Check for blas.
+AC_ARG_WITH(blas,
+  [  --with-blas=blaslib use the blas library blaslib. Make sure
+   the path to the libary is searched by ld, since it is included
+   by the argument -lblaslib. If no argument is given, use -lblas.
+   Default is to use -lblas only if required by other libraries.],
+  DEAL_II_WITH_BLAS($withval))
+AC_SUBST(BLAS_LIB)
+
 
 DEAL_II_CONFIGURE_TECPLOT
 AC_SUBST(TECPLOT_LIB)
@@ -339,7 +365,9 @@ dnl Check for UMFPack. This is more an enable for the contributed version,
 dnl but it should become a real --with-umfpack later
 AC_ARG_WITH(umfpack,
   [  --with-umfpack=umfpack-root-directory,
-      use contributed UMFPack is no directory is given.
+      Use installed UMFPack version. 'umfpack-root-directory' should
+      be the directory containing directories AMD and UMFPACK.
+      The contributed UMFPack library is used if no argument is given.
       Default is not to use UMFPack],
   DEAL_II_WITH_UMFPACK($withval))
 AC_SUBST(UMFPACK_LIB)
@@ -347,13 +375,7 @@ AC_SUBST(UMFPACK_INCLUDE_DIR)
 AC_SUBST(USE_CONTRIB_UMFPACK)
 
 dnl Check for LAPACK
-AC_CHECK_LIB(lapack, degsl_)
-
-dnl Check for blas. Must be after UMFPack and LAPACK!
-AC_ARG_WITH(blas,
-  [  --with-blas=blaslib use the blas library],
-  DEAL_II_WITH_BLAS($withval))
-AC_SUBST(BLAS_LIB)
+dnl AC_CHECK_LIB(lapack, degsl_)
 
 dnl -------------------------------------------------------------
 dnl       Optimizations and consistency of compiler flags
@@ -534,6 +556,10 @@ namespace deal_II_numbers {
 }
 #endif
 ])
+
+AC_SUBST(LIBS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(LDFLAGSPIC)
 
 dnl Write output to the global options file and modify other files as well
 dnl that need some information

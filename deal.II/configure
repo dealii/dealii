@@ -274,7 +274,7 @@ PACKAGE_BUGREPORT=
 
 ac_unique_file="deal.II"
 ac_subdirs_all="$ac_subdirs_all contrib tests"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD LDFLAGSPIC CC_VERSION enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared lib_suffix AR RANLIB ac_ct_RANLIB TECPLOT_LIB TECPLOT_INCLUDE_DIR HSL_LIB HSL_INCLUDE_DIR NEEDS_F77LIBS USE_CONTRIB_HSL USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH DEAL_II_PETSC_VERSION_MAJOR DEAL_II_PETSC_VERSION_MINOR DEAL_II_PETSC_VERSION_SUBMINOR DEAL_II_DEFINE_DEAL_II_USE_PETSC USE_CONTRIB_METIS DEAL_II_METIS_DIR UMFPACK_LIB UMFPACK_INCLUDE_DIR USE_CONTRIB_UMFPACK BLAS_LIB DOXYGEN DOT DEAL_II_HAVE_DOT PERL subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD CC_VERSION enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared lib_suffix AR RANLIB ac_ct_RANLIB NEEDS_F77LIBS BLAS_LIB TECPLOT_LIB TECPLOT_INCLUDE_DIR HSL_LIB HSL_INCLUDE_DIR USE_CONTRIB_HSL USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH DEAL_II_PETSC_VERSION_MAJOR DEAL_II_PETSC_VERSION_MINOR DEAL_II_PETSC_VERSION_SUBMINOR DEAL_II_DEFINE_DEAL_II_USE_PETSC USE_CONTRIB_METIS DEAL_II_METIS_DIR UMFPACK_LIB UMFPACK_INCLUDE_DIR USE_CONTRIB_UMFPACK DOXYGEN DOT DEAL_II_HAVE_DOT PERL subdirs LDFLAGSPIC LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -825,6 +825,10 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-multithreading=name If name==posix, or no name given, then use
                           POSIX threads
+  --with-blas=blaslib use the blas library blaslib. Make sure
+   the path to the libary is searched by ld, since it is included
+   by the argument -lblaslib. If no argument is given, use -lblas.
+   Default is to use -lblas only if required by other libraries.
   --with-petsc=/path/to/petsc   Specify the path to the PETSc installation,
                                    of which the include and library directories
                                    are subdirs; use this if you want to
@@ -838,9 +842,10 @@ Optional Packages:
                                    are subdirs; use this if you want to
                                    override the METIS_DIR environment variable
   --with-umfpack=umfpack-root-directory,
-      use contributed UMFPack is no directory is given.
+      Use installed UMFPack version. 'umfpack-root-directory' should
+      be the directory containing directories AMD and UMFPACK.
+      The contributed UMFPack library is used if no argument is given.
       Default is not to use UMFPack
-  --with-blas=blaslib use the blas library
   --with-cpu=cpu          Optimize specifically for the given CPU type,
                           rather than just generating code for this
 		          processor family
@@ -3506,9 +3511,6 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 	;;
     esac
   fi
-
-
-
 
 
 
@@ -8594,6 +8596,175 @@ echo "${ECHO_T}" >&6
 echo "$as_me:$LINENO: result: ---------------- configuring additional libs ----------------" >&5
 echo "${ECHO_T}---------------- configuring additional libs ----------------" >&6
 
+if test "x$with_umfpack" != "x" ; then
+  if test "x$with_blas" = "x" ; then
+    with_blas="yes"
+  fi
+fi
+
+
+
+# Check whether --with-blas or --without-blas was given.
+if test "${with_blas+set}" = set; then
+  withval="$with_blas"
+
+  if test "x$withval" != "xyes" ; then
+    as_ac_Lib=`echo "ac_cv_lib_$withval''_daxpy_" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for daxpy_ in -l$withval" >&5
+echo $ECHO_N "checking for daxpy_ in -l$withval... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Lib+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-l$withval $F77LIBS $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char daxpy_ ();
+int
+main ()
+{
+daxpy_ ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  eval "$as_ac_Lib=yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+eval "$as_ac_Lib=no"
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
+if test `eval echo '${'$as_ac_Lib'}'` = yes; then
+  BLAS_LIB="-l$withval"
+else
+  echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+fi
+
+  else
+    echo "$as_me:$LINENO: checking for daxpy_ in -lblas" >&5
+echo $ECHO_N "checking for daxpy_ in -lblas... $ECHO_C" >&6
+if test "${ac_cv_lib_blas_daxpy_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lblas $F77LIBS $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char daxpy_ ();
+int
+main ()
+{
+daxpy_ ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_blas_daxpy_=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_blas_daxpy_=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_blas_daxpy_" >&5
+echo "${ECHO_T}$ac_cv_lib_blas_daxpy_" >&6
+if test $ac_cv_lib_blas_daxpy_ = yes; then
+  BLAS_LIB="-lblas"
+else
+  echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+fi
+
+  fi
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_BLAS 1
+_ACEOF
+
+  NEEDS_F77LIBS="yes"
+
+
+fi;
+
+
+
 
   for i  in $TECHOME $TEC80HOME $TEC90HOME  ; do
     as_ac_File=`echo "ac_cv_file_$i/lib/tecio.a" | $as_tr_sh`
@@ -8902,31 +9073,158 @@ if test "${with_umfpack+set}" = set; then
   withval="$with_umfpack"
 
   if test "x$withval" != "xyes" ; then
-    as_ac_File=`echo "ac_cv_file_$withval/Lib/libumfpack.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $withval/Lib/libumfpack.a" >&5
-echo $ECHO_N "checking for $withval/Lib/libumfpack.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
+    LDFLAGS="-L$withval/UMFPACK/Lib -L$withval/AMD/Lib"
+
+echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
+echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6
+if test "${ac_cv_lib_amd_amd_info+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$withval/Lib/libumfpack.a"; then
-  eval "$as_ac_File=yes"
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lamd  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char amd_info ();
+int
+main ()
+{
+amd_info ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_amd_amd_info=yes
 else
-  eval "$as_ac_File=no"
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_amd_amd_info=no
 fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  UMFPACK_LIB=$withval/Lib/libumfpack.a
+echo "$as_me:$LINENO: result: $ac_cv_lib_amd_amd_info" >&5
+echo "${ECHO_T}$ac_cv_lib_amd_amd_info" >&6
+if test $ac_cv_lib_amd_amd_info = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBAMD 1
+_ACEOF
+
+  LIBS="-lamd $LIBS"
+
 fi
 
-    as_ac_File=`echo "ac_cv_file_$withval/Include/umfpack.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $withval/Include/umfpack.h" >&5
-echo $ECHO_N "checking for $withval/Include/umfpack.h... $ECHO_C" >&6
+
+echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
+echo $ECHO_N "checking for umfpack_di_defaults in -lumfpack... $ECHO_C" >&6
+if test "${ac_cv_lib_umfpack_umfpack_di_defaults+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lumfpack  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char umfpack_di_defaults ();
+int
+main ()
+{
+umfpack_di_defaults ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_umfpack_umfpack_di_defaults=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_umfpack_umfpack_di_defaults=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_umfpack_umfpack_di_defaults" >&5
+echo "${ECHO_T}$ac_cv_lib_umfpack_umfpack_di_defaults" >&6
+if test $ac_cv_lib_umfpack_umfpack_di_defaults = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBUMFPACK 1
+_ACEOF
+
+  LIBS="-lumfpack $LIBS"
+
+fi
+
+    as_ac_File=`echo "ac_cv_file_$withval/UMFPACK/Include/umfpack.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $withval/UMFPACK/Include/umfpack.h" >&5
+echo $ECHO_N "checking for $withval/UMFPACK/Include/umfpack.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -8934,7 +9232,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$withval/Include/umfpack.h"; then
+if test -r "$withval/UMFPACK/Include/umfpack.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -8943,9 +9241,11 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  UMFPACK_INCLUDE_DIR=-I$withval/Include
+  UMFPACK_INCLUDE_DIR=-I$withval/UMFPACK/Include
 else
-  UMFPACK_LIB=""
+  { { echo "$as_me:$LINENO: error: UMFPack installation faulty" >&5
+echo "$as_me: error: UMFPack installation faulty" >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
   else
@@ -8962,249 +9262,11 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_UMFPACK 1
 _ACEOF
 
-  if test "x$with_blas" = "x" ; then
-    with_blas="yes"
-  fi
 
 fi;
 
 
 
-
-
-echo "$as_me:$LINENO: checking for degsl_ in -llapack" >&5
-echo $ECHO_N "checking for degsl_ in -llapack... $ECHO_C" >&6
-if test "${ac_cv_lib_lapack_degsl_+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-llapack  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char degsl_ ();
-int
-main ()
-{
-degsl_ ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_lapack_degsl_=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_lapack_degsl_=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_lapack_degsl_" >&5
-echo "${ECHO_T}$ac_cv_lib_lapack_degsl_" >&6
-if test $ac_cv_lib_lapack_degsl_ = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBLAPACK 1
-_ACEOF
-
-  LIBS="-llapack $LIBS"
-
-fi
-
-
-
-# Check whether --with-blas or --without-blas was given.
-if test "${with_blas+set}" = set; then
-  withval="$with_blas"
-
-  if test "x$withval" != "xyes" ; then
-    as_ac_Lib=`echo "ac_cv_lib_$withval''_daxpy_" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for daxpy_ in -l$withval" >&5
-echo $ECHO_N "checking for daxpy_ in -l$withval... $ECHO_C" >&6
-if eval "test \"\${$as_ac_Lib+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l$withval $F77LIBS $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char daxpy_ ();
-int
-main ()
-{
-daxpy_ ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_Lib=yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-eval "$as_ac_Lib=no"
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
-if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-  BLAS_LIB="-l$withval"
-else
-  echo "$as_me:$LINENO: result: not found" >&5
-echo "${ECHO_T}not found" >&6
-fi
-
-  else
-    echo "$as_me:$LINENO: checking for daxpy_ in -lblas" >&5
-echo $ECHO_N "checking for daxpy_ in -lblas... $ECHO_C" >&6
-if test "${ac_cv_lib_blas_daxpy_+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lblas $F77LIBS $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char daxpy_ ();
-int
-main ()
-{
-daxpy_ ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_blas_daxpy_=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_blas_daxpy_=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_blas_daxpy_" >&5
-echo "${ECHO_T}$ac_cv_lib_blas_daxpy_" >&6
-if test $ac_cv_lib_blas_daxpy_ = yes; then
-  BLAS_LIB="-lblas"
-else
-  echo "$as_me:$LINENO: result: not found" >&5
-echo "${ECHO_T}not found" >&6
-fi
-
-  fi
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_BLAS 1
-_ACEOF
-
-  NEEDS_F77LIBS="yes"
-
-
-fi;
 
 
 
@@ -9560,6 +9622,10 @@ echo "$as_me:$LINENO: result: " >&5
 echo "${ECHO_T}" >&6
 echo "$as_me:$LINENO: result: --------------------- generating output ---------------------" >&5
 echo "${ECHO_T}--------------------- generating output ---------------------" >&6
+
+
+
+
 
 
 
@@ -10163,7 +10229,6 @@ s,@CXXFLAGSG@,$CXXFLAGSG,;t t
 s,@CXXFLAGSO@,$CXXFLAGSO,;t t
 s,@CXXFLAGSPIC@,$CXXFLAGSPIC,;t t
 s,@SHLIBLD@,$SHLIBLD,;t t
-s,@LDFLAGSPIC@,$LDFLAGSPIC,;t t
 s,@CC_VERSION@,$CC_VERSION,;t t
 s,@enablemultithreading@,$enablemultithreading,;t t
 s,@withmultithreading@,$withmultithreading,;t t
@@ -10178,11 +10243,12 @@ s,@lib_suffix@,$lib_suffix,;t t
 s,@AR@,$AR,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+s,@NEEDS_F77LIBS@,$NEEDS_F77LIBS,;t t
+s,@BLAS_LIB@,$BLAS_LIB,;t t
 s,@TECPLOT_LIB@,$TECPLOT_LIB,;t t
 s,@TECPLOT_INCLUDE_DIR@,$TECPLOT_INCLUDE_DIR,;t t
 s,@HSL_LIB@,$HSL_LIB,;t t
 s,@HSL_INCLUDE_DIR@,$HSL_INCLUDE_DIR,;t t
-s,@NEEDS_F77LIBS@,$NEEDS_F77LIBS,;t t
 s,@USE_CONTRIB_HSL@,$USE_CONTRIB_HSL,;t t
 s,@USE_CONTRIB_PETSC@,$USE_CONTRIB_PETSC,;t t
 s,@DEAL_II_PETSC_DIR@,$DEAL_II_PETSC_DIR,;t t
@@ -10196,12 +10262,12 @@ s,@DEAL_II_METIS_DIR@,$DEAL_II_METIS_DIR,;t t
 s,@UMFPACK_LIB@,$UMFPACK_LIB,;t t
 s,@UMFPACK_INCLUDE_DIR@,$UMFPACK_INCLUDE_DIR,;t t
 s,@USE_CONTRIB_UMFPACK@,$USE_CONTRIB_UMFPACK,;t t
-s,@BLAS_LIB@,$BLAS_LIB,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
 s,@DOT@,$DOT,;t t
 s,@DEAL_II_HAVE_DOT@,$DEAL_II_HAVE_DOT,;t t
 s,@PERL@,$PERL,;t t
 s,@subdirs@,$subdirs,;t t
+s,@LDFLAGSPIC@,$LDFLAGSPIC,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
