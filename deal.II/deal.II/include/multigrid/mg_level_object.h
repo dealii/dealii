@@ -197,7 +197,7 @@ MGLevelObject<Object>::memory_consumption () const
   typedef typename std::vector<boost::shared_ptr<Object> >::const_iterator Iter;
   const Iter end = objects.end();
   for (Iter o=objects.begin(); o!=end; ++o)
-    result += *o->memory_consumption();
+    result += (*o)->memory_consumption();
   
   return result;
 }
