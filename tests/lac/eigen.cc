@@ -25,7 +25,6 @@
 #include <lac/eigen.h>
 #include <lac/precondition.h>
 
-
 int main()
 {
     std::ofstream logfile("eigen.output");
@@ -39,6 +38,19 @@ int main()
   
   const unsigned int size = 10;
   const unsigned int dim = (size-1)*(size-1);
+
+				   /*
+				    * Compute minimal and maximal
+				    * eigenvalues of the 5-point
+				    * stencil matrix
+				    * (Hackbusch:Iterative Lösung...,
+				    * Satz 4.1.1)
+				    */
+  const double h = 1./size;
+  const double s = std::sin(M_PI*h/2.);
+  const double c = std::cos(M_PI*h/2.);
+  const double lambda_max = 8.*c*c;
+  const double lambda_min = 8.*s*s;
   
   FDMatrix testproblem(size, size);
   SparsityPattern structure(dim, dim, 5);
@@ -53,24 +65,24 @@ int main()
 
   EigenPower<> mises(control, mem);
   mises.solve(lambda, A, u);
-  deallog << "Eigenvalue " << lambda << std::endl;
+  deallog << "Eigenvalue " << lambda << " Error " << lambda-lambda_max << std::endl;
 
   double lambda2;
   u = 1.;
   
   EigenPower<> mises2(control, mem, -1.5*lambda);
   mises2.solve(lambda2, A, u);
-  deallog << "Eigenvalue " << lambda2 << std::endl;
+  deallog << "Eigenvalue " << lambda2 << " Error " << lambda2-lambda_min << std::endl;
 
   u = 1.;
   lambda = 0.;
-  EigenInverse<> wieland(control, mem);
+  EigenInverse<> wielandt(control, mem);
   wieland.solve(lambda, A, u);
-  deallog << "Eigenvalue " << lambda << std::endl;  
+  deallog << "Eigenvalue " << lambda << " Error " << lambda-lambda_min << std::endl;  
 
   u = 1.;
   lambda = 10.;
-  EigenInverse<> wieland2(control, mem);
+  EigenInverse<> wielandt2(control, mem);
   wieland2.solve(lambda, A, u);
-  deallog << "Eigenvalue " << lambda << std::endl;  
+  deallog << "Eigenvalue " << lambda << " Error " << lambda-lambda_max << std::endl;  
 }
