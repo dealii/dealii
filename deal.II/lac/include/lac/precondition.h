@@ -544,8 +544,8 @@ template<class VECTOR>
 inline void
 PreconditionJacobi<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
-  Assert (A!=0, ExcNotInitialized());
-  A->precondition_Jacobi (dst, src, omega);
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->precondition_Jacobi (dst, src, this->omega);
 }
 
 
@@ -555,8 +555,8 @@ template<class VECTOR>
 inline void
 PreconditionJacobi<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
-  Assert (A!=0, ExcNotInitialized());
-  A->precondition_Jacobi (dst, src, omega);
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->precondition_Jacobi (dst, src, this->omega);
 }
 
 
@@ -567,8 +567,8 @@ template<class VECTOR>
 inline void
 PreconditionSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
-  Assert (A!=0, ExcNotInitialized());
-  A->precondition_SOR (dst, src, omega);
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->precondition_SOR (dst, src, this->omega);
 }
 
 
@@ -578,8 +578,8 @@ template<class VECTOR>
 inline void
 PreconditionSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
-  Assert (A!=0, ExcNotInitialized());
-  A->precondition_TSOR (dst, src, omega);
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->precondition_TSOR (dst, src, this->omega);
 }
 
 
@@ -590,8 +590,8 @@ template<class VECTOR>
 inline void
 PreconditionSSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
-  Assert (A!=0, ExcNotInitialized());
-  A->precondition_SSOR (dst, src, omega);
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->precondition_SSOR (dst, src, this->omega);
 }
 
 
@@ -601,8 +601,8 @@ template<class VECTOR>
 inline void
 PreconditionSSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
-  Assert (A!=0, ExcNotInitialized());
-  A->precondition_SSOR (dst, src, omega);
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->precondition_SSOR (dst, src, this->omega);
 }
 
 

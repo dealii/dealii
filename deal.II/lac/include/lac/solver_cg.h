@@ -204,7 +204,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   deallog.push("cg");
   
 				   // Memory allocation
-  Vr  = memory.alloc();
+  Vr  = this->memory.alloc();
   Vp  = memory.alloc();
   Vz  = memory.alloc();
   VAp = memory.alloc();
@@ -237,7 +237,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
     g = b;
   res = g.l2_norm();
   
-  conv = control().check(0,res);
+  conv = this->control().check(0,res);
   if (conv) 
     {
       memory.free(Vr);
@@ -269,7 +269,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 
       print_vectors(it, x, g, d);
       
-      conv = control().check(it,res);
+      conv = this->control().check(it,res);
       if (conv)
 	break;
       
@@ -297,9 +297,9 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
  
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 };
 

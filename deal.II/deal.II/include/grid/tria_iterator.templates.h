@@ -135,8 +135,8 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,Accessor> &i
 				   // used() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end)
-    Assert (accessor.used(),
+  if (this->state() != IteratorState::past_the_end)
+    Assert (this->accessor.used(),
 	    ExcAssignmentOfUnusedObject());
 #endif  
 };
@@ -157,8 +157,8 @@ TriaIterator<dim,Accessor>::TriaIterator (Triangulation<dim> *parent,
 				   // used() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end)
-    Assert (accessor.used(),
+  if (this->state() != IteratorState::past_the_end)
+    Assert (this->accessor.used(),
 	    ExcAssignmentOfUnusedObject());
 #endif  
 };
@@ -168,7 +168,7 @@ template <int dim, typename Accessor>
 inline
 TriaIterator<dim,Accessor> &
 TriaIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &i) {
-  accessor.copy_from (i.accessor);
+  this->accessor.copy_from (i.accessor);
   return *this;
 };
 
@@ -177,7 +177,7 @@ template <int dim, typename Accessor>
 inline
 TriaIterator<dim,Accessor> &
 TriaIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
-  accessor.copy_from (i.accessor);
+  this->accessor.copy_from (i.accessor);
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
@@ -185,7 +185,7 @@ TriaIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) 
 				   // used() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end) 
+  if (this->state() != IteratorState::past_the_end) 
     Assert (accessor.used(),
 	    ExcAssignmentOfUnusedObject());
 #endif  
@@ -197,8 +197,8 @@ template <int dim, typename Accessor>
 inline
 TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator ++ () {
   while (TriaRawIterator<dim,Accessor>::operator++(),
-	 (state() == IteratorState::valid))
-    if (accessor.used() == true)
+	 (this->state() == IteratorState::valid))
+    if (this->accessor.used() == true)
       return *this;
   return *this;
 };
@@ -219,8 +219,8 @@ inline
 TriaIterator<dim,Accessor> &
 TriaIterator<dim,Accessor>::operator -- () {
   while (TriaRawIterator<dim,Accessor>::operator--(),
-	 (state() == IteratorState::valid))
-    if (accessor.used() == true)
+	 (this->state() == IteratorState::valid))
+    if (this->accessor.used() == true)
       return *this;
   return *this;
 };
@@ -264,8 +264,8 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end) 
-    Assert (accessor.has_children()==false,
+  if (this->state() != IteratorState::past_the_end) 
+    Assert (this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
 };
@@ -283,8 +283,8 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaIterator<dim,Acc
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end) 
-    Assert (accessor.has_children()==false,
+  if (this->state() != IteratorState::past_the_end) 
+    Assert (this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
 };
@@ -305,8 +305,8 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (Triangulation<dim> *parent
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end) 
-    Assert (accessor.has_children()==false,
+  if (this->state() != IteratorState::past_the_end) 
+    Assert (this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
 };
@@ -316,7 +316,7 @@ template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor> &
 TriaActiveIterator<dim,Accessor>::operator = (const TriaActiveIterator<dim,Accessor> &i) {
-  accessor.copy_from (i.accessor);
+  this->accessor.copy_from (i.accessor);
   return *this;
 };
 
@@ -325,7 +325,7 @@ template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor> &
 TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
-  accessor.copy_from (i.accessor);
+  this->accessor.copy_from (i.accessor);
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
@@ -333,7 +333,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor
 				   // has_chidlren() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end) 
+  if (this->state() != IteratorState::past_the_end) 
     Assert (accessor.used() && accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
@@ -345,7 +345,7 @@ template <int dim, typename Accessor>
 inline
 TriaActiveIterator<dim,Accessor> &
 TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &i) {
-  accessor.copy_from (i.accessor);
+  this->accessor.copy_from (i.accessor);
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
@@ -353,7 +353,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != IteratorState::past_the_end) 
+  if (this->state() != IteratorState::past_the_end) 
     Assert (accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
@@ -366,8 +366,8 @@ inline
 TriaActiveIterator<dim,Accessor> &
 TriaActiveIterator<dim,Accessor>::operator ++ () {
   while (TriaIterator<dim,Accessor>::operator++(),
-	 (state() == IteratorState::valid))
-    if (accessor.has_children() == false)
+	 (this->state() == IteratorState::valid))
+    if (this->accessor.has_children() == false)
       return *this;
   return *this;
 };
@@ -389,8 +389,8 @@ inline
 TriaActiveIterator<dim,Accessor> &
 TriaActiveIterator<dim,Accessor>::operator -- () {
   while (TriaIterator<dim,Accessor>::operator--(),
-	 (state() == IteratorState::valid))
-    if (accessor.has_children() == false)
+	 (this->state() == IteratorState::valid))
+    if (this->accessor.has_children() == false)
       return *this;
   return *this;
 };

@@ -165,7 +165,7 @@ TriaObjectAccessor<1,dim>::child (const unsigned int i) const
   Assert (i<2, ExcIndexRange(i,0,2));
   
   TriaIterator<dim,TriaObjectAccessor<1,dim> >
-    q (tria, this->present_level+1, child_index (i));
+    q (this->tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
@@ -322,7 +322,7 @@ TriaObjectAccessor<2,dim>::line (const unsigned int i) const
   return
     TriaIterator<dim,TriaObjectAccessor<1,dim> >
     (
-      tria,
+      this->tria,
       this->present_level,
       line_index (i)
     );
@@ -350,7 +350,7 @@ TriaObjectAccessor<2,dim>::child (const unsigned int i) const
   Assert (i<4, ExcIndexRange(i,0,4));
   
   TriaIterator<dim,TriaObjectAccessor<2,dim> >
-    q (tria, this->present_level+1, child_index (i));
+    q (this->tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
@@ -533,7 +533,7 @@ TriaObjectAccessor<3,dim>::line (const unsigned int i) const
 		return this->quad(4)->line(3);
 	};
   Assert (false, ExcIndexRange(i,0,12));
-  return TriaIterator<dim,TriaObjectAccessor<1,dim> >(tria, -1, -1, 0);
+  return TriaIterator<dim,TriaObjectAccessor<1,dim> >(this->tria, -1, -1, 0);
 };
 
 
@@ -547,7 +547,7 @@ TriaObjectAccessor<3,dim>::quad (const unsigned int i) const
   return
     TriaIterator<dim,TriaObjectAccessor<2,dim> >
     (
-      tria,
+      this->tria,
       this->present_level,
       quad_index (i)
     );
@@ -604,7 +604,7 @@ TriaObjectAccessor<3,dim>::child (const unsigned int i) const
 {
   Assert (i<8, ExcIndexRange(i,0,8));
   
-  TriaIterator<dim,TriaObjectAccessor<3,dim> > q (tria, this->present_level+1, child_index (i));
+  TriaIterator<dim,TriaObjectAccessor<3,dim> > q (this->tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
