@@ -202,15 +202,16 @@ PoissonProblem<dim>::PoissonProblem (unsigned int order) :
 
 template <int dim>
 void PoissonProblem<dim>::clear () {
+  if (dof != 0) {
+    delete dof;
+    dof = 0;
+  };
+
   if (tria != 0) {
     delete tria;
     tria = 0;
   };
   
-  if (dof != 0) {
-    delete dof;
-    dof = 0;
-  };
 
   				   // make it known to the underlying
 				   // ProblemBase that tria and dof
@@ -422,11 +423,16 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   
   cout << endl;
 
+  const unsigned int n_dofs = dof->n_dofs();
+				   // release the lock that the dof object
+				   // has to the finite element object
+  dof->clear ();
+  
   delete fe;
   delete quadrature;
   delete boundary_quadrature;
   
-  return dof->n_dofs();
+  return n_dofs;
 };
 
 
