@@ -351,7 +351,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 						 // Rotate yz-plane
 						 // clockwise
 	  case 'X':
-		Assert (dim>2, 
+	        Assert (dim>2, 
 			typename FiniteElementData<dim>::ExcSpaceDimensionMismatch (dim,3));
 		for (unsigned int iz=0;iz<n;++iz)
 		  for (unsigned int iy=0;iy<n;++iy)
@@ -362,8 +362,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 		      }
 		break;
 	  default:
-//TODO:[GK] direction='y' is default, but is not implemented?!		
-		Assert (false, ExcNotImplemented ());
+	    Assert (false, ExcNotImplemented ());
 	}
     }
 }

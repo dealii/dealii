@@ -607,7 +607,6 @@ MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &c
 
 				   // Multiply quadrature weights
                                   // by Jacobian determinants
-//TODO:[?] compute Jacobi determinants directly, if co/contravariant is not needed
   if (update_flags & update_JxW_values)
     {      
       Assert (JxW_values.size() == npts,

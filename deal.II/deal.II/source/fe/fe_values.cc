@@ -77,7 +77,6 @@ FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
 template <int dim>
 FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 				 const unsigned int dofs_per_cell,
-				 const unsigned int,
 				 const UpdateFlags flags,
 				 const Mapping<dim>       &mapping,
 				 const FiniteElement<dim> &fe)
@@ -490,7 +489,6 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 		:
 		FEValuesBase<dim> (q.n_quadrature_points,
 				   fe.dofs_per_cell,
-				   1,
 				   update_default,
 				   mapping,
 				   fe),
@@ -508,7 +506,6 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		:
 		FEValuesBase<dim> (q.n_quadrature_points,
 				   fe.dofs_per_cell,
-				   1,
 				   update_default,
 				   get_default_mapping(),
 				   fe),
@@ -590,7 +587,6 @@ FEValues<dim>::memory_consumption () const
 template <int dim>
 FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const unsigned int dofs_per_cell,
-					 const unsigned int n_faces_or_subfaces,
 					 const UpdateFlags,
 					 const Mapping<dim> &mapping,      
 					 const FiniteElement<dim> &fe,
@@ -598,7 +594,6 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 		:
 		FEValuesBase<dim> (n_q_points,
 				   dofs_per_cell,
-				   n_faces_or_subfaces,
 				   update_default,
 				   mapping,
 				   fe),
@@ -650,7 +645,6 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
-				       GeometryInfo<dim>::faces_per_cell,
 				       update_flags,
 				       mapping,
 				       fe, quadrature)
@@ -667,7 +661,6 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
-				       GeometryInfo<dim>::faces_per_cell,
 				       update_flags,
 				       get_default_mapping(),
 				       fe, quadrature)
@@ -742,8 +735,6 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
-				       GeometryInfo<dim>::faces_per_cell *
-				       GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
 				       mapping,
 				       fe, quadrature)
@@ -760,8 +751,6 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
-				       GeometryInfo<dim>::faces_per_cell *
-				       GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
 				       get_default_mapping(),
 				       fe, quadrature)

@@ -247,7 +247,6 @@ class FEValuesBase : protected FEValuesData<dim>
 //TODO:[GK] What is the meaning of the n_values_array? It is not used in the implementation    
     FEValuesBase (const unsigned int n_q_points,
 		  const unsigned int dofs_per_cell,
-		  const unsigned int n_values_array,
 		  const UpdateFlags         update_flags,
 		  const Mapping<dim>       &mapping,
 		  const FiniteElement<dim> &fe);
@@ -752,7 +751,6 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      */
     FEFaceValuesBase (const unsigned int n_q_points,
 		      const unsigned int dofs_per_cell,
-		      const unsigned int n_faces_or_subfaces,
 		      const UpdateFlags         update_flags,
 		      const Mapping<dim>       &mapping,
 		      const FiniteElement<dim> &fe,

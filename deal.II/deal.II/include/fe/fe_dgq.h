@@ -238,6 +238,14 @@ class FE_DGQ : public FiniteElement<dim>
 				      * Compute renumbering for rotation
 				      * of degrees of freedom.
 				      *
+				      * Rotates a tensor product
+				      * numbering of degrees of
+				      * freedom by 90 degrees. It is
+				      * used to compute the transfer
+				      * matrices of the children by
+				      * using only the matrix for the
+				      * first child.
+				      *
 				      * The direction parameter
 				      * determines the type of
 				      * rotation. It is one character
@@ -247,9 +255,13 @@ class FE_DGQ : public FiniteElement<dim>
 				      * direction. Lower case is
 				      * counter-clockwise seen in
 				      * direction of the axis.
+				      *
+				      * Since rotation around the
+				      * y-axis is not used, it is not
+				      * implemented either.
 				      */
     void rotate_indices (std::vector<unsigned int> &indices,
-			 const char                 direction = 'y') const;
+			 const char                 direction) const;
   
 				     /**
 				      * Degree of the polynomials.

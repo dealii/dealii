@@ -299,7 +299,6 @@ MappingCartesian<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iter
 				   // equal and are the product of the
 				   // local lengths in each coordinate
 				   // direction
-//TODO:[GK] does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_JxW_values)
     {
       double J = data.length[0];
@@ -343,14 +342,12 @@ MappingCartesian<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell
     if (d != (normal_directions[face_no]/2))
       J *= data.length[d];
   
-//TODO:[GK] does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_JxW_values)
     {
       for (unsigned int i=0; i<JxW_values.size();++i)
 	JxW_values[i] = J * q.weight(i);
     }
 
-//TODO:[GK] does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_boundary_forms)
     {
       for (unsigned int i=0; i<boundary_forms.size();++i)
@@ -391,14 +388,12 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::c
     if (d != (normal_directions[face_no]/2))
       J *= data.length[d];
   
-//TODO:[GK] does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_JxW_values)
     {
       for (unsigned int i=0; i<JxW_values.size();++i)
 	JxW_values[i] = J * q.weight(i) / GeometryInfo<dim>::subfaces_per_face;
     }
 
-//TODO:[GK] does it make sense to query the update flags in data if we did not set any in the get_*_data functions?
   if (data.current_update_flags() & update_boundary_forms)
     {
       for (unsigned int i=0; i<boundary_forms.size();++i)
