@@ -1143,9 +1143,20 @@ void Triangulation<1>::distort_random (const double factor,
 
   const unsigned int dim = 1;
   
-				   // find the smallest length of the lines
-				   // adjacent to the vertex
-  vector<double>             minimal_length (vertices.size(), 1e308);
+				   // find the smallest length of the
+				   // lines adjacent to the
+				   // vertex. take the initial value
+				   // to be larger than anything that
+				   // might be found: the diameter of
+				   // the triangulation, here computed
+				   // by adding up the diameters of
+				   // the coarse grid cells.
+  double almost_infinite_length = 0;
+  for (cell_iterator cell=begin(0); cell!=end(0); ++cell)
+    almost_infinite_length += cell->diameter();
+  
+  vector<double>             minimal_length (vertices.size(),
+					     almost_infinite_length);
 				   // also note if a vertex is at
 				   // the boundary
   vector<bool>               at_boundary (vertices.size(), false);
@@ -1205,9 +1216,21 @@ void Triangulation<dim>::distort_random (const double factor,
 				   // if you change something here, don't
 				   // forget to do so there as well
   
-				   // find the smallest length of the lines
-				   // adjecent to the vertex
-  vector<double>             minimal_length (vertices.size(), 1e308);
+				   // find the smallest length of the
+				   // lines adjacent to the
+				   // vertex. take the initial value
+				   // to be larger than anything that
+				   // might be found: the diameter of
+				   // the triangulation, here estimated
+				   // by adding up the diameters of
+				   // the coarse grid cells.
+  double almost_infinite_length = 0;
+  for (cell_iterator cell=begin(0); cell!=end(0); ++cell)
+    almost_infinite_length += cell->diameter();
+  
+  vector<double>             minimal_length (vertices.size(),
+					     almost_infinite_length);
+
 				   // also note if a vertex is at
 				   // the boundary
   vector<bool>               at_boundary (vertices.size(), false);

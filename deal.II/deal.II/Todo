@@ -159,7 +159,3 @@ Remove the hack in Make_forward_declarations when using gcc2.95. See
 
 Move the TriaNumberCache into the Triangulation class once the
   compiler supports this (gcc2.95 does not allow this at present)
-
-
-In Tria::distort_random: replace the initial value 1e308 by the
-  diameter of the domain (sum of diameters of coarse level cells).
