@@ -61,11 +61,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
-       Fixed: The class <code>MultipleParameterLoop::UserClass</code> had only
+       New: Class <code class="class">PathSearch</code> allows to find
+       a file in a sequence of directories and by appending suffixes.
+       <br> 
+       (GK, 2005/03/02)
+       </p>
+  <li> <p>
+       Fixed: The class <code class="class">MultipleParameterLoop::UserClass</code> had only
        virtual abstract functions but no virtual destructor. This caused
        warnings with some compilers, and is generally bad practice
        anyway. This is now fixed. The same holds with respect to the class
-       <code>DataOutInterface</code>.
+       <code class="class">DataOutInterface</code>.
        <br> 
        (WB, 2005/02/20)
        </p>

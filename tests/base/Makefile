@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -24,6 +24,7 @@ threads.cc : threads.pl
 
 data_out_base.exe  : data_out_base.g.$(OBJEXT)                      $(lib-base.g)
 logtest.exe        : logtest.g.$(OBJEXT)                            $(lib-base.g)
+path_search.exe    : path_search.g.$(OBJEXT)                        $(lib-base.g)
 polynomial_test.exe: polynomial_test.g.$(OBJEXT)                    $(lib-base.g)
 polynomial1d.exe   : polynomial1d.g.$(OBJEXT)                       $(lib-base.g)
 quadrature_test.exe: quadrature_test.g.$(OBJEXT)                    $(lib-base.g)
@@ -41,6 +42,7 @@ bdm.exe            : bdm.g.$(OBJEXT)                                $(lib-base.g
 auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries) $(lib-base.g)
 
 tests =  logtest reference quadrature_test quadrature_selector \
+	 path_search \
 	  slice_vector table tensor \
           timer threads polynomial1d polynomial_test \
 	  auto_derivative_function anisotropic_1 anisotropic_2 \
