@@ -2888,8 +2888,8 @@ rm -f conftest.$ac_objext conftest.$ac_ext
           ;;
 
       portland_group)
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
-          CXXFLAGSO="$CXXFLAGS"
+	            	   	  	                                                     	  	  	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175"
+          CXXFLAGSO="$CXXFLAGS -tused -fast -O2"
           CXXFLAGSPIC="-Kpic"
           ;;
 
@@ -3967,7 +3967,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	struct X
 	{
 	    template <typename T2>
-	    X operator = (T2 &);
+	    X operator = (T2 &){};
 	};
 
 	template X X::operator=<float> (float &);

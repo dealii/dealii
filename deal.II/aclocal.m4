@@ -377,8 +377,20 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           ;;
   
       portland_group)
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
-          CXXFLAGSO="$CXXFLAGS"
+	  dnl Suppress warnings:
+          dnl #111: "Statement unreachable": we use return statements
+	  dnl       occasionally after case-switches where you cannot
+ 	  dnl       fall though, but other compilers cometimes complain
+	  dnl       that the function might not return with a value, if
+          dnl       it can't figure out that the function always uses
+          dnl       one case. Also: a return statement after a failing
+          dnl       assertion
+          dnl #177: "function declared but not used": might happen with
+          dnl       templates and conditional compilation
+ 	  dnl #175: "out-of-bounds array indices": the same reason as
+	  dnl       for Compaq cxx
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175"
+          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175"
           CXXFLAGSPIC="-Kpic"
           ;;
 
