@@ -146,12 +146,14 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 
 				   // allocate an array of n_tmp_vectors
 				   // temporary vectors from the VectorMemory
-				   // object
+				   // object; resize them but do not set their
+				   // values since they will be overwritten soon
+				   // anyway.
   vector<Vector*> tmp_vectors (n_tmp_vectors, 0);
   for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
     {
       tmp_vectors[tmp] = memory.alloc();
-      tmp_vectors[tmp]->reinit (x.size());
+      tmp_vectors[tmp]->reinit (x.size(), true);
     };
 
 				   // number of the present iteration; this
