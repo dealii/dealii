@@ -20,6 +20,75 @@ DEAL:5-SparseMatrix<double>:RichardsonT::Starting
 DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 
 DEAL::GrowingVectorMemory:Overall allocated vectors: 16
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
+DEAL::	0	0	0	5.00
+DEAL::	0	1	1	-2.00
+DEAL::	0	4	2	-1.00
+DEAL::	1	1	0	5.00
+DEAL::	1	0	1	-1.00
+DEAL::	1	2	2	-2.00
+DEAL::	1	5	3	-1.00
+DEAL::	2	2	0	5.00
+DEAL::	2	1	1	-1.00
+DEAL::	2	3	2	-2.00
+DEAL::	2	6	3	-1.00
+DEAL::	3	3	0	5.00
+DEAL::	3	2	1	-1.00
+DEAL::	3	7	2	-1.00
+DEAL::	4	4	0	5.00
+DEAL::	4	0	1	-1.00
+DEAL::	4	5	2	-2.00
+DEAL::	4	8	3	-1.00
+DEAL::	5	5	0	5.00
+DEAL::	5	1	1	-1.00
+DEAL::	5	4	2	-1.00
+DEAL::	5	6	3	-2.00
+DEAL::	5	9	4	-1.00
+DEAL::	6	6	0	5.00
+DEAL::	6	2	1	-1.00
+DEAL::	6	5	2	-1.00
+DEAL::	6	7	3	-2.00
+DEAL::	6	10	4	-1.00
+DEAL::	7	7	0	5.00
+DEAL::	7	3	1	-1.00
+DEAL::	7	6	2	-1.00
+DEAL::	7	11	3	-1.00
+DEAL::	8	8	0	5.00
+DEAL::	8	4	1	-1.00
+DEAL::	8	9	2	-2.00
+DEAL::	8	12	3	-1.00
+DEAL::	9	9	0	5.00
+DEAL::	9	5	1	-1.00
+DEAL::	9	8	2	-1.00
+DEAL::	9	10	3	-2.00
+DEAL::	9	13	4	-1.00
+DEAL::	10	10	0	5.00
+DEAL::	10	6	1	-1.00
+DEAL::	10	9	2	-1.00
+DEAL::	10	11	3	-2.00
+DEAL::	10	14	4	-1.00
+DEAL::	11	11	0	5.00
+DEAL::	11	7	1	-1.00
+DEAL::	11	10	2	-1.00
+DEAL::	11	15	3	-1.00
+DEAL::	12	12	0	5.00
+DEAL::	12	8	1	-1.00
+DEAL::	12	13	2	-2.00
+DEAL::	13	13	0	5.00
+DEAL::	13	9	1	-1.00
+DEAL::	13	12	2	-1.00
+DEAL::	13	14	3	-2.00
+DEAL::	14	14	0	5.00
+DEAL::	14	10	1	-1.00
+DEAL::	14	13	2	-1.00
+DEAL::	14	15	3	-2.00
+DEAL::	15	15	0	5.00
+DEAL::	15	11	1	-1.00
+DEAL::	15	14	2	-1.00
+DEAL::Repeat row 2
+DEAL::	2	2	0	5.00
+DEAL::	2	1	1	-1.00
+DEAL::	2	3	2	-2.00
+DEAL::	2	6	3	-1.00
 DEAL::Assemble
 DEAL:5-SparseMatrixEZ<double>:Richardson::Starting 
 DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 

@@ -45,6 +45,122 @@ class SparseMatrix : public Subscriptor
 {
   public:
 				     /**
+				      * Accessor class for iterators
+				      */
+    class Accessor
+    {
+      public:
+					 /**
+					  * Constructor. Since we use
+					  * accessors only for read
+					  * access, a const matrix
+					  * pointer is sufficient.
+					  */
+	Accessor (const SparseMatrix<number>*,
+		  unsigned int row,
+		  unsigned short index);
+
+					 /**
+					  * Row number of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned int row() const;
+
+					 /**
+					  * Index in row of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned short index() const;
+
+					 /**
+					  * Column number of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int column() const;
+
+					 /**
+					  * Value of this matrix entry.
+					  */
+	number value() const;
+	
+	protected:
+					 /**
+					  * The matrix accessed.
+					  */
+	const SparseMatrix<number>* matrix;
+
+					 /**
+					  * Current row number.
+					  */
+	unsigned int a_row;
+
+					 /**
+					  * Current index in row.
+					  */
+	unsigned short a_index;
+      };
+
+				     /**
+				      * STL conforming iterator.
+				      */
+    class const_iterator : private Accessor
+      {
+	public:
+					   /**
+					    * Constructor.
+					    */ 
+	const_iterator(const SparseMatrix<number>*,
+		       unsigned int row,
+		       unsigned short index);
+	  
+					   /**
+					    * Prefix increment.
+					    */
+	const_iterator& operator++ ();
+
+					   /**
+					    * Postfix increment.
+					    */
+	const_iterator& operator++ (int);
+
+					   /**
+					    * Dereferencing operator.
+					    */
+	const Accessor& operator* () const;
+
+					   /**
+					    * Dereferencing operator.
+					    */
+	const Accessor* operator-> () const;
+
+					   /**
+					    * Comparison. True, if
+					    * both iterators point to
+					    * the same matrix
+					    * position.
+					    */
+	bool operator == (const const_iterator&) const;
+					   /**
+					    * Inverse of @p{==}.
+					    */
+	bool operator != (const const_iterator&) const;
+
+					   /**
+					    * Comparison
+					    * operator. Result is true
+					    * if either the first row
+					    * number is smaller or if
+					    * the row numbers are
+					    * equal and the first
+					    * index is smaller.
+					    */
+	bool operator < (const const_iterator&) const;
+      };
+    
+				     /**
 				      * Type of matrix entries. In analogy to
 				      * the STL container classes.
 				      */
@@ -720,6 +836,28 @@ class SparseMatrix : public Subscriptor
     const SparsityPattern & get_sparsity_pattern () const;
 
 				     /**
+				      * STL-like iterator with the
+				      * first entry.
+				      */
+    const_iterator begin () const;
+
+				     /**
+				      * Final iterator.
+				      */
+    const_iterator end () const;
+    
+				     /**
+				      * STL-like iterator with the
+				      * first entry of row @p{r}.
+				      */
+    const_iterator begin (unsigned int r) const;
+
+				     /**
+				      * Final iterator of row @p{r}.
+				      */
+    const_iterator end (unsigned int r) const;
+    
+				     /**
 				      * Print the matrix to the given
 				      * stream, using the format
 				      * @p{(line,col) value}, i.e. one
@@ -1178,6 +1316,172 @@ SparseMatrix<number>::copy_from (const ForwardIterator begin,
 	set (row, j->first, j->second);
     };
 };
+
+
+//----------------------------------------------------------------------//
+
+template <typename number>
+inline
+SparseMatrix<number>::Accessor::Accessor (
+  const SparseMatrix<number>* matrix,
+  unsigned int r,
+  unsigned short i)
+		:
+		matrix(matrix),
+		a_row(r),
+		a_index(i)
+{}
+
+
+template <typename number>
+inline
+unsigned int
+SparseMatrix<number>::Accessor::row() const
+{
+  return a_row;
+}
+
+
+template <typename number>
+inline
+unsigned int
+SparseMatrix<number>::Accessor::column() const
+{
+  const SparsityPattern& pat = matrix->get_sparsity_pattern();
+  return pat.get_column_numbers()[pat.get_rowstart_indices()[a_row]+a_index];
+}
+
+
+template <typename number>
+inline
+unsigned short
+SparseMatrix<number>::Accessor::index() const
+{
+  return a_index;
+}
+
+
+
+template <typename number>
+inline
+number
+SparseMatrix<number>::Accessor::value() const
+{
+  return matrix->raw_entry(a_row, a_index);
+}
+
+
+template <typename number>
+inline
+SparseMatrix<number>::const_iterator::const_iterator(
+  const SparseMatrix<number>* matrix,
+  unsigned int r,
+  unsigned short i)
+		:
+		Accessor(matrix, r, i)
+{}
+
+
+template <typename number>
+inline
+typename SparseMatrix<number>::const_iterator&
+SparseMatrix<number>::const_iterator::operator++ ()
+{
+  Assert (a_row < matrix->m(), ExcIteratorPastEnd());
+  
+  ++a_index;
+  if (a_index >= matrix->get_sparsity_pattern().row_length(a_row))
+    {
+      a_index = 0;
+      a_row++;
+    }
+  return *this;
+}
+
+
+template <typename number>
+inline
+const typename SparseMatrix<number>::Accessor&
+SparseMatrix<number>::const_iterator::operator* () const
+{
+  return *this;
+}
+
+
+template <typename number>
+inline
+const typename SparseMatrix<number>::Accessor*
+SparseMatrix<number>::const_iterator::operator-> () const
+{
+  return this;
+}
+
+
+template <typename number>
+inline
+bool
+SparseMatrix<number>::const_iterator::operator == (
+  const const_iterator& other) const
+{
+  return (row() == other->row() && index() == other->index());
+}
+
+
+template <typename number>
+inline
+bool
+SparseMatrix<number>::const_iterator::operator != (
+  const const_iterator& other) const
+{
+  return ! (*this == other);
+}
+
+
+template <typename number>
+inline
+bool
+SparseMatrix<number>::const_iterator::operator < (
+  const const_iterator& other) const
+{
+  return (row() < other->row() ||
+	  (row() == other->row() && index() < other->index()));
+}
+
+
+template <typename number>
+inline
+typename SparseMatrix<number>::const_iterator
+SparseMatrix<number>::begin () const
+{
+  return const_iterator(this, 0, 0);
+}
+
+template <typename number>
+inline
+typename SparseMatrix<number>::const_iterator
+SparseMatrix<number>::end () const
+{
+  return const_iterator(this, m(), 0);
+}
+
+template <typename number>
+inline
+typename SparseMatrix<number>::const_iterator
+SparseMatrix<number>::begin (unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r, 0);
+}
+
+template <typename number>
+inline
+typename SparseMatrix<number>::const_iterator
+SparseMatrix<number>::end (unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r+1, 0);
+}
+
 
 
 

@@ -1054,7 +1054,7 @@ SparseMatrixEZ<number>::const_iterator::const_iterator(
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::const_iterator&
+typename SparseMatrixEZ<number>::const_iterator&
 SparseMatrixEZ<number>::const_iterator::operator++ ()
 {
   Assert (a_row < matrix->m(), ExcIteratorPastEnd());
@@ -1071,7 +1071,7 @@ SparseMatrixEZ<number>::const_iterator::operator++ ()
 
 template <typename number>
 inline
-const SparseMatrixEZ<number>::Accessor&
+const typename SparseMatrixEZ<number>::Accessor&
 SparseMatrixEZ<number>::const_iterator::operator* () const
 {
   return *this;
@@ -1080,7 +1080,7 @@ SparseMatrixEZ<number>::const_iterator::operator* () const
 
 template <typename number>
 inline
-const SparseMatrixEZ<number>::Accessor*
+const typename SparseMatrixEZ<number>::Accessor*
 SparseMatrixEZ<number>::const_iterator::operator-> () const
 {
   return this;
@@ -1137,9 +1137,9 @@ unsigned int SparseMatrixEZ<number>::n () const
 
 template <typename number>
 inline
-const SparseMatrixEZ<number>::Entry* SparseMatrixEZ<number>::locate (
-  const unsigned int row,
-  const unsigned int col) const
+const typename SparseMatrixEZ<number>::Entry*
+SparseMatrixEZ<number>::locate ( const unsigned int row,
+				 const unsigned int col) const
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
@@ -1161,9 +1161,9 @@ const SparseMatrixEZ<number>::Entry* SparseMatrixEZ<number>::locate (
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::Entry* SparseMatrixEZ<number>::allocate (
-  const unsigned int row,
-  const unsigned int col)
+typename SparseMatrixEZ<number>::Entry*
+SparseMatrixEZ<number>::allocate (const unsigned int row,
+				  const unsigned int col)
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
@@ -1304,7 +1304,7 @@ number SparseMatrixEZ<number>::operator() (const unsigned int i,
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::const_iterator
+typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::begin () const
 {
   return const_iterator(this, 0, 0);
@@ -1312,7 +1312,7 @@ SparseMatrixEZ<number>::begin () const
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::const_iterator
+typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::end () const
 {
   return const_iterator(this, m(), 0);
@@ -1320,7 +1320,7 @@ SparseMatrixEZ<number>::end () const
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::const_iterator
+typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::begin (unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
@@ -1329,7 +1329,7 @@ SparseMatrixEZ<number>::begin (unsigned int r) const
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::const_iterator
+typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::end (unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));

@@ -128,6 +128,9 @@ int main()
   deallog << "Assemble" << std::endl;
   testproblem.five_point(A, true);
   check_vmult_quadratic(A_res, A, "5-SparseMatrix<double>");
+#ifdef DEBUG
+  check_iterator(A);
+#endif
 
   SparseMatrixEZ<double> E(dim,dim,row_length,2);
   deallog << "Assemble" << std::endl;
