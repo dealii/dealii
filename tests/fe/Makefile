@@ -24,6 +24,7 @@ default: run-tests
 
 derivatives.exe         : derivatives.g.$(OBJEXT)         $(libraries)
 fe_data_test.exe        : fe_data_test.g.$(OBJEXT)        $(libraries)
+fe_tools.exe            : fe_tools.g.$(OBJEXT)            $(libraries)
 fe_tools_test.exe       : fe_tools_test.g.$(OBJEXT)       $(libraries)
 fe_traits.exe           : fe_traits.g.$(OBJEXT)           $(libraries)
 internals.exe           : internals.g.$(OBJEXT)           $(libraries)
@@ -52,7 +53,7 @@ shapes.exe              : shapes.g.$(OBJEXT)              $(libraries)
 transfer.exe		: transfer.g.$(OBJEXT)	          $(libraries)
 up_and_down.exe         : up_and_down.g.$(OBJEXT)         $(libraries)
 
-tests = fe_data_test fe_traits fe_tools_test mapping \
+tests = fe_data_test fe_traits fe_tools fe_tools_test mapping \
         mapping_c1 shapes derivatives numbering mapping_q1_eulerian \
         transfer internals \
 	dgq_1 \

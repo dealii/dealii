@@ -12,7 +12,7 @@
 //----------------------------  fe_tools.cc  ---------------------------
 
 
-#include <base/quadrature.h>
+#include <base/quadrature_lib.h>
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
@@ -314,32 +314,92 @@ void FETools::get_interpolation_difference_matrix (const FiniteElement<dim> &fe1
 template <int dim, typename number>
 void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 				     const FiniteElement<dim> &fe2,
-				     FullMatrix<number> &interpolation_matrix)
+				     FullMatrix<number> &matrix)
 {
+  Assert (fe1.n_components() == 1, ExcNotImplemented());
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-  Assert(interpolation_matrix.m()==fe2.dofs_per_cell &&
-	 interpolation_matrix.n()==fe1.dofs_per_cell,
-	 ExcMatrixDimensionMismatch(interpolation_matrix.m(),
-				    interpolation_matrix.n(),
+  Assert(matrix.m()==fe2.dofs_per_cell && matrix.n()==fe1.dofs_per_cell,
+	 ExcMatrixDimensionMismatch(matrix.m(), matrix.n(),
 				    fe2.dofs_per_cell,
 				    fe1.dofs_per_cell));
+  matrix.clear();
   
-  unsigned int m = fe1.dofs_per_cell;
-  unsigned int n = fe2.dofs_per_cell;
+  unsigned int n1 = fe1.dofs_per_cell;
+  unsigned int n2 = fe2.dofs_per_cell;
 				   // First, create a mass matrix. We
 				   // cannot use MatrixTools, since we
 				   // want to have a FullMatrix.
 				   //
-				   // This happens in the target space
-  FullMatrix<double> mass (n, n);
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
-  DoFHandler<dim> dof;
-  dof.distribute_dofs(tr, fe2);
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin();
+  
+  DoFHandler<dim> dof1(tr);
+  dof1.distribute_dofs(fe1);
+  typename DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin();
+  DoFHandler<dim> dof2(tr);
+  dof2.distribute_dofs(fe2);
+  typename DoFHandler<dim>::active_cell_iterator cell2 = dof2.begin();
+  
+				   // Choose a quadrature rule
+				   // Gauss is exact up to degree 2n-1
+  const unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
+  Assert (degree != deal_II_numbers::invalid_unsigned_int,
+	  ExcNotImplemented());
+  
+  QGauss<dim> quadrature(degree+1);
+				   // Set up FEValues.
+  const UpdateFlags flags = update_values | update_q_points | update_JxW_values;
+  FEValues<dim> val1 (fe1, quadrature, update_values);
+  val1.reinit (cell1);
+  FEValues<dim> val2 (fe2, quadrature, flags);
+  val2.reinit (cell2);
 
-				   // Set up FEValues. Here, we 
+				   // Integrate and invert mass matrix
+				   // This happens in the target space
+  FullMatrix<double> mass (n2, n2);
+
+  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+    {
+      const double w = val2.JxW(k);
+      for (unsigned int i=0;i<n2;++i)
+	{
+	  const double v = val2.shape_value(i,k);
+	  for (unsigned int j=0;j<n2;++j)
+	    mass(i,j) += w*v * val2.shape_value(j,k);
+	}
+    }
+				   // Gauss-Jordan should be
+				   // sufficient since we expect the
+				   // mass matrix to be
+				   // well-conditioned
+  mass.gauss_jordan();
+  
+				   // Now, test every function of fe1
+				   // with test functions of fe2 and
+				   // compute the projection of each
+				   // unit vector.
+  Vector<double> b(n2);
+  Vector<double> x(n2);
+  
+  for (unsigned int j=0;j<n1;++j)
+    {
+      b = 0.;
+      for (unsigned int i=0;i<n2;++i)
+	{
+	  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+	    {
+	      const double w = val2.JxW(k);
+	      const double u = val1.shape_value(j,k);
+	      const double v = val2.shape_value(i,k);
+	      b(i) += u*v*w;
+	    }
+	}
+				       // Multiply by the inverse
+      mass.vmult(x,b);
+      for (unsigned int i=0;i<n2;++i)
+	matrix(i,j) = x(i);
+    }
 }
 
 
@@ -1468,6 +1528,11 @@ void FETools::get_interpolation_difference_matrix<deal_II_dimension>
  const FiniteElement<deal_II_dimension> &,
  FullMatrix<float> &);
 
+template
+void FETools::get_projection_matrix<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &,
+ const FiniteElement<deal_II_dimension> &,
+ FullMatrix<double> &);
 
 template
 void FETools::interpolate<deal_II_dimension>
