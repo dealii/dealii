@@ -278,7 +278,7 @@ class DerivativeApproximation
 					  * @p{get_projected_derivative}
 					  * to work.
 					  */
-	static const UpdateFlags update_flags = update_values;
+	static const UpdateFlags update_flags;
 
 					 /**
 					  * Declare the data type which
@@ -358,7 +358,7 @@ class DerivativeApproximation
 					  * @p{get_projected_derivative}
 					  * to work.
 					  */
-	static const UpdateFlags update_flags = update_gradients;
+	static const UpdateFlags update_flags;
 
 					 /**
 					  * Declare the data type which
