@@ -482,7 +482,8 @@ class DataOutBase
 					  * specified by the flag
 					  * #size_type#.
 					  *
-					  * Default is 300.
+					  * Default is 300, which represents
+					  * a size of roughly 10 cm.
 					  */
 	unsigned int size;
 
