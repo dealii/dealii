@@ -569,20 +569,31 @@ class MatrixCreator
  * list, see the discussion of the
  * @ref{VectorTools}@p{::interpolate_boundary_values} function.
  *
- * The inclusion into the assemblage process is as follows: when the
- * matrix and vectors are set up, a list of nodes subject to dirichlet
- * bc is made and matrix and vectors are changed accordingly. This is
- * done by deleting all entries in the matrix in the line of this
- * degree of freedom, setting the main diagonal entry to one and the
- * right hand side element to the boundary value at this node. This
- * forces this node's value to be as specified.  To decouple the
- * remaining linear system of equations and to make the system
- * symmetric again (at least if it was before), one Gauss elimination
- * step is performed with this line, by adding this (now almost empty)
- * line to all other lines which couple with the given degree of
- * freedom and thus eliminating all coupling between this degree of
- * freedom and others. Now also the column consists only of zeroes,
- * apart from the main diagonal entry.
+ * There are two ways to incorporate fixed degrees of freedom such as boundary
+ * nodes into a linear system, as discussed below.
+ * 
+ *
+ * @sect3{Global elimination}
+ *
+ * In the first method, we first assemble the global linear system without
+ * respect for fixed degrees of freedom, and in a second step eliminate them
+ * again from the linear system. The inclusion into the assembly process is as
+ * follows: when the matrix and vectors are set up, a list of nodes subject to
+ * dirichlet bc is made and matrix and vectors are modified accordingly. This
+ * is done by deleting all entries in the matrix in the line of this degree of
+ * freedom, setting the main diagonal entry to a suitable positive value and
+ * the right hand side element to a value so that the solution of the linear
+ * system will have the boundary value at this node. To decouple the remaining
+ * linear system of equations and to make the system symmetric again (at least
+ * if it was before), one Gauss elimination step is performed with this line,
+ * by adding this (now almost empty) line to all other lines which couple with
+ * the given degree of freedom and thus eliminating all coupling between this
+ * degree of freedom and others. Now the respective column also consists only
+ * of zeroes, apart from the main diagonal entry. Alternatively, the functions
+ * in this class take a boolean parameter that allows to omit this last step,
+ * if symmetry of the resulting linear system is not required. Note that
+ * usually even CG can cope with a non-symmetric linear system with this
+ * particular structure.
  *
  * Finding which rows contain an entry in the column for which we are
  * presently performing a Gauss elimination step is either difficult
@@ -660,6 +671,23 @@ class MatrixCreator
  * also find a formal (mathematical) description of the process of
  * modifying the matrix and right hand side vectors for boundary
  * values.
+ *
+ *
+ * @sect3{Local elimination}
+ *
+ * The second way of handling boundary values is to modify the local matrix
+ * and vector contributions appropriately before transferring them into the
+ * global sparse matrix and vector. This is what local_apply_boundary_values()
+ * does. The advantage is that we save the call to the apply_boundary_values
+ * function (which is expensive because it has to work on sparse data
+ * structures). On the other hand, the local_apply_boundary_values() function
+ * is called many times, even if we only have a very small number of fixed
+ * boundary nodes.
+ *
+ * However, since we do not have access to the data structures of some sparse
+ * matrix formats (e.g. the PETSc matrix classes), this may be the only way to
+ * get rid of boundary nodes for these matrix formats. In general, this
+ * function should not be a loss in efficiency over the global one.
  * 
  * @author Wolfgang Bangerth, 1998, 2000, 2004
  */
@@ -675,7 +703,9 @@ class MatrixTools : public MatrixCreator
 				      * For a replacement function,
 				      * see the documentation of the
 				      * @ref{FilteredMatrix} class in
-				      * the @p{LAC} sublibrary.
+				      * the @p{LAC} sublibrary, or use the
+				      * local_apply_boundary_values()
+				      * function..
 				      */
     template <typename number>
     static void
@@ -694,10 +724,12 @@ class MatrixTools : public MatrixCreator
 				      * works for block sparse
 				      * matrices and block vectors
 				      *
-				      * For a replacement function,
-				      * see the documentation of the
-				      * @ref{FilteredMatrix} class in
-				      * the @p{LAC} sublibrary.
+				      * For a replacement function, see the
+				      * documentation of the
+				      * @ref{FilteredMatrix} class in the
+				      * @p{LAC} sublibrary, or use the
+				      * local_apply_boundary_values()
+				      * function.
 				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
