@@ -138,6 +138,14 @@ TensorFunction<rank_, dim>::value (const Point<dim>  &p, vector<double> &erg) co
 }
 */
 
+
+template <int rank_, int dim> void
+TensorFunction<rank_, dim>::value (const Point<dim>  &, Vector<double> &) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
 template <int rank_, int dim> void
 TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > & points,
 				 vector<Vector<double> > & values) const
