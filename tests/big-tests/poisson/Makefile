@@ -45,10 +45,13 @@ h-files  = $(wildcard ../include/*/*.h)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-poisson : $(go-files) $(LIBFILES.g)
+poisson: $(go-files) $(LIBFILES.g)
 	@echo ============================ Linking poisson
-	$(CXX) -g $(CXXFLAGS.g) $(go-files) -o $@ ../../../mia/control.o $(LIBS.g) -lg++
+	@$(CXX) -g $(CXXFLAGS.g) $(go-files) -o $@ ../../../mia/control.o $(LIBS.g) -lg++
 
+
+run: poisson
+	poisson poisson.prm
 
 
 clean:
@@ -56,4 +59,4 @@ clean:
 
 
 
-.PHONY: clean
+.PHONY: run clean

@@ -1,0 +1,2 @@
+set Test run          = random
+set Global refinement = 1
