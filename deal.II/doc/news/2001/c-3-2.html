@@ -188,7 +188,7 @@ documentation, etc</a>.
        (WB 2001/11/05)
        </p>
 
-  <li> <p>
+  <li> <p> 
        New: <code
        class="member">DoFTools::extract_subdomain_dofs</code> selects
        those degrees of freedom which are located on cells with a
@@ -202,12 +202,10 @@ documentation, etc</a>.
        <em>subdomain_id</em> which can be used in parallel
        computations to identify which cells are handled on which
        processor. These flags are read and set using the functions
-       <code
-       class="member">cell->subdomain_id()</code> and
-       <code
-       class="member">cell->set_subdomain_id(new_id)</code>. The subdomain ids
-       are unsigned integers, so should be sufficiently large also for
-       larger numbers of subdomains.
+       <code class="member">cell->subdomain_id()</code> and <code
+       class="member">cell->set_subdomain_id(new_id)</code>. The
+       subdomain ids are unsigned integers, so should be sufficiently
+       large also for larger numbers of subdomains.
        <br>
        (WB 2001/10/27)
        </p>
