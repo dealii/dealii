@@ -79,9 +79,9 @@ class FunctionDerivative : public Function<dim>
 				      * must still be the same, when
 				      * values are accessed.
 				      */
-    FunctionDerivative (const Function<dim>& f,
-			const vector<Point<dim> >& direction,
-			const double h = 1.e-6);
+    FunctionDerivative (const Function<dim>            &f,
+			const std::vector<Point<dim> > &direction,
+			const double                    h = 1.e-6);
     
 				     /**
 				      * Choose the difference formula.
@@ -148,7 +148,7 @@ class FunctionDerivative : public Function<dim>
 				      * increment vector for the
 				      * formula.
 				      */
-    vector<Point<dim> > incr;
+    typename std::vector<Point<dim> > incr;
 };
 
 #endif

@@ -18,14 +18,14 @@
 #include <cmath>
 
 template <int dim>
-FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
-					     const Point<dim>& dir,
-					     const double h)
+FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
+					     const Point<dim>    &dir,
+					     const double         h)
 		:
 		Function<dim> (f.n_components, f.get_time()),
-  f(f),
-  h(h),
-  incr(1, h*dir)
+                f(f),
+                h(h),
+                incr(1, h*dir)
 {
   set_formula();
 }
@@ -34,7 +34,7 @@ FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
 
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
-					     const vector<Point<dim> >& dir,
+					     const std::vector<Point<dim> >& dir,
 					     const double h)
 		:
 		Function<dim> (f.n_components, f.get_time()),
