@@ -41,7 +41,7 @@ namespace internal
   namespace VectorHelper
   {
     template <typename Number>
-    static inline Number sqr (const Number x)
+    inline Number sqr (const Number x)
     {
       return x*x;
     }
