@@ -630,8 +630,11 @@ class DataOutBase
 					  * equals a position above or below
 					  * the negative y-axis.
 					  *
-					  * Default is the Gnuplot-default
-					  * of 30.
+					  * Default is the
+					  * Gnuplot-default of 30.
+					  * An exemple of a
+					  * Gnuplot-default of 0 is
+					  * the following:
 					  *
 					  * \begin{verbatim}
 					  *  
