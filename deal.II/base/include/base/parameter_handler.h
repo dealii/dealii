@@ -42,7 +42,7 @@ namespace Patterns
 				   /**
 				    * Base class to declare common
 				    * interface.
-				      */
+                                    */
   class PatternBase
   {
     public:
@@ -125,39 +125,39 @@ namespace Patterns
   };
     
 				   /**
-				      * Test for the string being an
-				      * integer. If bounds are given
-				      * to the constructor, then the
-				      * integer given also needs to be
-				      * withing the interval specified
-				      * by these bounds. Note that
-				      * unlike common convention in
-				      * the C++ standard library, both
-				      * bounds of this interval are
-				      * inclusive; the reason is that
-				      * in practice in most cases, one
-				      * needs closed intervals, but
-				      * these can only be realized
-				      * with inclusive bounds for
-				      * non-integer values. We thus
-				      * stay consistent by always
-				      * using closed intervals.
-				      *
-				      * If the upper bound given to
-				      * the constructor is smaller
-				      * than the lower bound, then the
-				      * infinite interval is implied,
-				      * i.e. every integer is allowed.
-				      *
-				      * Giving bounds may be useful if
-				      * for example a value can only
-				      * be positive and less than a
-				      * reasonable upper bound (for
-				      * example the number of
-				      * refinement steps to be
-				      * performed), or in many other
-				      * cases.
-				      */
+                                    * Test for the string being an
+                                    * integer. If bounds are given
+                                    * to the constructor, then the
+                                    * integer given also needs to be
+                                    * withing the interval specified
+                                    * by these bounds. Note that
+                                    * unlike common convention in
+                                    * the C++ standard library, both
+                                    * bounds of this interval are
+                                    * inclusive; the reason is that
+                                    * in practice in most cases, one
+                                    * needs closed intervals, but
+                                    * these can only be realized
+                                    * with inclusive bounds for
+                                    * non-integer values. We thus
+                                    * stay consistent by always
+                                    * using closed intervals.
+                                    *
+                                    * If the upper bound given to
+                                    * the constructor is smaller
+                                    * than the lower bound, then the
+                                    * infinite interval is implied,
+                                    * i.e. every integer is allowed.
+                                    *
+                                    * Giving bounds may be useful if
+                                    * for example a value can only
+                                    * be positive and less than a
+                                    * reasonable upper bound (for
+                                    * example the number of
+                                    * refinement steps to be
+                                    * performed), or in many other
+                                    * cases.
+                                    */
   class Integer : public PatternBase
   {
     public:
@@ -211,7 +211,7 @@ namespace Patterns
 				       /**
 					* Return a description of
 					* the pattern that valid
-					* string are expected to
+					* strings are expected to
 					* match. If bounds were
 					* specified to the
 					* constructor, then include
@@ -230,7 +230,7 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-	
+      
     private:
 				       /**
 					* Value of the lower
@@ -258,40 +258,40 @@ namespace Patterns
   };
     
 				   /**
-				      * Test for the string being a
-				      * @p{double}. If bounds are
-				      * given to the constructor, then
-				      * the integer given also needs
-				      * to be withing the interval
-				      * specified by these
-				      * bounds. Note that unlike
-				      * common convention in the C++
-				      * standard library, both bounds
-				      * of this interval are
-				      * inclusive; the reason is that
-				      * in practice in most cases, one
-				      * needs closed intervals, but
-				      * these can only be realized
-				      * with inclusive bounds for
-				      * non-integer values. We thus
-				      * stay consistent by always
-				      * using closed intervals.
-				      *
-				      * If the upper bound given to
-				      * the constructor is smaller
-				      * than the lower bound, then the
-				      * infinite interval is implied,
-				      * i.e. every integer is allowed.
-				      *
-				      * Giving bounds may be useful if
-				      * for example a value can only
-				      * be positive and less than a
-				      * reasonable upper bound (for
-				      * example damping parameters are
-				      * frequently only reasonable if
-				      * between zero and one), or in
-				      * many other cases.
-				      */
+                                    * Test for the string being a
+                                    * @p{double}. If bounds are
+                                    * given to the constructor, then
+                                    * the integer given also needs
+                                    * to be withing the interval
+                                    * specified by these
+                                    * bounds. Note that unlike
+                                    * common convention in the C++
+                                    * standard library, both bounds
+                                    * of this interval are
+                                    * inclusive; the reason is that
+                                    * in practice in most cases, one
+                                    * needs closed intervals, but
+                                    * these can only be realized
+                                    * with inclusive bounds for
+                                    * non-integer values. We thus
+                                    * stay consistent by always
+                                    * using closed intervals.
+                                    *
+                                    * If the upper bound given to
+                                    * the constructor is smaller
+                                    * than the lower bound, then the
+                                    * infinite interval is implied,
+                                    * i.e. every integer is allowed.
+                                    *
+                                    * Giving bounds may be useful if
+                                    * for example a value can only
+                                    * be positive and less than a
+                                    * reasonable upper bound (for
+                                    * example damping parameters are
+                                    * frequently only reasonable if
+                                    * between zero and one), or in
+                                    * many other cases.
+                                    */
   class Double : public PatternBase
   {
     public:
@@ -345,7 +345,7 @@ namespace Patterns
 				       /**
 					* Return a description of
 					* the pattern that valid
-					* string are expected to
+					* strings are expected to
 					* match. If bounds were
 					* specified to the
 					* constructor, then include
@@ -392,19 +392,19 @@ namespace Patterns
   };
     
 				   /**
-				      * Test for the string being one
-				      * of a sequence of values given
-				      * like a regular expression. For
-				      * example, if the string given
-				      * to the constructor is
-				      * @p{"red|blue|black"}, then the
-				      * @p{match} function returns
-				      * @p{true} exactly if the string
-				      * is either "red" or "blue" or
-				      * "black". Spaces around the
-				      * pipe signs do not matter and
-				      * are eliminated.
-				      */
+                                    * Test for the string being one
+                                    * of a sequence of values given
+                                    * like a regular expression. For
+                                    * example, if the string given
+                                    * to the constructor is
+                                    * @p{"red|blue|black"}, then the
+                                    * @p{match} function returns
+                                    * @p{true} exactly if the string
+                                    * is either "red" or "blue" or
+                                    * "black". Spaces around the
+                                    * pipe signs do not matter and
+                                    * are eliminated.
+                                    */
   class Selection : public PatternBase
   {
     public:
@@ -427,7 +427,7 @@ namespace Patterns
 				       /**
 					* Return a description of
 					* the pattern that valid
-					* string are expected to
+					* strings are expected to
 					* match. Here, this is the
 					* list of valid strings
 					* passed to the constructor.
@@ -465,26 +465,136 @@ namespace Patterns
   };
 
 
+                                   /**
+                                    * This pattern matches a list of
+                                    * comma-separated values each of
+                                    * which have to match a pattern
+                                    * given to the constructor. With
+                                    * to additional parameters, the
+                                    * number of elements this list has
+                                    * to have can be specified.
+                                    */
+  class List : public PatternBase
+  {
+    public:
+				       /**
+					* Maximal integer value. If
+					* the @p{numeric_limits} class
+					* is available use this
+					* information to obtain the
+					* extremal values, otherwise
+					* set it so that this class
+					* understands that all values
+					* are allowed.
+					*/
+      static const unsigned int max_int_value;
+
+      				       /**
+					* Constructor. Take the
+					* given parameter as the
+					* specification of valid
+					* elements of the list.
+					*
+					* The two other arguments can
+					* be used to denote minimal
+					* and maximal allowable
+					* lengths of the list.
+					*/
+      List (const PatternBase  &base_pattern,
+            const unsigned int  min_elements = 0,
+            const unsigned int  max_elements = max_int_value);
+
+                                       /**
+                                        * Destructor.
+                                        */
+      virtual ~List ();
+      
+				       /**
+					* Return @p{true} if the
+					* string is a comma-separated
+					* list of strings each of
+					* which match the pattern
+					* given to the constructor.
+					*/
+      virtual bool match (const std::string &test_string) const;
+
+				       /**
+					* Return a description of
+					* the pattern that valid
+					* strings are expected to
+					* match. 
+					*/
+      virtual std::string description () const;
+
+				       /**
+					* Return a copy of the
+					* present object, which is
+					* newly allocated on the
+					* heap. Ownership of that
+					* object is transferred to
+					* the caller of this
+					* function.
+					*/
+      virtual PatternBase * clone () const;
+
+				       /**
+					* Determine an estimate for
+					* the memory consumption (in
+					* bytes) of this object.
+					*/
+      unsigned int memory_consumption () const;
+
+                                       /**
+                                        * Exception.
+                                        */
+      DeclException2 (ExcInvalidRange,
+                      int, int,
+                      << "The values " << arg1 << " and " << arg2
+                      << " do not form a valid range.");
+
+    private:
+				       /**
+					* Copy of the pattern that
+					* each element of the list has
+					* to satisfy.
+					*/
+      PatternBase *pattern;
+
+                                       /**
+                                        * Minimum number of elements
+                                        * the list must have.
+                                        */
+      const unsigned int min_elements;
+
+                                       /**
+                                        * Minimum number of elements
+                                        * the list must have.
+                                        */
+      const unsigned int max_elements;
+  };
+
 				   /**
-				      * This class is much like the
-				      * @p{Selection} class, but it
-				      * allows the input to be a
-				      * comma-separated list of values
-				      * which each have to be given in
-				      * the constructor argument. For
-				      * example, if the string to the
-				      * constructor was
-				      * @p{"ucd|gmv|eps"}, then the
-				      * following would be legal
-				      * input: @p{eps, gmv}. You may
-				      * give an arbitrarily long list
-				      * of values, where there may be
-				      * as many spaces around commas
-				      * as you like.  However, commas
-				      * are not allowed inside the
-				      * values given to the
-				      * constructor.
-				      */
+                                    * This class is much like the
+                                    * @p{Selection} class, but it
+                                    * allows the input to be a
+                                    * comma-separated list of values
+                                    * which each have to be given in
+                                    * the constructor
+                                    * argument. Alternatively, it
+                                    * could be viewed as a
+                                    * specialization of the @p{List}
+                                    * class. For example, if the
+                                    * string to the constructor was
+                                    * @p{"ucd|gmv|eps"}, then the
+                                    * following would be legal input:
+                                    * @p{eps, gmv}. You may give an
+                                    * arbitrarily long list of values,
+                                    * where there may be as many
+                                    * spaces around commas as you
+                                    * like.  However, commas are not
+                                    * allowed inside the values given
+                                    * to the constructor.
+                                    */
   class MultipleSelection : public PatternBase
   {
     public:
@@ -507,7 +617,7 @@ namespace Patterns
 				       /**
 					* Return a description of
 					* the pattern that valid
-					* string are expected to
+					* strings are expected to
 					* match. Here, this is the
 					* list of valid strings
 					* passed to the constructor.
@@ -553,11 +663,11 @@ namespace Patterns
   };
 
 				   /**
-				      * Test for the string being
-				      * either "true" or "false". This
-				      * is mapped to the @p{Selection}
-				      * class.
-				      */
+                                    * Test for the string being
+                                    * either "true" or "false". This
+                                    * is mapped to the @p{Selection}
+                                    * class.
+                                    */
   class Bool : public Selection
   {
     public:
@@ -579,9 +689,9 @@ namespace Patterns
   };
         
 				   /**
-				      * Always returns true when testing a
-				      * string.
-				      */
+                                    * Always returns true when testing a
+                                    * string.
+                                    */
   class Anything : public PatternBase
   {
     public:
@@ -604,7 +714,7 @@ namespace Patterns
 				       /**
 					* Return a description of
 					* the pattern that valid
-					* string are expected to
+					* strings are expected to
 					* match. Here, this is the
 					* string @p{"[Anything]"}.
 					*/
@@ -1092,45 +1202,55 @@ class ParameterHandler
     ParameterHandler ();
 
 				     /**
-				      * Destructor. Declare this only to have
-				      * a virtual destructor, which is safer
-				      * as we have virtual functions.
-				      * It actually does nothing spectacular.
+				      * Destructor. Declare this only
+				      * to have a virtual destructor,
+				      * which is safer as we have
+				      * virtual functions.  It
+				      * actually does nothing
+				      * spectacular.
 				      */
     virtual ~ParameterHandler ();
     
 				     /**
-				      * Read input from a stream until stream
-				      * returns @p{eof} condition or error.
+				      * Read input from a stream until
+				      * stream returns @p{eof}
+				      * condition or error.
 				      *
-				      * Return whether the read was successful.
+				      * Return whether the read was
+				      * successful.
 				      */
     virtual bool read_input (std::istream &input);
     
     				     /**
-				      * Read input from a file the name of which
-				      * is given.
+				      * Read input from a file the
+				      * name of which is given.
 				      *
-				      * Return whether the read was successful.
+				      * Return whether the read was
+				      * successful.
 				      *
-				      * This function will automatically generate
-				      * the requested file with default values if
-				      * the file did not exist.
+				      * This function will
+				      * automatically generate the
+				      * requested file with default
+				      * values if the file did not
+				      * exist.
 				      */
     virtual bool read_input (const std::string &filename);
     
     				     /**
-				      * Read input from a string in memory. The
-				      * lines in memory have to be separated by
-				      * @p{\n} characters.
+				      * Read input from a string in
+				      * memory. The lines in memory
+				      * have to be separated by @p{\n}
+				      * characters.
 				      *
-				      * Return whether the read was successful.
+				      * Return whether the read was
+				      * successful.
 				      */
     virtual bool read_input_from_string (const char *s);
 
 				     /**
 				      * Return status of this object:
-				      * @p{true}=clean or @p{false}=error occured.
+				      * @p{true}=clean or
+				      * @p{false}=error occured.
 				      */
     bool ok () const;
 
@@ -1170,56 +1290,68 @@ class ParameterHandler
     bool leave_subsection ();
 
 				     /**
-				      * Return value of entry @p{entry_string}.
-				      * If the entry was changed, then the changed
-				      * value is returned, otherwise the default
-				      * value. If the value of an undeclared entry
-				      * is required, an empty string is returned and
-				      * @p{assert} is used to check whether this entry
-				      * was declared (therefore an exception may be
-				      * thrown).
+				      * Return value of entry
+				      * @p{entry_string}.  If the
+				      * entry was changed, then the
+				      * changed value is returned,
+				      * otherwise the default
+				      * value. If the value of an
+				      * undeclared entry is required,
+				      * an empty string is returned
+				      * and @p{assert} is used to
+				      * check whether this entry was
+				      * declared (therefore an
+				      * exception may be thrown).
 				      */
     const std::string & get (const std::string &entry_string) const;
     
 				     /**
-				      * Return value of entry @p{entry_string} as
-				      * @p{long int}.
+				      * Return value of entry
+				      * @p{entry_string} as @p{long
+				      * int}.
 				      */
     long int       get_integer (const std::string &entry_string) const;
     
 				     /**
-				      * Return value of entry @p{entry_string} as
+				      * Return value of entry
+				      * @p{entry_string} as
 				      * @p{double}.
 				      */
     double         get_double (const std::string &entry_string) const;
 
 				     /**
-				      * Return value of entry @p{entry_string} as
-				      * @p{bool}.
+				      * Return value of entry
+				      * @p{entry_string} as @p{bool}.
 				      */
     bool           get_bool (const std::string &entry_string) const;
 
 				     /**
-				      * Print all parameters with the given style
-				      * to @p{out}. Presently only @p{Text} and @p{LaTeX}
-				      * are implemented.
+				      * Print all parameters with the
+				      * given style to
+				      * @p{out}. Presently only
+				      * @p{Text} and @p{LaTeX} are
+				      * implemented.
 				      *
-				      * In @p{Text} format, the output is formatted
-				      * in such a way that it is possible to
-				      * use it for later input again. This is most
-				      * useful to record the parameters set for
-				      * a specific run, since if you output the
-				      * parameters using this function into a log
-				      * file, you can always recover the results
-				      * by simply copying the output to your
-				      * input file.
+				      * In @p{Text} format, the output
+				      * is formatted in such a way
+				      * that it is possible to use it
+				      * for later input again. This is
+				      * most useful to record the
+				      * parameters set for a specific
+				      * run, since if you output the
+				      * parameters using this function
+				      * into a log file, you can
+				      * always recover the results by
+				      * simply copying the output to
+				      * your input file.
 				      */
     std::ostream & print_parameters (std::ostream      &out,
 				     const OutputStyle  style);
 
 				     /**
-				      * Print out the parameters of the subsection
-				      * given by the @p{subsection_path} member
+				      * Print out the parameters of
+				      * the subsection given by the
+				      * @p{subsection_path} member
 				      * variable.
 				      */
     void print_parameters_section (std::ostream       &out,
@@ -1227,11 +1359,12 @@ class ParameterHandler
 				   const unsigned int  indent_level);
 
 				     /**
-				      * Print parameters to a logstream.
-				      * This function allows to print
-				      * all parameters into a log-file.
-				      * Sections will be indented in the
-				      * usual log-file style.
+				      * Print parameters to a
+				      * logstream.  This function
+				      * allows to print all parameters
+				      * into a log-file.  Sections
+				      * will be indented in the usual
+				      * log-file style.
 				      */
     void log_parameters (LogStream& out);
 
@@ -1239,7 +1372,7 @@ class ParameterHandler
 				      * Log parameters in
 				      * subsection. The subsection is
 				      * determined by the
-				      * @p{subsection_path} member *
+				      * @p{subsection_path} member
 				      * variable.
 				      */
     void log_parameters_section (LogStream& out);    
@@ -1706,17 +1839,17 @@ class MultipleParameterLoop : public ParameterHandler
     class Entry 
     {
       public:
-      /**
-       * Declare what a multiple entry
-       * is: a variant * entry (in
-       * curly braces @p{{}}) or an
-       * array (in double curly braces
-       * @p{{{}}}).
-       */
-      enum MultipleEntryType 
-      {
-	variant, array
-      };
+                                         /**
+                                          * Declare what a multiple entry
+                                          * is: a variant * entry (in
+                                          * curly braces @p{{}}) or an
+                                          * array (in double curly braces
+                                          * @p{{{}}}).
+                                          */
+        enum MultipleEntryType 
+        {
+              variant, array
+        };
 
 					 /**
 					  * Constructor

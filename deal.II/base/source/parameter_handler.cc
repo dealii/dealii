@@ -281,6 +281,103 @@ namespace Patterns
   };
   
 
+
+  const unsigned int List::max_int_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<unsigned int>::max();
+#else
+          static_cast<unsigned int>(-1);
+#endif
+
+
+  List::List (const PatternBase  &p,
+              const unsigned int  min_elements,
+              const unsigned int  max_elements)
+                  :
+                  pattern (p.clone()),
+                  min_elements (min_elements),
+                  max_elements (max_elements)
+  {
+    Assert (min_elements <= max_elements,
+            ExcInvalidRange (min_elements, max_elements));
+  };
+
+
+
+  List::~List ()
+  {
+    delete pattern;
+    pattern = 0;
+  };
+
+
+
+  bool List::match (const std::string &test_string_list) const
+  {
+    std::string tmp = test_string_list;
+    std::list<std::string> split_list;
+
+				     // first split the input list
+    while (tmp.length() != 0)
+      {
+	std::string name;
+	name = tmp;
+      
+	if (name.find(",") != std::string::npos)
+	  {
+	    name.erase (name.find(","), std::string::npos);
+	    tmp.erase (0, test_string_list.find(",")+1);
+	  }
+	else
+	  tmp = "";
+      
+	while ((name.length() != 0) &&
+	       (name[0] == ' '))
+	  name.erase (0,1);
+	while (name[name.length()-1] == ' ')
+	  name.erase (name.length()-1, 1);
+
+	split_list.push_back (name);
+      };
+
+    if ((split_list.size() < min_elements) ||
+        (split_list.size() > max_elements))
+      return false;
+
+				     // check the different possibilities
+    for (std::list<std::string>::const_iterator test_string = split_list.begin();
+	 test_string != split_list.end(); ++test_string) 
+      if (pattern->match (*test_string) == false)
+        return false;
+
+    return true;
+  };
+
+
+
+  std::string List::description () const
+  {
+    return std::string("list of <") + pattern->description() + ">";
+  };
+
+
+
+  PatternBase *
+  List::clone () const
+  {
+    return new List(*pattern, min_elements, max_elements);
+  };
+
+
+  unsigned int
+  List::memory_consumption () const
+  {
+    return (sizeof(PatternBase) +
+	    MemoryConsumption::memory_consumption(*pattern));
+  };
+
+  
+  
   MultipleSelection::MultipleSelection (const std::string &seq)
   {
     Assert (seq.find (",") == std::string::npos, ExcCommasNotAllowed(seq.find(",")));
