@@ -88,10 +88,6 @@ Revert istrstream(p.c_str()) to istrstream(p) when possible
   (parameter_handler.cc)
 
 
-Fully implement the POVRAY format, i.e. use textures, a better angle
-  of view, etc. The present implementation is only a rudimentary hack.
-
-
 I suppose the [mg_]get_dof_values really belongs to the
   [MG]Line/QuadAccessor classes, but now it is in the
   [MG]CellAccessor. Correct this some time.
