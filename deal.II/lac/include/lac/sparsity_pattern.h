@@ -20,6 +20,7 @@
 template <typename number> class SparseMatrix;
 
 #include <vector>
+#include <iterator>
 
 
 /**
@@ -208,14 +209,6 @@ class SparsityPattern : public Subscriptor
 		     const std::vector<unsigned int> &row_lengths);
 
 				     /**
-				      * Copy operator. For this the same holds
-				      * as for the copy constructor: it is
-				      * declared, defined and fine to be called,
-				      * but the latter only for empty objects.
-				      */
-    SparsityPattern & operator = (const SparsityPattern &);
-
-				     /**
 				      * Make a copy with extra off-diagonals.
 				      *
 				      * This constructs objects intended for
@@ -249,14 +242,22 @@ class SparsityPattern : public Subscriptor
 				      * structure is not compressed
 				      * after this function finishes.
 				      */
-    SparsityPattern (const SparsityPattern& original,
-		     const unsigned int        max_per_row,
-		     const unsigned int        extra_off_diagonals);
+    SparsityPattern (const SparsityPattern  &original,
+		     const unsigned int      max_per_row,
+		     const unsigned int      extra_off_diagonals);
     
 				     /**
 				      * Destructor.
 				      */
     ~SparsityPattern ();
+
+				     /**
+				      * Copy operator. For this the same holds
+				      * as for the copy constructor: it is
+				      * declared, defined and fine to be called,
+				      * but the latter only for empty objects.
+				      */
+    SparsityPattern & operator = (const SparsityPattern &);
     
 				     /**
 				      * Reallocate memory and set up data
@@ -315,6 +316,151 @@ class SparsityPattern : public Subscriptor
 				      */
     void compress ();
 
+				     /**
+				      * This function can be used as a
+				      * replacement for @ref{reinit},
+				      * subsequent calls to @ref{add}
+				      * and a final call to
+				      * @ref{close} if you know
+				      * exactly in advance the entries
+				      * that will form the matrix
+				      * sparsity pattern.
+				      *
+				      * The first two parameters
+				      * determine the size of the
+				      * matrix. For the two last ones,
+				      * note that a sparse matrix can
+				      * be described by a sequence of
+				      * rows, each of which is
+				      * represented by a sequence of
+				      * pairs of column indices and
+				      * values. In the present
+				      * context, the @ref{begin} and
+				      * @ref{end} parameters designate
+				      * iterators (of forward iterator
+				      * type) into a container, one
+				      * representing one row. The
+				      * distance between @ref{begin}
+				      * and @ref{end} should therefore
+				      * be equal to
+				      * @ref{n_rows}. These iterators
+				      * may be iterators of
+				      * @p{std::vector},
+				      * @p{std::list}, pointers into a
+				      * C-style array, or any other
+				      * iterator satisfying the
+				      * requirements of a forward
+				      * iterator. The objects pointed
+				      * to by these iterators
+				      * (i.e. what we get after
+				      * applying @p{operator*} or
+				      * @p{operator->} to one of these
+				      * iterators) must be a container
+				      * itself that provides functions
+				      * @p{begin} and @p{end}
+				      * designating a range of
+				      * iterators that describe the
+				      * contents of one
+				      * line. Dereferencing these
+				      * inner iterators must either
+				      * yield a pair of an unsigned
+				      * integer as column index and a
+				      * value of arbitrary type (such
+				      * a type would be used if we
+				      * wanted to describe a sparse
+				      * matrix with one such object),
+				      * or simply an unsigned integer
+				      * (of we only wanted to describe
+				      * a sparsity pattern). The
+				      * function is able to determine
+				      * itself whether an unsigned
+				      * integer or a pair is what we
+				      * get after dereferencing the
+				      * inner iterators, through some
+				      * template magic.
+				      *
+				      * While the order of the outer
+				      * iterators denotes the
+				      * different rows of the matrix,
+				      * the order of the inner
+				      * iterator denoting the columns
+				      * does not matter, as they are
+				      * sorted internal to this
+				      * function anyway.
+				      *
+				      * Since that all sounds very
+				      * complicated, consider the
+				      * following example code, which
+				      * may be used to fill a sparsity
+				      * pattern:
+				      * @begin{verbatim}
+				      * std::vector<std::vector<unsigned int> > column_indices (n_rows);
+				      * for (unsigned int row=0; row<n_rows; ++row)
+				      *         // generate necessary columns in this row
+				      *   fill_row (column_indices[row]);
+				      *
+				      * sparsity.copy_from (n_rows, n_cols,
+				      *                     column_indices.begin(),
+				      *                     column_indices.end());
+				      * @end{verbatim}
+				      *
+				      * Note that this example works
+				      * since the iterators
+				      * dereferenced yield containers
+				      * with functions @p{begin} and
+				      * @p{end} (namely
+				      * @p{std::vector}s), and the
+				      * inner iterators dereferenced
+				      * yield unsigned integers as
+				      * column indices. Note that we
+				      * could have replaced each of
+				      * the two @p{std::vector}
+				      * occurrences by @p{std::list},
+				      * and the inner one by
+				      * @p{std::set} as well.
+				      *
+				      * Another example would be as
+				      * follows, where we initialize a
+				      * whole matrix, not only a
+				      * sparsity pattern:
+				      * @begin{verbatim}
+				      * std::vector<std::map<unsigned int,double> > entries (n_rows);
+				      * for (unsigned int row=0; row<n_rows; ++row)
+				      *         // generate necessary pairs of columns
+				      *         // and corresponding values in this row
+				      *   fill_row (entries[row]);
+				      *
+				      * sparsity.copy_from (n_rows, n_cols,
+				      *                     column_indices.begin(),
+				      *                     column_indices.end());
+				      * matrix.reinit (sparsity);
+				      * matrix.copy_from (column_indices.begin(),
+				      *                   column_indices.end());
+				      * @end{verbatim}
+				      *
+				      * This example works because
+				      * dereferencing iterators of the
+				      * inner type yields a pair of
+				      * unsigned integers and a value,
+				      * the first of which we take as
+				      * column index. As previously,
+				      * the outer @p{std::vector}
+				      * could be replaced by
+				      * @p{std::list}, and the inner
+				      * @p{std::map<unsigned int,double>}
+				      * could be replaced by
+				      * @p{std::vector<std::pair<unsigned int,double> >},
+				      * or a list or set of such
+				      * pairs, as they all return
+				      * iterators that point to such
+				      * pairs.
+				      */
+    template <typename ForwardIterator>
+    void copy_from (const unsigned int    n_rows,
+		    const unsigned int    n_cols,
+		    const ForwardIterator begin,
+		    const ForwardIterator end);
+    
 				     /**
 				      * Return whether the object is empty. It
 				      * is empty if no memory is allocated,
@@ -563,6 +709,13 @@ class SparsityPattern : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcNotSquare);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcIteratorRange,
+		    int, int,
+		    << "The iterators denote a range of " << arg1
+		    << " elements, but the given number of rows was " << arg2);
     
   private:
 				     /**
@@ -711,6 +864,42 @@ class SparsityPattern : public Subscriptor
     optimized_lower_bound (const unsigned int *first,
 			   const unsigned int *last,
 			   const unsigned int &val);
+
+				     /**
+				      * Helper function to get the
+				      * column index from a
+				      * dereferenced iterator in the
+				      * @ref{copy_from} function, if
+				      * the inner iterator type points
+				      * to plain unsigned integers.
+				      */
+    static
+    unsigned int
+    get_column_index_from_iterator (const unsigned int i);
+    
+				     /**
+				      * Helper function to get the
+				      * column index from a
+				      * dereferenced iterator in the
+				      * @ref{copy_from} function, if
+				      * the inner iterator type points
+				      * to pairs of unsigned integers
+				      * and some other value.
+				      */
+    template <typename value>
+    unsigned int
+    get_column_index_from_iterator (const std::pair<unsigned int, value> &i);
+
+				     /**
+				      * Likewise, but sometimes needed
+				      * for certain types of
+				      * containers that make the first
+				      * element of the pair constant
+				      * (such as @p{std::map}).
+				      */
+    template <typename value>
+    unsigned int
+    get_column_index_from_iterator (const std::pair<const unsigned int, value> &i);
     
 				     /**
 				      * Make all sparse matrices
@@ -884,6 +1073,96 @@ SparsityPattern::n_nonzero_elements () const
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
   Assert (compressed, ExcNotCompressed());
   return rowstart[rows]-rowstart[0];
+};
+
+
+
+inline
+unsigned int
+SparsityPattern::get_column_index_from_iterator (const unsigned int i)
+{
+  return i;
+};
+
+
+
+template <typename value>
+inline
+unsigned int
+SparsityPattern::get_column_index_from_iterator (const std::pair<unsigned int, value> &i)
+{
+  return i.first;
+};
+
+
+
+template <typename value>
+inline
+unsigned int
+SparsityPattern::get_column_index_from_iterator (const std::pair<const unsigned int, value> &i)
+{
+  return i.first;
+};
+
+
+
+template <typename ForwardIterator>
+void
+SparsityPattern::copy_from (const unsigned int    n_rows,
+			    const unsigned int    n_cols,
+			    const ForwardIterator begin,
+			    const ForwardIterator end)
+{
+  Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
+	  ExcIteratorRange (std::distance (begin, end), n_rows));
+  
+				   // first determine row lengths for
+				   // each row. if the matrix is
+				   // square, then we might have to
+				   // add an additional entry for the
+				   // diagonal, if that is not yet
+				   // present. as we have to call
+				   // compress anyway later on, don't
+				   // bother to check whether that
+				   // diagonal entry is in a certain
+				   // row or not
+  const bool is_square = (n_rows == n_cols);
+  std::vector<unsigned int> row_lengths;
+  row_lengths.reserve(n_rows);
+  for (ForwardIterator i=begin; i!=end; ++i)
+    row_lengths.push_back (std::distance (i->begin(), i->end())
+			   +
+			   (is_square ? 1 : 0));
+  reinit (n_rows, n_cols, row_lengths);
+
+				   // now enter all the elements into
+				   // the matrix. note that if the
+				   // matrix is square, then we
+				   // already have the diagonal
+				   // element preallocated
+				   //
+				   // for use in the inner loop, we
+				   // define a typedef to the type of
+				   // the inner iterators
+  unsigned int row = 0;
+  typedef typename std::iterator_traits<ForwardIterator>::value_type::const_iterator inner_iterator;
+  for (ForwardIterator i=begin; i!=end; ++i, ++row)
+    {
+      unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
+      for (inner_iterator j=i->begin(); j!=i->end(); ++j)
+	{
+	  const unsigned int col = get_column_index_from_iterator(*j);
+	  Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
+	  
+	  if ((col!=row) || !is_square)
+	    *cols++ = col;
+	};
+    };
+
+				   // finally compress
+				   // everything. this also sorts the
+				   // entries within each row
+  compress ();
 };
 
 
