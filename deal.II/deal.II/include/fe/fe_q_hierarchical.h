@@ -24,45 +24,45 @@ template <int dim> class MappingQ;
 /*@{*/
 
 /**
- * Implementation of Hierarchical finite elements @p{Qp} that yield the
+ * Implementation of Hierarchical finite elements @p Qp that yield the
  * finite element space of continuous, piecewise polynomials of degree
- * @p{p}. This class is realized using tensor product polynomials
- * based on a hierarchical basis @p{Hierarchical} of the interval 
- * @p{[0,1]} which is suitable for building an @p{hp} tensor product 
+ * @p p. This class is realized using tensor product polynomials
+ * based on a hierarchical basis @p Hierarchical of the interval 
+ * @p{[0,1]} which is suitable for building an @p hp tensor product 
  * finite element, if we assume that each element has a single degree.
  * 
- * There are not many differences between @p{FE_Q_Hierarchical} and 
- * @p{FE_Q}, except that we add a function @p{embedding_dofs} that takes 
- * a given integer @p{q}, between @p{1} and @p{p}, and 
+ * There are not many differences between @p FE_Q_Hierarchical and 
+ * @p FE_Q, except that we add a function @p embedding_dofs that takes 
+ * a given integer @p q, between @p 1 and @p p, and 
  * returns the numbering of basis functions of the element of order 
- * @p{q} in basis of order @p{p}.  This function is 
+ * @p q in basis of order @p p.  This function is 
  * useful if one wants to make calculations using the hierarchical
  * nature of these shape functions.
  *
- * The unit support points now are reduced to @p{0}, @p{1}, and @p{0.5} in 
+ * The unit support points now are reduced to @p 0, @p 1, and @p{0.5} in 
  * one dimension, and tensor products in higher dimensions. Thus, various 
  * interpolation functions will only work correctly for the linear case. 
  * Future work will involve writing projection--interpolation operators
  * that can interpolate onto the higher order bubble functions.
  *
  * The various constraint, prolongation, and restriction matrices are 
- * now available in all dimensions for all degrees @p{p}, currently up to 
+ * now available in all dimensions for all degrees @p p, currently up to 
  * order 19.
  *
- * The constructor of this class takes the degree @p{p} of this finite
+ * The constructor of this class takes the degree @p p of this finite
  * element.
  *
  * @sect3{Implementation}
  *
- * The constructor creates a @ref{TensorProductPolynomials} object
- * that includes the tensor product of @p{Hierarchical}
- * polynomials of degree @p{p}. This @p{TensorProductPolynomials}
+ * The constructor creates a TensorProductPolynomials object
+ * that includes the tensor product of @p Hierarchical
+ * polynomials of degree @p p. This @p TensorProductPolynomials
  * object provides all values and derivatives of the shape functions.
  *
  * @sect3{Numbering of the degrees of freedom (DoFs)}
  *
  * The original ordering of the shape functions represented by the
- * @ref{TensorProductPolynomials} is a tensor product
+ * TensorProductPolynomials is a tensor product
  * numbering. However, the shape functions on a cell are renumbered
  * beginning with the shape functions whose support points are at the
  * vertices, then on the line, on the quads, and finally (for 3d) on
@@ -70,23 +70,23 @@ template <int dim> class MappingQ;
  * following:
  *
  * @sect4{Q1 elements}
- * @begin{itemize}
- * @item 1D case:
- *   @begin{verbatim}
+ * <ul>
+ * <li> 1D case:
+ *   @verbatim
  *      0-------1
- *   @end{verbatim}
+ *   @endverbatim
  *
- * @item 2D case:
- *   @begin{verbatim}
+ * <li> 2D case:
+ *   @verbatim
  *      3-------2
  *      |       |
  *      |       |
  *      |       |
  *      0-------1
- *   @end{verbatim}
+ *   @endverbatim
  *
- * @item 3D case:
- *   @begin{verbatim}
+ * <li> 3D case:
+ *   @verbatim
  *         7-------6        7-------6
  *        /|       |       /       /|
  *       / |       |      /       / |
@@ -100,35 +100,35 @@ template <int dim> class MappingQ;
  *
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
- *   @begin{itemize}
- *   @item Index 0: @p{[0, 0, 0]};
- *   @item Index 1: @p{[1, 0, 0]};
- *   @item Index 2: @p{[1, 0, 1]};
- *   @item Index 3: @p{[0, 0, 1]};
- *   @item Index 4: @p{[0, 1, 0]};
- *   @item Index 5: @p{[1, 1, 0]};
- *   @item Index 6: @p{[1, 1, 1]};
- *   @item Index 7: @p{[0, 1, 1]};
- *   @end{itemize}
- * @end{itemize}
+ *   <ul>
+ *   <li> Index 0: @p{[0, 0, 0]};
+ *   <li> Index 1: @p{[1, 0, 0]};
+ *   <li> Index 2: @p{[1, 0, 1]};
+ *   <li> Index 3: @p{[0, 0, 1]};
+ *   <li> Index 4: @p{[0, 1, 0]};
+ *   <li> Index 5: @p{[1, 1, 0]};
+ *   <li> Index 6: @p{[1, 1, 1]};
+ *   <li> Index 7: @p{[0, 1, 1]};
+ *   </ul>
+ * </ul>
  * @sect4{Q2 elements}
- * @begin{itemize}
- * @item 1D case:
- *   @begin{verbatim}
+ * <ul>
+ * <li> 1D case:
+ *   @verbatim
  *      0---2---1
- *   @end{verbatim}
+ *   @endverbatim
  *
- * @item 2D case:
- *   @begin{verbatim}
+ * <li> 2D case:
+ *   @verbatim
  *      3---6---2
  *      |       |
  *      7   8   5
  *      |       |
  *      0---4---1
- *   @end{verbatim}
+ *   @endverbatim
  *
- * @item 3D case:
- *   @begin{verbatim}
+ * <li> 3D case:
+ *   @verbatim
  *         7--14---6        7--14---6
  *        /|       |       /       /|
  *      19 |       13     19      1813
@@ -150,50 +150,50 @@ template <int dim> class MappingQ;
  *     | /  22   /      |       | /
  *     |/       /       |       |/
  *     *-------*        *-------* 
- *   @end{verbatim}
+ *   @endverbatim
  *   The center vertex has number 26.
  *
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
- *   @begin{itemize}
- *   @item Index 0: @p{[0, 0, 0]};
- *   @item Index 1: @p{[1, 0, 0]};
- *   @item Index 2: @p{[1, 0, 1]};
- *   @item Index 3: @p{[0, 0, 1]};
- *   @item Index 4: @p{[0, 1, 0]};
- *   @item Index 5: @p{[1, 1, 0]};
- *   @item Index 6: @p{[1, 1, 1]};
- *   @item Index 7: @p{[0, 1, 1]};
- *   @item Index 8: @p{[1/2, 0, 0]};
- *   @item Index 9: @p{[1, 0, 1/2]};
- *   @item Index 10: @p{[1/2, 0, 1]};
- *   @item Index 11: @p{[0, 0, 1/2]};
- *   @item Index 12: @p{[1/2, 1, 0]};
- *   @item Index 13: @p{[1, 1, 1/2]};
- *   @item Index 14: @p{[1/2, 1, 1]};
- *   @item Index 15: @p{[0, 1, 1/2]};
- *   @item Index 16: @p{[0, 1/2, 0]};
- *   @item Index 17: @p{[1, 1/2, 0]};
- *   @item Index 18: @p{[1, 1/2, 1]};
- *   @item Index 19: @p{[0, 1/2, 1]};
- *   @item Index 20: @p{[1/2, 0, 1/2]};
- *   @item Index 21: @p{[1/2, 1, 1/2]};
- *   @item Index 22: @p{[1/2, 1/2, 0]};
- *   @item Index 23: @p{[1, 1/2, 1/2]};
- *   @item Index 24: @p{[1/2, 1/2, 1]};
- *   @item Index 25: @p{[0, 1/2, 1/2]};
- *   @item Index 26: @p{[1/2, 1/2, 1/2]}; 
- *   @end{itemize}
- * @end{itemize}
+ *   <ul>
+ *   <li> Index 0: @p{[0, 0, 0]};
+ *   <li> Index 1: @p{[1, 0, 0]};
+ *   <li> Index 2: @p{[1, 0, 1]};
+ *   <li> Index 3: @p{[0, 0, 1]};
+ *   <li> Index 4: @p{[0, 1, 0]};
+ *   <li> Index 5: @p{[1, 1, 0]};
+ *   <li> Index 6: @p{[1, 1, 1]};
+ *   <li> Index 7: @p{[0, 1, 1]};
+ *   <li> Index 8: @p{[1/2, 0, 0]};
+ *   <li> Index 9: @p{[1, 0, 1/2]};
+ *   <li> Index 10: @p{[1/2, 0, 1]};
+ *   <li> Index 11: @p{[0, 0, 1/2]};
+ *   <li> Index 12: @p{[1/2, 1, 0]};
+ *   <li> Index 13: @p{[1, 1, 1/2]};
+ *   <li> Index 14: @p{[1/2, 1, 1]};
+ *   <li> Index 15: @p{[0, 1, 1/2]};
+ *   <li> Index 16: @p{[0, 1/2, 0]};
+ *   <li> Index 17: @p{[1, 1/2, 0]};
+ *   <li> Index 18: @p{[1, 1/2, 1]};
+ *   <li> Index 19: @p{[0, 1/2, 1]};
+ *   <li> Index 20: @p{[1/2, 0, 1/2]};
+ *   <li> Index 21: @p{[1/2, 1, 1/2]};
+ *   <li> Index 22: @p{[1/2, 1/2, 0]};
+ *   <li> Index 23: @p{[1, 1/2, 1/2]};
+ *   <li> Index 24: @p{[1/2, 1/2, 1]};
+ *   <li> Index 25: @p{[0, 1/2, 1/2]};
+ *   <li> Index 26: @p{[1/2, 1/2, 1/2]}; 
+ *   </ul>
+ * </ul>
  * @sect4{Q3 elements}
- * @begin{itemize}
- * @item 1D case:
- *   @begin{verbatim}
+ * <ul>
+ * <li> 1D case:
+ *   @verbatim
  *      0--2--3--1
- *   @end{verbatim}
+ *   @endverbatim
  *
- * @item 2D case:
- *   @begin{verbatim}
+ * <li> 2D case:
+ *   @verbatim
  *      3--8--9--2
  *      |        |
  *      11 14 15 7
@@ -201,19 +201,19 @@ template <int dim> class MappingQ;
  *      10 12 13 6
  *      |        |
  *      0--4--5--1
- *   @end{verbatim}
+ *   @endverbatim
  *   Note the reverse ordering of degrees of freedom on the left and
  *   upper line.
- * @end{itemize}
+ * </ul>
  * @sect4{Q4 elements}
- * @begin{itemize}
- * @item 1D case:
- *   @begin{verbatim}
+ * <ul>
+ * <li> 1D case:
+ *   @verbatim
  *      0--2--3--4--1
- *   @end{verbatim}
+ *   @endverbatim
  *
- * @item 2D case:
- *   @begin{verbatim}
+ * <li> 2D case:
+ *   @verbatim
  *      3--10-11-12-2
  *      |           |
  *      15 22 23 24 9
@@ -223,8 +223,8 @@ template <int dim> class MappingQ;
  *      13 16 17 18 7
  *      |           |
  *      0--4--5--6--1
- *   @end{verbatim}
- * @end{itemize}
+ *   @endverbatim
+ * </ul>
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line.
  *
@@ -245,7 +245,7 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * identifies a finite
 				      * element. This class returns
 				      * @p{FE_Q_Hierarchical<dim>(degree)},
-				      * with @p{dim} and @p{degree}
+				      * with @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
 				      */
@@ -255,14 +255,14 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * Check for non-zero values on a face.
 				      *
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p face_index.
 				      *
 				      * Implementation of the
 				      * interface in
-				      * @ref{FiniteElement}
+				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -282,21 +282,21 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 
                                      /**
 				      * For a finite element of degree
-				      * @p{sub_degree} < @p{degree}, we 
+				      * @p sub_degree < @p degree, we 
 				      * return a vector which maps the 
 				      * numbering on an FE
-				      * of degree @p{sub_degree} into the 
+				      * of degree @p sub_degree into the 
 				      * numbering on this element.
 				      */
     std::vector<unsigned int> get_embedding_dofs (const unsigned int sub_degree) const;
 
   protected:    
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> * clone() const;
 
@@ -305,12 +305,12 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				     /**
 				      * Only for internal use. Its
 				      * full name is
-				      * @p{get_dofs_per_object_vector}
+				      * @p get_dofs_per_object_vector
 				      * function and it creates the
-				      * @p{dofs_per_object} vector that is
+				      * @p dofs_per_object vector that is
 				      * needed within the constructor to
 				      * be passed to the constructor of
-				      * @p{FiniteElementData}.
+				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
     
@@ -319,12 +319,12 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * shape function numbering. This
 				      * function is actually an alike
 				      * replica of the respective
-				      * function in the @ref{FETools}
+				      * function in the FETools
 				      * class, but is kept for three
 				      * reasons:
 				      *
 				      * 1. It only operates on a
-				      * @ref{FiniteElementData}
+				      * FiniteElementData
 				      * structure. This is ok in the
 				      * present context, since we can
 				      * control which types of
@@ -332,14 +332,14 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * because this is a private
 				      * function. However, the
 				      * publicly visible function in
-				      * the @ref{FETools} class needs
+				      * the FETools class needs
 				      * to make sure that the
-				      * @ref{FiniteElementData} object
+				      * FiniteElementData object
 				      * it works on actually
 				      * represents a continuous finite
 				      * element, which we found too
 				      * difficult if we do not pass an
-				      * object of type @ref{FE_Q}
+				      * object of type FE_Q()
 				      * directly.
 				      *
 				      * 2. If we would call the
@@ -420,8 +420,8 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 
 				     /**
 				      * Initialize the
-				      * @p{unit_support_points} field
-				      * of the @ref{FiniteElementBase}
+				      * @p unit_support_points field
+				      * of the FiniteElementBase
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -429,8 +429,8 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 
 				     /**
 				      * Initialize the
-				      * @p{unit_face_support_points} field
-				      * of the @ref{FiniteElementBase}
+				      * @p unit_face_support_points field
+				      * of the FiniteElementBase
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -446,8 +446,8 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * Allow access from other
 				      * dimensions. We need this since
 				      * we want to call the functions
-				      * @p{get_dpo_vector} and
-				      * @p{lexicographic_to_hierarchic_numbering}
+				      * @p get_dpo_vector and
+				      * @p lexicographic_to_hierarchic_numbering
 				      * for the faces of the finite
 				      * element of dimension dim+1.
 				      */

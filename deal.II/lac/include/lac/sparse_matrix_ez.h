@@ -33,17 +33,17 @@ template<typename number> class FullMatrix;
  *
  * Instead of using a pre-assembled sparsity pattern, this matrix
  * builds the pattern on the fly. Filling the matrix may consume more
- * time as with @p{SparseMatrix}, since large memory movements may be
+ * time as with @p SparseMatrix, since large memory movements may be
  * involved. To help optimizing things, an expected row-length may be
  * provided to the constructor, as well as an increment size
  * for rows.
  *
  * The storage structure: like with the usual sparse matrix, it is
  * attempted to store only non-zero elements. these are stored in a
- * single data array @p{data}. They are ordered by row and inside each
+ * single data array @p data. They are ordered by row and inside each
  * row by column number. Each row is described by its starting point
  * in the data array and its length. These are stored in the
- * @p{row_info} array, together with additional useful information.
+ * @p row_info array, together with additional useful information.
  *
  * Due to the structure, gaps may occur between rows. Whenever a new
  * entry must be created, an attempt is made to use the gap in its
@@ -52,35 +52,35 @@ template<typename number> class FullMatrix;
  * operation and should be avoided as much as possible.
  *
  * This is, where the optimization parameters, provided to the
- * constructor or to the function @p{reinit} come
- * in. @p{default_row_length} is the amount of entries that will be
+ * constructor or to the function @p reinit come
+ * in. @p default_row_length is the amount of entries that will be
  * allocated for each row on initialization (the actual length of the
- * rows is still zero). This means, that @p{default_row_length}
+ * rows is still zero). This means, that @p default_row_length
  * entries can be added to this row without shifting other rows. If
  * less entries are added, the additional memory will be wasted.
  *
  * If the space for a row is not sufficient, then it is enlarged by
- * @p{default_increment} entries. This way, the subsequent rows are
+ * @p default_increment entries. This way, the subsequent rows are
  * not shifted by single entries very often.
  *
- * Finally, the @p{default_reserve} allocates extra space at the end
+ * Finally, the @p default_reserve allocates extra space at the end
  * of the data array. This space is used whenever a row must be
- * enlarged. Since @p{std::vector} doubles the capacity everytime it
+ * enlarged. Since @p std::vector doubles the capacity everytime it
  * must increase it, this value should allow for all the growth needed.
  *
- * Suggested settings: @p{default_row_length} should be the length of
+ * Suggested settings: @p default_row_length should be the length of
  * a typical row, for instance the size of the stencil in regular
- * parts of the grid. Then, @p{default_increment} may be the expected
+ * parts of the grid. Then, @p default_increment may be the expected
  * amount of entries added to the row by having one hanging node. This
  * way, a good compromise between memory consumption and speed should
- * be achieved. @p{default_reserve} should then be an estimate for the
- * number of hanging nodes times @p{default_increment}.
+ * be achieved. @p default_reserve should then be an estimate for the
+ * number of hanging nodes times @p default_increment.
  *
- * Letting @p{default_increment} zero causes an exception whenever a
+ * Letting @p default_increment zero causes an exception whenever a
  * row overflows.
  *
  * If the rows are expected to be filled more or less from first to
- * last, using a @p{default_row_length} of zero may not be such a bad
+ * last, using a @p default_row_length of zero may not be such a bad
  * idea.
  *
  * The name of this matrix is in reverence to a publication of the
@@ -103,8 +103,8 @@ class SparseMatrixEZ : public Subscriptor
     {
 					 /**
 					  * Standard constructor. Sets
-					  * @p{column} to
-					  * @p{invalid}.
+					  * @p column to
+					  * @p invalid.
 					  */
 	Entry();
 
@@ -350,7 +350,7 @@ class SparseMatrixEZ : public Subscriptor
 				      *
 				      * If you really want to copy a whole
 				      * matrix, you can do so by using the
-				      * @p{copy_from} function.
+				      * @p copy_from function.
 				      */
     SparseMatrixEZ (const SparseMatrixEZ &);
 
@@ -359,8 +359,8 @@ class SparseMatrixEZ : public Subscriptor
 				      * matrix of the given size,
 				      * ready to be filled. The
 				      * optional parameters
-				      * @p{default_row_length} and
-				      * @p{default_increment} allow
+				      * @p default_row_length and
+				      * @p default_increment allow
 				      * for preallocating
 				      * memory. Providing these
 				      * properly is essential for an
@@ -391,9 +391,9 @@ class SparseMatrixEZ : public Subscriptor
 				      * The matrix will have no
 				      * entries at this point. The
 				      * optional parameters
-				      * @p{default_row_length},
-				      * @p{default_increment} and
-				      * @p{reserve} allow
+				      * @p default_row_length,
+				      * @p default_increment and
+				      * @p reserve allow
 				      * for preallocating
 				      * memory. Providing these
 				      * properly is essential for an
@@ -441,15 +441,15 @@ class SparseMatrixEZ : public Subscriptor
 
 				     /**
 				      * Set the element @p{(i,j)} to
-				      * @p{value}. Allocates the entry,
+				      * @p value. Allocates the entry,
 				      * if it does not exist and
-				      * @p{value} is non-zero.
+				      * @p value is non-zero.
 				      */
     void set (const unsigned int i, const unsigned int j,
 	      const number value);
     
 				     /**
-				      * Add @p{value} to the element
+				      * Add @p value to the element
 				      * @p{(i,j)}. Allocates the entry
 				      * if it does not exist. Filters
 				      * out zeroes automatically.
@@ -480,7 +480,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * symmetrization. Symmetrization
 				      * of the sparsity pattern can be
 				      * obtain by the
-				      * @ref{SparsityPattern}@p{::symmetrize}
+				      * SparsityPattern@p ::symmetrize
 				      * function.
 				      */
 //    void symmetrize ();
@@ -509,7 +509,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * data type of this matrix.
 				      *
 				      * The function returns a reference to
-				      * @p{this}.
+				      * @p this.
 				      */
     template <class MATRIX>
     SparseMatrixEZ<number> &
@@ -518,7 +518,7 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * This function is complete
 				      * analogous to the
-				      * @ref{SparsityPattern}@p{::copy_from}
+				      * SparsityPattern@p ::copy_from
 				      * function in that it allows to
 				      * initialize a whole matrix in
 				      * one step. See there for more
@@ -533,10 +533,10 @@ class SparseMatrixEZ : public Subscriptor
 				      * objects which the inner
 				      * iterator points to need to be
 				      * of type @p{std::pair<unsigned int, value},
-				      * where @p{value}
+				      * where @p value
 				      * needs to be convertible to the
 				      * element type of this class, as
-				      * specified by the @p{number}
+				      * specified by the @p number
 				      * template argument.
 				      *
 				      * Previous content of the matrix
@@ -565,15 +565,15 @@ class SparseMatrixEZ : public Subscriptor
 //    void copy_from (const FullMatrix<somenumber> &matrix);
     
 				     /**
-				      * Add @p{matrix} scaled by
-				      * @p{factor} to this matrix.
+				      * Add @p matrix scaled by
+				      * @p factor to this matrix.
 				      *
 				      * The source matrix may be a
 				      * matrix of arbitrary type, as
 				      * long as its data type is
 				      * convertible to the data type
 				      * of this matrix and it has the
-				      * standard @p{const_iterator}.
+				      * standard @p const_iterator.
 				      */
     template <class MATRIX>
     void add_scaled (const number factor,
@@ -594,7 +594,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * that returns zero instead (for
 				      * entries that are not in the
 				      * sparsity pattern of the
-				      * matrix), use the @p{el}
+				      * matrix), use the @p el
 				      * function.
 				      */
     number operator () (const unsigned int i,
@@ -610,7 +610,7 @@ class SparseMatrixEZ : public Subscriptor
 
 				     /**
 				      * Return the main diagonal element in
-				      * the @p{i}th row. This function throws an
+				      * the @p ith row. This function throws an
 				      * error if the matrix is not square.
 				      *
 				      * This function is considerably
@@ -645,7 +645,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * let $dst = M^T*src$ with $M$
 				      * being this matrix. This
 				      * function does the same as
-				      * @p{vmult} but takes the
+				      * @p vmult but takes the
 				      * transposed matrix.
 				      */
     template <typename somenumber>
@@ -667,7 +667,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * multiplication. Add $M^T*src$
 				      * to $dst$ with $M$ being this
 				      * matrix. This function does the
-				      * same as @p{vmult_add} but takes
+				      * same as @p vmult_add but takes
 				      * the transposed matrix.
 				      */
     template <typename somenumber>
@@ -739,11 +739,11 @@ class SparseMatrixEZ : public Subscriptor
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
-				      * the @p{src} vector by the
+				      * the @p src vector by the
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * damping factor @p{omega}.
+				      * damping factor @p omega.
 				      */
     template <typename somenumber>
     void precondition_Jacobi (Vector<somenumber>       &dst,
@@ -752,7 +752,7 @@ class SparseMatrixEZ : public Subscriptor
 
 				     /**
 				      * Apply SSOR preconditioning to
-				      * @p{src}.
+				      * @p src.
 				      */
     template <typename somenumber>
     void precondition_SSOR (Vector<somenumber>       &dst,
@@ -760,7 +760,7 @@ class SparseMatrixEZ : public Subscriptor
 			    const number              om = 1.) const;
 
 				     /**
-				      * Apply SOR preconditioning matrix to @p{src}.
+				      * Apply SOR preconditioning matrix to @p src.
 				      * The result of this method is
 				      * $dst = (om D - L)^{-1} src$.
 				      */
@@ -770,7 +770,7 @@ class SparseMatrixEZ : public Subscriptor
  			   const number              om = 1.) const;
     
 				     /**
-				      * Apply transpose SOR preconditioning matrix to @p{src}.
+				      * Apply transpose SOR preconditioning matrix to @p src.
 				      * The result of this method is
 				      * $dst = (om D - U)^{-1} src$.
 				      */
@@ -780,16 +780,16 @@ class SparseMatrixEZ : public Subscriptor
 			    const number              om = 1.) const;
 
 				     /**
-				      * Add the matrix @p{A}
-				      * conjugated by @p{B}, that is,
+				      * Add the matrix @p A
+				      * conjugated by @p B, that is,
 				      * $B A B^T$ to this object. If
-				      * the parameter @p{transpose} is
+				      * the parameter @p transpose is
 				      * true, compute $B^T A B$.
 				      *
 				      * This function requires that
-				      * @p{B} has a @p{const_iterator}
+				      * @p B has a @p const_iterator
 				      * traversing all matrix entries
-				      * and that @p{A} has a function
+				      * and that @p A has a function
 				      * @p{el(i,j)} for access to a
 				      * specific entry.
 				      */
@@ -811,16 +811,16 @@ class SparseMatrixEZ : public Subscriptor
     
 				     /**
 				      * STL-like iterator with the
-				      * first entry of row @p{r}. If
+				      * first entry of row @p r. If
 				      * this row is empty, the result
 				      * is @p{end(r)}, which does NOT
-				      * point into row @p{r}..
+				      * point into row @p r..
 				      */
     const_iterator begin (const unsigned int r) const;
 
 				     /**
 				      * Final iterator of row
-				      * @p{r}. The result may be
+				      * @p r. The result may be
 				      * different from @p{end()}!
 				      */
     const_iterator end (const unsigned int r) const;
@@ -862,12 +862,12 @@ class SparseMatrixEZ : public Subscriptor
 				      *
 				      * The parameters allow for a
 				      * flexible setting of the output
-				      * format: @p{precision} and
-				      * @p{scientific} are used to
+				      * format: @p precision and
+				      * @p scientific are used to
 				      * determine the number format,
-				      * where @p{scientific} = @p{false}
+				      * where @p scientific = @p false
 				      * means fixed point notation.  A
-				      * zero entry for @p{width} makes
+				      * zero entry for @p width makes
 				      * the function compute a width,
 				      * but it may be changed to a
 				      * positive value, if output is
@@ -906,7 +906,7 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * Read data that has previously
 				      * been written by
-				      * @p{block_write}.
+				      * @p block_write.
 				      *
 				      * The object is resized on this
 				      * operation, and all previous
@@ -931,8 +931,8 @@ class SparseMatrixEZ : public Subscriptor
     unsigned int memory_consumption () const;
 
 				     /**
-				      * Print statistics. If @p{full}
-				      * is @p{true}, prints a
+				      * Print statistics. If @p full
+				      * is @p true, prints a
 				      * histogram of all existing row
 				      * lengths and allocated row
 				      * lengths. Otherwise, just the
@@ -1011,11 +1011,11 @@ class SparseMatrixEZ : public Subscriptor
 		     const unsigned int col);
     
 				     /**
-				      * Version of @p{vmult} which only
+				      * Version of @p vmult which only
 				      * performs its actions on the
 				      * region defined by
 				      * @p{[begin_row,end_row)}. This
-				      * function is called by @p{vmult}
+				      * function is called by @p vmult
 				      * in the case of enabled
 				      * multithreading.
 				      */
@@ -1027,12 +1027,12 @@ class SparseMatrixEZ : public Subscriptor
 
 				     /**
 				      * Version of
-				      * @p{matrix_norm_square} which
+				      * @p matrix_norm_square which
 				      * only performs its actions on
 				      * the region defined by
 				      * @p{[begin_row,end_row)}. This
 				      * function is called by
-				      * @p{matrix_norm_square} in the
+				      * @p matrix_norm_square in the
 				      * case of enabled
 				      * multithreading.
 				      */
@@ -1044,12 +1044,12 @@ class SparseMatrixEZ : public Subscriptor
 
     				     /**
 				      * Version of
-				      * @p{matrix_scalar_product} which
+				      * @p matrix_scalar_product which
 				      * only performs its actions on
 				      * the region defined by
 				      * @p{[begin_row,end_row)}. This
 				      * function is called by
-				      * @p{matrix_scalar_product} in the
+				      * @p matrix_scalar_product in the
 				      * case of enabled
 				      * multithreading.
 				      */

@@ -75,7 +75,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * Transfer from a vector on the
 				      * global grid to vectors defined
 				      * on each of the levels
-				      * separately, i.a. an @p{MGVector}.
+				      * separately, i.a. an @p MGVector.
 				      */
     template <int dim, class InVector>
     void
@@ -122,7 +122,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
     DeclException0(ExcNoProlongation);
     
 				     /**
-				      * Call @p{build_matrices}
+				      * Call @p build_matrices
 				      * function first.
 				      */
     DeclException0(ExcMatricesNotBuilt);
@@ -171,9 +171,9 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				     /**
 				      * Structure that is used to
 				      * disambiguate calls to
-				      * @p{copy_to_mg} for 1d and
+				      * @p copy_to_mg for 1d and
 				      * non-1d. We provide two
-				      * functions of @p{copy_to_mg},
+				      * functions of @p copy_to_mg,
 				      * where the 1d function takes an
 				      * argument of type
 				      * @p{is_1d<true>} and the other
@@ -360,14 +360,14 @@ class MGTransferBlockBase
  * problems, please contact Guido Kanschat.
  *
  * In addition to the functionality of
- * @ref{MGTransferPrebuilt}, the operation may be restricted to
+ * MGTransferPrebuilt, the operation may be restricted to
  * certain blocks of the vector.
  *
  * If the restricted mode is chosen, block vectors used in the
  * transfer routines may only have as many components as there are
- * @p{true}s in the selected-field.
+ * @p trues in the selected-field.
  *
- * See @ref{MGTransferBase} to find out which of the transfer classes
+ * See MGTransferBase to find out which of the transfer classes
  * is best for your needs.
  *
  * @author Guido Kanschat, 2001, 2002
@@ -500,9 +500,9 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				     /**
 				      * Structure that is used to
 				      * disambiguate calls to
-				      * @p{copy_to_mg} for 1d and
+				      * @p copy_to_mg for 1d and
 				      * non-1d. We provide two
-				      * functions of @p{copy_to_mg},
+				      * functions of @p copy_to_mg,
 				      * where the 1d function takes an
 				      * argument of type
 				      * @p{is_1d<true>} and the other
@@ -512,7 +512,7 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 
 				     /**
 				      * Implementation of the
-				      * @p{copy_to_mg} function for
+				      * @p copy_to_mg function for
 				      * 1d. We have to resort to some
 				      * template trickery because we
 				      * can't specialize template

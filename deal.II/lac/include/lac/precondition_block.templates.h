@@ -182,7 +182,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 				       // row, column are the global numbering
 				       // of the unkowns.
 
-				       // set the @p{var_inverse} array to the right
+				       // set the @p var_inverse array to the right
 				       // size. we could do it like this:
 				       // var_inverse = vector<>(nblocks,FullMatrix<>())
 				       // but this would involve copying many

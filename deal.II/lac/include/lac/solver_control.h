@@ -31,8 +31,8 @@ class ParameterHandler;
  * called in each iteration with the current iteration step and the
  * value indicating convergence (usually the residual).
  *
- * After the iteration has terminated, the functions @p{last_value} and
- * @p{last_step} can be used to obtain information about the final state
+ * After the iteration has terminated, the functions @p last_value and
+ * @p last_step can be used to obtain information about the final state
  * of the iteration.
  *
  * @p{check()} can be replaced in derived classes to allow for more
@@ -40,26 +40,26 @@ class ParameterHandler;
  *
  *
  * @sect2{State}
- * The return states of the check function are of type @p{State},
+ * The return states of the check function are of type @p State,
  * which is an enum local to this class. It indicates the state the
  * solver is in.
  *
  * The possible values of State are
- * @begin{itemize}
- * @item @p{iterate = 0}: continue the iteration.
- * @item @p{success}: the goal is reached, the iterative method can terminate
+ * <ul>
+ * <li> @p{iterate = 0}: continue the iteration.
+ * <li> @p success: the goal is reached, the iterative method can terminate
  *       successfully.
- * @item @p{failure}: the iterative method should stop because convergence 
+ * <li> @p failure: the iterative method should stop because convergence 
  *       could not be achieved or at least was not achieved within the given
  *       maximal number of iterations.
- * @end{itemize}
+ * </ul>
  */
 class SolverControl : public Subscriptor
 {
   public:
 
 				     /**
-				      * @p{Enum} denoting the different
+				      * @p Enum denoting the different
 				      * states a solver can be in. See
 				      * the general documentation of
 				      * this class for more
@@ -117,22 +117,22 @@ class SolverControl : public Subscriptor
     
 				     /**
 				      * Constructor. The parameters
-				      * @p{n} and @p{tol} are the
+				      * @p n and @p tol are the
 				      * maximum number of iteration
 				      * steps before failure and the
 				      * tolerance to determine success
 				      * of the iteration.
 				      *
-				      * @p{log_history} specifies
+				      * @p log_history specifies
 				      * whether the history (i.e. the
 				      * value to be checked and the
 				      * number of the iteration step)
 				      * shall be printed to
-				      * @p{deallog} stream.  Default
+				      * @p deallog stream.  Default
 				      * is: do not print. Similarly,
-				      * @p{log_result} specifies the
+				      * @p log_result specifies the
 				      * whether the final result is
-				      * logged to @p{deallog}. Default
+				      * logged to @p deallog. Default
 				      * is yes.
 				      */
     SolverControl (const unsigned int n           = 100,
@@ -164,11 +164,11 @@ class SolverControl : public Subscriptor
 				      * to determine, whether the
 				      * allowed number of steps has
 				      * been exceeded and returns
-				      * @p{failure} in this case. If
-				      * @p{check_value} is below the
+				      * @p failure in this case. If
+				      * @p check_value is below the
 				      * prescribed tolerance, it
-				      * returns @p{success}. In all
-				      * other cases @p{iterate} is
+				      * returns @p success. In all
+				      * other cases @p iterate is
 				      * returned to suggest
 				      * continuation of the iterative
 				      * procedure.
@@ -176,21 +176,21 @@ class SolverControl : public Subscriptor
 				      * The iteration is also aborted
 				      * if the residual becomes a
 				      * denormalized value
-				      * (@p{NaN}). Note, however, that
+				      * (@p NaN). Note, however, that
 				      * this check is only performed
-				      * if the @p{isnan} function is
+				      * if the @p isnan function is
 				      * provided by the operating
 				      * system, which is not always
-				      * true. The @p{configure}
+				      * true. The @p configure
 				      * scripts checks for this and
-				      * sets the flag @p{HAVE_ISNAN}
+				      * sets the flag @p HAVE_ISNAN
 				      * in the file
 				      * @p{Make.global_options} if
 				      * this function was found.
 				      *
 				      * @p{check()} additionally
-				      * preserves @p{step} and
-				      * @p{check_value}. These
+				      * preserves @p step and
+				      * @p check_value. These
 				      * values are accessible by
 				      * @p{last_value()} and
 				      * @p{last_step()}.
@@ -198,7 +198,7 @@ class SolverControl : public Subscriptor
 				      * Derived classes may overload
 				      * this function, e.g. to log the
 				      * convergence indicators
-				      * (@p{check_value}) or to do
+				      * (@p check_value) or to do
 				      * other computations.
 				      */
     virtual State check (const unsigned int step,
@@ -211,7 +211,7 @@ class SolverControl : public Subscriptor
     
 				     /**
 				      * Return the convergence value of last
-				      * iteration step for which @p{check} was
+				      * iteration step for which @p check was
 				      * called by the solver.
 				      */
     double last_value() const;
@@ -234,7 +234,7 @@ class SolverControl : public Subscriptor
 				     /**
 				      * Enables the failure
 				      * check. Solving is stopped with
-				      * @p{ReturnState} @p{failure} if
+				      * @p ReturnState @p failure if
 				      * @p{residual>failure_residual} with
 				      * @p{failure_residual:=rel_failure_residual*first_residual}.
 				      */
@@ -243,8 +243,8 @@ class SolverControl : public Subscriptor
 				     /**
 				      * Disables failure check and
 				      * resets
-				      * @p{relative_failure_residual}
-				      * and @p{failure_residual} to
+				      * @p relative_failure_residual
+				      * and @p failure_residual to
 				      * zero.
 				      */
     void clear_failure_criterion ();
@@ -261,13 +261,13 @@ class SolverControl : public Subscriptor
 
 				     /**
 				      * Log each iteration step. Use
-				      * @p{log_frequency} for skipping
+				      * @p log_frequency for skipping
 				      * steps.
 				      */
     void log_history (const bool);
 
 				     /**
-				      * Returns the @p{log_history} flag.
+				      * Returns the @p log_history flag.
 				      */
     bool log_history () const;
     
@@ -282,7 +282,7 @@ class SolverControl : public Subscriptor
     void log_result (const bool);
     
 				     /**
-				      * Returns the @p{log_result} flag.
+				      * Returns the @p log_result flag.
 				      */
     bool log_result () const;
     
@@ -313,24 +313,24 @@ class SolverControl : public Subscriptor
     unsigned int lstep;
 
 				     /**
-				      * Is set to @p{true} by
-				      * @p{set_failure_criterion} and
+				      * Is set to @p true by
+				      * @p set_failure_criterion and
 				      * enables failure checking.
 				      */
     bool         check_failure;
 
 				     /*
 				      * Stores the
-				      * @p{rel_failure_residual} set by
-				      * @p{set_failure_criterion}
+				      * @p rel_failure_residual set by
+				      * @p set_failure_criterion
 				      */
     double       relative_failure_residual;
     
 				     /**
-				      * @p{failure_residual} equals the
+				      * @p failure_residual equals the
 				      * first residual multiplied by
-				      * @p{relative_crit} set by
-				      * @p{set_failure_criterion} (see there).
+				      * @p relative_crit set by
+				      * @p set_failure_criterion (see there).
 				      *
 				      * Until the first residual is
 				      * known it is 0.
@@ -339,7 +339,7 @@ class SolverControl : public Subscriptor
     
 				     /**
 				      * Log convergence history to
-				      * @p{deallog}.
+				      * @p deallog.
 				      */
     bool         m_log_history;
 				     /**
@@ -349,18 +349,18 @@ class SolverControl : public Subscriptor
     
 				     /**
 				      * Log iteration result to
-				      * @p{deallog}.  If true, after
+				      * @p deallog.  If true, after
 				      * finishing the iteration, a
 				      * statement about failure or
-				      * success together with @p{lstep}
-				      * and @p{lvalue} are logged.
+				      * success together with @p lstep
+				      * and @p lvalue are logged.
 				      */
     bool         m_log_result;
 };
 
 //! Control of the stopping criterion depending on the initial residual.
 /**
- * Specialization of @p{SolverControl} which returns @p{success} if either
+ * Specialization of @p SolverControl which returns @p success if either
  * the specified tolerance is achieved or if the initial residual (or
  * whatever criterion was chosen by the solver class) is reduced by a
  * given factor. This is useful in cases where you don't want to solve

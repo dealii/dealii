@@ -29,13 +29,13 @@
  * Preconditioned MinRes method.
  *
  * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the @ref{Solver} base class.
+ * this class, see the documentation of the Solver base class.
  *
  * Like all other solver classes, this class has a local structure called
- * @p{AdditionalData} which is used to pass additional parameters to the
+ * @p AdditionalData which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
  * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p{SolverSelector} and
+ * to the constructor because this makes the use of the @p SolverSelector and
  * other classes much easier and guarantees that these will continue to
  * work even if number or type of the additional parameters for a certain
  * solver changes.
@@ -119,7 +119,7 @@ class SolverMinRes : public Solver<VECTOR>
 
 				     /**
 				      * Temporary vectors, allocated through
-				      * the @p{VectorMemory} object at the start
+				      * the @p VectorMemory object at the start
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
@@ -131,11 +131,11 @@ class SolverMinRes : public Solver<VECTOR>
 				      * Within the iteration loop, the
 				      * square of the residual vector is
 				      * stored in this variable. The
-				      * function @p{criterion} uses this
+				      * function @p criterion uses this
 				      * variable to compute the convergence
 				      * value, which in this class is the
 				      * norm of the residual vector and thus
-				      * the square root of the @p{res2} value.
+				      * the square root of the @p res2 value.
 				      */
     double res2;
 };

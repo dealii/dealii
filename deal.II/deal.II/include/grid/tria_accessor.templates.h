@@ -1183,7 +1183,7 @@ CellAccessor<dim>::refine_flag_set () const
 {
   Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 				   // cells flagged for refinement must be active
-				   // (the @p{set_refine_flag} function checks this,
+				   // (the @p set_refine_flag function checks this,
 				   // but activity may change when refinement is
 				   // executed and for some reason the refine
 				   // flag is not cleared).
@@ -1226,7 +1226,7 @@ CellAccessor<dim>::coarsen_flag_set () const
 {
   Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 				   // cells flagged for coarsening must be active
-				   // (the @p{set_refine_flag} function checks this,
+				   // (the @p set_refine_flag function checks this,
 				   // but activity may change when refinement is
 				   // executed and for some reason the refine
 				   // flag is not cleared).

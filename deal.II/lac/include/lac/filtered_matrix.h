@@ -89,23 +89,23 @@ template <typename number> class Vector;
  * then clears again. This class is a wrapper to this procedure, it
  * takes a pointer to a matrix with which to perform matrix-vector
  * products, and does the cleaning of constrained elements itself.
- * This class therefore implements an overloaded @p{vmult} function
- * that does the matrix-vector product, as well as @p{Tvmult} for
- * transpose matrix-vector multiplication and @p{residual} for
+ * This class therefore implements an overloaded @p vmult function
+ * that does the matrix-vector product, as well as @p Tvmult for
+ * transpose matrix-vector multiplication and @p residual for
  * residual computation, and can thus be used as a matrix replacement
  * in lineaer solvers.
  *
  * It also has the ability to generate the modification of the right
- * hand side, through the @ref{apply_constraints} function.
+ * hand side, through the apply_constraints() function.
  *
  *
  * @sect3{Connection to other classes}
  *
- * The function @p{MatrixTools::apply_boundary_values} does exactly
+ * The function @p MatrixTools::apply_boundary_values does exactly
  * the same that this class does, except for the fact that that
  * function actually modifies the matrix. Due to this, it is only
  * possible to solve with a matrix onto which
- * @p{MatrixTools::apply_boundary_values} was applied for one right
+ * @p MatrixTools::apply_boundary_values was applied for one right
  * hand side and one set of boundary values since the modification of
  * the right hand side depends on the original matrix.
  *
@@ -125,23 +125,23 @@ template <typename number> class Vector;
  * Usage is simple: create an object of this type, point it to a
  * matrix that shall be used for $A$ above (either through the
  * constructor, the copy constructor, or the
- * @ref{set_referenced_matrix} function), specify the list of boundary
- * values or other constraints (through the @ref{add_constraints}
+ * set_referenced_matrix() function), specify the list of boundary
+ * values or other constraints (through the add_constraints()
  * function), and then for each required solution modify the right
- * hand side vector (through @ref{apply_constraints}) and use this
+ * hand side vector (through apply_constraints()) and use this
  * object as matrix object in a linear solver. As linear solvers
- * should only use @ref{vmult} and @ref{residual} functions of a
+ * should only use vmult() and residual() functions of a
  * matrix class, this class should be as a good a matrix as any other
  * for that purpose.
  *
- * Furthermore, also the @ref{precondition_Jacobi} function is
+ * Furthermore, also the precondition_Jacobi() function is
  * provided (since the computation of diagonal elements of the
  * filtered matrix $A_X$ is simple), so you can use this as a
  * preconditioner. Some other function useful for matrices are also
  * available.
  *
  * A typical code snippet showing the above steps is as follows:
- * @begin{verbatim}
+ * @verbatim
  *   ... // set up sparse matrix A and right hand side b somehow
  *
  *                     // initialize filtered matrix with
@@ -163,14 +163,14 @@ template <typename number> class Vector;
  *
  *                     // solve for solution vector x
  *   solver.solve (filtered_A, x, b, prec);
- * @end{verbatim}
+ * @endverbatim
  *
  *
  * @sect3{Template arguments}
  *
  * This class takes as template arguments a matrix and a vector
- * class. The former must provide @p{vmult}, @p{Tvmult}, and
- * @p{residual} member function that operate on the vector type (the
+ * class. The former must provide @p vmult, @p Tvmult, and
+ * @p residual member function that operate on the vector type (the
  * second template argument). The latter template parameter must
  * provide access to indivual elements through @p{operator()},
  * assignment through @p{operator=}.
@@ -180,8 +180,8 @@ template <typename number> class Vector;
  *
  * The functions that operate as a matrix and do not change the
  * internal state of this object are synchronised and thus
- * threadsafe. You need not serialize calls to @p{vmult} or
- * @p{residual} therefore. Because these functions require the use of
+ * threadsafe. You need not serialize calls to @p vmult or
+ * @p residual therefore. Because these functions require the use of
  * a temporary, they block mutual execution, however. It is necessary
  * to allocate this temporary vector in class space since otherwise we
  * would have to allocate such a vector each time one of the member
@@ -215,7 +215,7 @@ class FilteredMatrix : public Subscriptor
 				      * Default constructor. You will
 				      * have to set the matrix to be
 				      * used later using the
-				      * @p{set_referenced_matrix}
+				      * @p set_referenced_matrix
 				      * function.
 				      */
     FilteredMatrix ();
@@ -245,7 +245,7 @@ class FilteredMatrix : public Subscriptor
 				      * Set the matrix to be used
 				      * further on. You will probably
 				      * also want to call the
-				      * @ref{clear_constraints}
+				      * clear_constraints()
 				      * function if constraits were
 				      * previously added.
 				      */
@@ -269,9 +269,9 @@ class FilteredMatrix : public Subscriptor
 				      * enforced on the respective
 				      * solution vector's entry. Thus,
 				      * the data type might be, for
-				      * example, a @p{std::list} or
-				      * @p{std::vector} of
-				      * @ref{IndexValuePair} objects,
+				      * example, a @p std::list or
+				      * @p std::vector of
+				      * IndexValuePair objects,
 				      * but also a
 				      * @p{std::map<unsigned,value_type>}.
 				      *
@@ -311,7 +311,7 @@ class FilteredMatrix : public Subscriptor
 				      * is symmetric (i.e. the matrix
 				      * itself, not only its sparsity
 				      * pattern), set the second
-				      * parameter to @p{true} to use a
+				      * parameter to @p true to use a
 				      * faster algorithm.
 				      */
     void apply_constraints (VECTOR     &v,
@@ -348,7 +348,7 @@ class FilteredMatrix : public Subscriptor
 				      * let $dst = M^T*src$ with $M$
 				      * being this matrix. This
 				      * function does the same as
-				      * @p{vmult} but takes the
+				      * @p vmult but takes the
 				      * transposed matrix. (This
 				      * matrix is the filtered one to
 				      * which we store a reference.)
@@ -402,18 +402,18 @@ class FilteredMatrix : public Subscriptor
 				      * Compute the residual of an
 				      * equation @p{Mx=b}, where the
 				      * residual is defined to be
-				      * @p{r=b-Mx} with @p{x}
+				      * @p{r=b-Mx} with @p x
 				      * typically being an approximate
 				      * of the true solution of the
 				      * equation. Write the residual
-				      * into @p{dst}. The l2 norm of
+				      * into @p dst. The l2 norm of
 				      * the residual vector is
 				      * returned.
 				      *
 				      * Note that it is assumed that
-				      * @p{b} is a vector that has been
+				      * @p b is a vector that has been
 				      * treated by the
-				      * @ref{modify_rhs} function,
+				      * modify_rhs() function,
 				      * since we can then assume that
 				      * the components of the residual
 				      * which correspond to
@@ -429,11 +429,11 @@ class FilteredMatrix : public Subscriptor
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
-				      * the @p{src} vector by the
+				      * the @p src vector by the
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * damping factor @p{omega}.
+				      * damping factor @p omega.
 				      */
     void precondition_Jacobi (VECTOR           &dst,
 			      const VECTOR     &src,
@@ -470,7 +470,7 @@ class FilteredMatrix : public Subscriptor
     {
 					 /**
 					  * Function comparing the
-					  * pairs @p{i1} and @p{i2}
+					  * pairs @p i1 and @p i2
 					  * for their keys.
 					  */
 	bool operator () (const IndexValuePair &i1,
@@ -483,7 +483,7 @@ class FilteredMatrix : public Subscriptor
 				      * matrix. In order to guarantee
 				      * that it is not deleted while
 				      * still in use, we subscribe to
-				      * it using the @p{SmartPointer}
+				      * it using the @p SmartPointer
 				      * class.
 				      */
     SmartPointer<const MATRIX> matrix;

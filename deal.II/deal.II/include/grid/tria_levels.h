@@ -64,8 +64,8 @@ class TriangulationLevel<0>
 				      *  vector depends on the dimension: in
 				      *  one dimension, the length of this
 				      *  vector equals the length of the
-				      *  @p{lines} vector, in two dimensions
-				      *  that of the @p{quads} vector, etc.
+				      *  @p lines vector, in two dimensions
+				      *  that of the @p quads vector, etc.
 				      */
     std::vector<bool> refine_flags;
 
@@ -79,7 +79,7 @@ class TriangulationLevel<0>
 				     /**
 				      *  Levels and indices of the neighbors
 				      *  of the cells. Convention is, that the
-				      *  neighbors of the cell with index @p{i}
+				      *  neighbors of the cell with index @p i
 				      *  are stored in the fields following
 				      *  $i*(2*real_space_dimension)$, e.g. in
 				      *  one spatial dimension, the neighbors
@@ -97,10 +97,10 @@ class TriangulationLevel<0>
 				      *  is set.
 				      *
 				      *  <em>Conventions:</em> The
-				      *  @p{i}th neighbor of a cell is
+				      *  @p ith neighbor of a cell is
 				      *  the one which shares the
-				      *  @p{i}th face (@p{Line} in 2D,
-				      *  @p{Quad} in 3D) of this cell.
+				      *  @p ith face (@p Line in 2D,
+				      *  @p Quad in 3D) of this cell.
 				      *
 				      *  The neighbor of a cell has at most the
 				      *  same level as this cell, i.e. it may
@@ -141,8 +141,8 @@ class TriangulationLevel<0>
     
 				     /**
 				      *  Reserve enough space to accomodate
-				      *  @p{total_cells} cells on this level.
-				      *  Since there are no @p{used} flags on this
+				      *  @p total_cells cells on this level.
+				      *  Since there are no @p used flags on this
 				      *  level, you have to give to total number
 				      *  of cells, not only the number of newly
 				      *  to accomodate ones, like in the
@@ -160,10 +160,10 @@ class TriangulationLevel<0>
 				     /**
 				      *  Check the memory consistency of the
 				      *  different containers. Should only be
-				      *  called with the prepro flag @p{DEBUG}
+				      *  called with the prepro flag @p DEBUG
 				      *  set. The function should be called from
 				      *  the functions of the higher
-				      *  @ref{TriangulationLevel} classes.
+				      *  TriangulationLevel classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 
@@ -198,7 +198,7 @@ class TriangulationLevel<0>
  *  
  *  In one dimension, this is a list of the lines associated with this level,
  *  as well as a list with the indices of the children of these lines.
- *  The @ref{TriangulationsLevel} objects of higher dimensions are derived from
+ *  The TriangulationsLevel objects of higher dimensions are derived from
  *  this one.
  *
  *  @author Wolfgang Bangerth, 1998
@@ -239,22 +239,22 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  stored in this list. A line is
 					  *  called active if it has no
 					  *  children. The function
-					  *  @ref{TriaIterator}@p{::active()}
+					  *  TriaIterator@p{::active()}
 					  *  tests for this.
 					  */
 	std::vector<int>  children;
 	
 					 /**
 					  *  Vector storing whether a line is
-					  *  used in the @p{lines} vector.
+					  *  used in the @p lines vector.
 					  *
 					  *  Since it is difficult to delete
-					  *  elements in a @p{vector}, when an
+					  *  elements in a @p vector, when an
 					  *  element is not needed any more
 					  *  (e.g. after derefinement), it is
 					  *  not deleted from the list, but
-					  *  rather the according @p{used} flag
-					  *  is set to @p{false}.
+					  *  rather the according @p used flag
+					  *  is set to @p false.
 					  */
 	std::vector<bool> used;
 
@@ -267,7 +267,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  already been processed.
 					  *
 					  *  You can clear all used flags using
-					  *  @ref{Triangulation}@p{::clear_user_flags()}.
+					  *  Triangulation@p{::clear_user_flags()}.
 					  */
 	std::vector<bool> user_flags;
 
@@ -311,7 +311,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 
     				     /**
 				      *  Assert that enough space is allocated
-				      *  to accomodate @p{new_lines} new lines.
+				      *  to accomodate @p new_lines new lines.
 				      *  This function does not only call
 				      *  @p{vector::reserve()}, but does really
 				      *  append the needed elements.
@@ -322,7 +322,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 				      *  between the number of new quads and
 				      *  the number of new lines, etc.). Also
 				      *  don't forget to call the
-				      *  @ref{TriangulationLevel<0>}@p{::reserve_space}
+				      *  @ref{TriangulationLevel<0>}@p ::reserve_space
 				      *  function.
 				      */
     void reserve_space (const unsigned int new_lines);
@@ -330,10 +330,10 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 				     /**
 				      *  Check the memory consistency of the
 				      *  different containers. Should only be
-				      *  called with the prepro flag @p{DEBUG}
+				      *  called with the prepro flag @p DEBUG
 				      *  set. The function should be called from
 				      *  the functions of the higher
-				      *  @ref{TriangulationLevel} classes.
+				      *  TriangulationLevel classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 
@@ -369,17 +369,17 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *
 				      *  It is fully analogous to the
 				      *  @ref{TriangulationLevel<1>::LinesData} structure inherited from
-				      *  @ref{Triangulation}@p{<1>}.
+				      *  Triangulation@p{<1>}.
 				      */
     struct QuadsData
     {
 					 /**
-					  *  Same as for the @p{lines} array.
+					  *  Same as for the @p lines array.
 					  */
 	std::vector<Quad> quads;
 					 /**
 					  *  Same as for the
-					  *  @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
+					  *  @ref{TriangulationLevel<1>::LinesData}@p ::chilren
 					  *  array, but since there
 					  *  are four children, the
 					  *  index points to the first
@@ -391,13 +391,13 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
 					  */
 	std::vector<bool> used;
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
 					  */
 	std::vector<bool> user_flags;
 
@@ -442,17 +442,17 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 
     				     /**
 				      *  Assert that enough space is allocated
-				      *  to accomodate @p{new_quads} new quads.
+				      *  to accomodate @p new_quads new quads.
 				      */
     void reserve_space (const unsigned int new_quads);
 
 				     /**
 				      *  Check the memory consistency of the
 				      *  different containers. Should only be
-				      *  called with the prepro flag @p{DEBUG}
+				      *  called with the prepro flag @p DEBUG
 				      *  set. The function should be called from
 				      *  the functions of the higher
-				      *  @ref{TriangulationLevel} classes.
+				      *  TriangulationLevel classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 
@@ -498,13 +498,13 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
     struct HexesData
     {
 					 /**
-					  *  Same as for the @p{lines} array.
+					  *  Same as for the @p lines array.
 					  */
 	std::vector<Hexahedron> hexes;
         
 					 /**
 					  *  Same as for the
-					  *  @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
+					  *  @ref{TriangulationLevel<1>::LinesData}@p ::chilren
 					  *  array, but since there
 					  *  are four children, the
 					  *  index points to the first
@@ -516,13 +516,13 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
 					  */
 	std::vector<bool> used;
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
 					  */
 	std::vector<bool> user_flags;
 
@@ -602,8 +602,8 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
                                           * follows this convention or
                                           * not. If this is so, then
                                           * this variable stores a
-                                          * @p{true} value, otherwise
-                                          * a @p{false} value.
+                                          * @p true value, otherwise
+                                          * a @p false value.
                                           *
                                           * In effect, this field has
                                           * @p{6*n_cells} elements,
@@ -622,7 +622,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 
     				     /**
 				      *  Assert that enough space is allocated
-				      *  to accomodate @p{new_quads} new quads.
+				      *  to accomodate @p new_quads new quads.
 				      */
     void reserve_space (const unsigned int new_quads);
 
@@ -631,10 +631,10 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 				      *  of the different
 				      *  containers. Should only be
 				      *  called with the prepro flag
-				      *  @p{DEBUG} set. The function
+				      *  @p DEBUG set. The function
 				      *  should be called from the
 				      *  functions of the higher
-				      *  @ref{TriangulationLevel}
+				      *  TriangulationLevel
 				      *  classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;

@@ -33,59 +33,59 @@
 
 //! Selects a solver by changing a parameter.
 /**
- * By calling the @p{solve} function of this @p{SolverSelector}, it selects
- * the @p{solve} function of that @p{Solver} that was specified in the constructor
+ * By calling the @p solve function of this @p SolverSelector, it selects
+ * the @p solve function of that @p Solver that was specified in the constructor
  * of this class.
  *
  * @sect3{Usage}
  * The simplest use of this class is the following:
- * @begin{verbatim}
- *                                  // generate a @p{SolverControl} and
- *                                  // a @p{VectorMemory}
+ * @verbatim
+ *                                  // generate a @p SolverControl and
+ *                                  // a @p VectorMemory
  * SolverControl control;
  * VectorMemory<Vector<double> > memory;
  *                                  // Line 3:
  *                                  //
- *                                  // generate a @p{SolverSelector} that
- *                                  // calls the @p{SolverCG}
+ *                                  // generate a @p SolverSelector that
+ *                                  // calls the @p SolverCG
  * SolverSelector<SparseMatrix<double>, Vector<double> > 
  *   solver_selector("cg", control, memory);
- *                                  // generate e.g. a @p{PreconditionRelaxation}
+ *                                  // generate e.g. a @p PreconditionRelaxation
  * PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
  *   preconditioning(A, &SparseMatrix<double>
  *                   ::template precondition_SSOR<double>,0.8);
- *                                  // call the @p{solve} function with this
+ *                                  // call the @p solve function with this
  *                                  // preconditioning as last argument
  * solver_selector.solve(A,x,b,preconditioning);
- * @end{verbatim}
- * But the full usefulness of the @p{SolverSelector} class is not
+ * @endverbatim
+ * But the full usefulness of the @p SolverSelector class is not
  * clear until the presentation of the following example that assumes
- * the user using the @p{ParameterHandler} class and having declared a
+ * the user using the @p ParameterHandler class and having declared a
  * "solver" entry, e.g. with
- * @begin{verbatim}
+ * @verbatim
  * Parameter_Handler prm;
  * prm.declare_entry ("solver", "none",
  *                    Patterns::Sequence(SolverSelector::get_solver_names()));
  * ...
- * @end{verbatim}
+ * @endverbatim
  * Assuming that in the users parameter file there exists the line
- * @begin{verbatim}
+ * @verbatim
  * set solver = cg
- * @end{verbatim}
+ * @endverbatim
  * then `Line 3' of the above example reads
- * @begin{verbatim}
+ * @verbatim
  * SolverSelector<SparseMatrix<double>, Vector<double> > 
  *   solver_selector(prm.get("solver"), control, memory);
- * @end{verbatim}
+ * @endverbatim
  *
  *
  * If at some time there exists a new solver "xyz" then the user does not need
- * to change his program. Only in the implementation of the @p{SolverSelector}
+ * to change his program. Only in the implementation of the @p SolverSelector
  * the calling of this solver has to be added and each user with program lines
  * quoted above only needs to 'set solver = xyz' in his parameter file to get
  * access to that new solver.  :-)
  *
- * (By the way, thanks to Wolfgang for implementing the @p{ParameterHandler}.)
+ * (By the way, thanks to Wolfgang for implementing the @p ParameterHandler.)
  * 
  * @author Ralf Hartmann, 1999
  */
@@ -95,9 +95,9 @@ class SolverSelector : public Subscriptor
   public:
 
 				     /**
-				      * Constructor. Takes the @p{SolverName},
-				      * the @p{SolverControl} and the 
-				      * @p{VectorMemory} as argument.
+				      * Constructor. Takes the @p SolverName,
+				      * the @p SolverControl and the 
+				      * @p VectorMemory as argument.
 				      */
     SolverSelector (const std::string    &solvername,
 		    SolverControl        &control,
@@ -109,9 +109,9 @@ class SolverSelector : public Subscriptor
     ~SolverSelector();
 
 				     /**
-				      * Solver procedure. Calls the @p{solve}
+				      * Solver procedure. Calls the @p solve
 				      * function
-				      * of the @p{solver} whose @p{SolverName}
+				      * of the @p solver whose @p SolverName
 				      * was specified in the constructor.
 				      * 
 				      */
@@ -123,35 +123,35 @@ class SolverSelector : public Subscriptor
     
 				     /**
 				      * Set the additional data. For more
-				      * info see the @p{Solver} class.
+				      * info see the @p Solver class.
 				      */
     void set_data(const typename SolverRichardson<VECTOR>
 		  ::AdditionalData &data);
 
 				     /**
 				      * Set the additional data. For more
-				      * info see the @p{Solver} class.
+				      * info see the @p Solver class.
 				      */
     void set_data(const typename SolverCG<VECTOR>
 		  ::AdditionalData &data);
 
 				     /**
 				      * Set the additional data. For more
-				      * info see the @p{Solver} class.
+				      * info see the @p Solver class.
 				      */
     void set_data(const typename SolverBicgstab<VECTOR>
 		  ::AdditionalData &data); 
 
 				     /**
 				      * Set the additional data. For more
-				      * info see the @p{Solver} class.
+				      * info see the @p Solver class.
 				      */
     void set_data(const typename SolverGMRES<VECTOR>
 		  ::AdditionalData &data);
 
 				     /**
 				      * Set the additional data. For more
-				      * info see the @p{Solver} class.
+				      * info see the @p Solver class.
 				      */
     void set_data(const typename SolverFGMRES<VECTOR>
 		  ::AdditionalData &data);
@@ -176,16 +176,16 @@ class SolverSelector : public Subscriptor
     std::string solver_name;
     
 				     /**
-				      * Stores the @p{SolverControl} that
+				      * Stores the @p SolverControl that
 				      * is needed in the constructor of
-				      * each @p{Solver} class.
+				      * each @p Solver class.
 				      */
     SmartPointer<SolverControl> control;
 
 				     /**
-				      * Stores the @p{VectorMemory} that
+				      * Stores the @p VectorMemory that
 				      * is needed in the constructor of
-				      * each @p{Solver} class.
+				      * each @p Solver class.
 				      */
     SmartPointer<VectorMemory<VECTOR> > vector_memory;
 

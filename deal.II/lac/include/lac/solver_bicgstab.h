@@ -29,28 +29,28 @@
  * Bicgstab algorithm by van der Vorst.
  *
  * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the @ref{Solver} base class.
+ * this class, see the documentation of the Solver base class.
  *
  * Like all other solver classes, this class has a local structure called
- * @p{AdditionalData} which is used to pass additional parameters to the
+ * @p AdditionalData which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
  * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p{SolverSelector} and
+ * to the constructor because this makes the use of the @p SolverSelector and
  * other classes much easier and guarantees that these will continue to
  * work even if number or type of the additional parameters for a certain
  * solver changes.
  *
  * The Bicgstab-method has two additional parameters: the first is a
  * boolean, deciding whether to compute the actual residual in each
- * step (@p{true}) or to use the length of the computed orthogonal
- * residual (@p{false}). Remark, that computing the residual causes a
+ * step (@p true) or to use the length of the computed orthogonal
+ * residual (@p false). Remark, that computing the residual causes a
  * third matrix-vector-multiplication, though no additional
  * preconditioning, in each step. The reason for doing this is, that
  * the size of the orthogonalized residual computed during the
  * iteration may be larger by orders of magnitude than the true
  * residual. This is due to numerical instabilities related to badly
  * conditioned matrices. Since this instability results in a bad
- * stopping criterion, the default for this parameter is @p{true}.
+ * stopping criterion, the default for this parameter is @p true.
  *
  * The second parameter is the size of a breakdown criterion. It is
  * difficult to find a general good criterion, so if things do not
@@ -63,7 +63,7 @@ class SolverBicgstab : public Solver<VECTOR>
     				     /**
 				      * There are two possibilities to compute
 				      * the residual: one is an estimate using
-				      * the computed value @p{tau}. The other
+				      * the computed value @p tau. The other
 				      * is exact computation using another matrix
 				      * vector multiplication.
 				      *

@@ -29,26 +29,26 @@ template <int dim> class FESystem;
 
 /**
  * Common interface of all finite elements. Here, the functions to
- * fill the data fields of @ref{FEValues} are declared. While
- * @ref{FiniteElementBase} provides implementation of common
+ * fill the data fields of FEValues are declared. While
+ * FiniteElementBase provides implementation of common
  * functionality, this class only serves as an abstract base class.
  *
  * The interface of this class is very restrictive. The reason is that
  * finite element values should be accessed only by use of
- * @ref{FEValues} objects. These, together with @p{FiniteElement} are
+ * FEValues objects. These, together with @p FiniteElement are
  * responsible to provide an optimized implementation.
  *
  * This even holds for evaluating finite elements at their support
  * points (provided the element is based on Lagrangian interpolation):
  * first, it is necessary to construct a quadrature rule from the
  * support points. This is then fed into an object of class
- * @ref{FEValues}. Even for evaluation on the unit cell, you will need
+ * FEValues. Even for evaluation on the unit cell, you will need
  * a triangulation containing that single cell.
  *
  * Basically, this class just declares the shape function and their
  * derivatives on the unit cell $[0,1]^d$, and the means to transform
  * them onto a given cell in physical space if provided by the
- * @ref{FEValues} class with a @ref{Mapping} object.
+ * FEValues class with a Mapping object.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001
  */
@@ -68,7 +68,7 @@ class FiniteElement : public FiniteElementBase<dim>
                                       * exception, since copying finite
                                       * element objects is not really
                                       * supported. If you want to copy such an
-                                      * object, use the @p{clone} function.
+                                      * object, use the @p clone function.
                                       */
     FiniteElement (const FiniteElement &);
     
@@ -96,7 +96,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * coincide with the number of
 				      * base elements, since they may
 				      * be reused. For example, if you
-				      * create a @ref{FESystem} with
+				      * create a FESystem with
 				      * three identical finite element
 				      * classes by using the
 				      * constructor that takes one
@@ -115,7 +115,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * objects. If the element is
 				      * scalar, then
 				      * @p{base_element(0)} is
-				      * @p{this}.
+				      * @p this.
 				      */
     virtual
     const FiniteElement<dim> &
@@ -123,12 +123,12 @@ class FiniteElement : public FiniteElementBase<dim>
 
                                      /**
                                       * This index denotes how often
-                                      * the base element @p{index} is
+                                      * the base element @p index is
                                       * used in a composed element. If
                                       * the element is scalar, then
                                       * the result is always equal to
                                       * one. See the documentation for
-                                      * the @p{n_base_elements}
+                                      * the @p n_base_elements
                                       * function for more details.
                                       */
     virtual
@@ -139,10 +139,10 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Check for non-zero values on a face.
 				      *
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p face_index.
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const = 0;
@@ -183,13 +183,13 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Determine the values a finite
 				      * element should compute on
 				      * initialization of data for
-				      * @p{FEValues}.
+				      * @p FEValues.
 				      *
 				      * Given a set of flags
 				      * indicating what quantities are
-				      * requested from a @p{FEValues}
-				      * object, @p{update_once} and
-				      * @p{update_each} compute which
+				      * requested from a @p FEValues
+				      * object, @p update_once and
+				      * @p update_each compute which
 				      * values must really be
 				      * computed. Then, the
 				      * @p{fill_*_values} functions
@@ -200,31 +200,31 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * computed either on the unit
 				      * cell or on the physical
 				      * cell. For instance, the
-				      * function values of @p{FE_Q} do
+				      * function values of @p FE_Q do
 				      * only depend on the quadrature
 				      * points on the unit
 				      * cell. Therefore, this flags
 				      * will be returned by
-				      * @p{update_once}. The gradients
+				      * @p update_once. The gradients
 				      * require computation of the
 				      * covariant transformation
 				      * matrix. Therefore,
-				      * @p{update_covariant_transformation}
-				      * and @p{update_gradients} will
+				      * @p update_covariant_transformation
+				      * and @p update_gradients will
 				      * be returned by
-				      * @p{update_each}.
+				      * @p update_each.
 				      *
 				      * For an example see the same
 				      * function in the derived class
-				      * @p{FE_Q}.
+				      * @p FE_Q.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
   
 				     /**
 				      * Complementary function for
-				      * @p{update_once}.
+				      * @p update_once.
 				      *
-				      * While @p{update_once} returns
+				      * While @p update_once returns
 				      * the values to be computed on
 				      * the unit cell for yielding the
 				      * required data, this function
@@ -232,17 +232,17 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * must be recomputed on each
 				      * cell.
 				      *
-				      * Refer to @p{update_once} for
+				      * Refer to @p update_once for
 				      * more details.
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
   
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> *clone() const = 0;
     
@@ -298,13 +298,13 @@ class FiniteElement : public FiniteElementBase<dim>
 
 				     /**
 				      * Fill the fields of
-				      * @ref{FEValues}. This function
+				      * FEValues. This function
 				      * performs all the operations
 				      * needed to compute the data of an
-				      * @p{FEValues} object.
+				      * @p FEValues object.
 				      *
 				      * The same function in
-				      * @p{mapping} must have been
+				      * @p mapping must have been
 				      * called for the same cell first!
 				      */				      
     virtual void
@@ -317,13 +317,13 @@ class FiniteElement : public FiniteElementBase<dim>
     
 				     /**
 				      * Fill the fields of
-				      * @ref{FEFaceValues}. This function
+				      * FEFaceValues. This function
 				      * performs all the operations
 				      * needed to compute the data of an
-				      * @p{FEFaceValues} object.
+				      * @p FEFaceValues object.
 				      *
 				      * The same function in
-				      * @p{mapping} must have been
+				      * @p mapping must have been
 				      * called for the same cell first!
 				      */				      
     virtual void
@@ -337,13 +337,13 @@ class FiniteElement : public FiniteElementBase<dim>
     
 				     /**
 				      * Fill the fields of
-				      * @ref{FESubfaceValues}. This function
+				      * FESubfaceValues. This function
 				      * performs all the operations
 				      * needed to compute the data of an
-				      * @p{FESubfaceValues} object.
+				      * @p FESubfaceValues object.
 				      *
 				      * The same function in
-				      * @p{mapping} must have been
+				      * @p mapping must have been
 				      * called for the same cell first!
 				      */				      
     virtual void

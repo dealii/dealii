@@ -40,7 +40,7 @@ template <int dim> class Triangulation;
 
 /**
  * Define some types which differ between the dimensions. This class
- * is analogous to the @ref{TriaDimensionInfo} class hierarchy.
+ * is analogous to the TriaDimensionInfo class hierarchy.
  * 
  * @ref DoFDimensionInfo<1>
  * @ref DoFDimensionInfo<2>
@@ -169,15 +169,15 @@ class DoFDimensionInfo<3>
  * also refer to all degrees of freedom and some kind of condensation
  * is needed to restrict the systems of equations to the unconstrained
  * degrees of freedom only. The actual layout of storage of the indices
- * is described in the @ref{DoFLevel} class documentation.
+ * is described in the DoFLevel class documentation.
  *
  * Finally it offers a starting point for the assemblage of the matrices
  * by offering @p{begin()} and @p{end()} functions which return iterators
  * to walk on the DoF structures as well as the triangulation data.
  * These iterators work much like those described in the documentation
- * of the @ref{Triangulation} class and of the iterator classes themselved,
+ * of the Triangulation class and of the iterator classes themselved,
  * but offer more functionality than pure triangulation iterators. The
- * order in which dof iterators are presented by the @p{++} and @p{--} operators
+ * order in which dof iterators are presented by the @p{++} and @p -- operators
  * is the same as that for the alike triangulation iterators.
  *
  * This class also provides functions to create the sparsity patterns of
@@ -201,14 +201,14 @@ class DoFDimensionInfo<3>
  *
  * This numbering implies very large bandwiths of the resulting matrices and
  * is thus vastly suboptimal for some solution algorithms. For this reason,
- * the @ref{DoFRenumbering} class offers the function @p{renumber_dofs} which reorders
+ * the DoFRenumbering class offers the function @p renumber_dofs which reorders
  * the dof numbering according to some scheme. See there for a discussion of
  * the implemented algorithms.
  *
  *
  * @sect3{User defined renumbering schemes}
  *
- * The @ref{DoFRenumbering} class offers a number of renumbering
+ * The DoFRenumbering class offers a number of renumbering
  * schemes like the Cuthill-McKey scheme. Basically, the function sets
  * up an array in which for each degree of freedom the index is stored
  * which is to be assigned by the renumbering. Using this array, the
@@ -253,7 +253,7 @@ class DoFHandler  :  public Subscriptor,
     typedef typename DoFDimensionInfo<dim>::active_face_iterator active_face_iterator;
 
 				     /**
-				      * Alias the @p{FunctionMap} type
+				      * Alias the @p FunctionMap type
 				      * declared elsewhere.
 				      */
     typedef typename ::FunctionMap<dim>::type FunctionMap;
@@ -276,7 +276,7 @@ class DoFHandler  :  public Subscriptor,
     static const unsigned int invalid_dof_index = deal_II_numbers::invalid_unsigned_int;
     
 				     /**
-				      * Constructor. Take @p{tria} as the
+				      * Constructor. Take @p tria as the
 				      * triangulation to work on.
 				      */
     DoFHandler (const Triangulation<dim> &tria);
@@ -294,7 +294,7 @@ class DoFHandler  :  public Subscriptor,
 				      * method.
 				      *
 				      * The additional optional
-				      * parameter @p{offset} allows you
+				      * parameter @p offset allows you
 				      * to reserve space for a finite
 				      * number of additional vector
 				      * entries in the beginning of
@@ -312,7 +312,7 @@ class DoFHandler  :  public Subscriptor,
 				      * object shall be longer than
 				      * that of this object. If you
 				      * don't want this behaviour, you
-				      * may want to call the @p{clear}
+				      * may want to call the @p clear
 				      * member function which also
 				      * releases the lock of this
 				      * object to the finite element.
@@ -324,7 +324,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Clear all data of this object and
 				      * especially delete the lock this object
 				      * has to the finite element used the last
-				      * time when @p{distribute_dofs} was called.
+				      * time when @p distribute_dofs was called.
 				      */
     virtual void clear ();
     
@@ -333,14 +333,14 @@ class DoFHandler  :  public Subscriptor,
 				      * a list of new dof numbers for all the
 				      * dofs.
 				      *
-				      * @p{new_numbers} is an array of integers
+				      * @p new_numbers is an array of integers
 				      * with size equal to the number of dofs
 				      * on the present grid. It stores the new
 				      * indices after renumbering in the
 				      * order of the old indices.
 				      *
 				      * This function is called by the
-				      * @p{renumber_dofs} function after computing
+				      * @p renumber_dofs function after computing
 				      * the ordering of the degrees of freedom.
 				      * However, you can call this function
 				      * yourself, which is necessary if a user
@@ -357,7 +357,7 @@ class DoFHandler  :  public Subscriptor,
 				      * This is the maximum number of entries
 				      * per line in the system matrix; this
 				      * information can therefore be used upon
-				      * construction of the @ref{SparsityPattern}
+				      * construction of the SparsityPattern
 				      * object.
 				      *
 				      * The returned number is not really the
@@ -381,7 +381,7 @@ class DoFHandler  :  public Subscriptor,
 				      * the boundary can couple with.
 				      *
 				      * The number is the same as for
-				      * @p{max_coupling_between_dofs} in one
+				      * @p max_coupling_between_dofs in one
 				      * dimension less.
 				      */
     unsigned int max_couplings_between_boundary_dofs () const;
@@ -392,30 +392,30 @@ class DoFHandler  :  public Subscriptor,
 				     /*@{*/
 				     /**
 				      *  Iterator to the first cell, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no cells, a past-the-end iterator
 				      *  is returned.
 				      *
-				      *  This function calls @p{begin_raw_line}
-				      *  in 1D and @p{begin_raw_quad} in 2D.
+				      *  This function calls @p begin_raw_line
+				      *  in 1D and @p begin_raw_quad in 2D.
 				      */
     raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first used cell
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      *
-				      *  This function calls @p{begin_line}
-				      *  in 1D and @p{begin_quad} in 2D.
+				      *  This function calls @p begin_line
+				      *  in 1D and @p begin_quad in 2D.
 				      */
     cell_iterator        begin       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  cell on level @p{level}.
+				      *  cell on level @p level.
 				      *
-				      *  This function calls @p{begin_active_line}
-				      *  in 1D and @p{begin_active_quad} in 2D.
+				      *  This function calls @p begin_active_line
+				      *  in 1D and @p begin_active_quad in 2D.
 				      */
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
@@ -425,14 +425,14 @@ class DoFHandler  :  public Subscriptor,
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      *
-				      *  This function calls @p{end_line}
-				      *  in 1D and @p{end_quad} in 2D.
+				      *  This function calls @p end_line
+				      *  in 1D and @p end_quad in 2D.
 				      */
     raw_cell_iterator    end () const;
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -440,7 +440,7 @@ class DoFHandler  :  public Subscriptor,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -448,7 +448,7 @@ class DoFHandler  :  public Subscriptor,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -458,17 +458,17 @@ class DoFHandler  :  public Subscriptor,
 				      *  Return an iterator pointing to the
 				      *  last cell, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 1D and @p{last_raw_quad} in 2D.
+				      *  This function calls @p last_raw_line
+				      *  in 1D and @p last_raw_quad in 2D.
 				      */
     raw_cell_iterator    last_raw () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  cell of the level @p{level}, used or not.
+				      *  cell of the level @p level, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 1D and @p{last_raw_quad} in 2D.
+				      *  This function calls @p last_raw_line
+				      *  in 1D and @p last_raw_quad in 2D.
 				      */
     raw_cell_iterator    last_raw (const unsigned int level) const;
 
@@ -476,17 +476,17 @@ class DoFHandler  :  public Subscriptor,
 				      *  Return an iterator pointing to the last
 				      *  used cell.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 1D and @p{last_quad} in 2D.
+				      *  This function calls @p last_line
+				      *  in 1D and @p last_quad in 2D.
 				      */
     cell_iterator        last () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used cell on level @p{level}.
+				      *  used cell on level @p level.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 1D and @p{last_quad} in 2D.
+				      *  This function calls @p last_line
+				      *  in 1D and @p last_quad in 2D.
 				      */
     cell_iterator        last (const unsigned int level) const;
 
@@ -494,17 +494,17 @@ class DoFHandler  :  public Subscriptor,
 				      *  Return an iterator pointing to the last
 				      *  active cell.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 1D and @p{last_active_quad} in 2D.
+				      *  This function calls @p last_active_line
+				      *  in 1D and @p last_active_quad in 2D.
 				      */
     active_cell_iterator last_active () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active cell on level @p{level}.
+				      *  active cell on level @p level.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 1D and @p{last_active_quad} in 2D.
+				      *  This function calls @p last_active_line
+				      *  in 1D and @p last_active_quad in 2D.
 				      */
     active_cell_iterator last_active (const unsigned int level) const;
 				     //@}
@@ -517,30 +517,30 @@ class DoFHandler  :  public Subscriptor,
 				     /*@{*/
 				     /**
 				      *  Iterator to the first face, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no faces, a past-the-end iterator
 				      *  is returned.
 				      *
-				      *  This function calls @p{begin_raw_line}
-				      *  in 2D and @p{begin_raw_quad} in 3D.
+				      *  This function calls @p begin_raw_line
+				      *  in 2D and @p begin_raw_quad in 3D.
 				      */
     raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first used face
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      *
-				      *  This function calls @p{begin_line}
-				      *  in 2D and @p{begin_quad} in 3D.
+				      *  This function calls @p begin_line
+				      *  in 2D and @p begin_quad in 3D.
 				      */
     face_iterator        begin_face       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  face on level @p{level}.
+				      *  face on level @p level.
 				      *
-				      *  This function calls @p{begin_active_line}
-				      *  in 2D and @p{begin_active_quad} in 3D.
+				      *  This function calls @p begin_active_line
+				      *  in 2D and @p begin_active_quad in 3D.
 				      */
     active_face_iterator begin_active_face(const unsigned int level = 0) const;
 
@@ -550,14 +550,14 @@ class DoFHandler  :  public Subscriptor,
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      *
-				      *  This function calls @p{end_line}
-				      *  in 2D and @p{end_quad} in 3D.
+				      *  This function calls @p end_line
+				      *  in 2D and @p end_quad in 3D.
 				      */
     raw_face_iterator    end_face () const;
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -565,7 +565,7 @@ class DoFHandler  :  public Subscriptor,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -573,7 +573,7 @@ class DoFHandler  :  public Subscriptor,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -583,17 +583,17 @@ class DoFHandler  :  public Subscriptor,
 				      *  Return an iterator pointing to the
 				      *  last face, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 2D and @p{last_raw_quad} in 3D.
+				      *  This function calls @p last_raw_line
+				      *  in 2D and @p last_raw_quad in 3D.
 				      */
     raw_face_iterator    last_raw_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  face of the level @p{level}, used or not.
+				      *  face of the level @p level, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 2D and @p{last_raw_quad} in 3D.
+				      *  This function calls @p last_raw_line
+				      *  in 2D and @p last_raw_quad in 3D.
 				      */
     raw_face_iterator    last_raw_face (const unsigned int level) const;
 
@@ -601,17 +601,17 @@ class DoFHandler  :  public Subscriptor,
 				      *  Return an iterator pointing to the last
 				      *  used face.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 2D and @p{last_quad} in 3D.
+				      *  This function calls @p last_line
+				      *  in 2D and @p last_quad in 3D.
 				      */
     face_iterator        last_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used face on level @p{level}.
+				      *  used face on level @p level.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 2D and @p{last_quad} in 3D.
+				      *  This function calls @p last_line
+				      *  in 2D and @p last_quad in 3D.
 				      */
     face_iterator        last_face (const unsigned int level) const;
 
@@ -619,17 +619,17 @@ class DoFHandler  :  public Subscriptor,
 				      *  Return an iterator pointing to the last
 				      *  active face.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 2D and @p{last_active_quad} in 3D.
+				      *  This function calls @p last_active_line
+				      *  in 2D and @p last_active_quad in 3D.
 				      */
     active_face_iterator last_active_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active face on level @p{level}.
+				      *  active face on level @p level.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 2D and @p{last_active_quad} in 3D.
+				      *  This function calls @p last_active_line
+				      *  in 2D and @p last_active_quad in 3D.
 				      */
     active_face_iterator last_active_face (const unsigned int level) const;
 				     //@}
@@ -643,7 +643,7 @@ class DoFHandler  :  public Subscriptor,
 				     /*@{*/
 				     /**
 				      *  Iterator to the first line, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
 				      */
@@ -651,13 +651,13 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Iterator to the first used line
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      */
     line_iterator        begin_line       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  line on level @p{level}.
+				      *  line on level @p level.
 				      */
     active_line_iterator begin_active_line(const unsigned int level = 0) const;
 
@@ -671,7 +671,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -679,7 +679,7 @@ class DoFHandler  :  public Subscriptor,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -687,7 +687,7 @@ class DoFHandler  :  public Subscriptor,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -702,7 +702,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  line of the level @p{level}, used or not.
+				      *  line of the level @p level, used or not.
 
 				      */
     raw_line_iterator    last_raw_line (const unsigned int level) const;
@@ -715,7 +715,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used line on level @p{level}.
+				      *  used line on level @p level.
 				      */
     line_iterator        last_line (const unsigned int level) const;
 
@@ -727,7 +727,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active line on level @p{level}.
+				      *  active line on level @p level.
 				      */
     active_line_iterator last_active_line (const unsigned int level) const;
 				     /*@}*/	  
@@ -740,7 +740,7 @@ class DoFHandler  :  public Subscriptor,
 				      */
     				     /**
 				      *  Iterator to the first quad, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
 				      */
@@ -748,13 +748,13 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Iterator to the first used quad
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      */
     quad_iterator        begin_quad       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  quad on level @p{level}.
+				      *  quad on level @p level.
 				      */
     active_quad_iterator begin_active_quad(const unsigned int level = 0) const;
 
@@ -768,7 +768,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -776,7 +776,7 @@ class DoFHandler  :  public Subscriptor,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -784,7 +784,7 @@ class DoFHandler  :  public Subscriptor,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -799,7 +799,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  quad of the level @p{level}, used or not.
+				      *  quad of the level @p level, used or not.
 
 				      */
     raw_quad_iterator    last_raw_quad (const unsigned int level) const;
@@ -812,7 +812,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used quad on level @p{level}.
+				      *  used quad on level @p level.
 				      */
     quad_iterator        last_quad (const unsigned int level) const;
 
@@ -824,7 +824,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active quad on level @p{level}.
+				      *  active quad on level @p level.
 				      */
     active_quad_iterator last_active_quad (const unsigned int level) const;
 				     /*@}*/
@@ -837,7 +837,7 @@ class DoFHandler  :  public Subscriptor,
 				      */
     				     /**
 				      *  Iterator to the first hex, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no hexs, a past-the-end iterator
 				      *  is returned.
 				      */
@@ -846,14 +846,14 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Iterator to the first used hex
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      */
     hex_iterator
     begin_hex       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  hex on level @p{level}.
+				      *  hex on level @p level.
 				      */
     active_hex_iterator
     begin_active_hex(const unsigned int level = 0) const;
@@ -869,7 +869,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -877,7 +877,7 @@ class DoFHandler  :  public Subscriptor,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -885,7 +885,7 @@ class DoFHandler  :  public Subscriptor,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -900,7 +900,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  hex of the level @p{level}, used or not.
+				      *  hex of the level @p level, used or not.
 
 				      */
     raw_hex_iterator
@@ -915,7 +915,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used hex on level @p{level}.
+				      *  used hex on level @p level.
 				      */
     hex_iterator
     last_hex (const unsigned int level) const;
@@ -929,7 +929,7 @@ class DoFHandler  :  public Subscriptor,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active hex on level @p{level}.
+				      *  active hex on level @p level.
 				      */
     active_hex_iterator
     last_active_hex (const unsigned int level) const;
@@ -958,11 +958,11 @@ class DoFHandler  :  public Subscriptor,
 				      * parts of the boundary which
 				      * have a boundary indicator
 				      * listed in the given set. The
-				      * reason that a @p{map} rather
-				      * than a @p{set} is used is the
+				      * reason that a @p map rather
+				      * than a @p set is used is the
 				      * same as descibed in the
 				      * section on the
-				      * @p{make_boundary_sparsity_pattern}
+				      * @p make_boundary_sparsity_pattern
 				      * function.
 				      */
     unsigned int
@@ -1098,7 +1098,7 @@ class DoFHandler  :  public Subscriptor,
 				      * needed for the given element. The
 				      * given element is that one which
 				      * was selected when calling
-				      * @p{distribute_dofs} the last time.
+				      * @p distribute_dofs the last time.
 				      */
     void reserve_space ();
 
@@ -1110,14 +1110,14 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Distribute dofs on the given cell,
 				      * with new dofs starting with index
-				      * @p{next_free_dof}. Return the next
+				      * @p next_free_dof. Return the next
 				      * unused index number. The finite
 				      * element used is the one given to
-				      * @p{distribute_dofs}, which is copied
-				      * to @p{selected_fe}.
+				      * @p distribute_dofs, which is copied
+				      * to @p selected_fe.
 				      *
 				      * This function is excluded from the
-				      * @p{distribute_dofs} function since
+				      * @p distribute_dofs function since
 				      * it can not be implemented dimension
 				      * independent.
 				      */
@@ -1127,7 +1127,7 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Analogous to the
-				      * @p{levels[]} tree of the @ref{Triangulation}
+				      * @p{levels[]} tree of the Triangulation
 				      * objects.
 				      */
     std::vector<DoFLevel<dim>*>    levels;

@@ -865,7 +865,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * matrix. In order to guarantee
 				      * that it is not deleted while
 				      * still in use, we subscribe to
-				      * it using the @p{SmartPointer}
+				      * it using the @p SmartPointer
 				      * class.
 				      */
     SmartPointer<const BlockSparsityPattern> sparsity_pattern;

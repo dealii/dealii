@@ -186,16 +186,16 @@ namespace PETScWrappers
  * base class. Derived classes will then only have to provide the
  * functionality to create one or the other kind of vector.
  *
- * The interface of this class is modeled after the existing @ref{Vector}
+ * The interface of this class is modeled after the existing Vector
  * class in deal.II. It has almost the same member functions, and is often
  * exchangable. However, since PETSc only supports a single scalar type
  * (either double, float, or a complex data type), it is not templated, and
  * only works with whatever your PETSc installation has defined the data type
- * @p{PetscScalar} to.
+ * @p PetscScalar to.
  *
  * Note that PETSc only guarantees that operations do what you expect if the
- * functions @p{VecAssemblyBegin} and @p{VecAssemblyEnd} have been called
- * after vector assembly. Therefore, you need to call @ref{Vector::compress}
+ * functions @p VecAssemblyBegin and @p VecAssemblyEnd have been called
+ * after vector assembly. Therefore, you need to call Vector::compress()
  * before you actually use the vector.
  *
  * @author Wolfgang Bangerth, 2004
@@ -255,7 +255,7 @@ namespace PETScWrappers
       
                                        /**
                                         * Set all components of the vector to
-                                        * the given number @p{s}.
+                                        * the given number @p s.
                                         */
       VectorBase & operator = (const PetscScalar s);    
       
@@ -388,7 +388,7 @@ namespace PETScWrappers
       bool all_zero () const;
 
                                        /**
-                                        * Return @p{true} if the vector has no
+                                        * Return @p true if the vector has no
                                         * negative entries, i.e. all entries
                                         * are zero or positive. This function
                                         * is used, for example, to check
@@ -422,8 +422,8 @@ namespace PETScWrappers
       VectorBase & operator -= (const VectorBase &V);
 
                                        /**
-                                        * Addition of @p{s} to all
-                                        * components. Note that @p{s} is a
+                                        * Addition of @p s to all
+                                        * components. Note that @p s is a
                                         * scalar and not a vector.
                                         */
       void add (const PetscScalar s);
@@ -527,15 +527,15 @@ namespace PETScWrappers
 
                                        /**
                                         * Print to a
-                                        * stream. @p{precision} denotes
+                                        * stream. @p precision denotes
                                         * the desired precision with
                                         * which values shall be printed,
-                                        * @p{scientific} whether
+                                        * @p scientific whether
                                         * scientific notation shall be
-                                        * used. If @p{across} is
-                                        * @p{true} then the vector is
+                                        * used. If @p across is
+                                        * @p true then the vector is
                                         * printed in a line, while if
-                                        * @p{false} then the elements
+                                        * @p false then the elements
                                         * are printed on a separate line
                                         * each.
                                         */
@@ -547,7 +547,7 @@ namespace PETScWrappers
                                        /**
                                         * Swap the contents of this
                                         * vector and the other vector
-                                        * @p{v}. One could do this
+                                        * @p v. One could do this
                                         * operation with a temporary
                                         * variable and copying over the
                                         * data elements, but this
@@ -560,7 +560,7 @@ namespace PETScWrappers
                                         * data around.
                                         *
                                         * This function is analog to the
-                                        * the @p{swap} function of all C++
+                                        * the @p swap function of all C++
                                         * standard containers. Also,
                                         * there is a global function
                                         * @p{swap(u,v)} that simply calls
@@ -637,7 +637,7 @@ namespace PETScWrappers
                                        /**
                                         * Store whether the last action was a
                                         * write or add operation. This
-                                        * variable is @p{mutable} so that the
+                                        * variable is @p mutable so that the
                                         * accessor classes can write to it,
                                         * even though the vector object they
                                         * refer to is constant.
@@ -655,7 +655,7 @@ namespace PETScWrappers
 // ------------------- inline and template functions --------------  
 
 /**
- * Global function @p{swap} which overloads the default implementation
+ * Global function @p swap which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *

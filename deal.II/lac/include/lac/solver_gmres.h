@@ -55,8 +55,8 @@ namespace internal
       public:
 					 /**
 					  * Constructor. Prepares an
-					  * array of @p{VECTOR} of
-					  * length @p{max_size}.
+					  * array of @p VECTOR of
+					  * length @p max_size.
 					  */
 	TmpVectors(const unsigned int    max_size,
 		   VectorMemory<VECTOR> &vmem);
@@ -68,7 +68,7 @@ namespace internal
 
 					 /**
 					  * Get vector number
-					  * @p{i}. If this vector was
+					  * @p i. If this vector was
 					  * unused before, an error
 					  * occurs.
 					  */
@@ -76,11 +76,11 @@ namespace internal
 	
 					 /**
 					  * Get vector number
-					  * @p{i}. Allocate it if
+					  * @p i. Allocate it if
 					  * necessary.
 					  *
 					  * If a vector must be
-					  * allocated, @p{temp} is
+					  * allocated, @p temp is
 					  * used to reinit it to the
 					  * proper dimensions.
 					  */
@@ -122,7 +122,7 @@ namespace internal
  * the number of iterations needed to solve the problem to the given
  * criterion, an intermediate solution is computed and a restart is
  * performed. If you don't want to use the restarted method, you can
- * limit the number of iterations (stated in the @p{SolverControl}
+ * limit the number of iterations (stated in the @p SolverControl
  * object given to the constructor) to be below the number of
  * temporary vectors minus three. Note the subtraction, which is due
  * to the fact that three vectors are used for other purposes, so the
@@ -145,23 +145,23 @@ namespace internal
  * possibilities is to use a good preconditioner.
  *
  * Like all other solver classes, this class has a local structure
- * called @p{AdditionalData} which is used to pass additional
+ * called @p AdditionalData which is used to pass additional
  * parameters to the solver, like the number of temporary vectors for
  * example. We use this additional structure instead of passing these
  * values directly to the constructor because this makes the use of
- * the @p{SolverSelector} and other classes much easier and guarantees
+ * the @p SolverSelector and other classes much easier and guarantees
  * that these will continue to work even if number or type of the
  * additional parameters for a certain solver changes.
  *
- * For the GMRes method, the @p{AdditionalData} structure contains the number
+ * For the GMRes method, the @p AdditionalData structure contains the number
  * of temporary vectors as commented upon above. By default, the number of
- * these vectors is set to 30. The @p{AdditionalData} also containes a flag
+ * these vectors is set to 30. The @p AdditionalData also containes a flag
  * indicating the use of right or left preconditioning. The default is left
  * preconditioning. Finally it includes a flag indicating whether or not the
  * default residual is used as stopping criterion. By default, the left
  * preconditioned GMRes uses the preconditioned residual and the right
  * preconditioned GMRes uses the normal, i.e. unpreconditioned, residual as
- * stopping criterion. If the @p{use_default_residual} flag is @p{false}, the
+ * stopping criterion. If the @p use_default_residual flag is @p false, the
  * left preconditioned GMRes uses as stopping criterion the unpreconditioned
  * residual and the right preconditioned GMRes the preconditioned
  * residual. But be aware that the non-default residuals are not automatically
@@ -171,7 +171,7 @@ namespace internal
  * @p{use_default_residual=false} only for debugging/testing purposes.
  *
  * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the @ref{Solver} base class.
+ * this class, see the documentation of the Solver base class.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
@@ -271,7 +271,7 @@ class SolverGMRES : public Solver<VECTOR>
 				      */
     FullMatrix<double> H;
 				     /**
-				      * Auxiliary matrix for inverting @p{H}
+				      * Auxiliary matrix for inverting @p H
 				      */
     FullMatrix<double> H1;
     
@@ -362,7 +362,7 @@ class SolverFGMRES : public Solver<VECTOR>
 				      */
     FullMatrix<double> H;
 				     /**
-				      * Auxiliary matrix for inverting @p{H}
+				      * Auxiliary matrix for inverting @p H
 				      */
     FullMatrix<double> H1;
 };
@@ -633,7 +633,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 				       // are temporary vectors. the
 				       // number of steps actually
 				       // been done is propagated
-				       // outside through the @p{dim}
+				       // outside through the @p dim
 				       // variable
       for (unsigned int inner_iteration=0;
 	   ((inner_iteration < n_tmp_vectors-2)

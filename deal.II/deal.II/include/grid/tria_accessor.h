@@ -112,7 +112,7 @@ class TriaAccessor
 				      * classes. Since the pure
 				      * triangulation iterators need
 				      * no additional data, this data
-				      * type is @p{void}.
+				      * type is @p void.
 				      */
     typedef void AccessorData;
 
@@ -144,8 +144,8 @@ class TriaAccessor
 				      *  used in a context like
 				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by @p{b} to the object
-				      *  pointed to by @p{a} and since
+				      *  pointed to by @p b to the object
+				      *  pointed to by @p a and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -206,7 +206,7 @@ class TriaAccessor
 				      *  iterator.  For the different
 				      *  states an accessor can be in,
 				      *  refer to the
-				      *  @ref{TriaRawIterator}
+				      *  TriaRawIterator
 				      *  documentation.
 				      */
     IteratorState::IteratorStates state () const;
@@ -307,9 +307,9 @@ class TriaAccessor
 
 /**
  * Common template for line, quad, hex accessors.  According to
- * @p{celldim} objects of this class represent lines, quadrilaterals,
- * or hexahedra in @p{dim} space dimensions. Concrete implementations
- * are done for specialized @p{celldim} template parameter. For easier
+ * @p celldim objects of this class represent lines, quadrilaterals,
+ * or hexahedra in @p dim space dimensions. Concrete implementations
+ * are done for specialized @p celldim template parameter. For easier
  * access, we nevertheless document all functions of the specialized
  * classes here as well. However, they are not implemented.
  *
@@ -362,7 +362,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  convention regarding the
 				      *  numbering of vertices is laid
 				      *  down in the documentation of
-				      *  the @ref{Triangulation}
+				      *  the Triangulation
 				      *  class.
 				      *
 				      *  Note that the returned value is only
@@ -370,19 +370,19 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  vertex. It has nothing to do with
 				      *  possible degrees of freedom
 				      *  associated with it. For this, see the
-				      *  @p{DoFAccessor::vertex_dof_index}
+				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
     				     /**
 				      *  Return a reference to the
-				      *  @p{i}th vertex.
+				      *  @p ith vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
-				      *  Pointer to the @p{i}th line
+				      *  Pointer to the @p ith line
 				      *  bounding this object.
 				      *
 				      * Implemented only for @p{celldim>1}.
@@ -391,7 +391,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     line (const unsigned int i) const;
 
 				     /**
-				      * Line index of the @p{i}th
+				      * Line index of the @p ith
 				      * line. The level is naturally
 				      * the same as that of the
 				      * object.
@@ -401,7 +401,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     unsigned int line_index (const unsigned int i) const;
     
     				     /**
-				      *  Pointer to the @p{i}th quad
+				      *  Pointer to the @p ith quad
 				      *  bounding this object.
 				      *
 				      * Implemented only for @p{celldim>2}.
@@ -410,7 +410,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     quad (const unsigned int i) const;
 
 				     /**
-				      * Quad index of the @p{i}th
+				      * Quad index of the @p ith
 				      * quad. The level is naturally
 				      * the same as that of the object.
 				      *
@@ -421,11 +421,11 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is @p{true} for all
+				      *  value is @p true for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return @p{false}. Since
+				      *  can return @p false. Since
 				      *  raw iterators are only used
 				      *  in the interiors of the
 				      *  library, you will not usually
@@ -434,7 +434,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the @p{used} flag. You
+				      *  Set the @p used flag. You
 				      *  should know quite exactly
 				      *  what you are doing of you
 				      *  touch this function. It is
@@ -444,7 +444,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the @p{used} flag. You
+				      *  Clear the @p used flag. You
 				      *  should know quite exactly
 				      *  what you are doing of you
 				      *  touch this function. It is
@@ -482,13 +482,13 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer
-				      * to @p{p}.
+				      * to @p p.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
 				      * Reset the user pointer
-				      * to a @p{NULL} pointer.
+				      * to a @p NULL pointer.
 				      */
     void clear_user_pointer () const;
     
@@ -540,20 +540,20 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * object and all of its
 				      * descendants. The same holds as
 				      * said for the
-				      * @ref{recursively_set_user_pointer}
+				      * recursively_set_user_pointer()
 				      * function.
 				      */
     void recursively_clear_user_pointer () const;
 
 				     /**
-				      *  Pointer to the @p{i}th
+				      *  Pointer to the @p ith
 				      *  child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
     child (const unsigned int i) const;
 
 				     /**
-				      *  Index of the @p{i}th child.
+				      *  Index of the @p ith child.
 				      *  The level of the child is one
 				      *  higher than that of the
 				      *  present cell.  If the child
@@ -594,7 +594,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * object is refined. Note that
 				      * not all its children are
 				      * refined that often (which is
-				      * why we prepend @p{max_}), the
+				      * why we prepend @p max_), the
 				      * returned number is rather the
 				      * maximum number of refinement
 				      * in any branch of children of
@@ -648,7 +648,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * for @p{dim>celldim}; however,
 				      * for @p{dim==celldim}, an
 				      * object is a cell and the
-				      * @ref{CellAccessor} class
+				      * CellAccessor class
 				      * offers another possibility to
 				      * determine whether a cell is at
 				      * the boundary or not.
@@ -718,20 +718,20 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 
                                      /**
                                       * Return whether the face with
-                                      * index @p{face} has its normal
+                                      * index @p face has its normal
                                       * pointing in the standard
-                                      * direction (@p{true}) or
+                                      * direction (@p true) or
                                       * whether it is the opposite
-                                      * (@p{false}). Which is the
+                                      * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * @ref{Triangulation} class. In
+                                      * Triangulation class. In
                                       * 1d and 2d, this is always
-                                      * @p{true}, but in 3d it may be
+                                      * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * @ref{Triangulation} class.
+                                      * Triangulation class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -746,8 +746,8 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  used in a context like
 				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by @p{b} to the object
-				      *  pointed to by @p{a} and since
+				      *  pointed to by @p b to the object
+				      *  pointed to by @p a and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -833,7 +833,7 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 
 /**
  *   Accessor to dereference the data of lines. This accessor is used
- *   to point to lines in @p{dim} space dimensions. There is a derived
+ *   to point to lines in @p dim space dimensions. There is a derived
  *   class for lines in one space dimension, in which case a line is
  *   also a cell and thus has much more functionality than in other
  *   dimensions.
@@ -873,25 +873,25 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  vertex. It has nothing to do with
 				      *  possible degrees of freedom
 				      *  associated with it. For this, see the
-				      *  @p{DoFAccessor::vertex_dof_index}
+				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
 				     /**
 				      *  Return a reference to the
-				      *  @p{i}th vertex.
+				      *  @p ith vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is @p{true} for all
+				      *  value is @p true for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return @p{false}. Since
+				      *  can return @p false. Since
 				      *  raw iterators are only used
 				      *  in the interiors of the
 				      *  library, you will not usually
@@ -900,14 +900,14 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the @p{used} flag. Only
+				      *  Set the @p used flag. Only
 				      *  for internal use in the
 				      *  library.
 				      */
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the @p{used} flag. Only
+				      *  Clear the @p used flag. Only
 				      *  for internal use in the
 				      *  library.
 				      */
@@ -947,7 +947,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer of this
-				      * line to @p{p}.
+				      * line to @p p.
 				      */
     void set_user_pointer (void *p) const;
 
@@ -985,14 +985,14 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * object and all of its
 				      * descendants. The same holds as
 				      * said for the
-				      * @ref{recursively_set_user_pointer}
+				      * recursively_set_user_pointer()
 				      * function.
 				      */
     void recursively_clear_user_pointer () const;
 
 				     /**
 				      * Reset the user pointer of this
-				      * line to a @p{NULL} pointer.
+				      * line to a @p NULL pointer.
 				      */
     void clear_user_pointer () const;
 
@@ -1012,14 +1012,14 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     
 				     /**
 				      *  Return a pointer to the
-				      *  @p{i}th child.
+				      *  @p ith child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the
-				      *  @p{i}th child.  The level of
+				      *  @p ith child.  The level of
 				      *  the child is one higher than
 				      *  that of the present cell.  If
 				      *  the child does not exist, -1
@@ -1060,7 +1060,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * refined. Note that not all its
 				      * children are refined that
 				      * often (which is why we prepend
-				      * @p{max_}), the returned number
+				      * @p max_), the returned number
 				      * is rather the maximum number
 				      * of refinement in any branch of
 				      * children of this object.
@@ -1114,7 +1114,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * only possible for @p{dim>1};
 				      * however, for @p{dim==1}, a
 				      * line is a cell and the
-				      * @ref{CellAccessor} class
+				      * CellAccessor class
 				      * offers another possibility to
 				      * determine whether a cell is at
 				      * the boundary or not.
@@ -1155,7 +1155,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * Return the barycenter of the
 				      * line, which is the
 				      * midpoint. The same applies as
-				      * for the @p{center} function
+				      * for the @p center function
 				      * with regard to lines at the
 				      * boundary.
 				      */
@@ -1164,7 +1164,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Return the length of the line.
 				      * The same applies as for the
-				      * @p{center} function with
+				      * @p center function with
 				      * regard to lines at the
 				      * boundary.
 				      */
@@ -1190,20 +1190,20 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     
                                      /**
                                       * Return whether the face with
-                                      * index @p{face} has its normal
+                                      * index @p face has its normal
                                       * pointing in the standard
-                                      * direction (@p{true}) or
+                                      * direction (@p true) or
                                       * whether it is the opposite
-                                      * (@p{false}). Which is the
+                                      * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * @ref{Triangulation} class. In
+                                      * Triangulation class. In
                                       * 1d and 2d, this is always
-                                      * @p{true}, but in 3d it may be
+                                      * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * @ref{Triangulation} class.
+                                      * Triangulation class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -1218,8 +1218,8 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  used in a context like
 				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by @p{b} to the object
-				      *  pointed to by @p{a} and since
+				      *  pointed to by @p b to the object
+				      *  pointed to by @p a and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -1275,7 +1275,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 
 /**
  *   Accessor to dereference the data of quads. This accessor is used
- *   to point to quads in @p{dim} space dimensions (only @p{dim>=2}
+ *   to point to quads in @p dim space dimensions (only @p{dim>=2}
  *   seems reasonable to me). There is a derived class for quads in
  *   two space dimension, in which case a quad is also a cell and thus
  *   has much more functionality than in other dimensions.
@@ -1327,21 +1327,21 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
     				     /**
 				      *  Return a reference to the
-				      *  @p{i}th vertex.
+				      *  @p ith vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
 				      *  Return a pointer to the
-				      *  @p{i}th line bounding this
-				      *  @ref{Quad}.
+				      *  @p ith line bounding this
+				      *  Quad.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
 				     /**
 				      * Return the line index of the
-				      * @p{i}th side (a line). The
+				      * @p ith side (a line). The
 				      * level is naturally the same as
 				      * that of the quad.
 				      */
@@ -1350,11 +1350,11 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is @p{true} for all
+				      *  value is @p true for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return @p{false}. Since
+				      *  can return @p false. Since
 				      *  raw iterators are only used
 				      *  in the interiors of the
 				      *  library, you will not usually
@@ -1363,7 +1363,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the @p{used} flag. You
+				      *  Set the @p used flag. You
 				      *  should know quite exactly
 				      *  what you are doing of you
 				      *  touch this function. It is
@@ -1373,7 +1373,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the @p{used} flag. You
+				      *  Clear the @p used flag. You
 				      *  should know quite exactly
 				      *  what you are doing of you
 				      *  touch this function. It is
@@ -1417,13 +1417,13 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer of this
-				      * quad to @p{p}.
+				      * quad to @p p.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
 				      * Reset the user pointer of this
-				      * quad to a @p{NULL} pointer.
+				      * quad to a @p NULL pointer.
 				      */
     void clear_user_pointer () const;
 
@@ -1475,20 +1475,20 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * object and all of its
 				      * descendants. The same holds as
 				      * said for the
-				      * @ref{recursively_set_user_pointer}
+				      * recursively_set_user_pointer()
 				      * function.
 				      */
     void recursively_clear_user_pointer () const;
 
 				     /**
-				      *  Return a pointer to the @p{i}th
+				      *  Return a pointer to the @p ith
 				      *  child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<2, dim> > child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the
-				      *  @p{i}th child.  The level of
+				      *  @p ith child.  The level of
 				      *  the child is one higher than
 				      *  that of the present cell.  If
 				      *  the child does not exist, -1
@@ -1529,7 +1529,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * refined. Note that not all its
 				      * children are refined that
 				      * often (which is why we prepend
-				      * @p{max_}), the returned number
+				      * @p max_), the returned number
 				      * is rather the maximum number
 				      * of refinement in any branch of
 				      * children of this object.
@@ -1583,7 +1583,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * function is only useful for
 				      * @p{dim>2}; however, for
 				      * @p{dim==2}, a quad is a cell
-				      * and the @ref{CellAccessor}
+				      * and the CellAccessor
 				      * class offers another
 				      * possibility to determine
 				      * whether a cell is at the
@@ -1644,7 +1644,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Return the barycenter of the
 				      * qaud. The same applies as for
-				      * the @p{center} function with
+				      * the @p center function with
 				      * regard to quads at the
 				      * boundary.
 				      */
@@ -1685,20 +1685,20 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
                                      /**
                                       * Return whether the face with
-                                      * index @p{face} has its normal
+                                      * index @p face has its normal
                                       * pointing in the standard
-                                      * direction (@p{true}) or
+                                      * direction (@p true) or
                                       * whether it is the opposite
-                                      * (@p{false}). Which is the
+                                      * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * @ref{Triangulation} class. In
+                                      * Triangulation class. In
                                       * 1d and 2d, this is always
-                                      * @p{true}, but in 3d it may be
+                                      * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * @ref{Triangulation} class.
+                                      * Triangulation class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -1714,8 +1714,8 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * like <tt>iterator a,b;
 				      * *a=*b;</tt>. Since the meaning
 				      * is to copy the object pointed
-				      * to by @p{b} to the object
-				      * pointed to by @p{a} and since
+				      * to by @p b to the object
+				      * pointed to by @p a and since
 				      * accessors are not real but
 				      * virtual objects, this
 				      * operation is not useful for
@@ -1770,7 +1770,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
 /**
  *   Accessor to dereference the data of hexahedra. This accessor is
- *   used to point to hexs in @p{dim} space dimensions (only
+ *   used to point to hexs in @p dim space dimensions (only
  *   @p{dim>=3} seems reasonable to me). There is a derived class for
  *   hexs in three space dimension, in which case a hex is also a cell
  *   and thus has much more functionality than in other dimensions.
@@ -1814,28 +1814,28 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  vertex. It has nothing to do with
 				      *  possible degrees of freedom
 				      *  associated with it. For this, see the
-				      *  @p{DoFAccessor::vertex_dof_index}
+				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
     				     /**
 				      *  Return a reference to the
-				      *  @p{i}th vertex.
+				      *  @p ith vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
 				      *  Return a pointer to the
-				      *  @p{i}th line bounding this
-				      *  @p{Hex}.
+				      *  @p ith line bounding this
+				      *  @p Hex.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
 				     /**
 				      * Return the line index of the
-				      * @p{i}th line. The level is
+				      * @p ith line. The level is
 				      * naturally the same as that of
 				      * the hex.
 				      */
@@ -1843,15 +1843,15 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     
     				     /**
 				      *  Return a pointer to the
-				      *  @p{i}th quad bounding this
-				      *  @p{Hex}.
+				      *  @p ith quad bounding this
+				      *  @p Hex.
 				      */
     TriaIterator<dim,TriaObjectAccessor<2, dim> >
     quad (const unsigned int i) const;
 
 				     /**
 				      * Return the quad index of the
-				      * @p{i}th side (a quad). The
+				      * @p ith side (a quad). The
 				      * level is naturally the same as
 				      * that of the hex.
 				      */
@@ -1860,11 +1860,11 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is @p{true} for all
+				      *  value is @p true for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return @p{false}. Since
+				      *  can return @p false. Since
 				      *  raw iterators are only used
 				      *  in the interiors of the
 				      *  library, you will not usually
@@ -1873,7 +1873,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the @p{used} flag. You
+				      *  Set the @p used flag. You
 				      *  should know quite exactly
 				      *  what you are doing of you
 				      *  touch this function. It is
@@ -1883,7 +1883,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the @p{used} flag. You
+				      *  Clear the @p used flag. You
 				      *  should know quite exactly
 				      *  what you are doing of you
 				      *  touch this function. It is
@@ -1927,13 +1927,13 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer of this
-				      * hex to @p{p}.
+				      * hex to @p p.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
 				      * Reset the user pointer of this
-				      * hex to a @p{NULL} pointer.
+				      * hex to a @p NULL pointer.
 				      */
     void clear_user_pointer () const;
 
@@ -1985,21 +1985,21 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * object and all of its
 				      * descendants. The same holds as
 				      * said for the
-				      * @ref{recursively_set_user_pointer}
+				      * recursively_set_user_pointer()
 				      * function.
 				      */
     void recursively_clear_user_pointer () const;
 
 				     /**
 				      *  Return a pointer to the
-				      *  @p{i}th child.
+				      *  @p ith child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<3, dim> >
     child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the
-				      *  @p{i}th child.  The level of
+				      *  @p ith child.  The level of
 				      *  the child is one higher than
 				      *  that of the present cell.  If
 				      *  the child does not exist, -1
@@ -2040,7 +2040,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * refined. Note that not all its
 				      * children are refined that
 				      * often (which is why we prepend
-				      * @p{max_}), the returned number
+				      * @p max_), the returned number
 				      * is rather the maximum number
 				      * of refinement in any branch of
 				      * children of this object.
@@ -2095,7 +2095,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * possible for @p{dim>3};
 				      * however, for @p{dim==3}, a hex
 				      * is a cell and the
-				      * @ref{CellAccessor} class
+				      * CellAccessor class
 				      * offers another possibility to
 				      * determine whether a cell is at
 				      * the boundary or not.
@@ -2178,20 +2178,20 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 
                                      /**
                                       * Return whether the face with
-                                      * index @p{face} has its normal
+                                      * index @p face has its normal
                                       * pointing in the standard
-                                      * direction (@p{true}) or
+                                      * direction (@p true) or
                                       * whether it is the opposite
-                                      * (@p{false}). Which is the
+                                      * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * @ref{Triangulation} class.  In
+                                      * Triangulation class.  In
                                       * 1d and 2d, this is always
-                                      * @p{true}, but in 3d it may be
+                                      * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * @ref{Triangulation} class.
+                                      * Triangulation class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -2202,14 +2202,14 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 
                                      /**
                                       * Set whether the quad with
-                                      * index @p{face} has its normal
+                                      * index @p face has its normal
                                       * pointing in the standard
-                                      * direction (@p{true}) or
+                                      * direction (@p true) or
                                       * whether it is the opposite
-                                      * (@p{false}). Which is the
+                                      * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * @ref{Triangulation} class.
+                                      * Triangulation class.
                                       *
                                       * This function is only for
                                       * internal use in the
@@ -2228,9 +2228,9 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  used in a context like
 				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the
-				      *  object pointed to by @p{b} to
+				      *  object pointed to by @p b to
 				      *  the object pointed to by
-				      *  @p{a} and since accessors are
+				      *  @p a and since accessors are
 				      *  not real but virtual objects,
 				      *  this operation is not useful
 				      *  for iterators on
@@ -2317,7 +2317,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 				     /**
 				      *  Return a pointer to the
-				      *  @p{i}th neighbor.  If the
+				      *  @p ith neighbor.  If the
 				      *  neighbor does not exist, an
 				      *  invalid iterator is returned.
 				      */
@@ -2326,7 +2326,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 				     /**
 				      *  Return the index of the
-				      *  @p{i}th neighbor.  If the
+				      *  @p ith neighbor.  If the
 				      *  neighbor does not exist, its
 				      *  index is -1.
 				      */
@@ -2334,16 +2334,16 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
     				     /**
 				      *  Return the level of the
-				      *  @p{i}th neighbor.  If the
+				      *  @p ith neighbor.  If the
 				      *  neighbor does not exist, its
 				      *  level is -1.
 				      */
     int neighbor_level (const unsigned int i) const;
 
 				     /**
-				      *  Set the neighbor @p{i} of
+				      *  Set the neighbor @p i of
 				      *  this cell to the cell pointed
-				      *  to by @p{pointer}.  This line
+				      *  to by @p pointer.  This line
 				      *  must be used.
 				      */
     void set_neighbor (const unsigned int i,
@@ -2353,7 +2353,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * Return the how-many'th
 				      * neighbor this cell is of
 				      * @p{cell->neighbor(neighbor)},
-				      * i.e. return the number @p{n}
+				      * i.e. return the number @p n
 				      * such that
 				      * @p{cell->neighbor(neighbor)->neighbor(n)==cell}. This
 				      * function is the right one if
@@ -2368,7 +2368,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * (i.e. @p{cell->neighbor(neighbor)->level()}
 				      * needs to be equal to
 				      * @p{cell->level()}. Use the
-				      * @p{neighbor_of_coarser_neighbor}
+				      * @p neighbor_of_coarser_neighbor
 				      * function in that case.
 				      */
     unsigned int neighbor_of_neighbor (const unsigned int neighbor) const;
@@ -2376,7 +2376,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				     /**
 				      * This function is a
 				      * generalization of the
-				      * @p{neighbor_of_neighbor}
+				      * @p neighbor_of_neighbor
 				      * function for the case of a
 				      * coarser neighbor. It returns a
 				      * pair of numbers, face_no and
@@ -2391,11 +2391,11 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     neighbor_of_coarser_neighbor (const unsigned int neighbor) const;
     
 				     /**
-				      *  Return whether the @p{i}th
+				      *  Return whether the @p ith
 				      *  vertex or face (depending on
 				      *  the dimension) is part of the
 				      *  boundary. This is true, if
-				      *  the @p{i}th neighbor does not
+				      *  the @p ith neighbor does not
 				      *  exist.
 				      */
     bool at_boundary (const unsigned int i) const;
@@ -2414,7 +2414,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  interiors of all faces are in
 				      *  the interior of the
 				      *  domain. For the latter case,
-				      *  the @p{has_boundary_lines}
+				      *  the @p has_boundary_lines
 				      *  function is the right one to
 				      *  ask.
 				      */
@@ -2422,7 +2422,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 				     /**
 				      * This is a slight variation to
-				      * the @p{at_boundary} function:
+				      * the @p at_boundary function:
 				      * for 1 and 2 space dimensions,
 				      * it is equivalent, for three
 				      * space dimensions it returns
@@ -2475,7 +2475,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 				     /**
 				      *  Return a pointer to the
-				      *  @p{i}th child. Overloaded
+				      *  @p ith child. Overloaded
 				      *  version which returns a more
 				      *  reasonable iterator class.
 				      */
@@ -2484,7 +2484,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 
 				     /**
 				      * Return an iterator to the
-				      * @p{i}th face of this cell.
+				      * @p ith face of this cell.
 				      *
 				      * This function is not
 				      * implemented in 1D, and maps to
@@ -2516,17 +2516,17 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * of the neighbor cell the
                                       * present cell is bordering on
                                       * (this is what the
-                                      * @p{neighbor_of_neighbor}
+                                      * @p neighbor_of_neighbor
                                       * function does), and then
                                       * asking
-                                      * @p{GeometryInfo::child_cell_on_subface}
+                                      * @p GeometryInfo::child_cell_on_subface
                                       * for the index of the
                                       * child. However, the function
                                       * is more complicated in 3d,
                                       * since there faces may have
                                       * more than one orientation, and
                                       * we have to use
-                                      * @p{face_orientation} for both
+                                      * @p face_orientation for both
                                       * this and the neighbor cell to
                                       * figure out which cell we want
                                       * to have.
@@ -2575,7 +2575,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     bool active () const;
 
 				     /**
-				      * Test whether the point @p{p}
+				      * Test whether the point @p p
 				      * is inside this cell. Points on
 				      * the boundary are counted as
 				      * being inside the cell.
@@ -2615,8 +2615,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  like <tt>iterator a,b;
 				      *  *a=*b;</tt>. Since the meaning is
 				      *  to copy the object pointed to
-				      *  by @p{b} to the object
-				      *  pointed to by @p{a} and since
+				      *  by @p b to the object
+				      *  pointed to by @p a and since
 				      *  accessors are not real but
 				      *  virtual objects, this
 				      *  operation is not useful for

@@ -41,21 +41,21 @@ template <typename> class Vector;
 /**
  * Block matrix composed of different single matrices.
  *
- * Given a set of arbitrary matrices @p{A_i}, this class implements a
+ * Given a set of arbitrary matrices @p A_i, this class implements a
  * block matrix with block entries of the form @p{M_{jk} = s_{jk}A_i}.
- * Each @p{A_i} may be used several times with different prefix.
+ * Each @p A_i may be used several times with different prefix.
  *
- * Non-zero entries are registered by the function @p{enter}, zero
- * entries are not stored at all. Using @p{enter} with the same
+ * Non-zero entries are registered by the function @p enter, zero
+ * entries are not stored at all. Using @p enter with the same
  * location @p{(i,j)} several times will add the corresponding
  * matrices in matrix-vector multiplications.
  *
  * @sect3{Requirements}
  *
- * The template argument @p{MATRIX} is a class providing the the
- * matrix-vector multiplication functions @p{vmult} etc. defined in
- * this class, but with arguments of type @p{VECTOR} instead of
- * @p{BlockVector<VECTOR>}. @ref{SparseMatrix} is a possible entry
+ * The template argument @p MATRIX is a class providing the the
+ * matrix-vector multiplication functions @p vmult etc. defined in
+ * this class, but with arguments of type @p VECTOR instead of
+ * @p{BlockVector<VECTOR>}. SparseMatrix is a possible entry
  * type.
  *
  * @author Guido Kanschat, 2000, 2001
@@ -106,7 +106,7 @@ class BlockMatrixArray : public Subscriptor
   
 				     /**
 				      * Matrix-vector multiplication
-				      * adding to @p{dst}.
+				      * adding to @p dst.
 				      */
     template <class number>
     void vmult_add (BlockVector<number>& dst,
@@ -123,7 +123,7 @@ class BlockMatrixArray : public Subscriptor
 				     /**
 				      * Transposed matrix-vector
 				      * multiplication adding to
-				      * @p{dst}.
+				      * @p dst.
 				      */
     template <class number>
     void Tvmult_add (BlockVector<number>& dst,
@@ -140,7 +140,7 @@ class BlockMatrixArray : public Subscriptor
 				      * Internal data structure.
 				      *
 				      * For each entry of a
-				      * @p{BlockMatrixArray}, its
+				      * @p BlockMatrixArray, its
 				      * position, matrix, prefix and
 				      * optional transposition must be
 				      * stored. This structure
@@ -222,12 +222,12 @@ class BlockMatrixArray : public Subscriptor
  * matrix. Then, forward or backward insertion is performed
  * block-wise. The diagonal blocks are NOT inverted for this purpose!
  *
- * While block indices may be duplicated (see @ref{BlockMatrixArray})
+ * While block indices may be duplicated (see BlockMatrixArray)
  * to add blocks, this is not allowed on the diagonal. A short
  * computation reveals why.
  *
  * Like for all preconditioners, the preconditioning operation is
- * performed by the @p{vmult} member function.
+ * performed by the @p vmult member function.
  *
  * The implementation may be a little clumsy, but it should be
  * sufficient as long as the block sizes are much larger than the
@@ -258,7 +258,7 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
   
 				     /**
 				      * Preconditioning
-				      * adding to @p{dst}.
+				      * adding to @p dst.
 				      */
     template <class number>
     void vmult_add (BlockVector<number>& dst,
@@ -273,7 +273,7 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
   
 				     /**
 				      * Transposed preconditioning
-				      * adding to @p{dst}.
+				      * adding to @p dst.
 				      */
     template <class number>
     void Tvmult_add (BlockVector<number>& dst,

@@ -30,7 +30,7 @@ template <int>      class FEValuesBase;
 /**
  * This is an abstract class which provides the functionality to generate
  * patches for output by base classes from data vectors on a grid. It allows
- * to store a pointer to a @ref{DoFHandler} object and one or more pointers to
+ * to store a pointer to a DoFHandler object and one or more pointers to
  * node and cell data denoting functions on the grid which shall later
  * be written in any of the implemented data formats.
  *
@@ -38,11 +38,11 @@ template <int>      class FEValuesBase;
  * @sect3{User visible interface}
  *
  * The user visible interface of this class consists of functions which allow
- * a user to make a @ref{DoFHandler} object known to this class and to add data
+ * a user to make a DoFHandler object known to this class and to add data
  * vectors which will later be written to a file in some format. Instead of
  * pondering about the different functions, an example is probably the best
  * way:
- * @begin{verbatim}
+ * @verbatim
  *   ...
  *   ...   // compute solution, which contains nodal values
  *   ...
@@ -63,10 +63,10 @@ template <int>      class FEValuesBase;
  *   data_out.write_xxx (output_file);
  *
  *   data_out.clear();
- * @end{verbatim}
+ * @endverbatim
  *
- * @p{attach_dof_handler} tells this class that all future operations are to take
- * place with the @ref{DoFHandler} object and the triangulation it lives on. We then
+ * @p attach_dof_handler tells this class that all future operations are to take
+ * place with the DoFHandler object and the triangulation it lives on. We then
  * add the solution vector and the error estimator; note that they have different
  * dimensions, because the solution is a nodal vector, here consisting of two
  * components ("x-displacement" and "y-displacement") while the error estimator
@@ -74,32 +74,32 @@ template <int>      class FEValuesBase;
  * to give a name to each component of the vector, which is done through an object
  * of type @p{vector<string>} as second argument; if only one component is in the
  * vector, for example if we are adding cell data as in the second case, or if
- * the finite element used by the @ref{DoFHandler} has only one component, then you
- * can use the second @p{add_data_vector} function which takes a @p{string} instead
+ * the finite element used by the DoFHandler has only one component, then you
+ * can use the second @p add_data_vector function which takes a @p string instead
  * of the @p{vector<string>}.
  *
  * You should note that this class does not copy the vector given to it through
- * the @p{add_data_vector} functions, for memory consumption reasons. It only
+ * the @p add_data_vector functions, for memory consumption reasons. It only
  * stores a reference to it, so it is in your responsibility to make sure that
  * the data vectors exist long enough.
  *
  * After adding all data vectors, you need to call a function which generates
  * the patches for output from the stored data. This function is here called
- * @p{build_patches}, but the naming is up to the derived class that actually
+ * @p build_patches, but the naming is up to the derived class that actually
  * implements this.
  *
- * Finally, you write the data in one format or other, indicated by @p{write_xxx},
+ * Finally, you write the data in one format or other, indicated by @p write_xxx,
  * to a file and may want to clear this object as soon as possible to reduce
  * memory requirements.
  *
- * Please note, that in the example above, an object of type @ref{DataOut} was
+ * Please note, that in the example above, an object of type DataOut was
  * used, i.e. an object of a derived class. This is necessary since this
  * class does not provide means to actually generate the patches, only aids to
  * store and access data.
  *
- * Note that the base class of this class, @ref{DataOutInterface} offers several
+ * Note that the base class of this class, DataOutInterface offers several
  * functions to ease programming with run-time determinable output formats
- * (i.e. you need not use a fixed format by calling @p{write_xxx} in the above
+ * (i.e. you need not use a fixed format by calling @p write_xxx in the above
  * example, but you can select it by a run-time parameter without having
  * to write the @p{if () ... else ...} clauses yourself), and also functions
  * and classes offering ways to control the appearance of the output by
@@ -124,8 +124,8 @@ template <int>      class FEValuesBase;
  * possible in this respect.
  *
  * For this reason, it is left to a derived class to provide a
- * function, named usually @p{build_patches} or the like, which fills
- * the @p{patches} array of this class.
+ * function, named usually @p build_patches or the like, which fills
+ * the @p patches array of this class.
  *
  * Regarding the templates of this class, it needs three values: first
  * the space dimension in which the triangulation and the DoF handler
@@ -135,7 +135,7 @@ template <int>      class FEValuesBase;
  * the result of a computation exploiting rotational symmetry in the
  * original domain (in which the space dimension of the output would
  * be one higher than that of the DoF handler, see the
- * @ref{DataOut_Rotation} class), or one might conceive that one could
+ * DataOut_Rotation() class), or one might conceive that one could
  * write a class that only outputs the solution on a cut through the
  * domain, in which case the space dimension of the output is less
  * than that of the DoF handler. The last template argument denotes
@@ -143,7 +143,7 @@ template <int>      class FEValuesBase;
  * usually, this dimension is the same as the dimensio of the patches
  * themselves (which is also the default value of the template
  * parameter), but there might be cases where this is not so. For
- * example, in the @ref{DataOut_Faces} class, patches are generated
+ * example, in the DataOut_Faces() class, patches are generated
  * from faces of the triangulation. Thus, the dimension of the patch
  * is one less than the dimension of the embedding space, which is, in
  * this case, equal to the dimension of the triangulation and DoF
@@ -162,20 +162,20 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				     /**
 				      * Type describing what the
 				      * vector given to
-				      * @ref{add_data_vector} is: a
+				      * add_data_vector() is: a
 				      * vector that has one entry per
 				      * degree of freedom in a
-				      * @ref{DoFHandler} object (such
+				      * DoFHandler object (such
 				      * as solution vectors), or one
 				      * entry per cell in the
 				      * triangulation underlying the
-				      * @ref{DoFHandler} object (such
+				      * DoFHandler object (such
 				      * as error per cell data). The
-				      * value @p{type_automatic} tells
-				      * @ref{add_data_vector} to find
+				      * value @p type_automatic tells
+				      * add_data_vector() to find
 				      * out itself (see the
 				      * documentation of
-				      * @p{add_data_vector} for the
+				      * @p add_data_vector for the
 				      * method used).
 				      */
     enum DataVectorType {
@@ -242,8 +242,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * case, you can change the last
 				      * argument of the function from
 				      * its default value
-				      * @p{type_automatic} to either
-				      * @p{type_dof_data} or @p{type_cell_data},
+				      * @p type_automatic to either
+				      * @p type_dof_data or @p type_cell_data,
 				      * depending on what the vector
 				      * represents. Apart from this
 				      * corner case, you can leave the
@@ -268,16 +268,16 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * shall only contain characters
 				      * which are letters, underscore
 				      * and a few other ones. Refer to
-				      * the @p{ExcInvalidCharacter}
+				      * the @p ExcInvalidCharacter
 				      * exception declared in this
 				      * class to see which characters
 				      * are valid and which are not.
 				      *
 				      * The actual type for the template
 				      * argument may be any vector type from
-				      * which @ref{FEValue} can extract values
+				      * which FEValue can extract values
 				      * on a cell using the
-				      * @p{get_function_values} function.
+				      * @p get_function_values function.
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR                   &data,
@@ -295,24 +295,24 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * what this function takes. It
 				      * simply relays its arguments
 				      * after a conversion of the
-				      * @p{name} to a vector of
+				      * @p name to a vector of
 				      * strings, to the other
-				      * @p{add_data_vector} function
+				      * @p add_data_vector function
 				      * above.
 				      *
-				      * If @p{data} is a vector with
+				      * If @p data is a vector with
 				      * multiple components this
 				      * function will generate
 				      * distinct names for all
 				      * components by appending an
 				      * underscore and the number of
-				      * each component to @p{name}
+				      * each component to @p name
 				      *
 				      * The actual type for the template
 				      * argument may be any vector type from
-				      * which @ref{FEValue} can extract values
+				      * which FEValue can extract values
 				      * on a cell using the
-				      * @p{get_function_values} function.
+				      * @p get_function_values function.
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR         &data,
@@ -325,7 +325,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * output of a new set of vectors
 				      * without supplying the DoF
 				      * handler again. Therefore, the
-				      * @ref{DataOut} object can be used
+				      * DataOut object can be used
 				      * in an algebraic context. Note
 				      * that besides the data vectors
 				      * also the patches already
@@ -339,7 +339,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * to data vectors and to the DoF
 				      * handler object. This function
 				      * may be useful when you have
-				      * called the @p{build_patches}
+				      * called the @p build_patches
 				      * function of derived class,
 				      * since then the patches are
 				      * built and the input data is no
@@ -359,7 +359,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * This function can be used to
                                       * merge the patches that were
                                       * created using the
-                                      * @p{build_patches} function of
+                                      * @p build_patches function of
                                       * the object given as argument
                                       * into the list of patches
                                       * created by this object. This
@@ -367,7 +367,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * for example, a domain
                                       * decomposition algorithm where
                                       * each block is represented by a
-                                      * @ref{DoFHandler} of its own,
+                                      * DoFHandler of its own,
                                       * but one wants to output the
                                       * solution on all the blocks at
                                       * the same time.
@@ -383,7 +383,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * both objects overlap in space.
                                       *
                                       * If you call
-                                      * @ref{build_patches} for this
+                                      * build_patches() for this
                                       * object after merging in
                                       * patches, the previous state is
                                       * overwritten, and the merged-in
@@ -412,7 +412,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * data vectors and the DoF
 				      * handler. You have to set all
 				      * data entries again using the
-				      * @p{add_data_vector}
+				      * @p add_data_vector
 				      * function. The pointer to the
 				      * dof handler is cleared as
 				      * well, along with all other
@@ -481,7 +481,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
   protected:
     				     /**
                                       * For each vector that has been added
-                                      * through the @ref{add_data_vector}
+                                      * through the add_data_vector()
                                       * functions, we need to keep track of a
                                       * pointer to it, and allow data
                                       * extraction from it when we generate
@@ -526,7 +526,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         get_cell_data_value (const unsigned int cell_number) const = 0;
 
                                          /**
-                                          * Given a @p{FEValuesBase} object,
+                                          * Given a @p FEValuesBase object,
                                           * extract the values on the present
                                           * cell from the vector we actually
                                           * store.
@@ -537,7 +537,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                              std::vector<double>             &patch_values) const = 0;
         
                                          /**
-                                          * Given a @p{FEValuesBase} object,
+                                          * Given a @p FEValuesBase object,
                                           * extract the values on the present
                                           * cell from the vector we actually
                                           * store. This function does the same
@@ -600,7 +600,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         get_cell_data_value (const unsigned int cell_number) const;
 
                                          /**
-                                          * Given a @p{FEValuesBase} object,
+                                          * Given a @p FEValuesBase object,
                                           * extract the values on the present
                                           * cell from the vector we actually
                                           * store.
@@ -611,7 +611,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                              std::vector<double>             &patch_values) const;
         
                                          /**
-                                          * Given a @p{FEValuesBase} object,
+                                          * Given a @p FEValuesBase object,
                                           * extract the values on the present
                                           * cell from the vector we actually
                                           * store. This function does the same
@@ -650,7 +650,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 
 				     /**
 				      * Abbreviate the somewhat lengthy
-				      * name for the @p{Patch} class.
+				      * name for the @p Patch class.
 				      */
     typedef ::DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
 
@@ -673,7 +673,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 
 				     /**
 				      * This is a list of patches that is
-				      * created each time @p{build_patches}
+				      * created each time @p build_patches
 				      * is called. These patches are used
 				      * in the output routines of the base
 				      * classes.
@@ -700,7 +700,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				     /**
 				      * Make all template siblings
 				      * friends. Needed for the
-				      * @p{merge_patches} function.
+				      * @p merge_patches function.
 				      */
     template <int,int,int> friend class DataOut_DoFData;
 
@@ -735,13 +735,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 
 /**
  * This class is an actual implementation of the functionality proposed by
- * the @ref{DataOut_DoFData} class. It offers a function @p{build_patches} that
+ * the DataOut_DoFData() class. It offers a function @p build_patches that
  * generates the patches to be written in some graphics format from the data
  * stored in the base class. Most of the interface and an example of its
  * use is described in the documentation of the base class.
  *
- * The only thing this class offers is the function @p{build_patches} which
- * loops over all cells of the triangulation stored by the @p{attach_dof_handler}
+ * The only thing this class offers is the function @p build_patches which
+ * loops over all cells of the triangulation stored by the @p attach_dof_handler
  * function of the base class and convert the data on these to actual patches
  * which are the objects that are later output by the functions of the
  * base classes. You can give a parameter to the function which determines
@@ -750,7 +750,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * for quadratic elements you may want to choose two, for cubic elements three,
  * and so on.
  *
- * Note that after having called @p{build_patches} once, you can call one or
+ * Note that after having called @p build_patches once, you can call one or
  * more of the @p{write_*} functions of the base classes. You can therefore
  * output the same data in more than one format without having to rebuild
  * the patches.
@@ -758,13 +758,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  *
  * @sect3{User interface information}
  *
- * The base classes of this class, @ref{DataOutBase}, @ref{DataOutInterface} and
- * @ref{DataOut_DoFData} offer several interfaces of their own. Refer to the
- * @ref{DataOutBase} class's documentation for a discussion of the different
- * output formats presently supported, @ref{DataOutInterface} for ways of
+ * The base classes of this class, DataOutBase, DataOutInterface and
+ * DataOut_DoFData() offer several interfaces of their own. Refer to the
+ * DataOutBase class's documentation for a discussion of the different
+ * output formats presently supported, DataOutInterface for ways of
  * selecting which format to use upon output at run-time and without
  * the need to adapt your program when new formats become available, as
- * well as for flags to determine aspects of output. The @ref{DataOut_DoFData}
+ * well as for flags to determine aspects of output. The DataOut_DoFData()
  * class's documentation has an example of using nodal data to generate
  * output.
  *
@@ -776,11 +776,11 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * small to be seen individually) or because you only want to see a certain
  * region of the domain, or for some other reason.
  *
- * For this, internally the @p{build_patches} function does not generate
+ * For this, internally the @p build_patches function does not generate
  * the sequence of cells to be converted into patches itself, but relies
- * on the two functions @p{first_cell} and @p{next_cell}. By default, they
+ * on the two functions @p first_cell and @p next_cell. By default, they
  * return the first active cell, and the next active cell, respectively.
- * Since they are @p{virtual} functions, you may overload them to select other
+ * Since they are @p virtual functions, you may overload them to select other
  * cells for output. If cells are not active, interpolated values are taken
  * for output instead of the exact values on active cells.
  *
@@ -829,7 +829,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
     
 				     /**
 				      * Return the next cell after
-				      * @p{cell} which we want output
+				      * @p cell which we want output
 				      * for.  If there are no more
 				      * cells, @p{dofs->end()} shall
 				      * be returned.
@@ -840,9 +840,9 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * other cells in a derived
 				      * class. Note that the default
 				      * implementation assumes that
-				      * the given @p{cell} is active,
+				      * the given @p cell is active,
 				      * which is guaranteed as long as
-				      * @p{first_cell} is also used
+				      * @p first_cell is also used
 				      * from the default
 				      * implementation. Overloading
 				      * only one of the two functions
@@ -867,12 +867,12 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * globally to avoid allocation
 				      * of memory in the threads.
 				      *
-				      * The @p{index_to_patch_map} is
+				      * The @p index_to_patch_map is
 				      * an array that stores for index
 				      * @p{[i][j]} the number of the
 				      * patch that associated with the
-				      * cell with index @p{j} on level
-				      * @p{i}. This information is set
+				      * cell with index @p j on level
+				      * @p i. This information is set
 				      * up prior to generation of the
 				      * patches, and is needed to
 				      * generate neighborship
@@ -891,7 +891,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
         std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
     };
 				     /**
-				      * Builds every @p{n_threads}'s
+				      * Builds every @p n_threads's
 				      * patch. This function may be
 				      * called in parallel.
 				      * If multithreading is not

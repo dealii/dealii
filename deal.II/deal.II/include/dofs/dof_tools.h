@@ -42,7 +42,7 @@ template <int dim> class Mapping;
  * documentation stating some commonalities.
  *
  * All member functions are static, so there is no need to create an
- * object of class @ref{DoFTools}.
+ * object of class DoFTools.
  *
  *
  * @sect3{Setting up sparsity patterns}
@@ -76,11 +76,11 @@ template <int dim> class Mapping;
  * of freedom on the boundary. What is needed in this case is a
  * numbering of the boundary degrees of freedom, starting from zero on
  * and not considering the degrees of freedom in the interior. The
- * @p{map_dof_to_boundary_indices} function does exactly this, by
+ * @p map_dof_to_boundary_indices function does exactly this, by
  * providing a vector with as many entries as there are degrees of
  * freedom on the whole domain, with each entry being the number in
  * the numbering of the boundary or
- * @ref{DoFHandler}@p{::invalid_dof_index} if the dof is not on the
+ * DoFHandler@p ::invalid_dof_index if the dof is not on the
  * boundary. You should always use this function to get the mapping
  * between local (boundary) and the global numbers, for example to
  * build the mass matrix on the boundary, or to get the global index
@@ -98,7 +98,7 @@ template <int dim> class Mapping;
  * algorithm, you are better off if you just accept the mapping `as
  * is'.
  *
- * Actually, there are two @p{map_dof_to_boundary_indices} functions,
+ * Actually, there are two @p map_dof_to_boundary_indices functions,
  * one producing a numbering for all boundary degrees of freedom and
  * one producing a numbering for only parts of the boundary, namely
  * those parts for which the boundary indicator is listed in a set of
@@ -113,11 +113,11 @@ template <int dim> class Mapping;
  * indices of degrees of freedom on different parts may be intermixed.
  *
  * Degrees of freedom on the boundary but not on one of the specified
- * boundary parts are given the index @p{invalid_dof_index}, as if
+ * boundary parts are given the index @p invalid_dof_index, as if
  * they were in the interior. If no boundary indicator was given or if
  * no face of a cell has a boundary indicator contained in the given
  * list, the vector of new indices consists solely of
- * @p{invalid_dof_index}s.
+ * @p invalid_dof_indexs.
  *
  * The question what a degree of freedom on the boundary is, is not so
  * easy.  It should really be a degree of freedom of which the
@@ -125,10 +125,10 @@ template <int dim> class Mapping;
  * least for Lagrange elements this definition is equal to the
  * statement that the off-point of the shape function, i.e. the point
  * where the function assumes its nominal value (for Lagrange elements
- * this is the point where it has the function value @p{1}), is
+ * this is the point where it has the function value @p 1), is
  * located on the boundary. We do not check this directly, the
  * criterion is rather defined through the information the finite
- * element class gives: the @ref{FiniteElementBase} class defines the
+ * element class gives: the FiniteElementBase class defines the
  * numbers of basis functions per vertex, per line, and so on and the
  * basis functions are numbered after this information; a basis
  * function is to be considered to be on the face of a cell (and thus
@@ -166,7 +166,7 @@ class DoFTools
 				      * correspond to degrees of
 				      * freedom of at least one common
 				      * cell. Therefore,
-				      * @p{make_sparsity_pattern} just
+				      * @p make_sparsity_pattern just
 				      * loops over all cells and
 				      * enters all couplings local to
 				      * that cell. As the generation
@@ -183,19 +183,19 @@ class DoFTools
 				      * of hanging nodes.  They have
 				      * to be taken care of by a call
 				      * to
-				      * @ref{ConstraintMatrix}@p{::condense()}
+				      * ConstraintMatrix@p{::condense()}
 				      * afterwards.
 				      *
 				      * Remember using
-				      * @ref{SparsityPattern}@p{::compress()}
+				      * SparsityPattern@p{::compress()}
 				      * after generating the pattern.
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
-				      * @ref{SparsityPattern},
-				      * @ref{CompressedSparsityPattern},
-				      * @ref{BlockSparsityPattern},
-				      * @ref{CompressedBlockSparsityPattern},
+				      * SparsityPattern,
+				      * CompressedSparsityPattern,
+				      * BlockSparsityPattern,
+				      * CompressedBlockSparsityPattern,
 				      * or any other class that
 				      * satisfies similar
 				      * requirements. It is assumed
@@ -222,48 +222,48 @@ class DoFTools
 				      * ector valued finite elements.
 				      * This function does mostly the
 				      * same as the previous
-				      * @p{make_sparsity_pattern}, but
+				      * @p make_sparsity_pattern, but
 				      * it is specialized for vector
 				      * finite elements and allows to
 				      * specify which variables couple
 				      * in which equation. For
 				      * example, if wanted to solve
 				      * the Stokes equations,
-				      * @begin{verbatim}
+				      * @verbatim
 				      * -\Delta \vec u + \nabla p = 0,
 				      * \div u                    = 0
-				      * @end{verbatim}
+				      * @endverbatim
 				      * in two space dimensions,
 				      * using stable Q2/Q1 mixed
-				      * elements (using the @ref{FESystem}
+				      * elements (using the FESystem
 				      * class), then you don't want
 				      * all degrees of freedom to
 				      * couple in each equation. You
 				      * rather may want to give the
 				      * following pattern of
 				      * couplings:
-				      * @begin{verbatim}
+				      * @verbatim
 				      *   1 0 1
 				      *   0 1 1
 				      *   1 1 0
-				      * @end{verbatim}
+				      * @endverbatim
 				      * where "1" indicates that two
 				      * variables (i.e. components of
-				      * the @ref{FESystem}) couple in the
+				      * the FESystem) couple in the
 				      * respective equation, and a "0"
 				      * means no coupling, in which
 				      * case it is not necessary to
 				      * allocate space in the matrix
 				      * structure. Obviously, the mask
 				      * refers to components of the
-				      * composed @ref{FESystem}, rather
+				      * composed FESystem, rather
 				      * than to the degrees of freedom
 				      * contained in there.
 				      *
 				      * This function is designed to
 				      * accept a mask, like the one
 				      * shown above, through the
-				      * @p{mask} parameter, which
+				      * @p mask parameter, which
 				      * contains boolean values. It
 				      * builds the matrix structure
 				      * just like the previous
@@ -276,10 +276,10 @@ class DoFTools
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
-				      * @ref{SparsityPattern},
-				      * @ref{CompressedSparsityPattern},
-				      * @ref{BlockSparsityPattern},
-				      * @ref{CompressedBlockSparsityPattern},
+				      * SparsityPattern,
+				      * CompressedSparsityPattern,
+				      * BlockSparsityPattern,
+				      * CompressedBlockSparsityPattern,
 				      * or any other class that
 				      * satisfies similar
 				      * requirements.
@@ -316,21 +316,21 @@ class DoFTools
 				      * nodes.  The sparsity pattern
 				      * is not compressed, since if
 				      * you want to call
-				      * @ref{ConstraintMatrix}@p{::condense(1)}
+				      * ConstraintMatrix@p{::condense(1)}
 				      * afterwards, new entries have
 				      * to be added. However, if you
 				      * don't want to call
-				      * @ref{ConstraintMatrix}@p{::condense(1)},
+				      * ConstraintMatrix@p{::condense(1)},
 				      * you have to compress the
 				      * matrix yourself, using
-				      * @ref{SparsityPattern}@p{::compress()}.
+				      * SparsityPattern@p{::compress()}.
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
-				      * @ref{SparsityPattern},
-				      * @ref{CompressedSparsityPattern},
-				      * @ref{BlockSparsityPattern},
-				      * @ref{CompressedBlockSparsityPattern},
+				      * SparsityPattern,
+				      * CompressedSparsityPattern,
+				      * BlockSparsityPattern,
+				      * CompressedBlockSparsityPattern,
 				      * or any other class that
 				      * satisfies similar
 				      * requirements. It is assumed
@@ -377,9 +377,9 @@ class DoFTools
 				      * the boundary indicator is listed in the
 				      * set of numbers passed to this function.
 				      *
-				      * In fact, rather than a @p{set}
+				      * In fact, rather than a @p set
 				      * of boundary indicators, a
-				      * @p{map} needs to be passed,
+				      * @p map needs to be passed,
 				      * since most of the functions
 				      * handling with boundary
 				      * indicators take a mapping of
@@ -429,7 +429,7 @@ class DoFTools
 				      * couple across faces of cells.
 				      * This is a replacement of the
 				      * function
-				      * @p{make_sparsity_pattern} for
+				      * @p make_sparsity_pattern for
 				      * discontinuous methods. Since
 				      * the fluxes include couplings
 				      * between neighboring elements,
@@ -490,11 +490,11 @@ class DoFTools
 				      * immediately. The object is not cleared
 				      * before use, so you should make sure
 				      * it containts only constraints you still
-				      * want; otherwise call the @p{clear}
+				      * want; otherwise call the @p clear
 				      * function.
 				      *
 				      * To condense a given sparsity pattern,
-				      * use @ref{ConstraintMatrix}@p{::condense}.
+				      * use ConstraintMatrix@p ::condense.
 				      * Before doing so, you need to close
 				      * the constraint object, which must be
 				      * done after all constraints are entered.
@@ -532,29 +532,29 @@ class DoFTools
 				      * note that the resulting field will not
 				      * be continuous at hanging nodes. This
 				      * can, however, easily be arranged by
-				      * calling the appropraite @p{distribute}
-				      * function of a @ref{ConstraintMatrix}
+				      * calling the appropraite @p distribute
+				      * function of a ConstraintMatrix
 				      * object created for this
-				      * @ref{DoFHandler} object, after the
+				      * DoFHandler object, after the
 				      * vector has been fully assembled.
 				      *
 				      * It is assumed that the number
-				      * of elements in @p{cell_data}
+				      * of elements in @p cell_data
 				      * equals the number of active
 				      * cells. The size of
-				      * @p{dof_data} is adjusted to
+				      * @p dof_data is adjusted to
 				      * the right size.
 				      *
 				      * Note that the input vector may
 				      * be a vector of any data type
 				      * as long as it is convertible
-				      * to @p{double}.  The output
+				      * to @p double.  The output
 				      * vector, being a data vector on
 				      * the grid, always consists of
-				      * elements of type @p{double}.
+				      * elements of type @p double.
 				      *
 				      * In case the finite element
-				      * used by this @ref{DoFHandler}
+				      * used by this DoFHandler
 				      * consists of more than one
 				      * component, you should give
 				      * which component in the output
@@ -569,7 +569,7 @@ class DoFTools
 				      * contents are not changed.
 				      *
 				      * It is assumed that the output
-				      * vector @p{dof_data} already
+				      * vector @p dof_data already
 				      * has the right size,
 				      * i.e. @p{n_dofs()} elements.
 				      *
@@ -594,24 +594,24 @@ class DoFTools
 				      * to certain vector components
 				      * of a vector-valued finite
 				      * element. The bit vector
-				      * @p{select} defines, which
+				      * @p select defines, which
 				      * components of an
-				      * @ref{FESystem} are to be
+				      * FESystem are to be
 				      * extracted from the
-				      * @ref{DoFHandler} @p{dof}. The
-				      * entries in @p{selected_dofs}
+				      * DoFHandler @p dof. The
+				      * entries in @p selected_dofs
 				      * corresponding to degrees of
 				      * freedom belonging to these
 				      * components are then flagged
-				      * @p{true}, while all others are
-				      * set to @p{false}.
+				      * @p true, while all others are
+				      * set to @p false.
 				      *
 				      * The size of
-				      * @p{component_select} shall
+				      * @p component_select shall
 				      * equal the number of components
 				      * in the finite element used by
-				      * @p{dof}. The size of
-				      * @p{selected_dofs} shall equal
+				      * @p dof. The size of
+				      * @p selected_dofs shall equal
 				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
 				      * overwritten.
@@ -630,7 +630,7 @@ class DoFTools
 				      * case, if <em>one</em> shape
 				      * vector component of this
 				      * element is flagged in
-				      * @p{component_select}, then
+				      * @p component_select, then
 				      * this is equivalent to
 				      * selecting <em>all</em> vector
 				      * components corresponding to
@@ -645,7 +645,7 @@ class DoFTools
 
 				     /**
 				      * Do the same thing as
-				      * @p{extract_dofs} for one level
+				      * @p extract_dofs for one level
 				      * of a multi-grid DoF numbering.
 				      */
     template <int dim>
@@ -663,14 +663,14 @@ class DoFTools
 				      * returns its results in the
 				      * last non-default-valued
 				      * parameter which contains
-				      * @p{true} if a degree of
+				      * @p true if a degree of
 				      * freedom is at the boundary and
 				      * belongs to one of the selected
-				      * components, and @p{false}
+				      * components, and @p false
 				      * otherwise.
 				      *
 				      * By specifying the
-				      * @p{boundary_indicator}
+				      * @p boundary_indicator
 				      * variable, you can select which
 				      * boundary indicators the faces
 				      * have to have on which the
@@ -680,11 +680,11 @@ class DoFTools
 				      * boundary indicators are
 				      * accepted.
 				      *
-				      * The size of @p{component_select}
+				      * The size of @p component_select
 				      * shall equal the number of
 				      * components in the finite
-				      * element used by @p{dof}. The
-				      * size of @p{selected_dofs} shall
+				      * element used by @p dof. The
+				      * size of @p selected_dofs shall
 				      * equal
 				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
@@ -724,7 +724,7 @@ class DoFTools
 				      * constraints, i.e. all hanging
 				      * nodes.
 				      *
-				      * The size of @p{selected_dofs}
+				      * The size of @p selected_dofs
 				      * shall equal
 				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
@@ -765,7 +765,7 @@ class DoFTools
 				      * If you want to get a unique
 				      * association of degree of freedom with
 				      * subdomains, use the
-				      * @p{get_subdomain_association}
+				      * @p get_subdomain_association
 				      * function.
 				      */
     template <int dim>
@@ -878,7 +878,7 @@ class DoFTools
 				      * degrees of freedom.
 				      *
 				      * The additional optional
-				      * argument @p{target_component}
+				      * argument @p target_component
 				      * allows for a re-sorting and
 				      * grouping of components. To
 				      * this end, it contains for each
@@ -893,13 +893,13 @@ class DoFTools
 				      * vectors, but want to pack
 				      * several components into the
 				      * same block (for example, when
-				      * you have @p{dim} velocities
+				      * you have @p dim velocities
 				      * and one pressure, to put all
 				      * velocities into one block, and
 				      * the pressure into another).
 				      *
 				      * The result is returned in
-				      * @p{dofs_per_component}.
+				      * @p dofs_per_component.
 				      */
     template <int dim>
     static void
@@ -1101,7 +1101,7 @@ class DoFTools
 				      * to the variable ``q''; zero
 				      * would be ``u'', two would be
 				      * ``lambda''). Furthermore, an
-				      * object of type @ref{IntergridMap}
+				      * object of type IntergridMap
 				      * is needed; this could in
 				      * principle be generated by the
 				      * function itself from the two
@@ -1113,7 +1113,7 @@ class DoFTools
 				      * it. Finally, the computed
 				      * constraints are entered into a
 				      * variable of type
-				      * @ref{ConstraintMatrix}; the
+				      * ConstraintMatrix; the
 				      * constraints are added,
 				      * i.e. previous contents which
 				      * may have, for example, be
@@ -1150,10 +1150,10 @@ class DoFTools
 				      *
 				      * The output of this function is
 				      * a compressed format that can
-				      * be given to the @p{reinit}
+				      * be given to the @p reinit
 				      * functions of the
-				      * @ref{SparsityPattern} ad
-				      * @ref{SparseMatrix} classes.
+				      * SparsityPattern ad
+				      * SparseMatrix classes.
 				      */
     template <int dim>
     static void
@@ -1172,13 +1172,13 @@ class DoFTools
 				      * this operation, @p{mapping[dof]}
 				      * gives the index of the
 				      * degree of freedom with global
-				      * number @p{dof} in the list of
+				      * number @p dof in the list of
 				      * degrees of freedom on the
 				      * boundary.  If the degree of
 				      * freedom requested is not on
 				      * the boundary, the value of
 				      * @p{mapping[dof]} is
-				      * @p{invalid_dof_index}. This
+				      * @p invalid_dof_index. This
 				      * function is mainly used when
 				      * setting up matrices and
 				      * vectors on the boundary from
@@ -1188,7 +1188,7 @@ class DoFTools
 				      * numbers of the trial functions
 				      * local to the boundary.
 				      *
-				      * Prior content of @p{mapping}
+				      * Prior content of @p mapping
 				      * is deleted.
 				      */
     template <int dim>

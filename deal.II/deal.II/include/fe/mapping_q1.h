@@ -36,12 +36,12 @@
  * functions.
  *
  * This function maps the unit cell to a general grid cell with
- * straight lines in @p{d} dimensions (remark that in 3D the surfaces
+ * straight lines in @p d dimensions (remark that in 3D the surfaces
  * may be curved, even if the edges are not). This is the well-known
  * mapping for polyhedral domains.
  *
  * Shape function for this mapping are the same as for the finite
- * element @p{FE_Q} of order 1. Therefore, coupling these two yields
+ * element @p FE_Q of order 1. Therefore, coupling these two yields
  * an isoparametric element.
  *
  * @author Guido Kanschat, Ralf Hartmann, 2000, 2001
@@ -56,10 +56,10 @@ class MappingQ1 : public Mapping<dim>
     MappingQ1 ();
     
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms the point @p p on
 				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns @p{p_real}.
+				      * @p p_real on the real cell
+				      * @p cell and returns @p p_real.
 				      */
     virtual Point<dim>
     transform_unit_to_real_cell (
@@ -67,13 +67,13 @@ class MappingQ1 : public Mapping<dim>
       const Point<dim>                                 &p) const;
     
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms the point @p p on
 				      * the real cell to the point
-				      * @p{p_unit} on the unit cell
-				      * @p{cell} and returns @p{p_unit}.
+				      * @p p_unit on the unit cell
+				      * @p cell and returns @p p_unit.
 				      *
 				      * Uses Newton iteration and the
-				      * @p{transform_unit_to_real_cell}
+				      * @p transform_unit_to_real_cell
 				      * function.
 				      */
     virtual Point<dim>
@@ -83,7 +83,7 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     transform_covariant (Tensor<1,dim>          *begin,
@@ -93,7 +93,7 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     transform_covariant (Tensor<2,dim>          *begin,
@@ -103,7 +103,7 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     transform_contravariant (Tensor<1,dim>          *begin,
@@ -113,7 +113,7 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     transform_contravariant (Tensor<2,dim>          *begin,
@@ -123,77 +123,77 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      *
 				      * Description of effects:
-				      * @begin{itemize}
-				      * @item if @p{update_q_points}
+				      * <ul>
+				      * <li> if @p update_q_points
 				      * is required, the output will
 				      * contain
-				      * @p{update_transformation_values}. This
+				      * @p update_transformation_values. This
 				      * computes the values of the
 				      * transformation basis
 				      * polynomials at the unit cell
 				      * quadrature points.
-				      * @item if any of
-				      * @p{update_covariant_transformation},
-				      * @p{update_contravariant_transformation},
-				      * @p{update_JxW_values},
-				      * @p{update_boundary_forms},
-				      * @p{update_normal_vectors} is
+				      * <li> if any of
+				      * @p update_covariant_transformation,
+				      * @p update_contravariant_transformation,
+				      * @p update_JxW_values,
+				      * @p update_boundary_forms,
+				      * @p update_normal_vectors is
 				      * required, the output will
 				      * contain
-				      * @p{update_transformation_gradients}
+				      * @p update_transformation_gradients
 				      * to compute derivatives of the
 				      * transformation basis
 				      * polynomials.
-				      * @end{itemize}
+				      * </ul>
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      *
 				      * Description of effects if
-				      * @p{flags} contains:
-				      * @begin{itemize}
-				      * @item p{update_q_points} is
+				      * @p flags contains:
+				      * <ul>
+				      * <li> p{update_q_points} is
 				      * copied to the output to
 				      * compute the quadrature points
 				      * on the real cell.
-				      * @item p{update_JxW_values} is
+				      * <li> p{update_JxW_values} is
 				      * copied and requires
-				      * @p{update_boundary_forms} on
+				      * @p update_boundary_forms on
 				      * faces. The latter, because the
 				      * surface element is just the
 				      * norm of the boundary form.
-				      * @item p{update_normal_vectors}
+				      * <li> p{update_normal_vectors}
 				      * is copied and requires
-				      * @p{update_boundary_forms}. The
+				      * @p update_boundary_forms. The
 				      * latter, because the normal
 				      * vector is the normalized
 				      * boundary form.
-				      * @item
+				      * <li>
 				      * p{update_covariant_transformation}
 				      * is copied and requires
-				      * @p{update_contravariant_transformation},
+				      * @p update_contravariant_transformation,
 				      * since it is computed as the
 				      * inverse of the latter.
-				      * @item p{update_JxW_values} is
+				      * <li> p{update_JxW_values} is
 				      * copied and requires
-				      * @p{update_contravariant_transformation},
+				      * @p update_contravariant_transformation,
 				      * since it is computed as one
 				      * over determinant of the
 				      * latter.
-				      * @item p{update_boundary_forms}
+				      * <li> p{update_boundary_forms}
 				      * is copied and requires
-				      * @p{update_contravariant_transformation},
+				      * @p update_contravariant_transformation,
 				      * since the boundary form is
 				      * computed as the contravariant
 				      * image of the normal vector to
 				      * the unit cell.
-				      * @end{itemize}
+				      * </ul>
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
@@ -254,7 +254,7 @@ class MappingQ1 : public Mapping<dim>
 					 /**
 					  * Values of shape
 					  * functions. Access by
-					  * function @p{shape}.
+					  * function @p shape.
 					  *
 					  * Computed once.
 					  */
@@ -263,7 +263,7 @@ class MappingQ1 : public Mapping<dim>
 					 /**
 					  * Values of shape function
 					  * derivatives. Access by
-					  * function @p{derivative}.
+					  * function @p derivative.
 					  *
 					  * Computed once.
 					  */
@@ -277,7 +277,7 @@ class MappingQ1 : public Mapping<dim>
 					  * inverse of the Jacobian
 					  * matrix, which itself is
 					  * stored in the
-					  * @p{contravariant} field of
+					  * @p contravariant field of
 					  * this structure.
 					  *
 					  * Computed on each cell.
@@ -315,23 +315,23 @@ class MappingQ1 : public Mapping<dim>
 					 /**
 					  * Stores the support points of
 					  * the mapping shape functions on
-					  * the @p{cell_of_current_support_points}.
+					  * the @p cell_of_current_support_points.
 					  */
 	std::vector<Point<dim> > mapping_support_points;
 	
 					 /**
 					  * Stores the cell of which the
-					  * @p{mapping_support_points} are
+					  * @p mapping_support_points are
 					  * stored.
 					  */
 	typename DoFHandler<dim>::cell_iterator cell_of_current_support_points;
 	
 					 /**
 					  * Default value of this flag
-					  * is @p{true}. If @p{*this}
+					  * is @p true. If @p{*this}
 					  * is an object of a derived
 					  * class, this flag is set to
-					  * @p{false}.
+					  * @p false.
 					  */
 	bool is_mapping_q1_data;
 
@@ -343,7 +343,7 @@ class MappingQ1 : public Mapping<dim>
 					  * cell. However, since also
 					  * derived classes use this
 					  * class (e.g. the
-					  * @ref{Mapping_Q} class),
+					  * Mapping_Q() class),
 					  * the number of shape
 					  * functions may also be
 					  * different.
@@ -371,7 +371,7 @@ class MappingQ1 : public Mapping<dim>
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
@@ -382,7 +382,7 @@ class MappingQ1 : public Mapping<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
@@ -396,7 +396,7 @@ class MappingQ1 : public Mapping<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
@@ -414,21 +414,21 @@ class MappingQ1 : public Mapping<dim>
 				      * derivatives.
 				      *
 				      * Calls either the
-				      * @p{compute_shapes_virtual} of
+				      * @p compute_shapes_virtual of
 				      * this class or that of the
 				      * derived class, depending on
 				      * whether
 				      * @p{data.is_mapping_q1_data}
-				      * equals @p{true} or @p{false}.
+				      * equals @p true or @p false.
 				      */
     void compute_shapes (const std::vector<Point<dim> > &unit_points,
 			 InternalData &data) const;
 
 				     /**
 				      * Do the computations for the
-				      * @p{get_data} functions. Here,
+				      * @p get_data functions. Here,
 				      * the data vectors of
-				      * @p{InternalData} are
+				      * @p InternalData are
 				      * reinitialized to proper size
 				      * and shape values are computed.
 				      */
@@ -439,14 +439,14 @@ class MappingQ1 : public Mapping<dim>
 
 				     /**
 				      * Do the computations for the
-				      * @p{get_face_data}
+				      * @p get_face_data
 				      * functions. Here, the data
-				      * vectors of @p{InternalData}
+				      * vectors of @p InternalData
 				      * are reinitialized to proper
 				      * size and shape values and
 				      * derivatives are
 				      * computed. Furthermore
-				      * @p{unit_tangential} vectors of
+				      * @p unit_tangential vectors of
 				      * the face are computed.
 				      */
     void compute_face_data (const UpdateFlags flags,
@@ -488,65 +488,65 @@ class MappingQ1 : public Mapping<dim>
 					 InternalData &data) const;
 
 				     /**
-				      * Transforms a point @p{p} on
+				      * Transforms a point @p p on
 				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns @p{p_real}.
+				      * @p p_real on the real cell
+				      * @p cell and returns @p p_real.
 				      *
 				      * This function is called by
-				      * @p{transform_unit_to_real_cell}
+				      * @p transform_unit_to_real_cell
 				      * and multiply (through the
 				      * Newton iteration) by
-				      * @p{transform_real_to_unit_cell_internal}.
+				      * @p transform_real_to_unit_cell_internal.
 				      *
 				      * Takes a reference to an
-				      * @p{InternalData} that must
+				      * @p InternalData that must
 				      * already include the shape
-				      * values at point @p{p} and the
+				      * values at point @p p and the
 				      * mapping support points of the
 				      * cell.
 				      *
-				      * This @p{InternalData} argument
+				      * This @p InternalData argument
 				      * avoids multiple computations
 				      * of the shape values at point
-				      * @p{p} and especially multiple
+				      * @p p and especially multiple
 				      * computations of the mapping
 				      * support points.
 				      */
     Point<dim> transform_unit_to_real_cell_internal (const InternalData &mdata) const;
     
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms the point @p p on
 				      * the real cell to the point
-				      * @p{p_unit} on the unit cell
-				      * @p{cell} by a Newton
+				      * @p p_unit on the unit cell
+				      * @p cell by a Newton
 				      * iteration.
 				      *
 				      * Takes a reference to an
-				      * @p{InternalData} that is
+				      * @p InternalData that is
 				      * assumed to be previously
-				      * created by the @p{get_data}
-				      * function with @p{UpdateFlags}
+				      * created by the @p get_data
+				      * function with @p UpdateFlags
 				      * including
-				      * @p{update_transformation_values}
+				      * @p update_transformation_values
 				      * and
-				      * @p{update_transformation_gradients}
+				      * @p update_transformation_gradients
 				      * and a one point Quadrature
 				      * including the given point
-				      * @p{p_unit}.  Hence this
+				      * @p p_unit.  Hence this
 				      * function assumes that
-				      * @p{mdata} already includes the
+				      * @p mdata already includes the
 				      * transformation shape values
 				      * and gradients computed at
-				      * @p{p_unit}.
+				      * @p p_unit.
 				      *
 				      * These assumptions should be
 				      * fulfilled by the calling
 				      * function. That is up to now
 				      * only the function
-				      * @p{transform_real_to_unit_cell}
+				      * @p transform_real_to_unit_cell
 				      * and its overloaded versions.
-				      * @p{mdata} will be changed by
+				      * @p mdata will be changed by
 				      * this function.
 				      */
     void transform_real_to_unit_cell_internal (const typename Triangulation<dim>::cell_iterator &cell,
@@ -564,7 +564,7 @@ class MappingQ1 : public Mapping<dim>
   private:
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
@@ -573,7 +573,7 @@ class MappingQ1 : public Mapping<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
@@ -582,7 +582,7 @@ class MappingQ1 : public Mapping<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
@@ -591,7 +591,7 @@ class MappingQ1 : public Mapping<dim>
 
 				     /**
 				      * Computes the support points of
-				      * the mapping. For @p{MappingQ1}
+				      * the mapping. For @p MappingQ1
 				      * these are the
 				      * vertices.
 				      */

@@ -108,7 +108,7 @@
  * to the sparse direct solver routines are not multithreading-safe,
  * i.e. at each time there may only be one call to these functions
  * active. You have to synchronise your calls to the functions
- * provided by this class using mutexes (see the @ref{Threads}
+ * provided by this class using mutexes (see the Threads
  * namespace for such classes) to avoid multiple active calls at the
  * same time if you use multithreading. Since you may use this class
  * in different parts of your program, and may not want to use a
@@ -631,7 +631,7 @@ class SparseDirectMA27 : public Subscriptor
  * to the sparse direct solver routines is not multithreading-capable,
  * i.e. at each time there may only be one call to these functions
  * active. You have to synchronise your calls to the functions
- * provided by this class using mutexes (see the @ref{Threads}
+ * provided by this class using mutexes (see the Threads
  * namespace for such classes) to avoid multiple active calls at the
  * same time if you use multithreading. Since you may use this class
  * in different parts of your program, and may not want to use a

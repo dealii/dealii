@@ -65,7 +65,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
-					   // note that @p{lines} is ordered
+					   // note that @p lines is ordered
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -83,8 +83,8 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 
   next_constraint = lines.begin();
 				   // note: in this loop we need not check
-				   // whether @p{next_constraint} is a valid
-				   // iterator, since @p{next_constraint} is
+				   // whether @p next_constraint is a valid
+				   // iterator, since @p next_constraint is
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
@@ -202,7 +202,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 	    
               if (distribute[column] != deal_II_numbers::invalid_unsigned_int)
                                                  // distribute entry at
-                                                 // regular row @p{row}
+                                                 // regular row @p row
                                                  // and irregular column
                                                  // sparsity.get_column_numbers()[j];
                                                  // set old entry to
@@ -240,7 +240,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
               if (distribute[column] == deal_II_numbers::invalid_unsigned_int)
                                                  // distribute entry at
                                                  // irregular row
-                                                 // @p{row} and regular
+                                                 // @p row and regular
                                                  // column
                                                  // column. set
                                                  // old entry to zero
@@ -257,9 +257,9 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
                 }
               else
                                                  // distribute entry at
-                                                 // irregular row @p{row} and
+                                                 // irregular row @p row and
                                                  // irregular column
-                                                 // @p{column} set old entry
+                                                 // @p column set old entry
                                                  // to one if on main
                                                  // diagonal, zero otherwise
                 {
@@ -359,7 +359,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 		    
                   if (distribute[global_col] != deal_II_numbers::invalid_unsigned_int)
                                                      // distribute entry at
-                                                     // regular row @p{row}
+                                                     // regular row @p row
                                                      // and irregular column
                                                      // global_col; set old
                                                      // entry to zero
@@ -400,7 +400,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
                                                      // distribute
                                                      // entry at
                                                      // irregular
-                                                     // row @p{row}
+                                                     // row @p row
                                                      // and regular
                                                      // column
                                                      // global_col. set
@@ -420,9 +420,9 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
                     }
                   else
                                                      // distribute entry at
-                                                     // irregular row @p{row}
+                                                     // irregular row @p row
                                                      // and irregular column
-                                                     // @p{global_col} set old
+                                                     // @p global_col set old
                                                      // entry to one if on
                                                      // main diagonal, zero
                                                      // otherwise
@@ -478,7 +478,7 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
-					   // note that @p{lines} is ordered
+					   // note that @p lines is ordered
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -496,8 +496,8 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 
   next_constraint = lines.begin();
 				   // note: in this loop we need not check
-				   // whether @p{next_constraint} is a valid
-				   // iterator, since @p{next_constraint} is
+				   // whether @p next_constraint is a valid
+				   // iterator, since @p next_constraint is
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
@@ -781,7 +781,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 	{
 					   // this line is constrained
 	  old_line.push_back (-1);
-					   // note that @p{lines} is ordered
+					   // note that @p lines is ordered
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -799,8 +799,8 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 
   next_constraint = lines.begin();
 				   // note: in this loop we need not check
-				   // whether @p{next_constraint} is a valid
-				   // iterator, since @p{next_constraint} is
+				   // whether @p next_constraint is a valid
+				   // iterator, since @p next_constraint is
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist

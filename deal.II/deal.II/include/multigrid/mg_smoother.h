@@ -42,7 +42,7 @@ class MGSmootherIdentity : public MGSmootherBase<VECTOR>
   public:
 				     /**
 				      * Implementation of the
-				      * interface for @p{Multigrid}.
+				      * interface for @p Multigrid.
 				      * This function does nothing,
 				      * which by comparison with the
 				      * definition of this function
@@ -86,7 +86,7 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
 				      * on the interior boundaries between
 				      * the different levels, which are
 				      * needed by the function
-				      * @p{set_zero_interior_boundaries}.
+				      * @p set_zero_interior_boundaries.
 				      *
 				      * Since this function is
 				      * implemented a bit different in
@@ -110,11 +110,11 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
 				      * boundaries between the
 				      * different levels, which are
 				      * needed by the function
-				      * @p{set_zero_interior_boundaries}.
+				      * @p set_zero_interior_boundaries.
 				      *
 				      * The parameter steps indicates
 				      * the number of smoothing steps
-				      * to be executed by @p{smooth}.
+				      * to be executed by @p smooth.
 				      */
     template <int dim>
     MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
@@ -124,7 +124,7 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
 				      * Reset the values of the degrees of
 				      * freedom on interior boundaries between
 				      * different levels to zero in the given
-				      * data vector @p{u}.
+				      * data vector @p u.
 				      *
 				      * Since the coarsest level (@p{level==0})
 				      * has no interior boundaries, this
@@ -170,32 +170,32 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
  *
  * This class performs smoothing on each level. The operation can be
  * controlled by several parameters. First, the relaxation parameter
- * @p{omega} is used in the underlying relaxation method. @p{steps} is
+ * @p omega is used in the underlying relaxation method. @p steps is
  * the number of relaxation steps on the finest level (on all levels
- * if @p{variable} is off). If @p{variable} is @p{true}, the number of
+ * if @p variable is off). If @p variable is @p true, the number of
  * smoothing steps is doubled on each coarser level. This results in a
  * method having the complexity of the W-cycle, but saving grid
  * transfers. This is the method proposed by Bramble at al.
  *
- * The option @p{symmetric} switches on alternating between the
+ * The option @p symmetric switches on alternating between the
  * smoother and its transpose in each step as proposed by Bramble.
  *
- * @p{transpose} and @p{reverse} are similar in the effect that
+ * @p transpose and @p reverse are similar in the effect that
  * instead of the smoother the transposed is used. Typically, this is
  * off for pre-smoothing and on for post-smoothing. While
- * @p{transpose} is the true transposed smoothing operation,
- * @p{reverse} just uses the transposed of the smoother, but the
+ * @p transpose is the true transposed smoothing operation,
+ * @p reverse just uses the transposed of the smoother, but the
  * non-transposed matrix-vector multiplication; this can be used to
  * invert the direction of the Gauss-Seidel method.
  *
- * If you are using block matrices, the second @p{initialize} function
+ * If you are using block matrices, the second @p initialize function
  * offers the possibility to extract a single block for smoothing. In
  * this case, the multigrid method must be used only with the vector
  * associated to that single block.
  *
  * The library contains instantiation for @p{SparseMatrix<.>} and
  * @p{Vector<.>}, where the template arguments are all combinations of
- * @p{float} and @p{double}. Additional instantiations may be created
+ * @p float and @p double. Additional instantiations may be created
  * by including the file mg_smoother.templates.h.
  * 
  * @author Guido Kanschat, 2003
@@ -217,20 +217,20 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 
 				     /**
 				      * Initialize for matrices. The
-				      * parameter @p{matrices} can be
+				      * parameter @p matrices can be
 				      * any object having functions
 				      * @p{get_minlevel()} and
 				      * @p{get_maxlevel()} as well as
 				      * an @p{operator[]} returning a
-				      * reference to @p{MATRIX}. This
+				      * reference to @p MATRIX. This
 				      * function stores pointers to
 				      * the level matrices and
 				      * initializes the smoothing
 				      * operator for each level.
 				      *
-				      * @p{additional_data} is an
+				      * @p additional_data is an
 				      * object of type
-				      * @p{RELAX::AdditionalData} and
+				      * @p RELAX::AdditionalData and
 				      * is handed to the
 				      * initialization function of the
 				      * relaxation method.
@@ -242,26 +242,26 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 				     /**
 				      * Initialize for single blocks
 				      * of matrices. The parameter
-				      * @p{matrices} can be any object
+				      * @p matrices can be any object
 				      * having functions
 				      * @p{get_minlevel()} and
 				      * @p{get_maxlevel()} as well as
 				      * an @p{operator[]} returning a
 				      * reference to a block matrix
 				      * where each block is of type
-				      * @p{MATRIX}. Of this block
+				      * @p MATRIX. Of this block
 				      * matrix, the block indicated by
-				      * @p{block_row} and
-				      * @p{block_col} is selected on
+				      * @p block_row and
+				      * @p block_col is selected on
 				      * each level.  This function
 				      * stores pointers to the level
 				      * matrices and initializes the
 				      * smoothing operator for each
 				      * level.
 				      *
-				      * @p{additional_data} is an
+				      * @p additional_data is an
 				      * object of type
-				      * @p{RELAX::AdditionalData} and
+				      * @p RELAX::AdditionalData and
 				      * is handed to the
 				      * initialization function of the
 				      * relaxation method.
@@ -298,14 +298,14 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 				     /**
 				      * Switch on/off transposed. This
 				      * is mutually exclusive with
-				      * @ref{reverse}.
+				      * reverse().
 				      */
     void set_transpose (const bool);
     
 				     /**
 				      * Switch on/off reversed. This
 				      * is mutually exclusive with
-				      * @ref{transpose}.
+				      * transpose().
 				      */
     void set_reverse (const bool);
 

@@ -24,21 +24,21 @@
  */
 
 /**
- * This class is a wrapper to the @p{Vector} class which allows to swap
+ * This class is a wrapper to the @p Vector class which allows to swap
  * out the data to a file and reload it later on. It handles the
  * management of the name of the file where the data is to be stored
  * temporarily and removes the file is necessary at the end of the
  * lifetime of the vector.
  *
  * There are functions to swap the data to a file, and to reload
- * it. There is also a function @p{alert} that can be used to signal to
+ * it. There is also a function @p alert that can be used to signal to
  * an object of this class that the data will be needed shortly, so
  * the object can initiate that the data be loaded already. While in
- * non-multithreading mode, this function has no effect since @p{reload}
+ * non-multithreading mode, this function has no effect since @p reload
  * has to be called afterwards anyway. On the other hand, in
  * multithreading mode, the data is preloaded in the background using
  * a thread on its own, and may already be available at the time when
- * @p{reload} is called. If it is not available, @p{reload} waits until
+ * @p reload is called. If it is not available, @p reload waits until
  * the detached thread has loaded the data.
  *
  *
@@ -69,15 +69,15 @@ class SwappableVector : public Vector<number>
 
 				     /**
 				      * Copy constructor. Copies the
-				      * data if @p{v} contains some, but
-				      * does not do so if @p{v} is empty
+				      * data if @p v contains some, but
+				      * does not do so if @p v is empty
 				      * or has its data swapped
 				      * out. In the latter case, warn
 				      * about that. In particular do
 				      * not take over ownership of any
-				      * files that @p{v} might own (as,
+				      * files that @p v might own (as,
 				      * for example, @p{C++}'s
-				      * @p{auto_ptr} objects would do).
+				      * @p auto_ptr objects would do).
 				      */
     SwappableVector (const SwappableVector &v);
 
@@ -107,7 +107,7 @@ class SwappableVector : public Vector<number>
 				      * ownership of this file is
 				      * assumed by this object. The
 				      * file is deleted either upon
-				      * calling @p{kill_file}, or on
+				      * calling @p kill_file, or on
 				      * destruction of this object.
 				      *
 				      * The content of the vector is
@@ -116,7 +116,7 @@ class SwappableVector : public Vector<number>
 				      *
 				      * If this object owns another
 				      * file, for example when
-				      * @p{swap_out} but no @p{kill_file}
+				      * @p swap_out but no @p kill_file
 				      * has previously been called,
 				      * then that is deleted first.
 				      */
@@ -126,9 +126,9 @@ class SwappableVector : public Vector<number>
 				      * Reload the data of this vector
 				      * from the file to which it has
 				      * been stored previously using
-				      * @p{swap_out}. Since the file is
+				      * @p swap_out. Since the file is
 				      * not deleted after reloading,
-				      * you can call @p{reload} multiple
+				      * you can call @p reload multiple
 				      * times, in between you may do
 				      * everything with the vector,
 				      * including changing its size.
@@ -136,7 +136,7 @@ class SwappableVector : public Vector<number>
 				      * This function resets the size
 				      * of the vector to the number of
 				      * elements there were upon
-				      * calling @p{swap_out} before.
+				      * calling @p swap_out before.
 				      */
     void reload ();
 
@@ -153,7 +153,7 @@ class SwappableVector : public Vector<number>
 				      * that reads the data in
 				      * parallel to the usual
 				      * execution of the program, such
-				      * that when @p{reload} is called,
+				      * that when @p reload is called,
 				      * the data may eventually be
 				      * available already. It might
 				      * therefore be wirthwhile to
@@ -166,7 +166,7 @@ class SwappableVector : public Vector<number>
 				      * a local tmp directory.
 				      *
 				      * Calling this function multiple
-				      * times before calling @p{reload}
+				      * times before calling @p reload
 				      * is allowed and has no effect
 				      * for subsequent calls. Calling
 				      * this function while the data
@@ -201,12 +201,12 @@ class SwappableVector : public Vector<number>
 				      * time. After this, the object
 				      * does not own any file any
 				      * more, so of course you can't
-				      * call @p{reload} no more.
+				      * call @p reload no more.
 				      *
 				      * If this object does not own a
 				      * file, for example since
-				      * @p{swap_out} was not called, or
-				      * because @p{kill_file} has been
+				      * @p swap_out was not called, or
+				      * because @p kill_file has been
 				      * called previously, then this
 				      * function does nothing.
 				      */
@@ -216,9 +216,9 @@ class SwappableVector : public Vector<number>
 				      * Return the name of the file to
 				      * which the data was stored the
 				      * last time you called
-				      * @p{swap_out}. If @p{swap_out} was
+				      * @p swap_out. If @p swap_out was
 				      * not called, or if in between
-				      * @p{kill_file} was called, then
+				      * @p kill_file was called, then
 				      * the filename is an empty
 				      * string.
 				      */
@@ -257,8 +257,8 @@ class SwappableVector : public Vector<number>
 				      * was swapped out. If no data is
 				      * presently swapped out
 				      * (i.e. before calling
-				      * @p{swap_out} and after
-				      * @p{kill_file}), the string is
+				      * @p swap_out and after
+				      * @p kill_file), the string is
 				      * empty, indicating no ownership
 				      * of files.
 				      */
@@ -266,9 +266,9 @@ class SwappableVector : public Vector<number>
 
 				     /**
 				      * If in multithread mode, then
-				      * the @p{alert} function has
+				      * the @p alert function has
 				      * functionality, but needs to
-				      * coordinate with the @p{reload}
+				      * coordinate with the @p reload
 				      * function. This is done through
 				      * the following lock.
 				      *
@@ -280,23 +280,23 @@ class SwappableVector : public Vector<number>
     Threads::ThreadMutex lock;
 
 				     /**
-				      * Flag by which the @p{alert}
+				      * Flag by which the @p alert
 				      * function signifies that the
 				      * data has been preloaded
 				      * already. This flag is always
-				      * @p{false} in non-MT mode.
+				      * @p false in non-MT mode.
 				      */
     bool data_is_preloaded;
 
 				     /**
 				      * Internal function that
 				      * actually reloads the
-				      * vector. Called from @p{reload}
-				      * and @p{alert}.
+				      * vector. Called from @p reload
+				      * and @p alert.
 				      *
 				      * The parameter specifies
 				      * whether the function shall set
-				      * @p{data_is_preloaded} or
+				      * @p data_is_preloaded or
 				      * not. The calling functions
 				      * can't sometimes do this
 				      * themselves, since they call

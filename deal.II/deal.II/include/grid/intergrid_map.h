@@ -28,18 +28,18 @@
  *
  * Usually, the two grids will be refined differently. Then, the value
  * returned for an iterator on the source grid will be either:
- * @begin{itemize}
- *   @item The same cell on the destination grid, if it exists there;
- *   @item The most refined cell of the destination grid from which the
+ * <ul>
+ *   <li> The same cell on the destination grid, if it exists there;
+ *   <li> The most refined cell of the destination grid from which the
  *      pendant of the source cell could be obtained by refinement. This
  *      cell is always active and has a refinement level less than that
  *      of the source cell.
- * @end{itemize}
+ * </ul>
  * Keys for this map are all cells on the source grid, whether active or
  * not.
  *
  * For example, consider these two one-dimensional grids:
- * @begin{verbatim}
+ * @verbatim
  * Grid 1:
  *   x--x--x-----x-----------x
  *    1  2    3        4 
@@ -47,25 +47,25 @@
  * Grid 2:
  *   x-----x-----x-----x-----x
  *      1     2     3     4
- * @end{verbatim}
+ * @endverbatim
  * (Cell numbers are only given as an example and will not correspond
  * to real cell iterator's indices.) The mapping from grid 1 to grid 2
  * will then be as follows:
- * @begin{verbatim}
+ * @verbatim
  *    Cell on grid 1         Cell on grid 2
  *          1  ------------------>  1
  *          2  ------------------>  1
  *          3  ------------------>  2
  *          4  ------------------>  mother cell of cells 3 and 4
  *                                  (a non-active cell, not shown here)
- * @end{verbatim}
+ * @endverbatim
  * Besides the mappings shown here, the non-active cells on grid 1 are also
  * valid keys. For example, the mapping for the mother cell of cells 1 and 2
  * on the first grid will point to cell 1 on the second grid.
  *
  * The implementation of this class is such that not only cell iterators
  * into triangulations can be mapped, but also iterators into objects of
- * type @ref{DoFHandler} and @ref{MGDoFHandler}. The extension to other classes
+ * type DoFHandler and MGDoFHandler. The extension to other classes
  * offering iterator functions and some minor additional requirements is
  * simple.
  *
@@ -78,7 +78,7 @@
  * @sect2{Usage}
  *
  * In practice, use of this class is as follows:
- * @begin{verbatim}
+ * @verbatim
  *                   // have two grids, which are derived from the
  *                   // same coarse grid
  *   Triangulation<dim> tria1, tria2;
@@ -97,15 +97,15 @@
  *                                           endc = dof_handler_1.end();
  *   for (; cell!=endc; ++cell)
  *                    // now do something with the cell of dof_handler_2
- *                    // corresponding to @p{cell} (which is one of
+ *                    // corresponding to @p cell (which is one of
  *                    // dof_handler_1
  *     f( grid_1_to_2_map[cell]);
- * @end{verbatim}
+ * @endverbatim
  *
  * Note that the template parameters to this class have to be given as
  * @p{InterGridMap<DoFHandler,2>}, i.e. the dimension is given explicitly and
  * no dimension is attributed to the first parameter, which here is
- * @ref{DoFHandler} (and could equally well be @ref{Triangulation} or @ref{MGDoFHandler}).
+ * DoFHandler (and could equally well be Triangulation or MGDoFHandler).
  *
  * @author Wolfgang Bangerth, 1999
  */
@@ -228,16 +228,16 @@ class InterGridMap
 		      const cell_iterator &dst_cell);
 
 				     /**
-				      * Set the value of the key @p{src_cell}
-				      * to @p{dst_cell}. Do so as well for
+				      * Set the value of the key @p src_cell
+				      * to @p dst_cell. Do so as well for
 				      * all the children and their children
-				      * of @p{src_cell}. This function is
+				      * of @p src_cell. This function is
 				      * used for cells which are more
-				      * refined on @p{src_grid} than on
-				      * @p{dst_grid}; then all values of
+				      * refined on @p src_grid than on
+				      * @p dst_grid; then all values of
 				      * the hierarchy of cells and their
 				      * children point to one cell on the
-				      * @p{dst_grid}.
+				      * @p dst_grid.
 				      */
     void set_entries_to_cell (const cell_iterator &src_cell,
 			      const cell_iterator &dst_cell);

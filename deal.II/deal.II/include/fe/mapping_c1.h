@@ -24,14 +24,14 @@
 /**
  * Mapping class that uses C1 (continuously differentiable) cubic
  * mappings of the boundary. This class is built atop of
- * @ref{MappingQ} by simply determining the interpolation points for a
- * cubic mapping of the boundary differently: @ref{MappingQ} chooses
+ * MappingQ by simply determining the interpolation points for a
+ * cubic mapping of the boundary differently: MappingQ chooses
  * them such that they interpolate the boundary, while this class
  * chooses them such that the discretized boundary is globally
  * continuously differentiable.
  *  
  * To use this class, make sure that the
- * @ref{Boundary}::@p{get_normals_at_vertices} function is implemented
+ * Boundary::@p get_normals_at_vertices function is implemented
  * for the users boundary object.
  *
  * @author Wolfgang Bangerth, 2001
@@ -42,7 +42,7 @@ class MappingC1 : public MappingQ<dim>
   public:
 				     /**
 				      * Constructor. Pass the fixed
-				      * degree @p{3} down to the base
+				      * degree @p 3 down to the base
 				      * class, as a cubic mapping
 				      * suffices to generate a
 				      * continuous mapping of the
@@ -56,7 +56,7 @@ class MappingC1 : public MappingQ<dim>
 				      * support points of all shape
 				      * functions located on bounding
 				      * lines to the vector
-				      * @p{a}. Points located on the
+				      * @p a. Points located on the
 				      * line but on vertices are not
 				      * included.
 				      *
@@ -82,12 +82,12 @@ class MappingC1 : public MappingQ<dim>
 				      * support points of all shape
 				      * functions located on bounding
 				      * faces (quads in 3d) to the
-				      * vector @p{a}. Points located
+				      * vector @p a. Points located
 				      * on the line but on vertices
 				      * are not included.
 				      *
 				      * Needed by the
-				      * @p{compute_support_points_laplace}
+				      * @p compute_support_points_laplace
 				      * function. For @p{dim=1} and 2
 				      * this function is empty.
 				      *

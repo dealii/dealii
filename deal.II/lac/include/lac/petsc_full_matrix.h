@@ -44,7 +44,7 @@ namespace PETScWrappers
     public:
                                        /**
                                         * Create a full matrix of dimensions
-                                        * @p{m} times @p{n}.
+                                        * @p m times @p n.
                                         */
       FullMatrix (const unsigned int m,
                   const unsigned int n);

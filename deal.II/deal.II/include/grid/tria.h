@@ -41,7 +41,7 @@ template <int dim> class MGDoFHandler;
 
 /**
  *  Structure which is passed to the
- *  @ref{Triangulation}@p{<dim>::create_triangulation} function. It
+ *  Triangulation@p{<dim>::create_triangulation} function. It
  *  contains all data needed to construct a cell, namely the indices
  *  of the vertices and the material indicator.
  */
@@ -102,7 +102,7 @@ struct CellData
 
 
 /**
- *  Structure to be passed to the @ref{Triangulation}@p{<dim>::create_triangulation}
+ *  Structure to be passed to the Triangulation@p{<dim>::create_triangulation}
  *  function to describe boundary information.
  *
  *  This structure is the same for all dimensions, since we use an input
@@ -146,7 +146,7 @@ struct SubCellData
 				      * dimension are really empty. I.e.,
 				      * whether the @p{boundary_*} arrays are
 				      * empty when in one space dimension
-				      * and whether the @p{boundary_quads}
+				      * and whether the @p boundary_quads
 				      * array is empty when in two dimensions.
 				      *
 				      * Since this structure is the same for all
@@ -179,25 +179,25 @@ class TriaDimensionInfo
  *  This class implements some types which differ between the dimensions.
  *  These are the declararions for the 1D case only.
  *
- *  A @p{line_iterator} is typdef'd to an iterator operating on the
- *  @p{lines} member variable of a @p{Triangulation<1>} object. An
- *  @p{active_line_iterator} only operates on the active lines.
- *  @p{raw_line_iterator} objects operate on all lines, used or not.
+ *  A @p line_iterator is typdef'd to an iterator operating on the
+ *  @p lines member variable of a @p{Triangulation<1>} object. An
+ *  @p active_line_iterator only operates on the active lines.
+ *  @p raw_line_iterator objects operate on all lines, used or not.
  *
  *  Since we are in one dimension, the following identities are declared:
- *  @begin{verbatim}
+ *  @verbatim
  *    typedef raw_line_iterator    raw_cell_iterator;
  *    typedef line_iterator        cell_iterator;
  *    typedef active_line_iterator active_cell_iterator;
- *  @end{verbatim}
+ *  @endverbatim
  *
- *  To enable the declaration of @p{begin_quad} and the like in
- *  @p{Triangulation<1>}, the @p{quad_iterator}s are declared as
+ *  To enable the declaration of @p begin_quad and the like in
+ *  @p{Triangulation<1>}, the @p quad_iterators are declared as
  *  @p{void *}. Thus these types exist, but are useless and will
  *  certainly make any involuntary use visible. The same holds
  *  for hexahedron iterators.
  *
- *  The same applies for the @p{face_iterator} types, since lines
+ *  The same applies for the @p face_iterator types, since lines
  *  have no substructures apart from vertices, which are handled in
  *  a different way, however.
  *
@@ -264,25 +264,25 @@ class TriaDimensionInfo<1>
  *  This class implements some types which differ between the dimensions.
  *  These are the declararions for the 2D case only.
  *
- *  A @p{line_iterator} is typdef'd to an iterator operating on the
- *  @p{lines} member variable of a @p{Triangulation<2>} object. An
- *  @p{active_line_iterator} only operates on the active lines.
- *  @p{raw_line_iterator} objects operate on all lines, used or not.
- *  Using @p{active_line_iterator}s may not be particularly in 2D useful since it
+ *  A @p line_iterator is typdef'd to an iterator operating on the
+ *  @p lines member variable of a @p{Triangulation<2>} object. An
+ *  @p active_line_iterator only operates on the active lines.
+ *  @p raw_line_iterator objects operate on all lines, used or not.
+ *  Using @p active_line_iterators may not be particularly in 2D useful since it
  *  only operates on unrefined lines. However, also refined lines may bound
  *  unrefined cells if the neighboring cell is refined once more than the
  *  present one.
  *
- *  Similarly to line iterators, @p{quad_iterator}, @p{raw_quad_iterator} and
- *  @p{active_quad_iterator} are declared.
+ *  Similarly to line iterators, @p quad_iterator, @p raw_quad_iterator and
+ *  @p active_quad_iterator are declared.
  *  
- *  To enable the declaration of @p{begin_hex} and the like in
- *  @p{Triangulation<[12]>}, the @p{hex_iterator}s are declared as
+ *  To enable the declaration of @p begin_hex and the like in
+ *  @p{Triangulation<[12]>}, the @p hex_iterators are declared as
  *  @p{void *}. Thus these types exist, but are useless and will
  *  certainly make any involuntary use visible.
  *
  *  Since we are in two dimension, the following identities are declared:
- *  @begin{verbatim}
+ *  @verbatim
  *    typedef raw_quad_iterator    raw_cell_iterator;
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
@@ -290,7 +290,7 @@ class TriaDimensionInfo<1>
  *    typedef raw_line_iterator    raw_face_iterator;
  *    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;    
- *  @end{verbatim}
+ *  @endverbatim
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -358,7 +358,7 @@ class TriaDimensionInfo<2>
  *  For the declarations of the data types, more or less the same holds
  *  as for lower dimensions (see @p{TriaDimensionInfo<[12]>}). The
  *  dimension specific data types are here, since we are in three dimensions:
- *  @begin{verbatim}
+ *  @verbatim
  *    typedef raw_hex_iterator    raw_cell_iterator;
  *    typedef hex_iterator        cell_iterator;
  *    typedef active_hex_iterator active_cell_iterator;
@@ -366,7 +366,7 @@ class TriaDimensionInfo<2>
  *    typedef raw_quad_iterator    raw_face_iterator;
  *    typedef quad_iterator        face_iterator;
  *    typedef active_quad_iterator active_face_iterator;    
- *  @end{verbatim}
+ *  @endverbatim
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -634,11 +634,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
 
 
 /**
- *  @ref{Triangulation}s denote a hierarchy of levels of elements which together
- *  form a region in @p{dim} spatial dimensions.
+ *  Triangulations denote a hierarchy of levels of elements which together
+ *  form a region in @p dim spatial dimensions.
  *
  *  This class is written to be as independent of the dimension as possible
- *  (thus the complex construction of the @ref{TriangulationLevel} classes) to
+ *  (thus the complex construction of the TriangulationLevel classes) to
  *  allow code-sharing, to allow reducing the need to mirror changes in the code
  *  for one dimension to the code for other dimensions. Nonetheless, some of
  *  the functions are dependent of the dimension and there only exist
@@ -647,51 +647,51 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *  @sect3{Structure and iterators}
  *
- *  The actual data structure of a @ref{Triangulation} object is rather complex
+ *  The actual data structure of a Triangulation object is rather complex
  *  and quite inconvenient if one attempted to operate on it directly, since
  *  data is spread over quite a lot of arrays and other places. However,
  *  there are ways powerful enough to work on these data structures
  *  without knowing their exact relations. This is done through the
- *  concept of iterators (see the STL documentation and @ref{TriaRawIterator}).
+ *  concept of iterators (see the STL documentation and TriaRawIterator).
  *  In order to make things as easy and dimension independent as possible,
  *  use of class local typedefs is made, see below.
  *  
- *  In the base class @ref{TriaDimensionInfo}, a @p{Cell} is typedef'd to be whatever
- *  is reasonable for a cell in the respective dimension, i.e. a @p{Line} in
- *  one dimension, a @p{Quad} in two dimensions, and so on.
+ *  In the base class TriaDimensionInfo, a @p Cell is typedef'd to be whatever
+ *  is reasonable for a cell in the respective dimension, i.e. a @p Line in
+ *  one dimension, a @p Quad in two dimensions, and so on.
  *
- *  The @ref{Triangulation} class provides iterator which enable looping over all
+ *  The Triangulation class provides iterator which enable looping over all
  *  lines, cells,
  *  etc without knowing the exact representation used to describe them. Their
- *  names are typedefs in the @ref{TriaDimensionInfo} base class (thus making them
+ *  names are typedefs in the TriaDimensionInfo base class (thus making them
  *  local types to this class) and are as follows:
  *
- *  @begin{itemize}
- *  @item @p{raw_line_iterator}: loop over all lines, used or not (declared for
+ *  <ul>
+ *  <li> @p raw_line_iterator: loop over all lines, used or not (declared for
  *  all dimensions).
  *  
- *  @item @p{line_iterator}: loop over all used lines (declared for all dimensions).
+ *  <li> @p line_iterator: loop over all used lines (declared for all dimensions).
  *
- *  @item @p{active_line_iterator}: loop over all active lines (declared for all
+ *  <li> @p active_line_iterator: loop over all active lines (declared for all
  *  dimensions).
  *
- *  @item @p{raw_quad_iterator}: loop over all quads, used or not (declared only
+ *  <li> @p raw_quad_iterator: loop over all quads, used or not (declared only
  *  for @p{dim>=2}).
  *  
- *  @item @p{quad_iterator}: loop over all quads (declared only for @p{dim}>=2).
+ *  <li> @p quad_iterator: loop over all quads (declared only for @p dim>=2).
  *
- *  @item @p{active_quad_iterator}: loop over all active quads (declared only for
- *  @p{dim}>=2).
- *  @end{itemize}
+ *  <li> @p active_quad_iterator: loop over all active quads (declared only for
+ *  @p dim>=2).
+ *  </ul>
  *
- *  Additionaly, for @p{dim}==1, the following identities hold:
- *  @begin{verbatim}
+ *  Additionaly, for @p dim==1, the following identities hold:
+ *  @verbatim
  *    typedef raw_line_iterator    raw_cell_iterator;
  *    typedef line_iterator        cell_iterator;
  *    typedef active_line_iterator active_cell_iterator;
- *  @end{verbatim}
- *  while for @p{dim}==2
- *  @begin{verbatim}
+ *  @endverbatim
+ *  while for @p dim==2
+ *  @verbatim
  *    typedef quad_line_iterator   raw_cell_iterator;    
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
@@ -699,7 +699,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    typedef raw_line_iterator    raw_face_iterator;
  *    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;    
- *  @end{verbatim}
+ *  @endverbatim
  *
  *  By using the cell iterators, you can write code nearly independent of
  *  the spatial dimension. The same applies for substructure iterators,
@@ -707,15 +707,15 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  cell is be a vertex in 1D and a line in 2D; however, vertices are
  *  handled in a different way and therefore lines have no faces.
  *
- *  The @ref{Triangulation} class offers functions like @p{begin_active} which gives
+ *  The Triangulation class offers functions like @p begin_active which gives
  *  you an iterator to the first active cell. There are quite a lot of functions
  *  returning iterators. Take a look at the class doc to get an overview.
  *
  *  Usage of these iterators works mostly like with the STL iterators. Some
- *  examples taken from the @ref{Triangulation} source code follow.
- *  @begin{itemize}
- *  @item <em>Counting the number of cells on a specific level</em>
- *    @begin{verbatim}
+ *  examples taken from the Triangulation source code follow.
+ *  <ul>
+ *  <li> <em>Counting the number of cells on a specific level</em>
+ *    @verbatim
  *     template <int dim>
  *     int Triangulation<dim>::n_cells (const int level) const {
  *        cell_iterator cell = begin (level),
@@ -725,9 +725,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *          ++n;
  *        return n;
  *      };
- *    @end{verbatim}
- *    Another way which uses the STL @p{distance} function would be to write
- *    @begin{verbatim}
+ *    @endverbatim
+ *    Another way which uses the STL @p distance function would be to write
+ *    @verbatim
  *      template <int dim>
  *      int Triangulation<dim>::n_cells (const int level) const {
  *        int n=0;
@@ -738,10 +738,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *                  n);
  *        return n;
  *      };  
- *    @end{verbatim}
+ *    @endverbatim
  *    
- *  @item <em>Refining all cells of a triangulation</em>
- *    @begin{verbatim}
+ *  <li> <em>Refining all cells of a triangulation</em>
+ *    @verbatim
  *      template <int dim>
  *      void Triangulation<dim>::refine_global () {
  *        active_cell_iterator cell = begin_active(),
@@ -751,15 +751,15 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *          cell->set_refine_flag ();
  *        execute_coarsening_and_refinement ();
  *      };
- *    @end{verbatim}
- *  @end{itemize}
+ *    @endverbatim
+ *  </ul>
  *
  *
  *  @sect3{Usage}
  *
- *  Usage of a @ref{Triangulation} is mainly done through the use of iterators.
+ *  Usage of a Triangulation is mainly done through the use of iterators.
  *  An example probably shows best how to use it:
- *  @begin{verbatim}
+ *  @verbatim
  *  void main () {
  *    Triangulation<2> tria;
  *
@@ -796,30 +796,30 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    ofstream out("grid.1");
  *    GridOut::write_gnuplot (tria, out);
  *  };  
- *  @end{verbatim}
+ *  @endverbatim
  *
  *  
  *  @sect3{Creating a triangulation}
  *
  *  There are several possibilities to create a triangulation:
- *  @begin{itemize}
- *    @item The most common domains, such as hypercubes (i.e. lines, squares,
+ *  <ul>
+ *    <li> The most common domains, such as hypercubes (i.e. lines, squares,
  *       cubes, etc), hyper-balls (circles, balls, ...) and some other, more
  *       weird domains such as the L-shape region and higher dimensional
- *       generalizations and others, are provided by the @ref{GridGenerator}
+ *       generalizations and others, are provided by the GridGenerator
  *       class which takes a triangulation and fills it by a division
  *       of the required domain.
  *   
- *     @item Reading in a triangulation: By using an object of the @ref{GridIn}
+ *     <li> Reading in a triangulation: By using an object of the GridIn
  *        class, you can read in fairly general triangulations. See there for
  *        more information. The mentioned class uses the interface described
  *        directly below to transfer the data into the triangulation.
  *
- *     @item Explicitely creating a triangulation: you can create a triangulation
+ *     <li> Explicitely creating a triangulation: you can create a triangulation
  *        by providing a list of vertices and a list of cells. Each such cell
  *        consists of a vector storing the indices of the vertices of this cell
  *        in the vertex list. To see how this works, you can take a look at the
- *        @ref{GridIn}@p{<dim>::read_*} functions. The appropriate function to be
+ *        GridIn@p{<dim>::read_*} functions. The appropriate function to be
  *        called is @p{Triangulation<dim>::create_triangulation ()}.
  *
  *        Creating the hierarchical information needed for this
@@ -855,16 +855,16 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        the data read from an UCD or any other input file, but also
  *        for the data passed to the
  *        @p{Triangulation<dim>::create_triangulation ()}
- *        function. See the documentation for the @ref{GridIn} class
+ *        function. See the documentation for the GridIn class
  *        for more details on this, and above all to the
- *        @ref{GridReordering} class that explains many of the
+ *        GridReordering class that explains many of the
  *        problems and an algorithm to reorder cells such that they
  *        satisfy the conditions outlined above.
  *
- *     @item Copying a triangulation: when computing on time dependent meshes
+ *     <li> Copying a triangulation: when computing on time dependent meshes
  *        of when using adaptive refinement, you will often want to create a
  *        new triangulation to be the same as another one. This is facilitated
- *        by the @p{copy_triangulation} function.
+ *        by the @p copy_triangulation function.
  *
  *        It is guaranteed that vertex, line or cell numbers in the two
  *        triangulations are the same and that two iterators walking on the
@@ -875,7 +875,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        operation but guaranteeing some parallelity in the two triangulations
  *        seems more important since usually data will have to be transferred
  *        between the grids.
- *   @end{itemize}
+ *   </ul>
  *
  *   The material id for each cell must be specified upon construction of
  *   a triangulation. (There is a special section on material identifier and
@@ -934,15 +934,15 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   @sect3{Refinement and coarsening of a triangulation}
  *
  *   Refinement of a triangulation may be done through several ways. The most
- *   low-level way is directly through iterators: let @p{i} be an iterator to
+ *   low-level way is directly through iterators: let @p i be an iterator to
  *   an active cell (i.e. the cell pointed to has no children), then the
  *   function call @p{i->set_refine_flag()} marks the respective cell for
  *   refinement. Marking non-active cells results in an error.
  *
  *   After all the cells you wanted to mark for refinement, call the
- *   @p{execute_coarsening_and_refinement} function to actually perform
+ *   @p execute_coarsening_and_refinement function to actually perform
  *   the refinement. This function itself first calls the
- *   @p{prepare_coarsening_and_refinement} function to regularize the resulting
+ *   @p prepare_coarsening_and_refinement function to regularize the resulting
  *   triangulation: since a face between two adjacent cells may only
  *   be subdivided once (i.e. the levels of two adjacent cells may
  *   differ by one at most; it is not possible to have a cell refined
@@ -955,7 +955,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   step than one needed by the finite element method.
  *
  *   To coarsen a grid, the same way as above is possible by using
- *   @p{i->set_coarsen_flag} and calling @p{execute_coarsening_and_refinement}.
+ *   @p{i->set_coarsen_flag} and calling @p execute_coarsening_and_refinement.
  *
  *   The reason for first coarsening, then refining is that the
  *   refinement usually adds some additional cells to keep the triangulation
@@ -972,22 +972,22 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   they do exactly these things). There are more advanced functions,
  *   however, which are more suitable for automatic generation of hierarchical
  *   grids in the context of a-posteriori error estimation and adaptive finite
- *   elements. These functions can be found in the @ref{GridRefinement} class.
+ *   elements. These functions can be found in the GridRefinement class.
  *
  *
  *   @sect3{Smoothing of a triangulation}
  *
  *   Some degradation of approximation properties has been observed
  *   for grids which are too unstructured. Therefore, the
- *   @p{prepare_coarsening_and_refinement} function which is automatically called
- *   by the @p{execute_coarsening_and_refinement} function can do some
+ *   @p prepare_coarsening_and_refinement function which is automatically called
+ *   by the @p execute_coarsening_and_refinement function can do some
  *   smoothing of the triangulation. Note that mesh smoothing is only
  *   done for two or more space dimensions, no smoothing is available
  *   at present for one spatial dimension. In the sequel, let
- *   @p{execute_*} stand for @p{execute_coarsening_and_refinement}.
+ *   @p{execute_*} stand for @p execute_coarsening_and_refinement.
  *
  *   For the purpose of smoothing, the
- *   @ref{Triangulation} constructor takes an argument specifying whether a
+ *   Triangulation constructor takes an argument specifying whether a
  *   smoothing step shall be performed on the grid each time @p{execute_*}
  *   is called. The default is that such a step not be done, since this results
  *   in additional cells being produced, which may not be necessary in all
@@ -1004,12 +1004,12 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   The parameter taken by the constructor is an integer which may be composed
  *   bitwise by the constants defined in the @p{enum MeshSmoothing}. The meaning
  *   of these constants is explained in the following:
- *   @begin{itemize}
- *   @item @p{limit_level_difference_at_vertices}:
+ *   <ul>
+ *   <li> @p limit_level_difference_at_vertices:
  *     It can be shown, that degradation of approximation occurs if the
  *     triangulation contains vertices which are member of cells with levels
  *     differing by more than one. One such example is the following:
- *     @begin{verbatim}
+ *     @verbatim
  *       |     |     |     |
  *       x-----x-----x--x--x--
  *       |     |     |  |  |
@@ -1024,7 +1024,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       |           |     |
  *       |           |     |
  *       x-----------x-----x--
- *     @end{verbatim}
+ *     @endverbatim
  *     It seems that in two space dimensions, the maximum jump in levels between
  *     cells sharing a common vertex is two (as in the example above). This is
  *     not true if more than four cells meet at a vertex. It is not uncommon
@@ -1046,17 +1046,17 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     of this cell (but with a less degree of deviation from the true value).
  *
  *     If the smoothing indicator given to the constructor contains the bit for
- *     @p{limit_level_difference_at_vertices}, situations as the above one are
+ *     @p limit_level_difference_at_vertices, situations as the above one are
  *     eliminated by also marking the lower left cell for refinement.
  *
- *   @item @p{eliminate_unrefined_islands}:
+ *   <li> @p eliminate_unrefined_islands:
  *     Single cells which are not refined and are surrounded by cells which are
  *     refined usually also lead to a sharp decline in approximation properties
  *     locally. The reason is that the nodes on the faces between unrefined and
  *     refined cells are not real degrees of freedom but carry constraints. The
  *     patch without additional degrees of freedom is thus significantly larger
  *     then the unrefined cell itself. If in the parameter passed to the
- *     constructor the bit for @p{eliminate_unrefined_islands} is set, all cells
+ *     constructor the bit for @p eliminate_unrefined_islands is set, all cells
  *     which are not flagged for refinement but which are surrounded by more
  *     refined cells than unrefined cells are flagged for refinement. Cells
  *     which are not yet refined but flagged for that are accounted for the
@@ -1068,10 +1068,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     name of the flag may indicate. However, no better name came to mind to
  *     the author by now.
  *
- *   @item @p{eliminate_refined_*_islands}:
+ *   <li> @p{eliminate_refined_*_islands}:
  *     This algorithm seeks for isolated cells which are refined or flagged
  *     for refinement. This definition is unlike that for
- *     @p{eliminate_unrefined_islands}, which would mean that an island is
+ *     @p eliminate_unrefined_islands, which would mean that an island is
  *     defined as a cell which
  *     is refined but more of its neighbors are not refined than are refined.
  *     For example, in 2D, a cell's refinement would be reverted if at most
@@ -1091,7 +1091,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     refinement flag.
  *
  *     Actually there are two versions of this flag,
- *     @p{eliminate_refined_inner_islands} and @p{eliminate_refined_boundary_islands}.
+ *     @p eliminate_refined_inner_islands and @p eliminate_refined_boundary_islands.
  *     There first eliminates islands defined by the definition above which are
  *     in the interior of the domain, while the second eliminates only those
  *     islands if the cell is at the boundary. The reason for this split of
@@ -1100,36 +1100,36 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     refines the mesh according to a criterion associated with a boundary
  *     integral or if one has rough boundary data.
  *
- *   @item @p{do_not_produce_unrefined_islands}:
+ *   <li> @p do_not_produce_unrefined_islands:
  *     This flag prevents the occurrence of unrefined islands. In more detail:
  *     It prohibits the coarsening of a cell if 'most of the neighbors' will
  *     be refined after the step.
  *
- *   @item @p{patch_level_1}:
+ *   <li> @p patch_level_1:
  *     Ensures patch level 1. As result the triangulation consists of
  *     patches, i.e. of cells that are refined once. It follows that
  *     if at least one of the children of a cell is or will be refined
- *     than all children need to be refined. If the @p{patch_level_1} flag
- *     is set, than the flags @p{eliminate_unrefined_islands},
- *     @p{eliminate_refined_inner_islands} and
- *     @p{eliminate_refined_boundary_islands} will be ignored as they will
+ *     than all children need to be refined. If the @p patch_level_1 flag
+ *     is set, than the flags @p eliminate_unrefined_islands,
+ *     @p eliminate_refined_inner_islands and
+ *     @p eliminate_refined_boundary_islands will be ignored as they will
  *     be fulfilled automatically.
  *
- *   @item @p{smoothing_on_refinement}:
+ *   <li> @p smoothing_on_refinement:
  *     This flag sums up all smoothing algorithms which may be performed upon
  *     refinement by flagging some more cells for refinement.
  *
- *   @item @p{smoothing_on_coarsening}:
+ *   <li> @p smoothing_on_coarsening:
  *     This flag sums up all smoothing algorithms which may be performed upon
  *     coarsening by flagging some more cells for coarsening.
  *
- *   @item @p{maximum_smoothing}:
+ *   <li> @p maximum_smoothing:
  *     This flag includes all the above ones and therefore combines all
  *     smoothing algorithms implemented.
  *
- *   @item @p{none}:
+ *   <li> @p none:
  *     Select no smoothing at all.
- *   @end{itemize}
+ *   </ul>
  *
  *
  *   @sect3{Material and boundary information}
@@ -1174,9 +1174,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   @sect3{History of a triangulation}
  *
  *   It is possible to reconstruct a grid from its refinement history, which
- *   can be stored and loaded through the @p{save_refine_flags} and
- *   @p{load_refine_flags} functions. Normally, the code will look like this:
- *   @begin{verbatim}
+ *   can be stored and loaded through the @p save_refine_flags and
+ *   @p load_refine_flags functions. Normally, the code will look like this:
+ *   @verbatim
  *                                 // open output file
  *     ofstream history("mesh.history");
  *                                 // do 10 refinement steps
@@ -1187,10 +1187,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       tria.save_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
  *     };        
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   If you want to re-create the grid from the stored information, you write:
- *   @begin{verbatim}
+ *   @verbatim
  *                                 // open input file
  *     ifstream history("mesh.history");
  *                                 // do 10 refinement steps
@@ -1198,7 +1198,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       tria.load_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
  *     };        
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   The same scheme is employed for coarsening and the coarsening flags.
  *
@@ -1227,18 +1227,18 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   used if an algorithm walks over all cells and needs information whether
  *   another cell, e.g. a neighbor, has already been processed. It can also
  *   be used to flag the lines subject to constraints in 2D, as for example the
- *   functions in the @ref{DoFHandler} classes do.
+ *   functions in the DoFHandler classes do.
  *
- *   There are two functions, @p{save_user_flags} and @p{load_user_flags} which
+ *   There are two functions, @p save_user_flags and @p load_user_flags which
  *   write and read these flags to and from a stream. Unlike
- *   @p{save_refine_flags} and @p{load_refine_flags}, these two functions store
+ *   @p save_refine_flags and @p load_refine_flags, these two functions store
  *   and read the flags of all used lines, quads, etc, not only of the
  *   active ones (well, activity is a concept which really only applies to
  *   cells, not for example to lines in 2D, so the abovementioned generalization
  *   to <em>all</em> lines, quads, etc seems plausible).
  *
  *   If you want to store more specific user flags, you can use the functions
- *   @p{save_user_flags_line} and @p{load_user_flags_line} and the generalizations
+ *   @p save_user_flags_line and @p load_user_flags_line and the generalizations
  *   for quads, etc.
  *
  *   As for the refinement and coarsening flags, there exist two versions of these
@@ -1258,13 +1258,13 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   line, quad, etc. You can access these user pointers through the
  *   functions @p{user_pointer()}, @p{clear_user_pointer()} and
  *   @p{set_user_pointer(p)} in the accessor classes. These pointers are
- *   neither used nor changed by the library and are @p{NULL} by
+ *   neither used nor changed by the library and are @p NULL by
  *   default. Thus, their handling is the sole responsibility of the
  *   application program.  Especially, the pointers are not inherited
  *   to children upon refinement. Still, after a remeshing they are
  *   available on all cells, where they were set on the previous mesh.
  *
- *   The usual warning about the missing type safety of @p{void} pointers are
+ *   The usual warning about the missing type safety of @p void pointers are
  *   obviously in place here; responsibility for correctness of types etc
  *   lies entirely with the user of the pointer.
  *
@@ -1278,11 +1278,11 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   component. If a new vertex is created on a side or face at the
  *   boundary, this function is used to compute where it will be
  *   placed. The boundary indicator of the face will be used to
- *   determine the proper component. See @ref{Boundary} for the
- *   details. Usage with the @ref{Triangulation} object is then like this
- *   (let @p{Ball} be a class derived from @ref{Boundary}@p{<2>}):
+ *   determine the proper component. See Boundary for the
+ *   details. Usage with the Triangulation object is then like this
+ *   (let @p Ball be a class derived from Boundary@p{<2>}):
  * 
- *   @begin{verbatim}
+ *   @verbatim
  *     void main () {
  *       Triangulation<2> tria;
  *                                        // set the boundary function
@@ -1309,7 +1309,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *           tria.execute_coarsening_and_refinement();
  *         };
  *     };            
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   You should take note of one caveat: if you have concave
  *   boundaries, you must make sure that a new boundary vertex does
@@ -1335,13 +1335,13 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   further the assumptions also hold.
  *
  *   The regularization and smoothing is done in the
- *   @p{prepare_coarsening_and_refinement} function, which is called by
- *   @p{execute_coarsening_and_refinement} at the very beginning.  It
+ *   @p prepare_coarsening_and_refinement function, which is called by
+ *   @p execute_coarsening_and_refinement at the very beginning.  It
  *   decides which additional cells to flag for refinement by looking
  *   at the old grid and the refinement flags for each cell.
  *
- *   @begin{itemize}
- *   @item <em>Regularization:</em> The algorithm walks over all cells checking
+ *   <ul>
+ *   <li> <em>Regularization:</em> The algorithm walks over all cells checking
  *     whether the present cell is flagged for refinement and a neighbor of the
  *     present cell is refined once less than the present one. If so, flag the
  *     neighbor for refinement. Because of the induction above, there may be no
@@ -1355,9 +1355,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     on lower levels, but if these induce more refinement needed, this is
  *     performed later on when we visit them in out backward running loop.
  *
- *   @item <em>Smoothing:</em>
- *     @begin{itemize}
- *     @item @p{limit_level_difference_at_vertices}:
+ *   <li> <em>Smoothing:</em>
+ *     <ul>
+ *     <li> @p limit_level_difference_at_vertices:
  *       First a list is set up which stores for each vertex
  *       the highest level one of the adjacent cells belongs to. Now, since we did
  *       smoothing in the previous refinement steps also, each cell may only have
@@ -1371,7 +1371,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       refinement, but these are on lower levels, as above, which is why we
  *       may do all kinds of additional flagging in one loop only.
  *
- *     @item @p{eliminate_unrefined_islands}:
+ *     <li> @p eliminate_unrefined_islands:
  *       For each cell we count the number of neighbors which are refined or
  *       flagged for refinement. If this exceeds the total number of neighbors
  *       (which is the number of faces minus the number of faces of this cell
@@ -1380,7 +1380,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       will need refinement, we will need additional loops of regularization
  *       and smoothing over all cells until nothing changes any more.
  *
- *     @item @p{eliminate_refined_*_islands}:
+ *     <li> @p{eliminate_refined_*_islands}:
  *       This one does much the same as the above one, but for coarsening. If
  *       a cell is flagged for refinement or if all of its children are active
  *       and if the number of neighbors which are either active and not flagged
@@ -1394,8 +1394,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       of this classes description.
  *
  *       The same applies as above: several loops may be necessary.
- *     @end{itemize}
- *   @end{itemize}
+ *     </ul>
+ *   </ul>
  *
  *   Regularization and smoothing are a bit complementary in that we check
  *   whether we need to set additional refinement flags when being on a cell
@@ -1414,7 +1414,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   2D. The direction of a line is the direction of point 0 towards point 1. We
  *   define, that allowed cells contain of lines of which the direction is
  *   as follows:
- *   @begin{verbatim}
+ *   @verbatim
  *          2
  *      3--->---2
  *      |       |
@@ -1422,7 +1422,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      |       |
  *      0--->---1
  *          0
- *   @end{verbatim}
+ *   @endverbatim
  *   The number of the vertices and lines is also indicated. This orientation of
  *   lines has to be checked/generated upon construction of a grid and is
  *   preserved upon refinement.
@@ -1437,7 +1437,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   Note that information about several of these conventions can be
  *   extracted at run- or compile-time from the member functions and
- *   variables of the @ref{GeometryInfo} classes.
+ *   variables of the GeometryInfo classes.
  *
  *
  *   @sect4{Coordinate systems}
@@ -1445,14 +1445,14 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   When explicit coordinates are required for points in a cell (e.g for
  *   quadrature formulae or the point of definition of trial functions), we
  *   define the following coordinate system for the unit cell:
- *   @begin{verbatim}
+ *   @verbatim
  *    y^   3-------2
  *     |   |       |
  *     |   |       |
  *     |   |       |
  *     |   0-------1
  *     *-------------->x
- *   @end{verbatim}
+ *   @endverbatim
  *   with vertex 0 being the origin of the coordinate system, vertex 1 having
  *   coordinates @p{(1,0)}, vertex 2 at @p{(1,1)} and vertex 3 at @p{(0,1)}.
  *
@@ -1464,7 +1464,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   dimensions. Before giving these conventions we declare the
  *   following sketch to be the standard way of drawing 3d pictures of
  *   hexahedra: 
- *   @begin{verbatim}
+ *   @verbatim
  *         *-------*        *-------*
  *        /|       |       /       /|
  *       / |       |      /       / |
@@ -1475,14 +1475,14 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     | /       /      |       | /
  *     |/       /       |       |/
  *     *-------*        *-------*
- *   @end{verbatim}
+ *   @endverbatim
  *   The left part of the picture shows the left, bottom and back face of the
  *   cube, while the right one shall be the top, right and front face. You may
  *   recover the whole cube by moving the two parts together into one.
  *
  *   Note again that information about several of the following
  *   conventions can be extracted at run- or compile-time from the
- *   member functions and variables of the @ref{GeometryInfo} classes.
+ *   member functions and variables of the GeometryInfo classes.
  *
  *
  *   @sect4{Vertices}
@@ -1491,7 +1491,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   the vertices on a quadrilateral. The vertices on the back face are numbered
  *   similarly by moving the front face to the back (no turning, no twisting, 
  *   just a shift):
- *   @begin{verbatim}
+ *   @verbatim
  *         7-------6        7-------6
  *        /|       |       /       /|
  *       / |       |      /       / |
@@ -1502,14 +1502,14 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     | /       /      |       | /
  *     |/       /       |       |/
  *     0-------1        0-------1
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   @sect4{Lines}
  *
  *   Here, the same holds as for the vertices: the lines of the front face are
  *   numbered as for the quadrilateral, for the back face they are just shifted.
  *   Finally, the four lines connecting front and back face are numbered:
- *   @begin{verbatim}
+ *   @verbatim
  *         *---6---*        *---6---*
  *        /|       |       /       /|
  *      11 |       5      11     10 5
@@ -1520,10 +1520,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     3 8       9      3       | 9
  *     |/       /       |       |/
  *     *---0---*        *---0---*
- *   @end{verbatim}
+ *   @endverbatim
  *   The directions of the front and back lines is as for the respective faces, while
  *   the connecting lines always point to the back:
- *   @begin{verbatim}
+ *   @verbatim
  *         *--->---*        *--->---*
  *        /|       |       /       /|
  *       ^ |       ^      ^       ^ ^
@@ -1534,7 +1534,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     ^ ^       ^      ^       | ^
  *     |/       /       |       |/
  *     *--->---*        *--->---*
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   The fact that edges (just as vertices and faces) are entities
  *   that are stored in their own right rather than constructed from
@@ -1546,7 +1546,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   class for creation of a triangulation, you therefore have to make
  *   sure that cells are oriented in a compatible fashion, so that
  *   edge directions are globally according to above
- *   convention. However, the @ref{GridReordering} class can do this
+ *   convention. However, the GridReordering class can do this
  *   for you, by reorienting cells and edges of an arbitrary list of
  *   input cells that need not be already sorted.
  *   
@@ -1554,7 +1554,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   The faces are numbered in the same order as the lines were numbered: front
  *   face, back face, then the four side faces:
- *   @begin{verbatim}
+ *   @verbatim
  *         *-------*        *-------*
  *        /|       |       /       /|
  *       / |   1   |      /   4   / |
@@ -1565,13 +1565,13 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     | /   2   /      |   0   | /
  *     |/       /       |       |/
  *     *-------*        *-------*
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   The <em>standard</em> direction of the faces is determined by the
  *   numbers the lines have within a given face. This is like follows:
- *   @begin{itemize}
- *   @item Faces 0 and 1:
- *    @begin{verbatim}
+ *   <ul>
+ *   <li> Faces 0 and 1:
+ *    @verbatim
  *          *---2---*        *-------*
  *         /|       |       /       /|
  *        / |       1      /       / |
@@ -1582,10 +1582,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      | /       /      3       | /
  *      |/       /       |       |/
  *      *-------*        *---0---*
- *    @end{verbatim}
+ *    @endverbatim
  * 
- *   @item Faces 2 and 4:
- *    @begin{verbatim}
+ *   <li> Faces 2 and 4:
+ *    @verbatim
  *          *-------*        *---2---*
  *         /|       |       /       /|
  *        / |       |      3       1 |
@@ -1596,10 +1596,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      | 3       1      |       | /
  *      |/       /       |       |/
  *      *---0---*        *-------*
- *    @end{verbatim} 
+ *    @endverbatim 
  * 
- *   @item Faces 3 and 5:
- *    @begin{verbatim}
+ *   <li> Faces 3 and 5:
+ *    @verbatim
  *          *-------*        *-------*
  *         /|       |       /       /|
  *        2 1       |      /       2 1
@@ -1610,25 +1610,25 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *      | 0       /      |       | 0
  *      |/       /       |       |/
  *      *-------*        *-------*
- *    @end{verbatim}
- *   @end{itemize}
+ *    @endverbatim
+ *   </ul>
  * 
  *   Due to this numbering, the following lines are identical in the
  *   standard orientation:
- *   @begin{itemize}
- *   @item Line 0 of face 0, and line 0 of face 2;
- *   @item Line 1 of face 0, and line 3 of face 3;
- *   @item Line 2 of face 0, and line 0 of face 4;
- *   @item Line 3 of face 0, and line 3 of face 5;
- *   @item Line 0 of face 1, and line 2 of face 2;
- *   @item Line 1 of face 1, and line 1 of face 3;
- *   @item Line 2 of face 1, and line 2 of face 4;
- *   @item Line 3 of face 1, and line 1 of face 5;
- *   @item Line 3 of face 2, and line 0 of face 5;
- *   @item Line 1 of face 2, and line 0 of face 3;
- *   @item Line 1 of face 4, and line 2 of face 3;
- *   @item Line 3 of face 4, and line 2 of face 5.
- *   @end{itemize}
+ *   <ul>
+ *   <li> Line 0 of face 0, and line 0 of face 2;
+ *   <li> Line 1 of face 0, and line 3 of face 3;
+ *   <li> Line 2 of face 0, and line 0 of face 4;
+ *   <li> Line 3 of face 0, and line 3 of face 5;
+ *   <li> Line 0 of face 1, and line 2 of face 2;
+ *   <li> Line 1 of face 1, and line 1 of face 3;
+ *   <li> Line 2 of face 1, and line 2 of face 4;
+ *   <li> Line 3 of face 1, and line 1 of face 5;
+ *   <li> Line 3 of face 2, and line 0 of face 5;
+ *   <li> Line 1 of face 2, and line 0 of face 3;
+ *   <li> Line 1 of face 4, and line 2 of face 3;
+ *   <li> Line 3 of face 4, and line 2 of face 5.
+ *   </ul>
  *
  *   This standard orientation of faces in 3d can also be depicted by
  *   assigning a normal vector to each face. The direction of this
@@ -1656,7 +1656,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   orders, and the above line equivalences would not hold any
  *   more. You can ask a cell whether a given face has standard
  *   orientation by calling @p{cell->face_orientation(face_no)}: if
- *   the result is @p{true}, then the face has standard orientation,
+ *   the result is @p true, then the face has standard orientation,
  *   otherwise its normal vector is pointing the other
  *   direction. There are not very many places in application programs
  *   where you need this information actually, but a few places in the
@@ -1665,7 +1665,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   @sect4{Children}
  *
  *   The eight children of a cell are numbered as follows:
- *   @begin{verbatim}
+ *   @verbatim
  *         *-------*        *-------*
  *        /| 7   6 |       / 7   6 /|
  *       /7|       |      /       /6|
@@ -1676,19 +1676,19 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     |0/       /      |       |1/
  *     |/0    1 /       | 0   1 |/
  *     *-------*        *-------*
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   Taking into account the orientation of the faces, the following
  *   children are adjacent to the respective faces:
- *   @begin{itemize}
- *   @item Face 0: children 0, 1, 2, 3;
- *   @item Face 1: children 4, 5, 6, 7;
- *   @item Face 2: children 0, 1, 5, 4;
- *   @item Face 3: children 1, 5, 6, 2;
- *   @item Face 4: children 3, 2, 6, 7;
- *   @item Face 5: children 0, 4, 7, 3.
- *   @end{itemize}
- *   You can get these numbers using the @ref{GeometryInfo<3>}@p{::child_cell_on_face}
+ *   <ul>
+ *   <li> Face 0: children 0, 1, 2, 3;
+ *   <li> Face 1: children 4, 5, 6, 7;
+ *   <li> Face 2: children 0, 1, 5, 4;
+ *   <li> Face 3: children 1, 5, 6, 2;
+ *   <li> Face 4: children 3, 2, 6, 7;
+ *   <li> Face 5: children 0, 4, 7, 3.
+ *   </ul>
+ *   You can get these numbers using the @ref{GeometryInfo<3>}@p ::child_cell_on_face
  *   function. Each child is adjacent to the vertex with the same number.
  *
  *   Note that, again, the above list only holds for faces in their
@@ -1699,7 +1699,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   The information which child cell is at which position of which
  *   face is most often used when computing jump terms across faces
  *   with hanging nodes, using objects of type
- *   @ref{FESubfaceValues}. Sitting on one cell, you would look at
+ *   FESubfaceValues. Sitting on one cell, you would look at
  *   face and figure out which child of the neighbor is sitting on a
  *   given subface between the present and the neighboring cell. To
  *   avoid having to query the standard orientation of the faces of
@@ -1717,7 +1717,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   We define the following coordinate system for the explicit coordinates of
  *   the vertices of the unit cell:
- *   @begin{verbatim}
+ *   @verbatim
  *                         7-------6        7-------6
  *                        /|       |       /       /|
  *                       / |       |      /       / |
@@ -1728,31 +1728,31 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    | /              | /       /      |       | /
  *    |/               |/       /       |       |/
  *    *------>x        0-------1        0-------1
- *   @end{verbatim}
+ *   @endverbatim
  *   This convention in conjunction with the numbering of the vertices is a bit
  *   unfortunate, since the vertices 0 through 3 have the coordinates @p{(x,0,z)}
- *   with @p{x} and @p{z} being the same as the @p{x} and @p{y} coordinates of a quad
+ *   with @p x and @p z being the same as the @p x and @p y coordinates of a quad
  *   in the plane; more intuitive would have been if they had the coordinates
  *   @p{(x,y,0)}. However, the vertex numbering was historically chosen as shown.
  *
  *   By the convention laid down as above, the vertices have the following
  *   coordinates:
- *   @begin{itemize}
- *      @item Vertex 0: @p{(0,0,0)};
- *      @item Vertex 1: @p{(1,0,0)};
- *      @item Vertex 2: @p{(1,0,1)};
- *      @item Vertex 3: @p{(0,0,1)};
- *      @item Vertex 4: @p{(0,1,0)};
- *      @item Vertex 5: @p{(1,1,0)};
- *      @item Vertex 6: @p{(1,1,1)};
- *      @item Vertex 7: @p{(0,1,1)}.
- *   @end{itemize}
+ *   <ul>
+ *      <li> Vertex 0: @p{(0,0,0)};
+ *      <li> Vertex 1: @p{(1,0,0)};
+ *      <li> Vertex 2: @p{(1,0,1)};
+ *      <li> Vertex 3: @p{(0,0,1)};
+ *      <li> Vertex 4: @p{(0,1,0)};
+ *      <li> Vertex 5: @p{(1,1,0)};
+ *      <li> Vertex 6: @p{(1,1,1)};
+ *      <li> Vertex 7: @p{(0,1,1)}.
+ *   </ul>
  *
  *
  *   @sect3{Warning}
  *
- *   It seems impossible to preserve @p{const}ness of a triangulation through
- *   iterator usage. Thus, if you declare pointers to a @p{const} triangulation
+ *   It seems impossible to preserve @p constness of a triangulation through
+ *   iterator usage. Thus, if you declare pointers to a @p const triangulation
  *   object, you should be well aware that you might involuntarily alter the
  *   data stored in the triangulation.
  *
@@ -1768,7 +1768,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * Default boundary object. This
 				      * declaration is used for the
 				      * default argument in
-				      * @p{set_boundary}.
+				      * @p set_boundary.
 				      *
 				      * The proper way would have been
 				      * to use a static object here,
@@ -1776,19 +1776,19 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * object. However, we have to
 				      * work around a bug in gcc2.95,
 				      * where the compiler tries to
-				      * instantiate @p{Triangulation}
+				      * instantiate @p Triangulation
 				      * while instantiating
-				      * @p{Boundary} (which it needs
+				      * @p Boundary (which it needs
 				      * to do, since local typedefs
 				      * are involved), but then tries
 				      * to in turn instantiate
-				      * @p{StraightBoundary} because
+				      * @p StraightBoundary because
 				      * of this member variable. This
 				      * is not needed since the member
 				      * variable is a static one, but
 				      * the compiler tries anyway and
 				      * finds that it can't since the
-				      * base class @p{Boundary} is not
+				      * base class @p Boundary is not
 				      * yet complete...
 				      */
     static const StraightBoundary<dim> *straight_boundary;
@@ -1800,7 +1800,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * for mesh smoothing
 				      * algorithms. The meaning of
 				      * these flags is documented in
-				      * the @ref{Triangulation} class.
+				      * the Triangulation class.
 				      */
     enum MeshSmoothing
     {
@@ -1852,7 +1852,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Copy constructor. You should really
-				      *  use the @p{copy_triangulation} function,
+				      *  use the @p copy_triangulation function,
 				      *  so we declare this function but let
 				      *  it throw an internal error. The
 				      *  reason for this is that we may use
@@ -1878,7 +1878,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *
 				      * Note that this operation is only allowed
 				      * if no subscriptions to this object exist
-				      * any more, such as @ref{DoFHandler} objects
+				      * any more, such as DoFHandler objects
 				      * using it.
 				      */
     void clear ();
@@ -1886,7 +1886,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /**					
 				      * Assign a boundary object to
 				      * the triangulation. If a face
-				      * with boundary number @p{number}
+				      * with boundary number @p number
 				      * is refined, this object is
 				      * used to find the location of
 				      * new vertices on the
@@ -1912,15 +1912,15 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * and are accessed with accessor
 				      * functions of that name.
 				      *
-				      * The @p{boundary_object} is not
+				      * The @p boundary_object is not
 				      * copied and MUST persist until
 				      * the triangulation is
 				      * destroyed. Otherwise, the
-				      * @ref{Subscriptor} class will issue
-				      * @p{ExcObjectInUse}.  This is
+				      * Subscriptor class will issue
+				      * @p ExcObjectInUse.  This is
 				      * also true for triangulations
 				      * generated from this one by
-				      * @p{copy_triangulation}.
+				      * @p copy_triangulation.
 				      *
 				      * It is possible to remove or
 				      * replace the boundary object
@@ -1945,7 +1945,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * a boundary object used for
 				      * this triangulation.  Number is
 				      * the same as in
-				      * @p{set_boundary}
+				      * @p set_boundary
 				      */
     const Boundary<dim> & get_boundary (const unsigned int number) const;
     
@@ -1965,7 +1965,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  function also copies the
 				      *  pointer to the boundary
 				      *  descriptor previously set by
-				      *  the @p{set_boundary}
+				      *  the @p set_boundary
 				      *  function. You must therefore
 				      *  also guarantee that the
 				      *  boundary objects has a
@@ -1976,7 +1976,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  empty beforehand.
 				      *
 				      *  The function is made
-				      *  @p{virtual} since some
+				      *  @p virtual since some
 				      *  derived classes might want to
 				      *  disable or extend the
 				      *  functionality of this
@@ -1996,19 +1996,19 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * (connected domain, etc.).
 				      *
 				      * Material data for the cells is
-				      * given within the @p{cells}
+				      * given within the @p cells
 				      * array, while boundary
 				      * information is given in the
-				      * @p{subcelldata} field.
+				      * @p subcelldata field.
 				      *
 				      * The numbering of vertices
-				      * within the @p{cells} array is
+				      * within the @p cells array is
 				      * subject to some constraints;
 				      * see the general class
 				      * documentation for this.
 				      *
 				      * This function is made
-				      * @p{virtual} to allow derived
+				      * @p virtual to allow derived
 				      * classes to set up some data
 				      * structures as well.
 				      *
@@ -2016,8 +2016,8 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * function can generate a valid
 				      * triangulation, see the
 				      * documentation of this class,
-				      * and the @ref{GridIn} and
-				      * @ref{GridReordering} class.
+				      * and the GridIn and
+				      * GridReordering class.
 				      */
     virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
 				       const std::vector<CellData<dim> > &cells,
@@ -2029,15 +2029,15 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * of the grid.  The direction of
 				      * moving is random, while the
 				      * length of the shift vector has
-				      * a value of @p{factor} times
+				      * a value of @p factor times
 				      * the minimal length of the
 				      * active lines adjacent to this
-				      * vertex. Note that @p{factor}
+				      * vertex. Note that @p factor
 				      * should obviously be well below
 				      * @p{0.5}.
 				      *
-				      * If @p{keep_boundary} is set to
-				      * @p{true} (which is the
+				      * If @p keep_boundary is set to
+				      * @p true (which is the
 				      * default), then boundary
 				      * vertices are not moved.
 				      */
@@ -2064,7 +2064,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     void set_all_refine_flags ();
 
 				     /**
-				      *  Refine all cells @p{times}
+				      *  Refine all cells @p times
 				      *  times, by alternatingly
 				      *  calling
 				      *  @p{set_all_refine_flags()}
@@ -2075,7 +2075,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  you have no way to store the
 				      *  refinement flags unless you
 				      *  overload the
-				      *  @p{execute_coarsening_and_refinement}
+				      *  @p execute_coarsening_and_refinement
 				      *  function.
 				      */
     void refine_global (const unsigned int times);
@@ -2094,7 +2094,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
                                       * information.
 				      *
 				      * Note that this function is
-				      * @p{virtual} to allow derived
+				      * @p virtual to allow derived
 				      * classes to insert hooks, such
 				      * as saving refinement flags and
 				      * the like.
@@ -2130,7 +2130,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * independent. However, for some
 				      * dimension dependent things, it
 				      * calls
-				      * @p{prepare_refinement_dim_dependent}.
+				      * @p prepare_refinement_dim_dependent.
 				      *
 				      * Regarding the coarsening part,
 				      * flagging and deflagging cells
@@ -2171,7 +2171,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /**
 				      *  Save the addresses of the
 				      *  cells which are flagged for
-				      *  refinement to @p{out}.  For
+				      *  refinement to @p out.  For
 				      *  usage, read the general
 				      *  documentation for this class.
 				      */
@@ -2185,18 +2185,18 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Read the information stored by
-				      *  @p{save_refine_flags}.
+				      *  @p save_refine_flags.
 				      */
     void load_refine_flags (std::istream &in);
 
     				     /**
 				      *  Read the information stored by
-				      *  @p{save_refine_flags}.
+				      *  @p save_refine_flags.
 				      */
     void load_refine_flags (const std::vector<bool> &v);
 
 				     /**
-				      * Analogue to @p{save_refine_flags}.
+				      * Analogue to @p save_refine_flags.
 				      */
     void save_coarsen_flags (std::ostream &out) const;
 
@@ -2207,12 +2207,12 @@ class Triangulation : public TriaDimensionInfo<dim>,
     void save_coarsen_flags (std::vector<bool> &v) const;
 
     				     /**
-				      * Analogue to @p{load_refine_flags}.
+				      * Analogue to @p load_refine_flags.
 				      */
     void load_coarsen_flags (std::istream &out);
 
 				     /**
-				      * Analogue to @p{load_refine_flags}.
+				      * Analogue to @p load_refine_flags.
 				      */
     void load_coarsen_flags (const std::vector<bool> &v);
 
@@ -2232,7 +2232,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  Save all user flags. See the general
 				      *  documentation for this class
 				      *  and the documentation for the
-				      *  @p{save_refine_flags} for more
+				      *  @p save_refine_flags for more
 				      *  details.
 				      */
     void save_user_flags (std::ostream &out) const;
@@ -2247,13 +2247,13 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Read the information stored by
-				      *  @p{save_user_flags}.
+				      *  @p save_user_flags.
 				      */
     void load_user_flags (std::istream &in);
 
     				     /**
 				      *  Read the information stored by
-				      *  @p{save_user_flags}.
+				      *  @p save_user_flags.
 				      */
     void load_user_flags (const std::vector<bool> &v);
 
@@ -2341,7 +2341,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      * Read the information stored by
-				      * @p{save_user_pointers}.
+				      * @p save_user_pointers.
 				      */
     void load_user_pointers (const std::vector<void *> &v);
 
@@ -2391,30 +2391,30 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /*@{*/
 				     /**
 				      *  Iterator to the first cell, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no cells, a past-the-end iterator
 				      *  is returned.
 				      *
-				      *  This function calls @p{begin_raw_line}
-				      *  in 1D and @p{begin_raw_quad} in 2D.
+				      *  This function calls @p begin_raw_line
+				      *  in 1D and @p begin_raw_quad in 2D.
 				      */
     raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first used cell
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      *
-				      *  This function calls @p{begin_line}
-				      *  in 1D and @p{begin_quad} in 2D.
+				      *  This function calls @p begin_line
+				      *  in 1D and @p begin_quad in 2D.
 				      */
     cell_iterator        begin       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  cell on level @p{level}.
+				      *  cell on level @p level.
 				      *
-				      *  This function calls @p{begin_active_line}
-				      *  in 1D and @p{begin_active_quad} in 2D.
+				      *  This function calls @p begin_active_line
+				      *  in 1D and @p begin_active_quad in 2D.
 				      */
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
@@ -2424,14 +2424,14 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      *
-				      *  This function calls @p{end_line}
-				      *  in 1D and @p{end_quad} in 2D.
+				      *  This function calls @p end_line
+				      *  in 1D and @p end_quad in 2D.
 				      */
     raw_cell_iterator    end () const;
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2439,7 +2439,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2447,7 +2447,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2458,17 +2458,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  Return an iterator pointing to the
 				      *  last cell, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 1D and @p{last_raw_quad} in 2D.
+				      *  This function calls @p last_raw_line
+				      *  in 1D and @p last_raw_quad in 2D.
 				      */
     raw_cell_iterator    last_raw () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  cell of the level @p{level}, used or not.
+				      *  cell of the level @p level, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 1D and @p{last_raw_quad} in 2D.
+				      *  This function calls @p last_raw_line
+				      *  in 1D and @p last_raw_quad in 2D.
 				      */
     raw_cell_iterator    last_raw (const unsigned int level) const;
 
@@ -2476,17 +2476,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  Return an iterator pointing to the last
 				      *  used cell.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 1D and @p{last_quad} in 2D.
+				      *  This function calls @p last_line
+				      *  in 1D and @p last_quad in 2D.
 				      */
     cell_iterator        last () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used cell on level @p{level}.
+				      *  used cell on level @p level.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 1D and @p{last_quad} in 2D.
+				      *  This function calls @p last_line
+				      *  in 1D and @p last_quad in 2D.
 				      */
     cell_iterator        last (const unsigned int level) const;
 
@@ -2494,17 +2494,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  Return an iterator pointing to the last
 				      *  active cell.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 1D and @p{last_active_quad} in 2D.
+				      *  This function calls @p last_active_line
+				      *  in 1D and @p last_active_quad in 2D.
 				      */
     active_cell_iterator last_active () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active cell on level @p{level}.
+				      *  active cell on level @p level.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 1D and @p{last_active_quad} in 2D.
+				      *  This function calls @p last_active_line
+				      *  in 1D and @p last_active_quad in 2D.
 				      */
     active_cell_iterator last_active (const unsigned int level) const;
 				     /*@}*/
@@ -2518,30 +2518,30 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /*@{*/
 				     /**
 				      *  Iterator to the first face, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no faces, a past-the-end iterator
 				      *  is returned.
 				      *
-				      *  This function calls @p{begin_raw_line}
-				      *  in 2D and @p{begin_raw_quad} in 3D.
+				      *  This function calls @p begin_raw_line
+				      *  in 2D and @p begin_raw_quad in 3D.
 				      */
     raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first used face
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      *
-				      *  This function calls @p{begin_line}
-				      *  in 2D and @p{begin_quad} in 3D.
+				      *  This function calls @p begin_line
+				      *  in 2D and @p begin_quad in 3D.
 				      */
     face_iterator        begin_face       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  face on level @p{level}.
+				      *  face on level @p level.
 				      *
-				      *  This function calls @p{begin_active_line}
-				      *  in 2D and @p{begin_active_quad} in 3D.
+				      *  This function calls @p begin_active_line
+				      *  in 2D and @p begin_active_quad in 3D.
 				      */
     active_face_iterator begin_active_face(const unsigned int level = 0) const;
 
@@ -2551,14 +2551,14 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      *
-				      *  This function calls @p{end_line}
-				      *  in 2D and @p{end_quad} in 3D.
+				      *  This function calls @p end_line
+				      *  in 2D and @p end_quad in 3D.
 				      */
     raw_face_iterator    end_face () const;
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2566,7 +2566,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2574,7 +2574,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2584,17 +2584,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  Return an iterator pointing to the
 				      *  last face, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 2D and @p{last_raw_quad} in 3D.
+				      *  This function calls @p last_raw_line
+				      *  in 2D and @p last_raw_quad in 3D.
 				      */
     raw_face_iterator    last_raw_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  face of the level @p{level}, used or not.
+				      *  face of the level @p level, used or not.
 				      *
-				      *  This function calls @p{last_raw_line}
-				      *  in 2D and @p{last_raw_quad} in 3D.
+				      *  This function calls @p last_raw_line
+				      *  in 2D and @p last_raw_quad in 3D.
 				      */
     raw_face_iterator    last_raw_face (const unsigned int level) const;
 
@@ -2602,17 +2602,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  Return an iterator pointing to the last
 				      *  used face.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 2D and @p{last_quad} in 3D.
+				      *  This function calls @p last_line
+				      *  in 2D and @p last_quad in 3D.
 				      */
     face_iterator        last_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used face on level @p{level}.
+				      *  used face on level @p level.
 				      *
-				      *  This function calls @p{last_line}
-				      *  in 2D and @p{last_quad} in 3D.
+				      *  This function calls @p last_line
+				      *  in 2D and @p last_quad in 3D.
 				      */
     face_iterator        last_face (const unsigned int level) const;
 
@@ -2620,17 +2620,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  Return an iterator pointing to the last
 				      *  active face.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 2D and @p{last_active_quad} in 3D.
+				      *  This function calls @p last_active_line
+				      *  in 2D and @p last_active_quad in 3D.
 				      */
     active_face_iterator last_active_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active face on level @p{level}.
+				      *  active face on level @p level.
 				      *
-				      *  This function calls @p{last_active_line}
-				      *  in 2D and @p{last_active_quad} in 3D.
+				      *  This function calls @p last_active_line
+				      *  in 2D and @p last_active_quad in 3D.
 				      */
     active_face_iterator last_active_face (const unsigned int level) const;
 				     /*@}*/
@@ -2644,7 +2644,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /*@{*/
 				     /**
 				      *  Iterator to the first line, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
 				      */
@@ -2653,14 +2653,14 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Iterator to the first used line
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      */
     line_iterator
     begin_line       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  line on level @p{level}.
+				      *  line on level @p level.
 				      */
     active_line_iterator
     begin_active_line(const unsigned int level = 0) const;
@@ -2676,7 +2676,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2684,7 +2684,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2692,7 +2692,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2707,7 +2707,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  line of the level @p{level}, used or not.
+				      *  line of the level @p level, used or not.
 
 				      */
     raw_line_iterator
@@ -2722,7 +2722,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used line on level @p{level}.
+				      *  used line on level @p level.
 				      */
     line_iterator
     last_line (const unsigned int level) const;
@@ -2736,7 +2736,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active line on level @p{level}.
+				      *  active line on level @p level.
 				      */
     active_line_iterator
     last_active_line (const unsigned int level) const;
@@ -2751,7 +2751,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      */
     				     /**
 				      *  Iterator to the first quad, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
 				      */
@@ -2760,14 +2760,14 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Iterator to the first used quad
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      */
     quad_iterator
     begin_quad       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  quad on level @p{level}.
+				      *  quad on level @p level.
 				      */
     active_quad_iterator
     begin_active_quad(const unsigned int level = 0) const;
@@ -2783,7 +2783,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2791,7 +2791,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2799,7 +2799,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2814,7 +2814,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  quad of the level @p{level}, used or not.
+				      *  quad of the level @p level, used or not.
 
 				      */
     raw_quad_iterator
@@ -2829,7 +2829,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used quad on level @p{level}.
+				      *  used quad on level @p level.
 				      */
     quad_iterator
     last_quad (const unsigned int level) const;
@@ -2843,7 +2843,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active quad on level @p{level}.
+				      *  active quad on level @p level.
 				      */
     active_quad_iterator
     last_active_quad (const unsigned int level) const;
@@ -2858,7 +2858,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      */
     				     /**
 				      *  Iterator to the first hex, used
-				      *  or not, on level @p{level}. If a level
+				      *  or not, on level @p level. If a level
 				      *  has no hexs, a past-the-end iterator
 				      *  is returned.
 				      */
@@ -2867,14 +2867,14 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Iterator to the first used hex
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      */
     hex_iterator
     begin_hex       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  hex on level @p{level}.
+				      *  hex on level @p level.
 				      */
     active_hex_iterator
     begin_active_hex(const unsigned int level = 0) const;
@@ -2890,7 +2890,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      * Return an iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2898,7 +2898,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p{level} is
+				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2906,7 +2906,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p{level}
+				      * first iterator not on level. If @p level
 				      * is the last level, then this returns
 				      * @p{end()}.
 				      */
@@ -2921,7 +2921,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  hex of the level @p{level}, used or not.
+				      *  hex of the level @p level, used or not.
 
 				      */
     raw_hex_iterator
@@ -2936,7 +2936,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  used hex on level @p{level}.
+				      *  used hex on level @p level.
 				      */
     hex_iterator
     last_hex (const unsigned int level) const;
@@ -2950,7 +2950,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  active hex on level @p{level}.
+				      *  active hex on level @p level.
 				      */
     active_hex_iterator
     last_active_hex (const unsigned int level) const;
@@ -2970,7 +2970,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      *  Return total number of used lines,
-				      *  active or not on level @p{level}.
+				      *  active or not on level @p level.
 				      */
     unsigned int n_lines (const unsigned int level) const;
     
@@ -2981,7 +2981,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      *  Return total number of active lines,
-				      *  on level @p{level}.
+				      *  on level @p level.
 				      */
     unsigned int n_active_lines (const unsigned int level) const;
     
@@ -2993,7 +2993,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return total number of used quads,
-				      *  active or not on level @p{level}.
+				      *  active or not on level @p level.
 				      */
     unsigned int n_quads (const unsigned int level) const;
     
@@ -3005,7 +3005,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      *  Return total number of active quads,
-				      *  active or not on level @p{level}.
+				      *  active or not on level @p level.
 				      */
     unsigned int n_active_quads (const unsigned int level) const;
     
@@ -3017,7 +3017,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      *  Return total number of used hexahedra,
-				      *  active or not on level @p{level}.
+				      *  active or not on level @p level.
 				      */
     unsigned int n_hexs(const unsigned int level) const;
     
@@ -3029,7 +3029,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
     
 				     /**
 				      *  Return total number of active hexahedra,
-				      *  active or not on level @p{level}.
+				      *  active or not on level @p level.
 				      */
     unsigned int n_active_hexs(const unsigned int level) const;
 
@@ -3043,7 +3043,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      *  Return total number of used cells,
-				      *  active or not, on level @p{level}.
+				      *  active or not, on level @p level.
 				      *  Maps to @p{n_lines(level)} in one space
 				      *  dimension and so on.
 				      */
@@ -3058,7 +3058,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
     				     /**
 				      * Return total number of active cells
-				      * on level @p{level}.
+				      * on level @p level.
 				      * Maps to @p{n_active_lines(level)} in one
 				      * space dimension and so on.
 				      */
@@ -3088,7 +3088,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * holes in the numbers of used
 				      * vertices.  You can get the
 				      * number of used vertices using
-				      * @p{n_used_vertices} function.
+				      * @p n_used_vertices function.
 				      */
     unsigned int n_vertices () const;
 
@@ -3107,7 +3107,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * once. You can find out about
 				      * which vertices are actually
 				      * used by the function
-				      * @ref{get_used_vertices}.
+				      * get_used_vertices().
 				      */
     const std::vector<Point<dim> > &
     get_vertices () const;
@@ -3122,7 +3122,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      * Return a constant reference to
-				      * the array of @p{bool}s
+				      * the array of @p bools
 				      * indicating whether an entry in
 				      * the vertex array is used or
 				      * not.
@@ -3290,11 +3290,11 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  as ASCII text.
 				      *
 				      *  The flags are stored in a binary
-				      *  format: for each @p{true}, a @p{1}
-				      *  bit is stored, a @p{0} bit otherwise.
+				      *  format: for each @p true, a @p 1
+				      *  bit is stored, a @p 0 bit otherwise.
 				      *  The bits are stored as @p{unsigned char},
 				      *  thus avoiding endianess. They are
-				      *  written to @p{out} in plain text, thus
+				      *  written to @p out in plain text, thus
 				      *  amounting to 3.6 bits per active cell
 				      *  on the overage. Other information
 				      *  (magic numbers ans number of elements)
@@ -3309,7 +3309,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
 				     /**
 				      * Re-read a vector of bools previously
-				      * written by @p{write_bool_vector} and
+				      * written by @p write_bool_vector and
 				      * compare with the magic numbers.
 				      */
     static void read_bool_vector (const unsigned int       magic_number1,
@@ -3339,7 +3339,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * it children, which is the
 				      * main step for the coarsening process.
 				      * This is the dimension dependent part
-				      * of @p{execute_coarsening}.
+				      * of @p execute_coarsening.
 				      */
     void delete_children (cell_iterator &cell);
 
@@ -3356,7 +3356,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * otherwise to steps of interpolation
 				      * would be necessary. This would make
 				      * the processes implemented in the
-				      * @p{ConstraintMatrix} class much more
+				      * @p ConstraintMatrix class much more
 				      * complex, since these two steps of
 				      * interpolation do not commute.
 				      */
@@ -3373,9 +3373,9 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * Re-compute the number of
 				      * lines, quads, etc. This
 				      * function is called by
-				      * @p{execute_coarsening_and_refinement}
+				      * @p execute_coarsening_and_refinement
 				      * and by
-				      * @p{create_triangulation} after
+				      * @p create_triangulation after
 				      * the grid was changed.
 				      *
 				      * This function simply delegates

@@ -31,19 +31,19 @@
  * The constructor of this class takes two arguments: a reference to
  * the vector that defines the mapping from the reference
  * configuration to the current configuration and a reference to the
- * @ref{DoFHandler}. The vector should then represent a (flattened out
+ * DoFHandler. The vector should then represent a (flattened out
  * version of a) vector valued field defined at nodes defined by the 
- * the @ref{DoFHandler}, where the number of components of the vector
+ * the DoFHandler, where the number of components of the vector
  * field equals the number of space dimensions. Thus, the 
- * @ref{DoFHandler} shall operate on a finite element that has as many 
+ * DoFHandler shall operate on a finite element that has as many 
  * components as space dimensions. As an additional requirement, we 
  * impose that it have as many degree of freedom per vertex as there
  * are space dimensions; since this object only evaluates the finite 
  * element field at the vertices, the values
  * of all other degrees of freedom (not associated to vertices) are
  * ignored. These requirements are met if the finite element which the
- * given @ref{DoFHandler} operates on is constructed as a system
- * element (@ref{FESystem}) from @p{dim} continuous @ref{FE_Q}
+ * given DoFHandler operates on is constructed as a system
+ * element (FESystem) from @p dim continuous FE_Q()
  * objects.
  *
  * In many cases, the shift vector will also be the solution vector of
@@ -52,18 +52,18 @@
  * space dimension, e.g. for scalar problems in @p{dim>1} where the
  * Eulerian coordinates only give a background field) or for coupled
  * problems where more variables are computed than just the flow
- * field), then a different @ref{DoFHandler} has to be set up on the
+ * field), then a different DoFHandler has to be set up on the
  * given triangulation, and the shift vector has then to be associated
  * to it.
  *
  * An example is shown below:
- * @begin{verbatim}
+ * @verbatim
  *    FESystem<dim> fe(FE_Q<dim>(1), dim);
  *    DoFHandler<dim> flowfield_dof_handler(triangulation);
  *    flowfield_dof_handler.distribute_dofs(fe);
  *    Vector<double> map_points(flowfield_dof_handler.n_dofs());
  *    MappingQ1Eulerian<dim> mymapping(map_points, flowfield_dof_handler);
- * @end{verbatim}
+ * @endverbatim
  *
  * Note that since the vector of shift values and the dof handler are
  * only associated to this object at construction time, you have to
@@ -85,16 +85,16 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      * problem from the reference to
 				      * the current configuration.
 				      * The organization of the
-				      * elements in the @p{Vector}
+				      * elements in the @p Vector
 				      * must follow the concept how
 				      * deal.II stores solutions that
 				      * are associated to a
 				      * triangulation.  This is
 				      * automatically the case if the
-				      * @p{Vector} represents the
+				      * @p Vector represents the
 				      * solution of the previous step
 				      * of a nonlinear problem.
-				      * Alternatively, the @p{Vector}
+				      * Alternatively, the @p Vector
 				      * can be initialized by
 				      * @p{DoFObjectAccessor::set_dof_values()}.
 				      */
@@ -142,7 +142,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				     /**
 				      * Computes the support points of
 				      * the mapping. For
-				      * @p{MappingQ1Eulerian} these
+				      * @p MappingQ1Eulerian these
 				      * are the vertices.
 				      */
     virtual void compute_mapping_support_points(

@@ -35,7 +35,7 @@ class PointerMatrixBase : public Subscriptor
 				      * This was defined to make this
 				      * matrix a possible template
 				      * argument to
-				      * @ref{BlockMatrixArray}.
+				      * BlockMatrixArray.
 				      */
     typedef typename VECTOR::value_type value_type;
     
@@ -61,14 +61,14 @@ class PointerMatrixBase : public Subscriptor
 
 				   /**
 				    * Matrix-vector product, adding to
-				    * @p{dst}.
+				    * @p dst.
 				    */
   virtual void vmult_add (VECTOR& dst,
 			  const VECTOR& src) const = 0;
 
 				   /**
 				    * Tranposed matrix-vector product,
-				    * adding to @p{dst}.
+				    * adding to @p dst.
 				    */
   virtual void Tvmult_add (VECTOR& dst,
 			   const VECTOR& src) const = 0;
@@ -93,9 +93,9 @@ public:
 				    * argument is stored in this
 				    * class. As usual, the lifetime of
 				    * @p{*M} must be longer than the
-				    * one of the @p{PointerMatrix}.
+				    * one of the @p PointerMatrix.
 				    *
-				    * If @p{M} is zero, no matrix is stored.
+				    * If @p M is zero, no matrix is stored.
 				    */
   PointerMatrix (const MATRIX* M=0);
 
@@ -127,14 +127,14 @@ public:
 
 				   /**
 				    * Matrix-vector product, adding to
-				    * @p{dst}.
+				    * @p dst.
 				    */
   virtual void vmult_add (VECTOR& dst,
 			  const VECTOR& src) const;
   
 				   /**
 				    * Tranposed matrix-vector product,
-				    * adding to @p{dst}.
+				    * adding to @p dst.
 				    */
   virtual void Tvmult_add (VECTOR& dst,
 			   const VECTOR& src) const;

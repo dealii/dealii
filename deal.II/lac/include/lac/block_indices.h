@@ -36,7 +36,7 @@ class BlockIndices
 				     /**
 				      * Default
 				      * constructor. Initialize for
-				      * @p{n_blocks} blocks and set
+				      * @p n_blocks blocks and set
 				      * all block sizes to zero.
 				      */
     BlockIndices (const unsigned int n_blocks = 0);
@@ -44,7 +44,7 @@ class BlockIndices
 				     /**
 				      * Constructor. Initialize the
 				      * number of entries in each
-				      * block @p{i} as @p{n[i]}. The
+				      * block @p i as @p{n[i]}. The
 				      * number of blocks will be the
 				      * size of the vector
 				      */
@@ -63,8 +63,8 @@ class BlockIndices
 				      * indices within each block from
 				      * the given argument. The number
 				      * of blocks will be adjusted to
-				      * the size of @p{n} and the size
-				      * of block @p{i} is set to
+				      * the size of @p n and the size
+				      * of block @p i is set to
 				      * @p{n[i]}.
 				      */
     inline void reinit (const std::vector<unsigned int> &n);
@@ -72,7 +72,7 @@ class BlockIndices
 				     /**
 				      * Return the block and the
 				      * index within that block
-				      * for the global index @p{i}. The
+				      * for the global index @p i. The
 				      * first element of the pair is
 				      * the block, the second the
 				      * index within it.
@@ -82,7 +82,7 @@ class BlockIndices
 
 				     /**
 				      * Return the global index of
-				      * @p{index} in block @p{block}.
+				      * @p index in block @p block.
 				      */
     unsigned int local_to_global (const unsigned int block,
 				  const unsigned int index) const;
@@ -102,7 +102,7 @@ class BlockIndices
     inline unsigned int total_size () const;
 
 				     /**
-				      * Return the size of the @p{i}th
+				      * Return the size of the @p ith
 				      * block.
 				      */
     unsigned int block_size (const unsigned int i) const;
@@ -313,7 +313,7 @@ BlockIndices::memory_consumption () const
 
 
 /**
- * Global function @p{swap} which overloads the default implementation
+ * Global function @p swap which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two objects.
  *

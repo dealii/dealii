@@ -45,7 +45,7 @@ namespace PETScWrappers
  * second type support the abgebraic operation for vectors. The third
  * und last type helps us to manipulate the components of the vector.
  * As opposed to the array of the C++ standard library called
- * @p{vector} (with a lowercase "v"), this class implements an element
+ * @p vector (with a lowercase "v"), this class implements an element
  * of a vector space suitable for numerical computations.
  *
  *
@@ -112,7 +112,7 @@ class Vector
 // 				      * Copy constructor taking a vector of
 // 				      * another data type. This will fail if
 // 				      * there is no conversion path from
-// 				      * @p{OtherNumber} to @p{Number}. Note that
+// 				      * @p OtherNumber to @p Number. Note that
 // 				      * you may lose accuracy when copying
 // 				      * to a vector with data elements with
 // 				      * less accuracy.
@@ -152,7 +152,7 @@ class Vector
     
 				     /**
 				      * Constructor. Set dimension to
-				      * @p{n} and initialize all
+				      * @p n and initialize all
 				      * elements with zero.
 				      *
 				      * The constructor is made
@@ -174,7 +174,7 @@ class Vector
 				      * given range of values pointed
 				      * to by the iterators. This
 				      * function is there in analogy
-				      * to the @p{std::vector} class.
+				      * to the @p std::vector class.
 				      */
     template <typename InputIterator>
     Vector (const InputIterator first,
@@ -191,7 +191,7 @@ class Vector
                                      /**
                                       * This function does nothing but is
                                       * there for compatibility with the
-                                      * @p{PETScWrappers::Vector} class.
+                                      * @p PETScWrappers::Vector class.
                                       * 
                                       * For the PETSc vector wrapper class,
                                       * thios function compresses the
@@ -221,7 +221,7 @@ class Vector
 
 				     /**
 				      * Change the dimension of the vector to
-				      * @p{N}. The reserved memory for this
+				      * @p N. The reserved memory for this
 				      * vector remains unchanged if possible,
 				      * to make things faster; this may waste
 				      * some memory, so keep this in mind.
@@ -244,10 +244,10 @@ class Vector
     
 				     /**
 				      * Change the dimension to that of the
-				      * vector @p{V}. The same applies as for
-				      * the other @p{reinit} function.
+				      * vector @p V. The same applies as for
+				      * the other @p reinit function.
 				      *
-				      * The elements of @p{V} are not copied,
+				      * The elements of @p V are not copied,
 				      * i.e.  this function is the same as
 				      * calling @p{reinit (V.size(), fast)}.
 				      */
@@ -258,7 +258,7 @@ class Vector
 				     /**
 				      * Swap the contents of this
 				      * vector and the other vector
-				      * @p{v}. One could do this
+				      * @p v. One could do this
 				      * operation with a temporary
 				      * variable and copying over the
 				      * data elements, but this
@@ -271,7 +271,7 @@ class Vector
 				      * data around.
 				      *
 				      * This function is analog to the
-				      * the @p{swap} function of all C++
+				      * the @p swap function of all C++
 				      * standard containers. Also,
 				      * there is a global function
 				      * @p{swap(u,v)} that simply calls
@@ -282,7 +282,7 @@ class Vector
     
 				     /**
 				      * Set all components of the vector to
-				      * the given number @p{s}.
+				      * the given number @p s.
 				      */
     Vector<Number> & operator= (const Number s);
     
@@ -356,7 +356,7 @@ class Vector
 				      * Return the scalar product of
 				      * two vectors.  The return type
 				      * is the underlying type of
-				      * @p{this} vector, so the return
+				      * @p this vector, so the return
 				      * type and the accuracy with
 				      * which it the result is
 				      * computed depend on the order
@@ -420,7 +420,7 @@ class Vector
     bool all_zero () const;
 
                                      /**
-                                      * Return @p{true} if the vector has no
+                                      * Return @p true if the vector has no
                                       * negative entries, i.e. all entries are
                                       * zero or positive. This function is
                                       * used, for example, to check whether
@@ -430,7 +430,7 @@ class Vector
     bool is_non_negative () const;
     
 				     /**
-				      * Make the @p{Vector} class a bit like the
+				      * Make the @p Vector class a bit like the
 				      * @p{vector<>} class of the C++ standard
 				      * library by returning iterators to
 				      * the start and end of the elements of this
@@ -463,13 +463,13 @@ class Vector
 				      */
 				     //@{
 				     /**
-				      * Access the value of the @p{i}th
+				      * Access the value of the @p ith
 				      * component.
 				      */
     Number operator() (const unsigned int i) const;
     
 				     /**
-				      * Access the @p{i}th component
+				      * Access the @p ith component
 				      * as a writeable reference.
 				      */
     Number& operator() (const unsigned int i);
@@ -494,8 +494,8 @@ class Vector
     Vector<Number> & operator -= (const Vector<Number> &V);
 
 				     /**
-				      * Addition of @p{s} to all
-				      * components. Note that @p{s} is a
+				      * Addition of @p s to all
+				      * components. Note that @p s is a
 				      * scalar and not a vector.
 				      */
     void add (const Number s);
@@ -639,15 +639,15 @@ class Vector
 
 				     /**
 				      * Print to a
-				      * stream. @p{precision} denotes
+				      * stream. @p precision denotes
 				      * the desired precision with
 				      * which values shall be printed,
-				      * @p{scientific} whether
+				      * @p scientific whether
 				      * scientific notation shall be
-				      * used. If @p{across} is
-				      * @p{true} then the vector is
+				      * used. If @p across is
+				      * @p true then the vector is
 				      * printed in a line, while if
-				      * @p{false} then the elements
+				      * @p false then the elements
 				      * are printed on a separate line
 				      * each.
 				      */
@@ -715,11 +715,11 @@ class Vector
 				      * Amount of memory actually
 				      * reserved for this vector. This
 				      * number may be greater than
-				      * @p{dim} if a @p{reinit} was
+				      * @p dim if a @p reinit was
 				      * called with less memory
 				      * requirements than the vector
 				      * needed last time. At present
-				      * @p{reinit} does not free
+				      * @p reinit does not free
 				      * memory when the number of
 				      * needed elements is reduced.
 				      */
@@ -959,7 +959,7 @@ Vector<Number>::compress () const
 
 
 /**
- * Global function @p{swap} which overloads the default implementation
+ * Global function @p swap which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *

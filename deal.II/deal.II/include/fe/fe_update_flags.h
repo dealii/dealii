@@ -35,49 +35,49 @@
  * @sect2{Description of Flags}
  *
  * The following flags are declared:
- * @begin{itemize}
- * @item <tt>update_default</tt>: Default: update nothing.
- * @item <tt>update_values</tt>: Compute the values of the shape
+ * <ul>
+ * <li> <tt>update_default</tt>: Default: update nothing.
+ * <li> <tt>update_values</tt>: Compute the values of the shape
  *     functions at the quadrature points on the real space cell. For
  *     the usual Lagrange elements, these values are equal to the
  *     values of the shape functions at the quadrature points on the
  *     unit cell, but they are different for more complicated
  *     elements, such as BDM or Raviart-Thomas elements.
- * @item <tt>update_gradients</tt>: Transform gradients on unit cell
+ * <li> <tt>update_gradients</tt>: Transform gradients on unit cell
  *     to gradients on real cell.
- * @item <tt>update_second_derivatives</tt>: Update the second
+ * <li> <tt>update_second_derivatives</tt>: Update the second
  *     derivatives of the shape functions on the real cell.
- * @item <tt>update_boundary_forms</tt>: Update boundary forms on the
+ * <li> <tt>update_boundary_forms</tt>: Update boundary forms on the
  *     face.  This flag is only evaluated by the FEFaceValues class.
  *     Giving this flag to the FEValues class will result in an error,
  *     since boundary forms only exist on the boundary.
- * @item <tt>update_q_points</tt>: Compute quadrature points in real
+ * <li> <tt>update_q_points</tt>: Compute quadrature points in real
  *     space (not on unit cell).
- * @item <tt>update_JxW_values</tt>: Compute the JxW values (Jacobian
+ * <li> <tt>update_JxW_values</tt>: Compute the JxW values (Jacobian
  *     determinant at the quadrature point times the weight of this
  *     point).
- * @item <tt>update_normal_vectors</tt>: Update the outward normal
+ * <li> <tt>update_normal_vectors</tt>: Update the outward normal
  *     vectors to the face relative to this cell.  This flag is only
  *     evaluated by the FEFaceValues class.  Giving this flag to the
  *     FEValues class will result in an error, since normal vectors
  *     are not useful in that case.
- * @item <tt>update_jacobians</tt>: Compute jacobian matrices of the
+ * <li> <tt>update_jacobians</tt>: Compute jacobian matrices of the
  *     transform between unit and real cell in the evaluation points.
- * @item <tt>update_jacobian_grads</tt>: Update gradients of the
+ * <li> <tt>update_jacobian_grads</tt>: Update gradients of the
  *     jacobian. These are used to compute second derivatives.
- * @item <tt>update_covariant_transformation</tt>: Update co-variant
+ * <li> <tt>update_covariant_transformation</tt>: Update co-variant
  *     transformation.  This flag is used internally to tell Mapping
  *     objects to compute the transformation matrices for co-variant
  *     vectors.
- * @item <tt>update_contravariant_transformation</tt>: Update
+ * <li> <tt>update_contravariant_transformation</tt>: Update
  *     contra-variant transformation.  This flag is used internally to
  *     tell Mapping objects to compute the transformation matrices for
  *     contra-variant vectors.
- * @item <tt>update_transformation_values</tt>: Update the shape
+ * <li> <tt>update_transformation_values</tt>: Update the shape
  *     function values of the transformation.
- * @item <tt>update_transformation_gradients</tt>: Update the
+ * <li> <tt>update_transformation_gradients</tt>: Update the
  *     gradients of the shape functions of the transformation.
- * @end{itemize}
+ * </ul>
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, Ralf Hartmann 2004
  */

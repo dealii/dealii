@@ -54,27 +54,27 @@ namespace PETScWrappers
  *
  * @sect3{Conventions for all functions}
  *
- * There exist two versions of each function. One with a @ref{Mapping}
+ * There exist two versions of each function. One with a Mapping
  * argument and one without. If a code uses a mapping different from
  * @ref{MappingQ1} the functions <em>with</em> mapping argument should
  * be used. Code that uses only @ref{MappingQ1} may also use the
- * functions <em>without</em> @ref{Mapping} argument. Each of these
+ * functions <em>without</em> Mapping argument. Each of these
  * latter functions create a @ref{MappingQ1} object and just call the
  * respective functions with that object as mapping argument. The
- * functions without @ref{Mapping} argument still exist to ensure
+ * functions without Mapping argument still exist to ensure
  * backward compatibility. Nevertheless it is advised to change the
- * user's codes to store a specific @ref{Mapping} object and to use
- * the functions that take this @p{Mapping} object as argument. This
+ * user's codes to store a specific Mapping object and to use
+ * the functions that take this @p Mapping object as argument. This
  * gives the possibility to easily extend the user codes to work also
  * on mappings of higher degree, this just by exchanging
- * @ref{MappingQ1} by, for example, a @ref{MappingQ} or another
- * @ref{Mapping} object of interest.
+ * @ref{MappingQ1} by, for example, a MappingQ or another
+ * Mapping object of interest.
  *
  * All functions take a sparse matrix object to hold the matrix to be
  * created. The functions assume that the matrix is initialized with a
- * sparsity pattern (@ref{SparsityPattern}) corresponding to the given degree
+ * sparsity pattern (SparsityPattern) corresponding to the given degree
  * of freedom handler, i.e. the sparsity structure is already as needed.
- * You can do this by calling the @ref{DoFHandler}@p{<dim>::make_sparsity_pattern}
+ * You can do this by calling the DoFHandler@p{<dim>::make_sparsity_pattern}
  * function.
  *
  * Furthermore it is assumed that no relevant data is in the matrix. All
@@ -89,7 +89,7 @@ namespace PETScWrappers
  * want to add several matrices and could then condense afterwards
  * only once, instead of for every matrix. To actually do computations
  * with these matrices, you have to condense the matrix using the
- * @ref{ConstraintMatrix}@p{::condense} function; you also have to
+ * ConstraintMatrix@p ::condense function; you also have to
  * condense the right hand side accordingly and distribute the
  * solution afterwards.
  *
@@ -102,8 +102,8 @@ namespace PETScWrappers
  * @sect3{Supported matrices}
  *
  * At present there are functions to create the following matrices:
- * @begin{itemize}
- * @item @p{create_mass_matrix}: create the matrix with entries
+ * <ul>
+ * <li> @p create_mass_matrix: create the matrix with entries
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ by numerical
  *   quadrature. Here, the $\phi_i$ are the basis functions of the
  *   finite element space given.
@@ -111,20 +111,20 @@ namespace PETScWrappers
  *   A coefficient may be given to evaluate
  *   $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$ instead.
  *
- * @item @p{create_laplace_matrix}: create the matrix with entries
+ * <li> @p create_laplace_matrix: create the matrix with entries
  *   $m_{ij} = \int_\Omega \nabla\phi_i(x) \nabla\phi_j(x) dx$ by
  *   numerical quadrature.
  *
  *   Again, a coefficient may be given to evaluate
  *   $m_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \phi_j(x) dx$ instead.
- * @end{itemize}
+ * </ul>
  *
- * Make sure that the order of the @ref{Quadrature} formula given to these
+ * Make sure that the order of the Quadrature formula given to these
  * functions is sufficiently high to compute the matrices with the
  * required accuracy. For the choice of this quadrature rule you need
- * to take into account the polynomial degree of the @ref{FiniteElement}
- * basis functions, the roughness of the coefficient @p{a}, as well as
- * the degree of the given @p{Mapping}.
+ * to take into account the polynomial degree of the FiniteElement
+ * basis functions, the roughness of the coefficient @p a, as well as
+ * the degree of the given @p Mapping.
  *
  * Note, that for system elements the mass matrix and the laplace
  * matrix is implemented such that each components couples only with
@@ -141,19 +141,19 @@ namespace PETScWrappers
  *
  * @sect3{Matrices on the boundary}
  *
- * The @p{create_boundary_mass_matrix} creates the matrix with entries
+ * The @p create_boundary_mass_matrix creates the matrix with entries
  * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the
  * union of boundary parts with indicators contained in a
- * @ref{FunctioMap}@p{::FunctionMap} passed to the function (i.e. if
+ * FunctioMap@p ::FunctionMap passed to the function (i.e. if
  * you want to set up the mass matrix for the parts of the boundary
  * with indicators zero and 2, you pass the function a map of
- * @p{unsigned char}s as parameter @p{boundary_functions} containing
+ * @p{unsigned char}s as parameter @p boundary_functions containing
  * the keys zero and 2). The $\phi_i$ are the basis functions which
  * have at least part of their support on $\Gamma$. The mapping
- * @p{dof_to_boundary_mapping} required by this function maps global
+ * @p dof_to_boundary_mapping required by this function maps global
  * DoF numbers to a numbering of the degrees of freedom located on the
  * boundary, and can be obtained using the function
- * @p{DoFTools::map_dof_to_boundary_indices}.
+ * @p DoFTools::map_dof_to_boundary_indices.
  *
  * Since in most cases we are not interested in the pure mass matrix on the
  * boundary, but rather need it to compute the projection of a function to
@@ -162,7 +162,7 @@ namespace PETScWrappers
  * This function needs to get passed a matrix object to hold the resulting sparse
  * matrix. This object is supposed to be initialized with a suitable sparsity
  * pattern, which can be created using the
- * @ref{DoFHandler}@p{::make_boundary_sparsity_pattern} function.
+ * DoFHandler@p ::make_boundary_sparsity_pattern function.
  *
  * The object describing the exact form of the boundary is obtained from the
  * triangulation object.
@@ -176,7 +176,7 @@ namespace PETScWrappers
  * exists in two versions, one only building the matrix and one also
  * building the right hand side vector. If you want to create a right
  * hand side vector without creating a matrix, you can use the
- * @ref{VectorTools::create_right_hand_side} function. The use of the
+ * VectorTools::create_right_hand_side() function. The use of the
  * latter may be useful if you want to create many right hand side
  * vectors.
  *
@@ -190,7 +190,7 @@ namespace PETScWrappers
  * once.
  *
  * All functions in this collection use the finite element given to
- * the @ref{DoFHandler} object the last time that the degrees of
+ * the DoFHandler object the last time that the degrees of
  * freedom were distributed on the triangulation.
  *
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
@@ -273,7 +273,7 @@ class MatrixCreator
 				      * The matrix is assumed to
 				      * already be initialized with a
 				      * suiting sparsity pattern (the
-				      * @ref{DoFHandler} provides an
+				      * DoFHandler provides an
 				      * appropriate function).
 				      *
 				      * If the library is configured
@@ -446,7 +446,7 @@ class MatrixCreator
     
 				     /**
 				      * Version of the same function
-				      * (without suffix @p{_1}) with
+				      * (without suffix @p _1) with
 				      * the same argument list that
 				      * operates only on an interval
 				      * of iterators. Used for
@@ -466,7 +466,7 @@ class MatrixCreator
 
 				     /**
 				      * Version of the same function
-				      * (without suffix @p{_2}) with
+				      * (without suffix @p _2) with
 				      * the same argument list that
 				      * operates only on an interval
 				      * of iterators. Used for
@@ -488,7 +488,7 @@ class MatrixCreator
 
 				     /**
 				      * Version of the same function
-				      * (without suffix @p{_1}) with
+				      * (without suffix @p _1) with
 				      * the same argument list that
 				      * operates only on an interval
 				      * of iterators. Used for
@@ -508,7 +508,7 @@ class MatrixCreator
 
 				     /**
 				      * Version of the same function
-				      * (without suffix @p{_2}) with
+				      * (without suffix @p _2) with
 				      * the same argument list that
 				      * operates only on an interval
 				      * of iterators. Used for
@@ -530,7 +530,7 @@ class MatrixCreator
 
 				     /**
 				      * Version of the same function
-				      * (without suffix @p{_1}) with
+				      * (without suffix @p _1) with
 				      * the same argument list that
 				      * operates only on an interval
 				      * of iterators. Used for
@@ -562,12 +562,12 @@ class MatrixCreator
  *
  * @sect3{Boundary conditions}
  *
- * The @p{apply_boundary_values} function inserts boundary conditions
+ * The @p apply_boundary_values function inserts boundary conditions
  * of into a system of equations.  To actually do this you have to
  * specify a list of degree of freedom indices along with the values
  * these degrees of freedom shall assume. To see how to get such a
  * list, see the discussion of the
- * @ref{VectorTools}@p{::interpolate_boundary_values} function.
+ * VectorTools@p ::interpolate_boundary_values function.
  *
  * There are two ways to incorporate fixed degrees of freedom such as boundary
  * nodes into a linear system, as discussed below.
@@ -607,7 +607,7 @@ class MatrixCreator
  * solver which can handle nonsymmetric matrices in any case, so there
  * may be no need to do the Gauss elimination anyway. In fact, this is
  * the way the function works: it takes a parameter
- * (@p{elininate_columns}) that specifies whether the sparsity pattern
+ * (@p elininate_columns) that specifies whether the sparsity pattern
  * is symmetric; if so, then the column is eliminated and the right
  * hand side is also modified accordingly. If not, then only the row
  * is deleted and the column is not touched at all, and all right hand
@@ -615,17 +615,17 @@ class MatrixCreator
  * remain unchanged.
  *
  * If the sparsity pattern for your matrix is non-symmetric, you must
- * set the value of this parameter to @p{false} in any case, since then
+ * set the value of this parameter to @p false in any case, since then
  * we can't eliminate the column without searching all rows, which
- * would be too expensive (if @p{N} be the number of rows, and @p{m} the
+ * would be too expensive (if @p N be the number of rows, and @p m the
  * number of nonzero elements per row, then eliminating one column is
  * an @p{O(N*log(m))} operation, since searching in each row takes
  * @p{log(m)} operations). If your sparsity pattern is symmetric, but
- * your matrix is not, then you might specify @p{false} as well. If your
+ * your matrix is not, then you might specify @p false as well. If your
  * sparsity pattern and matrix are both symmetric, you might want to
- * specify @p{true} (the complexity of eliminating one row is then
- * @p{O(m*log(m))}, since we only have to search @p{m} rows for the
- * respective element of the column). Given the fact that @p{m} is
+ * specify @p true (the complexity of eliminating one row is then
+ * @p{O(m*log(m))}, since we only have to search @p m rows for the
+ * respective element of the column). Given the fact that @p m is
  * roughly constant, irrespective of the discretization, and that the
  * number of boundary nodes is @p{sqrt(N)} in 2d, the algorithm for
  * symmetric sparsity patterns is @p{O(sqrt(N)*m*log(m))}, while it
@@ -665,9 +665,9 @@ class MatrixCreator
  * values. However, since the modification for boundary values of the
  * right hand side vector depends on the original matrix, this is not
  * possible without storing the original matrix somewhere and applying
- * the @p{apply_boundary_conditions} function to a copy of it each
+ * the @p apply_boundary_conditions function to a copy of it each
  * time we want to solve. In that case, you can use the
- * @ref{FilteredMatrix} class in the @p{LAC} sublibrary. There you can
+ * FilteredMatrix class in the @p LAC sublibrary. There you can
  * also find a formal (mathematical) description of the process of
  * modifying the matrix and right hand side vectors for boundary
  * values.
@@ -702,8 +702,8 @@ class MatrixTools : public MatrixCreator
 				      *
 				      * For a replacement function,
 				      * see the documentation of the
-				      * @ref{FilteredMatrix} class in
-				      * the @p{LAC} sublibrary, or use the
+				      * FilteredMatrix class in
+				      * the @p LAC sublibrary, or use the
 				      * local_apply_boundary_values()
 				      * function..
 				      */
@@ -726,8 +726,8 @@ class MatrixTools : public MatrixCreator
 				      *
 				      * For a replacement function, see the
 				      * documentation of the
-				      * @ref{FilteredMatrix} class in the
-				      * @p{LAC} sublibrary, or use the
+				      * FilteredMatrix class in the
+				      * @p LAC sublibrary, or use the
 				      * local_apply_boundary_values()
 				      * function.
 				      */

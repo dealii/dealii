@@ -48,7 +48,7 @@ namespace internal
                                       * already exists in a list of
                                       * edges, and if it already
                                       * exists in reverse order, then
-                                      * return @p{false}. If it is not
+                                      * return @p false. If it is not
                                       * already in the list, or in the
                                       * correct direction, then go on
                                       * with the next faces or cell.
@@ -63,7 +63,7 @@ namespace internal
  * edges come into each node and what the default deal.II directions
  * are for the quad.
  *
- * @begin{verbatim}
+ * @verbatim
  *       s2
  *       
  *     +-->--+       
@@ -73,7 +73,7 @@ namespace internal
  *     +-->--+               
  *   
  *       s0           
- * @end{verbatim}
+ * @endverbatim
  *
  * @author Michael Anderson, 2003
  */ 
@@ -139,7 +139,7 @@ namespace internal
 	unsigned int side[4]; 
 
 					 /**
-					  * Copy of the @p{CellData} object
+					  * Copy of the @p CellData object
 					  * from which we construct the
 					  * data of this object.
 					  */
@@ -218,7 +218,7 @@ namespace internal
 
 /**
  * Implement the 2d algorithm for grid reordering described in the
- * documentation of the @ref{GridReordering} class.
+ * documentation of the GridReordering class.
  *
  * @author Michael Anderson, 2003
  */   
@@ -570,7 +570,7 @@ namespace internal
                                           * Export the data of this
                                           * object to the deal.II
                                           * format that the
-                                          * @ref{Triangulation} class
+                                          * Triangulation class
                                           * wants as input.
                                           */
         void
@@ -717,7 +717,7 @@ namespace internal
                                           * private, the only entry
                                           * point of this class is the
                                           * static function
-                                          * @ref{orient_mesh}.
+                                          * orient_mesh().
                                           */
         Orienter (const std::vector<CellData<3> > &incubes);
 
@@ -740,7 +740,7 @@ namespace internal
                                          /**
                                           * Return whether the cell
                                           * with cell number
-                                          * @p{cell_num} is fully
+                                          * @p cell_num is fully
                                           * oriented.
                                           */
         bool is_oriented (const unsigned int cell_num) const;

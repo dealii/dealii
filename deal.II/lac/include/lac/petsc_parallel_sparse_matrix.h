@@ -71,7 +71,7 @@ namespace PETScWrappers
                                           * involves copying data, and is thus
                                           * expensive.
                                           *
-                                          * The @p{is_symmetric} flag determines
+                                          * The @p is_symmetric flag determines
                                           * whether we should tell PETSc that
                                           * the matrix is going to be symmetric
                                           * (as indicated by the call
@@ -80,7 +80,7 @@ namespace PETScWrappers
                                           * that one cannot form an ILU
                                           * decomposition of a matrix for which
                                           * this flag has been set. The default
-                                          * value of this flag is @p{false}.
+                                          * value of this flag is @p false.
                                           */
         SparseMatrix (const MPI_Comm     &communicator,
                       const unsigned int  m,
@@ -104,7 +104,7 @@ namespace PETScWrappers
                                           * row, but this involves copying data,
                                           * and is thus expensive.
                                           *
-                                          * The @p{is_symmetric} flag determines
+                                          * The @p is_symmetric flag determines
                                           * whether we should tell PETSc that
                                           * the matrix is going to be symmetric
                                           * (as indicated by the call
@@ -113,7 +113,7 @@ namespace PETScWrappers
                                           * that one cannot form an ILU
                                           * decomposition of a matrix for which
                                           * this flag has been set. The default
-                                          * value of this flag is @p{false}.
+                                          * value of this flag is @p false.
                                           */
         SparseMatrix (const MPI_Comm                  &communicator,
                       const unsigned int               m,

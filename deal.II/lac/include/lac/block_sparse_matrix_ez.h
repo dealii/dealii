@@ -30,11 +30,11 @@ template <typename Number> class BlockVector;
 
 
 /**
- * A block matrix consisting of blocks of type @p{SparseMatrixEZ}.
+ * A block matrix consisting of blocks of type @p SparseMatrixEZ.
  *
  * Like the other Block-objects, this matrix can be used like a
- * @p{SparseMatrixEZ}, when it comes to access to entries. Then, there
- * are functions for the multiplication with @p{BlockVector} and
+ * @p SparseMatrixEZ, when it comes to access to entries. Then, there
+ * are functions for the multiplication with @p BlockVector and
  * access to the individual blocks.
  *
  * @author Guido Kanschat, 2002, 2003
@@ -67,7 +67,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * of the same number of block
 				      * rows and columns. Since it
 				      * calls the copy constructor of
-				      * @ref{SparseMatrixEZ}, the
+				      * SparseMatrixEZ, the
 				      * block s must be empty.
 				      */
     BlockSparseMatrixEZ (const BlockSparseMatrixEZ<Number>&);
@@ -96,7 +96,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * initialized
 				      * subsequently. After setting
 				      * the sizes of the blocks,
-				      * @ref{collect_sizes} must be
+				      * collect_sizes() must be
 				      * called to update internal data
 				      * structures.
 				      */
@@ -196,7 +196,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 
 				     /**
 				      * Set the element @p{(i,j)} to
-				      * @p{value}.  Throws an error if
+				      * @p value.  Throws an error if
 				      * the entry does not
 				      * exist. Still, it is allowed to
 				      * store zero values in
@@ -207,7 +207,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 	      const Number value);
     
 				     /**
-				      * Add @p{value} to the element
+				      * Add @p value to the element
 				      * @p{(i,j)}.  Throws an error if
 				      * the entry does not
 				      * exist. Still, it is allowed to
@@ -232,7 +232,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * let $dst = M^T*src$ with $M$
 				      * being this matrix. This
 				      * function does the same as
-				      * @p{vmult} but takes the
+				      * @p vmult but takes the
 				      * transposed matrix.
 				      */
     template <typename somenumber>
@@ -254,7 +254,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * multiplication. Add $M^T*src$
 				      * to $dst$ with $M$ being this
 				      * matrix. This function does the
-				      * same as @p{vmult_add} but takes
+				      * same as @p vmult_add but takes
 				      * the transposed matrix.
 				      */
     template <typename somenumber>
@@ -263,8 +263,8 @@ class BlockSparseMatrixEZ : public Subscriptor
 
     
 				     /**
-				      * Print statistics. If @p{full}
-				      * is @p{true}, prints a
+				      * Print statistics. If @p full
+				      * is @p true, prints a
 				      * histogram of all existing row
 				      * lengths and allocated row
 				      * lengths. Otherwise, just the

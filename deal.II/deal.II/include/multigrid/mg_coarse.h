@@ -23,8 +23,8 @@
  * This is a little wrapper, transforming a triplet of iterative
  * solver, matrix and preconditioner into a coarse grid solver.
  *
- * The type of the matrix (i.e. the template parameter @p{MATRIX})
- * should be derived from @p{Subscriptor} to allow for the use of a
+ * The type of the matrix (i.e. the template parameter @p MATRIX)
+ * should be derived from @p Subscriptor to allow for the use of a
  * smart pointer to it.
  *
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
@@ -102,7 +102,7 @@ class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
  * Coarse grid solver by QR factorization
  *
  * This is a direct solver for possibly indefinite coarse grid
- * problems, using the @p{least_squares} function of the class
+ * problems, using the @p least_squares function of the class
  * FullMatrix.
  *
  * Since the currently implemented Householder algorithm transforms

@@ -20,16 +20,16 @@
 
 /**
  * In this namespace a number of classes is declared that may be used
- * as filters in the @ref{FilteredIterator} class. The filters either
- * check for binary information (for example, the @p{Active} filter
+ * as filters in the FilteredIterator class. The filters either
+ * check for binary information (for example, the @p Active filter
  * class checks whether the object pointed to is active), or for
  * valued information by comparison with prescribed values (for
- * example, the @ref{LevelEqualTo} filter class checks whether the
+ * example, the LevelEqualTo filter class checks whether the
  * level of the object pointed to by the iterator under consideration
  * is equal to a value that was given to the filter upon construction.
  *
  * For examples of use of these classes as well as requirements on
- * filters see the general description of the @ref{FilteredIterator}
+ * filters see the general description of the FilteredIterator
  * class.
  *
  * @author Wolfgang Bangerth, 2002
@@ -203,39 +203,39 @@ namespace IteratorFilters
  * pointers as well as classes that implement an @p{operator ()}.
  *
  * An example of a simple valid predicate is the following: given the function
- * @begin{verbatim}
+ * @verbatim
  *   template <typename Iterator>
  *   bool level_equal_to_3 (const Iterator c)
  *   {
  *     return (static_cast<unsigned int>(c->level()) == 3);
  *   };
- * @end{verbatim} 
+ * @endverbatim 
  * then
- * @begin{verbatim}
+ * @verbatim
  *   &level_equal_to_3<typename Triangulation<dim>::active_cell_iterator>
- * @end{verbatim}
+ * @endverbatim
  * is a valid predicate.
  *
  * Likewise, given the following binary function
- * @begin{verbatim}
+ * @verbatim
  *   template <typename Iterator>
  *   bool level_equal_to (const Iterator     c,
  *                        const unsigned int level)
  *   {
  *     return (static_cast<unsigned int>(c->level()) == level);
  *   };
- * @end{verbatim} 
+ * @endverbatim 
  * then
- * @begin{verbatim}
+ * @verbatim
  *   std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3)
- * @end{verbatim}
+ * @endverbatim
  * is another valid predicate (here: a function that returns true if
  * either the iterator is past the end or the level is equal to the
  * second argument; this second argument is bound to a fixed value
- * using the @p{std::bind2nd} function).
+ * using the @p std::bind2nd function).
  *
  * Finally, classes can be predicates. The following class is one:
- * @begin{verbatim}
+ * @verbatim
  *   class Active 
  *   {
  *     public:
@@ -244,10 +244,10 @@ namespace IteratorFilters
  *         return (i->active());
  *       }
  *   };
- * @end{verbatim}
+ * @endverbatim
  * and objects of this type can be used as predicates. Likewise, this
  * more complicated one can also be used:
- * @begin{verbatim}
+ * @verbatim
  *   class SubdomainEqualTo
  *   {
  *     public:
@@ -262,7 +262,7 @@ namespace IteratorFilters
  *     private:
  *       const unsigned int subdomain_id;
  *   };
- * @end{verbatim}
+ * @endverbatim
  * Objects like @p{SubdomainEqualTo(3)} can then be used as predicates.
  *
  * Since whenever a predicate is evaluated it is checked that the
@@ -270,7 +270,7 @@ namespace IteratorFilters
  * checks for this case have to be performed inside predicates.
  *
  * A number of filter classes are already implemented in the
- * @ref{IteratorFilters} namespace, but writing different ones is
+ * IteratorFilters namespace, but writing different ones is
  * simple following the examples above.
  *
  *
@@ -301,7 +301,7 @@ namespace IteratorFilters
  * iterator to the first one that satisfies a predicate (for example,
  * the first one for which the user flag is set, or the first one with
  * a given subdomain id), there are assignement functions
- * @p{set_to_next_positive} and @p{set_to_previous_positive} that
+ * @p set_to_next_positive and @p set_to_previous_positive that
  * assign the next or last previous iterator that satisfies the
  * predicate, i.e. they follow the list of iterators in either
  * direction until they find a matching one (or the past-the-end
@@ -313,49 +313,49 @@ namespace IteratorFilters
  *
  * The following call counts the number of active cells that
  * have a set user flag:
- * @begin{verbatim}
+ * @verbatim
  *   FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
  *      begin (IteratorFilters::UserFlagSet()),
  *      end (IteratorFilters::UserFlagSet());
  *   begin.set_to_next_positive(tria.begin_active());
  *   end = tria.end();
  *   n_flagged_cells = std::distance (begin, end);
- * @begin{verbatim}
- * Note that by the @p{set_to_next_positive} call the first cell with
- * a set user flag was assigned to the @p{begin} iterator. For the
+ * @verbatim
+ * Note that by the @p set_to_next_positive call the first cell with
+ * a set user flag was assigned to the @p begin iterator. For the
  * @{end} iterator, no such call was necessary, since the past-the-end
  * iterator always satisfies all predicates.
  *
  * The same can be achieved by the following snippet, though harder to read:
- * @begin{verbatim}
+ * @verbatim
  *   typedef FilteredIterator<typename Triangulation<dim>::active_cell_iterator> FI;
  *   n_flagged_cells =
  *      std::distance (FI(IteratorFilters::UserFlagSet())
  *                            .set_to_next_positive(tria.begin_active()),
  *                     FI(IteratorFilters::UserFlagSet(), tria.end()));
- * @begin{verbatim}
+ * @verbatim
  * It relies on the fact that if we create an unnamed filtered
  * iterator with a given predicate but no iterator value and assign it
  * the next positive value with respect to this predicate, it returns
  * itself which is then used as the first parameter to the
- * @p{std::distance} function. This procedure is not necessary for the
+ * @p std::distance function. This procedure is not necessary for the
  * end element to this function here, since the past-the-end iterator
  * always satisfies the predicate so that we can assign this value to
  * the filtered iterator directly in the constructor.
  *
  * Finally, the following loop only assembles the matrix on cells with
  * subdomain id equal to three:
- * @begin{verbatim}
+ * @verbatim
  * FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
  *   cell (FilteredIterator::SubdomainEqualTo(3)),
  *   endc (FilteredIterator::SubdomainEqualTo(3), tria.end());
  * cell.set_to_next_positive (tria.begin_active());
  * for (; cell!=endc; ++cell)
  *   assemble_local_matrix (cell);
- * @end{verbatim}
+ * @endverbatim
  *
  * Since comparison between filtered and unfiltered iterators is
- * defined, we could as well have let the @p{endc} variable in the
+ * defined, we could as well have let the @p endc variable in the
  * last example be of type
  * @p{Triangulation<dim>::active_cell_iterator} since it is unchanged
  * and its value does not depend on the filter.
@@ -434,7 +434,7 @@ class FilteredIterator : public BaseIterator
 
 				     /**
 				      * Search for the next iterator
-				      * from @p{bi} onwards that
+				      * from @p bi onwards that
 				      * satisfies the predicate of
 				      * this object and assign it to
 				      * this object.
@@ -451,7 +451,7 @@ class FilteredIterator : public BaseIterator
     
 				     /**
 				      * As above, but search for the
-				      * previous iterator from @p{bi}
+				      * previous iterator from @p bi
 				      * backwards that satisfies the
 				      * predicate of this object and
 				      * assign it to this object.

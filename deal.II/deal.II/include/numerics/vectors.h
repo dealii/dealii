@@ -133,7 +133,7 @@ class ConstraintMatrix;
  *
  *   The selection whether the projection to the boundary first is
  *   needed is done with the <tt>project_to_boundary_first</tt> flag
- *   passed to the function.  If @p{false} is given, the additional
+ *   passed to the function.  If @p false is given, the additional
  *   quadrature formula for faces is ignored.
  *
  *   You should be aware of the fact that if no projection to the boundary
@@ -142,22 +142,22 @@ class ConstraintMatrix;
  *   important case, which tells the function to enforce zero boundary values
  *   on the respective boundary parts. Since enforced zero boundary values
  *   could also have been reached through projection, but are more economically
- *   obtain using other methods, the @p{project_to_boundary_first} flag is
- *   ignored if the @p{enforce_zero_boundary} flag is set.
+ *   obtain using other methods, the @p project_to_boundary_first flag is
+ *   ignored if the @p enforce_zero_boundary flag is set.
  *
  *   The solution of the linear system is presently done using a simple CG
  *   method without preconditioning and without multigrid. This is clearly not
  *   too efficient, but sufficient in many cases and simple to implement. This
  *   detail may change in the future.
  *
- * @item Creation of right hand side vectors:
- *   The @p{create_right_hand_side} function computes the vector
+ * <li> Creation of right hand side vectors:
+ *   The @p create_right_hand_side function computes the vector
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
- *   @ref{MatrixCreator}@p{::create_*} functions which take a right hand side do,
+ *   MatrixCreator@p{::create_*} functions which take a right hand side do,
  *   but without assembling a matrix.
  *
- * @item Creation of boundary right hand side vectors: The
- *   @p{create_boundary_right_hand_side} function computes the vector
+ * <li> Creation of boundary right hand side vectors: The
+ *   @p create_boundary_right_hand_side function computes the vector
  *   $f_i = \int_{\partial\Omega} g(x) \phi_i(x) dx$. This is the
  *   right hand side contribution of boundary forces when having
  *   inhomogeneous Neumann boundary values in Laplace's equation or
@@ -165,13 +165,13 @@ class ConstraintMatrix;
  *   optional argument denoting over which parts of the boundary the
  *   integration shall extend.
  *
- * @item Interpolation of boundary values:
- *   The @ref{MatrixTools}@p{::apply_boundary_values} function takes a list
+ * <li> Interpolation of boundary values:
+ *   The MatrixTools@p ::apply_boundary_values function takes a list
  *   of boundary nodes and their values. You can get such a list by interpolation
- *   of a boundary function using the @p{interpolate_boundary_values} function.
+ *   of a boundary function using the @p interpolate_boundary_values function.
  *   To use it, you have to
  *   specify a list of pairs of boundary indicators (of type @p{unsigned char};
- *   see the section in the documentation of the @ref{Triangulation} class for more
+ *   see the section in the documentation of the Triangulation class for more
  *   details) and the according functions denoting the dirichlet boundary values
  *   of the nodes on boundary faces with this boundary indicator.
  *
@@ -182,7 +182,7 @@ class ConstraintMatrix;
  *   Within this function, boundary values are interpolated, i.e. a node is given
  *   the point value of the boundary function. In some cases, it may be necessary
  *   to use the L2-projection of the boundary function or any other method. For
- *   this purpose we refer to the @ref{VectorTools}@p{::project_boundary_values}
+ *   this purpose we refer to the VectorTools@p ::project_boundary_values
  *   function below.
  *
  *   You should be aware that the boundary function may be evaluated at nodes
@@ -200,45 +200,45 @@ class ConstraintMatrix;
  *   index 1 in the map. The respective boundary functions are then evaluated at
  *   the place of the respective boundary point.
  *
- * @item Projection of boundary values:
- *   The @p{project_boundary_values} function acts similar to the
- *   @p{interpolate_boundary_values} function, apart from the fact that it does
+ * <li> Projection of boundary values:
+ *   The @p project_boundary_values function acts similar to the
+ *   @p interpolate_boundary_values function, apart from the fact that it does
  *   not get the nodal values of boundary nodes by interpolation but rather
  *   through the <i>L<sup>2</sup></i>-projection of the trace of the function to the boundary.
  *
  *   The projection takes place on all boundary parts with boundary
- *   indicators listed in the map (@ref{FunctioMap}@p{::FunctionMap})
+ *   indicators listed in the map (FunctioMap@p ::FunctionMap)
  *   of boundary functions. These boundary parts may or may not be
  *   continuous. For these boundary parts, the mass matrix is
  *   assembled using the
- *   @ref{MatrixTools}@p{::create_boundary_mass_matrix} function, as
+ *   MatrixTools@p ::create_boundary_mass_matrix function, as
  *   well as the appropriate right hand side. Then the resulting
  *   system of equations is solved using a simple CG method (without
  *   preconditioning), which is in most cases sufficient for the
  *   present purpose.
  *
- * @item Computing errors:
- *   The function @p{integrate_difference} performs the calculation of the error
+ * <li> Computing errors:
+ *   The function @p integrate_difference performs the calculation of the error
  *   between the finite element solution and a given (continuous) reference
  *   function in different norms. The integration is performed using a given
  *   quadrature formulae and assumes that the given finite element objects equals
  *   that used for the computation of the solution.
  * 
- *   The result is stored in a vector (named @p{difference}), where each entry
+ *   The result is stored in a vector (named @p difference), where each entry
  *   equals the given norm of the difference on a cell. The order of entries
- *   is the same as a @p{cell_iterator} takes when started with @p{begin_active} and
+ *   is the same as a @p cell_iterator takes when started with @p begin_active and
  *   promoted with the @p{++} operator.
  * 
- *   You can use the @p{distribute_cell_to_dof_vector} function of the
- *   @ref{DoFHandler} class to convert cell based data to a data
+ *   You can use the @p distribute_cell_to_dof_vector function of the
+ *   DoFHandler class to convert cell based data to a data
  *   vector with values on the degrees of freedom, which can then be
- *   added to a @ref{DataOut} object to be printed. But also you can
- *   add a cell based data vector itself to a @ref{DataOut} object,
- *   see the @p{DataOut::add_data_vector} functions.
+ *   added to a DataOut object to be printed. But also you can
+ *   add a cell based data vector itself to a DataOut object,
+ *   see the @p DataOut::add_data_vector functions.
  * 
  *   Presently, there is the possibility to compute the following values from the
- *   difference, on each cell: @p{mean}, @p{L1_norm}, @p{L2_norm}, @p{Linfty_norm},
- *   @p{H1_seminorm} and @p{H1_norm}, see @p{VectorTools::NormType}.
+ *   difference, on each cell: @p mean, @p L1_norm, @p L2_norm, @p Linfty_norm,
+ *   @p H1_seminorm and @p H1_norm, see @p VectorTools::NormType.
  *   For the mean difference value, the reference function minus the numerical
  *   solution is computed, not the other way round.
  *
@@ -267,24 +267,24 @@ class ConstraintMatrix;
  *   and the square of the <i>L<sup>2</sup></i> norm.
  * 
  *   To get the global <i>L<sup>1</sup></i> error, you have to sum up the
- *   entries in @p{difference}, e.g. using
- *   @ref{Vector}@p{<double>::l1_norm} function.  For the global <i>L<sup>2</sup></i>
+ *   entries in @p difference, e.g. using
+ *   Vector@p{<double>::l1_norm} function.  For the global <i>L<sup>2</sup></i>
  *   difference, you have to sum up the squares of the entries and
  *   take the root of the sum, e.g. using
- *   @ref{Vector}@p{<double>::l2_norm}.  These two operations
+ *   Vector@p{<double>::l2_norm}.  These two operations
  *   represent the $l_1$ and $l_2$ norms of the vectors, but you need
  *   not take the absolute value of each entry, since the cellwise
  *   norms are already positive.
  *  
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
- *   using the @ref{Vector}@p{<double>::linfty_norm} function.
+ *   using the Vector@p{<double>::linfty_norm} function.
  *
  *   For the global <i>H<sup>1</sup></i> norm and seminorm, the same rule applies as for the
  *   <i>L<sup>2</sup></i> norm: compute the $l_2$ norm of the cell error vector.
- * @end{itemize}
+ * </ul>
  *
- * All functions use the finite element given to the @ref{DoFHandler} object the last
+ * All functions use the finite element given to the DoFHandler object the last
  * time that the degrees of freedom were distributed over the triangulation. Also,
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
@@ -365,18 +365,18 @@ class VectorTools
     
 				     /**
 				      * Compute the interpolation of
-				      * @p{function} at the support
+				      * @p function at the support
 				      * points to the finite element
 				      * space. It is assumed that the
 				      * number of components of
-				      * @p{function} matches that of
+				      * @p function matches that of
 				      * the finite element used by
-				      * @p{dof}.
+				      * @p dof.
 				      *
 				      * Note that you may have to call
 				      * @p{hanging_nodes.distribute(vec)}
 				      * with the hanging nodes from
-				      * space @p{dof} afterwards, to
+				      * space @p dof afterwards, to
 				      * make the result continuous
 				      * again.
 				      *
@@ -391,7 +391,7 @@ class VectorTools
 			     VECTOR                &vec);
     
 				     /**
-				      * Calls the @p{interpolate}
+				      * Calls the @p interpolate
 				      * function above with
 				      * <tt>mapping=MappingQ1@<dim>@()</tt>.
 				      */
@@ -404,19 +404,19 @@ class VectorTools
 				      * Interpolate different finite
 				      * element spaces. The
 				      * interpolation of vector
-				      * @p{data_1} is executed from the
+				      * @p data_1 is executed from the
 				      * FE space represented by
-				      * @p{dof_1} to the vector @p{data_2}
-				      * on FE space @p{dof_2}. The
+				      * @p dof_1 to the vector @p data_2
+				      * on FE space @p dof_2. The
 				      * interpolation on each cell is
 				      * represented by the matrix
-				      * @p{transfer}. Curved boundaries
+				      * @p transfer. Curved boundaries
 				      * are neglected so far.
 				      *
 				      * Note that you may have to call
 				      * @p{hanging_nodes.distribute(data_2)}
 				      * with the hanging nodes from
-				      * space @p{dof_2} afterwards, to
+				      * space @p dof_2 afterwards, to
 				      * make the result continuous
 				      * again.
 				      */
@@ -429,7 +429,7 @@ class VectorTools
 			  
 				     /**
 				      * Compute the projection of
-				      * @p{function} to the finite element space.
+				      * @p function to the finite element space.
 				      *
 				      * By default, projection to the boundary
 				      * and enforcement of zero boundary values
@@ -445,9 +445,9 @@ class VectorTools
 				      * space on the present grid. To
 				      * this end, the mass matrix is
 				      * assembled exactly using the
-				      * @p{create_mass_matrix}
+				      * @p create_mass_matrix
 				      * function in the
-				      * @ref{MatrixTools}
+				      * MatrixTools
 				      * collection. This function
 				      * performs numerical quadrature
 				      * using the given quadrature
@@ -492,7 +492,7 @@ class VectorTools
 			 const bool                project_to_boundary_first = false);
     
 				     /**
-				      * Calls the @p{project}
+				      * Calls the @p project
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
@@ -509,7 +509,7 @@ class VectorTools
 				     /**
 				      * Create a right hand side
 				      * vector. Prior content of the
-				      * given @p{rhs_vector} vector is
+				      * given @p rhs_vector vector is
 				      * deleted.
 				      *
 				      * See the general documentation of this
@@ -523,7 +523,7 @@ class VectorTools
 					Vector<double>        &rhs_vector);
     
 				     /**
-				      * Calls the @p{create_right_hand_side}
+				      * Calls the @p create_right_hand_side
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
@@ -537,7 +537,7 @@ class VectorTools
 				      * Create a right hand side
 				      * vector from boundary
 				      * forces. Prior content of the
-				      * given @p{rhs_vector} vector is
+				      * given @p rhs_vector vector is
 				      * deleted.
 				      *
 				      * See the general documentation of this
@@ -567,7 +567,7 @@ class VectorTools
     
 				     /**
 				      * Calls the
-				      * @p{create_boundary_right_hand_side}
+				      * @p create_boundary_right_hand_side
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
@@ -587,7 +587,7 @@ class VectorTools
 				      * be assigned to them, by
 				      * interpolation around the
 				      * boundary. If the
-				      * @p{boundary_values} contained
+				      * @p boundary_values contained
 				      * values before, the new ones
 				      * are added, or the old ones
 				      * overwritten if a node of the
@@ -596,15 +596,15 @@ class VectorTools
 				      * map of boundary values.
 				      *
 				      * The parameter
-				      * @p{boundary_component}
+				      * @p boundary_component
 				      * corresponds to the number
-				      * @p{boundary_indicator} of the
+				      * @p boundary_indicator of the
 				      * face.  255 is an illegal
 				      * value, since it is reserved
 				      * for interior faces.
 				      *
 				      * The flags in the last
-				      * parameter, @p{component_mask}
+				      * parameter, @p component_mask
 				      * denote which components of the
 				      * finite element space shall be
 				      * interpolated. If it is left as
@@ -625,9 +625,9 @@ class VectorTools
 				      *
 				      * It is assumed that the number
 				      * of components of the function
-				      * in @p{boundary_function} matches that
+				      * in @p boundary_function matches that
 				      * of the finite element used by
-				      * @p{dof}.
+				      * @p dof.
 				      *
 				      * If the finite element used has
 				      * shape functions that are
@@ -641,7 +641,7 @@ class VectorTools
 				      * corresponding to the
 				      * components of these
 				      * non-primitive shape functions
-				      * must be @p{false}.
+				      * must be @p false.
 				      *
 				      * See the general doc for more
 				      * information.
@@ -698,7 +698,7 @@ class VectorTools
     
 				     /**
 				      * Calls the other
-				      * @p{interpolate_boundary_values}
+				      * @p interpolate_boundary_values
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
@@ -711,7 +711,7 @@ class VectorTools
 
 				     /**
 				      * Calls the other
-				      * @p{interpolate_boundary_values}
+				      * @p interpolate_boundary_values
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
@@ -723,10 +723,10 @@ class VectorTools
 
     
 				     /**
-				      * Project @p{function} to the boundary
+				      * Project @p function to the boundary
 				      * of the domain, using the given quadrature
 				      * formula for the faces. If the
-				      * @p{boundary_values} contained values
+				      * @p boundary_values contained values
 				      * before, the new ones are added, or
 				      * the old one overwritten if a node
 				      * of the boundary part to be projected
@@ -734,9 +734,9 @@ class VectorTools
 				      *
 				      * It is assumed that the number
 				      * of components of
-				      * @p{boundary_function}
+				      * @p boundary_function
 				      * matches that of the finite
-				      * element used by @p{dof}.
+				      * element used by @p dof.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
@@ -763,7 +763,7 @@ class VectorTools
 					 std::map<unsigned int,double> &boundary_values);
     
 				     /**
-				      * Calls the @p{project_boundary_values}
+				      * Calls the @p project_boundary_values
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
@@ -781,12 +781,12 @@ class VectorTools
 				      * is given as a continuous function
 				      * object.
 				      *
-				      * The value of @p{exponent} is
+				      * The value of @p exponent is
 				      * used for computing $L^p$-norms
 				      * and $W^{1,p}$-norms.
 				      *
 				      * The additional argument
-				      * @p{weight} allows to evaluate
+				      * @p weight allows to evaluate
 				      * weighted norms.  The weight
 				      * function may be
 				      * one-dimensional, establishing
@@ -811,9 +811,9 @@ class VectorTools
 				      *
 				      * It is assumed that the number
 				      * of components of the function
-				      * @p{exact_solution} matches that
+				      * @p exact_solution matches that
 				      * of the finite element used by
-				      * @p{dof}.
+				      * @p dof.
 				      *
 				      * See the general documentation of this
 				      * class for more information.
@@ -830,7 +830,7 @@ class VectorTools
 				      const double exponent = 2.);
 
 				     /**
-				      * Calls the @p{integrate_difference}
+				      * Calls the @p integrate_difference
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */
@@ -882,7 +882,7 @@ class VectorTools
 				      * value zero. The mean value is
 				      * understood in the l1-sense.
 				      *
-				      * Apart from the vector @p{v} to
+				      * Apart from the vector @p v to
 				      * operate on, this function
 				      * takes a bit vector. This has a
 				      * true entry for every component
@@ -927,7 +927,7 @@ class VectorTools
 				      const unsigned int     component);
     
 				     /**
-				      * Calls the @p{compute_mean_value}
+				      * Calls the @p compute_mean_value
 				      * function, see above, with
 				      * @p{mapping=MappingQ1@<dim@>()}.
 				      */

@@ -217,11 +217,11 @@ class TriaRawIterator :
 				      * Through this constructor, it is also
 				      * possible to construct objects for
 				      * derived iterators:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * DoFCellAccessor dof_accessor;
 				      * Triangulation::active_cell_iterator cell
 				      *   = accessor;
-				      * @end{verbatim}
+				      * @endverbatim
 				      */
     TriaRawIterator (const Accessor &a);
     
@@ -244,17 +244,17 @@ class TriaRawIterator :
 				      * iterator type and copies the data;
 				      * this conversion works, if there is
 				      * a conversion path from the
-				      * @p{OtherAccessor} class to the @p{Accessor}
+				      * @p OtherAccessor class to the @p Accessor
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a @ref{Triangulation}@p{::raw_cell_iterator} from
-				      * a @ref{DoFHandler}@p{::raw_cell_iterator}, since
-				      * the @ref{DoFAccessor} class is derived from
-				      * the @ref{TriaAccessor} class.
+				      * a Triangulation@p ::raw_cell_iterator from
+				      * a DoFHandler@p ::raw_cell_iterator, since
+				      * the DoFAccessor class is derived from
+				      * the TriaAccessor class.
 				      *
-				      * Since @ref{TriaIterator} and
-				      * @ref{TriaActiveIterator} are derived classes
+				      * Since TriaIterator and
+				      * TriaActiveIterator are derived classes
 				      * of this class, this constructor also
 				      * serves to convert these iterators with
 				      * other accessor classes.
@@ -273,7 +273,7 @@ class TriaRawIterator :
 				      *
 				      *  This function has to be specialized
 				      *  explicitly for the different
-				      *  @p{Pointee}s, to allow an
+				      *  @p Pointees, to allow an
 				      *  @p{iterator<1,TriangulationLevel<1>::LinesData>}
 				      *  to point to @p{tria->lines.lines[index]} while
 				      *  for one dimension higher it has
@@ -285,7 +285,7 @@ class TriaRawIterator :
     const Accessor & operator * () const;
     
 				     /**
-				      *  Dereferencing operator, non-@p{const}
+				      *  Dereferencing operator, non-@p const
 				      *  version.
 				      */
     Accessor & operator * ();
@@ -295,13 +295,13 @@ class TriaRawIterator :
 				      *  reference of the cell pointed to.
 				      *  Usage is thus like @p{i->index ();}
 				      *
-				      *  There is a @p{const} and a non-@p{const}
+				      *  There is a @p const and a non-@p const
 				      *  version.
 				      */
     const Accessor * operator -> () const;
         
 				     /**
-				      *  Dereferencing operator, non-@p{const}
+				      *  Dereferencing operator, non-@p const
 				      *  version.
 				      */
     Accessor * operator -> ();
@@ -324,11 +324,11 @@ class TriaRawIterator :
 
 				     /**
 				      * Offer a weak ordering of iterators,
-				      * which is needed to make @p{map}s with
+				      * which is needed to make @p maps with
 				      * iterators being keys. An iterator
-				      * pointing to an element @p{a} is
+				      * pointing to an element @p a is
 				      * less than another iterator pointing
-				      * to an element @p{b} if
+				      * to an element @p b if
 				      * level(a)<level(b) or
 				      * (level(a)==level(b) and index(a)<index(b)).
 				      *
@@ -365,7 +365,7 @@ class TriaRawIterator :
 				      *  priviously pointed to. Since this
 				      *  involves a temporary and a copy
 				      *  operation and since an
-				      *  @p{iterator} is quite a large
+				      *  @p iterator is quite a large
 				      *  object for a pointer, use the
 				      *  prefix operator @p{++i} whenever
 				      *  possible, especially in the head
@@ -377,7 +377,7 @@ class TriaRawIterator :
     TriaRawIterator operator ++ (int);
 
     				     /**
-				      *  Prefix @p{--} operator: @p{--i}. This
+				      *  Prefix @p -- operator: @p --i. This
 				      *  operator advances the iterator to
 				      *  the previous element and returns
 				      *  a reference to @p{*this}.
@@ -391,16 +391,16 @@ class TriaRawIterator :
     TriaRawIterator & operator -- ();
     
 				     /**
-				      *  Postfix @p{--} operator: @p{i--}. This
+				      *  Postfix @p -- operator: @p i--. This
 				      *  operator advances the iterator to
 				      *  the previous element, but
 				      *  returns an iterator to the element
 				      *  priviously pointed to. Since this
 				      *  involves a temporary and a copy
 				      *  operation and since an
-				      *  @p{iterator} is quite a large
+				      *  @p iterator is quite a large
 				      *  object for a pointer, use the
-				      *  prefix operator @p{--i} whenever
+				      *  prefix operator @p --i whenever
 				      *  possible, especially in the head
 				      *  of for loops
 				      *  (@p{for (; i!=end; --i)}) since there
@@ -416,7 +416,7 @@ class TriaRawIterator :
     IteratorState::IteratorStates state () const;
 
 				     /**
-				      * Print the iterator to @p{out}. The
+				      * Print the iterator to @p out. The
 				      * format is like @p{level.index}.
 				      */
     void print (std::ostream &out) const;
@@ -554,16 +554,16 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      * iterator type and copies the data;
 				      * this conversion works, if there is
 				      * a conversion path from the
-				      * @p{OtherAccessor} class to the @p{Accessor}
+				      * @p OtherAccessor class to the @p Accessor
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a @ref{Triangulation}@p{::cell_iterator} from
-				      * a @ref{DoFHandler}@p{::cell_iterator}, since
-				      * the @ref{DoFAccessor} class is derived from
-				      * the @ref{TriaAccessor} class.
+				      * a Triangulation@p ::cell_iterator from
+				      * a DoFHandler@p ::cell_iterator, since
+				      * the DoFAccessor class is derived from
+				      * the TriaAccessor class.
 				      *
-				      * Since @ref{TriaActiveIterator} is a derived
+				      * Since TriaActiveIterator is a derived
 				      * class of this class, this constructor
 				      * also serves to convert these iterators 
 				      * with other accessor classes.
@@ -613,7 +613,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  previously pointed to. Since this
 				      *  involves a temporary and a copy
 				      *  operation and since an
-				      *  @p{active_iterator} is quite a large
+				      *  @p active_iterator is quite a large
 				      *  object for a pointer, use the
 				      *  prefix operator @p{++i} whenever
 				      *  possible, especially in the head
@@ -625,7 +625,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
     TriaIterator<dim,Accessor> operator ++ (int);
 
     				     /**
-				      *  Prefix @p{--} operator: @p{--i}. This
+				      *  Prefix @p -- operator: @p --i. This
 				      *  operator advances the iterator to
 				      *  the previous used element and returns
 				      *  a reference to @p{*this}.
@@ -633,7 +633,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
     TriaIterator<dim,Accessor> & operator -- ();
 
 				     /**
-				      *  Postfix @p{--} operator: @p{i--}.
+				      *  Postfix @p -- operator: @p i--.
 				      */
     TriaIterator<dim,Accessor> operator -- (int);
 				     /*@}*/
@@ -714,14 +714,14 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      * iterator type and copies the data;
 				      * this conversion works, if there is
 				      * a conversion path from the
-				      * @p{OtherAccessor} class to the @p{Accessor}
+				      * @p OtherAccessor class to the @p Accessor
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a @ref{Triangulation}@p{::active_cell_iterator} from
-				      * a @ref{DoFHandler}@p{::active_cell_iterator}, since
-				      * the @ref{DoFAccessor} class is derived from
-				      * the @ref{TriaAccessor} class.
+				      * a Triangulation@p ::active_cell_iterator from
+				      * a DoFHandler@p ::active_cell_iterator, since
+				      * the DoFAccessor class is derived from
+				      * the TriaAccessor class.
 				      */
     template <typename OtherAccessor>
     TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i);
@@ -781,7 +781,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  previously pointed to. Since this
 				      *  involves a temporary and a copy
 				      *  operation and since an
-				      *  @p{active_iterator} is quite a large
+				      *  @p active_iterator is quite a large
 				      *  object for a pointer, use the
 				      *  prefix operator @p{++i} whenever
 				      *  possible, especially in the head
@@ -793,7 +793,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
     TriaActiveIterator<dim,Accessor> operator ++ (int);
 
     				     /**
-				      *  Prefix @p{--} operator: @p{--i}. This
+				      *  Prefix @p -- operator: @p --i. This
 				      *  operator advances the iterator to
 				      *  the previous active element and
 				      *  returns a reference to @p{*this}.
@@ -801,7 +801,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
     TriaActiveIterator<dim,Accessor> & operator -- ();
 
 				     /**
-				      *  Postfix @p{--} operator: @p{i--}.
+				      *  Postfix @p -- operator: @p i--.
 				      */
     TriaActiveIterator<dim,Accessor> operator -- (int);
 				     /*@}*/
@@ -1016,8 +1016,8 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 
 
 /**
- * Print the address to which this iterator points to @p{out}. The
- * address is given by the pair @p{(level,index)}, where @p{index} is
+ * Print the address to which this iterator points to @p out. The
+ * address is given by the pair @p{(level,index)}, where @p index is
  * an index relative to the level in which the object is that is
  * pointed to.
  *
@@ -1035,8 +1035,8 @@ std::ostream & operator << (std::ostream                        &out,
 
 
 /**
- * Print the address to which this iterator points to @p{out}. The
- * address is given by the pair @p{(level,index)}, where @p{index} is
+ * Print the address to which this iterator points to @p out. The
+ * address is given by the pair @p{(level,index)}, where @p index is
  * an index relative to the level in which the object is that is
  * pointed to.
  *
@@ -1054,8 +1054,8 @@ std::ostream & operator << (std::ostream                     &out,
 
 
 /**
- * Print the address to which this iterator points to @p{out}. The
- * address is given by the pair @p{(level,index)}, where @p{index} is
+ * Print the address to which this iterator points to @p out. The
+ * address is given by the pair @p{(level,index)}, where @p index is
  * an index relative to the level in which the object is that is
  * pointed to.
  *

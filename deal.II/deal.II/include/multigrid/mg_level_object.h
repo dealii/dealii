@@ -46,13 +46,13 @@ class MGLevelObject : public Subscriptor
 		   const unsigned int maxlevel = 0);
     
 				     /**
-				      * Access object on level @p{level}.
+				      * Access object on level @p level.
 				      */
     Object & operator[] (const unsigned int level);
     
 				     /**
 				      * Access object on level
-				      * @p{level}. Constant version.
+				      * @p level. Constant version.
 				      */
     const Object & operator[] (const unsigned int level) const;
 
@@ -60,17 +60,17 @@ class MGLevelObject : public Subscriptor
 				      * Delete all previous contents
 				      * of this object and reset its
 				      * size according to the values
-				      * of @p{new_minlevel} and
-				      * @p{new_maxlevel}.
+				      * of @p new_minlevel and
+				      * @p new_maxlevel.
 				      */
     void resize (const unsigned int new_minlevel,
 		 const unsigned int new_maxlevel);
     
 				     /**
-				      * Call @p{clear} on all objects
+				      * Call @p clear on all objects
 				      * stored by this object. This
 				      * function is only implemented
-				      * for some @p{Object} classes,
+				      * for some @p Object classes,
 				      * most notably for vectors and
 				      * matrices. Note that if
 				      * <tt>Object==Vector@<T@></tt>,

@@ -261,7 +261,7 @@ namespace internals
  * The following picture will illustrate the relation between the
  * SparsityPattern an the SparseMatrix.
  *
- * @begin{verbatim}
+ * @verbatim
  *  SparsityPattern:                               \
  *                                                 |
  *              _________________________          |
@@ -291,9 +291,9 @@ namespace internals
  *   /_________colnums[0]                          |
  *                                                 |                    
  *                                                /                    
- * @end{verbatim}
+ * @endverbatim
  *
- * @begin{verbatim}
+ * @verbatim
  * For row = 0
  *   
  * there are: (0| 3) = colnums[0]
@@ -307,9 +307,9 @@ namespace internals
  *            (1| 4) = colnums[5]
  * ....
  *
- * @end{verbatim}
+ * @endverbatim
  *
- * @begin{verbatim}
+ * @verbatim
  * SparseMatrix:                                  \
  *                                                 |
  *              _____________________________      |
@@ -318,7 +318,7 @@ namespace internals
  *                                                 |
  *                                                 |
  *                                                /
- * @end{verbatim}
+ * @endverbatim
  *
  * If you want to get the <tt>3</tt> you need to get its position in
  * the table above and its value by returning the value of the element
@@ -696,15 +696,15 @@ class SparsityPattern : public Subscriptor
 				      * represented by a sequence of
 				      * pairs of column indices and
 				      * values. In the present
-				      * context, the @ref{begin} and
-				      * @ref{end} parameters designate
+				      * context, the begin() and
+				      * end() parameters designate
 				      * iterators (of forward iterator
 				      * type) into a container, one
 				      * representing one row. The
-				      * distance between @ref{begin}
-				      * and @ref{end} should therefore
+				      * distance between begin()
+				      * and end() should therefore
 				      * be equal to
-				      * @ref{n_rows}. These iterators
+				      * n_rows(). These iterators
 				      * may be iterators of
 				      * <tt>std::vector</tt>,
 				      * <tt>std::list</tt>, pointers into a
@@ -1087,13 +1087,13 @@ class SparsityPattern : public Subscriptor
                                       *
                                       * After calling this function, the
                                       * output array will have values between
-                                      * zero and @p{n_partitions-1} for each
+                                      * zero and @p n_partitions-1 for each
                                       * node (i.e. row or column of the
                                       * matrix).
                                       *
                                       * This function will generate an error
                                       * if METIS is not installed unless
-                                      * @p{n_partitions} is one. I.e., you can
+                                      * @p n_partitions is one. I.e., you can
                                       * write a program so that it runs in the
                                       * single-processor single-partition case
                                       * without METIS installed, and only
@@ -1114,7 +1114,7 @@ class SparsityPattern : public Subscriptor
                                       * methods you will want to partition the
                                       * mesh, not the matrix. This can be done
                                       * by calling
-                                      * @p{GridTools::partition_triangulation}.
+                                      * @p GridTools::partition_triangulation.
                                       */
     void partition (const unsigned int         n_partitions,
                     std::vector<unsigned int> &partition_indices) const;
@@ -1217,8 +1217,8 @@ class SparsityPattern : public Subscriptor
 				      * read-only.
 				      *
 				      * Use of this function is highly
-				      * deprecated. Use @p{row_length} and
-				      * @p{column_number} instead. Also, using
+				      * deprecated. Use @p row_length and
+				      * @p column_number instead. Also, using
 				      * iterators may get you most of the
 				      * information you may want.
 				      *
@@ -1241,8 +1241,8 @@ class SparsityPattern : public Subscriptor
     const unsigned int * get_rowstart_indices () const;
 
 				     /**
-				      * @deprecated. Use @p{row_length} and
-				      * @p{column_number} instead. Also, using
+				      * @deprecated. Use @p row_length and
+				      * @p column_number instead. Also, using
 				      * iterators may get you most of the
 				      * information you may want.
 				      *
@@ -1448,7 +1448,7 @@ class SparsityPattern : public Subscriptor
 				      *
 				      * At the beginning, all elements
 				      * of this array are set to
-				      * @p{-1} indicating invalid
+				      * @p -1 indicating invalid
 				      * (unused) column numbers
 				      * (diagonal elements are preset
 				      * if optimized storage is
@@ -1461,7 +1461,7 @@ class SparsityPattern : public Subscriptor
 				      * element. When compress is
 				      * called, unused elements
 				      * (indicated by column numbers
-				      * @p{-1}) are eliminated by
+				      * @p -1) are eliminated by
 				      * copying the column number of
 				      * subsequent rows and the column
 				      * numbers within each row (with

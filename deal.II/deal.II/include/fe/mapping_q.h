@@ -40,7 +40,7 @@ class MappingQ : public MappingQ1<dim>
 {
   public:
 				     /**
-				      * Constructor.  @p{p} gives the
+				      * Constructor.  @p p gives the
 				      * degree of mapping polynomials
 				      * on boundary cells.
 				      */
@@ -52,10 +52,10 @@ class MappingQ : public MappingQ1<dim>
     virtual ~MappingQ ();
     
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms the point @p p on
 				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns @p{p_real}.
+				      * @p p_real on the real cell
+				      * @p cell and returns @p p_real.
 				      */
     virtual Point<dim>
     transform_unit_to_real_cell (
@@ -63,13 +63,13 @@ class MappingQ : public MappingQ1<dim>
       const Point<dim>                                 &p) const;
     
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms the point @p p on
 				      * the real cell to the point
-				      * @p{p_unit} on the unit cell
-				      * @p{cell} and returns @p{p_unit}.
+				      * @p p_unit on the unit cell
+				      * @p cell and returns @p p_unit.
 				      *
 				      * Uses Newton iteration and the
-				      * @p{transform_unit_to_real_cell}
+				      * @p transform_unit_to_real_cell
 				      * function.
 				      */
     virtual Point<dim>
@@ -79,7 +79,7 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Implementation of the
-				      * interface in @ref{Mapping}.
+				      * interface in Mapping.
 				      */
     virtual void
     transform_covariant (Tensor<1,dim>          *begin,
@@ -89,7 +89,7 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * Implementation of the
-				      * interface in @ref{Mapping}.
+				      * interface in Mapping.
 				      */
     virtual void
     transform_covariant (Tensor<2,dim>          *begin,
@@ -99,7 +99,7 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * Implementation of the
-				      * interface in @ref{Mapping}.
+				      * interface in Mapping.
 				      */
     virtual void
     transform_contravariant (Tensor<1,dim>          *begin,
@@ -109,7 +109,7 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Implementation of the
-				      * interface in @ref{Mapping}.
+				      * interface in Mapping.
 				      */
     virtual void
     transform_contravariant (Tensor<2,dim>          *begin,
@@ -150,11 +150,11 @@ class MappingQ : public MappingQ1<dim>
 					  * for the alternative
 					  * computation of the normal
 					  * vectors. See doc of the
-					  * @p{alternative_normals_computation}
+					  * @p alternative_normals_computation
 					  * flag.
 					  *
 					  * Filled (hardcoded) once in
-					  * @p{get_face_data}.
+					  * @p get_face_data.
 					  */
         std::vector<std::vector<Point<dim> > > unit_normals;
 
@@ -163,17 +163,17 @@ class MappingQ : public MappingQ1<dim>
 					  * @p{fill_fe_[[sub]face]_values}
 					  * function.
 					  *
-					  * If this flag is @p{true}
+					  * If this flag is @p true
 					  * we are on an interior cell
 					  * and the
-					  * @p{mapping_q1_data} is
+					  * @p mapping_q1_data is
 					  * used.
 					  */
 	bool use_mapping_q1_on_current_cell;
 	
 					 /**
 					  * On interior cells
-					  * @p{MappingQ1} is used.
+					  * @p MappingQ1 is used.
 					  */
 	typename MappingQ1<dim>::InternalData mapping_q1_data;
     };
@@ -181,7 +181,7 @@ class MappingQ : public MappingQ1<dim>
   protected:
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
@@ -192,7 +192,7 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
@@ -206,7 +206,7 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual void
     fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
@@ -224,12 +224,12 @@ class MappingQ : public MappingQ1<dim>
 				      * support points of all shape
 				      * functions located on bounding
 				      * lines to the vector
-				      * @p{a}. Points located on the
+				      * @p a. Points located on the
 				      * line but not on vertices are not
 				      * included.
 				      *
 				      * Needed by the
-				      * @p{compute_support_points_laplace}
+				      * @p compute_support_points_laplace
 				      * function . For @p{dim=1} this
 				      * function is empty.
 				      *
@@ -251,12 +251,12 @@ class MappingQ : public MappingQ1<dim>
 				      * support points of all shape
 				      * functions located on bounding
 				      * faces (quads in 3d) to the
-				      * vector @p{a}. Points located
+				      * vector @p a. Points located
 				      * on the quad but not on vertices
 				      * are not included.
 				      *
 				      * Needed by the
-				      * @p{compute_support_points_laplace}
+				      * @p compute_support_points_laplace
 				      * function. For @p{dim=1} and
 				      * @p{dim=2} this function is
 				      * empty.
@@ -278,7 +278,7 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
@@ -287,7 +287,7 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
@@ -296,7 +296,7 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Mapping.
 				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
@@ -318,13 +318,13 @@ class MappingQ : public MappingQ1<dim>
 				      *
 				      * For @p{degree<4} this function
 				      * sets the
-				      * @p{laplace_on_quad_vector} to
+				      * @p laplace_on_quad_vector to
 				      * the hardcoded data. For
 				      * @p{degree>=4} and MappingQ<2>
 				      * this vector is computed.
 				      *
 				      * For the definition of the
-				      * @p{laplace_on_quad_vector}
+				      * @p laplace_on_quad_vector
 				      * please refer to equation (8)
 				      * of the `mapping' report.
 				      */
@@ -337,13 +337,13 @@ class MappingQ : public MappingQ1<dim>
 				      *
 				      * For @p{degree==2} this function
 				      * sets the
-				      * @p{laplace_on_hex_vector} to
+				      * @p laplace_on_hex_vector to
 				      * the hardcoded data. For
 				      * @p{degree>2} this vector is
 				      * computed.
 				      *
 				      * For the definition of the
-				      * @p{laplace_on_hex_vector}
+				      * @p laplace_on_hex_vector
 				      * please refer to equation (8)
 				      * of the `mapping' report.
 				      */
@@ -369,15 +369,15 @@ class MappingQ : public MappingQ1<dim>
 				      * Takes a
 				      * @p{laplace_on_hex(quad)_vector}
 				      * and applies it to the vector
-				      * @p{a} to compute the inner
+				      * @p a to compute the inner
 				      * support points as a linear
 				      * combination of the exterior
 				      * points.
 				      *
-				      * The vector @p{a} initially
+				      * The vector @p a initially
 				      * contains the locations of the
-				      * @p{n_outer} points, the
-				      * @p{n_inner} computed inner
+				      * @p n_outer points, the
+				      * @p n_inner computed inner
 				      * points are appended.
 				      *
 				      * See equation (7) of the
@@ -414,7 +414,7 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * Needed by the
-				      * @p{laplace_on_quad} function
+				      * @p laplace_on_quad function
 				      * (for @p{dim==2}). Filled by the
 				      * constructor.
 				      *
@@ -436,7 +436,7 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * Needed by the
-				      * @p{laplace_on_hex} function
+				      * @p laplace_on_hex function
 				      * (for @p{dim==3}). Filled by the
 				      * constructor.
 				      *
@@ -454,7 +454,7 @@ class MappingQ : public MappingQ1<dim>
 		    << "laplace_vector not set for degree=" << arg1 << ".");
      
 				     /**
-				      * Degree @p{p} of the
+				      * Degree @p p of the
 				      * polynomials used as shape
 				      * functions for the Qp mapping
 				      * of cells at the boundary.
@@ -475,7 +475,7 @@ class MappingQ : public MappingQ1<dim>
     
 				     /**
 				      * Pointer to the
-				      * @p{dim}-dimensional tensor
+				      * @p dim-dimensional tensor
 				      * product polynomials used as
 				      * shape functions for the Qp
 				      * mapping of cells at the
@@ -493,13 +493,13 @@ class MappingQ : public MappingQ1<dim>
 				      * Mapping from lexicographic to
 				      * to the Qp shape function
 				      * numbering. Its size is
-				      * @p{dofs_per_cell}.
+				      * @p dofs_per_cell.
 				      */
     std::vector<unsigned int> renumber;
 
 				     /**
-				      * If this flag is set @p{true}
-				      * then @p{MappingQ} is used on
+				      * If this flag is set @p true
+				      * then @p MappingQ is used on
 				      * all cells, not only on
 				      * boundary cells.
 				      *

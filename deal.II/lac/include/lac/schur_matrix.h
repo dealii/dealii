@@ -30,61 +30,61 @@
 /**
  * Schur complement of a block matrix.
  *
- * Given a non-singular matrix @p{A} (often positive definite) and a
- * positive semi-definite matrix @p{C} as well as matrices @p{B} and
- * @p{Dt} of full rank, this class implements a new matrix, the Schur
+ * Given a non-singular matrix @p A (often positive definite) and a
+ * positive semi-definite matrix @p C as well as matrices @p B and
+ * @p Dt of full rank, this class implements a new matrix, the Schur
  * complement a the system of equations of the structure
  *
- * @begin{verbatim}
+ * @verbatim
  * /        \  /   \     /   \
  * |  A  Dt |  | u |  -  | f |
  * | -B  C  |  | p |  -  | g |
  * \        /  \   /     \   /
- * @end{verbatim}
+ * @endverbatim
  *
- * Multiplication with the Schur matrix @p{S} is the operation
- * @begin{verbatim}
+ * Multiplication with the Schur matrix @p S is the operation
+ * @verbatim
  * S p = C p + B A-inverse Dt-transpose p,
- * @end{verbatim}
- * which is an operation within the space for @p{p}.
+ * @endverbatim
+ * which is an operation within the space for @p p.
  *
  * The data handed to the Schur matrix are as follows:
  *
- * @p{A}: the inverse of @p{A} is stored, instead of @p{A}. This
+ * @p A: the inverse of @p A is stored, instead of @p A. This
  * allows the application to use the most efficient form of inversion,
  * iterative or direct.
  *
- * @p{B}, @p{C}: these matrices are stored "as is".
+ * @p B, @p C: these matrices are stored "as is".
  *
- * @p{Dt}: the computation of the Schur complement involves the
- * function @p{Tvmult} of the matrix @p{Dt}, not @p{vmult}! This way,
- * it is sufficient to build only one matrix @p{B} for the symmetric
+ * @p Dt: the computation of the Schur complement involves the
+ * function @p Tvmult of the matrix @p Dt, not @p vmult! This way,
+ * it is sufficient to build only one matrix @p B for the symmetric
  * Schur complement and use it twice.
  *
  * All matrices involved are of arbitrary type and vectors are
- * @ref{BlockVector}s. This way, @p{SchurMatrix} can be coupled with
- * any matrix classes providing @p{vmult} and @p{Tvmult} and can be
- * even nested. Since @ref{SmartPointer}s of matrices are stored, the
- * matrix blocks should be derived from @ref{Subscriptor}.
+ * BlockVectors. This way, @p SchurMatrix can be coupled with
+ * any matrix classes providing @p vmult and @p Tvmult and can be
+ * even nested. Since SmartPointers of matrices are stored, the
+ * matrix blocks should be derived from Subscriptor.
  *
  * Since the Schur complement of a matrix corresponds to a Gaussian
  * block elimination, the right hand side of the condensed system must
  * be preprocessed. Furthermore, the eliminated variable must be
  * reconstructed after solving.
  *
- * @begin{verbatim}
+ * @verbatim
  *   g = g + B A-inverse f
  *   u = A-inverse (f - D-transpose p)
- * @end{verbatim}
+ * @endverbatim
  *
  * Applying these transformations, the solution of the system above by a
- * @p{SchurMatrix} @p{schur} is coded as follows:
+ * @p SchurMatrix @p schur is coded as follows:
  *
- * @begin{verbatim}
+ * @verbatim
  *   schur.prepare_rhs (g, f);
  *   solver.solve (schur, p, g, precondition);
  *   schur.postprocess (u, p);
- * @end{verbatim}
+ * @endverbatim
  *
  * @author Guido Kanschat, 2000, 2001, 2002
  */
@@ -102,7 +102,7 @@ class SchurMatrix :
 				    * for obtaining block vectors.
 				    *
 				    * Optionally, the length of the
-				    * @p{u}-vector can be provided.
+				    * @p u-vector can be provided.
 				    *
 				    * For the meaning of the matrices
 				    * see the class documentation.
@@ -126,7 +126,7 @@ class SchurMatrix :
 				    * first argument, which is also
 				    * part of the input data. If it is
 				    * necessary to conserve the data,
-				    * @p{dst} must be copied before
+				    * @p dst must be copied before
 				    * calling this function. This is
 				    * reasonable, since in many cases,
 				    * only the pre-processed right
@@ -202,7 +202,7 @@ class SchurMatrix :
   VectorMemory<BlockVector<double> >& mem;
 
 				   /**
-				    * Optional signature of the @p{u}-vector.
+				    * Optional signature of the @p u-vector.
 				    */
   std::vector<unsigned int> signature;
   

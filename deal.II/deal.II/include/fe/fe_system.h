@@ -41,19 +41,19 @@
  * elements and the third being a quadratic lagrange element, the
  * ordering for the system @p{s=(u,v,p)} is:
  *
- * @begin{itemize}
- * @item First vertex: @p{u0, v0, p0 = s0, s1, s2}
- * @item Second vertex: @p{u1, v1, p1 = s3, s4, s5}
- * @item First component on the line:
+ * <ul>
+ * <li> First vertex: @p{u0, v0, p0 = s0, s1, s2}
+ * <li> Second vertex: @p{u1, v1, p1 = s3, s4, s5}
+ * <li> First component on the line:
  *   @p{u2, u3 = s4, s5}
- * @item Second component on the line:
+ * <li> Second component on the line:
  *   @p{v2, v3 = s6, s7}.
- * @item Third component on the line:
+ * <li> Third component on the line:
  *   @p{p2 = s8}.
- * @end{itemize}
+ * </ul>
  * Do not rely on this numbering in your application as these
  * internals might change in future. Rather use the functions
- * @p{system_to_component_index} and @p{component_to_system_index},
+ * @p system_to_component_index and @p component_to_system_index,
  * instead.
  *
  * In the most cases, the composed element behaves as if it were a usual element
@@ -62,9 +62,9 @@
  * couple the degrees of freedom of the subobject. E.g. the continuity requirement
  * is imposed for the shape functions of the subobjects separately; no requirement
  * exist between shape functions of different subobjects, i.e. in the above
- * example: on a hanging node, the respective value of the @p{u} velocity is only
- * coupled to @p{u} at the vertices and the line on the larger cell next to this
- * vertex, there is no interaction with @p{v} and @p{w} of this or the other cell.
+ * example: on a hanging node, the respective value of the @p u velocity is only
+ * coupled to @p u at the vertices and the line on the larger cell next to this
+ * vertex, there is no interaction with @p v and @p w of this or the other cell.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, partial reimplementation Ralf Hartmann 2001.
  */
@@ -78,14 +78,14 @@ class FESystem : public FiniteElement<dim>
 				      * and the number of elements you want to
 				      * group together using this class.
 				      *
-				      * In fact, the object @p{fe} is not used,
+				      * In fact, the object @p fe is not used,
 				      * apart from getting the number of dofs
 				      * per vertex, line, etc for that finite
 				      * element class. The objects creates its
 				      * own copy of the finite element object
 				      * at construction time (but after
 				      * the initialization of the base class
-				      * @p{FiniteElement}, which is why we need
+				      * @p FiniteElement, which is why we need
 				      * a valid finite element object passed
 				      * to the constructor).
 				      *
@@ -127,11 +127,11 @@ class FESystem : public FiniteElement<dim>
 				      * element. This element returns
 				      * a string that is composed of
 				      * the strings
-				      * @p{name1}...@p{nameN} returned
+				      * @p name1...@p nameN returned
 				      * by the basis elements. From
 				      * these, we create a sequence
 				      * @p{FESystem<dim>[name1^m1-name2^m2-...-nameN^mN]},
-				      * where @p{mi} are the
+				      * where @p mi are the
 				      * multiplicities of the basis
 				      * elements. If a multiplicity is
 				      * equal to one, then the
@@ -141,8 +141,8 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Return the value of the
-				      * @p{i}th shape function at the
-				      * point @p{p}.  @p{p} is a point
+				      * @p ith shape function at the
+				      * point @p p.  @p p is a point
 				      * on the reference element. Since
 				      * this finite element is always
 				      * vector-valued, we return the
@@ -154,13 +154,13 @@ class FESystem : public FiniteElement<dim>
 				      * we refer to with the term
 				      * non-primitive), then throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}.
+				      * @p ExcShapeFunctionNotPrimitive.
 				      *
 				      * An
-				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * @p ExcUnitShapeValuesDoNotExist
 				      * is thrown if the shape values
-				      * of the @p{FiniteElement}
-				      * (corresponding to the @p{i}th
+				      * of the @p FiniteElement
+				      * (corresponding to the @p ith
 				      * shape function) depend on the
 				      * shape of the cell in real
 				      * space.
@@ -170,11 +170,11 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Return the value of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
+				      * @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -190,8 +190,8 @@ class FESystem : public FiniteElement<dim>
     
 				     /**
 				      * Return the gradient of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. @p{p} is a point
+				      * @p ith shape function at the
+				      * point @p p. @p p is a point
 				      * on the reference element, and
 				      * likewise the gradient is the
 				      * gradient on the unit cell with
@@ -207,13 +207,13 @@ class FESystem : public FiniteElement<dim>
 				      * we refer to with the term
 				      * non-primitive), then throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}.
+				      * @p ExcShapeFunctionNotPrimitive.
 				      *
 				      * An
-				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * @p ExcUnitShapeValuesDoNotExist
 				      * is thrown if the shape values
-				      * of the @p{FiniteElement}
-				      * (corresponding to the @p{i}th
+				      * of the @p FiniteElement
+				      * (corresponding to the @p ith
 				      * shape function) depend on the
 				      * shape of the cell in real
 				      * space.
@@ -223,11 +223,11 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Return the gradient of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
+				      * @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -243,8 +243,8 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Return the tensor of second
-				      * derivatives of the @p{i}th
-				      * shape function at point @p{p}
+				      * derivatives of the @p ith
+				      * shape function at point @p p
 				      * on the unit cell. The
 				      * derivatives are derivatives on
 				      * the unit cell with respect to
@@ -259,13 +259,13 @@ class FESystem : public FiniteElement<dim>
 				      * we refer to with the term
 				      * non-primitive), then throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}.
+				      * @p ExcShapeFunctionNotPrimitive.
 				      *
 				      * An
-				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * @p ExcUnitShapeValuesDoNotExist
 				      * is thrown if the shape values
-				      * of the @p{FiniteElement}
-				      * (corresponding to the @p{i}th
+				      * of the @p FiniteElement
+				      * (corresponding to the @p ith
 				      * shape function) depend on the
 				      * shape of the cell in real
 				      * space.
@@ -275,11 +275,11 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Return the second derivatives
-				      * of the @p{component}th vector
-				      * component of the @p{i}th shape
+				      * of the @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -300,18 +300,18 @@ class FESystem : public FiniteElement<dim>
 				      * interpolating from the given
 				      * finite element to the present
 				      * one. The size of the matrix is
-				      * then @p{dofs_per_cell} times
+				      * then @p dofs_per_cell times
 				      * @p{source.dofs_per_cell}.
 				      *
 				      * These matrices are available
 				      * if source and destination
-				      * element are both @p{FESystem}
+				      * element are both @p FESystem
 				      * elements, have the same number
 				      * of base elements with same
 				      * element multiplicity, and if
 				      * these base elements also
 				      * implement their
-				      * @p{get_interpolation_matrix}
+				      * @p get_interpolation_matrix
 				      * functions. Otherwise, an
 				      * exception of type
 				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
@@ -360,14 +360,14 @@ class FESystem : public FiniteElement<dim>
 				      * face.
 				      *
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p face_index.
 				      *
 				      * Implementation of the
 				      * interface in
-				      * @ref{FiniteElement}
+				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -417,11 +417,11 @@ class FESystem : public FiniteElement<dim>
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> * clone() const;
   
@@ -438,10 +438,10 @@ class FESystem : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      *
 				      * Passes on control to
-				      * @p{compute_fill} that does the
+				      * @p compute_fill that does the
 				      * work for all three
 				      * @p{fill_fe*_values}
 				      * functions.
@@ -457,10 +457,10 @@ class FESystem : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      *
 				      * Passes on control to
-				      * @p{compute_fill} that does the
+				      * @p compute_fill that does the
 				      * work for all three
 				      * @p{fill_fe*_values} functions.
 				      */    
@@ -476,10 +476,10 @@ class FESystem : public FiniteElement<dim>
     				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      *
 				      * Passes on control to
-				      * @p{compute_fill} that does the
+				      * @p compute_fill that does the
 				      * work for all three
 				      * @p{fill_fe*_values} functions.
 				      */
@@ -501,17 +501,17 @@ class FESystem : public FiniteElement<dim>
 				      * Calls (among other things)
 				      * @p{fill_fe_([sub]face)_values}
 				      * of the base elements. Calls
-				      * @p{fill_fe_values} if
+				      * @p fill_fe_values if
 				      * @p{face_no==invalid_face_no}
 				      * and
 				      * @p{sub_no==invalid_face_no};
-				      * calls @p{fill_fe_face_values}
+				      * calls @p fill_fe_face_values
 				      * if
 				      * @p{face_no==invalid_face_no}
 				      * and
 				      * @p{sub_no!=invalid_face_no};
 				      * and calls
-				      * @p{fill_fe_subface_values} if
+				      * @p fill_fe_subface_values if
 				      * @p{face_no!=invalid_face_no}
 				      * and
 				      * @p{sub_no!=invalid_face_no}.
@@ -557,8 +557,8 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Initialize the
-				      * @p{unit_support_points} field
-				      * of the @ref{FiniteElementBase}
+				      * @p unit_support_points field
+				      * of the FiniteElementBase
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -566,8 +566,8 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Initialize the
-				      * @p{unit_face_support_points} field
-				      * of the @ref{FiniteElementBase}
+				      * @p unit_face_support_points field
+				      * of the FiniteElementBase
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -575,11 +575,11 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Helper function used in the constructor:
-				      * take a @p{FiniteElementData} object
+				      * take a @p FiniteElementData object
 				      * and return an object of the same type
 				      * with the number of degrees of
 				      * freedom per vertex, line, etc.
-				      * multiplied by @p{n}. Don't touch the
+				      * multiplied by @p n. Don't touch the
 				      * number of functions for the
 				      * transformation from unit to real
 				      * cell.
@@ -614,13 +614,13 @@ class FESystem : public FiniteElement<dim>
 				     /**
 				      * Helper function used in the
 				      * constructor: takes a
-				      * @p{FiniteElement} object and
+				      * @p FiniteElement object and
 				      * returns an boolean vector
 				      * including the
-				      * @p{restriction_is_additive_flags}
+				      * @p restriction_is_additive_flags
 				      * of the mixed element
-				      * consisting of @p{N} elements
-				      * of the sub-element @p{fe}.
+				      * consisting of @p N elements
+				      * of the sub-element @p fe.
 				      */
     static std::vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
@@ -712,24 +712,24 @@ class FESystem : public FiniteElement<dim>
 				      * constructors since there are
 				      * several of them. It sets up
 				      * the index table for the system
-				      * as well as @p{restriction} and
-				      * @p{prolongation}
+				      * as well as @p restriction and
+				      * @p prolongation
 				      * matrices.
 				      */
     void initialize();
 
 				     /**
-				      * Used by @p{initialize}.
+				      * Used by @p initialize.
 				      */
     void build_cell_tables();
     
 				     /**
-				      * Used by @p{initialize}.
+				      * Used by @p initialize.
 				      */
     void build_face_tables();
 
 				     /**
-				      * Used by @p{initialize}.
+				      * Used by @p initialize.
 				      */
     void build_interface_constraints ();
 
@@ -740,7 +740,7 @@ class FESystem : public FiniteElement<dim>
 				      * However, here, this class does
 				      * not itself store the data but
 				      * only pointers to
-				      * @p{InternalData} objects for
+				      * @p InternalData objects for
 				      * each of the base elements.
 				      */
     class InternalData : public FiniteElementBase<dim>::InternalDataBase
@@ -748,19 +748,19 @@ class FESystem : public FiniteElement<dim>
       public:
 					 /**
 					  * Constructor. Is called by
-					  * the @p{get_data}
+					  * the @p get_data
 					  * function. Sets the size of
-					  * the @p{base_fe_datas}
+					  * the @p base_fe_datas
 					  * vector to
-					  * @p{n_base_elements}.
+					  * @p n_base_elements.
 					  */
 	InternalData (const unsigned int n_base_elements);
 	
 					 /**
 					  * Destructor. Deletes all
-					  * @p{InternalDatas} whose
+					  * @p InternalDatas whose
 					  * pointers are stored by the
-					  * @p{base_fe_datas}
+					  * @p base_fe_datas
 					  * vector.
 					  */
 	~InternalData();
@@ -775,8 +775,8 @@ class FESystem : public FiniteElement<dim>
 					 /**
 					  * Gives write-access to the
 					  * pointer to a
-					  * @p{InternalData} of the
-					  * @p{base_no}th base
+					  * @p InternalData of the
+					  * @p base_noth base
 					  * element.
 					  */
 	void set_fe_data(const unsigned int                        base_no,
@@ -785,8 +785,8 @@ class FESystem : public FiniteElement<dim>
 					 /**
 					  * Gives read-access to the
 					  * pointer to a
-					  * @p{InternalData} of the
-					  * @p{base_no}th base element.
+					  * @p InternalData of the
+					  * @p base_noth base element.
 					  */	
 	typename FiniteElementBase<dim>::InternalDataBase &
 	get_fe_data (const unsigned int base_no) const;
@@ -795,8 +795,8 @@ class FESystem : public FiniteElement<dim>
 					 /**
 					  * Gives write-access to the
 					  * pointer to a
-					  * @p{FEValuesData} for the
-					  * @p{base_no}th base
+					  * @p FEValuesData for the
+					  * @p base_noth base
 					  * element.
 					  */
 	void set_fe_values_data (const unsigned int base_no,
@@ -805,14 +805,14 @@ class FESystem : public FiniteElement<dim>
 					 /**
 					  * Gives read-access to the
 					  * pointer to a
-					  * @p{FEValuesData} for the
-					  * @p{base_no}th base element.
+					  * @p FEValuesData for the
+					  * @p base_noth base element.
 					  */	
 	FEValuesData<dim> & get_fe_values_data (const unsigned int base_no) const;
 
 					 /**
 					  * Deletes the
-					  * @p{FEValuesData} the
+					  * @p FEValuesData the
 					  * @p{fe_datas[base_no]}
 					  * pointer is pointing
 					  * to. Sets
@@ -820,21 +820,21 @@ class FESystem : public FiniteElement<dim>
 					  * zero.
 					  *
 					  * This function is used to
-					  * delete @p{FEValuesData}
+					  * delete @p FEValuesData
 					  * that are needed only on
 					  * the first cell but not any
 					  * more afterwards.  This is
 					  * the case for
 					  * e.g. Lagrangian elements
-					  * (see e.g. @p{FE_Q}
+					  * (see e.g. @p FE_Q
 					  * classes).
 					  */
 	void delete_fe_values_data (const unsigned int base_no);
 
                                          /**
-                                          * Set the @p{first_cell}
-                                          * flag to @p{false}. Used by
-                                          * the @p{FEValues} class to
+                                          * Set the @p first_cell
+                                          * flag to @p false. Used by
+                                          * the @p FEValues class to
                                           * indicate that we have
                                           * already done the work on
                                           * the first cell.
@@ -851,18 +851,18 @@ class FESystem : public FiniteElement<dim>
 	
 					 /**
 					  * Pointers to
-					  * @p{InternalData} objects
+					  * @p InternalData objects
 					  * for each of the base
 					  * elements. They are
 					  * accessed to by the
-					  * @p{set_} and
-					  * @p{get_fe_data} functions.
+					  * @p set_ and
+					  * @p get_fe_data functions.
 					  *
 					  * The size of this vector is
-					  * set to @p{n_base_elements}
+					  * set to @p n_base_elements
 					  * by the InternalData
 					  * constructor.  It is filled
-					  * by the @p{get_data}
+					  * by the @p get_data
 					  * function. Note that since
 					  * the data for each instance
 					  * of a base class is
@@ -876,18 +876,18 @@ class FESystem : public FiniteElement<dim>
 
 					 /**
 					  * Pointers to the
-					  * @p{FEValuesData} objects
+					  * @p FEValuesData objects
 					  * that are given to the
-					  * @p{fill_fe_values}
+					  * @p fill_fe_values
 					  * function of the base
 					  * elements. They are
 					  * accessed to by the
-					  * @p{set_} and
-					  * @p{get_fe_values_data}
+					  * @p set_ and
+					  * @p get_fe_values_data
 					  * functions.
 					  *
 					  * The size of this vector is
-					  * set to @p{n_base_elements}
+					  * set to @p n_base_elements
 					  * by the InternalData
 					  * constructor.
 					  */

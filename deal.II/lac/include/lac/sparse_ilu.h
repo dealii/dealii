@@ -29,9 +29,9 @@
  * in the decomposition that do not fit into the sparsity structure of this
  * object are discarded.
  *
- * The algorithm used by this class is as follows (indices run from @p{0}
- * to @p{N-1}):
- * @begin{verbatim}
+ * The algorithm used by this class is as follows (indices run from @p 0
+ * to @p N-1):
+ * @verbatim
  * copy original matrix into a[i,j]
  * 
  * for i=1..N-1
@@ -43,12 +43,12 @@
  *     for j=k+1..N-1
  *      if (a[i,j] exists & a[k,j] exists)
  *        a[i,j] -= a[i,k] * a[k,j]
- * @end{verbatim}
+ * @endverbatim
  *
  * 
  * @sect2{Usage and state management}
  *
- * Refer to @ref{SparseLUDecomposition} documentation for suggested
+ * Refer to SparseLUDecomposition documentation for suggested
  * usage and state management.
  *
  * 
@@ -73,10 +73,10 @@ class SparseILU : public SparseLUDecomposition<number>
                                      /**
                                       * Constructor. Does nothing.
 				      *
-				      * Call the @p{initialize}
+				      * Call the @p initialize
 				      * function before using this
 				      * object as preconditioner
-				      * (@p{vmult}).
+				      * (@p vmult).
                                       */
     SparseILU ();
 
@@ -89,7 +89,7 @@ class SparseILU : public SparseLUDecomposition<number>
     SparseILU (const SparsityPattern &sparsity);
 
 				     /**
-				      * Make the @p{AdditionalData}
+				      * Make the @p AdditionalData
 				      * type in the base class
 				      * accessible to this class as
 				      * well.
@@ -113,15 +113,15 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * class documentation of
 				      * SparseLUDecomposition and the
 				      * documentation of the
-				      * @p{SparseLUDecomposition::AdditionalData}
+				      * @p SparseLUDecomposition::AdditionalData
 				      * class.
 				      *
 				      * According to the
-				      * @p{parameters}, this function
+				      * @p parameters, this function
 				      * creates a new SparsityPattern
 				      * or keeps the previous sparsity
 				      * or takes the sparsity given by
-				      * the user to @p{data}. Then,
+				      * the user to @p data. Then,
 				      * this function performs the LU
 				      * decomposition.
 				      *
@@ -158,7 +158,7 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * i.e. do one forward-backward step
 				      * $dst=(LU)^{-1}src$.
 				      *
-				      * The @p{initialize} function
+				      * The @p initialize function
 				      * needs to be called beforehand.
 				      */
     template <typename somenumber>

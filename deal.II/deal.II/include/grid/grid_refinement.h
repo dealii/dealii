@@ -40,10 +40,10 @@ template <class T> class Vector;
  *   flags those cells for
  *   coarsening for which the criterion is less than the threshold.
  *
- *   There are two variations of these functions, which rely on @p{refine} and
- *   @p{coarsen} by computing the thresholds from other information:
- *   @begin{itemize}
- *   @item @p{refine_and_coarsen_fixed_number}: this function takes a vector as
+ *   There are two variations of these functions, which rely on @p refine and
+ *   @p coarsen by computing the thresholds from other information:
+ *   <ul>
+ *   <li> @p refine_and_coarsen_fixed_number: this function takes a vector as
  *     above and two values between zero and one denoting the fractions of cells to
  *     be refined and coarsened. For this purpose, it sorts the criteria per cell
  *     and takes the threshold to be the one belonging to the cell with the
@@ -51,13 +51,13 @@ template <class T> class Vector;
  *     the fraction is $0.3$, the threshold is computed to a value such that
  *     30 per cent of cells have a criterion higher than the threshold and are
  *     thus flagged for refinement. The flagging for refinement is done through
- *     the central @p{refine} function. For coarsening, the same holds.
+ *     the central @p refine function. For coarsening, the same holds.
  *
  *     The sorting of criteria is not done actually, since we only need one
  *     value, in the example above the criterion of the cell which is at
  *     30 per cent in the sorted list of cells. The order of cells with higher
  *     and of those with lower criteria is irrelevant. Getting this value is
- *     accomplished by the @p{nth_element} function of the @p{C++} standard
+ *     accomplished by the @p nth_element function of the @p{C++} standard
  *     library, which takes only linear time in the number of elements, rather
  *     than @p{N log N} for sorting all values.
  *
@@ -66,7 +66,7 @@ template <class T> class Vector;
  *     want to chose a smaller value to avoid overrefinement in regions which
  *     do not contribute much to the error.
  *
- *   @item @p{refine_and_coarsen_fixed_fraction}: this function computes the
+ *   <li> @p refine_and_coarsen_fixed_fraction: this function computes the
  *     threshold such that the number of cells getting flagged for refinement
  *     makes up for a certain fraction of the total error. If this fraction is 50
  *     per cent, for example, the threshold is computed such that the cells with
@@ -92,11 +92,11 @@ template <class T> class Vector;
  *     From the point of view of implementation, this time we really need to
  *     sort the array of criteria.
  *     Just like the other strategy described above, this function only
- *     computes the threshold values and then passes over to @p{refine} and
- *     @p{coarsen}.
+ *     computes the threshold values and then passes over to @p refine and
+ *     @p coarsen.
  *
  *     A typical value for the fraction of the total error is 0.5.
- *   @end{itemize}
+ *   </ul>
  *
  *   There are other functions relying on different methods to flag
  *   cells for refinement or coarsening. See their documentation for
@@ -123,7 +123,7 @@ class GridRefinement
 				      * Refine the triangulation
 				      * according to the given
 				      * criteria. The criterion is a
-				      * @p{double} value for each cell
+				      * @p double value for each cell
 				      * which determines which cells
 				      * are to be refined by
 				      * comparison with the threshold:
@@ -134,13 +134,13 @@ class GridRefinement
 				      * guarantee that the threshold
 				      * value is in a resonable
 				      * range. Please note that the
-				      * @p{criteria} array may contain
+				      * @p criteria array may contain
 				      * negative values (sometimes,
 				      * error estimators are evaluated
 				      * in a way which produces
 				      * positive and negative values),
 				      * but the comparison with
-				      * @p{threshold} is done only on
+				      * @p threshold is done only on
 				      * the absolute values of the
 				      * criteria.
 				      *
@@ -148,7 +148,7 @@ class GridRefinement
 				      * refinement, they are not
 				      * actually refined. To do so,
 				      * you have to call the
-				      * @p{execute_coarsening_and_refinement}
+				      * @p execute_coarsening_and_refinement
 				      * function.
 				      *
 				      * There are more sophisticated
@@ -164,7 +164,7 @@ class GridRefinement
 			const double        threshold);
 
 				     /**
-				      * Analogue to the @p{refine}
+				      * Analogue to the @p refine
 				      * function: flag all cells for
 				      * coarsening for which the
 				      * absolute value of the
@@ -179,16 +179,16 @@ class GridRefinement
 				     /**
 				      * Refine the triangulation by
 				      * refining a certain fraction
-				      * @p{top_fraction_of_cells} with
+				      * @p top_fraction_of_cells with
 				      * the highest error. Likewise
 				      * coarsen the fraction
-				      * @p{bottom_fraction_of_cells}
+				      * @p bottom_fraction_of_cells
 				      * with the least error. To
 				      * actually perform the
 				      * refinement, call
-				      * @p{execute_coarsening_and_refinement}.
+				      * @p execute_coarsening_and_refinement.
 				      *
-				      * @p{fraction_of_cells} shall be
+				      * @p fraction_of_cells shall be
 				      * a value between zero and one.
 				      *
 				      * Refer to the general doc of
@@ -207,13 +207,13 @@ class GridRefinement
 				      * Refine the triangulation by
 				      * flagging those cells which
 				      * make up a certain
-				      * @p{top_fraction} of the total
+				      * @p top_fraction of the total
 				      * error.  Likewise, coarsen all
 				      * cells which make up only
-				      * @p{bottom_fraction}.  To
+				      * @p bottom_fraction.  To
 				      * actually perform the
 				      * refinement, call
-				      * @p{execute_coarsening_and_refinement}.
+				      * @p execute_coarsening_and_refinement.
 				      *
 				      * @p{*_fraction} shall be a
 				      * values between zero and one.
@@ -275,13 +275,13 @@ class GridRefinement
   private:
     
 				     /**
-				      * Sorts the vector @p{ind} as an
-				      * index vector of @p{a} in
+				      * Sorts the vector @p ind as an
+				      * index vector of @p a in
 				      * increasing order.  This
 				      * implementation of quicksort
 				      * seems to be faster than the
 				      * STL version and is needed in
-				      * @p{refine_and_coarsen_optimize}
+				      * @p refine_and_coarsen_optimize
 				      */
     template <class Vector>
     static void qsort_index (const Vector               &a,

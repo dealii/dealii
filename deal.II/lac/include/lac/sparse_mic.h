@@ -22,7 +22,7 @@
 /**
  * Modified incomplete Cholesky (MIC(0)) preconditioner.  This class
  * conforms to the state and usage specification in
- * @ref{SparseLUDecomposition}.
+ * SparseLUDecomposition.
  *
  * 
  * @sect2{The decomposition}
@@ -42,7 +42,7 @@ class SparseMIC : public SparseLUDecomposition<number>
   public:
                                      /**
                                       * Constructor. Does nothing, so
-                                      * you have to call @p{reinit}
+                                      * you have to call @p reinit
                                       * sometimes afterwards.
                                       */
     SparseMIC ();
@@ -69,7 +69,7 @@ class SparseMIC : public SparseLUDecomposition<number>
     virtual void clear();
 
 				     /**
-				      * Make the @p{AdditionalData}
+				      * Make the @p AdditionalData
 				      * type in the base class
 				      * accessible to this class as
 				      * well.
@@ -95,7 +95,7 @@ class SparseMIC : public SparseLUDecomposition<number>
     void reinit (const SparsityPattern &sparsity);
 
 				     /**
-				      * Same as @p{decompose}.
+				      * Same as @p decompose.
 				      */
     template <typename somenumber>
     void initialize (const SparseMatrix<somenumber> &matrix,
@@ -116,7 +116,7 @@ class SparseMIC : public SparseLUDecomposition<number>
 				      * i.e. do one forward-backward step
 				      * $dst=(LU)^{-1}src$.
 				      *
-				      * Call @p{initialize} before
+				      * Call @p initialize before
 				      * calling this function.
 				      */
     template <typename somenumber>

@@ -308,9 +308,9 @@ class FE_Poly : public FiniteElement<dim>
 				      *
 				      * The effect in this element is
 				      * as follows:
-				      * @begin{itemize}
+				      * <ul>
 
-				      * @item if
+				      * <li> if
 				      * <tt>update_gradients</tt> is
 				      * set, the result will contain
 				      * <tt>update_gradients</tt> and
@@ -324,7 +324,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * is actually performed by the
 				      * Mapping object used in
 				      * conjunction with this finite
-				      * element.  @item if
+				      * element.  <li> if
 				      * <tt>update_second_derivatives</tt>
 				      * is set, the result will
 				      * contain
@@ -339,7 +339,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * quotients for the actual
 				      * computation.
 				      *
-				      * @end{itemize}
+				      * </ul>
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
 

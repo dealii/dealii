@@ -19,7 +19,7 @@
 
 /**
  * Multilevel matrix. This class implements the interface defined by
- * @ref{MGMatrixBase}, using @ref{MGLevelObject} of an arbitrary
+ * MGMatrixBase, using MGLevelObject of an arbitrary
  * matrix class.
  *
  * @author Guido Kanschat, 2002
@@ -31,10 +31,10 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 				     /**
 				      * Constructor. The argument is
 				      * handed over to the
-				      * @p{SmartPointer}
+				      * @p SmartPointer
 				      * constructor. The matrix object
 				      * must exist longer as the
-				      * @p{MGMatrix} object, since
+				      * @p MGMatrix object, since
 				      * only a pointer is stored.
 				      */
     MGMatrix (MGLevelObject<MATRIX>* = 0);
@@ -43,7 +43,7 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 				      * Set the matrix object to be
 				      * used. The matrix object must
 				      * exist longer as the
-				      * @p{MGMatrix} object, since
+				      * @p MGMatrix object, since
 				      * only a pointer is stored.
 				      */
     void set_matrix (MGLevelObject<MATRIX>* M);
@@ -94,11 +94,11 @@ private:
 
 /**
  * Multilevel matrix selecting from block matrices. This class
- * implements the interface defined by @ref{MGMatrixBase}.  The
- * template parameter @p{MATRIX} should be a block matrix class like
- * @ref{BlockSparseMatrix} or @p{BlockSparseMatrixEZ}. Then, this
- * class stores a pointer to a @ref{MGLevelObject} of this matrix
- * class. In each @p{vmult}, the block selected on initialization will
+ * implements the interface defined by MGMatrixBase.  The
+ * template parameter @p MATRIX should be a block matrix class like
+ * BlockSparseMatrix or @p BlockSparseMatrixEZ. Then, this
+ * class stores a pointer to a MGLevelObject of this matrix
+ * class. In each @p vmult, the block selected on initialization will
  * be multiplied with the vector provided.
  *
  * @author Guido Kanschat, 2002
@@ -108,11 +108,11 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 {
   public:
 				     /**
-				      * Constructor. @p{row} and
-				      * @p{col} are the coordinate of
+				      * Constructor. @p row and
+				      * @p col are the coordinate of
 				      * the selected block. The other
 				      * argument is handed over to the
-				      * @p{SmartPointer} constructor.
+				      * @p SmartPointer constructor.
 				      */
     MGMatrixSelect (const unsigned int row = 0,
 		    const unsigned int col = 0,
@@ -122,7 +122,7 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 				      * Set the matrix object to be
 				      * used. The matrix object must
 				      * exist longer as the
-				      * @p{MGMatrix} object, since
+				      * @p MGMatrix object, since
 				      * only a pointer is stored.
 				      */
     void set_matrix (MGLevelObject<MATRIX>* M);

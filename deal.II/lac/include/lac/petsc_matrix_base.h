@@ -263,21 +263,21 @@ namespace PETScWrappers
  * matrix.
  *
  * The interface of this class is modeled after the existing
- * @ref{SparseMatrix} class in deal.II. It has almost the same member
+ * SparseMatrix class in deal.II. It has almost the same member
  * functions, and is often exchangable. However, since PETSc only supports a
  * single scalar type (either double, float, or a complex data type), it is
  * not templated, and only works with whatever your PETSc installation has
- * defined the data type @p{PetscScalar} to.
+ * defined the data type @p PetscScalar to.
  *
  * Note that PETSc only guarantees that operations do what you expect if the
- * functions @p{MatAssemblyBegin} and @p{MatAssemblyEnd} have been called
+ * functions @p MatAssemblyBegin and @p MatAssemblyEnd have been called
  * after matrix assembly. Therefore, you need to call
- * @ref{SparseMatrix::compress} before you actually use the matrix. This also
- * calls @p{MatCompress} that compresses the storage format for sparse
+ * SparseMatrix::compress() before you actually use the matrix. This also
+ * calls @p MatCompress that compresses the storage format for sparse
  * matrices by discarding unused elements. PETSc allows to continue with
  * assembling the matrix after calls to these functions, but since there are
  * no more free entries available after that any more, it is better to only
- * call @ref{SparseMatrix::compress} once at the end of the assembly stage and
+ * call SparseMatrix::compress() once at the end of the assembly stage and
  * before the matrix is actively used.
  * 
  * @author Wolfgang Bangerth, 2004
@@ -342,7 +342,7 @@ namespace PETScWrappers
                                        /**
                                         * PETSc matrices store their own
                                         * sparsity patterns. So, in analogy to
-                                        * our own @ref{SparsityPattern} class,
+                                        * our own SparsityPattern class,
                                         * this function compresses the
                                         * sparsity pattern and allows the
                                         * resulting matrix to be used in all
@@ -361,7 +361,7 @@ namespace PETScWrappers
                                         * always take care where to call this
                                         * function. In contrast to the
                                         * respective function in the
-                                        * @p{MatrixBase} class, we don't
+                                        * @p MatrixBase class, we don't
                                         * throw an exception if the respective
                                         * entry doesn't exist in the sparsity
                                         * pattern of this class, since PETSc
@@ -549,7 +549,7 @@ namespace PETScWrappers
                                         *
                                         * The implementation of this function
                                         * is not as efficient as the one in
-                                        * the @p{MatrixBase} class used in
+                                        * the @p MatrixBase class used in
                                         * deal.II (i.e. the original one, not
                                         * the PETSc wrapper class) since PETSc
                                         * doesn't support this operation and
@@ -563,7 +563,7 @@ namespace PETScWrappers
                                         *
                                         * The implementation of this function
                                         * is not as efficient as the one in
-                                        * the @p{MatrixBase} class used in
+                                        * the @p MatrixBase class used in
                                         * deal.II (i.e. the original one, not
                                         * the PETSc wrapper class) since PETSc
                                         * doesn't support this operation and

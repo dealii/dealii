@@ -33,7 +33,7 @@
  * of the base class.
  *
  * A typical usage of this class would be as follows:
- * @begin{verbatim}
+ * @verbatim
  *    FullMatrix<double> M;
  *    ...                // fill matrix M with some values
  *
@@ -42,26 +42,26 @@
  *    std::ofstream out ("M.gnuplot");
  *    matrix_out.build_patches (M, "M");
  *    matrix_out.write_gnuplot (out);
- * @end{verbatim}
+ * @endverbatim
  * Of course, you can as well choose a different graphical output
  * format. Also, this class supports any matrix, not only of type
- * @ref{FullMatrix}, as long as it satisfies a number of requirements,
+ * FullMatrix, as long as it satisfies a number of requirements,
  * stated with the member functions of this class.
  *
- * The generation of patches through the @p{build_patches} function
+ * The generation of patches through the @p build_patches function
  * can be modified by giving it an object holding certain flags. See
- * the documentation of the members of the @ref{Options} class for a
+ * the documentation of the members of the Options class for a
  * description of these flags.
  *
  *
  * @sect3{Internals}
  *
  * To avoid a compiler error in Sun's Forte compiler, we derive
- * privately from @ref{DataOutBase}. Since the base class
- * @ref{DataOutInterface} does so as well, this does no harm, but
+ * privately from DataOutBase. Since the base class
+ * DataOutInterface does so as well, this does no harm, but
  * calms the compiler which is suspecting an access control conflict
  * otherwise. Testcase here:
- * @begin{verbatim}
+ * @verbatim
  *    template <typename T> class V {};
  *    
  *    struct B1 { 
@@ -79,7 +79,7 @@
  *    }; 
  *    
  *    D d;
- * @end{verbatim} 
+ * @endverbatim 
  *
  *
  * @author Wolfgang Bangerth, 2001
@@ -91,18 +91,18 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * Class holding various
 				      * variables which are used to
 				      * modify the output of the
-				      * @ref{MatrixOut} class.
+				      * MatrixOut class.
 				      */
     struct Options 
     {
 					 /**
-					  * If @p{true}, only show the
+					  * If @p true, only show the
 					  * absolute values of the
 					  * matrix entries, rather
 					  * than their true values
 					  * including the
 					  * sign. Default value is
-					  * @p{false}.
+					  * @p false.
 					  */
 	bool         show_absolute_values;
 
@@ -171,7 +171,7 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * requires that we can extract
 				      * elements of the matrix, which
 				      * is done using the
-				      * @p{get_element} function
+				      * @p get_element function
 				      * declared below. By adding
 				      * specializations, you can
 				      * extend this class to other
@@ -195,21 +195,21 @@ class MatrixOut : public DataOutInterface<2,2>
     
 				     /**
 				      * Abbreviate the somewhat
-				      * lengthy name for the @p{Patch}
+				      * lengthy name for the @p Patch
 				      * class.
 				      *
 				      * Note that we have to indicate
 				      * the global scope using the
-				      * @p{::} in front of
-				      * @p{DataOutBase}, since
+				      * @p :: in front of
+				      * @p DataOutBase, since
 				      * otherwise the C++ rules
 				      * specify that this here
-				      * indicates the @p{DataOutBase}
+				      * indicates the @p DataOutBase
 				      * base class of this
 				      * class. Since that is a private
 				      * base class, we cannot access
 				      * its members, and so access to
-				      * the local @p{Patch} type would
+				      * the local @p Patch type would
 				      * be forbidden.
 				      */
     typedef ::DataOutBase::Patch<2,2> Patch;
@@ -217,7 +217,7 @@ class MatrixOut : public DataOutInterface<2,2>
 				     /**
 				      * This is a list of patches that
 				      * is created each time
-				      * @p{build_patches} is
+				      * @p build_patches is
 				      * called. These patches are used
 				      * in the output routines of the
 				      * base classes.

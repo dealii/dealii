@@ -37,13 +37,13 @@ template <int dim> class Quadrature;
 /*@{*/
 
 /**
- * Contains all data vectors for @p{FEValues}.
- * This class has been extracted from @p{FEValuesBase} to be handed
- * over to the fill functions of @p{Mapping} and
- * @p{FiniteElement}.
+ * Contains all data vectors for @p FEValues.
+ * This class has been extracted from @p FEValuesBase to be handed
+ * over to the fill functions of @p Mapping and
+ * @p FiniteElement.
  *
  * @note All data fields are public, but this is not
- * critical, because access to this object is private in @p{FEValues}.
+ * critical, because access to this object is private in @p FEValues.
  *
  * @author Guido Kanschat, 2000
  */
@@ -84,14 +84,14 @@ class FEValuesData
 				      * shape function number equals
 				      * the row number. Otherwise, use
 				      * the
-				      * @p{shape_function_to_row_table}
+				      * @p shape_function_to_row_table
 				      * array to get at the first row
 				      * that belongs to this
 				      * particular shape function, and
 				      * navigate among all the rows
 				      * for this shape function using
 				      * the
-				      * @p{FiniteElement::get_nonzero_components}
+				      * @p FiniteElement::get_nonzero_components
 				      * function which tells us which
 				      * components are non-zero and
 				      * thus have a row in the array
@@ -103,7 +103,7 @@ class FEValuesData
 				      * Storage type for
 				      * gradients. The layout of data
 				      * is the same as for the
-				      * @ref{ShapeVector} data type.
+				      * ShapeVector data type.
 				      */
     typedef Table<2,Tensor<1,dim> > GradientVector;
 
@@ -147,7 +147,7 @@ class FEValuesData
 				      * times the Jacobi determinant
 				      * at the quadrature points. This
 				      * function is reset each time
-				      * @p{reinit} is called. The
+				      * @p reinit is called. The
 				      * Jacobi determinant is actually
 				      * the reciprocal value of the
 				      * Jacobi matrices stored in this
@@ -159,7 +159,7 @@ class FEValuesData
 
 				     /**
 				      * Array of quadrature points. This array
-				      * is set up upon calling @p{reinit} and
+				      * is set up upon calling @p reinit and
 				      * contains the quadrature points on the
 				      * real element, rather than on the
 				      * reference element.
@@ -183,8 +183,8 @@ class FEValuesData
 				     /**
 				      * Indicate the first row which a
 				      * given shape function occupies
-				      * in the @p{ShapeVector},
-				      * @p{ShapeGradient}, etc
+				      * in the @p ShapeVector,
+				      * @p ShapeGradient, etc
 				      * arrays. If all shape functions
 				      * are primitive, then this is
 				      * the identity mapping. If, on
@@ -213,7 +213,7 @@ class FEValuesData
                                      /**
 				      * Original update flags handed
 				      * to the constructor of
-				      * @p{FEValues}.
+				      * @p FEValues.
 				      */
     UpdateFlags          update_flags;
 };
@@ -262,8 +262,8 @@ class FEValuesData
  *  @sect3{Member functions}
  *
  *  The functions of this class fall into different cathegories:
- *  @begin{itemize}
- *  @item @p{shape_value}, @p{shape_grad}, etc: return one of the values 
+ *  <ul>
+ *  <li> @p shape_value, @p shape_grad, etc: return one of the values 
  *    of this object at a time. These functions are inlined, so this
  *    is the suggested access to all finite element values. There
  *    should be no loss in performance with an optimizing compiler. If
@@ -275,7 +275,7 @@ class FEValuesData
  *    throw an exception since they cannot generate a useful
  *    result. Rather, use the next set of functions.
  *
- *  @item @p{shape_value_component}, @p{shape_grad_component}, etc:
+ *  <li> @p shape_value_component, @p shape_grad_component, etc:
  *    This is the same set of functions as above, except that for vector
  *    valued finite elements they return only one vector component. This
  *    is useful for elements of which shape functions have more than one
@@ -283,29 +283,29 @@ class FEValuesData
  *    and you have to walk over all (or only the non-zero) components of
  *    the shape function using this set of functions.
  *   
- *  @item @p{get_function_values}, @p{get_function_grads}, @p{...}:
+ *  <li> @p get_function_values, @p get_function_grads, @p{...}:
  *    Compute a finite element function or its derivative
  *    in quadrature points.
  *
- *  @item @p{reinit}: initialize the @p{FEValues} object for a certain cell.
+ *  <li> @p reinit: initialize the @p FEValues object for a certain cell.
  *    This function is not in the present class but only in the derived
  *    classes and has a variable call syntax. 
  *    See the docs for the derived classes for more information.
- * @end{itemize}
+ * </ul>
  *
  *
  * @sect3{UpdateFlags}
  *
- * The @ref{UpdateFlags} object handed to the constructor is used to
+ * The UpdateFlags object handed to the constructor is used to
  * determine, which of the data fields to compute. This way, it is
  * possible to avoid expensive computations of useless derivatives.
  * In the beginning, these flags are processed through the functions
- * @p{update_once} and @p{update_each} of @ref{Mapping} and
- * @p{FiniteElement}. All the results are bit-wise or'd and determine
- * the fields actually computed. This enables @ref{Mapping} and
- * @p{FiniteElement} to schedule auxiliary data fields for
+ * @p update_once and @p update_each of Mapping and
+ * @p FiniteElement. All the results are bit-wise or'd and determine
+ * the fields actually computed. This enables Mapping and
+ * @p FiniteElement to schedule auxiliary data fields for
  * updating. Still, it is recommended to give ALL needed update flags
- * to @p{FEValues}.
+ * to @p FEValues.
  *
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
  */
@@ -393,14 +393,14 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * finite element is scalar, then
 				      * only component zero is allowed
 				      * and the return value equals
-				      * that of the @p{shape_value}
+				      * that of the @p shape_value
 				      * function. If the finite
 				      * element is vector valued but
 				      * all shape functions are
 				      * primitive (i.e. they are
 				      * non-zero in only one
 				      * component), then the value
-				      * returned by @p{shape_value}
+				      * returned by @p shape_value
 				      * equals that of this function
 				      * for exactly one
 				      * component. This function is
@@ -448,7 +448,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * finite element in use is a scalar one,
 				      * i.e. has only one vector component. If
 				      * it is a vector-valued one, then use
-				      * the other @p{get_function_values}
+				      * the other @p get_function_values
 				      * function.
 				      * 
 				      * The function assumes that the
@@ -475,7 +475,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      *
 				      * This function does the same as
 				      * the other
-				      * @p{get_function_values}, but
+				      * @p get_function_values, but
 				      * applied to multi-component
 				      * elements.
 				      *
@@ -495,8 +495,8 @@ class FEValuesBase : protected FEValuesData<dim>
 
     				     /**
 				      * Compute the gradient of the
-				      * @p{i}th shape function at the
-				      * @p{j} quadrature point with
+				      * @p ith shape function at the
+				      * @p j quadrature point with
 				      * respect to real cell
 				      * coordinates.  If you want to
 				      * get the derivative in one of
@@ -558,8 +558,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				     /**
 				      * Compute the gradients of the finite
 				      * element function characterized
-				      * by @p{fe_function} restricted to
-				      * @p{cell} at the quadrature points.
+				      * by @p fe_function restricted to
+				      * @p cell at the quadrature points.
 				      *
 				      * If the present cell is not an active
 				      * one the interpolated function values
@@ -569,11 +569,11 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * finite element in use is a scalar one,
 				      * i.e. has only one vector component. If
 				      * it is a vector-valued one, then use
-				      * the other @p{get_function_grads}
+				      * the other @p get_function_grads
 				      * function.
 				      * 
 				      * The function assumes that the
-				      * @p{gradients} object already has the
+				      * @p gradients object already has the
 				      * right size.
 				      *
 				      * The actual data type of the input
@@ -599,19 +599,19 @@ class FEValuesBase : protected FEValuesData<dim>
 				     /**
 				      * Compute the gradients of the finite
 				      * element function characterized
-				      * by @p{fe_function} restricted to
-				      * @p{cell} at the quadrature points.
+				      * by @p fe_function restricted to
+				      * @p cell at the quadrature points.
 				      *
 				      * If the present cell is not an active
 				      * one the interpolated function values
 				      * are returned.
 				      *
 				      * The function assumes that the
-				      * @p{gradients} object already has the
+				      * @p gradients object already has the
 				      * right size.
 				      *
 				      * This function does the same as
-				      * the other @p{get_function_values},
+				      * the other @p get_function_values,
 				      * but applied to multi-component
 				      * elements.
 				      *
@@ -621,8 +621,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
-				      * @ref{DofHandler} object with
-				      * which this @ref{FEValues}
+				      * DofHandler object with
+				      * which this FEValues
 				      * object was last initialized.
 				      *
 				      * The output are the gradients
@@ -637,14 +637,14 @@ class FEValuesBase : protected FEValuesData<dim>
 
     				     /**
 				      * Second derivatives of
-				      * the @p{function_no}th shape function at
-				      * the @p{point_no}th quadrature point
+				      * the @p function_noth shape function at
+				      * the @p point_noth quadrature point
 				      * with respect to real cell
 				      * coordinates. If you want to
 				      * get the derivatives in one of
 				      * the coordinate directions, use
 				      * the appropriate function of
-				      * the @p{Tensor} class to
+				      * the @p Tensor class to
 				      * extract one component. Since
 				      * only a reference to the
 				      * derivative values is returned,
@@ -659,9 +659,9 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * non-zero component (i.e. it is
 				      * not primitive), then throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * @p ExcShapeFunctionNotPrimitive. In
 				      * that case, use the
-				      * @ref{shape_grad_grad_component}
+				      * shape_grad_grad_component()
 				      * function.
 				      */
     const Tensor<2,dim> &
@@ -677,7 +677,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * is scalar, then only component
 				      * zero is allowed and the return
 				      * value equals that of the
-				      * @p{shape_2nd_derivative}
+				      * @p shape_2nd_derivative
 				      * function. If the finite
 				      * element is vector valued but
 				      * all shape functions are
@@ -685,7 +685,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * non-zero in only one
 				      * component), then the value
 				      * returned by
-				      * @p{shape_2nd_derivative}
+				      * @p shape_2nd_derivative
 				      * equals that of this function
 				      * for exactly one
 				      * component. This function is
@@ -704,12 +704,12 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Compute the tensor of second
 				      * derivatives of the finite
 				      * element function characterized
-				      * by @p{fe_function} restricted
-				      * to @p{cell} at the quadrature
+				      * by @p fe_function restricted
+				      * to @p cell at the quadrature
 				      * points.
 				      *
 				      * The function assumes that the
-				      * @p{second_derivatives} object
+				      * @p second_derivatives object
 				      * already has the correct size.
 				      *
 				      * This function may only be used if the
@@ -717,7 +717,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * i.e. has only one vector component. If
 				      * it is a vector-valued one, then use
 				      * the other
-				      * @p{get_function_2nd_derivatives}
+				      * @p get_function_2nd_derivatives
 				      * function.
 				      * 
 				      * The actual data type of the input
@@ -726,8 +726,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * PETSc vector wrapper classes..It
 				      * represents a global vector of
 				      * DoF values associated with the
-				      * @ref{DofHandler} object with
-				      * which this @ref{FEValues}
+				      * DofHandler object with
+				      * which this FEValues
 				      * object was last initialized.
 				      *
 				      * The output are the second derivatives
@@ -746,11 +746,11 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Compute the tensor of second
 				      * derivatives of the finite
 				      * element function characterized
-				      * by @p{fe_function} restricted to
-				      * @p{cell} at the quadrature points.
+				      * by @p fe_function restricted to
+				      * @p cell at the quadrature points.
 				      *
 				      * The function assumes that the
-				      * @p{second_derivatives} object already has
+				      * @p second_derivatives object already has
 				      * the right size.
 				      *
 				      * This function does the same as
@@ -764,8 +764,8 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
-				      * @ref{DofHandler} object with
-				      * which this @ref{FEValues}
+				      * DofHandler object with
+				      * which this FEValues
 				      * object was last initialized.
 				      *
 				      * The output are the second derivatives
@@ -780,7 +780,7 @@ class FEValuesBase : protected FEValuesData<dim>
                                   std::vector<std::vector<Tensor<2,dim> > > &second_derivatives) const;
     
 				     /**
-				      * Position of the @p{i}th
+				      * Position of the @p ith
 				      * quadrature point in real space.
 				      */
     const Point<dim> & quadrature_point (const unsigned int i) const;
@@ -795,7 +795,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Mapped quadrature weight. This
 				      * is the Jacobi determinant
 				      * times the weight of the
-				      * @p{i}th unit quadrature point.
+				      * @p ith unit quadrature point.
 				      *
 				      * On faces, this is the mapped
 				      * surface element.
@@ -876,7 +876,7 @@ class FEValuesBase : protected FEValuesData<dim>
   protected:
 				     /**
 				      * Store the cell selected last time
-				      * the @p{reinit} function was called
+				      * the @p reinit function was called
 				      * to make access
 				      * to the @p{get_function_*} functions
 				      * safer.
@@ -907,7 +907,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				     /**
 				      * Initialize some update
 				      * flags. Called from the
-				      * @p{initialize} functions of
+				      * @p initialize functions of
 				      * derived classes, which are in
 				      * turn called from their
 				      * constructors.
@@ -925,10 +925,10 @@ class FEValuesBase : protected FEValuesData<dim>
 
 				     /**
 				      * Returns reference to default
-				      * @p{MappingQ1} object. Needed
+				      * @p MappingQ1 object. Needed
 				      * by constructors of derived
 				      * classes that uses
-				      * @p{MappingQ1} implicitly.
+				      * @p MappingQ1 implicitly.
 				      */
     static const Mapping<dim> &get_default_mapping();
 };
@@ -939,7 +939,7 @@ class FEValuesBase : protected FEValuesData<dim>
  * Finite element evaluated in quadrature points of a cell.
  *
  * This function implements the initialization routines for
- * @ref{FEValuesBase}, if values in quadrature points of a cell are
+ * FEValuesBase, if values in quadrature points of a cell are
  * needed. For further documentation see this class.
  * 
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
@@ -1005,14 +1005,14 @@ class FEValues : public FEValuesBase<dim>
 
 
 /**
- * Extend the interface of @ref{FEValuesBase} by surface values.
+ * Extend the interface of FEValuesBase by surface values.
  *
  * On surfaces of mesh cells, normal vectors and boundary forms are
  * additional values that can be computed. This class provides the
  * interface to access those. Implementations are in derived classes
- * @p{FEFaceValues} and @p{FESubfaceValues}.
+ * @p FEFaceValues and @p FESubfaceValues.
  *
- * @ref{FEValuesBase}
+ * FEValuesBase
  *
  *  @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
@@ -1028,12 +1028,12 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * duty of the derived class's
 				      * constructors.
 				      *
-				      * @p{n_faces_or_subfaces} is the number
+				      * @p n_faces_or_subfaces is the number
 				      * of faces or subfaces that this object
 				      * is to store. The actual number depends
 				      * on the derived class, for
-				      * @p{FEFaceValues} it is @p{2*dim}, while for
-				      * the @p{FESubfaceValues} class it is
+				      * @p FEFaceValues it is @p{2*dim}, while for
+				      * the @p FESubfaceValues class it is
 				      * @p{2*dim*(1<<(dim-1))}, i.e. the number
 				      * of faces times the number of subfaces
 				      * per face.
@@ -1047,7 +1047,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 
     				     /**
 				      * Return the outward normal vector to
-				      * the cell at the @p{i}th quadrature
+				      * the cell at the @p ith quadrature
 				      * point. The length of the vector
 				      * is normalized to one.
 				      */
@@ -1056,7 +1056,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
     				     /**
 				      * Boundary form of the
 				      * transformation of the cell at
-				      * the @p{i}th quadrature point.
+				      * the @p ith quadrature point.
 				      *
 				      * The boundary form is the cross
 				      * product of the images of the
@@ -1112,8 +1112,8 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 /**
  * Finite element evaluated in quadrature points on a face.
  *
- * This class adds the functionality of @ref{FEFaceValuesBase} to
- * @ref{FEValues}; see there for more documentation.
+ * This class adds the functionality of FEFaceValuesBase to
+ * FEValues; see there for more documentation.
  *
  * Since finite element functions and their derivatives may be
  * discontinuous at cell boundaries, there is no restriction of this
@@ -1149,7 +1149,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				     /**
 				      * Reinitialize the gradients, Jacobi
 				      * determinants, etc for the face with
-				      * number @p{face_no} of @p{cell}
+				      * number @p face_no of @p cell
 				      * and the given finite element.
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator& cell,
@@ -1168,8 +1168,8 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 /**
  * Finite element evaluated in quadrature points on a face.
  *
- * This class adds the functionality of @ref{FEFaceValuesBase} to
- * @ref{FEValues}; see there for more documentation.
+ * This class adds the functionality of FEFaceValuesBase to
+ * FEValues; see there for more documentation.
  *
  * This class is used for faces lying on a refinement edge. In this
  * case, the neighboring cell is refined. To be able to compute
@@ -1209,7 +1209,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				     /**
 				      * Reinitialize the gradients, Jacobi
 				      * determinants, etc for the face with
-				      * number @p{face_no} of @p{cell}
+				      * number @p face_no of @p cell
 				      * and the given finite element.
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator& cell,

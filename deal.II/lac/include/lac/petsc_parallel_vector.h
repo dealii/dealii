@@ -262,7 +262,7 @@ namespace PETScWrappers
 
                                          /**
                                           * Set all components of the vector to
-                                          * the given number @p{s}. Simply pass
+                                          * the given number @p s. Simply pass
                                           * this down to the base class, but we
                                           * still need to declare this function
                                           * to make the example given in the
@@ -326,7 +326,7 @@ namespace PETScWrappers
                                           * over the partitioning into local
                                           * sizes as well as the MPI
                                           * communicator. The same applies as
-                                          * for the other @p{reinit} function.
+                                          * for the other @p reinit function.
                                           *
                                           * The elements of @p v are not
                                           * copied, i.e. this function is the
@@ -340,7 +340,7 @@ namespace PETScWrappers
       protected:
                                          /**
                                           * Create a vector of length
-                                          * @p{n}. For this class, we create a
+                                          * @p n. For this class, we create a
                                           * parallel vector. @p n denotes
                                           * the total size of the vector to be
                                           * created. @p local_size denotes

@@ -184,7 +184,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -253,7 +253,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -318,7 +318,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -383,7 +383,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -462,7 +462,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -531,7 +531,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -596,7 +596,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -661,7 +661,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -731,7 +731,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -796,7 +796,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not
@@ -861,7 +861,7 @@ namespace PETScWrappers
                                         * to have an MPI communicator context
                                         * over which computations are
                                         * parallelized. By default,
-                                        * @p{PETSC_COMM_SELF} is used here,
+                                        * @p PETSC_COMM_SELF is used here,
                                         * but you can change this. Note that
                                         * for single processor (non-MPI)
                                         * versions, this parameter does not

@@ -697,7 +697,7 @@ class FullMatrix : public Table<2,number>
 				      * since the amount of code
 				      * needed grows quickly.  For
 				      * larger matrices, the method
-				      * @ref{gauss_jordan} is invoked
+				      * gauss_jordan() is invoked
 				      * implicitly.
 				      */
     template <typename number2>

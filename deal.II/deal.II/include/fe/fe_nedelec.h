@@ -28,7 +28,7 @@ template <int dim> class MappingQ;
  * H_curl. Note, however, that continuity only concerns the tangential
  * component of the vector field.
  *
- * The constructor of this class takes the degree @p{p} of this finite
+ * The constructor of this class takes the degree @p p of this finite
  * element. However, presently, only lowest order elements
  * (i.e. @p{p==1}) are implemented. For a general overview of this
  * element and its properties, see the report by Anna Schneebeli that
@@ -105,7 +105,7 @@ template <int dim> class MappingQ;
  * interpolated or projected, or better: whether the matrices the
  * finite element provides are to be treated with the properties of a
  * projection or of an interpolation, is controlled by the
- * @p{restriction_is_additive} flag. See there for more information.)
+ * @p restriction_is_additive flag. See there for more information.)
  *
  * Here, things are not so simple: since the element has some
  * continuity requirements across faces, we can only resort to some
@@ -133,7 +133,7 @@ template <int dim> class MappingQ;
  * direction. We use the standard enumeration and direction of edges
  * in deal.II, yielding the following shape functions in 2d:
  *
- *   @begin{verbatim}
+ *   @verbatim
  *          2
  *      *--->---*
  *      |       |
@@ -141,12 +141,12 @@ template <int dim> class MappingQ;
  *      |       |
  *      *--->---*
  *          0
- *   @end{verbatim}
+ *   @endverbatim
  *
  * For the 3d case, the ordering follows the same scheme: the lines
  * are numbered as described in the documentation of the
- * @ref{Triangulation} class, i.e.
- *   @begin{verbatim}
+ * Triangulation class, i.e.
+ *   @verbatim
  *         *---6---*        *---6---*
  *        /|       |       /       /|
  *      11 |       5      11     10 5
@@ -157,9 +157,9 @@ template <int dim> class MappingQ;
  *     3 8       9      3       | 9
  *     |/       /       |       |/
  *     *---0---*        *---0---*
- *   @end{verbatim}
+ *   @endverbatim
  * and their directions are as follows:
- *   @begin{verbatim}
+ *   @verbatim
  *         *--->---*        *--->---*
  *        /|       |       /       /|
  *       ^ |       ^      ^       ^ ^
@@ -170,7 +170,7 @@ template <int dim> class MappingQ;
  *     ^ ^       ^      ^       | ^
  *     |/       /       |       |/
  *     *--->---*        *--->---*
- *   @end{verbatim}
+ *   @endverbatim
  *
  * The element does not make much sense in 1d, so it is not
  * implemented there.
@@ -184,7 +184,7 @@ class FE_Nedelec : public FiniteElement<dim>
   public:
 				     /**
 				      * Constructor for the Nedelec
-				      * element of degree @p{p}.
+				      * element of degree @p p.
 				      */
     FE_Nedelec (const unsigned int p);
     
@@ -193,7 +193,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * identifies a finite
 				      * element. This class returns
 				      * @p{FE_Nedelec<dim>(degree)}, with
-				      * @p{dim} and @p{degree}
+				      * @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
 				      */
@@ -201,11 +201,11 @@ class FE_Nedelec : public FiniteElement<dim>
 
 				     /**
 				      * Return the value of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
+				      * @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -216,11 +216,11 @@ class FE_Nedelec : public FiniteElement<dim>
 
 				     /**
 				      * Return the gradient of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
+				      * @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -231,11 +231,11 @@ class FE_Nedelec : public FiniteElement<dim>
 
 				     /**
 				      * Return the second derivative
-				      * of the @p{component}th vector
-				      * component of the @p{i}th shape
+				      * of the @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -264,7 +264,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * Access to base element
 				      * objects. Since this element is
 				      * atomic, @p{base_element(0)} is
-				      * @p{this}, and all other
+				      * @p this, and all other
 				      * indices throw an error.
 				      */
     virtual const FiniteElement<dim> &
@@ -272,7 +272,7 @@ class FE_Nedelec : public FiniteElement<dim>
 
                                      /**
                                       * Multiplicity of base element
-                                      * @p{index}. Since this is an
+                                      * @p index. Since this is an
                                       * atomic element,
                                       * @p{element_multiplicity(0)}
                                       * returns one, and all other
@@ -282,10 +282,10 @@ class FE_Nedelec : public FiniteElement<dim>
     
 				     /**
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}. For the lowest
+				      * @p face_index. For the lowest
 				      * order Nedelec elements, this
 				      * is actually the case for the
 				      * one on which the shape
@@ -294,7 +294,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      *
 				      * Implementation of the
 				      * interface in
-				      * @ref{FiniteElement}
+				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -363,7 +363,7 @@ class FE_Nedelec : public FiniteElement<dim>
 
 					 /**
 					  * As the
-					  * @p{embedding_matrices}
+					  * @p embedding_matrices
 					  * field, but for the
 					  * interface constraints. One
 					  * for each element for which
@@ -373,7 +373,7 @@ class FE_Nedelec : public FiniteElement<dim>
 
 					 /**
 					  * Like
-					  * @p{n_embedding_matrices},
+					  * @p n_embedding_matrices,
 					  * but for the number of
 					  * interface constraint
 					  * matrices.
@@ -387,11 +387,11 @@ class FE_Nedelec : public FiniteElement<dim>
     
   protected:    
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> * clone() const;
   
@@ -409,7 +409,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      */
     virtual void
     fill_fe_values (const Mapping<dim> &mapping,
@@ -422,7 +422,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      */
     virtual void
     fill_fe_face_values (const Mapping<dim> &mapping,
@@ -436,7 +436,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim> &mapping,
@@ -453,12 +453,12 @@ class FE_Nedelec : public FiniteElement<dim>
 				     /**
 				      * Only for internal use. Its
 				      * full name is
-				      * @p{get_dofs_per_object_vector}
+				      * @p get_dofs_per_object_vector
 				      * function and it creates the
-				      * @p{dofs_per_object} vector that is
+				      * @p dofs_per_object vector that is
 				      * needed within the constructor to
 				      * be passed to the constructor of
-				      * @p{FiniteElementData}.
+				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
 
@@ -486,8 +486,8 @@ class FE_Nedelec : public FiniteElement<dim>
     
 				     /**
 				      * Initialize the
-				      * @p{unit_support_points} field
-				      * of the @ref{FiniteElementBase}
+				      * @p unit_support_points field
+				      * of the FiniteElementBase
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -495,8 +495,8 @@ class FE_Nedelec : public FiniteElement<dim>
 
 				     /**
 				      * Initialize the
-				      * @p{unit_face_support_points} field
-				      * of the @ref{FiniteElementBase}
+				      * @p unit_face_support_points field
+				      * of the FiniteElementBase
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -505,7 +505,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				     /**
 				      * Given a set of flags indicating
 				      * what quantities are requested
-				      * from a @p{FEValues} object,
+				      * from a @p FEValues object,
 				      * return which of these can be
 				      * precomputed once and for
 				      * all. Often, the values of
@@ -514,8 +514,8 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * example, in which case the
 				      * return value of this function
 				      * would be the logical and of
-				      * the input @p{flags} and
-				      * @p{update_values}.
+				      * the input @p flags and
+				      * @p update_values.
 				      *
 				      * For the present kind of finite
 				      * element, this is exactly the

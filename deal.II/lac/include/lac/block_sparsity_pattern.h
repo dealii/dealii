@@ -38,13 +38,13 @@ class CompressedBlockSparsityPattern;
  * and compressed sparsity pattern classes. It has not much
  * functionality, but only administrates an array of sparsity pattern
  * objects and delegates work to them. It has mostly the same
- * interface as has the @ref{SparsityPattern} and
- * @ref{CompressedSparsityPattern} classes, and simply transforms
+ * interface as has the SparsityPattern and
+ * CompressedSparsityPattern classes, and simply transforms
  * calls to its member functions to calls to the respective member
  * functions of the member sparsity patterns.
  *
- * The largest difference between the @ref{SparsityPattern} and
- * @ref{CompressedSparsityPattern} classes and this class is that
+ * The largest difference between the SparsityPattern and
+ * CompressedSparsityPattern classes and this class is that
  * mostly, the matrices have different properties and you will want to
  * work on the blocks making up the matrix rather than the whole
  * matrix. You can access the different blocks using the
@@ -70,14 +70,14 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Define a value which is used
 				      * to indicate that a certain
-				      * value in the @p{colnums} array
+				      * value in the @p colnums array
 				      * is unused, i.e. does not
 				      * represent a certain column
 				      * number index.
 				      *
 				      * This value is only an alias to
 				      * the respective value of the
-				      * @p{SparsityPattern} class.
+				      * @p SparsityPattern class.
 				      */
     static const unsigned int invalid_entry = SparsityPattern::invalid_entry;
     
@@ -89,7 +89,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p{reinit} function.
+				      * the @p reinit function.
 				      */
     BlockSparsityPatternBase ();
 
@@ -98,7 +98,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p{collect_sizes} after
+				      * to call @p collect_sizes after
 				      * you assign them sizes.
 				      */
     BlockSparsityPatternBase (const unsigned int n_block_rows,
@@ -112,7 +112,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * are no block allocated at
 				      * present. This is for the same
 				      * reason as for the
-				      * @p{SparsityPattern}, see there
+				      * @p SparsityPattern, see there
 				      * for the details.
 				      */
     BlockSparsityPatternBase (const BlockSparsityPatternBase &bsp);
@@ -130,10 +130,10 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * unitialized ones, i.e. ones
 				      * for which also the sizes are
 				      * not yet set. You have to do
-				      * that by calling the @p{reinit}
+				      * that by calling the @p reinit
 				      * functions of the blocks
 				      * themselves. Do not forget to
-				      * call @p{collect_sizes} after
+				      * call @p collect_sizes after
 				      * that on this object.
 				      *
 				      * The reason that you have to
@@ -143,7 +143,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * of elements per row may be
 				      * varying, etc. It is simpler
 				      * not to reproduce the interface
-				      * of the @p{SparsityPattern}
+				      * of the @p SparsityPattern
 				      * class here but rather let the
 				      * user call whatever function
 				      * she desires.
@@ -215,7 +215,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * This function compresses the
 				      * sparsity structures that this
 				      * object represents. It simply
-				      * calls @p{compress} for all
+				      * calls @p compress for all
 				      * sub-objects.
 				      */
     void compress ();
@@ -397,8 +397,8 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Make the block sparse matrix a
 				      * friend, so that it can use our
-				      * @p{row_indices} and
-				      * @p{column_indices} objects.
+				      * @p row_indices and
+				      * @p column_indices objects.
 				      */
     template <typename number>
     friend class BlockSparseMatrix;
@@ -426,7 +426,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p{reinit} function.
+				      * the @p reinit function.
 				      */
     BlockSparsityPattern ();
 
@@ -435,7 +435,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p{collect_sizes} after
+				      * to call @p collect_sizes after
 				      * you assign them sizes.
 				      */
     BlockSparsityPattern (const unsigned int n_rows,
@@ -459,7 +459,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				     /**
 				      * Copy data from an object of
 				      * type
-				      * @ref{CompressedBlockSparsityPattern},
+				      * CompressedBlockSparsityPattern,
 				      * i.e. resize this object to the
 				      * size of the given argument,
 				      * and copy over the contents of
@@ -475,8 +475,8 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 /**
  * This class extends the base class to implement an array of
  * compressed sparsity patterns that can be used to initialize objects
- * of type @ref{BlockSparsityPattern}. It does not add additional
- * member functions, but rather acts as a @p{typedef} to introduce the
+ * of type BlockSparsityPattern. It does not add additional
+ * member functions, but rather acts as a @p typedef to introduce the
  * name of this class, without requiring the user to specify the
  * templated name of the base class. For information on the interface
  * of this class refer to the base class.
@@ -495,7 +495,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p{reinit} function.
+				      * the @p reinit function.
 				      */
     CompressedBlockSparsityPattern ();
 
@@ -504,7 +504,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p{collect_sizes} after
+				      * to call @p collect_sizes after
 				      * you assign them sizes.
 				      */
     CompressedBlockSparsityPattern (const unsigned int n_rows,

@@ -35,22 +35,22 @@ template <int dim> class FESubfaceValues;
 /**
  * Abstract base class for mapping classes.
  *
- * The interface for filling the tables of @ref{FEValues} is provided.
+ * The interface for filling the tables of FEValues is provided.
  * Everything else has to happen in derived classes.
  *
  * The following paragraph applies to the implementation of
- * @ref{FEValues}. Usage of the class is as follows: first, call the
- * functions @p{update_once} and @p{update_each} with the update
+ * FEValues. Usage of the class is as follows: first, call the
+ * functions @p update_once and @p update_each with the update
  * flags you need. This includes the flags needed by the
- * @ref{FiniteElement}. Then call @p{get_*_data} and with the or'd
+ * FiniteElement. Then call @p{get_*_data} and with the or'd
  * results.  This will initialize and return some internal data
  * structures.  On the first cell, call @p{fill_fe_*_values} with the
- * result of @p{update_once}. Finally, on each cell, use
- * @p{fill_fe_*_values} with the result of @p{update_each} to compute
+ * result of @p update_once. Finally, on each cell, use
+ * @p{fill_fe_*_values} with the result of @p update_each to compute
  * values for a special cell.
  *
  * A hint to implementators: no function except the two functions
- * @p{update_once} and @p{update_each} may add any flags.
+ * @p update_once and @p update_each may add any flags.
  *
  * @author Guido Kanschat, Ralf Hartmann 2000, 2001
  */
@@ -65,10 +65,10 @@ class Mapping : public Subscriptor
     virtual ~Mapping ();
     
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms the point @p p on
 				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns @p{p_real}.
+				      * @p p_real on the real cell
+				      * @p cell and returns @p p_real.
 				      */
     virtual Point<dim>
     transform_unit_to_real_cell (
@@ -76,10 +76,10 @@ class Mapping : public Subscriptor
       const Point<dim>                                 &p) const = 0;
     
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms the point @p p on
 				      * the real cell to the point
-				      * @p{p_unit} on the unit cell
-				      * @p{cell} and returns @p{p_unit}.
+				      * @p p_unit on the unit cell
+				      * @p cell and returns @p p_unit.
 				      */
     virtual Point<dim>
     transform_real_to_unit_cell (
@@ -91,7 +91,7 @@ class Mapping : public Subscriptor
 				      * of finite element and mapping
 				      * objects. The internal
 				      * mechanism is that upon
-				      * construction of a @p{FEValues}
+				      * construction of a @p FEValues
 				      * objects, it asks the mapping
 				      * and finite element classes
 				      * that are to be used to
@@ -106,16 +106,16 @@ class Mapping : public Subscriptor
 				      * they do not change from cell
 				      * to cell and only need to be
 				      * computed once. Since different
-				      * @p{FEValues} objects using
+				      * @p FEValues objects using
 				      * different quadrature rules
 				      * might access the same finite
 				      * element object at the same
 				      * time, it is necessary to
 				      * create one such object per
-				      * @p{FEValues} object. Ownership
+				      * @p FEValues object. Ownership
 				      * of this object is then
 				      * transferred to the
-				      * @p{FEValues} object, but a
+				      * @p FEValues object, but a
 				      * pointer to this object is
 				      * passed to the finite element
 				      * object every time it shall
@@ -134,9 +134,9 @@ class Mapping : public Subscriptor
       public:
 					 /**
 					  * Constructor. Sets
-					  * @p{UpdateFlags} to
-					  * @p{update_default} and
-					  * @p{first_cell} to @p{true}.
+					  * @p UpdateFlags to
+					  * @p update_default and
+					  * @p first_cell to @p true.
 					  */
         InternalDataBase ();
 	
@@ -167,11 +167,11 @@ class Mapping : public Subscriptor
 					 /**
 					  * If @p{first_cell==true}
 					  * this function returns
-					  * @p{update_flags},
+					  * @p update_flags,
 					  * i.e. @p{update_once|update_each}.
 					  * If @p{first_cell==false}
 					  * it returns
-					  * @p{update_each}.
+					  * @p update_each.
 					  */
 	UpdateFlags  current_update_flags() const;
 
@@ -182,25 +182,25 @@ class Mapping : public Subscriptor
                                           * cell. The value of the
                                           * field this function is
                                           * returning is set to
-                                          * @p{true} in the
+                                          * @p true in the
                                           * constructor, and cleared
-                                          * by the @p{FEValues} class
+                                          * by the @p FEValues class
                                           * after the first cell has
                                           * been initialized.
                                           *
                                           * This function is used to
                                           * determine whether we need
-                                          * to use the @p{update_once}
+                                          * to use the @p update_once
                                           * flags for computing data,
                                           * or whether we can use the
-                                          * @p{update_each} flags.
+                                          * @p update_each flags.
                                           */
         bool is_first_cell () const;
 
                                          /**
-                                          * Set the @p{first_cell}
-                                          * flag to @p{false}. Used by
-                                          * the @p{FEValues} class to
+                                          * Set the @p first_cell
+                                          * flag to @p false. Used by
+                                          * the @p FEValues class to
                                           * indicate that we have
                                           * already done the work on
                                           * the first cell.
@@ -218,7 +218,7 @@ class Mapping : public Subscriptor
       private:
                                          /**
                                           * The value returned by
-                                          * @p{is_first_cell}.
+                                          * @p is_first_cell.
                                           */
         bool first_cell;
     };
@@ -238,14 +238,14 @@ class Mapping : public Subscriptor
 				      * matrix.
 				      *
 				      * The range of vectors spanned
-				      * by @p{begin} and @p{end} must
+				      * by @p begin and @p end must
 				      * have as many elements as there
 				      * are quadrature points (not
 				      * tested inside the function).
 				      * Also note the different
 				      * convention for parameters
 				      * compared to the standard C++
-				      * @p{transform} function: here,
+				      * @p transform function: here,
 				      * first destination, then source
 				      * are specified, and the number
 				      * of elements is determined by a
@@ -254,7 +254,7 @@ class Mapping : public Subscriptor
 				      * due to the way the function is
 				      * usually called.
 				      *
-				      * The vector @p{src} must
+				      * The vector @p src must
 				      * contain at least as many
 				      * elements as there are
 				      * quadrature points.
@@ -295,14 +295,14 @@ class Mapping : public Subscriptor
 				      * unit to real space cell.
 				      * 
 				      * The range of vectors spanned
-				      * by @p{begin} and @p{end} must
+				      * by @p begin and @p end must
 				      * have as many elements as there
 				      * are quadrature points (not
 				      * tested inside the function).
 				      * Also note the different
 				      * convention for parameters
 				      * compared to the standard C++
-				      * @p{transform} function: here,
+				      * @p transform function: here,
 				      * first destination, then source
 				      * are specified, and the number
 				      * of elements is determined by a
@@ -311,7 +311,7 @@ class Mapping : public Subscriptor
 				      * due to the way the function is
 				      * usually called.
 				      *
-				      * The vector @p{src} must
+				      * The vector @p src must
 				      * contain at least as many
 				      * elements as there are
 				      * quadrature points.
@@ -352,14 +352,14 @@ class Mapping : public Subscriptor
 				     /**
 				      * Indicate fields to be updated
 				      * in the constructor of
-				      * @ref{FEValues}. Especially,
+				      * FEValues. Especially,
 				      * fields not asked for by
-				      * @ref{FEValues}, but computed
+				      * FEValues, but computed
 				      * for efficiency reasons will be
 				      * notified here.
 				      *
 				      * Refer to the same function in
-				      * @ref{FiniteElement} for
+				      * FiniteElement for
 				      * further information.
 				      *
 				      * Example: refer to the same
@@ -368,7 +368,7 @@ class Mapping : public Subscriptor
     virtual UpdateFlags update_once (const UpdateFlags) const = 0;
     
 				     /**
-				      * The same as @p{update_once},
+				      * The same as @p update_once,
 				      * but for the flags to be updated for
 				      * each grid cell.
 				      */
@@ -438,18 +438,18 @@ class Mapping : public Subscriptor
 
 				     /**
 				      * Fill the transformation fields
-				      * of @p{FEValues}.  Given a grid
+				      * of @p FEValues.  Given a grid
 				      * cell and the quadrature points
 				      * on the unit cell, it computes
 				      * all values specified by
-				      * @p{flags}. The arrays to be
+				      * @p flags. The arrays to be
 				      * filled have to have the
 				      * correct size.
 				      *
 				      * Values are split into three
 				      * groups: first,
-				      * @p{quadrature_points} and
-				      * @p{JxW_values} are
+				      * @p quadrature_points and
+				      * @p JxW_values are
 				      * filled with the quadrature
 				      * rule transformed to the
 				      * cell in physical space.
@@ -458,10 +458,10 @@ class Mapping : public Subscriptor
 				      * matrices needed to transform
 				      * vector-valued functions,
 				      * namely
-				      * @p{covariant_transformation},
-				      * @p{contravariant_transformation} and the 
+				      * @p covariant_transformation,
+				      * @p contravariant_transformation and the 
 				      * derivatives
-				      * @p{covariant_grads}.
+				      * @p covariant_grads.
 				      *
 				      */
     virtual void
@@ -472,10 +472,10 @@ class Mapping : public Subscriptor
 		    std::vector<double>                           &JxW_values) const = 0;
 
 				     /**
-				      * Performs the same as @p{fill_fe_values}
+				      * Performs the same as @p fill_fe_values
 				      * on a face.
-				      * Additionally, @p{boundary_form} and
-				      * @p{normal_vectors} can be
+				      * Additionally, @p boundary_form and
+				      * @p normal_vectors can be
 				      * computed on surfaces. The
 				      * boundary form is the vector
 				      * product of the image of
@@ -517,7 +517,7 @@ class Mapping : public Subscriptor
 			    std::vector<Point<dim> >        &normal_vectors) const = 0;
 
 				     /**
-				      * Give class @p{FEValues} access
+				      * Give class @p FEValues access
 				      * to the private @p{get_...data}
 				      * and @p{fill_fe_...values}
 				      * functions.

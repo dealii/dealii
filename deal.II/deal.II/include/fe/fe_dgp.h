@@ -47,7 +47,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * identifies a finite
 				      * element. This class returns
 				      * @p{FE_DGP<dim>(degree)}, with
-				      * @p{dim} and @p{degree}
+				      * @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
 				      */
@@ -57,14 +57,14 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * Check for non-zero values on a face.
 				      *
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p face_index.
 				      *
 				      * Implementation of the
 				      * interface in
-				      * @ref{FiniteElement}
+				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -115,14 +115,14 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 	static const unsigned int n_embedding_matrices;
 
 					 /**
-					  * As @p{embedding} but for
+					  * As @p embedding but for
 					  * projection matrices.
 					  */
 	static const double * const projection_matrices[][GeometryInfo<dim>::children_per_cell];
 
 					 /**
 					  * As
-					  * @p{n_embedding_matrices}
+					  * @p n_embedding_matrices
 					  * but for projection
 					  * matrices.
 					  */
@@ -132,11 +132,11 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
   protected:
 
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> *clone() const;
 
@@ -145,12 +145,12 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				     /**
 				      * Only for internal use. Its
 				      * full name is
-				      * @p{get_dofs_per_object_vector}
+				      * @p get_dofs_per_object_vector
 				      * function and it creates the
-				      * @p{dofs_per_object} vector that is
+				      * @p dofs_per_object vector that is
 				      * needed within the constructor to
 				      * be passed to the constructor of
-				      * @p{FiniteElementData}.
+				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
     
@@ -160,7 +160,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
     template <int dim1> friend class FE_DGP;
 
 				     /**
-				      * Allows @p{MappingQ} class
+				      * Allows @p MappingQ class
 				      * access to build_renumbering
 				      * function.
 				      */

@@ -80,18 +80,18 @@
  *
  * The renumbering algorithms need quite a lot of memory, since they have
  * to store for each dof with which other dofs it couples. This is done
- * using a @ref{SparsityPattern} object used to store the sparsity pattern of
+ * using a SparsityPattern object used to store the sparsity pattern of
  * matrices. It
  * is not useful for the user to do anything between distributing the dofs
- * and renumbering, i.e. the calls to @ref{DoFHandler}@p{::distribute_dofs} and
- * @ref{DoFHandler}@p{::renumber_dofs} should follow each other immediately. If
+ * and renumbering, i.e. the calls to DoFHandler@p ::distribute_dofs and
+ * DoFHandler@p ::renumber_dofs should follow each other immediately. If
  * you try to create a sparsity pattern or anything else in between, these
  * will be invalid afterwards.
  *
  * The renumbering may take care of dof-to-dof couplings only induced by
  * eliminating constraints. In addition to the memory consumption mentioned
  * above, this also takes quite some computational time, but it may be
- * switched off upon calling the @p{renumber_dofs} function. This will then
+ * switched off upon calling the @p renumber_dofs function. This will then
  * give inferior results, since knots in the graph (representing dofs)
  * are not found to be neighbors even if they would be after condensation.
  * 
@@ -147,7 +147,7 @@
  *
  * @sect2{Component-wise numbering}
  *
- * For finite elements composed of several base elements using the @ref{FESystem}
+ * For finite elements composed of several base elements using the FESystem
  * class, or for elements which provide several components themselves, it
  * may be of interest to sort the DoF indices by component. This will then
  * bring out the block matrix structure, since otherwise the degrees of freedom
@@ -155,7 +155,7 @@
  * different components.
  *
  * This kind of numbering may be obtained by calling the
- * @p{component_wise} function of this class. Since it does not touch
+ * @p component_wise function of this class. Since it does not touch
  * the order of indices within each, it may be worthwhile to first
  * renumber using the Cuthill-McKee or a similar algorithm and
  * afterwards renumbering component-wise. This will bring out the
@@ -181,10 +181,10 @@
  *
  * @sect2{Random renumbering}
  *
- * The @p{random} function renumbers degrees of freedom randomly. This
+ * The @p random function renumbers degrees of freedom randomly. This
  * function is probably seldom of use, except to check the dependence of
  * solvers (iterative or direct ones) on the numbering of the degrees
- * of freedom. It uses the @p{random_shuffle} function from the C++
+ * of freedom. It uses the @p random_shuffle function from the C++
  * standard library to do its work.
  *
  *
@@ -226,10 +226,10 @@ class DoFRenumbering
 				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p{Cuthill_McKee}
+				      * @p Cuthill_McKee
 				      * function. Does not perform the
 				      * renumbering on the
-				      * @p{DoFHandler} dofs but
+				      * @p DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */    
@@ -283,14 +283,14 @@ class DoFRenumbering
 				      * You can specify that the
 				      * components are ordered in a
 				      * different way than suggested
-				      * by the @p{FESystem} object you
+				      * by the @p FESystem object you
 				      * use. To this end, Set up the
-				      * vector @p{target_component}
+				      * vector @p target_component
 				      * such that the entry at index
-				      * @p{i} denotes the number of
+				      * @p i denotes the number of
 				      * the target component for dofs
-				      * with component @p{i} in the
-				      * @p{FESystem}. Naming the same
+				      * with component @p i in the
+				      * @p FESystem. Naming the same
 				      * component more than once is
 				      * possible and results in a
 				      * blocking of several components
@@ -343,10 +343,10 @@ class DoFRenumbering
 				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p{component_wise}
+				      * @p component_wise
 				      * functions. Does not perform the
 				      * renumbering on the
-				      * @p{DoFHandler} dofs but
+				      * @p DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */    
@@ -361,7 +361,7 @@ class DoFRenumbering
 				      * Cell-wise renumbering for DG
 				      * elements.  This function takes
 				      * the ordered set of cells in
-				      * @p{cell_order}, and makes sure
+				      * @p cell_order, and makes sure
 				      * that all degrees of freedom in
 				      * a cell with higher index are
 				      * behind all degrees of freedom
@@ -384,10 +384,10 @@ class DoFRenumbering
 				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p{cell_wise_dg}
+				      * @p cell_wise_dg
 				      * function. Does not perform the
 				      * renumbering on the
-				      * @p{DoFHandler} dofs but
+				      * @p DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */
@@ -419,7 +419,7 @@ class DoFRenumbering
 				      * the centers of higher numbers
 				      * are further downstream with
 				      * respect to the constant vector
-				      * @p{direction} than the centers
+				      * @p direction than the centers
 				      * of lower numbers. Even if this
 				      * yields a downstream numbering
 				      * with respect to the flux on
@@ -430,7 +430,7 @@ class DoFRenumbering
 				      * This function produces a
 				      * downstream ordering of the
 				      * mesh cells and calls
-				      * @ref{cell_wise_dg}.
+				      * cell_wise_dg().
 				      * Therefore, it only works with
 				      * Discontinuous Galerkin Finite
 				      * Elements, i.e. all degrees of
@@ -458,10 +458,10 @@ class DoFRenumbering
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p{downstream_dg}
+				      * @p downstream_dg
 				      * function. Does not perform the
 				      * renumbering on the
-				      * @p{DoFHandler} dofs but
+				      * @p DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */
@@ -478,8 +478,8 @@ class DoFRenumbering
 				      * This function produces a
 				      * (counter)clockwise ordering of
 				      * the mesh cells with respect to
-				      * the hub @p{center} and calls
-				      * @ref{cell_wise_dg}.
+				      * the hub @p center and calls
+				      * cell_wise_dg().
 				      * Therefore, it only works with
 				      * Discontinuous Galerkin Finite
 				      * Elements, i.e. all degrees of
@@ -507,10 +507,10 @@ class DoFRenumbering
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p{clockwise_dg}
+				      * @p clockwise_dg
 				      * functions. Does not perform the
 				      * renumbering on the
-				      * @p{DoFHandler} dofs but
+				      * @p DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */
@@ -523,8 +523,8 @@ class DoFRenumbering
 
 				     /**
 				      * Sort those degrees of freedom
-				      * which are tagged with @p{true}
-				      * in the @p{selected_dofs} array
+				      * which are tagged with @p true
+				      * in the @p selected_dofs array
 				      * to the back of the DoF
 				      * numbers. The sorting is
 				      * stable, i.e. the relative
@@ -542,10 +542,10 @@ class DoFRenumbering
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p{sort_selected_dofs_back}
+				      * @p sort_selected_dofs_back
 				      * function. Does not perform the
 				      * renumbering on the
-				      * @p{DoFHandler} dofs but
+				      * @p DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */
@@ -566,9 +566,9 @@ class DoFRenumbering
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p{random} function. Does not
+				      * @p random function. Does not
 				      * perform the renumbering on the
-				      * @p{DoFHandler} dofs but
+				      * @p DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */   
@@ -588,7 +588,7 @@ class DoFRenumbering
 				      * when doing parallel computations after
 				      * assigning subdomain ids using a
 				      * partitioner (see the
-				      * @p{GridTools::partition_triangulation}
+				      * @p GridTools::partition_triangulation
 				      * function for this).
 				      *
 				      * Note that degrees of freedom
@@ -600,7 +600,7 @@ class DoFRenumbering
 				      * which subdomain they have to be
 				      * associated. For this, we use what we
 				      * get from the
-				      * @p{DoFTools::get_subdomain_association}
+				      * @p DoFTools::get_subdomain_association
 				      * function.
 				      *
 				      * The algorithm is stable, i.e. if
@@ -615,9 +615,9 @@ class DoFRenumbering
 
     				     /**
 				      * Computes the renumbering vector needed
-				      * by the @p{subdomain_wise}
+				      * by the @p subdomain_wise
 				      * function. Does not perform the
-				      * renumbering on the @p{DoFHandler} dofs
+				      * renumbering on the @p DoFHandler dofs
 				      * but returns the renumbering vector.
 				      */   
     template <int dim>

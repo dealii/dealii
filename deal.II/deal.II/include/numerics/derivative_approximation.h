@@ -57,7 +57,7 @@
  *                             \frac{u_h(x_{K'}) - u_h(x_K)}{ \|y_{K'}\| }
  *                      \right).$
  * This is a quantity that is easily computed. The value returned for
- * each cell when calling the @p{approximate_gradient} function of
+ * each cell when calling the @p approximate_gradient function of
  * this class is the $l_2$ norm of this approximation to the
  * gradient. To make this a useful quantity, you may want to scale
  * each element by the correct power of the respective cell size.
@@ -143,17 +143,17 @@
  * these operations that are dependent on the actual order of the
  * derivatives to be approximated, as well as the computation of the
  * quantities entering the difference quotient, have been separated
- * into auxiliary nested classes (names @p{Gradient} and
- * @p{SecondDerivative}) and the main algorithm is simply passed one
+ * into auxiliary nested classes (names @p Gradient and
+ * @p SecondDerivative) and the main algorithm is simply passed one
  * or the other data types and asks them to perform the order
  * dependent operations. The main framework that is independent of
  * this, such as finding all active neighbors, or setting up the
- * matrix $Y$ is done in the main function @p{approximate}.
+ * matrix $Y$ is done in the main function @p approximate.
  *
  * Due to this way of operation, the class may be easily extended for
  * higher oder derivatives than are presently implemented. Basically,
  * only an additional class along the lines of the derivative
- * descriptor classes @p{Gradient} and @p{SecondDerivative} has to be
+ * descriptor classes @p Gradient and @p SecondDerivative has to be
  * implemented, with the respective typedefs and functions replaced by
  * the appropriate analogues for the derivative that is to be
  * approximated.
@@ -193,7 +193,7 @@ class DerivativeApproximation
 			  const unsigned int     component = 0);
 
     				     /**
-				      * Calls the @p{interpolate}
+				      * Calls the @p interpolate
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -240,7 +240,7 @@ class DerivativeApproximation
 				   const unsigned int     component = 0);
     
     				     /**
-				      * Calls the @p{interpolate}
+				      * Calls the @p interpolate
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -284,7 +284,7 @@ class DerivativeApproximation
 					 /**
 					  * Declare which data fields have
 					  * to be updated for the function
-					  * @p{get_projected_derivative}
+					  * @p get_projected_derivative
 					  * to work.
 					  */
 	static const UpdateFlags update_flags;
@@ -305,7 +305,7 @@ class DerivativeApproximation
 	typedef double        ProjectedDerivative;
 
 					 /**
-					  * Given an @ref{FEValues} object
+					  * Given an FEValues object
 					  * initialized to a cell, and a
 					  * solution vector, extract the
 					  * desired derivative at the
@@ -365,7 +365,7 @@ class DerivativeApproximation
 					 /**
 					  * Declare which data fields have
 					  * to be updated for the function
-					  * @p{get_projected_derivative}
+					  * @p get_projected_derivative
 					  * to work.
 					  */
 	static const UpdateFlags update_flags;
@@ -386,7 +386,7 @@ class DerivativeApproximation
 	typedef Tensor<1,dim> ProjectedDerivative;
 
 					 /**
-					  * Given an @ref{FEValues} object
+					  * Given an FEValues object
 					  * initialized to a cell, and a
 					  * solution vector, extract the
 					  * desired derivative at the
@@ -451,14 +451,14 @@ class DerivativeApproximation
 				      * this class with the correct
 				      * template first argument and
 				      * then simply calls the
-				      * @p{approximate} function,
+				      * @p approximate function,
 				      * after setting up several
 				      * threads and doing some
 				      * administration that is
 				      * independent of the actual
 				      * derivative to be computed.
 				      *
-				      * The @p{component} argument
+				      * The @p component argument
 				      * denotes which component of the
 				      * solution vector we are to work
 				      * on.

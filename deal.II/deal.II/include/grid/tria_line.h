@@ -34,7 +34,7 @@ class Line
   public:
 				     /**
 				      *  Construct a line with end point
-				      *  indices @p{i0} and @p{i1}. By default,
+				      *  indices @p i0 and @p i1. By default,
 				      *  indices are set to -1, i.e. an
 				      *  invalid value.
 				      */
@@ -42,14 +42,14 @@ class Line
 	  const int i1 = -1);
     
 				     /**
-				      *  Return the index of end point @p{i}=0
+				      *  Return the index of end point @p i=0
 				      *  or 1.
 				      */
     int vertex (const int i) const;
     
 				     /**
-				      *  Set the index of the @p{i}th vertex to
-				      *  @p{index}. @p{i}=0 or 1.
+				      *  Set the index of the @p ith vertex to
+				      *  @p index. @p i=0 or 1.
 				      */
     void set_vertex (const int i, const int index);
     

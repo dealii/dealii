@@ -49,8 +49,8 @@ template <int dim> class FESubfaceValues;
  *  the conormal derivative $a\frac{du}{dn} = g$.
  *
  *  The error estimator returns a vector of estimated errors per cell which
- *  can be used to feed the @ref{Triangulation}@p{<dim>::refine_*} functions. This
- *  vector contains elements of data type @p{float}, rather than @p{double},
+ *  can be used to feed the Triangulation@p{<dim>::refine_*} functions. This
+ *  vector contains elements of data type @p float, rather than @p double,
  *  since accuracy is not so important here, and since this can save rather
  *  a lot of memory, when using many cells.
  *
@@ -69,8 +69,8 @@ template <int dim> class FESubfaceValues;
  *  is considered, but may lead to wrong results. You may scale the vector
  *  appropriately afterwards.
  *
- *  To perform the integration, use is made of the @ref{FEFaceValues} and
- *  @ref{FESubfaceValues} classes. The integration is performed by looping
+ *  To perform the integration, use is made of the FEFaceValues and
+ *  FESubfaceValues classes. The integration is performed by looping
  *  over all cells and integrating over faces that are not yet treated.
  *  This way we avoid integration on faces twice, once for each time we
  *  visit one of the adjacent cells. In a second loop over all cells, we
@@ -79,10 +79,10 @@ template <int dim> class FESubfaceValues;
  *
  *  The integration is done using a quadrature formula on the face.
  *  For linear trial functions (@ref{FEQ1}), the @ref{QGauss2} or even the
- *  @ref{QMidpoint} rule will suffice. For higher order elements, it is
+ *  QMidpoint rule will suffice. For higher order elements, it is
  *  necessary to utilize higher order quadrature formulae as well.
  *
- *  We store the contribution of each face in a @p{map}, as provided by the
+ *  We store the contribution of each face in a @p map, as provided by the
  *  C++ standard library, with the iterator pointing to that face being the
  *  key into the map. In fact, we do not store the indicator per face, but
  *  only the integral listed above. When looping the second time over all
@@ -105,7 +105,7 @@ template <int dim> class FESubfaceValues;
  *  components at the same time. The main function of this class takes
  *  a list of flags denoting the components for which components the
  *  error estimator is to be applied; by default, it is a list of only
- *  @p{true}s, meaning that all variables shall be treated.
+ *  @p trues, meaning that all variables shall be treated.
  *
  *  In case the different components of a field have different
  *  physical meaning (for example velocity and pressure in the Stokes
@@ -123,8 +123,8 @@ template <int dim> class FESubfaceValues;
  *  
  *  If the face is at the boundary, i.e. there is no neighboring cell to which
  *  the jump in the gradiend could be computed, there are two possibilities:
- *  @begin{itemize}
- *  @item The face belongs to a Dirichlet boundary. Then the face is not
+ *  <ul>
+ *  <li> The face belongs to a Dirichlet boundary. Then the face is not
  *    considered, which can be justified looking at a dual problem technique and
  *    should hold exactly if the boundary can be approximated exactly by the
  *    finite element used (i.e. it is a linear boundary for linear finite elements,
@@ -141,15 +141,15 @@ template <int dim> class FESubfaceValues;
  *    store a zero for this face, which makes summing up the contributions of
  *    the different faces to the cells easier.
  *
- *  @item The face belongs to a Neumann boundary.  In this case, the
+ *  <li> The face belongs to a Neumann boundary.  In this case, the
  *    contribution of the face $F\in\partial K$ looks like
  *    \f[ \int_F \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds \f]
  *    where $g$ is the Neumann boundary function. If the finite element is
  *    vector-valued, then obviously the function denoting the Neumann boundary
  *    conditions needs to be vector-valued as well.
  *
- *  @item No other boundary conditions are considered.
- *  @end{itemize}
+ *  <li> No other boundary conditions are considered.
+ *  </ul>
  *  The object describing the boundary conditions is obtained from the
  *  triangulation.
  *
@@ -161,7 +161,7 @@ template <int dim> class FESubfaceValues;
  *  
  *  The integration along faces with hanging nodes is quite tricky, since one
  *  of the elements has to be shifted one level up or down. See the
- *  documentation for the @ref{FESubFaceValues} class for more information about
+ *  documentation for the FESubFaceValues class for more information about
  *  technical issues regarding this topic.
  *
  *  In praxi, since we integrate over each face only once, we do this when we
@@ -191,14 +191,14 @@ template <int dim> class FESubfaceValues;
  *  then call the functions of this class several times for each
  *  solution. However, it is observed that the largest factor in the
  *  computation of the error estimates (in terms of computing time) is
- *  initialization of @ref{FEFaceValues} and @ref{FESubFaceValues}
+ *  initialization of FEFaceValues and FESubFaceValues
  *  objects, and iterating through all faces and subfaces. If the
  *  solution vectors live on the same grid, this effort can be reduced
  *  significantly by treating all solution vectors at the same time,
- *  initializing the @ref{FEFaceValues} objects only once per cell and
+ *  initializing the FEFaceValues objects only once per cell and
  *  for all solution vectors at once, and also only looping through
  *  the triangulation only once. For this reason, besides the
- *  @p{estimate} function in this class that takes a single input
+ *  @p estimate function in this class that takes a single input
  *  vector and returns a single output vector, there is also a
  *  function that accepts several in- and output vectors at the same
  *  time. 
@@ -232,11 +232,11 @@ class KellyErrorEstimator
 				      * components you want to
 				      * evaluate, in case the finite
 				      * element used by the
-				      * @ref{DoFHandler} object is
+				      * DoFHandler object is
 				      * vector-valued. You then have
 				      * to set those entries to true
 				      * in the bit-vector
-				      * @p{component_mask} for which the
+				      * @p component_mask for which the
 				      * respective component is to be
 				      * used in the error
 				      * estimator. The default is to
@@ -304,7 +304,7 @@ class KellyErrorEstimator
                           const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
-				      * Calls the @p{estimate}
+				      * Calls the @p estimate
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */    
@@ -359,7 +359,7 @@ class KellyErrorEstimator
                           const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
-				      * Calls the @p{estimate}
+				      * Calls the @p estimate
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -601,7 +601,7 @@ class KellyErrorEstimator
 				      * becomes clear when looking at
 				      * the source code. This function
 				      * is only externalized from
-				      * @p{estimate_error} to avoid
+				      * @p estimate_error to avoid
 				      * ending up with a function of
 				      * 500 lines of code.
 				      */
@@ -626,7 +626,7 @@ class KellyErrorEstimator
 				      * The same applies as for the
 				      * function above, except that
 				      * integration is over face
-				      * @p{face_no} of @p{cell}, where
+				      * @p face_no of @p cell, where
 				      * the respective neighbor is
 				      * refined, so that the
 				      * integration is a bit more
@@ -656,7 +656,7 @@ class KellyErrorEstimator
 				      * class. Nevertheless, some
 				      * compilers don't implement this
 				      * resolution yet, so we have to
-				      * make them @p{friend}, which
+				      * make them @p friend, which
 				      * doesn't hurt on the other
 				      * compilers as well.
 				      */
@@ -703,11 +703,11 @@ class KellyErrorEstimator<1>
 				      * components you want to
 				      * evaluate, in case the finite
 				      * element used by the
-				      * @ref{DoFHandler} object is
+				      * DoFHandler object is
 				      * vector-valued. You then have
 				      * to set those entries to true
 				      * in the bit-vector
-				      * @p{component_mask} for which the
+				      * @p component_mask for which the
 				      * respective component is to be
 				      * used in the error
 				      * estimator. The default is to
@@ -743,7 +743,7 @@ class KellyErrorEstimator<1>
                           const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
-				      * Calls the @p{estimate}
+				      * Calls the @p estimate
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<1>()}.
 				      */    
@@ -798,7 +798,7 @@ class KellyErrorEstimator<1>
                           const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
-				      * Calls the @p{estimate}
+				      * Calls the @p estimate
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<1>()}.
 				      */

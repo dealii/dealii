@@ -57,7 +57,7 @@ template <typename number> class SparseBlockVanka;
  * For each selected degree of freedom, a local system of equations is built
  * by the degree of freedom itself and all other values coupling immediately,
  * i.e. the set of degrees of freedom considered for the local system of
- * equations for degree of freedom @p{i} is @p{i} itself and all @p{j} such that
+ * equations for degree of freedom @p i is @p i itself and all @p j such that
  * the element @p{(i,j)} is a nonzero entry in the sparse matrix under 
  * consideration. The elements @p{(j,i)} are not considered. We now pick all
  * matrix entries from rows and columns out of the set of degrees of freedom
@@ -88,7 +88,7 @@ template <typename number> class SparseBlockVanka;
  * This little example is taken from a program doing parameter optimization.
  * The Lagrange multiplier is the third component of the finite element
  * used. The system is solved by the GMRES method.
- * @begin{verbatim}
+ * @verbatim
  *                        // tag the Lagrange multiplier variable
  *    vector<bool> signature(3);
  *    signature[0] = signature[1] = false;
@@ -108,7 +108,7 @@ template <typename number> class SparseBlockVanka;
  *			  // solve
  *    gmres.solve (global_matrix, solution, right_hand_side,
  *	           vanka);
- * @end{verbatim}
+ * @endverbatim
  *
  *
  * @sect4{Implementor's remark}
@@ -139,7 +139,7 @@ class SparseVanka
 				     /**
 				      * Constructor. Gets the matrix
 				      * for preconditioning and a bit
-				      * vector with entries @p{true} for
+				      * vector with entries @p true for
 				      * all rows to be updated. A
 				      * reference to this vector will
 				      * be stored, so it must persist
@@ -147,7 +147,7 @@ class SparseVanka
 				      * object. The same is true for
 				      * the matrix.
 				      *
-				      * The matrix @p{M} which is passed
+				      * The matrix @p M which is passed
 				      * here may or may not be the
 				      * same matrix for which this
 				      * object shall act as
@@ -160,27 +160,27 @@ class SparseVanka
 				      * where the matrix changes in
 				      * each step slightly.
 				      *
-				      * If @p{conserve_mem} is @p{false},
+				      * If @p conserve_mem is @p false,
 				      * then the inverses of the local
 				      * systems are computed now, if
-				      * the flag is @p{true}, then they
+				      * the flag is @p true, then they
 				      * are computed every time the
 				      * preconditioner is
 				      * applied. This saves some
 				      * memory, but makes
 				      * preconditioning very
 				      * slow. Note also, that if the
-				      * flag is @p{false}, the the
-				      * contents of the matrix @p{M} at
+				      * flag is @p false, the the
+				      * contents of the matrix @p M at
 				      * the time of calling this
 				      * constructor are used, while if
-				      * the flag is @p{true}, then the
-				      * values in @p{M} at the time of
+				      * the flag is @p true, then the
+				      * values in @p M at the time of
 				      * preconditioning are used. This
 				      * may lead to different results,
-				      * obviously, of @p{M} changes.
+				      * obviously, of @p M changes.
 				      *
-				      * The parameter @p{n_threads}
+				      * The parameter @p n_threads
 				      * determines how many threads
 				      * shall be used in parallel when
 				      * building the inverses of the
@@ -205,8 +205,8 @@ class SparseVanka
 				     /**
 				      * Do the preconditioning.
 				      * This function takes the residual
-				      * in @p{src} and returns the resulting
-				      * update vector in @p{dst}.
+				      * in @p src and returns the resulting
+				      * update vector in @p dst.
 				      */
     template<typename number2>
     void vmult (Vector<number2>       &dst,
@@ -228,12 +228,12 @@ class SparseVanka
 				     /**
 				      * Apply the inverses
 				      * corresponding to those degrees
-				      * of freedom that have a @p{true}
-				      * value in @p{dof_mask}, to the
-				      * @p{src} vector and move the
-				      * result into @p{dst}. Actually,
+				      * of freedom that have a @p true
+				      * value in @p dof_mask, to the
+				      * @p src vector and move the
+				      * result into @p dst. Actually,
 				      * only values for allowed
-				      * indices are written to @p{dst},
+				      * indices are written to @p dst,
 				      * so the application of this
 				      * function only does what is
 				      * announced in the general
@@ -248,13 +248,13 @@ class SparseVanka
 				      * parallelize the
 				      * application. Then, it is
 				      * important to only write to
-				      * some slices of @p{dst}, in order
+				      * some slices of @p dst, in order
 				      * to eliminate the dependencies
 				      * of threads of each other.
 				      *
 				      * If a null pointer is passed
 				      * instead of a pointer to the
-				      * @p{dof_mask} (as is the default
+				      * @p dof_mask (as is the default
 				      * value), then it is assumed
 				      * that we shall work on all
 				      * degrees of freedom. This is
@@ -262,7 +262,7 @@ class SparseVanka
 				      * function with a
 				      * @p{vector<bool>(n_dofs,true)}.
 				      *
-				      * The @p{vmult} of this class
+				      * The @p vmult of this class
 				      * of course calls this function
 				      * with a null pointer
 				      */
@@ -307,7 +307,7 @@ class SparseVanka
 				      * Array of inverse matrices,
 				      * one for each degree of freedom.
 				      * Only those elements will be used
-				      * that are tagged in @p{selected}.
+				      * that are tagged in @p selected.
 				      */
     mutable std::vector<SmartPointer<FullMatrix<float> > > inverses;
 
@@ -334,7 +334,7 @@ class SparseVanka
 				     /**
 				      * Compute the inverse of the
 				      * block located at position
-				      * @p{row}. Since the vector is
+				      * @p row. Since the vector is
 				      * used quite often, it is
 				      * generated only once in the
 				      * caller of this function and
@@ -354,18 +354,18 @@ class SparseVanka
                                       * is actually necessary, since
                                       * derived classes can only
                                       * access non-public members
-                                      * through their @p{this}
+                                      * through their @p this
                                       * pointer, but not access these
                                       * members as member functions of
                                       * other objects of the type of
                                       * this base class (i.e. like
-                                      * @p{x.f()}, where @p{x} is an
+                                      * @p{x.f()}, where @p x is an
                                       * object of the base class, and
-                                      * @p{f} one of it's non-public
+                                      * @p f one of it's non-public
                                       * member functions).
                                       *
                                       * Now, in the case of the
-                                      * @p{SparseBlockVanka} class, we
+                                      * @p SparseBlockVanka class, we
                                       * would like to take the address
                                       * of a function of the base
                                       * class in order to call it
@@ -389,7 +389,7 @@ class SparseVanka
  *
  * This class is probably useless if you don't have a multiprocessor
  * system, since then the amount of work per preconditioning step is
- * the same as for the @p{SparseVanka} class, but preconditioning
+ * the same as for the @p SparseVanka class, but preconditioning
  * properties are worse. On the other hand, if you have a
  * multiprocessor system, the worse preconditioning quality (leading
  * to more iterations of the linear solver) usually is well balanced
@@ -402,7 +402,7 @@ class SparseVanka
  *
  * To facilitate writing portable code, if the number of blocks into
  * which the matrix is to be subdivided, is set to one, then this
- * class acts just like the @p{SparseVanka} class. You may therefore
+ * class acts just like the @p SparseVanka class. You may therefore
  * want to set the number of blocks equal to the number of processors
  * you have.
  *
@@ -421,7 +421,7 @@ class SparseVanka
  * to be solved is equal between blocks. The reason for this strategy
  * to subdivision is load-balancing for multithreading. There are
  * several possibilities to actually split the matrix into blocks,
- * which are selected by the flag @p{blocking_strategy} that is passed
+ * which are selected by the flag @p blocking_strategy that is passed
  * to the constructor. By a block, we will in the sequel denote a list
  * of indices of degrees of freedom; the algorithm will work on each
  * block separately, i.e. the solutions of the local systems
@@ -431,11 +431,11 @@ class SparseVanka
  * a consecutive list of indices, as in the first alternative below,
  * or a nonconsecutive list of indices. Of course, we assume that the
  * intersection of each two blocks is empty and that the union of all
- * blocks equals the interval @p{[0,N)}, where @p{N} is the number of
+ * blocks equals the interval @p{[0,N)}, where @p N is the number of
  * degrees of freedom of the system of equations.
  *
- * @begin{itemize}
- * @item @p{index_intervals}:
+ * <ul>
+ * <li> @p index_intervals:
  *    Here, we chose the blocks to be intervals @p{[a_i,a_{i+1})},
  *    i.e. consecutive degrees of freedom are usually also within the
  *    same block. This is a reasonable strategy, if the degrees of
@@ -445,7 +445,7 @@ class SparseVanka
  *    the matrix is usually restricted to the vicinity of the diagonal
  *    as well, and we can simply cut the matrix into blocks.
  *
- *    The bounds of the intervals, i.e. the @p{a_i} above, are chosen
+ *    The bounds of the intervals, i.e. the @p a_i above, are chosen
  *    such that the number of degrees of freedom on which we shall
  *    work (i.e. usually the degrees of freedom corresponding to
  *    Lagrange multipliers) is about the same in each block; this does
@@ -463,7 +463,7 @@ class SparseVanka
  *    preconditioner useless if the degrees of freedom are numbered by
  *    component, i.e. all Lagrange multipliers en bloc.
  *
- * @item @p{adaptive}: This strategy is a bit more clever in cases where
+ * <li> @p adaptive: This strategy is a bit more clever in cases where
  *    the Langrange DoFs are clustered, as in the example above. It
  *    works as follows: it first groups the Lagrange DoFs into blocks,
  *    using the same strategy as above. However, instead of grouping
@@ -485,7 +485,7 @@ class SparseVanka
  *    does not differ much. However, unlike the first strategy, the
  *    performance of the second strategy does not deteriorate if the
  *    DoFs are renumbered by component.
- * @end{itemize}
+ * </ul>
  *
  *
  * @sect3{Typical results}
@@ -494,18 +494,18 @@ class SparseVanka
  * optimization, which leads to a series of saddle point problems,
  * each of which is solved using GMRES with Vanka as
  * preconditioner. The equation had approx. 850 degrees of
- * freedom. With the non-blocked version @p{SparseVanka} (or
- * @p{SparseBlockVanka} with @p{n_blocks==1}), the following numbers of
+ * freedom. With the non-blocked version @p SparseVanka (or
+ * @p SparseBlockVanka with @p{n_blocks==1}), the following numbers of
  * iterations is needed to solver the linear system in each nonlinear
  * step:
- * @begin{verbatim}
+ * @verbatim
  *   101 68 64 53 35 21
- * @end{verbatim}
+ * @endverbatim
  *
  * With four blocks, we need the following numbers of iterations
- * @begin{verbatim}
+ * @verbatim
  *   124 88 83 66 44 28
- * @end{verbatim}
+ * @endverbatim
  * As can be seen, more iterations are needed. However, in terms of
  * computing time, the first version needs 72 seconds wall time (and
  * 79 seconds CPU time, which is more than wall time since some other
@@ -542,7 +542,7 @@ class SparseBlockVanka : public SparseVanka<number>
 				     /**
 				      * Constructor. Pass all
 				      * arguments except for
-				      * @p{n_blocks} to the base class.
+				      * @p n_blocks to the base class.
 				      */
     SparseBlockVanka (const SparseMatrix<number> &M,
 		      const std::vector<bool>    &selected,
@@ -576,10 +576,10 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * for each block which degrees
 				      * of freedom belong to it. Thus,
 				      * if @p{dof_masks[i][j]==true},
-				      * then DoF @p{j} belongs to block
-				      * @p{i}. Of course, no other
+				      * then DoF @p j belongs to block
+				      * @p i. Of course, no other
 				      * @p{dof_masks[l][j]} may be
-				      * @p{true} for @p{l!=i}. This
+				      * @p true for @p{l!=i}. This
 				      * computation is done in the
 				      * constructor, to avoid
 				      * recomputing each time the
@@ -589,7 +589,7 @@ class SparseBlockVanka : public SparseVanka<number>
 
 				     /**
 				      * Compute the contents of the
-				      * field @p{dof_masks}. This
+				      * field @p dof_masks. This
 				      * function is called from the
 				      * constructor.
 				      */

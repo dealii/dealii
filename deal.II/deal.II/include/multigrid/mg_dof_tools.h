@@ -28,13 +28,13 @@ template <class number> class FullMatrix;
 /**
  * This is a collection of functions operating on, and manipulating
  * the numbers of degrees of freedom in a multilevel triangulation. It
- * is similar in purpose and function to the @p{DoFTools} class, but
- * operates on @p{MGDoFHandler} objects instead of @ref{DoFHandler}
+ * is similar in purpose and function to the @p DoFTools class, but
+ * operates on @p MGDoFHandler objects instead of DoFHandler
  * objects. See there and the documentation of the member functions
  * for more information.
  *
  * All member functions are static, so there is no need to create an
- * object of class @p{MGTools}.
+ * object of class @p MGTools.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999-2003
  */
@@ -44,7 +44,7 @@ class MGTools
 				     /**
 				      * Write the sparsity structure
 				      * of the matrix belonging to the
-				      * specified @p{level}. The sparsity pattern
+				      * specified @p level. The sparsity pattern
 				      * is not compressed, so before 
 				      * creating the actual matrix
 				      * you have to compress the
@@ -78,10 +78,10 @@ class MGTools
 				      * the fluxes at refinement
 				      * edges. The matrix maps a
 				      * function of the fine level
-				      * space @p{level} to the coarser
+				      * space @p level to the coarser
 				      * space.
 				      *
-				      * @ref{make_flux_sparsity_pattern}
+				      * make_flux_sparsity_pattern()
 				      */
     template <int dim, class SparsityPattern>
     static void
@@ -136,7 +136,7 @@ class MGTools
 				      * correct size.  Here, we just
 				      * count the numbers of degrees
 				      * of freedom on each level and
-				      * @p{reinit} each level vector
+				      * @p reinit each level vector
 				      * to this length.
 				      */
     template <int dim, typename number>
@@ -150,16 +150,16 @@ class MGTools
 				      * the numbers of degrees of
 				      * freedom on each level
 				      * component-wise. Then, assign
-				      * each block of @p{vector} the
+				      * each block of @p vector the
 				      * corresponding size.
 				      *
-				      * The boolean field @p{selected}
+				      * The boolean field @p selected
 				      * allows restricting this
 				      * operation to certain
 				      * components. In this case,
-				      * @p{vector} will only have as
+				      * @p vector will only have as
 				      * many blocks as there are true
-				      * values in @p{selected} (no
+				      * values in @p selected (no
 				      * blocks of length zero are
 				      * padded in).
 				      *
@@ -169,10 +169,10 @@ class MGTools
 				      * from this function.
 				      *
 				      * The argument
-				      * @p{target_component} allows to
+				      * @p target_component allows to
 				      * re-sort and groupt components
 				      * as in
-				      * @p{DoFRenumbering::component_wise}.
+				      * @p DoFRenumbering::component_wise.
 				      */
     template <int dim, typename number>
       static void
@@ -186,14 +186,14 @@ class MGTools
 				      * numbers of degrees of freedom
 				      * on each level component-wise
 				      * in a single component. Then,
-				      * assign @p{vector} the
+				      * assign @p vector the
 				      * corresponding size.
 				      *
-				      * The boolean field @p{selected}
+				      * The boolean field @p selected
 				      * may be nonzero in a single
 				      * component, indicating the
 				      * block of a block vector the
-				      * argument @p{v} corresponds to.
+				      * argument @p v corresponds to.
 				      *
 				      * Degrees of freedom must be
 				      * sorted by component in order
@@ -201,10 +201,10 @@ class MGTools
 				      * from this function.
 				      *
 				      * The argument
-				      * @p{target_component} allows to
+				      * @p target_component allows to
 				      * re-sort and groupt components
 				      * as in
-				      * @p{DoFRenumbering::component_wise}.
+				      * @p DoFRenumbering::component_wise.
 				      */
     template <int dim, typename number>
       static void

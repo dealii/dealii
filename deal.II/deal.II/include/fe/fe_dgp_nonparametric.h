@@ -51,7 +51,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
   public:
 				     /**
 				      * Constructor for tensor product
-				      * polynomials of degree @p{k}.
+				      * polynomials of degree @p k.
 				      */
     FE_DGPNonparametric (const unsigned int k);
     
@@ -60,7 +60,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * identifies a finite
 				      * element. This class returns
 				      * @p{FE_DGPNonparametric<dim>(degree)},
-				      * with @p{dim} and @p{degree}
+				      * with @p dim and @p degree
 				      * replaced by appropriate
 				      * values.
 				      */
@@ -68,9 +68,9 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 
 				     /**
 				      * Return the value of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p ith shape function at the
+				      * point @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -80,11 +80,11 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 
 				     /**
 				      * Return the value of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
+				      * @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -92,7 +92,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Since this element is scalar,
 				      * the returned value is the same
 				      * as if the function without the
-				      * @p{_component} suffix were
+				      * @p _component suffix were
 				      * called, provided that the
 				      * specified component is zero.
 				      */
@@ -102,9 +102,9 @@ class FE_DGPNonparametric : public FiniteElement<dim>
     
 				     /**
 				      * Return the gradient of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p ith shape function at the
+				      * point @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -114,11 +114,11 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 
 				     /**
 				      * Return the gradient of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
+				      * @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -126,7 +126,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Since this element is scalar,
 				      * the returned value is the same
 				      * as if the function without the
-				      * @p{_component} suffix were
+				      * @p _component suffix were
 				      * called, provided that the
 				      * specified component is zero.
 				      */
@@ -136,10 +136,10 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 
 				     /**
 				      * Return the tensor of second
-				      * derivatives of the @p{i}th
-				      * shape function at point @p{p}
+				      * derivatives of the @p ith
+				      * shape function at point @p p
 				      * on the unit cell.  See the
-				      * @ref{FiniteElementBase} base
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -149,11 +149,11 @@ class FE_DGPNonparametric : public FiniteElement<dim>
     
 				     /**
 				      * Return the second derivative
-				      * of the @p{component}th vector
-				      * component of the @p{i}th shape
+				      * of the @p componentth vector
+				      * component of the @p ith shape
 				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
+				      * @p p. See the
+				      * FiniteElementBase base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -161,7 +161,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Since this element is scalar,
 				      * the returned value is the same
 				      * as if the function without the
-				      * @p{_component} suffix were
+				      * @p _component suffix were
 				      * called, provided that the
 				      * specified component is zero.
 				      */
@@ -189,7 +189,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Access to base element
 				      * objects. Since this element is
 				      * scalar, @p{base_element(0)} is
-				      * @p{this}, and all other
+				      * @p this, and all other
 				      * indices throw an error.
 				      */
     virtual const FiniteElement<dim> &
@@ -197,7 +197,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 
                                      /**
                                       * Multiplicity of base element
-                                      * @p{index}. Since this is a
+                                      * @p index. Since this is a
                                       * scalar element,
                                       * @p{element_multiplicity(0)}
                                       * returns one, and all other
@@ -209,14 +209,14 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Check for non-zero values on a face.
 				      *
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p face_index.
 				      *
 				      * Implementation of the
 				      * interface in
-				      * @ref{FiniteElement}
+				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -267,14 +267,14 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 	static const unsigned int n_embedding_matrices;
 
 					 /**
-					  * As @p{embedding} but for
+					  * As @p embedding but for
 					  * projection matrices.
 					  */
 	static const double * const projection_matrices[][GeometryInfo<dim>::children_per_cell];
 
 					 /**
 					  * As
-					  * @p{n_embedding_matrices}
+					  * @p n_embedding_matrices
 					  * but for projection
 					  * matrices.
 					  */
@@ -284,11 +284,11 @@ class FE_DGPNonparametric : public FiniteElement<dim>
   protected:
 
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> *clone() const;
   
@@ -306,7 +306,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      */
     virtual void
     fill_fe_values (const Mapping<dim> &mapping,
@@ -319,7 +319,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      */
     virtual void
     fill_fe_face_values (const Mapping<dim> &mapping,
@@ -333,7 +333,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				     /**
 				      * Implementation of the same
 				      * function in
-				      * @ref{FiniteElement}.
+				      * FiniteElement.
 				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim> &mapping,
@@ -350,19 +350,19 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				     /**
 				      * Only for internal use. Its
 				      * full name is
-				      * @p{get_dofs_per_object_vector}
+				      * @p get_dofs_per_object_vector
 				      * function and it creates the
-				      * @p{dofs_per_object} vector that is
+				      * @p dofs_per_object vector that is
 				      * needed within the constructor to
 				      * be passed to the constructor of
-				      * @p{FiniteElementData}.
+				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
     
 				     /**
 				      * Given a set of flags indicating
 				      * what quantities are requested
-				      * from a @p{FEValues} object,
+				      * from a @p FEValues object,
 				      * return which of these can be
 				      * precomputed once and for
 				      * all. Often, the values of
@@ -371,8 +371,8 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * example, in which case the
 				      * return value of this function
 				      * would be the logical and of
-				      * the input @p{flags} and
-				      * @p{update_values}.
+				      * the input @p flags and
+				      * @p update_values.
 				      *
 				      * For the present kind of finite
 				      * element, this is exactly the
@@ -433,7 +433,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
     template <int dim1> friend class FE_DGPNonparametric;
 
 				     /**
-				      * Allows @p{MappingQ} class to
+				      * Allows @p MappingQ class to
 				      * access to build_renumbering
 				      * function.
 				      */

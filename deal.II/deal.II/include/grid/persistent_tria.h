@@ -29,10 +29,10 @@
  * of cell numbers to the geometrical cells.
  *
  * Basically, this is a drop-in replacement for the triangulation. Since it
- * is derived from the @ref{Triangulation} class, it shares all the
+ * is derived from the Triangulation class, it shares all the
  * functionality, but it overrides some virtual functions and adds some
  * functions, too. The main change to the base class is that it overrides
- * the @p{execute_coarsening_and_refinement} function, where the new version
+ * the @p execute_coarsening_and_refinement function, where the new version
  * first stores all refinement and coarsening flags and only then calls the
  * respective function of the base class. The stored flags may later be
  * used to restore the grid just as it was before. Some other functions
@@ -41,7 +41,7 @@
  *
  * We note that since the triangulation is created in exactly the same state
  * as it was before, other objects working on it should result in the same
- * state as well. This holds in particular for the @ref{DoFHandler} object, which
+ * state as well. This holds in particular for the DoFHandler object, which
  * will assign the same degrees of freedom to the original cells and the ones
  * after reconstruction of the triangulation. You can therefore safely use data
  * vectors computed on the original grid on the reconstructed grid as well.
@@ -49,14 +49,14 @@
  *
  * @sect3{Usage}
  * You can use objects of this class almost in the same way as objects of the
- * @ref{Triangulation} class. One of the few differences is that you can only
+ * Triangulation class. One of the few differences is that you can only
  * construct such an object by giving a coarse grid to the constructor. The
  * coarse grid will be used to base the triangulation on, and therefore the
  * lifetime of the coarse grid has to be longer than the lifetime of the
  * object of this class.
  *
  * Basically, usage looks like this:
- * @begin{verbatim}
+ * @verbatim
  *   Triangulation<dim> coarse_grid;
  *   ...                     // initialize coarse grid
  *
@@ -85,13 +85,13 @@
  *                           // is not needed anymore, e.g.
  *                           // working with another grid
  *     };
- * @end{verbatim}
+ * @endverbatim
  *
- * Note that initially, the @ref{PersistentTriangulation} object does not
- * constitute a triangulation; it only becomes one after @p{restore} is first
- * called. Note also that the @p{execute_coarsening_and_refinement} stores
- * all necessary flags for later reconstruction using the @p{restore} function.
- * @ref{Triangulation}@p{<dim>::clear ()} resets the underlying triangulation to a
+ * Note that initially, the PersistentTriangulation object does not
+ * constitute a triangulation; it only becomes one after @p restore is first
+ * called. Note also that the @p execute_coarsening_and_refinement stores
+ * all necessary flags for later reconstruction using the @p restore function.
+ * Triangulation@p{<dim>::clear ()} resets the underlying triangulation to a
  * virgin state, but does not affect the stored refinement flags needed for
  * later reconstruction and does also not touch the coarse grid which is
  * used withing @p{restore()}.
@@ -108,7 +108,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * flags, etc from that grid as well.
 				      * Note that the initial state of the
 				      * triangulation is empty, until
-				      * @p{restore_grid} is called for the
+				      * @p restore_grid is called for the
 				      * first time.
 				      *
 				      * The coarse grid must persist until
@@ -168,7 +168,7 @@ class PersistentTriangulation : public Triangulation<dim>
 
 				     /**
 				      * Differential restore. Performs
-				      * the @p{step_no}th local
+				      * the @p step_noth local
 				      * refinement and coarsening step.
 				      * Step 0 stands for the copying
 				      * of the coarse grid.
@@ -186,20 +186,20 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * Returns the number of
 				      * refinement and coarsening
 				      * steps. This is given by the
-				      * size of the @p{refine_flags}
+				      * size of the @p refine_flags
 				      * vector.
 				      */
     unsigned int n_refinement_steps () const;
 
 				     /**
 				      * Overload this function to use
-				      * @p{tria} as a new coarse grid. The
+				      * @p tria as a new coarse grid. The
 				      * present triangulation and all
 				      * refinement and coarsening flags
 				      * storing its history are deleted,
 				      * and the state of the underlying
 				      * triangulation is reset to be
-				      * empty, until @p{restore_grid} is
+				      * empty, until @p restore_grid is
 				      * called the next time.
 				      *
 				      * The coarse grid must persist until
@@ -220,7 +220,7 @@ class PersistentTriangulation : public Triangulation<dim>
 
 				     /**
 				      * Writes all refine and coarsen
-				      * flags to the ostream @p{out}.
+				      * flags to the ostream @p out.
 				      */
     virtual void write_flags(std::ostream &out) const;
 

@@ -60,12 +60,12 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * interpolating from the given
 				      * finite element to the present
 				      * one. The size of the matrix is
-				      * then @p{dofs_per_cell} times
+				      * then @p dofs_per_cell times
 				      * @p{source.dofs_per_cell}.
 				      *
 				      * These matrices are only
 				      * available if the source
-				      * element is also a @p{FE_DGQ}
+				      * element is also a @p FE_DGQ
 				      * element. Otherwise, an
 				      * exception of type
 				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
@@ -79,14 +79,14 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * Check for non-zero values on a face.
 				      *
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p face_index.
 				      *
 				      * Implementation of the
 				      * interface in
-				      * @ref{FiniteElement}
+				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -137,14 +137,14 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 	static const unsigned int n_embedding_matrices;
 
 					 /**
-					  * As @p{embedding} but for
+					  * As @p embedding but for
 					  * projection matrices.
 					  */
 	static const double * const projection_matrices[];
 
 					 /**
 					  * As
-					  * @p{n_embedding_matrices}
+					  * @p n_embedding_matrices
 					  * but for projection
 					  * matrices.
 					  */
@@ -155,11 +155,11 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
   protected:
 
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> *clone() const;
 
@@ -167,12 +167,12 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				     /**
 				      * Only for internal use. Its
 				      * full name is
-				      * @p{get_dofs_per_object_vector}
+				      * @p get_dofs_per_object_vector
 				      * function and it creates the
-				      * @p{dofs_per_object} vector that is
+				      * @p dofs_per_object vector that is
 				      * needed within the constructor to
 				      * be passed to the constructor of
-				      * @p{FiniteElementData}.
+				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
   
@@ -191,7 +191,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * The direction parameter
 				      * determines the type of
 				      * rotation. It is one character
-				      * of @p{xXyYzZ}. The character
+				      * of @p xXyYzZ. The character
 				      * determines the axis of
 				      * rotation, case determines the
 				      * direction. Lower case is
@@ -211,7 +211,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
     template <int dim1> friend class FE_DGQ;
 
 				     /**
-				      * Allows @p{MappingQ} class to
+				      * Allows @p MappingQ class to
 				      * access to build_renumbering
 				      * function.
 				      */

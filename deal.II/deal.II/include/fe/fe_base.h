@@ -34,7 +34,7 @@ template<int dim> class FESystem;
 
 /**
  * Dimension independent data for finite elements. See the derived
- * class @ref{FiniteElementBase} class for information on its use. All
+ * class FiniteElementBase class for information on its use. All
  * its data are available to the implementation in a concrete finite
  * element class.
  *
@@ -127,7 +127,7 @@ class FiniteElementData
 				      * components is in many cases
 				      * equal to the number of base
 				      * elements glued together with
-				      * the help of the @ref{FESystem}
+				      * the help of the FESystem
 				      * class. However, for elements
 				      * like the Nedelec element, the
 				      * number is greater than one
@@ -399,7 +399,7 @@ class FiniteElementBase : public Subscriptor,
 				   /**
 				    * Base class for internal data.
 				    * Adds data for second derivatives to
-				    * @ref{Mapping::InternalDataBase}
+				    * Mapping::InternalDataBase()
 				    *
 				    * For information about the
 				    * general purpose of this class,
@@ -430,15 +430,15 @@ class FiniteElementBase : public Subscriptor,
 			     const Quadrature<dim>    &quadrature);
 	
 					 /**
-					  * Storage for @p{FEValues}
+					  * Storage for @p FEValues
 					  * objects needed to
 					  * approximate second
 					  * derivatives.
 					  *
 					  * The ordering is @p{p+hx},
 					  * @p{p+hy}, @p{p+hz},
-					  * @p{p-hx}, @p{p-hy},
-					  * @p{p-hz}, where unused
+					  * @p p-hx, @p p-hy,
+					  * @p p-hz, where unused
 					  * entries in lower dimensions
 					  * are missing.
 					  */
@@ -479,14 +479,14 @@ class FiniteElementBase : public Subscriptor,
 				      *
 				      * Systems of elements have their
 				      * own naming convention, see the
-				      * @ref{FESystem} class.
+				      * FESystem class.
 				      */
     virtual std::string get_name () const = 0;
     
 				     /**
 				      * Return the value of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. @p{p} is a point
+				      * @p ith shape function at the
+				      * point @p p. @p p is a point
 				      * on the reference element. If
 				      * the finite element is
 				      * vector-valued, then return the
@@ -500,15 +500,15 @@ class FiniteElementBase : public Subscriptor,
 				      * classes implementing this
 				      * function should throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * @p ExcShapeFunctionNotPrimitive. In
 				      * that case, use the
-				      * @ref{shape_value_component}
+				      * shape_value_component()
 				      * function.
 				      *
 				      * An
-				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * @p ExcUnitShapeValuesDoNotExist
 				      * is thrown if the shape values
-				      * of the @p{FiniteElement} under
+				      * of the @p FiniteElement under
 				      * consideration depends on the
 				      * shape of the cell in real
 				      * space.
@@ -517,16 +517,16 @@ class FiniteElementBase : public Subscriptor,
 			        const Point<dim>   &p) const;
 
 				     /**
-				      * Just like for @p{shape_value},
+				      * Just like for @p shape_value,
 				      * but this function will be
 				      * called when the shape function
 				      * has more than one non-zero
 				      * vector component. In that
 				      * case, this function should
 				      * return the value of the
-				      * @p{component}-th vector
-				      * component of the @p{i}th shape
-				      * function at point @p{p}.
+				      * @p component-th vector
+				      * component of the @p ith shape
+				      * function at point @p p.
 				      */
     virtual double shape_value_component (const unsigned int i,
 					  const Point<dim>   &p,
@@ -534,8 +534,8 @@ class FiniteElementBase : public Subscriptor,
     
 				     /**
 				      * Return the gradient of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. @p{p} is a point
+				      * @p ith shape function at the
+				      * point @p p. @p p is a point
 				      * on the reference element, and
 				      * likewise the gradient is the
 				      * gradient on the unit cell with
@@ -553,15 +553,15 @@ class FiniteElementBase : public Subscriptor,
 				      * classes implementing this
 				      * function should throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * @p ExcShapeFunctionNotPrimitive. In
 				      * that case, use the
-				      * @ref{shape_grad_component}
+				      * shape_grad_component()
 				      * function.
 				      *
 				      * An
-				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * @p ExcUnitShapeValuesDoNotExist
 				      * is thrown if the shape values
-				      * of the @p{FiniteElement} under
+				      * of the @p FiniteElement under
 				      * consideration depends on the
 				      * shape of the cell in real
 				      * space.
@@ -570,16 +570,16 @@ class FiniteElementBase : public Subscriptor,
 				      const Point<dim>   &p) const;
 
 				     /**
-				      * Just like for @p{shape_grad},
+				      * Just like for @p shape_grad,
 				      * but this function will be
 				      * called when the shape function
 				      * has more than one non-zero
 				      * vector component. In that
 				      * case, this function should
 				      * return the gradient of the
-				      * @p{component}-th vector
-				      * component of the @p{i}th shape
-				      * function at point @p{p}.
+				      * @p component-th vector
+				      * component of the @p ith shape
+				      * function at point @p p.
 				      */
     virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
 						const Point<dim>   &p,
@@ -587,8 +587,8 @@ class FiniteElementBase : public Subscriptor,
 
 				     /**
 				      * Return the tensor of second
-				      * derivatives of the @p{i}th
-				      * shape function at point @p{p}
+				      * derivatives of the @p ith
+				      * shape function at point @p p
 				      * on the unit cell. The
 				      * derivatives are derivatives on
 				      * the unit cell with respect to
@@ -605,15 +605,15 @@ class FiniteElementBase : public Subscriptor,
 				      * classes implementing this
 				      * function should throw an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * @p ExcShapeFunctionNotPrimitive. In
 				      * that case, use the
-				      * @ref{shape_grad_grad_component}
+				      * shape_grad_grad_component()
 				      * function.
 				      *
 				      * An
-				      * @p{ExcUnitShapeValuesDoNotExist}
+				      * @p ExcUnitShapeValuesDoNotExist
 				      * is thrown if the shape values
-				      * of the @p{FiniteElement} under
+				      * of the @p FiniteElement under
 				      * consideration depends on the
 				      * shape of the cell in real
 				      * space.
@@ -622,16 +622,16 @@ class FiniteElementBase : public Subscriptor,
 					   const Point<dim>   &p) const;
 
 				     /**
-				      * Just like for @p{shape_grad_grad},
+				      * Just like for @p shape_grad_grad,
 				      * but this function will be
 				      * called when the shape function
 				      * has more than one non-zero
 				      * vector component. In that
 				      * case, this function should
 				      * return the gradient of the
-				      * @p{component}-th vector
-				      * component of the @p{i}th shape
-				      * function at point @p{p}.
+				      * @p component-th vector
+				      * component of the @p ith shape
+				      * function at point @p p.
 				      */
     virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
 						     const Point<dim>   &p,
@@ -642,16 +642,16 @@ class FiniteElementBase : public Subscriptor,
 				      * space onto a coarse grid
 				      * space. If this projection
 				      * operator is associated with a
-				      * matrix @p{P}, then the
+				      * matrix @p P, then the
 				      * restriction of this matrix
-				      * @p{P_i} to a single child cell
+				      * @p P_i to a single child cell
 				      * is returned here.
 				      *
-				      * The matrix @p{P} is the
+				      * The matrix @p P is the
 				      * concatenation or the sum of
-				      * the cell matrices @p{P_i},
+				      * the cell matrices @p P_i,
 				      * depending on the
-				      * @p{restriction_is_additive_flags}
+				      * @p restriction_is_additive_flags
 				      * given to the constructor. This
 				      * distinguishes interpolation
 				      * (concatenation) and projection
@@ -669,7 +669,7 @@ class FiniteElementBase : public Subscriptor,
 				      * implemented in the derived
 				      * finite element class, this
 				      * function aborts with
-				      * @p{ExcProjectionVoid}.
+				      * @p ExcProjectionVoid.
 				      */
     const FullMatrix<double> &
     get_restriction_matrix (const unsigned int child) const;
@@ -680,21 +680,21 @@ class FiniteElementBase : public Subscriptor,
 				      * The identity operator from a
 				      * coarse grid space into a fine
 				      * grid space is associated with
-				      * a matrix @p{P}. The
-				      * restriction of this matrix @p{P_i} to
+				      * a matrix @p P. The
+				      * restriction of this matrix @p P_i to
 				      * a single child cell is
 				      * returned here.
 				      *
-				      * The matrix @p{P} is the
+				      * The matrix @p P is the
 				      * concatenation, not the sum of
 				      * the cell matrices
-				      * @p{P_i}. That is, if the same
+				      * @p P_i. That is, if the same
 				      * non-zero entry @p{j,k} exists
 				      * in in two different child
-				      * matrices @p{P_i}, the value
+				      * matrices @p P_i, the value
 				      * should be the same in both
 				      * matrices and it is copied into
-				      * the matrix @p{P} only once.
+				      * the matrix @p P only once.
 				      *
 				      * Row and column indices are
 				      * related to fine grid and
@@ -718,7 +718,7 @@ class FiniteElementBase : public Subscriptor,
 				      * implemented in the derived
 				      * finite element class, this
 				      * function aborts with
-				      * @p{ExcEmbeddingVoid}. You can
+				      * @p ExcEmbeddingVoid. You can
 				      * check whether this is the case
 				      * by calling the
 				      * @ref{prolongation_is_implemented()}.
@@ -730,7 +730,7 @@ class FiniteElementBase : public Subscriptor,
                                       * Return whether this element implements
                                       * its prolongation matrices. The return
                                       * value also indicates whether a call to
-                                      * the @p{get_prolongation_matrix}
+                                      * the @p get_prolongation_matrix
                                       * function will generate an error or
                                       * not.
                                       *
@@ -776,7 +776,7 @@ class FiniteElementBase : public Subscriptor,
 				      * should have a way to live with
 				      * this, then you might want to
 				      * use the
-				      * @p{constraints_are_implemented}
+				      * @p constraints_are_implemented
 				      * function to check up front
 				      * whethehr this function will
 				      * succeed or generate the
@@ -789,7 +789,7 @@ class FiniteElementBase : public Subscriptor,
                                       * implements its hanging node
                                       * constraints. The return value
                                       * also indicates whether a call
-                                      * to the @p{constraint} function
+                                      * to the @p constraint function
                                       * will generate an error or not.
                                       *
                                       * This function is mostly here
@@ -821,7 +821,7 @@ class FiniteElementBase : public Subscriptor,
 				      * interpolating from the given
 				      * finite element to the present
 				      * one. The size of the matrix is
-				      * then @p{dofs_per_cell} times
+				      * then @p dofs_per_cell times
 				      * @p{source.dofs_per_cell}.
 				      *
 				      * Derived elements will have to
@@ -854,8 +854,8 @@ class FiniteElementBase : public Subscriptor,
 				      * implementational question
 				      * about comparing arrays and do
 				      * not compare the matrix arrays
-				      * @p{restriction} and
-				      * @p{prolongation}.
+				      * @p restriction and
+				      * @p prolongation.
 				      */
     bool operator == (const FiniteElementBase<dim> &) const;
 
@@ -881,7 +881,7 @@ class FiniteElementBase : public Subscriptor,
 				      * cannot be associated with one
 				      * vector component, and an
 				      * exception of type
-				      * @p{ExcShapeFunctionNotPrimitive}
+				      * @p ExcShapeFunctionNotPrimitive
 				      * will be raised.
 				      *
 				      * Note that if the element is
@@ -905,9 +905,9 @@ class FiniteElementBase : public Subscriptor,
 				      * that has more than one
 				      * vector-component). For this
 				      * information, refer to the
-				      * @p{system_to_base_table} field
+				      * @p system_to_base_table field
 				      * and the
-				      * @p{system_to_base_index}
+				      * @p system_to_base_index
 				      * function.
 				      */
     std::pair<unsigned int,unsigned int>
@@ -923,7 +923,7 @@ class FiniteElementBase : public Subscriptor,
 
                                      /**
                                       * Return for shape function
-                                      * @p{index} the base element it
+                                      * @p index the base element it
                                       * belongs to, the number of the
                                       * copy of this base element
                                       * (which is between zero and the
@@ -944,7 +944,7 @@ class FiniteElementBase : public Subscriptor,
 				      * then base values and dof
 				      * indices within this element
 				      * are equal to the
-				      * @p{system_to_component_table}. It
+				      * @p system_to_component_table. It
 				      * differs only in case the
 				      * element is composed of other
 				      * elements and at least one of
@@ -955,7 +955,7 @@ class FiniteElementBase : public Subscriptor,
 				      * vector-valued
 				      * (i.e. non-primitive) shape
 				      * functions, in contrast to the
-				      * @p{system_to_component_index}
+				      * @p system_to_component_index
 				      * function.
                                       */
     std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
@@ -963,7 +963,7 @@ class FiniteElementBase : public Subscriptor,
 
                                      /**
                                       * Same as
-                                      * @p{system_to_base_index}, but
+                                      * @p system_to_base_index, but
                                       * for degrees of freedom located
                                       * on a face.
                                       */
@@ -986,7 +986,7 @@ class FiniteElementBase : public Subscriptor,
 				      * implementing a certain vector
 				      * component, which can be done
 				      * using this function and the
-				      * @ref{FESystem}::@p{base_element}
+				      * FESystem::@p base_element
 				      * function.
 				      *
 				      * If this is a scalar finite
@@ -999,7 +999,7 @@ class FiniteElementBase : public Subscriptor,
 
 				     /**
 				      * Access the
-				      * @p{restriction_is_additive_flag}
+				      * @p restriction_is_additive_flag
 				      * field. See there for more
 				      * information on its contents.
 				      *
@@ -1046,7 +1046,7 @@ class FiniteElementBase : public Subscriptor,
 				      * element has defined support
 				      * points. If the result is true,
 				      * then a call to the
-				      * @p{get_unit_support_points}
+				      * @p get_unit_support_points
 				      * yields a non-empty array.
 				      *
 				      * The result may be false if an
@@ -1063,7 +1063,7 @@ class FiniteElementBase : public Subscriptor,
 				      * other shape functions.
 				      *
 				      * In composed elements (i.e. for
-				      * the @ref{FESystem} class, the
+				      * the FESystem class, the
 				      * result will be true if all all
 				      * the base elements have defined
 				      * support points.
@@ -1073,7 +1073,7 @@ class FiniteElementBase : public Subscriptor,
                                      /**
                                       * Return the position of the
                                       * support point of the
-                                      * @p{index}th shape function. If
+                                      * @p indexth shape function. If
                                       * it does not exist, raise an
                                       * exception.
                                       *
@@ -1081,11 +1081,11 @@ class FiniteElementBase : public Subscriptor,
                                       * simply returns the respective
                                       * element from the array you get
                                       * from
-                                      * @ref{get_unit_support_points},
+                                      * get_unit_support_points(),
                                       * but derived elements may
                                       * overload this function. In
                                       * particular, note that the
-                                      * @ref{FESystem} class overloads
+                                      * FESystem class overloads
                                       * it so that it can return the
                                       * support points of individual
                                       * base elements, of not all the
@@ -1093,7 +1093,7 @@ class FiniteElementBase : public Subscriptor,
                                       * points. In this way, you can
                                       * still ask for certain support
                                       * points, even if
-                                      * @p{get_unit_support_points}
+                                      * @p get_unit_support_points
                                       * only returns an empty array.
                                       */
     virtual
@@ -1147,7 +1147,7 @@ class FiniteElementBase : public Subscriptor,
 				      * support points, then their
 				      * number equals the number of
 				      * degrees of freedom on the face
-				      * (@p{dofs_per_face}). The order
+				      * (@p dofs_per_face). The order
 				      * of points in the array matches
 				      * that returned by the
 				      * @p{cell->get_dof_indices}
@@ -1164,19 +1164,19 @@ class FiniteElementBase : public Subscriptor,
 				      * element has defined support
 				      * points on faces. If the result
 				      * is true, then a call to the
-				      * @p{get_unit_support_points}
+				      * @p get_unit_support_points
 				      * yields a non-empty array.
 				      *
 				      * For more information, see the
 				      * documentation for the
-				      * @ref{has_support_points}
+				      * has_support_points()
 				      * function.
 				      */
     bool has_face_support_points () const;
 
                                      /**
                                       * The function corresponding to
-                                      * the @p{unit_support_point}
+                                      * the @p unit_support_point
                                       * function, but for faces. See
                                       * there for more information.
                                       */
@@ -1187,7 +1187,7 @@ class FiniteElementBase : public Subscriptor,
 				     /**
 				      * Return in which of the vector
 				      * components of this finite
-				      * element the @p{i}the shape
+				      * element the @p ithe shape
 				      * function is non-zero. The
 				      * length of the returned array
 				      * is equal to the number of
@@ -1198,7 +1198,7 @@ class FiniteElementBase : public Subscriptor,
 				      * spaces, the result of this
 				      * function will be a vector with
 				      * exactly one element being
-				      * @p{true}, since for most
+				      * @p true, since for most
 				      * spaces the individual vector
 				      * components are independent. In
 				      * that case, the component with
@@ -1212,19 +1212,19 @@ class FiniteElementBase : public Subscriptor,
 				      * components, for example to
 				      * make a shape function
 				      * divergence free, will there be
-				      * more than one @p{true} entry.
+				      * more than one @p true entry.
 				      */
     const std::vector<bool> &
     get_nonzero_components (const unsigned int i) const;
 
 				     /**
 				      * Return in how many vector
-				      * components the @p{i}th shape
+				      * components the @p ith shape
 				      * function is non-zero. This
 				      * value equals the number of
-				      * entries equal to @p{true} in
+				      * entries equal to @p true in
 				      * the result of the
-				      * @p{get_nonzero_components}
+				      * @p get_nonzero_components
 				      * function.
 				      *
 				      * For most finite element
@@ -1241,7 +1241,7 @@ class FiniteElementBase : public Subscriptor,
     n_nonzero_components (const unsigned int i) const;
 
 				     /**
-				      * Return whether the @p{i}th
+				      * Return whether the @p ith
 				      * shape function is primitive in
 				      * the sense that the shape
 				      * function is non-zero in only
@@ -1254,7 +1254,7 @@ class FiniteElementBase : public Subscriptor,
 				      * components are coupled.
 				      *
 				      * The result of the function is
-				      * @p{true} if and only if the
+				      * @p true if and only if the
 				      * result of
 				      * @p{n_nonzero_components(i)} is
 				      * equal to one.
@@ -1274,7 +1274,7 @@ class FiniteElementBase : public Subscriptor,
 				      * Since this is an extremely
 				      * common operation, the result
 				      * is cached in the
-				      * @p{cached_primitivity}
+				      * @p cached_primitivity
 				      * variable which is computed in
 				      * the constructor.
 				      */
@@ -1288,7 +1288,7 @@ class FiniteElementBase : public Subscriptor,
 				      *
 				      * This function is not
 				      * virtual. Use a
-				      * @ref{FiniteElement} object to
+				      * FiniteElement object to
 				      * get the actual size of a
 				      * concrete element.
 				      */
@@ -1350,7 +1350,7 @@ class FiniteElementBase : public Subscriptor,
   protected:  
  				     /**
 				      * Array of projection matrices. See
-				      * @p{get_restriction_matrix} above.
+				      * @p get_restriction_matrix above.
 				      *
 				      * Matrices in this array are
 				      * automatically initialized to
@@ -1420,7 +1420,7 @@ class FiniteElementBase : public Subscriptor,
     
 				     /**
 				      * Store what
-				      * @p{system_to_component_index}
+				      * @p system_to_component_index
 				      * will return.
 				      */
     std::vector< std::pair<unsigned int, unsigned int> > system_to_component_table;
@@ -1463,7 +1463,7 @@ class FiniteElementBase : public Subscriptor,
 				      * then base values and dof
 				      * indices within this element
 				      * are equal to the
-				      * @p{system_to_component_table}. It
+				      * @p system_to_component_table. It
 				      * differs only in case the
 				      * element is composed of other
 				      * elements and at least one of
@@ -1474,7 +1474,7 @@ class FiniteElementBase : public Subscriptor,
 				      * vector-valued
 				      * (i.e. non-primitive) shape
 				      * functions, in contrast to the
-				      * @p{system_to_component_table}.
+				      * @p system_to_component_table.
 				      */
     std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> >
     system_to_base_table;
@@ -1493,7 +1493,7 @@ class FiniteElementBase : public Subscriptor,
 				      * This table converts a
 				      * component number to a pair
 				      * consisting of the
-				      * @p{base_element} number, and
+				      * @p base_element number, and
 				      * the component within this base
 				      * element. While component
 				      * information contains
@@ -1535,13 +1535,13 @@ class FiniteElementBase : public Subscriptor,
 				      * functional are identified and
 				      * enter the interpolated value
 				      * only once. In this case, the
-				      * flag must be @p{false}.
+				      * flag must be @p false.
 				      *
 				      * For projections with respect
 				      * to scalar products, the child
 				      * matrices must be summed up to
 				      * build the complete matrix. The
-				      * flag should be @p{true}.
+				      * flag should be @p true.
 				      *
 				      * For examples of use of these
 				      * flags, see the places in the
@@ -1569,7 +1569,7 @@ class FiniteElementBase : public Subscriptor,
 				      * this flag in the vector-valued
 				      * case: this used to be done
 				      * with the
-				      * @p{system_to_component_index}
+				      * @p system_to_component_index
 				      * function that returns which
 				      * vector component a shape
 				      * function is associated
@@ -1612,7 +1612,7 @@ class FiniteElementBase : public Subscriptor,
 				     /**
 				      * Same for the faces. See the
 				      * description of the
-				      * @p{get_unit_face_support_points}
+				      * @p get_unit_face_support_points
 				      * function for a discussion of
 				      * what contributes a face
 				      * support point.
@@ -1637,7 +1637,7 @@ class FiniteElementBase : public Subscriptor,
 				     /**
 				      * This array holds how many
 				      * values in the respective entry
-				      * of the @p{nonzero_components}
+				      * of the @p nonzero_components
 				      * element are non-zero. The
 				      * array is thus a short-cut to
 				      * allow faster access to this
@@ -1708,8 +1708,8 @@ class FiniteElementBase : public Subscriptor,
 				      * possibility to see if these matrices
 				      * are initialized without accessing
 				      * these matrices through the
-				      * @p{get_restriction_matrix} and
-				      * @p{get_prolongation_matrix}
+				      * @p get_restriction_matrix and
+				      * @p get_prolongation_matrix
 				      * functions. This is important as these
 				      * functions include assertions that
 				      * throw if the matrices are not already

@@ -130,7 +130,7 @@ struct GeometryInfo
 				      *
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * .      2
 				      * .   3-->--2
 				      * .   |     |
@@ -138,20 +138,20 @@ struct GeometryInfo
 				      * .   |     |
 				      * .   0-->--1
 				      * .      0
-				      * @end{verbatim}
+				      * @endverbatim
 				      * Vertices and faces are indicated
 				      * with their numbers, faces also with
 				      * their directions.
 				      *
 				      * Now, when refined, the layout is
 				      * like this:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * *--*--*
 				      * | 3|2 |
 				      * *--*--*
 				      * | 0|1 |
 				      * *--*--*
-				      * @end{verbatim}
+				      * @endverbatim
 				      *
 				      * Thus, the child cells on face zero
 				      * are (ordered in the direction of the
@@ -162,7 +162,7 @@ struct GeometryInfo
 				      * the exact order of the
 				      * children is laid down in the
 				      * documentation of the
-				      * @ref{Triangulation} class.
+				      * Triangulation class.
 				      * However, it must be noted that
 				      * this class and function only
 				      * deals with faces in standard
@@ -193,12 +193,12 @@ struct GeometryInfo
 
 				     /**
 				      * Return the position of the
-				      * @p{i}th vertex on the unit
+				      * @p ith vertex on the unit
 				      * cell. The order of vertices is
 				      * the canonical one in deal.II,
 				      * as described in the
 				      * documentation of the
-				      * @ref{Triangulation} class.
+				      * Triangulation class.
 				      */
     static Point<dimension> unit_cell_vertex (const unsigned int vertex);
 
@@ -206,7 +206,7 @@ struct GeometryInfo
 				      * Report, for @p{vertex=0,1} the
 				      * indices of the two vertices
 				      * adjacent to the line with
-				      * index @p{line} among the lines
+				      * index @p line among the lines
 				      * forming this cell. In 1d, the
 				      * only line is the cell itself,
 				      * while in 2d and 3d there are 4
@@ -215,7 +215,7 @@ struct GeometryInfo
 				      * The positions of these
 				      * vertices in the unit cell can
 				      * be obtained using the
-				      * @p{unit_cell_vertex} function.
+				      * @p unit_cell_vertex function.
 				      *
 				      * The order of the lines, as
 				      * well as their direction (which
@@ -224,14 +224,14 @@ struct GeometryInfo
 				      * vertex on a line) is the
 				      * canonical one in deal.II, as
 				      * described in the documentation
-				      * of the @ref{Triangulation}
+				      * of the Triangulation
 				      * class.
 				      */
     static unsigned int vertices_adjacent_to_line (const unsigned int line,
 						   const unsigned int vertex);
 
 				     /**
-				      * Given a point @p{p} in unit
+				      * Given a point @p p in unit
 				      * coordinates, return the number
 				      * of the child cell in which it
 				      * would lie in. If the point
@@ -243,12 +243,12 @@ struct GeometryInfo
 				      *
 				      * The order of child cells is
 				      * described the documentation of
-				      * the @ref{Triangulation} class.
+				      * the Triangulation class.
 				      */
     static unsigned int child_cell_from_point (const Point<dimension> &p);
 
 				     /**
-				      * Given coordinates @p{p} on the
+				      * Given coordinates @p p on the
 				      * unit cell, return the values
 				      * of the coordinates of this
 				      * point in the coordinate system
@@ -301,9 +301,9 @@ struct GeometryInfo
  * faces.
  *
  * This class contains as static members information on vertices and
- * faces of a @p{dim}-dimensional grid cell. The interface is the same
+ * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. @p{subfaces_per_cell} in
+ * cell, it is (correctly) set to zero, e.g. @p subfaces_per_cell in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -349,7 +349,7 @@ struct GeometryInfo<0>
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
 				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p{i} is an @p{unsigned int}.
+				      * at least if @p i is an @p{unsigned int}.
 				      */
     static const unsigned int vertices_per_face = 0;
 
@@ -387,9 +387,9 @@ struct GeometryInfo<0>
  * Topological description of one dimensional cells.
  *
  * This class contains as static members information on vertices and
- * faces of a @p{dim}-dimensional grid cell. The interface is the same
+ * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. @p{subfaces_per_cell} in
+ * cell, it is (correctly) set to zero, e.g. @p subfaces_per_cell in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -435,7 +435,7 @@ struct GeometryInfo<1>
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
 				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p{i} is an @p{unsigned int}.
+				      * at least if @p i is an @p{unsigned int}.
 				      */
     static const unsigned int vertices_per_face = 1;
 
@@ -504,7 +504,7 @@ struct GeometryInfo<1>
 				      *
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * .      2
 				      * .   3-->--2
 				      * .   |     |
@@ -512,20 +512,20 @@ struct GeometryInfo<1>
 				      * .   |     |
 				      * .   0-->--1
 				      * .      0
-				      * @end{verbatim}
+				      * @endverbatim
 				      * Vertices and faces are indicated
 				      * with their numbers, faces also with
 				      * their directions.
 				      *
 				      * Now, when refined, the layout is
 				      * like this:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * *--*--*
 				      * | 3|2 |
 				      * *--*--*
 				      * | 0|1 |
 				      * *--*--*
-				      * @end{verbatim}
+				      * @endverbatim
 				      *
 				      * Thus, the child cells on face zero
 				      * are (ordered in the direction of the
@@ -536,7 +536,7 @@ struct GeometryInfo<1>
 				      * the exact order of the
 				      * children is laid down in the
 				      * documentation of the
-				      * @ref{Triangulation}
+				      * Triangulation
 				      * class. However, it must be
 				      * noted that this class and
 				      * function only deals with faces
@@ -568,12 +568,12 @@ struct GeometryInfo<1>
 
 				     /**
 				      * Return the position of the
-				      * @p{i}th vertex on the unit
+				      * @p ith vertex on the unit
 				      * cell. The order of vertices is
 				      * the canonical one in deal.II,
 				      * as described in the
 				      * documentation of the
-				      * @ref{Triangulation} class.
+				      * Triangulation class.
 				      */
     static Point<1> unit_cell_vertex (const unsigned int vertex);
 
@@ -581,7 +581,7 @@ struct GeometryInfo<1>
 				      * Report, for @p{vertex=0,1} the
 				      * indices of the two vertices
 				      * adjacent to the line with
-				      * index @p{line} among the lines
+				      * index @p line among the lines
 				      * forming this cell. In 1d, the
 				      * only line is the cell itself,
 				      * while in 2d and 3d there are 4
@@ -590,7 +590,7 @@ struct GeometryInfo<1>
 				      * The positions of these
 				      * vertices in the unit cell can
 				      * be obtained using the
-				      * @p{unit_cell_vertex} function.
+				      * @p unit_cell_vertex function.
 				      *
 				      * The order of the lines, as
 				      * well as their direction (which
@@ -599,14 +599,14 @@ struct GeometryInfo<1>
 				      * vertex on a line) is the
 				      * canonical one in deal.II, as
 				      * described in the documentation
-				      * of the @ref{Triangulation}
+				      * of the Triangulation
 				      * class.
 				      */
     static unsigned int vertices_adjacent_to_line (const unsigned int line,
 						   const unsigned int vertex);
 
 				     /**
-				      * Given a point @p{p} in unit
+				      * Given a point @p p in unit
 				      * coordinates, return the number
 				      * of the child cell in which it
 				      * would lie in. If the point
@@ -618,12 +618,12 @@ struct GeometryInfo<1>
 				      *
 				      * The order of child cells is
 				      * described the documentation of
-				      * the @ref{Triangulation} class.
+				      * the Triangulation class.
 				      */
     static unsigned int child_cell_from_point (const Point<1> &p);
 
 				     /**
-				      * Given coordinates @p{p} on the
+				      * Given coordinates @p p on the
 				      * unit cell, return the values
 				      * of the coordinates of this
 				      * point in the coordinate system
@@ -672,9 +672,9 @@ struct GeometryInfo<1>
  * Topological description of two dimensional cells.
  *
  * This class contains as static members information on vertices and
- * faces of a @p{dim}-dimensional grid cell. The interface is the same
+ * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. @p{subfaces_per_cell} in
+ * cell, it is (correctly) set to zero, e.g. @p subfaces_per_cell in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -720,7 +720,7 @@ struct GeometryInfo<2>
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
 				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p{i} is an @p{unsigned int}.
+				      * at least if @p i is an @p{unsigned int}.
 				      */
     static const unsigned int vertices_per_face = 2;
 
@@ -788,7 +788,7 @@ struct GeometryInfo<2>
 				      *
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * .      2
 				      * .   3-->--2
 				      * .   |     |
@@ -796,20 +796,20 @@ struct GeometryInfo<2>
 				      * .   |     |
 				      * .   0-->--1
 				      * .      0
-				      * @end{verbatim}
+				      * @endverbatim
 				      * Vertices and faces are indicated
 				      * with their numbers, faces also with
 				      * their directions.
 				      *
 				      * Now, when refined, the layout is
 				      * like this:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * *--*--*
 				      * | 3|2 |
 				      * *--*--*
 				      * | 0|1 |
 				      * *--*--*
-				      * @end{verbatim}
+				      * @endverbatim
 				      *
 				      * Thus, the child cells on face zero
 				      * are (ordered in the direction of the
@@ -820,7 +820,7 @@ struct GeometryInfo<2>
 				      * the exact order of the
 				      * children is laid down in the
 				      * documentation of the
-				      * @ref{Triangulation}
+				      * Triangulation
 				      * class. However, it must be
 				      * noted that this class and
 				      * function only deals with faces
@@ -853,12 +853,12 @@ struct GeometryInfo<2>
 
 				     /**
 				      * Return the position of the
-				      * @p{i}th vertex on the unit
+				      * @p ith vertex on the unit
 				      * cell. The order of vertices is
 				      * the canonical one in deal.II,
 				      * as described in the
 				      * documentation of the
-				      * @ref{Triangulation} class.
+				      * Triangulation class.
 				      */
     static Point<2> unit_cell_vertex (const unsigned int i);
 
@@ -866,7 +866,7 @@ struct GeometryInfo<2>
 				      * Report, for @p{vertex=0,1} the
 				      * indices of the two vertices
 				      * adjacent to the line with
-				      * index @p{line} among the lines
+				      * index @p line among the lines
 				      * forming this cell. In 1d, the
 				      * only line is the cell itself,
 				      * while in 2d and 3d there are 4
@@ -875,7 +875,7 @@ struct GeometryInfo<2>
 				      * The positions of these
 				      * vertices in the unit cell can
 				      * be obtained using the
-				      * @p{unit_cell_vertex} function.
+				      * @p unit_cell_vertex function.
 				      *
 				      * The order of the lines, as
 				      * well as their direction (which
@@ -884,14 +884,14 @@ struct GeometryInfo<2>
 				      * vertex on a line) is the
 				      * canonical one in deal.II, as
 				      * described in the documentation
-				      * of the @ref{Triangulation}
+				      * of the Triangulation
 				      * class.
 				      */
     static unsigned int vertices_adjacent_to_line (const unsigned int line,
 						   const unsigned int vertex);
 
 				     /**
-				      * Given a point @p{p} in unit
+				      * Given a point @p p in unit
 				      * coordinates, return the number
 				      * of the child cell in which it
 				      * would lie in. If the point
@@ -903,13 +903,13 @@ struct GeometryInfo<2>
 				      *
 				      * The order of child cells is
 				      * described the documentation of
-				      * the @ref{Triangulation} class.
+				      * the Triangulation class.
 				      */
     static unsigned int child_cell_from_point (const Point<2> &p);
 
 
 				     /**
-				      * Given coordinates @p{p} on the
+				      * Given coordinates @p p on the
 				      * unit cell, return the values
 				      * of the coordinates of this
 				      * point in the coordinate system
@@ -958,9 +958,9 @@ struct GeometryInfo<2>
  * Topological description of three dimensional cells.
  *
  * This class contains as static members information on vertices and
- * faces of a @p{dim}-dimensional grid cell. The interface is the same
+ * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. @p{subfaces_per_cell} in
+ * cell, it is (correctly) set to zero, e.g. @p subfaces_per_cell in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -1006,7 +1006,7 @@ struct GeometryInfo<3>
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
 				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p{i} is an @p{unsigned int}.
+				      * at least if @p i is an @p{unsigned int}.
 				      */
     static const unsigned int vertices_per_face = 4;
 
@@ -1074,7 +1074,7 @@ struct GeometryInfo<3>
 				      *
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * .      2
 				      * .   3-->--2
 				      * .   |     |
@@ -1082,20 +1082,20 @@ struct GeometryInfo<3>
 				      * .   |     |
 				      * .   0-->--1
 				      * .      0
-				      * @end{verbatim}
+				      * @endverbatim
 				      * Vertices and faces are indicated
 				      * with their numbers, faces also with
 				      * their directions.
 				      *
 				      * Now, when refined, the layout is
 				      * like this:
-				      * @begin{verbatim}
+				      * @verbatim
 				      * *--*--*
 				      * | 3|2 |
 				      * *--*--*
 				      * | 0|1 |
 				      * *--*--*
-				      * @end{verbatim}
+				      * @endverbatim
 				      *
 				      * Thus, the child cells on face zero
 				      * are (ordered in the direction of the
@@ -1106,7 +1106,7 @@ struct GeometryInfo<3>
 				      * the exact order of the
 				      * children is laid down in the
 				      * documentation of the
-				      * @ref{Triangulation}
+				      * Triangulation
 				      * class. However, it must be
 				      * noted that this class and
 				      * function only deals with faces
@@ -1136,12 +1136,12 @@ struct GeometryInfo<3>
 					    const unsigned int subface);
 				     /**
 				      * Return the position of the
-				      * @p{i}th vertex on the unit
+				      * @p ith vertex on the unit
 				      * cell. The order of vertices is
 				      * the canonical one in deal.II,
 				      * as described in the
 				      * documentation of the
-				      * @ref{Triangulation} class.
+				      * Triangulation class.
 				      */
     static Point<3> unit_cell_vertex (const unsigned int i);
 
@@ -1149,7 +1149,7 @@ struct GeometryInfo<3>
 				      * Report, for @p{vertex=0,1} the
 				      * indices of the two vertices
 				      * adjacent to the line with
-				      * index @p{line} among the lines
+				      * index @p line among the lines
 				      * forming this cell. In 1d, the
 				      * only line is the cell itself,
 				      * while in 2d and 3d there are 4
@@ -1158,7 +1158,7 @@ struct GeometryInfo<3>
 				      * The positions of these
 				      * vertices in the unit cell can
 				      * be obtained using the
-				      * @p{unit_cell_vertex} function.
+				      * @p unit_cell_vertex function.
 				      *
 				      * The order of the lines, as
 				      * well as their direction (which
@@ -1167,14 +1167,14 @@ struct GeometryInfo<3>
 				      * vertex on a line) is the
 				      * canonical one in deal.II, as
 				      * described in the documentation
-				      * of the @ref{Triangulation}
+				      * of the Triangulation
 				      * class.
 				      */
     static unsigned int vertices_adjacent_to_line (const unsigned int line,
 						   const unsigned int vertex);
 
 				     /**
-				      * Given a point @p{p} in unit
+				      * Given a point @p p in unit
 				      * coordinates, return the number
 				      * of the child cell in which it
 				      * would lie in. If the point
@@ -1186,13 +1186,13 @@ struct GeometryInfo<3>
 				      *
 				      * The order of child cells is
 				      * described the documentation of
-				      * the @ref{Triangulation} class.
+				      * the Triangulation class.
 				      */
     static unsigned int child_cell_from_point (const Point<3> &p);
 
 
 				     /**
-				      * Given coordinates @p{p} on the
+				      * Given coordinates @p p on the
 				      * unit cell, return the values
 				      * of the coordinates of this
 				      * point in the coordinate system
@@ -1245,9 +1245,9 @@ struct GeometryInfo<3>
  * equation timestep after timestep in a (d+1)-dimensional space).
  *
  * This class contains as static members information on vertices and
- * faces of a @p{dim}-dimensional grid cell. The interface is the same
+ * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. @p{subfaces_per_cell} in
+ * cell, it is (correctly) set to zero, e.g. @p subfaces_per_cell in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -1293,7 +1293,7 @@ struct GeometryInfo<4>
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
 				      * @p{for (i=0; i<vertices_per_face; ++i)},
-				      * at least if @p{i} is an @p{unsigned int}.
+				      * at least if @p i is an @p{unsigned int}.
 				      */
     static const unsigned int vertices_per_face = 8;
 

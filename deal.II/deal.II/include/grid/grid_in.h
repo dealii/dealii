@@ -34,7 +34,7 @@ class SubCellData;
  * format for grid data. Any numerical data after the block of
  * topological information is ignored.
  *
- * Since the coarse mesh fed into a @p{Triangulation} object cannot
+ * Since the coarse mesh fed into a @p Triangulation object cannot
  * have hanging nodes, strange things will happen if the input file
  * has them. This is due to the fact that most mesh description
  * formats do not store neighborship information between cells, so the
@@ -50,7 +50,7 @@ class SubCellData;
  *
  * Note: if you experience unexpected problems with the use of this
  * class, be sure to read the documentation right until the end, and
- * also read the documentation of the @ref{GridReordering} class.
+ * also read the documentation of the GridReordering class.
  *
  * To read grid data, the triangulation to be fed with has to be empty.
  * When giving a file which does not contain the assumed information or
@@ -64,35 +64,35 @@ class SubCellData;
  *
  * Material indicators are accepted to denote the material ID of cells and
  * to denote boundary part indication for lines in 2D. Read the according
- * sections in the documentation of the @ref{Triangulation} class for
+ * sections in the documentation of the Triangulation class for
  * further details.
  *
  *
  * @sect3{Supported input formats}
  *
  * At present, the following input formats are supported:
- * @begin{itemize}
- * @item @p{UCD} (unstructured cell data) format: this format is used
+ * <ul>
+ * <li> @p UCD (unstructured cell data) format: this format is used
  * for grid input as well as data output. If there are data vectors in
  * the input file, they are ignored, as we are only interested in the
  * grid in this class. The exact description of the format can be
  * found in the AVS Explorer manual (see @url{http://www.avs.com}).
- * The @p{UCD} format can be read by the @p{read_ucd} function.
+ * The @p UCD format can be read by the @p read_ucd function.
  *
- * @item @p{DB mesh} format: this format is used by the @p{BAMG} mesh
+ * <li> @p{DB mesh} format: this format is used by the @p BAMG mesh
  * generator (see
  * @url{http://www-rocq.inria.fr/gamma/cdrom/www/bamg/eng.htm}. The
- * documentation of the format in the @p{BAMG} manual is very
+ * documentation of the format in the @p BAMG manual is very
  * incomplete, so we don't actually parse many of the fields of the
  * output since we don't know their meaning, but the data that is read
  * is enough to build up the mesh as intended by the mesh generator.
- * This format can be read by the @p{read_dbmesh} function.
+ * This format can be read by the @p read_dbmesh function.
  *
- * @item @p{XDA} format: this is a rather simple format used by the MGF
+ * <li> @p XDA format: this is a rather simple format used by the MGF
  * code. We don't have an exact specification of the format, but the reader
  * can read in several example files. If the reader does not grok your files,
  * it should be fairly simple to extend it.
- * @end{itemize}
+ * </ul>
  *
  *
  * @sect3{Structure of input grid data. The GridReordering class}
@@ -101,32 +101,32 @@ class SubCellData;
  * list, i.e. for lines in 1d, you have to first give the vertex with
  * the lower coordinate value, then that with the higher coordinate
  * value. For quadrilaterals in two dimensions, the vertex indices in
- * the @p{quad} list have to be such that the vertices are numbered in
+ * the @p quad list have to be such that the vertices are numbered in
  * counter-clockwise sense.
  *
  * In two dimensions, another difficulty occurs, which has to do with the sense
  * of a quadrilateral. A quad consists of four lines which have a direction,
  * which is per definitionem as follows:
- * @begin{verbatim}
+ * @verbatim
  *   3-->--2
  *   |     |
  *   ^     ^
  *   |     |
  *   0-->--1
- * @end{verbatim}
+ * @endverbatim
  * Now, two adjacent cells must have a vertex numbering such that the direction
  * of the common side is the same. For example, the following two quads
- * @begin{verbatim}
+ * @verbatim
  *   3---4---5
  *   |   |   |
  *   0---1---2
- * @end{verbatim}
+ * @endverbatim
  * may be characterised by the vertex numbers @p{(0 1 4 3)} and
  * @p{(1 2 5 4)}, since the middle line would get the direction @p{1->4}
  * when viewed from both cells.  The numbering @p{(0 1 4 3)} and
  * @p{(5 4 1 2)} would not be allowed, since the left quad would give the
  * common line the direction @p{1->4}, while the right one would want
- * to use @p{4->1}, leading to an ambiguity. The @ref{Triangulation}
+ * to use @p{4->1}, leading to an ambiguity. The Triangulation
  * object is capable of detecting this special case, which can be
  * eliminated by rotating the indices of the right quad by
  * two. However, it would not know what to do if you gave the vertex
@@ -141,10 +141,10 @@ class SubCellData;
  * taken care of.
  *
  * For this reason, the @p{read_*} functions of this class that read
- * in grids in various input formats call the @ref{GridReordering}
+ * in grids in various input formats call the GridReordering
  * class to bring the order of vertices that define the cells into an
  * ordering that satisfies the requiremenets of the
- * @ref{Triangulation} class. Be sure to read the documentation of
+ * Triangulation class. Be sure to read the documentation of
  * that class if you experience unexpected problems when reading grids
  * through this class.
  *
@@ -297,7 +297,7 @@ class GridIn
 				      * what actually was created, if
 				      * it is known that the data is
 				      * not correct in some way, but
-				      * the @ref{Triangulation} class
+				      * the Triangulation class
 				      * refuses to generate a
 				      * triangulation because of these
 				      * errors. In particular, the
@@ -317,7 +317,7 @@ class GridIn
 				      * respect to neighboring cells
 				      * (see the documentations to
 				      * this class and the
-				      * @ref{GridReordering} class).
+				      * GridReordering class).
 				      *
 				      * The output of this function
 				      * consists of vectors for each

@@ -33,10 +33,10 @@ class PreconditionBlockJacobi;
 
 
 /**
- * Base class for @p{PreconditionBlockJacobi},
- * @p{PreconditionBlockSOR}, ...  This class assumes the
+ * Base class for @p PreconditionBlockJacobi,
+ * @p PreconditionBlockSOR, ...  This class assumes the
  * @p{SparseMatrix<number>} consisting of invertible blocks of
- * @p{blocksize} on the diagonal and provides the inversion of the
+ * @p blocksize on the diagonal and provides the inversion of the
  * diagonal blocks of the matrix. NOT only block diagonal matrices are
  * allowed but all matrices of arbitrary structure with the minimal
  * property of having invertible blocks on the diagonal!
@@ -47,13 +47,13 @@ class PreconditionBlockJacobi;
  * empty above the diagonal blocks.
  *
  * For all matrices that are empty above and below the diagonal blocks
- * (i.e. for all block diagonal matrices) the @p{BlockJacobi}
+ * (i.e. for all block diagonal matrices) the @p BlockJacobi
  * preconditioner is a direct solver. For all matrices that are empty
  * only above the diagonal blocks (e.g. the matrices one gets by the
- * DG method with downstream numbering) @p{BlockSOR} is a direct
+ * DG method with downstream numbering) @p BlockSOR is a direct
  * solver.
  * 
- * This first implementation of the @p{PreconditionBlock} assumes the
+ * This first implementation of the @p PreconditionBlock assumes the
  * matrix has blocks each of the same block size. Varying block sizes
  * within the matrix must still be implemented if needed.
  *
@@ -210,7 +210,7 @@ class PreconditionBlock : public virtual Subscriptor
     				     /**
 				      * Stores the inverse of the
 				      * diagonal blocks in
-				      * @p{inverse}. This costs some
+				      * @p inverse. This costs some
 				      * additional memory - for DG
 				      * methods about 1/3 (for double
 				      * inverses) or 1/6 (for float
@@ -227,7 +227,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      *
 				      * After this function is called,
 				      * the lock on the matrix given
-				      * through the @p{use_matrix}
+				      * through the @p use_matrix
 				      * function is released, i.e. you
 				      * may overwrite of delete it.
 				      * You may want to do this in
@@ -318,11 +318,11 @@ class PreconditionBlock : public virtual Subscriptor
 				      * sure that the matrix exists as
 				      * long as this class needs it,
 				      * i.e. until calling
-				      * @p{invert_diagblocks}, or (if
+				      * @p invert_diagblocks, or (if
 				      * the inverse matrices should
 				      * not be stored) until the last
 				      * call of the preconditoining
-				      * @p{vmult} function of the
+				      * @p vmult function of the
 				      * derived classes.
 				      */
     SmartPointer<const MATRIX> A;
@@ -359,8 +359,8 @@ class PreconditionBlock : public virtual Subscriptor
 
 				     /**
 				      * Storage of the original diagonal blocks.
-				      * These are only filled if @p{store_diagonals}
-				      * is @p{true}.
+				      * These are only filled if @p store_diagonals
+				      * is @p true.
 				      *
 				      * Used by the blocked SSOR method.
 				      */
@@ -377,7 +377,7 @@ class PreconditionBlock : public virtual Subscriptor
 
 /**
  * Block Jacobi preconditioning.
- * See @ref{PreconditionBlock} for requirements on the matrix.
+ * See PreconditionBlock for requirements on the matrix.
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -584,13 +584,13 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
-				      * Same as @p{vmult}, since Jacobi is symmetric.
+				      * Same as @p vmult, since Jacobi is symmetric.
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 				     /**
 				      * Execute block Jacobi
-				      * preconditioning, adding to @p{dst}.
+				      * preconditioning, adding to @p dst.
 				      *
 				      * This function will
 				      * automatically use the inverse
@@ -604,7 +604,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     void vmult_add (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
-				      * Same as @p{vmult_add}, since Jacobi is symmetric.
+				      * Same as @p vmult_add, since Jacobi is symmetric.
 				      */
     template <typename number2>
     void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
@@ -622,12 +622,12 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     
 				     /**
 				      * STL-like iterator with the
-				      * first entry of row @p{r}.
+				      * first entry of row @p r.
 				      */
     const_iterator begin (const unsigned int r) const;
 
 				     /**
-				      * Final iterator of row @p{r}.
+				      * Final iterator of row @p r.
 				      */
     const_iterator end (const unsigned int r) const;
     
@@ -637,7 +637,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				    * Actual implementation of the
 				    * preconditioner.
 				    *
-				    * Depending on @p{adding}, the
+				    * Depending on @p adding, the
 				    * result of preconditioning is
 				    * added to the destination vector.
 				    */
@@ -655,12 +655,12 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 /**
  * Block SOR preconditioning.
  *
- * The functions @p{vmult} and @p{Tvmult} execute a (transposed)
- * block-SOR step, based on the blocks in @ref{PreconditionBlock}. The
+ * The functions @p vmult and @p Tvmult execute a (transposed)
+ * block-SOR step, based on the blocks in PreconditionBlock. The
  * elements outside the diagonal blocks may be distributed
  * arbitrarily.
  *
- * See @ref{PreconditionBlock} for requirements on the matrix.
+ * See PreconditionBlock for requirements on the matrix.
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -729,10 +729,10 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * preconditioning.
 				      *
 				      * Warning: this function
-				      * performs normal @p{vmult}
+				      * performs normal @p vmult
 				      * without adding. The reason for
 				      * its existence is that
-				      * @ref{BlockMatrixArray}
+				      * BlockMatrixArray
 				      * requires the adding version by
 				      * default. On the other hand,
 				      * adding requires an additional
@@ -745,11 +745,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     void vmult_add (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
-				      * Backward application of @ref{vmult}.
+				      * Backward application of vmult().
 				      *
 				      * In the current implementation,
 				      * this is not the transpose of
-				      * @ref{vmult}. It is a
+				      * vmult(). It is a
 				      * transposed Gauss-Seidel
 				      * algorithm applied to the whole
 				      * matrix, but the diagonal
@@ -766,10 +766,10 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * preconditioning.
 				      *
 				      * Warning: this function
-				      * performs normal @p{vmult}
+				      * performs normal @p vmult
 				      * without adding. The reason for
 				      * its existence is that
-				      * @ref{BlockMatrixArray}
+				      * BlockMatrixArray
 				      * requires the adding version by
 				      * default. On the other hand,
 				      * adding requires an additional
@@ -786,7 +786,7 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * Actual implementation of the
 				      * preconditioning algorithm.
 				      *
-				      * The parameter @p{adding} does
+				      * The parameter @p adding does
 				      * not have any function, yet.
 				      */
     template <typename number2>
@@ -798,7 +798,7 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * Actual implementation of the
 				      * preconditioning algorithm.
 				      *
-				      * The parameter @p{adding} does
+				      * The parameter @p adding does
 				      * not have any function, yet.
 				      */
     template <typename number2>
@@ -812,11 +812,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 /**
  * Block SSOR preconditioning.
  *
- * The functions @p{vmult} and @p{Tvmult} execute a block-SSOR step,
- * based on the implementation in @ref{PreconditionBlockSOR}.  This
+ * The functions @p vmult and @p Tvmult execute a block-SSOR step,
+ * based on the implementation in PreconditionBlockSOR.  This
  * class requires storage of the diagonal blocks and their inverses.
  *
- * See @ref{PreconditionBlock} for requirements on the matrix.
+ * See PreconditionBlock for requirements on the matrix.
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -881,7 +881,7 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
-				      * Same as @ref{vmult}
+				      * Same as vmult()
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;

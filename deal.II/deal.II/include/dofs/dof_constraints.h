@@ -47,8 +47,8 @@ class BlockIndices;
  *
  * The matrix is organized in lines (rows), but only those lines are stored
  * where constraints are present. New constraints are added by adding new
- * lines using the @ref{add_line} function, and then populating it using the
- * @ref{add_entry} function to a given line, or @ref{add_entries} to add more
+ * lines using the add_line() function, and then populating it using the
+ * add_entry() function to a given line, or add_entries() to add more
  * than one entry at a time. After all constraints have been added, you need
  * to call @ref{close()}, which compresses the storage format and sorts the
  * entries.
@@ -78,14 +78,14 @@ class BlockIndices;
  * 
  * Condensation of a matrix is done in four steps: first one builds the
  * sparsity pattern (e.g. using
- * @ref{DoFHandler}@p{::create_sparsity_pattern}); then the sparsity pattern
+ * DoFHandler@p ::create_sparsity_pattern); then the sparsity pattern
  * of the condensed matrix is made out of the original sparsity pattern and
  * the constraints; third, the global matrix is assembled; and fourth, the
  * matrix is finally condensed. To do these steps, you have (at least) two
  * possibilities:
  * 
- * @begin{itemize}
- * @item Use two different sparsity patterns and two different matrices: you
+ * <ul>
+ * <li> Use two different sparsity patterns and two different matrices: you
  *   may eliminate the lines and rows connected with a constraint and create
  *   a totally new sparsity pattern and a new system matrix. This has the
  *   advantage that the resulting system of equations is smaller and free from
@@ -96,7 +96,7 @@ class BlockIndices;
  *   expensive, since <em>all</em> entries of the matrix have to be copied, not only
  *   those which are subject to constraints.
  *
- * @item Use only one sparsity pattern and one matrix: doing it this way, the
+ * <li> Use only one sparsity pattern and one matrix: doing it this way, the
  *   condense functions add nonzero entries to the sparsity pattern of the large
  *   matrix (with constrained nodes in it) where the condensation process of the
  *   matrix will create additional nonzero elements. In the condensation process
@@ -122,22 +122,22 @@ class BlockIndices;
  *   consumption for those iterative solution methods using a larger number of
  *   auxiliary vectors (e.g. methods using explicit orthogonalization
  *   procedures).
- * @end{itemize}
+ * </ul>
  *
  * Usually, the second way is chosen since memory consumption upon
  * construction of a second matrix rules out the first
  * possibility. Furthermore, all example programs use this method, and we
  * recommend that you use it instead of the first way.
  *
- * This class provides two sets of @p{condense} functions: those taking two
+ * This class provides two sets of @p condense functions: those taking two
  * arguments refer to the first possibility above, those taking only one do
  * their job in-place and refer to the second possibility.
  *
  * The condensation functions exist for different argument types. The in-place
  * functions (i.e. those following the second way) exist for arguments of type
- * @ref{SparsityPattern}, @ref{SparseMatrix} and @ref{BlockSparseMatrix}. Note
+ * SparsityPattern, SparseMatrix and BlockSparseMatrix. Note
  * that there are no versions for arguments of type
- * @ref{PETScWrappers::SparseMatrix} or any of the other PETSc matrix wrapper
+ * PETScWrappers::SparseMatrix() or any of the other PETSc matrix wrapper
  * classes. This is due to the fact that it is relatively hard to get a
  * representation of the sparsity structure of PETSc matrices, and to modify
  * them; this holds in particular, if the matrix is actually distributed
@@ -183,7 +183,7 @@ class BlockIndices;
  * @sect3{Distributing constraints}
  * 
  * After solving the condensed system of equations, the solution vector has to
- * be redistributed. This is done by the two @p{distribute} function, one
+ * be redistributed. This is done by the two @p distribute function, one
  * working with two vectors, one working in-place. The operation of
  * distribution undoes the condensation process in some sense, but it should
  * be noted that it is not the inverse operation. Basically, distribution sets
@@ -281,7 +281,7 @@ class ConstraintMatrix : public Subscriptor
 				      * this object. Both objects may
 				      * or may not be closed (by
 				      * having their function
-				      * @p{close} called before), if
+				      * @p close called before), if
 				      * this object was closed before,
 				      * then it will be closed
 				      * afterwards as well. Note,
@@ -303,10 +303,10 @@ class ConstraintMatrix : public Subscriptor
 				      * an exception is thrown.
 				      *
 				      * However, the following is
-				      * possible: if DoF @p{x} is
-				      * constrained to dofs @p{x_i}
-				      * for some set of indices @p{i},
-				      * then the DoFs @p{x_i} may be
+				      * possible: if DoF @p x is
+				      * constrained to dofs @p x_i
+				      * for some set of indices @p i,
+				      * then the DoFs @p x_i may be
 				      * further constrained by the
 				      * constraints object given as
 				      * argument, although not to
@@ -314,7 +314,7 @@ class ConstraintMatrix : public Subscriptor
 				      * constrained in either of the
 				      * two objects. Note that it is
 				      * not possible that the DoFs
-				      * @p{x_i} are constrained within
+				      * @p x_i are constrained within
 				      * the present object.
 				      *
 				      * Because of simplicity of
@@ -363,13 +363,13 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Shift all entries of this
-				      * matrix down @p{offset} rows
-				      * and over @p{offset} columns.
+				      * matrix down @p offset rows
+				      * and over @p offset columns.
 				      *
 				      * This function is useful if you
 				      * are building block matrices,
 				      * where all blocks are built by
-				      * the same @p{DoFHandler}
+				      * the same @p DoFHandler
 				      * object, i.e. the matrix size
 				      * is larger than the number of
 				      * degrees of freedom. Since
@@ -378,7 +378,7 @@ class ConstraintMatrix : public Subscriptor
 				      * degrees of freedom, you'd
 				      * generate several constraint
 				      * objects, then shift them, and
-				      * finally @p{merge} them
+				      * finally @p merge them
 				      * together again.
 				      */
     void shift (const unsigned int offset);
@@ -402,17 +402,17 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Return whether the degree of
-				      * freedom with number @p{index} is
+				      * freedom with number @p index is
 				      * a constrained one.
 				      *
-				      * Note that if @p{close} was
+				      * Note that if @p close was
 				      * called before, then this
 				      * function is significantly
 				      * faster, since then the
 				      * constrained degrees of freedom
 				      * are sorted and we can do a
 				      * binary search, while before
-				      * @p{close} was called, we have to
+				      * @p close was called, we have to
 				      * perform a linear search
 				      * through all entries.
 				      */
@@ -429,7 +429,7 @@ class ConstraintMatrix : public Subscriptor
 				      * eliminated in favor of exactly
 				      * one other degree of freedom.
 				      *
-				      * The function returns @p{false}
+				      * The function returns @p false
 				      * if either the degree of
 				      * freedom is not constrained at
 				      * all, or if it is constrained
@@ -448,7 +448,7 @@ class ConstraintMatrix : public Subscriptor
 				      * in 2d a hanging node is
 				      * constrained only to its two
 				      * neighbors, so the returned
-				      * value would be @p{2}. However,
+				      * value would be @p 2. However,
 				      * for higher order elements
 				      * and/or higher dimensions, or
 				      * other types of constraints,
@@ -530,7 +530,7 @@ class ConstraintMatrix : public Subscriptor
 				      * matrix struct should be condensed and
 				      * compressed. It is the user's
 				      * responsibility to guarantee that all
-				      * entries in the @p{condensed} matrix be
+				      * entries in the @p condensed matrix be
 				      * zero!
 				      *
 				      * The constraint matrix object must be
@@ -560,15 +560,15 @@ class ConstraintMatrix : public Subscriptor
     
 				     /**
 				      * Condense the given vector
-				      * @p{uncondensed} into @p{condensed}. It
+				      * @p uncondensed into @p condensed. It
 				      * is the user's responsibility to
 				      * guarantee that all entries of
-				      * @p{condensed} be zero.
+				      * @p condensed be zero.
 				      *
-				      * The @p{VectorType} may be a
-				      * @ref{Vector}@p{<float>},
-				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * The @p VectorType may be a
+				      * Vector@p{<float>},
+				      * Vector@p{<double>},
+				      * BlockVector@p{<...>}, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -578,10 +578,10 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Condense the given vector
-				      * in-place. The @p{VectorType} may be a
-				      * @ref{Vector}@p{<float>},
-				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * in-place. The @p VectorType may be a
+				      * Vector@p{<float>},
+				      * Vector@p{<double>},
+				      * BlockVector@p{<...>}, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -590,22 +590,22 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Re-distribute the elements of
-				      * the vector @p{condensed} to
-				      * @p{uncondensed}. It is the
+				      * the vector @p condensed to
+				      * @p uncondensed. It is the
 				      * user's responsibility to
 				      * guarantee that all entries of
-				      * @p{uncondensed} be zero!
+				      * @p uncondensed be zero!
 				      *
 				      * This function undoes the
-				      * action of @p{condense} somehow,
+				      * action of @p condense somehow,
 				      * but it should be noted that it
 				      * is not the inverse of
-				      * @p{condense}.
+				      * @p condense.
 				      *
-				      * The @p{VectorType} may be a
-				      * @ref{Vector}@p{<float>},
-				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * The @p VectorType may be a
+				      * Vector@p{<float>},
+				      * Vector@p{<double>},
+				      * BlockVector@p{<...>}, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -615,10 +615,10 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Re-distribute the elements of the
-				      * vector in-place. The @p{VectorType}
-				      * may be a @ref{Vector}@p{<float>},
-				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * vector in-place. The @p VectorType
+				      * may be a Vector@p{<float>},
+				      * Vector@p{<double>},
+				      * BlockVector@p{<...>}, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -628,10 +628,10 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Delete hanging nodes in a vector.
 				      * Sets all hanging node values to
-				      * zero. The @p{VectorType} may be a
-				      * @ref{Vector}@p{<float>},
-				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * zero. The @p VectorType may be a
+				      * Vector@p{<float>},
+				      * Vector@p{<double>},
+				      * BlockVector@p{<...>}, a PETSc
 				      * vector wrapper class, or any other
 				      * type having the same interface.
 				      */
@@ -844,7 +844,7 @@ class ConstraintMatrix : public Subscriptor
 					  * For the reason why we use a vector
 					  * instead of a map and the consequences
 					  * thereof, the same applies as what is
-					  * said for @ref{ConstraintMatrix}@p{::lines}.
+					  * said for ConstraintMatrix@p ::lines.
 					  */
 	std::vector<std::pair<unsigned int,double> > entries;
 
@@ -910,7 +910,7 @@ class ConstraintMatrix : public Subscriptor
     bool sorted;
 
 				     /**
-				      * Return @p{true} if the weight
+				      * Return @p true if the weight
 				      * of an entry (the second
 				      * element of the pair) equals
 				      * zero. This function is used to

@@ -27,9 +27,9 @@ template <int dim> class DoFHandler;
  * This class generates output in the full domain of computations that
  * were done using rotational symmetry of domain and solution. In
  * particular, if a computation of a three dimensional problem with
- * rotational symmetry around the @p{z}-axis (i.e. in the
- * @p{r-z}-plane) was done, then this class can be used to generate
- * the output in the original @p{x-y-z} space. In order to do so, it
+ * rotational symmetry around the @p z-axis (i.e. in the
+ * @p r-z-plane) was done, then this class can be used to generate
+ * the output in the original @p x-y-z space. In order to do so, it
  * generates from each cell in the computational mesh a cell in the
  * space with dimension one greater than that of the DoFHandler
  * object. The resulting output will then consist of hexahedra forming
@@ -37,16 +37,16 @@ template <int dim> class DoFHandler;
  * graphical programs can not represent ring-like structures, the
  * angular (rotation) variable is discretized into a finite number of
  * intervals as well; the number of these intervals must be given to
- * the @p{build_patches} function. It is noted, however, that while
+ * the @p build_patches function. It is noted, however, that while
  * this function generates nice pictures of the whole domain, it often
  * produces <em>very</em> large output files.
  *
  *
  * @sect3{Interface}
  *
- * The interface of this class is copied from the @ref{DataOut}
+ * The interface of this class is copied from the DataOut
  * class. Furthermore, they share the common parent class
- * @ref{DataOut_DoFData}. See the reference of these two classes for a
+ * DataOut_DoFData(). See the reference of these two classes for a
  * discussion of the interface and how to extend it by deriving
  * further classes from this class.
  *
@@ -54,7 +54,7 @@ template <int dim> class DoFHandler;
  * @sect3{Details for 1d computations}
  *
  * The one coordinate in the triangulation used by the
- * @ref{DoFHandler} object passed to this class is taken as the radial
+ * DoFHandler object passed to this class is taken as the radial
  * variable, and the output will then be either a circle or a ring
  * domain. It is in the user's responsibility to assure that the
  * radial coordinate only attains non-negative values.
@@ -62,12 +62,12 @@ template <int dim> class DoFHandler;
  *
  * @sect3{Details for 2d computations}
  *
- * We consider the computation (represented by the @ref{DoFHandler}
+ * We consider the computation (represented by the DoFHandler
  * object that is attached to this class) to have happened in the
- * @p{r-z}-plane, where @p{r} is the radial variable and @p{z} denotes
+ * @p r-z-plane, where @p r is the radial variable and @p z denotes
  * the axis of revolution around which the solution is symmetric. The
- * output is in @p{x-y-z} space, where the radial dependence is
- * transformed to the @p{x-y} plane. At present, it is not possible to
+ * output is in @p x-y-z space, where the radial dependence is
+ * transformed to the @p x-y plane. At present, it is not possible to
  * exchange the meaning of the first and second variable of the plane
  * in which the simulation was made, i.e. generate output from a
  * simulation where the first variable denoted the symmetry axis, and
@@ -96,7 +96,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 				      * In addition to the same
 				      * parameters as found in the
 				      * respective function of the
-				      * @ref{DataOut} class, the first
+				      * DataOut class, the first
 				      * parameter denotes into how
 				      * many intervals the angular
 				      * (rotation) variable is to be
@@ -127,7 +127,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
     first_cell ();
     
 				     /**
-				      * Return the next cell after @p{cell} which
+				      * Return the next cell after @p cell which
 				      * we want output for.
 				      * If there are no more cells,
 				      * @p{dofs->end()} shall be returned.
@@ -138,8 +138,8 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 				      * to return other cells in a derived
 				      * class. Note that the default
 				      * implementation assumes that
-				      * the given @p{cell} is active, which
-				      * is guaranteed as long as @p{first_cell}
+				      * the given @p cell is active, which
+				      * is guaranteed as long as @p first_cell
 				      * is also used from the default
 				      * implementation. Overloading only one
 				      * of the two functions might not be
@@ -185,7 +185,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 	  {}
     };
 				     /**
-				      * Builds every @p{n_threads}'s
+				      * Builds every @p n_threads's
 				      * patch. This function may be
 				      * called in parallel.
 				      * If multithreading is not

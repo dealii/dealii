@@ -599,7 +599,7 @@ namespace internal
  * A vector composed of several blocks each representing a vector of
  * its own.
  *
- * The BlockVector is a collection of normal LAC-@ref{Vector}s. Each of
+ * The BlockVector is a collection of normal LAC-Vectors. Each of
  * the vectors inside can have a different size. The special case of a
  * block vector with constant block size is supported by constructor
  * and reinit() functions.
@@ -969,7 +969,7 @@ class BlockVector
 				      */
     bool all_zero () const;
                                      /**
-                                      * Return @p{true} if the vector has no
+                                      * Return @p true if the vector has no
                                       * negative entries, i.e. all entries are
                                       * zero or positive. This function is
                                       * used, for example, to check whether

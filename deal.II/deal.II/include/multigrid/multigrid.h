@@ -40,7 +40,7 @@
  * meet on conferences seem to deny this.
  *
  * The function actually performing a multi-level cycle,
- * @p{level_mgstep}, as well as the function @p{vcycle}, calling it,
+ * @p level_mgstep, as well as the function @p vcycle, calling it,
  * require several helper classes handed over as template parameters.
  * These classes have to meet the following requirements:
  *
@@ -77,15 +77,15 @@ class Multigrid : public Subscriptor
   
 				     /**
 				      * Constructor. The
-				      * @p{MGDoFHandler} is used to
+				      * @p MGDoFHandler is used to
 				      * determine the highest possible
-				      * level. @p{transfer} is an
+				      * level. @p transfer is an
 				      * object performing prolongation
 				      * and restriction.
 				      *
 				      * The V-cycle will start on
-				      * level @p{maxlevel} and goes
-				      * down to level @p{minlevel},
+				      * level @p maxlevel and goes
+				      * down to level @p minlevel,
 				      * where the coarse grid solver
 				      * will be used.
 				      *
@@ -110,7 +110,7 @@ class Multigrid : public Subscriptor
 
 				     /**
 				      * Reinit this class according to
-				      * @p{minlevel} and @p{maxlevel}.
+				      * @p minlevel and @p maxlevel.
 				      */
     void reinit (const unsigned int minlevel,
 		 const unsigned int maxlevel);
@@ -119,21 +119,21 @@ class Multigrid : public Subscriptor
 				      * Execute one step of the
 				      * v-cycle algorithm.  This
 				      * function assumes, that the
-				      * vector @p{defect} is properly
+				      * vector @p defect is properly
 				      * filled with the residual in
 				      * the outer defect correction
 				      * scheme (usually performed by
-				      * @ref{PreconditionMG}). After
+				      * PreconditionMG). After
 				      * execution of @p{vcycle()}, the
 				      * result is in the vector
-				      * @p{solution}. See
+				      * @p solution. See
 				      * @p{copy_*_mg} in class
-				      * @p{MGTools} if you want to use
+				      * @p MGTools if you want to use
 				      * these vectors yourself.
 				      *
 				      * The actual work for this
 				      * function is done in
-				      * @p{level_mgstep}.
+				      * @p level_mgstep.
 				      */
     void vcycle();
 
@@ -149,13 +149,13 @@ class Multigrid : public Subscriptor
     
 				     /**
 				      * The actual v-cycle multigrid method.
-				      * @p{level} is the level the
+				      * @p level is the level the
 				      * function should work on. It
 				      * will usually be called for the
 				      * highest level from outside,
 				      * but will then call itself
-				      * recursively for @p{level-1},
-				      * unless we are on @p{minlevel}
+				      * recursively for @p level-1,
+				      * unless we are on @p minlevel
 				      * where instead of recursing
 				      * deeper, the coarse grid solver
 				      * is used to solve the matrix of
@@ -244,10 +244,10 @@ class Multigrid : public Subscriptor
  * Here, we collect all information needed for multi-level preconditioning
  * and provide the standard interface for LAC iterative methods.
  *
- * The template parameter class @p{MG} is required to inherit @p{MGBase}.
+ * The template parameter class @p MG is required to inherit @p MGBase.
  * Furthermore, it needs functions @p{void copy_to_mg(const VECTOR&)}
- * to store @p{src} in the right hand side of the multi-level method and
- * @p{void copy_from_mg(VECTOR&)} to store the result of the v-cycle in @p{dst}.
+ * to store @p src in the right hand side of the multi-level method and
+ * @p{void copy_from_mg(VECTOR&)} to store the result of the v-cycle in @p dst.
  *
  * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */
@@ -272,8 +272,8 @@ class PreconditionMG : public Subscriptor
     
 				     /**
 				      * Preconditioning operator.
-				      * Calls the @p{vcycle} function
-				      * of the @p{MG} object passed to
+				      * Calls the @p vcycle function
+				      * of the @p MG object passed to
 				      * the constructor.
 				      *
 				      * This is the operator used by
@@ -285,8 +285,8 @@ class PreconditionMG : public Subscriptor
     
 				     /**
 				      * Preconditioning operator.
-				      * Calls the @p{vcycle} function
-				      * of the @p{MG} object passed to
+				      * Calls the @p vcycle function
+				      * of the @p MG object passed to
 				      * the constructor.
 				      */
     template<class VECTOR2>
@@ -315,7 +315,7 @@ class PreconditionMG : public Subscriptor
     
   private:
 				     /**
-				      * Associated @p{MGDoFHandler}.
+				      * Associated @p MGDoFHandler.
 				      */
     SmartPointer<const MGDoFHandler<dim> > mg_dof_handler;
 

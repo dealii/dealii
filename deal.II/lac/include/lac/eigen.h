@@ -86,13 +86,13 @@ class EigenPower : private Solver<VECTOR>
     virtual ~EigenPower ();
 
 				     /**
-				      * Power method. @p{x} is the
+				      * Power method. @p x is the
 				      * (not necessarily normalized,
 				      * but nonzero) start vector for
 				      * the power method. After the
-				      * iteration, @p{value} is the
+				      * iteration, @p value is the
 				      * approximated eigenvalue and
-				      * @p{x} is the corresponding
+				      * @p x is the corresponding
 				      * eigenvector, normalized with
 				      * respect to the l2-norm.
 				      */
@@ -119,17 +119,17 @@ class EigenPower : private Solver<VECTOR>
  * norm of the residual $A x - l x$ is computed. Since this might not
  * converge to zero for non-symmetric matrices with non-trivial Jordan
  * blocks, it can be replaced by checking the difference of successive
- * eigenvalues. Use @p{AdditionalData::use_residual} for switching
+ * eigenvalues. Use @p AdditionalData::use_residual for switching
  * this option.
  *
  * Usually, the initial guess entering this method is updated after
  * each step, replacing it with the new approximation of the
- * eigenvalue. Using a parameter @p{AdditionalData::relaxation}
+ * eigenvalue. Using a parameter @p AdditionalData::relaxation
  * between 0 and 1, this update can be damped. With relaxation
  * parameter 0, no update is performed. This damping allows for slower
  * adaption of the shift value to make sure that the method converges
  * to the eigenvalue closest to the initial guess. This can be aided
- * by the parameter @p{AdditionalData::start_adaption}, which
+ * by the parameter @p AdditionalData::start_adaption, which
  * indicates the first iteration step in which the shift value should
  * be adapted.
  *
@@ -188,15 +188,15 @@ class EigenInverse : private Solver<VECTOR>
     virtual ~EigenInverse ();
 
 				     /**
-				      * Inverse method. @p{value} is
+				      * Inverse method. @p value is
 				      * the start guess for the
-				      * eigenvalue and @p{x} is the
+				      * eigenvalue and @p x is the
 				      * (not necessarily normalized,
 				      * but nonzero) start vector for
 				      * the power method. After the
-				      * iteration, @p{value} is the
+				      * iteration, @p value is the
 				      * approximated eigenvalue and
-				      * @p{x} is the corresponding
+				      * @p x is the corresponding
 				      * eigenvector, normalized with
 				      * respect to the l2-norm.
 				      */

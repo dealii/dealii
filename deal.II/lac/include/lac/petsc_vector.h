@@ -53,7 +53,7 @@ namespace PETScWrappers
       
                                        /**
                                         * Constructor. Set dimension to
-                                        * @p{n} and initialize all
+                                        * @p n and initialize all
                                         * elements with zero.
                                         *
                                         * The constructor is made explicit to
@@ -111,7 +111,7 @@ namespace PETScWrappers
 
                                        /**
                                         * Set all components of the vector to
-                                        * the given number @p{s}. Simply pass
+                                        * the given number @p s. Simply pass
                                         * this down to the base class, but we
                                         * still need to declare this function
                                         * to make the example given in the
@@ -164,7 +164,7 @@ namespace PETScWrappers
 
     protected:
                                        /**
-                                        * Create a vector of length @p{n}. For
+                                        * Create a vector of length @p n. For
                                         * this class, we create a sequential
                                         * vector. @p n denotes the total
                                         * size of the vector to be

@@ -25,33 +25,33 @@ template <int dim> class DoFHandler;
 
 /**
  * This class generates output from faces of a triangulation rather
- * than from cells, as do for example the @ref{DataOut} and
- * @ref{DataOut_Rotation} classes. It might be used to generate output
+ * than from cells, as do for example the DataOut and
+ * DataOut_Rotation() classes. It might be used to generate output
  * only for the surface of the triangulation (this is the default of
  * this class), or for another arbitrary set of faces. The output of
  * this class is a set of patches (as defined by the class
- * @ref{DataOutBase::Patch}), one for each face for which output is to
+ * DataOutBase::Patch()), one for each face for which output is to
  * be generated. These patches can then be written in several
  * graphical data formats by the functions of the underlying classes.
  *
  * @sect3{Interface}
  *
- * The interface of this class is copied from the @ref{DataOut}
+ * The interface of this class is copied from the DataOut
  * class. Furthermore, they share the common parent class
- * @ref{DataOut_DoFData}. See the reference of these two classes for a
+ * DataOut_DoFData(). See the reference of these two classes for a
  * discussion of the interface.
  *
  *
  * @sect3{Extending this class}
  *
  * The sequence of faces to generate patches from is generated in the
- * same way as in the @ref{DataOut} class, see there for a description
+ * same way as in the DataOut class, see there for a description
  * of the respective interface. For obvious reasons, the functions
  * generating the sequence of faces which shall be used to generate
- * output, are called @p{first_face} and @p{next_face} in this class,
- * rather than @p{first_cell} and @p{next_cell}.
+ * output, are called @p first_face and @p next_face in this class,
+ * rather than @p first_cell and @p next_cell.
  *
- * Since we need to initialize objects of type @ref{FEValues} with the
+ * Since we need to initialize objects of type FEValues with the
  * faces generated from these functions, it is not sufficient that
  * they only return face iterators. Rather, we need a pair of cell and
  * the number of the face, as the values of finite element fields need
@@ -59,10 +59,10 @@ template <int dim> class DoFHandler;
  * elements, where the value of the finite element field depend on the
  * direction from which you approach a face, thus it is necessary to
  * use a pair of cell and face, rather than only a face
- * iterator). Therefore, this class defines a @p{typedef} which
- * creates a type @p{FaceDescriptor} that is an abbreviation for a
- * pair of cell iterator and face number. The functions @p{first_face}
- * and @p{next_face} operate on objects of this type.
+ * iterator). Therefore, this class defines a @p typedef which
+ * creates a type @p FaceDescriptor that is an abbreviation for a
+ * pair of cell iterator and face number. The functions @p first_face
+ * and @p next_face operate on objects of this type.
  *
  * Extending this class might, for example, be useful if you only want
  * output from certain portions of the boundary, e.g. as indicated by
@@ -109,10 +109,10 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * generate output for. The usual
 				      * way would, of course, be to
 				      * use an object of type
-				      * @ref{DoFHandler}@p{<dim>::fec_iterator},
+				      * DoFHandler@p{<dim>::fec_iterator},
 				      * but since we have to describe
 				      * faces to objects of type
-				      * @ref{FEValues}, we can only
+				      * FEValues, we can only
 				      * represent faces by pairs of a
 				      * cell and the number of the
 				      * face. This pair is here
@@ -135,7 +135,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
     
 				     /**
 				      * Return the next face after
-				      * @p{face} which we want output
+				      * @p face which we want output
 				      * for.  If there are no more
 				      * face, @p{dofs->end()} shall be
 				      * returned as the first
@@ -147,9 +147,9 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * want to return other faces in
 				      * a derived class. Note that the
 				      * default implementation assumes
-				      * that the given @p{face} is
+				      * that the given @p face is
 				      * active, which is guaranteed as
-				      * long as @p{first_face} is also
+				      * long as @p first_face is also
 				      * used from the default
 				      * implementation. Overloading
 				      * only one of the two functions
@@ -192,7 +192,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 	  {}
     };
 				     /**
-				      * Builds every @p{n_threads}'s
+				      * Builds every @p n_threads's
 				      * patch. This function may be
 				      * called in parallel.
 				      * If multithreading is not

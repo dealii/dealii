@@ -30,8 +30,8 @@ template <typename number> class SparseMatrix;
 
 /**
  * This class acts as an intermediate form of the
- * @ref{SparsityPattern} class. From the interface it mostly
- * represents a @ref{SparsityPattern} object that is kept compressed
+ * SparsityPattern class. From the interface it mostly
+ * represents a SparsityPattern object that is kept compressed
  * at all times. However, since the final sparsity pattern is not
  * known while constructing it, keeping the pattern compressed at all
  * times can only be achieved at the expense of either increased
@@ -40,7 +40,7 @@ template <typename number> class SparseMatrix;
  * it memory conservative, but the chosen data format is too unsuited
  * to be used for actual matrices. It is therefore necessary to first
  * copy the data of this object over to an object of type
- * @ref{SparsityPattern} before using it in actual matrices.
+ * SparsityPattern before using it in actual matrices.
  *
  * Another viewpoint is that this class does not need up front
  * allocation of a certain amount of memory, but grows as necessary.
@@ -52,16 +52,16 @@ template <typename number> class SparseMatrix;
  * first have to provide an empty sparsity pattern object with a fixed
  * maximal number of entries per row. To find out about this maximal
  * row length, one usually calls the function
- * @ref{DoFHandler}@p{::max_couplings_per_dof} which returns an
+ * DoFHandler@p ::max_couplings_per_dof which returns an
  * estimate for that quantity. While this estimate is usually quite
  * good in 2d and exact in 1d, it is often significantly too large in
  * 3d and especially for higher order elements. Furthermore, normally
  * only a small fraction of the rows of a matrix will end up having
  * the maximal number of nonzero entries per row (usually those nodes
  * adjacent to hanging nodes), most have much less. In effect, the
- * empty @ref{SparsityPattern} object has allocated much too much
+ * empty SparsityPattern object has allocated much too much
  * memory. Although this unnecessarily allocated memory is later freed
- * when @ref{SparsityPattern}@p{::compress} is called, this
+ * when SparsityPattern@p ::compress is called, this
  * overallocation has, with higher order elements and in 3d, sometimes
  * been so large that the program aborted due to lack of memory.
  *
@@ -70,21 +70,21 @@ template <typename number> class SparseMatrix;
  * but store a set of column indices indicating possible nonzero
  * entries in the sparsity pattern for each row. This is very much
  * like the final "compressed" format used in the
- * @ref{SparsityPattern} object after compression, but uses a less
+ * SparsityPattern object after compression, but uses a less
  * compact memory storage format, since the exact number of entries
  * per row is only known a posteriori and since it may change (for the
- * @ref{SparsityPattern} class, no more changes are allowed after
+ * SparsityPattern class, no more changes are allowed after
  * compressing it). We can therefore not store all the column indices
  * in a big array, but have to use a vector of sets. This can later be
- * used to actually initialize a @ref{SparsityPattern} object with the
+ * used to actually initialize a SparsityPattern object with the
  * then final set of necessary indices.
  *
  *
  * @sect3{Interface}
  *
  * Since this class is intended as an intermediate replacement of the
- * @ref{SparsityPattern} class, it has mostly the same interface, with
- * small changes where necessary. In particular, the @ref{add}
+ * SparsityPattern class, it has mostly the same interface, with
+ * small changes where necessary. In particular, the add()
  * function, and the functions inquiring properties of the sparsity
  * pattern are the same.
  *
@@ -92,7 +92,7 @@ template <typename number> class SparseMatrix;
  * @sect3{Usage}
  *
  * Use this class as follows:
- * @begin{verbatim}
+ * @verbatim
  * CompressedSparsityPattern compressed_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
  *                                  compressed_pattern);
@@ -100,7 +100,7 @@ template <typename number> class SparseMatrix;
  *
  * SparsityPattern sp;
  * sp.copy_from (compressed_pattern);
- * @end{verbatim}
+ * @endverbatim
  *
  *
  * @author Wolfgang Bangerth, 2001
@@ -116,7 +116,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p{reinit} function.
+				      * the @p reinit function.
 				      */
     CompressedSparsityPattern ();
     
@@ -132,7 +132,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * on classes like this, e.g. to write
 				      * such statements like
 				      * @p{v.push_back (CompressedSparsityPattern());},
-				      * with @p{v} a vector of @p{CompressedSparsityPattern}
+				      * with @p v a vector of @p CompressedSparsityPattern
 				      * objects.
 				      *
 				      * Usually, it is sufficient to
@@ -151,15 +151,15 @@ class CompressedSparsityPattern : public Subscriptor
 
 				     /**
 				      * Initialize a rectangular
-				      * matrix with @p{m} rows and
-				      * @p{n} columns.
+				      * matrix with @p m rows and
+				      * @p n columns.
 				      */
     CompressedSparsityPattern (const unsigned int m,
 			       const unsigned int n);
     
 				     /**
 				      * Initialize a square matrix of
-				      * dimension @p{n}.
+				      * dimension @p n.
 				      */
     CompressedSparsityPattern (const unsigned int n);
 
@@ -176,9 +176,9 @@ class CompressedSparsityPattern : public Subscriptor
 				     /**
 				      * Reallocate memory and set up
 				      * data structures for a new
-				      * matrix with @p{m} rows and
-				      * @p{n} columns, with at most
-				      * @p{max_per_row} nonzero
+				      * matrix with @p m rows and
+				      * @p n columns, with at most
+				      * @p max_per_row nonzero
 				      * entries per row.
 				      */
     void reinit (const unsigned int m,
@@ -191,7 +191,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * but is declared to make the
 				      * interface of this class as
 				      * much alike as that of the
-				      * @ref{SparsityPattern} class.
+				      * SparsityPattern class.
 				      */
     void compress ();
     
@@ -242,7 +242,7 @@ class CompressedSparsityPattern : public Subscriptor
     
 				     /**
 				      * Print the sparsity of the matrix
-				      * in a format that @p{gnuplot} understands
+				      * in a format that @p gnuplot understands
 				      * and which can be used to plot the
 				      * sparsity pattern in a graphical
 				      * way. The format consists of pairs
@@ -262,7 +262,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * Print the sparsity pattern in
 				      * gnuplot by setting the data style
 				      * to dots or points and use the
-				      * @p{plot} command.
+				      * @p plot command.
 				      */
     void print_gnuplot (std::ostream &out) const;
 
@@ -288,7 +288,7 @@ class CompressedSparsityPattern : public Subscriptor
 				     /**
 				      * Access to column number field.
 				      * Return the column number of
-				      * the @p{index}th entry in @p{row}.
+				      * the @p indexth entry in @p row.
 				      */
     unsigned int column_number (const unsigned int row,
 				const unsigned int index) const;

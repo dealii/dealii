@@ -93,7 +93,7 @@ class GridTools
 				      * Shift each vertex of the
 				      * triangulation by the given
 				      * shift vector. This function
-				      * uses the @ref{transform}
+				      * uses the transform()
 				      * function above, so the
 				      * requirements on the
 				      * triangulation stated there
@@ -115,7 +115,7 @@ class GridTools
 				      * system by the given angle
 				      * (given in radians, rather than
 				      * degrees). This function uses
-				      * the @ref{transform} function
+				      * the transform() function
 				      * above, so the requirements on
 				      * the triangulation stated there
 				      * hold for this function as
@@ -133,7 +133,7 @@ class GridTools
 				      * must be positive.
 				      *
 				      * This function uses the
-				      * @ref{transform} function
+				      * transform() function
 				      * above, so the requirements on
 				      * the triangulation stated there
 				      * hold for this function as
@@ -147,12 +147,12 @@ class GridTools
                                      /**
                                       * Find and return an iterator to
                                       * the active cell that surrounds
-                                      * a given point @p{ref}. The
+                                      * a given point @p ref. The
                                       * type of the first parameter
                                       * may be either
-                                      * @ref{Triangulation},
-                                      * @ref{DoFHandler}, or
-                                      * @ref{MGDoFHandler}, i.e. we
+                                      * Triangulation,
+                                      * DoFHandler, or
+                                      * MGDoFHandler, i.e. we
                                       * can find the cell around a
                                       * point for iterators into each
                                       * of these classes.
@@ -164,8 +164,8 @@ class GridTools
                                       * then recursively checking its
                                       * sibling cells. The complexity
                                       * is thus @p{O(M+log N)} where
-                                      * @p{M} is the number of coarse
-                                      * grid cells, and @p{N} the
+                                      * @p M is the number of coarse
+                                      * grid cells, and @p N the
                                       * total number of cells.
                                       *
                                       * There are cases where this
@@ -241,13 +241,13 @@ class GridTools
                                       * calling this function, the subdomain
                                       * ids of all active cells will have
                                       * values between zero and
-                                      * @p{n_partitions-1}. You can access the
+                                      * @p n_partitions-1. You can access the
                                       * subdomain id of a cell by using
                                       * @p{cell->subdomain_id()}.
                                       *
                                       * This function will generate an error
                                       * if METIS is not installed unless
-                                      * @p{n_partitions} is one. I.e., you can
+                                      * @p n_partitions is one. I.e., you can
                                       * write a program so that it runs in the
                                       * single-processor single-partition case
                                       * without METIS installed, and only

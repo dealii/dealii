@@ -60,12 +60,12 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				      * interpolating from the given
 				      * finite element to the present
 				      * one. The size of the matrix is
-				      * then @p{dofs_per_cell} times
+				      * then @p dofs_per_cell times
 				      * @p{source.dofs_per_cell}.
 				      *
 				      * These matrices are only
 				      * available if the source
-				      * element is also a @p{FE_Q}
+				      * element is also a @p FE_Q
 				      * element. Otherwise, an
 				      * exception of type
 				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
@@ -79,14 +79,14 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				      * Check for non-zero values on a face.
 				      *
 				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
+				      * @p true, if the shape
+				      * function @p shape_index has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p face_index.
 				      *
 				      * Implementation of the
 				      * interface in
-				      * @ref{FiniteElement}
+				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -107,11 +107,11 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
   protected:
 
 				     /**
-				      * @p{clone} function instead of
+				      * @p clone function instead of
 				      * a copy constructor.
 				      *
 				      * This function is needed by the
-				      * constructors of @p{FESystem}.
+				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim> *clone() const;
 
@@ -120,12 +120,12 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				     /**
 				      * Only for internal use. Its
 				      * full name is
-				      * @p{get_dofs_per_object_vector}
+				      * @p get_dofs_per_object_vector
 				      * function and it creates the
-				      * @p{dofs_per_object} vector that is
+				      * @p dofs_per_object vector that is
 				      * needed within the constructor to
 				      * be passed to the constructor of
-				      * @p{FiniteElementData}.
+				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
 
@@ -144,7 +144,7 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
     void initialize_restriction ();
 
 				     /**
-				      * Allows @p{MappingQ} class
+				      * Allows @p MappingQ class
 				      * access to build_renumbering
 				      * function.
 				      */

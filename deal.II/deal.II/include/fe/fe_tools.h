@@ -33,8 +33,8 @@ class ConstraintMatrix;
 
 /**
  * This class performs interpolations and extrapolations of discrete
- * functions of one @p{FiniteElement} @p{fe1} to another @p{FiniteElement}
- * @p{fe2}.
+ * functions of one @p FiniteElement @p fe1 to another @p FiniteElement
+ * @p fe2.
  *
  * It also provides the local interpolation matrices that interpolate
  * on each cell. Furthermore it provides the difference matrix
@@ -48,16 +48,16 @@ class FETools
   public:
 				     /**
 				      * Gives the interpolation matrix
-				      * that interpolates a @p{fe1}-
-				      * function to a @p{fe2}-function on
+				      * that interpolates a @p fe1-
+				      * function to a @p fe2-function on
 				      * each cell. The interpolation_matrix
 				      * needs to be of size
 				      * @p{(fe2.dofs_per_cell, fe1.dofs_per_cell)}.
 				      *
 				      * Note, that if the finite element
-				      * space @p{fe1} is a subset of
+				      * space @p fe1 is a subset of
 				      * the finite element space
-				      * @p{fe2} then the @p{interpolation_matrix}
+				      * @p fe2 then the @p interpolation_matrix
 				      * is an embedding matrix.
 				      */
     template <int dim, typename number>
@@ -67,20 +67,20 @@ class FETools
     
 				     /**
 				      * Gives the interpolation matrix
-				      * that interpolates a @p{fe1}-
-				      * function to a @p{fe2}-function, and
+				      * that interpolates a @p fe1-
+				      * function to a @p fe2-function, and
 				      * interpolates this to a second
-				      * @p{fe1}-function on
+				      * @p fe1-function on
 				      * each cell. The interpolation_matrix
 				      * needs to be of size
 				      * @p{(fe1.dofs_per_cell, fe1.dofs_per_cell)}.
 				      *
 				      * Note, that this function only
 				      * makes sense if the finite element
-				      * space due to @p{fe1} is not a subset of
+				      * space due to @p fe1 is not a subset of
 				      * the finite element space due to
-				      * @p{fe2}, as if it were a subset then
-				      * the @p{interpolation_matrix} would be 
+				      * @p fe2, as if it were a subset then
+				      * the @p interpolation_matrix would be 
 				      * only the unit matrix.
 				      */
     template <int dim, typename number>
@@ -91,16 +91,16 @@ class FETools
 				     /**
 				      * Gives the unit matrix minus the
 				      * back interpolation matrix.
-				      * The @p{difference_matrix}
+				      * The @p difference_matrix
 				      * needs to be of size
 				      * @p{(fe1.dofs_per_cell, fe1.dofs_per_cell)}.
 				      *
 				      * This function gives
 				      * the matrix that transforms a
-				      * @p{fe1} function $z$ to $z-I_hz$
+				      * @p fe1 function $z$ to $z-I_hz$
 				      * where $I_h$ denotes the interpolation
-				      * operator from the @p{fe1} space to
-				      * the @p{fe2} space. This matrix hence
+				      * operator from the @p fe1 space to
+				      * the @p fe2 space. This matrix hence
 				      * is useful to evaluate
 				      * error-representations where $z$
 				      * denotes the dual solution.
@@ -125,20 +125,20 @@ class FETools
     
 				     /**
 				      * Gives the interpolation of a the
-				      * @p{dof1}-function @p{u1} to a
-				      * @p{dof2}-function @p{u2}. @p{dof1} and
-				      * @p{dof2} need to be @ref{DoFHandler}s
+				      * @p dof1-function @p u1 to a
+				      * @p dof2-function @p u2. @p dof1 and
+				      * @p dof2 need to be DoFHandlers
 				      * based on the same triangulation.
 				      *
-				      * If the elements @p{fe1} and @p{fe2}
+				      * If the elements @p fe1 and @p fe2
 				      * are either both continuous or
 				      * both discontinuous then this
 				      * interpolation is the usual point
 				      * interpolation. The same is true
-				      * if @p{fe1} is a continuous and
-				      * @p{fe2} is a discontinuous finite
-				      * element. For the case that @p{fe1}
-				      * is a discontinuous and @p{fe2} is
+				      * if @p fe1 is a continuous and
+				      * @p fe2 is a discontinuous finite
+				      * element. For the case that @p fe1
+				      * is a discontinuous and @p fe2 is
 				      * a continuous finite element
 				      * there is no point interpolation
 				      * defined at the discontinuities.
@@ -171,12 +171,12 @@ class FETools
 				      * For this case (continuous
 				      * elements on grids with hanging
 				      * nodes), please use the
-				      * @p{interpolate} function with
+				      * @p interpolate function with
 				      * an additional
-				      * @p{ConstraintMatrix} argument,
+				      * @p ConstraintMatrix argument,
 				      * see below, or make the field
 				      * conforming yourself by calling
-				      * the @p{distribute} function of
+				      * the @p distribute function of
 				      * your hanging node constraints
 				      * object.
 				      */
@@ -188,30 +188,30 @@ class FETools
     
 				     /**
 				      * Gives the interpolation of a
-				      * the @p{dof1}-function @p{u1}
-				      * to a @p{dof2}-function
-				      * @p{u2}. @p{dof1} and @p{dof2}
-				      * need to be @ref{DoFHandler}s
+				      * the @p dof1-function @p u1
+				      * to a @p dof2-function
+				      * @p u2. @p dof1 and @p dof2
+				      * need to be DoFHandlers
 				      * based on the same
 				      * triangulation.
-				      * @p{constraints} is a hanging
+				      * @p constraints is a hanging
 				      * node constraints object
 				      * corresponding to
-				      * @p{dof2}. This object is
+				      * @p dof2. This object is
 				      * particular important when
 				      * interpolating onto continuous
 				      * elements on grids with hanging
 				      * nodes (locally refined grids).
 				      *
-				      * If the elements @p{fe1} and @p{fe2}
+				      * If the elements @p fe1 and @p fe2
 				      * are either both continuous or
 				      * both discontinuous then this
 				      * interpolation is the usual point
 				      * interpolation. The same is true
-				      * if @p{fe1} is a continuous and
-				      * @p{fe2} is a discontinuous finite
-				      * element. For the case that @p{fe1}
-				      * is a discontinuous and @p{fe2} is
+				      * if @p fe1 is a continuous and
+				      * @p fe2 is a discontinuous finite
+				      * element. For the case that @p fe1
+				      * is a discontinuous and @p fe2 is
 				      * a continuous finite element
 				      * there is no point interpolation
 				      * defined at the discontinuities.
@@ -229,27 +229,27 @@ class FETools
 
 				     /**
 				      * Gives the interpolation of the
-				      * @p{fe1}-function @p{u1} to a
-				      * @p{fe2}-function, and
+				      * @p fe1-function @p u1 to a
+				      * @p fe2-function, and
 				      * interpolates this to a second
-				      * @p{fe1}-function named
-				      * @p{u1_interpolated}.
+				      * @p fe1-function named
+				      * @p u1_interpolated.
 				      *
 				      * Note, that this function does
 				      * not work on continuous
 				      * elements at hanging nodes. For
 				      * that case use the
-				      * @p{back_interpolate} function,
+				      * @p back_interpolate function,
 				      * below, that takes an
 				      * additional
-				      * @p{ConstraintMatrix} object.
+				      * @p ConstraintMatrix object.
 				      *
 				      * Furthermore note, that for the
 				      * specific case when the finite
 				      * element space corresponding to
-				      * @p{fe1} is a subset of the
+				      * @p fe1 is a subset of the
 				      * finite element space
-				      * corresponding to @p{fe2}, this
+				      * corresponding to @p fe2, this
 				      * function is simply an identity
 				      * mapping.
 				      */
@@ -261,16 +261,16 @@ class FETools
 
 				     /**
 				      * Gives the interpolation of the
-				      * @p{dof1}-function @p{u1} to a
-				      * @p{dof2}-function, and
+				      * @p dof1-function @p u1 to a
+				      * @p dof2-function, and
 				      * interpolates this to a second
-				      * @p{dof1}-function named
-				      * @p{u1_interpolated}.
-				      * @p{constraints1} and
-				      * @p{constraints2} are the
+				      * @p dof1-function named
+				      * @p u1_interpolated.
+				      * @p constraints1 and
+				      * @p constraints2 are the
 				      * hanging node constraints
-				      * corresponding to @p{dof1} and
-				      * @p{dof2}, respectively. These
+				      * corresponding to @p dof1 and
+				      * @p dof2, respectively. These
 				      * objects are particular
 				      * important when continuous
 				      * elements on grids with hanging
@@ -280,9 +280,9 @@ class FETools
 				      * Furthermore note, that for the
 				      * specific case when the finite
 				      * element space corresponding to
-				      * @p{dof1} is a subset of the
+				      * @p dof1 is a subset of the
 				      * finite element space
-				      * corresponding to @p{dof2}, this
+				      * corresponding to @p dof2, this
 				      * function is simply an identity
 				      * mapping.
 				      */
@@ -296,19 +296,19 @@ class FETools
 
 				     /**
 				      * Gives $(Id-I_h)z1$ for a given
-				      * @p{dof1}-function @p{z1}, where $I_h$
-				      * is the interpolation from @p{fe1}
-				      * to @p{fe2}. $(Id-I_h)z1$ is
-				      * denoted by @p{z1_difference}.
+				      * @p dof1-function @p z1, where $I_h$
+				      * is the interpolation from @p fe1
+				      * to @p fe2. $(Id-I_h)z1$ is
+				      * denoted by @p z1_difference.
 				      *
 				      * Note, that this function does
 				      * not work on continuous
 				      * elements at hanging nodes. For
 				      * that case use the
-				      * @p{interpolation_difference}
+				      * @p interpolation_difference
 				      * function, below, that takes an
 				      * additional
-				      * @p{ConstraintMatrix} object.
+				      * @p ConstraintMatrix object.
 				      */
     template <int dim, class InVector, class OutVector>
     static void interpolation_difference(const DoFHandler<dim> &dof1,
@@ -318,15 +318,15 @@ class FETools
     
 				     /**
 				      * Gives $(Id-I_h)z1$ for a given
-				      * @p{dof1}-function @p{z1}, where $I_h$
-				      * is the interpolation from @p{fe1}
-				      * to @p{fe2}. $(Id-I_h)z1$ is
-				      * denoted by @p{z1_difference}.
-				      * @p{constraints1} and
-				      * @p{constraints2} are the
+				      * @p dof1-function @p z1, where $I_h$
+				      * is the interpolation from @p fe1
+				      * to @p fe2. $(Id-I_h)z1$ is
+				      * denoted by @p z1_difference.
+				      * @p constraints1 and
+				      * @p constraints2 are the
 				      * hanging node constraints
-				      * corresponding to @p{dof1} and
-				      * @p{dof2}, respectively. These
+				      * corresponding to @p dof1 and
+				      * @p dof2, respectively. These
 				      * objects are particular
 				      * important when continuous
 				      * elements on grids with hanging
@@ -363,10 +363,10 @@ class FETools
     
 				     /**
 				      * Gives the patchwise
-				      * extrapolation of a @p{dof1}
-				      * function @p{z1} to a @p{dof2}
-				      * function @p{z2}.  @p{dof1} and
-				      * @p{dof2} need to be @ref{DoFHandler}
+				      * extrapolation of a @p dof1
+				      * function @p z1 to a @p dof2
+				      * function @p z2.  @p dof1 and
+				      * @p dof2 need to be DoFHandler
 				      * based on the same triangulation.
 				      *
 				      * This function is interesting
@@ -383,9 +383,9 @@ class FETools
 				      * When you use continuous
 				      * elements on grids with hanging
 				      * nodes, please use the
-				      * @p{extrapolate} function with
+				      * @p extrapolate function with
 				      * an additional
-				      * @p{ConstraintMatrix} argument,
+				      * @p ConstraintMatrix argument,
 				      * see below.
 				      *
 				      * Since this function operates
@@ -404,22 +404,22 @@ class FETools
 
 				     /**
 				      * Gives the patchwise
-				      * extrapolation of a @p{dof1}
-				      * function @p{z1} to a @p{dof2}
-				      * function @p{z2}.  @p{dof1} and
-				      * @p{dof2} need to be @ref{DoFHandler}
+				      * extrapolation of a @p dof1
+				      * function @p z1 to a @p dof2
+				      * function @p z2.  @p dof1 and
+				      * @p dof2 need to be DoFHandler
 				      * based on the same triangulation.
-				      * @p{constraints} is a hanging
+				      * @p constraints is a hanging
 				      * node constraints object
 				      * corresponding to
-				      * @p{dof2}. This object is
+				      * @p dof2. This object is
 				      * particular important when
 				      * interpolating onto continuous
 				      * elements on grids with hanging
 				      * nodes (locally refined grids).
 				      *
 				      * Otherwise, the same holds as
-				      * for the other @p{extrapolate}
+				      * for the other @p extrapolate
 				      * function.
 				      */
     template <int dim, class InVector, class OutVector>
@@ -448,7 +448,7 @@ class FETools
 				      * running in x-direction, then
 				      * in y-direction and finally in
 				      * z-direction. Discontinuous
-				      * elements of class @ref{FE_DGQ}
+				      * elements of class FE_DGQ()
 				      * are numbered in this way, for
 				      * example.
 				      *
@@ -466,7 +466,7 @@ class FETools
 				      * uses specifics of the
 				      * continuous finite elements, it
 				      * can only operate on objects of
-				      * type @ref{FE_Q}.
+				      * type FE_Q().
 				      *
 				      * It is assumed that the size of
 				      * the output argument already
@@ -497,7 +497,7 @@ class FETools
 				     /**
 				      * Given a name in the form which
 				      * is returned by the
-				      * @p{FiniteElement::get_name}
+				      * @p FiniteElement::get_name
 				      * function, regenerate such a
 				      * finite element.
 				      *
@@ -515,7 +515,7 @@ class FETools
 				      * finite element can be
 				      * reconstructed from this
 				      * string, an exception of type
-				      * @p{FETools::ExcInvalidFEName}
+				      * @p FETools::ExcInvalidFEName
 				      * is thrown.
 				      *
 				      * There is one exception,
@@ -610,7 +610,7 @@ class FETools
 				      * calling site can continue
 				      * parsing finite element lists
 				      * (for example for
-				      * @ref{FESystem} objects) at the
+				      * FESystem objects) at the
 				      * position after which the
 				      * present element's name ends.
 				      *
@@ -619,7 +619,7 @@ class FETools
 				      * beginning of the given string,
 				      * then an exception is thrown,
 				      * just as for the
-				      * @ref{get_fe_from_name}
+				      * get_fe_from_name()
 				      * function.
 				      */
     template <int dim>

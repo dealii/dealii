@@ -32,7 +32,7 @@ template <int dim> class DoFHandler;
  * space-time output file, or for example to connect the results of
  * solutions of a parameter dependent equation for several parameter
  * value together into one. The interface is mostly modelled after the
- * @ref{DataOut} class.
+ * DataOut class.
  *
  * We will explain the concept for a time dependent problem, but
  * instead of the time any parameter can be substituted. In our
@@ -56,11 +56,11 @@ template <int dim> class DoFHandler;
  *
  * The following little example shall illustrate the different steps
  * of use of this class. It is assumed that the finite element used is
- * composed of two components, @p{u} and @p{v}, that the solution vector
- * is named @p{solution} and that a vector @p{error} is computed which
+ * composed of two components, @p u and @p v, that the solution vector
+ * is named @p solution and that a vector @p error is computed which
  * contains an error indicator for each spatial cell.
  *
- * Note that unlike for the @ref{DataOut} class it is necessary to first
+ * Note that unlike for the DataOut class it is necessary to first
  * declare data vectors and the names of the components before first
  * use. This is because on all time levels the same data should be
  * present to produce reasonable time-space output. The output is
@@ -68,7 +68,7 @@ template <int dim> class DoFHandler;
  * which is suitable for quadratic finite elements in space, for
  * example.
  *
- * @begin{verbatim}
+ * @verbatim
  *   DataOutStack<dim> data_out_stack;
  *
  *                                  // first declare the vectors
@@ -96,7 +96,7 @@ template <int dim> class DoFHandler;
  *       data_out_stack.build_patches (2);
  *       data_out_stack.finish_parameter_value ();
  *     };
- * @end{verbatim}
+ * @endverbatim
  *
  * @author Wolfgang Bangerth, 1999
  */
@@ -113,16 +113,16 @@ class DataOutStack : public DataOutInterface<dim+1>
 
 				     /**
 				      * Destructor. Only declared to make
-				      * it @p{virtual}.
+				      * it @p virtual.
 				      */
     virtual ~DataOutStack ();
     
 				     /**
 				      * Start the next set of data for a
 				      * specific parameter value. The argument
-				      * @p{parameter_step} denotes the interval
+				      * @p parameter_step denotes the interval
 				      * (in backward direction, counted from
-				      * @p{parameter_value}) with which the
+				      * @p parameter_value) with which the
 				      * output will be extended in parameter
 				      * direction, i.e. orthogonal to the
 				      * space directions.
@@ -134,7 +134,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * Attach the DoF handler for the
 				      * grid and data associated with the
 				      * parameter previously set by
-				      * @p{new_parameter_value}.
+				      * @p new_parameter_value.
 				      *
 				      * This has to happen before adding
 				      * data vectors for the present
@@ -143,14 +143,14 @@ class DataOutStack : public DataOutInterface<dim+1>
     void attach_dof_handler (const DoFHandler<dim> &dof_handler);
 
 				     /**
-				      * Declare a data vector. The @p{vector_type}
+				      * Declare a data vector. The @p vector_type
 				      * argument determines whether the data
 				      * vector will be considered as DoF or
 				      * cell data.
 				      *
 				      * This version may be called if the
 				      * finite element presently used by the
-				      * @ref{DoFHandler} (and previously attached
+				      * DoFHandler (and previously attached
 				      * to this object) has only one component
 				      * and therefore only one name needs to
 				      * be given.
@@ -159,14 +159,14 @@ class DataOutStack : public DataOutInterface<dim+1>
 			      const VectorType   vector_type);
 
 				     /**
-				      * Declare a data vector. The @p{vector_type}
+				      * Declare a data vector. The @p vector_type
 				      * argument determines whether the data
 				      * vector will be considered as DoF or
 				      * cell data.
 				      *
 				      * This version must be called if the
 				      * finite element presently used by the
-				      * @ref{DoFHandler} (and previously attached
+				      * DoFHandler (and previously attached
 				      * to this object) has more than one
 				      * component and therefore more than one
 				      * name needs to be given. However, you
@@ -185,18 +185,18 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      *
 				      * This version may be called if the
 				      * finite element presently used by the
-				      * @ref{DoFHandler} (and previously attached
+				      * DoFHandler (and previously attached
 				      * to this object) has only one component
 				      * and therefore only one name needs to
 				      * be given.
 				      *
 				      * The data vector must have been
-				      * registered using the @p{declare_data_vector}
+				      * registered using the @p declare_data_vector
 				      * function before actually using it the
 				      * first time.
 				      *
 				      * Note that a copy of this vector is
-				      * stored until @p{finish_parameter_value}
+				      * stored until @p finish_parameter_value
 				      * is called the next time, so if you are
 				      * short of memory you may want to call
 				      * this function only after all
@@ -213,7 +213,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      *
 				      * This version must be called if the
 				      * finite element presently used by the
-				      * @ref{DoFHandler} (and previously attached
+				      * DoFHandler (and previously attached
 				      * to this object) has more than one
 				      * component and therefore more than one
 				      * name needs to be given. However, you
@@ -223,12 +223,12 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * only one component.
 				      *
 				      * The data vector must have been
-				      * registered using the @p{declare_data_vector}
+				      * registered using the @p declare_data_vector
 				      * function before actually using it the
 				      * first time.
 				      *
 				      * Note that a copy of this vector is
-				      * stored until @p{finish_parameter_value}
+				      * stored until @p finish_parameter_value
 				      * is called the next time, so if you are
 				      * short of memory you may want to call
 				      * this function only after all
@@ -243,10 +243,10 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * Actually build the patches for output
 				      * by the base classes from the data
 				      * stored in the data vectors and using
-				      * the previously attached @ref{DoFHandler}
+				      * the previously attached DoFHandler
 				      * object.
 				      *
-				      * By @p{n_subdivisions} you can decide
+				      * By @p n_subdivisions you can decide
 				      * into how many subdivisions (in each
 				      * space and parameter direction) each
 				      * patch is divided. This is useful
@@ -260,11 +260,11 @@ class DataOutStack : public DataOutInterface<dim+1>
 
 				     /**
 				      * Release all data that is no
-				      * more needed once @p{build_patches}
+				      * more needed once @p build_patches
 				      * was called and all other transactions
 				      * for a given parameter value are done.
 				      *
-				      * Couterpart of @p{new_parameter_value}.
+				      * Couterpart of @p new_parameter_value.
 				      */
     void finish_parameter_value ();
 
@@ -409,8 +409,8 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * This is the function through
 				      * which derived classes propagate
 				      * preprocessed data in the form of
-				      * @ref{Patch} structures (declared in
-				      * the base class @ref{DataOutBase}) to
+				      * Patch structures (declared in
+				      * the base class DataOutBase) to
 				      * the actual output function.
 				      */
     virtual const std::vector< ::DataOutBase::Patch<dim+1,dim+1> > & get_patches () const;

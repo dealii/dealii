@@ -97,8 +97,8 @@ void SwappableVector<number>::swap_out (const std::string &name)
   Threads::ThreadMutex::ScopedLock lock(this->lock);
 
                                    //  check that we have not called
-				   //  @p{alert} without the respective
-				   //  @p{reload} function
+				   //  @p alert without the respective
+				   //  @p reload function
   Assert (data_is_preloaded == false, ExcInternalError());
   
   std::ofstream tmp_out(filename.c_str());
@@ -114,7 +114,7 @@ template <typename number>
 void SwappableVector<number>::reload () 
 {
 				   // if in MT mode: synchronise with
-				   // possibly existing @p{alert}
+				   // possibly existing @p alert
 				   // calls. if not in MT mode, this
 				   // is a no-op
   lock.acquire ();

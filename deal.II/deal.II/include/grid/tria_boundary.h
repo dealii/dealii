@@ -31,17 +31,17 @@ template <int dim> class Triangulation;
  *   When a triangulation creates a new vertex on the boundary of the
  *   domain, it determines the new vertex' coordinates through the
  *   following code (here in two dimensions):
- *   @begin{verbatim}
+ *   @verbatim
  *     ...
  *     Point<2> new_vertex = boundary.get_new_point_on_line (line);
  *     ...
- *   @end{verbatim}
- *   @p{line} denotes the line at the boundary that shall be refined
+ *   @endverbatim
+ *   @p line denotes the line at the boundary that shall be refined
  *   and for which we seek the common point of the two child lines.
  *
  *   In 3D, a new vertex may be placed on the middle of a line or on
  *   the middle of a side. Respectively, the library calls
- *   @begin{verbatim}
+ *   @verbatim
  *     ...
  *     Point<3> new_line_vertices[4]
  *       = { boundary.get_new_point_on_line (face->line(0)),
@@ -49,14 +49,14 @@ template <int dim> class Triangulation;
  *           boundary.get_new_point_on_line (face->line(2)),
  *           boundary.get_new_point_on_line (face->line(3))  };
  *     ...
- *   @end{verbatim}
+ *   @endverbatim
  *   to get the four midpoints of the lines bounding the quad at the
  *   boundary, and after that
- *   @begin{verbatim}
+ *   @verbatim
  *     ...
  *     Point<3> new_quad_vertex = boundary.get_new_point_on_quad (face);
  *     ...
- *   @end{verbatim}
+ *   @endverbatim
  *   to get the midpoint of the face. It is guaranteed that this order
  *   (first lines, then faces) holds, so you can use information from
  *   the children of the four lines of a face, since these already exist
@@ -66,9 +66,9 @@ template <int dim> class Triangulation;
  *   about boundary indicators and the like, as well as all other information
  *   provided by these objects.
  *
- *   There are specialisations, @ref{StraightBoundary}, which places
+ *   There are specialisations, StraightBoundary, which places
  *   the new point right into the middle of the given points, and
- *   @ref{HyperBallBoundary} creating a hyperball with given radius
+ *   HyperBallBoundary creating a hyperball with given radius
  *   around a given center point.
  *
  *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001
@@ -137,7 +137,7 @@ class Boundary : public Subscriptor
 				      *
 				      * This function is called after
 				      * the four lines bounding the
-				      * given @p{quad} are refined, so
+				      * given @p quad are refined, so
 				      * you may want to use the
 				      * information provided by
 				      * @p{quad->line(i)->child(j)},
@@ -159,19 +159,19 @@ class Boundary : public Subscriptor
                                       *
 				      * The number of points requested
 				      * is given by the size of the
-				      * vector @p{points}. It is the
+				      * vector @p points. It is the
 				      * task of the derived classes to
 				      * arrange the points in
 				      * approximately equal distances.
 				      *
 				      * This function is called by the
-				      * @p{MappingQ} class. This
+				      * @p MappingQ class. This
 				      * happens on each face line of a
 				      * cells that has got at least
 				      * one boundary line.
 				      *
 				      * As this function is not needed
-				      * for @p{MappingQ1}, it is not
+				      * for @p MappingQ1, it is not
 				      * made pure virtual, to avoid
 				      * the need to overload it.  The
 				      * default implementation throws
@@ -188,7 +188,7 @@ class Boundary : public Subscriptor
 				      *
 				      * The number of points requested
 				      * is given by the size of the
-				      * vector @p{points}. It is
+				      * vector @p points. It is
 				      * required that this number is a
 				      * square of another integer,
 				      * i.e. @p{n=points.size()=m*m}. It
@@ -205,7 +205,7 @@ class Boundary : public Subscriptor
 				      * least one boundary face quad.
 				      *
 				      * As this function is not needed
-				      * for @p{MappingQ1}, it is not
+				      * for @p MappingQ1, it is not
 				      * made pure virtual, to avoid
 				      * the need to overload it.  The
 				      * default implementation throws
@@ -264,7 +264,7 @@ class Boundary : public Subscriptor
 
 
 /**
- *   Specialisation of @ref{Boundary}<dim>, which places the new point
+ *   Specialisation of Boundary<dim>, which places the new point
  *   right into the middle of the given points. The middle is defined
  *   as the arithmetic mean of the points.
  *

@@ -30,10 +30,10 @@
  * Preconditioned cg method.
  *
  * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the @ref{Solver} base class.
+ * this class, see the documentation of the Solver base class.
  *
  * Like all other solver classes, this class has a local structure
- * called @p{AdditionalData} which is used to pass additional
+ * called @p AdditionalData which is used to pass additional
  * parameters to the solver, like damping parameters or the number of
  * temporary vectors. For this class, there is a switch allowing for
  * additional output for the computation of eigenvalues of the matrix.
@@ -45,17 +45,17 @@
  *
  * The cg-method performs an orthogonal projection of the original
  * preconditioned linear system to another system of smaller
- * dimension. Furthermore, the projected matrix @p{T} is
+ * dimension. Furthermore, the projected matrix @p T is
  * tri-diagonal. Since the projection is orthogonal, the eigenvalues
- * of @p{T} approximate those of the original preconditioned matrix
- * @p{PA}. In fact, after @p{n} steps, where @p{n} is the dimension of
+ * of @p T approximate those of the original preconditioned matrix
+ * @p PA. In fact, after @p n steps, where @p n is the dimension of
  * the original system, the eigenvalues of both matrices are
  * equal. But, even for small numbers of iteration steps, the
- * condition number of @p{T} is a good estimate for the one of @p{PA}.
+ * condition number of @p T is a good estimate for the one of @p PA.
  *
- * With the coefficients @p{alpha} and @p{beta} written to the log
+ * With the coefficients @p alpha and @p beta written to the log
  * file if @p{AdditionalData::log_coefficients = true}, the matrix
- * @p{T_m} after @p{m} steps is the tri-diagonal matrix with diagonal
+ * @p T_m after @p m steps is the tri-diagonal matrix with diagonal
  * elements @p{1/alpha_0}, @p{1/alpha_1 + beta_0/alpha_0}, ...,
  * @p{1/alpha_{m-1}+beta_{m-2}/alpha_{m-2}} and off-diagonal elements
  * @p{sqrt(beta_0)/alpha_0}, ..., @p{sqrt(beta_{m-2})/alpha_{m-2}}.
@@ -139,7 +139,7 @@ class SolverCG : public Solver<VECTOR>
 
 				     /**
 				      * Temporary vectors, allocated through
-				      * the @p{VectorMemory} object at the start
+				      * the @p VectorMemory object at the start
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
@@ -152,11 +152,11 @@ class SolverCG : public Solver<VECTOR>
 				      * Within the iteration loop, the
 				      * square of the residual vector is
 				      * stored in this variable. The
-				      * function @p{criterion} uses this
+				      * function @p criterion uses this
 				      * variable to compute the convergence
 				      * value, which in this class is the
 				      * norm of the residual vector and thus
-				      * the square root of the @p{res2} value.
+				      * the square root of the @p res2 value.
 				      */
     double res2;
 

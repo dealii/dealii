@@ -56,14 +56,14 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
     
 				     /**
 				      * Matrix-vector product, adding to
-				      * @p{dst}.
+				      * @p dst.
 				      */
     virtual void vmult_add (VECTOR& dst,
 			    const VECTOR& src) const;
     
 				     /**
 				      * Tranposed matrix-vector product,
-				      * adding to @p{dst}.
+				      * adding to @p dst.
 				      */
     virtual void Tvmult_add (VECTOR& dst,
 			     const VECTOR& src) const;
@@ -87,9 +87,9 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 
 
 /**
- * Mean value filter.  The @p{vmult} functions of this matrix filter
+ * Mean value filter.  The @p vmult functions of this matrix filter
  * out mean values of the vector.  If the vector is of type
- * @p{BlockVector}, then an additional parameter selects a single
+ * @p BlockVector, then an additional parameter selects a single
  * component for this operation.
  *
  * @author Guido Kanschat, 2002, 2003
@@ -104,13 +104,13 @@ class MeanValueFilter : public Subscriptor
     MeanValueFilter(unsigned int component = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
-				      * Subtract mean value from @p{v}.
+				      * Subtract mean value from @p v.
 				      */
     template <typename number>
     void filter (Vector<number>& v) const;
     
 				     /**
-				      * Subtract mean value from @p{v}.
+				      * Subtract mean value from @p v.
 				      */
     template <typename number>
     void filter (BlockVector<number>& v) const;
