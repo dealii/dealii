@@ -110,7 +110,7 @@ struct GeometryInfo<2> {
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
 				      * \begin{verbatim}
-				      *      2
+				      * .      2
 				      * .   3-->--2
 				      * .   |     |
 				      * . 3 ^     ^ 1
