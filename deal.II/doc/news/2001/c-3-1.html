@@ -442,6 +442,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: the classes that denote flags to the <code
+       class="class">TimeStepBase_Tria</class> class have been move
+       from local classes to a namespace of their own, names
+       <code class="class">TimeStepBase_Tria_Flags</code>.
+       <br>
+       (WB 2001/05/23)
+       </p>
+
+  <li> <p>
        Fixed: due to a bug in gcc, the compiler did not check that we
        did not use the set of given boundary indicators to the
        <code class="member">DoFTools::extract_boundary_dofs</code>

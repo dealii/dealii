@@ -1126,6 +1126,427 @@ class TimeStepBase : public Subscriptor
 
 
 
+
+/**
+ * Namespace in which some classes are declared that encapsulate flags
+ * for the @ref{TimeStepBase_Tria} class. These used to be local data
+ * types of that class, but some compilers choked on some aspects, so
+ * we put them into a namespace of their own.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+namespace TimeStepBase_Tria_Flags
+{
+/**
+ * This structure is used to tell the @ref{TimeStepBase_Tria} class how grids should
+ * be handled. It has flags defining the moments where grids shall be
+ * re-made and when they may be deleted. Also, one variable states whether
+ * grids should be kept in memory or should be deleted between to uses to
+ * save memory.
+ */
+  template <int dim>
+  struct Flags
+  {
+				       /**
+					* Default constructor; yields
+					* an exception, so is not
+					* really usable.
+					*/
+      Flags ();
+      
+				       /**
+					* Constructor; see the different
+					* fields for a description of the
+					* meaning of the parameters.
+					*/
+      Flags (const bool         delete_and_rebuild_tria,
+	     const unsigned int wakeup_level_to_build_grid,
+	     const unsigned int sleep_level_to_delete_grid);
+      
+				       /**
+					* This flag determines whether
+					* the @p{sleep} and
+					* @p{wake_up} functions shall
+					* delete and rebuild the
+					* triangulation.  While for
+					* small problems, this is not
+					* necessary, for large
+					* problems it is indispensable
+					* to save memory.  The reason
+					* for this is that there may
+					* be several hundred time
+					* levels in memory, each with
+					* its own triangulation, which
+					* may require large amounts if
+					* there are many cells on
+					* each. Having a total of
+					* 100.000.000 cells on all
+					* time levels taken together
+					* is not uncommon, which makes
+					* this flag understandable.
+					*/
+      const bool delete_and_rebuild_tria;
+
+				       /**
+					* This number denotes the
+					* parameter to the @p{wake_up}
+					* function at which it shall
+					* rebuild the grid. Obviously,
+					* it shall be less than or
+					* equal to the @p{look_ahead}
+					* number passed to the time
+					* step management object; if
+					* it is equal, then the grid
+					* is rebuilt the first time
+					* the @p{wake_up} function is
+					* called. If
+					* @p{delete_and_rebuild_tria}
+					* is @p{false}, this number
+					* has no meaning.
+					*/
+      const unsigned int wakeup_level_to_build_grid;
+      
+				       /**
+					* This is the opposite flag to
+					* the one above: it determines
+					* at which call to * @p{sleep}
+					* the grid shall be deleted.
+					*/
+      const unsigned int sleep_level_to_delete_grid;
+      
+				       /**
+					* Exception
+					*/
+      DeclException1 (ExcInvalidParameter,
+		      int,
+		      << "The parameter " << arg1 << " has an invalid value.");
+  };
+
+
+
+/**
+ * This structure is used to tell the @ref{TimeStepBase_Tria} class how grids should
+ * be refined. Before we explain all the different variables, fist some terminology:
+ * @begin{itemize}
+ * @item Correction: after having flagged some cells of the triangulation for
+ *   following some given criterion, we may want to change the number of flagged
+ *   cells on this grid according to another criterion that the number of cells
+ *   may be only a certain fraction more or less then the number of cells on
+ *   the previous grid. This change of refinement flags will be called
+ *   "correction" in the sequel.
+ * @item Adaption: in order to make the change between one grid and the next not
+ *   to large, we may want to flag some additional cells on one of the two
+ *   grids such that there are not too grave differences. This process will
+ *   be called "adaption".
+ * @end{itemize}
+ *
+ *
+ * @sect3{Description of flags}
+ *
+ * @begin{itemize}
+ * @item @p{max_refinement_level}: Cut the refinement of cells at a given level.
+ *   This flag does not influence the flagging of cells, so not more cells
+ *   on the coarser levels are flagged than usual. Rather, the flags are all
+ *   set, but when it comes to the actual refinement, the maximum refinement
+ *   level is truncated.
+ *
+ *   This option is only really useful when you want to compare global
+ *   refinement with adaptive refinement when you don't want the latter
+ *   to refine more than the global refinement.
+ *
+ * @item @p{first_sweep_with_correction}: When using cell number correction
+ *   as defined above, it may be worth while to start with this only in
+ *   later sweeps, not already in the first one. If this variable is
+ *   zero, then start with the first sweep, else with a higher one. The
+ *   rationale for only starting later is that we do not want to block the
+ *   development of grids at the beginning and only impose restrictions in
+ *   the sweeps where we start to be interested in the actual results of
+ *   the computations.
+ *
+ * @item @p{min_cells_for_correction}: If we want a more free process of
+ *   grid development, we may want to impose less rules for grids with few
+ *   cells also. This variable sets a lower bound for the cell number of
+ *   grids where corrections are to be performed.
+ *
+ * @item @p{cell_number_corridor_top}: Fraction of the number of cells by
+ *   which the number of cells of one grid may be higher than that on the
+ *   previous grid. Common values are 10 per cent (i.e. 0.1). The naming
+ *   of the variable results from the goal to define a target corridor
+ *   for the number of cells after refinement has taken place.
+ *
+ * @item @p{cell_number_corridor_bottom}: Fraction of the number of cells by
+ *   which the number of cells of one grid may be lower than that on the
+ *   previous grid. Common values are 5 per cent (i.e. 0.05). Usually this
+ *   number will be smaller than @p{cell_number_corridor_top} since an
+ *   increase of the number of cells is not harmful (though it increases
+ *   the numerical amount of work needed to solve the problem) while a
+ *   sharp decrease may reduce the accuracy of the final result even if
+ *   the time steps computed before the decrease were computed to high
+ *   accuracy.
+ *
+ *   Note however, that if you compute the dual problem as well, then the time
+ *   direction is reversed, so the two values defining the cell number
+ *   corridor should be about equal.
+ *
+ * @item @p{correction_relaxations}: This is a list of pairs of number with the
+ *   following meaning: just as for @p{min_cells_for_correction}, it may be
+ *   worth while to reduce the requirements upon grids if the have few cells.
+ *   The present variable stores a list of cell numbers along with some values
+ *   which tell us that the cell number corridor should be enlarged by a
+ *   certain factor. For example, if this list was @p{((100 5) (200 3) (500 2))},
+ *   this would mean that for grids with a cell number below 100, the
+ *   @p{cell_number_corridor_*} variables are to be multiplied by 5 before they
+ *   are applied, for cell numbers below 200 they are to be multiplied by 3,
+ *   and so on.
+ *
+ *   @p{correction_relaxations} is actually a vector of such list. Each entry
+ *   in this vector denotes the relaxation rules for one sweep. The last
+ *   entry defines the relaxation rules for all following sweeps. This
+ *   scheme is adopted to allow for stricter corrections in later sweeps
+ *   while the relaxations may be more generous in the first sweeps.
+ *
+ *   There is a static variable @p{default_correction_relaxations} which you
+ *   can use as a default value. It is an empty list and thus defines no
+ *   relaxations.
+ *
+ * @item @p{cell_number_correction_steps}: Usually, if you want the number of
+ *   cells to be corrected, the target corridor for the cell number is computed
+ *   and some additional cells are flagged or flags are removed. But since
+ *   the cell number resulting after flagging and deflagging can not be
+ *   easily computed, it will usually not be within the corridor. We therefore
+ *   need to iteratively get to our goal. Usually, three or four iterations are
+ *   needed, but using this variable, you can reduce the allowed number of
+ *   iterations; breaking the loop after two iterations yields good results
+ *   regularly. Setting the variable to zero will result in no correction
+ *   steps at all.
+ *
+ * @item @p{mirror_flags_to_previous_grid}: If a cell on the present grid is
+ *   flagged for refinement, also flag the corresponding cell on the previous
+ *   grid. This is useful if, for example, error indicators are computed for
+ *   space-time cells, but are stored for the second grid only. Now, since the
+ *   first grid has the same contributions to the indicators as the second, it
+ *   may be useful to flag both if necessary. This is done if the present
+ *   variable is set.
+ *
+ * @item @p{adapt_grids}: adapt the present grid to the previous one in the sense
+ *   defined above. What is actually done here is the following: if going from
+ *   the previous to the present grid would result in double refinement or
+ *   double coarsening of some cells, then we try to flag these cells for
+ *   refinement or coarsening such as to avoid the double step. Obviously, more
+ *   than double refinement of coarsening is also caught.
+ *
+ *   Grid adaption can try to avoid such changes between two grids, but it can
+ *   never promise that they don't occur. This is because the next grid may
+ *   change the present one, but then again there may be jumps in refinement
+ *   level between the present and the previous one; this could only be avoided
+ *   by looping iteratively through all grids, back and forth, until nothing
+ *   changes anymore, which is obviously impossible if there are many time steps
+ *   with very large grids.
+ * @end{itemize}
+ */
+  template <int dim>
+  struct RefinementFlags
+  {
+				       /**
+					* Typedef of a data type
+					* describing some relaxations
+					* of the correction process.
+					* See the general description
+					* of this class for more
+					* information.
+					*/
+      typedef std::vector<std::vector<std::pair<unsigned int, double> > >   CorrectionRelaxations;
+      
+				       /**
+					* Default values for the relaxations:
+					* no relaxations.
+					*/
+      static CorrectionRelaxations default_correction_relaxations;
+      
+				       /**
+					* Constructor. The default
+					* values are chosen such that
+					* almost no restriction on the
+					* mesh refinement is imposed.
+					*/
+      RefinementFlags (const unsigned int max_refinement_level         = 0,
+		       const unsigned int first_sweep_with_correction  = 0,
+		       const unsigned int min_cells_for_correction     = 0,
+		       const double cell_number_corridor_top           = (1<<dim),
+		       const double cell_number_corridor_bottom        = 1,
+		       const CorrectionRelaxations &correction_relaxations = CorrectionRelaxations(),
+		       const unsigned int cell_number_correction_steps = 0,
+		       const bool mirror_flags_to_previous_grid        = false,
+		       const bool adapt_grids                          = false);
+      
+				       /**
+					* Maximum level of a cell in
+					* the triangulation of a time
+					* level. If it is set to zero,
+					* then no limit is imposed on
+					* the number of refinements a
+					* coarse grid cell may
+					* undergo. Usually, this field
+					* is used, if for some reason
+					* you want to limit refinement
+					* in an adaptive process, for
+					* example to avoid overly
+					* large numbers of cells or to
+					* compare with grids which
+					* have a certain number of
+					* refinements.
+					*/
+      const unsigned int  max_refinement_level;
+      
+				       /**
+					* First sweep to perform cell
+					* number correction steps on;
+					* for sweeps before, cells are
+					* only flagged and no
+					* number-correction to
+					* previous grids is performed.
+					*/
+      const unsigned int  first_sweep_with_correction;
+
+
+				       /**
+					* Apply cell number correction
+					* with the previous time level
+					* only if there are more than
+					* this number of cells.
+					*/
+      const unsigned int  min_cells_for_correction;
+    
+				       /**
+					* Fraction by which the number
+					* of cells on a time level may
+					* differ from the number on
+					* the previous time level
+					* (first: top deviation,
+					* second: bottom deviation).
+					*/
+      const double        cell_number_corridor_top;
+      
+				       /**
+					* @see cell_number_corridor_top
+					*/
+      const double        cell_number_corridor_bottom;
+
+				       /**
+					* List of relaxations to the
+					* correction step.
+					*/
+      const std::vector<std::vector<std::pair<unsigned int,double> > > correction_relaxations;
+    
+				       /**
+					* Number of iterations to be
+					* performed to adjust the
+					* number of cells on a time
+					* level to those on the
+					* previous one. Zero means: do
+					* no such iteration.
+					*/
+      const unsigned int  cell_number_correction_steps;
+
+				       /**
+					* Flag all cells which are
+					* flagged on this timestep for
+					* refinement on the previous
+					* one also. This is useful in
+					* case the error indicator was
+					* computed by integration over
+					* time-space cells, but are
+					* now associated to a grid on
+					* a discrete time level. Since
+					* the error contribution comes
+					* from both grids, however, it
+					* is appropriate to refine
+					* both grids.
+					*
+					* Since the previous grid does
+					* not mirror the flags to the
+					* one before it, this does not
+					* lead to an almost infinite
+					* growth of cell numbers. You
+					* should use this flag with
+					* cell number correction
+					* switched on only, however.
+					*
+					* Mirroring is done after cell
+					* number correction is done,
+					* but before grid adaption, so
+					* the cell number on this grid
+					* is not noticably influenced
+					* by the cells flagged
+					* additionally on the previous
+					* grid.
+					*/
+      const bool          mirror_flags_to_previous_grid;
+
+				       /**
+					* Adapt this grid to the
+					* previous one.
+					*/
+      const bool          adapt_grids;
+    
+				       /**
+					* Exception
+					*/
+      DeclException1 (ExcInvalidValue,
+		      double,
+		      << "The following value does not fulfill the requirements: " << arg1);
+  };
+
+
+
+/**
+ * Structure given to the actual refinement function, telling it which
+ * thresholds to take for coarsening and refinement. The actual refinement
+ * criteria are loaded by calling the virtual function
+ * @p{get_tria_refinement_criteria}.
+ */
+  template <int dim>
+  struct RefinementData 
+  {
+				       /**
+					* Constructor
+					*/
+      RefinementData (const double         refinement_threshold,
+		      const double         coarsening_threshold=0);
+      
+				       /**
+					* Threshold for refinement:
+					* cells having a larger value
+					* will be refined (at least in
+					* the first round; subsequent
+					* steps of the refinement
+					* process may flag other cells
+					* as well or remove the flag
+					* from cells with a criterion
+					* higher than this threshold).
+					*/
+      const double         refinement_threshold;
+      
+				       /**
+					* Same threshold for
+					* coarsening: cells with a
+					* smaller threshold will be
+					* coarsened if possible.
+					*/
+      const double         coarsening_threshold;
+
+				       /**
+					* Exception
+					*/
+      DeclException1 (ExcInvalidValue,
+		      double,
+		      << "The following value does not fulfill the requirements: " << arg1);
+  };
+};
+
+
+
+
 /**
  * Specialisation of @ref{TimeStepBase} which addresses some aspects of grid handling.
  * In particular, this class is thought to make handling of grids available that
@@ -1144,14 +1565,19 @@ class TimeStepBase : public Subscriptor
  * @author Wolfgang Bangerth, 1999; large parts taken from the wave program, by Wolfgang Bangerth 1998
  */
 template <int dim>
-class TimeStepBase_Tria :  public TimeStepBase
+class TimeStepBase_Tria : public TimeStepBase
 {
   public:
-				     // forward declaration
-    struct Flags;
-    struct RefinementFlags;
-    struct RefinementData;
-
+				     /**
+				      * Typedef the data types of the
+				      * @ref{TimeStepBase_Tria_Flags}
+				      * namespace into local scope.
+				      */
+    typedef TimeStepBase_Tria_Flags::Flags<dim>           Flags;
+    typedef TimeStepBase_Tria_Flags::RefinementFlags<dim> RefinementFlags;
+    typedef TimeStepBase_Tria_Flags::RefinementData<dim>  RefinementData;
+    
+    
 				     /**
 				      * Extension of the enum in the base
 				      * class denoting the next action to be
@@ -1422,376 +1848,6 @@ class TimeStepBase_Tria :  public TimeStepBase
 
 
 
-/**
- * This structure is used to tell the @ref{TimeStepBase_Tria} class how grids should
- * be handled. It has flags defining the moments where grids shall be
- * re-made and when they may be deleted. Also, one variable states whether
- * grids should be kept in memory or should be deleted between to uses to
- * save memory.
- */
-template <int dim>
-struct TimeStepBase_Tria<dim>::Flags
-{
-				     /**
-				      * Default constructor; yields an exception,
-				      * so is not really usable.
-				      */
-    Flags ();
-    
-				     /**
-				      * Constructor; see the different
-				      * fields for a description of the
-				      * meaning of the parameters.
-				      */
-    Flags (const bool         delete_and_rebuild_tria,
-	   const unsigned int wakeup_level_to_build_grid,
-	   const unsigned int sleep_level_to_delete_grid);
-    
-				     /**
-				      * This flag determines whether the
-				      * @p{sleep} and @p{wake_up} functions shall
-				      * delete and rebuild the triangulation.
-				      * While for small problems, this is
-				      * not necessary, for large problems
-				      * it is indispensable to save memory.
-				      * The reason for this is that there
-				      * may be several hundred time levels
-				      * in memory, each with its own
-				      * triangulation, which may require
-				      * large amounts if there are many
-				      * cells on each. Having a total
-				      * of 100.000.000 cells on all time
-				      * levels taken together is not
-				      * uncommon, which makes this flag
-				      * understandable.
-				      */
-    const bool delete_and_rebuild_tria;
-
-				     /**
-				      * This number denotes the parameter to
-				      * the @p{wake_up} function at which it
-				      * shall rebuild the grid. Obviously,
-				      * it shall be less than or equal to the
-				      * @p{look_ahead} number passed to the
-				      * time step management object; if it
-				      * is equal, then the grid is rebuilt
-				      * the first time the @p{wake_up} function
-				      * is called. If @p{delete_and_rebuild_tria}
-				      * is @p{false}, this number has no meaning.
-				      */
-    const unsigned int wakeup_level_to_build_grid;
-
-				     /**
-				      * This is the opposite flag to the one
-				      * above: it determines at which call to
-				      * @p{sleep} the grid shall be deleted.
-				      */
-    const unsigned int sleep_level_to_delete_grid;
-
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidParameter,
-		    int,
-		    << "The parameter " << arg1 << " has an invalid value.");
-};
-
-
-
-/**
- * This structure is used to tell the @ref{TimeStepBase_Tria} class how grids should
- * be refined. Before we explain all the different variables, fist some terminology:
- * @begin{itemize}
- * @item Correction: after having flagged some cells of the triangulation for
- *   following some given criterion, we may want to change the number of flagged
- *   cells on this grid according to another criterion that the number of cells
- *   may be only a certain fraction more or less then the number of cells on
- *   the previous grid. This change of refinement flags will be called
- *   "correction" in the sequel.
- * @item Adaption: in order to make the change between one grid and the next not
- *   to large, we may want to flag some additional cells on one of the two
- *   grids such that there are not too grave differences. This process will
- *   be called "adaption".
- * @end{itemize}
- *
- *
- * @sect3{Description of flags}
- *
- * @begin{itemize}
- * @item @p{max_refinement_level}: Cut the refinement of cells at a given level.
- *   This flag does not influence the flagging of cells, so not more cells
- *   on the coarser levels are flagged than usual. Rather, the flags are all
- *   set, but when it comes to the actual refinement, the maximum refinement
- *   level is truncated.
- *
- *   This option is only really useful when you want to compare global
- *   refinement with adaptive refinement when you don't want the latter
- *   to refine more than the global refinement.
- *
- * @item @p{first_sweep_with_correction}: When using cell number correction
- *   as defined above, it may be worth while to start with this only in
- *   later sweeps, not already in the first one. If this variable is
- *   zero, then start with the first sweep, else with a higher one. The
- *   rationale for only starting later is that we do not want to block the
- *   development of grids at the beginning and only impose restrictions in
- *   the sweeps where we start to be interested in the actual results of
- *   the computations.
- *
- * @item @p{min_cells_for_correction}: If we want a more free process of
- *   grid development, we may want to impose less rules for grids with few
- *   cells also. This variable sets a lower bound for the cell number of
- *   grids where corrections are to be performed.
- *
- * @item @p{cell_number_corridor_top}: Fraction of the number of cells by
- *   which the number of cells of one grid may be higher than that on the
- *   previous grid. Common values are 10 per cent (i.e. 0.1). The naming
- *   of the variable results from the goal to define a target corridor
- *   for the number of cells after refinement has taken place.
- *
- * @item @p{cell_number_corridor_bottom}: Fraction of the number of cells by
- *   which the number of cells of one grid may be lower than that on the
- *   previous grid. Common values are 5 per cent (i.e. 0.05). Usually this
- *   number will be smaller than @p{cell_number_corridor_top} since an
- *   increase of the number of cells is not harmful (though it increases
- *   the numerical amount of work needed to solve the problem) while a
- *   sharp decrease may reduce the accuracy of the final result even if
- *   the time steps computed before the decrease were computed to high
- *   accuracy.
- *
- *   Note however, that if you compute the dual problem as well, then the time
- *   direction is reversed, so the two values defining the cell number
- *   corridor should be about equal.
- *
- * @item @p{correction_relaxations}: This is a list of pairs of number with the
- *   following meaning: just as for @p{min_cells_for_correction}, it may be
- *   worth while to reduce the requirements upon grids if the have few cells.
- *   The present variable stores a list of cell numbers along with some values
- *   which tell us that the cell number corridor should be enlarged by a
- *   certain factor. For example, if this list was @p{((100 5) (200 3) (500 2))},
- *   this would mean that for grids with a cell number below 100, the
- *   @p{cell_number_corridor_*} variables are to be multiplied by 5 before they
- *   are applied, for cell numbers below 200 they are to be multiplied by 3,
- *   and so on.
- *
- *   @p{correction_relaxations} is actually a vector of such list. Each entry
- *   in this vector denotes the relaxation rules for one sweep. The last
- *   entry defines the relaxation rules for all following sweeps. This
- *   scheme is adopted to allow for stricter corrections in later sweeps
- *   while the relaxations may be more generous in the first sweeps.
- *
- *   There is a static variable @p{default_correction_relaxations} which you
- *   can use as a default value. It is an empty list and thus defines no
- *   relaxations.
- *
- * @item @p{cell_number_correction_steps}: Usually, if you want the number of
- *   cells to be corrected, the target corridor for the cell number is computed
- *   and some additional cells are flagged or flags are removed. But since
- *   the cell number resulting after flagging and deflagging can not be
- *   easily computed, it will usually not be within the corridor. We therefore
- *   need to iteratively get to our goal. Usually, three or four iterations are
- *   needed, but using this variable, you can reduce the allowed number of
- *   iterations; breaking the loop after two iterations yields good results
- *   regularly. Setting the variable to zero will result in no correction
- *   steps at all.
- *
- * @item @p{mirror_flags_to_previous_grid}: If a cell on the present grid is
- *   flagged for refinement, also flag the corresponding cell on the previous
- *   grid. This is useful if, for example, error indicators are computed for
- *   space-time cells, but are stored for the second grid only. Now, since the
- *   first grid has the same contributions to the indicators as the second, it
- *   may be useful to flag both if necessary. This is done if the present
- *   variable is set.
- *
- * @item @p{adapt_grids}: adapt the present grid to the previous one in the sense
- *   defined above. What is actually done here is the following: if going from
- *   the previous to the present grid would result in double refinement or
- *   double coarsening of some cells, then we try to flag these cells for
- *   refinement or coarsening such as to avoid the double step. Obviously, more
- *   than double refinement of coarsening is also caught.
- *
- *   Grid adaption can try to avoid such changes between two grids, but it can
- *   never promise that they don't occur. This is because the next grid may
- *   change the present one, but then again there may be jumps in refinement
- *   level between the present and the previous one; this could only be avoided
- *   by looping iteratively through all grids, back and forth, until nothing
- *   changes anymore, which is obviously impossible if there are many time steps
- *   with very large grids.
- * @end{itemize}
- */
-template <int dim>
-struct TimeStepBase_Tria<dim>::RefinementFlags
-{
-				     /**
-				      * Typedef of a data type describing some
-				      * relaxations of the correction process.
-				      * See the general description of this
-				      * class for more information.
-				      */
-    typedef std::vector<std::vector<std::pair<unsigned int, double> > >   CorrectionRelaxations;
-
-				     /**
-				      * Default values for the relaxations:
-				      * no relaxations.
-				      */
-    static CorrectionRelaxations default_correction_relaxations;
-
-				     /**
-				      * Constructor. The default values are
-				      * chosen such that almost no restriction
-				      * on the mesh refinement is imposed.
-				      */
-    RefinementFlags (const unsigned int max_refinement_level         = 0,
-		     const unsigned int first_sweep_with_correction  = 0,
-		     const unsigned int min_cells_for_correction     = 0,
-		     const double cell_number_corridor_top           = (1<<dim),
-		     const double cell_number_corridor_bottom        = 1,
-		     const CorrectionRelaxations &correction_relaxations = CorrectionRelaxations(),
-		     const unsigned int cell_number_correction_steps = 0,
-		     const bool mirror_flags_to_previous_grid        = false,
-		     const bool adapt_grids                          = false);
-    
-				     /**
-				      * Maximum level of a cell in the
-				      * triangulation of a time level. If it
-				      * is set to zero, then no limit is imposed
-				      * on the number of refinements a coarse
-				      * grid cell may undergo. Usually, this
-				      * field is used, if for some reason you
-				      * want to limit refinement in an
-				      * adaptive process, for example to avoid
-				      * overly large numbers of cells or to
-				      * compare with grids which have a certain
-				      * number of refinements.
-				      */
-    const unsigned int  max_refinement_level;
-
-				     /**
-				      * First sweep to perform cell number
-				      * correction steps on; for sweeps
-				      * before, cells are only flagged and
-				      * no number-correction to previous grids
-				      * is performed.
-				      */
-    const unsigned int  first_sweep_with_correction;
-
-
-				     /**
-				      * Apply cell number correction with the
-				      * previous time level only if there are
-				      * more than this number of cells.
-				      */
-    const unsigned int  min_cells_for_correction;
-    
-				     /**
-				      * Fraction by which the number of cells
-				      * on a time level may differ from the
-				      * number on the previous time level
-				      * (first: top deviation, second: bottom
-				      * deviation).
-				      */
-    const double        cell_number_corridor_top;
-				     /**
-				      * @see cell_number_corridor_top
-				      */
-    const double        cell_number_corridor_bottom;
-
-				     /**
-				      * List of relaxations to the correction
-				      * step.
-				      */
-    const std::vector<std::vector<std::pair<unsigned int,double> > > correction_relaxations;
-    
-				     /**
-				      * Number of iterations to be performed
-				      * to adjust the number of cells on a
-				      * time level to those on the previous
-				      * one. Zero means: do no such iteration.
-				      */
-    const unsigned int  cell_number_correction_steps;
-
-				     /**
-				      * Flag all cells which are flagged on this
-				      * timestep for refinement on the previous
-				      * one also. This is useful in case the
-				      * error indicator was computed by
-				      * integration over time-space cells, but
-				      * are now associated to a grid on a
-				      * discrete time level. Since the error
-				      * contribution comes from both grids,
-				      * however, it is appropriate to refine
-				      * both grids.
-				      *
-				      * Since the previous grid does not mirror
-				      * the flags to the one before it, this
-				      * does not lead to an almost infinite
-				      * growth of cell numbers. You should
-				      * use this flag with cell number
-				      * correction switched on only, however.
-				      *
-				      * Mirroring is done after cell number
-				      * correction is done, but before grid
-				      * adaption, so the cell number on
-				      * this grid is not noticably influenced
-				      * by the cells flagged additionally on
-				      * the previous grid.
-				      */
-    const bool          mirror_flags_to_previous_grid;
-
-				     /**
-				      * Adapt this grid to the previous one.
-				      */
-    const bool          adapt_grids;
-    
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidValue,
-		    double,
-		    << "The following value does not fulfill the requirements: " << arg1);
-};
-
-
-
-/**
- * Structure given to the actual refinement function, telling it which
- * thresholds to take for coarsening and refinement. The actual refinement
- * criteria are loaded by calling the virtual function
- * @p{get_tria_refinement_criteria}.
- */
-template <int dim>
-struct TimeStepBase_Tria<dim>::RefinementData 
-{
-				     /**
-				      * Constructor
-				      */
-    RefinementData (const double         refinement_threshold,
-		    const double         coarsening_threshold=0);
-    
-				     /**
-				      * Threshold for refinement: cells having
-				      * a larger value will be refined (at least
-				      * in the first round; subsequent steps
-				      * of the refinement process may flag
-				      * other cells as well or remove the
-				      * flag from cells with a criterion higher
-				      * than this threshold).
-				      */
-    const double         refinement_threshold;
-
-				     /**
-				      * Same threshold for coarsening: cells
-				      * with a smaller threshold will be
-				      * coarsened if possible.
-				      */
-    const double         coarsening_threshold;
-
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidValue,
-		    double,
-		    << "The following value does not fulfill the requirements: " << arg1);
-};
 
 
 /*----------------------------- template functions ------------------------------*/

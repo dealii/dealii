@@ -1132,7 +1132,11 @@ TimeStepBase_Tria<dim>::memory_consumption () const
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::Flags::Flags ()
+TimeStepBase_Tria_Flags::Flags<dim>::Flags ()
+		:
+		delete_and_rebuild_tria (false),
+		wakeup_level_to_build_grid (0),
+		sleep_level_to_delete_grid (0)
 {
   Assert (false, ExcInternalError());
 };
@@ -1140,9 +1144,9 @@ TimeStepBase_Tria<dim>::Flags::Flags ()
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::Flags::Flags (const bool delete_and_rebuild_tria,
-				      const unsigned int wakeup_level_to_build_grid,
-				      const unsigned int sleep_level_to_delete_grid):
+TimeStepBase_Tria_Flags::Flags<dim>::Flags (const bool delete_and_rebuild_tria,
+					    const unsigned int wakeup_level_to_build_grid,
+					    const unsigned int sleep_level_to_delete_grid):
 		delete_and_rebuild_tria (delete_and_rebuild_tria),
 		wakeup_level_to_build_grid (wakeup_level_to_build_grid),
 		sleep_level_to_delete_grid (sleep_level_to_delete_grid)
@@ -1155,8 +1159,8 @@ TimeStepBase_Tria<dim>::Flags::Flags (const bool delete_and_rebuild_tria,
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::RefinementFlags::CorrectionRelaxations
-TimeStepBase_Tria<dim>::RefinementFlags::default_correction_relaxations 
+TimeStepBase_Tria_Flags::RefinementFlags<dim>::CorrectionRelaxations
+TimeStepBase_Tria_Flags::RefinementFlags<dim>::default_correction_relaxations 
   (1,    // one element, denoting the first and all subsequent sweeps
    std::vector<std::pair<unsigned int,double> >(1,    // one element, denoting the upper bound
 										 // for the following
@@ -1165,7 +1169,7 @@ TimeStepBase_Tria<dim>::RefinementFlags::default_correction_relaxations
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::RefinementFlags::
+TimeStepBase_Tria_Flags::RefinementFlags<dim>::
 RefinementFlags (const unsigned int max_refinement_level,
 		 const unsigned int first_sweep_with_correction,
 		 const unsigned int min_cells_for_correction,
@@ -1194,7 +1198,7 @@ RefinementFlags (const unsigned int max_refinement_level,
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::RefinementData::
+TimeStepBase_Tria_Flags::RefinementData<dim>::
 RefinementData (const double         _refinement_threshold,
 		const double         _coarsening_threshold) :
 		refinement_threshold(_refinement_threshold),
