@@ -37,3 +37,5 @@ DEAL::Row 17 sparsity:  00010101100010101000010101010
 DEAL::Row=17: expected length=11, actual length=11
 DEAL::Row 18 sparsity:  01010000111010000101010000101
 DEAL::Row=18: expected length=11, actual length=11
+DEAL::196==196
+DEAL::196==196

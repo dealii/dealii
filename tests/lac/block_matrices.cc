@@ -14,13 +14,14 @@
 
 #include <base/logstream.h>
 #include <lac/block_sparsity_pattern.h>
+#include <lac/block_sparse_matrix.h>
 #include <fstream>
 #include <algorithm>
 
 
 
 
-int main () 
+void test () 
 {
   ofstream logfile("block_matrices.output");
   logfile.setf(ios::fixed);
@@ -71,6 +72,7 @@ int main ()
 				   // their places are checked later
 				   // with the matrix-vector
 				   // operations.
+  unsigned int total_nonzero_elements = 0;
   for (unsigned int row=0; row<19; ++row)
     {
 				       // first count the number of
@@ -91,7 +93,7 @@ int main ()
       deallog << endl;
       
       const unsigned int c=count(t.begin(), t.end(), true);
-
+      
 				       // now see how many elements
 				       // there really are:
       unsigned int ac=0;
@@ -107,6 +109,72 @@ int main ()
 	      << ": expected length=" << c
 	      << ", actual length=" << ac
 	      << endl;
-      Assert (c==ac, ExcInternalError());
+      total_nonzero_elements += ac;
+      AssertThrow (c==ac, ExcInternalError());
     };
+  deallog << total_nonzero_elements << "=="
+	  << bsp.n_nonzero_elements()
+	  << endl;
+  AssertThrow (total_nonzero_elements == bsp.n_nonzero_elements(),
+	       ExcInternalError());
+
+
+
+  
+				   // now make a matrix with this
+				   // sparsity pattern
+  BlockSparseMatrix<double,3,2> bsm (bsp);
+  deallog << total_nonzero_elements << "=="
+	  << bsm.n_nonzero_elements()
+	  << endl;
+  AssertThrow (total_nonzero_elements == bsm.n_nonzero_elements(),
+	       ExcInternalError());
+  
+				   // try to write something into it,
+				   // set entry (i,j) to i*j
+  for (unsigned int row=0; row<19; ++row)
+    for (unsigned int i=0; i<10; ++i)
+      bsm.set (row, (row*5+i*9)%29, row*((row*5+i*9)%29));
+				   // and add .5 to each value
+  for (unsigned int row=0; row<19; ++row)
+    for (unsigned int i=0; i<10; ++i)
+      bsm.add (row, (row*5+i*9)%29, 0.5);
+};
+
+
+
+
+int main ()
+{
+  try
+    {
+      test ();
+    }
+  catch (exception &e)
+    {
+      cerr << endl << endl
+	   << "----------------------------------------------------"
+	   << endl;
+      cerr << "Exception on processing: " << e.what() << endl
+	   << "Aborting!" << endl
+	   << "----------------------------------------------------"
+	   << endl;
+				       // abort
+      return 2;
+    }
+  catch (...) 
+    {
+      cerr << endl << endl
+	   << "----------------------------------------------------"
+	   << endl;
+      cerr << "Unknown exception!" << endl
+	   << "Aborting!" << endl
+	   << "----------------------------------------------------"
+	   << endl;
+				       // abort
+      return 3;
+    };
+  
+  
+  return 0;
 };
