@@ -193,7 +193,7 @@ class FiniteElementData
 };
 
 
-//TODO:[WB] Unify FiniteElementBase with FiniteElement? There is no clear distinction between the two
+
 
 /**
  * Base class for finite elements in arbitrary dimensions. This class
