@@ -14,24 +14,25 @@
 
 #include <lac/sparse_matrix.templates.h>
 
-
 #define TYPEMAT float
 
 template class SparseMatrix<TYPEMAT>;
 
+#define TYPEVEC float
 
-#define TYPE2 float
+#include "sparse_matrix.in.h"
 
-#include <lac/sparse_matrix.2.templates>
+#undef TYPEVEC
+#define TYPEVEC double
 
-#undef TYPE2
-#define TYPE2 double
-
-#include <lac/sparse_matrix.2.templates>
+#include "sparse_matrix.in.h"
 
 				 // a prerelease of gcc3.0 fails to
 				 // compile this due to long double
-//  #undef TYPE2
-//  #define TYPE2 long double
+//  #undef TYPEVEC
+//  #define TYPEVEC long double
 
 //  #include <lac/sparse_matrix.2.templates>
+
+#undef TYPEVEC
+#undef TYPEMAT
