@@ -202,3 +202,7 @@ In GridOut::write_ucd, a vector of vertices is built along with
   take a look whether re-building these arrays is a large wast of
   computing time and memory, or whether it is justifiable.
 
+
+Fix a potential problem with viewing angles in 3d Eps GridOut (see
+  comment)
+
