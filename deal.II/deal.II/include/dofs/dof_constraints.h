@@ -116,18 +116,33 @@ class ConstraintMatrix : public Subscriptor
 
 
 				     /**
-				      * Add a new line to the matrix.
+				      * Add a new line to the
+				      * matrix. If the line already
+				      * exists, then the function
+				      * simply returns.
 				      */
     void add_line (const unsigned int line);
 
 				     /**
-				      * Add an entry to a given line. The list
-				      * of lines is searched from the back to
-				      * the front, so clever programming would
-				      * add a new line (which is pushed to the
-				      * back) and immediately afterwards fill
-				      * the entries of that line. This way, no
-				      * expensive searching is needed.
+				      * Add an entry to a given
+				      * line. The list of lines is
+				      * searched from the back to the
+				      * front, so clever programming
+				      * would add a new line (which is
+				      * pushed to the back) and
+				      * immediately afterwards fill
+				      * the entries of that line. This
+				      * way, no expensive searching is
+				      * needed.
+				      *
+				      * If an entry with the same
+				      * indices as the one this
+				      * function call denotes already
+				      * exists, then this function
+				      * simply returns provided that
+				      * the value of the entry is the
+				      * same. Thus, it does no harm to
+				      * enter a constraint twice.
 				      */
     void add_entry (const unsigned int line,
 		    const unsigned int column,
