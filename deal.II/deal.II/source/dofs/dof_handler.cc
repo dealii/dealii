@@ -546,6 +546,127 @@ DoFHandler<dim>::end_quad () const {
 
 
 template <int dim>
+typename DoFDimensionInfo<dim>::raw_cell_iterator
+DoFHandler<dim>::end_raw (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end() :
+	  begin_raw (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::cell_iterator
+DoFHandler<dim>::end (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  cell_iterator(end()) :
+	  begin (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::active_cell_iterator
+DoFHandler<dim>::end_active (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_cell_iterator(end()) :
+	  begin_active (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::raw_face_iterator
+DoFHandler<dim>::end_raw_face (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end_face() :
+	  begin_raw_face (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::face_iterator
+DoFHandler<dim>::end_face (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  face_iterator(end_face()) :
+	  begin_face (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::active_face_iterator
+DoFHandler<dim>::end_active_face (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_face_iterator(end_face()) :
+	  begin_active_face (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::raw_line_iterator
+DoFHandler<dim>::end_raw_line (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end_line() :
+	  begin_raw_line (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::line_iterator
+DoFHandler<dim>::end_line (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  line_iterator(end_line()) :
+	  begin_line (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::active_line_iterator
+DoFHandler<dim>::end_active_line (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_line_iterator(end_line()) :
+	  begin_active_line (level+1));
+};
+
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::raw_quad_iterator
+DoFHandler<dim>::end_raw_quad (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end_quad() :
+	  begin_raw_quad (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::quad_iterator
+DoFHandler<dim>::end_quad (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  quad_iterator(end_quad()) :
+	  begin_quad (level+1));
+};
+
+
+
+template <int dim>
+typename DoFDimensionInfo<dim>::active_quad_iterator
+DoFHandler<dim>::end_active_quad (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_quad_iterator(end_quad()) :
+	  begin_active_quad (level+1));
+};
+
+
+
+template <int dim>
 typename DoFHandler<dim>::raw_line_iterator
 DoFHandler<dim>::last_raw_line (const unsigned int level) const {
   return raw_line_iterator (tria,

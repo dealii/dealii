@@ -24,6 +24,7 @@ template <int dim, class Accessor> class TriaIterator;
 template <int dim, class Accessor> class TriaActiveIterator;
 
 template <int dim> class DoFHandler;
+template <int dim> class MGDoFHandler;
 
 template <int dim> struct CellData;
 struct SubCellData;
@@ -267,9 +268,7 @@ class TriaDimensionInfo<2> {
  *     template <int dim>
  *     int Triangulation<dim>::n_cells (const int level) const {
  *        cell_iterator cell = begin (level),
- *                      endc = (level == levels.size()-1 ?
- *                              cell_iterator(end()) :
- *                              begin (level+1));
+ *                      endc = end(level);
  *        int n=0;
  *        for (; cell!=endc; ++cell)
  *          ++n;
@@ -1527,6 +1526,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
     void load_user_flags_quad (const vector<bool> &v);
 				     /*@}*/
 
+				     /* ------------------------------------ */
     
 				     /**
 				      *  @name Cell iterator functions
@@ -1572,6 +1572,31 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      */
     raw_cell_iterator    end () const;
 
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    cell_iterator        end (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_cell_iterator    end_raw (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_cell_iterator end_active (const unsigned int level) const;
+
+    
 				     /**
 				      *  Return an iterator pointing to the
 				      *  last cell, used or not.
@@ -1675,6 +1700,30 @@ class Triangulation : public TriaDimensionInfo<dim> {
     raw_face_iterator    end_face () const;
 
 				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    face_iterator        end_face (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_face_iterator    end_raw_face (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_face_iterator end_active_face (const unsigned int level) const;
+
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last face, used or not.
 				      *
@@ -1769,6 +1818,30 @@ class Triangulation : public TriaDimensionInfo<dim> {
     end_line () const;
 
 				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    line_iterator        end_line (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_line_iterator    end_raw_line (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_line_iterator end_active_line (const unsigned int level) const;
+
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last line, used or not.
 				      */
@@ -1849,6 +1922,30 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      */
     raw_quad_iterator
     end_quad () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    quad_iterator        end_quad (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_quad_iterator    end_raw_quad (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_quad_iterator end_active_quad (const unsigned int level) const;
 
 				     /**
 				      *  Return an iterator pointing to the
@@ -2018,7 +2115,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * rather than by returning a pre-stored
 				      * value. It is therefore often better
 				      * to rewrite lines like
-				      * #for (i=0; i<tria.n_cells(); ++i) ...#
+				      * #for (i=0; i<tria.n_cells() const; ++i) ...#
 				      * by
 				      * #const unsigned int n=tria.n_cells();#
 				      * #for (i=0; i<n; ++i) ...#.
@@ -2294,6 +2391,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
     friend class TriaRawIterator<2,CellAccessor<2> >;
 
     friend class DoFHandler<dim>;
+    friend class MGDoFHandler<dim>;
 };
 
 

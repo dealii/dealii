@@ -62,6 +62,7 @@ Triangulation<1>::begin (const unsigned int level) const {
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::raw_cell_iterator
 Triangulation<1>::end () const {
@@ -78,7 +79,6 @@ TriaDimensionInfo<2>::cell_iterator
 Triangulation<2>::begin (const unsigned int level) const {
   return begin_quad (level);
 };
-
 
 
 
@@ -1457,7 +1457,6 @@ Triangulation<dim>::begin_active_quad (unsigned int level) const {
 };
 
 
-
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::end_line () const {
@@ -1619,6 +1618,128 @@ template <int dim>
 typename TriaDimensionInfo<dim>::active_quad_iterator
 Triangulation<dim>::last_active_quad () const {
   return last_active_quad (levels.size()-1);
+};
+
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_cell_iterator
+Triangulation<dim>::end_raw (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end() :
+	  begin_raw (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::cell_iterator
+Triangulation<dim>::end (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  cell_iterator(end()) :
+	  begin (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_cell_iterator
+Triangulation<dim>::end_active (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_cell_iterator(end()) :
+	  begin_active (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_face_iterator
+Triangulation<dim>::end_raw_face (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end_face() :
+	  begin_raw_face (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::face_iterator
+Triangulation<dim>::end_face (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  face_iterator(end_face()) :
+	  begin_face (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_face_iterator
+Triangulation<dim>::end_active_face (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_face_iterator(end_face()) :
+	  begin_active_face (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_line_iterator
+Triangulation<dim>::end_raw_line (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end_line() :
+	  begin_raw_line (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::line_iterator
+Triangulation<dim>::end_line (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  line_iterator(end_line()) :
+	  begin_line (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_line_iterator
+Triangulation<dim>::end_active_line (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_line_iterator(end_line()) :
+	  begin_active_line (level+1));
+};
+
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::raw_quad_iterator
+Triangulation<dim>::end_raw_quad (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  end_quad() :
+	  begin_raw_quad (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::quad_iterator
+Triangulation<dim>::end_quad (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  quad_iterator(end_quad()) :
+	  begin_quad (level+1));
+};
+
+
+
+template <int dim>
+typename TriaDimensionInfo<dim>::active_quad_iterator
+Triangulation<dim>::end_active_quad (const unsigned int level) const {
+  return (level == levels.size()-1 ?
+	  active_quad_iterator(end_quad()) :
+	  begin_active_quad (level+1));
 };
 
 

@@ -812,6 +812,30 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     raw_cell_iterator    end () const;
 
 				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    cell_iterator        end (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_cell_iterator    end_raw (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_cell_iterator end_active (const unsigned int level) const;
+
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last cell, used or not.
 				      *
@@ -913,6 +937,30 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     raw_face_iterator    end_face () const;
 
 				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    face_iterator        end_face (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_face_iterator    end_raw_face (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_face_iterator end_active_face (const unsigned int level) const;
+
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last face, used or not.
 				      *
@@ -1007,6 +1055,31 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     end_line () const;
 
 				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    line_iterator        end_line (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_line_iterator    end_raw_line (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_line_iterator end_active_line (const unsigned int level) const;
+
+
+				     /**
 				      *  Return an iterator pointing to the
 				      *  last line, used or not.
 				      */
@@ -1087,6 +1160,31 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     raw_quad_iterator
     end_quad () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    quad_iterator        end_quad (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_quad_iterator    end_raw_quad (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_quad_iterator end_active_quad (const unsigned int level) const;
+
 
 				     /**
 				      *  Return an iterator pointing to the
