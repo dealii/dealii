@@ -13,9 +13,16 @@
 #include <basic/data_io.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.criss_cross.h>
+#include <fe/fe_update_flags.h>
 #include <fe/quadrature_lib.h>
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
+#include <numerics/matrices.h>
+
+#include <lac/dvector.h>
+#include <lac/dsmatrix.h>
+#include <lac/solver_cg.h>
+#include <lac/vector_memory.h>
 
 #include <map>
 #include <fstream>
@@ -56,10 +63,51 @@ class PoissonEquation :  public Equation<dim> {
 template <int dim>
 class PoissonProblem {
   public:
+				     /**
+				      *	Declare a data type which denotes a
+				      *	mapping between a boundary indicator
+				      *	and the function denoting the boundary
+				      *	values on this part of the boundary.
+				      *	Only one boundary function may be given
+				      *	for each boundary indicator, which is
+				      *	guaranteed by the #map# data type.
+				      *	
+				      *	See the general documentation of this
+				      *	class for more detail.
+				      */
+    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+				     /**
+				      * Typdedef an iterator which assembles
+				      * matrices and vectors.
+				      */
+    typedef TriaActiveIterator<dim, Assembler<dim> > active_assemble_iterator;
+
     PoissonProblem (unsigned int order);
 
     void clear ();
     void create_new ();
+    void solve ();
+    
+				     /**
+				      * Initiate the process of assemblage of
+				      * vectors and system matrix. Use the
+				      * given equation object and the given
+				      * quadrature formula. Also use the list
+				      * of dirichlet boundary value functions
+				      * (by default, no dirichlet bc are assumed
+				      * which means that all bc are included
+				      * into the weak formulation).
+				      *
+				      * For what exactly happens here, refer to
+				      * the general doc of this class.
+				      */
+    virtual void assemble (const Equation<dim>      &equation,
+			   const Quadrature<dim>    &q,
+			   const FiniteElement<dim> &fe,
+			   const UpdateFlags         update_flags,
+			   const FunctionMap        &dirichlet_bc = FunctionMap(),
+			   const Boundary<dim>      &boundary = StraightBoundary<dim>());
+
     int run (unsigned int level);
     void print_history (string filename) const;
     
@@ -67,6 +115,33 @@ class PoissonProblem {
     Triangulation<dim> *tria;
     MGDoFHandler<dim>  *dof;
     
+
+				     /**
+				      * Sparsity pattern of the system matrix.
+				      */
+    dSMatrixStruct      system_sparsity;
+
+				     /**
+				      * System matrix.
+				      */
+    dSMatrix            system_matrix;
+
+				     /**
+				      * Vector storing the right hand side.
+				      */
+    dVector             right_hand_side;
+
+				     /**
+				      * Solution vector.
+				      */
+    dVector             solution;
+
+				     /**
+				      * List of constraints introduced by
+				      * hanging nodes.
+				      */
+    ConstraintMatrix    constraints;
+
     Function<dim>      *rhs;
     Function<dim>      *boundary_values;
 
@@ -219,7 +294,11 @@ void PoissonProblem<dim>::clear () {
       boundary_values = 0;
     };
 
-  ProblemBase<dim>::clear ();
+  system_sparsity.reinit (0,0,1);
+  system_matrix.clear ();
+  right_hand_side.reinit (1);
+  solution.reinit (1);
+  constraints.clear ();
 };
 
 
@@ -231,9 +310,89 @@ void PoissonProblem<dim>::create_new () {
   
   tria = new Triangulation<dim>();
   dof = new MGDoFHandler<dim> (tria);
-  set_tria_and_dof (tria, dof);
 };
 
+
+
+template <int dim>
+void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
+				    const Quadrature<dim>    &quadrature,
+				    const FiniteElement<dim> &fe,
+				    const UpdateFlags         update_flags,
+				    const FunctionMap        &dirichlet_bc,
+				    const Boundary<dim>      &boundary) {
+  Assert ((tria!=0) && (dof!=0), ExcNoTriaSelected());
+  
+  system_sparsity.reinit (dof->DoFHandler<dim>::n_dofs(),
+			  dof->DoFHandler<dim>::n_dofs(),
+			  dof->max_couplings_between_dofs());
+  right_hand_side.reinit (dof->DoFHandler<dim>::n_dofs());
+  
+				   // make up sparsity pattern and
+				   // compress with constraints
+  constraints.clear ();
+  dof->DoFHandler<dim>::make_constraint_matrix (constraints);
+  dof->DoFHandler<dim>::make_sparsity_pattern (system_sparsity);
+  constraints.condense (system_sparsity);
+
+				   // reinite system matrix
+  system_matrix.reinit (system_sparsity);
+				   // reinit solution vector, preset
+				   // with zeroes.
+  solution.reinit (dof->DoFHandler<dim>::n_dofs());
+  
+				   // create assembler
+  AssemblerData<dim> data (*dof,
+			   true, true, //assemble matrix and rhs
+			   system_matrix,
+			   right_hand_side,
+			   quadrature,
+			   fe,
+			   update_flags,
+			   boundary);
+  active_assemble_iterator assembler (tria,
+				      tria->begin_active()->level(),
+				      tria->begin_active()->index(),
+				      &data);
+				   // loop over all cells, fill matrix and rhs
+  do 
+    {
+      assembler->assemble (equation);
+    }
+  while ((++assembler).state() == valid);
+
+				   // condense system matrix in-place
+  constraints.condense (system_matrix);
+
+				   // condense right hand side in-place
+  constraints.condense (right_hand_side);
+
+				   // apply Dirichlet bc as described
+				   // in the docs
+  map<int, double> boundary_value_list;
+  VectorTools<dim>::interpolate_boundary_values (*dof,
+						 dirichlet_bc, fe, boundary,
+						 boundary_value_list);
+  MatrixTools<dim>::apply_boundary_values (boundary_value_list,
+					   system_matrix, solution,
+					   right_hand_side);  
+};
+
+
+
+template <int dim>
+void PoissonProblem<dim>::solve () {
+  Assert ((tria!=0) && (dof!=0), ExcNoTriaSelected());
+  
+  SolverControl                    control(4000, 1e-16);
+  PrimitiveVectorMemory<dVector>   memory(right_hand_side.size());
+  SolverCG<dSMatrix,dVector>       cg(control,memory);
+
+				   // solve
+  cg.solve (system_matrix, solution, right_hand_side);
+				   // distribute solution
+  constraints.distribute (solution);
+};
 
 
 
@@ -304,14 +463,14 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   
   cout << "    Distributing dofs... "; 
   dof->distribute_dofs (*fe);
-  cout << dof->n_dofs() << " degrees of freedom." << endl;
-  n_dofs.push_back (dof->n_dofs());
+  cout << dof->DoFHandler<dim>::n_dofs() << " degrees of freedom." << endl;
+  n_dofs.push_back (dof->DoFHandler<dim>::n_dofs());
 
   cout << "    Assembling matrices..." << endl;
   UpdateFlags update_flags = UpdateFlags(update_q_points  | update_gradients |
 					 update_JxW_values);
   
-  ProblemBase<dim>::FunctionMap dirichlet_bc;
+  map<unsigned char,const Function<dim>*> dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
   assemble (equation, *quadrature, *fe, update_flags, dirichlet_bc);
 
@@ -323,7 +482,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   dVector       h1_seminorm_error_per_cell, h1_error_per_cell;
   
   cout << "    Calculating L1 error... ";
-  VectorTools<dim>::integrate_difference (*dof_handler,
+  VectorTools<dim>::integrate_difference (*dof,
 					  solution, sol,
 					  l1_error_per_cell,
 					  *quadrature, *fe, L1_norm);
@@ -331,7 +490,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   l1_error.push_back (l1_error_per_cell.l1_norm());
 
   cout << "    Calculating L2 error... ";
-  VectorTools<dim>::integrate_difference (*dof_handler,
+  VectorTools<dim>::integrate_difference (*dof,
 					  solution, sol,
 					  l2_error_per_cell,
 					  *quadrature, *fe, L2_norm);
@@ -339,7 +498,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   l2_error.push_back (l2_error_per_cell.l2_norm());
 
   cout << "    Calculating L-infinity error... ";
-  VectorTools<dim>::integrate_difference (*dof_handler,
+  VectorTools<dim>::integrate_difference (*dof,
 					  solution, sol,
 					  linfty_error_per_cell,
 					  *quadrature, *fe, Linfty_norm);
@@ -347,7 +506,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   linfty_error.push_back (linfty_error_per_cell.linfty_norm());
   
   cout << "    Calculating H1-seminorm error... ";
-  VectorTools<dim>::integrate_difference (*dof_handler,
+  VectorTools<dim>::integrate_difference (*dof,
 					  solution, sol,
 					  h1_seminorm_error_per_cell,
 					  *quadrature, *fe, H1_seminorm);
@@ -355,14 +514,14 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   h1_seminorm_error.push_back (h1_seminorm_error_per_cell.l2_norm());
 
   cout << "    Calculating H1 error... ";
-  VectorTools<dim>::integrate_difference (*dof_handler,
+  VectorTools<dim>::integrate_difference (*dof,
 					  solution, sol,
 					  h1_error_per_cell,
 					  *quadrature, *fe, H1_norm);
   cout << h1_error_per_cell.l2_norm() << endl;
   h1_error.push_back (h1_error_per_cell.l2_norm());
 
-  if (dof->n_dofs()<=5000) 
+  if (dof->DoFHandler<dim>::n_dofs()<=5000) 
     {
       dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
       dVector h1_seminorm_error_per_dof, h1_error_per_dof;
@@ -382,7 +541,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 // 				 sol, projected_solution, false,
 // 				 *boundary_quadrature);
 //       cout << "    Calculating L2 error of projected solution... ";
-//       VectorTools<dim>::integrate_difference (*dof_handler,
+//       VectorTools<dim>::integrate_difference (*dof,
 // 					      projected_solution, sol,
 // 					      l2_error_per_cell,
 // 					      *quadrature, *fe, L2_norm);
@@ -398,7 +557,9 @@ int PoissonProblem<dim>::run (const unsigned int level) {
       
       DataOut<dim> out;
       ofstream o(filename.c_str());
-      fill_data (out);
+      out.attach_dof_handler (*dof);
+
+      out.add_data_vector (solution, "u");
       out.add_data_vector (l1_error_per_dof, "L1-Error");
       out.add_data_vector (l2_error_per_dof, "L2-Error");
       out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
@@ -416,7 +577,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   delete quadrature;
   delete boundary_quadrature;
   
-  return dof->n_dofs();
+  return dof->DoFHandler<dim>::n_dofs();
 };
 
 
