@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -114,43 +114,47 @@ class Tensor
     bool operator != (const Tensor<rank_,dim> &) const;
 
 				     /**
-				      *  Add another vector, i.e. move this tensor by
-				      *  the given offset.
+				      *  Add another tensor.
 				      */
     Tensor<rank_,dim> & operator += (const Tensor<rank_,dim> &);
     
 				     /**
-				      *  Subtract another vector.
+				      *  Subtract another tensor.
 				      */
     Tensor<rank_,dim> & operator -= (const Tensor<rank_,dim> &);
 
 				     /**
-				      *  Scale the tensor by <tt>factor</tt>, i.e. multiply
-				      *  all coordinates by <tt>factor</tt>.
+				      *  Scale the tensor by <tt>factor</tt>,
+				      *  i.e. multiply all components by
+				      *  <tt>factor</tt>.
 				      */
     Tensor<rank_,dim> & operator *= (const double &factor);
 
 				     /**
-				      *  Scale the vector by <tt>1/factor</tt>.
+				      *  Scale the vector by
+				      *  <tt>1/factor</tt>.
 				      */
     Tensor<rank_,dim> & operator /= (const double &factor);
 
 				     /**
-				      *  Add two tensors. If possible, use
-				      *  <tt>operator +=</tt> instead since this does not
-				      *  need to copy a point at least once.
+				      *  Add two tensors. If possible, you
+				      *  should use <tt>operator +=</tt>
+				      *  instead since this does not need the
+				      *  creation of a temporary.
 				      */
     Tensor<rank_,dim>   operator + (const Tensor<rank_,dim> &) const;
 
 				     /**
-				      *  Subtract two tensors. If possible, use
-				      *  <tt>operator +=</tt> instead since this does not
-				      *  need to copy a point at least once.
+				      *  Subtract two tensors. If possible,
+				      *  you should use <tt>operator -=</tt>
+				      *  instead since this does not need the
+				      *  creation of a temporary.
 				      */
     Tensor<rank_,dim>   operator - (const Tensor<rank_,dim> &) const;
 
 				     /**
-				      * Invert all entries of a tensor.
+				      * Unary minus operator. Negate all
+				      * entries of a tensor.
 				      */
     Tensor<rank_,dim>   operator - () const;
     
@@ -224,7 +228,7 @@ class Tensor
 				     // also, it would be sufficient to make
 				     // the function unroll_loops a friend,
 				     // but that seems to be impossible as well.
-    template <int otherrank, int otherdim> friend class Tensor;
+    template <int, int> friend class Tensor;
 };
 
 
