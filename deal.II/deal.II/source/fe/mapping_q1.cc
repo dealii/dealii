@@ -888,7 +888,8 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
   Assert(mdata!=0, ExcInternalError());
 
   MappingQ1<dim>::compute_mapping_support_points(cell, mdata->mapping_support_points);
-  Assert(mdata->mapping_support_points.size()==4, ExcInternalError());
+  Assert(mdata->mapping_support_points.size()==GeometryInfo<dim>::vertices_per_cell,
+	 ExcInternalError());
 
 				   // perform the newton iteration.
   transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
