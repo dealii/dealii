@@ -603,7 +603,7 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 
       typename std::vector<Tensor<1,dim> >::iterator
 	result = boundary_forms.begin();
-      typename std::vector<Tensor<1,dim> >::const_iterator
+      const typename std::vector<Tensor<1,dim> >::iterator
 	end = boundary_forms.end();
       const Tensor<1,dim> *
 	tang1 = data.aux[0].begin();
