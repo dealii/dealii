@@ -1381,30 +1381,264 @@ void DataOut<dim>::write_eps (ostream &,
 
 
 template <int dim>
+void DataOut<dim>::write_gmv (ostream &out) const
+{
+				   // this function is mostly copied from
+				   // the ucd format function
+
+  Assert (dofs != 0, ExcNoDoFHandlerSelected());
+  Assert (dofs->get_fe().dofs_per_vertex==1,
+	  ExcIncorrectDofsPerVertex());
+  Assert ((1<=dim) && (dim<=3), ExcNotImplemented());
+
+  const unsigned int dofs_per_vertex = dofs->get_fe().dofs_per_vertex;
+  
+				   ///////////////////////
+				   // preamble
+  out << "gmvinput ascii"
+      << endl
+      << endl;
+
+
+				   ///////////////////////////////
+				   // first make up a list of used
+				   // vertices along with their
+				   // coordinates. since dofs have
+				   // no separate numbering in
+				   // gmv format, we need to generate
+				   // a separate numbering as well
+				   // for those dofs on vertices.
+				   // note that we can't simply use
+				   // the numbers of the vertices,
+				   // since this numbering may not
+				   // always be continuous if the
+				   // triangulation has undergone
+				   // coarsening somewhen (well, we
+				   // could place all unused vertices
+				   // to the origin, but that's not
+				   // really elegant...)
+				   //
+				   // therefore: have a list with
+				   // one slot for each dof, where
+				   // the value indicates the
+				   // respective number of the vertex
+				   // if the dof is on a vertex,
+				   // and -1 otherwise.
+				   //
+				   // also create a list of vertices
+				   // storing their coordinates in
+				   // the order defined by the
+				   // above map, which we write to
+				   // the file immediately after
+				   // creation.
+				   //
+				   // note: since GMV seems to be
+				   // made by Fortranists, the count
+				   // their indices from 1 onwards,
+				   // so whenever we actually output
+				   // a vertex number, we should add
+				   // a one.
+  DoFHandler<dim>::active_cell_iterator       cell;
+  const DoFHandler<dim>::active_cell_iterator endc = dofs->end();
+  
+  vector<int> dof_to_vertex_map (dofs->n_dofs(), -1);
+  unsigned int used_vertices = 0;
+  if (true)
+    {
+      vector<Point<dim> > vertices (dofs->get_tria().n_used_vertices());
+      unsigned int next_free_vertex = 0;
+
+      for (cell=dofs->begin_active(); cell!=endc; ++cell)
+	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+					   // check whether we
+					   // already treated this vertex
+	  if (dof_to_vertex_map[cell->vertex_dof_index(vertex,0)] == -1)
+	    {
+	      vertices[next_free_vertex] = cell->vertex(vertex);
+
+					       // associate all dofs on
+					       // this vertex with the
+					       // respective vertex
+	      for (unsigned int d=0; d<dofs_per_vertex; ++d)
+		dof_to_vertex_map[cell->vertex_dof_index(vertex,d)] = next_free_vertex;
+
+	      ++next_free_vertex;
+	    };
+      Assert (next_free_vertex == vertices.size(),
+	      ExcInternalError());
+      used_vertices = vertices.size();
+
+				       // now write out the vertices in
+				       // this order
+      out << "nodes " << vertices.size() << endl;
+      for (unsigned int component=0; component<dim; ++component)
+	{
+	  for (unsigned int v=0; v<vertices.size(); ++v)
+	    out << vertices[v](component) << ' ';
+	  out << endl;
+	};
+
+				       // and write the missing components
+				       // y (for 1d) and z (for 1d and 2d)
+				       // by simply setting them to zero
+      for (unsigned int d=dim+1; d<=3; ++d)
+	{
+	  fill_n (ostream_iterator<double>(out, " "), vertices.size(), 0.0);
+	  out << endl;
+	}
+            
+      out << endl;
+    };
+  
+
+				   /////////////////////////////////////
+				   // now for the cells. this is simpler
+				   // than the above task
+  if (true)
+    {
+      out << "cells " << dofs->get_tria().n_active_cells() << endl;
+
+      const char *cell_description[3] = { "line 2\n  ",
+					  "quad 4\n  ",
+					  "hex 8\n  "};
+      
+      for (cell=dofs->begin_active(); cell!=endc; ++cell)
+	{
+	  out << cell_description[dim-1];
+					   // output vertex indices,
+					   // counted from 1 onwards
+	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	    out << dof_to_vertex_map[cell->vertex_dof_index(v,0)]+1 << ' ';
+	  out << endl << endl;
+	};
+
+      out << endl;
+    };
+
+
+				   ///////////////////////////////////////
+				   // data output.
+  out << "variable" << endl;
+
+				   // first go for node data
+				   //
+				   // since here as with the vertex
+				   // coordinates the order is a bit
+				   // unpleasant (first all data of
+				   // variable 1, then variable 2, etc)
+				   // we have to copy them a bit around
+				   //
+				   // note that we copy vectors when
+				   // looping over the cells since we
+				   // have to write them one variable
+				   // at a time and don't want to use
+				   // more than one loop
+  if (true)
+    {
+      vector<vector<double> > data_vectors (dof_data.size(),
+					    vector<double> (used_vertices));
+
+				       // loop over all cells and copy
+				       // the data into the other vector
+				       // note  if a vertex has already
+				       // been visited
+      vector<bool> vertex_copied (dofs->n_dofs(), false);
+      for (cell=dofs->begin_active(); cell!=endc; ++cell)
+	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	  if (vertex_copied[cell->vertex_dof_index(v,0)] == false)
+	    {
+					       // global dof number
+	      const unsigned int dof_index = cell->vertex_dof_index(v,0);
+	      
+					       // this is this vertex's
+					       // number to GMV
+	      const int vertex_index = dof_to_vertex_map[dof_index];
+	      Assert (vertex_index >= 0, ExcInternalError());
+	      
+	      for (unsigned vec=0; vec<dof_data.size(); ++vec)
+		data_vectors[vec][vertex_index] = (*dof_data[vec].data)(dof_index);
+
+	      vertex_copied[dof_index] = true;
+	    };
+      
+				       // indicator 0 = node data 
+      for (unsigned int vec=0; vec<dof_data.size(); ++vec)
+	{
+	  out << dof_data[vec].name << " 1" << endl;
+	  copy(data_vectors[vec].begin(),
+	       data_vectors[vec].end(),
+	       ostream_iterator<double>(out, " "));
+	  out << endl
+	      << endl;
+	};
+    };
+
+
+				   // Cell data is the simplest since the order
+				   // already is correct
+  if (true)
+    {
+      for (unsigned int vec=0; vec<cell_data.size(); ++vec)
+	{
+	  out << cell_data[vec].name << " 0" << endl;
+	  copy((*cell_data[vec].data).begin(),
+	       (*cell_data[vec].data).end(),
+	       ostream_iterator<double>(out, " "));
+	  out << endl
+	      << endl;
+	};
+    };
+  
+				   // end of variable section
+  out << "endvars" << endl;
+  
+				   // end of output
+  out << "endgmv"
+      << endl;
+  
+				   // assert the stream is still ok
+  AssertThrow (out, ExcIO());
+};
+
+  
+
+
+
+template <int dim>
 void DataOut<dim>::write (ostream &out,
 			  const OutputFormat output_format) const {
   switch (output_format) 
     {
-    case ucd:
-      write_ucd (out);
-      break;
-    case gnuplot:
-      write_gnuplot (out);
-      break;
-    case gnuplot_draft:
-      write_gnuplot_draft (out);
-      break;
-    case povray_mesh:
-      write_povray_mesh (out);
-      break;
-    case eps:
-      write_eps(out);
-      break;
-    case epsgrid:
-      write_epsgrid(out);
-      break;
-    default:
-      Assert (false, ExcNotImplemented());
+      case ucd:
+	    write_ucd (out);
+	    break;
+	    
+      case gnuplot:
+	    write_gnuplot (out);
+	    break;
+	    
+      case gnuplot_draft:
+	    write_gnuplot_draft (out);
+	    break;
+	    
+      case povray_mesh:
+	    write_povray_mesh (out);
+	    break;
+	    
+      case eps:
+	    write_eps(out);
+	    break;
+	    
+      case epsgrid:
+	    write_epsgrid(out);
+	    break;
+
+      case gmv:
+	    write_gmv (out);
+	    break;
+	    
+      default:
+	    Assert (false, ExcNotImplemented());
     };
 };
 
@@ -1428,6 +1662,9 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format)
       case eps: 
       case epsgrid: 
 	    return ".eps";
+
+      case gmv:
+	    return ".gmv";
 	    
       default: 
 	    Assert (false, ExcNotImplemented()); 
@@ -1458,13 +1695,16 @@ DataOut<dim>::parse_output_format (const string format_name) {
   if (format_name == "epsgrid")
     return epsgrid;
 
+  if (format_name == "gmv")
+    return gmv;
+  
   AssertThrow (false, ExcInvalidState ());
 };
 
 
 template <int dim>
 string DataOut<dim>::get_output_format_names () {
-  return "ucd|gnuplot|gnuplot draft|povray mesh|eps|epsgrid";
+  return "ucd|gnuplot|gnuplot draft|povray mesh|eps|epsgrid|gmv";
 };
 
 

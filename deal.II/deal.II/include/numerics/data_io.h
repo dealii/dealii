@@ -364,6 +364,21 @@ class DataIn {
  * #write_eps#. One than can switch between the different graphics
  * with the #>># Button in GhostView for example.
  *
+ *
+ * \subsection {GMV format}
+ *
+ * The #write_gmv# function and the #write# function through the #gmv# parameter
+ * write the data in a format understood by the GMV (general mesh viewer)
+ * program. This program is able to generate 2d and 3d plots of almost
+ * arbitrarily many data sets, along with shading, cuts through data sets and
+ * many other nifty features.
+ *
+ * Data is written in the following format: nodes are considered the vertices
+ * of the triangulation. In spatial dimensions less than three, zeroes are
+ * inserted for the missing coordinates. The data vectors are written as
+ * node or cell data, where for the first the data space is interpolated to
+ * (bi-,tri-)linear elements.
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, Stefan Nauber, 1998, 1999
  */
 template <int dim>  
@@ -373,7 +388,7 @@ class DataOut {
 				      * Provide a data type specifying the
 				      * presently supported output formats.
 				      */
-    enum OutputFormat { ucd, gnuplot, gnuplot_draft, povray_mesh, eps, epsgrid };
+    enum OutputFormat { ucd, gnuplot, gnuplot_draft, povray_mesh, eps, epsgrid, gmv };
     
 				     /**
 				      * Constructor
@@ -481,6 +496,11 @@ class DataOut {
 				    */
     void write_epsgrid (ostream &out) const;
 
+    				   /**
+				    * Write data and grid in GMV format.
+				    */
+    void write_gmv (ostream &out) const;
+
 				     /**
 				      * Write data and grid to #out# according
 				      * to the given data format. This function
@@ -502,6 +522,8 @@ class DataOut {
 				      * \item #gnuplot# and #gnuplot_draft#:
 				      *    #.gnuplot#
 				      * \item #povray_mesh#: #.pov#
+				      * \item #eps# and #epsgrid#: #.eps#
+				      * \item #gmv#: #.gmv#.
 				      * \end{itemize}
 				      *
 				      * Since this function does not need data
