@@ -19,7 +19,6 @@ help:
 	@echo "=  all: base, lac, 1d, 2d and 3d, contrib                            ="
 	@echo "=  debug: baseg, lacg, 1dg, 2dg and 3dg, contrib                     ="
 	@echo "=  online-doc: generate the documentation in HTML format             ="
-	@echo "=  tex-doc: same, but only generate the LaTeX file, don't compile it ="
 	@echo "=  TODO: create a TODO file from TODO lines in the source files      ="
 	@echo "=  TAGS: create a TAGS file from include and source files            ="
 	@echo "=  clean: removes all object files, libraries, etc in all subdirs    ="
