@@ -15,14 +15,11 @@
 
 
 #include <base/memory_consumption.h>
+#include <base/thread_management.h>
 #include <lac/sparse_vanka.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
-
-#ifdef DEAL_II_USE_MT
-#  include <base/thread_management.h>
-#endif
 
 #include <algorithm>
 #include <map>
@@ -71,64 +68,66 @@ template <typename number>
 void
 SparseVanka<number>::compute_inverses () 
 {
-#ifdef DEAL_II_USE_MT
-  const unsigned int n_inverses = count (selected.begin(),
-					 selected.end(),
-					 true);
-
-  const unsigned int n_inverses_per_thread = std::max(n_inverses / n_threads,
-						      1U);
-  
-				   // set up start and end index for
-				   // each of the threads. note that
-				   // we have to work somewhat to get
-				   // this appropriate, since the
-				   // indices for which inverses have
-				   // to be computed may not be evenly
-				   // distributed in the vector. as an
-				   // extreme example consider
-				   // numbering of DoFs by component,
-				   // then all indices for which we
-				   // have to do work will be
-				   // consecutive, with other
-				   // consecutive regions where we do
-				   // not have to do something
-  std::vector<std::pair<unsigned int, unsigned int> > blocking (n_threads);
-
-  unsigned int c       = 0;
-  unsigned int thread  = 0;
-  blocking[0].first = 0;
-  
-  for (unsigned int i=0; (i<matrix->m()) && (thread+1<n_threads); ++i)
+  if (!DEAL_II_USE_MT)
+    compute_inverses (0, matrix->m());
+  else
     {
-      if (selected[i] == true)
-	++c;
-      if (c == n_inverses_per_thread)
-	{
-	  blocking[thread].second  = i;
-	  blocking[thread+1].first = i;
-	  ++thread;
+      const unsigned int n_inverses = count (selected.begin(),
+                                             selected.end(),
+                                             true);
 
-	  c = 0;
-	};
+      const unsigned int n_inverses_per_thread = std::max(n_inverses / n_threads,
+                                                          1U);
+  
+                                       // set up start and end index
+                                       // for each of the
+                                       // threads. note that we have
+                                       // to work somewhat to get this
+                                       // appropriate, since the
+                                       // indices for which inverses
+                                       // have to be computed may not
+                                       // be evenly distributed in the
+                                       // vector. as an extreme
+                                       // example consider numbering
+                                       // of DoFs by component, then
+                                       // all indices for which we
+                                       // have to do work will be
+                                       // consecutive, with other
+                                       // consecutive regions where we
+                                       // do not have to do something
+      std::vector<std::pair<unsigned int, unsigned int> > blocking (n_threads);
+
+      unsigned int c       = 0;
+      unsigned int thread  = 0;
+      blocking[0].first = 0;
+  
+      for (unsigned int i=0; (i<matrix->m()) && (thread+1<n_threads); ++i)
+        {
+          if (selected[i] == true)
+            ++c;
+          if (c == n_inverses_per_thread)
+            {
+              blocking[thread].second  = i;
+              blocking[thread+1].first = i;
+              ++thread;
+
+              c = 0;
+            };
+        };
+      blocking[n_threads-1].second = matrix->m();
+
+      typedef void (SparseVanka<number>::*FunPtr)(unsigned int, unsigned int);
+      FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
+  
+                                       // Now spawn the threads
+      Threads::ThreadManager thread_manager;
+      for (unsigned int i=0; i<n_threads; ++i)
+        Threads::spawn (thread_manager,
+                        Threads::encapsulate (fun_ptr)
+                        .collect_args (this, blocking[i].first, blocking[i].second));
+  
+      thread_manager.wait ();
     };
-  blocking[n_threads-1].second = matrix->m();
-
-  typedef void (SparseVanka<number>::*FunPtr)(unsigned int, unsigned int);
-  FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
-  
-				   // Now spawn the threads
-  Threads::ThreadManager thread_manager;
-  for (unsigned int i=0; i<n_threads; ++i)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (fun_ptr)
-		    .collect_args (this, blocking[i].first, blocking[i].second));
-  
-  thread_manager.wait ();
-  
-#else
-  compute_inverses (0, matrix->m());
-#endif
 };
 
 
@@ -579,36 +578,39 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
   else
 				     // otherwise: blocking requested
     {
-#ifdef DEAL_II_USE_MT
-				       // spawn threads. since
-				       // some compilers have trouble
-				       // finding out which
-				       // 'encapsulate' function to
-				       // take of all those possible
-				       // ones if we simply drop in
-				       // the address of an overloaded
-				       // template member function,
-				       // make it simpler for the
-				       // compiler by giving it the
-				       // correct type right away:
-      typedef void (SparseVanka<number>::*mem_fun_p)
-	(Vector<number2> &,
-	 const Vector<number2> &,
-	 const std::vector<bool> *) const;
-      const mem_fun_p comp
-	= &SparseVanka<number>::template apply_preconditioner<number2>;
-      Threads::ThreadManager thread_manager;
-      for (unsigned int block=0; block<n_blocks; ++block)
-	Threads::spawn (thread_manager,
-			Threads::encapsulate (comp)
-			.collect_args (this, dst, src, &dof_masks[block]));
-
-      thread_manager.wait ();
-#else
-      for (unsigned int block=0; block<n_blocks; ++block)
-	apply_preconditioner (dst, src,
-			      &dof_masks[block]);
-#endif
+      if (DEAL_II_USE_MT)
+        {
+                                           // spawn threads. since
+                                           // some compilers have
+                                           // trouble finding out
+                                           // which 'encapsulate'
+                                           // function to take of all
+                                           // those possible ones if
+                                           // we simply drop in the
+                                           // address of an overloaded
+                                           // template member
+                                           // function, make it
+                                           // simpler for the compiler
+                                           // by giving it the correct
+                                           // type right away:
+          typedef void (SparseVanka<number>::*mem_fun_p)
+            (Vector<number2> &,
+             const Vector<number2> &,
+             const std::vector<bool> *) const;
+          const mem_fun_p comp
+            = &SparseVanka<number>::template apply_preconditioner<number2>;
+          Threads::ThreadManager thread_manager;
+          for (unsigned int block=0; block<n_blocks; ++block)
+            Threads::spawn (thread_manager,
+                            Threads::encapsulate (comp)
+                            .collect_args (this, dst, src, &dof_masks[block]));
+          
+          thread_manager.wait ();
+        }
+      else
+        for (unsigned int block=0; block<n_blocks; ++block)
+          apply_preconditioner (dst, src,
+                                &dof_masks[block]);
     }
 }
 

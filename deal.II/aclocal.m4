@@ -917,10 +917,15 @@ dnl Default (i.e. no arg) means POSIX
       DEAL_II_SET_ACE_FLAGS
     fi
   
-    AC_DEFINE(DEAL_II_USE_MT, 1, 
-              [Flag indicating whether the library shall be compiled for
-               multithreaded applications])
+    DEAL_II_USE_MT_VAL=1
+  else
+    DEAL_II_USE_MT_VAL=0
   fi
+
+  AC_DEFINE_UNQUOTED(DEAL_II_USE_MT, $DEAL_II_USE_MT_VAL, 
+                     [Flag indicating whether the library shall be
+                      compiled for multithreaded applications. If so,
+		      then it is set to one, otherwise to zero.])
 ])
 
 

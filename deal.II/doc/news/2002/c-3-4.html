@@ -34,6 +34,24 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: Previously, we just set the preprocessor variable
+       <code>DEAL_II_USE_MT</code>, when <code>--with-multithreading</code> was
+       given as argument to <code>./configure</code>. Tests in the code
+       therefore looked like <code>#ifdef DEAL_II_USE_MT</code>. This has been
+       changed so that the variable is always defined, but it is now equal to 1
+       when multithreading was requested, and zero otherwise. The reason for
+       this is that you can now write <code>if (DEAL_II_USE_MT && ...)</code>
+       conditions, and need not interleave if-else clauses from regular code
+       and the preprocessor, if conditions involve both the state of this
+       preprocessor variable and the run-time state of your program. However,
+       this change requires that all appearances of <code>#ifdef
+       DEAL_II_USE_MT</code> be changed to <code>#if DEAL_II_USE_MT ==
+       1</code>, since the variable is now defined unconditionally.
+       <br>
+       (WB 2002/11/14)
+       </p>
+
+  <li> <p> 
        New: Object files are now named according to the local defaults
        on the system we are running on. On Unix systems, this is
        usually a <code>.o</code> suffix, while on Windows it is

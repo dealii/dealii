@@ -353,7 +353,10 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 				      const unsigned int        begin_row,
 				      const unsigned int        end_row) const
 {
-#ifdef DEAL_II_USE_MT
+				   // this function should not be called
+				   // when not in parallel mode.
+  Assert (DEAL_II_USE_MT, ExcInternalError());
+
   const number       *val_ptr    = &val[cols->rowstart[begin_row]];
   const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
   somenumber         *dst_ptr    = &dst(begin_row);
@@ -365,11 +368,6 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 	s += *val_ptr++ * src(*colnum_ptr++);
       *dst_ptr++ = s;
     };
-#else
-				   // this function should not be called
-				   // when not in parallel mode.
-  Assert (false, ExcInternalError());
-#endif
 };
 
 
@@ -533,7 +531,10 @@ SparseMatrix<number>::threaded_matrix_norm_square (const Vector<somenumber> &v,
 						   const unsigned int        end_row,
 						   somenumber               *partial_sum) const
 {
-#ifdef DEAL_II_USE_MT
+				   // this function should not be called
+				   // when not in parallel mode.
+  Assert (DEAL_II_USE_MT, ExcInternalError());
+
   somenumber sum = 0.;
   const number       *val_ptr    = &val[cols->rowstart[begin_row]];
   const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
@@ -547,11 +548,6 @@ SparseMatrix<number>::threaded_matrix_norm_square (const Vector<somenumber> &v,
       sum += s* v(row);
     };
   *partial_sum = sum;
-  
-#else
-				   // function should not have been called
-  Assert (false, ExcInternalError());
-#endif
 };
 
 
@@ -650,7 +646,10 @@ SparseMatrix<number>::threaded_matrix_scalar_product (const Vector<somenumber> &
 						      const unsigned int        end_row,
 						      somenumber               *partial_sum) const
 {
-#ifdef DEAL_II_USE_MT
+				   // this function should not be called
+				   // when not in parallel mode.
+  Assert (DEAL_II_USE_MT, ExcInternalError());
+
   somenumber sum = 0.;
   const number       *val_ptr    = &val[cols->rowstart[begin_row]];
   const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
@@ -664,11 +663,6 @@ SparseMatrix<number>::threaded_matrix_scalar_product (const Vector<somenumber> &
       sum += s* u(row);
     };
   *partial_sum = sum;
-  
-#else
-				   // function should not have been called
-  Assert (false, ExcInternalError());
-#endif
 };
 
 
@@ -808,7 +802,10 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 					 const std::pair<unsigned int, unsigned int> interval,
 					 somenumber               *partial_norm) const
 {
-#ifdef DEAL_II_USE_MT
+				   // this function should not be called
+				   // when not in parallel mode.
+  Assert (DEAL_II_USE_MT, ExcInternalError());
+
   const unsigned int begin_row = interval.first,
 		     end_row   = interval.second;
   
@@ -827,9 +824,6 @@ SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
     };
 
   *partial_norm = norm;
-#else
-  Assert (false, ExcInternalError());
-#endif
 };
 
 

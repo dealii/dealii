@@ -13,6 +13,7 @@
 
 
 #include <base/quadrature_lib.h>
+#include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <numerics/data_out_rotation.h>
@@ -23,10 +24,6 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
-
-#ifdef DEAL_II_USE_MT
-#include <base/thread_management.h>
-#endif
 
 #include <cmath>
 
@@ -326,16 +323,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
   typedef DataOut_DoFData<dim,dim+1> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
-#ifdef DEAL_II_USE_MT
-  const unsigned int n_threads = n_threads_;
-#else
-				   // access this variable to avoid
-				   // compiler warning about unused
-				   // var:
-  (void)n_threads_;
-  const unsigned int n_threads = 1;
-#endif
-
+  const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
 
 				   // before we start the loop:
 				   // create a quadrature rule that
@@ -399,20 +387,20 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 			     n_q_points * (n_subdivisions+1));
   this->patches.insert (this->patches.end(), n_patches, default_patch);
 
-#ifdef DEAL_II_USE_MT
-
-  Threads::ThreadManager thread_manager;  
-  for (unsigned int l=0;l<n_threads;++l)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (&DataOutRotation<dim>::build_some_patches)
-		    .collect_args (this, thread_data[l]));
-  thread_manager.wait();
-  
-				   // just one thread
-#else
-  build_some_patches(thread_data[0]);
-#endif
+  if (DEAL_II_USE_MT)
+    {
+      Threads::ThreadManager thread_manager;  
+      for (unsigned int l=0;l<n_threads;++l)
+        Threads::spawn (thread_manager,
+                        Threads::encapsulate (&DataOutRotation<dim>::build_some_patches)
+                        .collect_args (this, thread_data[l]));
+      thread_manager.wait();
+    }
+  else
+                                     // just one thread
+    build_some_patches(thread_data[0]);
 };
+
 
 
 template <int dim>

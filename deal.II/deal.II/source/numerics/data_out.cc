@@ -537,16 +537,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
   typedef DataOut_DoFData<dim,dim> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
-#ifdef DEAL_II_USE_MT
-  const unsigned int n_threads = n_threads_;
-#else
-				   // access this variable to avoid
-				   // compiler warning about unused
-				   // var:
-  (void)n_threads_;
-  const unsigned int n_threads = 1;
-#endif
-
+  const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
 
 				   // before we start the loop:
 				   // create a quadrature rule that

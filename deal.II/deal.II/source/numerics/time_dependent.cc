@@ -14,15 +14,12 @@
 
 #include <numerics/time_dependent.h>
 #include <base/memory_consumption.h>
+#include <base/thread_management.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_refinement.h>
 #include <lac/vector.h>
-
-#ifdef DEAL_II_USE_MT
-#  include <base/thread_management.h>
-#endif
 
 #include <functional>
 #include <algorithm>
@@ -205,27 +202,24 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 void TimeDependent::end_sweep (const unsigned int n_threads)
 {
-#ifdef DEAL_II_USE_MT
-  const unsigned int stride = timesteps.size() / n_threads;
-  Threads::ThreadManager thread_manager;
-  void (TimeDependent::*p) (unsigned int, unsigned int)
-    = &TimeDependent::end_sweep;
-  for (unsigned int i=0; i<n_threads; ++i)
-    Threads::spawn (thread_manager,
-		    Threads::encapsulate (p)
-		    .collect_args (this, i*stride,
-				   (i == n_threads-1 ?
-				    timesteps.size() :
-				    (i+1)*stride)));
-  thread_manager.wait();
-  
-#else
-				   // ignore this parameter, but don't
-				   // let the compiler warn
-  (void) n_threads;
-				   // now do the work
-  end_sweep (0, timesteps.size());
-#endif
+  if (DEAL_II_USE_MT && (n_threads > 1))
+    {
+      const unsigned int stride = timesteps.size() / n_threads;
+      Threads::ThreadManager thread_manager;
+      void (TimeDependent::*p) (unsigned int, unsigned int)
+        = &TimeDependent::end_sweep;
+      for (unsigned int i=0; i<n_threads; ++i)
+        Threads::spawn (thread_manager,
+                        Threads::encapsulate (p)
+                        .collect_args (this, i*stride,
+                                       (i == n_threads-1 ?
+                                        timesteps.size() :
+                                        (i+1)*stride)));
+      thread_manager.wait();
+    }
+  else
+                                     // now do the work
+    end_sweep (0, timesteps.size());
 }
 
 

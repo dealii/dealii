@@ -21,7 +21,7 @@
 #include <vector>
 #include <iterator>
 
-#ifdef DEAL_II_USE_MT
+#if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_ACE)
 #    include <ace/Thread_Manager.h>
 #    include <ace/Synch.h>
@@ -182,7 +182,7 @@ namespace Threads
   };
   
   
-#ifdef DEAL_II_USE_MT
+#if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_ACE)
 				   /**
 				    * In multithread mode with ACE

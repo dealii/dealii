@@ -107,7 +107,7 @@ namespace Threads
   };
   
   
-#ifndef DEAL_II_USE_MT
+#if DEAL_II_USE_MT != 1
   void DummyThreadManager::spawn (const FunPtr fun_ptr,
 				  void *       fun_data,
 				  int          /*flags*/) const
@@ -393,7 +393,7 @@ namespace Threads
 				     // once it has copied all data
     fun_data.fun_data_base->lock.acquire ();
 				     // now start the new thread
-#ifdef DEAL_II_USE_MT
+#if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_ACE)
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,

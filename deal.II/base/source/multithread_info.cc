@@ -30,7 +30,7 @@
 
 
 
-#ifdef DEAL_II_USE_MT
+#if DEAL_II_USE_MT == 1
 
 #if defined(__linux__)
 

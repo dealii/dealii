@@ -582,6 +582,8 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
   for (unsigned int n=0; n<solutions.size(); ++n)
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
 	    ExcInvalidSolutionVector());
+
+  Assert (n_threads_ > 0, ExcInternalError());
   
 				   // if no mask given: treat all components
   std::vector<bool> component_mask ((component_mask_.size() == 0)    ?
@@ -591,12 +593,9 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcInvalidComponentMask());
 	  
-				   // if NOT multithreaded, set n_threads to one
-  unsigned int n_threads = n_threads_;
-#ifndef DEAL_II_USE_MT
-  n_threads = 1;
-#endif
-  Assert (n_threads > 0, ExcInternalError());
+				   // if NOT multithreaded, set
+				   // n_threads to one
+  const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
   
   const unsigned int n_solution_vectors = solutions.size();
 

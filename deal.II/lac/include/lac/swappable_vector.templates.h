@@ -20,11 +20,9 @@
 
 
 
-#ifdef DEAL_II_USE_MT
 				 // allocate static variable
 template <typename number>
 Threads::ThreadManager SwappableVector<number>::thread_manager;
-#endif
 
 
 
@@ -73,18 +71,14 @@ SwappableVector<number>::operator= (const SwappableVector<number> &v)
     kill_file ();
 
 				   // if in MT mode, block all other
-				   // operations
-#ifdef DEAL_II_USE_MT
+				   // operations. if not in MT mode,
+				   // this is a no-op
   lock.acquire ();
-#endif
   
   Vector<number>::operator = (v);
   data_is_preloaded = false;
   
-#ifdef DEAL_II_USE_MT
   lock.release ();
-#endif
-  
   
   return *this;
 };
@@ -107,12 +101,11 @@ void SwappableVector<number>::swap_out (const std::string &name)
   Assert (this->size() != 0, ExcSizeZero());
 
 				   // if in MT mode, block all other
-				   // operations
-#ifdef DEAL_II_USE_MT
+				   // operations. if not in MT mode,
+				   // this is a no-op
   lock.acquire ();
-#endif
-  
-				   //  check that we have not called
+
+                                   //  check that we have not called
 				   //  @p{alert} without the respective
 				   //  @p{reload} function
   Assert (data_is_preloaded == false, ExcInternalError());
@@ -123,9 +116,7 @@ void SwappableVector<number>::swap_out (const std::string &name)
 	
   this->reinit (0);
 
-#ifdef DEAL_II_USE_MT
   lock.release ();
-#endif
 };
 
 
@@ -134,10 +125,11 @@ template <typename number>
 void SwappableVector<number>::reload () 
 {
 				   // if in MT mode: synchronise with
-				   // possibly existing @p{alert} calls
-#ifdef DEAL_II_USE_MT
+				   // possibly existing @p{alert}
+				   // calls. if not in MT mode, this
+				   // is a no-op
   lock.acquire ();
-#endif
+  
 				   // if data was already preloaded,
 				   // then there is no more need to
 				   // load it
@@ -155,9 +147,7 @@ void SwappableVector<number>::reload ()
 				       // release lock. the lock is
 				       // also released in the other
 				       // branch of the if-clause
-#ifdef DEAL_II_USE_MT
       lock.release ();
-#endif
     };
 };
 
@@ -168,7 +158,8 @@ void SwappableVector<number>::alert ()
 {
 				   // note: this function does nothing
 				   // in non-MT mode
-#ifdef DEAL_II_USE_MT
+  if (!DEAL_II_USE_MT)
+    return;
   
 				   // synchronise with possible other
 				   // invokations of this function and
@@ -191,7 +182,6 @@ void SwappableVector<number>::alert ()
 		    .collect_args(this, true));
 				   // note that reload_vector also
 				   // releases the lock
-#endif
 };
 
 
@@ -209,14 +199,13 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
 				   // release the lock that was
 				   // acquired by the calling
 				   // functions
-#ifdef DEAL_II_USE_MT
-				   // set the flag if so required
-  if (set_flag)
-    data_is_preloaded = true;
-  lock.release ();
-#else
-  (void)set_flag;
-#endif
+  if (DEAL_II_USE_MT)
+    {
+                                       // set the flag if so required
+      if (set_flag)
+        data_is_preloaded = true;
+      lock.release ();
+    };
 };
 
 
@@ -227,10 +216,9 @@ void SwappableVector<number>::kill_file ()
 				   // if in MT mode, wait for other
 				   // operations to finish first
 				   // (there should be none, but who
-				   // knows)
-#ifdef DEAL_II_USE_MT
+				   // knows). if not in MT mode,
+				   // this is a no-op
   lock.acquire();
-#endif
 
 				   // this is too bad: someone
 				   // requested the vector in advance,
@@ -246,9 +234,7 @@ void SwappableVector<number>::kill_file ()
       filename = "";
     };
 
-#ifdef DEAL_II_USE_MT
   lock.release ();
-#endif
 };
 
 
