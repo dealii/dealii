@@ -960,8 +960,15 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 		      const unsigned int n_faces_or_subfaces,
 		      const UpdateFlags         update_flags,
 		      const FiniteElement<dim> &fe);
-
-    				     /**
+    
+				     /**
+				      * Virtual destructor needed for
+				      * the virtual @p{get_face}
+				      * function.
+				      */
+    virtual ~FEFaceValuesBase ();
+    
+				     /**
 				      * Return the outward normal vector to
 				      * the cell at the @p{i}th quadrature
 				      * point. The length of the vector
@@ -975,6 +982,14 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * quadrature points.
 				      */
     const vector<Point<dim> > & get_normal_vectors () const;
+
+				     /**
+				      * Return the present
+				      * face. Implemented in the
+				      * derived classes.
+				      */
+    virtual DoFHandler<dim>::face_iterator get_face() const=0;
+
 
   protected:
 				     /**
@@ -1115,6 +1130,12 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no);
+
+    
+				     /**
+				      * Return the present face.
+				      */
+    virtual DoFHandler<dim>::face_iterator get_face() const;
 };
 
 
@@ -1253,11 +1274,30 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 		 const unsigned int                    subface_no);
 
 				     /**
+				      * Return the present face.
+				      */
+    virtual DoFHandler<dim>::face_iterator get_face() const;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcReinitCalledWithBoundaryFace);
-};
 
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFaceHasNoSubfaces);
+
+  protected:
+    
+				     /**
+				      * Store the subface selected
+				      * last time the @p{reinit}
+				      * function was called. Is used
+				      * by the @p{get_face} fuction.
+				      */
+    DoFHandler<dim>::face_iterator present_subface;
+};
 
 
 
@@ -1354,12 +1394,39 @@ FEValuesBase<dim>::get_cell() const
 
 template <int dim>
 inline
+FEFaceValuesBase<dim>::~FEFaceValuesBase()
+{};
+
+
+template <int dim>
+inline
 const vector<Point<dim> > &
 FEFaceValuesBase<dim>::get_normal_vectors () const
 {
   Assert (update_flags & update_normal_vectors,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   return normal_vectors;
+};
+
+
+/*------------------------ Inline functions: FEFaceValues ------------------------*/
+
+template <int dim>
+inline
+DoFHandler<dim>::face_iterator
+FEFaceValues<dim>::get_face() const {
+  return present_cell->face(selected_dataset);
+};
+
+
+
+/*------------------------ Inline functions: FESubfaceValues ------------------------*/
+
+template <int dim>
+inline
+DoFHandler<dim>::face_iterator
+FESubfaceValues<dim>::get_face() const {
+  return present_subface;
 };
 
 

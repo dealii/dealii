@@ -739,10 +739,17 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   const unsigned int         face_no,
 				   const unsigned int         subface_no)
 {
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
+	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
   Assert (cell->face(face_no)->at_boundary() == false,
 	  ExcReinitCalledWithBoundaryFace());
+  Assert (cell->face(face_no)->has_children()== true,
+	  ExcFaceHasNoSubfaces());
   
   present_cell  = cell;
+  present_subface = cell->face(face_no)->child(subface_no);
   selected_dataset = face_no*(1<<(dim-1)) + subface_no;
 
 				   // assert that the finite elements
@@ -753,10 +760,6 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	  ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
-  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
-	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
     
 				   // fill jacobi matrices and real
 				   // quadrature points
