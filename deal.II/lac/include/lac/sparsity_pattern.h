@@ -742,23 +742,35 @@ class SparsityPattern : public Subscriptor
 				      * uses special convention for
 				      * quadratic matrices.
 				      *
-				      * A return value <tt>true</tt>
-				      * means that diagonal elements
-				      * are stored first in each
-				      * row. This is required by
-				      * relaxation methods like
-				      * Jacobi() and SOR(). A side
-				      * effect of this scheme is that
-				      * each row contains at least one
-				      * element.
+				      * A return value <tt>true</tt> means
+				      * that diagonal elements are stored
+				      * first in each row. A number of
+				      * functions in this class and the
+				      * library in general, for example
+				      * relaxation methods like Jacobi() and
+				      * SOR(), require this to make their
+				      * operations more efficient, since they
+				      * need to quickly access the diagonal
+				      * elements and do not have to search for
+				      * them if they are the first element of
+				      * each row. A side effect of this scheme
+				      * is that each row contains at least one
+				      * element, even if the row is empty
+				      * (i.e. the diagonal element exists, but
+				      * has value zero).
 				      *
-				      * A return value <tt>false</tt>
-				      * means that diagonal elements
-				      * are stored anywhere in the
-				      * row. In particular, a row or
-				      * even the whole matrix may be
-				      * empty.
-				     */
+				      * A return value <tt>false</tt> means
+				      * that diagonal elements are stored
+				      * anywhere in the row, or not at all. In
+				      * particular, a row or even the whole
+				      * matrix may be empty. This can be used
+				      * if you have block matrices where the
+				      * off-diagonal blocks are quadratic but
+				      * are never used for operations like the
+				      * ones mentioned above. In this case,
+				      * some memory can be saved by not using
+				      * the diagonal storage optimization.
+                                      */
     bool optimize_diagonal () const;
     
                                      /**
