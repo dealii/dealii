@@ -185,7 +185,11 @@ SolverRichardson<VECTOR>::solve (const MATRIX &A,
 				   // Main loop
   for(int iter=0; conv==SolverControl::iterate; iter++)
     {
-      res=A.residual(r,x,b);
+				       // Do not use residual,
+				       // but do it in 2 steps
+      A.vmult(r,x);
+      r.sadd(-1.,1.,b);
+      res=sqrt(r*r);
 
       conv = control().check (iter, criterion());
       if (conv != SolverControl::iterate)
