@@ -257,6 +257,33 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> 
+
+       New: There is now a new <code class="class">PolynomialsP</code>
+       class which is based on <code
+       class="class">Polynomials::Monomial</code> and <code
+       class="class">PolynomialSpace</code>. In contrast to the
+       default ordering of the polynomials in <code
+       class="class">PolynomialSpace</code>, (e.g. for degree=2) <i>1,
+       x, x<sup>2</sup>, y, xy, y<sup>2</sup></i>, the <code
+       class="class">PolynomialsP</code> class now gives the
+       (natural?!)  ordering <i>1, x, y, xy, x<sup>2</sup>,
+       y<sup>2</sup></i>.
+       <br>
+       (RH 2004/03/11)
+       </p>
+
+  <li> <p> 
+       New: The classes <code class="class">PolynomialSpace</code> and
+       <code class="class">TensorProductPolynomials</code> now have
+       new <code class="member">set_numbering</code> functions which
+       allow to change the ordering of the polynomials. The ordering
+       and the indices of the polynomials kann be checked by using the
+       new <code class="member">output_indices</code> functions.
+       <br>
+       (RH 2004/03/11)
+       </p>
+
   <li> <p> New: The class <code
        class="class">PolynomialsBDM</code> implements BDM polynomials in
        two dimensions on the unit square. It was implemented as is
