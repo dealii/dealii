@@ -61,6 +61,8 @@ namespace Threads
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
     pthread_barrier_init (&barrier, 0, count);
 #else
+				     // calm down warning, then error out
+    (void *)(&count);
     AssertThrow (false,
 		 ExcMessage ("Your local POSIX installation does not support\n"
 			     "POSIX barriers. You will not be able to use\n"
