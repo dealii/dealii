@@ -17,6 +17,8 @@ when a new release shall be issued:
   announcement. Do these things on both HEAD and branch. Be sure to
   have the changes file on both HEAD and branch.
 
+- adjust download.html on both HEAD and branch.
+
 - run `make validate-xrefs' on the branch to check that the changes
   do not point to nirvana
 
