@@ -164,6 +164,18 @@ class Multigrid : public Subscriptor
 			    const MGMatrixBase<VECTOR>& edge_up);
 
 				     /**
+				      * Return the finest level for
+				      * multigrid.
+				      */
+    unsigned int get_maxlevel() const;
+    
+				     /**
+				      * Return the coarsest level for
+				      * multigrid.
+				      */
+    unsigned int get_minlevel() const;
+    
+				     /**
 				      * Set the highest level for
 				      * which the multilevel method is
 				      * performed. By default, this is
@@ -182,10 +194,18 @@ class Multigrid : public Subscriptor
 				      * the multilevel method is
 				      * performed. By default, this is
 				      * zero. Accepted are
-				      * non-negative values smaller
+				      * non-negative values not larger than
 				      * than the current #maxlevel.
+				      *
+				      * If <tt>relative</tt> ist
+				      * <tt>true</tt>, then this
+				      * function determins the number
+				      * of levels used, that is, it
+				      * sets #minlevel to
+				      * #maxlevel-<tt>level</tt>.
 				      */
-    void set_minlevel(unsigned int);
+    void set_minlevel(unsigned int level,
+		      bool relative = false);
 
 				     /**
 				      * Chance #cycle_type used in cycle().
@@ -440,6 +460,26 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 		edge_up(0),
 		debug(0)
 {}
+
+
+
+template <class VECTOR>
+inline
+unsigned int
+Multigrid<VECTOR>::get_maxlevel () const
+{
+  return maxlevel;
+}
+
+
+
+template <class VECTOR>
+inline
+unsigned int
+Multigrid<VECTOR>::get_minlevel () const
+{
+  return minlevel;
+}
 
 
 /* --------------------------- inline functions --------------------- */

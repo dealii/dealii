@@ -77,10 +77,13 @@ Multigrid<VECTOR>::set_maxlevel(unsigned int l)
 
 template <class VECTOR>
 void
-Multigrid<VECTOR>::set_minlevel(unsigned int l)
+Multigrid<VECTOR>::set_minlevel(unsigned int l,
+				bool relative)
 {
   Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
-  minlevel = l;
+  minlevel = (relative)
+	     ? (maxlevel-l)
+	     : l;
 }
 
 
