@@ -330,23 +330,13 @@ class DataOut {
 					  * invalid object, but is needed for
 					  * the STL classes.
 					  */
-	DataEntry () :
-							 // don't know why we have
-							 // to define here, gcc2.8
-							 // should be able to handle
-							 // this in the .cc file
-			data(0), name(""), units("") {};
+	DataEntry ();
 			
 					 /**
 					  * Constructor
 					  */
-	DataEntry (const dVector *data, const String name, const String units) :
-							 // don't know why we have
-							 // to define here, gcc2.8
-							 // should be able to handle
-							 // this in the .cc file
-			data(data), name(name), units(units) {};
-
+	DataEntry (const dVector *data, const String name, const String units);
+	
 					 /**
 					  * Pointer to the data vector.
 					  */

@@ -267,23 +267,13 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
 				      *  You must not dereference invalid or
 				      *  past the end iterators.
 				      */
-    const Accessor & operator * () const {
-				       // put this function here, since we can't
-				       // inline it with gcc 2.7
-      Assert (state() == valid, ExcDereferenceInvalidObject());
-      return accessor;
-    };
-
+    const Accessor & operator * () const;
+    
 				     /**
 				      *  Dereferencing operator, non-#const#
 				      *  version.
 				      */
-    Accessor & operator * () {
-				       // put this function here, since we can't
-				       // inline it with gcc 2.7
-      Assert (state() == valid, ExcDereferenceInvalidObject());
-      return accessor;
-    };
+    Accessor & operator * ();
         
 				     /**
 				      *  Dereferencing operator, returns a
@@ -293,22 +283,13 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
 				      *  There is a #const# and a non-#const#
 				      *  version.
 				      */
-    const Accessor * operator -> () const {
-				       // put this function here, since we can't
-				       // inline it with gcc 2.7
-      return &(this->operator* ());
-    };
-      
-    
+    const Accessor * operator -> () const;
+        
 				     /**
 				      *  Dereferencing operator, non-#const#
 				      *  version.
 				      */
-    Accessor * operator -> () {
-				       // put this function here, since we can't
-				       // inline it with gcc 2.7
-      return &(this->operator* ());
-    };
+    Accessor * operator -> ();
 				     /*@}*/
     
 				     /**
@@ -417,7 +398,7 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
 				      */
     DeclException0 (ExcAdvanceInvalidObject);
 				     /*@}*/
-//  protected:  // don't know why we can't declare this protected (gcc2.7 chokes!?)
+//  protected:  // don't know why we can't declare this protected (gcc2.7/8 chokes!?)
     Accessor accessor;
 };
 
@@ -678,6 +659,52 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 
 
 
+
+
+/*----------------------- Inline functions -------------------*/
+
+
+
+template <int dim, class Accessor>
+inline
+const Accessor &
+TriaRawIterator<dim,Accessor>::operator * () const {
+  Assert (state() == valid, ExcDereferenceInvalidObject());
+  return accessor;
+};
+
+
+
+
+template <int dim, class Accessor>
+inline
+Accessor &
+TriaRawIterator<dim,Accessor>::operator * () {
+  Assert (state() == valid, ExcDereferenceInvalidObject());
+  return accessor;
+};
+
+
+
+template <int dim, class Accessor>
+inline
+const Accessor *
+TriaRawIterator<dim,Accessor>::operator -> () const {
+  return &(this->operator* ());
+};
+
+
+
+template <int dim, class Accessor>
+inline
+Accessor *
+TriaRawIterator<dim,Accessor>::operator -> () {
+  return &(this->operator* ());
+};
+
+
+
+
 template <int dim, class Accessor>
 inline
 IteratorState TriaRawIterator<dim,Accessor>::state () const {
@@ -717,12 +744,16 @@ ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i) {
   return out;
 };
 
+
+
 template <int dim, class Accessor>
 inline
 ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i) {
   i.print(out);
   return out;
 };
+
+
 
 template <int dim, class Accessor>
 inline

@@ -129,6 +129,21 @@ void DataIn<dim>::read_ucd (istream &in) {
 
 
 template <int dim>
+DataOut<dim>::DataEntry::DataEntry () :
+		data(0), name(""), units("") {};
+
+
+
+template <int dim>
+DataOut<dim>::DataEntry::DataEntry (const dVector *data,
+				    const String name,
+				    const String units) :
+			data(data), name(name), units(units) {};
+
+
+
+
+template <int dim>
 DataOut<dim>::DataOut () :
 		dofs(0) {};
 

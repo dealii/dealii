@@ -1,12 +1,6 @@
 Replace the declaration of vector<bool> in tria.h by something real
   when gcc2.8 is available
 
-Make some functions in the iterators inlined, if the compiler
-  accepts them in gcc2.8
-
-Make the iterator functions (begin_*, end) templated with gcc2.8,
-  let the dimension then be templated (gcc2.8 chokes ober the return
-  type)
 
 Rewrite code like
       int flagged_cells = 0;

@@ -1443,13 +1443,8 @@ unsigned int Triangulation<dim>::max_adjacent_cells () const {
     for (unsigned vertex=0; vertex<(1<<dim); ++vertex)
       ++usage_count[cell->vertex_index(vertex)];
 
-				   // use max(.,.) when gcc2.8 is available
-  const unsigned short int max_entry =  *(max_element (usage_count.begin(),
-						       usage_count.end()));
-  if (max_entry > (1<<dim))
-    return max_entry;
-  else
-    return (1<<dim);
+  return max ((unsigned int)1<<dim,
+	      (unsigned int)*(max_element (usage_count.begin(),usage_count.end())));
 };
 
 
