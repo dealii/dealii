@@ -90,7 +90,11 @@
                                  // introduction, almost all of this has been
                                  // copied verbatim from step-8, so we only
                                  // comment on the few things that are
-                                 // different.
+                                 // different. There is one (cosmetic) change
+                                 // in that we let ``solve'' return a value,
+                                 // namely the number of iterations it took to
+                                 // converge, so that we can output this to
+                                 // the screen at the appropriate place.
 template <int dim>
 class ElasticProblem 
 {
@@ -102,7 +106,7 @@ class ElasticProblem
   private:
     void setup_system ();
     void assemble_system ();
-    void solve ();
+    unsigned int solve ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
@@ -501,7 +505,34 @@ void ElasticProblem<dim>::assemble_system ()
 					   Vector<double>(dim));
 
 
-                                     // xxx
+                                   // The next thing is the loop over all
+                                   // elements. Note that we do not have to do
+                                   // all the work: our job here is only to
+                                   // assemble the system on cells that
+                                   // actually belong to this MPI process, all
+                                   // other cells will be taken care of by
+                                   // other processes. This is what the
+                                   // if-clause immediately after the for-loop
+                                   // takes care of: it queries the subdomain
+                                   // identifier of each cell, which is a
+                                   // number associated with each cell that
+                                   // tells which process handles it. In more
+                                   // generality, the subdomain id is used to
+                                   // split a domain into several parts (we do
+                                   // this below), and which allows to
+                                   // identify which subdomain a cell is
+                                   // living on. In this application, we have
+                                   // each process handle exactly one
+                                   // subdomain, so we identify the terms
+                                   // ``subdomain'' and ``MPI process'' with
+                                   // each other.
+                                   //
+                                   // Apart from this, assembling the local
+                                   // system is relatively uneventful if you
+                                   // have understood how this is done in
+                                   // step-8, and only becomes interesting
+                                   // again once we start distributing it into
+                                   // the global matrix and right hand sides.
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -548,9 +579,9 @@ void ElasticProblem<dim>::assemble_system ()
                         )
                       *
                       fe_values.JxW(q_point);
-                  };
-              };
-          };
+                  }
+              }
+          }
 
         right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
                                            rhs_values);
@@ -563,18 +594,94 @@ void ElasticProblem<dim>::assemble_system ()
               cell_rhs(i) += fe_values.shape_value(i,q_point) *
                              rhs_values[q_point](component_i) *
                              fe_values.JxW(q_point);
-          };
+          }
 
+                                         // Now we have the local system, and
+                                         // need to transfer it into the
+                                         // global objects. However, as
+                                         // described in the introduction to
+                                         // this function, we will not be able
+                                         // to do any operations to matrix and
+                                         // vector entries any more after
+                                         // handing them off to PETSc
+                                         // (i.e. after distributing to the
+                                         // global objects), and we will have
+                                         // to take care of boundary value and
+                                         // hanging node constraints already
+                                         // here. This is done as follows:
+                                         // first, we take care of boundary
+                                         // values. This is relatively simple,
+                                         // since it only involves deleting
+                                         // rows and columns from the global
+                                         // matrix, and setting the value of
+                                         // the right hand side entry
+                                         // correctly. This, however, can
+                                         // already be done on the local
+                                         // level, for which this is the
+                                         // correct way:
         cell->get_dof_indices (local_dof_indices);
-
-                                         //xxx
         MatrixTools::local_apply_boundary_values (boundary_values,
                                                   local_dof_indices,
                                                   cell_matrix,
                                                   cell_rhs,
-                                                  false);
+                                                  true);
+                                         // The last argument to the call just
+                                         // performed allows for some
+                                         // optimizations that are more
+                                         // important for the case where we
+                                         // eliminate boundary values from
+                                         // global objects. It controls
+                                         // whether we should also delete the
+                                         // column corresponding to a boundary
+                                         // node, or keep it (and passing
+                                         // ``true'' as above means: yes, do
+                                         // eliminate the column). If we do,
+                                         // then the resulting matrix will be
+                                         // symmetric again if it was before;
+                                         // if we don't, then it won't. The
+                                         // solution of the resulting system
+                                         // should be the same, though. The
+                                         // only reason why we may want to
+                                         // make the system symmetric again is
+                                         // that we would like to use the CG
+                                         // method, which only works with
+                                         // symmetric matrices.  Experience
+                                         // tells that CG also works (and
+                                         // works almost as well) if we don't
+                                         // remove the columns associated with
+                                         // boundary nodes, which can be
+                                         // easily explained by the special
+                                         // structure of the
+                                         // non-symmetry. Since eliminating
+                                         // columns from dense matrices is not
+                                         // expensive, though, we let the
+                                         // function do it; not doing so is
+                                         // more important if the linear
+                                         // system is either non-symmetric
+                                         // anyway, or we are using the
+                                         // non-local version of this function
+                                         // (as in all the other example
+                                         // programs before) and want to save
+                                         // a few cycles during this
+                                         // operation.
 
-                                         // xxx
+                                         // The second task is to take care of
+                                         // hanging node constraints. This is
+                                         // a little more complicated, since
+                                         // the rows and columns of
+                                         // constrained nodes have to be
+                                         // distributed to the rows and
+                                         // columns of those nodes to which
+                                         // they are constrained. This can't
+                                         // be done on a purely local basis,
+                                         // but it can be done while
+                                         // distributing the local system to
+                                         // the global one. This is what the
+                                         // following two calls do, i.e. they
+                                         // distribute to the global objects
+                                         // and at the same time make sure
+                                         // that hanging node constraints are
+                                         // taken care of:
         hanging_node_constraints
           .distribute_local_to_global (cell_matrix,
                                        local_dof_indices,
@@ -586,50 +693,154 @@ void ElasticProblem<dim>::assemble_system ()
                                        system_rhs);
       }
 
-                                   //xxx no condense necessary, no apply_b_v
-                                   //either
-
-
-                                   // xxx
+                                   // The global matrix and right hand side
+                                   // vectors have now been formed. Note that
+                                   // since we took care of these operations
+                                   // already above, we do not have to apply
+                                   // boundary values or condense away hanging
+                                   // node constraints any more.
+                                   //
+                                   // However, we have to make sure that those
+                                   // entries we wrote into matrix and vector
+                                   // objects but which are stored on other
+                                   // processes, reach their destination. For
+                                   // this, the ``compress'' functions of
+                                   // these objects are used, which compress
+                                   // the object by flushing the caches that
+                                   // PETSc holds for them:
   system_matrix.compress ();
   system_rhs.compress ();
 }
 
 
 
+                                 // The fourth step is to solve the linear
+                                 // system, with its distributed matrix and
+                                 // vector objects. Fortunately, PETSc offers
+                                 // a variety of sequential and parallel
+                                 // solvers, for which we have written
+                                 // wrappers that have almost the same
+                                 // interface as is used for the deal.II
+                                 // solvers used in all previous example
+                                 // programs.
 template <int dim>
-void ElasticProblem<dim>::solve () 
+unsigned int ElasticProblem<dim>::solve () 
 {
-                                   // xxx
+                                   // First, we have to set up a convergence
+                                   // monitor, and assign it the accuracy to
+                                   // which we would like to solve the linear
+                                   // system. Next, an actual solver object
+                                   // using PETSc's CG solver which also works
+                                   // with parallel (distributed) vectors and
+                                   // matrices. And finally a preconditioner;
+                                   // we choose to use a block Jacobi
+                                   // preconditioner which works by computing
+                                   // an incomplete LU decomposition on each
+                                   // block (i.e. the chunk of matrix that is
+                                   // stored on each MPI process). That means
+                                   // that if you run the program with only
+                                   // one process, then you will use an ILU(0)
+                                   // as a preconditioner, while if it is run
+                                   // on many processes, then we will have a
+                                   // number of blocks on the diagonal and the
+                                   // preconditioner is the ILU(0) of each of
+                                   // these blocks.
   SolverControl           solver_control (1000, 1e-10);
   PETScWrappers::SolverCG cg (solver_control,
                               mpi_communicator);
 
   PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
-  
+
+                                   // Then solve the system:
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
+                                   // The next step is to distribute hanging
+                                   // node constraints. This is a little
+                                   // tricky, since to fill in the value of a
+                                   // constrained node you need access to the
+                                   // values of the nodes to which it is
+                                   // constrained (for example, for a Q1
+                                   // element in 2d, we need access to the two
+                                   // nodes on the big side of a hanging node
+                                   // face, to compute the value of the
+                                   // constrained node in the middle). Since
+                                   // PETSc (and, for that matter, the MPI
+                                   // model on which it is built) does not
+                                   // allow to query the value of another node
+                                   // in a simple way if we should need it,
+                                   // what we do here is to get a copy of the
+                                   // distributed vector where we keep all
+                                   // elements locally. This is simple, since
+                                   // the deal.II wrappers have a conversion
+                                   // constructor for the non-MPI vector
+                                   // class:
   PETScWrappers::Vector localized_solution (solution);
+
+                                   // Then we distribute hanging node
+                                   // constraints on this local copy, i.e. we
+                                   // compute the values of all constrained
+                                   // nodes:
   hanging_node_constraints.distribute (localized_solution);
 
-
+                                   // The next step is a little more
+                                   // convoluted: we need to get the result
+                                   // back into the global, distributed
+                                   // vector. The problematic part is that on
+                                   // each process, we can only efficiently
+                                   // write to the elements we own ourselves,
+                                   // despite the fact that all processors
+                                   // have just computed the complete solution
+                                   // vector locally. If we write to elements
+                                   // that we do not own, this may be
+                                   // expensive since they will have to be
+                                   // communicated to the other processors
+                                   // later on. So what we do is to ask the
+                                   // library to which subdomain each degree
+                                   // of freedom belongs (or, in other words:
+                                   // which process has them stored locally,
+                                   // since we identify subdomains with
+                                   // processes), and only write to these. For
+                                   // this, let us first get the subdomain for
+                                   // each DoF:
   std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
   DoFTools::get_subdomain_association (dof_handler,
-                                       subdomain_association);  
+                                       subdomain_association);
+
+                                   // Then loop over all degrees of freedom
+                                   // and transfer the newly computed value
+                                   // for a constrained degree of freedom into
+                                   // the global solution if a) this is really
+                                   // a constrained DoF, all other vector
+                                   // entries should not have been changed
+                                   // anyway, and b) we are the owner of this
+                                   // degree of freedom, i.e. the subdomain
+                                   // the DoF belongs to equals the present
+                                   // process's number.
   for (unsigned int i=0; i<localized_solution.size(); ++i)
-    if (subdomain_association[i] == this_mpi_process)
+    if (hanging_node_constraints.is_constrained (i)
+        &&
+        (subdomain_association[i] == this_mpi_process))
       solution(i) = static_cast<PetscScalar>(localized_solution(i));
+
+                                   // After this has happened, flush the PETSc
+                                   // buffers. This may or may not be strictly
+                                   // necessary here (the PETSc documentation
+                                   // is not very verbose on these things),
+                                   // but certainly doesn't hurt either.
   solution.compress ();  
 
-  if (this_mpi_process == 0)
-    std::cout << "   Solver converged in "
-              << solver_control.last_step()
-              << " iterations." << std::endl;
+                                   // Finally return the number of iterations
+                                   // it took to converge, to allow for some
+                                   // output:
+  return solver_control.last_step();
 }
 
 
 
+                                 // The fifth step is to take the solution
+                                 // just computed, and evaluate some kind of
+                                 // refinement indicator to refine the mesh.
 template <int dim>
 void ElasticProblem<dim>::refine_grid ()
 {
@@ -719,7 +930,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
                 break;
           default:
                 Assert (false, ExcInternalError());
-        };
+        }
 
                                        // xxx
       std::vector<unsigned int> p (triangulation.n_active_cells());
@@ -778,9 +989,14 @@ void ElasticProblem<dim>::run ()
         }
       
       assemble_system ();
-      solve ();
+      const unsigned int n_iterations = solve ();
+  
+      if (this_mpi_process == 0)
+        std::cout << "   Solver converged in " << n_iterations
+                  << " iterations." << std::endl;
+      
       output_results (cycle);
-    };
+    }
 }
 
 
@@ -824,7 +1040,7 @@ int main (int argc, char **argv)
 		<< "----------------------------------------------------"
 		<< std::endl;
       return 1;
-    };
+    }
 
   return 0;
 }
