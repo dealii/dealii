@@ -91,8 +91,6 @@ void test ()
 
                                        // or let other functions do that
       constraints.distribute_local_to_global (local_vector, local_dofs, B);
-
-      break;
     }
 
                                    // now condense away constraints from A
