@@ -643,6 +643,10 @@ class ParameterHandler
 				      * is given.
 				      *
 				      * Return whether the read was successful.
+				      *
+				      * This function will automatically generate
+				      * the requested file with default values if
+				      * the file did not exist.
 				      */
     virtual bool read_input (const string &filename);
     

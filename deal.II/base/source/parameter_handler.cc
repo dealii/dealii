@@ -239,17 +239,27 @@ bool ParameterHandler::read_input (istream &input) {
 };
 
 
-bool ParameterHandler::read_input (const string &filename) {
+bool ParameterHandler::read_input (const string &filename)
+{
   ifstream input (filename.c_str());
   if (!input) 
     {
       cerr << "ParameterHandler::read_input: could not open file <"
-	   << filename << ">. Aborting." << endl;
+	   << filename << "> for reading." << endl
+	   << "Trying to make file ;<"
+	   << filename << "> with default values for you." << endl;
+
+      ofstream output (filename.c_str());
+      if (output)
+	{
+	  print_parameters (output, Text);
+	}
+      
       return false;
-    };
+    }
   
   return read_input (input);
-};
+}
 
 
 
