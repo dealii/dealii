@@ -1,4 +1,6 @@
 /* $Id$ */
+/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+
 
 #include <fe/quadrature_lib.h>
 #include <cmath>

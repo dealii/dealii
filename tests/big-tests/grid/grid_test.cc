@@ -1,4 +1,6 @@
 /* $Id$ */
+/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+
 
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>

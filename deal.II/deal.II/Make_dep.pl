@@ -1,3 +1,7 @@
+# $Id$
+# Copyright W. Bangerth, University of Heidelberg, 1998
+
+
 #Make a dependency file tree
 #usage: make_dep library_base_name -Iinc_path1 -Iinc_path2 ... files
 

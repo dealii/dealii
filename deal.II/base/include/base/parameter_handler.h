@@ -1,5 +1,6 @@
 /**********************   parameter-handler.h     ****************************/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __parameter_handler_H
 #define __parameter_handler_H
 /**********************   parameter-handler.h     ****************************/

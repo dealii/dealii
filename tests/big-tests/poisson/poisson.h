@@ -1,5 +1,6 @@
 /*----------------------------   poisson.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __poisson_H
 #define __poisson_H
 /*----------------------------   poisson.h     ---------------------------*/

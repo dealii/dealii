@@ -1,5 +1,6 @@
 /*----------------------------   vectors.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __vectors_H
 #define __vectors_H
 /*----------------------------   vectors.h     ---------------------------*/

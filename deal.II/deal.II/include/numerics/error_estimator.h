@@ -1,5 +1,6 @@
 /*----------------------------   error_estimator.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __error_estimator_H
 #define __error_estimator_H
 /*----------------------------   error_estimator.h     ---------------------------*/

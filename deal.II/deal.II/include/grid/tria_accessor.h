@@ -1,5 +1,6 @@
 /*----------------------------   tria_accessor.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __tria_accessor_H
 #define __tria_accessor_H
 /*----------------------------   tria_accessor.h     ---------------------------*/

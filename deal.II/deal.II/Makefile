@@ -1,4 +1,5 @@
 # $Id$
+# Copyright W. Bangerth, University of Heidelberg, 1998
 
 
 all: deal.II doc examples

@@ -1,5 +1,6 @@
 /*----------------------------   tria-iterator.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __tria_iterator_H
 #define __tria_iterator_H
 /*----------------------------   tria-iterator.h     ---------------------------*/

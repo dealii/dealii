@@ -1,5 +1,6 @@
 /*----------------------------   fe_update_flags.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __fe_update_flags_H
 #define __fe_update_flags_H
 /*----------------------------   fe_update_flags.h     ---------------------------*/

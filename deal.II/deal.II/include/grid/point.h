@@ -1,5 +1,6 @@
 /*----------------------------   point.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __point_H
 #define __point_H
 /*----------------------------   point.h     ---------------------------*/

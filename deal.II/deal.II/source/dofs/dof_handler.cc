@@ -1,4 +1,6 @@
 /* $Id$ */
+/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+
 
 #include <grid/dof.h>
 #include <grid/dof_levels.h>

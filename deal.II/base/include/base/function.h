@@ -1,5 +1,6 @@
 /*----------------------------   function.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __function_H
 #define __function_H
 /*----------------------------   function.h     ---------------------------*/

@@ -1,5 +1,6 @@
 /*----------------------------   data_io.h     ---------------------------*/
 /*      <Id:>                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __data_io_H
 #define __data_io_H
 /*----------------------------   data_io.h     ---------------------------*/

@@ -1,5 +1,6 @@
 /*----------------------------   quadrature.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __quadrature_H
 #define __quadrature_H
 /*----------------------------   quadrature.h     ---------------------------*/

@@ -1,5 +1,6 @@
 /*----------------------------   tria_levels.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __tria_levels_H
 #define __tria_levels_H
 /*----------------------------   tria_levels.h     ---------------------------*/

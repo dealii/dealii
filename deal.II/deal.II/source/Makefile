@@ -1,4 +1,5 @@
 # $Id$
+# Copyright W. Bangerth, University of Heidelberg, 1998
 
 #this file uses many small rules to allow
 #   make -j

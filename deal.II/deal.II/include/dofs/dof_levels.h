@@ -1,5 +1,6 @@
 /*----------------------------   dof_levels.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __dof_levels_H
 #define __dof_levels_H
 /*----------------------------   dof_levels.h     ---------------------------*/

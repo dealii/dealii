@@ -1,5 +1,6 @@
 /*----------------------------   timer.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __timer_H
 #define __timer_H
 /*----------------------------   timer.h     ---------------------------*/

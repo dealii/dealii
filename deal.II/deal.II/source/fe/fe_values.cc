@@ -1,4 +1,6 @@
 /* $Id$ */
+/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+
 
 #include <fe/fe.h>
 #include <fe/fe_values.h>

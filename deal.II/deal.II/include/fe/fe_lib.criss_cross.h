@@ -1,5 +1,6 @@
 /*----------------------------   fe_lib.criss_cross.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __fe_lib_criss_cross_H
 #define __fe_lib_criss_cross_H
 /*----------------------------   fe_lib.criss_cross.h     ---------------------------*/

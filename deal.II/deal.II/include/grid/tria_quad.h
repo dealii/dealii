@@ -1,5 +1,6 @@
 /*----------------------------   tria_quad.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __tria_quad_H
 #define __tria_quad_H
 /*----------------------------   tria_quad.h     ---------------------------*/

@@ -1,5 +1,6 @@
 /*----------------------------   fe_lib.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __fe_lib_lagrange_H
 #define __fe_lib_lagrange_H
 /*----------------------------   fe_lib.h     ---------------------------*/

@@ -1,5 +1,6 @@
 /*----------------------------   fe_linear_mapping.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __fe_linear_mapping_H
 #define __fe_linear_mapping_H
 /*----------------------------   fe_linear_mapping.h     ---------------------------*/

@@ -1,4 +1,6 @@
 # $Id$
+# Copyright W. Bangerth, University of Heidelberg, 1998
+
 
 # list the directories we want to visit
 subdirs = grid/ dof/ poisson/ convergence/ error-estimation/

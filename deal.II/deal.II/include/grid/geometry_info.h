@@ -1,5 +1,6 @@
 /*----------------------------   geometry_info.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __geometry_info_H
 #define __geometry_info_H
 /*----------------------------   geometry_info.h     ---------------------------*/

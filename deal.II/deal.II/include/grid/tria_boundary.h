@@ -1,5 +1,6 @@
 /*----------------------------   boundary-function.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __tria_boundary_H
 #define __tria_boundary_H
 /*----------------------------   boundary-function.h     ---------------------------*/

@@ -1,4 +1,6 @@
 /* $Id$ */
+/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+
 
 #include <fe/fe_lib.criss_cross.h>
 #include <grid/tria_iterator.h>

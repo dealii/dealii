@@ -1,5 +1,6 @@
 /*----------------------------   dof_constraints.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __dof_constraints_H
 #define __dof_constraints_H
 /*----------------------------   dof_constraints.h     ---------------------------*/

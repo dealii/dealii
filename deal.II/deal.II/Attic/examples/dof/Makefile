@@ -1,5 +1,5 @@
 # $Id$
-# Author: Wolfgang Bangerth, 1998
+# Copyright W. Bangerth, University of Heidelberg, 1998
 
 # Template for makefiles for the examples subdirectory. In principle,
 # everything should be done automatically if you set the target file

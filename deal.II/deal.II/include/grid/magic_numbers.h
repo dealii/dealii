@@ -1,5 +1,6 @@
 /*----------------------------   magic_numbers.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __magic_numbers_H
 #define __magic_numbers_H
 /*----------------------------   magic_numbers.h     ---------------------------*/

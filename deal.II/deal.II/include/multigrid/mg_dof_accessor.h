@@ -1,5 +1,6 @@
 /*----------------------------   mg_dof_accessor.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __mg_dof_accessor_H
 #define __mg_dof_accessor_H
 /*----------------------------   mg_dof_accessor.h     ---------------------------*/

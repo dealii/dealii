@@ -1,5 +1,6 @@
 /*----------------------------   tria.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __tria_H
 #define __tria_H
 /*----------------------------   tria.h     ---------------------------*/

@@ -1,5 +1,6 @@
 /*----------------------------   dof.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __dof_H
 #define __dof_H
 /*----------------------------   dof.h     ---------------------------*/

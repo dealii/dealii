@@ -1,5 +1,6 @@
 /*----------------------------   dof_iterator.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __dof_iterator_H
 #define __dof_iterator_H
 /*----------------------------   dof_iterator.h     ---------------------------*/

@@ -1,4 +1,6 @@
 # $Id$
+# Copyright W. Bangerth, University of Heidelberg, 1998
+
 # Global options for all compilations (compilations in /source now
 # use other options!)
 

@@ -1,5 +1,6 @@
 /*----------------------------   tria_line.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __tria_line_H
 #define __tria_line_H
 /*----------------------------   tria_line.h     ---------------------------*/

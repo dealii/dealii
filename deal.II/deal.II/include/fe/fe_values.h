@@ -1,5 +1,6 @@
 /*----------------------------   fe_values.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __fe_values_H
 #define __fe_values_H
 /*----------------------------   fe_values.h     ---------------------------*/

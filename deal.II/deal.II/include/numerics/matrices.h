@@ -1,5 +1,6 @@
 /*----------------------------   matrices.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __matrices_H
 #define __matrices_H
 /*----------------------------   matrices.h     ---------------------------*/

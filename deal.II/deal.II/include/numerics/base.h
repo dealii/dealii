@@ -1,5 +1,6 @@
 /*----------------------------   problem_base.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __problem_base_H
 #define __problem_base_H
 /*----------------------------   problem_base.h     ---------------------------*/

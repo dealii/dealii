@@ -1,5 +1,6 @@
 /*----------------------------   problem_assembler.h     ---------------------------*/
 /*      $Id$                 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
 #ifndef __problem_assembler_H
 #define __problem_assembler_H
 /*----------------------------   problem_assembler.h     ---------------------------*/
