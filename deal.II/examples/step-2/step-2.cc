@@ -118,7 +118,7 @@ void make_grid (Triangulation<2> &triangulation)
 };
 
 
-				 // up to now, we only have a grid,
+				 // Up to now, we only have a grid,
 				 // i.e. some geometrical (the
 				 // position of the vertices and which
 				 // vertices make up which cell) and
