@@ -324,8 +324,6 @@ namespace Functions
 /**
  * Singularity on the L-shaped domain in 2D.
  *
- * Caveat: derivatives of this function are not implemented!
- *
  * @author Guido Kanschat, 1999
  */
   class LSingularityFunction : public Function<2>
@@ -376,11 +374,58 @@ namespace Functions
 /**
  * Singularity on the slit domain in 2D.
  *
- * Caveat: derivatives of this function are not implemented!
- *
  * @author Guido Kanschat, 1999
  */
   class SlitSingularityFunction : public Function<2>
+  {
+    public:
+				       /**
+					* The value at a single point.
+					*/
+      virtual double value (const Point<2>   &p,
+			    const unsigned int  component = 0) const;
+      
+				       /**
+					* Values at multiple points.
+					*/
+      virtual void value_list (const std::vector<Point<2> > &points,
+			       std::vector<double>            &values,
+			       const unsigned int              component = 0) const;
+      
+				       /**
+					* Gradient at a single point.
+					*/
+      virtual Tensor<1,2> gradient (const Point<2>   &p,
+				    const unsigned int  component = 0) const;
+      
+				       /**
+					* Gradients at multiple points.
+					*/
+      virtual void gradient_list (const std::vector<Point<2> > &points,
+				  std::vector<Tensor<1,2> >    &gradients,
+				  const unsigned int            component = 0) const;
+      
+				       /**
+					* Laplacian at a single point.
+					*/
+      virtual double laplacian (const Point<2>   &p,
+				const unsigned int  component = 0) const;
+      
+				       /**
+					* Laplacian at multiple points.
+					*/
+      virtual void laplacian_list (const std::vector<Point<2> > &points,
+				   std::vector<double>          &values,
+				   const unsigned int            component = 0) const;
+  };
+  
+  
+/**
+ * Singularity on the slit domain with one Neumann boundary in 2D.
+ *
+ * @author Guido Kanschat, 2002
+ */
+  class SlitHyperSingularityFunction : public Function<2>
   {
     public:
 				       /**

@@ -987,6 +987,108 @@ namespace Functions
   
 //////////////////////////////////////////////////////////////////////
   
+  
+  double
+  SlitHyperSingularityFunction::value (const Point<2>   &p,
+				       const unsigned int) const
+  {
+    double x = p(0);
+    double y = p(1);
+    
+    double phi = std::atan2(x,y)+M_PI;
+    double r2 = x*x+y*y;
+    
+    return std::pow(r2,.125) * std::sin(.25*phi);
+  }
+  
+  
+  void
+  SlitHyperSingularityFunction::value_list (
+    const std::vector<Point<2> > &points,
+    std::vector<double>            &values,
+    const unsigned int) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	double x = points[i](0);
+	double y = points[i](1);
+	
+	double phi = std::atan2(x,y)+M_PI;
+	double r2 = x*x+y*y;
+	
+	values[i] = std::pow(r2,.125) * std::sin(.25*phi);
+      }
+  }
+  
+  
+  double
+  SlitHyperSingularityFunction::laplacian (
+    const Point<2>   &,
+    const unsigned int) const
+  {
+    return 0.;
+  }
+  
+  
+  void
+  SlitHyperSingularityFunction::laplacian_list (
+    const std::vector<Point<2> > &points,
+    std::vector<double>            &values,
+    const unsigned int) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      values[i] = 0.;
+  }
+  
+  
+  Tensor<1,2>
+  SlitHyperSingularityFunction::gradient (
+    const Point<2>   &p,
+    const unsigned int) const
+  {
+    double x = p(0);
+    double y = p(1);
+    double phi = std::atan2(x,y)+M_PI;
+    double r78 = std::pow(x*x+y*y,7./8.);
+    
+    
+    Tensor<1,2> result;
+    result[0] = 1./4.*(std::sin(1./4.*phi)*x + std::cos(1./4.*phi)*y)/r78;
+    result[1] = 1./4.*(std::sin(1./4.*phi)*y - std::cos(1./4.*phi)*x)/r78;
+    return result;
+  }
+  
+  
+  void
+  SlitHyperSingularityFunction::gradient_list (
+    const std::vector<Point<2> > &points,
+    std::vector<Tensor<1,2> >    &gradients,
+    const unsigned int) const
+  {
+    Assert (gradients.size() == points.size(),
+	    ExcDimensionMismatch(gradients.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	const Point<2>& p = points[i];
+	double x = p(0);
+	double y = p(1);
+	double phi = std::atan2(x,y)+M_PI;
+	double r78 = std::pow(x*x+y*y,7./8.);
+	
+	gradients[i][0] = 1./4.*(std::sin(1./4.*phi)*x + std::cos(1./4.*phi)*y)/r78;
+	gradients[i][1] = 1./4.*(std::sin(1./4.*phi)*y - std::cos(1./4.*phi)*x)/r78;
+      }
+  }
+  
+//////////////////////////////////////////////////////////////////////
+  
   template<int dim>
   JumpFunction<dim>::JumpFunction(const Point<dim> &direction,
 				  const double      steepness)
