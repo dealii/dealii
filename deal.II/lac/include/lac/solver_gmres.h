@@ -22,7 +22,9 @@
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <lac/full_matrix.h>
+
 #include <vector>
+#include <cmath>
 
 
 /**
@@ -322,7 +324,7 @@ SolverGMRES<VECTOR>::givens_rotation (Vector<double> &h,
       h(i+1) = -s*dummy + c*h(i+1);
     };
   
-  const double r = 1./sqrt(h(col)*h(col) + h(col+1)*h(col+1));
+  const double r = 1./std::sqrt(h(col)*h(col) + h(col+1)*h(col+1));
   si(col) = h(col+1) *r;
   ci(col) = h(col)   *r;
   h(col)  =  ci(col)*h(col) + si(col)*h(col+1);
@@ -486,7 +488,7 @@ unsigned int dim = 0;
 	    H(i,inner_iteration) = h(i);
 	  
 					   /*  residual  */
-	  rho = fabs(gamma(dim));
+	  rho = std::fabs(gamma(dim));
     
 	  iteration_state = this->control().check (accumulated_iterations, rho);
 	};
