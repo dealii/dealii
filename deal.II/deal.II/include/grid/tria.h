@@ -283,7 +283,8 @@ class TriaDimensionInfo<3> {
  * Note: these class should be made local to the triangulation class
  * once the compiler supports that (gcc2.95 does not at present).
  *
- * @author Wolfgang Bangerth, 1999 */
+ * @author Wolfgang Bangerth, 1999
+ */
 template <int dim>
 struct TriaNumberCache;
 
@@ -1561,7 +1562,6 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   object, you should be well aware that you might involuntarily alter the
  *   data stored in the triangulation.
  *
- *   @memo Implementation of a multilevel triangulation of a domain
  *   @see TriaRawIterator
  *   @author Wolfgang Bangerth, 1998
  */
@@ -1578,10 +1578,13 @@ class Triangulation : public TriaDimensionInfo<dim>,
 
   public:
     
-/**
- * Declare some symbolic names for mesh smoothing algorithms. The meaning of
- * these flags is documented in the @p{Triangulation} class.
- */
+				     /**
+				      * Declare some symbolic names
+				      * for mesh smoothing
+				      * algorithms. The meaning of
+				      * these flags is documented in
+				      * the @p{Triangulation} class.
+				      */
     enum MeshSmoothing
     {
 	  none                               = 0x0,

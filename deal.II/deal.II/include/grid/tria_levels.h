@@ -50,10 +50,11 @@ class TriangulationLevel;
  *  for the lines. Since we only store one byte per line, quad or hex,
  *  this is a minor loss and we can live with that.
  *
- *  @memo Information belonging to one level of the multilevel hierarchy.
+ *  @author Wolfgang Bangerth, 1998
  */
 template <>
-class TriangulationLevel<0> {
+class TriangulationLevel<0>
+{
   public:
 				     /**
 				      *  Flags for the cells whether they are
@@ -175,6 +176,7 @@ class TriangulationLevel<0> {
 };
 
 
+
 /**
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *  
@@ -183,11 +185,11 @@ class TriangulationLevel<0> {
  *  The @p{TriangulationsLevel} objects of higher dimensions are derived from
  *  this one.
  *
- *  @memo Information belonging to one level of the multilevel hierarchy.
  *  @author Wolfgang Bangerth, 1998
  */
 template <>
-class TriangulationLevel<1> : public TriangulationLevel<0> {
+class TriangulationLevel<1> : public TriangulationLevel<0>
+{
   private:
 
 				     /**
@@ -195,7 +197,8 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 				      *  is needed to describe the lines on one
 				      *  level.
 				      */
-    struct LinesData {
+    struct LinesData
+    {
 					 /**
 					  *  Vector of the lines belonging to
 					  *  this level. The index of the line
@@ -320,6 +323,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 };
 
 
+
 /**
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *
@@ -330,7 +334,6 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
  *  The vector of lines and their children is derived from
  *  @p{TriangulationLevel<1>}.
  *
- *  @memo Information belonging to one level of the multilevel hierarchy.
  *  @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -345,7 +348,8 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *  @p{LinesData} structure inherited from
 				      *  @p{Triangulation<1>}.
 				      */
-    struct QuadsData {
+    struct QuadsData
+    {
 					 /**
 					  *  Same as for the @p{lines} array.
 					  */
@@ -426,6 +430,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 };
 
 
+
 /**
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *
@@ -436,7 +441,6 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
  *  The vectors of lines and quads and their children are derived from
  *  @p{TriangulationLevel<2>}.
  *
- *  @memo Information belonging to one level of the multilevel hierarchy.
  *  @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -451,7 +455,8 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 				      *  @p{LinesData} structure inherited from
 				      *  @p{Triangulation<1>}.
 				      */
-    struct HexesData {
+    struct HexesData
+    {
 					 /**
 					  *  Same as for the @p{lines} array.
 					  */
