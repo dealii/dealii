@@ -478,15 +478,16 @@ class vector2d : public Subscriptor
 				      */
     unsigned int val_size;    
     
-				     /** 
-				      * Number of Columns
-				      */
-    unsigned int num_cols;
-    
 				     /**
 				      * Number of Rows
 				      */
     unsigned int num_rows;
+    
+				     /** 
+				      * Number of Columns
+				      */
+    unsigned int num_cols;
+
 				     /**
 				      * Friend declaration needed for
 				      * inter-type copy operator.
@@ -498,8 +499,16 @@ class vector2d : public Subscriptor
 				      */
     template <typename T2> friend class FullMatrix;
 
+				     /**
+				      * Make the following classes
+				      * friends; this is not strictly
+				      * necessary according to a
+				      * defect report to the C++
+				      * standard, but older compilers
+				      * still require this behavior.
+				      */
     friend class ConstRowAccessor;
-    friend class NonConstRowAccessor;    
+    friend class NonConstRowAccessor;
 };
 
 
@@ -726,11 +735,12 @@ vector2d<T>::reinit (const vector2d<T2> &B)
 
 template <typename T>
 vector2d<T>::vector2d (const unsigned int m,
-		       const unsigned int n) :
+		       const unsigned int n)
+		:
 		val (0),
                 val_size (0),
-                num_cols (0),
-                num_rows (0)
+                num_rows (0),
+                num_cols (0)
 {
   reinit (m,n);
 };
@@ -738,11 +748,12 @@ vector2d<T>::vector2d (const unsigned int m,
 
 
 template <typename T>
-vector2d<T>::vector2d (const unsigned int m) :
+vector2d<T>::vector2d (const unsigned int m)
+		:
 		val (0),
                 val_size (0),
-                num_cols (0),
-                num_rows (0)
+                num_rows (0),
+                num_cols (0)
 {
   reinit (m,m);
 };
@@ -750,13 +761,14 @@ vector2d<T>::vector2d (const unsigned int m) :
 
 
 template <typename T>
-vector2d<T>::vector2d (const unsigned int m,
-				const unsigned int n,
-				const T* entries) :
+vector2d<T>::vector2d (const unsigned int  m,
+		       const unsigned int  n,
+		       const T            *entries)
+		:
 		val (0),
                 val_size (0),
-		num_cols (0),
-		num_rows (0)
+		num_rows (0),
+		num_cols (0)
 {
   reinit (m,n);
 
@@ -767,17 +779,17 @@ vector2d<T>::vector2d (const unsigned int m,
 
 
 template <typename T>
-vector2d<T>::vector2d (const vector2d &m) :
+vector2d<T>::vector2d (const vector2d &m)
+		:
 		Subscriptor (),
 		val (0),
 		val_size (0),
-		num_cols (0),
-		num_rows (0)
+		num_rows (0),
+		num_cols (0)
 {
   reinit (m.num_rows, m.num_cols);
   if (num_cols*num_rows != 0)
-    std::copy (&m.val[0], &m.val[num_rows*num_cols],
-	       &val[0]);
+    std::copy (&m.val[0], &m.val[num_rows*num_cols], &val[0]);
 };
 
 
