@@ -307,13 +307,18 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 
 				     /**
 				      * Declare a nested class which
-				      * will hold static definitions of
-				      * various matrices such as
-				      * constraint and embedding
-				      * matrices. The definition of
-				      * the various static fields are
-				      * in the files <tt>fe_q_[123]d.cc</tt>
-				      * in the source directory.
+				      * will hold static definitions
+				      * of various matrices such as
+				      * constraint. All other
+				      * information about this
+				      * particular finite element,
+				      * such as embedding matrices,
+				      * will be computed on-the-fly
+				      * during construction. The
+				      * definition of the various
+				      * static fields are in the files
+				      * <tt>fe_q_[123]d.cc</tt> in the
+				      * source directory.
 				      */
     struct Matrices
     {
