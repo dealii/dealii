@@ -59,7 +59,7 @@ class ConvergenceTable: public TableHandler
 				      * the reduction rate with the assumption
 				      * row-1: h, row: h/2. Hence the order 
 				      * is evaluated by
-				      * $\log(value(row-1)/value(row))/\log 2$.
+				      * $log(value(row-1)/value(row))/log 2$.
 				      *
 				      * Rate in relation to a reference column:
 				      *
