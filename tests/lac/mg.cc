@@ -1,6 +1,16 @@
-// $Id$
+//----------------------------  mg.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg.cc  ---------------------------
 
-// Test program for multigrid with test matrices (fd)
 
 #include <cmath>
 #include <fstream>
@@ -50,9 +60,9 @@ class FDMG
   public:
     FDMG(unsigned int maxlevel, MGLevelObject<SparseMatrix<double> >& matrices,
 	 FDMGTransfer& transfer);
-    
-    
-    virtual void level_vmult (unsigned int level,
+
+
+virtual void level_vmult (unsigned int level,
 				 Vector<double>& dst,
 				 const Vector<double>& src,
 				 const Vector<double>& rhs);
@@ -103,8 +113,8 @@ int main()
   ReductionControl cgcontrol(100, 1.e-30, 1.e-2, false, false);
   SolverCG<> cgcg(cgcontrol,cgmem);
 
-  
-  for (unsigned int level = 0; level <= maxlevel; ++level)
+
+for (unsigned int level = 0; level <= maxlevel; ++level)
     {
       const unsigned int minlevel = 0;
 

@@ -1,15 +1,15 @@
-// 	$Id$
-
-// test for correctness of gradients on a given cell. originally, this
-// file did the testing itself, by comparing the computed results with
-// builtin values; this would be unnecessary now, by simply comparing
-// against a prebuilt output file, but it works this way also. if the
-// computations fail at some time, the "ok" will be replaced by
-// "WRONG!", which would let the comparison against the stored .expect
-// file fail also.
-
-// deal_II_libraries.g=-ldeal_II_2d.g
-// deal_II_libraries=-ldeal_II_2d
+//----------------------------  gradients.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  gradients.cc  ---------------------------
 
 
 #include <grid/tria.h>
@@ -46,9 +46,9 @@ int main ()
   QTrapez<2> q;
   FEValues<2> fevalues(fe,q,update_gradients);
   fevalues.reinit (dof.begin_active());
-  
-  
-  Vector<double> val(4);
+
+
+Vector<double> val(4);
 
   deallog << "Testing transformation of gradients of shape function:" << endl;
   
@@ -63,8 +63,8 @@ int main ()
       vector<Tensor<1,2> > grads(4);
       fevalues.get_function_grads (val, grads);
 
-      
-      bool ok;
+
+bool ok;
       switch (vertex) 
 	{
 	  case 0:

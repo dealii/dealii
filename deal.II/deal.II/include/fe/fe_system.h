@@ -1,14 +1,25 @@
-/*----------------------------   fe_lib.system.h     ---------------------------*/
-/*      $Id$                 */
-#ifndef __deal_fe_system_H
-#define __deal_fe_system_H
+//----------------------------  fe_system.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_system.h  ---------------------------
+#ifndef __deal2__fe_system_h
+#define __deal2__fe_system_h
+
+
 /*----------------------------   fe_lib.system.h     ---------------------------*/
 
 
 #include <fe/fe.h>
 #include <vector>
 #include <utility>
-
 
 
 /**
@@ -405,8 +416,8 @@ class FESystem : public FiniteElement<dim>
 				      */
     vector< ElementPair > base_elements;
 
-    
-				     /**
+
+/**
 				      * Helper function used in the constructor:
 				      * take a #FiniteElementData# object
 				      * and return an object of the same type
@@ -443,8 +454,8 @@ class FESystem : public FiniteElement<dim>
 			  const FiniteElementData<dim> &fe3,
 			  const unsigned int            N3);
 
-   
-				     /**
+
+/**
 				      * Helper function used in the constructor:
 				      * takes a #FiniteElement# object
 				      * and returns an boolean vector including
@@ -514,9 +525,6 @@ class FESystem : public FiniteElement<dim>
 };
 
 
-
-
-
 /* ------------------------- template functions ------------------------- */
 
 template<int dim>
@@ -525,7 +533,6 @@ FESystem<dim>::n_base_elements() const
 {
   return base_elements.size();
 }
-
 
 
 template <int dim>
@@ -539,7 +546,6 @@ FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
   base_elements[0].first -> subscribe ();
   initialize ();
 };
-
 
 
 template <int dim>
@@ -561,7 +567,6 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
   base_elements[1].first -> subscribe ();
   initialize ();
 };
-
 
 
 template <int dim>
@@ -593,7 +598,6 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 };
 
 
-
 template<int dim>
 inline unsigned int
 FESystem<dim>::element_multiplicity(unsigned int index) const
@@ -602,7 +606,6 @@ FESystem<dim>::element_multiplicity(unsigned int index) const
 	  ExcIndexRange(index, 0, base_elements.size()));
   return base_elements[index].second;
 }
-
 
 
 template <int dim>
@@ -615,12 +618,7 @@ FESystem<dim>::base_element(unsigned int index) const
 }
 
 
-
-
-
-
-
 /*----------------------------  fe_lib.system.h  ---------------------------*/
-/* end of #ifndef __fe_system_H */
+
 #endif
 /*----------------------------  fe_lib.system.h  ---------------------------*/

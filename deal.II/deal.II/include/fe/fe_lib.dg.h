@@ -1,9 +1,17 @@
-/*----------------------------   fe_lib.dg.h     ---------------------------*/
-/*      $Id$ */
-/*   Ralf Hartmann, University of Heidelberg, Dez 98                        */
-#ifndef __fe_lib_dg_H 
-#define __fe_lib_dg_H 
-/*----------------------------   fe_lib.dg.h     ---------------------------*/
+//----------------------------  fe_lib.dg.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_lib.dg.h  ---------------------------
+#ifndef __deal2__fe_lib_dg_h
+#define __deal2__fe_lib_dg_h
 
 
 #include <fe/fe_lib.lagrange.h>
@@ -82,7 +90,6 @@ class FEDG_Q0 : public FEQ1Mapping<dim> {
 };
 
 
-
 /**
  * Define a (bi-, tri-, etc)linear finite element in #dim# space dimensions,
  * along with (bi-, tri-)linear (therefore isoparametric) transforms from the
@@ -118,7 +125,6 @@ class FEDG_Q1 : public FEQ1<dim>{
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					  vector<Point<dim> > &support_points) const;
 };
-
 
 
 /**
@@ -157,8 +163,6 @@ class FEDG_Q2 : public FEQ2<dim>{
 };
 
 
-
-
 /**
  * Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions,
  * along with (bi-, tri-)cubic (therefore isoparametric) transforms from the
@@ -193,7 +197,6 @@ class FEDG_Q3 : public FEQ3<dim>{
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					  vector<Point<dim> > &support_points) const;
 };
-
 
 
 /**
@@ -232,10 +235,4 @@ class FEDG_Q4 : public FEQ4<dim>{
 };
 
 
-
-
-
-/*----------------------------   fe_lib.dg.h     ---------------------------*/
-/* end of #ifndef __fe_lib_dg_H */
 #endif
-/*----------------------------   fe_lib.dg.h     ---------------------------*/

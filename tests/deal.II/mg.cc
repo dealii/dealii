@@ -1,8 +1,16 @@
-// $Id$
-/* (c) Guido Kanschat, 1999 */
+//----------------------------  mg.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  mg.cc  ---------------------------
 
-// deal_II_libraries.g=-ldeal_II_2d.g
-// deal_II_libraries=-ldeal_II_2d
 
 #include <base/function.h>
 #include <base/quadrature_lib.h>
@@ -32,8 +40,6 @@
 #include "helmholtz.h"
 
 #include <fstream>
-
-
 
 
 template<int dim>
@@ -144,9 +150,9 @@ int main()
 	  MGSmootherLAC smoother(mgA);
 	  MGTransferPrebuilt transfer;
 	  transfer.build_matrices(mgdof);
-	  
-	  
-	  Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer);
+
+
+Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer);
 	  PreconditionMG<Multigrid<2> >
 	    mgprecondition(multigrid, smoother, smoother, coarse);
 	  

@@ -1,7 +1,16 @@
-// $Id$
+//----------------------------  fe_tables.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_tables.cc  ---------------------------
 
-// deal_II_libraries.g=-ldeal_II_2d.g -ldeal_II_1d.g
-// deal_II_libraries=-ldeal_II_2d
 
 #include <base/exceptions.h>
 #include <base/point.h>
@@ -92,7 +101,6 @@ print_fe_matrices(const FiniteElement<dim>& high,
   deallog << "Interpolation" << endl;
   interpolation.print(logfile);
 }
-
 
 
 int main()

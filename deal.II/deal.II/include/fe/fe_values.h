@@ -1,9 +1,17 @@
-/*----------------------------   fe_values.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __fe_values_H
-#define __fe_values_H
-/*---------------------------   fe_values.h     ---------------------------*/
+//----------------------------  fe_values.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_values.h  ---------------------------
+#ifndef __deal2__fe_values_h
+#define __deal2__fe_values_h
 
 
 #include <base/exceptions.h>
@@ -14,8 +22,6 @@
 #include <base/tensor.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
-
-
 
 
 /**
@@ -251,9 +257,9 @@ class FEValuesBase
 		  const unsigned int n_values_array,
 		  const UpdateFlags         update_flags,
 		  const FiniteElement<dim> &fe);
-    
 
-				     /**
+
+/**
 				      * Return the value of the #i#th shape
 				      * function at the #j# quadrature point
 				      * on the cell, face or subface selected
@@ -707,8 +713,6 @@ class FEValuesBase
 };
 
 
-
-
 /**
  * Represent a finite element evaluated with a specific quadrature rule on
  * a cell.
@@ -733,9 +737,8 @@ class FEValues : public FEValuesBase<dim>
 {
   public:
 
-    
-    
-				     /**
+
+/**
 				      * Constructor. Fill all arrays with the
 				      * values of the shape functions of the
 				      * specified finite element using the
@@ -812,9 +815,6 @@ class FEValues : public FEValuesBase<dim>
 				      */
     vector<Point<dim> >  unit_quadrature_points;    
 };
-
-
-
 
 
 /**
@@ -1000,7 +1000,6 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 };
 
 
-
 /**
  * Represent a finite element evaluated with a specific quadrature rule on
  * the face of a cell.
@@ -1070,8 +1069,6 @@ class FEFaceValues : public FEFaceValuesBase<dim>
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no);
 };
-
-
 
 
 /**
@@ -1215,12 +1212,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 };
 
 
-
-
-
 /*------------------------ Inline functions: FEValuesBase ------------------------*/
-
-
 
 
 template <int dim>
@@ -1234,7 +1226,6 @@ const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const
 };
 
 
-
 template <int dim>
 inline
 const vector<vector<Tensor<1,dim> > > &
@@ -1243,7 +1234,6 @@ FEValuesBase<dim>::get_shape_grads () const
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;
 };
-
 
 
 template <int dim>
@@ -1256,7 +1246,6 @@ FEValuesBase<dim>::get_shape_2nd_derivatives () const
 };
 
 
-
 template <int dim>
 inline
 const vector<Point<dim> > &
@@ -1264,7 +1253,6 @@ FEValuesBase<dim>::get_quadrature_points () const {
   Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
   return quadrature_points;
 };
-
 
 
 template <int dim>
@@ -1276,7 +1264,6 @@ FEValuesBase<dim>::get_support_points () const {
 };
 
 
-
 template <int dim>
 inline
 const vector<double> &
@@ -1284,7 +1271,6 @@ FEValuesBase<dim>::get_JxW_values () const {
   Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
   return JxW_values;
 };
-
 
 
 template <int dim>
@@ -1307,9 +1293,4 @@ FEFaceValuesBase<dim>::get_normal_vectors () const {
 };
 
 
-
-
-/*----------------------------   fe_values.h     ---------------------------*/
-/* end of #ifndef __fe_values_H */
 #endif
-/*----------------------------   fe_values.h     ---------------------------*/

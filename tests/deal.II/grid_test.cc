@@ -1,12 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
-
-
-
-// deal_II_libraries.g=-ldeal_II_2d.g -ldeal_II_3d.g
-// deal_II_libraries=-ldeal_II_2d -ldeal_II_3d
-
-
+//----------------------------  grid_test.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  grid_test.cc  ---------------------------
 
 
 #include <grid/tria_boundary.h>
@@ -29,10 +32,6 @@ ofstream logfile("grid_test.output");
 // 2: refinement of a wiggled area at the boundary
 
 
-
-
-
-
 template <int dim>
 class Ball :
   public StraightBoundary<dim>
@@ -51,8 +50,8 @@ class Ball :
       return middle;
     };
 
-    
-    virtual Point<dim>
+
+virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const {
       Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
       
@@ -78,7 +77,6 @@ class CurvedLine :
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
-
 
 
 template <int dim>
@@ -111,7 +109,7 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
       return middle;
 
 
-  double x=middle(0),
+double x=middle(0),
 	 y=middle(1);
   
   if (y<x)
@@ -128,7 +126,6 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
   
   return middle;
 };
-
 
 
 template <int dim>
@@ -165,7 +162,6 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 };
 
 
-
 template <int dim>
 void test (const int test_case)
 {
@@ -184,8 +180,8 @@ void test (const int test_case)
       return;
     };
 
-  
-  switch (test_case) 
+
+switch (test_case) 
     {
       case 1: 
       {
@@ -222,9 +218,9 @@ void test (const int test_case)
 	    tria.begin_active()->face(2)->set_boundary_indicator(1);
 	    tria.begin_active()->face(4)->set_boundary_indicator(1);
 	  };
-	
-	
-					 // set the boundary function
+
+
+// set the boundary function
 	Ball<dim>       ball;
 	CurvedLine<dim> curved_line;
 	if (test_case==2)
@@ -256,16 +252,15 @@ void test (const int test_case)
 	break;
       }
     };
-  
-  
-  GridOut().write_gnuplot (tria, logfile);
+
+
+GridOut().write_gnuplot (tria, logfile);
     
   deallog << "     Total number of cells        = " << tria.n_cells() << endl
        << "     Total number of active cells = " << tria.n_active_cells() << endl;
 
   deallog.pop();
 };
-
 
 
 int main ()

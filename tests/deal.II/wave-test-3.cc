@@ -1,5 +1,16 @@
-// deal_II_libraries.g=-ldeal_II_2d.g
-// deal_II_libraries=-ldeal_II_2d
+//----------------------------  wave-test-3.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  wave-test-3.cc  ---------------------------
+
 
 #include <grid/tria_boundary_lib.h>
 #include <base/parameter_handler.h>
@@ -27,7 +38,6 @@ template <int dim> class TimeStep_ErrorEstimation;
 template <int dim> class TimeStep_Postprocess;
 
 
-
 template <int dim>
 class TimeStepBase_Wave :  public TimeStepBase_Tria<dim>{
   public:
@@ -49,7 +59,6 @@ class TimeStepBase_Wave :  public TimeStepBase_Tria<dim>{
 };
 
 
-
 template <int dim>
 class TimeStep_Wave :  public virtual TimeStepBase_Wave<dim>
 {
@@ -65,9 +74,9 @@ class TimeStep_Wave :  public virtual TimeStepBase_Wave<dim>
     virtual string branch_signature () const = 0;
     DeclException0 (ExcIO);
     DeclException0 (ExcCoarsestGridsDiffer);
-    
-    
-  protected:
+
+
+protected:
     struct StatisticData 
     {
 	StatisticData ();
@@ -111,7 +120,6 @@ class TimeStep_Wave :  public virtual TimeStepBase_Wave<dim>
 };
 
 
-
 template <int dim>
 class TimeStep_Primal :  public TimeStep_Wave<dim> 
 {
@@ -146,7 +154,6 @@ class TimeStep_Primal :  public TimeStep_Wave<dim>
 			    Vector<double>        &right_hand_side1,
 			    Vector<double>        &right_hand_side2);
 };
-
 
 
 template <int dim>
@@ -185,9 +192,7 @@ class TimeStep_Dual :  public TimeStep_Wave<dim>
 };
 
 
-
 #include <lac/full_matrix.h>
-
 
 
 template <int dim>
@@ -220,7 +225,7 @@ class TimeStep_ErrorEstimation :  public virtual TimeStepBase_Wave<dim>
     };
 
 
-    struct CellwiseError
+struct CellwiseError
     {
 	CellwiseError (const unsigned int n_errors);
 	vector<ErrorOnCell>                    errors;
@@ -317,9 +322,7 @@ class TimeStep_Postprocess : public TimeStep_ErrorEstimation<dim>
 };
 
 
-
 template <int dim> class WaveParameters;
-
 
 
 template <int dim>
@@ -339,7 +342,6 @@ class TimeStep :  public TimeStep_Primal<dim>, public TimeStep_Dual<dim>, public
 
 template <int dim> class TimeStep_Primal;
 template <int dim> class TimeStep_Dual;
-
 
 
 template <int dim>
@@ -454,9 +456,6 @@ class DualFunctional {
 };
 
 
-
-
-
 /**
  * Compute the dual functional which is approximately associated
  * with the end time energy in the high atmosphere above 4000km.
@@ -486,11 +485,6 @@ class EndEnergy : public DualFunctional<dim> {
 };
 
 
-
-
-
-
-
 /**
  * Let the point value of $u$ at the origin integrated over time
  * be the goal.
@@ -513,9 +507,6 @@ class IntegratedValueAtOrigin : public EndEnergy<dim> {
 };
 
 
-
-
-
 /**
  * Dual function corresponding to the #EvaluateSeismicSignal# class.
  */
@@ -530,7 +521,6 @@ class SeismicSignal : public DualFunctional<dim> {
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
-
 
 
 /**
@@ -551,7 +541,6 @@ class EarthSurface : public DualFunctional<dim> {
 };
 
 
-
 /**
  * Compute $J(\Psi) = \int_0^0.25 u(x=2,y,t=2.2) dy.
  */
@@ -566,9 +555,6 @@ class SplitSignal : public DualFunctional<dim> {
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
-
-
-
 
 
 /**
@@ -587,7 +573,6 @@ class SplitLine : public DualFunctional<dim> {
 };
 
 
-
 /**
  * Compute $J(\Psi) = \int_{-0.6}^{-0.4} u(x,t=2.5) dx.
  */
@@ -604,7 +589,6 @@ class OneBranch1d : public DualFunctional<dim> {
 };
 
 
-
 /**
  * Compute $J(\Psi) = \int_{-0.1}^{0.1} u(x,t=2.4) dx.
  */
@@ -619,7 +603,6 @@ class SecondCrossing : public DualFunctional<dim> {
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
-
 
 
 /**
@@ -642,9 +625,6 @@ class HuyghensWave : public DualFunctional<dim> {
 #include <lac/forward_declarations.h>
 #include <base/exceptions.h>
 #include <string>
-
-
-
 
 
 /**
@@ -807,9 +787,6 @@ class EvaluationBase {
 };
 
 
-
-
-
 /**
  * This class is a common base class to the following two. It provides
  * for some infrastructure for evaluations computing the energy in part
@@ -863,11 +840,6 @@ class EvaluateEnergyContent : public EvaluationBase<dim> {
 };
 
 
-
-
-
-
-
 /**
  * Evaluate the value of $u$ at the origin, i.e. $u(0,0)$.
  *
@@ -900,10 +872,6 @@ class EvaluateIntegratedValueAtOrigin : public EvaluationBase<dim> {
 };
 
 
-
-
-
-
 /**
  * Integrate the value of $u_h$ at the top boundary over $x$ and $t$ using a
  * highly oscillatory weight.
@@ -918,9 +886,9 @@ class EvaluateSeismicSignal : public EvaluationBase<dim> {
       const double pi = 3.14159265359;
       return sin(3*pi*p(0))*sin(5*pi*time/2);
     };
-    
-    
-    virtual double evaluate ();
+
+
+virtual double evaluate ();
     virtual void print_final_result (ostream &out);
     virtual double get_final_result ();
     virtual string description () const;
@@ -933,7 +901,6 @@ class EvaluateSeismicSignal : public EvaluationBase<dim> {
   private:
     double result;
 };
-
 
 
 /**
@@ -944,9 +911,9 @@ class EvaluateSplitSignal : public EvaluationBase<dim> {
   public:
     EvaluateSplitSignal () :
 		    result (0) {};
-    
-    
-    virtual double evaluate ();
+
+
+virtual double evaluate ();
     virtual void print_final_result (ostream &out);
     virtual double get_final_result ();
     virtual string description () const;
@@ -960,16 +927,15 @@ class EvaluateSplitSignal : public EvaluationBase<dim> {
     double result;
 };
 
-    
 
 template <int dim>
 class EvaluateOneBranch1d : public EvaluationBase<dim> {
   public:
     EvaluateOneBranch1d () :
 		    result (0) {};
-    
-    
-    virtual double evaluate ();
+
+
+virtual double evaluate ();
     virtual void print_final_result (ostream &out);
     virtual double get_final_result ();
     virtual string description () const;
@@ -982,8 +948,6 @@ class EvaluateOneBranch1d : public EvaluationBase<dim> {
   private:
     double result;
 };
-
-
 
 
 template <int dim>
@@ -991,9 +955,9 @@ class EvaluateSecondCrossing1d : public EvaluationBase<dim> {
   public:
     EvaluateSecondCrossing1d () :
 		    result (0) {};
-    
-    
-    virtual double evaluate ();
+
+
+virtual double evaluate ();
     virtual void print_final_result (ostream &out);
     virtual double get_final_result ();
     virtual string description () const;
@@ -1006,7 +970,6 @@ class EvaluateSecondCrossing1d : public EvaluationBase<dim> {
   private:
     double result;
 };
-
 
 
 template <int dim>
@@ -1015,9 +978,9 @@ class EvaluateHuyghensWave : public EvaluationBase<dim> {
     EvaluateHuyghensWave () :
 		    integrated_value (0),
 		    weighted_value (0) {};
-    
-    
-    virtual double evaluate ();
+
+
+virtual double evaluate ();
     virtual void print_final_result (ostream &out);
     virtual double get_final_result ();
     virtual string description () const;
@@ -1032,10 +995,7 @@ class EvaluateHuyghensWave : public EvaluationBase<dim> {
 };
 
 
-    
-
 template <int dim> class DataOutStack;
-
 
 
 /**
@@ -1055,11 +1015,9 @@ class SweepData
 };
 
 
-
 #include <base/timer.h>
 #include <iostream>
 #include <list>
-
 
 
 /**
@@ -1085,7 +1043,7 @@ class SweepInfo
     };
 
 
-    struct Timers 
+struct Timers 
     {
 	Timer grid_generation;
 	Timer primal_problem;
@@ -1095,12 +1053,12 @@ class SweepInfo
     };
 
 
-    Data & get_data ();
+Data & get_data ();
 
     Timers & get_timers ();
-    
-    
-    template <int dim>
+
+
+template <int dim>
     void write_summary (const list<EvaluationBase<dim>*> & eval_list,
 			ostream &out) const;
     
@@ -1110,10 +1068,7 @@ class SweepInfo
 };
 
 
-
 #include <lac/sparse_matrix.h>
-
-
 
 
 /**
@@ -1125,7 +1080,6 @@ enum Preconditioning {
       sor,
       ssor
 };
-
 
 
 /**
@@ -1187,7 +1141,6 @@ inline number sqr (const number a) {
 };
 
 
-
 /**
  * This is a helper class which has a collection of static elements and returns
  * the right finite element as a pointer when the name of the element is given.
@@ -1242,7 +1195,6 @@ struct FEHelper {
 };
 
 
-
 #include <base/forward_declarations.h>
 #include <grid/forward_declarations.h>
 #include <list>
@@ -1250,8 +1202,6 @@ struct FEHelper {
 
 template <int dim> class DualFunctional;
 template <int dim> class EvaluationBase;
-
-
 
 
 /**
@@ -1770,9 +1720,9 @@ class WaveParameters
 				      * Undefined copy operator.
 				      */
     WaveParameters & operator = (const WaveParameters &);
-    
-    
-				     /**
+
+
+/**
 				      * List of names for the initial values.
 				      * Make this a member of the templated
 				      * class since the supported initial
@@ -1802,8 +1752,8 @@ class WaveParameters
 				      */
     static const string dual_functional_names;
 
-    
-				     /**
+
+/**
 				      * Set the initial function pointers
 				      * depending on the given names.
 				      */
@@ -1841,13 +1791,11 @@ class WaveParameters
 };
 
 
-
 #include <numerics/time_dependent.h>
 
 template <int dim> class WaveParameters;
 template <int dim> class DataOutStack;
 class SweepInfo;
-
 
 
 /**
@@ -1906,9 +1854,6 @@ class TimestepManager : public TimeDependent {
 				      */
     void write_stacked_data (DataOutStack<dim> &data_out_stack) const;
 };
-
-
-
 
 
 /**
@@ -1971,9 +1916,6 @@ class WaveProblem :  public MultipleParameterLoop::UserClass {
 };
 
 
-
-
-
 /* $Id$ */
 
 
@@ -1989,7 +1931,6 @@ class WaveProblem :  public MultipleParameterLoop::UserClass {
 #include <base/function.h>
 
 #include <cmath>
-
 
 
 /*------------------------ DualFunctional --------------------------------*/
@@ -2019,14 +1960,12 @@ DualFunctional<dim>::DualFunctional (const bool use_primal_problem,
 {};
 
 
-
 template <int dim>
 void DualFunctional<dim>::compute_functionals (Vector<double> &j1,
 					       Vector<double> &j2) {
   j1.reinit (dof->n_dofs());
   j2.reinit (dof->n_dofs());
 };
-
 
 
 template <int dim>
@@ -2037,19 +1976,16 @@ void DualFunctional<dim>::compute_endtime_vectors (Vector<double> &final_u_bar,
 };
 
 
-
 template <int dim>
 bool DualFunctional<dim>::use_primal_solutions () const {
   return use_primal_problem;
 };
 
 
-
 template <int dim>
 bool DualFunctional<dim>::use_primal_solutions_at_endtime () const {
   return use_primal_problem_at_endtime;
 };
-
 
 
 template <int dim>
@@ -2067,7 +2003,6 @@ void DualFunctional<dim>::reset (const TimeStep_Primal<dim> &primal_problem) {
   u = &primal_problem.u;
   v = &primal_problem.v;
 };
-
 
 
 template <int dim>
@@ -2088,21 +2023,12 @@ void DualFunctional<dim>::reset (const TimeStep_Dual<dim> &dual_problem) {
 };
 
 
-
-
-
-
-
-
-
 /* ----------------------- EndEnergy ------------------------------*/
 
 
 template <int dim>
 EndEnergy<dim>::EndEnergy (const bool use_primal_problem) :
 		DualFunctional<dim> (use_primal_problem, true) {};
-
-
 
 
 template <int dim>
@@ -2154,9 +2080,9 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
 		  continue;
 		break;
 	};
-      
-      
-      fe_values.reinit (cell);
+
+
+fe_values.reinit (cell);
       fe_values_primal.reinit (primal_cell);
       fe_values_primal.get_function_values (*v, local_v);
       fe_values_primal.get_function_grads (*u, local_u_grad);
@@ -2201,9 +2127,6 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
 };
 
 
-
-
-
 /*------------------------ IntegrateValueAtOrigin --------------------------------*/
 
 
@@ -2233,10 +2156,6 @@ void IntegratedValueAtOrigin<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-
-
-
-
 /*------------------------ SeismicSignal --------------------------------*/
 
 
@@ -2246,7 +2165,6 @@ void SeismicSignal<1>::compute_functionals (Vector<double> &,
 {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <int dim>
@@ -2307,8 +2225,6 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-
-
 /*------------------------ EarthSurface --------------------------------*/
 
 
@@ -2318,7 +2234,6 @@ void EarthSurface<1>::compute_functionals (Vector<double> &,
 {
   Assert (false, ExcNotImplemented());
 };
-
 
 
 template <int dim>
@@ -2366,8 +2281,6 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-
-
 /*------------------------ SplitSignal --------------------------------*/
 
 
@@ -2377,8 +2290,6 @@ void SplitSignal<1>::compute_functionals (Vector<double> &,
 {
   Assert (false, ExcInternalError());
 };
-
-
 
 
 template <int dim>
@@ -2440,8 +2351,6 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-
-
 /* ------------------------------ Split line 1d case ----------------------------- */
 
 template <int dim>
@@ -2496,9 +2405,7 @@ void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
 #endif
 
 
-
 /*------------------------ OneBranch1d --------------------------------*/
-
 
 
 template <int dim>
@@ -2545,9 +2452,7 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-
 /*------------------------ SecondCrossing --------------------------------*/
-
 
 
 template <int dim>
@@ -2592,9 +2497,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-
 /*------------------------ HuyghensWave --------------------------------*/
-
 
 
 template <int dim>
@@ -2634,7 +2537,6 @@ void HuyghensWave<dim>::compute_functionals (Vector<double> &j1,
 };
 
 
-
 // explicit specializations
 
 template class DualFunctional<2>;
@@ -2665,7 +2567,6 @@ template class HuyghensWave<2>;
 
 #include <cmath>
 #include <fstream>
-
 
 
 /*--------------------------- EvaluationBase --------------------------*/
@@ -2712,10 +2613,8 @@ void EvaluationBase<dim>::reset_timelevel (const TimeStep_Primal<dim> &target) {
 };
 
 
-
 template <int dim>
 void EvaluationBase<dim>::reset () {};
-
 
 
 template <int dim>
@@ -2726,10 +2625,6 @@ template <int dim>
 double EvaluationBase<dim>::get_final_result () {
   return 0;
 };
-
-
-
-
 
 
 /*--------------------------- EvaluateEnergyContent ----------------------*/
@@ -2745,7 +2640,6 @@ void EvaluateEnergyContent<dim>::reset () {
   old_energy         = 0;
   integrated_outflux = 0;
 };
-
 
 
 template <int dim>
@@ -2785,9 +2679,9 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
 		  continue;
 		break;
 	};
-      
-      
-      fe_values.reinit (cell);
+
+
+fe_values.reinit (cell);
       const FullMatrix<double>             &values    = fe_values.get_shape_values();
       const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
       const vector<double>                 &weights   = fe_values.get_JxW_values ();
@@ -2828,8 +2722,6 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
 };
 
 
-
-
 /* ---------------------------- EvaluateIntegratedValueAtOrigin ------------------- */
 
 
@@ -2840,12 +2732,10 @@ void EvaluateIntegratedValueAtOrigin<dim>::print_final_result (ostream &out) {
 };
 
 
-
 template <int dim>
 double EvaluateIntegratedValueAtOrigin<dim>::get_final_result () {
   return integrated_value;
 };
-
 
 
 template <int dim>
@@ -2854,12 +2744,10 @@ string EvaluateIntegratedValueAtOrigin<dim>::description () const {
 };
 
 
-
 template <int dim>
 void EvaluateIntegratedValueAtOrigin<dim>::reset () {
   integrated_value = 0;
 };
-
 
 
 template <int dim>
@@ -2890,10 +2778,6 @@ double EvaluateIntegratedValueAtOrigin<dim>::evaluate () {
 };
 
 
-
-
-
-
 /*------------------------- EvaluateSeismicSignal --------------------------*/
 
 
@@ -2903,12 +2787,10 @@ void EvaluateSeismicSignal<dim>::print_final_result (ostream &out) {
 };
 
 
-
 template <int dim>
 double EvaluateSeismicSignal<dim>::get_final_result () {
   return result;
 };
-
 
 
 template <int dim>
@@ -2917,12 +2799,10 @@ string EvaluateSeismicSignal<dim>::description () const {
 };
 
 
-
 template <int dim>
 void EvaluateSeismicSignal<dim>::reset () {
   result = 0;
 };
-
 
 
 template <>
@@ -2931,7 +2811,6 @@ double EvaluateSeismicSignal<1>::evaluate ()
   Assert (false, ExcNotImplemented());
   return 0;
 };
-
 
 
 template <int dim>
@@ -2992,8 +2871,6 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 };
 
 
-
-
 /*------------------------- EvaluateSplitSignal --------------------------*/
 
 
@@ -3003,12 +2880,10 @@ void EvaluateSplitSignal<dim>::print_final_result (ostream &out) {
 };
 
 
-
 template <int dim>
 double EvaluateSplitSignal<dim>::get_final_result () {
   return result;
 };
-
 
 
 template <int dim>
@@ -3017,12 +2892,10 @@ string EvaluateSplitSignal<dim>::description () const {
 };
 
 
-
 template <int dim>
 void EvaluateSplitSignal<dim>::reset () {
   result = 0;
 };
-
 
 
 template <>
@@ -3031,7 +2904,6 @@ double EvaluateSplitSignal<1>::evaluate ()
   Assert (false, ExcNotImplemented());
   return 0;
 };
-
 
 
 template <int dim>
@@ -3085,8 +2957,6 @@ double EvaluateSplitSignal<dim>::evaluate () {
 };
 
 
-
-
 /*------------------------- EvaluateOneBranch1d --------------------------*/
 
 
@@ -3096,12 +2966,10 @@ void EvaluateOneBranch1d<dim>::print_final_result (ostream &out) {
 };
 
 
-
 template <int dim>
 double EvaluateOneBranch1d<dim>::get_final_result () {
   return result;
 };
-
 
 
 template <int dim>
@@ -3110,12 +2978,10 @@ string EvaluateOneBranch1d<dim>::description () const {
 };
 
 
-
 template <int dim>
 void EvaluateOneBranch1d<dim>::reset () {
   result = 0;
 };
-
 
 
 template <int dim>
@@ -3162,8 +3028,6 @@ double EvaluateOneBranch1d<1>::evaluate () {
 #endif
 
 
-
-
 /*------------------------- EvaluateSecondCrossing1d --------------------------*/
 
 
@@ -3173,12 +3037,10 @@ void EvaluateSecondCrossing1d<dim>::print_final_result (ostream &out) {
 };
 
 
-
 template <int dim>
 double EvaluateSecondCrossing1d<dim>::get_final_result () {
   return result;
 };
-
 
 
 template <int dim>
@@ -3187,12 +3049,10 @@ string EvaluateSecondCrossing1d<dim>::description () const {
 };
 
 
-
 template <int dim>
 void EvaluateSecondCrossing1d<dim>::reset () {
   result = 0;
 };
-
 
 
 template <int dim>
@@ -3241,7 +3101,6 @@ double EvaluateSecondCrossing1d<1>::evaluate () {
 #endif
 
 
-
 /*------------------------- EvaluateHuyghensWave --------------------------*/
 
 
@@ -3252,12 +3111,10 @@ void EvaluateHuyghensWave<dim>::print_final_result (ostream &out) {
 };
 
 
-
 template <int dim>
 double EvaluateHuyghensWave<dim>::get_final_result () {
   return weighted_value / integrated_value;
 };
-
 
 
 template <int dim>
@@ -3266,12 +3123,10 @@ string EvaluateHuyghensWave<dim>::description () const {
 };
 
 
-
 template <int dim>
 void EvaluateHuyghensWave<dim>::reset () {
   integrated_value = weighted_value = 0;
 };
-
 
 
 template <int dim>
@@ -3314,7 +3169,6 @@ double EvaluateHuyghensWave<dim>::evaluate ()
 };
 
 
-		
 // explicit instantiations
 template class EvaluationBase<2>;
 template class EvaluateEnergyContent<2>;
@@ -3353,7 +3207,6 @@ TimestepManager<dim>::TimestepManager (const WaveParameters<dim> &parameters) :
 {};
 
 
-
 template <int dim>
 void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
 {
@@ -3374,9 +3227,9 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
 	  (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
 	sweep_data.data_out_stack->declare_data_vector ("est_error", DataOutStack<dim>::cell_vector);
     };
-  
-  
-  deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
+
+
+deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
        << "---------" << endl;
 
   for (typename list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
@@ -3424,15 +3277,13 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
 };
 
 
-
-
 template <int dim>
 void TimestepManager<dim>::refine_grids () 
 {
   deallog << "  Collecting refinement data: " << endl;
 
-  
-  const unsigned int n_timesteps = timesteps.size();
+
+const unsigned int n_timesteps = timesteps.size();
       
 				       // first collect all the error indicators
   vector<Vector<float> > indicators (n_timesteps);
@@ -3442,15 +3293,14 @@ void TimestepManager<dim>::refine_grids ()
       ->get_timestep_postprocess().get_tria_refinement_criteria (indicators[i]);
 
 
-				   // count the number of cells for some
+// count the number of cells for some
 				   // statistics and other things
   unsigned int total_number_of_cells = 0;
   for (unsigned int i=0; i<timesteps.size(); ++i)
     total_number_of_cells += indicators[i].size();
 
 
-
-  if (parameters.produce_error_statistics)
+if (parameters.produce_error_statistics)
     {
       deallog << "    Generating error statistics ";
 
@@ -3469,7 +3319,7 @@ void TimestepManager<dim>::refine_grids ()
     };
 
 
-  if (parameters.compare_indicators_globally)
+if (parameters.compare_indicators_globally)
     {
 
 				       // collect all indicators in one
@@ -3613,12 +3463,10 @@ void TimestepManager<dim>::refine_grids ()
 	static_cast<TimeStepBase_Tria<dim>*>(timesteps.back())->sleep(1);
 
 
-      deallog << "    Got " << total_number_of_cells << " presently, expecting "
+deallog << "    Got " << total_number_of_cells << " presently, expecting "
 	   << total_expected_cells << " for next sweep." << endl;
     };
 };
-
-
 
 
 template <int dim>
@@ -3652,8 +3500,8 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
       deallog << endl;
     };
 
-  
-				   // write summary
+
+// write summary
   if (true)
     {
       deallog << "    Writing summary.";
@@ -3666,7 +3514,6 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
     };
 };
 
-							
 
 template <int dim>
 void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack) const 
@@ -3685,8 +3532,6 @@ void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack
   data_out_stack.write (logfile, output_format);
   deallog << '.' << endl;
 };
-
-
 
 
 //explicit instantiation
@@ -3743,11 +3588,9 @@ const string WaveParameters<dim>::dual_functional_names ("none"
 							 "|Huyghens wave");
 
 
-
 DeclException1 (ExcUnknownName,
 		string,
 		<< "Unknown description string " << arg1);
-
 
 
 template <int dim>
@@ -3775,7 +3618,7 @@ class InitialValues {
     };
 
 
-    class SmallBump : public Function<dim> {
+class SmallBump : public Function<dim> {
       public:
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
@@ -3788,7 +3631,7 @@ class InitialValues {
     };
 
 
-    class ShiftedBump : public Function<dim> {
+class ShiftedBump : public Function<dim> {
       public:
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
@@ -3823,7 +3666,7 @@ class InitialValues {
     };
 
 
-    class Earthquake : public Function<dim> {
+class Earthquake : public Function<dim> {
       public:
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
@@ -3835,7 +3678,6 @@ class InitialValues {
 	};
     };
 };
-
 
 
 template <int dim>
@@ -3877,7 +3719,7 @@ class Coefficients {
     };
 
 
-    class Gradient : public Function<dim> {
+class Gradient : public Function<dim> {
       public:
 	inline virtual double value (const Point<dim> &p,
 				     const unsigned int) const {
@@ -3909,8 +3751,7 @@ class Coefficients {
     };
 
 
-
-    class PreliminaryEarthModel : public Function<dim> {
+class PreliminaryEarthModel : public Function<dim> {
       public:
 	inline virtual double value (const Point<dim> &p,
 				     const unsigned int) const {
@@ -3948,9 +3789,8 @@ class Coefficients {
 	};
     };
 
-    
-    
-    class Distorted : public Function<dim> {
+
+class Distorted : public Function<dim> {
       public:
 	inline virtual double value (const Point<dim> &p,
 				     const unsigned int) const {
@@ -3988,8 +3828,6 @@ class Coefficients {
 };
 
 
-
-
 template <int dim>
 class BoundaryValues {
   public:
@@ -4021,7 +3859,7 @@ class BoundaryValues {
     };
 
 
-    class FastWaveFromLeft_u : public Function<dim> {
+class FastWaveFromLeft_u : public Function<dim> {
       public:
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
@@ -4045,8 +3883,8 @@ class BoundaryValues {
 	};
     };
 
-    
-    class WaveFromLeftCenter_u : public Function<dim> {
+
+class WaveFromLeftCenter_u : public Function<dim> {
       public:
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
@@ -4071,7 +3909,7 @@ class BoundaryValues {
     };
 
 
-    class WaveFromLeftBottom_u : public Function<dim> {
+class WaveFromLeftBottom_u : public Function<dim> {
       public:
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
@@ -4119,7 +3957,6 @@ class BoundaryValues {
 };
 
 
-
 template <int dim>
 class Boundaries 
 {
@@ -4133,9 +3970,9 @@ class Boundaries
 	  middle *= sqrt(line->vertex(0).square()) / sqrt(middle.square());
 	  return middle;
 	};
-	
-	
-	virtual Point<dim>
+
+
+virtual Point<dim>
 	get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const {
 	  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
 	  middle *= sqrt(quad->vertex(0).square()) / sqrt(middle.square());
@@ -4143,8 +3980,6 @@ class Boundaries
 	};
     };
 };
-
-
 
 
 template <int dim>
@@ -4161,13 +3996,11 @@ WaveParameters<dim>::WaveParameters () :
 {};
 
 
-
 template <int dim>
 WaveParameters<dim>::~WaveParameters ()
 {
   delete_parameters ();
 };
-
 
 
 template <int dim>
@@ -4218,8 +4051,6 @@ void WaveParameters<dim>::delete_parameters ()
 };
 
 
-
-
 template <int dim>
 void WaveParameters<dim>::set_initial_functions (const string &u_name,
 						 const string &v_name) {
@@ -4261,9 +4092,6 @@ void WaveParameters<dim>::set_initial_functions (const string &u_name,
   initial_u = functions[0];
   initial_v = functions[1];
 };
-
-
-
 
 
 template <int dim>
@@ -4308,7 +4136,6 @@ void WaveParameters<dim>::set_coefficient_functions (const string &name) {
 };
 
 
-
 template <int dim>
 void WaveParameters<dim>::set_boundary_functions (const string &name) {
   Assert (boundary_values_u==0, ExcInternalError());
@@ -4346,7 +4173,6 @@ void WaveParameters<dim>::set_boundary_functions (const string &name) {
 	  else
 	    AssertThrow (false, ExcUnknownName (name));
 };
-
 
 
 template <int dim>
@@ -4395,8 +4221,6 @@ void WaveParameters<dim>::make_eval_list (const string &names) {
 };
 
 
-
-
 template <int dim>
 void WaveParameters<dim>::set_dual_functional (const string &name) {
   Assert (dual_functional==0, ExcInternalError());
@@ -4429,8 +4253,6 @@ void WaveParameters<dim>::set_dual_functional (const string &name) {
 		  else
 		    AssertThrow (false, ExcUnknownName (name));
 };
-
-
 
 
 #if 2 == 1
@@ -4492,7 +4314,6 @@ void WaveParameters<1>::make_coarse_grid (const string &name) {
 };
 
 #endif
-
 
 
 #if 2 == 2
@@ -4635,24 +4456,24 @@ void WaveParameters<2>::make_coarse_grid (const string &name) {
 
 		  break;
 		};
-		  
-		
-		case uniform_channel:
+
+
+case uniform_channel:
 		{
 		  coarse_grid->refine_global (initial_refinement-1);
 		  break;
 		};
 
 
-		default:
+default:
 		      Assert (false, ExcInternalError());
 	      };
 	  };
 	break;
       };
 
-      
-      case square:
+
+case square:
       case seismic_square:
       {
 	GridGenerator::hyper_cube (*coarse_grid, -1, 1);
@@ -4808,8 +4629,6 @@ void WaveParameters<3>::make_coarse_grid (const string &name) {
 #endif
 
 
-
-
 template <int dim>
 void WaveParameters<dim>::declare_parameters (ParameterHandler &prm) 
 {
@@ -4904,18 +4723,17 @@ void WaveParameters<dim>::declare_parameters (ParameterHandler &prm)
   prm.leave_subsection ();
 
 
-  prm.enter_subsection ("Goal");
+prm.enter_subsection ("Goal");
   prm.declare_entry ("Goal", "none",
 		     Patterns::Selection (dual_functional_names));
   prm.declare_entry ("Evaluate", "");
   prm.leave_subsection ();  
 
 
-  prm.declare_entry ("Refinement criterion", "energy estimator",
+prm.declare_entry ("Refinement criterion", "energy estimator",
  		     Patterns::Selection ("energy estimator|dual estimator"));
   prm.declare_entry ("Sweeps", "3", Patterns::Integer());
 };
-
 
 
 template <int dim>
@@ -4940,9 +4758,9 @@ void WaveParameters<dim>::parse_parameters (ParameterHandler &prm) {
   write_strategy_list["never"] = never;
   write_strategy_list["all sweeps"] = all_sweeps;
   write_strategy_list["last sweep only"] = last_sweep_only;
-  
-  
-  prm.enter_subsection ("Grid");
+
+
+prm.enter_subsection ("Grid");
   initial_refinement = prm.get_integer ("Initial refinement");
 				   // don't make the grid here already, since
 				   // it may depend on the chosen boundary
@@ -5024,14 +4842,13 @@ void WaveParameters<dim>::parse_parameters (ParameterHandler &prm) {
   prm.leave_subsection ();
 
 
-  prm.enter_subsection ("Goal");
+prm.enter_subsection ("Goal");
   set_dual_functional (prm.get("Goal"));
   make_eval_list (prm.get("Evaluate"));
   prm.leave_subsection ();
 
-  
-  
-  if (prm.get("Refinement criterion")=="energy estimator")
+
+if (prm.get("Refinement criterion")=="energy estimator")
     refinement_strategy = energy_estimator;
   else
     refinement_strategy = dual_estimator;
@@ -5044,8 +4861,6 @@ void WaveParameters<dim>::parse_parameters (ParameterHandler &prm) {
   make_coarse_grid (prm.get("Coarse mesh"));
   prm.leave_subsection ();
 };
-
-
 
 
 // explicit instantiations
@@ -5067,7 +4882,6 @@ SweepData<dim>::SweepData (const bool use_data_out_stack)
 };
 
 
-
 template <int dim>
 SweepData<dim>::~SweepData () 
 {
@@ -5075,8 +4889,6 @@ SweepData<dim>::~SweepData ()
     delete data_out_stack;
   data_out_stack = 0;
 };
-
-
 
 
 // explicit instantiations
@@ -5095,13 +4907,11 @@ SweepInfo::get_data ()
 };
 
 
-
 SweepInfo::Timers &
 SweepInfo::get_timers () 
 {
   return timers;
 };
-
 
 
 template <int dim>
@@ -5142,22 +4952,12 @@ SweepInfo::write_summary (const list<EvaluationBase<dim>*> &eval_list,
 };
 
 
-  
-
-
-
-
 SweepInfo::Data::Data () :
 		accumulated_error (0),
 		cells (0),
 		primal_dofs (0),
 		dual_dofs (0)
 {};
-
-
-
-
-
 
 
 // explicit instantiations
@@ -5193,8 +4993,6 @@ void SweepInfo::write_summary (const list<EvaluationBase<2>*> &eval_list,
 #include <iomanip>
 
 
-
-
 static const pair<unsigned int, double> relaxations[3]
 = { make_pair(100,5), make_pair(300,3), make_pair(500,2) };
 
@@ -5205,13 +5003,11 @@ wave_correction_relaxations (1,
 								 &relaxations[3]));
 
 
-
 template <int dim>
 TimeStepBase_Wave<dim>::TimeStepBase_Wave ():
 		TimeStepBase_Tria<dim> (),
 		parameters (*static_cast<WaveParameters<dim>*>(0))
 {};
-
 
 
 template <int dim>
@@ -5237,14 +5033,12 @@ TimeStepBase_Wave<dim>::TimeStepBase_Wave (const double                    time,
 {};
 
 
-
 template <int dim>
 const TimeStep_Primal<dim> &
 TimeStepBase_Wave<dim>::get_timestep_primal () const
 {
   return dynamic_cast<const TimeStep_Primal<dim> &> (*this);
 };
-
 
 
 template <int dim>
@@ -5255,14 +5049,12 @@ TimeStepBase_Wave<dim>::get_timestep_dual () const
 };
 
 
-
 template <int dim>
 const TimeStep_Postprocess<dim> &
 TimeStepBase_Wave<dim>::get_timestep_postprocess () const
 {
   return dynamic_cast<const TimeStep_Postprocess<dim> &> (*this);
 };
-
 
 
 template <int dim>
@@ -5275,7 +5067,6 @@ string TimeStepBase_Wave<dim>::tmp_filename_base (const string &branch_signature
 };
 
 
-
 template <int dim>
 void TimeStepBase_Wave<dim>::attach_sweep_info (SweepInfo &si)
 {
@@ -5283,16 +5074,11 @@ void TimeStepBase_Wave<dim>::attach_sweep_info (SweepInfo &si)
 };
 
 
-
 template <int dim>
 void TimeStepBase_Wave<dim>::attach_sweep_data (SweepData<dim> &sd)
 {
   sweep_data = &sd;
 };
-
-
-
-
 
 
 /* --------------------------------------------------------------*/
@@ -5308,7 +5094,6 @@ TimeStep_Wave<dim>::TimeStep_Wave (const string fe_name) :
 {};
 
 
-
 template <int dim>
 TimeStep_Wave<dim>::~TimeStep_Wave ()
 {
@@ -5321,7 +5106,6 @@ TimeStep_Wave<dim>::~TimeStep_Wave ()
   Assert (v.size() ==0, ExcInternalError());
 };
 
-				   
 
 template <int dim>
 void TimeStep_Wave<dim>::wake_up (const unsigned int wakeup_level) 
@@ -5341,9 +5125,9 @@ void TimeStep_Wave<dim>::wake_up (const unsigned int wakeup_level)
 
       if (parameters.renumber_dofs)
 	DoFRenumbering::Cuthill_McKee (*dof_handler);
-      
 
-      constraints.clear ();
+
+constraints.clear ();
       DoFTools::make_hanging_node_constraints (*dof_handler, constraints);
       constraints.close ();
 
@@ -5405,7 +5189,6 @@ void TimeStep_Wave<dim>::wake_up (const unsigned int wakeup_level)
 };
 
 
-
 template <int dim>
 void TimeStep_Wave<dim>::sleep (const unsigned int sleep_level) 
 {
@@ -5456,7 +5239,6 @@ void TimeStep_Wave<dim>::sleep (const unsigned int sleep_level)
 };
 
 
-
 template <int dim>
 void TimeStep_Wave<dim>::end_sweep ()
 {
@@ -5465,7 +5247,6 @@ void TimeStep_Wave<dim>::end_sweep ()
 };
 
 
-    
 template <int dim>
 unsigned int TimeStep_Wave<dim>::solve (const UserMatrix       &matrix,
 					Vector<double>         &solution,
@@ -5484,7 +5265,6 @@ unsigned int TimeStep_Wave<dim>::solve (const UserMatrix       &matrix,
 
   return control.last_step();
 };
-
 
 
 template <int dim>
@@ -5521,9 +5301,9 @@ void TimeStep_Wave<dim>::create_matrices ()
   if (stiffness_constant)
     fill_n (stiffness_values.begin(), n_q_points,
 	    parameters.stiffness->value(Point<dim>()));
-  
-  
-  FEValues<dim>  fe_values (fe, quadrature,
+
+
+FEValues<dim>  fe_values (fe, quadrature,
 			    UpdateFlags(update_values |
 					update_gradients  |
 					update_JxW_values |
@@ -5537,8 +5317,8 @@ void TimeStep_Wave<dim>::create_matrices ()
   FullMatrix<double> cell_mass_matrix (dofs_per_cell, dofs_per_cell);
   FullMatrix<double> cell_laplace_matrix (dofs_per_cell, dofs_per_cell);
 
-  
-  for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
+
+for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell)
     {
       fe_values.reinit (cell);
@@ -5594,7 +5374,6 @@ void TimeStep_Wave<dim>::create_matrices ()
 };
 
 
-
 template <int dim>
 void TimeStep_Wave<dim>::transfer_old_solutions (Vector<double> &old_u,
 						 Vector<double> &old_v) const 
@@ -5645,7 +5424,6 @@ void TimeStep_Wave<dim>::transfer_old_solutions (Vector<double> &old_u,
 };
 
 
-
 template <int dim>
 void
 TimeStep_Wave<dim>::transfer_old_solutions (const typename DoFHandler<dim>::cell_iterator &old_cell,
@@ -5681,7 +5459,6 @@ TimeStep_Wave<dim>::transfer_old_solutions (const typename DoFHandler<dim>::cell
 };
 
 
-
 template <int dim>
 pair<double,double>
 TimeStep_Wave<dim>::compute_energy () {
@@ -5707,7 +5484,6 @@ TimeStep_Wave<dim>::compute_energy () {
 };
 
 
-
 template <int dim>
 TimeStep_Wave<dim>::StatisticData::
 StatisticData () :
@@ -5717,7 +5493,6 @@ StatisticData () :
 		n_solver_steps_projection (0),
 		energy (make_pair(0.0, 0.0))
 {};
-
 
 
 template <int dim>
@@ -5735,7 +5510,6 @@ StatisticData (const unsigned int        n_active_cells,
 {};
 
 
-
 template <int dim>
 void
 TimeStep_Wave<dim>::StatisticData::write_descriptions (ostream &out) 
@@ -5750,7 +5524,6 @@ TimeStep_Wave<dim>::StatisticData::write_descriptions (ostream &out)
 };
 
 
-
 template <int dim>
 void TimeStep_Wave<dim>::StatisticData::write (ostream &out) const
 {
@@ -5762,11 +5535,6 @@ void TimeStep_Wave<dim>::StatisticData::write (ostream &out) const
       << energy.second              << ' '
       << energy.first+energy.second;
 };
-
-
-
-
-
 
 
 // explicit instantiations
@@ -5792,13 +5560,11 @@ template class TimeStep_Wave<2>;
 #include <iomanip>
 
 
-
 template <int dim>
 TimeStep_Dual<dim>::TimeStep_Dual (const string &dual_fe)
 		:
 		TimeStep_Wave<dim> (dual_fe)
 {};
-
 
 
 template <int dim>
@@ -5855,7 +5621,6 @@ void TimeStep_Dual<dim>::do_initial_step () {
 				    make_pair (0.0, 0.0));
   deallog << "." << endl;
 };
-
 
 
 template <int dim>
@@ -5920,7 +5685,7 @@ void TimeStep_Dual<dim>::do_timestep ()
 				   // zero already.
 
 
-				   // in 1d, do not set boundary conditions
+// in 1d, do not set boundary conditions
 				   // at all
 				   //
 				   // note: in boundary_value_map, all entries
@@ -5990,8 +5755,6 @@ void TimeStep_Dual<dim>::do_timestep ()
 };
 
 
-
-
 template <int dim>
 void TimeStep_Dual<dim>::solve_dual_problem ()
 {
@@ -6004,13 +5767,11 @@ void TimeStep_Dual<dim>::solve_dual_problem ()
 };
 
 
-
 template <int dim>
 string TimeStep_Dual<dim>::branch_signature () const 
 {
   return "d";
 };
-
 
 
 template <int dim>
@@ -6027,7 +5788,6 @@ void TimeStep_Dual<dim>::wake_up (const unsigned int wakeup_level)
     };
   sweep_info->get_timers().dual_problem.stop();
 };
-
 
 
 template <int dim>
@@ -6057,7 +5817,6 @@ void TimeStep_Dual<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 };
 
 
-
 template <int dim>
 void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
 				    Vector<double> &right_hand_side2) {
@@ -6082,8 +5841,8 @@ void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
 				       update_JxW_values |
 				       update_q_points));
 
-  
-  cell_iterator old_cell = previous_time_level.dof_handler->begin(),
+
+cell_iterator old_cell = previous_time_level.dof_handler->begin(),
 		new_cell = dof_handler->begin(),
 		end_cell = (tria->n_levels() == 1                  ?
 			    static_cast<cell_iterator>(dof_handler->end()) :
@@ -6093,7 +5852,6 @@ void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
 	       fe_values,
 	       right_hand_side1, right_hand_side2);
 };
-
 
 
 template <int dim>
@@ -6120,7 +5878,7 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
     };
 
 
-				   // select the TimeStep_Wave part in the
+// select the TimeStep_Wave part in the
 				   // TimeStep_Dual branch
   const TimeStep_Dual<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
@@ -6281,7 +6039,6 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 };
 
 
-
 template <int dim>
 unsigned int
 TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator &old_cell,
@@ -6412,7 +6169,6 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 };
 
 
-
 template <int dim>
 unsigned int
 TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator &new_cell,
@@ -6463,8 +6219,8 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 				   // the new grid
   vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
-      
-				       // loop over the child cells
+
+// loop over the child cells
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
       const DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
@@ -6553,8 +6309,6 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 };
 
 
-
-
 // explicit instantiations
 template class TimeStep_Dual<2>;
 /* $Id$ */
@@ -6578,11 +6332,9 @@ template class TimeStep_Dual<2>;
 #include <numeric>
 
 
-
 template <int dim>
 TimeStep_ErrorEstimation<dim>::TimeStep_ErrorEstimation () 
 {};
-
 
 
 template <int dim>
@@ -6616,7 +6368,6 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 };
 
 
-
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::wake_up (const unsigned int wakeup_level)
 {
@@ -6630,7 +6381,6 @@ void TimeStep_ErrorEstimation<dim>::wake_up (const unsigned int wakeup_level)
       estimated_error_per_cell.reinit (tria->n_active_cells());
     };
 };
-
 
 
 template <int dim>
@@ -6652,7 +6402,6 @@ void TimeStep_ErrorEstimation<dim>::sleep (const unsigned int sleep_level)
 };
 
 
-
 template <int dim>
 void
 TimeStep_ErrorEstimation<dim>::get_tria_refinement_criteria (Vector<float> &indicators) const 
@@ -6670,7 +6419,6 @@ TimeStep_ErrorEstimation<dim>::get_error_indicators (Vector<float> &indicators) 
   ifstream in (tmp_filename_base(branch_signature()).c_str());
   indicators.block_read (in);
 };
-
 
 
 template <int dim>
@@ -6718,7 +6466,6 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 };
 
 
-
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
   CellwiseError cellwise_error (tria->n_active_cells());
@@ -6731,7 +6478,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 						 (previous_timestep)->get_timestep_dual();
 
 
-				   // first clear the user pointers of
+// first clear the user pointers of
 				   // the cells we need
   if (true)
     {
@@ -6795,9 +6542,9 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 				   // compute the sum of the errors
 				   // on the cells
   ErrorOnCell total_estimated_error;
-  
 
-				   // now fill the data we collected to the
+
+// now fill the data we collected to the
 				   // error_per_cell array
   Vector<float>::iterator i = estimated_error_per_cell.begin();
   DoFHandler<dim>::active_cell_iterator
@@ -6816,7 +6563,6 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
       total_estimated_error += *error_on_this_cell;
     };
 };
-
 
 
 template <int dim>
@@ -6842,9 +6588,8 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
       return;
     };
 
-  
 
-  const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
+const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
 			     &primal_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
 						   (previous_timestep)->get_timestep_primal();
   const TimeStep_Dual<dim>   &dual_problem     = get_timestep_dual(),
@@ -6858,7 +6603,7 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
 			    dofs_per_cell_dual   = dual_fe.dofs_per_cell;  
 
 
-				   // none of the two cells has children
+// none of the two cells has children
   if (!primal_cell->has_children() && !primal_cell_old->has_children())
     {
 				       // vector holding the solutions on
@@ -6888,7 +6633,7 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
       dual_cell->get_dof_values (dual_problem.v, local_v_bar);
 
 
-      				       // fill local old solution vectors.
+// fill local old solution vectors.
 				       // no problems here, since the two
 				       // cells are both unrefined
       primal_cell_old->get_dof_values (primal_problem_old.u, primal_tmp);
@@ -6914,8 +6659,7 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
     };
 
 
-
-				   // only new cell has children. handle this
+// only new cell has children. handle this
 				   // case by prolonging the solutions on the
 				   // old cell to its children and recursing
 				   // thereon
@@ -6941,7 +6685,7 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
       dual_cell_old->get_dof_values (dual_problem_old.v, local_v_bar_old);
 
 
-      compute_error_on_new_children (primal_cell, dual_cell,
+compute_error_on_new_children (primal_cell, dual_cell,
 				     local_u_old,
 				     local_v_old,
 				     local_u_bar_old,
@@ -6953,7 +6697,7 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
     };
 
 
-				   // last possibility: new cell is not
+// last possibility: new cell is not
 				   // refined, but old one is. in this case:
 				   // collect error on this cell from the
 				   // smaller ones on the old grid
@@ -7040,10 +6784,8 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const DoFHandler<dim>::cell_
     };
 
 
-  Assert (false, ExcInternalError());
+Assert (false, ExcInternalError());
 };
-
-
 
 
 template <int dim>
@@ -7061,9 +6803,9 @@ compute_error_on_new_children (const DoFHandler<dim>::cell_iterator &primal_cell
 
   const FiniteElement<dim> &dual_fe  = get_timestep_dual().fe;
   const unsigned int dofs_per_cell_dual = dual_fe.dofs_per_cell;
-  
-  
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+
+
+for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
       				       // we have the solutions on the
 				       // old (large) cell, we restrict it to
@@ -7131,7 +6873,6 @@ compute_error_on_new_children (const DoFHandler<dim>::cell_iterator &primal_cell
 	};
     };
 };
-
 
 
 template <int dim>
@@ -7224,9 +6965,9 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const DoFHandler<dim
 	  local_difference_u_bar_old -= local_Ih_u_bar_old;
 	  local_difference_v_bar_old =  local_v_bar_old;
 	  local_difference_v_bar_old -= local_Ih_v_bar_old;
-	  
-	  
-	  error_sum += error_formula (old_dual_child,
+
+
+error_sum += error_formula (old_dual_child,
 				      child_u,            child_v,
 				      child_u_bar,        child_v_bar,
 				      local_u_old,        local_v_old,
@@ -7237,7 +6978,6 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const DoFHandler<dim
 
   return error_sum;
 };
-
 
 
 template <int dim>
@@ -7275,7 +7015,6 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 };
 
 
-
 template <int dim>
 typename TimeStep_ErrorEstimation<dim>::ErrorOnCell
 TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell_iterator &cell,
@@ -7306,7 +7045,7 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
   Vector<double> tmp2(dofs_per_cell);
 
 
-  vector<double> stiffness(fe_values.n_quadrature_points);
+vector<double> stiffness(fe_values.n_quadrature_points);
   parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 				    stiffness);
   vector<Tensor<1,dim> > grad_stiffness(fe_values.n_quadrature_points);
@@ -7363,19 +7102,18 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 				 weights[point] *
 				 stiffness[point];
 	};
-  
-			       
-				   
-				   // ////////////////////////////////////
+
+
+// ////////////////////////////////////
 				   // Compute the different contributions
 				   // separately. Note that the parts
 				   // 1 and 2a+2b together should give
 				   // a small quantity, since they form
 				   // the first domain residual, which is
 				   // small for elements of odd order.
-  
-      
-				   // ////////////////////////////////////
+
+
+// ////////////////////////////////////
 				   // PART 1
 				   //
 				   // let #tmp_dual2# hold the contribution
@@ -7391,9 +7129,9 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
   tmp1 -= local_u_old;
   
   error_on_cell.part[0] = mass_matrix.matrix_scalar_product (tmp1, tmp2);
-  
-  
-				   // same thing for the second part
+
+
+// same thing for the second part
 				   // with v instead of u
   tmp2  = local_difference_v_bar;
   tmp2 += local_difference_v_bar_old;
@@ -7403,10 +7141,9 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
   tmp1 -= local_v_old;
   
   error_on_cell.part[1] = mass_matrix.matrix_scalar_product (tmp1, tmp2);
-  
 
-  
-				   // ////////////////////////////////
+
+// ////////////////////////////////
 				   // PART 2a
 				   //
 				   // let tmp2=(1-I)(u_bar^n+u_bar^(n-1))
@@ -7419,9 +7156,9 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 
   error_on_cell.part[2] = -(get_backward_timestep() / 4 *
 			    mass_matrix.matrix_scalar_product (tmp1, tmp2));
-  
 
-				   // ////////////////////////////////
+
+// ////////////////////////////////
 				   // PART 2b
 				   //
 				   // let tmp1 = v^n-v^(n-1)
@@ -7436,7 +7173,7 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 			    mass_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
-				   // ////////////////////////////////
+// ////////////////////////////////
 				   // PART 3a
 				   //
 				   // let tmp2=(1-I)(v_bar^n+v_bar^(n-1))
@@ -7451,7 +7188,7 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 			   laplace_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
-				   // ////////////////////////////////
+// ////////////////////////////////
 				   // PART 3b
 				   //
 				   // let tmp1 = u^n-u^(n-1)
@@ -7464,7 +7201,6 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 
   error_on_cell.part[5] = (get_backward_timestep() / 12 *
 			   laplace_matrix.matrix_scalar_product (tmp1, tmp2));
-
 
 
 // 				   // ///////////////////////////
@@ -7520,7 +7256,7 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 
 //   error_on_cell.part[3]  = mass_matrix.matrix_scalar_product (tmp1, tmp2);
 //   error_on_cell.part[3] *= get_backward_timestep() / 12;
-  
+
 
 // 				   // /////////////////////////////
 // 				   // PART 4 and 6:
@@ -7555,13 +7291,9 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
 //   error_on_cell.part[7]  = grad_grad_matrix.matrix_scalar_product (tmp1, tmp2);
 //   error_on_cell.part[7] *= get_backward_timestep() / 12;
 
-  
-  return error_on_cell;
+
+return error_on_cell;
 };
-
-
-
-
 
 
 template <int dim>
@@ -7580,7 +7312,7 @@ void TimeStep_ErrorEstimation<dim>::make_interpolation_matrices () {
       embedding_matrix(i,j) = primal_fe.shape_value (j, unit_support_points[i]);
 
 
-				   // construct the difference between the
+// construct the difference between the
 				   // identity and the interpolation operator
 				   // to the primal ansatz space. The
 				   // interpolation operator is to act from
@@ -7612,21 +7344,16 @@ void TimeStep_ErrorEstimation<dim>::make_interpolation_matrices () {
 };
 
 
-
-
-
 template <int dim>
 TimeStep_ErrorEstimation<dim>::StatisticData::StatisticData () :
 		estimated_error (0)
 {};
 
 
-
 template <int dim>
 TimeStep_ErrorEstimation<dim>::StatisticData::StatisticData (const double estimated_error) :
 		estimated_error (estimated_error)
 {};
-
 
 
 template <int dim>
@@ -7636,7 +7363,6 @@ void TimeStep_ErrorEstimation<dim>::StatisticData::write_descriptions (ostream &
 };
 
 
-
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::StatisticData::write (ostream &out) const
 {
@@ -7644,13 +7370,11 @@ void TimeStep_ErrorEstimation<dim>::StatisticData::write (ostream &out) const
 };
 
 
-
 template <int dim>
 TimeStep_ErrorEstimation<dim>::ErrorOnCell::ErrorOnCell () {
   for (unsigned int i=0; i<sizeof(part)/sizeof(part[0]); ++i)
     part[i] = 0;
 };
-
 
 
 template <int dim>
@@ -7662,7 +7386,6 @@ TimeStep_ErrorEstimation<dim>::ErrorOnCell::operator += (const ErrorOnCell &eoc)
 };
 
 
-
 template <int dim>
 double TimeStep_ErrorEstimation<dim>::ErrorOnCell::sum () const {
   double x=0;
@@ -7672,13 +7395,11 @@ double TimeStep_ErrorEstimation<dim>::ErrorOnCell::sum () const {
 };
 
 
-
 template <int dim>
 TimeStep_ErrorEstimation<dim>::CellwiseError::CellwiseError (const unsigned int n_errors) :
 		errors (n_errors),
 		next_free_slot (errors.begin())
 {};
-
 
 
 // explicit instantiations
@@ -7692,8 +7413,6 @@ template class TimeStep_ErrorEstimation<2>;
 #include <dofs/dof_handler.h>
 
 
-
-
 template <int dim>
 TimeStep<dim>::TimeStep (const double               time,
 			 const WaveParameters<dim> &parameters):
@@ -7703,8 +7422,6 @@ TimeStep<dim>::TimeStep (const double               time,
 		TimeStep_Primal<dim>(parameters.primal_fe),
 		TimeStep_Dual<dim>  (parameters.dual_fe)
 {};
-
-
 
 
 template <int dim>
@@ -7745,7 +7462,6 @@ void TimeStep<dim>::wake_up (const unsigned int wakeup_level)
 	    Assert (false, ExcInternalError());
     };
 };
-
 
 
 template <int dim>
@@ -7790,7 +7506,6 @@ void TimeStep<dim>::sleep (const unsigned int sleep_level)
 };
 
 
-
 template <int dim>
 void TimeStep<dim>::end_sweep ()
 {
@@ -7798,7 +7513,6 @@ void TimeStep<dim>::end_sweep ()
   TimeStep_Dual<dim>::end_sweep ();
   TimeStep_Postprocess<dim>::end_sweep ();
 };
-
 
 
 template <int dim>
@@ -7822,7 +7536,6 @@ void TimeStep<dim>::write_statistics_descriptions (ostream                   &ou
 };
 
 
-
 template <int dim>
 void TimeStep<dim>::write_statistics (ostream &out) const 
 {
@@ -7834,7 +7547,6 @@ void TimeStep<dim>::write_statistics (ostream &out) const
   out << "    ";
   TimeStep_Postprocess<dim>::statistic_data.write (out);
 };
-
 
 
 // explicit instantiations
@@ -7854,7 +7566,6 @@ template class TimeStep<2>;
 
 #include <fstream>
 #include <iomanip>
-
 
 
 template <int dim>
@@ -8020,12 +7731,11 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       sweep_data->data_out_stack->build_patches ();
       sweep_data->data_out_stack->finish_parameter_value ();
     };
-  
-	
-  deallog << endl;
+
+
+deallog << endl;
   sweep_info->get_timers().postprocessing.stop();
 };
-
 
 
 template <int dim>
@@ -8035,13 +7745,11 @@ void TimeStep_Postprocess<dim>::wake_up (const unsigned int wakeup_level)
 };
 
 
-
 template <int dim>
 void TimeStep_Postprocess<dim>::sleep (const unsigned int sleep_level) 
 {
   TimeStep_ErrorEstimation<dim>::sleep (sleep_level);
 };
-
 
 
 template <int dim>
@@ -8051,17 +7759,12 @@ string TimeStep_Postprocess<dim>::branch_signature () const
 };
 
 
-
 template <int dim>
 void TimeStep_Postprocess<dim>::end_sweep ()
 {
   string tmp_filename = tmp_filename_base(branch_signature());
   remove (tmp_filename.c_str());
 };
-
-
-    
-
 
 
 template <int dim>
@@ -8095,8 +7798,6 @@ void TimeStep_Postprocess<dim>::interpolate_dual_solution (Vector<double> &inter
 };
 
 
-
-
 template <int dim>
 void TimeStep_Postprocess<dim>::StatisticData::
 write_descriptions (ostream &out,
@@ -8108,15 +7809,12 @@ write_descriptions (ostream &out,
 };
 
 
-
 template <int dim>
 void TimeStep_Postprocess<dim>::StatisticData::write (ostream &out) const
 {
   for (unsigned int i=0; i<evaluation_results.size(); ++i)
     out << evaluation_results[i] << ' ';
 };
-
-
 
 
 // explicit instantiations
@@ -8141,14 +7839,11 @@ template class TimeStep_Postprocess<2>;
 #include <iomanip>
 
 
-
 template <int dim>
 TimeStep_Primal<dim>::TimeStep_Primal (const string &primal_fe)
 		:
 		TimeStep_Wave<dim> (primal_fe)
 {};
-
-		
 
 
 template <int dim>
@@ -8163,7 +7858,7 @@ void TimeStep_Primal<dim>::do_initial_step ()
        << dof_handler->n_dofs() << " dofs";
 
 
-				   // add up sweep-accumulated data. count
+// add up sweep-accumulated data. count
 				   // u and v as separate dofs
   sweep_info->get_data().cells       += tria->n_active_cells();
   sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
@@ -8193,8 +7888,6 @@ void TimeStep_Primal<dim>::do_initial_step ()
 };
 
 
-
-
 template <int dim>
 void TimeStep_Primal<dim>::do_timestep ()
 {
@@ -8210,9 +7903,9 @@ void TimeStep_Primal<dim>::do_timestep ()
 				   // u and v as separate dofs
   sweep_info->get_data().cells       += tria->n_active_cells();
   sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
-  
-  
-  const double time_step = get_backward_timestep ();
+
+
+const double time_step = get_backward_timestep ();
   
 				   // Vectors holding the right hand sides of
 				   // the two equations.
@@ -8233,8 +7926,8 @@ void TimeStep_Primal<dim>::do_timestep ()
       transfer_old_solutions (old_u, old_v);
     };
 
-  
-  assemble_vectors (right_hand_side1, right_hand_side2);
+
+assemble_vectors (right_hand_side1, right_hand_side2);
 
   UserMatrix system_matrix (system_sparsity, parameters.preconditioning);
   system_matrix.copy_from (mass_matrix);
@@ -8285,7 +7978,7 @@ void TimeStep_Primal<dim>::do_timestep ()
   constraints.condense (right_hand_side2);
 
 
-				   // in 1d, do not set boundary conditions
+// in 1d, do not set boundary conditions
 				   // at all
   if (dim != 1)
     {
@@ -8297,9 +7990,9 @@ void TimeStep_Primal<dim>::do_timestep ()
 					       system_matrix, v,
 					       right_hand_side2);
     };
-  
 
-  if (parameters.extrapolate_old_solutions)
+
+if (parameters.extrapolate_old_solutions)
 				     // solve with a hopefully good guess
 				     // as start vector
     {
@@ -8321,8 +8014,6 @@ void TimeStep_Primal<dim>::do_timestep ()
 };
 
 
-
-
 template <int dim>
 void TimeStep_Primal<dim>::solve_primal_problem ()
 {
@@ -8335,13 +8026,11 @@ void TimeStep_Primal<dim>::solve_primal_problem ()
 };
 
 
-
 template <int dim>
 string TimeStep_Primal<dim>::branch_signature () const 
 {
   return "p";
 };
-
 
 
 template <int dim>
@@ -8360,7 +8049,6 @@ void TimeStep_Primal<dim>::wake_up (const unsigned int wakeup_level)
 };
 
 
-
 template <int dim>
 void TimeStep_Primal<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 					     Vector<double> &right_hand_side2) {
@@ -8373,12 +8061,6 @@ void TimeStep_Primal<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 				   // condense right hand side in-place
   constraints.condense (right_hand_side1);
 };
-
-
-
-
-
-
 
 
 template <int dim>
@@ -8405,8 +8087,8 @@ void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
 				       update_JxW_values |
 				       update_q_points));
 
-  
-  cell_iterator old_cell = previous_time_level.dof_handler->begin(),
+
+cell_iterator old_cell = previous_time_level.dof_handler->begin(),
 		new_cell = dof_handler->begin(),
 		end_cell = (tria->n_levels() == 1                  ?
 			    static_cast<cell_iterator>(dof_handler->end()) :
@@ -8416,7 +8098,6 @@ void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
 	       fe_values,
 	       right_hand_side1, right_hand_side2);
 };
-
 
 
 template <int dim>
@@ -8443,7 +8124,7 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
     };
 
 
-				   // select the TimeStep_Wave part in the
+// select the TimeStep_Wave part in the
 				   // TimeStep_Primal branch
   const TimeStep_Primal<dim> &previous_time_level
     = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
@@ -8522,7 +8203,7 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       cell_matrix.vmult (local_A_u, old_dof_values_u);
 
 
-      rhs1 = local_M_u;
+rhs1 = local_M_u;
       rhs1.add (time_step, local_M_v);
       rhs1.add ((-time_step*time_step*
 		 parameters.theta*
@@ -8607,8 +8288,6 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 };
 
 
-     
-  
 template <int dim>
 unsigned int
 TimeStep_Primal<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator &old_cell,
@@ -8629,8 +8308,8 @@ TimeStep_Primal<dim>::collect_from_children (const DoFHandler<dim>::cell_iterato
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const double time_step = get_backward_timestep();
 
-  
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+
+FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   
 				   // these will hold the values of the
 				   // solution on the old grid, i.e. on
@@ -8741,8 +8420,6 @@ TimeStep_Primal<dim>::collect_from_children (const DoFHandler<dim>::cell_iterato
 };
 
 
-
-
 template <int dim>
 unsigned int
 TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator &new_cell,
@@ -8793,8 +8470,8 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 				   // the new grid
   vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
-      
-				       // loop over the child cells
+
+// loop over the child cells
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
     {
       const DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
@@ -8883,17 +8560,11 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 };
 
 
-
-
-
-
-
 // explicit instantiations
 template class TimeStep_Primal<2>;
 /* $Id$ */
 
 #include <lac/vector.h>
-
 
 
 void UserMatrix::precondition (Vector<double> &dst,
@@ -8919,14 +8590,8 @@ void UserMatrix::precondition (Vector<double> &dst,
 /* $Id$ */
 
 
-
 #include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>
-
-
-
-
-
 
 
 // static objects
@@ -8979,7 +8644,6 @@ const FiniteElement<dim> & FEHelper<dim>::get_fe (const string &name) {
 };
 
 
-
 template <int dim>
 const Quadrature<dim> &FEHelper<dim>::get_quadrature (const string &name) {
   if (name=="linear")
@@ -9002,13 +8666,11 @@ const Quadrature<dim> &FEHelper<dim>::get_quadrature (const string &name) {
 };
 
 
-
 template <>
 const Quadrature<0> &FEHelper<1>::get_quadrature_face (const string &) {
   static const Quadrature<0> dummy_quadrature(1);
   return dummy_quadrature;
 };
-
 
 
 template <int dim>
@@ -9033,7 +8695,6 @@ const Quadrature<dim-1> &FEHelper<dim>::get_quadrature_face (const string &name)
 };
 
 
-
 string int_to_string (const unsigned int i, const unsigned int digits) {
   string s;
   switch (digits) 
@@ -9054,15 +8715,11 @@ string int_to_string (const unsigned int i, const unsigned int digits) {
 };
 
 
-
-
-
 // explicit instantiations
 template class FEHelper<2>;
 
 
 /* $Id$ */
-
 
 
 #include <base/logstream.h>
@@ -9072,18 +8729,14 @@ template class FEHelper<2>;
 #include <dofs/dof_constraints.h>
 
 
-
-
 template <int dim>
 WaveProblem<dim>::WaveProblem ()
 {};
 
 
-
 template <int dim>
 WaveProblem<dim>::~WaveProblem ()
 {};
-
 
 
 template <int dim>
@@ -9093,13 +8746,11 @@ void WaveProblem<dim>::declare_parameters (ParameterHandler &prm)
 };
 
 
-
 template <int dim>
 void WaveProblem<dim>::parse_parameters (ParameterHandler &prm)
 {
   parameters.parse_parameters (prm);
 };
-
 
 
 template <int dim>
@@ -9109,7 +8760,6 @@ void WaveProblem<dim>::create_new (const unsigned int)
 };
 
 
-
 template <int dim>
 void WaveProblem<dim>::run (ParameterHandler &prm) 
 {
@@ -9117,7 +8767,7 @@ void WaveProblem<dim>::run (ParameterHandler &prm)
 //  prm.print_parameters (logfile, Text);
 
 
-				   ////////////////////////////////
+////////////////////////////////
 				   // Set up the time step objects
   TimestepManager<dim> timestep_manager (parameters);
   if (true) {
@@ -9153,14 +8803,12 @@ void WaveProblem<dim>::run (ParameterHandler &prm)
   };
 
 
-				   ////////////////////////////////////
+////////////////////////////////////
 				   // actually do the work (or rather:
 				   // let the work be done)
   for (unsigned int sweep=0; sweep<parameters.number_of_sweeps; ++sweep)
     timestep_manager.run_sweep (sweep);
 };
-
-
 
 
 int main ()
@@ -9221,10 +8869,9 @@ int main ()
 				       // abort
       return 3;
     };
-  
-  
-  return 0;
-};
 
+
+return 0;
+};
 
 

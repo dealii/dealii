@@ -1,9 +1,18 @@
-/*----------------------------   fe.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __fe_H
-#define __fe_H
-/*----------------------------   fe.h     ---------------------------*/
+//----------------------------  fe.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe.h  ---------------------------
+#ifndef __deal2__fe_h
+#define __deal2__fe_h
+
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
@@ -12,8 +21,6 @@
 #include <dofs/dof_handler.h>
 #include <grid/geometry_info.h>
 #include <lac/full_matrix.h>
-
-
 
 
 /**
@@ -98,8 +105,8 @@ class FiniteElementData
 				      */
     const unsigned int transform_functions;
 
-    
-				     /**
+
+/**
 				      * Number of components and dimension of
 				      * the image space.
 				      */
@@ -190,9 +197,9 @@ class FiniteElementData
 				      * Return the #transform_functions#.
 				      */
     unsigned int n_transform_functions () const;
-    
-    
-				     /**
+
+
+/**
 				      * Comparison operator. It is not clear to
 				      * me (WB) why we have to declare and implement
 				      * this one explicitely.
@@ -205,9 +212,6 @@ class FiniteElementData
     DeclException2 (ExcDimensionMismatch, int, int,
 		    << "used " << arg1 << "-d constructor for " << arg2 << "-d object");
 };
-
-    
-
 
 
 /**
@@ -688,11 +692,6 @@ class FiniteElementBase : public Subscriptor,
 				      */
     const vector<bool> restriction_is_additive_flags;    
 };
-
-
-
-
-
 
 
 /**
@@ -1641,7 +1640,6 @@ class FiniteElement : public FiniteElementBase<dim>
 };
 
 
-
 /* ------------------------------- Inline functions ----------------------- */
 
 
@@ -1654,7 +1652,6 @@ FiniteElementData<dim>::n_dofs_per_vertex () const
 };
 
 
-
 template <int dim>
 inline
 unsigned int 
@@ -1662,7 +1659,6 @@ FiniteElementData<dim>::n_dofs_per_line () const
 {
   return dofs_per_line;
 };
-
 
 
 template <int dim>
@@ -1674,7 +1670,6 @@ FiniteElementData<dim>::n_dofs_per_quad () const
 };
 
 
-
 template <int dim>
 inline
 unsigned int 
@@ -1682,7 +1677,6 @@ FiniteElementData<dim>::n_dofs_per_hex () const
 {
   return dofs_per_hex;
 };
-
 
 
 template <int dim>
@@ -1694,7 +1688,6 @@ FiniteElementData<dim>::n_dofs_per_face () const
 };
 
 
-
 template <int dim>
 inline
 unsigned int 
@@ -1702,7 +1695,6 @@ FiniteElementData<dim>::n_dofs_per_cell () const
 {
   return dofs_per_cell;
 };
-
 
 
 template <int dim>
@@ -1714,7 +1706,6 @@ FiniteElementData<dim>::n_components () const
 };
 
 
-
 template <int dim>
 inline
 unsigned int 
@@ -1722,7 +1713,6 @@ FiniteElementData<dim>::n_transform_functions () const
 {
   return transform_functions;
 };
-
 
 
 template <int dim>
@@ -1740,7 +1730,6 @@ FiniteElementBase<dim>::component_to_system_index (unsigned int component,
 }
 
 
-
 template <int dim>  
 inline
 pair<unsigned int,unsigned int>
@@ -1750,7 +1739,6 @@ FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
 	 ExcIndexRange(index, 0, system_to_component_table.size()));
   return system_to_component_table[index];
 }
-
 
 
 template <int dim>
@@ -1768,7 +1756,6 @@ FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
 }
 
 
-
 template <int dim>  
 inline
 pair<unsigned int,unsigned int>
@@ -1778,7 +1765,6 @@ FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) cons
 	 ExcIndexRange(index, 0, face_system_to_component_table.size()));
   return face_system_to_component_table[index];
 }
-
 
 
 template <int dim>  
@@ -1794,7 +1780,6 @@ FiniteElementBase<dim>::component_to_base (unsigned int index) const
 }
 
 
-
 template <int dim>
 inline
 bool
@@ -1806,7 +1791,4 @@ FiniteElementBase<dim>::restriction_is_additive (const unsigned int component) c
 }
 
 
-/*----------------------------   fe.h     ---------------------------*/
-/* end of #ifndef __fe_H */
 #endif
-/*----------------------------   fe.h     ---------------------------*/

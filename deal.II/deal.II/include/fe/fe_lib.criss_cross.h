@@ -1,9 +1,17 @@
-/*----------------------------   fe_lib.criss_cross.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __fe_lib_criss_cross_H
-#define __fe_lib_criss_cross_H
-/*----------------------------   fe_lib.criss_cross.h     ---------------------------*/
+//----------------------------  fe_lib.criss_cross.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_lib.criss_cross.h  ---------------------------
+#ifndef __deal2__fe_lib_criss_cross_h
+#define __deal2__fe_lib_criss_cross_h
 
 
 #include <fe/fe.h>
@@ -340,8 +348,6 @@ class FECrissCross : public FiniteElement<dim> {
 };
 
 
-
-
 /**
  * Quadrature formula for the criss-cross element. This quadrature
  * formula uses one point at the barycenter of each of the four subtriangles.
@@ -358,8 +364,4 @@ class QCrissCross1 : public Quadrature<dim> {
 };
 
 
-
-/*----------------------------   fe_lib.criss_cross.h     ---------------------------*/
-/* end of #ifndef __fe_lib_criss_cross_H */
 #endif
-/*----------------------------   fe_lib.criss_cross.h     ---------------------------*/

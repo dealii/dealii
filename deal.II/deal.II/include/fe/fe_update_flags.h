@@ -1,9 +1,17 @@
-/*----------------------------   fe_update_flags.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __fe_update_flags_H
-#define __fe_update_flags_H
-/*----------------------------   fe_update_flags.h     ---------------------------*/
+//----------------------------  fe_update_flags.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_update_flags.h  ---------------------------
+#ifndef __deal2__fe_update_flags_h
+#define __deal2__fe_update_flags_h
 
 
 /**
@@ -91,8 +99,4 @@ enum UpdateFlags {
 };
 
 
-
-/*----------------------------   fe_update_flags.h     ---------------------------*/
-/* end of #ifndef __fe_update_flags_H */
 #endif
-/*----------------------------   fe_update_flags.h     ---------------------------*/

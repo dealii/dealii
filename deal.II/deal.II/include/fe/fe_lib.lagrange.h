@@ -1,8 +1,19 @@
-/*----------------------------   fe_lib.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __fe_lib_lagrange_H
-#define __fe_lib_lagrange_H
+//----------------------------  fe_lib.lagrange.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  fe_lib.lagrange.h  ---------------------------
+#ifndef __deal2__fe_lib_lagrange_h
+#define __deal2__fe_lib_lagrange_h
+
+
 /*----------------------------   fe_lib.h     ---------------------------*/
 
 
@@ -118,8 +129,6 @@ class FEQ1 : public FEQ1Mapping<dim>
 				      */
     void initialize_matrices ();
 };
-
-
 
 
 /**
@@ -299,8 +308,6 @@ class FEQ2 : public FEQ1Mapping<dim>
 };
 
 
-
-
 /**
  * Subparametric Q3 finite element in #dim# space dimensions.
  * A Q1 mapping from the unit cell
@@ -420,7 +427,6 @@ class FEQ3 : public FEQ1Mapping<dim>
 				      */
     void initialize_matrices ();
 };
-
 
 
 /**
@@ -546,14 +552,8 @@ class FEQ4 : public FEQ1Mapping<dim>
 };
 
 
-
-
-
-
-
-
 /*----------------------------   fe_lib.h     ---------------------------*/
-/* end of #ifndef __fe_lib_lagrange_H */
+
 #endif
 /*----------------------------   fe_lib.h     ---------------------------*/
 

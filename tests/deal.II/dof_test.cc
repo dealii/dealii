@@ -1,9 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
-
-// deal_II_libraries.g=-ldeal_II_2d.g -ldeal_II_3d.g
-// deal_II_libraries=-ldeal_II_2d -ldeal_II_3d
-
+//----------------------------  dof_test.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_test.cc  ---------------------------
 
 
 #include <dofs/dof_handler.h>
@@ -51,8 +57,8 @@ class Ball
 	return middle;
       };
 
-    
-    virtual Point<dim>
+
+virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
       {
 	Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
@@ -80,7 +86,6 @@ class CurvedLine
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
-
 
 
 template <int dim>
@@ -113,7 +118,7 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
       return middle;
 
 
-  double x=middle(0),
+double x=middle(0),
 	 y=middle(1);
   
   if (y<x)
@@ -130,7 +135,6 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
   
   return middle;
 };
-
 
 
 template <int dim>
@@ -167,8 +171,6 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 };
 
 
-
-
 template <int dim>
 class TestCases
 {
@@ -187,7 +189,6 @@ class TestCases
 };
 
 
-
 template <int dim>
 TestCases<dim>::TestCases () :
 		tria(0), dof(0) {};
@@ -201,7 +202,6 @@ TestCases<dim>::~TestCases ()
 };
 
 
-
 template <int dim>
 void TestCases<dim>::create_new ()
 {
@@ -213,9 +213,6 @@ void TestCases<dim>::create_new ()
 
   dof = new DoFHandler<dim> (*tria);
 };
-
-
-
 
 
 template <int dim>
@@ -291,7 +288,7 @@ void TestCases<dim>::run (const unsigned int test_case)
     };
 
 
-  deallog << "    Distributing degrees of freedom..." << endl;
+deallog << "    Distributing degrees of freedom..." << endl;
   FEQ1<dim> fe;
   dof->distribute_dofs (fe);
 
@@ -300,17 +297,16 @@ void TestCases<dim>::run (const unsigned int test_case)
     
   SparsityPattern sparsity (dof->n_dofs(),
 			    dof->max_couplings_between_dofs());
-  
-  
-  DoFTools::make_sparsity_pattern (*dof, sparsity);
+
+
+DoFTools::make_sparsity_pattern (*dof, sparsity);
   int unconstrained_bandwidth = sparsity.bandwidth();
 
   deallog << "    Writing sparsity pattern..." << endl;
   sparsity.print_gnuplot (logfile);
 
 
-  
-				   // computing constraints
+// computing constraints
   deallog << "    Computing constraints..." << endl;
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (*dof, constraints);
@@ -321,7 +317,7 @@ void TestCases<dim>::run (const unsigned int test_case)
   sparsity.print_gnuplot (logfile);
 
 
-  deallog << endl
+deallog << endl
        << "    Total number of cells         = " << tria->n_cells() << endl
        << "    Total number of active cells  = " << tria->n_active_cells() << endl
        << "    Number of DoFs                = " << dof->n_dofs() << endl
@@ -334,7 +330,6 @@ void TestCases<dim>::run (const unsigned int test_case)
 				   // finite element object
   dof->clear ();
 };
-
 
 
 int main ()

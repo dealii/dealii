@@ -1,20 +1,15 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1999 */
-
-
-// deal_II_libraries.g=-ldeal_II_3d.g
-// deal_II_libraries=-ldeal_II_3d
-
-
-// this test case produces a lot of output about hanging nodes in 3d.
-// I used it to track down an error, but it serves perfectly well as
-// a standalone testcase.
+//----------------------------  constraints.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
 //
-// the tests are reliable in the following way: I checked all test cases
-// for the tri-linear elements by hand, and the first test case for the
-// biquadratic. all other tests are used to find differences in the
-// behavious of the library, without stating that the previous behaviour
-// was correct.
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  constraints.cc  ---------------------------
 
 
 #include <dofs/dof_handler.h>
@@ -33,7 +28,6 @@
 #include <fstream>
 #include <cmath>
 #include <cstdlib>
-
 
 
 void make_tria (Triangulation<3> &tria, int step) 
@@ -163,8 +157,8 @@ void make_tria (Triangulation<3> &tria, int step)
 	break;
       };
 
-       
-      case 6:
+
+case 6:
       case 7:
       case 8:
       {
@@ -232,8 +226,6 @@ void make_tria (Triangulation<3> &tria, int step)
       };
     };
 };
-
-
 
 
 int main ()

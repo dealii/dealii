@@ -1,15 +1,23 @@
-/*----------------------------   q1_mapping.h     ---------------------------*/
-/*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
-#ifndef __fe_q1_mapping_H
-#define __fe_q1_mapping_H
-/*----------------------------   q1_mapping.h     ---------------------------*/
+//----------------------------  q1_mapping.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  q1_mapping.h  ---------------------------
+#ifndef __deal2__q1_mapping_h
+#define __deal2__q1_mapping_h
+
+
 // File has moved from fe_linear_mapping.h
 
 #include <cmath>
 #include <fe/fe.h>
-
-
 
 
 /**
@@ -169,7 +177,7 @@ class FEQ1Mapping : public FiniteElement<dim>
 					    vector<Tensor<3,dim> >               &jacobians);
 
 
-				     /**
+/**
 				      * Exception
 				      */
     DeclException0 (ExcInternalError);
@@ -180,9 +188,4 @@ class FEQ1Mapping : public FiniteElement<dim>
 };
 
 
-
-
-/*----------------------------   q1_mapping.h     ---------------------------*/
-/* end of #ifndef __q1_mapping_H */
 #endif
-/*----------------------------   q1_mapping.h     ---------------------------*/

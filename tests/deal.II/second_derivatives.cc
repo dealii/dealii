@@ -1,8 +1,16 @@
-// 	$Id$	
-// test for correctness of gradients on a given cell
+//----------------------------  second_derivatives.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  second_derivatives.cc  ---------------------------
 
-// deal_II_libraries.g=-ldeal_II_2d.g
-// deal_II_libraries=-ldeal_II_2d
 
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>
@@ -36,9 +44,9 @@ int main ()
   StraightBoundary<2> b;
   QTrapez<2> q;
   FEValues<2> fevalues(fe,q,update_second_derivatives);
-  
-  
-  Vector<double> val(4);
+
+
+Vector<double> val(4);
 
   deallog << "Testing transformation of 2nd derivatives of shape function:" << endl;
   
