@@ -84,7 +84,7 @@ endif
 # if you call it without arguments.
 $(target) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS) 
+	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
 
 # To make running the application somewhat independent of the actual
@@ -133,21 +133,14 @@ clean:
 # changed. The following rule to created a dependency file
 # `Makefile.dep', which `make' uses to determine when to regenerate
 # the executable. This file is automagically remade whenever needed,
-# i.e. whenever one of the cc-(include-path-base)/baseh-files changed. Make detects whether
+# i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion at the bottom of this file.
-#
-# The dependency file is created using a perl script.  Since the
-# script prefixes the output names by `lib(include-path-base)/baseo' or `lib(include-path-base)/basego' (it was
-# written for the sublibraries' Makefile), we have to strip that again
-# since object files are placed in the present directory for this
-# application. All these things are made in the next rule:
 Makefile.dep: $(target).cc Makefile \
               $(shell echo $(include-path-base)/base/*.h    \
                            $(include-path-lac)/lac/*.h      \
                            $(include-path-deal2)/*/*.h)
-	@echo ============================ Remaking Makefile
+	@echo ============================ Remaking $@
 	@$(PERL) $D/common/scripts/make_dependencies.pl  $(INCLUDE) -B. $(target).cc \
-		| $(PERL) -pi -e 's!lib/g?o/!!g;' \
 		> Makefile.dep
 
 # To make the dependencies known to `make', we finally have to include
