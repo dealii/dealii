@@ -21,7 +21,7 @@
 #include <vector>
 
 
-void test (petsc_wrappers::Vector &v)
+void test (PETScWrappers::Vector &v)
 {
                                    // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -30,7 +30,7 @@ void test (petsc_wrappers::Vector &v)
   v.compress ();
 
                                    // then copy it
-  petsc_wrappers::Vector w (v.size());
+  PETScWrappers::Vector w (v.size());
   w = v;
 
                                    // make sure they're equal
@@ -54,7 +54,7 @@ int main (int argc,char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        petsc_wrappers::Vector v (100);
+        PETScWrappers::Vector v (100);
         test (v);
       }
       PetscFinalize();

@@ -20,7 +20,7 @@
 #include <iostream>
 
 
-void test (petsc_wrappers::SparseMatrix &m)
+void test (PETScWrappers::SparseMatrix &m)
 {
   Assert (m.m() == 5, ExcInternalError());
   Assert (m.n() == 5, ExcInternalError());
@@ -40,7 +40,7 @@ int main (int argc,char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        petsc_wrappers::SparseMatrix m (5,5,3);
+        PETScWrappers::SparseMatrix m (5,5,3);
         test (m);
       }
       PetscFinalize();

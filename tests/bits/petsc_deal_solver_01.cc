@@ -75,18 +75,18 @@ int main(int argc, char **argv)
       
                                      // Make matrix
     FDMatrix testproblem(size, size);
-    petsc_wrappers::SparseMatrix  A(dim, dim, 5);
+    PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
 
-    petsc_wrappers::Vector  f(dim);
-    petsc_wrappers::Vector  u(dim);
+    PETScWrappers::Vector  f(dim);
+    PETScWrappers::Vector  u(dim);
     f = 1.;
     A.compress ();
     f.compress ();
     u.compress ();
 
-    GrowingVectorMemory<petsc_wrappers::Vector> mem;
-    SolverCG<petsc_wrappers::Vector> solver(control,mem);
+    GrowingVectorMemory<PETScWrappers::Vector> mem;
+    SolverCG<PETScWrappers::Vector> solver(control,mem);
     PreconditionIdentity preconditioner;
     check_solve (solver, A,u,f, preconditioner);
   }

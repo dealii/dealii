@@ -44,7 +44,8 @@ check_solve( SOLVER& solver, const MATRIX& A,
   catch (std::exception& e)
     {
       deallog << e.what() << std::endl;
-      abort ();
+                                       // just like for Richardson: expect to
+                                       // get here, don't abort the program
     }
 
   deallog << "Solver stopped after " << solver.control().last_step()
@@ -70,18 +71,18 @@ int main(int argc, char **argv)
       
                                      // Make matrix
     FDMatrix testproblem(size, size);
-    petsc_wrappers::SparseMatrix  A(dim, dim, 5);
+    PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
 
-    petsc_wrappers::Vector  f(dim);
-    petsc_wrappers::Vector  u(dim);
+    PETScWrappers::Vector  f(dim);
+    PETScWrappers::Vector  u(dim);
     f = 1.;
     A.compress ();
     f.compress ();
     u.compress ();
 
-    petsc_wrappers::SolverLSQR solver(control);
-    petsc_wrappers::PreconditionJacobi preconditioner(A);
+    PETScWrappers::SolverLSQR solver(control);
+    PETScWrappers::PreconditionJacobi preconditioner(A);
     check_solve (solver, A,u,f, preconditioner);
   }
   PetscFinalize ();

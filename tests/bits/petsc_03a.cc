@@ -25,7 +25,7 @@
 #include <iostream>
 
 
-void test (petsc_wrappers::SparseMatrix &m)
+void test (PETScWrappers::SparseMatrix &m)
 {
                                    // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
@@ -70,7 +70,7 @@ int main (int argc,char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        petsc_wrappers::SparseMatrix m (5,5,3);
+        PETScWrappers::SparseMatrix m (5,5,3);
         test (m);
       }
       PetscFinalize();

@@ -22,7 +22,7 @@
 #include <vector>
 
 
-void test (petsc_wrappers::Vector &v)
+void test (PETScWrappers::Vector &v)
 {
                                    // set only certain elements of the
                                    // vector. have a bit pattern of where we
@@ -63,7 +63,7 @@ int main (int argc,char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        petsc_wrappers::Vector v (100);
+        PETScWrappers::Vector v (100);
         test (v);
       }
       PetscFinalize();

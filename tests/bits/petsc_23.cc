@@ -22,8 +22,8 @@
 #include <vector>
 
 
-void test (petsc_wrappers::Vector &v,
-           petsc_wrappers::Vector &w)
+void test (PETScWrappers::Vector &v,
+           PETScWrappers::Vector &w)
 {
                                    // set only certain elements of each
                                    // vector, and record the expected scalar
@@ -60,8 +60,8 @@ int main (int argc,char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        petsc_wrappers::Vector v (100);
-        petsc_wrappers::Vector w (100);
+        PETScWrappers::Vector v (100);
+        PETScWrappers::Vector w (100);
         test (v,w);
       }
       PetscFinalize();

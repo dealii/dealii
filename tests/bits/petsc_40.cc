@@ -21,9 +21,9 @@
 #include <vector>
 
 
-void test (petsc_wrappers::Vector &v,
-           petsc_wrappers::Vector &w,
-           petsc_wrappers::Vector &x)
+void test (PETScWrappers::Vector &v,
+           PETScWrappers::Vector &w,
+           PETScWrappers::Vector &x)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -61,9 +61,9 @@ int main (int argc,char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        petsc_wrappers::Vector v (100);
-        petsc_wrappers::Vector w (100);
-        petsc_wrappers::Vector x (100);
+        PETScWrappers::Vector v (100);
+        PETScWrappers::Vector w (100);
+        PETScWrappers::Vector x (100);
         test (v,w,x);
       }
       PetscFinalize();

@@ -22,9 +22,9 @@
 #include <vector>
 
 
-void test (petsc_wrappers::Vector &v)
+void test (PETScWrappers::Vector &v)
 {
-  petsc_wrappers::SparseMatrix m(v.size(),v.size(),v.size());
+  PETScWrappers::SparseMatrix m(v.size(),v.size(),v.size());
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
         m.set (i,j, i+2*j);
@@ -64,7 +64,7 @@ int main (int argc, char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        petsc_wrappers::Vector v (100);
+        PETScWrappers::Vector v (100);
         test (v);
       }
       PetscFinalize ();
