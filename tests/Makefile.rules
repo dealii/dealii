@@ -24,7 +24,11 @@ ifneq ($(with-multithreading),no)
   LIBS += $(lib-ACE)
 endif
 
-flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
+flags     = $(CXXFLAGS.g)
+
+ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
+flags += -Wno-missing-noreturn
+endif
 
 %.go : %.cc Makefile
 	@echo =====debug========= $<
