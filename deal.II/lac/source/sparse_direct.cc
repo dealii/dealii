@@ -312,25 +312,66 @@ void die (const std::string &text, const T1 t1, const T2 t2, const pid_t child)
  * process is dead but still exists, so kill will not report an error. so
  * we have to make sure we call wait* before the kill, but then we also 
  * do not want to use a blocking wait, so use it with WNOHANG
+ *
+ * the reason we check at all is that if the child dies and we do not
+ * eventually kill the master as well, we may end up in a situation
+ * where the master is waiting indefinitely for incoming data. so
+ * rather than creating a situation where the master hangs, we'd like
+ * to abort it
  */
-void monitor_child_liveness (const pid_t child_pid) 
+namespace MonitorChildLiveness 
 {
-  while (true)
-    {
-      waitpid (child_pid, 0, WNOHANG);
-      int ret = kill (child_pid, 0);
-      if (ret != 0)
-        if ((ret == -1) && (errno == ESRCH))
-          die ("Child process seems to have died!", child_pid);
-        else
-          die ("Unspecified error while checking for other process!", ret, errno, child_pid);
+  Threads::ThreadMutex process_list_lock;
+  std::list<pid_t> process_list;
+  
+  void monitor (const pid_t child_pid) 
+  {
+    while (true)
+      {
+                                         // check whether the process
+                                         // we are looking for is
+                                         // still in the list of
+                                         // pending processes
+        process_list_lock.acquire ();
+        bool process_found = false;
+        for (std::list<pid_t>::const_iterator i=process_list.begin();
+             i!=process_list.end(); ++i)
+          if (*i == child_pid)
+            {
+              process_found = true;
+              break;
+            };
+        process_list_lock.release ();
+        
+                                         // if not, then the
+                                         // respective process has
+                                         // exited gracefully upon our
+                                         // request, and has been
+                                         // deleted from the
+                                         // list. then we can exit
+                                         // this monitor thread
+        if (process_found == false)
+          return;
 
-                                       // ok, master still running,
-                                       // take a little rest and then
-                                       // ask again
-      sleep (10);
-    };
+                                         // otherwise, we expect the
+                                         // process to still be
+                                         // living. check this:
+        waitpid (child_pid, 0, WNOHANG);
+        int ret = kill (child_pid, 0);
+        if (ret != 0)
+          if ((ret == -1) && (errno == ESRCH))
+            die ("Child process seems to have died!", child_pid);
+          else
+            die ("Unspecified error while checking for other process!", ret, errno, child_pid);
+        
+                                         // ok, master still running,
+                                         // take a little rest and then
+                                         // ask again
+        sleep (10);
+      };
+  };
 };
+
 
 
 Threads::ThreadManager child_liveness_watchers;
@@ -448,8 +489,24 @@ SparseDirectMA27::~SparseDirectMA27()
   if (detached_mode)
     if (detached_mode_data != 0)
       {
+                                         // first remove this process
+                                         // from the watch list. this
+                                         // will also terminate the
+                                         // watcher thread on its next
+                                         // awakening
+      MonitorChildLiveness::process_list_lock.acquire();
+      for (std::list<pid_t>::iterator
+             i=MonitorChildLiveness::process_list.begin();
+           i!=MonitorChildLiveness::process_list.end(); ++i)
+        if (*i == detached_mode_data->child_pid)
+          {
+            MonitorChildLiveness::process_list.erase (i);
+            break;
+          };
+      MonitorChildLiveness::process_list_lock.release();
+        
 
-                                         // first close down client
+                                         // next close down client
         detached_mode_data->mutex.acquire ();
         write (detached_mode_data->server_client_pipe[1], "7", 1);
         detached_mode_data->mutex.release ();
@@ -550,9 +607,15 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
       const pid_t parent_pid = getpid();
       detached_mode_data->put (&parent_pid, 1, "parent_pid");
 
-      Threads::spawn (child_liveness_watchers,
-                      Threads::encapsulate(&monitor_child_liveness)
-                      .collect_args (detached_mode_data->child_pid));
+                                       // then set up a watcher thread
+      MonitorChildLiveness::process_list_lock.acquire();
+      MonitorChildLiveness::
+        process_list.push_back (detached_mode_data->child_pid);
+      MonitorChildLiveness::process_list_lock.release();
+      
+//       Threads::spawn (child_liveness_watchers,
+//                       Threads::encapsulate(&MonitorChildLiveness::monitor)
+//                       .collect_args (detached_mode_data->child_pid));
     };
   
   
