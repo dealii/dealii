@@ -10,13 +10,15 @@
 #include <fe/fe_system.h>
 #include <basic/dof_tools.h>
 
+
+
 template<int dim>
 void
-DoFTools::extract_dofs(const DoFHandler<dim>& dof,
-		       const bit_vector& local_select,
-		       bit_vector& selected_dofs)
+DoFTools::extract_dofs(const DoFHandler<dim> &dof,
+		       const vector<bool>    &local_select,
+		       vector<bool>          &selected_dofs)
 {
-  const FiniteElement<dim>& fe = dof.get_fe();
+  const FiniteElement<dim> &fe = dof.get_fe();
   Assert(local_select.size() == fe.n_components,
 	 ExcDimensionMismatch(local_select.size(), fe.n_components));
   Assert(selected_dofs.size() == dof.n_dofs(),
@@ -37,12 +39,14 @@ DoFTools::extract_dofs(const DoFHandler<dim>& dof,
     }
 }
 
+
+
 template<int dim>
 void
-DoFTools::extract_level_dofs(unsigned int level,
-			     const MGDoFHandler<dim>& dof,
-			     const bit_vector& local_select,
-			     bit_vector& selected_dofs)
+DoFTools::extract_level_dofs(const unsigned int       level,
+			     const MGDoFHandler<dim> &dof,
+			     const vector<bool>      &local_select,
+			     vector<bool>            &selected_dofs)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   Assert(local_select.size() == fe.n_components,
@@ -65,11 +69,14 @@ DoFTools::extract_level_dofs(unsigned int level,
     }
 }
 
+
+
+// explicit instantiations
 template void DoFTools::extract_dofs(const DoFHandler<deal_II_dimension>& dof,
-				     const bit_vector& local_select,
-				     bit_vector& selected_dofs);
+				     const vector<bool>& local_select,
+				     vector<bool>& selected_dofs);
 template void DoFTools::extract_level_dofs(unsigned int level,
 					   const MGDoFHandler<deal_II_dimension>& dof,
-					   const bit_vector& local_select,
-					   bit_vector& selected_dofs);
-//template DoFTools<deal_II_dimension>;
+					   const vector<bool>& local_select,
+					   vector<bool>& selected_dofs);
+
