@@ -374,6 +374,9 @@ namespace
   }
   
 
+#ifdef DEAL_II_ANON_NAMESPACE_BUG
+  static
+#endif
   bool
   constraint_is_support_point (const unsigned int          /*i*/,
 			       const unsigned int          /*j*/,
