@@ -194,11 +194,12 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 
 
 
+template <typename number>
 void
 MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-				    BlockSparseMatrix<double>  &matrix,
-				    BlockVector<double>   &solution,
-				    BlockVector<double>   &right_hand_side,
+				    BlockSparseMatrix<number>  &matrix,
+				    BlockVector<number>   &solution,
+				    BlockVector<number>   &right_hand_side,
 				    const bool             preserve_symmetry)
 {
   const unsigned int blocks = matrix.n_block_rows();
@@ -219,7 +220,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 	  right_hand_side.get_block_indices (),
 	  ExcBlocksDontMatch ());
 
-  for (unsigned int i=0;i<blocks;++i)
+  for (unsigned int i=0; i<blocks; ++i)
     Assert (matrix.block(i,i).get_sparsity_pattern().optimize_diagonal(),
 	    SparsityPattern::ExcDiagonalNotOptimized());
 
@@ -238,7 +239,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				   // the first nonzero diagonal
 				   // element of the matrix, or 1 if
 				   // there is no such thing
-  double first_nonzero_diagonal_entry = 0;
+  number first_nonzero_diagonal_entry = 0;
   for (unsigned int diag_block=0; diag_block<blocks; ++diag_block)
     {
       for (unsigned int i=0; i<matrix.block(diag_block,diag_block).n(); ++i)
@@ -247,13 +248,13 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 	    first_nonzero_diagonal_entry 
 	      = matrix.block(diag_block,diag_block).diag_element(i);
 	    break;
-	  };
+	  }
 				       // check whether we have found
 				       // something in the present
 				       // block
       if (first_nonzero_diagonal_entry != 0)
 	break;
-    };
+    }
 				   // nothing found on all diagonal
 				   // blocks? if so, use 1.0 instead
   if (first_nonzero_diagonal_entry == 0)
@@ -337,7 +338,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       //
 				       // store the new rhs entry to make
 				       // the gauss step more efficient
-      double new_rhs;
+      number new_rhs;
       if (matrix.block(block_index.first, block_index.first)
 	  .diag_element(block_index.second) != 0.0)
 	new_rhs = dof->second * 
@@ -368,7 +369,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 					   // store the only nonzero entry
 					   // of this line for the Gauss
 					   // elimination step
-	  const double diagonal_entry 
+	  const number diagonal_entry 
 	    = matrix.block(block_index.first,block_index.first)
 	    .diag_element(block_index.second);
 	  
@@ -776,4 +777,19 @@ MatrixTools::apply_boundary_values<float> (const std::map<unsigned int,double> &
 					   SparseMatrix<float>  &matrix,
 					   Vector<float>   &solution,
 					   Vector<float>   &right_hand_side,
+					   const bool        preserve_symmetry);
+
+template
+void
+MatrixTools::apply_boundary_values<double> (const std::map<unsigned int,double> &boundary_values,
+					    BlockSparseMatrix<double>  &matrix,
+					    BlockVector<double>   &solution,
+					    BlockVector<double>   &right_hand_side,
+					    const bool        preserve_symmetry);
+template
+void
+MatrixTools::apply_boundary_values<float> (const std::map<unsigned int,double> &boundary_values,
+					   BlockSparseMatrix<float>  &matrix,
+					   BlockVector<float>   &solution,
+					   BlockVector<float>   &right_hand_side,
 					   const bool        preserve_symmetry);

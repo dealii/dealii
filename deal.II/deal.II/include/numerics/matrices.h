@@ -781,11 +781,12 @@ class MatrixTools : public MatrixCreator
 				      * local_apply_boundary_values()
 				      * function.
 				      */
+    template <typename number>
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   BlockSparseMatrix<double>           &matrix,
-			   BlockVector<double>                 &solution,
-			   BlockVector<double>                 &right_hand_side,
+			   BlockSparseMatrix<number>           &matrix,
+			   BlockVector<number>                 &solution,
+			   BlockVector<number>                 &right_hand_side,
 			   const bool           eliminate_columns = true);
 
 				     /**

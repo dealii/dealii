@@ -220,6 +220,14 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The <code class="member">MatrixTools::apply_boundary_values</code>
+       that works on block matrices and vectors is now templatized over the
+       number type, i.e. it also works for float matrices and vectors.
+       <br> 
+       (WB 2004/06/22)
+       </p>
+
+  <li> <p>
        New: The new <code class="member">FEValuesBase::get_cell</code>
        function returns the current cell, i.e. the latest cell the
        <code class="class">FEValues</code> object was reinited with.
