@@ -101,11 +101,7 @@ namespace PETScWrappers
   MatrixBase &
   MatrixBase::operator = (const double d)
   {
-    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
-				     // first flush the buffers as
-				     // this is not done by
-				     // MatZeroEntries
-    compress();
+    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());    
     
     const int ierr = MatZeroEntries (matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
