@@ -290,9 +290,31 @@ namespace PETScWrappers
                                         * this number is the same as size(),
                                         * but for parallel vectors it may be
                                         * smaller.
+					*
+					* To figure out which elements
+					* exactly are stored locally,
+					* use local_range().
                                         */
       unsigned int local_size () const;
-      
+
+                                       /**
+					* Return a pair of indices
+					* indicating which elements of
+					* this vector are stored
+					* locally. The first number is
+					* the index of the first
+					* element stored, the second
+					* the index of the one past
+					* the last one that is stored
+					* locally. If this is a
+					* sequential vector, then the
+					* result will be the pair
+					* (0,N), otherwise it will be
+					* a pair (i,i+n), where
+					* <tt>n=local_size()</tt>.
+					*/
+      std::pair<unsigned int, unsigned int> local_range () const;
+
                                        /**
                                         * Provide access to a given element,
                                         * both read and write.

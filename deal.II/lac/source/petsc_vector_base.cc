@@ -195,6 +195,19 @@ namespace PETScWrappers
 
 
 
+  std::pair<unsigned int, unsigned int>
+  VectorBase::local_range () const
+  {
+    int begin, end;
+    const int ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
+					   &begin, &end);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return std::make_pair (begin, end);
+  }
+
+
+
   PetscScalar
   VectorBase::operator * (const VectorBase &vec) const
   {
