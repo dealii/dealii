@@ -798,24 +798,15 @@ DoFCellAccessor<deal_II_dimension>::set_dof_values_by_interpolation(const Vector
 
 #if deal_II_dimension == 1
 template class DoFObjectAccessor<1, 1>;
-template class DoFCellAccessor<1>;
-
-template class TriaRawIterator<1,DoFCellAccessor<1> >;
-template class TriaIterator<1,DoFCellAccessor<1> >;
-template class TriaActiveIterator<1,DoFCellAccessor<1> >;
 #endif
 
 #if deal_II_dimension == 2
 template class DoFObjectAccessor<1, 2>;
 template class DoFObjectAccessor<2, 2>;
-template class DoFCellAccessor<2>;
 
 template class TriaRawIterator   <2,DoFObjectAccessor<1, 2> >;
 template class TriaIterator      <2,DoFObjectAccessor<1, 2> >;
 template class TriaActiveIterator<2,DoFObjectAccessor<1, 2> >;
-template class TriaRawIterator   <2,DoFCellAccessor<2> >;
-template class TriaIterator      <2,DoFCellAccessor<2> >;
-template class TriaActiveIterator<2,DoFCellAccessor<2> >;
 #endif
 
 
@@ -824,7 +815,6 @@ template class TriaActiveIterator<2,DoFCellAccessor<2> >;
 template class DoFObjectAccessor<1, 3>;
 template class DoFObjectAccessor<2, 3>;
 template class DoFObjectAccessor<3, 3>;
-template class DoFCellAccessor<3>;
 
 template class TriaRawIterator   <3,DoFObjectAccessor<1, 3> >;
 template class TriaIterator      <3,DoFObjectAccessor<1, 3> >;
@@ -832,9 +822,13 @@ template class TriaActiveIterator<3,DoFObjectAccessor<1, 3> >;
 template class TriaRawIterator   <3,DoFObjectAccessor<2, 3> >;
 template class TriaIterator      <3,DoFObjectAccessor<2, 3> >;
 template class TriaActiveIterator<3,DoFObjectAccessor<2, 3> >;
-template class TriaRawIterator   <3,DoFCellAccessor<3> >;
-template class TriaIterator      <3,DoFCellAccessor<3> >;
-template class TriaActiveIterator<3,DoFCellAccessor<3> >;
 #endif
+
+
+template class DoFCellAccessor<deal_II_dimension>;
+
+template class TriaRawIterator   <deal_II_dimension,DoFCellAccessor<deal_II_dimension> >;
+template class TriaIterator      <deal_II_dimension,DoFCellAccessor<deal_II_dimension> >;
+template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<deal_II_dimension> >;
 
 
