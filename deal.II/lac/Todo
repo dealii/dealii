@@ -12,3 +12,6 @@ Why not replace Vector::scale by Vector::operator *= ?
 
 Use the commented-out version in PreconditionBlock::invert_diagblocks
   using the try-catch clauses
+
+
+GrowingVectorMemory is not thread-safe. Use a Mutex to fix this.
