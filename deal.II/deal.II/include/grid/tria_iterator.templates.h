@@ -67,6 +67,17 @@ template <int dim, typename Accessor>
 inline
 bool
 TriaRawIterator<dim,Accessor>::operator != (const TriaRawIterator<dim,Accessor> &i) const {
+				   // Note that at times, there is a problem
+				   // with egcs 1.1 that makes it choose
+				   // the global STL operator != (which
+				   // does only !(a==b)) over the member 
+				   // function one, which then results in an
+				   // error because the operator == of
+				   // the accessor class is
+				   // not made public. Strange... don't know
+				   // whose fault it is.
+				   //
+				   // Work around the problem this way:
   return accessor.operator != (i.accessor);
 };
 
