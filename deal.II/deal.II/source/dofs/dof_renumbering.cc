@@ -1,6 +1,6 @@
 //----------------------------  dof_renumbering.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    dof_renumbering.cc,v 1.65 2004/05/18 23:22:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
@@ -144,10 +144,8 @@ DoFRenumbering::compute_Cuthill_McKee (
 				   // it is a no-op
   ConstraintMatrix constraints;
   if (use_constraints) 
-    {
-      DoFTools::make_hanging_node_constraints (dof_handler, constraints);
-      constraints.close ();
-    }
+    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+  constraints.close ();
     
   SparsityPattern sparsity;
   if (dim <= 2)
