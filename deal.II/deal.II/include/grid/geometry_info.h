@@ -818,7 +818,7 @@ GeometryInfo<1>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  static const Point<dim> vertices[vertices_per_cell] =
+  const Point<dim> vertices[vertices_per_cell] =
     { Point<dim>(0.), Point<dim>(1.) };
   return vertices[vertex];
 };
@@ -832,7 +832,7 @@ GeometryInfo<2>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  static const Point<dim> vertices[vertices_per_cell] =
+  const Point<dim> vertices[vertices_per_cell] =
     { Point<dim>(0., 0.), Point<dim>(1., 0.),
       Point<dim>(1.,1.), Point<dim>(0.,1.) };
   return vertices[vertex];
@@ -847,7 +847,7 @@ GeometryInfo<3>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  static const Point<dim> vertices[vertices_per_cell] =
+  const Point<dim> vertices[vertices_per_cell] =
     { Point<dim>(0., 0., 0.), Point<dim>(1., 0., 0.),
       Point<dim>(1., 0., 1.), Point<dim>(0., 0., 1.),
       Point<dim>(0., 1., 0.), Point<dim>(1., 1., 0.),
@@ -882,7 +882,7 @@ GeometryInfo<2>::vertices_adjacent_to_line (const unsigned int line,
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, 2));
 
-  static const unsigned int vertex_indices[lines_per_cell][2] =
+  const unsigned int vertex_indices[lines_per_cell][2] =
     { {0, 1}, {1, 2}, {3, 2}, {0, 3} };
 
   return vertex_indices[line][vertex];
@@ -900,7 +900,7 @@ GeometryInfo<3>::vertices_adjacent_to_line (const unsigned int line,
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, 2));
 
-  static const unsigned int vertex_indices[lines_per_cell][2] =
+  const unsigned int vertex_indices[lines_per_cell][2] =
     { {0, 1}, {1, 2}, {3, 2}, {0, 3},
       {4, 5}, {5, 6}, {7, 6}, {4, 7},
       {0, 4}, {1, 5}, {2, 6}, {3, 7}  };
