@@ -332,14 +332,14 @@ void FESystem<dim>::build_interface_constraints ()
 		  m_index.second = (system_to_component_index
 				    (GeometryInfo<2>::vertices_per_cell * dofs_per_vertex
 				     + index_in_line).second
-				    - base_element (m_index.first).first_line_index)
+				    - base_element (component_to_base_table[m_index.first]).first_line_index)
 						   // then add the number of dofs
 						   // per vertex to get the index
 						   // on the first line
-				   + base_element(m_index.first).dofs_per_vertex
+				   + base_element(component_to_base_table[m_index.first]).dofs_per_vertex
 						   // if on the second line: add
 						   // some more
-				   + base_element(m_index.first).dofs_per_line * sub_line;
+				   + base_element(component_to_base_table[m_index.first]).dofs_per_line * sub_line;
 		};
 	      break;
 	    };
