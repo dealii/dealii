@@ -353,7 +353,7 @@ class FullMatrix : public Subscriptor
 				      * sum of all matrix entries. Also called
 				      * Frobenius Norm.
 				      * 
-				      * This norm is compatible with the l2
+				      * This norm is compatible with the $l_2$
 				      * vector norm. But it is not a natural
 				      * matrix norm (cf Rannacher Numeric0),
 				      * therefore it is not called $l_2$-norm.
