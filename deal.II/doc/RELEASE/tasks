@@ -9,8 +9,9 @@ when a new release shall be issued:
 
 1/ rename the changes file and create a new one for the next release
 
-2/ adjust news.html. Crosslink changes file. If necessary link an
-  announcement.
+2/ adjust news.html: new entry for the release, remove temporary entry
+  used to show changes after last release. Crosslink changes file. If
+  necessary link an announcement.
 
 3/ adjust download.html and files in doc/main.
 
