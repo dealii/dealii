@@ -15,7 +15,7 @@ debug-mode = off
 
 # If you want your program to be linked with extra object or library
 # files, specify them here:
-user-libs = ../../lib/libfe.g.a
+user-libs =
 
 # To run the program, use "make run"; to give parameters to the program,
 # give the parameters to the following variable:
@@ -47,8 +47,8 @@ h-files     = $(wildcard *.h)
 lib-h-files = $(wildcard ../../include/*/*.h)
 
 # list of libraries needed to link with
-libs     = ./Obj.a   $(wildcard ../../lib/lib*.a)   ../../../lac/lib/liblac.a
-libs.g   = ./Obj.g.a $(wildcard ../../lib/lib*.g.a) ../../../lac/lib/liblac.g.a
+libs     = ./Obj.a   ../../lib/libdeal_II.a   ../../../lac/lib/liblac.a
+libs.g   = ./Obj.g.a ../../lib/libdeal_II.g.a ../../../lac/lib/liblac.g.a
 
 
 # check whether we use debug mode or not

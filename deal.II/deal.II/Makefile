@@ -3,8 +3,7 @@
 
 all: deal.II doc examples
 
-clean: examples-clean doc-clean source-clean
-	rm -f *~ include/*~ include/*/*~ lib/lib*
+clean: lib-clean doc-clean source-clean examples-clean
 
 
 deal.II:
@@ -15,6 +14,9 @@ doc:
 
 examples:
 	cd examples ; make
+
+lib-clean:
+	rm -f *~ include/*~ include/*/*~ lib/lib* lib/*o lib/st*
 
 
 doc-clean:
@@ -29,4 +31,4 @@ source-clean:
 
 
 .PHONY: all deal.II doc examples
-.PHONY: clean doc-clean examples-clean source-clean
+.PHONY: clean lib-clean doc-clean examples-clean source-clean

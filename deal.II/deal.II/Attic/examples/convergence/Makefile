@@ -47,8 +47,8 @@ h-files     = $(wildcard *.h)
 lib-h-files = $(wildcard ../../include/*/*.h)
 
 # list of libraries needed to link with
-libs     = ./Obj.a   $(wildcard ../../lib/lib*.a)   ../../../lac/lib/liblac.a
-libs.g   = ./Obj.g.a $(wildcard ../../lib/lib*.g.a) ../../../lac/lib/liblac.g.a
+libs     = ./Obj.a   ../../lib/libdeal_II.a   ../../../lac/lib/liblac.a
+libs.g   = ./Obj.g.a ../../lib/libdeal_II.g.a ../../../lac/lib/liblac.g.a
 
 
 # check whether we use debug mode or not

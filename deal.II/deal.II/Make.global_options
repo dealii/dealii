@@ -1,5 +1,6 @@
 # $Id$
-# Global options for all compilations
+# Global options for all compilations (compilations in /source now
+# use other options!)
 
 deal_II_dimension=2
 
