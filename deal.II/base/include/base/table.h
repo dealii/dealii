@@ -50,7 +50,19 @@ template <typename T> class Table<6,T>;
                                         * <tt>i</tt>th index.
                                         */
       unsigned int operator[] (const unsigned int i) const;
-    
+
+				       /**
+					* Compare two index fields for
+					* equality.
+					*/
+      bool operator == (const TableIndicesBase<N> &other) const;
+
+				       /**
+					* Compare two index fields for
+					* inequality.
+					*/
+      bool operator != (const TableIndicesBase<N> &other) const;
+      
     protected:
                                        /**
                                         * Store the indices in an array.
@@ -1582,6 +1594,29 @@ TableIndicesBase<N>::operator [] (const unsigned int i) const
 {
   Assert (i < N, ExcIndexRange (i, 0, N));
   return indices[i];
+}
+
+
+
+template <int N>
+inline
+bool
+TableIndicesBase<N>::operator == (const TableIndicesBase<N> &other) const 
+{
+  for (unsigned int i=0; i<N; ++i)
+    if (indices[i] != other.indices[i])
+      return false;
+  return true;
+}
+
+
+
+template <int N>
+inline
+bool
+TableIndicesBase<N>::operator != (const TableIndicesBase<N> &other) const 
+{
+  return !(*this == other);
 }
 
 
