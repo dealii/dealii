@@ -20,7 +20,10 @@ when a new release shall be issued:
 
 5/  cvs update -P -r Branch-<x>-<y>
 	or
-	cvs checkout -P -r Branch-<x>-<y> deal.II
+    cvs checkout -P -r Branch-<x>-<y> deal.II
+
+    cd deal.II
+    cvs checkout tests
 
 6/ change the content of the `Version' file on both HEAD and branch
 
@@ -32,8 +35,8 @@ when a new release shall be issued:
 	make all
 	make run
 
-8/ run `make validate-xrefs' on the branch to check that the changes
-  do not point to nirvana
+8/ run `make online-doc' on the branch and check that no link
+  points to Nirvana
 
 9/ cvs tag all files with Version-x-y-z
 
@@ -43,7 +46,7 @@ when a new release shall be issued:
 
 12/ put it on the web server.
 
-13/ if necessary, change contents of doc/main/*
+13/ Add links to navbar.html and toc.html on homepage.
 
 14/ Log in as deal and execute "makedoc_version x.y.z"
     Report errors!!!
