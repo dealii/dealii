@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -160,6 +160,28 @@ class GridIn
 {
   public:
 				     /**
+				      * List of possible mesh input
+				      * formats. These values are used
+				      * when calling the function
+				      * read() in order to determine
+				      * the actual reader to be
+				      * called.
+				      */
+    enum Format
+    {
+					   /// Use #default_format stored in this object
+	  Default,
+					   /// Use read_ucd()
+	  ucd,
+					   /// Use read_dbmesh()
+	  dbmesh,
+					   /// Use read_xda()
+	  xda,
+					   /// Use read_msh()
+	  msh
+    };
+    
+				     /**
 				      * Constructor.
 				      */
     GridIn ();
@@ -170,6 +192,21 @@ class GridIn
 				      */
     void attach_triangulation (Triangulation<dim> &tria);
 
+				     /**
+				      * Read from the given stream. If
+				      * no format is given, the
+				      * #default_format variable is
+				      * used.
+				      */
+    void read (std::istream &, Format format=Default);
+    
+				     /**
+				      * Open the file given by the
+				      * string and call the previous
+				      * function read().
+				      */
+    void read (const std::string&, Format format=Default);
+    
 				     /**
 				      * Read grid data from an ucd file.
 				      * Numerical data is ignored.
@@ -194,6 +231,27 @@ class GridIn
 				      * Read grid data from an msh file.
 				      */
     void read_msh (std::istream &);
+    
+				     /**
+				      * Returns the standard suffix
+				      * for a file in this format.
+				      */
+    static std::string default_suffix (const Format format);
+    
+				     /**
+				      * Return the enum Format for the
+				      * format name.
+				      */
+    static Format parse_format (const std::string &format_name);
+
+				     /**
+				      * Return a list of implemented input
+				      * formats. The different names are
+				      * separated by vertical bar signs (<tt>`|'</tt>)
+				      * as used by the ParameterHandler
+				      * classes.
+				      */
+    static std::string get_format_names ();
 
 				     /**
 				      * Exception
@@ -360,6 +418,12 @@ class GridIn
     static void debug_output_grid (const std::vector<CellData<dim> > &cells,
 				   const std::vector<Point<dim> >    &vertices,
 				   std::ostream                               &out);
+    
+				     /**
+				      * Input format used by read() if
+				      * no format is given.
+				      */
+    Format default_format;
 };
 
 

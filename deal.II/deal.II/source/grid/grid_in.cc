@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,12 +18,13 @@
 
 #include <map>
 #include <algorithm>
-
+#include <fstream>
 
 
 template <int dim>
 GridIn<dim>::GridIn () :
-		tria(0) {}
+		tria(0), default_format(ucd)
+{}
 
 
 template <int dim>
@@ -988,6 +989,110 @@ GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
 }
 
 #endif
+
+template <int dim>
+void GridIn<dim>::read (const std::string& filename,
+			Format format)
+{
+  std::ifstream in(filename.c_str());
+  
+  Assert (in.is_open(), ExcFileNotOpen(filename.c_str()));
+
+  if (!in)
+    {
+      std::ios_base::iostate state = in.rdstate();
+      std::cerr << "File open, but error " << state << std::endl;
+      exit(1);
+    }
+  
+  read(in, format);
+  in.close();
+}
+
+
+template <int dim>
+void GridIn<dim>::read (std::istream& in,
+			Format format)
+{
+  if (format == Default)
+    format = default_format;
+  
+  switch (format)
+    {
+      case dbmesh:
+	read_dbmesh (in);
+	return;
+	
+      case msh:
+	read_msh (in);
+	return;
+	
+      case ucd:
+	read_ucd (in);
+	return;
+	
+      case xda:
+	read_xda (in);
+	return;
+
+      case Default:
+	break;
+   }
+  Assert (false, ExcInternalError());
+}
+
+
+
+template <int dim>
+std::string
+GridIn<dim>::default_suffix (const Format format) 
+{
+  switch (format) 
+    {
+      case dbmesh:
+        return ".dbmesh";
+      case msh: 
+	return ".msh";
+      case ucd: 
+	return ".inp";
+      case xda:
+	return ".xda";
+      default: 
+	Assert (false, ExcNotImplemented()); 
+	return ".unknown_format";
+    }
+}
+
+
+
+template <int dim>
+typename GridIn<dim>::Format
+GridIn<dim>::parse_format (const std::string &format_name)
+{
+  if (format_name == "dbmesh")
+    return dbmesh;
+
+  if (format_name == "msh")
+    return msh;
+  
+  if (format_name == "ucd")
+    return ucd;
+
+  if (format_name == "xda")
+    return xda;
+
+  AssertThrow (false, ExcInvalidState ());
+				   // return something weird
+  return Format(Default);
+}
+
+
+
+template <int dim>
+std::string GridIn<dim>::get_format_names () 
+{
+  return "dbmesh|msh|ucd|xda";
+}
 
 
 
