@@ -12,9 +12,6 @@
 //----------------------------  exceptions.cc  ---------------------------
 
 
-//TODO:[WB] (compiler) replace s.c_str() by s when that is possible
-
-
 #include <base/exceptions.h>
 #include <string>
 #include <cstdlib>
