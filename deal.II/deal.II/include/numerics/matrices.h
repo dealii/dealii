@@ -562,12 +562,12 @@ class MatrixCreator
  *
  * @sect3{Boundary conditions}
  *
- * The @p apply_boundary_values function inserts boundary conditions
- * of into a system of equations.  To actually do this you have to
+ * The apply_boundary_values() function inserts boundary conditions
+ * into a system of equations.  To actually do this you have to
  * specify a list of degree of freedom indices along with the values
  * these degrees of freedom shall assume. To see how to get such a
  * list, see the discussion of the
- * VectorTools@p ::interpolate_boundary_values function.
+ * VectorTools::interpolate_boundary_values function.
  *
  * There are two ways to incorporate fixed degrees of freedom such as boundary
  * nodes into a linear system, as discussed below.
