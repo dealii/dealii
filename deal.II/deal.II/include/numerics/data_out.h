@@ -391,7 +391,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * in the object passed in in the
 				      * first parameter by a certain
 				      * amount. This is sometimes
-				      * useful to generated "exploded"
+				      * useful to generate "exploded"
 				      * views of a collection of
 				      * blocks.
 				      *
