@@ -97,7 +97,7 @@ optimized: deps
 # when HSL functions are used, we also compile the detached_ma27
 # program which itself uses the optimized base library; so add this to
 # the dependencies if necessary
-contrib: $(subst no,,$(subst yes,baseo,$(USE_CONTRIB_HSL)))
+contrib: $(subst no,,$(subst yes,base,$(USE_CONTRIB_HSL)))
 	cd $D/contrib && $(MAKE)
 
 
