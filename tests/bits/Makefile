@@ -153,6 +153,8 @@ sparse_matrix_10.exe    : sparse_matrix_10.g.$(OBJEXT)     $(libraries)
 petsc_01.exe            : petsc_01.g.$(OBJEXT)             $(libraries)
 petsc_02.exe            : petsc_02.g.$(OBJEXT)             $(libraries)
 petsc_03.exe            : petsc_03.g.$(OBJEXT)             $(libraries)
+petsc_03a.exe           : petsc_03a.g.$(OBJEXT)            $(libraries)
+petsc_03b.exe           : petsc_03b.g.$(OBJEXT)            $(libraries)
 petsc_04.exe            : petsc_04.g.$(OBJEXT)             $(libraries)
 petsc_05.exe            : petsc_05.g.$(OBJEXT)             $(libraries)
 petsc_06.exe            : petsc_06.g.$(OBJEXT)             $(libraries)
@@ -162,6 +164,12 @@ petsc_09.exe            : petsc_09.g.$(OBJEXT)             $(libraries)
 petsc_10.exe            : petsc_10.g.$(OBJEXT)             $(libraries)
 petsc_11.exe            : petsc_11.g.$(OBJEXT)             $(libraries)
 petsc_12.exe            : petsc_12.g.$(OBJEXT)             $(libraries)
+petsc_13.exe            : petsc_13.g.$(OBJEXT)             $(libraries)
+petsc_14.exe            : petsc_14.g.$(OBJEXT)             $(libraries)
+petsc_15.exe            : petsc_15.g.$(OBJEXT)             $(libraries)
+petsc_16.exe            : petsc_16.g.$(OBJEXT)             $(libraries)
+petsc_17.exe            : petsc_17.g.$(OBJEXT)             $(libraries)
+petsc_18.exe            : petsc_18.g.$(OBJEXT)             $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	geometry_info_1 point_inside_1 point_inside_2 \
@@ -208,8 +216,10 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
         sparse_matrix_10
 
 ifeq ($(USE_CONTRIB_HSL),yes)
-  tests += petsc_01 petsc_02 petsc_03 petsc_04 petsc_05 petsc_06 \
-           petsc_07 petsc_08 petsc_09 petsc_10 petsc_11 petsc_12
+  tests += petsc_01 petsc_02 petsc_03 petsc_03a petsc_03b \
+           petsc_04 petsc_05 petsc_06 \
+           petsc_07 petsc_08 petsc_09 petsc_10 petsc_11 petsc_12 \
+           petsc_13 petsc_14 petsc_15 petsc_16 petsc_17 petsc_18
 endif
 
 ############################################################
