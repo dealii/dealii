@@ -35,9 +35,9 @@
          <code>DoFHandler</code> class, as well as extensions to the finite
          element classes where descriptions of interface conditions to
          other finite elements on neighboring cells are needed. While
-         the latter is probably straightforward, the first is a major
-         task and is not planned for the immediate future. We would,
-         however, offer advice if anyone wanted to implement this.
+         the latter is straightforward, the first is a major
+         task. We are presently working on this and hope to have something in
+	 the near future for at least discontinuous elements.
 	 </p>
 
     <li> <p>
@@ -64,8 +64,8 @@
 
     <li> <p> 
          <strong>A better test-suite:</strong> We have a small
-         suite of programs (approximately 140 programs with roughly
-         30,000 lines of code at present) that are run automatically
+         suite of programs (approximately 150 programs with roughly
+         32,000 lines of code at present) that are run automatically
          for regression tests each night. Some of these are modified real-life
          applications, so they should cover a relevant part of the
          library, but it would be necessary to reach every corner of
@@ -90,9 +90,9 @@
 	 a good choice, since it can be converted into many other
 	 formats, including printable ones and ones which can be
 	 nicely displayed on the screen. This would require that some
-	 document-generating scripts produce SGML instead (or in
-	 addition) to HTML, and some other tweaks, but is probably no
-	 big deal.
+	 document-generating scripts produce SGML instead of (or in
+	 addition to) HTML, and some other tweaks, but is probably no
+	 big deal. It just needs someone with appropriate knowledge.
 	 </p>
 
     <li> <p>
@@ -102,17 +102,9 @@
          eventually be made better. The most outstanding example is
          the way we build shared libraries; for this, the
 	 <a href="http://www.gnu.org/software/libtool/libtool.html"
-	 target="_top">libtool</a> utility may be a help.
-	 </p>
-
-	 <p>
-	 Regarding shared and static libraries, there may also be
-	 another open problem in that we don't call
-	 <code>ranlib</code> on static libraries (or <code>ar
-	 -s</code>). This has no particular reason, it is simply that
-	 we don't know what is the right thing to do in a
-	 cross-platform way. Help in the configuration of these things
-	 would be greatly appreciated.
+	 target="_top">libtool</a> utility may be a useful.
+	 Help in the configuration of these things would be greatly
+	 appreciated.
 	 </p>
     </ul>
     </p>
