@@ -109,7 +109,7 @@ namespace internals
                                           * valid. If this is so, then this
                                           * function will return false.
                                           */
-        bool is_valid_entry () const;
+        inline bool is_valid_entry () const;
 
 
                                          /**
@@ -644,12 +644,12 @@ class SparsityPattern : public Subscriptor
 				      * can be used to walk over all nonzero
 				      * entries of the sparsity pattern.
 				      */
-    iterator begin () const;
+    inline iterator begin () const;
 
 				     /**
 				      * Final iterator.
 				      */
-    iterator end () const;
+    inline iterator end () const;
 
 				     /**
 				      * STL-like iterator with the first entry
@@ -663,7 +663,7 @@ class SparsityPattern : public Subscriptor
 				      * iterator may not be dereferencable in
 				      * that case.
 				      */
-    iterator begin (const unsigned int r) const;
+    inline iterator begin (const unsigned int r) const;
 
 				     /**
 				      * Final iterator of row <tt>r</tt>. It
@@ -676,7 +676,7 @@ class SparsityPattern : public Subscriptor
 				      * particular the case if it is the end
 				      * iterator for the last row of a matrix.
 				      */
-    iterator end (const unsigned int r) const;
+    inline iterator end (const unsigned int r) const;
     
     				     /**
 				      * This function can be used as a
@@ -951,14 +951,14 @@ class SparsityPattern : public Subscriptor
 				      * matrix, which equals the dimension
 				      * of the image space.
 				      */
-    unsigned int n_rows () const;
+    inline unsigned int n_rows () const;
 
 				     /**
 				      * Return number of columns of this
 				      * matrix, which equals the dimension
 				      * of the range space.
 				      */
-    unsigned int n_cols () const;
+    inline unsigned int n_cols () const;
 
     				     /**
 				      * Check if a value at a certain
@@ -970,7 +970,7 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Number of entries in a specific row.
 				      */
-    unsigned int row_length (const unsigned int row) const;
+    inline unsigned int row_length (const unsigned int row) const;
 
 				     /**
 				      * Access to column number field.
@@ -1238,7 +1238,7 @@ class SparsityPattern : public Subscriptor
 				      * avoid programs relying on outdated
 				      * information!
 				      */
-    const unsigned int * get_rowstart_indices () const;
+    inline const unsigned int * get_rowstart_indices () const;
 
 				     /**
 				      * @deprecated. Use @p row_length and
@@ -1266,7 +1266,7 @@ class SparsityPattern : public Subscriptor
 				      * avoid programs relying on outdated
 				      * information!
 				      */
-    const unsigned int * get_column_numbers () const;
+    inline const unsigned int * get_column_numbers () const;
 
 				     /**
 				      * Exception
