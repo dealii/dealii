@@ -42,7 +42,7 @@ wave-test-3.exe              : wave-test-3.go                        $(lib-2d)  
 support_point_map.exe        : support_point_map.go        $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 filtered_matrix.exe          : filtered_matrix.go          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 boundaries.exe               : boundaries.go               $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-sparsity_pattern.exe         : sparsity_pattern.go         $(lib-1d) $(lib-2d) $(lib-1d) $(libraries)
+sparsity_pattern.exe         : sparsity_pattern.go         $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 
 tests = grid_test grid_transform dof_test data_out derivatives gradients constraints mg \
         mglocal block_matrices second_derivatives derivative_approximation \
