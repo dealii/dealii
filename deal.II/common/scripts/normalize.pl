@@ -1,7 +1,7 @@
 ######################################################################
 # $Id$
 #
-# Copyright (C) 2001, the deal.II authors
+# Copyright (C) 2001, 2003, the deal.II authors
 #
 # Remove insignificant volatile data from output files of tests
 #
@@ -25,6 +25,7 @@ s/# Date =.*//;
 s/^\s+Time =.*//;
 s/^\s+Date =.*//;
 s/Time tag:.*//g;
+s/by the deal.II library on.*//;
 
 # Exceptions
 
