@@ -78,6 +78,11 @@ class BlockMatrixArray : public Subscriptor
 		bool transpose = false);
 
 				     /**
+				      * Delete all entries
+				      */
+    void clear();
+    
+				     /**
 				      * Number of block-entries per
 				      * column.
 				      */
@@ -284,6 +289,7 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
 				      * Make function of base class available.
 				      */
     BlockMatrixArray<MATRIX>::n_block_cols;
+    BlockMatrixArray<MATRIX>::clear;
     BlockMatrixArray<MATRIX>::Subscriptor::subscribe;
     BlockMatrixArray<MATRIX>::Subscriptor::unsubscribe;
 
@@ -351,6 +357,15 @@ BlockMatrixArray<MATRIX>::enter (const MATRIX& matrix,
   entries.push_back(Entry(matrix, row, col, prefix, transpose));
 }
 
+
+
+template <class MATRIX>
+inline
+void
+BlockMatrixArray<MATRIX>::clear ()
+{
+  entries.clear();
+}
 
 
 template <class MATRIX>
