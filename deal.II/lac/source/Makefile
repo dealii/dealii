@@ -2,10 +2,10 @@
 
 D=../..
 
-cc-files = $(wildcard *.cc)
+cc-files = $(shell echo *.cc)
 o-files  = $(addprefix ../lib/o/, $(cc-files:.cc=.o))
 go-files = $(addprefix ../lib/go/, $(cc-files:.cc=.go))
-h-files  = $(wildcard ../include/*/*.h)
+h-files  = $(shell echo ../include/*/*.h)
 
 forward-declarations = $D/lac/include/lac/forward-declarations.h
 

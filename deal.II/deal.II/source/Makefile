@@ -12,8 +12,8 @@
 
 D=../..
 
-cc-files = $(wildcard */*.cc)
-h-files  = $(wildcard ../include/*/*.h)
+cc-files = $(shell echo */*.cc)
+h-files  = $(shell echo ../include/*/*.h)
 
 forward-declarations = $D/deal.II/include/basic/forward-declarations.h
 

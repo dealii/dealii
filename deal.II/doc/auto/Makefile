@@ -7,16 +7,17 @@
 #
 # specify which are the include files that a specific documentation libary
 # depends upon
-kdoc.base     = $(wildcard ../../base/include/base/*.h)
-kdoc.lac      = $(wildcard ../../lac/include/lac/*.h)
-kdoc.basic    = $(wildcard ../../deal.II/include/basic/*.h)
-kdoc.grid     = $(wildcard ../../deal.II/include/grid/tria*.h)\
-                $(wildcard ../../deal.II/include/grid/grid*.h)\
-                ../../deal.II/include/grid/geometry_info.h
-kdoc.dof      = $(wildcard ../../deal.II/include/grid/dof*.h) \
-                $(wildcard ../../deal.II/include/grid/mg_*.h) \
-                $(wildcard ../../deal.II/include/fe/*.h)
-kdoc.numerics = $(wildcard ../../deal.II/include/numerics/*.h)
+kdoc.base     = $(shell echo ../../base/include/base/*.h)
+kdoc.lac      = $(shell echo ../../lac/include/lac/*.h)
+kdoc.basic    = $(shell echo ../../deal.II/include/basic/*.h)
+kdoc.grid     = $(shell echo ../../deal.II/include/grid/tria*.h)\
+                $(shell echo ../../deal.II/include/grid/grid*.h)\
+                ../../deal.II/include/grid/geometry_info.h \
+                ../../deal.II/include/grid/persistent_tria.h
+kdoc.dof      = $(shell echo ../../deal.II/include/grid/dof*.h) \
+                $(shell echo ../../deal.II/include/grid/mg_*.h) \
+                $(shell echo ../../deal.II/include/fe/*.h)
+kdoc.numerics = $(shell echo ../../deal.II/include/numerics/*.h)
 
 # for latex-output, we join the different libraries of the
 # deal.II library into just one file
@@ -24,8 +25,8 @@ kdoc.dealII = $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
 
 # user projects. the projects should be independant of each other, so
 # we need not take care of cross-dependencies each time 
-kdoc.transport     = $(wildcard ../../projects/transport/trans_dg/*.h)
-kdoc.wave-equation = $(wildcard ../../projects/wave-equation/include/*.h)
+kdoc.transport     = $(shell echo ../../projects/transport/trans_dg/*.h)
+kdoc.wave-equation = $(shell echo ../../projects/wave-equation/include/*.h)
 
 
 # specify the names of the resulting doc libraries
@@ -46,7 +47,8 @@ kdoc.library-files = kdoc/base.kdoc         \
 kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 
-KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
+#KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
+KDOCFLAGS = /home/people/wolf/tmp/kdoc-a12/bin/kdoc
 ifeq ($(shell uname),SunOS)
 DOCPP = /home/people/wolf/Config/doc++/doc++
 #DOCPP = /home/people/kanschat/bin/doc++

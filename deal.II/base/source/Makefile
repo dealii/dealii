@@ -6,7 +6,7 @@ D=../..
 # create lists of file names. note that we need several output
 # files for data_out_base.cc, which is why we use the several
 # intermediate o-files-base* rules
-cc-files     = $(wildcard *.cc)
+cc-files     = $(shell echo *.cc)
 o-files-base1= $(addprefix ../lib/o/, $(cc-files:.cc=.o))
 o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
                $(patsubst %.o,%_1d.o,$(filter %data_out_base.o, $(o-files-base1))) \
@@ -15,7 +15,7 @@ o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
 go-files     = $(patsubst ../lib/o/%,../lib/go/%,$(o-files-base3:.o=.go))
-h-files      = $(wildcard ../include/*/*.h)
+h-files      = $(shell echo ../include/*/*.h)
 
 forward-declarations = $D/base/include/base/forward-declarations.h
 
