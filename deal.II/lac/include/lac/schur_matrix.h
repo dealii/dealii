@@ -27,20 +27,20 @@ template <typename> class BlockVector;
  *
  * Given a non-singular matrix @p{A} (often positive definite) and a
  * positive semi-definite matrix @p{C} as well as matrices @p{B} and
- * @{Dt} of full rank, this class implements a new matrix, the Schur
+ * @p{Dt} of full rank, this class implements a new matrix, the Schur
  * complement a the system of equations of the structure
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  * /        \  /   \     /   \
  * |  A  Dt |  | u |  -  | f |
  * | -B  C  |  | p |  -  | g |
  * \        /  \   /     \   /
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Multiplication with the Schur matrix @p{S} is the operation
- * \begin{verbatim}
+ * @begin{verbatim}
  * S p = C p + B A-inverse Dt-transpose p,
- * \end{verbatim}
+ * @end{verbatim}
  * which is an operation within the space for @p{p}.
  *
  * The data handed to the Schur matrix are as follows:
@@ -58,27 +58,28 @@ template <typename> class BlockVector;
  *
  * All matrices involved are of arbitrary type and vectors are
  * @ref{BlockVector}s. This way, @p{SchurMatrix} can be coupled with
- * any matrix classes providing @p{vmult} and @p{Tvmult} and even
- * nested.
+ * any matrix classes providing @p{vmult} and @p{Tvmult} and can be
+ * even nested. Since @ref{SmartPointer}s of matrices are stored, the
+ * matrix blocks should be derived from @ref{Subscriptor}.
  *
  * Since the Schur complement of a matrix corresponds to a Gaussian
  * block elimination, the right hand side of the condensed system must
  * be preprocessed. Furthermore, the eliminated variable must be
  * reconstructed after solving.
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  *   g = g + B A-inverse f
  *   u = A-inverse (f - D-transpose p)
- * \end{verbatim}
+ * @end{verbatim}
  *
  * Applying these transformations, the solution of the system above by a
  * @p{SchurMatrix} @p{schur} is coded as follows:
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  *   schur.prepare_rhs (g, f);
  *   solver.solve (schur, p, g, precondition);
  *   schur.postprocess (u, p);
- * \end{verbatim}
+ * @end{verbatim}
  *
  * @author Guido Kanschat, 2000, 2001
  */
