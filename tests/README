@@ -22,3 +22,24 @@ information, the output of make will contain lines like
 If the second line is replaced by some diff-output, please check for
 consistency. A check-in of the modified results should be considered
 carefully.
+
+Running the tests on a new platform
+-----------------------------------
+
+1) Link the subdirectory in results, matching your platform most closely
+   to a directory ./compare.
+2) Run the tests and check the results.
+3) Run 'make resultname' and remember the output $N
+4a) if all results are good edit Makefile in results and add a link to
+    $N. Edit .cvsignore accordingly.
+4b) else, create a directory in results named $N and add it to cvs.
+4c) if all results in a subdirectory are ok, do the link thing in 4a
+    for the subdir.
+4d) else continue with 5
+5) Run make output in the subdirectories necessary.
+6) Create subdirectories in results/$N named as in tests and copy
+   the output files there. Add them to cvs. Consider links for large
+   coinciding files.
+7) Check in. Remove the link compare and the results subdirectory.
+8) cvs update -d
+9) Run the tests to see if everything works.

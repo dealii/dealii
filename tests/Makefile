@@ -68,6 +68,9 @@ compare:
 	cd results; $(MAKE)
 	ln -s results/$(TARGET)+$(GXX-VERSION) compare
 
+resultname:
+	@echo $(TARGET)+$(GXX-VERSION)
+
 clean: clean-base clean-lac clean-deal.II clean-fe clean-bits
 veryclean: veryclean-base veryclean-lac veryclean-deal.II veryclean-fe veryclean-bits
 
