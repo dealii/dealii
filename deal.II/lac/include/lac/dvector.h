@@ -73,7 +73,12 @@ class dVector : public VectorBase
 				      *         Destructor. Clears memory
 				      */
     ~dVector();
-    
+
+				     /**
+				      * Set all entries to zero. Equivalent to
+				      * #v = 0#, but more obvious and faster.
+				      */
+    void clear ();
 				     /**
 				      *  U(0-N) = s       . Fill all components
 				      */

@@ -64,7 +64,8 @@ void dVector::reinit(const dVector& v, int fast)
     maxdim = n;
   }
   dim = n;
-  if (!fast) (*this) = 0.;
+  if (!fast)
+    clear ();
 }
 
 dVector::~dVector()
@@ -72,6 +73,12 @@ dVector::~dVector()
   if (val) delete[] val;
 }
 
+
+
+void dVector::clear () {
+  for (int i=0; i<dim; ++i)
+    val[i] = 0.;
+}
 
 
 double dVector::operator * (const dVector& v) const

@@ -54,7 +54,7 @@ clean:
 #rather for libbasic.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files)
 	@echo ============================ Remaking Makefile
-	perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files) \
+	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files) \
 		> Makefile.dep
 
 
