@@ -23,6 +23,10 @@
 #  include <unistd.h>
 #endif
 
+#if defined(__sgi__)
+#  include <unistd.h>
+#endif
+
 
 
 
@@ -58,6 +62,15 @@ unsigned int MultithreadInfo::get_n_cpus()
 unsigned int MultithreadInfo::get_n_cpus()
 {
   return sysconf(_SC_NPROCESSORS_ONLN);
+}
+
+
+#elif defined(__sgi__)
+
+
+unsigned int MultithreadInfo::get_n_cpus()
+{
+  return sysconf(_SC_NPROC_ONLN);
 }
 
 
