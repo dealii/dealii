@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,20 +27,21 @@ BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase ()
 
 template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::
-BlockSparsityPatternBase (const unsigned int r,
-		      const unsigned int c)
+BlockSparsityPatternBase (const unsigned int n_block_rows,
+                          const unsigned int n_block_columns)
 		:
 		rows (0),
 		columns (0)
 {
-  reinit (r,c);
+  reinit (n_block_rows, n_block_columns);
 }
 
 
 
 template <class SparsityPatternBase>
-BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase (
-  const BlockSparsityPatternBase<SparsityPatternBase>& s) :
+BlockSparsityPatternBase<SparsityPatternBase>::
+BlockSparsityPatternBase (const BlockSparsityPatternBase &s)
+                :
 		Subscriptor ()
 {
   Assert(s.rows==0, ExcInvalidConstructorCall());
@@ -63,8 +64,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::~BlockSparsityPatternBase ()
 
 template <class SparsityPatternBase>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::reinit (const unsigned int r,
-						       const unsigned int c)
+BlockSparsityPatternBase<SparsityPatternBase>::
+reinit (const unsigned int n_block_rows,
+        const unsigned int n_block_columns)
 {
 				   // delete previous content
   for (unsigned int i=0; i<rows; ++i)
@@ -77,8 +79,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::reinit (const unsigned int r,
   sub_objects.clear ();
 
 				   // set new sizes
-  rows = r;
-  columns = c;
+  rows = n_block_rows;
+  columns = n_block_columns;
   sub_objects.reinit (rows, columns);
 
 				   // allocate new objects

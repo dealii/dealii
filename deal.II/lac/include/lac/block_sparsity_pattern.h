@@ -97,8 +97,8 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * to call @p{collect_sizes} after
 				      * you assign them sizes.
 				      */
-    BlockSparsityPatternBase (const unsigned int n_rows,
-			      const unsigned int n_columns);
+    BlockSparsityPatternBase (const unsigned int n_block_rows,
+			      const unsigned int n_block_columns);
 
 				     /**
 				      * Copy constructor. This
@@ -119,17 +119,18 @@ class BlockSparsityPatternBase : public Subscriptor
     ~BlockSparsityPatternBase ();
     
 				     /**
-				      * Resize the matrix. This
-				      * deletes all blocks and replaces
-				      * them by unitialized ones,
-				      * i.e. ones for which also the
-				      * sizes are not yet set. You
-				      * have to do that by calling the
-				      * @p{reinit} functions of the
-				      * blocks themselves. Do not
-				      * forget to call
-				      * @p{collect_sizes} after that on
-				      * this object.
+				      * Resize the matrix, by setting
+				      * the number of block rows and
+				      * columns. This deletes all
+				      * blocks and replaces them by
+				      * unitialized ones, i.e. ones
+				      * for which also the sizes are
+				      * not yet set. You have to do
+				      * that by calling the @p{reinit}
+				      * functions of the blocks
+				      * themselves. Do not forget to
+				      * call @p{collect_sizes} after
+				      * that on this object.
 				      *
 				      * The reason that you have to
 				      * set sizes of the blocks
@@ -143,8 +144,8 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * user call whatever function
 				      * she desires.
 				      */
-    void reinit (const unsigned int n_rows,
-		 const unsigned int n_columns);
+    void reinit (const unsigned int n_block_rows,
+		 const unsigned int n_block_columns);
     
 				     /**
 				      * Copy operator. For this the
