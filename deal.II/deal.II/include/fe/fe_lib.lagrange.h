@@ -165,16 +165,16 @@ class FELinear : public FiniteElement<dim> {
 
 /**
  * Define a (bi-, tri-, etc)quadratic finite element in #dim# space dimensions.
- * In one space dimension, a linear (subparametric) mapping from the unit cell
+ * A linear (subparametric) mapping from the unit cell
  * to the real cell is implemented.
  */
 template <int dim>
-class FEQuadratic : public FiniteElement<dim> {
+class FEQuadraticSub : public FiniteElement<dim> {
   public:
 				     /**
 				      * Constructor
 				      */
-    FEQuadratic ();
+    FEQuadraticSub ();
 
 				     /**
 				      * Return the value of the #i#th shape

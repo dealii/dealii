@@ -47,7 +47,7 @@ FELinear<1>::FELinear () :
 template <>
 double
 FELinear<1>::shape_value(const unsigned int i,
-			 const Point<1>& p) const
+			 const Point<1>     &p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
   switch (i)
@@ -647,13 +647,13 @@ void FELinear<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face
 #if deal_II_dimension == 1
 
 template <>
-FEQuadratic<1>::FEQuadratic () :
+FEQuadraticSub<1>::FEQuadraticSub () :
 		FiniteElement<1> (1, 1) {};
 
 
 
 template <>
-void FEQuadratic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
+void FEQuadraticSub<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				     const vector<Point<1> >            &unit_points,
 				     vector<dFMatrix>  &jacobians,
 				     const bool         compute_jacobians,
@@ -672,16 +672,53 @@ void FEQuadratic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 
 
 template <>
-void FEQuadratic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
-					const Boundary<1>  &boundary,
-					vector<Point<1> >  &ansatz_points) const {
+double
+FEQuadraticSub<1>::shape_value(const unsigned int i,
+			       const Point<1>     &p) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+  const double xi = p(0);
+  switch (i)
+    {
+      case 0: return (1-xi)*(1-2*xi);
+      case 1: return xi*(2*xi-1);
+      case 2: return 4*xi*(1-xi);
+    }
+  return 0.;
+}
+
+
+
+template <>
+inline
+Point<1>
+FEQuadraticSub<1>::shape_grad(const unsigned int i,
+			      const Point<1>    &p) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+  const double xi = p(0);
+  switch (i)
+    {
+      case 0: return Point<1>(-3+4*xi);
+      case 1: return Point<1>(4*xi-1);
+      case 2: return Point<1>(4-8*xi);
+    }
+  return Point<1>();
+};
+
+
+
+template <>
+void FEQuadraticSub<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
+					   const Boundary<1>  &boundary,
+					   vector<Point<1> >  &ansatz_points) const {
   FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
 };
 
 
 
 template <>
-void FEQuadratic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
+void FEQuadraticSub<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
 					     const Boundary<1>  &,
 					     vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
@@ -690,18 +727,8 @@ void FEQuadratic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_
 
 
 template <>
-void FEQuadratic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-					 const Boundary<1>         &,
-					 const vector<Point<0> > &,
-					 vector<double>      &) const {
-  Assert (false, ExcInternalError());
-};
-
-
-
-template <>
-void FEQuadratic<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
-					    const unsigned int           ,
+void FEQuadraticSub<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
+					    const Boundary<1>         &,
 					    const vector<Point<0> > &,
 					    vector<double>      &) const {
   Assert (false, ExcInternalError());
@@ -710,22 +737,32 @@ void FEQuadratic<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &
 
 
 template <>
-void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-					 const unsigned int,
-					 const Boundary<1> &,
-					 const vector<Point<0> > &,
-					 vector<Point<1> > &) const {
+void FEQuadraticSub<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
+					       const unsigned int           ,
+					       const vector<Point<0> > &,
+					       vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
 
 
 
 template <>
-void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-					 const unsigned int,
-					 const unsigned int,
-					 const vector<Point<0> > &,
-					 vector<Point<1> > &) const {
+void FEQuadraticSub<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+					    const unsigned int,
+					    const Boundary<1> &,
+					    const vector<Point<0> > &,
+					    vector<Point<1> > &) const {
+  Assert (false, ExcInternalError());
+};
+
+
+
+template <>
+void FEQuadraticSub<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
+					    const unsigned int,
+					    const unsigned int,
+					    const vector<Point<0> > &,
+					    vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -735,7 +772,7 @@ void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 #if deal_II_dimension == 2
 
 template <>
-FEQuadratic<2>::FEQuadratic () :
+FEQuadraticSub<2>::FEQuadraticSub () :
 		FiniteElement<2> (1, 1, 1)
 {
   interface_constraints(0,2) = 1.0;
@@ -751,36 +788,231 @@ FEQuadratic<2>::FEQuadratic () :
   Assert (false, ExcNotImplemented());
 };
 
+
+template <>
+double
+FEQuadraticSub<2>::shape_value (const unsigned int i,
+				const Point<2>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi = p(0),
+	       eta= p(1);
+  switch (i)
+    {
+      case 0: return (1.-xi)*( 2*xi-1) * (1.-eta)*( 2*eta-1);
+      case 1: return     xi *(-2*xi+1) * (1.-eta)*( 2*eta-1);
+      case 2: return     xi *(-2*xi+1) *     eta *(-2*eta+1);
+      case 3: return (1.-xi)*( 2*xi-1) *     eta *(-2*eta+1);
+      case 4: return 4 * (1-xi)*xi * (1-eta)*(1-2*eta);
+      case 5: return 4 *    xi *(-1+2*xi) * (1-eta)*eta;
+      case 6: return 4 * (1-xi)*xi *    eta *(-1+2*eta);
+      case 7: return 4 * (1.-xi)*(1-2*xi) * (1-eta)*eta;
+      case 8: return 16 * xi*(1-xi) * eta*(1-eta);
+    };
+  return 0;
+};
+
+
+
+template <>
+Point<2>
+FEQuadraticSub<2>::shape_grad (const unsigned int i,
+			       const Point<2>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi = p(0),
+	       eta= p(1);
+  switch (i)
+    {
+      case 0: return Point<2>((-4*xi+3) * (1.-eta)*( 2*eta-1),
+			      (1.-xi)*( 2*xi-1) * (-4*eta+3));
+      case 1: return Point<2>((-4*xi+1) * (1.-eta)*( 2*eta-1) ,
+			      xi *(-2*xi+1) * (-4*eta+3));
+      case 2: return Point<2>((-4*xi+1) *     eta *(-2*eta+1),
+			      xi *(-2*xi+1) * (-4*eta+1));
+      case 3: return Point<2>((-4*xi+3) *     eta *(-2*eta+1),
+			      (1.-xi)*( 2*xi-1) * (-4*eta+1));
+      case 4: return Point<2>(4 * (1-2*xi) * (1-eta)*(1-2*eta),
+			      4 * (1-xi)*xi * (4*eta-3));
+      case 5: return Point<2>(4 * (4*xi-1) * (1-eta)*eta,
+			      4 *    xi *(-1+2*xi) * (1-2*eta));
+      case 6: return Point<2>(4 * (1-2*xi) *    eta *(-1+2*eta),
+			      4 * (1-xi)*xi * (4*eta-1));
+      case 7: return Point<2>(4 * (4*xi-3) * (1-eta)*eta,
+			      4 * (1.-xi)*(1-2*xi) * (1-2*eta));
+      case 8: return Point<2>(16 * (1-2*xi) * eta*(1-eta),
+			      16 * xi*(1-xi) * (1-2*eta));
+    };
+  return Point<2> ();
+};
+
+
+template <>
+void FEQuadraticSub<2>::get_ansatz_points (const typename DoFHandler<2>::cell_iterator &cell,
+					   const Boundary<2>&,
+					   vector<Point<2> >  &ansatz_points) const {
+  Assert (ansatz_points.size() == total_dofs,
+	  ExcWrongFieldDimension (ansatz_points.size(), total_dofs));
+  
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    ansatz_points[vertex] = cell->vertex(vertex);
+
+				   // for the bilinear mapping, the centers
+				   // of the face on the unit cell are mapped
+				   // to the mean coordinates of the vertices
+  for (unsigned int line=0; line<4; ++line)
+    ansatz_points[4+line] = (cell->line(line)->vertex(0) +
+			     cell->line(line)->vertex(1)) / 2;
+				   // same for the center of the square:
+				   // since all four linear basis functions
+				   // take on the value 1/4 at the center,
+				   // the center is mapped to the mean
+				   // coordinates of the four vertices
+  ansatz_points[8] = (ansatz_points[0] +
+		      ansatz_points[1] +
+		      ansatz_points[2] +
+		      ansatz_points[3]) / 4;
+};
+
+
+
+template <>
+void FEQuadraticSub<2>::get_face_ansatz_points (const typename DoFHandler<2>::face_iterator &face,
+						const Boundary<2>  &,
+						vector<Point<2> >  &ansatz_points) const {
+  Assert (ansatz_points.size() == dofs_per_face,
+	  ExcWrongFieldDimension (ansatz_points.size(), dofs_per_face));
+
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    ansatz_points[vertex] = face->vertex(vertex);
+  ansatz_points[2] = (ansatz_points[0] + ansatz_points[1]) / 1;
+};
+
+
+
+template <>
+void FEQuadraticSub<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
+					    const Boundary<2>         &,
+					    const vector<Point<1> > &unit_points,
+					    vector<double> &face_jacobians) const {
+				   // more or less copied from the linear
+				   // finite element
+  Assert (unit_points.size() == face_jacobians.size(),
+	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+
+				   // a linear mapping for a single line
+				   // produces particularly simple
+				   // expressions for the jacobi
+				   // determinant :-)
+  const double h = sqrt((face->vertex(1) - face->vertex(0)).square());
+  fill_n (face_jacobians.begin(),
+	  unit_points.size(),
+	  h);  
+};
+
+
+
+template <>
+void FEQuadraticSub<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
+					      const unsigned int           ,
+					      const vector<Point<1> > &unit_points,
+					      vector<double> &face_jacobians) const {
+				   // more or less copied from the linear
+				   // finite element
+  Assert (unit_points.size() == face_jacobians.size(),
+	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
+  Assert (face->at_boundary() == false,
+	  ExcBoundaryFaceUsed ());
+
+				   // a linear mapping for a single line
+				   // produces particularly simple
+				   // expressions for the jacobi
+				   // determinant :-)
+  const double h = sqrt((face->vertex(1) - face->vertex(0)).square());
+  fill_n (face_jacobians.begin(),
+	  unit_points.size(),
+	  h/2);
+};
+
+
+
+template <>
+void FEQuadraticSub<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
+					   const unsigned int       face_no,
+					   const Boundary<2>       &,
+					   const vector<Point<1> > &unit_points,
+					   vector<Point<2> > &normal_vectors) const {
+				   // more or less copied from the linear
+				   // finite element
+  Assert (unit_points.size() == normal_vectors.size(),
+	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+
+  const DoFHandler<2>::face_iterator face = cell->face(face_no);
+				   // compute direction of line
+  const Point<2> line_direction = (face->vertex(1) - face->vertex(0));
+				   // rotate to the right by 90 degrees
+  const Point<2> normal_direction(line_direction(1),
+				  -line_direction(0));
+
+  if (face_no <= 1)
+				     // for sides 0 and 1: return the correctly
+				     // scaled vector
+    fill (normal_vectors.begin(), normal_vectors.end(),
+	  normal_direction / sqrt(normal_direction.square()));
+  else
+				     // for sides 2 and 3: scale and invert
+				     // vector
+    fill (normal_vectors.begin(), normal_vectors.end(),
+	  normal_direction / (-sqrt(normal_direction.square())));
+};
+
+
+
+template <>
+void FEQuadraticSub<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
+					   const unsigned int       face_no,
+					   const unsigned int,
+					   const vector<Point<1> > &unit_points,
+					   vector<Point<2> > &normal_vectors) const {
+				   // more or less copied from the linear
+				   // finite element
+				   // note, that in 2D the normal vectors to the
+				   // subface have the same direction as that
+				   // for the face
+  Assert (unit_points.size() == normal_vectors.size(),
+	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
+  Assert (cell->face(face_no)->at_boundary() == false,
+	  ExcBoundaryFaceUsed ());
+
+  const DoFHandler<2>::face_iterator face = cell->face(face_no);
+				   // compute direction of line
+  const Point<2> line_direction = (face->vertex(1) - face->vertex(0));
+				   // rotate to the right by 90 degrees
+  const Point<2> normal_direction(line_direction(1),
+				  -line_direction(0));
+
+  if (face_no <= 1)
+				     // for sides 0 and 1: return the correctly
+				     // scaled vector
+    fill (normal_vectors.begin(), normal_vectors.end(),
+	  normal_direction / sqrt(normal_direction.square()));
+  else
+				     // for sides 2 and 3: scale and invert
+				     // vector
+    fill (normal_vectors.begin(), normal_vectors.end(),
+	  normal_direction / (-sqrt(normal_direction.square())));
+};
+
 #endif
 
 
 
-template <int dim>
-double
-FEQuadratic<dim>::shape_value (const unsigned int i,
-			       const Point<dim> &) const
-{
-  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
-  return 0.;
-};
-
 
 
 template <int dim>
-Point<dim>
-FEQuadratic<dim>::shape_grad (const unsigned int i,
-			      const Point<dim> &) const
-{
-  Assert (i<total_dofs, typename FiniteElementBase<dim>::ExcInvalidIndex(i));
-  Assert (false, ExcNotImplemented());
-  return Point<dim> ();
-};
-
-
-
-template <int dim>
-void FEQuadratic<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
+void FEQuadraticSub<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 				       const vector<Point<dim> >            &unit_points,
 				       vector<dFMatrix>  &jacobians,
 				       const bool,
@@ -801,73 +1033,12 @@ void FEQuadratic<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 
 
 
-template <int dim>
-void FEQuadratic<dim>::get_ansatz_points (const typename DoFHandler<dim>::cell_iterator &,
-					  const Boundary<dim>  &,
-					  vector<Point<dim> >  &) const {
-  Assert (false, ExcNotImplemented());
-};
+
 
 
 
 template <int dim>
-void FEQuadratic<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &,
-					       const Boundary<dim>  &,
-					       vector<Point<dim> >  &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FEQuadratic<dim>::get_face_jacobians (const DoFHandler<dim>::face_iterator &,
-					   const Boundary<dim>         &,
-					   const vector<Point<dim-1> > &,
-					   vector<double>      &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FEQuadratic<dim>::get_subface_jacobians (const DoFHandler<dim>::face_iterator &face,
-					      const unsigned int           ,
-					      const vector<Point<dim-1> > &,
-					      vector<double>      &) const {
-  Assert (face->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
-
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FEQuadratic<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &,
-					   const unsigned int,
-					   const Boundary<dim> &,
-					   const vector<Point<dim-1> > &,
-					   vector<Point<dim> > &) const {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FEQuadratic<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
-					   const unsigned int           face_no,
-					   const unsigned int,
-					   const vector<Point<dim-1> > &,
-					   vector<Point<dim> > &) const {
-  Assert (cell->face(face_no)->at_boundary() == false,
-	  ExcBoundaryFaceUsed ());
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-template <int dim>
-void FEQuadratic<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &,
+void FEQuadraticSub<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &,
 					      const Boundary<dim> &,
  					      dFMatrix &) const {
   Assert (false, ExcNotImplemented());
@@ -1102,6 +1273,6 @@ void FECubic<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &
 // explicit instantiations
 
 template class FELinear<deal_II_dimension>;
-template class FEQuadratic<deal_II_dimension>;
+template class FEQuadraticSub<deal_II_dimension>;
 template class FECubic<deal_II_dimension>;
 
