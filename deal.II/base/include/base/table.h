@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -707,11 +707,12 @@ namespace internal
  * dimensions. Of course, this is not possible.
  *
  * The way out of the first problem (and partly the second one as
- * well) is to have derived class for each value of <tt>N</tt> that have a
- * constructor with the right number of arguments, one for each
- * dimension. These then transform their arguments into the data type
- * this class wants to see, both for construction as well as access
- * through the <tt>operator()</tt> function.
+ * well) is to have a common base class TableBase and a derived class
+ * for each value of <tt>N</tt>.  This derived class has a constructor
+ * with the correct number of arguments, namely <tt>N</tt>. These then
+ * transform their arguments into the data type the base class (this
+ * class in fact) uses in the constructor as well as in
+ * element access through operator() functions.
  *
  * The second problem is that we would like to allow access through a
  * sequence of <tt>operator[]</tt> calls. This mostly because, as said,
@@ -724,7 +725,7 @@ namespace internal
  * namespace.
  *
  *
- * @section TableComp Comparison with the Tensor class
+ * <h3>Comparison with the Tensor class</h3>
  *
  * In some way, this class is similar to the Tensor class, in
  * that it templatizes on the number of dimensions. However, there are
@@ -1163,6 +1164,139 @@ class Table<2,T> : public TableBase<2,T>
                                       */
     internal::TableBaseAccessors::Accessor<2,T,false,1>
     operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j);
+
+    
+                                     /**
+                                      * Number of rows. This function
+                                      * really makes only sense since
+                                      * we have a two-dimensional
+                                      * object here.
+                                      */
+    unsigned int n_rows () const;
+    
+                                     /**
+                                      * Number of columns. This function
+                                      * really makes only sense since
+                                      * we have a two-dimensional
+                                      * object here.
+                                      */
+    unsigned int n_cols () const;
+
+  protected:
+                                     /**
+                                      * Return a read-write reference
+                                      * to the element <tt>(i,j)</tt>.
+                                      *
+                                      * This function does no bounds
+                                      * checking and is only to be
+                                      * used internally and in
+                                      * functions already checked.
+                                      *
+                                      * These functions are mainly
+                                      * here for compatibility with a
+                                      * former implementation of these
+                                      * table classes for 2d arrays,
+                                      * then called <tt>vector2d</tt>.
+                                      */
+    T & el (const unsigned int i,
+            const unsigned int j);
+  
+                                     /**
+                                      * Return the value of the
+                                      * element <tt>(i,j)</tt> as a
+                                      * read-only reference.
+                                      *
+                                      * This function does no bounds
+                                      * checking and is only to be
+                                      * used internally and in
+                                      * functions already checked.
+                                      *
+                                      * We return the requested value
+                                      * as a constant reference rather
+                                      * than by value since this
+                                      * object may hold data types
+                                      * that may be large, and we
+                                      * don't know here whether
+                                      * copying is expensive or not.
+                                      *
+                                      * These functions are mainly
+                                      * here for compatibility with a
+                                      * former implementation of these
+                                      * table classes for 2d arrays,
+                                      * then called <tt>vector2d</tt>.
+                                      */
+    const T & el (const unsigned int i,
+                  const unsigned int j) const;
+};
+
+
+
+/**
+ * A class representing a transpose two-dimensional table, i.e. a
+ * matrix of objects (not necessarily only numbers) in column first
+ * numbering (FORTRAN convention).
+ *
+ * This class copies the functions of Table<2,T>, but the element
+ * access and the dimensions will be for the transpose ordering of the
+ * data field in TableBase.
+ *
+ * @author Guido Kanschat, 2005
+ */
+template <typename T>
+class TransposeTable : public TableBase<2,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    TransposeTable ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    TransposeTable (const unsigned int size1,
+		    const unsigned int size2);
+
+                                     /**
+                                      * Reinitialize the object. This
+                                      * function is mostly here for
+                                      * compatibility with the earlier
+                                      * <tt>vector2d</tt> class. Passes
+                                      * down to the base class by
+                                      * converting the arguments to
+                                      * the data type requested by the
+                                      * base class.
+                                      */
+    void reinit (const unsigned int size1,
+                 const unsigned int size2);
 
                                      /**
                                       * Direct access to one element
@@ -2429,7 +2563,7 @@ Table<1,T>::operator () (const unsigned int i)
 }
 
 
-
+//----------------------------------------------------------------------
 
 template <typename T>
 Table<2,T>::Table ()
@@ -2554,6 +2688,106 @@ Table<2,T>::n_cols () const
 
 
 
+//----------------------------------------------------------------------
+
+template <typename T>
+TransposeTable<T>::TransposeTable ()
+{}
+
+
+
+template <typename T>
+TransposeTable<T>::TransposeTable (const unsigned int size1,
+				   const unsigned int size2)
+                :
+                TableBase<2,T> (TableIndices<2> (size2, size1))
+{}
+
+
+
+template <typename T>
+void
+TransposeTable<T>::reinit (const unsigned int size1,
+			   const unsigned int size2)
+{
+  this->TableBase<2,T>::reinit (TableIndices<2> (size2, size1));
+}
+
+
+
+template <typename T>
+inline
+const T &
+TransposeTable<T>::operator () (const unsigned int i,
+				const unsigned int j) const
+{
+  Assert (i < this->table_size[1],
+          ExcIndexRange (i, 0, this->table_size[1]));
+  Assert (j < this->table_size[0],
+          ExcIndexRange (j, 0, this->table_size[0]));
+  return this->val[j*this->table_size[1]+i];
+}
+
+
+
+template <typename T>
+inline
+T &
+TransposeTable<T>::operator () (const unsigned int i,
+				const unsigned int j)
+{
+  Assert (i < this->table_size[1],
+          ExcIndexRange (i, 0, this->table_size[1]));
+  Assert (j < this->table_size[0],
+          ExcIndexRange (j, 0, this->table_size[0]));
+  return this->val[j*this->table_size[1]+i];
+}
+
+
+
+template <typename T>
+inline
+const T &
+TransposeTable<T>::el (const unsigned int i,
+		       const unsigned int j) const
+{
+  return this->val[j*this->table_size[1]+i];
+}
+
+
+
+template <typename T>
+inline
+T &
+TransposeTable<T>::el (const unsigned int i,
+		       const unsigned int j)
+{
+  return this->val[j*this->table_size[1]+i];
+}
+
+
+
+template <typename T>
+inline
+unsigned int
+TransposeTable<T>::n_rows () const
+{
+  return this->table_size[1];
+}
+
+
+
+template <typename T>
+inline
+unsigned int
+TransposeTable<T>::n_cols () const
+{
+  return this->table_size[0];
+}
+
+
+
+//----------------------------------------------------------------------
 
 
 template <typename T>

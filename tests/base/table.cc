@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,7 +40,7 @@ main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-                                   // first check: a square table
+                                   // a square table
   if (true)
     {
       Table<2,double> Td(3,3);
@@ -70,7 +70,7 @@ main ()
           };
     };
   
-                                   // second check: a rectangular table
+                                   // a rectangular table
   if (true)
     {
       Table<2,double> Td(4,3);
@@ -105,7 +105,37 @@ main ()
     };
 
 
-                                   // third check: a 1d-table
+                                   // a transposed rectangular table
+  if (true)
+    {
+      TransposeTable<float> Td(4,3);
+      TransposeTable<int> Ti(4,3);
+
+				       // Fill the float matrix in row
+				       // first ordering
+      for (unsigned int i=0; i<12; ++i)
+        {
+          Td(i/3,i%3) = entries[i];
+        };
+
+				       // This fills the integer
+				       // matrix in column first
+				       // ordering
+      Ti.fill(entries);
+				       // Output both matrices...
+				       // They should be different
+      for (unsigned int i=0; i<4; ++i)
+	{
+	  for (unsigned int j=0; j<3; ++j)
+	    {
+	      logfile << '\t' << Ti(i,j) << '/' << Td(i,j);
+	    }
+	  logfile << std::endl;
+	}
+    }
+  
+
+                                   // a 1d-table
   if (true)
     {
       const unsigned int N=10;
@@ -128,7 +158,7 @@ main ()
         };
     };
   
-                                   // fourth check: a 3d-table
+                                   // a 3d-table
   if (true)
     {
       const unsigned int I=4, J=3, K=2;
@@ -170,7 +200,7 @@ main ()
                   ExcInternalError());
     };
 
-                                   // fifth check: a 4d-table
+                                   // a 4d-table
   if (true)
     {
       const unsigned int I=5, J=4, K=3, L=2;
@@ -223,7 +253,7 @@ main ()
 					 static_cast<signed int>(L)));
     };
 
-                                   // sixth check: a 5d-table
+                                   // 5d-table
   if (true)
     {
       const unsigned int I=6, J=2, K=3, L=4, M=5;
@@ -272,7 +302,7 @@ main ()
 					   static_cast<signed int>(M)));
     };
   
-                                   // seventh check: a 6d-table
+                                   // a 6d-table
   if (true)
     {
       const unsigned int I=6, J=2, K=4, L=3, M=5, N=7;
