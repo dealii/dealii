@@ -227,12 +227,11 @@ StraightBoundary<2>::
 get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
 			 Boundary<2>::FaceVertexNormals &face_vertex_normals) const
 {
-  const unsigned int dim=2;
-  const Tensor<1,dim> tangent = face->vertex(1) - face->vertex(0);
-  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
+  const Tensor<1,2> tangent = face->vertex(1) - face->vertex(0);
+  for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_face; ++vertex)
 				     // compute normals from tangent
-    face_vertex_normals[vertex] = Point<dim>(tangent[1],
-					     -tangent[0]);
+    face_vertex_normals[vertex] = Point<2>(tangent[1],
+                                           -tangent[0]);
 }
 
 #endif
