@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -122,18 +122,19 @@ class CompressedSparsityPattern : public Subscriptor
     
 				     /**
 				      * Copy constructor. This constructor is
-				      * only allowed to be called if the matrix
-				      * structure to be copied is empty. This is
-				      * so in order to prevent involuntary
-				      * copies of objects for temporaries, which
-				      * can use large amounts of computing time.
-				      * However, copy constructors are needed
-				      * if yo want to use the STL data types
-				      * on classes like this, e.g. to write
-				      * such statements like
-				      * <tt>v.push_back (CompressedSparsityPattern());</tt>,
-				      * with @p v a vector of @p CompressedSparsityPattern
-				      * objects.
+				      * only allowed to be called if the
+				      * matrix structure to be copied is
+				      * empty. This is so in order to prevent
+				      * involuntary copies of objects for
+				      * temporaries, which can use large
+				      * amounts of computing time.  However,
+				      * copy constructors are needed if yo
+				      * want to use the STL data types on
+				      * classes like this, e.g. to write such
+				      * statements like <tt>v.push_back
+				      * (CompressedSparsityPattern());</tt>,
+				      * with @p v a vector of @p
+				      * CompressedSparsityPattern objects.
 				      *
 				      * Usually, it is sufficient to
 				      * use the explicit keyword to
@@ -241,22 +242,21 @@ class CompressedSparsityPattern : public Subscriptor
     void symmetrize ();
     
 				     /**
-				      * Print the sparsity of the matrix
-				      * in a format that @p gnuplot understands
-				      * and which can be used to plot the
-				      * sparsity pattern in a graphical
-				      * way. The format consists of pairs
-				      * <tt>i j</tt> of nonzero elements, each
-				      * representing one entry of this
-				      * matrix, one per line of the output
-				      * file. Indices are counted from
-				      * zero on, as usual. Since sparsity
-				      * patterns are printed in the same
-				      * way as matrices are displayed, we
+				      * Print the sparsity of the matrix in a
+				      * format that @p gnuplot understands and
+				      * which can be used to plot the sparsity
+				      * pattern in a graphical way. The format
+				      * consists of pairs <tt>i j</tt> of
+				      * nonzero elements, each representing
+				      * one entry of this matrix, one per line
+				      * of the output file. Indices are
+				      * counted from zero on, as usual. Since
+				      * sparsity patterns are printed in the
+				      * same way as matrices are displayed, we
 				      * print the negative of the column
 				      * index, which means that the
-				      * <tt>(0,0)</tt> element is in the top left
-				      * rather than in the bottom left
+				      * <tt>(0,0)</tt> element is in the top
+				      * left rather than in the bottom left
 				      * corner.
 				      *
 				      * Print the sparsity pattern in
@@ -304,16 +304,17 @@ class CompressedSparsityPattern : public Subscriptor
     unsigned int bandwidth () const;
 
 				     /**
-				      * Return the number of nonzero elements of
-				      * this matrix. Actually, it returns the
-				      * number of entries in the sparsity
+				      * Return the number of nonzero elements
+				      * of this matrix. Actually, it returns
+				      * the number of entries in the sparsity
 				      * pattern; if any of the entries should
 				      * happen to be zero, it is counted
 				      * anyway.
 				      *
-				      * This function may only be called if the
-				      * matrix struct is compressed. It does not
-				      * make too much sense otherwise anyway.
+				      * This function may only be called if
+				      * the matrix struct is compressed. It
+				      * does not make too much sense otherwise
+				      * anyway.
 				      */
     unsigned int n_nonzero_elements () const;
 
