@@ -15,10 +15,10 @@
 
 
 template <int dim>
-PolynomialsP<dim>::PolynomialsP (const unsigned int k)
+PolynomialsP<dim>::PolynomialsP (const unsigned int p)
 		:
-		PolynomialSpace<dim>(Polynomials::Monomial<double>::generate_complete_basis(k)),
-		k(k)
+		PolynomialSpace<dim>(Polynomials::Monomial<double>::generate_complete_basis(p)),
+		p(p)
 {
   std::vector<unsigned int> index_map(this->n());
   create_polynomial_ordering(index_map);
@@ -56,7 +56,7 @@ void PolynomialsP<2>::create_polynomial_ordering(
 {
   Assert(index_map.size()==this->n(),
 	 ExcDimensionMismatch(index_map.size(), this->n()));
-  Assert(k<=5, ExcNotImplemented());
+  Assert(p<=5, ExcNotImplemented());
   
 				   // Given the number i of the
 				   // polynomial in
@@ -65,7 +65,7 @@ void PolynomialsP<2>::create_polynomial_ordering(
 				   // the polynomial in
 				   // PolynomialSpace.
   for (unsigned int i=0; i<this->n(); ++i)
-    index_map[i]=imap2[k][i];
+    index_map[i]=imap2[p][i];
 }
 
 
@@ -82,7 +82,7 @@ void PolynomialsP<3>::create_polynomial_ordering(
 {
   Assert(index_map.size()==this->n(),
 	 ExcDimensionMismatch(index_map.size(), this->n()));
-  Assert(k<=3, ExcNotImplemented());
+  Assert(p<=3, ExcNotImplemented());
   
 				   // Given the number i of the
 				   // polynomial in
@@ -91,7 +91,7 @@ void PolynomialsP<3>::create_polynomial_ordering(
 				   // the polynomial in
 				   // PolynomialSpace.
   for (unsigned int i=0; i<this->n(); ++i)
-    index_map[i]=imap3[k][i];
+    index_map[i]=imap3[p][i];
 }
 
 

@@ -33,7 +33,7 @@
  * book by Brezzi and Fortin.
  *
  * Right now, they are implemented in two dimensions only. There, they
- * consist of the complete polynomial space of order $k$ plus two
+ * consist of the complete polynomial space of degree $p$ plus two
  * additional vectors.
  *
  * @author Guido Kanschat, 2003
@@ -52,10 +52,10 @@ class PolynomialsBDM
 				      * largest complete polynomial
 				      * space embedded.
 				      *
-				      * @arg k: the degree of the
+				      * @arg p: the degree of the
 				      * BDM-space
 				      */
-    PolynomialsBDM (const unsigned int k);
+    PolynomialsBDM (const unsigned int p);
 
 				     /**
 				      * Computes the value and the

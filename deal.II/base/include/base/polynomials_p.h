@@ -26,13 +26,13 @@
 
 
 /**
- * @brief The complete polynomial space of order <tt>k</tt> based on
+ * @brief The complete polynomial space of degree <tt>p</tt> based on
  * the monomials.
  *
- * This class implements the polynomial space of order <tt>k</tt>
+ * This class implements the polynomial space of degree <tt>p</tt>
  * based on the monomials ${1,x,x^2,...}$. I.e. in <tt>d</tt>
  * dimensions it constructs all polynomials of the form $\prod_{i=1}^d
- * x_i^{n_i}$, where $\sum_i n_i\leq k$. The base polynomials are
+ * x_i^{n_i}$, where $\sum_i n_i\leq p$. The base polynomials are
  * given a specific ordering, e.g. in 2 dimensions:
  * ${1,x,y,xy,x^2,y^2,x^2y,xy^2,x^3,y^3,...}$. The ordering of the
  * monomials in $P_k1$ matches the ordering of the monomials in $P_k2$
@@ -46,16 +46,16 @@ class PolynomialsP: public PolynomialSpace<dim>
   public:
 				     /**
 				      * Constructor. Creates all basis
-				      * functions of $P_k$.
-				      * @arg k: the degree of the
+				      * functions of $P_p$.
+				      * @arg p: the degree of the
 				      * polynomial space
 				      */
-    PolynomialsP (const unsigned int k);
+    PolynomialsP (const unsigned int p);
 
 				     /**
-				      * Returns the degree <tt>k</tt>
+				      * Returns the degree <tt>p</tt>
 				      * of the polynomial space
-				      * <tt>P_k</tt>.
+				      * <tt>P_p</tt>.
 				      *
 				      * Note, that this number is
 				      * <tt>PolynomialSpace::degree()-1</tt>,
@@ -82,13 +82,13 @@ class PolynomialsP: public PolynomialSpace<dim>
     void create_polynomial_ordering(std::vector<unsigned int> &index_map) const;
 
 				     /**
-				      * Degree <tt>k<tt> of the
-				      * polynomial space $P_k$,
-				      * i.e. the number <tt>k<tt>
+				      * Degree <tt>p<tt> of the
+				      * polynomial space $P_p$,
+				      * i.e. the number <tt>p<tt>
 				      * which was given to the
 				      * constructor.
 				      */
-    const unsigned int k;
+    const unsigned int p;
 };
 
 
@@ -97,7 +97,7 @@ template <int dim>
 inline unsigned int
 PolynomialsP<dim>::degree() const
 {
-  return k;
+  return p;
 }
 
 

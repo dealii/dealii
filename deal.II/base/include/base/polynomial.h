@@ -62,7 +62,8 @@ namespace Polynomials
       Polynomial (const std::vector<number> &coefficients);
 
 				       /**
-					* Default constructor creating an illegal object.
+					* Default constructor creating
+					* an illegal object.
 					*/
       Polynomial ();
       
@@ -250,7 +251,7 @@ namespace Polynomials
 
                                        /**
                                         * Return a vector of Monomial
-                                        * objects of orders zero
+                                        * objects of degree zero
                                         * through <tt>degree</tt>, which
                                         * then spans the full space of
                                         * polynomials up to the given
@@ -283,7 +284,7 @@ namespace Polynomials
  * and the support point is 1, then the polynomial represented by this
  * object is cubic and its value is 1 at the point <tt>x=1/3</tt>, and zero
  * at the point <tt>x=0</tt>, <tt>x=2/3</tt>, and <tt>x=1</tt>. All the polynomials
- * have polynomial order equal to <tt>degree</tt>, but together they span
+ * have polynomial degree equal to <tt>degree</tt>, but together they span
  * the entire space of polynomials of degree less than or equal
  * <tt>degree</tt>.
  *
@@ -295,7 +296,7 @@ namespace Polynomials
   {
     public:
                                        /**
-                                        * Constructor. Takes the order
+                                        * Constructor. Takes the degree
                                         * <tt>n</tt> of the Lagrangian
                                         * polynom and the index
                                         * <tt>support_point</tt> of the
@@ -308,7 +309,7 @@ namespace Polynomials
 
                                        /**
                                         * Return a vector of polynomial
-                                        * objects of order <tt>degree</tt>,
+                                        * objects of degree <tt>degree</tt>,
                                         * which then spans the full
                                         * space of polynomials up to the
                                         * given degree. The polynomials
@@ -344,9 +345,9 @@ namespace Polynomials
 
 
 /**
- * Legendre polynomials of arbitrary order on <tt>[0,1]</tt>.
+ * Legendre polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
- * Constructing a Legendre polynomial of order <tt>k</tt>, the coefficients
+ * Constructing a Legendre polynomial of degree <tt>p</tt>, the coefficients
  * will be computed by the three-term recursion formula.  The
  * coefficients are stored in a static data vector to be available
  * when needed next time. Since the recursion is performed for the
@@ -360,13 +361,13 @@ namespace Polynomials
     public:
                                        /**
                                         * Constructor for polynomial of
-                                        * order <tt>k</tt>.
+                                        * degree <tt>p</tt>.
                                         */
-      Legendre (const unsigned int k);
+      Legendre (const unsigned int p);
 
                                        /**
                                         * Return a vector of Legendre
-                                        * polynomial objects of orders
+                                        * polynomial objects of degrees
                                         * zero through <tt>degree</tt>, which
                                         * then spans the full space of
                                         * polynomials up to the given
@@ -401,7 +402,7 @@ namespace Polynomials
                                        /**
                                         * Compute coefficients recursively.
                                         */
-      static void compute_coefficients (const unsigned int k);
+      static void compute_coefficients (const unsigned int p);
     
                                        /**
                                         * Get coefficients for
@@ -417,9 +418,9 @@ namespace Polynomials
 
 
 /**
- * Hierarchical polynomials of arbitrary order on <tt>[0,1]</tt>.
+ * Hierarchical polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
- * When Constructing a Hierarchical polynomial of order <tt>k</tt>, 
+ * When Constructing a Hierarchical polynomial of degree <tt>p</tt>, 
  * the coefficients will be computed by a recursion formula.  The
  * coefficients are stored in a static data vector to be available
  * when needed next time.
@@ -461,7 +462,7 @@ namespace Polynomials
     public:
                                      /**
 				      * Constructor for polynomial of
-				      * order <tt>p</tt>. There is an
+				      * degree <tt>p</tt>. There is an
 				      * exception for <tt>p==0</tt>, see
 				      * the general documentation.
 				      */
@@ -470,7 +471,7 @@ namespace Polynomials
 				     /**
 				      * Return a vector of
 				      * Hierarchical polynomial
-				      * objects of orders zero through
+				      * objects of degrees zero through
 				      * <tt>degree</tt>, which then spans
 				      * the full space of polynomials
 				      * up to the given degree. Note
@@ -494,7 +495,7 @@ namespace Polynomials
 				     /**
 				      * Compute coefficients recursively.
 				      */
-      static void compute_coefficients (const unsigned int k);
+      static void compute_coefficients (const unsigned int p);
 
 				     /**
 				      * Get coefficients for
@@ -504,7 +505,7 @@ namespace Polynomials
 				      * @ref{Polynomial}.
 				      */
      static const std::vector<double> &
-     get_coefficients (const unsigned int k);
+     get_coefficients (const unsigned int p);
  
      static std::vector<const std::vector<double> *> recursive_coefficients;
    };  
