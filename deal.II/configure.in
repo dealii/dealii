@@ -267,7 +267,7 @@ else
 	dnl       (allowed for compatibility)' (I don't understand what the
 	dnl       compiler means)
         CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -DDEBUG -inline_debug_info"
-        CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -unroll -w0"
+        CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O3 -tpp6 -xiMK -unroll -w0"
 
       else
 
