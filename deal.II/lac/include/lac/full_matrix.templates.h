@@ -1370,8 +1370,8 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 
   AssertThrow (out, ExcIO());
 				   // reset output format
-  out.precision(old_precision);
   out.flags (old_flags);
+  out.precision(old_precision);
 };
 
 
