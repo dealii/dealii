@@ -326,11 +326,6 @@ void DGTransportEquation<dim>::assemble_boundary_term(
   FullMatrix<double> &u_v_matrix,
   Vector<double> &cell_vector) const
 {
-				   // First we check whether the
-				   // current face is really at the
-				   // boundary.
-  Assert(fe_v.get_face()->at_boundary(), ExcInternalError());
-  
 				   // Again, as in the previous
 				   // function, we ask the ``FEValues''
 				   // object for the shape values and
@@ -416,11 +411,6 @@ void DGTransportEquation<dim>::assemble_face_term1(
   FullMatrix<double> &u_v_matrix,
   FullMatrix<double> &un_v_matrix) const
 {
-				   // First we check that the current
-				   // face is not at the boundary by
-				   // accident.
-  Assert(!fe_v.get_face()->at_boundary(), ExcInternalError());
-  
 				   // Again, as in the previous
 				   // function, we ask the FEValues
 				   // objects for the shape values,
