@@ -14,6 +14,7 @@
 class ostream;
 class dSMatrix;
 class dSMatrixStruct;
+class dVector;
 
 
 /**
@@ -83,6 +84,14 @@ class dSMatrixStruct;
   This class provides two sets of #condense# functions: those taking two
   arguments refer to the first possibility above, those taking only one do
   their job in-place and refer to the second possibility.
+
+  Condensing vectors works exactly as described above for matrices.
+
+  After solving the condensed system of equations, the solution vector has to
+  be redistributed. This is done by the two #distribute# function, one working
+  with two vectors, one working in-place. The operation of distribution undoes
+  the condensation process in some sense, but it should be noted that it is not
+  the inverse operation.
   */
 class ConstraintMatrix {
   public:
@@ -178,14 +187,16 @@ class ConstraintMatrix {
 				     /**
 				      * Condense a given matrix. The associated
 				      * matrix struct should be condensed and
-				      * compressed.
+				      * compressed. It is the user's
+				      * responsibility to guarantee that all
+				      * entries in the #condensed# matrix be
+				      * zero!
 				      *
 				      * The constraint matrix object must be
 				      * closed to call this function.
 				      */
     void condense (const dSMatrix &uncondensed,
 		   dSMatrix       &condensed) const;
-
 
 				     /**
 				      * This function does much the same as
@@ -196,6 +207,39 @@ class ConstraintMatrix {
 				      */
     void condense (dSMatrix &matrix) const;
 
+				     /**
+				      * Condense the given vector #uncondensed#
+				      * into #condensed#. It is the user's
+				      * responsibility to guarantee that all
+				      * entries of #condensed# be zero!
+				      */
+    void condense (const dVector &uncondensed,
+		   dVector       &condensed) const;
+
+				     /**
+				      * Condense the given vector in-place.
+				      */
+    void condense (dVector &vec) const;
+
+				     /**
+				      * Re-distribute the elements of the vector
+				      * #condensed# to #uncondensed#. It is the user's
+				      * responsibility to guarantee that all
+				      * entries of #uncondensed# be zero!
+				      *
+				      * This function undoes the action of
+				      * #condense# somehow, but it should be noted
+				      * that it is not the inverse of #condense#-
+				      */
+    void distribute (const dVector &condensed,
+		     dVector       &uncondensed) const;
+
+				     /**
+				      * Re-distribute the elements of the vector
+				      * in-place.
+				      */
+    void distribute (dVector &vec) const;
+    
     
 				     /**
 				      * Print the constraint lines. Mainly for
@@ -238,7 +282,10 @@ class ConstraintMatrix {
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotSquare);
-    
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcWrongDimension);
     
   private:
 

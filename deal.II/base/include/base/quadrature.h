@@ -16,7 +16,15 @@
   square [0,1]x[0,1], etc. This information is used together with
   objects of the \Ref{FiniteElement} class to compute the values stored
   in the \Ref{FEValues} objects.
-  */
+
+  There are a number of derived classes, denoting concrete integration
+  formulae. These are named by a prefixed #Q#, the name of the formula
+  (e.g. #Gauss#) and finally the order of integration. For example,
+  #QGauss2<dim># denotes a second order Gauss integration formula in
+  any dimension. Second order means that it integrates polynomials of
+  third order exact. In general, a formula of order #n# exactly
+  integrates polynomials of order #2n-1#.
+*/
 template <int dim>
 class Quadrature {
   public:

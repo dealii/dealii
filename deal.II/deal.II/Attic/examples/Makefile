@@ -35,7 +35,7 @@ dof/dof_test: dof/dof_test.o
 
 poisson/poisson: poisson/poisson.o
 	@echo ================= Linking $@
-	@$(CXX) $(CXXFLAGS.g) -o $@ $< ../../mia/control.o $(LIBS.g) -lg++
+	@$(CXX) $(CXXFLAGS.g) -g -o $@ $< ../../mia/control.o $(LIBS.g) -lg++
 
 
 run: run_grid_test run_dof_test

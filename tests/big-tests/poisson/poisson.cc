@@ -48,8 +48,9 @@ double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
   switch (dim) 
     {
       case 1:
-	    return ((1-4*3.1415926536*3.1415926536) *
-		    cos(2*3.1415926536*p(0)));
+//	    return ((1-4*3.1415926536*3.1415926536) *
+//		    cos(2*3.1415926536*p(0)));
+	    return p(0)*p(0)*p(0)-3./2.*p(0)*p(0)-6*p(0)+3;
       case 2:
 	    return ((1-3.1415926536*3.1415926536) *
 		    cos(3.1415926536*p(0)) *
@@ -91,9 +92,9 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
       {
 	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
 	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
-			       fe_values.shape_grad(j,point) +
+			       fe_values.shape_grad(j,point) /*+
 			       fe_values.shape_value(i,point) *
-			       fe_values.shape_value(j,point)) *
+			       fe_values.shape_value(j,point)*/) *
 			      fe_values.JxW(point);
 	rhs[0](i) += fe_values.shape_value(i,point) *
 		     right_hand_side(fe_values.quadrature_point(point)) *
@@ -112,20 +113,26 @@ int main () {
   PoissonEquation<2> equation;
   QGauss4<2>         quadrature;
 
-  HyperBallBoundary<2> boundary(Point<2>(2,3), 4);
+				   
+//  HyperBallBoundary<2> boundary(Point<2>(2,3), 4);
+
+  tria.create_hypercube ();
+//  tria.create_hyper_ball(Point<2>(2,3),4);
+//  tria.set_boundary (&boundary);
   
-  tria.create_hyper_ball(Point<2>(2,3),4);
-  tria.set_boundary (&boundary);
+  tria.refine_global (1);
+  tria.begin_active()->set_refine_flag();
+  tria.execute_refinement ();
   
-  tria.refine_global (5);
   dof.distribute_dofs (fe);
   problem.assemble (equation, quadrature, fe);
 
-  problem.solve ();
+				   
+//  problem.solve ();
 
   DataOut<2> out;
   ofstream gnuplot("gnuplot.out.5");
-  problem.fill_data (out);
+  problem.fill_data (out); 
   out.write_gnuplot (gnuplot);
   
   return 0;
