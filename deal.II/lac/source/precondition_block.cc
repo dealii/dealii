@@ -112,3 +112,49 @@ template void PreconditionBlockSOR<double, double>::Tvmult (
   Vector<double> &, const Vector<double> &) const;
 
 
+/*--------------------- PreconditionBlockSSOR -----------------------*/
+
+
+// explicit instantiations for "float" PreconditionBlock
+template class PreconditionBlockSSOR<float, float>;
+
+template void PreconditionBlockSSOR<float, float>::vmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSSOR<float, float>::vmult (
+  Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSSOR<float, float>::Tvmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSSOR<float, float>::Tvmult (
+  Vector<double> &, const Vector<double> &) const;
+
+
+// the instantiation for class PreconditionBlockSSOR<float, double> is skipped
+// because it does not make sense to have inverse block matrices with
+// higher precision than the matrix itself
+
+
+// explicit instantiations for "double" PreconditionBlockSSOR
+template class PreconditionBlockSSOR<double, float>;
+
+
+template void PreconditionBlockSSOR<double, float>::vmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSSOR<double, float>::vmult (
+  Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSSOR<double, float>::Tvmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSSOR<double, float>::Tvmult (
+  Vector<double> &, const Vector<double> &) const;
+
+template class PreconditionBlockSSOR<double, double>;
+
+template void PreconditionBlockSSOR<double, double>::vmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSSOR<double, double>::vmult (
+  Vector<double> &, const Vector<double> &) const;
+template void PreconditionBlockSSOR<double, double>::Tvmult (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockSSOR<double, double>::Tvmult (
+  Vector<double> &, const Vector<double> &) const;
+
+

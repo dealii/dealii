@@ -96,9 +96,14 @@ class PreconditionBlock
 				      * second step, the inverses of
 				      * the diagonal blocks may be
 				      * computed.
+				      *
+				      * Additionally, a relaxation
+				      * parameter for derived classes
+				      * may be provided.
 				      */
     void initialize (const SparseMatrix<number>& A,
-		     const unsigned int block_size);
+		     const unsigned int block_size,
+		     const double relaxation = 1.);
 
 				     /**
 				      * Deletes the inverse diagonal
@@ -192,6 +197,11 @@ class PreconditionBlock
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotSquare);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcDiagonalsNotStored);
    
   protected:
 				     /**
@@ -199,6 +209,12 @@ class PreconditionBlock
 				      * blocks.
 				      */
     const FullMatrix<inverse_type>& inverse (unsigned int i) const;
+    
+				     /**
+				      * Access to the diagonal
+				      * blocks.
+				      */
+    const FullMatrix<inverse_type>& diagonal (unsigned int i) const;
     
 				     /**
 				      * Size of the blocks. Each
@@ -220,6 +236,18 @@ class PreconditionBlock
 				      * derived classes.
 				      */
     SmartPointer<const SparseMatrix<number> > A;
+				     /**
+				      * Relaxation parameter to be
+				      * used by derived classes.
+				      */
+    double relaxation;
+
+
+				     /**
+				      * Flag for storing the diagonal
+				      * blocks of the matrix.
+				      */
+    bool store_diagonals;
 
   private:
 				     /**
@@ -227,14 +255,22 @@ class PreconditionBlock
 				      * matrices of the diagonal
 				      * blocks matrices as
 				      * @p{FullMatrix<inverse_type>}
-				      * matrices.  For BlockSOR as
-				      * preconditioning using
+				      * matrices. Using
 				      * @p{inverse_type=float} saves
 				      * memory in comparison with
 				      * @p{inverse_type=double}.
 				      */
-    vector<FullMatrix<inverse_type> > _inverse;
+    vector<FullMatrix<inverse_type> > var_inverse;
 
+				     /**
+				      * Storage of the original diagonal blocks.
+				      * These are only filled if @p{store_diagonals}
+				      * is @p{true}.
+				      *
+				      * Used by the blocked SSOR method.
+				      */
+    vector<FullMatrix<inverse_type> > var_diagonal;
+				      
 				     /**
 				      * Flag for diagonal compression.
 				      * @see set_same_diagonal()
@@ -302,29 +338,19 @@ class PreconditionBlockJacobi : public Subscriptor,
 /**
  * Block SOR preconditioning.
  *
- * The diagonal blocks and the elements 
- * (of arbitray structure) below the diagonal blocks are used
- * in the @p{operator ()} function of this class.
+ * The functions @p{vmult} and @p{Tvmult} execute a (transposed)
+ * block-SOR step, based on the blocks in @ref{PreconditionBlock}. The
+ * elements outside the diagonal blocks may be distributed
+ * arbitrarily.
  *
  * See @ref{PreconditionBlock} for requirements on the matrix.
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<typename number, typename inverse_type = number>
 class PreconditionBlockSOR : public  Subscriptor,
-			     private PreconditionBlock<number,inverse_type>
+			     protected PreconditionBlock<number,inverse_type>
 {
   public:
-				     /**
-				      * Constructor. Takes the damping
-				      * Parameter as 
-				      */
-    PreconditionBlockSOR (const number omega=1.);
-    
-				     /**
-				      * Destructor.
-				      */
-    ~PreconditionBlockSOR();
-
 				     /**
 				      * Make initialization function
 				      * publicly available.
@@ -346,11 +372,6 @@ class PreconditionBlockSOR : public  Subscriptor,
 				      */
     PreconditionBlock<number,inverse_type>::invert_diagblocks;
 
-				     /**
-				      * Set the relaxation parameter.
-				      */
-    void set_omega(number omega);
-    
 				     /**
 				      * Execute block SOR
 				      * preconditioning.
@@ -375,12 +396,68 @@ class PreconditionBlockSOR : public  Subscriptor,
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
+};
 
-  private:
+
+/**
+ * Block SSOR preconditioning.
+ *
+ * The functions @p{vmult} and @p{Tvmult} execute a block-SSOR step,
+ * based on the implementation in @ref{PreconditionBlockSOR}.  This
+ * class requires storage of the diagonal blocks and their inverses.
+ *
+ * See @ref{PreconditionBlock} for requirements on the matrix.
+ * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
+ */
+template<typename number, typename inverse_type = number>
+class PreconditionBlockSSOR : private PreconditionBlockSOR<number,inverse_type>
+{
+  public:
 				     /**
-				      * Relaxation parameter.
+				      * Constructor.
 				      */
-    number omega;
+    PreconditionBlockSSOR ();
+				     /**
+				      * Make initialization function
+				      * publicly available.
+				      */
+    PreconditionBlock<number,inverse_type>::initialize;
+    
+				     /**
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<number,inverse_type>::clear;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<number,inverse_type>::set_same_diagonal;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    PreconditionBlock<number,inverse_type>::invert_diagblocks;
+
+				     /**
+				      * Execute block SSOR
+				      * preconditioning.
+				      *
+				      * This function will
+				      * automatically use the inverse
+				      * matrices if they exist, if not
+				      * then BlockSOR will waste much
+				      * time inverting the diagonal
+				      * block matrices in each
+				      * preconditioning step.
+				      */
+    template <typename number2>
+    void vmult (Vector<number2>&, const Vector<number2>&) const;
+
+				     /**
+				      * Same as @ref{vmult}
+				      */
+    template <typename number2>
+    void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 };
 
 
