@@ -1156,7 +1156,7 @@ fi
 
 if test $GXX = yes ; then
   CXXFLAGSO="-O2 -Wuninitialized -felide-constructors -fnonnull-objects -ftemplate-depth-32"
-  CXXFLAGSG="-DDEBUG -ggdb -Wall -W -Wconversion -Winline -Woverloaded-virtual -ftemplate-depth-32"
+  CXXFLAGSG="-DDEBUG -ggdb -Wall -W -Wtraditional -Wpointer-arith -Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -ftemplate-depth-32"
 
                       
   case "$GXXVERSION" in
