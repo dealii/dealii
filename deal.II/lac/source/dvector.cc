@@ -261,3 +261,10 @@ void dVector::print(const char* format) const
   for (int j=0;j<n();j++) printf (format, val[j]);
   printf ("\n");
 }
+
+
+
+void dVector::print (ostream &out) const {
+  for (int i=0; i<n(); ++i)
+    out << val[i] << endl;
+};

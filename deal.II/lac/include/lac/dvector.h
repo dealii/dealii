@@ -253,6 +253,11 @@ class dVector : public VectorBase
 				      *  Output of vector in user-defined format.
 				      */
     void print(const char* format = 0) const;
+
+				     /**
+				      * Print to given stream, one element per line.
+				      */
+    void print (ostream &) const;
 				     //@}
 
 				     /**
