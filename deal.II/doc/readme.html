@@ -188,12 +188,15 @@
     <p>
 
     In case you have a multi-processor machine, you can call `make
-    PAR=-j4 target-name' to let make call multiple instances of the
+    PAR=-j4 target-name' to let `make' call multiple instances of the
     compiler (in this case four). Since the make files are written in
     a way to minimize cross-dependencies, this speeds up compilation
     by about the factor given after `-j', at least if you have as many
     processors. If you have GNU make 3.78 or higher, it is simpler to
-    directly call `make -j4 target-name'.
+    directly call `make -j4 target-name'. Note, however, that
+    parallel makes will sometimes fail when compiling the library for
+    the first time (this is due to a bug in `make'); in that case,
+    simply re-run `make', or run it without `-jN'.
 
     <p>
 
@@ -271,6 +274,20 @@
       they run stable and are used in production mode.
       </p>
     </ul>
+
+    <p>
+    Apart from the libraries, you should generate the full set of
+    documentation files, by typing `make online-doc'. This way, you
+    have (almost) all the documentation locally on your computer and
+    need not use the <acronym>deal.II</acronym> homepage in
+    Heidelberg. You can access all documentation through <a
+    href="documentation.html" target="body">this page</a>. (For
+    obvious reasons, the only document that you don't have locally is
+    the News page, and the pages that convert the CVS logs into
+    HTML. Access them through the <a
+    href="http://gaia.iwr.uni-heidelberg.de/~deal"
+    target="_top">global homepage</a>.)
+    </p>
 
 
     <a name="options">
