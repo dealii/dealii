@@ -873,7 +873,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         unsigned int longest_value = 0;
         for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr) 
           longest_value
-            = std::max (longest_value,         
+            = std::max ((size_t) longest_value,         
                         (pc->entries.find(ptr->first) != pc->entries.end()
                          ?
                          pc->entries[ptr->first].value
