@@ -769,6 +769,21 @@ SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst, const Vector<so
 template <typename number>
 template <typename somenumber>
 void
+SparseMatrix<number>::precondition_TSOR (Vector<somenumber>& dst, const Vector<somenumber>& src,
+			    const number om) const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
+
+  dst = src;
+  TSOR(dst,om);
+};
+
+
+template <typename number>
+template <typename somenumber>
+void
 SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -781,6 +796,29 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
       somenumber s = dst(row);
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
 	if (cols->colnums[j] < row)
+	  s -= val[j] * dst(cols->colnums[j]);
+
+      dst(row) = s * om / val[cols->rowstart[row]];
+    }
+}
+
+
+template <typename number>
+template <typename somenumber>
+void
+SparseMatrix<number>::TSOR (Vector<somenumber>& dst, const number om) const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
+
+  for (unsigned int row=m(); row!=0;)
+    {
+      --row;
+      somenumber s = dst(row);
+      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
+	if (cols->colnums[j] > row)
 	  s -= val[j] * dst(cols->colnums[j]);
 
       dst(row) = s * om / val[cols->rowstart[row]];

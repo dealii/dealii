@@ -527,6 +527,16 @@ class SparseMatrix : public Subscriptor
  			   const number              om = 1.) const;
     
 				     /**
+				      * Apply transpose SOR preconditioning matrix to @p{src}.
+				      * The result of this method is
+				      * $dst = (om D - U)^{-1} src$.
+				      */
+    template <typename somenumber>
+    void precondition_TSOR (Vector<somenumber>       &dst,
+			    const Vector<somenumber> &src,
+			    const number              om = 1.) const;
+    
+				     /**
 				      * Perform SSOR preconditioning
 				      * in-place.  Apply the
 				      * preconditioner matrix without
@@ -545,6 +555,15 @@ class SparseMatrix : public Subscriptor
 				      */
     template <typename somenumber>
     void SOR (Vector<somenumber> &v,
+	      const number        om = 1.) const;
+
+				     /**
+				      * Perform a transpose SOR preconditioning in-place.
+				      * The result is $v = (\omega D - L)^{-1} v$.
+				      * @p{omega} is the damping parameter.
+				      */
+    template <typename somenumber>
+    void TSOR (Vector<somenumber> &v,
 	      const number        om = 1.) const;
 
 				     /**

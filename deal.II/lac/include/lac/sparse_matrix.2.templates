@@ -51,11 +51,16 @@ template void SparseMatrix<TYPEMAT>::precondition_SOR (Vector<TYPE2> &,
 						     const Vector<TYPE2> &,
 						     TYPEMAT) const;
 
+template void SparseMatrix<TYPEMAT>::precondition_TSOR (Vector<TYPE2> &,
+						     const Vector<TYPE2> &,
+						     TYPEMAT) const;
+
 template void SparseMatrix<TYPEMAT>::precondition_Jacobi (Vector<TYPE2> &,
 							const Vector<TYPE2> &,
 							TYPEMAT) const;
 
 template void SparseMatrix<TYPEMAT>::SOR (Vector<TYPE2> &, TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::TSOR (Vector<TYPE2> &, TYPEMAT) const;
 template void SparseMatrix<TYPEMAT>::SSOR (Vector<TYPE2> &, TYPEMAT) const;
 template void SparseMatrix<TYPEMAT>::SOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, TYPEMAT) const;
 template void SparseMatrix<TYPEMAT>::TSOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, TYPEMAT) const;
