@@ -1292,13 +1292,13 @@ MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
       };
 
 
-// dofs of quad
+				   // dofs of quad
   if (selected_fe->dofs_per_quad > 0)
     for (unsigned int d=0; d<selected_fe->dofs_per_quad; ++d)
       cell->set_mg_dof_index (d, next_free_dof++);
 
 
-// note that this cell has been processed
+				   // note that this cell has been processed
   cell->set_user_flag ();
   
   return next_free_dof;
@@ -1354,13 +1354,13 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
       };
 
 
-// dofs of cell
+				   // dofs of cell
   if (selected_fe->dofs_per_hex > 0)
     for (unsigned int d=0; d<selected_fe->dofs_per_hex; ++d)
       cell->set_mg_dof_index (d, next_free_dof++);
 
 
-// note that this cell has been processed
+				   // note that this cell has been processed
   cell->set_user_flag ();
   
   return next_free_dof;
@@ -1601,7 +1601,7 @@ void MGDoFHandler<2>::reserve_space () {
   mg_vertex_dofs.clear ();
 
 
-////////////////////////////
+				   ////////////////////////////
 				   // CONSTRUCTION
   
 				   // first allocate space for the
@@ -1619,7 +1619,7 @@ void MGDoFHandler<2>::reserve_space () {
     };
 
 
-// now allocate space for the
+				   // now allocate space for the
 				   // vertices. To this end, we need
 				   // to construct as many objects as
 				   // there are vertices and let them
@@ -1691,7 +1691,7 @@ void MGDoFHandler<3>::reserve_space () {
   mg_vertex_dofs.clear ();
 
 
-////////////////////////////
+				   ////////////////////////////
 				   // CONSTRUCTION
   
 				   // first allocate space for the
@@ -1712,7 +1712,7 @@ void MGDoFHandler<3>::reserve_space () {
     };
 
 
-// now allocate space for the
+				   // now allocate space for the
 				   // vertices. To this end, we need
 				   // to construct as many objects as
 				   // there are vertices and let them
@@ -1743,7 +1743,7 @@ void MGDoFHandler<3>::reserve_space () {
       };
 
 
-// now allocate the needed space
+				   // now allocate the needed space
   for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
     {
       Assert (min_level[vertex] < tria->n_levels(),   ExcInternalError());
