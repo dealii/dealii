@@ -89,6 +89,14 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Improved: class <code class="class">SolverGMRES</code> accepts
+       a parameter in <code class="class">AdditionalData</code>,
+       allowing for right preconditioning.
+       <br>
+       (GK 2001/11/09)
+       </p>
+
+  <li> <p>
        Fixed: class <code class="class">SparsityPattern</code> can
        handle rows of length zero now. For quadratic matrices, these
        rows are changed to length one, since a diagonal element must
