@@ -1496,7 +1496,7 @@ namespace Threads
 					*/
       template <class Class_>
       friend
-      typename MemFunData0<Class,void>::ArgCollector
+      typename MemFunData0<Class_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)());
   };
 
