@@ -278,7 +278,8 @@
  *
  *  @author Wolfgang Bangerth, November 1997, extensions 1998
  */
-class ExceptionBase : public exception {
+class ExceptionBase : public exception
+{
   public:
 				     /**
 				      * Default constructor.
@@ -362,6 +363,7 @@ class ExceptionBase : public exception {
 };
 
 
+
 /**
  *  This routine does the main work for the
  *  exception generation mechanism used in the
@@ -375,7 +377,8 @@ void __IssueError_Assert (const char *file,
 			  const char *function,
 			  const char *cond,
 			  const char *exc_name,
-			  exc         e) {
+			  exc         e)
+{
 				   // Fill the fields of the exception object
   e.SetFields (file, line, function, cond, exc_name);
   cerr << "--------------------------------------------------------"
@@ -389,6 +392,7 @@ void __IssueError_Assert (const char *file,
   
   abort ();
 };
+
 
 
 /**
@@ -409,6 +413,7 @@ void __IssueError_Throw (const char *file,
   e.SetFields (file, line, function, cond, exc_name);
   throw e;
 };
+
 
 
 #ifdef DEBUG  ////////////////////////////////////////
@@ -439,6 +444,7 @@ void __IssueError_Throw (const char *file,
 #endif      ////////////////////////////////////////
 
 
+
 /**
  * This is the main routine in the exception mechanism for run-time
  * mode error checking. It assert that a certain condition is
@@ -466,6 +472,9 @@ void __IssueError_Throw (const char *file,
    { if (!(cond)) abort(); }
 #endif
 
+
+
+
 /**
  * See the @p{ExceptionBase} class for a detailed description.
  *
@@ -474,6 +483,8 @@ void __IssueError_Throw (const char *file,
  */
 #define DeclException0(Exception0)  \
 class Exception0 :  public ExceptionBase {};
+
+
 
 /**
   *  Declare an exception class with
@@ -491,6 +502,8 @@ class Exception1 : public ExceptionBase {                             \
   private:                                                            \
       const type1 arg1;                                               \
 }
+
+
 
 /**
  *  Declare an exception class with
@@ -511,6 +524,8 @@ class Exception2 : public ExceptionBase {                             \
       const type2 arg2;                                               \
 }
 
+
+
 /**
  *  Declare an exception class with
  *  three additional parameters.
@@ -530,6 +545,8 @@ class Exception3 : public ExceptionBase {                             \
       const type2 arg2;                                               \
       const type3 arg3;                                               \
 }
+
+
 
 /**
  *  Declare an exception class with
@@ -552,6 +569,8 @@ class Exception4 : public ExceptionBase {                             \
       const type3 arg3;                                               \
       const type4 arg4;                                               \
 }
+
+
 
 /**
  *  Declare an exception class with
@@ -577,15 +596,123 @@ class Exception5 : public ExceptionBase {                             \
 }
 
 
+
+/**
+ * Declare some exceptions that occur over and over. This way, you can
+ * simply use these exceptions, instead of having to declare them
+ * locally in your class. The namespace in which these exceptions are
+ * declared is later included into the global namespace by @p{using
+ * namespace StandardExceptions;}.
+ */
 namespace StandardExceptions 
 {
+				   /**
+				    * Exception denoting a division by
+				    * zero.
+				    */
   DeclException0 (ExcDivideByZero);
+
+				   /**
+				    * Exception denoting a part of the
+				    * library or application program
+				    * that has not yet been
+				    * implemented. In many cases, this
+				    * only indicates that there wasn't
+				    * much need for something yet, not
+				    * that this is difficult to
+				    * implement. It is therefore quite
+				    * worth the effort to take a look
+				    * at the corresponding place and
+				    * see whether it can be
+				    * implemented without too much
+				    * effort.
+				    */
   DeclException0 (ExcNotImplemented);
+
+				   /**
+				    * This exception usually indicates
+				    * that some condition which the
+				    * programmer thinks must be
+				    * satisfied at a certain point in
+				    * an algorithm, is not
+				    * fulfilled. This might be due to
+				    * some programming error above,
+				    * due to changes to the algorithm
+				    * that did not preserve this
+				    * assertion, or due to assumptions
+				    * the programmer made that are not
+				    * valid at all (i.e. the exception
+				    * is thrown although there is no
+				    * error here). Within the library,
+				    * this exception is most often
+				    * used when we write some kind of
+				    * complicated algorithm and are
+				    * not yet sure whether we got it
+				    * right; we then put in assertions
+				    * after each part of the algorithm
+				    * that check for some conditions
+				    * that should hold there, and
+				    * throw an exception if they do
+				    * not.
+				    *
+				    * We usually leave in these
+				    * exceptions even after we are
+				    * confident that the
+				    * implementation is correct, since
+				    * if someone later changes or
+				    * extends the algorithm, these
+				    * exceptions will indicate to him
+				    * if he violates assumptions that
+				    * are used later in the
+				    * algorithm. Furthermore, it
+				    * sometimes happens that an
+				    * algorithm does not work in very
+				    * rare corner cases. These cases
+				    * will then be trapped sooner or
+				    * later by the exception, so that
+				    * the algorithm can then be fixed
+				    * for these cases as well.
+				    */
   DeclException0 (ExcInternalError);
+
+				   /**
+				    * This exception is used in
+				    * functions that may not be called
+				    * (i.e. in pure functions) but
+				    * could not be declared pure since
+				    * the class is intended to be used
+				    * anyway, even though the
+				    * respective function may only be
+				    * called if a derived class is
+				    * used.
+				    */
   DeclException0 (ExcPureFunctionCalled);
+
+				   /**
+				    * This exception is used if some
+				    * object is found uninitialized.
+				    */
   DeclException0 (ExcNotInitialized);
-  DeclException2 (ExcDimensionMismatch, int, int,
+
+				   /**
+				    * This exception is raised
+				    * whenever the sizes of two
+				    * objects were assumed to be
+				    * equal, but were not.
+				    */
+  DeclException2 (ExcDimensionMismatch,
+		  int, int,
 		  << "Dimension " << arg1 << " not equal to " << arg2);
+
+				   /**
+				    * This exception is one of the
+				    * most often used ones, and
+				    * indicates that an index is not
+				    * within the expected range. For
+				    * example, you might try to access
+				    * an element of a vector which
+				    * does not exist.
+				    */
   DeclException3 (ExcIndexRange, int, int, int,
 		  << "Index " << arg1 << " is not in ["
 		  << arg2 << "," << arg3 << "[");
