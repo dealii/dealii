@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <link href="audio.css" rel="StyleSheet" title="deal.II Homepage" media="aural">
+    <title>The deal.II Homepage</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II"></head>
+  <body>
+
+
+    <h2>Plans for the future of deal.II</h2>
+
+    <p>
+    While we believe that <acronym>deal.II</acronym> is quite usable
+    in the present form, there are still many things that we would
+    implement for future versions. Among these are the following
+    topics:
+    <ul>
+    <li> <p>
+         <strong>Multigrid:</strong> Guido Kanschat is working on an
+         implementation of multigrid methods for
+         <acronym>deal.II</acronym>. While this is running on globally
+         refined grids, we are still having problems on locally
+         refined grid. We hope to have them sorted out soon.
+	 </p>
+
+    <li> <p>
+         <strong>Non-conforming elements:</strong> While
+         <acronym>deal.II</acronym> is quite flexible with respect to
+         the finite element to be used, it was written with Lagrange
+         elements in mind. The basic problems in the implementation of
+         other elements would therefore be the computation of shape
+         function values if the shape functions depend on the shape of
+         the cell. Since this is not the case for the usual continuous
+         elements, the present implementation does not provide all
+         information necessary for the computation of these values.
+	 </p>
+
+	 <p>
+	 In order to implement these elements, it would therefore be
+	 necessary to review the interface between the
+	 <code>FEValues</code> class and the
+	 <code>FiniteElement</code> class. This would probably also be
+	 the right time to further separate the implementation of the
+	 mapping from unit to real cell from the actual finite element
+	 code.
+	 </p>
+
+    <li> <p>
+         <strong>Linear solvers:</strong>
+	 We already have the most common linear solvers, such as CG,
+         BiCGStab, or GMRES. However, there are certainly more
+         proficient implementations of these solvers, but that would
+         need experts in this field which we certainly are not. It
+         would also be of interest to have linear solvers for more
+         specialized applications; in particular, solvers for
+         indefinite symmetric problems, such as MinRes or SymmLQ would
+         be nice.
+	 </p>
+
+    <li> <p>
+         <strong>Faster linear algebra:</strong>
+	 The linear algebra implementation in
+         <acronym>deal.II</acronym> is quite fast, but only compared
+         to other C/C++ implementations. We know that Fortran
+         compilers can do a much better job in optimizing the tight
+         inner loops of matrix-vector operations. We plan to try
+         interfaces from C to Fortran for that purpose.
+	 </p>
+
+    <li> <p>
+         <strong>More output formats:</strong>
+	 It would be nice to have the possibility of writing output in
+         more graphics formats. This is a simple task, since basically
+         only two files have to be modified and the interface is very
+         simple. In case you have an unsupported graphics program and
+         a student with half a week spare time, this is the right
+         project.
+	 </p>
+
+    <li> <p>
+         <strong>More example programs:</strong>
+	 There are still many aspects of the library that are not yet
+         covered by the example programs. This is certainly something
+         that should be improved, but is time consuming.
+	 </p>
+
+    <li> <p>
+         <strong>Parallelization:</strong>
+	 We do not presently think about parallelizing the libraries
+         on distributed memory machines, but the present
+         implementation of multithreading on shared memory machines is
+         quite promising. We will implement multithreading for several
+         other parts of the library of which we know they are taking
+         significant amounts of time in common applications.
+	 </p>
+
+    <li> <p>
+         <strong>Documentation:</strong>
+	 Printing the documentation is probably not what one would
+         usually do anyway, due to the sheer size. However, it might
+         be useful to print, for instance, the example programs. There
+         might be more information worth printing in some cases which
+         I presently can't think about.
+	 </p>
+
+	 <p>
+	 For these cases, it would be interesting to have them in
+	 another format than HTML. We think that DocBook SGML would be
+	 a good choice, since it can be converted into many other
+	 formats, including printable ones and ones which can be
+	 nicely displayed on the screen. This would require that some
+	 document-generating scripts produce SGML instead (or in
+	 addition) to HTML, and some other tweaks, but is probably no
+	 big deal.
+	 </p>
+
+    </ul>
+    </p>
+
+    <p>
+    We believe in an open development model and would like to
+    encourage everyone to send us patches and extensions they have. We
+    think that a cooperative effort can improve the library much more
+    than a limited and closed circle of developers ever can. We are
+    therefore eager to review contributions by others for inclusion
+    into the library and to help in their development. Please feel
+    free to contact us in such cases!
+    </p>
+
+
+    <hr>
+    
+    <address>
+      <a href="mailto:deal@hermes.iwr.uni-heidelberg.de">The deal.II group</a></address>
+
+  </body>
+</html>
+
