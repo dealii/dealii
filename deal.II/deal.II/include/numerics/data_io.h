@@ -301,11 +301,48 @@ class DataIn {
  *
  * \subsection{Encapsulated Postscript format}
  *
- * There exist two functions for generating encapsulated Postscript
+ * There are two functions for generating encapsulated Postscript
  * (EPS) without the need for another graphics tool.
- * #write_epsgrid# writes just the 2d grid. The function
- * #write_eps# uses the first data vector to produce a shaded surface plot.
+ * #write_epsgrid# writes just the 2d grid - This is obsolete and
+ * should be removed. The functionality is provided through write_eps
+ * and eps_output_data now. 
+ * #write_eps# can use one data vector for height information and one
+ * cell vector for shading information. Control is done through an
+ * object of class eps_output_data as follows.
  *
+ * Vectors are added as usual by #add_data_vector#. Then one has to
+ * decide, wether to produce a 2D or 3D plot. This is done by setting
+ * #height_type# to 
+ * \begin{description}
+ *   \item[None] for 2D-Output (or Top-View thats the same by no
+ *     turning is done) or to
+ *   \item[Vector] for 3D-Output.
+ * \end{description}
+ * For 3D-Output one has to set #azimuth# and #elevation# for the
+ * angle of view and #height_vector# to the number of the dof_data
+ * vector that provides the height information to be used.
+ *
+ * The cells can be shaded in three different modes, controlled by the
+ * attribute cell_type:
+ * \begin{description}
+ *   \item[None] provides transparent shading.
+ *   \item[Vector] uses a cell vector to do shading. The number of the
+ *     cell vector to be uses is provided in #cell_vector#. To scale
+ *     the cell vector there is the method #color#. It is called with
+ *     the actual value of the cell, the maximum and the minimum value
+ *     of a cell in the cell vector. It returns three values for red,
+ *     green and blue.
+ *   \item[Shaded] just shades the plot. This is controlled by the
+ *     vector #light# which stores the direction of the light beams.
+ * \end{description}
+ *
+ * Finnaly one can choose to mark the cell boundaries by setting
+ * #cell_boundary_type#. It can take one of three values:
+ * \begin{description}
+ *   \item[None] for no cell boundaries,
+ *   \item[Black] for black cell boundaries, and
+ *   \item[White] for white cell boundaries.
+ * \end{desctiption}
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Stefan Nauber, 1998, 1999
  */
@@ -412,7 +449,7 @@ class DataOut {
 				    * Further data vectors
 				    * as well as cell data is ignored.
 				    */
-    void write_eps (ostream &out) const;
+    void write_eps (ostream &out, const eps_output_data EOD) const;
 
 				   /**
 				    * Write grid in Encapsulated
@@ -480,7 +517,7 @@ class DataOut {
 				      * classes.
 				      */
     static string get_output_format_names ();
-    
+
 				     /**
 				      * Exception
 				      */
@@ -620,37 +657,135 @@ class DataOut {
     void write_ucd_faces (ostream &out,
 			  const unsigned int starting_index) const;
 
-    class eps_vertex_data
-    {
+				     /**
+				      * Class of data for vertices
+				      * for eps output.
+				      */
+    class eps_vertex_data{
       public:
+				       /**
+					* Coordinates
+					*/
         double x;
 	double y;
 	double z;
+      
+				       /**
+					* Default Constructor;
+					* needed for STL.
+					*/
         eps_vertex_data()
 	  {};
+      
+				       /**
+					* Constructor that takes three
+					* coordinate values as argument.
+					*/
         eps_vertex_data(double a, double b, double c):x(a),y(b),z(c)
 	  {};
-        void turn(double azi, double ele);
+      
+				       /**
+					* Transformation method
+					*/
+	void turn(double azi, double ele);
     };
+    
                                      /** 
 				      * Class of cell data for output.
 				      * For eps output some calculations have
 				      * to be done between transformation and
-				      * projection and output. There for all
-				      * output data is put into a STL set.
+				      * projection and output. Because of this all
+				      * output data is put into a STL multiset.
 				      */
     class eps_cell_data{
       public:
-        vector<eps_vertex_data> vertices;
-        void turn(double azi, double ele);
-      bool operator < (const eps_cell_data &) const;
+	
+					 /**
+					  * STL-vector of vertices
+					  */
+	vector<eps_vertex_data> vertices;
+	
+					 /**
+					  * Color values
+					  */
+	float red;
+	float green;
+	float blue;
+
+					 /**
+					  * Transformation method
+					  */
+	void turn(double azi, double ele);
+	
+					 /**
+					  * Comparison operator for
+					  * sorting
+					  */
+	bool operator < (const eps_cell_data &) const;
     };
 };
 
+				 /** 
+				  * Structure for the controll of
+				  * eps_output. See general
+				  * documentation of class DataOut for
+				  * description.
+				  */
+class eps_output_data{
+  public:
+				     /** 
+				      * Different types of
+				      * colorization
+				      */
+    typedef enum {None,Vector,Shaded,Black,White} color_type;
+    
+				     /**
+				      * Type of height information 
+				      */
+    color_type height_type;
+				     /**
+				      * Cell shading
+				      */
+    color_type cell_type;
+				     /**
+				      * Boundary color
+				      */
+    color_type cell_boundary_type;
 
+				     /**
+				      * Vector with height information
+				      */
+    unsigned height_vector;
+				     /**
+				      * Vector with cell shading values
+				      */
+    unsigned cell_vector;
+                                     /**
+				      * View angle
+				      */
+    float azimuth;
 
+                                     /**
+				      * View angle
+				      */
+    float elevation;
 
-		
+				     /**
+				      * Direction of Light
+				      */
+    double light[3];
+    
+				     /**
+				      * Default constructor
+				      */
+    eps_output_data();
+
+				     /**
+				      * Color scaling
+				      */
+    void color(const float x, const float xmax, const float xmin, 
+	       float &r, float &g, float &b) const;
+};
 
 
 /*----------------------------   data_io.h     ---------------------------*/
