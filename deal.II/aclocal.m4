@@ -1543,9 +1543,9 @@ AC_DEFUN(DEAL_II_CHECK_TEMPL_CONST_MEM_PTR_BUG, dnl
     [
       AC_MSG_RESULT(yes. using workaround)
       AC_DEFINE(DEAL_II_TEMPL_CONST_MEM_PTR_BUG, 1, 
-                     [Define if we have to work around a bug in icc in which
-                      the compiler refuses to consider a template when given
-                      a pointer to a constant member function.
+                     [Define if we have to work around a bug in Intel's icc
+                      compiler in which the compiler refuses to consider a
+                      template when given a pointer to a constant member function.
                       See the aclocal.m4 file in the top-level directory
                       for a description of this bug.])
     ])
