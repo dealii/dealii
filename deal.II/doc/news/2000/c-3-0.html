@@ -40,7 +40,7 @@
        </p>
 
   <li> <p>
-       There is now a function <code class="member">invert
+       New: There is now a function <code class="member">invert
        (Tensor<2,dim>)</code> that returns the inverse of a tensor of
        rank 2.
        <br>
@@ -276,6 +276,24 @@
        <code class="class">BlockSparsityPattern</code> arguments.
        <br>
        (WB 2000/05/15)
+       </p>
+
+  <li> <p>
+       New: many functions are now templatized on the data type of the
+       vector they take or return. They thus now support
+       <code class="class">Vector&lt;float&gt;</code>, but also
+       <code class="class">BlockVector&lt;...&gt;</code>. An
+       incomplete and growing list of functions that were treated in
+       this way is:
+       <code class="member">DoFAccess::get_dof_values</code>,
+       <code class="member">DoFAccess::set_dof_values</code>,
+       <code class="member">DoFAccess::get_interpolated_dof_values</code>,
+       <code class="member">DoFAccess::set_dof_values_by_interpolation</code>,
+       <code class="member">FEValues::get_function_values</code>,
+       <code class="member">FEValues::get_function_grads</code>,
+       <code class="member">FEValues::get_function_2nd_derivatives</code>.
+       <br>
+       (WB 2000/05/16)
        </p>
 </ol>
 
