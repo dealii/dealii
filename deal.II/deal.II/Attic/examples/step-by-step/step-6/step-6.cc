@@ -56,6 +56,11 @@ class LaplaceProblem
     FEQ1<dim>            fe;
     DoFHandler<dim>      dof_handler;
 
+				     // This is the only addition to
+				     // the main class. We need an
+				     // object which holds a list of
+				     // the constraints from the
+				     // hanging nodes:
     ConstraintMatrix     hanging_node_constraints;
 
     SparseMatrixStruct   sparsity_pattern;
@@ -128,10 +133,38 @@ void LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
-				   //...
+				   // After setting up all the degrees
+				   // of freedoms, we can make up the
+				   // list of constraints associated
+				   // with the hanging nodes. This is
+				   // done using the following
+				   // function calls (the first clears
+				   // the contents of the object,
+				   // which is still there from the
+				   // previous cycle, i.e. before the
+				   // grid was refined):
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
+				   // In principle, the
+				   // ConstraintMatrix class can hold
+				   // other constraints as well,
+				   // i.e. constraints that do not
+				   // stem from hanging
+				   // nodes. Sometimes, it is useful
+				   // to use such constraints, in
+				   // which case they may be added to
+				   // the ConstraintMatrix object
+				   // after the hanging node
+				   // constraints were computed. After
+				   // all constraints have been added,
+				   // they need to be sorted and
+				   // rearranged to perform some
+				   // actions more efficiently. This
+				   // postprocessing is done using the
+				   // ``close'' function, after which
+				   // no further constraints may be
+				   // added any more.
   hanging_node_constraints.close ();
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
@@ -139,9 +172,32 @@ void LaplaceProblem<dim>::setup_system ()
 			   dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
-				   //...
+				   // The constrained hanging nodes
+				   // will later be eliminated from
+				   // the linear system of
+				   // equations. When doing so, some
+				   // additional entries in the global
+				   // matrix will be set to non-zero
+				   // values, so we have to reserve
+				   // some space for them here. Since
+				   // the process of elimination of
+				   // these constrained nodes is
+				   // called ``condensation'', the
+				   // functions that eliminate them
+				   // are called ``condense'' for both
+				   // the system matrix and right hand
+				   // side, as well as for teh
+				   // sparsity pattern.
   hanging_node_constraints.condense (sparsity_pattern);
-  
+
+				   // Now all non-zero entries of the
+				   // matrix are known (i.e. those
+				   // from regularly assembling the
+				   // matrix and those that were
+				   // introduced by eliminating
+				   // constraints). We can thus close
+				   // the sparsity pattern and remove
+				   // unneeded space:
   sparsity_pattern.compress();
 
   system_matrix.reinit (sparsity_pattern);
@@ -231,8 +287,29 @@ void LaplaceProblem<dim>::assemble_system ()
 					   solution,
 					   system_rhs);
 
+				   // After the system of equations
+				   // has been assembled just as for
+				   // the previous examples, we still
+				   // have to eliminate the
+				   // constraints due to hanging
+				   // nodes. This is done using the
+				   // following two function calls:
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);
+				   // Using them, degrees of freedom
+				   // associated to hanging nodes have
+				   // been removed from the linear
+				   // system and the independent
+				   // variables are only regular
+				   // nodes. The constrained nodes are
+				   // still in the linear system
+				   // (there is a one on the diagonal
+				   // of the matrix and all other
+				   // entries for this line are set to
+				   // zero) but the computed values
+				   // are invalid. They are set to
+				   // reasonable values in the
+				   // ``solve'' function.
 };
 
 
@@ -252,11 +329,22 @@ void LaplaceProblem<dim>::solve ()
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
+				   // To set the constrained nodes to
+				   // resonable values, you have to
+				   // use the following function. It
+				   // computes the values of these
+				   // nodes from the values of the
+				   // unconstrained nodes, which are
+				   // the solutions of the linear
+				   // system just solved.
   hanging_node_constraints.distribute (solution);
 };
 
 
-				 //...
+				 // Instead of global refinement, we
+				 // now use a slightly more elaborate
+				 // scheme.
+				 // ...
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
