@@ -158,6 +158,9 @@ void MGTransferBlockBase::build_matrices (
   const MGDoFHandler<dim> &mg_dof,
   std::vector<bool> select) 
 {
+  prolongation_matrices.clear();
+  prolongation_sparsities.clear();
+
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   const unsigned int n_components  = fe.n_components();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;  
