@@ -24,6 +24,19 @@ foreach $filename (@ARGV)
     }
     
     while (<IN>) {
+	# save the entire line for simpler grepping when an error
+	# occurs
+	$this_line = $_;
+
+	# if line ends with an = character, the concatenate it with the next 
+	# one
+	while ( /=\s*$/ ) {
+	    $newline = <IN>;
+	    $newline =~ s/^\s*//g;
+	    $_ = $thisline . $newline;
+	    $this_line = $_;
+        }
+
         # first find all hrefs
         while ( /<\s*a\s+href=\"?(.*?)[\s\"]/gi ) {
 	    # then decide whether they are relevant for 
@@ -54,7 +67,7 @@ foreach $filename (@ARGV)
 		    }
 		}
 		
-		die "---Internal reference `$internal_ref' not found in file $filename\n"
+		die "---Internal reference `$internal_ref' not found in file $filename\n This line is: $this_line.\n"
 		    unless $found;
 		next;
 	    }
@@ -83,7 +96,7 @@ foreach $filename (@ARGV)
 		    }
 		}
 		
-		die "---External reference `$external_file#$external_ref' not found in file $filename\n"
+		die "---External reference `$external_file#$external_ref' not found in file $filename\n This line is: $this_line.\n"
 		    unless $found;
 		next;
 	    }
@@ -95,7 +108,7 @@ foreach $filename (@ARGV)
 		# so no double-slash), then split off http:
 		$link =~ s/^http://g;
 
-		die "---Local file `$link' not found in file `$filename'\n"
+		die "---Local file `$link' not found in file `$filename'\n This line is: $this_line.\n"
 		    unless ((-r $link) && (-f $link));
 	    }
 	}
@@ -105,7 +118,7 @@ foreach $filename (@ARGV)
 	    # check whether the file for the image is present
 	    $link = $1;
 
-	    die "---Local image `$link' not found in file `$filename'\n"
+	    die "---Local image `$link' not found in file `$filename'\n This line is: $this_line.\n"
 		unless ((-r $link) && (-f $link));
 	}
    }
