@@ -15,9 +15,10 @@
 
 
 #include <base/config.h>
+#include <grid/tria.h>
+
 #include <map>
 #include <vector>
-#include <grid/tria.h>
 
 
 namespace internal
