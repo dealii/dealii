@@ -1,0 +1,44 @@
+
+DEAL::Number of active cells: 1
+DEAL::Total number of cells: 1
+DEAL::Number of degrees of freedom: 12
+DEAL::  shapefunction 0 is Nedelec:  false
+DEAL::  shapefunction 1 is Nedelec:  false
+DEAL::  shapefunction 2 is Nedelec:  false
+DEAL::  shapefunction 3 is Nedelec:  false
+DEAL::  shapefunction 4 is Nedelec:  true
+DEAL::  shapefunction 5 is Nedelec:  true
+DEAL::  shapefunction 6 is Nedelec:  true
+DEAL::  shapefunction 7 is Nedelec:  true
+DEAL::  shapefunction 8 is Nedelec:  true
+DEAL::  shapefunction 9 is Nedelec:  true
+DEAL::  shapefunction 10 is Nedelec:  true
+DEAL::  shapefunction 11 is Nedelec:  true
+DEAL::  DoF 0 belongs to base element 1, instance 0
+DEAL::  DoF 1 belongs to base element 1, instance 0
+DEAL::  DoF 2 belongs to base element 1, instance 0
+DEAL::  DoF 3 belongs to base element 1, instance 0
+DEAL::  DoF 4 belongs to base element 0, instance 0
+DEAL::  DoF 5 belongs to base element 0, instance 1
+DEAL::  DoF 6 belongs to base element 0, instance 0
+DEAL::  DoF 7 belongs to base element 0, instance 1
+DEAL::  DoF 8 belongs to base element 0, instance 0
+DEAL::  DoF 9 belongs to base element 0, instance 1
+DEAL::  DoF 10 belongs to base element 0, instance 0
+DEAL::  DoF 11 belongs to base element 0, instance 1
+DEAL::
+DEAL::  Now we renumber the DoFs component-wise:
+DEAL::  ****************************************
+DEAL::  DoF 8 belongs to base 1, instance 0
+DEAL::  DoF 9 belongs to base 1, instance 0
+DEAL::  DoF 10 belongs to base 1, instance 0
+DEAL::  DoF 11 belongs to base 1, instance 0
+DEAL::  DoF 0 belongs to base 0, instance 0
+DEAL::  DoF 4 belongs to base 0, instance 1
+DEAL::  DoF 1 belongs to base 0, instance 0
+DEAL::  DoF 5 belongs to base 0, instance 1
+DEAL::  DoF 2 belongs to base 0, instance 0
+DEAL::  DoF 6 belongs to base 0, instance 1
+DEAL::  DoF 3 belongs to base 0, instance 0
+DEAL::  DoF 7 belongs to base 0, instance 1
+DEAL::

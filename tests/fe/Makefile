@@ -39,12 +39,13 @@ numbering.exe           : numbering.go           $(libraries)
 shapes.exe              : shapes.go              $(libraries)
 transfer.exe		: transfer.go		 $(libraries)
 up_and_down.exe         : up_and_down.go	 $(libraries)
+anna_1.exe              : anna_1.go              $(libraries)
 
 tests = derivatives fe_data_test fe_traits fe_tools_test mapping \
         mapping_c1 shapes numbering mapping_q1_eulerian \
         transfer internals \
         non_primitive_1 non_primitive_2 \
-        nedelec nedelec_2 nedelec_3 up_and_down
+        nedelec nedelec_2 nedelec_3 up_and_down anna_1
 
 ############################################################
 
