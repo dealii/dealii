@@ -184,10 +184,10 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 				   quad->vertex(2),
 				   quad->vertex(3) };
 
-  for (unsigned int i=0; i<n; ++i, y+=ds)
+  for (unsigned int i=0; i<m; ++i, y+=ds)
     {
       double x=ds;
-      for (unsigned int j=0; j<n; ++j, x+=ds)
+      for (unsigned int j=0; j<m; ++j, x+=ds)
 	points[i*m+j]=((1-x) * vertices[0] +
 		       x     * vertices[1]) * (1-y) +
 		      ((1-x) * vertices[3] +
