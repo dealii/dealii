@@ -863,50 +863,50 @@ DoFRenumbering::random (DoFHandler<dim> &dof_handler)
 
 // explicit instantiations
 template
-void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension>&,
-				    const bool,
-				    const bool,
-				    const std::vector<unsigned int>&);
+void DoFRenumbering::Cuthill_McKee<> (DoFHandler<deal_II_dimension>&,
+				      const bool,
+				      const bool,
+				      const std::vector<unsigned int>&);
 
 template
-void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension>&,
-				     const std::vector<unsigned int>&);
+void DoFRenumbering::component_wise<> (DoFHandler<deal_II_dimension>&,
+				       const std::vector<unsigned int>&);
 
 template
-void DoFRenumbering::component_wise (MGDoFHandler<deal_II_dimension>&,
-				     unsigned int,
-				     const std::vector<unsigned int>&);
+void DoFRenumbering::component_wise<> (MGDoFHandler<deal_II_dimension>&,
+				       unsigned int,
+				       const std::vector<unsigned int>&);
 
 
 template
-void DoFRenumbering::cell_wise_dg (DoFHandler<deal_II_dimension>&,
-				   const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
+void DoFRenumbering::cell_wise_dg<> (DoFHandler<deal_II_dimension>&,
+				     const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
-void DoFRenumbering::downstream_dg (DoFHandler<deal_II_dimension>&,
-				    const Point<deal_II_dimension>&);
+void DoFRenumbering::downstream_dg<> (DoFHandler<deal_II_dimension>&,
+				      const Point<deal_II_dimension>&);
 
 template
-void DoFRenumbering::sort_selected_dofs_back (DoFHandler<deal_II_dimension> &,
-					      const std::vector<bool> &);
+void DoFRenumbering::sort_selected_dofs_back<> (DoFHandler<deal_II_dimension> &,
+						const std::vector<bool> &);
 
 template
-void DoFRenumbering::random (DoFHandler<deal_II_dimension> &);
+void DoFRenumbering::random<> (DoFHandler<deal_II_dimension> &);
 
 #ifdef ENABLE_MULTIGRID
 template
-void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension>&,
-				    const unsigned int,
-				    const bool,
-				    const std::vector<unsigned int>&);
+void DoFRenumbering::Cuthill_McKee<> (MGDoFHandler<deal_II_dimension>&,
+				      const unsigned int,
+				      const bool,
+				      const std::vector<unsigned int>&);
 template
-void DoFRenumbering::cell_wise_dg (MGDoFHandler<deal_II_dimension>&,
-				   const unsigned int,
-				   const std::vector<MGDoFHandler<deal_II_dimension>::cell_iterator>&);
+void DoFRenumbering::cell_wise_dg<> (MGDoFHandler<deal_II_dimension>&,
+				     const unsigned int,
+				     const std::vector<MGDoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
-void DoFRenumbering::downstream_dg (MGDoFHandler<deal_II_dimension>&,
-				    const unsigned int,
-				    const Point<deal_II_dimension>&);
+void DoFRenumbering::downstream_dg<> (MGDoFHandler<deal_II_dimension>&,
+				      const unsigned int,
+				      const Point<deal_II_dimension>&);
 
 #endif

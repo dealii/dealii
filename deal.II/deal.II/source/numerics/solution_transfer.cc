@@ -401,4 +401,4 @@ SolutionTransfer<dim, number>::Pointerstruct::memory_consumption () const
 template class SolutionTransfer<deal_II_dimension, float>;
 template class SolutionTransfer<deal_II_dimension, double>;
 
-/*----------------------------   solutiontransfer.cc     ----------------------*/
+/*----------------------------   solution_transfer.cc     ----------------------*/

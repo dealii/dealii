@@ -36,7 +36,7 @@
 #if deal_II_dimension == 1
 
 MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<1> &/*mg_dof*/,
-					    unsigned int steps)
+					    const unsigned int steps)
 		:
 		steps(steps)
 {
@@ -50,7 +50,7 @@ MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<1> &/*mg_dof*/,
 
 template <int dim>
 MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
-					    unsigned int steps)
+					    const unsigned int steps)
 		:
 		steps(steps)
 {
@@ -133,24 +133,25 @@ MGSmootherContinuous::set_zero_interior_boundary (const unsigned int level,
 // don't do the following instantiation in 1d, since there is a specialized
 // function there
 #if deal_II_dimension > 1
-template MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<deal_II_dimension>&, unsigned int);
+template MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<deal_II_dimension>&,
+						     const unsigned int);
 #endif
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
-					     Vector<double>&) const;
+void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+							 Vector<double>&) const;
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
-					     Vector<float>&) const;
+void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+							 Vector<float>&) const;
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
-					     BlockVector<double>&) const;
+void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+							 BlockVector<double>&) const;
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
-					     BlockVector<float>&) const;
+void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+							 BlockVector<float>&) const;
 
 
   

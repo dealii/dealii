@@ -1037,25 +1037,25 @@ MappingQ1<dim>::covariant_transformation (std::vector<tensor_>       &dst,
 
 template class MappingQ1<deal_II_dimension>;
 
-template void MappingQ1<deal_II_dimension>::contravariant_transformation (
+template void MappingQ1<deal_II_dimension>::contravariant_transformation<> (
   std::vector<Tensor<1,deal_II_dimension> >       &dst,
   const std::vector<Tensor<1,deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,
   const unsigned int src_offset) const;
 
-template void MappingQ1<deal_II_dimension>::contravariant_transformation (
+template void MappingQ1<deal_II_dimension>::contravariant_transformation<> (
   std::vector<Point<deal_II_dimension> >       &dst,
   const std::vector<Point<deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,
   const unsigned int src_offset) const;
 
-template void MappingQ1<deal_II_dimension>::covariant_transformation (
+template void MappingQ1<deal_II_dimension>::covariant_transformation<> (
   std::vector<Tensor<1,deal_II_dimension> >       &dst,
   const std::vector<Tensor<1,deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,
   const unsigned int src_offset) const;
 
-template void MappingQ1<deal_II_dimension>::covariant_transformation (
+template void MappingQ1<deal_II_dimension>::covariant_transformation<> (
   std::vector<Point<deal_II_dimension> >       &dst,
   const std::vector<Point<deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,

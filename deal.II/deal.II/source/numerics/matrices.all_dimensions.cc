@@ -511,15 +511,15 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 
 template
 void
-MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-				    SparseMatrix<double>  &matrix,
-				    Vector<double>   &solution,
-				    Vector<double>   &right_hand_side,
-				    const bool        preserve_symmetry);
+MatrixTools::apply_boundary_values<> (const std::map<unsigned int,double> &boundary_values,
+				      SparseMatrix<double>  &matrix,
+				      Vector<double>   &solution,
+				      Vector<double>   &right_hand_side,
+				      const bool        preserve_symmetry);
 template
 void
-MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-				    SparseMatrix<float>  &matrix,
-				    Vector<float>   &solution,
-				    Vector<float>   &right_hand_side,
-				    const bool        preserve_symmetry);
+MatrixTools::apply_boundary_values<> (const std::map<unsigned int,double> &boundary_values,
+				      SparseMatrix<float>  &matrix,
+				      Vector<float>   &solution,
+				      Vector<float>   &right_hand_side,
+				      const bool        preserve_symmetry);

@@ -713,31 +713,31 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 template
 void 
 DerivativeApproximation::
-approximate_gradient (const Mapping<deal_II_dimension> &mapping,
-		      const DoFHandler<deal_II_dimension> &dof_handler,
-		      const Vector<double>  &solution,
-		      Vector<float>         &derivative_norm,
-		      const unsigned int     component);
+approximate_gradient<> (const Mapping<deal_II_dimension> &mapping,
+			const DoFHandler<deal_II_dimension> &dof_handler,
+			const Vector<double>  &solution,
+			Vector<float>         &derivative_norm,
+			const unsigned int     component);
 template
 void 
 DerivativeApproximation::
-approximate_gradient (const DoFHandler<deal_II_dimension> &dof_handler,
-		      const Vector<double>  &solution,
-		      Vector<float>         &derivative_norm,
-		      const unsigned int     component);
+approximate_gradient<> (const DoFHandler<deal_II_dimension> &dof_handler,
+			const Vector<double>  &solution,
+			Vector<float>         &derivative_norm,
+			const unsigned int     component);
 
 template
 void 
 DerivativeApproximation::
-approximate_second_derivative (const Mapping<deal_II_dimension>    &mapping,
-			       const DoFHandler<deal_II_dimension> &dof_handler,
-			       const Vector<double>  &solution,
-			       Vector<float>         &derivative_norm,
-			       const unsigned int     component);
+approximate_second_derivative<> (const Mapping<deal_II_dimension>    &mapping,
+				 const DoFHandler<deal_II_dimension> &dof_handler,
+				 const Vector<double>  &solution,
+				 Vector<float>         &derivative_norm,
+				 const unsigned int     component);
 template
 void 
 DerivativeApproximation::
-approximate_second_derivative (const DoFHandler<deal_II_dimension> &dof_handler,
-			       const Vector<double>  &solution,
-			       Vector<float>         &derivative_norm,
-			       const unsigned int     component);
+approximate_second_derivative<> (const DoFHandler<deal_II_dimension> &dof_handler,
+				 const Vector<double>  &solution,
+				 Vector<float>         &derivative_norm,
+				 const unsigned int     component);

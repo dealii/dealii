@@ -329,23 +329,23 @@ Histogram::memory_consumption () const
 
 // explicit instantiations for float
 template
-void Histogram::evaluate (const std::vector<Vector<float> > &values,
-			  const std::vector<double>                  &y_values, 
-			  const unsigned int                          n_intervals,
-			  const IntervalSpacing                       interval_spacing);
+void Histogram::evaluate<> (const std::vector<Vector<float> > &values,
+			    const std::vector<double>                  &y_values, 
+			    const unsigned int                          n_intervals,
+			    const IntervalSpacing                       interval_spacing);
 template
-void Histogram::evaluate (const Vector<float>   &values,
-			  const unsigned int     n_intervals,
-			  const IntervalSpacing  interval_spacing);
+void Histogram::evaluate<> (const Vector<float>   &values,
+			    const unsigned int     n_intervals,
+			    const IntervalSpacing  interval_spacing);
 
 
 // explicit instantiations for double
 template
-void Histogram::evaluate (const std::vector<Vector<double> >  &values,
-			  const std::vector<double>                    &y_values, 
-			  const unsigned int                            n_intervals,
-			  const IntervalSpacing                         interval_spacing);
+void Histogram::evaluate<> (const std::vector<Vector<double> >  &values,
+			    const std::vector<double>                    &y_values, 
+			    const unsigned int                            n_intervals,
+			    const IntervalSpacing                         interval_spacing);
 template
-void Histogram::evaluate (const Vector<double>   &values,
-			  const unsigned int      n_intervals,
-			  const IntervalSpacing   interval_spacing);
+void Histogram::evaluate<> (const Vector<double>   &values,
+			    const unsigned int      n_intervals,
+			    const IntervalSpacing   interval_spacing);

@@ -34,6 +34,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: Explicit specializations of member templates are now
+       conforming to the C++ standard. While most compilers accepted
+       the previous form, Sun's Forte compiler wants a strictly
+       conforming one.
+       <br>
+       (WB 2002/03/25)
+       </p>
+
+  <li> <p> 
        Fixed: For gcc versions that used <code
        class="class">ostrstream</code> instead of <code
        class="class">ostringstream</code>, it was necessary to append

@@ -15,20 +15,20 @@
 
 // explicit instantiations
 template class BlockVector<double>;
-template BlockVector<double>& BlockVector<double>::operator=(
+template BlockVector<double>& BlockVector<double>::template operator=<>(
   const BlockVector<float>&);
-template void BlockVector<double>::reinit(const BlockVector<double>&, const bool);
-template void BlockVector<double>::reinit(const BlockVector<float>&, const bool);
-template void BlockVector<double>::equ(const double, const BlockVector<double>&);
-template void BlockVector<double>::equ(const double, const BlockVector<float>&);
+template void BlockVector<double>::reinit<>(const BlockVector<double>&, const bool);
+template void BlockVector<double>::reinit<>(const BlockVector<float>&, const bool);
+template void BlockVector<double>::equ<>(const double, const BlockVector<double>&);
+template void BlockVector<double>::equ<>(const double, const BlockVector<float>&);
 
 template class BlockVector<float>;
-template BlockVector<float>& BlockVector<float>::operator=(
+template BlockVector<float>& BlockVector<float>::template operator=<>(
   const BlockVector<double>&);
-template void BlockVector<float>::reinit(const BlockVector<double>&, const bool);
-template void BlockVector<float>::reinit(const BlockVector<float>&, const bool);
-template void BlockVector<float>::equ(const float, const BlockVector<double>&);
-template void BlockVector<float>::equ(const float, const BlockVector<float>&);
+template void BlockVector<float>::reinit<>(const BlockVector<double>&, const bool);
+template void BlockVector<float>::reinit<>(const BlockVector<float>&, const bool);
+template void BlockVector<float>::equ<>(const float, const BlockVector<double>&);
+template void BlockVector<float>::equ<>(const float, const BlockVector<float>&);
 
 namespace BlockVectorIterators
 {

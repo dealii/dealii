@@ -786,5 +786,5 @@ SparsityPattern::memory_consumption () const
 
 
 // explicit instantiations
-template void SparsityPattern::copy_from (const FullMatrix<float> &);
-template void SparsityPattern::copy_from (const FullMatrix<double> &);
+template void SparsityPattern::copy_from<> (const FullMatrix<float> &);
+template void SparsityPattern::copy_from<> (const FullMatrix<double> &);

@@ -17,27 +17,27 @@
 // explicit instantiations
 template class Vector<long double>;
 
-template Vector<long double>& Vector<long double>::operator=(const Vector<double>&);
-template Vector<long double>& Vector<long double>::operator=(const Vector<float>&);
-template long double Vector<long double>::operator * (const Vector<long double> &) const;
-template long double Vector<long double>::operator * (const Vector<double> &) const;
-template long double Vector<long double>::operator * (const Vector<float> &) const;
-template void Vector<long double>::reinit(const Vector<long double>&, const bool);
-template void Vector<long double>::reinit(const Vector<double>&, const bool);
-template void Vector<long double>::reinit(const Vector<float>&, const bool);
-template void Vector<long double>::equ(const long double, const Vector<long double>&);
-template void Vector<long double>::equ(const long double, const Vector<double>&);
-template void Vector<long double>::equ(const long double, const Vector<float>&);
+template Vector<long double>& Vector<long double>::template operator=<>(const Vector<double>&);
+template Vector<long double>& Vector<long double>::template operator=<>(const Vector<float>&);
+template long double Vector<long double>::template operator *<> (const Vector<long double> &) const;
+template long double Vector<long double>::template operator *<> (const Vector<double> &) const;
+template long double Vector<long double>::template operator *<> (const Vector<float> &) const;
+template void Vector<long double>::reinit<>(const Vector<long double>&, const bool);
+template void Vector<long double>::reinit<>(const Vector<double>&, const bool);
+template void Vector<long double>::reinit<>(const Vector<float>&, const bool);
+template void Vector<long double>::equ<>(const long double, const Vector<long double>&);
+template void Vector<long double>::equ<>(const long double, const Vector<double>&);
+template void Vector<long double>::equ<>(const long double, const Vector<float>&);
 
-template Vector<double>& Vector<double>::operator=(const Vector<long double>&);
-template double Vector<double>::operator * (const Vector<long double> &) const;
-template void Vector<double>::reinit(const Vector<long double>&, const bool);
-template void Vector<double>::equ(const double, const Vector<long double>&);
+template Vector<double>& Vector<double>::template operator=<>(const Vector<long double>&);
+template double Vector<double>::template operator *<> (const Vector<long double> &) const;
+template void Vector<double>::reinit<>(const Vector<long double>&, const bool);
+template void Vector<double>::equ<>(const double, const Vector<long double>&);
 
-template Vector<float>& Vector<float>::operator=(const Vector<long double>&);
-template float Vector<float>::operator * (const Vector<long double> &) const;
-template void Vector<float>::reinit(const Vector<long double>&, const bool);
-template void Vector<float>::equ(const float, const Vector<long double>&);
+template Vector<float>& Vector<float>::template operator=<>(const Vector<long double>&);
+template float Vector<float>::template operator *<> (const Vector<long double> &) const;
+template void Vector<float>::reinit<>(const Vector<long double>&, const bool);
+template void Vector<float>::equ<>(const float, const Vector<long double>&);
 
 // see the .h file for why these functions are disabled.
 // template Vector<float>::Vector (const Vector<double>& v);
