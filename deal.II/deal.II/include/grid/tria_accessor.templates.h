@@ -516,7 +516,8 @@ TriaObjectAccessor<3,dim>::line_index (unsigned int i) const {
 template <int dim>
 inline
 unsigned int
-TriaObjectAccessor<3,dim>::quad_index (unsigned int i) const {
+TriaObjectAccessor<3,dim>::quad_index (unsigned int i) const
+{
   Assert (i<6, ExcIndexRange(i,0,6));
 
   return tria->levels[present_level]->hexes.hexes[present_index].quad(i);
@@ -526,8 +527,9 @@ TriaObjectAccessor<3,dim>::quad_index (unsigned int i) const {
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<3,dim> >
-TriaObjectAccessor<3,dim>::child (const unsigned int i) const {
-  Assert (i<6, ExcIndexRange(i,0,6));
+TriaObjectAccessor<3,dim>::child (const unsigned int i) const
+{
+  Assert (i<8, ExcIndexRange(i,0,8));
   
   TriaIterator<dim,TriaObjectAccessor<3,dim> > q (tria, present_level+1, child_index (i));
   
