@@ -674,6 +674,12 @@ class FilteredIterator : public BaseIterator
 				      * the constructor.
 				      */
     const PredicateBase * predicate;
+
+#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
+    template <typename T>
+    template <typename>
+    friend class FilteredIterator<T>::PredicateTemplate;
+#endif
 };
 
 
