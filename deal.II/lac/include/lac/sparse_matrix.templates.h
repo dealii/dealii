@@ -245,7 +245,7 @@ void
 SparseMatrix<number>::copy_from (const FullMatrix<somenumber> &matrix)
 {
 				   // first delete previous content
-  clear ();
+  reinit ();
 
 				   // then copy old matrix
   for (unsigned int row=0; row<matrix.m(); ++row)
