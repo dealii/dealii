@@ -543,6 +543,20 @@ class TriaDimensionInfo<2> {
 
 
 
+/**
+ * Declare some symbolic names for mesh smoothing algorithms. The meaning of
+ * these flags is documented in the #Triangulation# class.
+ */
+enum MeshSmoothing {
+      none                               = 0x0,
+      limit_level_difference_at_vertices = 0x1,     
+      eliminate_unrefined_islands        = 0x2,
+      maximum_smoothing                  = 0xffffffff
+};
+
+				       
+
+
 
 /*------------------------------------------------------------------------*/
 
@@ -840,7 +854,7 @@ class TriaDimensionInfo<2> {
  *   interface between regions of different materials.
  *
  *
- *   \subsection{Refinement of a triangulation}
+ *   \subsection{Refinement and of a triangulation}
  *
  *   Refinement of a triangulation may be done through several ways. The most
  *   low-level way is directly through iterators: let #i# be an iterator to
@@ -860,63 +874,6 @@ class TriaDimensionInfo<2> {
  *   approximationonal properties and, above all, making the handling of data
  *   structures and algorithms much much easier. To be honest, this is mostly
  *   an algorithmic step than one needed by the finite element method.
- *
- *   However, some degradation of approximation properties has been observed
- *   for grids which were refined more than once across a face, as descibed
- *   above, so there is also a practical justification for the above.
- *   It can also be shown, that such degradation occurs if the
- *   triangulation contains vertices which are member of cells with levels
- *   differing by more than one. One such example is the following:
- *   \begin{verbatim}
- *     |     |     |     |
- *     x-----x-----x--x--x--
- *     |     |     |  |  |
- *     |     |     x--x--x
- *     |     |     |  |  |
- *     x-----x-----x--x--x--
- *     |           |     |
- *     |           |     |
- *     |           |     |
- *     |           x-----x--
- *     |           |     |
- *     |           |     |
- *     |           |     |
- *     x-----------x-----x--
- *   \end{verbatim}
- *   It seems that in two space dimensions, the maximum jump in levels between
- *   cells sharing a common vertex is two (as in the example above). This is
- *   not true if more than four cells meet at a vertex. It is not uncommon
- *   that a coarse (initial) mesh contains vertices at which six or even eight
- *   cells meet, when small features of the domain have to be resolved even on
- *   the coarsest mesh. In that case, the maximum difference in levels is
- *   three or four, respectively. The problem gets even worse in three space
- *   dimensions.
- *
- *   Looking at an interpolation of the second derivative of the finite
- *   element solution (asuming bilinear finite elements), one sees that the
- *   numerical solution is almost totally wrong, compared with the true second
- *   derivative. Indeed, on regular meshes, there exist sharp estimations that
- *   the $H^2$-error is only $O(1)$, so we should not be suprised; however, the
- *   numerical solution may show a value for the second derivative which may
- *   be a factor of ten away from the true value. These problems are located
- *   on the small cell adjacent to the center vertex, where cells of
- *   non-subsequent levels meet, as well as on the upper and right neighbor
- *   of this cell (but with a less degree of deviation from the true value).
- *
- *   Due to the approximational problems described above, the
- *   #Triangulation# constructor takes an argument specifying whether a
- *   smoothing step shall be performed on the grid each time #execute_refinement#
- *   is called. The default is that such a step not be done, since this results
- *   in additional cells being produced, which may not be necessary in all
- *   cases. If switched on, calling #execute_refinement# results in
- *   flagging additional cells for refinement to avoid
- *   vertices as the ones mentioned. The algorithms for both regularisation
- *   and smoothing of triangulations are described below in the section on
- *   technical issues. The reason why this parameter must be given to the
- *   constructor rather than to #execute_refinement# is that it would result
- *   in algorithmic problems if you called #execute_refinement# once without
- *   and once with smoothing, since then in some refinement steps would need
- *   to be refined twice.
  *
  *   Marking cells for refinement 'by hand' through iterators is one way to
  *   produce a new grid, especially if you know what kind of grid you are
@@ -1010,6 +967,102 @@ class TriaDimensionInfo<2> {
  *   It is assumed that the criterion is a value in a certain norm over each
  *   element, such that the square of the total error is the sum over the
  *   squares of the criteria on the cells. The criteria shall be positive.
+ *
+ *
+ *   \subsection{Smoothing of a triangulation}
+ *
+ *   Some degradation of approximation properties has been observed
+ *   for grids which are too unstructured. Therefore, the #prepare_refinement#
+ *   function which is automatically called by the #execute_refinement# function
+ *   can do some smoothing of the triangulation. For this purpose the
+ *   #Triangulation# constructor takes an argument specifying whether a
+ *   smoothing step shall be performed on the grid each time #execute_refinement#
+ *   is called. The default is that such a step not be done, since this results
+ *   in additional cells being produced, which may not be necessary in all
+ *   cases. If switched on, calling #execute_refinement# results in
+ *   flagging additional cells for refinement to avoid
+ *   vertices as the ones mentioned. The algorithms for both regularisation
+ *   and smoothing of triangulations are described below in the section on
+ *   technical issues. The reason why this parameter must be given to the
+ *   constructor rather than to #execute_refinement# is that it would result
+ *   in algorithmic problems if you called #execute_refinement# once without
+ *   and once with smoothing, since then in some refinement steps would need
+ *   to be refined twice.
+ *
+ *   The parameter taken by the constructor is an integer which may be composed
+ *   bitwise by the constants defined in the #enum MeshSmoothing#. The meaning
+ *   of these constants is explained in the following:
+ *   \begin{itemize}
+ *   \item #limit_level_difference_at_vertices#:
+ *     It can be shown, that degradation of approximation occurs if the
+ *     triangulation contains vertices which are member of cells with levels
+ *     differing by more than one. One such example is the following:
+ *     \begin{verbatim}
+ *       |     |     |     |
+ *       x-----x-----x--x--x--
+ *       |     |     |  |  |
+ *       |     |     x--x--x
+ *       |     |     |  |  |
+ *       x-----x-----x--x--x--
+ *       |           |     |
+ *       |           |     |
+ *       |           |     |
+ *       |           x-----x--
+ *       |           |     |
+ *       |           |     |
+ *       |           |     |
+ *       x-----------x-----x--
+ *     \end{verbatim}
+ *     It seems that in two space dimensions, the maximum jump in levels between
+ *     cells sharing a common vertex is two (as in the example above). This is
+ *     not true if more than four cells meet at a vertex. It is not uncommon
+ *     that a coarse (initial) mesh contains vertices at which six or even eight
+ *     cells meet, when small features of the domain have to be resolved even on
+ *     the coarsest mesh. In that case, the maximum difference in levels is
+ *     three or four, respectively. The problem gets even worse in three space
+ *     dimensions.
+ *
+ *     Looking at an interpolation of the second derivative of the finite
+ *     element solution (asuming bilinear finite elements), one sees that the
+ *     numerical solution is almost totally wrong, compared with the true second
+ *     derivative. Indeed, on regular meshes, there exist sharp estimations that
+ *     the $H^2$-error is only $O(1)$, so we should not be suprised; however, the
+ *     numerical solution may show a value for the second derivative which may
+ *     be a factor of ten away from the true value. These problems are located
+ *     on the small cell adjacent to the center vertex, where cells of
+ *     non-subsequent levels meet, as well as on the upper and right neighbor
+ *     of this cell (but with a less degree of deviation from the true value).
+ *
+ *     If the smoothing indicator given to the constructor contains the bit for
+ *     #limit_level_difference_at_vertices#, situations as the above one are
+ *     eliminated by also marking the lower left cell for refinement.
+ *
+ *   \item #eliminate_unrefined_islands#:
+ *     Single cells which are not refined and are surrounded by cells which are
+ *     refined usually also lead to a sharp decline in approximation properties
+ *     locally. The reason is that the nodes on the faces between unrefined and
+ *     refined cells are not real degrees of freedom but carry constraints. The
+ *     patch without additional degrees of freedom is thus significantly larger
+ *     then the unrefined cell itself. If in the parameter passed to the
+ *     constructor the bit for #eliminate_unrefined_islands# is set, all cells
+ *     which are not flagged for refinement but which are surrounded by more
+ *     refined cells than unrefined cells are flagged for refinement. Cells
+ *     which are not yet refined but flagged for that are accounted for the
+ *     number of refined neighbors. Cells on the boundary are not accounted for
+ *     at all. An unrefined island is, by this definition
+ *     also a cell which (in 2D) is surrounded by three refined cells and one
+ *     unrefined one, or one surrounded by two refined cells, one unrefined one
+ *     and is at the boundary on one side. It is thus not a true island, as the
+ *     name of the flag may indicate. However, no better name came to mind to
+ *     the author by now.
+ *
+ *   \item #maximum_smoothing#:
+ *     This flag includes all the above ones and therefore combines all
+ *     smoothing algorithms implemented.
+ *
+ *   \item #none#:
+ *     Select no smoothing at all.
+ *   \end{itemize}
  *
  *
  *   \subsection{Material and boundary information}
@@ -1183,31 +1236,44 @@ class TriaDimensionInfo<2> {
  *
  *   \begin{itemize}
  *   \item {\it Regularisation:} The algorithm walks over all cells checking
- *   whether the present cell is flagged for refinement and a neighbor of the
- *   present cell is refined once less than the present one. If so, flag the
- *   neighbor for refinement. Because of the induction above, there may be no
- *   neighbor with level two less than the present one.
+ *     whether the present cell is flagged for refinement and a neighbor of the
+ *     present cell is refined once less than the present one. If so, flag the
+ *     neighbor for refinement. Because of the induction above, there may be no
+ *     neighbor with level two less than the present one.
  *
- *   The neighbor thus flagged for refinement may induce more cells which need
- *   to be refined. However, such cells which need additional refinement always
- *   are on one level lower than the present one, so we can get away with only
- *   one sweep over all cells if we do the loop in the reverse way, starting
- *   with those on the highest level. This way, we may flag additional cells
- *   on lower levels, but if these induce more refinement needed, this is
- *   performed later on when we visit them in out backward running loop.
+ *     The neighbor thus flagged for refinement may induce more cells which need
+ *     to be refined. However, such cells which need additional refinement always
+ *     are on one level lower than the present one, so we can get away with only
+ *     one sweep over all cells if we do the loop in the reverse way, starting
+ *     with those on the highest level. This way, we may flag additional cells
+ *     on lower levels, but if these induce more refinement needed, this is
+ *     performed later on when we visit them in out backward running loop.
  *
- *   \item {\it Smoothing:} First a list is set up which stores for each vertex
- *   the highest level one of the adjacent cells belongs to. Now, since we did
- *   smoothing in the previous refinement steps also, each cell may only have
- *   vertices with levels at most one greater than the level of the present
- *   cell.
+ *   \item {\it Smoothing:}
+ *     \begin{itemize}
+ *     \item #limit_level_difference_at_vertices#:
+ *       First a list is set up which stores for each vertex
+ *       the highest level one of the adjacent cells belongs to. Now, since we did
+ *       smoothing in the previous refinement steps also, each cell may only have
+ *       vertices with levels at most one greater than the level of the present
+ *       cell.
  *
- *   However, if we store the level plus one for cells marked for refinement,
- *   we may end up with cells which have vertices of level two greater than
- *   the cells level. We need to refine this cell also, and need thus also
- *   update the levels of its vertices. This itself may lead to cells needing
- *   refinement, but these are on lower levels, as above, which is why we
- *   may do all kinds of additional flagging in one loop only.
+ *       However, if we store the level plus one for cells marked for refinement,
+ *       we may end up with cells which have vertices of level two greater than
+ *       the cells level. We need to refine this cell also, and need thus also
+ *       update the levels of its vertices. This itself may lead to cells needing
+ *       refinement, but these are on lower levels, as above, which is why we
+ *       may do all kinds of additional flagging in one loop only.
+ *
+ *     \item #eliminate_unrefined_islands#:
+ *       For each cell we count the number of neighbors which are refined or
+ *       flagged for refinement. If this exceeds the total number of neighbors
+ *       (which is the number of faces minus the number of faces of this cell
+ *       which are located on the boundary), then this cell is flagged for
+ *       refinement. Since this may lead to cells on the same level which also
+ *       will need refinement, we will need additional loops of regularisation
+ *       and smoothing over all cells until nothing changes any more.
+ *     \end{itemize}
  *   \end{itemize}
  *
  *   Regularisation and smoothing are a bit complementary in that we check
@@ -1287,7 +1353,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  the first level of the hierarchy.
 				      *  Do not create any cells.
 				      */
-    Triangulation (const bool smooth_grid = false);
+    Triangulation (const MeshSmoothing smooth_grid = none);
 
 				     /**
 				      *  Copy constructor. You should really
@@ -2328,7 +2394,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  the general doc of this class for
 				      *  more information about this.
 				      */
-    bool                             smooth_grid;
+    MeshSmoothing                    smooth_grid;
 
 				     // Friendship includes local classes.
     friend class TriaAccessor<dim>;
