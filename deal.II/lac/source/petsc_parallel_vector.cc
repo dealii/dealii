@@ -113,27 +113,31 @@ namespace PETScWrappers
     Vector &
     Vector::operator = (const PETScWrappers::Vector &v)
     {
-      // first flush buffers
+                                       // first flush buffers
       compress ();
 
       int ierr;
 
-                            // get a pointer to the local memory of this vector
+                                       // get a pointer to the local memory of
+                                       // this vector
       PetscScalar *dest_array;
       ierr = VecGetArray (vector, &dest_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                            // then also a pointer to the source vector
+                                       // then also a pointer to the source
+                                       // vector
       PetscScalar *src_array;
       ierr = VecGetArray (static_cast<const Vec &>(v), &src_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      // then copy:
-      const std::pair<unsigned int, unsigned int> local_elements = local_range ();
-      std::copy (src_array + local_elements.first, src_array + local_elements.second,
+                                       // then copy:
+      const std::pair<unsigned int, unsigned int>
+        local_elements = local_range ();
+      std::copy (src_array + local_elements.first,
+                 src_array + local_elements.second,
 		 dest_array);
 
-      // finally restore the arrays
+                                       // finally restore the arrays
       ierr = VecRestoreArray (vector, &dest_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -165,5 +169,5 @@ namespace PETScWrappers
 #else
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-  namespace { void dummy () {} }
+namespace { void dummy () {} }
 #endif // DEAL_II_USE_PETSC
