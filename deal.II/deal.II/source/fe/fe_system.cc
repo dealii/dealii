@@ -1102,10 +1102,6 @@ void FESystem<dim>::initialize ()
 				   // now set up the interface constraints.
 				   // this is kind'o hairy, so don't try
 				   // to do it dimension independent
-
-//TODO: there's an assertion thrown for dim=3 and for
-//FESystem(FE_Q<dim> (3), 2) and for FESystem<dim>(FE_Q<dim> (1), 2,
-//FE_Q<dim> (3), 1) and for FESystem<dim>(FE_Q<dim> (4), 2))
   build_interface_constraints ();
 
 				   // finally fill in support points
