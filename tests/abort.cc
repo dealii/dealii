@@ -20,6 +20,16 @@
 // actually generates an assertion, which would otherwise be
 // impossible
 
+namespace  deal_II_exceptions
+{
+  namespace internals 
+  {
+    extern unsigned int n_treated_exceptions;
+  }
+};
+
 extern "C"
 void abort()
-{}
+{
+  deal_II_exceptions::internals::n_treated_exceptions = 0;
+}

@@ -4,22 +4,22 @@
 
 all: compare base lac fe deal.II bits
 
-base: compare
+base: compare abort.o
 	cd base ; $(MAKE)
 
-lac: compare
+lac: compare abort.o
 	cd lac ; $(MAKE)
 
-fe: compare
+fe: compare abort.o
 	cd fe ; $(MAKE)
 
-bits: compare
+bits: compare abort.o
 	cd bits ; $(MAKE)
 
-deal.II: compare
+deal.II: compare abort.o
 	cd deal.II ; $(MAKE)
 
-report: compare
+report: compare abort.o
 	@for i in base lac fe deal.II bits ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
@@ -110,6 +110,8 @@ clean-bits:
 veryclean-bits:
 	cd bits ; $(MAKE) veryclean
 
+abort.o: abort.cc
+	 @$(CXX) -ggdb -o $@ -c $<
 
 .PHONY : all base lac fe deal.II bits \
 	clean clean-base clean-lac clean-fe clean-deal.II clean-bits \

@@ -26,19 +26,19 @@ threads.cc : threads.pl
 
 data_out_base.exe  : data_out_base.g.$(OBJEXT)                      $(lib-base.g)
 logtest.exe        : logtest.g.$(OBJEXT)                            $(lib-base.g)
-polynomial_test.exe: polynomial_test.g.$(OBJEXT) abort.g.$(OBJEXT)  $(lib-base.g)
+polynomial_test.exe: polynomial_test.g.$(OBJEXT)                    $(lib-base.g)
 polynomial1d.exe   : polynomial1d.g.$(OBJEXT)                       $(lib-base.g)
 quadrature_test.exe: quadrature_test.g.$(OBJEXT)                    $(lib-base.g)
 quadrature_selector.exe: quadrature_selector.g.$(OBJEXT)            $(lib-base.g)
-reference.exe      : reference.g.$(OBJEXT) abort.g.$(OBJEXT)        $(lib-base.g)
+reference.exe      : reference.g.$(OBJEXT)                          $(lib-base.g)
 table.exe          : table.g.$(OBJEXT)                              $(lib-base.g)
 tensor.exe         : tensor.g.$(OBJEXT)                             $(lib-base.g)
 timer.exe          : timer.g.$(OBJEXT)                              $(lib-base.g)
 threads.exe        : threads.g.$(OBJEXT)                            $(lib-base.g)
-auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries)
 anisotropic_1.exe  : anisotropic_1.g.$(OBJEXT)                      $(lib-base.g)
 anisotropic_2.exe  : anisotropic_2.g.$(OBJEXT)                      $(lib-base.g)
 hierarchical.exe   : hierarchical.g.$(OBJEXT)                       $(lib-base.g)
+auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries) $(lib-base.g)
 
 tests =  logtest reference quadrature_test quadrature_selector table tensor \
           timer threads polynomial1d polynomial_test \

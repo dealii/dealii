@@ -21,7 +21,7 @@ default: run-tests
 ############################################################
 
 block_matrices.exe        : block_matrices.g.$(OBJEXT)                  $(libraries)
-block_vector.exe          : block_vector.g.$(OBJEXT) abort.g.$(OBJEXT)  $(libraries)
+block_vector.exe          : block_vector.g.$(OBJEXT)                    $(libraries)
 block_vector_iterator.exe : block_vector_iterator.g.$(OBJEXT)           $(libraries)
 full_matrix.exe           : full_matrix.g.$(OBJEXT)                     $(libraries)
 matrix_out.exe            : matrix_out.g.$(OBJEXT)                      $(libraries)
