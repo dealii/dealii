@@ -574,37 +574,42 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/13)
        </p>
 
-  <li> <p> New: The <code class="class">SolverGMRES</code> now accepts
-  an <code class="class">AdditionalData</code> parameter
-  <code>use_default_residual</code> whose default is
-  <code>true</code>. By setting this flag to <code>false</code>, the
-  stopping criterion of the left-preconditioned GMRes solver is not
-  the default preconditioned residual but the normal (unpreconditioned)
-  residual and visa versa for the right-preconditioned GMRes
-  solver. Due to a performance loss of the solver this flag should
-  be set to <code>false</code> only for debugging/testing purposes.
-  <br>
-  (RH 2003/01/31)
-  </p>
+  <li> <p> 
+       New: The <code class="class">SolverGMRES</code> now accepts an
+       <code class="class">AdditionalData</code> parameter
+       <code>use_default_residual</code> whose default is
+       <code>true</code>. By setting this flag to <code>false</code>,
+       the stopping criterion of the left-preconditioned GMRes solver
+       is not the default preconditioned residual but the normal
+       (unpreconditioned) residual and visa versa for the
+       right-preconditioned GMRes solver. Due to a performance loss of
+       the solver this flag should be set to <code>false</code> only
+       for debugging/testing purposes.
+       <br>
+       (RH 2003/01/31)
+       </p>
 
-  <li> <p> New: <code class="class">FullMatrix</code> has a
-  function <code class="member">copy_from</code>, copying from sparse matrices.
-  It uses iterators of the sparse matrix classes.
-  <br>
-  (GK 2003/01/08)
-  </p>
+  <li> <p> 
+       New: <code class="class">FullMatrix</code> has a function <code
+       class="member">copy_from</code>, copying from sparse matrices.
+       It uses iterators of the sparse matrix classes.
+       <br>
+       (GK 2003/01/08)
+       </p>
 
 
-  <li><p>Changed: In an attempt to unify the use of preconditioners a little,
-  the function <code class="member">initialize</code> of classes <code
-  class="class">PreconditionRelaxation</code> and <code
-  class="class">PreconditionBlock</code> take an argument of type <code
-  class="class">AdditionalData</code>, defined in the same class.
-  Standard behavior of <code class="class">PreconditionBlock</code> has been
-  changed on this occasion to invert diagonal blocks during initialization.
-  <br>
-  (GK 2003/01/06)
-  </p>
+  <li><p>
+       Changed: In an attempt to unify the use of preconditioners a
+       little, the function <code class="member">initialize</code> of
+       classes <code class="class">PreconditionRelaxation</code> and
+       <code class="class">PreconditionBlock</code> take an argument
+       of type <code class="class">AdditionalData</code>, defined in
+       the same class.  Standard behavior of <code
+       class="class">PreconditionBlock</code> has been changed on this
+       occasion to invert diagonal blocks during initialization.
+       <br>
+       (GK 2003/01/06)
+       </p>
 
   <li> <p>
        New: The interface for sparse decompositions has been abstracted, and
