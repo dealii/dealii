@@ -11,12 +11,6 @@ when a new release shall be issued:
 
 4/ test the branch thoroughly
 
-5/ rename the changes file and create a new one for the next release
-
-6/ adjust news.html. Crosslink changes file. If necessary link an
-  announcement. Do these things on both HEAD and branch. Be sure to
-  have the changes file on both HEAD and branch.
-
 8/ run `make validate-xrefs' on the branch to check that the changes
   do not point to nirvana
 
