@@ -7,7 +7,7 @@ o-files  = $(cc-files:.cc=.o)
 go-files = $(cc-files:.cc=.go)
 h-files  = $(wildcard ../include/*/*.h)
 
-forward-declarations = ../include/base/forward-declarations.h
+forward-declarations = $D/base/include/base/forward-declarations.h
 
 include $D/deal.II/Make.global_options
 
