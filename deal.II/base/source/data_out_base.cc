@@ -638,47 +638,59 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 	  switch (dim)
 	    {
 	      case 1:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  out << first_vertex_of_patch+i << '\t'
-		      << first_vertex_of_patch+i+1 << std::endl;
+		if (true)
+		  {
+		    for (unsigned int i=0; i<n_subdivisions; ++i)
+		      out << first_vertex_of_patch+i << '\t'
+			  << first_vertex_of_patch+i+1 << std::endl;
+		  };
 		break;
-	      };
-	       
 	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    {
-		      out << first_vertex_of_patch+i*(n_subdivisions+1)+j << '\t'
-			  << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << '\t'
-			  << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << '\t'
-			  << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1
-			  << std::endl;
-		    };
+		if (true)
+		  {
+		    for (unsigned int i=0; i<n_subdivisions; ++i)
+		      for (unsigned int j=0; j<n_subdivisions; ++j)
+			{
+			  out << first_vertex_of_patch+i*(n_subdivisions+1)+j << '\t'
+			      << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << '\t'
+			      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << '\t'
+			      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1
+			      << std::endl;
+			};
+		  };
 		break;
-	      };
-	       
 	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    for (unsigned int k=0; k<n_subdivisions; ++k)
-		      {
+		if (true)
+		  {
+		    const unsigned int nvt = n_subdivisions+1;
+		    for (unsigned int i=0; i<n_subdivisions; ++i)
+		      for (unsigned int j=0; j<n_subdivisions; ++j)
+			for (unsigned int k=0; k<n_subdivisions; ++k)
+			  {
 //TODO:[GK] Put in correct order
-			out << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
-			    << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
-			    << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
-			    << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
-			    << std::endl;
-		      };
+			    out
+			      << first_vertex_of_patch+((i  )*nvt+j  )*nvt+k   << '\t'
+			      << first_vertex_of_patch+((i  )*nvt+j  )*nvt+k+1 << '\t'
+			      << first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k   << '\t'
+			      << first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k+1 << '\t'
+			      << first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k   << '\t'
+			      << first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k+1 << '\t'
+			      << first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k   << '\t'
+			      << first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k+1 << '\t'
+			      ;
+			
+//  			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
+//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
+//  			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
+//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
+//  			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
+//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
+//   			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
+//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
+			    out << std::endl;
+			  }
+		  }
 		break;
-	      };
-
 	      default:
 		    Assert (false, ExcNotImplemented());
 	    };
@@ -729,19 +741,32 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n = patch->n_subdivisions;
-	  const unsigned int cells_per_patch
-	    = n
-	    * ((dim>1) ? n : 1)
-	    * ((dim>2) ? n : 1);
+	  unsigned int cells_per_patch = 1;
+	  unsigned int dx = 1;
+	  unsigned int dy = 1;
+	  unsigned int dz = 1;
+	  switch(dim)
+	    {
+	      case 3:
+		dx *= n;
+		dy *= n;
+		cells_per_patch *= n;
+	      case 2:
+		dx *= n;
+		cells_per_patch *= n;
+	      case 1:
+		cells_per_patch *= n;
+	    }
+
 	  const unsigned int patch_start = patch->me * cells_per_patch;
 
 	  for (unsigned int ix=0;ix<n;++ix)
 	    for (unsigned int iy=0;iy<((dim>1) ? n : 1);++iy)
 	      for (unsigned int iz=0;iz<((dim>2) ? n : 1);++iz)
 		{
-		  const unsigned int nx = ix*n;
-		  const unsigned int ny = iy;
-		  const unsigned int nz = iz*n*n;
+		  const unsigned int nx = ix*dx;
+		  const unsigned int ny = iy*dy;
+		  const unsigned int nz = iz*dz;
 
 		  out << std::endl;
 						   // Direction -x
@@ -752,12 +777,12 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 		      const unsigned int nn = patch->neighbors[0];
 		      out << '\t';
 		      if (nn != patch->no_neighbor)
-			out << (nn*cells_per_patch+ny+nz+n*(n-1));
+			out << (nn*cells_per_patch+ny+nz+dx*(n-1));
 		      else
 			out << "-1";
 		    } else {      
 		      out << '\t'
-			  << patch_start+nx-n+ny+nz;
+			  << patch_start+nx-dx+ny+nz;
 		    }
 						       // Direction +x
 						       // First cell in row
@@ -772,7 +797,7 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 			out << "-1";
 		    } else {
 		      out << '\t'
-			  << patch_start+nx+n+ny+nz;
+			  << patch_start+nx+dx+ny+nz;
 		    }
 		  if (dim<2)
 		    continue;
@@ -782,12 +807,12 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 		      const unsigned int nn = patch->neighbors[2];
 		      out << '\t';
 		      if (nn != patch->no_neighbor)
-			out << (nn*cells_per_patch+nx+nz+1*(n-1));
+			out << (nn*cells_per_patch+nx+nz+dy*(n-1));
 		      else
 			out << "-1";
 		    } else {      
 		      out << '\t'
-			  << patch_start+nx+ny-1+nz;
+			  << patch_start+nx+ny-dy+nz;
 		    }
 						   // Direction +y
 		  if (iy == n-1)
@@ -800,7 +825,7 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 			out << "-1";
 		    } else {
 		      out << '\t'
-			  << patch_start+nx+ny+1+nz;
+			  << patch_start+nx+ny+dy+nz;
 		    }
 		  if (dim<3)
 		    continue;
@@ -811,17 +836,17 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 		      const unsigned int nn = patch->neighbors[4];
 		      out << '\t';
 		      if (nn != patch->no_neighbor)
-			out << (nn*cells_per_patch+nx+ny+n*n*(n-1));
+			out << (nn*cells_per_patch+nx+ny+dz*(n-1));
 		      else
 			out << "-1";
 		    } else {      
 		      out << '\t'
-			  << patch_start+nx+ny+nz-n*n;
+			  << patch_start+nx+ny+nz-dz;
 		    }
 						   // Direction +z
 		  if (iz == n-1)
 		    {
-		      const unsigned int nn = patch->neighbors[4];
+		      const unsigned int nn = patch->neighbors[5];
 		      out << '\t';
 		      if (nn != patch->no_neighbor)
 			out << (nn*cells_per_patch+nx+ny);
@@ -829,7 +854,7 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 			out << "-1";
 		    } else {
 		      out << '\t'
-			  << patch_start+nx+ny+nz+n*n;
+			  << patch_start+nx+ny+nz+dz;
 		    }
 		}
 	  out << std::endl;	  
