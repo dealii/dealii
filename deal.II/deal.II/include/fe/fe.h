@@ -43,7 +43,7 @@ template <int dim> class MatrixCreator;
  * @ref{FEValues}. Even for evaluation on the unit cell, you will need
  * a triangulation containing that single cell.
  * 
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001
  */
 template <int dim>
 class FiniteElement : public FiniteElementBase<dim>
@@ -176,27 +176,39 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * This function is needed by the
 				      * constructors of @p{FESystem}.
 				      */
-    virtual FiniteElement<dim> *clone() const =0;
+    virtual FiniteElement<dim> *clone() const = 0;
     
 				     /**
 				      * Prepare internal data
 				      * structures and fill in values
-				      * independent of the cell.
+				      * independent of the
+				      * cell. Returns a pointer to an
+				      * object of which the caller of
+				      * this function then has to
+				      * assume ownership (which
+				      * includes destruction when it
+				      * is no more needed).
 				      */
     virtual typename Mapping<dim>::InternalDataBase*
-    get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
+    get_data (const UpdateFlags      flags,
+	      const Mapping<dim>    &mapping,
 	      const Quadrature<dim> &quadrature) const = 0;
 
 				     /**
 				      * Prepare internal data
 				      * structure for transformation
 				      * of faces and fill in values
-				      * independent of the cell.
+				      * independent of the
+				      * cell. Returns a pointer to an
+				      * object of which the caller of
+				      * this function then has to
+				      * assume ownership (which
+				      * includes destruction when it
+				      * is no more needed).
 				      */
     virtual typename Mapping<dim>::InternalDataBase*
-    get_face_data (const UpdateFlags flags,
-		   const Mapping<dim>& mapping,
+    get_face_data (const UpdateFlags        flags,
+		   const Mapping<dim>      &mapping,
 		   const Quadrature<dim-1> &quadrature) const;
 
 				     /**
@@ -204,11 +216,16 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * structure for transformation
 				      * of children of faces and fill
 				      * in values independent of the
-				      * cell.
+				      * cell. Returns a pointer to an
+				      * object of which the caller of
+				      * this function then has to
+				      * assume ownership (which
+				      * includes destruction when it
+				      * is no more needed).
 				      */
     virtual typename Mapping<dim>::InternalDataBase*
-    get_subface_data (const UpdateFlags flags,
-		      const Mapping<dim>& mapping,
+    get_subface_data (const UpdateFlags        flags,
+		      const Mapping<dim>      &mapping,
 		      const Quadrature<dim-1> &quadrature) const;
 
 				     /**
@@ -223,11 +240,11 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * called for the same cell first!
 				      */				      
     virtual void
-    fill_fe_values (const Mapping<dim> &mapping,
+    fill_fe_values (const Mapping<dim>                   &mapping,
 		    const DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    Mapping<dim>::InternalDataBase      &mapping_internal,
-		    Mapping<dim>::InternalDataBase      &fe_internal,
+		    Mapping<dim>::InternalDataBase       &mapping_internal,
+		    Mapping<dim>::InternalDataBase       &fe_internal,
 		    FEValuesData<dim>                    &data) const = 0;
     
 				     /**
@@ -242,13 +259,13 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * called for the same cell first!
 				      */				      
     virtual void
-    fill_fe_face_values (const Mapping<dim> &mapping,
+    fill_fe_face_values (const Mapping<dim>                   &mapping,
 			 const DoFHandler<dim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>              &quadrature,
-			 Mapping<dim>::InternalDataBase      &mapping_internal,
-			 Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim> &data) const = 0;
+			 Mapping<dim>::InternalDataBase       &mapping_internal,
+			 Mapping<dim>::InternalDataBase       &fe_internal,
+			 FEValuesData<dim>                    &data) const = 0;
     
 				     /**
 				      * Fill the fields of
@@ -262,14 +279,14 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * called for the same cell first!
 				      */				      
     virtual void
-    fill_fe_subface_values (const Mapping<dim> &mapping,
+    fill_fe_subface_values (const Mapping<dim>                   &mapping,
 			    const DoFHandler<dim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>              &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim> &data) const = 0;
+			    typename Mapping<dim>::InternalDataBase &mapping_internal,
+			    typename Mapping<dim>::InternalDataBase &fe_internal,
+			    FEValuesData<dim>                    &data) const = 0;
 
 				     /**
 				      * Declare some other classes as
