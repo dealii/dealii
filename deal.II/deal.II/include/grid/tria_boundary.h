@@ -230,7 +230,7 @@ class Boundary : public Subscriptor
 				      * implementation is to throw an
 				      * error, so you need not
 				      * overload this function in case
-				      * you don not intend to use C1
+				      * you do not intend to use C1
 				      * mappings.
 				      *
 				      * Note that when computing
