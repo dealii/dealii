@@ -1,0 +1,65 @@
+
+DEAL::dim=1
+DEAL::Triangulation0:
+DEAL::exact_area=2.00
+DEAL::Mapping1d-0-Q1fixed.dat
+DEAL::  area=2.00
+DEAL::Mapping1d-0-Q1.dat
+DEAL::  area=2.00
+DEAL::dim=2
+DEAL::Triangulation0:
+DEAL::exact_area=9.00
+DEAL::Triangulation1:
+DEAL::exact_area=7.00
+DEAL::Triangulation2:
+DEAL::exact_area=6.82
+DEAL::Mapping2d-2-Q1fixed.dat
+DEAL::  area=6.00
+DEAL::MappingFace2d-2-Q1fixed.dat
+DEAL::MappingSubface2d-2-Q1fixed.dat
+DEAL::p_unit=0.857 0.571,  p_real=3.45 2.14,  p_re_unit=0.857 0.571
+DEAL::Mapping2d-2-Q1.dat
+DEAL::  area=6.00
+DEAL::MappingFace2d-2-Q1.dat
+DEAL::MappingSubface2d-2-Q1.dat
+DEAL::p_unit=0.857 0.571,  p_real=3.45 2.14,  p_re_unit=0.857 0.571
+DEAL::Mapping2d-2-Q2.dat
+DEAL::  area=6.79
+DEAL::MappingFace2d-2-Q2.dat
+DEAL::MappingSubface2d-2-Q2.dat
+DEAL::p_unit=0.857 0.571,  p_real=3.73 2.40,  p_re_unit=0.857 0.571
+DEAL::Mapping2d-2-Q3.dat
+DEAL::  area=6.83
+DEAL::MappingFace2d-2-Q3.dat
+DEAL::MappingSubface2d-2-Q3.dat
+DEAL::p_unit=0.857 0.571,  p_real=3.70 2.38,  p_re_unit=0.857 0.571
+DEAL::Mapping2d-2-Q4.dat
+DEAL::  area=6.82
+DEAL::MappingFace2d-2-Q4.dat
+DEAL::MappingSubface2d-2-Q4.dat
+DEAL::p_unit=0.857 0.571,  p_real=3.71 2.38,  p_re_unit=0.857 0.571
+DEAL::dim=3
+DEAL::Triangulation0:
+DEAL::exact_area=8.00
+DEAL::Triangulation1:
+DEAL::exact_area=12.5
+DEAL::Triangulation2:
+DEAL::exact_area=8.28
+DEAL::Triangulation3:
+DEAL::exact_area=2.72
+DEAL::Mapping3d-3-Q1fixed.dat
+DEAL::  area=2.09
+DEAL::MappingFace3d-3-Q1fixed.dat
+DEAL::MappingSubface3d-3-Q1fixed.dat
+DEAL::Mapping3d-3-Q1.dat
+DEAL::  area=2.09
+DEAL::MappingFace3d-3-Q1.dat
+DEAL::MappingSubface3d-3-Q1.dat
+DEAL::Mapping3d-3-Q2.dat
+DEAL::  area=2.72
+DEAL::MappingFace3d-3-Q2.dat
+DEAL::MappingSubface3d-3-Q2.dat
+DEAL::Mapping3d-3-Q3.dat
+DEAL::  area=2.72
+DEAL::MappingFace3d-3-Q3.dat
+DEAL::MappingSubface3d-3-Q3.dat
