@@ -66,7 +66,9 @@ int main ()
   B2.fill(B2data);
   C.fill(Cdata);
   
-  BlockMatrixArray<FullMatrix<float> > matrix(2,2);
+  GrowingVectorMemory<Vector<double> > simple_mem;
+  
+  BlockMatrixArray<FullMatrix<float>, double> matrix(2, 2, simple_mem);
   
   matrix.enter(A,0,0,2.);
   matrix.enter(B1,0,1,-1.);
@@ -97,12 +99,17 @@ int main ()
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
   
+  deallog << "Error A-norm "
+	  << std::sqrt(matrix.matrix_norm_square(x))
+	  << std::endl;
+  
   FullMatrix<float> Ainv(4,4);
   Ainv.invert(A);
   FullMatrix<float> Cinv(2,2);
   Cinv.invert(C);
   
-  BlockTrianglePrecondition<FullMatrix<float> > precondition(2,2);
+  BlockTrianglePrecondition<FullMatrix<float>, double>
+    precondition(2, simple_mem);
   precondition.enter(Ainv,0,0,.5);
   precondition.enter(Cinv,1,1);
 
