@@ -385,7 +385,7 @@ void GridOut::write_xfig (const Triangulation<dim>&,
 template <int dim>
 void GridOut::write_xfig (const Triangulation<dim>& tria,
 			  std::ostream&             out,
-			  const Mapping<dim>*       mapping)
+			  const Mapping<dim>*       /*mapping*/)
 {
   const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
 
