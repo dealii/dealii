@@ -322,8 +322,9 @@ class FE_DGP : public FiniteElement<dim>
 };
 
 
-// declaration of explicit specializations
-
+// declaration of explicit specializations of member variables, if the
+// compiler allows us to do that (the standard says we must)
+#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
 const double * const FE_DGP<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
 
@@ -359,6 +360,6 @@ const double * const FE_DGP<3>::Matrices::projection_matrices[][GeometryInfo<3>:
 
 template <>
 const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
-
+#endif
 
 #endif

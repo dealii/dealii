@@ -387,10 +387,13 @@ class Mapping : public Subscriptor
 /* -------------- declaration of explicit specializations ------------- */
 
 
+// declaration of explicit specializations of member variables, if the
+// compiler allows us to do that (the standard says we must)
+#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template<> const unsigned int Mapping<1>::normal_directions[2];
 template<> const unsigned int Mapping<2>::normal_directions[4];
 template<> const unsigned int Mapping<3>::normal_directions[6];
-
+#endif
 
 /* ------------------------- inline functions ------------------------- */
 

@@ -662,6 +662,9 @@ template <> void FE_Q<1>::initialize_unit_face_support_points ();
 template <> void FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int,
 								      std::vector<unsigned int>&);
 
+// declaration of explicit specializations of member variables, if the
+// compiler allows us to do that (the standard says we must)
+#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
 const double * const 
 FE_Q<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
@@ -701,6 +704,6 @@ const double * const FE_Q<3>::Matrices::constraint_matrices[];
 template <>
 const unsigned int FE_Q<3>::Matrices::n_constraint_matrices;
 
-
+#endif
 
 #endif

@@ -351,8 +351,9 @@ class FE_DGQ : public FiniteElement<dim>
 };
 
 
-// declaration of explicit specializations
-
+// declaration of explicit specializations of member variables, if the
+// compiler allows us to do that (the standard says we must)
+#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
 const double * const FE_DGQ<1>::Matrices::embedding[];
 
@@ -388,6 +389,6 @@ const double * const FE_DGQ<3>::Matrices::projection_matrices[];
 
 template <>
 const unsigned int FE_DGQ<3>::Matrices::n_projection_matrices;
-
+#endif
 
 #endif
