@@ -861,7 +861,10 @@ void LaplaceProblem<dim>::run ()
 					   // as well. We place the
 					   // center of the circle at
 					   // the origin and have the
-					   // radius be one.
+					   // radius be one (these are
+					   // the two hidden arguments
+					   // to the function, which
+					   // have default values).
 					   //
 					   // You will notice by
 					   // looking at the coarse
@@ -877,7 +880,7 @@ void LaplaceProblem<dim>::run ()
 					   // any space dimension,
 					   // which was not the case
 					   // before.
-	  GridGenerator::hyper_ball (triangulation, Point<dim>(), 1);
+	  GridGenerator::hyper_ball (triangulation);
 
 	  static const HyperBallBoundary<dim> boundary;
 	  triangulation.set_boundary (0, boundary);
