@@ -173,6 +173,13 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
     unsigned int n_alloc;
 
 				     /**
+				      * Memory consumed by this class
+				      * and all currently allocated
+				      * vectors.
+				      */
+    unsigned int memory_consumption() const;
+    
+				     /**
 				      * Mutex to synchronise access to
 				      * internal data of this object
 				      * from multiple threads.
@@ -276,5 +283,17 @@ GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
   Assert(false, typename VectorMemory<VECTOR>::ExcNotAllocatedHere());
 }
 
+
+template<typename VECTOR>
+unsigned int
+GrowingVectorMemory<VECTOR>::memory_consumption () const
+{
+  unsigned int result = sizeof (*this);
+  const typename std::vector<entry_type>::const_iterator
+    end = pool.end();
+  for (typename std::vector<entry_type>::const_iterator i = pool.begin()
+						     ; i != end ; ++i)
+    result += i->memory_consumption();
+}
 
 #endif
