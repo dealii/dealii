@@ -183,7 +183,7 @@ namespace PETScWrappers
                                         * base class visible, though it is
                                         * protected.
                                         */
-      BlockMatrixBase<SparseMatrix>::clear;
+      using BlockMatrixBase<SparseMatrix>::clear;
       
                                        /**
                                         * Exception
