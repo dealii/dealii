@@ -258,7 +258,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
     };
 
 
-// some security tests
+				   // some security tests
   unsigned int boundary_nodes = 0;
   for (unsigned int i=0; i<lines_at_vertex.size(); ++i)
     switch (lines_at_vertex[i].size()) 
@@ -277,7 +277,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
   AssertThrow (boundary_nodes == 2, ExcInternalError());
 
 
-// update neighborship info
+				   // update neighborship info
   active_line_iterator line = begin_active_line ();
 				   // for all lines
   for (; line!=end(); ++line)
@@ -310,7 +310,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 	};
 
 
-// re-compute numbers of lines, etc
+				   // re-compute numbers of lines, etc
   update_number_cache ();  
 };
 
@@ -339,7 +339,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   vector<CellData<2> > cells(c);
 
 
-// make up a list of the needed lines
+				   // make up a list of the needed lines
 				   // each line is a pair of vertices. The list
 				   // is kept sorted and it is guaranteed
 				   // that each line is inserted only once.
@@ -402,7 +402,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	  };
 
 
-for (unsigned int line=0; line<4; ++line)
+      for (unsigned int line=0; line<4; ++line)
 	{
 					   // assert that the line was not
 					   // already inserted in reverse
@@ -439,7 +439,7 @@ for (unsigned int line=0; line<4; ++line)
     };
 
 
-// check the every vertex has
+				   // check the every vertex has
 				   // at least two adjacent lines
   if (true) 
     {
@@ -481,7 +481,7 @@ for (unsigned int line=0; line<4; ++line)
     };
 
 
-// store for each line index
+				   // store for each line index
 				   // the adjacent cells
   map<int,vector<cell_iterator> > adjacent_cells;
 
@@ -525,7 +525,7 @@ for (unsigned int line=0; line<4; ++line)
     };
 
 
-for (line_iterator line=begin_line(); line!=end_line(); ++line) 
+  for (line_iterator line=begin_line(); line!=end_line(); ++line) 
     {
       const unsigned int n_adj_cells = adjacent_cells[line->index()].size();
 				       // assert that every line has one or
@@ -582,7 +582,7 @@ for (line_iterator line=begin_line(); line!=end_line(); ++line)
     };
 
 
-// finally update neighborship info
+				   // finally update neighborship info
   for (cell_iterator cell=begin(); cell!=end(); ++cell)
     for (unsigned int side=0; side<4; ++side)
       if (adjacent_cells[cell->line(side)->index()][0] == cell)
@@ -601,7 +601,7 @@ for (line_iterator line=begin_line(); line!=end_line(); ++line)
 			    adjacent_cells[cell->line(side)->index()][0]);
 
 
-// re-compute numbers of lines, etc
+				   // re-compute numbers of lines, etc
   update_number_cache ();  
 };
 
@@ -732,7 +732,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
     };
 
 
-/////////////////////////////////
+				   /////////////////////////////////
 				   // now for some sanity-checks:
 				   //
 				   // check the every vertex has
@@ -756,7 +756,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
     };
 
 
-///////////////////////////////////
+				   ///////////////////////////////////
 				   // actually set up data structures
 				   // for the lines
   				   // reserve enough space
@@ -783,7 +783,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
     };
 
 
-///////////////////////////////////////////
+				   ///////////////////////////////////////////
 				   // make up the quads of this triangulation
 				   //
 				   // same thing: the iterators are set
@@ -878,7 +878,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
     };
 
 
-/////////////////////////////////
+				   /////////////////////////////////
 				   // enter the resulting quads into
 				   // the arrays of the Triangulation
 				   //
@@ -1037,7 +1037,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
     };
 
 
-/////////////////////////////////////////
+				   /////////////////////////////////////////
 				   // find those quads which are at the
 				   // boundary and mark them appropriately
   for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
@@ -1076,7 +1076,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 	quad->line(l)->set_boundary_indicator (0);
 
 
-///////////////////////////////////////
+				   ///////////////////////////////////////
 				   // now set boundary indicators
 				   // where given
 				   //
@@ -1086,7 +1086,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 	       ExcInternalError());
 
 
-/////////////////////////////////////////
+				   /////////////////////////////////////////
 				   // finally update neighborship info
   for (cell_iterator cell=begin(); cell!=end(); ++cell)
     for (unsigned int face=0; face<6; ++face)
@@ -1106,7 +1106,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 			    adjacent_cells[cell->quad(face)->index()][0]);
 
 
-// re-compute numbers of lines, etc
+				   // re-compute numbers of lines, etc
   update_number_cache ();  
 };
 
@@ -1163,7 +1163,7 @@ void Triangulation<1>::distort_random (const double factor,
     };
 
 
-const unsigned int n_vertices = vertices.size();
+  const unsigned int n_vertices = vertices.size();
   Point<dim> shift_vector;
   
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
@@ -1259,7 +1259,7 @@ const unsigned int n_vertices = vertices.size();
     };
 
 
-// finally correct hanging nodes
+				   // finally correct hanging nodes
 				   // again. The following is not
 				   // necessary for 1D
   active_cell_iterator cell = begin_active(),
@@ -3460,7 +3460,7 @@ void Triangulation<1>::execute_refinement () {
     };
 
 
-// check how much space is needed
+				   // check how much space is needed
 				   // on every level
 				   // we need not check the highest
 				   // level since either
@@ -3521,7 +3521,7 @@ void Triangulation<1>::execute_refinement () {
     };
 
 
-// Do REFINEMENT
+				   // Do REFINEMENT
 				   // on every level; exclude highest level as
 				   // above
 
@@ -3646,7 +3646,7 @@ void Triangulation<1>::execute_refinement () {
     };
 
 
-// re-compute number of lines
+				   // re-compute number of lines
   update_number_cache ();
   
 #ifdef DEBUG
@@ -3694,7 +3694,7 @@ void Triangulation<2>::execute_refinement () {
     };
 
 
-// check how much space is needed
+				   // check how much space is needed
 				   // on every level
 				   // we need not check the highest
 				   // level since either
@@ -3801,7 +3801,7 @@ void Triangulation<2>::execute_refinement () {
 		bind2nd (equal_to<bool>(), true));
 
 
-// reserve space for the used_cells
+				       // reserve space for the used_cells
 				       // cells already existing on the next
 				       // higher level as well as for the
 				       // 4*flagged_cells that will be created
@@ -3835,7 +3835,7 @@ void Triangulation<2>::execute_refinement () {
     };
 
 
-// Do REFINEMENT
+				   // Do REFINEMENT
 				   // on every level; exclude highest level as
 				   // above
 
@@ -4179,7 +4179,7 @@ void Triangulation<2>::execute_refinement () {
 	    new_lines[11]->set_boundary_indicator (255);
 
 
-// finally add the four new cells!
+					     // finally add the four new cells!
 	    
 					     // search for next unused cell
 					     // the four children have to be put
@@ -4197,7 +4197,7 @@ void Triangulation<2>::execute_refinement () {
 	      };
 
 
-cell->set_children (subcells[0]->index());
+	    cell->set_children (subcells[0]->index());
 	    
 	    subcells[0]->set (Quad(new_lines[0]->index(),  new_lines[8]->index(),
 				   new_lines[10]->index(), new_lines[7]->index()));
@@ -4212,14 +4212,14 @@ cell->set_children (subcells[0]->index());
 	    subcells[1]->clear_user_pointer ();
 
 
-subcells[2]->set (Quad(new_lines[11]->index(),  new_lines[3]->index(),
+	    subcells[2]->set (Quad(new_lines[11]->index(),  new_lines[3]->index(),
 				   new_lines[4]->index(), new_lines[9]->index()));
 	    subcells[2]->set_used_flag();
 	    subcells[2]->clear_children();
 	    subcells[2]->clear_user_pointer ();
 
 
-subcells[3]->set (Quad(new_lines[10]->index(),  new_lines[9]->index(),
+	    subcells[3]->set (Quad(new_lines[10]->index(),  new_lines[9]->index(),
 				   new_lines[5]->index(), new_lines[6]->index()));
 	    subcells[3]->set_used_flag();
 	    subcells[3]->clear_children();
@@ -4316,7 +4316,7 @@ void Triangulation<3>::execute_refinement () {
     };
 
 
-// first clear user flags for
+				   // first clear user flags for
 				   // quads and lines; we're gonna
 				   // use them to flag which lines
 				   // and quads need refinement
@@ -4326,7 +4326,7 @@ void Triangulation<3>::execute_refinement () {
     quad->clear_user_flag();
 
 
-// check how much space is needed
+				   // check how much space is needed
 				   // on every level
 				   // we need not check the highest
 				   // level since either
@@ -4405,7 +4405,7 @@ void Triangulation<3>::execute_refinement () {
 	  };
 
 
-// count number of used cells on
+				       // count number of used cells on
 				       // the next higher level
       const unsigned int used_cells
 	= count_if (levels[level+1]->quads.used.begin(),
@@ -4413,7 +4413,7 @@ void Triangulation<3>::execute_refinement () {
 		bind2nd (equal_to<bool>(), true));
 
 
-// reserve space for the used_cells
+				       // reserve space for the used_cells
 				       // cells already existing on the next
 				       // higher level as well as for the
 				       // 8*flagged_cells that will be created
@@ -4451,7 +4451,7 @@ void Triangulation<3>::execute_refinement () {
     };
 
 
-///////////////////////////////////////////
+				   ///////////////////////////////////////////
 				   // Before we start with the actual
 				   // refinement, we do some sanity checks if
 				   // in debug mode. especially, we try to
@@ -4566,7 +4566,7 @@ void Triangulation<3>::execute_refinement () {
     };
 
 
-///////////////////////////////////////
+				   ///////////////////////////////////////
 				   // now refine marked quads
 				   ///////////////////////////////////////
   for (unsigned int level=0; level!=levels.size()-1; ++level)
@@ -4655,7 +4655,7 @@ void Triangulation<3>::execute_refinement () {
 	      };
 
 
-// now for the quads. again, first
+					     // now for the quads. again, first
 					     // collect some data about the
 					     // indices of the lines, with
 					     // the following numbering:
@@ -4809,7 +4809,7 @@ void Triangulation<3>::execute_refinement () {
 	    vertices[next_unused_vertex] /= 26;
 
 
-// now that we created the right
+					     // now that we created the right
 					     // point, make up the six
 					     // lines interior to the quad
 					     // (++ takes care of the end of
@@ -4872,7 +4872,7 @@ void Triangulation<3>::execute_refinement () {
 	      };
 
 
-// now for the quads. again, first
+					     // now for the quads. again, first
 					     // collect some data about the
 					     // indices of the lines, with
 					     // the following numbering:
@@ -5087,7 +5087,7 @@ void Triangulation<3>::execute_refinement () {
 	      };  
 
 
-/////////////////////////////////
+					     /////////////////////////////////
 					     // create the eight new hexes
 					     //
 					     // again first collect some data.
@@ -5187,7 +5187,7 @@ void Triangulation<3>::execute_refinement () {
 	      };
 
 
-// find some space for the eight
+					     // find some space for the eight
 					     // newly to be created hexes.
 					     // note that there should
 					     // always be eight consecutive
@@ -5261,7 +5261,7 @@ void Triangulation<3>::execute_refinement () {
 					  quad_indices[34]));
 
 
-for (unsigned int i=0; i<8; ++i)
+	    for (unsigned int i=0; i<8; ++i)
 	      {
 		new_hexes[i]->set_used_flag();
 		new_hexes[i]->clear_user_flag();
@@ -5272,7 +5272,7 @@ for (unsigned int i=0; i<8; ++i)
 	      };
 
 
-/////////////////////////////////
+					     /////////////////////////////////
 					     // now the only thing still to be
 					     // done is setting neighborship
 					     // information.
@@ -5422,7 +5422,7 @@ for (unsigned int i=0; i<8; ++i)
 	    new_hexes[7]->set_neighbor (5, neighbor_cells[5][2]);
 
 
-// now we need to set the neighbors
+					     // now we need to set the neighbors
 					     // neighborship information; this
 					     // is only necessary if the
 					     // neighboring cell is refined,
@@ -5477,7 +5477,7 @@ for (unsigned int i=0; i<8; ++i)
 		  };
 
 
-// note that the refinement
+					     // note that the refinement
 					     // flag was already cleared at
 					     // the beginning of this loop
 	  };
@@ -5554,7 +5554,7 @@ void Triangulation<dim>::execute_coarsening () {
 	};
 
 
-// now do the actual coarsening step. Since
+				   // now do the actual coarsening step. Since
 				   // the loop goes over used cells only we need
 				   // not worry about deleting some cells since
 				   // the ++operator will then just hop over
@@ -5622,7 +5622,7 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 	      cell->line(line)->set_user_flag();
 
 
-// now check whether there are cells with
+				       // now check whether there are cells with
 				       // lines that are more than once refined
 				       // or that will be more than once
 				       // refined. The first thing should never
@@ -5842,7 +5842,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
   save_refine_flags (flags_before[1]);
 
 
-// do nothing in 1d, except setting the
+				   // do nothing in 1d, except setting the
 				   // coarsening flags correctly
   if (dim == 1)
     {
@@ -6035,7 +6035,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				}
 
 
-if ((neighbor->active() &&
+			      if ((neighbor->active() &&
 				   neighbor->refine_flag_set()) ||
 				  !not_active_neighbor_will_be_coarsened)
 				++count;
@@ -6057,7 +6057,7 @@ if ((neighbor->active() &&
 	} // if (smooth_grid & ...)
 
 
-//////////////////////////////////////
+				       //////////////////////////////////////
 				       // STEP 1:
 				       //    eliminate refined islands in the
 				       //    interior and at the boundary. since
@@ -6433,7 +6433,7 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
       };
 
 
-// delete the vertex which will not be
+				   // delete the vertex which will not be
 				   // needed anymore. This vertex is the
 				   // second of the second line of the
 				   // first child
@@ -6451,7 +6451,7 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
     };
 
 
-// delete pointer to children
+				   // delete pointer to children
   cell->set_children (-1);
   cell->clear_user_flag();
 };
@@ -6580,7 +6580,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
     };
 
 
-// delete pointer to children
+				   // delete pointer to children
   cell->set_children (-1);
   cell->clear_user_flag();
 };
@@ -6760,7 +6760,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
     };
 
 
-// delete pointer to children
+				   // delete pointer to children
   cell->clear_children ();
   cell->clear_user_flag();
 
@@ -6893,7 +6893,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
     };
 
 
-// now, if the lines are not marked as
+				   // now, if the lines are not marked as
 				   // needed, we may delete their children
 				   // and the midpoint
   map<line_iterator,bool>::iterator line_and_flag;
