@@ -1,6 +1,3 @@
-// files on the new-threads branch: base/include/base/thread_management.h base/source/data_out_base.cc base/source/thread_management.cc deal.II/source/dofs/dof_tools.cc deal.II/source/grid/grid_generator.cc deal.II/source/multigrid/mg_dof_tools.cc deal.II/source/numerics/data_out.cc deal.II/source/numerics/data_out_faces.cc deal.II/source/numerics/data_out_rotation.cc deal.II/source/numerics/derivative_approximation.cc deal.II/source/numerics/error_estimator.cc deal.II/source/numerics/matrices.cc deal.II/source/numerics/time_dependent.cc examples/step-13/step-13.cc examples/step-14/step-14.cc examples/step-9/step-9.cc lac/include/lac/sparse_matrix.templates.h lac/include/lac/sparse_vanka.templates.h lac/include/lac/swappable_vector.h lac/include/lac/swappable_vector.templates.h configure configure.in aclocal.m4 common/Make.global_options.in contrib/hsl/source/detached_ma27.cc base/include/base/config.h.in
-
-
 //----------------------------  thread_management.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
