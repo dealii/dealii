@@ -9,16 +9,6 @@ go-files = $(cc-files:.cc=.go)
 h-files  = $(wildcard ../include/*/*.h)
 
 
-%.go : %.cc
-	@echo ============================ Compiling with debugging information:   $<
-	@echo $(CXX) ... -c $< -o $@
-	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-%.o : %.cc
-	@echo ============================ Compiling with optimization:   $<
-	@echo $(CXX) ... -c $< -o $@
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
-
-
 lib: lib.g.a lib.a
 
 lib.a: ../../lib/libgrid.a($(o-files))
