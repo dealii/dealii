@@ -48,6 +48,16 @@ template <typename> class BlockVector;
  * Note that the numbers of blocks and rows are implicitly determined
  * by the sparsity pattern objects used.
  *
+ * Objects of this type are frequently used when a system of differential
+ * equations has solutions with variables that fall into different
+ * classes. For example, solutions of the Stokes or Navier-Stokes equations
+ * have @p dim velocity components and one pressure component. In this case,
+ * it may make sense to consider the linear system of equations as a system of
+ * 2x2 blocks, and one can construct preconditioners or solvers based on this
+ * 2x2 block structure. This class can help you in these cases, as it allows
+ * to view the matrix alternatively as one big matrix, or as a number of
+ * individual blocks.
+ * 
  * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
  *
  * @author Wolfgang Bangerth, 2000
@@ -126,7 +136,8 @@ class BlockSparseMatrix : public Subscriptor
 	const BlockSparseMatrix<number>* matrix;
 	
 					 /**
-					  * Iterator of the underlying matrix class.
+					  * Iterator of the underlying matrix
+					  * class.
 					  */
 	typename SparseMatrix<number>::const_iterator base_iterator;
 	
@@ -141,7 +152,8 @@ class BlockSparseMatrix : public Subscriptor
 	unsigned int row_start;	
 	
 					 /**
-					  * Number of block column where column lies in.
+					  * Number of block column where
+					  * column lies in.
 					  */
 	unsigned int col_block;
 	
@@ -162,58 +174,58 @@ class BlockSparseMatrix : public Subscriptor
 				      * STL conforming iterator.
 				      */
     class const_iterator : private Accessor
-      {
-	public:
-					   /**
-					    * Constructor.
-					    */ 
+    {
+      public:
+                                         /**
+                                          * Constructor.
+                                          */ 
 	const_iterator(const BlockSparseMatrix<number>*,
 		       unsigned int row,
 		       unsigned short index);
 	  
-					   /**
-					    * Prefix increment.
-					    */
+                                         /**
+                                          * Prefix increment.
+                                          */
 	const_iterator& operator++ ();
 
-					   /**
-					    * Postfix increment.
-					    */
+                                         /**
+                                          * Postfix increment.
+                                          */
 	const_iterator& operator++ (int);
 
-					   /**
-					    * Dereferencing operator.
-					    */
+                                         /**
+                                          * Dereferencing operator.
+                                          */
 	const Accessor& operator* () const;
 
-					   /**
-					    * Dereferencing operator.
-					    */
+                                         /**
+                                          * Dereferencing operator.
+                                          */
 	const Accessor* operator-> () const;
 
-					   /**
-					    * Comparison. True, if
-					    * both iterators point to
-					    * the same matrix
-					    * position.
-					    */
+                                         /**
+                                          * Comparison. True, if
+                                          * both iterators point to
+                                          * the same matrix
+                                          * position.
+                                          */
 	bool operator == (const const_iterator&) const;
-					   /**
-					    * Inverse of operator==().
-					    */
+                                         /**
+                                          * Inverse of operator==().
+                                          */
 	bool operator != (const const_iterator&) const;
 
-					   /**
-					    * Comparison
-					    * operator. Result is true
-					    * if either the first row
-					    * number is smaller or if
-					    * the row numbers are
-					    * equal and the first
-					    * index is smaller.
-					    */
+                                         /**
+                                          * Comparison
+                                          * operator. Result is true
+                                          * if either the first row
+                                          * number is smaller or if
+                                          * the row numbers are
+                                          * equal and the first
+                                          * index is smaller.
+                                          */
 	bool operator < (const const_iterator&) const;
-      };
+    };
 
 				     /**
 				      * Constructor; initializes the
@@ -996,20 +1008,24 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
 
 				   // Remember current row inside block
   unsigned int local_row = this->base_iterator->row();
-				   // Advance inside block
+
+  				   // Advance inside block
   ++this->base_iterator;
   ++this->a_index;
+  
 				   // If end of row inside block,
 				   // advance to next block
-  if (this->base_iterator == this->matrix->block(this->row_block, this->col_block).end(local_row))
+  if (this->base_iterator ==
+      this->matrix->block(this->row_block, this->col_block).end(local_row))
     {
-      if (this->col_block<this->matrix->n_block_cols()-1)
+      if (this->col_block < this->matrix->n_block_cols()-1)
 	{
 					   // Advance to next block in
 					   // row
+//TODO: what if this row in that block is empty?          
 	  ++this->col_block;
 	  this->col_start = this->matrix->sparsity_pattern
-		      ->get_column_indices().local_to_global(this->col_block, 0);
+                            ->get_column_indices().local_to_global(this->col_block, 0);
 	}
       else
 	{
@@ -1019,7 +1035,7 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
 	  this->col_start = 0;
 	  this->a_index = 0;
 	  ++local_row;
-	  if (local_row>=this->matrix->block(this->row_block,0).m())
+	  if (local_row >= this->matrix->block(this->row_block,0).m())
 	    {
 					       // If final row in
 					       // block, go to next
@@ -1028,7 +1044,7 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
 	      ++this->row_block;
 	      if (this->row_block < this->matrix->n_block_rows())
 		this->row_start = this->matrix->sparsity_pattern
-			    ->get_row_indices().local_to_global(this->row_block, 0);
+                                  ->get_row_indices().local_to_global(this->row_block, 0);
 	    }
 	}
 				       // Finally, set base_iterator
@@ -1041,6 +1057,7 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
 					 // defined state for
 					 // comparison. This is the
 					 // end() state.
+//TODO: this is a particularly bad choice, since it is actually a valid iterator. it should rather be something like the end iterator of the last block!
 	this->base_iterator = this->matrix->block(0, 0).begin();
     }
   return *this;
@@ -1113,7 +1130,7 @@ bool
 BlockSparseMatrix<number>::const_iterator::
 operator < (const const_iterator& i) const
 {
-  if (this->row_block<i->row_block)
+  if (this->row_block < i->row_block)
     return true;
   if (this->row_block == i->row_block)
     {

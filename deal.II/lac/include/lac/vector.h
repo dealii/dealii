@@ -663,7 +663,7 @@ class Vector
 				      * readable by humans nor
 				      * (probably) by other computers
 				      * using a different operating
-				      * system of number format.
+				      * system or number format.
 				      */
     void block_write (std::ostream &out) const;
 

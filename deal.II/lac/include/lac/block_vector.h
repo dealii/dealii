@@ -305,21 +305,21 @@ namespace internal
         Iterator & operator = (const Iterator &c);
 
                                          /**
-                                          * Dereferencing operator. If
-                                          * the template argument
-                                          * <tt>constness</tt> is <tt>true</tt>,
-                                          * then no writing to the
-                                          * result is possible, making
+                                          * Dereferencing operator. If the
+                                          * template argument
+                                          * <tt>constness</tt> is
+                                          * <tt>true</tt>, then no writing to
+                                          * the result is possible, making
                                           * this a const_iterator.
                                           */
         reference operator * () const;
 
                                          /**
-                                          * Dereferencing operator. If
-                                          * the template argument
-                                          * <tt>constness</tt> is <tt>true</tt>,
-                                          * then no writing to the
-                                          * result is possible, making
+                                          * Dereferencing operator. If the
+                                          * template argument
+                                          * <tt>constness</tt> is
+                                          * <tt>true</tt>, then no writing to
+                                          * the result is possible, making
                                           * this a const_iterator.
                                           */ 
         pointer operator -> () const;
@@ -333,11 +333,10 @@ namespace internal
         reference operator [] (const difference_type d) const;
       
                                          /**
-                                          * Prefix increment operator. This operator
-                                          * advances the iterator to
-                                          * the next element and
-                                          * returns a reference to
-                                          * <tt>*this</tt>.
+                                          * Prefix increment operator. This
+                                          * operator advances the iterator to
+                                          * the next element and returns a
+                                          * reference to <tt>*this</tt>.
                                           */
         Iterator & operator ++ ();
 
@@ -352,11 +351,10 @@ namespace internal
         Iterator operator ++ (int);
 
                                          /**
-                                          * Prefix decrement operator. This operator
-                                          * retracts the iterator to
-                                          * the previous element and
-                                          * returns a reference to
-                                          * <tt>*this</tt>.
+                                          * Prefix decrement operator. This
+                                          * operator retracts the iterator to
+                                          * the previous element and returns a
+                                          * reference to <tt>*this</tt>.
                                           */
         Iterator & operator -- ();
 
@@ -376,7 +374,7 @@ namespace internal
                                           * checks whether the vectors
                                           * pointed to are the same,
                                           * and if not it throws an
-                                          * exception.					 
+                                          * exception.
                                           */
         bool operator == (const Iterator &i) const;
       
@@ -393,7 +391,7 @@ namespace internal
                                           * checks whether the vectors
                                           * pointed to are the same,
                                           * and if not it throws an
-                                          * exception.					 
+                                          * exception.
                                           */
         bool operator != (const Iterator &i) const;
 
@@ -604,12 +602,12 @@ namespace internal
  * block vector with constant block size is supported by constructor
  * and reinit() functions.
  *
- * The functionality of BlockVector includes everything a Vector can
- * do, plus the access to a single Vector inside the BlockVector by
- * block(i). It also has a complete random access iterator, just as
+ * The functionality of BlockVector includes everything a Vector can do, plus
+ * the access to a single Vector inside the BlockVector by
+ * <tt>block(i)</tt>. It also has a complete random access iterator, just as
  * the LAC Vector class or the standard C++ library template
- * <tt>std::vector</tt>. Therefore, all algorithms working on
- * iterators also work with objects of this class.
+ * <tt>std::vector</tt>. Therefore, all algorithms working on iterators also
+ * work with objects of this class.
  *
  *
  * @section BlockVectorAccess Accessing individual blocks, and resizing vectors
@@ -818,10 +816,11 @@ class BlockVector
     
 				     /**
 				      * Set all entries to zero. Equivalent to
-				      * <tt>v = 0</tt>, but more obvious and faster.
-				      * Note that this function does not change
-				      * the size of the vector, unlike the
-				      * STL's <tt>vector<>::clear</tt> function.
+				      * <tt>v=0</tt>, but more obvious and
+				      * faster.  Note that this function does
+				      * not change the size of the vector,
+				      * unlike the STL's
+				      * <tt>vector<>::clear</tt> function.
 				      */
     void clear ();
 
@@ -923,28 +922,28 @@ class BlockVector
     Number norm_sqr () const;
 
 				     /**
-				      * Return the mean value of the elements of
-				      * this vector.
+				      * Return the mean value of the elements
+				      * of this vector.
 				      */
     Number mean_value () const;
 
 				     /**
-				      * Return the $l_1$-norm of the vector, i.e.
-				      * the sum of the absolute values.
+				      * Return the $l_1$-norm of the vector,
+				      * i.e. the sum of the absolute values.
 				      */
     Number l1_norm () const;
 
 				     /**
-				      * Return the $l_2$-norm of the vector, i.e.
-				      * the square root of the sum of the
-				      * squares of the elements.
+				      * Return the $l_2$-norm of the vector,
+				      * i.e. the square root of the sum of
+				      * the squares of the elements.
 				      */
     Number l2_norm () const;
 
 				     /**
-				      * Return the maximum absolute value of the
-				      * elements of this vector, which is the
-				      * $l_\infty$-norm of a vector.
+				      * Return the maximum absolute value of
+				      * the elements of this vector, which is
+				      * the $l_\infty$-norm of a vector.
 				      */
     Number linfty_norm () const;
 
@@ -954,8 +953,9 @@ class BlockVector
     unsigned int n_blocks () const;
   
   				     /**
-  				      * Return dimension of the vector. This is the
-				      * sum of the dimensions of all components.
+  				      * Return dimension of the vector. This
+  				      * is the sum of the dimensions of all
+  				      * components.
   				      */
     unsigned int size () const;
 
@@ -968,6 +968,7 @@ class BlockVector
 				      * some time.
 				      */
     bool all_zero () const;
+    
                                      /**
                                       * Return @p true if the vector has no
                                       * negative entries, i.e. all entries are
@@ -1026,23 +1027,24 @@ class BlockVector
 				      */
 				     //@{
 				     /**
-				      * Addition operator.
-				      * Fast equivalent to <tt>U.add(1, V)</tt>.
+				      * Addition operator.  Fast equivalent to
+				      * <tt>U.add(1, V)</tt>.
 				      */
     BlockVector<Number> &
     operator += (const BlockVector<Number> &V);
 
     				     /**
-				      * Subtraction operator.
-				      * Fast equivalent to <tt>U.add(-1, V)</tt>.
+				      * Subtraction operator.  Fast equivalent
+				      * to <tt>U.add(-1, V)</tt>.
 				      */
     BlockVector<Number> &
     operator -= (const BlockVector<Number> &V);
 
 				     /**
-				      * $U(0-DIM)+=s$.
-				      * Addition of <tt>s</tt> to all components. Note
-				      * that <tt>s</tt> is a scalar and not a vector.
+				      * $U(0-DIM)+=s$.  Addition of <tt>s</tt>
+				      * to all components. Note that
+				      * <tt>s</tt> is a scalar and not a
+				      * vector.
 				      */
     void add (const Number s);
     
@@ -1150,7 +1152,8 @@ class BlockVector
 				      */
 				     //@{
 				     /**
-				      *  Output of vector in user-defined format.
+				      *  Output of vector in user-defined
+				      *  format.
 				      */
     void print (const char* format = 0) const;
 
@@ -1163,21 +1166,21 @@ class BlockVector
 		const bool          across = true) const;
 
 				     /**
-				      * Write the vector en bloc to a file. This
-				      * is done in a binary mode, so the output
-				      * is neither readable by humans nor 
-				      * (probably) by other computers using
-				      * a different operating system of number
-				      * format.
+				      * Write the vector en bloc to a
+				      * stream. This is done in a binary mode,
+				      * so the output is neither readable by
+				      * humans nor (probably) by other
+				      * computers using a different operating
+				      * system or number format.
 				      */
     void block_write (std::ostream &out) const;
 
 				     /**
-				      * Read a vector en block from a file. This
-				      * is done using the inverse operations to
-				      * the above function, so it is reasonably
-				      * fast because the bitstream is not
-				      * interpreted.
+				      * Read a vector en block from a
+				      * file. This is done using the inverse
+				      * operations to the above function, so
+				      * it is reasonably fast because the
+				      * bitstream is not interpreted.
 				      *
 				      * The vector is resized if necessary.
 				      *
