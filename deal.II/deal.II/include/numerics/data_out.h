@@ -10,6 +10,14 @@
 #define __deal2__data_out_h
 
 
+//TODO:[?] DataOut determines whether something is a DoF or cell vector by the size of the vector.
+//    This will fail if someone is using DG0 elements,
+//    since there the number of elements of both types of vectors is the
+//    same, but the ordering will usually differ. Errors cannot be plotted
+//    anyway, since they are float vectors.
+
+
+
 #include <base/smartpointer.h>
 #include <base/multithread_info.h>
 #include <base/data_out_base.h>

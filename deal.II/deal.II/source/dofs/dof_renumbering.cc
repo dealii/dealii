@@ -12,6 +12,12 @@
 //----------------------------  dof_renumbering.cc  ---------------------------
 
 
+//TODO:[WB] Unify lots of code of the two Cuthill-McKee dof renumbering functions
+//    This should be rather
+//    straightforward, since all the unified code needs to get is a
+//    sparsity structure, possibly compressed and return a vector
+//    of numbers. Simple task.
+
 #include <lac/sparsity_pattern.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>

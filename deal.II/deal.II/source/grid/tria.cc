@@ -821,6 +821,10 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					     const std::vector<CellData<3> > &c,
 					     const SubCellData               &subcelldata)
 {
+//TODO:[?]Add tests in Triangulation<3>::create_triangulation for faces (quads)
+//    which are entered twice: once and once again in a rotated or
+//    mirrored direction.
+  
   const unsigned int dim=3;
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -1614,11 +1618,18 @@ template <int dim>
 void Triangulation<dim>::distort_random (const double factor,
 					 const bool   keep_boundary)
 {
-				   // this function is mostly equivalent to
-				   // that for the general dimensional case
-				   // the only difference being the correction
-				   // for split faces which is not necessary
-				   // in 1D
+//TODO:[?]Implement the random distortion in Triangulation for hanging nodes as well
+//    Hanging nodes need to be reset to the correct mean value
+//    at the end, which is simple for 2D but difficult for 3D. Maybe take
+//    a look at how we get to the original location of the point in the
+//    execute_refinement function and copy the relevant lines.
+  
+				   // this function is mostly
+				   // equivalent to that for the
+				   // general dimensional case the
+				   // only difference being the
+				   // correction for split faces which
+				   // is not necessary in 1D
 				   //
 				   // if you change something here, don't
 				   // forget to do so there as well

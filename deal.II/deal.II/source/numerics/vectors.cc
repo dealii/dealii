@@ -299,7 +299,8 @@ void VectorTools::project (const DoFHandler<1>    &,
 			   Vector<double>         &,
 			   const bool              ,
 			   const Quadrature<0>    &,
-			   const bool              ) {
+			   const bool              )
+{
 				   // this function should easily be implemented
 				   // using the template below. However some
 				   // changes have to be made since faces don't
@@ -735,6 +736,12 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {
+//TODO:[?] In VectorTools::project_boundary_values, no condensation of sparsity
+//    structures, matrices and right hand sides or distribution of
+//    solution vectors is performed. This is ok for dim<3 because then
+//    there are no constrained nodes on the boundary, but is not
+//    acceptable for higher dimensions. Fix this.
+
   Assert (dof.get_fe().n_components() == boundary_functions.begin()->second->n_components,
 	  ExcComponentMismatch());
   

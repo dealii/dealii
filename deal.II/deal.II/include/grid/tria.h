@@ -324,6 +324,11 @@ class TriaDimensionInfo<3>
 
 /*------------------------------------------------------------------------*/
 
+//TODO:[WB] Move the TriaNumberCache into the Triangulation class
+//  once the compiler supports this (gcc2.95 does not allow this at present)
+
+
+
 /**
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This

@@ -31,6 +31,13 @@ template <int dim>
 void GridOut::write_ucd (const Triangulation<dim> &tria,
 			 std::ostream             &out) 
 {
+//TODO:[WB] In GridOut::write_ucd, a vector of vertices is built along with
+//    another vector stating which of these are used. These are actually
+//    the same arrays as exist already in the triangulation, but I did not
+//    want to write just another access function. However, someone should
+//    take a look whether re-building these arrays is a large waste of
+//    computing time and memory, or whether it is justifiable.
+  
   AssertThrow (out, ExcIO());
 
   typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
@@ -666,6 +673,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // we chose here the viewpoint as in
 					 // gnuplot as default.
 					 //
+//TODO:[WB] Fix a potential problem with viewing angles in 3d Eps GridOut
 					 // note: the following might be wrong
 					 // if one of the base vectors below
 					 // is in direction of the viewer, but

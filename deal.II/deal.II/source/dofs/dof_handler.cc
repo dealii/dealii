@@ -1646,15 +1646,18 @@ void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 #if deal_II_dimension == 1
 
 template <>
-unsigned int DoFHandler<1>::max_couplings_between_dofs () const {
+unsigned int DoFHandler<1>::max_couplings_between_dofs () const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   return std::min(3*selected_fe->dofs_per_vertex +
 		  2*selected_fe->dofs_per_line, n_dofs());
 };
 
 
+
 template <>
-unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const {
+unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcInternalError());
   return 0;
@@ -1666,7 +1669,8 @@ unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const {
 #if deal_II_dimension == 2
 
 template <>
-unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
+unsigned int DoFHandler<2>::max_couplings_between_dofs () const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
 
 				   // get these numbers by drawing pictures
@@ -1726,8 +1730,10 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 };
 
 
+
 template <>
-unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const {
+unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   return 3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line;
 };
@@ -1738,7 +1744,9 @@ unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const {
 #if deal_II_dimension == 3
 
 template <>
-unsigned int DoFHandler<3>::max_couplings_between_dofs () const {
+unsigned int DoFHandler<3>::max_couplings_between_dofs () const
+{
+//TODO:[?] Invent significantly better estimates than the ones in this function  
   Assert (selected_fe != 0, ExcNoFESelected());
 
 				   // doing the same thing here is a rather

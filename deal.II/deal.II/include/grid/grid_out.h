@@ -14,6 +14,9 @@
 #define __deal2__grid_out_h
 
 
+//TODO:[WB]Reorganize GridOut class. Either templatize GridOut or remove template from EpsFlags
+
+
 #include <base/exceptions.h>
 #include <string>
 

@@ -12,6 +12,13 @@
 //----------------------------  tria.all_dimensions.cc  ---------------------------
 
 
+//TODO:[WB]Remove the comment signs in the monitor_* functions
+//    as early as possible. These were inserted, since at home the
+//    program did some strange things in the reserve_memory
+//    functions (allocated more memory than told), such that the
+//    memory checks failed.
+
+
 #include <base/memory_consumption.h>
 #include <grid/tria.h>
 #include <grid/tria_levels.h>
