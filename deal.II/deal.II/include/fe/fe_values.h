@@ -727,9 +727,7 @@ class FEValuesBase
  * @author Wolfgang Bangerth, 1998  
  */
 template <int dim>
-class FEValues
-  :
-  public FEValuesBase<dim>
+class FEValues : public FEValuesBase<dim>
 {
   public:
 
@@ -885,9 +883,7 @@ class FEValues
  *  @author Wolfgang Bangerth, 1998
 */
 template <int dim>
-class FEFaceValuesBase
-  :
-  public FEValuesBase<dim>
+class FEFaceValuesBase : public FEValuesBase<dim>
 {
   public:
 				     /**
@@ -1025,9 +1021,7 @@ class FEFaceValuesBase
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEFaceValues
-  :
-  public FEFaceValuesBase<dim>
+class FEFaceValues : public FEFaceValuesBase<dim>
 {
   public:
 				     /**
@@ -1179,9 +1173,7 @@ class FEFaceValues
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FESubfaceValues
-  :
-  public FEFaceValuesBase<dim>
+class FESubfaceValues : public FEFaceValuesBase<dim>
 {
   public:
 				     /**

@@ -25,9 +25,7 @@
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class FEQ1
-  :
-  public FEQ1Mapping<dim>
+class FEQ1 : public FEQ1Mapping<dim>
 {
   public:
 				     /**
@@ -207,9 +205,7 @@ class FEQ1
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
-class FEQ2
-  :
-  public FEQ1Mapping<dim>
+class FEQ2 : public FEQ1Mapping<dim>
 {
   public:
 				     /**
@@ -332,9 +328,7 @@ class FEQ2
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEQ3
-  :
-  public FEQ1Mapping<dim>
+class FEQ3 : public FEQ1Mapping<dim>
 {
   public:
 				     /**
@@ -458,9 +452,7 @@ class FEQ3
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEQ4
-  :
-  public FEQ1Mapping<dim>
+class FEQ4 : public FEQ1Mapping<dim>
 {
   public:
 				     /**

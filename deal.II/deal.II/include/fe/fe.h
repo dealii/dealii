@@ -187,10 +187,8 @@ class FiniteElementData
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FiniteElementBase :
-  public Subscriptor,
-  public FiniteElementData<dim>
-
+class FiniteElementBase : public Subscriptor,
+			  public FiniteElementData<dim>
 {
   public:
 				     /**
