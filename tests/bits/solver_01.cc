@@ -9691,7 +9691,7 @@ void test ()
 
 int main () 
 {
-  std::ofstream logfile("solver.output");
+  std::ofstream logfile("solver_01.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
