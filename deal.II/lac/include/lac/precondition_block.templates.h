@@ -57,7 +57,7 @@ void PreconditionBlock<number,inverse_type>::clear ()
 
 template <typename number, typename inverse_type>
 void PreconditionBlock<number,inverse_type>::initialize (const SparseMatrix<number> &M,
-							 unsigned int bsize,
+							 const unsigned int bsize,
 							 const double relax)
 {
   clear();
