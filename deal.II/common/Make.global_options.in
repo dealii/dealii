@@ -40,6 +40,7 @@ DEAL_II_MINOR        = @DEAL_II_MINOR@
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
 TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
+TARGET               = @target@
 
 # if HSL sublibs are used, add F77 libs to linker flags
 ifeq ($(USE_CONTRIB_HSL),yes)

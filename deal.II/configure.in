@@ -70,7 +70,7 @@ AC_SUBST(DEAL2_DIR)
 
 dnl    Check for machine type operating system
 AC_CANONICAL_SYSTEM
-dnl AC_SUBST(target_os)
+AC_SUBST(target)
 
 dnl    Set the language for which subsequent tests shall be
 dnl    performed to C++
