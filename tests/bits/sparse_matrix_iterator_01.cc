@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix_01.cc  ---------------------------
+//----------------------------  sparse_matrix_iterator_01.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix_01.cc  ---------------------------
+//----------------------------  sparse_matrix_iterator_01.cc  ---------------------------
 
 
 // SparseMatrix::const_iterator::operator++(int) was declared but not defined
