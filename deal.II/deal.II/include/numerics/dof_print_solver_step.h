@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 #include <base/logstream.h>
+#include <lac/solver_control.h>
 #include <numerics/data_out.h>
 
 #include <strstream>

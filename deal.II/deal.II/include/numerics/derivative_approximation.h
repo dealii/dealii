@@ -15,7 +15,9 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <dofs/dof_handler.h>
 #include <fe/fe_update_flags.h>
+#include <fe/mapping.h>
 #include <utility>
 
 
