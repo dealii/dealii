@@ -195,6 +195,13 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> Fix: The <code
+       class="member">MappingQ<dim>::transform_real_to_unit_cell</code>
+       function failed on a very unusual cell. This is now fixed.
+       <br>
+       (RH 2001/11/26)
+       </p>
+
   <li> <p> New: The new <code
        class="member">CellAccessor<dim>::neighbor_of_coarser_neighbor</code>
        function returns where to find the present cell from a coarser
