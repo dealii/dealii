@@ -227,7 +227,7 @@ struct SparseDirectMA27::DetachedModeData
     pid_t child_pid;
 
     template <typename T>
-    void put (const T *t, const size_t N, const char *info) const
+    void put (const T *t, const size_t N, const char */*debug_info*/) const
       {
         write (server_client_pipe[1],
                reinterpret_cast<const char *> (t),
@@ -236,7 +236,7 @@ struct SparseDirectMA27::DetachedModeData
       };
 
     template <typename T>
-    void get (T *t, const size_t N, const char *info) const
+    void get (T *t, const size_t N, const char */*debug_info*/) const
       {
         unsigned int count = 0;
         while (count < sizeof(T)*N)
