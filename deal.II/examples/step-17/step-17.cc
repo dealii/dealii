@@ -467,7 +467,7 @@ void ElasticProblem<dim>::run ()
       if (cycle == 0)
 	{
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
-	  triangulation.refine_global (4);
+	  triangulation.refine_global (3);
 
                                            // xxx
           GridTools::partition_triangulation (n_partitions, triangulation);
@@ -514,7 +514,7 @@ int main (int argc, char **argv)
 
                                        // xxx localize scope
       {
-        ElasticProblem<3> elastic_problem_2d;
+        ElasticProblem<2> elastic_problem_2d;
         elastic_problem_2d.run ();
       }
 
