@@ -28,6 +28,8 @@ when a new release shall be issued:
 6/ change the content of the `Version' file on both HEAD and branch
 
 7/ test the branch thoroughly:
+	make distclean (if applicable)
+	./configure
 	make all
 	cd tests
 	make all
