@@ -148,11 +148,13 @@
  * are numbered cell-wise without taking into account that they may belong to
  * different components.
  *
- * This kind of numbering may be obtained by calling the @p{component_wise} function
- * of this class. Since it does not touch the order of indices within each, it
- * may be worthwhile to first renumber using the Cuthill-McKee or a similar
- * algorithm and afterwards renumbering component-wise. This will bring out the
- * matrix structure and additionally have a good numbering within each block.
+ * This kind of numbering may be obtained by calling the
+ * @p{component_wise} function of this class. Since it does not touch
+ * the order of indices within each, it may be worthwhile to first
+ * renumber using the Cuthill-McKee or a similar algorithm and
+ * afterwards renumbering component-wise. This will bring out the
+ * matrix structure and additionally have a good numbering within each
+ * block.
  *
  *
  * @sect2{Cell-wise numbering for Discontinuous Galerkin FEM}
@@ -169,6 +171,15 @@
  * Given an ordered vector of cells, the function @p{cell_wise_dg}
  * accomplishes this. Inside the cells, the previous ordering will be
  * preserved, so it may be useful to apply @component_wise} first.
+ *
+ *
+ * @sect2{Random renumbering}
+ *
+ * The @p{random} function renumbers degrees of freedom randomly. This
+ * function is probably seldom of use, but to check the dependence of
+ * solvers (iterative or direct ones) on the numbering of the degrees
+ * of freedom. It uses the @p{random_shuffle} function from the C++
+ * standard library to do its work.
  *
  *
  * @sect2{Multigrid DoF numbering}
@@ -364,6 +375,14 @@ class DoFRenumbering
     sort_selected_dofs_back (DoFHandler<dim>    &dof_handler,
 			     const vector<bool> &selected_dofs);
 
+				     /**
+				      * Renumber the degrees of
+				      * freedom in a random way.
+				      */
+    template <int dim>
+    static void
+    random (DoFHandler<dim> &dof_handler);
+    
 				     /**
 				      * Exception
 				      */

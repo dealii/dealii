@@ -716,6 +716,20 @@ DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 
 
 
+extern "C" long int lrand48 (void);
+
+
+template <int dim>
+void
+DoFRenumbering::random (DoFHandler<dim> &dof_handler)
+{
+  vector<unsigned int> new_indices (dof_handler.n_dofs());
+  random_shuffle (new_indices.begin(), new_indices.end());
+  dof_handler.renumber_dofs(new_indices);  
+};
+
+
+
 // explicit instantiations
 template
 void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension>&,
@@ -755,3 +769,6 @@ void DoFRenumbering::downstream_dg (MGDoFHandler<deal_II_dimension>&,
 template
 void DoFRenumbering::sort_selected_dofs_back (DoFHandler<deal_II_dimension> &,
 					      const vector<bool> &);
+
+template
+void DoFRenumbering::random (DoFHandler<deal_II_dimension> &);
