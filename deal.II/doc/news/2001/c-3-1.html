@@ -120,6 +120,17 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       The <code class="class">Threads</code> now has a barrier
+       class in order to synchronise multiple threads. In
+       multithreaded mode, this is an alias to the <code
+       class="class">ACE_Barrier</code> class of the ACE library, if
+       deal.II is not configured for multithreading, then the class is
+       a dummy class that does nothing.
+       <br>
+       (WB 2001/03/19)
+       </p>
+
+  <li> <p>
        We now support the output format of the <a
        href="http://www.kitware.com/vtk.html"
        target="_top">Visualization Toolkit (Vtk)</a> from the <code
