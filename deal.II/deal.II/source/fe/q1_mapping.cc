@@ -281,12 +281,14 @@ void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cel
 					 const unsigned int       face_no,
 					 const unsigned int,
 					 const std::vector<Point<1> > &unit_points,
-					 std::vector<Point<2> > &normal_vectors) const {
-				   // more or less copied from the linear
-				   // finite element
-				   // note, that in 2D the normal vectors to the
-				   // subface have the same direction as that
-				   // for the face
+					 std::vector<Point<2> > &normal_vectors) const
+{
+				   // more or less copied from the
+				   // linear finite element note, that
+				   // in 2D the normal vectors to the
+				   // subface have the same direction
+				   // as that for the face, so we can
+				   // ignore the subface number
   Assert (unit_points.size() == normal_vectors.size(),
 	  FiniteElementBase<2>::ExcWrongFieldDimension (unit_points.size(),
 							normal_vectors.size()));
