@@ -127,7 +127,7 @@ inconvenience this causes.
        commented out a long time ago due to a compiler bug in which the
        <code>explicit</code> keyword on template constructors was ignored, a
        fact that is dangerous since it may lead the compiler to generate
-       temporaries without our ado. This bug is not detected during
+       temporaries without our ado. This bug is now detected during
        configuration time of the library, and these constructors are available
        whenever the compiler does not contain this bug.
        <br> 
@@ -193,7 +193,7 @@ inconvenience this causes.
 
   <li> <p>
        Fixed: The <code class="member">GridGenerator::cylinder_shell</code>
-       function generated cells that were all inside-out, i.e. had negative
+       function generated cells were all inside-out, i.e. had negative
        Jacobians. In usual finite element computations this simply leads to
        all components of the linear system being negated, so it is not
        harmful. It is fixed now anyway.
