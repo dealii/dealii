@@ -13,12 +13,16 @@
 
 
 // the Kelly estimator used to fall over when presented with 3d meshes
-// with mis-oriented faces
+// with mis-oriented faces. the actual assertion where we fail is
+// again tested isolated in mesh_3d_13 (we limit the number of
+// refinements here to reduce run time; it is not limited there to the
+// same degree)
 
 #include "mesh_3d.h"
 
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
+#include <base/function_lib.h>
 #include <lac/vector.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
@@ -28,8 +32,11 @@
 #include <dofs/dof_handler.h>
 #include <fe/fe_q.h>
 #include <numerics/error_estimator.h>
+#include <numerics/vectors.h>
 
 #include <fstream>
+
+
 
 
 void check_this (Triangulation<3> &tria)
@@ -40,12 +47,20 @@ void check_this (Triangulation<3> &tria)
 
   Vector<double> u(dof_handler.n_dofs());
   Vector<float>  e(tria.n_active_cells());
+
+  VectorTools::interpolate (dof_handler,
+                            Functions::SquareFunction<3>(),
+                            u);
   
   KellyErrorEstimator<3>::estimate (dof_handler,
                                     QGauss2<2>(),
                                     FunctionMap<3>::type(),
                                     u,
                                     e);
+
+  deallog << "  " << e.l1_norm() << std::endl;
+  deallog << "  " << e.l2_norm() << std::endl;
+  deallog << "  " << e.linfty_norm() << std::endl;
 }
 
 
@@ -57,20 +72,12 @@ void check (Triangulation<3> &tria)
   deallog << "Initial check" << std::endl;
   check_this (tria);
   
-  for (unsigned int r=0; r<3; ++r)
+  for (unsigned int r=0; r<2; ++r)
     {
       tria.refine_global (1);
       deallog << "Check " << r << std::endl;
       check_this (tria);
     }
-
-  coarsen_global (tria);
-  deallog << "Check " << 1 << std::endl;
-  check_this (tria);
-  
-  tria.refine_global (1);
-  deallog << "Check " << 2 << std::endl;
-  check_this (tria);
 }
 
 
