@@ -21,8 +21,6 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
-
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -30,9 +28,6 @@
 using namespace std;
 #endif
 
-
-//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
-static const MappingQ1<deal_II_dimension> mapping;
 
 
 template <int dim>
@@ -223,7 +218,10 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 				   // cell to these points
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
-  FEValues<dim>  fe_patch_values (mapping, dof_handler->get_fe(),
+  
+				   // this constructor implicitely
+				   // uses a MappingQ1 mapping
+  FEValues<dim>  fe_patch_values (dof_handler->get_fe(),
 				  patch_points,
 				  update_values);
   const unsigned int n_q_points = patch_points.n_quadrature_points;
