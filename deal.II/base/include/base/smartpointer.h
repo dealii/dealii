@@ -152,7 +152,13 @@ SmartPointer<T>::~SmartPointer () {
 
 
 template <typename T>
-SmartPointer<T> & SmartPointer<T>::operator = (T *tt) {
+SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
+{
+				   // optimize if no real action is
+				   // requested
+  if (t == tt)
+    return *this;
+  
   if (t)
     t->unsubscribe();
   t = tt;
@@ -163,7 +169,14 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt) {
 
 
 template <typename T>
-SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt) {
+SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt)
+{
+				   // if objects on the left and right
+				   // hand side of the operator= are
+				   // the same, then this is a no-op
+  if (&tt == this)
+    return *this;
+  
   if (t)
     t->unsubscribe();
   t = static_cast<T*>(tt);
