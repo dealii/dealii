@@ -14,6 +14,8 @@
 
 #include <fe/q1_mapping.h>
 #include <base/quadrature.h>
+#include <lac/vector.h>
+#include <lac/full_matrix.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 
@@ -543,6 +545,59 @@ Point<dim> FEQ1Mapping<dim>::transform_unit_to_real_cell (
 }
 
 
+template <int dim>
+Point<dim> FEQ1Mapping<dim>::transform_real_to_unit_cell (
+  const DoFHandler<dim>::cell_iterator cell,
+  const Point<dim> &p) const
+{
+				   // Newton iteration to solve
+				   // f(x)=p(x)-p=0
+				   // x_{n+1}=x_n-[f'(x)]^{-1}f(x)
+  
+				   // start value in center of unit
+				   // cell (p_unit stands for x)
+  Point<dim> p_unit;
+  for (unsigned int i=0; i<dim; ++i)
+    p_unit(i)=0.5;
+
+				   // f(x)
+  Point<dim> p_real(transform_unit_to_real_cell(cell, p_unit));
+  Point<dim> f = p_real-p;
+
+  double eps=1e-15*cell->diameter();
+  
+  while (f.square()>eps*eps)
+    {
+				       // f'(x)
+      Tensor<2,dim> df;
+      for (unsigned int k=0; k<GeometryInfo<dim>::vertices_per_cell; ++k)
+	{
+	  Tensor<1,dim> grad_transform(shape_grad_transform (k, p_unit));
+	  Point<dim> &vertex=cell->vertex(k);
+
+	  
+	  for (unsigned int i=0; i<dim; ++i)
+	    for (unsigned int j=0; j<dim; ++j)
+	      df[i][j]+=vertex[i]*grad_transform[j];
+	}
+      
+				       // Solve  [f'(x)]d=f(x)
+      Point<dim> d;
+      Tensor<2,dim> df_1;
+
+      df_1 = invert(df);
+      contract (d, df_1, f);
+      
+      p_unit -= d;
+				   // f(x)
+      p_real=transform_unit_to_real_cell(cell, p_unit);
+      f = p_real-p;
+    }
+  
+  return p_unit;
+}
+
+  
 template <int dim>
 void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				       const vector<Point<dim> >            &unit_points,

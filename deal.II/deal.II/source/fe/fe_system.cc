@@ -934,6 +934,15 @@ Point<dim> FESystem<dim>::transform_unit_to_real_cell (
 
 
 template <int dim>
+Point<dim> FESystem<dim>::transform_real_to_unit_cell (
+  const DoFHandler<dim>::cell_iterator cell,
+  const Point<dim> &p) const
+{
+  return base_elements[0].first->transform_real_to_unit_cell(cell, p);
+};
+
+
+template <int dim>
 double FESystem<dim>::shape_value_transform (const unsigned int i,
 					     const Point<dim>  &p) const
 {
