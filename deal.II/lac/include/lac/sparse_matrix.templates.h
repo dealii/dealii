@@ -458,9 +458,9 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 				       // ... and wait until they're finished
       thread_manager.wait ();
 				       // accumulate the partial results
-      return accumulate (partial_sums.begin(),
-			 partial_sums.end(),
-			 0.);
+      return std::accumulate (partial_sums.begin(),
+			      partial_sums.end(),
+			      0.);
     };
 #endif
 				   // if not in MT mode or the matrix is
@@ -551,9 +551,9 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 				       // ... and wait until they're finished
       thread_manager.wait ();
 				       // accumulate the partial results
-      return accumulate (partial_sums.begin(),
-			 partial_sums.end(),
-			 0.);
+      return std::accumulate (partial_sums.begin(),
+			      partial_sums.end(),
+			      0.);
     };
 #endif
 				   // if not in MT mode or the matrix is
@@ -688,9 +688,9 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 				       // ... and wait until they're finished
       thread_manager.wait ();
 				       // accumulate the partial results
-      return sqrt(accumulate (partial_norms.begin(),
-			      partial_norms.end(),
-			      0.));
+      return std::sqrt(std::accumulate (partial_norms.begin(),
+					partial_norms.end(),
+					0.));
     };
 #endif
   
