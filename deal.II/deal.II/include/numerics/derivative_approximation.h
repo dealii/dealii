@@ -173,12 +173,19 @@ class DerivativeApproximation
 				      * receive the cell-wise
 				      * Euclidian norm of the
 				      * approximated gradient.
+				      *
+				      * The last parameter denotes the
+				      * solution component, for which
+				      * the gradient is to be
+				      * computed. It defaults to the
+				      * first component.
 				      */
     template <int dim>
     static void
     approximate_gradient (const DoFHandler<dim> &dof,
 			  const Vector<double>  &solution,
-			  Vector<float>         &derivative_norm);
+			  Vector<float>         &derivative_norm,
+			  const unsigned int     component = 0);
 
 				     /**
 				      * This function is the analogue
@@ -195,12 +202,19 @@ class DerivativeApproximation
 				      * derivatives. The spectral norm
 				      * is the matrix norm associated
 				      * to the $l_2$ vector norm.
+				      *
+				      * The last parameter denotes the
+				      * solution component, for which
+				      * the gradient is to be
+				      * computed. It defaults to the
+				      * first component.
 				      */
     template <int dim>
     static void
     approximate_second_derivative (const DoFHandler<dim> &dof,
 				   const Vector<double>  &solution,
-				   Vector<float>         &derivative_norm);
+				   Vector<float>         &derivative_norm,
+				   const unsigned int     component);
     
 				     /**
 				      * Exception
@@ -268,7 +282,8 @@ class DerivativeApproximation
 					  */
 	static ProjectedDerivative
 	get_projected_derivative (const FEValues<dim>  &fe_values,
-				  const Vector<double> &solution);
+				  const Vector<double> &solution,
+				  const unsigned int    component);
     
 					 /**
 					  * Return the norm of the
@@ -347,7 +362,8 @@ class DerivativeApproximation
 					  */
 	static ProjectedDerivative
 	get_projected_derivative (const FEValues<dim>  &fe_values,
-				  const Vector<double> &solution);
+				  const Vector<double> &solution,
+				  const unsigned int    component);
 	
 					 /**
 					  * Return the norm of the
@@ -404,11 +420,17 @@ class DerivativeApproximation
 				      * administration that is
 				      * independent of the actual
 				      * derivative to be computed.
+				      *
+				      * The @p{component} argument
+				      * denotes which component of the
+				      * solution vector we are to work
+				      * on.
 				      */
     template <class DerivativeDescription, int dim>
     static void
     approximate_derivative (const DoFHandler<dim> &dof,
 			    const Vector<double>  &solution,
+			    const unsigned int     component,
 			    Vector<float>         &derivative_norm);
 
 				     /**
@@ -421,8 +443,9 @@ class DerivativeApproximation
     static void
     approximate (const DoFHandler<dim> &dof,
 		 const Vector<double>  &solution,
+		 const unsigned int     component,
 		 const IndexInterval   &index_interval,
-			     Vector<float>         &derivative_norm);    
+		 Vector<float>         &derivative_norm);    
 };
 
 

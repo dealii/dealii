@@ -42,11 +42,22 @@ inline
 typename DerivativeApproximation::Gradient<dim>::ProjectedDerivative
 DerivativeApproximation::Gradient<dim>::
 get_projected_derivative (const FEValues<dim>  &fe_values,
-			  const Vector<double> &solution) 
+			  const Vector<double> &solution,
+			  const unsigned int    component)
 {
-  vector<ProjectedDerivative> values (1);
-  fe_values.get_function_values (solution, values);
-  return values[0];
+  if (fe_values.get_fe().n_components() == 1)
+    {
+      vector<ProjectedDerivative> values (1);
+      fe_values.get_function_values (solution, values);
+      return values[0];
+    }
+  else
+    {
+      vector<Vector<double> > values
+	(1, Vector<double>(fe_values.get_fe().n_components()));
+      fe_values.get_function_values (solution, values);
+      return values[0](component);
+    };
 };
 
 
@@ -79,11 +90,22 @@ inline
 typename DerivativeApproximation::SecondDerivative<dim>::ProjectedDerivative
 DerivativeApproximation::SecondDerivative<dim>::
 get_projected_derivative (const FEValues<dim>  &fe_values,
-			  const Vector<double> &solution) 
+			  const Vector<double> &solution,
+			  const unsigned int    component)
 {
-  vector<ProjectedDerivative> values (1);
-  fe_values.get_function_grads (solution, values);
-  return values[0];
+  if (fe_values.get_fe().n_components() == 1)
+    {
+      vector<ProjectedDerivative> values (1);
+      fe_values.get_function_grads (solution, values);
+      return values[0];
+    }
+  else
+    {
+      vector<vector<ProjectedDerivative> > values
+	(1, vector<ProjectedDerivative>(fe_values.get_fe().n_components()));
+      fe_values.get_function_grads (solution, values);
+      return values[0][component];
+    };
 };
 
 
@@ -169,10 +191,12 @@ void
 DerivativeApproximation::
 approximate_gradient (const DoFHandler<dim> &dof_handler,
 		      const Vector<double>  &solution,
-		      Vector<float>         &derivative_norm)
+		      Vector<float>         &derivative_norm,
+		      const unsigned int     component)
 {
   approximate_derivative<Gradient<dim>,dim> (dof_handler,
 					     solution,
+					     component,
 					     derivative_norm);
 };
 
@@ -183,10 +207,12 @@ void
 DerivativeApproximation::
 approximate_second_derivative (const DoFHandler<dim> &dof_handler,
 			       const Vector<double>  &solution,
-			       Vector<float>         &derivative_norm)
+			       Vector<float>         &derivative_norm,
+			       const unsigned int     component)
 {
   approximate_derivative<SecondDerivative<dim>,dim> (dof_handler,
 						     solution,
+						     component,
 						     derivative_norm);
 };
 
@@ -197,6 +223,7 @@ void
 DerivativeApproximation::
 approximate_derivative (const DoFHandler<dim> &dof_handler,
 			const Vector<double>  &solution,
+			const unsigned int     component,
 			Vector<float>         &derivative_norm)
 {
   Assert (derivative_norm.size() == dof_handler.get_tria().n_active_cells(),
@@ -215,7 +242,7 @@ approximate_derivative (const DoFHandler<dim> &dof_handler,
 		    Threads::encapsulate
 		    (&DerivativeApproximation::
 		     template approximate<DerivativeDescription,dim>)
-		    .collect_args (dof_handler, solution,
+		    .collect_args (dof_handler, solution, component,
 				   index_intervals[i],
 				   derivative_norm));
   thread_manager.wait ();
@@ -227,6 +254,7 @@ template <class DerivativeDescription, int dim>
 void 
 DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
 				      const Vector<double>  &solution,
+				      const unsigned int     component,
 				      const IndexInterval   &index_interval,
 				      Vector<float>         &derivative_norm)
 {
@@ -278,7 +306,8 @@ DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
       const typename DerivativeDescription::ProjectedDerivative
 	this_midpoint_value
 	= DerivativeDescription::get_projected_derivative (fe_midpoint_value,
-						    solution);
+							   solution,
+							   component);
       				       // ...and the place where it lives
       const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
 
@@ -364,7 +393,7 @@ DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
 	  const typename DerivativeDescription::ProjectedDerivative
 	    neighbor_midpoint_value
 	    = DerivativeDescription::get_projected_derivative (fe_midpoint_value,
-							solution);
+							       solution, component);
 	  
 					   // ...and the place where it lives
 	  const Point<dim>
@@ -446,14 +475,16 @@ void
 DerivativeApproximation::
 approximate_gradient (const DoFHandler<deal_II_dimension> &dof_handler,
 		      const Vector<double>  &solution,
-		      Vector<float>         &derivative_norm);
+		      Vector<float>         &derivative_norm,
+		      const unsigned int     component);
 
 template
 void 
 DerivativeApproximation::
 approximate_second_derivative (const DoFHandler<deal_II_dimension> &dof_handler,
 			       const Vector<double>  &solution,
-			       Vector<float>         &derivative_norm);
+			       Vector<float>         &derivative_norm,
+			       const unsigned int     component);
 
 
 
