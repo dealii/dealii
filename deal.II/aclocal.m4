@@ -2744,12 +2744,13 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG3, dnl
 
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
-  case "$GXXVERSION" in
+  case "$GXX_VERSION" in
     gcc*)
 	CXXFLAGS="$CXXFLAGS -Werror"
 	;;
+
     MIPSpro*)
-	CXXFLAGS="$CXXFLAGS -diagerror"
+	CXXFLAGS="$CXXFLAGS -diag_error 1174"
 	;;
   esac
 
