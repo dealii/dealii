@@ -1,0 +1,18 @@
+# Generated automatically from Makefile.in by configure.
+# Generated automatically from Makefile.in by configure.
+############################################################
+# Makefile,v 1.27 2002/09/03 17:39:25 wolf Exp
+# Copyright (C) 2000, 2001, 2002 by the deal.II authors
+############################################################
+
+############################################################
+# Include general settings for including DEAL libraries
+############################################################
+
+include ../Makefile.paths
+include $D/common/Make.global_options
+debug-mode = on
+
+default: tmp.go
+
+include ../Makefile.rules

@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by configure.
-# $Id$
+# Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
 all: base lac fe deal.II big-tests
@@ -48,12 +48,11 @@ all-headers:
 			 for j in */*.h ; do echo $$j ; done` ; \
 		popd > /dev/null ; \
 		cd tmp-all-headers ; \
-		cp ../base/Makefile . ; \
+		cp ../Makefile.headers Makefile ; \
 		for j in $$headers ; do \
-			echo ; echo ; \
-			echo "********** Checking for $$j ************" ; \
+			echo "=====Header======== $$j " ; \
 			echo "#include <$$j>" > tmp.cc ; \
-			if $(MAKE) tmp.go ; then : ; else exit 1 ; fi ; \
+			if $(MAKE) -s tmp.go ; then : ; else exit 1 ; fi ; \
 			rm -f tmp.* ; \
 		done ; \
 		cd .. ; \
