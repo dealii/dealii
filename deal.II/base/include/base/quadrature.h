@@ -357,10 +357,10 @@ class QProjector
 				      * type to one in the enclosing
 				      * class.
 				      */
-    template <int dim>
+    template <int dim2>
     struct SubQuadratureHelper
     {
-	typedef Quadrature<dim-1> type;
+	typedef Quadrature<dim2-1> type;
     };
 
 				     /**
