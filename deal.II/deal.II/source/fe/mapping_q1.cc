@@ -1143,3 +1143,7 @@ MappingQ1<dim>::transform_real_to_unit_cell_internal (
 //----------------------------------------------------------------------//
 
 template class MappingQ1<deal_II_dimension>;
+namespace internal
+{
+  template class DataSetDescriptor<deal_II_dimension>;
+}
