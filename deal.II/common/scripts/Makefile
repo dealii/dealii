@@ -12,3 +12,8 @@ include $D/common/Make.global_options
 make_dependencies : make_dependencies.cc
 	@echo ============================ Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $< -o $@
+
+clean:
+	rm -f make_dependencies
+
+.PHONY: clean
