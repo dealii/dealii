@@ -576,6 +576,19 @@ class DataOutBase
 	static RgbValues default_color_function (const double value,
 						 const double min_value,
 						 const double max_value);
+
+					 /**
+					  * This is an alternative color
+					  * function producing a grey scale
+					  * between black (lowest values)
+					  * and white (highest values). You
+					  * may use it by setting the
+					  * #color_function# variable to the
+					  * address of this function.
+					  */
+	static RgbValues grey_scale_color_function (const double value,
+						    const double min_value,
+						    const double max_value);
 	
 					 /**
 					  * Constructor.
