@@ -20,10 +20,11 @@
 
 /**
  * Boundary object for the hull of a cylinder.  In three dimensions,
- * points are projected on a circular tube along the @p x-axis. The
- * radius of the tube can be set. Similar to HyperBallBoundary,
- * new points are projected by dividing the straight line between the
- * old two points and adjusting the radius in the @p yz-plane.
+ * points are projected on a circular tube along the <tt>x-</tt>,
+ * <tt>y-</tt> or <tt>z</tt>-axis. The radius of the tube can be
+ * set. Similar to HyperBallBoundary, new points are projected by
+ * dividing the straight line between the old two points and adjusting
+ * the radius in the @p yz-plane (xz-plane or xy-plane, respectively).
  *
  * This class was developed to be used in conjunction with the
  * @p cylinder function of GridGenerator. It should be used for
@@ -40,9 +41,16 @@ class CylinderBoundary : public StraightBoundary<dim>
 {
   public:
 				     /**
-				      * Constructor
+				      * Constructor. Per default
+				      * circular tube along the x-axis
+				      * (<tt>axis=0<\tt>). Choose
+				      * <tt>axis=1<\tt> or
+				      * <tt>axis=2<\tt> for a tube
+				      * along the y- or z-axis,
+				      * respectively.
 				      */
-    CylinderBoundary (const double     radius = 1.0);
+    CylinderBoundary (const double       radius = 1.0,
+		      const unsigned int axis   = 0);
 
 				     /**
 				      * Refer to the general documentation of
@@ -119,6 +127,18 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * Radius of the cylinder.
 				      */
     const double radius;
+
+				     /**
+				      * Denotes the axis of the
+				      * circular
+				      * tube. <tt>axis=0<\tt>,
+				      * <tt>axis=1<\tt> and
+				      * <tt>axis=2<\tt> denote the
+				      * <tt>x-axis</tt>,
+				      * <tt>y-axis</tt> and
+				      * <tt>z-axis</tt>, respectively.
+				      */
+    const unsigned int axis;
 
   private:
 

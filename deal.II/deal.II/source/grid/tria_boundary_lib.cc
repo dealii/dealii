@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,8 +21,10 @@
 
 
 template <int dim>
-CylinderBoundary<dim>::CylinderBoundary (const double radius) :
-		radius(radius)
+CylinderBoundary<dim>::CylinderBoundary (const double radius,
+					 const unsigned int axis) :
+		radius(radius),
+		axis(axis)
 {}
 
 
@@ -34,12 +36,13 @@ CylinderBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>:
   Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
 				   // project to boundary
   if (dim>=3
-      && line->vertex(0).square()-line->vertex(0)(0)*line->vertex(0)(0) >= radius*radius-1.e-12
-      && line->vertex(1).square()-line->vertex(1)(0)*line->vertex(1)(0) >= radius*radius-1.e-12)
+      && line->vertex(0).square()-line->vertex(0)(axis)*line->vertex(0)(axis) >= radius*radius-1.e-10
+      && line->vertex(1).square()-line->vertex(1)(axis)*line->vertex(1)(axis) >= radius*radius-1.e-10)
     {
-      const double f = radius / std::sqrt(middle.square()-middle(0)*middle(0));
-      for (unsigned int i=1;i<dim;++i)
-	middle(i) *= f;
+      const double f = radius / std::sqrt(middle.square()-middle(axis)*middle(axis));
+      for (unsigned int i=0; i<dim; ++i)
+	if (i!=axis)
+	  middle(i) *= f;
     }
   return middle;
 }
@@ -55,15 +58,16 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
   Point<3> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
   
 				   // project to boundary
-  if (quad->vertex(0).square()-quad->vertex(0)(0)*quad->vertex(0)(0) >= radius*radius-1.e-12
-      && quad->vertex(1).square()-quad->vertex(1)(0)*quad->vertex(1)(0) >= radius*radius-1.e-12
-      && quad->vertex(2).square()-quad->vertex(2)(0)*quad->vertex(2)(0) >= radius*radius-1.e-12
-      && quad->vertex(3).square()-quad->vertex(3)(0)*quad->vertex(3)(0) >= radius*radius-1.e-12)
+  if (quad->vertex(0).square()-quad->vertex(0)(axis)*quad->vertex(0)(axis) >= radius*radius-1.e-10
+      && quad->vertex(1).square()-quad->vertex(1)(axis)*quad->vertex(1)(axis) >= radius*radius-1.e-10
+      && quad->vertex(2).square()-quad->vertex(2)(axis)*quad->vertex(2)(axis) >= radius*radius-1.e-10
+      && quad->vertex(3).square()-quad->vertex(3)(axis)*quad->vertex(3)(axis) >= radius*radius-1.e-10)
     
     {
-      const double f = radius / std::sqrt(middle.square()-middle(0)*middle(0));
-      for (unsigned int i=1;i<3;++i)
-	middle(i) *= f;
+      const double f = radius / std::sqrt(middle.square()-middle(axis)*middle(axis));
+      for (unsigned int i=0; i<3; ++i)
+	if (i!=axis)
+	  middle(i) *= f;
     }
   return middle;
 }
@@ -112,8 +116,8 @@ CylinderBoundary<dim>::get_intermediate_points_between_points (
   ds /= n+1;
 
   bool scale = (dim>=3
-		&& v0.square()-v0(0)*v0(0) >= radius*radius-1.e-12
-		&& v1.square()-v1(0)*v1(0) >= radius*radius-1.e-12);
+		&& v0.square()-v0(axis)*v0(axis) >= radius*radius-1.e-10
+		&& v1.square()-v1(axis)*v1(axis) >= radius*radius-1.e-10);
   
   for (unsigned int i=0; i<n; ++i)
     {
@@ -124,9 +128,10 @@ CylinderBoundary<dim>::get_intermediate_points_between_points (
 
       if (scale)
 	{
-	  const double f = radius / std::sqrt(points[i].square()-points[i](0)*points[i](0));
-	  for (unsigned int d=1;d<dim;++d)
-	    points[i](d) *= f;
+	  const double f = radius / std::sqrt(points[i].square()-points[i](axis)*points[i](axis));
+	  for (unsigned int d=0; d<dim; ++d)
+	    if (i!=axis)
+	      points[i](d) *= f;
 	}
     }
 }
@@ -196,7 +201,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
     {
       face_vertex_normals[vertex] = face->vertex(vertex);
-      face_vertex_normals[vertex][0] = 0.;
+      face_vertex_normals[vertex][axis] = 0.;
     }
 }
 
