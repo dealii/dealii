@@ -31,7 +31,8 @@ template <int dim>
 class Point {
   public:
 				     /**
-				      *  Constructor.
+				      *  Constructor. Initialize all entries
+				      * to zero.
 				      */
     Point ();
 				     /**
@@ -67,17 +68,17 @@ class Point {
 				      *  Return the dimension of the space this
 				      *  point is living in.
 				      */
-    int dimension() const { return dim; };
+    unsigned int dimension() const { return dim; };
     
 				     /**
 				      *  Read access to the #index#th coordinate.
 				      */
-    double   operator () (const int index) const;
+    double   operator () (const unsigned int index) const;
     				     /**
 				      *  Read and write access to the #index#th
 				      *  coordinate.
 				      */
-    double & operator () (const int index);
+    double & operator () (const unsigned int index);
 
 				     /**
 				      *  Assignment operator.
@@ -99,12 +100,30 @@ class Point {
 				      *  need to copy a point at least once.
 				      */
     Point<dim>   operator + (const Point<dim> &) const;
+
 				     /**
 				      *  Subtract two point vectors. If possible, use
 				      *  #operator +=# instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Point<dim>   operator - (const Point<dim> &) const;
+
+				     /**
+				      *  Multiply by a factor. If possible, use
+				      *  #operator *=# instead since this does not
+				      *  need to copy a point at least once.
+				      *
+				      * There is a commutative complement to this
+				      * function also
+				      */
+    Point<dim>   operator * (const double) const;
+
+				     /**
+				      *  Divide by a factor. If possible, use
+				      *  #operator /=# instead since this does not
+				      *  need to copy a point at least once.
+				      */
+    Point<dim>   operator / (const double) const;
 
 				     /**
 				      *  Add another vector, i.e. move this point by
@@ -121,6 +140,7 @@ class Point {
 				      *  all coordinates by #factor#.
 				      */
     Point<dim> & operator *= (const double &factor);
+
 				     /**
 				      *  Scale the vector by #1/factor#.
 				      */
@@ -138,11 +158,6 @@ class Point {
 				      */
     double              square () const;
 
-				     /**
-				      *  Prints the coordinates of this point in the
-				      *  form #(x1,x2,x3,etc)#.
-				      */
-//    friend ostream & operator << (ostream &, const Point<dim> &p);
 
 				     /**
 				      *  Exception
@@ -184,7 +199,7 @@ inline
 Point<dim>::Point () {
   Assert (dim>0, ExcDimTooSmall(dim));
 
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     coordinates[i] = 0;
 };
 
@@ -217,7 +232,7 @@ Point<3>::Point (const double x, const double y, const double z) {
 template <int dim>
 inline
 Point<dim>::Point (const Point<dim> &p) {
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     coordinates[i] = p.coordinates[i];
 };
 
@@ -225,36 +240,40 @@ Point<dim>::Point (const Point<dim> &p) {
 
 template <int dim>
 inline
-double Point<dim>::operator () (const int index) const {
-  Assert ((index>=0) && (index<dim), ExcInvalidIndex (index));
+double Point<dim>::operator () (const unsigned int index) const {
+  Assert (index<dim, ExcInvalidIndex (index));
   return coordinates[index];
 };
+
 
 
 template <int dim>
 inline
-double & Point<dim>::operator () (const int index) {
-  Assert ((index>=0) && (index<dim), ExcInvalidIndex (index));
+double & Point<dim>::operator () (const unsigned int index) {
+  Assert (index<dim, ExcInvalidIndex (index));
   return coordinates[index];
 };
+
 
 
 template <int dim>
 inline
 Point<dim> & Point<dim>::operator = (const Point<dim> &p) {
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     coordinates[i] = p.coordinates[i];
   return *this;
 };
 
 
+
 template <int dim>
 inline
 bool Point<dim>::operator == (const Point<dim> &p) const {
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     if (coordinates[i] != p.coordinates[i]) return false;
   return true;
 };
+
 
 
 template <int dim>
@@ -264,11 +283,13 @@ bool Point<dim>::operator != (const Point<dim> &p) const {
 };
 
 
+
 template <int dim>
 inline
 Point<dim> Point<dim>::operator + (const Point<dim> &p) const {
   return (Point<dim>(*this) += p);
 };
+
 
 
 template <int dim>
@@ -277,58 +298,88 @@ Point<dim> Point<dim>::operator - (const Point<dim> &p) const {
   return (Point<dim>(*this) -= p);
 };
 
+
+
+template <int dim>
+inline
+Point<dim> Point<dim>::operator * (const double factor) const {
+  return (Point<dim>(*this) *= factor);
+};
+
+
+
+template <int dim>
+inline
+Point<dim> operator * (const double factor, const Point<dim> &p) {
+  return p*factor;
+};
+
+
+
+template <int dim>
+inline
+Point<dim> Point<dim>::operator / (const double factor) const {
+  return (Point<dim>(*this) /= factor);
+};
+
+
   
 template <int dim>
 inline
 Point<dim> & Point<dim>::operator += (const Point<dim> &p) {
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     coordinates[i] += p.coordinates[i];
   return *this;
 };
 
 
+
 template <int dim>
 inline
 Point<dim> & Point<dim>::operator -= (const Point<dim> &p) {
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     coordinates[i] -= p.coordinates[i];
   return *this;
 };
 
 
+
 template <int dim>
 inline
 Point<dim> & Point<dim>::operator *= (const double &s) {
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     coordinates[i] *= s;
   return *this;
 };
 
 
+
 template <int dim>
 inline
 Point<dim> & Point<dim>::operator /= (const double &s) {
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     coordinates[i] /= s;
   return *this;
 };
+
 
 
 template <int dim>
 inline
 double Point<dim>::operator * (const Point<dim> &p) const {
   double q=0;
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     q += coordinates[i] * p.coordinates[i];
   return q;
 };
+
 
 
 template <int dim>
 inline
 double Point<dim>::square () const {
   double q=0;
-  for (int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     q += coordinates[i] * coordinates[i];
   return q;
 };
@@ -345,7 +396,7 @@ ostream & operator << (ostream &out, const Point<1> &p) {
 inline
 ostream & operator << (ostream &out, const Point<2> &p) {
 //  out << "(";
-//  for (int i=0; i<1; i++)
+//  for (unsigned int i=0; i<1; i++)
 //    out << p(i) << ",";
 //  out << p(1) << ")";
   out << p(0) << " " << p(1);
