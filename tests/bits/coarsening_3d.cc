@@ -62,23 +62,17 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
                                      // and the rest of those on the
                                      // upper surface
     vertices.push_back (Point<3>(0,0,0));
-    for (unsigned int ring=0; ring<3; ++ring)
-      for (unsigned int i=0; i<8; ++i)
-        vertices.push_back (ring_points[i] * (ring == 0 ? PhantomGeometry::r0 :
-                                              ring == 1 ? PhantomGeometry::r1 :
-                                                          PhantomGeometry::r2));
+    for (unsigned int i=0; i<8; ++i)
+      vertices.push_back (ring_points[i]);
 
                                      // then points on lower surface
     vertices.push_back (Point<3>(0,0,-PhantomGeometry::dz));
-    for (unsigned int ring=0; ring<3; ++ring)
-      for (unsigned int i=0; i<8; ++i)
-        vertices.push_back (ring_points[i] * (ring == 0 ? PhantomGeometry::r0 :
-                                              ring == 1 ? PhantomGeometry::r1 :
-                                                          PhantomGeometry::r2)
-                            +
-                            Point<3>(0,0,-PhantomGeometry::dz));
+    for (unsigned int i=0; i<8; ++i)
+      vertices.push_back (ring_points[i]
+                          +
+                          Point<3>(0,0,-PhantomGeometry::dz));
 
-    const unsigned int n_vertices_per_surface = 25;
+    const unsigned int n_vertices_per_surface = 9;
     Assert (vertices.size() == n_vertices_per_surface*2,
             ExcInternalError());
     
@@ -87,44 +81,24 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
                                      // vertices of the upper surface,
                                      // the lower ones are the same
                                      // +12
-    {
-      const unsigned int connectivity[20][4]
-        = { { 1, 2, 3, 0 },  // four cells in the center
-            { 3, 4, 5, 0 },
-            { 0, 5, 6, 7 },
-            { 1, 0, 7, 8 },            
-          
-            { 9, 10, 2, 1 },  // eight cells of inner ring
-            { 10, 11, 3, 2 },
-            { 11, 12, 4, 3 },
-            { 4, 12, 13, 5 },
-            { 5, 13, 14, 6 },
-            { 6, 14, 15, 7 },
-            { 8, 7, 15, 16 },
-            { 9, 1, 8, 16 },
-
-            { 17, 18, 10, 9 },  // eight cells of outer ring
-            { 18, 19, 11, 10 },
-            { 19, 20, 12, 11 },
-            { 12, 20, 21, 13 },
-            { 13, 21, 22, 14 },
-            { 14, 22, 23, 15 },
-            { 16, 15, 23, 24 },
-            { 17, 9, 16, 24 }   };
-
-                                       // now create cells out of this
-      for (unsigned int i=0; i<20; ++i)
-        {
-          CellData<3> cell;
-          for (unsigned int j=0; j<4; ++j)
-            {
-              cell.vertices[j]   = connectivity[i][j];
-              cell.vertices[j+4] = connectivity[i][j]+n_vertices_per_surface;
-            }
-          cell.material_id = 0;
-          cells.push_back (cell);
-        }
-    }    
+    const unsigned int connectivity[4][4]
+      = { { 1, 2, 3, 0 },
+          { 3, 4, 5, 0 },
+          { 0, 5, 6, 7 },
+          { 1, 0, 7, 8 } };
+      
+                                     // now create cells out of this
+    for (unsigned int i=0; i<4; ++i)
+      {
+        CellData<3> cell;
+        for (unsigned int j=0; j<4; ++j)
+          {
+            cell.vertices[j]   = connectivity[i][j];
+            cell.vertices[j+4] = connectivity[i][j]+n_vertices_per_surface;
+          }
+        cell.material_id = 0;
+        cells.push_back (cell);
+      }   
   }
 
                                    // finally generate a triangulation
