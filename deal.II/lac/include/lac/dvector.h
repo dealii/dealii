@@ -177,17 +177,20 @@ class dVector : public VectorBase
     void reinit (const unsigned int N, const bool fast=false);
     
 				     /**
-				      * Adjust  Dimension. <p>
-				      * Set dimension to n(V) <p>
-				      * ! reserved memory for This remains unchanged ! <p>
-				      * ! components of V are not copied in any case ! <p>
-				      * on fast==false vector is filled by 0.
+				      * Change the dimension to that of the
+				      * vector #V#. The same applies as for
+				      * the other #reinit# function.
+				      *
+				      * The elements of #V# are not copied.
 				      */
     void reinit (const dVector& V, const bool fast=false);
     
 				     /**
-				      *  Inquire Dimension. returns Dimension , 
-				      *             INLINE
+				      * Return dimension of the vector. This
+				      * function was formerly called #n()#, but
+				      * was renamed to get the #dVector# class
+				      * closer to the C++ standard library's
+				      * #vector# container.
 				      */
     unsigned int size () const;
 
@@ -253,44 +256,54 @@ class dVector : public VectorBase
     dVector & operator -= (const dVector &V);
 
 				     /**
-				      *  U(0-DIM)+=s      . Addition of S to all components
+				      * U(0-DIM)+=s.
+				      * Addition of #s# to all components. Note
+				      * that #s# is a scalar and not a vector.
 				      */
     void add (const double s);
     
 				     /**
-				      *  U+=V             . Simple addition
+				      * U+=V.
+				      * Simple vector addition, equal to the
+				      * #operator +=#.
 				      */
     void add (const dVector& V);
     
 				     /**
-				      *  U+=a*V           . Simple addition
+				      * U+=a*V.
+				      * Simple addition of a scaled vector.
 				      */
     void add (const double a, const dVector& V);
     
 				     /**
-				      *  U+=a*V+b*W       . Multiple addition
+				      * U+=a*V+b*W.
+				      * Multiple addition of scaled vectors.
 				      */
     void add (const double a, const dVector& V,
 	      const double b, const dVector& W);
     
 				     /**
-				      *  U=s*U+V          . Scaling + simple addition
+				      * U=s*U+V.
+				      * Scaling and simple vector addition.
 				      */
     void sadd (const double s, const dVector& V);
     
 				     /**
-				      *  U=s*U+a*V        . Scaling + simple addition
+				      * U=s*U+a*V.
+				      * Scaling and simple addition.
 				      */
     void sadd (const double s, const double a, const dVector& V);
     
 				     /**
-				      *  U=s*U+a*V+b*W    . Scaling + multiple addition
+				      * U=s*U+a*V+b*W.
+				      * Scaling and multiple addition.
 				      */
     void sadd (const double s, const double a,
 	       const dVector& V, const double b, const dVector& W);
     
 				     /**
-				      *  U=s*U+a*V+b*W+c*X. Scaling + multiple addition
+				      * U=s*U+a*V+b*W+c*X.
+				      * Scaling and multiple addition.
 				      */
     void sadd (const double s, const double a,
 	       const dVector& V, const double b, const dVector& W, 
@@ -306,12 +319,13 @@ class dVector : public VectorBase
     void scale (const double factor);
     
 				     /**
-				      *  U=a*V            . Replacing
+				      *  U=a*V. Replacing
 				      */
     void equ (const double a, const dVector& V);
     
 				     /**
-				      *  U=a*V+b*W        . Replacing by sum
+				      * U=a*V+b*W.
+				      * Replacing by sum.
 				      */
     void equ (const double a, const dVector& V,
 	      const double b, const dVector& W);
@@ -358,7 +372,8 @@ class dVector : public VectorBase
 	       const double b, const unsigned int k);
     
 				     /**
-				      *  U(i)=a*V(j)+b*V(k)+c*V(l)+d*V(m) . Replacing by sum
+				      * U(i)=a*V(j)+b*V(k)+c*V(l)+d*V(m).
+				      * Replacing by sum
 				      */
     void cequ (const unsigned int i, const VectorBase& V,
 	       const double a, const unsigned int j,
@@ -380,7 +395,8 @@ class dVector : public VectorBase
 	       const double b, const unsigned int k);
     
 				     /**
-				      *  U(i)+=a*V(j)+b*V(k)+c*V(l)+d*V(m) . Multiple addition
+				      * U(i)+=a*V(j)+b*V(k)+c*V(l)+d*V(m).
+				      * Multiple addition
 				      */
     void cadd (const unsigned int i, const VectorBase& V,
 	       const double a, const unsigned int j,
@@ -441,6 +457,10 @@ class dVector : public VectorBase
 
 
 
+
+
+
+/*----------------------- Inline functions ----------------------------------*/
 
 
 inline unsigned int dVector::size () const

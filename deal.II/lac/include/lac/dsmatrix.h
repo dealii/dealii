@@ -301,9 +301,7 @@ class dSMatrixStruct
 CLASS
    dSMatrix
 
-   @author Original version by Roland Becker, Guido Kanschat,
-   Franz-Theo Suttmeier; lots of enhancements, reorganisation
-   and documentation by Wolfgang Bangerth
+   @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth 1998
    */
 class dSMatrix
 {
@@ -326,10 +324,26 @@ class dSMatrix
 				      */
     dSMatrix ();
     
-				     //
+				     /**
+				      * Constructor. Takes the given matrix
+				      * sparisty structure to represent the
+				      * sparsity pattern of this matrix. You
+				      * can change the sparsity pattern later
+				      * on by calling the #reinit# function.
+				      *
+				      * You have to make sure that the lifetime
+				      * of the sparsity structure is at least
+				      * as long as that of this matrix or as
+				      * long as #reinit# is not called with a
+				      * new sparsity structure.
+				      */
     dSMatrix (dSMatrixStruct& c);
     
-				     //
+				     /**
+				      * Destructor. Free all memory, but do not
+				      * release the memory of the sparsity
+				      * structure.
+				      */
     ~dSMatrix ();
     
 
@@ -342,12 +356,27 @@ class dSMatrix
 				      * Release all memory and return to a state
 				      * just like after having called the
 				      * default constructor.
+				      *
+				      * You have to make sure that the lifetime
+				      * of the sparsity structure is at least
+				      * as long as that of this matrix or as
+				      * long as #reinit# is not called with a
+				      * new sparsity structure.
 				      */
     void clear ();
     
-				     //
+				     /**
+				      * Return the dimension of the imga space.
+				      * To remember: the matrix is of dimension
+				      * $m \times n$.
+				      */
     unsigned int m () const;
-				     //
+    
+				     /**
+				      * Return the dimension of the range space.
+				      * To remember: the matrix is of dimension
+				      * $m \times n$.
+				      */
     unsigned int n () const;
 
 				     /**
@@ -446,10 +475,19 @@ class dSMatrix
 				      */
     double & global_entry (const unsigned int i);
 
-				     //
-    void vmult (dVector& dst,const dVector& src) const;
-				     //
-    void Tvmult (dVector& dst,const dVector& src) const;
+				     /**
+				      * Matrix-vector multiplication: let
+				      * #dst = M*src# with #M# being this matrix.
+				      */
+    void vmult (dVector& dst, const dVector& src) const;
+    
+				     /**
+				      * Matrix-vector multiplication: let
+				      * #dst = M^T*src# with #M# being this
+				      * matrix. This function does the same as
+				      * #vmult# but takes the transposed matrix.
+				      */
+    void Tvmult (dVector& dst, const dVector& src) const;
   
 
 				     /**
