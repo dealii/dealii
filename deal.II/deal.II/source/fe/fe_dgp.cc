@@ -23,7 +23,7 @@
 
 
 template <int dim>
-FE_DGP<dim>::FE_DGP (unsigned int degree)
+FE_DGP<dim>::FE_DGP (const unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
 				    std::vector<bool>(1,true),
