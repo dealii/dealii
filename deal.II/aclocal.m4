@@ -663,9 +663,9 @@ AC_DEFUN(DEAL_II_HAVE_STD_OSTREAM_HEADER, dnl
   AC_TRY_COMPILE(
     [
 #include <ostream>
+void f (const std::ostream &out);
     ],
     [
-	std::ostream &cout_reference = std::cout;
     ],
     [
       AC_MSG_RESULT(yes)
