@@ -4,9 +4,14 @@
 #include <numerics/base.h>
 #include <grid/dof_constraints.h>
 #include <grid/tria_iterator.h>
+#include <basic/data_io.h>
 
 
-extern TriaActiveIterator<1,CellAccessor<1> > __dummy1233; // for gcc2.8
+#include "../../../mia/vectormemory.h"
+#include "../../../mia/control.h"
+#include "../../../mia/cg.h"
+
+extern TriaActiveIterator<1,CellAccessor<1> > __dummy1233; // for gcc2.7
 extern TriaActiveIterator<2,CellAccessor<2> > __dummy1234;
 
 
@@ -81,6 +86,29 @@ void ProblemBase<dim>::assemble (const Equation<dim>   &equation,
 
 
 
+template <int dim>
+void ProblemBase<dim>::solve () {
+  int    max_iter  = 4000;
+  double tolerance = 1.e-14;
+  
+  Control                          control1(max_iter,tolerance);
+  PrimitiveVectorMemory<dVector>   memory(right_hand_sides[0]->n());
+  CG<dSMatrix,dVector>             cg(control1,memory);
+
+  cg (system_matrix, solution, *right_hand_sides[0]);
+};
+
+
+
+template <int dim>
+void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
+  out.clear_data_vectors ();
+  out.attach_dof_handler (*dof_handler);
+  out.add_data_vector (solution, "solution");
+};
+
+  
+  
 
 
 // explicit instantiations
