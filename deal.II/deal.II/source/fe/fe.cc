@@ -2,6 +2,10 @@
 
 #include <fe/fe.h>
 #include <fe/quadrature.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_accessor.h>
+
+extern TriaIterator<1,CellAccessor<1> > __dummy2687; // for gcc2.8
 
 
 
@@ -89,8 +93,11 @@ void FEValues<1>::reinit (const Triangulation<1>::cell_iterator &cell,
   
 				   // compute Jacobi determinants in
 				   // quadrature points.
+				   // refer to the general doc for
+				   // why we take the inverse of the
+				   // determinant
   for (unsigned int i=0; i<quadrature_points.size(); ++i)
-    JxW_values[i] = jacobi_matrices[i].determinant() * weights[i];
+    JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
 };
 
 
@@ -120,10 +127,11 @@ void FEValues<2>::reinit (const Triangulation<2>::cell_iterator &cell,
 	      unit_shape_gradients[i][j](b) * jacobi_matrices[j](b,s);
 	};
   
-				   // compute Jacobi determinants in
-				   // quadrature points.
+				   // refer to the general doc for
+				   // why we take the inverse of the
+				   // determinant
   for (unsigned int i=0; i<quadrature_points.size(); ++i)
-    JxW_values[i] = jacobi_matrices[i].determinant() * weights[i];  
+    JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
 };
 
 
@@ -226,11 +234,37 @@ bool FiniteElement<1>::operator == (const FiniteElement<1> &f) const {
 
 
 
+void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
+				       const vector<Point<1> > &unit_points,
+				       vector<dFMatrix>  &jacobians,
+				       vector<Point<1> > &points) const {
+				   // local mesh width
+  double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
+
+  unsigned int n_points = unit_points.size();
+  for (unsigned int i=0; i<n_points; ++i) 
+    {
+      jacobians[i](0,0) = 1./h;
+      points[i] = cell->vertex(0) + h*unit_points[i];
+    };
+};
+
+
+
 bool FiniteElement<2>::operator == (const FiniteElement<2> &f) const {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
 	  (dofs_per_line == f.dofs_per_line) &&
 	  (dofs_per_quad == f.dofs_per_quad) &&
 	  (FiniteElementBase<2>::operator == (f)));
+};
+
+
+
+void FiniteElement<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
+				       const vector<Point<2> > &,
+				       vector<dFMatrix> &,
+				       vector<Point<2> > &) const {
+  Assert (false, ExcPureFunctionCalled());
 };
 
 

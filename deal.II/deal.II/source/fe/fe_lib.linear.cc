@@ -1,7 +1,11 @@
 /* $Id$ */
 
 #include <fe/fe_lib.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_accessor.h>
 
+extern TriaIterator<1,CellAccessor<1> > __dummy2687; // for gcc2.8
+extern TriaIterator<2,CellAccessor<2> > __dummy2688; // for gcc2.8
 
 
 FELinear<1>::FELinear () :
@@ -72,6 +76,18 @@ FELinear<1>::shape_grad(const unsigned int i,
     }
   return Point<1>();
 }
+
+
+
+void FELinear<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
+				  const vector<Point<1> >               &unit_points,
+				  vector<dFMatrix>  &jacobians,
+				  vector<Point<1> > &points) const {
+				   // simply pass down
+  FiniteElement<1>::fill_fe_values (cell, unit_points, jacobians, points);
+};
+
+
 
 
 
@@ -176,8 +192,8 @@ FELinear<2>::FELinear () :
 
 
 double
-FELinear<2>::shape_value(const unsigned int i,
-			       const Point<2>& p) const
+FELinear<2>::shape_value (const unsigned int i,
+			  const Point<2>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
   switch (i)
@@ -193,8 +209,8 @@ FELinear<2>::shape_value(const unsigned int i,
 
 
 Point<2>
-FELinear<2>::shape_grad(const unsigned int i,
-			const Point<2>& p) const
+FELinear<2>::shape_grad (const unsigned int i,
+			 const Point<2>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
   switch (i)
@@ -209,8 +225,54 @@ FELinear<2>::shape_grad(const unsigned int i,
 
 
 
+// this function may be generalised to three or more dimensions with gcc2.8
+// you will have to change th number of vertices
+void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
+				  const vector<Point<2> >               &unit_points,
+				  vector<dFMatrix>  &jacobians,
+				  vector<Point<2> > &points) const {
+  const unsigned int dim=2;
+  const unsigned int n_vertices=4;
+  
+  unsigned int n_points=unit_points.size();
+
+				   // initialize points to zero
+  for (unsigned int i=0; i<n_points; ++i)
+    points[i] = Point<dim> ();
+  
+				   // note: let x_l be the vector of the
+				   // lth quadrature point in real space and
+				   // xi_l that on the unit cell, let further
+				   // p_j be the vector of the jth vertex
+				   // of the cell in real space and
+				   // N_j(xi_l) be the value of the associated
+				   // basis function at xi_l, then
+				   // x_l(xi_l) = sum_j p_j N_j(xi_l)
+  for (unsigned int j=0; j<n_vertices; ++j) 
+    for (unsigned int l=0; l<n_points; ++l) 
+      points[l] += cell->vertex(j) * shape_value(j, unit_points[l]);
+
+// computation of jacobian still missing
+};
+
+
+
+
+
+
 FEQuadratic<1>::FEQuadratic () :
 		FiniteElement<1> (1, 1) {};
+
+
+
+void FEQuadratic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
+				     const vector<Point<1> >               &unit_points,
+				     vector<dFMatrix>  &jacobians,
+				     vector<Point<1> > &points) const {
+				   // simply pass down
+  FiniteElement<1>::fill_fe_values (cell, unit_points, jacobians, points);
+};
+
 
 
 FEQuadratic<2>::FEQuadratic () :
@@ -229,8 +291,21 @@ FEQuadratic<2>::FEQuadratic () :
 
 
 
+
 FECubic<1>::FECubic () :
 		FiniteElement<1> (1, 2) {};
+
+
+
+void FECubic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
+				 const vector<Point<1> >               &unit_points,
+				 vector<dFMatrix>  &jacobians,
+				 vector<Point<1> > &points) const {
+				   // simply pass down
+  FiniteElement<1>::fill_fe_values (cell, unit_points, jacobians, points);
+};
+
+
 
 
 FECubic<2>::FECubic () :
