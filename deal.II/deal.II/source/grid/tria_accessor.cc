@@ -121,7 +121,7 @@ void LineAccessor<dim>::clear_used_flag () const {
 
 template <int dim>
 bool LineAccessor<dim>::user_flag_set () const {
-  Assert (used(), ExcRefineCellNotActive());
+  Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->lines.user_flags[present_index];
 };
 
@@ -169,7 +169,7 @@ int LineAccessor<dim>::child_index (unsigned int i) const {
 
 template <int dim>
 void LineAccessor<dim>::set_children (const int index) const {
-  Assert (used(), ExcRefineCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->lines.children[present_index] = index;
 };
 
@@ -241,7 +241,7 @@ void LineAccessor<dim>::operator -- () {
 template <int dim>
 unsigned char LineAccessor<dim>::boundary_indicator () const {
   Assert (dim>=2, ExcNotUsefulForThisDimension());
-  Assert (used(), ExcRefineCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
 
   return tria->levels[present_level]->lines.material_id[present_index];
 };
@@ -251,7 +251,7 @@ unsigned char LineAccessor<dim>::boundary_indicator () const {
 template <int dim>
 void LineAccessor<dim>::set_boundary_indicator (unsigned char boundary_ind) const {
   Assert (dim>=2, ExcNotUsefulForThisDimension());
-  Assert (used(), ExcRefineCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
 
   tria->levels[present_level]->lines.material_id[present_index] = boundary_ind;
 };
@@ -331,7 +331,7 @@ void QuadAccessor<dim>::clear_used_flag () const {
 
 template <int dim>
 bool QuadAccessor<dim>::user_flag_set () const {
-  Assert (used(), ExcRefineCellNotActive());
+  Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->quads.user_flags[present_index];
 };
 
@@ -403,7 +403,7 @@ int QuadAccessor<dim>::child_index (unsigned int i) const {
 
 template <int dim>
 void QuadAccessor<dim>::set_children (const int index) const {
-  Assert (used(), ExcRefineCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->quads.children[present_index] = index;
 };
 
@@ -474,7 +474,7 @@ void QuadAccessor<dim>::operator -- () {
 template <int dim>
 unsigned char QuadAccessor<dim>::boundary_indicator () const {
   Assert (dim>=3, ExcNotUsefulForThisDimension());
-  Assert (used(), ExcRefineCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
 
   return tria->levels[present_level]->quads.material_id[present_index];
 };
@@ -484,7 +484,7 @@ unsigned char QuadAccessor<dim>::boundary_indicator () const {
 template <int dim>
 void QuadAccessor<dim>::set_boundary_indicator (unsigned char boundary_ind) const {
   Assert (dim>=3, ExcNotUsefulForThisDimension());
-  Assert (used(), ExcRefineCellNotUsed());
+  Assert (used(), ExcCellNotUsed());
 
   tria->levels[present_level]->quads.material_id[present_index] = boundary_ind;
 };
@@ -529,7 +529,7 @@ bool CellAccessor<1>::at_boundary () const {
 template <>
 unsigned char CellAccessor<1>::material_id () const {
   Assert (used(),
-	  typename TriaSubstructAccessor<1>::ExcRefineCellNotUsed());
+	  typename TriaSubstructAccessor<1>::ExcCellNotUsed());
   return tria->levels[present_level]->lines.material_id[present_index];
 };
 
@@ -538,7 +538,7 @@ unsigned char CellAccessor<1>::material_id () const {
 template <>
 void CellAccessor<1>::set_material_id (const unsigned char mat_id) const {
   Assert (used(),
-	  typename TriaSubstructAccessor<1>::ExcRefineCellNotUsed());
+	  typename TriaSubstructAccessor<1>::ExcCellNotUsed());
   tria->levels[present_level]->lines.material_id[present_index]
     = mat_id;						 
 };
@@ -569,7 +569,7 @@ bool CellAccessor<2>::at_boundary () const {
 template <>
 unsigned char CellAccessor<2>::material_id () const {
   Assert (used(),
-	  typename TriaSubstructAccessor<2>::ExcRefineCellNotUsed());
+	  typename TriaSubstructAccessor<2>::ExcCellNotUsed());
   return tria->levels[present_level]->quads.material_id[present_index];
 };
 
@@ -578,7 +578,7 @@ unsigned char CellAccessor<2>::material_id () const {
 template <>
 void CellAccessor<2>::set_material_id (const unsigned char mat_id) const {
   Assert (used(),
-	  typename TriaSubstructAccessor<2>::ExcRefineCellNotUsed());
+	  typename TriaSubstructAccessor<2>::ExcCellNotUsed());
   tria->levels[present_level]->quads.material_id[present_index]
     = mat_id;						 
 };
@@ -653,7 +653,7 @@ bool CellAccessor<dim>::refine_flag_set () const {
 				   // executed and for some reason the refine
 				   // flag is not cleared).
   Assert (active() ||  !tria->levels[present_level]->refine_flags[present_index],
-	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+	  ExcRefineCellNotActive());
   return tria->levels[present_level]->refine_flags[present_index];
 };
 
@@ -661,8 +661,9 @@ bool CellAccessor<dim>::refine_flag_set () const {
 
 template <int dim>
 void CellAccessor<dim>::set_refine_flag () const {
-  Assert (used() && active(),
-	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+  Assert (used() && active(), ExcRefineCellNotActive());
+  Assert (!coarsen_flag_set(), ExcCellFlaggedForCoarsening());
+  
   tria->levels[present_level]->refine_flags[present_index] = true;
 };
 
@@ -670,8 +671,7 @@ void CellAccessor<dim>::set_refine_flag () const {
 
 template <int dim>
 void CellAccessor<dim>::clear_refine_flag () const {
-  Assert (used() && active(),
-	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+  Assert (used() && active(), ExcRefineCellNotActive());
   tria->levels[present_level]->refine_flags[present_index] = false;
 };
 
@@ -686,7 +686,7 @@ bool CellAccessor<dim>::coarsen_flag_set () const {
 				   // executed and for some reason the refine
 				   // flag is not cleared).
   Assert (active() ||  !tria->levels[present_level]->coarsen_flags[present_index],
-	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+	  ExcRefineCellNotActive());
   return tria->levels[present_level]->coarsen_flags[present_index];
 };
 
@@ -694,8 +694,9 @@ bool CellAccessor<dim>::coarsen_flag_set () const {
 
 template <int dim>
 void CellAccessor<dim>::set_coarsen_flag () const {
-  Assert (used() && active(),
-	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+  Assert (used() && active(), ExcRefineCellNotActive());
+  Assert (!refine_flag_set(), ExcCellFlaggedForRefinement());
+  
   tria->levels[present_level]->coarsen_flags[present_index] = true;
 };
 
@@ -703,8 +704,7 @@ void CellAccessor<dim>::set_coarsen_flag () const {
 
 template <int dim>
 void CellAccessor<dim>::clear_coarsen_flag () const {
-  Assert (used() && active(),
-	  typename TriaSubstructAccessor<dim>::ExcRefineCellNotActive());
+  Assert (used() && active(), ExcRefineCellNotActive());
   tria->levels[present_level]->coarsen_flags[present_index] = false;
 };
 
