@@ -965,8 +965,8 @@ namespace LaplaceSolver
 					 update_q_points  |
 					 update_JxW_values));
 
-    const unsigned int   dofs_per_cell = fe->dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature->n_quadrature_points;
+    const unsigned int   dofs_per_cell = this->fe->dofs_per_cell;
+    const unsigned int   n_q_points    = this->quadrature->n_quadrature_points;
 
     Vector<double>       cell_rhs (dofs_per_cell);
     std::vector<double>  rhs_values (n_q_points);
@@ -1091,7 +1091,7 @@ namespace LaplaceSolver
     GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
 						     estimated_error_per_cell,
 						     0.3, 0.03);
-    triangulation->execute_coarsening_and_refinement ();
+    this->triangulation->execute_coarsening_and_refinement ();
   };
 
 
@@ -1175,7 +1175,7 @@ namespace LaplaceSolver
 				     // documentation of that class.
     Vector<float> estimated_error (this->triangulation->n_active_cells());
     KellyErrorEstimator<dim>::estimate (this->dof_handler,
-					*face_quadrature,
+					*this->face_quadrature,
 					typename FunctionMap<dim>::type(),
 					this->solution,
 					estimated_error);
@@ -1185,8 +1185,8 @@ namespace LaplaceSolver
 				     // of the function given to the
 				     // constructor:
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+      cell = this->dof_handler.begin_active(),
+      endc = this->dof_handler.end();
     for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
       estimated_error(cell_index)
 	*= weighting_function->value (cell->center());
@@ -1194,7 +1194,7 @@ namespace LaplaceSolver
     GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
 						     estimated_error,
 						     0.3, 0.03);
-    triangulation->execute_coarsening_and_refinement ();
+    this->triangulation->execute_coarsening_and_refinement ();
   };
 
 };
@@ -2737,7 +2737,7 @@ namespace LaplaceSolver
     GridRefinement::refine_and_coarsen_fixed_fraction (*this->triangulation,
 						       error_indicators,
 						       0.8, 0.02);
-    triangulation->execute_coarsening_and_refinement ();
+    this->triangulation->execute_coarsening_and_refinement ();
   };
   
 
