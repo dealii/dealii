@@ -27,14 +27,14 @@ check_support (FiniteElement<dim>& finel, const char* name)
   DoFHandler<dim> dof (tr);
   dof.distribute_dofs (finel);
 
+  cout << name << '<' << dim << '>' << " cell support points" << endl;
+  
   vector<Point<dim> > cell_points (finel.dofs_per_cell);
   vector<Point<dim> > face_points (finel.dofs_per_face);
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   finel.get_support_points (cell, cell_points);
 
-  cout << name << '<' << dim << '>' << " cell support points" << endl;
-  
   for (unsigned int k=0;k<cell_points.size();++k)
     cout << setprecision(3) << cell_points[k] << endl;
   
@@ -66,31 +66,24 @@ check_matrices (FiniteElement<dim>& fe, const char* name)
 }
 
 
-#define CHECK_S(EL,dim) FE ## EL<dim> EL; check_support(EL, #EL);
-#define CHECK_M(EL,dim) FE ## EL<dim> EL; check_matrices(EL, #EL);
-#define CHECK_ALL(EL,dim) FE ## EL<dim> EL; check_support(EL, #EL); check_matrices(EL,#EL)
+#define CHECK_S(EL,dim) { FE ## EL<dim> EL; check_support(EL, #EL); }
+#define CHECK_M(EL,dim) { FE ## EL<dim> EL; check_matrices(EL, #EL); }
+#define CHECK_ALL(EL,dim) { FE ## EL<dim> EL; check_support(EL, #EL); check_matrices(EL,#EL); }
 
 int
 main()
 {
-  if (true)
-    {
-      CHECK_ALL(Q1,2);
-      CHECK_ALL(Q2,2);
-      CHECK_ALL(Q3,2);
-      CHECK_ALL(Q4,2);
-      CHECK_ALL(DG_Q0,2);
-      CHECK_ALL(DG_Q1,2);
-      CHECK_ALL(DG_Q2,2);
-      CHECK_ALL(DG_Q3,2);
-    }
-  if (true)
-    {
-      CHECK_ALL(Q1,3);
-      CHECK_ALL(Q2,3);
-      CHECK_ALL(DG_Q0,3);
-      CHECK_ALL(DG_Q1,3);
-    }
-  
+  CHECK_M(DG_Q0,2);
+  CHECK_M(DG_Q1,2);
+  CHECK_M(DG_Q2,2);
+  CHECK_M(DG_Q3,2);
+  CHECK_ALL(Q1,2);
+  CHECK_ALL(Q2,2);
+  CHECK_ALL(Q3,2);
+  CHECK_ALL(Q4,2);
+  CHECK_ALL(Q1,3);
+  CHECK_ALL(Q2,3);
+  CHECK_M(DG_Q0,3);
+  CHECK_M(DG_Q1,3);  
   return 0;
 }
