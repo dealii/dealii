@@ -327,7 +327,7 @@ namespace Patterns
 	if (name.find(",") != std::string::npos)
 	  {
 	    name.erase (name.find(","), std::string::npos);
-	    tmp.erase (0, test_string_list.find(",")+1);
+	    tmp.erase (0, tmp.find(",")+1);
 	  }
 	else
 	  tmp = "";
