@@ -296,18 +296,20 @@ class KellyErrorEstimator
 
 
 				     /**
-				      * All data needed by the several functions
-				      * of the error estimator is gathered in
-				      * this struct. It is passed as a reference
-				      * to the seperate functions in this class.
+				      * All data needed by the several
+				      * functions of the error
+				      * estimator is gathered in this
+				      * struct. It is passed as a
+				      * reference to the seperate
+				      * functions in this class.
 				      *
 				      * The reason for invention of
 				      * this object is two-fold:
 				      * first, class member data is
 				      * not possible because no real
 				      * object is created (all
-				      * functions are @p{static}), which
-				      * is a historical
+				      * functions are @p{static}),
+				      * which is a historical
 				      * reason. Second, if we don't
 				      * collect the data the various
 				      * functions need somewhere at a
@@ -330,33 +332,46 @@ class KellyErrorEstimator
 				      * parallel, since they are quite
 				      * often blocked by these
 				      * synchronisation points.
+				      *
+				      * Thus, every thread gets an
+				      * instance of this class to work
+				      * with and needs not allocate
+				      * memory itself, or synchronise
+				      * with other threads.
 				      */
     struct Data
     {
-	const DoFHandler<dim>   &dof;
+	const DoFHandler<dim>   &dof_handler;
 	const Quadrature<dim-1> &quadrature;
 	const FunctionMap       &neumann_bc;
 	const Vector<double>    &solution;
-	vector<bool>            component_mask;
+	const vector<bool>       component_mask;
 	const Function<dim>     *coefficients;
-	unsigned int            n_threads;
-    
-	DoFHandler<dim>::active_cell_iterator endc;
-	unsigned int            n_components;
-	unsigned int            n_q_points;
-	FaceIntegrals           face_integrals;  
+	const unsigned int       n_threads;
 
 					 /**
-					  * A vector to store the jump of the
-					  * normal vectors in the quadrature
-					  * points.
-					  * There is one vector for every
-					  * thread used in the estimator.
-					  * The allocation of memory has to
-					  * be global to enable fast use
-					  * of multithreading	  
+					  * Reference to the global
+					  * object that stores the
+					  * face integrals.
+					  */
+	FaceIntegrals           &face_integrals;  
+
+					 /**
+					  * A vector to store the jump
+					  * of the normal vectors in
+					  * the quadrature points
+					  * (i.e. a temporary
+					  * value). This vector is not
+					  * allocated inside the
+					  * functions that use it, but
+					  * rather globally, since
+					  * memory allocation is slow,
+					  * in particular in presence
+					  * of multiple threads where
+					  * synchronisation makes
+					  * things even slower.
 					  */ 
-	vector< vector<vector<double> > >         phi;
+	vector<vector<double> >         phi;
 
 					 /**
 					  * A vector for the gradients of
@@ -370,18 +385,18 @@ class KellyErrorEstimator
 					  * index the number of the
 					  * quadrature point.
 					  */
-	vector< vector<vector<Tensor<1,dim> > > > psi;
+	vector<vector<Tensor<1,dim> > > psi;
 
 					 /**
 					  * The same vector for a neighbor cell
 					  */
-	vector< vector<vector<Tensor<1,dim> > > > neighbor_psi;
+	vector<vector<Tensor<1,dim> > > neighbor_psi;
 
 					 /**
 					  * The normal vectors of the finite
 					  * element function on one face
 					  */
-	vector< vector<Point<dim> > > normal_vectors;
+	vector<Point<dim> > normal_vectors;
 
 					 /**
 					  * Two arrays needed for the
@@ -389,8 +404,8 @@ class KellyErrorEstimator
 					  * the jumps, if they are
 					  * given.
 					  */
-	vector< vector<double> >          coefficient_values1;
-	vector< vector<Vector<double> > > coefficient_values;
+	vector<double>          coefficient_values1;
+	vector<Vector<double> > coefficient_values;
 
 					 /**
 					  * Array for the products of
@@ -398,7 +413,7 @@ class KellyErrorEstimator
 					  * weights of quadraturs
 					  * points.
 					  */
-	vector< vector<double> >          JxW_values;
+	vector<double>          JxW_values;
 
 					 /**
 					  * A constructor of the
@@ -409,9 +424,10 @@ class KellyErrorEstimator
 	     const Quadrature<dim-1> &quadrature,
 	     const FunctionMap       &neumann_bc,
 	     const Vector<double>    &solution,
-	     vector<bool>             component_mask_,
+	     const vector<bool>      &component_mask,
 	     const Function<dim>     *coefficients,
-	     unsigned int             n_threads);
+	     const unsigned int       n_threads,
+	     FaceIntegrals           &face_integrals);
     };
 
 
@@ -434,25 +450,26 @@ class KellyErrorEstimator
 			       const unsigned int this_thread);
     				
 				     /**
-				      * Actually do the computation on a face
-				      * which has no hanging nodes (it is
-				      * regular),  i.e.
-				      * either on the other side there is
-				      * nirvana (face is at boundary), or
-				      * the other side's refinement level
-				      * is the same as that of this side,
-				      * then handle the integration of
+				      * Actually do the computation on
+				      * a face which has no hanging
+				      * nodes (it is regular), i.e.
+				      * either on the other side there
+				      * is nirvana (face is at
+				      * boundary), or the other side's
+				      * refinement level is the same
+				      * as that of this side, then
+				      * handle the integration of
 				      * these both cases together.
 				      *
-				      * The meaning of the parameters becomes
-				      * clear when looking at the source
-				      * code. This function is only
-				      * externalized from @p{estimate_error}
-				      * to avoid ending up with a function
-				      * of 500 lines of code.
+				      * The meaning of the parameters
+				      * becomes clear when looking at
+				      * the source code. This function
+				      * is only externalized from
+				      * @p{estimate_error} to avoid
+				      * ending up with a function of
+				      * 500 lines of code.
 				      */
     static void integrate_over_regular_face (Data                       &data,
-					     const unsigned int          this_thread,
 					     const active_cell_iterator &cell,
 					     const unsigned int          face_no,
 					     FEFaceValues<dim>          &fe_face_values_cell,
@@ -460,15 +477,16 @@ class KellyErrorEstimator
 
 
 				     /**
-				      * The same applies as for the function
-				      * above, except that integration is
-				      * over face @p{face_no} of @p{cell}, where
-				      * the respective neighbor is refined,
-				      * so that the integration is a bit more
+				      * The same applies as for the
+				      * function above, except that
+				      * integration is over face
+				      * @p{face_no} of @p{cell}, where
+				      * the respective neighbor is
+				      * refined, so that the
+				      * integration is a bit more
 				      * complex.
 				      */
     static void integrate_over_irregular_face (Data                       &data,
-					       const unsigned int          this_thread,
 					       const active_cell_iterator &cell,
 					       const unsigned int          face_no,
 					       FEFaceValues<dim>          &fe_face_values,
