@@ -500,6 +500,13 @@ dSMatrix::SSOR(dVector& dst, double om)
 }
 
 
+
+const dSMatrixStruct & dSMatrix::get_sparsity_pattern () const {
+  return *cols;
+};
+
+
+
 void dSMatrix::print (ostream &out) const {
   Assert (cols != 0, ExcMatrixNotInitialized());
 

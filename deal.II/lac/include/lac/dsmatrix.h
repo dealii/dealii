@@ -174,6 +174,8 @@ class dSMatrix
 				     //
     void precondition(dVector& dst,const dVector& src) { dst=src; }
 
+    const dSMatrixStruct & get_sparsity_pattern () const;
+    
     void print (ostream &) const;
 
 				     /**
@@ -191,5 +193,6 @@ class dSMatrix
 		    int, int,
 		    << "The dimensions " << arg1 << " and " << arg2
 		    << " do not match properly.");
+    friend class ConstraintMatrix;
 };
 #endif
