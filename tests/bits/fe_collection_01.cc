@@ -31,12 +31,15 @@ template <int dim>
 void
 check ()
 {
-  const FE_Q<dim> fe_1(1);
-  const FE_Q<dim> fe_2(2);
-
-  FECollection<dim> fc;
-  fc.add_fe (fe_1);
-  fc.add_fe (fe_2);
+  {
+    const FE_Q<dim> fe_1(1);
+    const FE_Q<dim> fe_2(2);
+    
+    FECollection<dim> fc;
+    fc.add_fe (fe_1);
+    fc.add_fe (fe_2);
+  }
+  deallog << dim << "d: OK" << std::endl;
 }
 
 int main()
