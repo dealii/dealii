@@ -67,6 +67,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+  Improved: <code class="class">FEFaceValuesBase</code> has a new
+  function <code class="member">orientation</code> accessing a unique
+  and consistent orientation for each face.
+  <br>
+  (GK 2003/06/23)
+
   <li> <p> 
        Changed: Embedding and restriction matrices for intergrid transfer are
        now computed in the constructor of most elements, rather than taken from
@@ -74,7 +81,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        elements are available since the old tables were only precomputed for
        certain polynomial degrees and are now available for all.
        <br>
-       (WB 2002/06/09)
+       (WB 2003/06/09)
        </p>
 
   <li> <p> 
@@ -87,7 +94,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        this function if it implements the desired interpolation, and falls back
        to the old algorithm if this is not the case.
        <br>
-       (WB 2002/06/09)
+       (WB 2003/06/09)
        </p>
 
   <li> <p> 
@@ -95,14 +102,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">get_name</class>, which can be used to identify a finite
        element by its name.
        <br>
-       (WB 2002/06/09)
+       (WB 2003/06/09)
        </p>
 
   <li> <p> 
        New: Raviart-Thomas elements are now implemented in the <code
        class="class">FE_RaviartThomas</class> class.
        <br>
-       (WB 2002/06/09)
+       (WB 2003/06/09)
        </p>
 </ol>
 
