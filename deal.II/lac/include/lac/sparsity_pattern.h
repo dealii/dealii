@@ -1149,7 +1149,8 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
   for (ForwardIterator i=begin; i!=end; ++i, ++row)
     {
       unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
-      for (inner_iterator j=i->begin(); j!=i->end(); ++j)
+      const inner_iterator end_of_row = i->end();
+      for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
 	{
 	  const unsigned int col = get_column_index_from_iterator(*j);
 	  Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
