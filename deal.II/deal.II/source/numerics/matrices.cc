@@ -85,10 +85,10 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const FiniteElement<dim> &fe,
 					     const Boundary<dim>      &boundary,
 					     dSMatrix                 &matrix) {
-  const unsigned int n_dofs = fe.total_dofs;
+  const unsigned int total_dofs = fe.total_dofs;
   
-  dFMatrix    local_mass_matrix (n_dofs, n_dofs);
-  vector<int> dofs_on_this_cell (n_dofs);
+  dFMatrix    local_mass_matrix (total_dofs, total_dofs);
+  vector<int> dofs_on_this_cell (total_dofs);
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
@@ -97,8 +97,8 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
       cell->get_dof_indices (dofs_on_this_cell);
       fe.get_local_mass_matrix (cell, boundary, local_mass_matrix);
       
-      for (unsigned int i=0; i<n_dofs; ++i)
-	for (unsigned int j=0; j<n_dofs; ++j)
+      for (unsigned int i=0; i<total_dofs; ++i)
+	for (unsigned int j=0; j<total_dofs; ++j)
 	  matrix.add (dofs_on_this_cell[i], dofs_on_this_cell[j],
 		      local_mass_matrix(i,j));
     };
@@ -544,13 +544,13 @@ template <int dim>
 void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				const FEValues<dim> &fe_values,
 				const typename Triangulation<dim>::cell_iterator &) const {
-  const unsigned int n_dofs = fe_values.total_dofs,
+  const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (cell_matrix.n() == n_dofs,
-	  ExcWrongSize(cell_matrix.n(), n_dofs));
-  Assert (cell_matrix.m() == n_dofs,
-	  ExcWrongSize(cell_matrix.m(), n_dofs));
+  Assert (cell_matrix.n() == total_dofs,
+	  ExcWrongSize(cell_matrix.n(), total_dofs));
+  Assert (cell_matrix.m() == total_dofs,
+	  ExcWrongSize(cell_matrix.m(), total_dofs));
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   
   const dFMatrix       &values    = fe_values.get_shape_values ();
@@ -562,8 +562,8 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
       vector<double> coefficient_values (fe_values.n_quadrature_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
-      for (unsigned int i=0; i<n_dofs; ++i) 
-	for (unsigned int j=0; j<n_dofs; ++j)
+      for (unsigned int i=0; i<total_dofs; ++i) 
+	for (unsigned int j=0; j<total_dofs; ++j)
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    cell_matrix(i,j) += (values(i,point) *
 				 values(j,point) *
@@ -571,8 +571,8 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				 coefficient_values[point]);
     }
   else
-    for (unsigned int i=0; i<n_dofs; ++i) 
-      for (unsigned int j=0; j<n_dofs; ++j)
+    for (unsigned int i=0; i<total_dofs; ++i) 
+      for (unsigned int j=0; j<total_dofs; ++j)
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  cell_matrix(i,j) += (values(i,point) *
 			       values(j,point) *
@@ -588,15 +588,15 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				const Triangulation<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
-  const unsigned int n_dofs = fe_values.total_dofs,
+  const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (cell_matrix.n() == n_dofs,
-	  ExcWrongSize(cell_matrix.n(), n_dofs));
-  Assert (cell_matrix.m() == n_dofs,
-	  ExcWrongSize(cell_matrix.m(), n_dofs));
-  Assert (rhs.size() == n_dofs,
-	  ExcWrongSize(rhs.size(), n_dofs));
+  Assert (cell_matrix.n() == total_dofs,
+	  ExcWrongSize(cell_matrix.n(), total_dofs));
+  Assert (cell_matrix.m() == total_dofs,
+	  ExcWrongSize(cell_matrix.m(), total_dofs));
+  Assert (rhs.size() == total_dofs,
+	  ExcWrongSize(rhs.size(), total_dofs));
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
@@ -611,9 +611,9 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<n_q_points; ++point)
-	for (unsigned int i=0; i<n_dofs; ++i) 
+	for (unsigned int i=0; i<total_dofs; ++i) 
 	  {
-	    for (unsigned int j=0; j<n_dofs; ++j)
+	    for (unsigned int j=0; j<total_dofs; ++j)
 	      cell_matrix(i,j) += (values(i,point) *
 				   values(j,point) *
 				   weights[point] *
@@ -625,9 +625,9 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
     }
   else
     for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<n_dofs; ++i) 
+      for (unsigned int i=0; i<total_dofs; ++i) 
 	{
-	  for (unsigned int j=0; j<n_dofs; ++j)
+	  for (unsigned int j=0; j<total_dofs; ++j)
 	    cell_matrix(i,j) += (values(i,point) *
 				 values(j,point) *
 				 weights[point]);
@@ -645,10 +645,10 @@ void MassMatrix<dim>::assemble (dVector             &rhs,
 				const Triangulation<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
-  const unsigned int n_dofs = fe_values.total_dofs,
+  const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (rhs.size() == n_dofs, ExcWrongSize(rhs.size(), n_dofs));
+  Assert (rhs.size() == total_dofs, ExcWrongSize(rhs.size(), total_dofs));
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
   const dFMatrix       &values    = fe_values.get_shape_values ();
@@ -657,7 +657,7 @@ void MassMatrix<dim>::assemble (dVector             &rhs,
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   for (unsigned int point=0; point<n_q_points; ++point)
-    for (unsigned int i=0; i<n_dofs; ++i) 
+    for (unsigned int i=0; i<total_dofs; ++i) 
       rhs(i) += values(i,point) *
 		rhs_values[point] *
 		weights[point];
@@ -682,15 +682,15 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				   const Triangulation<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
   
-  const unsigned int n_dofs = fe_values.total_dofs,
+  const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (cell_matrix.n() == n_dofs,
-	  ExcWrongSize(cell_matrix.n(), n_dofs));
-  Assert (cell_matrix.m() == n_dofs,
-	  ExcWrongSize(cell_matrix.m(), n_dofs));
-  Assert (rhs.size() == n_dofs,
-	  ExcWrongSize(rhs.size(), n_dofs));
+  Assert (cell_matrix.n() == total_dofs,
+	  ExcWrongSize(cell_matrix.n(), total_dofs));
+  Assert (cell_matrix.m() == total_dofs,
+	  ExcWrongSize(cell_matrix.m(), total_dofs));
+  Assert (rhs.size() == total_dofs,
+	  ExcWrongSize(rhs.size(), total_dofs));
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
@@ -706,9 +706,9 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<n_q_points; ++point)
-	for (unsigned int i=0; i<n_dofs; ++i) 
+	for (unsigned int i=0; i<total_dofs; ++i) 
 	  {
-	    for (unsigned int j=0; j<n_dofs; ++j)
+	    for (unsigned int j=0; j<total_dofs; ++j)
 	      cell_matrix(i,j) += (gradients[i][point] *
 				   gradients[j][point]) *
 				  weights[point] *
@@ -720,9 +720,9 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
     }
   else
     for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<n_dofs; ++i) 
+      for (unsigned int i=0; i<total_dofs; ++i) 
 	{
-	  for (unsigned int j=0; j<n_dofs; ++j)
+	  for (unsigned int j=0; j<total_dofs; ++j)
 	    cell_matrix(i,j) += (gradients[i][point] *
 				 gradients[j][point]) *
 				weights[point];
@@ -739,13 +739,13 @@ template <int dim>
 void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				   const FEValues<dim> &fe_values,
 				   const Triangulation<dim>::cell_iterator &) const {
-  const unsigned int n_dofs = fe_values.total_dofs,
+  const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (cell_matrix.n() == n_dofs,
-	  ExcWrongSize(cell_matrix.n(), n_dofs));
-  Assert (cell_matrix.m() == n_dofs,
-	  ExcWrongSize(cell_matrix.m(), n_dofs));
+  Assert (cell_matrix.n() == total_dofs,
+	  ExcWrongSize(cell_matrix.n(), total_dofs));
+  Assert (cell_matrix.m() == total_dofs,
+	  ExcWrongSize(cell_matrix.m(), total_dofs));
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   
   const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
@@ -757,8 +757,8 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
       for (unsigned int point=0; point<n_q_points; ++point)
-	for (unsigned int i=0; i<n_dofs; ++i) 
-	  for (unsigned int j=0; j<n_dofs; ++j)
+	for (unsigned int i=0; i<total_dofs; ++i) 
+	  for (unsigned int j=0; j<total_dofs; ++j)
 	    cell_matrix(i,j) += (gradients[i][point] *
 				 gradients[j][point]) *
 				weights[point] *
@@ -766,8 +766,8 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
     }
   else
     for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<n_dofs; ++i) 
-	for (unsigned int j=0; j<n_dofs; ++j)
+      for (unsigned int i=0; i<total_dofs; ++i) 
+	for (unsigned int j=0; j<total_dofs; ++j)
 	  cell_matrix(i,j) += (gradients[i][point] *
 			       gradients[j][point]) *
 			      weights[point];
@@ -781,10 +781,10 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
 				   const Triangulation<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
-  const unsigned int n_dofs = fe_values.total_dofs,
+  const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
-  Assert (rhs.size() == n_dofs, ExcWrongSize(rhs.size(), n_dofs));
+  Assert (rhs.size() == total_dofs, ExcWrongSize(rhs.size(), total_dofs));
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
   const dFMatrix       &values    = fe_values.get_shape_values ();
@@ -793,7 +793,7 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
    
   for (unsigned int point=0; point<n_q_points; ++point)
-    for (unsigned int i=0; i<n_dofs; ++i) 
+    for (unsigned int i=0; i<total_dofs; ++i) 
       rhs(i) += values(i,point) *
 		rhs_values[point] *
 		weights[point];
