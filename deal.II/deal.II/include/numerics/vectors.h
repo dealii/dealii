@@ -287,6 +287,21 @@ class VectorTools //<dim>
 			     Vector<double>           &vec);
 
 				     /**
+				      * Compute the interpolation of
+				      * #vectorfunction# at the support points to
+				      * the finite element space. This is the
+				      * analogue for vectorfunctions
+				      * to the #interpolate# function for scalar
+				      * functions above.
+				      *
+				      * See the general documentation of this
+				      * class for further information.
+				      */
+    static void interpolate (const DoFHandler<dim>    &dof,
+			     const VectorFunction<dim>&vectorfunction,
+			     Vector<double>           &vec);
+
+				     /**
 				      * Interpolate different finite
 				      * element spaces. The
 				      * interpolation is executed from
@@ -444,7 +459,13 @@ class VectorTools //<dim>
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcNotUseful);
+
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcInvalidFE);
+
 				     /**
 				      * Exception
 				      */
