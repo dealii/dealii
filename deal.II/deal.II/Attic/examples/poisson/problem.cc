@@ -161,7 +161,7 @@ double RHSPoly<dim>::operator () (const Point<dim> &p) const {
 
 template <int dim>
 double Solution<dim>::operator () (const Point<dim> &p) const {
-  double ret_val = 0;
+  double ret_val = 1;
   for (unsigned int i=0; i<dim; ++i)
     ret_val *= p(i)*(1.-p(i));
   return ret_val;
@@ -467,22 +467,27 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << "    Writing to file <" << prm.get("Output file") << ">..."
        << endl;
   
-  DataOut<dim> out;
-  String o_filename = prm.get ("Output file");
-  ofstream gnuplot(o_filename);
-  fill_data (out); 
-  out.write_gnuplot (gnuplot);
-  gnuplot.close ();
-
   cout << "    Calculation L2 error... ";
   Solution<dim> sol;
   vector<double> difference;
   QGauss3<dim> q;
   integrate_difference (sol, difference, q, fe, L2_norm);
-  double error = 0;
+  double error = 0.;
   for (unsigned int i=0; i<difference.size(); ++i)
     error += difference[i]*difference[i];
-  cout << sqrt(error) << endl;
+  cout << sqrt(error) << " on " << difference.size() << " cells." << endl;
+
+  dVector error_per_dof;
+  dof->distribute_cell_to_dof_vector (difference, error_per_dof);
+
+  DataOut<dim> out;
+  String o_filename = prm.get ("Output file");
+  ofstream gnuplot(o_filename);
+  fill_data (out);
+  out.add_data_vector (error_per_dof, "Error");
+  out.write_gnuplot (gnuplot);
+  gnuplot.close ();
+
 
   cout << endl;
 };
