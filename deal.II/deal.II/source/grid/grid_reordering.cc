@@ -41,7 +41,7 @@ namespace internal
 {
   namespace GridReordering2d
   {
-// -- Definition Of conectivity information --
+// -- Definition of connectivity information --
     const int ConnectGlobals::EdgeToNode[4][2] = 
     { {0,1},{1,2},{2,3},{3,0} };
 
@@ -590,6 +590,89 @@ namespace internal
 	std::swap (v1, v2);
     }
 
+
+    namespace ElementInfo
+    {
+				       /**
+					* The numbers of the edges
+					* coming into node i are
+					* given by
+					* edge_to_node[i][k] where
+					* k=0,1,2.
+					*/    
+      static const int edge_to_node[8][3] = 
+      { 
+	    {0,4,8},
+	    {0,5,9},
+	    {3,5,10},
+	    {3,4,11},
+	    {1,7,8},
+	    {1,6,9},
+	    {2,6,10},
+	    {2,7,11}
+      };
+
+
+				       /**
+					* The orientation of edge
+					* coming into node i is
+					* given by
+					* edge_to_node_orient[i][k]
+					* where k=0,1,2. 1 means the
+					* given node is the start of
+					* the edge -1 means the end
+					* of the edge.
+					*/
+      static const int edge_to_node_orient[8][3] = 
+      {
+	    { 1, 1, 1},
+	    {-1, 1, 1},
+	    {-1,-1, 1},
+	    { 1,-1, 1},
+	    { 1, 1,-1},
+	    {-1, 1,-1},
+	    {-1,-1,-1}, 
+	    { 1,-1,-1}
+      };	    
+    
+				       /**
+					* nodesonedge[i][0] is the
+					* start node for edge i.
+					* nodesonedge[i][1] is the
+					* end node for edge i.
+					*/
+      static const int nodes_on_edge[12][2] = 
+      {
+	    {0,1},
+	    {4,5},
+	    {7,6},
+	    {3,2},
+	    {0,3},
+	    {1,2},
+	    {5,6},
+	    {4,7},
+	    {0,4},
+	    {1,5},
+	    {2,6},
+	    {3,7}
+      };	  
+
+
+				       // Starting at emination node
+				       // (for edges) and chosing
+				       // clockwise order
+// TODO: HERE
+      static const int nodes_on_face[6][4] = 
+      {
+	    {0,1,2,3},
+	    {0,4,5,1},
+	    {1,5,6,2},
+	    {3,2,6,7},
+	    {0,3,7,4},
+	    {4,7,6,5}
+      };
+    }
+    
     
     CheapEdge::CheapEdge(int n0, int n1) : node0(n0), node1(n1)
     {
@@ -611,7 +694,6 @@ namespace internal
 				     // This is the guts of the matter...
     void build_mesh(Mesh &m)
     {
-      const ElementInfo &info = m.info; 
       std::vector<Cell> & cell_list = m.cell_list;
       std::vector<Edge> & edge_list = m.edge_list;
 
@@ -643,8 +725,8 @@ namespace internal
 		unsigned int gl_edge_num = 0;
 		int l_edge_orient = 1;
 						 // Construct the CheapEdge
-		int node0 = cur_cell.nodes[info.nodes_on_edge[edge_num][0]];
-		int node1 = cur_cell.nodes[info.nodes_on_edge[edge_num][1]];
+		int node0 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][0]];
+		int node1 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][1]];
 		CheapEdge cur_edge(node0,node1);
 		if (edge_map.count(cur_edge) == 0) // Edge not in map
 		  {
@@ -741,82 +823,6 @@ namespace internal
     }
 
 
-
-    ElementInfo::ElementInfo()
-    {
-      for (int node = 0; node<8; ++node)
-	for (int i = 0; i<3; ++i)
-	  {
-	    static const int deal_edge_to_node[8][3] = 
-	      { 
-		    {0,4,8},
-		    {0,5,9},
-		    {3,5,10},
-		    {3,4,11},
-		    {1,7,8},
-		    {1,6,9},
-		    {2,6,10},
-		    {2,7,11}
-	      };
-	    edge_to_node[node][i] = deal_edge_to_node[node][i];
-
-	    static const int deal_edge_orient_array[8][3] = 
-	      {
-		    { 1, 1, 1},
-		    {-1, 1, 1},
-		    {-1,-1, 1},
-		    { 1,-1, 1},
-		    { 1, 1,-1},
-		    {-1, 1,-1},
-		    {-1,-1,-1}, 
-		    { 1,-1,-1}
-	      };	    
-	    edge_to_node_orient[node][i] = deal_edge_orient_array[node][i];
-	  }
-
-      for (int edge = 0;edge<12; ++edge)
-	{
-	  static const int deal_nodes_on_edge_array[12][2] = 
-	    {
-		  {0,1},
-		  {4,5},
-		  {7,6},
-		  {3,2},
-		  {0,3},
-		  {1,2},
-		  {5,6},
-		  {4,7},
-		  {0,4},
-		  {1,5},
-		  {2,6},
-		  {3,7}
-	    };	  
-	  nodes_on_edge[edge][0] = deal_nodes_on_edge_array[edge][0];
-	  nodes_on_edge[edge][1] = deal_nodes_on_edge_array[edge][1];
-	}
-
-      for (int facenum = 0;facenum<6;++facenum)
-	for (int nodenum = 0;nodenum<4;++nodenum)
-	  {
-					     // Starting at emination node
-					     // (for edges) and chosing
-					     // clockwise order
-// TODO: HERE
-	    static const int deal_face_node_array[6][4] = 
-	      {
-		    {0,1,2,3},
-		    {0,4,5,1},
-		    {1,5,6,2},
-		    {3,2,6,7},
-		    {0,3,7,4},
-		    {4,7,6,5}
-	      };
-    
-	    nodes_on_face[facenum][nodenum] = deal_face_node_array[facenum][nodenum];
-	  }
-    }
-
-
     
     Edge::Edge (int n0,
 		int n1,
@@ -871,6 +877,11 @@ namespace internal
     }
 
 
+
+    Mesh::Mesh ()
+    {}
+    
+
     
     bool Mesh::sanity_check() const
     {
@@ -899,9 +910,9 @@ namespace internal
     {
 				       // Get the Local Node Numbers
 				       // of the incoming edges
-      int e0 = info.edge_to_node[local_node_num][0];
-      int e1 = info.edge_to_node[local_node_num][1]; 
-      int e2 = info.edge_to_node[local_node_num][2];
+      int e0 = ElementInfo::edge_to_node[local_node_num][0];
+      int e1 = ElementInfo::edge_to_node[local_node_num][1]; 
+      int e2 = ElementInfo::edge_to_node[local_node_num][2];
 
 				       // Global Edge Numbers
       const Cell& c = cell_list[cell_num];
@@ -911,9 +922,9 @@ namespace internal
       int ge2 = c.edges[e2];
 
 
-      int or0 = info.edge_to_node_orient[local_node_num][0]*c.local_orientation_flags[e0];
-      int or1 = info.edge_to_node_orient[local_node_num][1]*c.local_orientation_flags[e1];
-      int or2 = info.edge_to_node_orient[local_node_num][2]*c.local_orientation_flags[e2];
+      int or0 = ElementInfo::edge_to_node_orient[local_node_num][0]*c.local_orientation_flags[e0];
+      int or1 = ElementInfo::edge_to_node_orient[local_node_num][1]*c.local_orientation_flags[e1];
+      int or2 = ElementInfo::edge_to_node_orient[local_node_num][2]*c.local_orientation_flags[e2];
 
 				       // What each edge thinks the
 				       // current node should be.
@@ -1300,17 +1311,17 @@ namespace internal
 					       // The local edge
 					       // numbers coming into
 					       // the node
-	      int iedg0 = the_mesh.info.edge_to_node[node_num][0];
-	      int iedg1 = the_mesh.info.edge_to_node[node_num][1];
-	      int iedg2 = the_mesh.info.edge_to_node[node_num][2];
+	      int iedg0 = ElementInfo::edge_to_node[node_num][0];
+	      int iedg1 = ElementInfo::edge_to_node[node_num][1];
+	      int iedg2 = ElementInfo::edge_to_node[node_num][2];
 
 					       // The local
 					       // orientation of the
 					       // edge coming into the
 					       // node.
-	      int isign0 = the_mesh.info.edge_to_node_orient[node_num][0];
-	      int isign1 = the_mesh.info.edge_to_node_orient[node_num][1];
-	      int isign2 = the_mesh.info.edge_to_node_orient[node_num][2];
+	      int isign0 = ElementInfo::edge_to_node_orient[node_num][0];
+	      int isign1 = ElementInfo::edge_to_node_orient[node_num][1];
+	      int isign2 = ElementInfo::edge_to_node_orient[node_num][2];
 
 					       // Add one to the total
 					       // for each edge
@@ -1354,13 +1365,6 @@ void GridReordering<3>::reorder_cells(std::vector<CellData<3> > &incubes,
   Assert (incubes.size() != 0,
 	  ExcMessage("List of elements to orient was of zero length"));
   
-				   // This keeps track of all the
-				   // local element conectivity
-				   // information.  e.g. what edges
-				   // come into which nodes and with
-				   // which orientation
-  internal::GridReordering3d::DealElemInfo deal_info; 
-  
 				   // This does the real work
   internal::GridReordering3d::Orienter orienter;
 
@@ -1368,7 +1372,7 @@ void GridReordering<3>::reorder_cells(std::vector<CellData<3> > &incubes,
 				   // all global connectivity
 				   // information it starts prety much
 				   // empty.
-  internal::GridReordering3d::Mesh the_mesh(deal_info);
+  internal::GridReordering3d::Mesh the_mesh;
 
   if (node_vec_ptr != NULL)
     the_mesh.node_list = *node_vec_ptr;
@@ -1385,9 +1389,9 @@ void GridReordering<3>::reorder_cells(std::vector<CellData<3> > &incubes,
       the_mesh.cell_list.push_back(the_cell);
     }
   
-				   // Build the conectivity
+				   // Build the connectivity
 				   // information This fills in the
-				   // conectivity information in the
+				   // connectivity information in the
 				   // internal structure
   build_mesh(the_mesh);
 

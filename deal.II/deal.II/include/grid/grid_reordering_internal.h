@@ -427,53 +427,7 @@ namespace internal
     };
 
   
-    struct ElementInfo
-    {
-					 /**
-					  * Constructor.
-					  */
-	ElementInfo ();
-	
-                                         /**
-                                          * The numbers of the edges
-                                          * coming into node i are
-                                          * given by
-                                          * edge_to_node[i][k] where
-                                          * k=0,1,2.
-                                          */
-        int edge_to_node[8][3];
 
-                                         /**
-                                          * The orientation of edge
-                                          * coming into node i is
-                                          * given by
-                                          * edge_to_node_orient[i][k]
-                                          * where k=0,1,2. 1 means the
-                                          * given node is the start of
-                                          * the edge -1 means the end
-                                          * of the edge.
-                                          */
-        int edge_to_node_orient[8][3];
-
-                                         /**
-                                          * nodesonedge[i][0] is the
-                                          * start node for edge i.
-                                          * nodesonedge[i][1] is the
-                                          * end node for edge i.
-                                          */
-        int nodes_on_edge[12][2];
-        int nodes_on_face[6][4];
-    };
-
-    
-    struct DealElemInfo : public ElementInfo
-    {
-        DealElemInfo();
-    };
-
-
-
- 
                                      /**
                                       * A conectivity and orientation
                                       * aware edge class.
@@ -594,16 +548,9 @@ namespace internal
     {
       public:
                                          /**
-                                          * Information about how a
-                                          * cell is built up from
-                                          * nodes and edges.
-                                          */
-        const ElementInfo & info;
-      
-                                         /**
                                           * The list of nodes
                                           */
-        std::vector< Point<3> > node_list;
+        std::vector<Point<3> > node_list;
                                          /**
                                           * The list of edges 
                                           */
@@ -641,7 +588,7 @@ namespace internal
                                          /**
                                           * Default Constructor
                                           */
-        Mesh(const ElementInfo & INFO): info(INFO) { }
+        Mesh ();
 
       private:
                                          /**
