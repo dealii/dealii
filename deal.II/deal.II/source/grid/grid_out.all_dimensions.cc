@@ -150,7 +150,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names () 
 {
-  return "gnuplot|eps";
+  return "gnuplot|eps|ucd";
 };
 
 
