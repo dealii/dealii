@@ -303,7 +303,7 @@ int main (int argc, char **argv) {
     };
 
   TestCases<2> tests;
-  MultipleParameterLoop input_data;   //gcc2.7 does nonsense, wait for gcc2.8
+  MultipleParameterLoop input_data;
 
   tests.declare_parameters(input_data);
   input_data.read_input (argv[1]);
