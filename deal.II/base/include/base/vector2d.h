@@ -77,12 +77,7 @@ class vector2d : public Subscriptor
     vector2d<T>& operator = (const vector2d<T>& src);
     
 				     /**
-				      * Destructor. Free allocated memory.
-				      */
-    ~vector2d ();
-    
-				     /**
-				      * Assignment operator.
+				      * Copy operator.
 				      * Copy all elements of @p{src}
 				      * into the array. The size is
 				      * adjusted if needed.
@@ -93,6 +88,11 @@ class vector2d : public Subscriptor
 				      */
     template<typename T2>
     vector2d<T>& operator = (const vector2d<T2> &src);
+				      
+				     /**
+				      * Destructor. Free allocated memory.
+				      */
+    ~vector2d ();
     
 				     /**
 				      * Set dimension to $m\times n$
@@ -225,6 +225,16 @@ class vector2d : public Subscriptor
 				      * Number of Rows
 				      */
     unsigned int num_rows;
+				     /**
+				      * Friend declaration needed for
+				      * inter-type copy operator.
+				      */
+    template <typename T2> friend class vector2d;
+    
+				     /**
+				      * This is unfortunately needed.
+				      */
+    template <typename T2> friend class FullMatrix;    
 };
 
 
