@@ -50,8 +50,10 @@ class Function {
 				     /**
 				      * Set #values# to the point values
 				      * of the function at the #points#.
-				      * It is assumed that #values# be
-				      * empty.
+				      * It is assumed that #values#
+				      * already has the right size, i.e.
+				      * the same size as the #points#
+				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<double>            &values) const;
@@ -65,8 +67,9 @@ class Function {
 				     /**
 				      * Set #gradients# to the gradients of
 				      * the function at the #points#.
-				      * It is assumed that #values# be
-				      * empty.
+				      * It is assumed that #values# 
+				      * already has the right size, i.e.
+				      * the same size as the #points# array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Point<dim> >       &gradients) const;
@@ -79,7 +82,10 @@ class Function {
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcVectorNotEmpty);
+    DeclException2 (ExcVectorHasWrongSize,
+		    int, int,
+		    << "The vector has size " << arg1 << " but should have "
+		    << arg2 << " elements.");
 };
 
 
@@ -109,8 +115,10 @@ class ZeroFunction : public Function<dim> {
 				     /**
 				      * Set #values# to the point values
 				      * of the function at the #points#.
-				      * It is assumed that #values# be
-				      * empty.
+				      * It is assumed that #values#
+				      * already has the right size, i.e.
+				      * the same size as the #points#
+				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<double>            &values) const;
@@ -124,8 +132,9 @@ class ZeroFunction : public Function<dim> {
 				     /**
 				      * Set #gradients# to the gradients of
 				      * the function at the #points#.
-				      * It is assumed that #values# be
-				      * empty.
+				      * It is assumed that #values#
+				      * already has the right size, i.e.
+				      * the same size as the #points# array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Point<dim> >       &gradients) const;
@@ -137,9 +146,14 @@ class ZeroFunction : public Function<dim> {
 
 /**
  *  Provide a function which always returns a constant value, which is delivered
- *  upon construction. Obviously, the derivates of this function are zerom which
+ *  upon construction. Obviously, the derivates of this function are zero, which
  *  is why we derive this class from #ZeroFunction#: we then only have to
- *  overload th value functions, not all the derivatives.
+ *  overload th value functions, not all the derivatives. In some way, it would
+ *  be more obvious to do the derivation in the opposite direction, i.e. let
+ *  #ZeroFunction# be a more specialized version of #ConstantFunction#; however,
+ *  this would be more inefficient, since we could not make use of the fact that
+ *  the function value of the #ZeroFunction# is known at compile time and need
+ *  not be looked up somewhere in memory.
  */
 template <int dim>
 class ConstantFunction : public ZeroFunction<dim> {
@@ -164,8 +178,10 @@ class ConstantFunction : public ZeroFunction<dim> {
 				     /**
 				      * Set #values# to the point values
 				      * of the function at the #points#.
-				      * It is assumed that #values# be
-				      * empty.
+				      * It is assumed that #values#
+				      * already has the right size, i.e.
+				      * the same size as the #points#
+				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<double>            &values) const;

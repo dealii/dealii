@@ -5,7 +5,6 @@
 #include <vector>
 
 
-
 template <int dim>
 Function<dim>::~Function () {};
 
@@ -21,12 +20,11 @@ double Function<dim>::operator () (const Point<dim> &) const {
 template <int dim>
 void Function<dim>::value_list (const vector<Point<dim> > &points,
 				vector<double>            &values) const {
-  Assert (values.size() == 0,
-	  ExcVectorNotEmpty());
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
 
-  values.reserve (points.size());
   for (unsigned int i=0; i<points.size(); ++i)
-    values.push_back (this->operator() (points[i]));
+    values[i]  = this->operator() (points[i]);
 };
 
 
@@ -43,12 +41,11 @@ Point<dim> Function<dim>::gradient (const Point<dim> &) const {
 template <int dim>
 void Function<dim>::gradient_list (const vector<Point<dim> > &points,
 				   vector<Point<dim> >       &gradients) const {
-  Assert (gradients.size() == 0,
-	  ExcVectorNotEmpty());
+  Assert (gradients.size() == points.size(),
+	  ExcVectorHasWrongSize(gradients.size(), points.size()));
 
-  gradients.reserve (points.size());
   for (unsigned int i=0; i<points.size(); ++i)
-    gradients.push_back (gradient(points[i]));
+    gradients[i] = gradient(points[i]);
 };
 
 
@@ -72,11 +69,10 @@ double ZeroFunction<dim>::operator () (const Point<dim> &) const {
 template <int dim>
 void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
 				    vector<double>            &values) const {
-  Assert (values.size() == 0,
-	  ExcVectorNotEmpty());
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
 
-  values.reserve (points.size());
-  values.insert (values.begin(), points.size(), 0.);
+  fill_n (values.begin(), points.size(), 0.);
 };
 
 
@@ -90,12 +86,11 @@ Point<dim> ZeroFunction<dim>::gradient (const Point<dim> &) const {
 
 template <int dim>
 void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
-				       vector<Point<dim> >       &values) const {
-  Assert (values.size() == 0,
-	  ExcVectorNotEmpty());
+				       vector<Point<dim> >       &gradients) const {
+  Assert (gradients.size() == points.size(),
+	  ExcVectorHasWrongSize(gradients.size(), points.size()));
 
-  values.reserve (points.size());
-  values.insert (values.begin(), points.size(), Point<dim>());
+  fill_n (gradients.begin(), points.size(), Point<dim>());
 };
 
 
@@ -121,11 +116,10 @@ double ConstantFunction<dim>::operator () (const Point<dim> &) const {
 template <int dim>
 void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
 				    vector<double>            &values) const {
-  Assert (values.size() == 0,
-	  ExcVectorNotEmpty());
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
 
-  values.reserve (points.size());
-  values.insert (values.begin(), points.size(), function_value);
+  fill_n (values.begin(), points.size(), function_value);
 };
 
 
