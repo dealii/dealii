@@ -3977,7 +3977,7 @@ int main ()
 				       // One such additional
 				       // evaluation is to output the
 				       // grid in each step.
-      const Point<dim> evaluation_point (0.5, 0.5);
+      const Point<dim> evaluation_point (0.75, 0.75);
       descriptor.dual_functional
 	= new DualFunctional::PointValueEvaluation<dim> (evaluation_point);
       
