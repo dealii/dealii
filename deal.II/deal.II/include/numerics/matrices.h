@@ -42,9 +42,9 @@ template <int dim> class Equation;
  *
  * All functions take a sparse matrix object to hold the matrix to be
  * created. The functions assume that the matrix is initialized with a
- * sparsity pattern (@p{SparsityPattern}) corresponding to the given degree
+ * sparsity pattern (@ref{SparsityPattern}) corresponding to the given degree
  * of freedom handler, i.e. the sparsity structure is already as needed.
- * You can do this by calling the @p{DoFHandler<dim>::make_sparsity_pattern}
+ * You can do this by calling the @ref{DoFHandler}@p{<dim>::make_sparsity_pattern}
  * function.
  *
  * Furthermore it is assumed that no relevant data is in the matrix. All
@@ -61,14 +61,14 @@ template <int dim> class Equation;
  * @item @p{create_mass_matrix}: create the matrix with entries
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$. Here, the $\phi_i$
  *   are the basis functions of the finite element space given.
- *   This function uses the @p{MassMatrix} class.
+ *   This function uses the @ref{MassMatrix} class.
  *
  *   Two ways to create this matrix are offered. The first one uses
- *   numerical quadrature and the @p{MassMatrix} class. In this case,
+ *   numerical quadrature and the @ref{MassMatrix} class. In this case,
  *   a coefficient may be given to evaluate
  *   $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$ instead.
  *   This way of setting up the mass matrix is quite general, but has
- *   some drawbacks, see the documentation of the @p{MassMatrix} class.
+ *   some drawbacks, see the documentation of the @ref{MassMatrix} class.
  *
  *   The other way uses exact integration, as offered by the finite
  *   element class used. This way you can avoid quadrature errors and
@@ -80,26 +80,26 @@ template <int dim> class Equation;
  *   composed of several subelements. In this case, using the
  *   quadrature free way (without coefficient) results in a matrix
  *   which does not couple the subelements, as described in the
- *   @p{FESystem::get_local_mass_matrix} documentation, while the
+ *   @ref{FESystem}@p{::get_local_mass_matrix} documentation, while the
  *   way using quadrature sets up the full matrix, i.e. with the
  *   cross coupling of shape functions belonging to different subelements.
  *
  *   If the finite element for which the mass matrix is to be built
  *   has more than one component, the resulting matrix will not couple
  *   the different components. It will furthermore accept a single
- *   coefficient through the @p{Function} parameter for all
+ *   coefficient through the @ref{Function} parameter for all
  *   components. If you want different coefficients for the different
  *   parameters, you need to pass a function object representing the
  *   respective number of components.
  *
  * @item @p{create_laplace_matrix}: there are two versions of this; the
- *   one which takes the @p{Function<dim>} object creates
+ *   one which takes the @ref{Function} object creates
  *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$,
  *   $a$ being the given function, while the other one assumes that
  *   $a=1$ which enables some optimizations. In fact the two versions
  *   are in one function, the coefficient being given as a defaulted
  *   argument, which is a pointer to a function and defaults to zero.
- *   This function uses the @p{LaplaceMatrix} class.
+ *   This function uses the @ref{LaplaceMatrix} class.
  *
  *   If the finite element in use presently has more than only one
  *   component, this function may not be overly useful and presently
@@ -111,7 +111,7 @@ template <int dim> class Equation;
  * several matrices and could then condense afterwards only once,
  * instead of for every matrix. To actually do computations with these
  * matrices, you have to condense the matrix using the
- * @p{ConstraintMatrix::condense} function; you also have to condense the
+ * @ref{ConstraintMatrix}@p{::condense} function; you also have to condense the
  * right hand side accordingly and distribute the solution afterwards.
  *
  * In all cases, the elements of the matrix to be assembled are simply
@@ -145,7 +145,7 @@ template <int dim> class Equation;
  * This function needs to get passed a matrix object to hold the resulting sparse
  * matrix. This object is supposed to be initialized with a suitable sparsity
  * pattern, which can be created using the
- * @p{DoFHandler<>::make_boundary_sparsity_pattern} function.
+ * @ref{DoFHandler}@p{::make_boundary_sparsity_pattern} function.
  *
  * The object describing the exact form of the boundary is obtained from the
  * triangulation object.
@@ -159,7 +159,7 @@ template <int dim> class Equation;
  * building the right hand side vector. (The @p{create_mass_matrix} function
  * which does not use quadrature does not offer a version to evaluate a right
  * hand side also, since this needs quadrature anyway. Take look at the
- * @p{VectorTools} class to find a function to set up a right hand side vector
+ * @ref{VectorTools} class to find a function to set up a right hand side vector
  * only.)
  *
  * Creation of the right hand side
@@ -175,7 +175,7 @@ template <int dim> class Equation;
  *
  *
  * All functions in this collection use the finite elemen given to the
- * @p{DoFHandler} object the last time that the degrees of freedom were
+ * @ref{DoFHandler} object the last time that the degrees of freedom were
  * distributed on the triangulation.
  *
  * @author Wolfgang Bangerth, 1998
@@ -274,7 +274,7 @@ class MatrixCreator
 				      *
 				      * The matrix is assumed to already be
 				      * initialized with a suiting sparsity
-				      * pattern (the @p{DoFHandler} provides an
+				      * pattern (the @ref{DoFHandler} provides an
 				      * appropriate function).
 				      *
 				      * See the general doc of this class
@@ -348,7 +348,7 @@ class MatrixCreator
  * into a system of equations.  To actually do this you have to specify
  * a list of degree of freedom indices along with the values these degrees of
  * freedom shall assume. To see how to get such a list, see the discussion
- * of the @p{VectorTools::interpolate_boundary_values} function.
+ * of the @ref{VectorTools}@p{::interpolate_boundary_values} function.
  *
  * The inclusion into the assemblage process is as follows: when the matrix and
  * vectors are set up, a list of nodes subject to dirichlet bc is made and
@@ -484,7 +484,7 @@ class MatrixTools : public MatrixCreator<dim>
 
 
 /**
- * Equation class to be passed to the @p{Assembler} if you want to make up the
+ * Equation class to be passed to the @ref{Assembler} if you want to make up the
  * mass matrix for your problem. The mass matrix is the matrix with
  * $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$.
  *
@@ -510,7 +510,7 @@ class MatrixTools : public MatrixCreator<dim>
  * You will usually want to use this object only if you have coefficients
  * which vary over each cell. If you have coefficients which are constant
  * on each cell or even on the whole domain, you can get the local mass
- * matrix easier by calling the @p{FiniteElement::get_local_mass_matrix} and
+ * matrix easier by calling the @ref{FiniteElement}@p{::get_local_mass_matrix} and
  * then scaling this one on each cell. This has the additional benefit that
  * the mass matrix is evaluated exactly, i.e. not using a quadrature formula
  * and is normally much faster since it can be precomputed and needs only
@@ -519,7 +519,7 @@ class MatrixTools : public MatrixCreator<dim>
  * The useful use of this object is therefore probable one of the following
  * cases:
  * @begin{itemize}
- * @item Mass lumping: use an @p{Assembler} object and a special quadrature
+ * @item Mass lumping: use an @ref{Assembler} object and a special quadrature
  *   formula to voluntarily evaluate the mass matrix incorrect. For example
  *   by using the trapezoidal formula, the mass matrix will become a
  *   diagonal (at least if no hanging nodes are considered). However, there
@@ -545,7 +545,7 @@ class MatrixTools : public MatrixCreator<dim>
  *    occurs in the discretization of the heat and the wave equation, amoung
  *    others), once could conceive an equation object in which the @p{assemble}
  *    functions do nothing but sum up the contributions delivered by the
- *    @p{assemble} functions of the @p{MassMatrix} and @p{LaplaceMatrix} classes.
+ *    @p{assemble} functions of the @ref{MassMatrix} and @ref{LaplaceMatrix} classes.
  *    Since numerical quadrature is necessary here anyway, this way is
  *    justifyable to quickly try something out. In the further process it
  *    may be useful to replace this behaviour by more sophisticated methods,
@@ -636,7 +636,7 @@ class MassMatrix :  public Equation<dim> {
 
 
 /**
- * Equation class to be passed to the @p{Assembler} if you want to make up the
+ * Equation class to be passed to the @ref{Assembler} if you want to make up the
  * laplace matrix for your problem. The laplace matrix is the matrix with
  * $a_{ij} = \int_\Omega \nabla\phi_i(x) \cdot \nabla\phi_j(x) dx$.
  *

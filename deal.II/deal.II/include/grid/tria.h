@@ -450,7 +450,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
 
 
 /**
- *  @p{Triangulation}s denote a hierarchy of levels of elements which together
+ *  @ref{Triangulation}s denote a hierarchy of levels of elements which together
  *  form a region in @p{dim} spatial dimensions.
  *
  *  This class is written to be as independent of the dimension as possible
@@ -463,7 +463,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *  @sect3{Structure and iterators}
  *
- *  The actual data structure of a @p{Triangulation} object is rather complex
+ *  The actual data structure of a @ref{Triangulation} object is rather complex
  *  and quite inconvenient if one attempted to operate on it directly, since
  *  data is spread over quite a lot of arrays and other places. However,
  *  there are ways powerful enough to work on these data structures
@@ -476,7 +476,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  is reasonable for a cell in the respective dimension, i.e. a @p{Line} in
  *  one dimension, a @p{Quad} in two dimensions, and so on.
  *
- *  The @p{Triangulation} class provides iterator which enable looping over all
+ *  The @ref{Triangulation} class provides iterator which enable looping over all
  *  lines, cells,
  *  etc without knowing the exact representation used to describe them. Their
  *  names are typedefs in the @ref{TriaDimensionInfo} base class (thus making them
@@ -523,12 +523,12 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  cell is be a vertex in 1D and a line in 2D; however, vertices are
  *  handled in a different way and therefore lines have no faces.
  *
- *  The @p{Triangulation} class offers functions like @p{begin_active} which gives
+ *  The @ref{Triangulation} class offers functions like @p{begin_active} which gives
  *  you an iterator to the first active cell. There are quite a lot of functions
  *  returning iterators. Take a look at the class doc to get an overview.
  *
  *  Usage of these iterators works mostly like with the STL iterators. Some
- *  examples taken from the @p{Triangulation} source code follow.
+ *  examples taken from the @ref{Triangulation} source code follow.
  *  @begin{itemize}
  *  @item @em{Counting the number of cells on a specific level}
  *    @begin{verbatim}
@@ -573,7 +573,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *  @sect3{Usage}
  *
- *  Usage of a @p{Triangulation} is mainly done through the use of iterators.
+ *  Usage of a @ref{Triangulation} is mainly done through the use of iterators.
  *  An example probably shows best how to use it:
  *  @begin{verbatim}
  *  void main () {
@@ -795,7 +795,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   @p{execute_*} stand for @p{execute_coarsening_and_refinement}.
  *
  *   For the purpose of smoothing, the
- *   @p{Triangulation} constructor takes an argument specifying whether a
+ *   @ref{Triangulation} constructor takes an argument specifying whether a
  *   smoothing step shall be performed on the grid each time @p{execute_*}
  *   is called. The default is that such a step not be done, since this results
  *   in additional cells being produced, which may not be necessary in all
@@ -1087,7 +1087,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   boundary, this function is used to compute where it will be
  *   placed. The boundary indicator of the face will be used to
  *   determine the proper component. See @ref{Boundary} for the
- *   details. Usage with the @p{Triangulation} object is then like this
+ *   details. Usage with the @ref{Triangulation} object is then like this
  *   (let @p{Ball} be a class derived from @ref{Boundary}@p{<2>}):
  * 
  *   @begin{verbatim}

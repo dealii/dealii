@@ -46,7 +46,7 @@ template <int dim> class FESubfaceValues;
  *  the conormal derivative $a\frac{du}{dn} = g$.
  *
  *  The error estimator returns a vector of estimated errors per cell which
- *  can be used to feed the @p{Triangulation<dim>::refine_*} functions. This
+ *  can be used to feed the @ref{Triangulation}@p{<dim>::refine_*} functions. This
  *  vector contains elements of data type @p{float}, rather than @p{double},
  *  since accuracy is not so important here, and since this can save rather
  *  a lot of memory, when using many cells.
@@ -66,8 +66,8 @@ template <int dim> class FESubfaceValues;
  *  is considered, but may lead to wrong results. You may scale the vector
  *  appropriately afterwards.
  *
- *  To perform the integration, use is made of the @p{FEFaceValues} and
- *  @p{FESubfaceValues} classes. The integration is performed by looping
+ *  To perform the integration, use is made of the @ref{FEFaceValues} and
+ *  @ref{FESubfaceValues} classes. The integration is performed by looping
  *  over all cells and integrating over faces that are not yet treated.
  *  This way we avoid integration on faces twice, once for each time we
  *  visit one of the adjacent cells. In a second loop over all cells, we
@@ -75,8 +75,8 @@ template <int dim> class FESubfaceValues;
  *  square of the jumps) of each cell and take the square root.
  *
  *  The integration is done using a quadrature formula on the face.
- *  For linear trial functions (@p{FELinear}), the @p{Gauss2} or even the
- *  @p{Midpoint} rule will suffice. For higher order elements, it is
+ *  For linear trial functions (@ref{FEQ1}), the @ref{QGauss2} or even the
+ *  @ref{QMidpoint} rule will suffice. For higher order elements, it is
  *  necessary to utilize higher order quadrature formulae as well.
  *
  *  We store the contribution of each face in a @p{map}, as provided by the
@@ -158,7 +158,7 @@ template <int dim> class FESubfaceValues;
  *  
  *  The integration along faces with hanging nodes is quite tricky, since one
  *  of the elements has to be shifted one level up or down. See the
- *  documentation for the @p{FESubfaceValues} class for more information about
+ *  documentation for the @ref{FESubFaceValues} class for more information about
  *  technical issues regarding this topic.
  *
  *  In praxi, since we integrate over each face only once, we do this when we
@@ -220,7 +220,7 @@ class KellyErrorEstimator
 				      * components you want to
 				      * evaluate, in case the finite
 				      * element used by the
-				      * @p{DoFHandler} object is
+				      * @ref{DoFHandler} object is
 				      * vector-valued. You then have
 				      * to set those entries to true
 				      * in the bit-vector

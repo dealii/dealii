@@ -33,7 +33,7 @@ class EpsOutputData;
  * Encapsulated Postscript supports Q1-Elements only.
  *
  * It allows the user to attach a degree of freedom handler object
- * (@p{DoFHandler}) which also gives access to the geometry data of the
+ * (@ref{DoFHandler}) which also gives access to the geometry data of the
  * underlying triangulation and to add data vectors of which the values
  * are to be written.
  *

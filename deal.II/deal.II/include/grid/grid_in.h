@@ -76,7 +76,7 @@ template <int dim> class Triangulation;
  * the middle line would get the direction @p{1->4} when viewed from both cells.
  * The numbering (0 1 4 3) and (5 4 1 2) would not be allowed, since the left
  * quad would give the common line the direction @p{1->4}, while the right one
- * would want to use @p{4->1}, leading to ambiguity. The @p{Triangulation} object
+ * would want to use @p{4->1}, leading to ambiguity. The @ref{Triangulation} object
  * is capable of detecting this special case, which can be eliminated by
  * rotating the indices of the right quad by two. However, it would not
  * know what to do if you gave the vertex indices (4 1 2 5), since then it

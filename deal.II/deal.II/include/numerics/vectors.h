@@ -95,11 +95,11 @@ enum NormType {
  *   given function onto the finite element space restricted to the boundary
  *   of the domain, then taking this information and using it to eliminate
  *   the boundary nodes from the mass matrix of the whole domain, using the
- *   @p{MatrixTools::apply_boundary_values} function. The projection of the
+ *   @ref{MatrixTools}@p{::apply_boundary_values} function. The projection of the
  *   trace of the function to the boundary is done with the
- *   @p{VectorTools::project_boundary_values} (see below) function, which is
+ *   @ref{VectorTools}@p{::project_boundary_values} (see below) function, which is
  *   called with a map of boundary functions in which all boundary indicators
- *   from zero to 254 (255 is used for other purposes, see the @p{Triangulation}
+ *   from zero to 254 (255 is used for other purposes, see the @ref{Triangulation}
  *   class documentation) point to the function to be projected. The projection
  *   to the boundary takes place using a second quadrature formula on the
  *   boundary given to the @p{project} function. The first quadrature formula is
@@ -145,11 +145,11 @@ enum NormType {
  * @item Creation of right hand side vectors:
  *   The @p{create_right_hand_side} function computes the vector
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
- *   @p{MatrixCreator::create_*} functions which take a right hand side do,
+ *   @ref{MatrixCreator}@p{::create_*} functions which take a right hand side do,
  *   but without assembling a matrix.
  *
  * @item Interpolation of boundary values:
- *   The @p{MatrixTools::apply_boundary_values} function takes a list
+ *   The @ref{MatrixTools}@p{::apply_boundary_values} function takes a list
  *   of boundary nodes and their values. You can get such a list by interpolation
  *   of a boundary function using the @p{interpolate_boundary_values} function.
  *   To use it, you have to
@@ -165,7 +165,7 @@ enum NormType {
  *   Within this function, boundary values are interpolated, i.e. a node is given
  *   the point value of the boundary function. In some cases, it may be necessary
  *   to use the L2-projection of the boundary function or any other method. For
- *   this purpose to the @p{VectorTools::project_boundary_values}
+ *   this purpose to the @ref{VectorTools}@p{::project_boundary_values}
  *   function below.
  *
  *   You should be aware that the boundary function may be evaluated at nodes
@@ -192,7 +192,7 @@ enum NormType {
  *   The projection takes place on all boundary parts with boundary indicators
  *   listed in the map of boundary functions. These boundary parts may or may
  *   not be contiguous. For these boundary parts, the mass matrix is assembled
- *   using the @p{MatrixTools::create_boundary_mass_matrix} function, as well as
+ *   using the @ref{MatrixTools}@p{::create_boundary_mass_matrix} function, as well as
  *   the appropriate right hand side. Then the resulting system of equations is
  *   solved using a simple CG method (without preconditioning), which is in most
  *   cases sufficient for the present purpose.
@@ -209,9 +209,9 @@ enum NormType {
  *   is the same as a @p{cell_iterator} takes when started with @p{begin_active} and
  *   promoted with the @p{++} operator.
  * 
- *   You can use the @p{distribute_cell_to_dof_vector} function of the @p{DoFHandler}
+ *   You can use the @p{distribute_cell_to_dof_vector} function of the @ref{DoFHandler}
  *   class to convert cell based data to a data vector with values on the degrees
- *   of freedom, which can then be attached to a @p{DataOut} object to be printed.
+ *   of freedom, which can then be attached to a @ref{DataOut} object to be printed.
  * 
  *   Presently, there is the possibility to compute the following values from the
  *   difference, on each cell: @p{mean}, @p{L1_norm}, @p{L2_norm}, @p{Linfty_norm},
@@ -241,23 +241,25 @@ enum NormType {
  *   The $H_1$ seminorm is the $L_2$ norm of the gradient of the difference. The
  *   full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
  * 
- *   To get the @em{global} $L_1$ error, you have to sum up the entries in
- *   @p{difference}, e.g. using @p{Vector<double>::l1_norm} function.
- *   For the global $L_2$ difference, you have to sum up the squares of the
- *   entries and take the root of the sum, e.g. using @p{Vector<double>::l2_norm}.
- *   These two operations represent the
- *   $l_1$ and $l_2$ norms of the vectors, but you need not take the absolute
- *   value of each entry, since the cellwise norms are already positive.
+ *   To get the @em{global} $L_1$ error, you have to sum up the
+ *   entries in @p{difference}, e.g. using
+ *   @ref{Vector}@p{<double>::l1_norm} function.  For the global $L_2$
+ *   difference, you have to sum up the squares of the entries and
+ *   take the root of the sum, e.g. using
+ *   @ref{Vector}@p{<double>::l2_norm}.  These two operations
+ *   represent the $l_1$ and $l_2$ norms of the vectors, but you need
+ *   not take the absolute value of each entry, since the cellwise
+ *   norms are already positive.
  *  
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
- *   using the @p{Vector<double>::linfty_norm} function.
+ *   using the @ref{Vector}@p{<double>::linfty_norm} function.
  *
  *   For the global $H_1$ norm and seminorm, the same rule applies as for the
  *   $L_2$ norm: compute the $l_2$ norm of the cell error vector.
  * @end{itemize}
  *
- * All functions use the finite element given to the @p{DoFHandler} object the last
+ * All functions use the finite element given to the @ref{DoFHandler} object the last
  * time that the degrees of freedom were distributed over the triangulation. Also,
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
@@ -329,7 +331,7 @@ class VectorTools
 				      * present grid. To this end, the mass
 				      * matrix is assembled exactly using the
 				      * @p{create_mass_matrix} function in the
-				      * @p{MatrixTools} collection. This function
+				      * @ref{MatrixTools} collection. This function
 				      * uses the @p{get_local_mass_matrix}
 				      * function of the finite element; however,
 				      * this function is not supported by all

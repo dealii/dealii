@@ -30,7 +30,7 @@ template <int dim> class DoFHandler;
  * space-time output file, or for example to connect the results of
  * solutions of a parameter dependent equation for several parameter
  * value together into one. The interface is mostly modelled after the
- * @p{DataOut} class.
+ * @ref{DataOut} class.
  *
  * We will explain the concept for a time dependent problem, but
  * instead of the time any parameter can be substituted. In our
@@ -58,7 +58,7 @@ template <int dim> class DoFHandler;
  * is named @p{solution} and that a vector @p{error} is computed which
  * contains an error indicator for each spatial cell.
  *
- * Note that unlike for the @p{DataOut} class it is necessary to first
+ * Note that unlike for the @ref{DataOut} class it is necessary to first
  * declare data vectors and the names of the components before first
  * use. This is because on all time levels the same data should be
  * present to produce reasonable time-space output. The output is
@@ -148,7 +148,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      *
 				      * This version may be called if the
 				      * finite element presently used by the
-				      * @p{DoFHandler} (and previously attached
+				      * @ref{DoFHandler} (and previously attached
 				      * to this object) has only one component
 				      * and therefore only one name needs to
 				      * be given.
@@ -164,7 +164,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      *
 				      * This version must be called if the
 				      * finite element presently used by the
-				      * @p{DoFHandler} (and previously attached
+				      * @ref{DoFHandler} (and previously attached
 				      * to this object) has more than one
 				      * component and therefore more than one
 				      * name needs to be given. However, you
@@ -183,7 +183,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      *
 				      * This version may be called if the
 				      * finite element presently used by the
-				      * @p{DoFHandler} (and previously attached
+				      * @ref{DoFHandler} (and previously attached
 				      * to this object) has only one component
 				      * and therefore only one name needs to
 				      * be given.
@@ -211,7 +211,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      *
 				      * This version must be called if the
 				      * finite element presently used by the
-				      * @p{DoFHandler} (and previously attached
+				      * @ref{DoFHandler} (and previously attached
 				      * to this object) has more than one
 				      * component and therefore more than one
 				      * name needs to be given. However, you
@@ -241,7 +241,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * Actually build the patches for output
 				      * by the base classes from the data
 				      * stored in the data vectors and using
-				      * the previously attached @p{DoFHandler}
+				      * the previously attached @ref{DoFHandler}
 				      * object.
 				      *
 				      * By @p{n_subdivisions} you can decide
@@ -390,8 +390,8 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * This is the function through
 				      * which derived classes propagate
 				      * preprocessed data in the form of
-				      * @p{Patch} structures (declared in
-				      * the base class @p{DataOutBase}) to
+				      * @ref{Patch} structures (declared in
+				      * the base class @ref{DataOutBase}) to
 				      * the actual output function.
 				      */
     virtual const vector<DataOutBase::Patch<dim+1> > & get_patches () const;

@@ -27,10 +27,10 @@ template <int dim> class MGDoFHandler;
  * result in a strange kind of behaviour, though every reasonable
  * operating system should disallow access through that pointer.
  * The reason we do not check for the null pointer in the
- * constructor which gets passed the @p{DoFHandler} pointer is that
+ * constructor which gets passed the @ref{DoFHandler} pointer is that
  * if we did we could not make dof iterators member of other classes
  * (like in the @p{FEValues} class) if we did not know about the
- * @p{DoFHandler} object to be used upon construction of that object.
+ * @ref{DoFHandler} object to be used upon construction of that object.
  * Through the way this class is implemented here, we allow the
  * creation of a kind of virgin object which only gets useful if
  * assigned to from another object before first usage.
@@ -353,7 +353,7 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
     				     /**
 				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a @p{DoFHandler<dim>} object.
+				      * to a @ref{DoFHandler} object.
 				      */
     MGDoFObjectAccessor (Triangulation<dim> *tria,
 		       const int           level,
@@ -478,7 +478,7 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
     				     /**
 				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a @p{DoFHandler<dim>} object.
+				      * to a @ref{DoFHandler} object.
 				      */
     MGDoFObjectAccessor (Triangulation<dim> *tria,
 		      const int           level,

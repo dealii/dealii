@@ -60,7 +60,7 @@ template <class T> class SmartPointer;
  *
  * The implementation of this class is such that not only cell iterators
  * into triangulations can be mapped, but also iterators into objects of
- * type @p{DoFHandler} and @p{MGDoFHandler}. The extension to other classes
+ * type @ref{DoFHandler} and @ref{MGDoFHandler}. The extension to other classes
  * offering iterator functions and some minor additional requirements is
  * simple.
  *
@@ -100,7 +100,7 @@ template <class T> class SmartPointer;
  * Note that the template parameters to this class have to be given as
  * @p{InterGridMap<DoFHandler,2>}, i.e. the dimension is given explicitely and
  * no dimension is attributed to the first parameter, which here is
- * @p{DoFHandler} (and could equally well be @p{Triangulation} or @p{MGDoFHandler}).
+ * @ref{DoFHandler} (and could equally well be @ref{Triangulation} or @ref{MGDoFHandler}).
  *
  * @author Wolfgang Bangerth, 1999
  */

@@ -23,7 +23,7 @@ template <int dim> class DoFHandler;
 /**
  * This is an abstract class which provides the functionality to generate
  * patches for output by base classes from data vectors on a grid. It alloes
- * to store a pointer to a @p{DoFHandler} object and one or more pointers to
+ * to store a pointer to a @ref{DoFHandler} object and one or more pointers to
  * node and cell data denoting functions on the grid which shall later
  * be written in any of the implemented data formats.
  *
@@ -31,7 +31,7 @@ template <int dim> class DoFHandler;
  * @sect3{User visible interface}
  *
  * The user visible interface of this class consists of functions which allow
- * a user to make a @p{DoFHandler} object known to this class and to add data
+ * a user to make a @ref{DoFHandler} object known to this class and to add data
  * vectors which will later be written to a file in some format. Instead of
  * pondering about the different functions, an example is probably the best
  * way:
@@ -61,7 +61,7 @@ template <int dim> class DoFHandler;
  * @end{verbatim}
  *
  * @p{attach_dof_handler} tells this class that all future operations are to take
- * place with the @p{DoFHandler} object and the triangulation it lives on. We then
+ * place with the @ref{DoFHandler} object and the triangulation it lives on. We then
  * add the solution vector and the error estimator; note that they have different
  * dimensions, because the solution is a nodal vector, here consisting of two
  * components ("x-displacement" and "y-displacement") while the error estimator
@@ -69,7 +69,7 @@ template <int dim> class DoFHandler;
  * to give a name to each component of the vector, which is done through an object
  * of type @p{vector<string>} as second argument; if only one component is in the
  * vector, for example if we are adding cell data as in the second case, or if
- * the finite element used by the @p{DoFHandler} has only one component, then you
+ * the finite element used by the @ref{DoFHandler} has only one component, then you
  * can use the second @p{add_data_vector} function which takes a @p{string} instead
  * of the @p{vector<string>}.
  *
@@ -87,12 +87,12 @@ template <int dim> class DoFHandler;
  * to a file and may want to clear this object as soon as possible to reduce
  * memory requirements.
  *
- * Please note, that in the example above, an object of type @p{DataOut} was
+ * Please note, that in the example above, an object of type @ref{DataOut} was
  * used, i.e. an object of a derived class. This is necessary since this
  * class does not provide means to actually generate the patches, only aids to
  * store and access data.
  *
- * Note that the base class of this class, @p{DataOutInterface} offers several
+ * Note that the base class of this class, @ref{DataOutInterface} offers several
  * functions to ease programming with run-time determinable output formats
  * (i.e. you need not use a fixed format by calling @p{write_xxx} in the above
  * example, but you can select it by a run-time parameter without having
@@ -227,7 +227,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
 				      * output of a new set of vectors
 				      * without supplying the DoF
 				      * handler again. Therefore, the
-				      * @p{DataOut} object can be used
+				      * @ref{DataOut} object can be used
 				      * in an algebraic context. Note
 				      * that besides the data vectors
 				      * also the patches already
@@ -386,7 +386,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
 
 /**
  * This class is an actual implementation of the functionality proposed by
- * the @p{DataOut_DoFData} class. It offers a function @p{build_patches} that
+ * the @ref{DataOut_DoFData} class. It offers a function @p{build_patches} that
  * generates the patches to be written in some graphics format from the data
  * stored in the base class. Most of the interface and an example of its
  * use is described in the documentation of the base class.
@@ -409,13 +409,13 @@ class DataOut_DoFData : public DataOutInterface<dim>
  *
  * @sect3{User interface information}
  *
- * The base classes of this class, @p{DataOutBase}, @p{DataOutInterface} and
- * @p{DataOut_DoFData} offer several interfaces of their own. Refer to the
- * @p{DataOutBase} class's documentation for a discussion of the different
- * output formats presently supported, @p{DataOutInterface} for ways of
+ * The base classes of this class, @ref{DataOutBase}, @ref{DataOutInterface} and
+ * @ref{DataOut_DoFData} offer several interfaces of their own. Refer to the
+ * @ref{DataOutBase} class's documentation for a discussion of the different
+ * output formats presently supported, @ref{DataOutInterface} for ways of
  * selecting which format to use upon output at run-time and without
  * the need to adapt your program when new formats become available, as
- * well as for flags to determine aspects of output. The @p{DataOut_DoFData}
+ * well as for flags to determine aspects of output. The @ref{DataOut_DoFData}
  * class's documentation has an example of using nodal data to generate
  * output.
  *

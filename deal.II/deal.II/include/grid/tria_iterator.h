@@ -60,17 +60,17 @@ template <int dim> class Triangulation;
  *   the creation and copying of these iterators is rather expensive
  *   compared to normal pointers.
  *   
- *   The objects pointed to by iterators are @p{TriangulationLevel<1>::LinesData},
- *   @p{TriangulationLevel<2>::LinesData}
- *   and @p{TriangulationLevel<2>::QuadsData}. To chose which of those, the
+ *   The objects pointed to by iterators are @ref{TriangulationLevel<1>}@p{::LinesData},
+ *   @ref{TriangulationLevel<2>}@p{::LinesData}
+ *   and @ref{TriangulationLevel<2>}@p{::QuadsData}. To chose which of those, the
  *   template parameter @p{Pointee} is used.
  *
- *   Since the names as is are quite unhandy, the @p{Triangulation<>} class which
+ *   Since the names as is are quite unhandy, the @ref{Triangulation} class which
  *   uses these iterators declares typedef'd versions. See there for more
  *   information.
  *
- *   The objects pointed to are, as mentioned, @p{LinesData} etc. To be
- *   more exact, when dereferencing an iterator, you do not get a @p{LineData}
+ *   The objects pointed to are, as mentioned, @ref{LinesData} etc. To be
+ *   more exact, when dereferencing an iterator, you do not get a @ref{LineData}
  *   object (or the like, but we will assume that you have a @p{line_iterator}
  *   in the following), but a @em{virtual} object (called @em{accessor}) which
  *   behaves as if it stored the data of a line. It does not contain any data
@@ -79,7 +79,7 @@ template <int dim> class Triangulation;
  *
  *   Since the data of one line is splitted to
  *   several arrays (@p{lines}, @p{children} and @p{used}) for performance reasons
- *   rather than keeping all information in a @p{Line} struct, access through
+ *   rather than keeping all information in a @ref{Line} struct, access through
  *   an accessor is usually much simpler than handling the exact data structure
  *   and also less error prone since the data structure itself can be changed
  *   in an arbitrary way while the only pieces of code which access these
@@ -152,18 +152,18 @@ template <int dim> class Triangulation;
  *   your own version (non-virtual, since we use templates) to add functionality.
  *
  *   There is a standard implementation, using classes which are derived from
- *   @ref{TriaAccessor}. These classes point to @p{Line}s, @p{Quad}s and the like.
+ *   @ref{TriaAccessor}. These classes point to @ref{Line}s, @ref{Quad}s and the like.
  *   For advanced use of the iterator classes, derive classes from
  *   @p{{Line|Quad|Cell}Accessor} which also dereference data structures in other
  *   objects, e.g. in a finite element context. An iterator with such an accessor
  *   then simultaneously points to (for example) a cell in the triangulation and
  *   the data stored on it in the finite element class.
  *
- *   Derived accessor classes may need additional data (e.g. the @p{DoFAccessor}
- *   needs a pointer to the @p{DoFHandler} to work on). This data can be
+ *   Derived accessor classes may need additional data (e.g. the @ref{DoFAccessor}
+ *   needs a pointer to the @ref{DoFHandler} to work on). This data can be
  *   set upon construction through the last argument of the constructors.
  *   The data type of this additional data is given by the local data type
- *   @p{AccessorData} explained above. The iterator classes take a pointer to
+ *   @ref{AccessorData} explained above. The iterator classes take a pointer to
  *   an object of that data type; by default, this parameter equals the
  *   @p{NULL} pointer.
  *   
@@ -189,7 +189,7 @@ template <int dim> class Triangulation;
  *   past the end; in all other cases, the iterator is considered invalid.
  *   You can check this by calling the @p{state()} function.
  *
- *   An iterator is also invalid, if the pointer pointing to the @p{Triangulation}
+ *   An iterator is also invalid, if the pointer pointing to the @ref{Triangulation}
  *   object is invalid or zero.
  *
  *   Finally, an iterator is invalid, if the element pointed to by
@@ -286,13 +286,13 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a @p{Triangulation::raw_cell_iterator} from
-				      * a @p{DoFHandler::raw_cell_iterator}, since
-				      * the @p{DoFAccessor} class is derived from
-				      * the @p{TriaAccessor} class.
+				      * a @ref{Triangulation}@p{::raw_cell_iterator} from
+				      * a @ref{DoFHandler}@p{::raw_cell_iterator}, since
+				      * the @ref{DoFAccessor} class is derived from
+				      * the @ref{TriaAccessor} class.
 				      *
-				      * Since @p{TriaIterator} and
-				      * @p{TriaActiveIterator} are derived classes
+				      * Since @ref{TriaIterator} and
+				      * @ref{TriaActiveIterator} are derived classes
 				      * of this class, this constructor also
 				      * serves to convert these iterators with
 				      * other accessor classes.
@@ -560,12 +560,12 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a @p{Triangulation::cell_iterator} from
-				      * a @p{DoFHandler::cell_iterator}, since
-				      * the @p{DoFAccessor} class is derived from
-				      * the @p{TriaAccessor} class.
+				      * a @ref{Triangulation}@p{::cell_iterator} from
+				      * a @ref{DoFHandler}@p{::cell_iterator}, since
+				      * the @ref{DoFAccessor} class is derived from
+				      * the @ref{TriaAccessor} class.
 				      *
-				      * Since @p{TriaActiveIterator} is a derived
+				      * Since @ref{TriaActiveIterator} is a derived
 				      * class of this class, this constructor
 				      * also serves to convert these iterators 
 				      * with other accessor classes.
@@ -718,10 +718,10 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a @p{Triangulation::active_cell_iterator} from
-				      * a @p{DoFHandler::active_cell_iterator}, since
-				      * the @p{DoFAccessor} class is derived from
-				      * the @p{TriaAccessor} class.
+				      * a @ref{Triangulation}@p{::active_cell_iterator} from
+				      * a @ref{DoFHandler}@p{::active_cell_iterator}, since
+				      * the @ref{DoFAccessor} class is derived from
+				      * the @ref{TriaAccessor} class.
 				      */
     template <typename OtherAccessor>
     TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i);

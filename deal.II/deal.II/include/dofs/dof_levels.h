@@ -21,6 +21,8 @@
  * Store the indices of the degrees of freedom which are located on the lines.
  * Declare it to have a template parameter, but do not actually declare
  * other types than those explicitely instantiated.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int N>
 class DoFLevel
@@ -37,9 +39,9 @@ class DoFLevel
 /**
  * Store the indices of the degrees of freedom which are located on the lines.
  *
- * @sect3{Information for all @p{DoFLevel} classes}
+ * @sect3{Information for all @ref{DoFLevel} classes}
  *
- * The @p{DoFLevel<N>} classes 
+ * The @ref{DoFLevel}@p{<N>} classes 
  * store the global indices of the degrees of freedom for each cell on a
  * certain level. The index or number of a degree of freedom is the zero-based
  * index of the according value in the solution vector and the row and column
@@ -57,25 +59,27 @@ class DoFLevel
  * $\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots$ with $m$ denoting the
  * $m$th basis function, or $\ldots, u_1^m, u_1^{m+1}, u_1^{m+2}, \ldots,
  * u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots$, respectively). Likewise, the
- * constraint matrix returned by @p{DoFHandler::make_hanging_node_constraints ()}
+ * constraint matrix returned by @ref{DoFHandler}@p{::make_hanging_node_constraints ()}
  * is then
  * to be understood as a block matrix.
  *
  * The storage format of the degrees of freedom indices (short: DoF indices) is
  * somewhat like a mirror of the data structures of the triangulation classes.
- * There is a hierarchy of @p{DoFLevel<dim>} classes for the different dimensions
+ * There is a hierarchy of @ref{DoFLevel}@p{<dim>} classes for the different dimensions
  * which have objects named @p{line_dofs}, @p{quad_dofs} and so on, in which the
  * indices of DoFs located on lines and quads, respectively, are stored. The
  * indices are stored levelwise. The layout in
  * these arrays is as follows: if for a selected finite element (use
- * @p{DoFHandler::distribute_dofs()} to select a finite element) the number of
+ * @ref{DoFHandler}@p{::distribute_dofs()} to select a finite element) the number of
  * DoFs on each line (without those in the vertices) is @p{N}, then the length
  * of the @p{line_dofs} array is @p{N} times the number of lines on this level. The
  * DoF indices for the @p{i}th line are at the positions @p{N*i...(N+1)*i-1}.
  *
  * The DoF indices for vertices are not stored this way, since they need
  * different treatment in multigrid environments. If no multigrid is used, the
- * indices are stored in the @p{vertex_dofs} array of the @p{DoFHandler} class.
+ * indices are stored in the @p{vertex_dofs} array of the @ref{DoFHandler} class.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 class DoFLevel<1>
 {
@@ -89,11 +93,15 @@ class DoFLevel<1>
 };
 
 
+
 /**
  * Store the indices of the degrees of freedom which are located on quads.
  * See @ref{DoFLevel<1>} for more information.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
-class DoFLevel<2> : public DoFLevel<1> {
+class DoFLevel<2> : public DoFLevel<1>
+{
   public:
 				     /**
 				      * Store the global indices of the degrees
@@ -104,11 +112,15 @@ class DoFLevel<2> : public DoFLevel<1> {
 };
 
 
+
 /**
  * Store the indices of the degrees of freedom which are located on hexhedra.
  * See @ref{DoFLevel<1>} for more information.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
-class DoFLevel<3> : public DoFLevel<2> {
+class DoFLevel<3> : public DoFLevel<2>
+{
   public:
 				     /**
 				      * Store the global indices of the degrees

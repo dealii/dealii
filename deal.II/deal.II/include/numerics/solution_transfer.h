@@ -93,7 +93,7 @@
  * solution vector on the current (original) grid.
  * Each entry of this vector belongs to one of the
  * DoFs of the discretisation. If we now refine the grid then the calling of
- * @p{DoFHandler::distribute_dofs(...)} will change at least some of the
+ * @ref{DoFHandler}@p{::distribute_dofs(...)} will change at least some of the
  * DoF indices. Hence we need to store the DoF indices of all active cells
  * before the refinement. The @p{user_pointer} of each active cell
  * is used to point to the vector of these DoF indices of that cell, all other
@@ -111,11 +111,11 @@
  * arbitrary many discrete functions (solution vectors) on the original grid. 
  *
  * @item Solution transfer while coarsening and refinement. After 
- * calling @p{Triangulation::prepare_coarsening_and_refinement} the
+ * calling @ref{Triangulation}@p{::prepare_coarsening_and_refinement} the
  * coarsen flags of either all or none of the children of a 
  * (father-)cell are set. While coarsening 
- * (@p{Triangulation::execute_coarsening_and_refinement})
- * the cells that are not needed any more will be deleted from the @p{Triangulation}.
+ * (@ref{Triangulation}@p{::execute_coarsening_and_refinement})
+ * the cells that are not needed any more will be deleted from the @ref{Triangulation}.
  * 
  * For the interpolation from the (to be coarsenend) children to their father
  * the children cells are needed. Hence this interpolation
@@ -163,7 +163,7 @@ class SolutionTransfer
   public:
     
 				     /**
-				      * Constructor, takes the current @p{DoFHandler}
+				      * Constructor, takes the current @ref{DoFHandler}
 				      * as argument.
 				      */
     SolutionTransfer(const DoFHandler<dim> &dof);
@@ -254,11 +254,11 @@ class SolutionTransfer
 				      *
 				      * Calling this function is
 				      * allowed only if first
-				      * @p{Triangulation::prepare_coarsening_and_refinement},
+				      * @ref{Triangulation}@p{::prepare_coarsening_and_refinement},
 				      * second
 				      * @p{SolutionTransfer::prepare_for_coarsening_and_refinement},
 				      * an then third
-				      * @p{Triangulation::execute_coarsening_and_refinement}
+				      * @ref{Triangulation}@p{::execute_coarsening_and_refinement}
 				      * are called before. Multiple
 				      * calling of this function is
 				      * NOT allowed. Interpolating

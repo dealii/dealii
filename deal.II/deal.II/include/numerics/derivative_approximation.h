@@ -75,7 +75,7 @@
  * the values of the finite element field at the centers of the cells
  * are taken. It might therefore only be useful to use this class for
  * discontinuous, piecewise constant elements (i.e. using the
- * @p{FEDG_Q0} class), since all other finite elements can approximate
+ * @ref{FEDG_Q0} class), since all other finite elements can approximate
  * gradients themselves.
  *
  *
@@ -256,7 +256,7 @@ class DerivativeApproximation
 	typedef double        ProjectedDerivative;
 
 					 /**
-					  * Given an @p{FEValues} object
+					  * Given an @ref{FEValues} object
 					  * initialized to a cell, and a
 					  * solution vector, extract the
 					  * desired derivative at the
@@ -335,7 +335,7 @@ class DerivativeApproximation
 	typedef Tensor<1,dim> ProjectedDerivative;
 
 					 /**
-					  * Given an @p{FEValues} object
+					  * Given an @ref{FEValues} object
 					  * initialized to a cell, and a
 					  * solution vector, extract the
 					  * desired derivative at the

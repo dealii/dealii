@@ -26,9 +26,9 @@
  *   The center of the ball and its radius may be given upon construction of
  *   an object of this type. They default to the origin and a radius of 1.0.
  *
- *   This class is derived from @p{StraightBoundary} rather than from
- *   @p{Boundary}, which would seem natural, since this way we can use the
- *   @p{StraightBoundary<dim>::in_between(neighbors)} function.
+ *   This class is derived from @ref{StraightBoundary} rather than from
+ *   @ref{Boundary}, which would seem natural, since this way we can use the
+ *   @ref{StraightBoundary}@p{<dim>::in_between(neighbors)} function.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -83,7 +83,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 
 
 /**
- * Variant of @p{HyperBallBoundary} which denotes a half hyper ball
+ * Variant of @ref{HyperBallBoundary} which denotes a half hyper ball
  * where the first coordinate is restricted to the range $x>=0$ (or
  * $x>=center(0)$). In two dimensions, this equals the right half
  * circle, in three space dimensions it is a half ball. This class
@@ -162,7 +162,7 @@ class HyperShellBoundary : public StraightBoundary<dim>
 
 
 /**
- * Variant of @p{HyperShellBoundary} which denotes a half hyper shell
+ * Variant of @ref{HyperShellBoundary} which denotes a half hyper shell
  * where the first coordinate is restricted to the range $x>=0$ (or
  * $x>=center(0)$). In two dimensions, this equals the right half arc,
  * in three space dimensions it is a half shell. This class might be

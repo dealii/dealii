@@ -44,7 +44,7 @@ template <int n_blocks> class BlockIndices;
  * operation.
  *
  * Condensation is done in four steps: first the large matrix sparsity pattern
- * is created (e.g. using @p{DoFHandler::create_sparsity_pattern}), then the
+ * is created (e.g. using @ref{DoFHandler}@p{::create_sparsity_pattern}), then the
  * sparsity pattern of the condensed matrix is made out of the large sparsity
  * pattern and the constraints. After that the global matrix is assembled and
  * finally condensed. To do these steps, you have (at least) two possibilities:
@@ -286,9 +286,9 @@ class ConstraintMatrix : public Subscriptor
 				      * entries of @p{condensed} be zero!
 				      *
 				      * The @p{VectorType} may be a
-				      * @p{Vector<float>},
-				      * @p{Vector<double>},
-				      * @p{BlockVector<...>}, or any
+				      * @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>},
+				      * @ref{BlockVector}@p{<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -299,9 +299,9 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Condense the given vector
 				      * in-place. The @p{VectorType} may
-				      * be a @p{Vector<float>},
-				      * @p{Vector<double>},
-				      * @p{BlockVector<...>}, or any
+				      * be a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>},
+				      * @ref{BlockVector}@p{<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -323,9 +323,9 @@ class ConstraintMatrix : public Subscriptor
 				      * @p{condense}.
 				      *
 				      * The @p{VectorType} may be a
-				      * @p{Vector<float>},
-				      * @p{Vector<double>},
-				      * @p{BlockVector<...>}, or any
+				      * @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>},
+				      * @ref{BlockVector}@p{<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -337,9 +337,9 @@ class ConstraintMatrix : public Subscriptor
 				      * Re-distribute the elements of
 				      * the vector in-place. The
 				      * @p{VectorType} may be a
-				      * @p{Vector<float>},
-				      * @p{Vector<double>},
-				      * @p{BlockVector<...>}, or any
+				      * @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>},
+				      * @ref{BlockVector}@p{<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -351,9 +351,9 @@ class ConstraintMatrix : public Subscriptor
 				      * vector.  Sets all hanging node
 				      * values to zero. The
 				      * @p{VectorType} may be a
-				      * @p{Vector<float>},
-				      * @p{Vector<double>},
-				      * @p{BlockVector<...>}, or any
+				      * @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>},
+				      * @ref{BlockVector}@p{<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -443,7 +443,7 @@ class ConstraintMatrix : public Subscriptor
 					  * For the reason why we use a vector
 					  * instead of a map and the consequences
 					  * thereof, the same applies as what is
-					  * said for @p{ConstraintMatrix::lines}.
+					  * said for @ref{ConstraintMatrix}@p{::lines}.
 					  */
 	vector<pair<unsigned int,double> > entries;
 

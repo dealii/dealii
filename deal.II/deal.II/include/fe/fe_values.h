@@ -174,7 +174,7 @@ template <int dim> class Quadrature;
  *    the need to pass the cell iterator again to these two functions,
  *    which guarantees that the cell used here is in sync with that used
  *    for the @p{reinit} function. You should, however, make sure that
- *    nothing substantial happens to the @p{DoFHandler} object or any
+ *    nothing substantial happens to the @ref{DoFHandler} object or any
  *    other involved instance between the @p{reinit} and the @p{get_function_*}
  *    functions are called.
  *
@@ -884,7 +884,7 @@ class FEValues : public FEValuesBase<dim>
  *  the convention is used that the unit cell/face be the tensor product of the
  *  interval $[-1,1]$, which is to distinguished properly. A subface is the
  *  child of a face; they are numbered in the way laid down in the
- *  @p{Triangulation} class.
+ *  @ref{Triangulation} class.
  *
  *  Just like in the @p{FEValues} class, function values and gradients on the unit
  *  face or subface are evaluated at the quadrature points only once, and stored

@@ -28,7 +28,8 @@
  *
  *   @author Wolfgang Bangerth, 1998
  */
-class Line {
+class Line
+{
   public:
 				     /**
 				      *  Construct a line with end point
@@ -71,22 +72,27 @@ class Line {
 
 
 inline                               // wahrlich inline hier!
-Line::Line (const int i0, const int i1) {
+Line::Line (const int i0, const int i1)
+{
   end_points[0] = i0;
   end_points[1] = i1;
 };
 
 
+
 inline
-int Line::vertex (const int i) const {
+int Line::vertex (const int i) const
+{
   Assert ((i==0) || (i==1),
 	  ExcRange(i));
   return end_points[i];
 };
 
 
+
 inline
-void Line::set_vertex (const int i, const int index) {
+void Line::set_vertex (const int i, const int index)
+{
   Assert ((i==0) || (i==1),
 	  ExcRange(i));
   end_points[i] = index;

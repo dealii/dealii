@@ -20,7 +20,7 @@
  * This is a collection of functions operating on, and manipulating
  * the numbers of degrees of freedom in a multilevel triangulation. It
  * is similar in purpose and function to the @p{DoFTools} class, but
- * operates on @p{MGDoFHandler} objects instead of @p{DoFHandler}
+ * operates on @p{MGDoFHandler} objects instead of @ref{DoFHandler}
  * objects. See there and the documentation of the member functions
  * for more information.
  *

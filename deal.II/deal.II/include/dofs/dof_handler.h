@@ -48,7 +48,8 @@ class DoFDimensionInfo;
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
-class DoFDimensionInfo<1> {
+class DoFDimensionInfo<1>
+{
   public:
     typedef TriaRawIterator<1,DoFCellAccessor<1> >    raw_line_iterator;
     typedef TriaIterator<1,DoFCellAccessor<1> >       line_iterator;
@@ -72,12 +73,14 @@ class DoFDimensionInfo<1> {
 };
 
 
+
 /**
  * Define some types for the DoF handling in two dimensions.
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
-class DoFDimensionInfo<2> {
+class DoFDimensionInfo<2>
+{
   public:
     typedef TriaRawIterator<2,DoFObjectAccessor<1, 2> >    raw_line_iterator;
     typedef TriaIterator<2,DoFObjectAccessor<1, 2> >       line_iterator;
@@ -101,12 +104,14 @@ class DoFDimensionInfo<2> {
 };
 
 
+
 /**
  * Define some types for the DoF handling in two dimensions.
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<3>}.
  */
-class DoFDimensionInfo<3> {
+class DoFDimensionInfo<3>
+{
   public:
     typedef TriaRawIterator<3,DoFObjectAccessor<1, 3> >    raw_line_iterator;
     typedef TriaIterator<3,DoFObjectAccessor<1, 3> >       line_iterator;
@@ -130,6 +135,7 @@ class DoFDimensionInfo<3> {
 };
 
 
+
 /**
  * Manage the distribution and numbering of the degrees of freedom for
  * non-multigrid algorithms.
@@ -149,7 +155,7 @@ class DoFDimensionInfo<3> {
  * by offering @p{begin()} and @p{end()} functions which return iterators
  * to walk on the DoF structures as well as the triangulation data.
  * These iterators work much like those described in the documentation
- * of the @p{Triangulation} class and of the iterator classes themselved,
+ * of the @ref{Triangulation} class and of the iterator classes themselved,
  * but offer more functionality than pure triangulation iterators. The
  * order in which dof iterators are presented by the @p{++} and @p{--} operators
  * is the same as that for the alike triangulation iterators.
@@ -175,14 +181,14 @@ class DoFDimensionInfo<3> {
  *
  * This numbering implies very large bandwiths of the resulting matrices and
  * is thus vastly suboptimal for some solution algorithms. For this reason,
- * the @p{DoFRenumbering} class offers the function @p{renumber_dofs} which reorders
+ * the @ref{DoFRenumbering} class offers the function @p{renumber_dofs} which reorders
  * the dof numbering according to some scheme. See there for a discussion of
  * the implemented algorithms.
  *
  *
  * @sect3{User defined renumbering schemes}
  *
- * The @p{DoFRenumbering} class offers a fixed number of renumbering
+ * The @ref{DoFRenumbering} class offers a fixed number of renumbering
  * schemes like the Cuthill-McKey scheme. Basically, the function sets
  * up an array in which for each degree of freedom the index is stored
  * which is to be assigned by the renumbering. Using this array, the
@@ -250,7 +256,7 @@ class DoFDimensionInfo<3> {
  * Lagrange elements this is the point where it has the function value @p{1}), is
  * located on the boundary. We do not check this directly, the criterion is
  * rather defined through the information the finite element class gives: the
- * @p{FiniteElementBase} class defines the numbers of basis functions per vertex,
+ * @ref{FiniteElementBase} class defines the numbers of basis functions per vertex,
  * per line, and so on and the basis functions are numbered after this
  * information; a basis function is to be considered to be on the face of a
  * cell (and thus on the boundary if the cell is at the boundary) according
@@ -405,7 +411,7 @@ class DoFHandler  :  public Subscriptor,
 				      * This is the maximum number of entries
 				      * per line in the system matrix; this
 				      * information can therefore be used upon
-				      * construction of the @p{SparsityPattern}
+				      * construction of the @ref{SparsityPattern}
 				      * object.
 				      *
 				      * The returned number is not really the

@@ -27,8 +27,8 @@ template <int dim> class Triangulation;
  * the different output functions based on a parameter given, e.g., through
  * a parameter file, thus making user programs invariant of the number and
  * names of the file formats implemented in this class. The main advantage of
- * this class over the @p{DataOut} class is that it does not have to mess around
- * with actual data vectors and that no @p{DoFHandler} object is needed to
+ * this class over the @ref{DataOut} class is that it does not have to mess around
+ * with actual data vectors and that no @ref{DoFHandler} object is needed to
  * write the pure geometrical information involved here.
  *
  * Available output formats can be found in the functions with names @p{write_...}
@@ -48,9 +48,9 @@ template <int dim> class Triangulation;
  *   GridOut().write (tria, output_file, output_format);
  * @end{verbatim}
  * The function @p{get_output_format_names()} provides a list of possible names of
- * output formats in a string that is understandable by the @p{ParameterHandler} class.
+ * output formats in a string that is understandable by the @ref{ParameterHandler} class.
  *
- * Note that here, we have created an unnamed object of type @p{GridOut} and called
+ * Note that here, we have created an unnamed object of type @ref{GridOut} and called
  * one of its @p{write_*} functions. This looks like as if the respective function
  * could really be made @p{static}. This was not done in order to allow for
  * parameters to be passed to the different output functions in a way compatible
@@ -66,9 +66,9 @@ template <int dim> class Triangulation;
  * output format supported which it may then pass on to the respective output
  * function.
  *
- * Rather, we have chosen to let each object of this class @p{GridOut} have a
+ * Rather, we have chosen to let each object of this class @ref{GridOut} have a
  * set of parameters for each supported output format. These are collected
- * in structures @p{EpsFlags}, @p{GnuplotFlags}, etc and you can set your preferred
+ * in structures @ref{EpsFlags}, @ref{GnuplotFlags}, etc and you can set your preferred
  * flags like this:
  * @begin{verbatim}
  *   GridOut grid_out;
@@ -358,7 +358,7 @@ class GridOut
 				      * flags controlling the output
 				      * can be found in the
 				      * documentation of the
-				      * @p{GridOut::GnuplotFlags} class.
+				      * @ref{GridOut::GnuplotFlags} class.
 				      */
     template <int dim>
     void write_gnuplot (const Triangulation<dim> &tria,
@@ -377,7 +377,7 @@ class GridOut
 				      * only, you can decide through
 				      * additional flags (see below,
 				      * and the documentation of the
-				      * @p{GridOut::UcdFlags} class)
+				      * @ref{GridOut::UcdFlags} class)
 				      * whether boundary faces with
 				      * non-zero boundary indicator
 				      * shall be written to the file
@@ -397,7 +397,7 @@ class GridOut
 				      * flags controlling the output
 				      * can be found in the
 				      * documentation of the
-				      * @p{GridOut::UcdFlags} class.
+				      * @ref{GridOut::UcdFlags} class.
 				      */
     template <int dim>
     void write_ucd (const Triangulation<dim> &tria,
@@ -420,7 +420,7 @@ class GridOut
 				      * shall fit into is determined
 				      * by the output flags (see
 				      * below, and the documentation
-				      * of the @p{GridOut::EpsFlags}
+				      * of the @ref{GridOut::EpsFlags}
 				      * class).
 				      *
 				      * The bounding box is close to
@@ -447,7 +447,7 @@ class GridOut
 				      * flags controlling the output
 				      * can be found in the
 				      * documentation of the
-				      * @p{GridOut::EpsFlags}
+				      * @ref{GridOut::EpsFlags}
 				      * class. Especially the
 				      * viewpoint for three
 				      * dimensional grids is of
@@ -533,7 +533,7 @@ class GridOut
 				      *
 				      * To get a list of presently available
 				      * format names, e.g. to give it to the
-				      * @p{ParameterHandler} class, use the
+				      * @ref{ParameterHandler} class, use the
 				      * function @p{get_output_format_names ()}.
 				      */
     static OutputFormat parse_output_format (const string &format_name);
@@ -542,7 +542,7 @@ class GridOut
 				      * Return a list of implemented output
 				      * formats. The different names are
 				      * separated by vertical bar signs (@p{`|'})
-				      * as used by the @p{ParameterHandler}
+				      * as used by the @ref{ParameterHandler}
 				      * classes.
 				      */
     static string get_output_format_names ();

@@ -842,7 +842,7 @@ class FiniteElementBase : public Subscriptor,
  *
  * The faces of a hexahedron are arranged in a way such that
  * some must be viewed from the inside and some from the outside of the cell to
- * show this order; refer to the documentation of the @p{Triangulation} class for
+ * show this order; refer to the documentation of the @ref{Triangulation} class for
  * the definition of this.
  *
  * If of the cells adjacent to one line more than one is refined and there is
@@ -995,7 +995,7 @@ class FiniteElementBase : public Subscriptor,
  *   of this class.
  *
  *   This also is used in some sense in the
- *   @p{DoFHandler::distribute_cell_to_dof_vector} where it is assumed that
+ *   @ref{DoFHandler}@p{::distribute_cell_to_dof_vector} where it is assumed that
  *   the degrees of freedom denote function values and not derivatives or
  *   the like.
  *
@@ -1007,9 +1007,9 @@ class FiniteElementBase : public Subscriptor,
  *
  *   This assumption is used in the @p{VectorTools::project_boundary_values},
  *   @p{MatrixCreator::create_boundary_mass_matrix},
- *   @p{DoFHandler::make_boundary_sparsity_pattern},
- *   @p{DoFHandler::map_dof_to_boundary_indices} and may be a few other places.
- *   The places in the @p{DoFHandler} class are probably not that dangerous,
+ *   @ref{DoFHandler}@p{::make_boundary_sparsity_pattern},
+ *   @ref{DoFHandler}@p{::map_dof_to_boundary_indices} and may be a few other places.
+ *   The places in the @ref{DoFHandler} class are probably not that dangerous,
  *   since wrong results will most likely lead to internal errors through
  *   the @p{Assert} mechanism, but the first places will lead to undiscovered
  *   errors if not thought of properly.
@@ -1020,7 +1020,7 @@ class FiniteElementBase : public Subscriptor,
  *   constrained nodes happens with the face nodes on the large call. If
  *   the assumption does not hold, then the distribution has to happen
  *   with all nodes on the small and the large cells. This is not
- *   implemented in the @p{DoFHandler} class as of now.
+ *   implemented in the @ref{DoFHandler} class as of now.
  * @end{itemize}
  *
  * @author Wolfgang Bangerth, 1998
@@ -1269,7 +1269,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * quadrature points which also
 				      * use the standard direction of
 				      * faces as laid down by the
-				      * @p{Triangulation} class.
+				      * @ref{Triangulation} class.
 				      *
 				      * There is a standard
 				      * implementation for dimensions
@@ -1702,15 +1702,15 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * is declared.
 				      *
 				      * The function takes a
-				      * @p{DoFHandler} iterator, which
+				      * @ref{DoFHandler} iterator, which
 				      * provides a superset of
 				      * information to the geometrical
 				      * information needed for the
 				      * computations.  The additional
 				      * data should not be used,
-				      * however a @p{DoFHandler}
+				      * however a @ref{DoFHandler}
 				      * iterator was preferred over a
-				      * @p{Triangulation} iterator
+				      * @ref{Triangulation} iterator
 				      * since this is what usually is
 				      * available in places where this
 				      * function is called.

@@ -249,6 +249,7 @@ class TriaAccessor
 };
 
 
+
 /**
  * Common template for line, quad, hex accessors.
  * According to @p{celldim} objects of this class represent lines,
@@ -286,11 +287,13 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      */
 
     void set (const Line&) const;
+    
 				     /**
 				      *  Copy the data of the given quad. Only
 				      * implemented for @p{celldim==2}.
 				      */
     void set (const Quad&) const;
+    
 				     /**
 				      *  Copy the data of the given hex. Only
 				      * implemented for @p{celldim==3}.
@@ -301,7 +304,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  Index of vertex. The convention regarding the
 				      *  numbering of vertices is laid down
 				      *  in the documentation of the
-				      *  @p{Triangulation} class.
+				      *  @ref{Triangulation} class.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
@@ -515,7 +518,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * the use of this function is only
 				      * possible for @p{dim>celldim};
 				      * however, for @p{dim==celldim}, an object is
-				      * a cell and the @p{CellAccessor} class
+				      * a cell and the @ref{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -634,6 +637,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 };
 
 
+
 /**
  * Closure class to stop induction of classes. Should never be called and thus
  * producesan error when created.
@@ -661,6 +665,7 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 	Assert (false, ExcInternalError());
       };
 };
+
 
 
 /**
@@ -876,7 +881,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * interior of the domain. Obviously,
 				      * this is only possible for @p{dim>1};
 				      * however, for @p{dim==1}, a line is
-				      * a cell and the @p{CellAccessor} class
+				      * a cell and the @ref{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -997,6 +1002,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 };
 
 
+
 /**
  *   Accessor to dereference the data of quads. This accessor is used to
  *   point to quads in @p{dim} space dimensions (only @p{dim>=2} seems reasonable
@@ -1047,7 +1053,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      *  Return a pointer to the @p{i}th line
-				      *  bounding this @p{Quad}.
+				      *  bounding this @ref{Quad}.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     line (const unsigned int i) const;
@@ -1231,7 +1237,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * interior of the domain. Obviously,
 				      * this function is only useful for @p{dim>2};
 				      * however, for @p{dim==2}, a quad is
-				      * a cell and the @p{CellAccessor} class
+				      * a cell and the @ref{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -1369,6 +1375,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 };
 
 
+
 /**
  *   Accessor to dereference the data of hexahedra. This accessor is used to
  *   point to hexs in @p{dim} space dimensions (only @p{dim>=3} seems reasonable
@@ -1407,7 +1414,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  a hex. The convention regarding the
 				      *  numbering of vertices is laid down
 				      *  in the documentation of the
-				      *  @p{Triangulation} class.
+				      *  @ref{Triangulation} class.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
@@ -1619,7 +1626,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * the use of this function is only
 				      * possible for @p{dim>3};
 				      * however, for @p{dim==3}, a hex is
-				      * a cell and the @p{CellAccessor} class
+				      * a cell and the @ref{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -1743,6 +1750,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      */
     template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
+
 
 
 /**
@@ -1954,6 +1962,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      */
     void operator = (const CellAccessor<dim> &);
 };
+
 
 
 // if in optimized mode: include more templates

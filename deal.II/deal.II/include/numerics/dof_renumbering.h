@@ -74,11 +74,11 @@
  *
  * The renumbering algorithms need quite a lot of memory, since they have
  * to store for each dof with which other dofs it couples. This is done
- * using a @p{SparsityPattern} object used to store the sparsity pattern of
+ * using a @ref{SparsityPattern} object used to store the sparsity pattern of
  * matrices. It
  * is not useful for the user to do anything between distributing the dofs
- * and renumbering, i.e. the calls to @p{DoFHandler::distribute_dofs} and
- * @p{DoFHandler::renumber_dofs} should follow each other immediately. If
+ * and renumbering, i.e. the calls to @ref{DoFHandler}@p{::distribute_dofs} and
+ * @ref{DoFHandler}@p{::renumber_dofs} should follow each other immediately. If
  * you try to create a sparsity pattern or anything else in between, these
  * will be invalid afterwards.
  *
@@ -141,7 +141,7 @@
  *
  * @sect2{Component-wise numbering}
  *
- * For finite elements composed of several base elements using the @p{FESystem}
+ * For finite elements composed of several base elements using the @ref{FESystem}
  * class, or for elements which provide several components themselves, it
  * may be of interest to sort the DoF indices by component. This will then
  * bring out the block matrix structure, since otherwise the degrees of freedom

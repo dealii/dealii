@@ -41,10 +41,10 @@ template <int dim> class DoFHandler;
  * result in a strange kind of behaviour, though every reasonable
  * operating system should disallow access through that pointer.
  * The reason we do not check for the null pointer in the
- * constructor which gets passed the @p{DoFHandler} pointer is that
+ * constructor which gets passed the @ref{DoFHandler} pointer is that
  * if we did we could not make dof iterators member of other classes
- * (like in the @p{FEValues} class) if we did not know about the
- * @p{DoFHandler} object to be used upon construction of that object.
+ * (like in the @ref{FEValues} class) if we did not know about the
+ * @ref{DoFHandler} object to be used upon construction of that object.
  * Through the way this class is implemented here, we allow the
  * creation of a kind of virgin object which only gets useful if
  * assigned to from another object before first usage.
@@ -85,7 +85,7 @@ class DoFAccessor
 
 				     /**
 				      * Return a handle on the
-				      * @p{DoFHandler} object which we
+				      * @ref{DoFHandler} object which we
 				      * are using.
 				      */
     const DoFHandler<dim> &
@@ -120,7 +120,7 @@ class DoFAccessor
 
   protected:
 				     /**
-				      * Store the address of the @p{DoFHandler} object
+				      * Store the address of the @ref{DoFHandler} object
 				      * to be accessed.
 				      */
     DoFHandler<dim> *dof_handler;  
@@ -131,13 +131,13 @@ class DoFAccessor
 
 /**
  * This is a switch class which only declares a @p{typedef}. It is meant to
- * determine which class a @p{DoFObjectAccessor} class is to be derived
+ * determine which class a @ref{DoFObjectAccessor} class is to be derived
  * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
  * the @p{typedef} in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
  * class, which is @p{TriaObjectAccessor<celldim,dim>},
  * but if @p{celldim==dim}, then the specialization @p{DoFObjectAccessor_Inheritance<dim,dim>}
  * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
- * the inheritance is automatically chosen to be from @p{CellAccessor} if the
+ * the inheritance is automatically chosen to be from @ref{CellAccessor} if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @author Wolfgang Bangerth, 1999
@@ -156,13 +156,13 @@ class DoFObjectAccessor_Inheritance
 
 /**
  * This is a switch class which only declares a @p{typedef}. It is meant to
- * determine which class a @p{DoFObjectAccessor} class is to be derived
+ * determine which class a @ref{DoFObjectAccessor} class is to be derived
  * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
  * the @p{typedef} in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
  * class, which is @p{TriaObjectAccessor<celldim,dim>},
  * but if @p{celldim==dim}, then the specialization @p{DoFObjectAccessor_Inheritance<dim,dim>}
  * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
- * the inheritance is automatically chosen to be from @p{CellAccessor} if the
+ * the inheritance is automatically chosen to be from @ref{CellAccessor} if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @author Wolfgang Bangerth, 1999
@@ -243,7 +243,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
     				     /**
 				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a @p{DoFHandler<dim>} object.
+				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		    const int           level,
@@ -309,8 +309,8 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      *
 				      * The input vector may be either
 				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -346,9 +346,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * to this function.
 				      *
 				      * The output vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -375,7 +375,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
     quad (const unsigned int i) const;
     
 				     /**
-				      * @p{i}th child as a @p{DoFObjectAccessor}
+				      * @p{i}th child as a @ref{DoFObjectAccessor}
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a hex accessor without
@@ -400,7 +400,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * @p{distribute_local_to_global(dVector,dVector)}
+				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -497,7 +497,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
     				     /**
 				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a @p{DoFHandler<dim>} object.
+				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		       const int           level,
@@ -559,9 +559,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -596,9 +596,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -636,7 +636,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * @p{distribute_local_to_global(dVector,dVector)}
+				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -685,7 +685,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
     				     /**
 				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a @p{DoFHandler<dim>} object.
+				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		     const int           level,
@@ -748,9 +748,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -785,9 +785,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -833,7 +833,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * @p{distribute_local_to_global(dVector,dVector)}
+				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -882,7 +882,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
     				     /**
 				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a @p{DoFHandler<dim>} object.
+				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		    const int           level,
@@ -945,9 +945,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -982,9 +982,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -1036,7 +1036,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * @p{distribute_local_to_global(dVector,dVector)}
+				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -1053,6 +1053,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 };
 
 
+
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
@@ -1060,14 +1061,14 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
  * one and two, respectively, this class only collects the pieces
  * together by deriving from the appropriate @p{DoF*Accessor} and the
  * right @p{CellAccessor<dim>} and finally adding two functions which give
- * access to the neighbors and children as @p{DoFCellAccessor} objects
- * rather than @p{CellAccessor} objects (the latter function was inherited
+ * access to the neighbors and children as @ref{DoFCellAccessor} objects
+ * rather than @ref{CellAccessor} objects (the latter function was inherited
  * from the @p{CellAccessor<dim>} class).
  *
  * Note that since for the class we derive from, i.e. @p{DoFObjectAccessor<dim,dim>},
  * the two template parameters are equal, the base class is actually derived from
- * @p{CellAccessor}, which makes the functions of this class available to the
- * @p{DoFCellAccessor} class as well.
+ * @ref{CellAccessor}, which makes the functions of this class available to the
+ * @ref{DoFCellAccessor} class as well.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -1233,9 +1234,9 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * objects.
 				      *
 				      * The output vector may be either
-				      * a @p{Vector<float>},
-				      * @p{Vector<double>}, or a
-				      * @p{BlockVector<...,double>}. It
+				      * a @ref{Vector}@p{<float>},
+				      * @ref{Vector}@p{<double>}, or a
+				      * @ref{BlockVector}@p{<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in

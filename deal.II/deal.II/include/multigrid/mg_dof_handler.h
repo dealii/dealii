@@ -173,7 +173,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * distribute the degrees of freedoms
 				      * needed for the given finite element
 				      * according to the given distribution
-				      * method. We first call the @p{DoFHandler}'s
+				      * method. We first call the @ref{DoFHandler}'s
 				      * function and then distribute the
 				      * levelwise numbers.
 				      *
@@ -927,7 +927,7 @@ class MGDoFHandler : public DoFHandler<dim>
     				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Unlike the @p{levels}
-				      * object in the @p{DoFHandler}, these are
+				      * object in the @ref{DoFHandler}, these are
 				      * not global numbers but rather are
 				      * numbers which start from zero on each
 				      * level.

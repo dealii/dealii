@@ -28,7 +28,7 @@
  * of cell numbers to the geometrical cells.
  *
  * Basically, this is a drop-in replacement for the triangulation. Since it
- * is derived from the @p{Triangulation<dim>} class, it shares all the
+ * is derived from the @ref{Triangulation} class, it shares all the
  * functionality, but it overrides some virtual functions and adds some
  * functions, too. The main change to the base class is that it overrides
  * the @p{execute_coarsening_and_refinement} function, where the new version
@@ -40,7 +40,7 @@
  *
  * We note that since the triangulation is created in exactly the same state
  * as it was before, other objects working on it should result in the same
- * state as well. This holds in particular for the @p{DoFHandler} object, which
+ * state as well. This holds in particular for the @ref{DoFHandler} object, which
  * will assign the same degrees of freedom to the original cells and the ones
  * after reconstruction of the triangulation. You can therefore safely use data
  * vectors computed on the original grid on the reconstructed grid as well.
@@ -48,7 +48,7 @@
  *
  * @sect3{Usage}
  * You can use objects of this class almost in the same way as objects of the
- * @p{Triangulation} class. One of the few differences is that you can only
+ * @ref{Triangulation} class. One of the few differences is that you can only
  * construct such an object by giving a coarse grid to the constructor. The
  * coarse grid will be used to base the triangulation on, and therefore the
  * lifetime of the coarse grid has to be longer than the lifetime of the
@@ -86,11 +86,11 @@
  *     };
  * @end{verbatim}
  *
- * Note that initially, the @p{PersistentTriangulation} object does not
+ * Note that initially, the @ref{PersistentTriangulation} object does not
  * constitute a triangulation; it only becomes one after @p{restore} is first
  * called. Note also that the @p{execute_coarsening_and_refinement} stores
  * all necessary flags for later reconstruction using the @p{restore} function.
- * @p{Triangulation<dim>::clear ()} resets the underlying triangulation to a
+ * @ref{Triangulation}@p{<dim>::clear ()} resets the underlying triangulation to a
  * virgin state, but does not affect the stored refinement flags needed for
  * later reconstruction and does also not touch the coarse grid which is
  * used withing @p{restore()}.

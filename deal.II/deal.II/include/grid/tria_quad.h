@@ -30,7 +30,8 @@
  *
  *   @author Wolfgang Bangerth, 1998
  */
-class Quad {
+class Quad
+{
   public:
 
 				     /**
@@ -75,7 +76,8 @@ class Quad {
 
 
 inline
-Quad::Quad (const int i0, const int i1, const int i2, const int i3) {
+Quad::Quad (const int i0, const int i1, const int i2, const int i3)
+{
   lines[0] = i0;
   lines[1] = i1;
   lines[2] = i2;
@@ -83,16 +85,20 @@ Quad::Quad (const int i0, const int i1, const int i2, const int i3) {
 };
 
 
+
 inline
-int Quad::line (const int i) const {
+int Quad::line (const int i) const
+{
   Assert ((i>=0) && (i<4),
 	  ExcRange(i));
   return lines[i];
 };
 
 
+
 inline
-void Quad::set_line (const int i, const int index) {
+void Quad::set_line (const int i, const int index)
+{
   Assert ((i>=0) && (i<4),
 	  ExcRange(i));
   lines[i] = index;

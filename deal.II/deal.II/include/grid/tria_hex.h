@@ -28,11 +28,12 @@
  *   of the triangulation.
  *
  *   For conventions on the numbering of faces, lines and vertices within a
- *   hexahedron, refer to the documentation of the @p{Triangulation} class.
+ *   hexahedron, refer to the documentation of the @ref{Triangulation} class.
  *
  *   @author Wolfgang Bangerth, 1998
  */
-class Hexahedron {
+class Hexahedron
+{
   public:
 
 				     /**
@@ -81,7 +82,8 @@ class Hexahedron {
 inline
 Hexahedron::Hexahedron (const int i0, const int i1,
 			const int i2, const int i3,
-			const int i4, const int i5) {
+			const int i4, const int i5)
+{
   quads[0] = i0;
   quads[1] = i1;
   quads[2] = i2;
@@ -91,16 +93,20 @@ Hexahedron::Hexahedron (const int i0, const int i1,
 };
 
 
+
 inline
-int Hexahedron::quad (const int i) const {
+int Hexahedron::quad (const int i) const
+{
   Assert ((i>=0) && (i<6),
 	  ExcRange(i));
   return quads[i];
 };
 
 
+
 inline
-void Hexahedron::set_quad (const int i, const int index) {
+void Hexahedron::set_quad (const int i, const int index)
+{
   Assert ((i>=0) && (i<6),
 	  ExcRange(i));
   quads[i] = index;

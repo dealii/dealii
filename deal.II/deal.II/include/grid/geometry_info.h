@@ -19,7 +19,7 @@
 template <int _dim> struct GeometryInfo;
 
 /**
- * Pseudo-class for recursive functions in @p{GeometryInfo<dim>}.
+ * Pseudo-class for recursive functions in @ref{GeometryInfo}@p{<dim>}.
  */
 struct GeometryInfo<0>
 {
@@ -31,11 +31,12 @@ struct GeometryInfo<0>
 };
 
 
+
 /**
  * Topological description of cells.
  *
  * This class contains as static members information on vertices and
- * faces of a @p{dim}-dimensinal grid cell. The interface is the same
+ * faces of a @p{dim}-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
  * cell, it is (correctly) set to zero, e.g. @p{sub_faces_per_cell} in
  * 1d.
@@ -182,7 +183,7 @@ struct GeometryInfo
 				      * For three spatial dimensions,
 				      * the exact order of the children is
 				      * laid down in the documentation of
-				      * the @p{Triangulation} class.
+				      * the @ref{Triangulation} class.
 				      */
     static unsigned int child_cell_on_face (unsigned int face,
 					    unsigned int subface);

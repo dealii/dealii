@@ -106,7 +106,7 @@ class FETools
 				    * Gives the interpolation of a the
 				    * @p{dof1}-function @p{u1} to a
 				    * @p{dof2}-function @p{u2}. @p{dof1} and
-				    * @p{dof2} need to be @p{DoFHandler}s
+				    * @p{dof2} need to be @ref{DoFHandler}s
 				    * based on the same triangulation.
 				    *
 				    * If the elements @p{fe1} and @p{fe2}
@@ -168,7 +168,7 @@ class FETools
 				    * extrapolation of a @p{dof1}
 				    * function @p{z1} to a @p{dof2}
 				    * function @p{z2}.  @p{dof1} and
-				    * @p{dof2} need to be @p{DoFHandler}
+				    * @p{dof2} need to be @ref{DoFHandler}
 				    * based on the same triangulation.
 				    *
 				    * This function is interesting for

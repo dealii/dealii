@@ -62,15 +62,16 @@ template <int dim> class Triangulation;
  *   about boundary indicators and the like, as well as all other information
  *   provided by these objects.
  *
- *   There are specialisations, @p{StraightBoundary<dim>}, which places
+ *   There are specialisations, @ref{StraightBoundary}, which places
  *   the new point right into the middle of the given points, and
- *   @p{HyperBallBoundary<dim>} creating a hyperball with given radius
+ *   @ref{HyperBallBoundary} creating a hyperball with given radius
  *   around a given center point.
  *
  *   @author Wolfgang Bangerth, 1999
  */
 template <int dim>
-class Boundary : public Subscriptor {
+class Boundary : public Subscriptor
+{
   public:
 				     /**
 				      * Destructor. Does nothing here, but
@@ -123,6 +124,7 @@ class Boundary : public Subscriptor {
 };
 
 
+
 /**
  *   Specialisation of @ref{Boundary}<dim>, which places the new point right
  *   into the middle of the given points. The middle is defined as the
@@ -161,6 +163,7 @@ class StraightBoundary : public Boundary<dim> {
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
+
 
 
 /*----------------------------   boundary-function.h     ---------------------------*/

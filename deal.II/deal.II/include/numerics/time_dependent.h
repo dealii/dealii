@@ -210,8 +210,8 @@
  *       timestep_manager.run_sweep (sweep);
  *   };
  * @end{verbatim}
- * Here, @p{timestep_manager} is an object of type @p{TimeDependent_Wave}, which
- * is a class derived from @p{TimeDependent}. @p{start_sweep}, 
+ * Here, @p{timestep_manager} is an object of type @ref{TimeDependent_Wave}, which
+ * is a class derived from @ref{TimeDependent}. @p{start_sweep}, 
  * @p{solve_primal_problem}, @p{solve_dual_problem}, @p{postprocess} and @p{end_sweep}
  * are functions inherited from this class. They all do a loop over all 
  * timesteps within this object and call the respective function on each of
@@ -253,7 +253,7 @@
  * invoked (@p{solve_primal_problem}, @p{solve_dual_problem}, @p{postprocess},
  * @p{refine_grids} and @p{write_statistics} all have this form, where the
  * latter two give functions of the derived timestep class, rather than
- * from the base class). The function @p{TimeStepBase::init_for_primal_problem}
+ * from the base class). The function @ref{TimeStepBase}@p{::init_for_primal_problem}
  * and the respective ones for the other operations defined by that class
  * are only used to store the type of operation which the loop presently
  * performed will do.
@@ -281,7 +281,7 @@
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
  * @end{verbatim}
- * @p{TimeStepBase_Wave<dim>::refine_grid} is a function taking an argument, unlike
+ * @ref{TimeStepBase_Wave}@p{::refine_grid} is a function taking an argument, unlike
  * all the other functions used above within the loops. However, in this special
  * case the parameter was the same for all timesteps and known before the loop
  * was started, so we fixed it and made a function object which to the outside
@@ -455,7 +455,7 @@ class TimeDependent
 				      *
 				      * Note that by giving an object
 				      * to this function, the
-				      * @p{TimeDependent} object assumes
+				      * @ref{TimeDependent} object assumes
 				      * ownership of the object; it will
 				      * therefore also take care of
 				      * deletion of the objects its manages.
@@ -522,7 +522,7 @@ class TimeDependent
 				      * Solve the primal problem; uses the
 				      * functions @p{init_for_primal_problem}
 				      * and @p{solve_primal_problem} of the
-				      * @p{TimeStepBase} class through the
+				      * @ref{TimeStepBase} class through the
 				      * @p{do_loop} function of this class.
 				      *
 				      * Look ahead and look back are
@@ -535,7 +535,7 @@ class TimeDependent
 				      * Solve the dual problem; uses the
 				      * functions @p{init_for_dual_problem}
 				      * and @p{solve_dual_problem} of the
-				      * @p{TimeStepBase} class through the
+				      * @ref{TimeStepBase} class through the
 				      * @p{do_loop} function of this class.
 				      *
 				      * Look ahead and look back are
@@ -548,7 +548,7 @@ class TimeDependent
 				      * Do a postprocessing round; uses the
 				      * functions @p{init_for_postprocessing}
 				      * and @p{postprocess} of the
-				      * @p{TimeStepBase} class through the
+				      * @ref{TimeStepBase} class through the
 				      * @p{do_loop} function of this class.
 				      *
 				      * Look ahead and look back are
@@ -575,16 +575,16 @@ class TimeDependent
 				      *
 				      * Note also, that the given class from which
 				      * the two functions are taken needs not
-				      * necessarily be @p{TimeStepBase}, but it
+				      * necessarily be @ref{TimeStepBase}, but it
 				      * could also be a derived class, that is
-				      * @p{static_cast}able from a @p{TimeStepBase}.
+				      * @p{static_cast}able from a @ref{TimeStepBase}.
 				      * The function may be a virtual function
 				      * (even a pure one) of that class, which
 				      * should help if the actual class where it
 				      * is implemented is one which is derived
 				      * through virtual base classes and thus
 				      * unreachable by @p{static_cast} from the
-				      * @p{TimeStepBase} class.
+				      * @ref{TimeStepBase} class.
 				      *
 				      * Instead of using the above form, you can
 				      * equally well use
@@ -1102,8 +1102,9 @@ class TimeStepBase : public Subscriptor
 };
 
 
+
 /**
- * Specialisation of @p{TimeStepBase} which addresses some aspects of grid handling.
+ * Specialisation of @ref{TimeStepBase} which addresses some aspects of grid handling.
  * In particular, this class is thought to make handling of grids available that
  * are adaptively refined on each time step separately or with a loose coupling
  * between time steps. It also takes care of deleting and rebuilding grids when
@@ -1381,8 +1382,9 @@ class TimeStepBase_Tria :  public TimeStepBase
 };
 
 
+
 /**
- * This structure is used to tell the @p{TimeStepBase_Tria} class how grids should
+ * This structure is used to tell the @ref{TimeStepBase_Tria} class how grids should
  * be handled. It has flags defining the moments where grids shall be
  * re-made and when they may be deleted. Also, one variable states whether
  * grids should be kept in memory or should be deleted between to uses to
@@ -1456,8 +1458,9 @@ struct TimeStepBase_Tria<dim>::Flags
 };
 
 
+
 /**
- * This structure is used to tell the @p{TimeStepBase_Tria} class how grids should
+ * This structure is used to tell the @ref{TimeStepBase_Tria} class how grids should
  * be refined. Before we explain all the different variables, fist some terminology:
  * @begin{itemize}
  * @item Correction: after having flagged some cells of the triangulation for
@@ -1707,6 +1710,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 		    int,
 		    << "The following value does not fulfil the requirements: " << arg1);
 };
+
 
 
 /**
