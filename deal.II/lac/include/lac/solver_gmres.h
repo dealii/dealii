@@ -16,30 +16,34 @@
  * Minimal Residual Method. The stopping criterion is the norm of the
  * residual.
  *
- * You have to give the number of temporary vectors to the constructor which
- * are to be used to do the orthogonalization. If the number of iterations
- * needed to solve the problem to the given criterion, an intermediate
- * solution is computed and a restart is performed. If you don't want to
- * use the restarted method, you can limit the number of iterations (stated
- * in the #SolverControl# object given to the constructor) to be below
- * the number of temporary vectors minus three. Note the subtraction, which
- * is due to the fact that three vectors are used for other purposes, so
- * the number of iterations before a restart occurs is less by three than
- * the total number of temporary vectors.
+ * You have to give the maximum number of temporary vectors to the
+ * constructor which are to be used to do the orthogonalization. If
+ * the number of iterations needed to solve the problem to the given
+ * criterion, an intermediate solution is computed and a restart is
+ * performed. If you don't want to use the restarted method, you can
+ * limit the number of iterations (stated in the #SolverControl#
+ * object given to the constructor) to be below the number of
+ * temporary vectors minus three. Note the subtraction, which is due
+ * to the fact that three vectors are used for other purposes, so the
+ * number of iterations before a restart occurs is less by three than
+ * the total number of temporary vectors. If the size of the matrix is
+ * smaller than the maximum number of temporary vectors, then fewer
+ * vectors are allocated since GMRES can then be used as a direct
+ * solver.
  *
- * Note that restarts don't compensate temporary vectors very well, i.e.
- * giving too few temporary vectors will increase the necessary iteration
- * steps greatly; it is not uncommon that you will need more iterations
- * than there are degrees of freedom in your solution vector, if the number
- * of temporary vectors is lower than the size of the vector, even though
- * GMRES is an exact solver if a sufficient number of temporary vectors is
- * given. You should therefore always give as many temporary vectors as you
- * can, unless you are limited by the available memory; only then should you
- * start to trade computational speed against memory. One of the few other
+ * Note that restarts don't compensate temporary vectors very well,
+ * i.e.  giving too few temporary vectors will increase the necessary
+ * iteration steps greatly; it is not uncommon that you will need more
+ * iterations than there are degrees of freedom in your solution
+ * vector, if the number of temporary vectors is lower than the size
+ * of the vector, even though GMRES is an exact solver if a sufficient
+ * number of temporary vectors is given. You should therefore always
+ * give as many temporary vectors as you can, unless you are limited
+ * by the available memory; only then should you start to trade
+ * computational speed against memory. One of the few other
  * possibilities is to use a good preconditioner.
  *
- * @author Original implementation by the DEAL authors; adapted, cleaned and documented by Wolfgang Bangerth
- */
+ * @author Original implementation by the DEAL authors; adapted, cleaned and documented by Wolfgang Bangerth */
 template<class Matrix, class Vector>
 class SolverGMRES : public Solver<Matrix, Vector> {
   public:
@@ -48,7 +52,7 @@ class SolverGMRES : public Solver<Matrix, Vector> {
 				      */
     SolverGMRES (SolverControl        &cn,
 		 VectorMemory<Vector> &mem,
-		 const unsigned int    n_tmp_vectors);
+		 const unsigned int    max_n_tmp_vectors);
     
 				     /**
 				      * Solver method.
@@ -64,7 +68,7 @@ class SolverGMRES : public Solver<Matrix, Vector> {
 		    << "any results, and much more for reasonable ones.");
     
   protected:
-    const unsigned int n_tmp_vectors;
+    const unsigned int max_n_tmp_vectors;
     
 				     /**
 				      * Implementation of the computation of
@@ -92,11 +96,11 @@ class SolverGMRES : public Solver<Matrix, Vector> {
 template <class Matrix, class Vector>
 SolverGMRES<Matrix,Vector>::SolverGMRES (SolverControl        &cn,
 					 VectorMemory<Vector> &mem,
-					 const unsigned int    n_tmp_vectors) :
+					 const unsigned int    max_n_tmp_vectors) :
 		Solver<Matrix,Vector> (cn,mem),
-		n_tmp_vectors (n_tmp_vectors)
+		max_n_tmp_vectors (max_n_tmp_vectors)
 {
-  Assert (n_tmp_vectors >= 10, ExcTooFewTmpVectors (n_tmp_vectors));
+  Assert (max_n_tmp_vectors >= 10, ExcTooFewTmpVectors (max_n_tmp_vectors));
 };
 
 
@@ -145,6 +149,15 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 				   // place should get stoned, IMHO! (WB)
 
   deallog.push("GMRES");
+
+				   // determine how many vectors to allocate.
+				   // if the size of the matrix is very small,
+				   // then only allocate a number of vectors
+				   // which is needed
+  const unsigned int n_tmp_vectors = (A.m()+3 > max_n_tmp_vector ?
+				      max_n_tmp_vectors :
+				      A.m()+3);
+
 				   // allocate an array of n_tmp_vectors
 				   // temporary vectors from the VectorMemory
 				   // object; resize them but do not set their
