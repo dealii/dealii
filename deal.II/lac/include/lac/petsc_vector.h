@@ -115,9 +115,7 @@ namespace PETScWrappers
   template <typename number>
   Vector::Vector (const ::Vector<number> &v)
   {
-    int ierr
-      = VecCreateSeq (PETSC_COMM_SELF, v.size(), &vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    create_vector (v.size());
 
     VectorBase::operator = (v);
   }
