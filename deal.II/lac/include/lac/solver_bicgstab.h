@@ -308,6 +308,8 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
   
   do
     {
+      ++step;
+      
       rhobar = r*rbar;
       beta   = rhobar * alpha / (rho * omega);
       rho    = rhobar;
@@ -322,7 +324,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 
       if (std::fabs(alpha) > 1.e10)
 	return true;
-    
+      
       s.equ(1., r, -alpha, v);
       precondition.vmult(z,s);
       A.vmult(t,z);
@@ -336,7 +338,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
       else
 	res = r.l2_norm();
       
-      state = control().check(++step, res);
+      state = control().check(step, res);
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
@@ -371,9 +373,10 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   
   do 
     {
-      if (step)
+      if (step != 0)
 	deallog << "Restart step " << step << std::endl;
-      if (start(A) == SolverControl::success) break;  
+      if (start(A) == SolverControl::success)
+	break;
       state = iterate(A, precondition);
     }
   while (state);
