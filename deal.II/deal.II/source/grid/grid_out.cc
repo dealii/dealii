@@ -839,17 +839,21 @@ void GridOut::write (const Triangulation<dim> &tria,
 
 
 // explicit instantiations
-template void GridOut::write_ucd<> (const Triangulation<deal_II_dimension> &,
-				    std::ostream &);
+template void GridOut::write_ucd<deal_II_dimension>
+(const Triangulation<deal_II_dimension> &,
+ std::ostream &);
 #if deal_II_dimension != 1
-template void GridOut::write_gnuplot<> (const Triangulation<deal_II_dimension> &,
-					std::ostream &,
-					const Mapping<deal_II_dimension> *);
-template void GridOut::write_eps<> (const Triangulation<deal_II_dimension> &,
-				    std::ostream &,
-				    const Mapping<deal_II_dimension> *);
+template void GridOut::write_gnuplot<deal_II_dimension>
+(const Triangulation<deal_II_dimension> &,
+ std::ostream &,
+ const Mapping<deal_II_dimension> *);
+template void GridOut::write_eps<deal_II_dimension>
+(const Triangulation<deal_II_dimension> &,
+ std::ostream &,
+ const Mapping<deal_II_dimension> *);
 #endif
-template void GridOut::write<> (const Triangulation<deal_II_dimension> &,
-				std::ostream &,
-				const OutputFormat,
-				const Mapping<deal_II_dimension> *);
+template void GridOut::write<deal_II_dimension>
+(const Triangulation<deal_II_dimension> &,
+ std::ostream &,
+ const OutputFormat,
+ const Mapping<deal_II_dimension> *);

@@ -643,44 +643,52 @@ DataOut<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &cell)
 // explicit instantiations
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension>;
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
+add_data_vector<Vector<double> > (
   const Vector<double> &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
+add_data_vector<BlockVector<double> > (
   const BlockVector<double> &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
+add_data_vector<Vector<double> > (
   const Vector<double> &vec,
   const std::string    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
+add_data_vector<BlockVector<double> > (
   const BlockVector<double> &vec,
   const std::string    &name,
   const DataVectorType  type);
 
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>;
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
+add_data_vector<Vector<double> > (
   const Vector<double> &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
+add_data_vector<BlockVector<double> > (
   const BlockVector<double> &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
+add_data_vector<Vector<double> > (
   const Vector<double> &vec,
   const std::string    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
+add_data_vector<BlockVector<double> > (
   const BlockVector<double> &vec,
   const std::string    &name,
   const DataVectorType  type);
@@ -693,22 +701,26 @@ template class DataOut<deal_II_dimension>;
 #if deal_II_dimension >= 2
 template class DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>;
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
+add_data_vector<Vector<double> > (
   const Vector<double> &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
+add_data_vector<BlockVector<double> > (
   const BlockVector<double> &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
+add_data_vector<Vector<double> > (
   const Vector<double> &vec,
   const std::string    &name,
   const DataVectorType  type);
 template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::add_data_vector<> (
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
+add_data_vector<BlockVector<double> > (
   const BlockVector<double> &vec,
   const std::string    &name,
   const DataVectorType  type);

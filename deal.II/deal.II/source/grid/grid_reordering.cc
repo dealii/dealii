@@ -1314,5 +1314,5 @@ void GridReordering<1>::reorder_cells (std::vector<CellData<1> > &)
 template
 void
 GridReordering<deal_II_dimension>::
-reorder_cells<> (std::vector<CellData<deal_II_dimension> > &);
+reorder_cells (std::vector<CellData<deal_II_dimension> > &);
 #endif

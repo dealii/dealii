@@ -138,19 +138,19 @@ template MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<deal_II_
 #endif
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+void MGSmootherContinuous::set_zero_interior_boundary<Vector<double> > (const unsigned int,
 							 Vector<double>&) const;
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+void MGSmootherContinuous::set_zero_interior_boundary<Vector<float> > (const unsigned int,
 							 Vector<float>&) const;
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+void MGSmootherContinuous::set_zero_interior_boundary<BlockVector<double> > (const unsigned int,
 							 BlockVector<double>&) const;
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary<> (const unsigned int,
+void MGSmootherContinuous::set_zero_interior_boundary<BlockVector<float> > (const unsigned int,
 							 BlockVector<float>&) const;
 
 

@@ -17,27 +17,27 @@
 // explicit instantiations
 template class Vector<long double>;
 
-template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<double>&);
-template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<float>&);
-template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<long double> &) const;
-template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<double> &) const;
-template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<float> &) const;
-template void Vector<long double>::reinit<>(const Vector<long double>&, const bool);
-template void Vector<long double>::reinit<>(const Vector<double>&, const bool);
-template void Vector<long double>::reinit<>(const Vector<float>&, const bool);
-template void Vector<long double>::equ<>(const long double, const Vector<long double>&);
-template void Vector<long double>::equ<>(const long double, const Vector<double>&);
-template void Vector<long double>::equ<>(const long double, const Vector<float>&);
+template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(const Vector<double>&);
+template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<float>(const Vector<float>&);
+template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<long double> (const Vector<long double> &) const;
+template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<double> (const Vector<double> &) const;
+template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<float> (const Vector<float> &) const;
+template void Vector<long double>::reinit<long double>(const Vector<long double>&, const bool);
+template void Vector<long double>::reinit<double>(const Vector<double>&, const bool);
+template void Vector<long double>::reinit<float>(const Vector<float>&, const bool);
+template void Vector<long double>::equ<long double>(const long double, const Vector<long double>&);
+template void Vector<long double>::equ<double>(const long double, const Vector<double>&);
+template void Vector<long double>::equ<float>(const long double, const Vector<float>&);
 
-template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<long double>&);
-template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<long double> &) const;
-template void Vector<double>::reinit<>(const Vector<long double>&, const bool);
-template void Vector<double>::equ<>(const double, const Vector<long double>&);
+template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<long double>(const Vector<long double>&);
+template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<long double> (const Vector<long double> &) const;
+template void Vector<double>::reinit<long double>(const Vector<long double>&, const bool);
+template void Vector<double>::equ<long double>(const double, const Vector<long double>&);
 
-template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<long double>&);
-template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<long double> &) const;
-template void Vector<float>::reinit<>(const Vector<long double>&, const bool);
-template void Vector<float>::equ<>(const float, const Vector<long double>&);
+template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<long double>(const Vector<long double>&);
+template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<long double> (const Vector<long double> &) const;
+template void Vector<float>::reinit<long double>(const Vector<long double>&, const bool);
+template void Vector<float>::equ<long double>(const float, const Vector<long double>&);
 
 // see the .h file for why these functions are disabled.
 // template Vector<float>::Vector (const Vector<double>& v);

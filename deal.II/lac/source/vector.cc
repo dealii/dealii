@@ -16,22 +16,22 @@
 
 // explicit instantiations
 template class Vector<double>;
-template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<float>&);
-template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<float>&) const;
-template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<double>&) const;
-template void Vector<double>::reinit<>(const Vector<double>&, const bool);
-template void Vector<double>::reinit<>(const Vector<float>&, const bool);
-template void Vector<double>::equ<>(const double, const Vector<double>&);
-template void Vector<double>::equ<>(const double, const Vector<float>&);
+template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<float>(const Vector<float>&);
+template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<float>(const Vector<float>&) const;
+template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<double>(const Vector<double>&) const;
+template void Vector<double>::reinit<double>(const Vector<double>&, const bool);
+template void Vector<double>::reinit<float>(const Vector<float>&, const bool);
+template void Vector<double>::equ<double>(const double, const Vector<double>&);
+template void Vector<double>::equ<float>(const double, const Vector<float>&);
 
 template class Vector<float>;
-template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<double>&);
-template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<float>&) const;
-template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<double>&) const;
-template void Vector<float>::reinit<>(const Vector<double>&, const bool);
-template void Vector<float>::reinit<>(const Vector<float>&, const bool);
-template void Vector<float>::equ<>(const float, const Vector<double>&);
-template void Vector<float>::equ<>(const float, const Vector<float>&);
+template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(const Vector<double>&);
+template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<float>(const Vector<float>&) const;
+template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<double>(const Vector<double>&) const;
+template void Vector<float>::reinit<double>(const Vector<double>&, const bool);
+template void Vector<float>::reinit<float>(const Vector<float>&, const bool);
+template void Vector<float>::equ<double>(const float, const Vector<double>&);
+template void Vector<float>::equ<float>(const float, const Vector<float>&);
 
 // see the .h file for why these functions are disabled.
 // template Vector<float>::Vector (const Vector<double>& v);

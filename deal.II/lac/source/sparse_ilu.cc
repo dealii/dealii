@@ -17,22 +17,22 @@
 
 // explicit instantiations
 template class SparseILU<double>;
-template void SparseILU<double>::decompose<> (const SparseMatrix<double> &,
-					      const double);
-template void SparseILU<double>::apply_decomposition<> (Vector<double> &,
-							const Vector<double> &) const;
-template void SparseILU<double>::decompose<> (const SparseMatrix<float> &,
-					      const double);
-template void SparseILU<double>::apply_decomposition<> (Vector<float> &,
-							const Vector<float> &) const;
+template void SparseILU<double>::decompose<double> (const SparseMatrix<double> &,
+						    const double);
+template void SparseILU<double>::apply_decomposition<double> (Vector<double> &,
+							      const Vector<double> &) const;
+template void SparseILU<double>::decompose<float> (const SparseMatrix<float> &,
+						   const double);
+template void SparseILU<double>::apply_decomposition<float> (Vector<float> &,
+							     const Vector<float> &) const;
 
 
 template class SparseILU<float>;
-template void SparseILU<float>::decompose<> (const SparseMatrix<double> &,
-					     const double);
-template void SparseILU<float>::apply_decomposition<> (Vector<double> &,
-						       const Vector<double> &) const;
-template void SparseILU<float>::decompose<> (const SparseMatrix<float> &,
-					     const double);
-template void SparseILU<float>::apply_decomposition<> (Vector<float> &,
-						       const Vector<float> &) const;
+template void SparseILU<float>::decompose<double> (const SparseMatrix<double> &,
+						   const double);
+template void SparseILU<float>::apply_decomposition<double> (Vector<double> &,
+							     const Vector<double> &) const;
+template void SparseILU<float>::decompose<float> (const SparseMatrix<float> &,
+						  const double);
+template void SparseILU<float>::apply_decomposition<float> (Vector<float> &,
+							    const Vector<float> &) const;

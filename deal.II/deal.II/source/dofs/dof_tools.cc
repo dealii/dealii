@@ -293,7 +293,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 
 
-template<int dim, class SparsityPattern>
+template <int dim, class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				      SparsityPattern       &sparsity)
@@ -436,12 +436,12 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
 #endif
 
 
-template<int dim, class SparsityPattern>
+template <int dim, class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				      SparsityPattern       &sparsity,
-				      const FullMatrix<double>& int_mask,
-				      const FullMatrix<double>& flux_mask)
+				      const FullMatrix<double> &int_mask,
+				      const FullMatrix<double> &flux_mask)
 {
   const unsigned int n_dofs = dof.n_dofs();
   const FiniteElement<dim>& fe = dof.get_fe();
@@ -1157,7 +1157,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
   Assert(selected_dofs.size() == dof_handler.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
 				   // preset all values by false
-  fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
 				   // there are no hanging nodes in 1d
 };
@@ -2342,183 +2342,284 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 
 // explicit instantiations
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					SparsityPattern    &sparsity);
+DoFTools::make_sparsity_pattern<deal_II_dimension,SparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ SparsityPattern    &sparsity);
+
+template void
+DoFTools::make_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ CompressedSparsityPattern    &sparsity);
+
+template void
+DoFTools::make_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ BlockSparsityPattern                &sparsity);
+template void
+DoFTools::make_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ CompressedBlockSparsityPattern      &sparsity);
+
+
+template void 
+DoFTools::make_sparsity_pattern<deal_II_dimension,SparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ const std::vector<std::vector<bool> > &mask,
+ SparsityPattern             &sparsity);
+
+template void 
+DoFTools::make_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ const std::vector<std::vector<bool> > &mask,
+ CompressedSparsityPattern             &sparsity);
+
+template void 
+DoFTools::make_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ const std::vector<std::vector<bool> > &mask,
+ BlockSparsityPattern        &sparsity);
+
+template void 
+DoFTools::make_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ const std::vector<std::vector<bool> > &mask,
+ CompressedBlockSparsityPattern        &sparsity);
+
 #if deal_II_dimension > 1
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					SparsityPattern    &,
-					const FullMatrix<double>&,
-					const FullMatrix<double>&);
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,SparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ SparsityPattern    &);
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					CompressedSparsityPattern    &sparsity);
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ CompressedSparsityPattern    &);
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					CompressedSparsityPattern    &,
-					const FullMatrix<double>&,
-					const FullMatrix<double>&);
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ BlockSparsityPattern    &);
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					BlockSparsityPattern    &sparsity);
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ CompressedBlockSparsityPattern    &);
+
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					BlockSparsityPattern    &,
-					const FullMatrix<double>&,
-					const FullMatrix<double>&);
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,SparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ SparsityPattern    &sparsity);
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					CompressedBlockSparsityPattern    &sparsity);
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ CompressedSparsityPattern    &sparsity);
 template void
-DoFTools::make_flux_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					CompressedBlockSparsityPattern    &,
-					const FullMatrix<double>&,
-					const FullMatrix<double>&);
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ BlockSparsityPattern    &sparsity);
+template void
+DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ CompressedBlockSparsityPattern    &sparsity);
 #endif
 
+#if deal_II_dimension == 1
 template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const std::vector<unsigned int>  &,
-					    SparsityPattern    &);
+DoFTools::make_boundary_sparsity_pattern<SparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ SparsityPattern    &);
 template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const std::vector<unsigned int>  &,
-					    CompressedSparsityPattern    &);
+DoFTools::make_boundary_sparsity_pattern<CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ CompressedSparsityPattern    &);
 template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const std::vector<unsigned int>  &,
-					    BlockSparsityPattern    &);
+DoFTools::make_boundary_sparsity_pattern<BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ BlockSparsityPattern    &);
 template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const std::vector<unsigned int>  &,
-					    CompressedBlockSparsityPattern    &);
-
-
-template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
-					    const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					    SparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
-					    const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					    CompressedSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
-					    const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					    BlockSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<> (const DoFHandler<deal_II_dimension>& dof,
-					    const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
-					    const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					    CompressedBlockSparsityPattern    &sparsity);
-
-
+DoFTools::make_boundary_sparsity_pattern<CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<unsigned int>  &,
+ CompressedBlockSparsityPattern    &);
 
 template void
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   SparsityPattern    &sparsity);
-
+DoFTools::make_boundary_sparsity_pattern<SparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ SparsityPattern    &sparsity);
 template void
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   CompressedSparsityPattern    &sparsity);
-
+DoFTools::make_boundary_sparsity_pattern<CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ CompressedSparsityPattern    &sparsity);
 template void
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   BlockSparsityPattern                &sparsity);
+DoFTools::make_boundary_sparsity_pattern<BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ BlockSparsityPattern    &sparsity);
 template void
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   CompressedBlockSparsityPattern      &sparsity);
+DoFTools::make_boundary_sparsity_pattern<CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ CompressedBlockSparsityPattern    &sparsity);
+#endif
 
 
-template void 
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   const std::vector<std::vector<bool> > &mask,
-				   SparsityPattern             &sparsity);
+#if deal_II_dimension > 1
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,SparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ BlockSparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ CompressedBlockSparsityPattern    &sparsity);
+#else
+template void
+DoFTools::make_flux_sparsity_pattern<SparsityPattern>
+(const DoFHandler<1>& dof,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern<CompressedSparsityPattern>
+(const DoFHandler<1>& dof,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern<BlockSparsityPattern>
+(const DoFHandler<1>& dof,
+ BlockSparsityPattern    &sparsity);
+template void
+DoFTools::make_flux_sparsity_pattern<CompressedBlockSparsityPattern>
+(const DoFHandler<1>& dof,
+ CompressedBlockSparsityPattern    &sparsity);
+#endif
 
-template void 
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   const std::vector<std::vector<bool> > &mask,
-				   CompressedSparsityPattern             &sparsity);
-
-template void 
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   const std::vector<std::vector<bool> > &mask,
-				   BlockSparsityPattern        &sparsity);
-
-template void 
-DoFTools::make_sparsity_pattern<> (const DoFHandler<deal_II_dimension> &dof,
-				   const std::vector<std::vector<bool> > &mask,
-				   CompressedBlockSparsityPattern        &sparsity);
+#if deal_II_dimension > 1
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,SparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ SparsityPattern    &,
+ const FullMatrix<double>&,
+ const FullMatrix<double>&);
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ CompressedSparsityPattern    &,
+ const FullMatrix<double>&,
+ const FullMatrix<double>&);
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ BlockSparsityPattern    &,
+ const FullMatrix<double>&,
+ const FullMatrix<double>&);
+template void
+DoFTools::make_flux_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>& dof,
+ CompressedBlockSparsityPattern    &,
+ const FullMatrix<double>&,
+ const FullMatrix<double>&);
+#endif
 
 
 
 template
 void
-DoFTools::distribute_cell_to_dof_vector<> (const DoFHandler<deal_II_dimension> &dof_handler,
-					   const Vector<float>  &cell_data,
-					   Vector<double>       &dof_data,
-					   const unsigned int    component);
+DoFTools::distribute_cell_to_dof_vector<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<float>  &cell_data,
+ Vector<double>       &dof_data,
+ const unsigned int    component);
 
 template
 void
-DoFTools::distribute_cell_to_dof_vector<> (const DoFHandler<deal_II_dimension> &dof_handler,
-					   const Vector<double> &cell_data,
-					   Vector<double>       &dof_data,
-					   const unsigned int    component);
+DoFTools::distribute_cell_to_dof_vector<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<double> &cell_data,
+ Vector<double>       &dof_data,
+ const unsigned int    component);
 
 
-template void DoFTools::extract_dofs<>(const DoFHandler<deal_II_dimension>& dof,
-				       const std::vector<bool>& component_select,
-				       std::vector<bool>& selected_dofs);
+template void DoFTools::extract_dofs<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>& dof,
+ const std::vector<bool>& component_select,
+ std::vector<bool>& selected_dofs);
 
 #ifdef ENABLE_MULTIGRID
-template void DoFTools::extract_level_dofs<>(const unsigned int level,
-					     const MGDoFHandler<deal_II_dimension>& dof,
-					     const std::vector<bool>& component_select,
-					     std::vector<bool>& selected_dofs);
+template void DoFTools::extract_level_dofs<deal_II_dimension>
+(const unsigned int level,
+ const MGDoFHandler<deal_II_dimension>& dof,
+ const std::vector<bool>& component_select,
+ std::vector<bool>& selected_dofs);
 #endif
 
 #if deal_II_dimension != 1
 template
 void
-DoFTools::extract_boundary_dofs<> (const DoFHandler<deal_II_dimension> &,
-				   const std::vector<bool>                  &,
-				   std::vector<bool>                        &,
-				   const std::set<unsigned char> &);
+DoFTools::extract_boundary_dofs<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const std::vector<bool>                  &,
+ std::vector<bool>                        &,
+ const std::set<unsigned char> &);
 #endif 
 
 template
 void
-DoFTools::extract_subdomain_dofs<> (const DoFHandler<deal_II_dimension> &dof_handler,
-				    const unsigned int     subdomain_id,
-				    std::vector<bool>     &selected_dofs);
+DoFTools::extract_subdomain_dofs<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const unsigned int     subdomain_id,
+ std::vector<bool>     &selected_dofs);
 
   
 template
 void
-DoFTools::count_dofs_per_component<> (const DoFHandler<deal_II_dimension> &dof_handler,
-				      std::vector<unsigned int>           &dofs_per_component);
+DoFTools::count_dofs_per_component<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<unsigned int>           &dofs_per_component);
 
 
 template
 void
-DoFTools::compute_intergrid_constraints<> (const DoFHandler<deal_II_dimension> &,
-					   const unsigned int                   ,
-					   const DoFHandler<deal_II_dimension> &,
-					   const unsigned int                   ,
-					   const InterGridMap<DoFHandler,deal_II_dimension> &,
-					   ConstraintMatrix                    &);
+DoFTools::compute_intergrid_constraints<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const unsigned int                   ,
+ const DoFHandler<deal_II_dimension> &,
+ const unsigned int                   ,
+ const InterGridMap<DoFHandler,deal_II_dimension> &,
+ ConstraintMatrix                    &);
 template
 void
-DoFTools::compute_intergrid_transfer_representation<> (const DoFHandler<deal_II_dimension> &,
-						       const unsigned int                   ,
-						       const DoFHandler<deal_II_dimension> &,
-						       const unsigned int                   ,
-						       const InterGridMap<DoFHandler,deal_II_dimension> &,
-						       std::vector<std::map<unsigned int, float> > &);
+DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const unsigned int                   ,
+ const DoFHandler<deal_II_dimension> &,
+ const unsigned int                   ,
+ const InterGridMap<DoFHandler,deal_II_dimension> &,
+ std::vector<std::map<unsigned int, float> > &);
 
 
 
@@ -2526,14 +2627,16 @@ DoFTools::compute_intergrid_transfer_representation<> (const DoFHandler<deal_II_
 
 template
 void
-DoFTools::map_dof_to_boundary_indices<> (const DoFHandler<deal_II_dimension> &,
-					 std::vector<unsigned int> &);
+DoFTools::map_dof_to_boundary_indices<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ std::vector<unsigned int> &);
 
 template
 void
-DoFTools::map_dof_to_boundary_indices<> (const DoFHandler<deal_II_dimension> &,
-					 const std::set<unsigned char> &,
-					 std::vector<unsigned int> &);
+DoFTools::map_dof_to_boundary_indices<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const std::set<unsigned char> &,
+ std::vector<unsigned int> &);
 
 #endif 
 
@@ -2541,6 +2644,7 @@ DoFTools::map_dof_to_boundary_indices<> (const DoFHandler<deal_II_dimension> &,
 
 template
 void
-DoFTools::map_dofs_to_support_points<> (const Mapping<deal_II_dimension>       &mapping,
-					const DoFHandler<deal_II_dimension>    &dof_handler,
-					std::vector<Point<deal_II_dimension> > &support_points);
+DoFTools::map_dofs_to_support_points<deal_II_dimension>
+(const Mapping<deal_II_dimension>       &mapping,
+ const DoFHandler<deal_II_dimension>    &dof_handler,
+ std::vector<Point<deal_II_dimension> > &support_points);

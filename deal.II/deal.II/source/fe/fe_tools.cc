@@ -711,79 +711,95 @@ FETools::lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
 /*-------------- Explicit Instantiations -------------------------------*/
 
 template
-void FETools::get_interpolation_matrix<>(const FiniteElement<deal_II_dimension> &,
-					 const FiniteElement<deal_II_dimension> &,
-					 FullMatrix<double> &);
+void FETools::get_interpolation_matrix<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &,
+ const FiniteElement<deal_II_dimension> &,
+ FullMatrix<double> &);
 template
-void FETools::get_back_interpolation_matrix<>(const FiniteElement<deal_II_dimension> &,
-					      const FiniteElement<deal_II_dimension> &,
-					      FullMatrix<double> &);
+void FETools::get_back_interpolation_matrix<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &,
+ const FiniteElement<deal_II_dimension> &,
+ FullMatrix<double> &);
 template
-void FETools::get_interpolation_difference_matrix<>(const FiniteElement<deal_II_dimension> &,
-						    const FiniteElement<deal_II_dimension> &,
-						    FullMatrix<double> &);
+void FETools::get_interpolation_difference_matrix<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &,
+ const FiniteElement<deal_II_dimension> &,
+ FullMatrix<double> &);
 template
-void FETools::interpolate<>(const DoFHandler<deal_II_dimension> &,
-			    const Vector<double> &,
-			    const DoFHandler<deal_II_dimension> &,
-			    Vector<double> &);
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<double> &,
+ const DoFHandler<deal_II_dimension> &,
+ Vector<double> &);
 template
-void FETools::back_interpolate<>(const DoFHandler<deal_II_dimension> &,
-				 const Vector<double> &,
-				 const FiniteElement<deal_II_dimension> &,
-				 Vector<double> &);
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<double> &,
+ const FiniteElement<deal_II_dimension> &,
+ Vector<double> &);
 template
-void FETools::interpolation_difference<>(const DoFHandler<deal_II_dimension> &,
-					 const Vector<double> &,
-					 const FiniteElement<deal_II_dimension> &,
-					 Vector<double> &);
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<double> &,
+ const FiniteElement<deal_II_dimension> &,
+ Vector<double> &);
 template
-void FETools::extrapolate<>(const DoFHandler<deal_II_dimension> &,
-			    const Vector<double> &,
-			    const DoFHandler<deal_II_dimension> &,
-			    Vector<double> &);
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<double> &,
+ const DoFHandler<deal_II_dimension> &,
+ Vector<double> &);
 
 
 template
-void FETools::get_interpolation_matrix<>(const FiniteElement<deal_II_dimension> &,
-					 const FiniteElement<deal_II_dimension> &,
-					 FullMatrix<float> &);
+void FETools::get_interpolation_matrix<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &,
+ const FiniteElement<deal_II_dimension> &,
+ FullMatrix<float> &);
 template
-void FETools::get_back_interpolation_matrix<>(const FiniteElement<deal_II_dimension> &,
-					      const FiniteElement<deal_II_dimension> &,
-					      FullMatrix<float> &);
+void FETools::get_back_interpolation_matrix<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &,
+ const FiniteElement<deal_II_dimension> &,
+ FullMatrix<float> &);
 template
-void FETools::get_interpolation_difference_matrix<>(const FiniteElement<deal_II_dimension> &,
-						    const FiniteElement<deal_II_dimension> &,
-						    FullMatrix<float> &);
+void FETools::get_interpolation_difference_matrix<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &,
+ const FiniteElement<deal_II_dimension> &,
+ FullMatrix<float> &);
 template
-void FETools::interpolate<>(const DoFHandler<deal_II_dimension> &,
-			    const Vector<float> &,
-			    const DoFHandler<deal_II_dimension> &,
-			    Vector<float> &);
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<float> &,
+ const DoFHandler<deal_II_dimension> &,
+ Vector<float> &);
 template
-void FETools::back_interpolate<>(const DoFHandler<deal_II_dimension> &,
-				 const Vector<float> &,
-				 const FiniteElement<deal_II_dimension> &,
-				 Vector<float> &);
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<float> &,
+ const FiniteElement<deal_II_dimension> &,
+ Vector<float> &);
 template
-void FETools::interpolation_difference<>(const DoFHandler<deal_II_dimension> &,
-					 const Vector<float> &,
-					 const FiniteElement<deal_II_dimension> &,
-					 Vector<float> &);
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<float> &,
+ const FiniteElement<deal_II_dimension> &,
+ Vector<float> &);
 template
-void FETools::extrapolate<>(const DoFHandler<deal_II_dimension> &,
-			    const Vector<float> &,
-			    const DoFHandler<deal_II_dimension> &,
-			    Vector<float> &);
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<float> &,
+ const DoFHandler<deal_II_dimension> &,
+ Vector<float> &);
 template
 void
-FETools::hierarchic_to_lexicographic_numbering<> (const FE_Q<deal_II_dimension> &fe,
-						  std::vector<unsigned int>     &h2l);
+FETools::hierarchic_to_lexicographic_numbering<deal_II_dimension>
+(const FE_Q<deal_II_dimension> &fe,
+ std::vector<unsigned int>     &h2l);
 template
 void
-FETools::lexicographic_to_hierarchic_numbering<> (const FE_Q<deal_II_dimension> &fe,
-						  std::vector<unsigned int>     &h2l);
+FETools::lexicographic_to_hierarchic_numbering<deal_II_dimension>
+(const FE_Q<deal_II_dimension> &fe,
+ std::vector<unsigned int>     &h2l);
 
 
 /*----------------------------   fe_tools.cc     ---------------------------*/

@@ -31,15 +31,17 @@ class DoFLevel
 {
   private:
 				     /**
-				      * Make the constructor private to avoid
-				      * that someone uses this class.
+				      * Make the constructor private
+				      * to avoid that someone uses
+				      * this class.
 				      */
     DoFLevel ();
 };
 
 
 /**
- * Store the indices of the degrees of freedom which are located on the lines.
+ * Store the indices of the degrees of freedom which are located on
+ * the lines.
  *
  * @sect3{Information for all @ref{DoFLevel} classes}
  *
@@ -65,21 +67,24 @@ class DoFLevel
  * is then
  * to be understood as a block matrix.
  *
- * The storage format of the degrees of freedom indices (short: DoF indices) is
- * somewhat like a mirror of the data structures of the triangulation classes.
- * There is a hierarchy of @ref{DoFLevel}@p{<dim>} classes for the different dimensions
- * which have objects named @p{line_dofs}, @p{quad_dofs} and so on, in which the
- * indices of DoFs located on lines and quads, respectively, are stored. The
- * indices are stored levelwise. The layout in
- * these arrays is as follows: if for a selected finite element (use
- * @ref{DoFHandler}@p{::distribute_dofs()} to select a finite element) the number of
- * DoFs on each line (without those in the vertices) is @p{N}, then the length
- * of the @p{line_dofs} array is @p{N} times the number of lines on this level. The
- * DoF indices for the @p{i}th line are at the positions @p{N*i...(N+1)*i-1}.
+ * The storage format of the degrees of freedom indices (short: DoF
+ * indices) is somewhat like a mirror of the data structures of the
+ * triangulation classes.  There is a hierarchy of
+ * @ref{DoFLevel}@p{<dim>} classes for the different dimensions which
+ * have objects named @p{line_dofs}, @p{quad_dofs} and so on, in which
+ * the indices of DoFs located on lines and quads, respectively, are
+ * stored. The indices are stored levelwise. The layout in these
+ * arrays is as follows: if for a selected finite element (use
+ * @ref{DoFHandler}@p{::distribute_dofs()} to select a finite element)
+ * the number of DoFs on each line (without those in the vertices) is
+ * @p{N}, then the length of the @p{line_dofs} array is @p{N} times
+ * the number of lines on this level. The DoF indices for the @p{i}th
+ * line are at the positions @p{N*i...(N+1)*i-1}.
  *
- * The DoF indices for vertices are not stored this way, since they need
- * different treatment in multigrid environments. If no multigrid is used, the
- * indices are stored in the @p{vertex_dofs} array of the @ref{DoFHandler} class.
+ * The DoF indices for vertices are not stored this way, since they
+ * need different treatment in multigrid environments. If no multigrid
+ * is used, the indices are stored in the @p{vertex_dofs} array of the
+ * @ref{DoFHandler} class.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -88,9 +93,10 @@ class DoFLevel<1>
 {
   public:
 				     /**
-				      * Store the global indices of the degrees
-				      * of freedom. See @ref{DoFLevel} for
-				      * detailed information.
+				      * Store the global indices of
+				      * the degrees of freedom. See
+				      * @ref{DoFLevel} for detailed
+				      * information.
 				      */
     std::vector<unsigned int> line_dofs;
 
@@ -105,8 +111,8 @@ class DoFLevel<1>
 
 
 /**
- * Store the indices of the degrees of freedom which are located on quads.
- * See @ref{DoFLevel<1>} for more information.
+ * Store the indices of the degrees of freedom which are located on
+ * quads.  See @ref{DoFLevel<1>} for more information.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -115,9 +121,10 @@ class DoFLevel<2> : public DoFLevel<1>
 {
   public:
 				     /**
-				      * Store the global indices of the degrees
-				      * of freedom. See @ref{DoFLevel} for
-				      * detailed information.
+				      * Store the global indices of
+				      * the degrees of freedom. See
+				      * @ref{DoFLevel} for detailed
+				      * information.
 				      */
     std::vector<unsigned int> quad_dofs;
 
@@ -132,8 +139,8 @@ class DoFLevel<2> : public DoFLevel<1>
 
 
 /**
- * Store the indices of the degrees of freedom which are located on hexhedra.
- * See @ref{DoFLevel<1>} for more information.
+ * Store the indices of the degrees of freedom which are located on
+ * hexhedra.  See @ref{DoFLevel<1>} for more information.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -142,9 +149,10 @@ class DoFLevel<3> : public DoFLevel<2>
 {
   public:
 				     /**
-				      * Store the global indices of the degrees
-				      * of freedom. See @ref{DoFLevel} for
-				      * detailed information.
+				      * Store the global indices of
+				      * the degrees of freedom. See
+				      * @ref{DoFLevel} for detailed
+				      * information.
 				      */
     std::vector<unsigned int> hex_dofs;
 

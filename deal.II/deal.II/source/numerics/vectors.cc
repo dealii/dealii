@@ -1460,298 +1460,340 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 
 // explicit instantiations
 template
-void VectorTools::interpolate<> (const Mapping<deal_II_dimension>&,
-				 const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 Vector<double>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ Vector<double>&);
 template
-void VectorTools::interpolate<> (const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 Vector<double>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ Vector<double>&);
 template
-void VectorTools::interpolate<> (const Mapping<deal_II_dimension>&,
-				 const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 Vector<float>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ Vector<float>&);
 template
-void VectorTools::interpolate<> (const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 Vector<float>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ Vector<float>&);
 template
-void VectorTools::interpolate<> (const Mapping<deal_II_dimension>&,
-				 const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 BlockVector<double>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ BlockVector<double>&);
 template
-void VectorTools::interpolate<> (const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 BlockVector<double>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ BlockVector<double>&);
 template
-void VectorTools::interpolate<> (const Mapping<deal_II_dimension>&,
-				 const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 BlockVector<float>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ BlockVector<float>&);
 template
-void VectorTools::interpolate<> (const DoFHandler<deal_II_dimension>&,
-				 const Function<deal_II_dimension>&,
-				 BlockVector<float>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ BlockVector<float>&);
 
 template
-void VectorTools::interpolate<>(const DoFHandler<deal_II_dimension>&,
-				const DoFHandler<deal_II_dimension>&,
-				const FullMatrix<double>&,
-				const Vector<double>&,
-				Vector<double>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const FullMatrix<double>&,
+ const Vector<double>&,
+ Vector<double>&);
 template
-void VectorTools::interpolate<>(const DoFHandler<deal_II_dimension>&,
-				const DoFHandler<deal_II_dimension>&,
-				const FullMatrix<double>&,
-				const BlockVector<double>&,
-				BlockVector<double>&);
+void VectorTools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const FullMatrix<double>&,
+ const BlockVector<double>&,
+ BlockVector<double>&);
 
 template
-void VectorTools::project<> (const DoFHandler<deal_II_dimension>   &,
-			     const ConstraintMatrix                &,
-			     const Quadrature<deal_II_dimension>   &,
-			     const Function<deal_II_dimension>     &,
-			     Vector<double>                        &,
-			     const bool,
-			     const Quadrature<deal_II_dimension-1> &,
-			     const bool);
+void VectorTools::project<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>   &,
+ const ConstraintMatrix                &,
+ const Quadrature<deal_II_dimension>   &,
+ const Function<deal_II_dimension>     &,
+ Vector<double>                        &,
+ const bool,
+ const Quadrature<deal_II_dimension-1> &,
+ const bool);
 template
-void VectorTools::create_right_hand_side<> (const Mapping<deal_II_dimension>    &,
-					    const DoFHandler<deal_II_dimension> &,
-					    const Quadrature<deal_II_dimension> &,
-					    const Function<deal_II_dimension>   &,
-					    Vector<double>                      &);
+void VectorTools::create_right_hand_side<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const Quadrature<deal_II_dimension> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &);
 template
-void VectorTools::create_right_hand_side<> (const DoFHandler<deal_II_dimension> &,
-					    const Quadrature<deal_II_dimension> &,
-					    const Function<deal_II_dimension>   &,
-					    Vector<double>                      &);
+void VectorTools::create_right_hand_side<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Quadrature<deal_II_dimension> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &);
 
 #if deal_II_dimension != 1
 template
 void
-VectorTools::create_boundary_right_hand_side<> (const Mapping<deal_II_dimension>    &,
-						const DoFHandler<deal_II_dimension> &,
-						const Quadrature<deal_II_dimension-1> &,
-						const Function<deal_II_dimension>   &,
-						Vector<double>                      &,
-						const std::set<unsigned char> &);
+VectorTools::create_boundary_right_hand_side<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const Quadrature<deal_II_dimension-1> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const std::set<unsigned char> &);
 #endif
 
 template
 void
-VectorTools::create_boundary_right_hand_side<> (const DoFHandler<deal_II_dimension> &,
-						const Quadrature<deal_II_dimension-1> &,
-						const Function<deal_II_dimension>   &,
-						Vector<double>                      &,
-						const std::set<unsigned char> &);
+VectorTools::create_boundary_right_hand_side<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Quadrature<deal_II_dimension-1> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const std::set<unsigned char> &);
 template
-void VectorTools::interpolate_boundary_values<> (const DoFHandler<deal_II_dimension> &,
-						 const unsigned char,
-						 const Function<deal_II_dimension>   &,
-						 std::map<unsigned int,double>       &,
-						 const std::vector<bool>    &);
+void VectorTools::interpolate_boundary_values<deal_II_dimension> (const DoFHandler<deal_II_dimension> &,
+								  const unsigned char,
+								  const Function<deal_II_dimension>   &,
+								  std::map<unsigned int,double>       &,
+								  const std::vector<bool>    &);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const Vector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const Vector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const Vector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const Vector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const Vector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const Vector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const Vector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const Vector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const Vector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const Vector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const Vector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const Vector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Vector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const BlockVector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const BlockVector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const BlockVector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<double>                &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const BlockVector<double>                &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const BlockVector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<float>                       &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const BlockVector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<float>                       &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const Mapping<deal_II_dimension>    &,
-					  const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const BlockVector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 template
-void VectorTools::integrate_difference<> (const DoFHandler<deal_II_dimension> &,
-					  const BlockVector<float>                 &,
-					  const Function<deal_II_dimension>   &,
-					  Vector<double>                      &,
-					  const Quadrature<deal_II_dimension> &,
-					  const NormType                      &,
-					  const Function<deal_II_dimension>   *);
+void VectorTools::integrate_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const BlockVector<float>                 &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const Quadrature<deal_II_dimension> &,
+ const NormType                      &,
+ const Function<deal_II_dimension>   *);
 #if deal_II_dimension != 1
 template
-void VectorTools::project_boundary_values<> (const Mapping<deal_II_dimension>     &,
-					     const DoFHandler<deal_II_dimension>  &,
-					     const FunctionMap<deal_II_dimension>::type &,
-					     const Quadrature<deal_II_dimension-1>&,
-					     std::map<unsigned int,double>        &);
+void VectorTools::project_boundary_values<deal_II_dimension>
+(const Mapping<deal_II_dimension>     &,
+ const DoFHandler<deal_II_dimension>  &,
+ const FunctionMap<deal_II_dimension>::type &,
+ const Quadrature<deal_II_dimension-1>&,
+ std::map<unsigned int,double>        &);
 #endif
 
 template
-void VectorTools::project_boundary_values<> (const DoFHandler<deal_II_dimension>  &,
-					     const FunctionMap<deal_II_dimension>::type &,
-					     const Quadrature<deal_II_dimension-1>&,
-					     std::map<unsigned int,double>        &);
+void VectorTools::project_boundary_values<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>  &,
+ const FunctionMap<deal_II_dimension>::type &,
+ const Quadrature<deal_II_dimension-1>&,
+ std::map<unsigned int,double>        &);
 
 template
-double VectorTools::compute_mean_value<> (const Mapping<deal_II_dimension>&,
-					  const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const Vector<double>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const Vector<double>&,
+ const unsigned int);
 template
-double VectorTools::compute_mean_value<> (const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const Vector<double>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const Vector<double>&,
+ const unsigned int);
 
 template
-double VectorTools::compute_mean_value<> (const Mapping<deal_II_dimension>&,
-					  const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const BlockVector<double>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const BlockVector<double>&,
+ const unsigned int);
 template
-double VectorTools::compute_mean_value<> (const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const BlockVector<double>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const BlockVector<double>&,
+ const unsigned int);
 
 template
-double VectorTools::compute_mean_value<> (const Mapping<deal_II_dimension>&,
-					  const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const Vector<float>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const Vector<float>&,
+ const unsigned int);
 template
-double VectorTools::compute_mean_value<> (const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const Vector<float>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const Vector<float>&,
+ const unsigned int);
 
 template
-double VectorTools::compute_mean_value<> (const Mapping<deal_II_dimension>&,
-					  const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const BlockVector<float>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const BlockVector<float>&,
+ const unsigned int);
 template
-double VectorTools::compute_mean_value<> (const DoFHandler<deal_II_dimension>&,
-					  const Quadrature<deal_II_dimension>&,
-					  const BlockVector<float>&,
-					  const unsigned int);
+double VectorTools::compute_mean_value<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const Quadrature<deal_II_dimension>&,
+ const BlockVector<float>&,
+ const unsigned int);
 
 
 
@@ -1759,20 +1801,22 @@ double VectorTools::compute_mean_value<> (const DoFHandler<deal_II_dimension>&,
 // and thus need no explicit instantiation
 #if deal_II_dimension > 1
 template
-void VectorTools::interpolate_boundary_values<> (const Mapping<deal_II_dimension>    &,
-						 const DoFHandler<deal_II_dimension> &,
-						 const unsigned char,
-						 const Function<deal_II_dimension>   &,
-						 std::map<unsigned int,double>       &,
-						 const std::vector<bool>    &);
+void VectorTools::interpolate_boundary_values<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const unsigned char,
+ const Function<deal_II_dimension>   &,
+ std::map<unsigned int,double>       &,
+ const std::vector<bool>    &);
 template
-void VectorTools::project<> (const Mapping<deal_II_dimension>      &,
-			     const DoFHandler<deal_II_dimension>   &,
-			     const ConstraintMatrix                &,
-			     const Quadrature<deal_II_dimension>   &,
-			     const Function<deal_II_dimension>     &,
-			     Vector<double>                        &,
-			     const bool,
-			     const Quadrature<deal_II_dimension-1> &,
-			     const bool);
+void VectorTools::project<deal_II_dimension>
+(const Mapping<deal_II_dimension>      &,
+ const DoFHandler<deal_II_dimension>   &,
+ const ConstraintMatrix                &,
+ const Quadrature<deal_II_dimension>   &,
+ const Function<deal_II_dimension>     &,
+ Vector<double>                        &,
+ const bool,
+ const Quadrature<deal_II_dimension-1> &,
+ const bool);
 #endif

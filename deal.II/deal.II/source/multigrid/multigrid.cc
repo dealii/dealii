@@ -333,12 +333,15 @@ void MGTransferSelect::build_matrices (const MGDoFHandler<dim> &mg_dof,
 // explicit instatations
 
 template
-void MGTransferPrebuilt::build_matrices<> (const MGDoFHandler<deal_II_dimension> &mg_dof);
+void MGTransferPrebuilt::build_matrices<deal_II_dimension>
+(const MGDoFHandler<deal_II_dimension> &mg_dof);
 
 template
-void MGTransferBlock::build_matrices<> (const MGDoFHandler<deal_II_dimension> &mg_dof,
-					std::vector<bool>);
+void MGTransferBlock::build_matrices<deal_II_dimension>
+(const MGDoFHandler<deal_II_dimension> &mg_dof,
+ std::vector<bool>);
 
 template
-void MGTransferSelect::build_matrices<> (const MGDoFHandler<deal_II_dimension> &mg_dof,
-					 unsigned int);
+void MGTransferSelect::build_matrices<deal_II_dimension>
+(const MGDoFHandler<deal_II_dimension> &mg_dof,
+ unsigned int);

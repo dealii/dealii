@@ -380,7 +380,9 @@ std::vector<std::string> DataOutStack<dim>::get_dataset_names () const
 
 // explicit instantiations
 template class DataOutStack<deal_II_dimension>;
-template void DataOutStack<deal_II_dimension>::add_data_vector<> (const Vector<double> &vec,
-								  const std::string    &name);
-template void DataOutStack<deal_II_dimension>::add_data_vector<> (const Vector<float>  &vec,
-								  const std::string    &name);
+template void DataOutStack<deal_II_dimension>::
+add_data_vector<double> (const Vector<double> &vec,
+			 const std::string    &name);
+template void DataOutStack<deal_II_dimension>::
+add_data_vector<float> (const Vector<float>  &vec,
+			const std::string    &name);

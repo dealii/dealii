@@ -1228,77 +1228,87 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<dim>    &dof,
 // explicit instantiations
 
 template
-void MatrixCreator::create_mass_matrix<> (const Mapping<deal_II_dimension>       &mapping,
-					  const DoFHandler<deal_II_dimension>    &dof,
-					  const Quadrature<deal_II_dimension>    &q,
-					  SparseMatrix<double>     &matrix,
-					  const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension>       &mapping,
+ const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension> * const coefficient);
 template
-void MatrixCreator::create_mass_matrix<> (const DoFHandler<deal_II_dimension>    &dof,
-					  const Quadrature<deal_II_dimension>    &q,
-					  SparseMatrix<double>     &matrix,
-					  const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension> * const coefficient);
 template
-void MatrixCreator::create_mass_matrix<> (const Mapping<deal_II_dimension>       &mapping,
-					  const DoFHandler<deal_II_dimension>    &dof,
-					  const Quadrature<deal_II_dimension>    &q,
-					  SparseMatrix<double>     &matrix,
-					  const Function<deal_II_dimension>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension>       &mapping,
+ const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension> * const coefficient);
 template
-void MatrixCreator::create_mass_matrix<> (const DoFHandler<deal_II_dimension>    &dof,
-					  const Quadrature<deal_II_dimension>    &q,
-					  SparseMatrix<double>     &matrix,
-					  const Function<deal_II_dimension>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension> * const coefficient);
 
 #if deal_II_dimension != 1
 template
 void
-MatrixCreator::create_boundary_mass_matrix<> (const Mapping<deal_II_dimension>        &mapping,
-					      const DoFHandler<deal_II_dimension>     &dof,
-					      const Quadrature<deal_II_dimension-1>   &q,
-					      SparseMatrix<double>      &matrix,
-					      const FunctionMap<deal_II_dimension>::type         &boundary_functions,
-					      Vector<double>            &rhs_vector,
-					      std::vector<unsigned int> &dof_to_boundary_mapping,
-					      const Function<deal_II_dimension> * const a);
+MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension>        &mapping,
+ const DoFHandler<deal_II_dimension>     &dof,
+ const Quadrature<deal_II_dimension-1>   &q,
+ SparseMatrix<double>      &matrix,
+ const FunctionMap<deal_II_dimension>::type         &boundary_functions,
+ Vector<double>            &rhs_vector,
+ std::vector<unsigned int> &dof_to_boundary_mapping,
+ const Function<deal_II_dimension> * const a);
 #endif
 
 template
-void MatrixCreator::create_boundary_mass_matrix<> (const DoFHandler<deal_II_dimension>     &dof,
-						   const Quadrature<deal_II_dimension-1>   &q,
-						   SparseMatrix<double>      &matrix,
-						   const FunctionMap<deal_II_dimension>::type &rhs,
-						   Vector<double>            &rhs_vector,
-						   std::vector<unsigned int> &dof_to_boundary_mapping,
-						   const Function<deal_II_dimension> * const a);
+void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>     &dof,
+ const Quadrature<deal_II_dimension-1>   &q,
+ SparseMatrix<double>      &matrix,
+ const FunctionMap<deal_II_dimension>::type &rhs,
+ Vector<double>            &rhs_vector,
+ std::vector<unsigned int> &dof_to_boundary_mapping,
+ const Function<deal_II_dimension> * const a);
 template
-void MatrixCreator::create_laplace_matrix<> (const DoFHandler<deal_II_dimension>    &dof,
-					     const Quadrature<deal_II_dimension>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_laplace_matrix<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension> * const coefficient);
 
 template
-void MatrixCreator::create_laplace_matrix<> (const Mapping<deal_II_dimension>       &mapping,
-					     const DoFHandler<deal_II_dimension>    &dof,
-					     const Quadrature<deal_II_dimension>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_laplace_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension>       &mapping,
+ const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension> * const coefficient);
 template
-void MatrixCreator::create_laplace_matrix<> (const Mapping<deal_II_dimension>       &mapping,
-					     const DoFHandler<deal_II_dimension>    &dof,
-					     const Quadrature<deal_II_dimension>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<deal_II_dimension>      &rhs,
-					     Vector<double>           &rhs_vector,
-					     const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_laplace_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension>       &mapping,
+ const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension> * const coefficient);
 template
-void MatrixCreator::create_laplace_matrix<> (const DoFHandler<deal_II_dimension>    &dof,
-					     const Quadrature<deal_II_dimension>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<deal_II_dimension>      &rhs,
-					     Vector<double>           &rhs_vector,
-					     const Function<deal_II_dimension> * const coefficient);
+void MatrixCreator::create_laplace_matrix<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension> * const coefficient);

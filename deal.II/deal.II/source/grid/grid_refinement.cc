@@ -319,46 +319,54 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim>   &tria,
 
 // explicit instantiations
 template void GridRefinement
-::refine<> (Triangulation<deal_II_dimension> &, const Vector<float> &, const double);
+::refine<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+			     const Vector<float> &,
+			     const double);
 
 template void GridRefinement
-::refine<> (Triangulation<deal_II_dimension> &, const Vector<double> &, const double);
+::refine<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+			     const Vector<double> &,
+			     const double);
 
 template void GridRefinement
-::coarsen<> (Triangulation<deal_II_dimension> &, const Vector<float> &, const double);
+::coarsen<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+			      const Vector<float> &,
+			      const double);
 
 template void GridRefinement
-::coarsen<> (Triangulation<deal_II_dimension> &, const Vector<double> &, const double);
+::coarsen<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+			      const Vector<double> &,
+			      const double);
 
 
 template void GridRefinement
-::refine_and_coarsen_fixed_number<> (Triangulation<deal_II_dimension> &,
-				     const Vector<double> &,
-				     const double         top_fraction,
-				     const double         bottom_fraction);
+::refine_and_coarsen_fixed_number<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+						      const Vector<double> &,
+						      const double         top_fraction,
+						      const double         bottom_fraction);
 
 template void GridRefinement
-::refine_and_coarsen_fixed_number<> (Triangulation<deal_II_dimension> &,
-				     const Vector<float> &criteria,
-				     const double         top_fraction,
-				     const double         bottom_fraction);
+::refine_and_coarsen_fixed_number<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+						      const Vector<float> &criteria,
+						      const double         top_fraction,
+						      const double         bottom_fraction);
 
 template void GridRefinement
-::refine_and_coarsen_fixed_fraction<> (Triangulation<deal_II_dimension> &,
-				       const Vector<double> &criteria,
-				       const double         top_fraction,
-				       const double         bottom_fraction);
+::refine_and_coarsen_fixed_fraction<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+							const Vector<double> &criteria,
+							const double         top_fraction,
+							const double         bottom_fraction);
 
 template void GridRefinement
-::refine_and_coarsen_fixed_fraction<> (Triangulation<deal_II_dimension> &,
-				       const Vector<float> &criteria,
-				       const double         top_fraction,
-				       const double         bottom_fraction);
+::refine_and_coarsen_fixed_fraction<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+							const Vector<float> &criteria,
+							const double         top_fraction,
+							const double         bottom_fraction);
 
 template void GridRefinement
-::refine_and_coarsen_optimize<> (Triangulation<deal_II_dimension> &,
-				 const Vector<float> &criteria);
+::refine_and_coarsen_optimize<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+						  const Vector<float> &criteria);
 
 template void GridRefinement
-::refine_and_coarsen_optimize<> (Triangulation<deal_II_dimension> &,
-				 const Vector<double> &criteria);
+::refine_and_coarsen_optimize<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+						  const Vector<double> &criteria);

@@ -15,20 +15,28 @@
 
 // explicit instantiations
 template class BlockVector<double>;
-template BlockVector<double>& BlockVector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(
+template BlockVector<double>& BlockVector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<float>(
   const BlockVector<float>&);
-template void BlockVector<double>::reinit<>(const BlockVector<double>&, const bool);
-template void BlockVector<double>::reinit<>(const BlockVector<float>&, const bool);
-template void BlockVector<double>::equ<>(const double, const BlockVector<double>&);
-template void BlockVector<double>::equ<>(const double, const BlockVector<float>&);
+template void BlockVector<double>::reinit<double>(const BlockVector<double>&,
+						  const bool);
+template void BlockVector<double>::reinit<float>(const BlockVector<float>&,
+						 const bool);
+template void BlockVector<double>::equ<double>(const double,
+					       const BlockVector<double>&);
+template void BlockVector<double>::equ<float>(const double,
+					      const BlockVector<float>&);
 
 template class BlockVector<float>;
-template BlockVector<float>& BlockVector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(
+template BlockVector<float>& BlockVector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(
   const BlockVector<double>&);
-template void BlockVector<float>::reinit<>(const BlockVector<double>&, const bool);
-template void BlockVector<float>::reinit<>(const BlockVector<float>&, const bool);
-template void BlockVector<float>::equ<>(const float, const BlockVector<double>&);
-template void BlockVector<float>::equ<>(const float, const BlockVector<float>&);
+template void BlockVector<float>::reinit<double>(const BlockVector<double>&,
+						 const bool);
+template void BlockVector<float>::reinit<float>(const BlockVector<float>&,
+						const bool);
+template void BlockVector<float>::equ<double>(const float,
+					      const BlockVector<double>&);
+template void BlockVector<float>::equ<float>(const float,
+					     const BlockVector<float>&);
 
 namespace BlockVectorIterators
 {

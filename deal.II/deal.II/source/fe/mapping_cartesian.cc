@@ -625,25 +625,29 @@ covariant_transformation (typename std::vector<tensor_>       &dst,
 
 template class MappingCartesian<deal_II_dimension>;
 
-template void MappingCartesian<deal_II_dimension>::contravariant_transformation<> (
+template void MappingCartesian<deal_II_dimension>::
+contravariant_transformation<Tensor<1,deal_II_dimension> > (
   std::vector<Tensor<1,deal_II_dimension> >       &dst,
   const std::vector<Tensor<1,deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,
   const unsigned int src_offset) const;
 
-template void MappingCartesian<deal_II_dimension>::contravariant_transformation<> (
+template void MappingCartesian<deal_II_dimension>::
+contravariant_transformation<Point<deal_II_dimension> > (
   std::vector<Point<deal_II_dimension> >       &dst,
   const std::vector<Point<deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,
   const unsigned int src_offset) const;
 
-template void MappingCartesian<deal_II_dimension>::covariant_transformation<> (
+template void MappingCartesian<deal_II_dimension>::
+covariant_transformation<Tensor<1,deal_II_dimension> > (
   std::vector<Tensor<1,deal_II_dimension> >       &dst,
   const std::vector<Tensor<1,deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,
   const unsigned int src_offset) const;
 
-template void MappingCartesian<deal_II_dimension>::covariant_transformation<> (
+template void MappingCartesian<deal_II_dimension>::
+covariant_transformation<Point<deal_II_dimension> > (
   std::vector<Point<deal_II_dimension> >       &dst,
   const std::vector<Point<deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,

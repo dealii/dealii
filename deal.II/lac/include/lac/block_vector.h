@@ -854,7 +854,7 @@ class BlockVector
 				      */
     template<typename Number2>
     BlockVector<Number> &
-    operator= (const BlockVector< Number2>& V);
+    operator= (const BlockVector<Number2>& V);
     
 				     /**
 				      * $U = U * V$: scalar product.

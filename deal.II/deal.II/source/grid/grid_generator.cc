@@ -958,18 +958,19 @@ void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
 
 // explicit instantiations
 template void
-GridGenerator::hyper_rectangle<> (Triangulation<deal_II_dimension> &,
-				  const Point<deal_II_dimension>&,
-				  const Point<deal_II_dimension>&,
-				  const bool);
+GridGenerator::hyper_rectangle<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+						   const Point<deal_II_dimension>&,
+						   const Point<deal_II_dimension>&,
+						   const bool);
 template void
-GridGenerator::hyper_cube<> (Triangulation<deal_II_dimension> &,
-			     const double,
-			     const double);
+GridGenerator::hyper_cube<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+					      const double,
+					      const double);
 
 #if deal_II_dimension != 1
 template void
-GridGenerator::laplace_transformation<> (Triangulation<deal_II_dimension> &,
-					 const std::map<unsigned int,Point<deal_II_dimension> > &);
+GridGenerator::
+laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+					   const std::map<unsigned int,Point<deal_II_dimension> > &);
 
 #endif

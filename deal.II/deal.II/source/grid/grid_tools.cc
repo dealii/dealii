@@ -96,5 +96,5 @@ GridTools::diameter (const Triangulation<1> &tria)
 #if deal_II_dimension != 1
 template
 double
-GridTools::diameter<> (const Triangulation<deal_II_dimension> &);
+GridTools::diameter<deal_II_dimension> (const Triangulation<deal_II_dimension> &);
 #endif
