@@ -30,13 +30,13 @@
  *
  * There are two possibilities of how to evaluate the convergence rates of multiple 
  * columns in the same #RateMode#.
- * \begin{enumeration}
+ * \begin{enumerate}
  * \item call #evaluate_convergence_rates(data_column_key, ...)# for all wanted columns
  * \item call #omit_column_from_convergence_rate_evaluation(data_column_key)# for all
  * NOT wanted columns and then 
  * #evaluate_all_convergence_rates(...)# to evaluate the convergence rates of all columns
  * that are not signed to be omitted.
- * \end{enumeration}
+ * \end{enumerate}
  *
  *
  * @author Ralf Hartmann, 1999
