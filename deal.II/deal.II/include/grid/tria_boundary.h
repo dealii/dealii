@@ -18,6 +18,7 @@
 
 #include <base/subscriptor.h>
 #include <base/point.h>
+#include <grid/tria.h>
 
 
 template <int dim> class Triangulation;
