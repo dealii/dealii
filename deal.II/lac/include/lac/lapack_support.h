@@ -70,7 +70,7 @@ namespace LAPACKSupport
 				    * Interger constant.
 				    */
   extern const int one = 1;
-};
+}
 
 
 #endif
