@@ -135,9 +135,11 @@ InterGridMap<GridClass,dim>::set_entries_to_cell (const cell_iterator &src_cell,
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
 
 				   // then do so for the children as well
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-    set_entries_to_cell (src_cell->child(c),
-			 dst_cell);
+				   // if there are any
+  if (src_cell->has_children())
+    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+      set_entries_to_cell (src_cell->child(c),
+			   dst_cell);
 };
 
 
