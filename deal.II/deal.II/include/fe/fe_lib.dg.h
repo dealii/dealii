@@ -24,12 +24,13 @@
 
 /**
  * Define a constant discontinuous finite element in #dim#
- * space dimensions, along with (bi-, tri-)linear (therefore isoparametric)
+ * space dimensions, along with (bi-, tri-)linear
  * transforms from the unit cell to the real cell.
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDG_Q0 : public FEQ1Mapping<dim> {
+class FEDG_Q0 : public FEQ1Mapping<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -111,7 +112,8 @@ class FEDG_Q0 : public FEQ1Mapping<dim> {
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDG_Q1 : public FEQ1<dim>{
+class FEDG_Q1 : public FEQ1<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -129,7 +131,7 @@ class FEDG_Q1 : public FEQ1<dim>{
 
 /**
  * Define a (bi-, tri-, etc)quadratic finite element in #dim# space dimensions,
- * along with (bi-, tri-)quadratic (therefore isoparametric) transforms from the
+ * along with (bi-, tri-)linear transforms from the
  * unit cell to the real cell allowing discontinuous Galerkin methods.
  * 
  * This class is derived from and provides substantially the same 
@@ -147,7 +149,8 @@ class FEDG_Q1 : public FEQ1<dim>{
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDG_Q2 : public FEQ2<dim>{
+class FEDG_Q2 : public FEQ2<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -165,7 +168,7 @@ class FEDG_Q2 : public FEQ2<dim>{
 
 /**
  * Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions,
- * along with (bi-, tri-)cubic (therefore isoparametric) transforms from the
+ * along with (bi-, tri-)linear transforms from the
  * unit cell to the real cell allowing discontinuous Galerkin methods.
  * 
  * This class is derived from and provides substantially the same 
@@ -183,7 +186,8 @@ class FEDG_Q2 : public FEQ2<dim>{
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDG_Q3 : public FEQ3<dim>{
+class FEDG_Q3 : public FEQ3<dim>
+{
   public:
 				     /**
 				      * Constructor
@@ -201,7 +205,7 @@ class FEDG_Q3 : public FEQ3<dim>{
 
 /**
  * Define a (bi-, tri-, etc)quartic finite element in #dim# space dimensions,
- * along with (bi-, tri-)quartic (therefore isoparametric) transforms from the
+ * along with (bi-, tri-)linear transforms from the
  * unit cell to the real cell allowing discontinuous Galerkin methods.
  * 
  * This class is derived from and provides substantially the same 
@@ -219,7 +223,8 @@ class FEDG_Q3 : public FEQ3<dim>{
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDG_Q4 : public FEQ4<dim>{
+class FEDG_Q4 : public FEQ4<dim>
+{
   public:
 				     /**
 				      * Constructor
