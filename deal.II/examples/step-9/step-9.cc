@@ -229,6 +229,8 @@ template <int dim>
 class AdvectionField : public TensorFunction<1,dim>
 {
   public:
+    AdvectionField () : TensorFunction<1,dim> () {};
+    
     virtual Tensor<1,dim> value (const Point<dim> &p) const;
     
     virtual void value_list (const std::vector<Point<dim> > &points,
@@ -369,6 +371,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
   public:
+    RightHandSide () : Function<dim>() {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     
@@ -449,6 +453,8 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
   public:
+    BoundaryValues () : Function<dim>() {};
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     
@@ -1459,11 +1465,34 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				   // but rather a static function, we
 				   // need not (and can not) pass a
 				   // ``this'' function in this case.
+				   //
+				   // Taking pointers to templated
+				   // functions seems to be
+				   // notoriously difficult for many
+				   // compilers (since there are
+				   // several functions with the same
+				   // name -- just as with overloaded
+				   // functions). It therefore happens
+				   // quite frequently that we can't
+				   // directly insert taking the
+				   // address of a function in the
+				   // call to ``encapsulate'' for one
+				   // or the other compiler, but have
+				   // to take a temporary variable for
+				   // that purpose. Here, in this
+				   // case, Compaq's ``cxx'' compiler
+				   // choked on the code so we use the
+				   // workaround with the function
+				   // pointer:
   Threads::ThreadManager thread_manager;
+  void (*estimate_interval_ptr) (const DoFHandler<dim> &,
+				 const Vector<double> &,
+				 const IndexInterval &,
+				 Vector<float> &)
+    = &GradientEstimation::template estimate_interval<dim>;
   for (unsigned int i=0; i<n_threads; ++i)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate (&GradientEstimation::
-					  template estimate_interval<dim>)
+		    Threads::encapsulate (estimate_interval_ptr)
 		    .collect_args (dof_handler, solution, index_intervals[i],
 				   error_per_cell));
 				   // Ok, now the threads are at work,
@@ -1908,7 +1937,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 					   // used everywhere in the
 					   // computations.
 	  Point<dim>   y        = neighbor_center - this_center;
-	  const double distance = sqrt(y.square());
+	  const double distance = std::sqrt(y.square());
 	  y /= distance;
 	  
 					   // Then add up the
@@ -1994,9 +2023,9 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
       Point<dim> gradient;
       contract (gradient, Y_inverse, projected_gradient);
       
-      *error_on_this_cell = (pow(cell->diameter(),
-				 1+1.0*dim/2) *
-			     sqrt(gradient.square()));
+      *error_on_this_cell = (std::pow(cell->diameter(),
+				      1+1.0*dim/2) *
+			     std::sqrt(gradient.square()));
     };
 };
 
