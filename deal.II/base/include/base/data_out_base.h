@@ -5,6 +5,7 @@
 /*----------------------------   data_out_base.h     ---------------------------*/
 
 
+#include <base/forward-declarations.h>
 #include <base/point.h>
 #include <lac/fullmatrix.h>
 #include <grid/geometry_info.h>
@@ -331,6 +332,24 @@ class DataOutBase
 					  * Constructor.
 					  */
 	UcdFlags (const bool write_preamble = true);
+
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * #declare_parameters# and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
     };
 
 				     /**
@@ -350,6 +369,25 @@ class DataOutBase
 					  * #private# as well).
 					  */
 	int dummy;
+
+      public:
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * #declare_parameters# and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
     };
 
     				     /**
@@ -369,6 +407,25 @@ class DataOutBase
 					  * #private# as well).
 					  */
 	int dummy;
+
+      public:
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * #declare_parameters# and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
     };
 
     
@@ -606,6 +663,28 @@ class DataOutBase
 		  const bool          draw_cells    = true,
 		  const bool          shade_cells   = true,
 		  const ColorFunction color_function= &default_color_function);
+
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  *
+					  * For coloring, only the color
+					  * functions declared in this
+					  * class are offered.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * #declare_parameters# and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
     };
 
     				     /**
@@ -625,6 +704,25 @@ class DataOutBase
 					  * #private# as well).
 					  */
 	int dummy;
+
+      public:
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * #declare_parameters# and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
     };
 
 				     /**
@@ -966,6 +1064,44 @@ class DataOutInterface : private DataOutBase
 				      */
     static string get_output_format_names ();
 
+				     /**
+				      * Declare parameters for all output
+				      * formats by declaring subsections
+				      * within the parameter file for each
+				      * output format and call the
+				      * respective #declare_parameters#
+				      * functions of the flag classes for
+				      * each output format.
+				      *
+				      * Some of the declared subsections
+				      * may not contain entries, if the
+				      * respective format does not
+				      * export any flags.
+				      *
+				      * Note that the top-level parameters
+				      * denoting the number of subdivisions
+				      * per patch and the output format
+				      * are not declared, since they are
+				      * only passed to virtual functions
+				      * and are not stored inside objects
+				      * of this type. You have to
+				      * declare them yourself.
+				      */
+    static void declare_parameters (ParameterHandler &prm);
+
+				     /**
+				      * Read the parameters declared in
+				      * #declare_parameters# and set the
+				      * flags for the output formats
+				      * accordingly.
+				      *
+				      * The flags thus obtained overwrite
+				      * all previous contents of the flag
+				      * objects as default-constructed or
+				      * set by the #set_flags# function.
+				      */
+    void parse_parameters (ParameterHandler &prm);
+    
 				     /**
 				      * Exception
 				      */

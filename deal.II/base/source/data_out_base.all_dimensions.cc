@@ -2,12 +2,51 @@
 
 
 #include <base/data_out_base.h>
-
+#include <base/parameter_handler.h>
 
 
 DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 		write_preamble (write_preamble)
 {};
+
+
+
+void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
+{
+  prm.declare_entry ("Write preamble", "true", Patterns::Bool());
+};
+
+
+
+void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
+{
+  write_preamble = prm.get_bool ("Write preamble");
+};
+
+
+
+void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
+{
+};
+
+
+
+void DataOutBase::GnuplotFlags::parse_parameters (ParameterHandler &/*prm*/)
+{
+};
+
+
+
+void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &/*prm*/)
+{
+};
+
+
+
+void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &/*prm*/)
+{
+};
+
 
 
 DataOutBase::EpsFlags::EpsFlags (const unsigned int  height_vector,
@@ -147,4 +186,66 @@ bool DataOutBase::EpsCell2d::operator < (const EpsCell2d &e) const
 
 
 
+void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
+{
+  prm.declare_entry ("Index of vector for height", "0",
+		     Patterns::Integer());
+  prm.declare_entry ("Index of vector for color", "0",
+		     Patterns::Integer());
+  prm.declare_entry ("Scale to width or height", "width",
+		     Patterns::Selection ("width|height"));
+  prm.declare_entry ("Size (width or height) in eps units", "300",
+		     Patterns::Integer());
+  prm.declare_entry ("Line widths in eps units", "0.5",
+		     Patterns::Double());
+  prm.declare_entry ("Azimut angle", "60",
+		     Patterns::Double());
+  prm.declare_entry ("Turn angle", "30",
+		     Patterns::Double());
+  prm.declare_entry ("Scaling for z-axis", "1",
+		     Patterns::Double ());
+  prm.declare_entry ("Draw mesh lines", "true",
+		     Patterns::Bool());
+  prm.declare_entry ("Fill interior of cells", "true",
+		     Patterns::Bool());
+  prm.declare_entry ("Color shading of interior of cells", "true",
+		     Patterns::Bool());
+  prm.declare_entry ("Color function", "default",
+		     Patterns::Selection ("default|grey scale"));
+};
 
+
+
+void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
+{
+  height_vector = prm.get_integer ("Index of vector for height");
+  color_vector  = prm.get_integer ("Index of vector for color");
+  if (prm.get ("Scale to width or height") == "width")
+    size_type   = width;
+  else
+    size_type   = height;
+  size          = prm.get_integer ("Size (width or height) in eps units");
+  line_width    = prm.get_double ("Line widths in eps units");
+  azimut_angle  = prm.get_double ("Azimut angle");
+  turn_angle    = prm.get_double ("Turn angle");
+  z_scaling     = prm.get_double ("Scaling for z-axis");
+  draw_mesh     = prm.get_bool ("Draw mesh lines");
+  draw_cells    = prm.get_bool ("Fill interior of cells");
+  shade_cells   = prm.get_bool ("Color shading of interior of cells");
+  if (prm.get("Color function") == "default")
+    color_function = &default_color_function;
+  else
+    color_function = &grey_scale_color_function;
+};
+
+
+
+void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
+{
+};
+
+
+
+void DataOutBase::GmvFlags::parse_parameters (ParameterHandler &/*prm*/)
+{
+};
