@@ -592,12 +592,27 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * STL-like iterator with the first entry
 				      * of row <tt>r</tt>.
+				      *
+				      * Note that if the given row is empty,
+				      * i.e. does not contain any nonzero
+				      * entries, then the iterator returned by
+				      * this function equals
+				      * <tt>end(r)</tt>. Note also that the
+				      * iterator may not be dereferencable in
+				      * that case.
 				      */
     iterator begin (const unsigned int r) const;
 
 				     /**
 				      * Final iterator of row
 				      * <tt>r</tt>.
+				      *
+				      * Note that the end iterator is not
+				      * necessarily dereferencable. This is in
+				      * particular the case if the row after
+				      * the one for which this is the end
+				      * iterator is empty, or if it is the end
+				      * iterator for the last row of a matrix.
 				      */
     iterator end (const unsigned int r) const;
     
@@ -1633,7 +1648,16 @@ inline
 SparsityPattern::iterator
 SparsityPattern::begin () const
 {
-  return iterator(this, 0, 0);
+                                   // search for the first line with a nonzero
+                                   // number of entries
+  for (unsigned int r=0; r<n_rows(); ++r)
+    if (row_length(r) > 0)
+      return iterator(this, r, 0);
+
+                                   // alright, this matrix is completely
+                                   // empty. that's strange but ok. simply
+                                   // return the end() iterator
+  return end();
 }
 
 
@@ -1651,7 +1675,11 @@ SparsityPattern::iterator
 SparsityPattern::begin (const unsigned int r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
-  return iterator(this, r, 0);
+
+  if (row_length(r) > 0)
+    return iterator(this, r, 0);
+  else
+    return end (r);
 }
 
 
