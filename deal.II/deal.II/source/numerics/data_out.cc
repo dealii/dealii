@@ -3,10 +3,10 @@
 
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
-#include <basic/data_out.h>
+#include <numerics/data_out.h>
 #include <grid/tria.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>

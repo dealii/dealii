@@ -6,7 +6,7 @@
 /*----------------------------   mg_dof_accessor.h     ---------------------------*/
 
 
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 
 
 

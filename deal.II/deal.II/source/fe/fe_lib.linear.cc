@@ -5,7 +5,7 @@
 
 #include <fe/fe_lib.lagrange.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 #include <grid/geometry_info.h>
 #include <algorithm>
 

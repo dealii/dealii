@@ -5,8 +5,8 @@
 
 #include <lac/precondition_block.h>
 #include <lac/vector.h>
-#include <lac/fullmatrix.h>
-#include <lac/sparsematrix.h>
+#include <lac/full_matrix.h>
+#include <lac/sparse_matrix.h>
 
 
 template <typename number, typename inverse_type>

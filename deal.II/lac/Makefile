@@ -17,7 +17,7 @@ o-files      = $(o-files-base3)
 go-files     = $(patsubst lib/o/%,lib/go/%,$(o-files-base3:.o=.go))
 h-files      = $(shell echo include/lac/*.h)
 
-forward-declarations = $D/lac/include/lac/forward-declarations.h
+forward-declarations = $D/lac/include/lac/forward_declarations.h
 
 # get options which hold for all files of the project
 include $D/common/Make.global_options
@@ -46,7 +46,8 @@ lib/liblac.g.a: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/*.o lib/go/*.go include/base/forward-declarations.h*
+	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/*.o lib/go/*.go \
+               include/base/forward_declarations.h*
 
 
 
@@ -57,14 +58,14 @@ clean:
 #of this file.
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/Make_dep_2.pl $(INCLUDE) $(cc-files) \
+	@perl $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
 		> lib/Makefile.dep
 
 # include all the dependencies
 include lib/Makefile.dep
 
 # include a rule which tells how to remake the forward declarations file
-include $D/common/Makescripts/forward_declarations
+include $D/common/scripts/forward_declarations
 
 
 .PHONY: clean

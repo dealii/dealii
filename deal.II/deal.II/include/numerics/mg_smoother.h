@@ -5,9 +5,9 @@
 /*----------------------------   mg_smoother.h     ---------------------------*/
 
 
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 #include <lac/mgbase.h>
-#include <basic/forward-declarations.h>
+#include <grid/forward_declarations.h>
 #include <base/smartpointer.h>
 #include <vector>
 

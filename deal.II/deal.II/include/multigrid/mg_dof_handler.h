@@ -6,7 +6,7 @@
 /*----------------------------   mg_dof.h     ---------------------------*/
 
 
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 
 
 

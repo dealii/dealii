@@ -2,8 +2,8 @@
 // Copyright Guido Kanschat, Universitaet Heidelberg, 1999
 
 #include <grid/tria.h>
-#include <grid/mg_dof.h>
-#include <grid/mg_dof_accessor.h>
+#include <dofs/mg_dof_handler.h>
+#include <dofs/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <numerics/multigrid.h>

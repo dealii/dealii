@@ -8,7 +8,7 @@
 #include <base/logstream.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 #include <vector>
 
 

@@ -4,19 +4,19 @@
 
 
 #include <base/function.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
-#include <basic/dof_tools.h>
+#include <dofs/dof_tools.h>
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>

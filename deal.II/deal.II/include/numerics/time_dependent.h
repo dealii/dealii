@@ -7,8 +7,8 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <basic/forward-declarations.h>
-#include <lac/forward-declarations.h>
+#include <grid/forward_declarations.h>
+#include <lac/forward_declarations.h>
 
 #include <vector>
 #include <utility>

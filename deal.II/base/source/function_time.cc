@@ -1,6 +1,6 @@
 // $Id$
 
-#include <base/functiontime.h>
+#include <base/function_time.h>
 
 
 FunctionTime::FunctionTime(double initial_time)

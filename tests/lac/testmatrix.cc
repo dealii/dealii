@@ -1,7 +1,7 @@
 // $Id$
 
 #include "testmatrix.h"
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 FDMatrix::FDMatrix(unsigned int nx, unsigned int ny)
 		:

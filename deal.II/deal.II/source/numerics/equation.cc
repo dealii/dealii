@@ -4,9 +4,9 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 template <int dim>
 Equation<dim>::Equation (const unsigned int n_equations) :

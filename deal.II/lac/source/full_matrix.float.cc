@@ -10,7 +10,7 @@
  * 4. TYPEMAT2: numerical type for the second matrix
  */
 
-#include <lac/fullmatrix.templates.h>
+#include <lac/full_matrix.templates.h>
 
 #define TYPEMAT float
 

@@ -6,7 +6,7 @@
 // Copyright Wolfgang Bangerth, Guido Kanschat, and others 1999
 
 
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 #include <vector>
 
 

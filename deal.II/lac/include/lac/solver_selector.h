@@ -7,7 +7,7 @@
 
 #include <lac/solver.h>
 #include <base/smartpointer.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/vector_memory.h>
 #include <lac/solver_control.h>

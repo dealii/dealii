@@ -8,7 +8,7 @@
 
 
 #include <base/smartpointer.h>
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 
 #include <vector>
 

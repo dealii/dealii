@@ -3,8 +3,8 @@
 
 
 
-#include <grid/dof_constraints.h>
-#include <lac/sparsematrix.h>
+#include <dofs/dof_constraints.h>
+#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <iostream>
 #include <algorithm>
@@ -323,7 +323,7 @@ void ConstraintMatrix::print (ostream &out) const {
   AssertThrow (out, ExcIO());
 };
 
-#include <grid/dof_constraints.templates.h>
+#include <dofs/dof_constraints.templates.h>
 
 #define number double
 template void ConstraintMatrix::condense(const SparseMatrix<number> &uncondensed,

@@ -6,7 +6,7 @@
 #include <base/quadrature.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_boundary.h>
 
 

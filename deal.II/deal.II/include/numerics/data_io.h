@@ -6,8 +6,8 @@
 /*----------------------------   data_io.h     ---------------------------*/
 
 #include <base/exceptions.h>
-#include <basic/forward-declarations.h>
-#include <lac/forward-declarations.h>
+#include <grid/forward_declarations.h>
+#include <lac/forward_declarations.h>
 #include <vector>
 #include <string>
 

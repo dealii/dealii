@@ -8,8 +8,8 @@
 
 #include <base/exceptions.h>
 #include <base/function.h>
-#include <basic/forward-declarations.h>
-#include <grid/dof.h>
+#include <grid/forward_declarations.h>
+#include <dofs/dof_handler.h>
 #include <map>
 
 

@@ -4,8 +4,8 @@
 #define __data_out_H
 /*----------------------------   data_out.h     ---------------------------*/
 
-#include <lac/forward-declarations.h>
-#include <basic/forward-declarations.h>
+#include <lac/forward_declarations.h>
+#include <grid/forward_declarations.h>
 #include <base/data_out_base.h>
 
 

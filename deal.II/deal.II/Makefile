@@ -23,7 +23,7 @@ default: 2dg 2d
 cc-files     = $(shell echo source/*/*.cc)
 h-files      = $(shell echo include/*/*.h)
 
-forward-declarations = $D/deal.II/include/basic/forward-declarations.h
+forward-declarations = $D/deal.II/include/grid/forward_declarations.h
 
 
 # strip subdirectories from cc file names, preprend a "lib/[g]o"
@@ -72,7 +72,7 @@ lib/3d/o/%.o :
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 # special rules for exceptional files
-lib/3d/o/q1_mapping_jacobians_3d.o:
+lib/3d/o/q1_mapping.jacobians_3d.o:
 	@echo =====deal.II====3d====opt==special== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
 
@@ -108,7 +108,7 @@ lib/libdeal_II_3d.a: $(o-files-3d)
 #of this file.
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/Make_dep_2.pl $(INCLUDE) $(cc-files) \
+	@perl $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
 		| perl -p -e 's!^lib/(g?o/.*):!lib/DIM_PLACEHOLDER/$$1:!g;' \
 		| perl -pe 's!(\.g?o):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | perl -pe 's!^lib/DIM_PLACEHOLDER/(.*):!lib/1d/$$1 lib/2d/$$1 lib/3d/$$1:!g;'\
@@ -121,7 +121,7 @@ lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 include lib/Makefile.dep
 
 # include a rule which tells how to remake the forward declarations file
-include $D/common/Makescripts/forward_declarations
+include $D/common/scripts/forward_declarations
 
 
 
@@ -138,7 +138,7 @@ examples:
 clean: examples-clean lib-clean 
 
 lib-clean:
-	-rm -f *~ */*~ */*/*~ include/basic/forward-declarations.h*
+	-rm -f *~ */*~ */*/*~ include/grid/forward_declarations.h*
 	cd lib ; $(MAKE) clean
 
 examples-clean:

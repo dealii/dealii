@@ -1,7 +1,7 @@
 // $Id$
 
 #include <lac/vector.h>
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 
 #include <vector>
 #include <cmath>

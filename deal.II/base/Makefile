@@ -22,7 +22,7 @@ o-files      = $(o-files-base3)
 go-files     = $(patsubst lib/o/%,lib/go/%,$(o-files-base3:.o=.go))
 h-files      = $(shell echo include/base/*.h)
 
-forward-declarations = $D/base/include/base/forward-declarations.h
+forward-declarations = $D/base/include/base/forward_declarations.h
 
 # get options which hold for all files of the project
 include $D/common/Make.global_options
@@ -73,7 +73,8 @@ lib/libbase.g.a: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/*.o lib/go/*.go include/base/forward-declarations.h*
+	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/*.o lib/go/*.go \
+               include/base/forward_declarations.h*
 
 
 
@@ -88,7 +89,7 @@ clean:
 #appended
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/Make_dep_2.pl $(INCLUDE) $(cc-files) \
+	@perl $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
 		| perl -p -e 's!(lib/g?o/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
 		> lib/Makefile.dep
 
@@ -97,7 +98,7 @@ lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 include lib/Makefile.dep
 
 # include a rule which tells how to remake the forward declarations file
-include $D/common/Makescripts/forward_declarations
+include $D/common/scripts/forward_declarations
 
 
 .PHONY: clean

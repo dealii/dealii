@@ -6,7 +6,7 @@
 // Revised, modified and extended by Wolfgang Bangerth, 1998, 1999
 
 
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 #include <iostream>
 #include <iomanip>

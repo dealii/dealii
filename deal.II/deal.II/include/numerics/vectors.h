@@ -6,9 +6,9 @@
 /*----------------------------   vectors.h     ---------------------------*/
 
 
-#include <base/forward-declarations.h>
+#include <base/forward_declarations.h>
 #include <base/exceptions.h>
-#include <basic/forward-declarations.h>
+#include <grid/forward_declarations.h>
 #include <map>
 #include <vector>
 

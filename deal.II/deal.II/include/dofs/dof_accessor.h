@@ -7,7 +7,7 @@
 
 
 #include <grid/tria_accessor.h>
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 #include <vector>
 
 

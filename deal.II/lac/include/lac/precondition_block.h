@@ -4,7 +4,7 @@
 #define __precondition_block_H
 /*----------------------------   precondition_block.h     ---------------------------*/
 
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>

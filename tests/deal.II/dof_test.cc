@@ -6,17 +6,17 @@
 
 
 
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_lib.lagrange.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
-#include <lac/sparsematrix.h>
-#include <grid/dof_constraints.h>
+#include <lac/sparse_matrix.h>
+#include <dofs/dof_constraints.h>
 #include <numerics/dof_renumbering.h>
-#include <basic/dof_tools.h>
+#include <dofs/dof_tools.h>
 #include <base/logstream.h>
 
 #include <cmath>

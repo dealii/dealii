@@ -6,9 +6,9 @@
 
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
-#include <lac/forward-declarations.h>
-#include <basic/forward-declarations.h>
-#include <lac/sparsematrix.h>
+#include <lac/forward_declarations.h>
+#include <grid/forward_declarations.h>
+#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/mgbase.h>
 

@@ -8,10 +8,10 @@
 #include <vector>
 #include <map>
 #include <base/exceptions.h>
-#include <base/forward-declarations.h>
+#include <base/forward_declarations.h>
 #include <base/smartpointer.h>
-#include <basic/forward-declarations.h>
-#include <lac/forward-declarations.h>
+#include <grid/forward_declarations.h>
+#include <lac/forward_declarations.h>
 
 
 

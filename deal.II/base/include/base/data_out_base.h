@@ -5,9 +5,9 @@
 /*----------------------------   data_out_base.h     ---------------------------*/
 
 
-#include <base/forward-declarations.h>
+#include <base/forward_declarations.h>
 #include <base/point.h>
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 #include <grid/geometry_info.h>
 #include <iostream>
 #include <vector>

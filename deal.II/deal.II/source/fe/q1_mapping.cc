@@ -6,7 +6,7 @@
 #include <fe/q1_mapping.h>
 #include <base/quadrature.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 
 #include <cmath>
 
@@ -665,12 +665,12 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
   -------------------------------------------
   #include <grid/tria.h>
   #include <grid/tria_boundary.h>
-  #include <grid/dof.h>
+  #include <dofs/dof_handler.h>
   #include <fe/fe_values.h>
   #include <fe/fe_lib.lagrange.h>
   #include <base/quadrature_lib.h>
   #include <grid/tria_iterator.h>
-  #include <grid/dof_accessor.h>
+  #include <dofs/dof_accessor.h>
   #include <lac/vector.h>
 
   int main () {

@@ -6,9 +6,9 @@
 /*----------------------------   problem_base.h     ---------------------------*/
 
 
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <base/exceptions.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <fe/fe_update_flags.h>
 #include <map>
 #include <string>

@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #include <grid/persistent_tria.h>
-#include <basic/magic_numbers.h>
+#include <grid/magic_numbers.h>
 #include <iostream>
 
 

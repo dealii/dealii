@@ -1,7 +1,7 @@
 // $Id$
 
 #include <base/logstream.h>
-#include <base/jobidentifier.h>
+#include <base/job_identifier.h>
 
 
 

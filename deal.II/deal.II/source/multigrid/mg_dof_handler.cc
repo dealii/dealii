@@ -2,17 +2,17 @@
 /* Copyright W. Bangerth, University of Heidelberg, 1998 */
 
 
-#include <grid/mg_dof.h>
-#include <grid/dof_levels.h>
-#include <grid/mg_dof_accessor.h>
-#include <grid/dof_constraints.h>
+#include <dofs/mg_dof_handler.h>
+#include <dofs/dof_levels.h>
+#include <dofs/mg_dof_accessor.h>
+#include <dofs/dof_constraints.h>
 #include <grid/tria_levels.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 #include <algorithm>
 

@@ -1,6 +1,6 @@
 // $Id$
 
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 #include <base/exceptions.h>
 #include <lac/mgbase.h>
 

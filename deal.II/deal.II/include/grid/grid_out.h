@@ -4,7 +4,7 @@
 #define __grid_out_H
 /*----------------------------   grid_out.h     ---------------------------*/
 
-#include <basic/forward-declarations.h>
+#include <grid/forward_declarations.h>
 #include <base/exceptions.h>
 #include <string>
 

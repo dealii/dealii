@@ -1,6 +1,6 @@
 // $Id$
 
-#include <base/jobidentifier.h>
+#include <base/job_identifier.h>
 #include <ctime>
 
 

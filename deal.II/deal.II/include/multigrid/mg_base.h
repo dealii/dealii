@@ -8,11 +8,10 @@
 
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 #include <lac/vector.h>
 
 #include <vector>
-#include <base/smartpointer.h>
 
 
 
@@ -258,7 +257,7 @@ class MGVector : public Subscriptor
  * with a subscriptor for smart pointers.
  * @author Guido Kanschat, 1999
  */
-template<class MATRIX = SparseMatrix<double> >
+template <class MATRIX = SparseMatrix<double> >
 class MGMatrix : public Subscriptor,
 		 public vector<MATRIX>
 {

@@ -1,15 +1,15 @@
 // $Id$
 // Copyright Guido Kanschat, 1999
 
-#include <grid/dof.h>
-#include <grid/mg_dof.h>
-#include <grid/dof_accessor.h>
-#include <grid/mg_dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/mg_dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_system.h>
-#include <basic/dof_tools.h>
-#include <lac/sparsematrix.h>
+#include <dofs/dof_tools.h>
+#include <lac/sparse_matrix.h>
 
 #include <algorithm>
 

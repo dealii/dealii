@@ -7,7 +7,7 @@
 #include <lac/vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_values.h>

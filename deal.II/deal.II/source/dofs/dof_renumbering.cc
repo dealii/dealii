@@ -1,14 +1,14 @@
 /* $Id$ */
 
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof.h>
-#include <grid/mg_dof.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_handler.h>
+#include <dofs/mg_dof_handler.h>
+#include <dofs/dof_constraints.h>
 #include <fe/fe.h>
 #include <numerics/dof_renumbering.h>
-#include <basic/dof_tools.h>
-#include <lac/sparsematrix.h>
+#include <dofs/dof_tools.h>
+#include <lac/sparse_matrix.h>
 
 #include <vector>
 #include <map>

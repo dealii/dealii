@@ -3,13 +3,13 @@
 /*           Ralf Hartmann, University of Heidelberg                          */
 
 #include <grid/tria.h>
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 #include <grid/tria_accessor.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <lac/vector.h>
-#include <numerics/solutiontransfer.h>
+#include <numerics/solution_transfer.h>
 
 
 

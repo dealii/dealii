@@ -13,8 +13,8 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <iomanip>
 #include <fstream>

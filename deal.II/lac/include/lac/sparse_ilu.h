@@ -5,7 +5,7 @@
 /*----------------------------   sparse_ilu.h     ---------------------------*/
 
 
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 
 

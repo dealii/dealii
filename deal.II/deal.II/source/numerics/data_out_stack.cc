@@ -1,10 +1,10 @@
 /* $Id$ */
 
-#include <basic/data_out_stack.h>
+#include <numerics/data_out_stack.h>
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>

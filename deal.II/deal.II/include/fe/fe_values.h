@@ -8,8 +8,8 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <lac/fullmatrix.h>
-#include <grid/dof.h>
+#include <lac/full_matrix.h>
+#include <dofs/dof_handler.h>
 #include <base/point.h>
 #include <base/tensor.h>
 #include <grid/tria.h>

@@ -5,7 +5,7 @@
 /*----------------------------   multigrid.templates.h     ---------------------------*/
 
 
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <numerics/multigrid.h>
 #include <algorithm>
 #include <fstream>

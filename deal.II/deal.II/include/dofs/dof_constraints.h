@@ -10,7 +10,7 @@
 #include <utility>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <lac/forward-declarations.h>
+#include <lac/forward_declarations.h>
 
 
 

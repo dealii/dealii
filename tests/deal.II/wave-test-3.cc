@@ -1,15 +1,15 @@
 // deal_II_libraries.g=-ldeal_II_2d.g
 // deal_II_libraries=-ldeal_II_2d
 
+#include <base/logstream.h>
 #include <grid/tria_boundary_lib.h>
 #include <base/parameter_handler.h>
-#include <base/forward-declarations.h>
-#include <lac/forward-declarations.h>
-#include <basic/forward-declarations.h>
-#include <numerics/time-dependent.h>
-#include <grid/dof.h>
-#include <basic/dof_tools.h>
-#include <base/logstream.h>
+#include <base/forward_declarations.h>
+#include <lac/forward_declarations.h>
+#include <grid/forward_declarations.h>
+#include <numerics/time_dependent.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_tools.h>
 
 #include <fstream>
 #include <string>
@@ -187,7 +187,7 @@ class TimeStep_Dual :  public TimeStep_Wave<dim>
 
 
 
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 
 
 
@@ -638,9 +638,9 @@ class HuyghensWave : public DualFunctional<dim> {
 };
 
 
-#include <basic/forward-declarations.h>
-#include <base/forward-declarations.h>
-#include <lac/forward-declarations.h>
+#include <grid/forward_declarations.h>
+#include <base/forward_declarations.h>
+#include <lac/forward_declarations.h>
 #include <base/exceptions.h>
 #include <string>
 
@@ -1112,7 +1112,7 @@ class SweepInfo
 
 
 
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 
 
@@ -1174,7 +1174,7 @@ class UserMatrix :  public SparseMatrix<double> {
 
 
 #include <base/exceptions.h>
-#include <basic/forward-declarations.h>
+#include <grid/forward_declarations.h>
 
 #include <string>
 
@@ -1244,8 +1244,8 @@ struct FEHelper {
 
 
 
-#include <base/forward-declarations.h>
-#include <basic/forward-declarations.h>
+#include <base/forward_declarations.h>
+#include <grid/forward_declarations.h>
 #include <list>
 #include <string>
 
@@ -1843,7 +1843,7 @@ class WaveParameters
 
 
 
-#include <numerics/time-dependent.h>
+#include <numerics/time_dependent.h>
 
 template <int dim> class WaveParameters;
 template <int dim> class DataOutStack;
@@ -1979,11 +1979,11 @@ class WaveProblem :  public MultipleParameterLoop::UserClass {
 
 
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <lac/sparse_matrix.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
@@ -2650,17 +2650,17 @@ template class HuyghensWave<2>;
 
 
 #include <grid/tria.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
 #include <base/function.h>
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 #include <cmath>
 #include <fstream>
@@ -3323,11 +3323,11 @@ template class EvaluateHuyghensWave<2>;
 /* $Id$ */
 
 #include <base/data_out_base.h>
-#include <basic/histogram.h>
-#include <lac/sparsematrix.h>
+#include <numerics/histogram.h>
+#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
-#include <grid/dof_constraints.h>
-#include <grid/dof.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_handler.h>
 #include <grid/geometry_info.h>
 
 #include <cmath>
@@ -3336,7 +3336,7 @@ template class EvaluateHuyghensWave<2>;
 #include <fstream>
 #include <iomanip>
 
-#include <basic/data_out_stack.h>
+#include <numerics/data_out_stack.h>
 
 
 template <int dim>
@@ -3692,7 +3692,7 @@ template class TimestepManager<2>;
 #include <base/exceptions.h>
 #include <base/function.h>
 #include <base/parameter_handler.h>
-#include <basic/histogram.h>
+#include <numerics/histogram.h>
 #include <base/data_out_base.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
@@ -5047,8 +5047,8 @@ void WaveParameters<dim>::parse_parameters (ParameterHandler &prm) {
 template class WaveParameters<2>;
 /* $Id$ */
 
-#include <basic/data_out_stack.h>
-#include <grid/dof.h>  //??
+#include <numerics/data_out_stack.h>
+#include <dofs/dof_handler.h>  //??
 #include <lac/vector.h>
 
 
@@ -5166,15 +5166,15 @@ void SweepInfo::write_summary (const list<EvaluationBase<2>*> &eval_list,
 #include <base/quadrature.h>
 #include <base/function.h>
 #include <lac/vector.h>
-#include <lac/fullmatrix.h>
-#include <lac/sparsematrix.h>
+#include <lac/full_matrix.h>
+#include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/geometry_info.h>
-#include <grid/dof_constraints.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <fe/fe.h>
@@ -5769,13 +5769,13 @@ template class TimeStep_Wave<2>;
 /* $Id$ */
 
 #include <base/function.h>
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <grid/tria.h>
-#include <grid/dof.h>
-#include <grid/dof_constraints.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe_values.h>
 #include <fe/fe.h>
@@ -6556,10 +6556,10 @@ template class TimeStep_Dual<2>;
 #include <base/tensor.h>
 #include <lac/vector.h>
 #include <grid/tria.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <numerics/error_estimator.h>
@@ -7679,9 +7679,9 @@ template class TimeStep_ErrorEstimation<2>;
 
 
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
-#include <grid/dof_constraints.h>
-#include <grid/dof.h>
+#include <lac/sparse_matrix.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_handler.h>
 
 
 
@@ -7835,14 +7835,14 @@ template class TimeStep<2>;
 
 
 #include <lac/vector.h>
-#include <basic/data_out.h>
-#include <grid/dof_constraints.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <numerics/data_out.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
-#include <basic/data_out_stack.h>
+#include <numerics/data_out_stack.h>
 
 #include <fstream>
 #include <iomanip>
@@ -8117,13 +8117,13 @@ template class TimeStep_Postprocess<2>;
 /* $Id$ */
 
 #include <base/function.h>
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <grid/tria.h>
-#include <grid/dof.h>
-#include <grid/dof_constraints.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe_values.h>
 #include <fe/fe.h>
@@ -9058,10 +9058,10 @@ template class FEHelper<2>;
 
 
 #include <base/logstream.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
-#include <grid/dof.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_constraints.h>
 
 
 

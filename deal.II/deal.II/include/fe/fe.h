@@ -9,9 +9,9 @@
 #include <base/subscriptor.h>
 #include <base/point.h>
 #include <base/tensor.h>
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 #include <grid/geometry_info.h>
-#include <lac/fullmatrix.h>
+#include <lac/full_matrix.h>
 
 
 

@@ -2,9 +2,9 @@
 /* Copyright W. Bangerth, Guido Kanschat, Stefan Nauber  */
 /* University of Heidelberg, 1998, 1999                  */
 
-#include <basic/data_io.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <numerics/data_io.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <grid/geometry_info.h>

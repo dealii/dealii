@@ -2,8 +2,8 @@
 // Copyright Guido Kanschat, 1999
 
 #include <lac/sparse_vanka.h>
-#include <lac/fullmatrix.h>
-#include <lac/sparsematrix.h>
+#include <lac/full_matrix.h>
+#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 
 #include <map>

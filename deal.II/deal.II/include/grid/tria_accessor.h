@@ -7,8 +7,8 @@
 
 
 #include <base/exceptions.h>
-#include <base/forward-declarations.h>
-#include <basic/forward-declarations.h>
+#include <base/forward_declarations.h>
+#include <grid/forward_declarations.h>
 #include <grid/tria_iterator_base.h>
 
 

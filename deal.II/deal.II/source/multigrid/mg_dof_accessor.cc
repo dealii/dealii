@@ -3,16 +3,16 @@
 
 
 
-#include <grid/mg_dof_accessor.h>
-#include <grid/mg_dof.h>
-#include <grid/dof_levels.h>
+#include <dofs/mg_dof_accessor.h>
+#include <dofs/mg_dof_handler.h>
+#include <dofs/dof_levels.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
 
 #include <lac/vector.h>
-#include <lac/fullmatrix.h>
-#include <lac/sparsematrix.h>
+#include <lac/full_matrix.h>
+#include <lac/sparse_matrix.h>
 
 
 

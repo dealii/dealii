@@ -8,7 +8,7 @@
 #include <base/point.h>
 #include <base/subscriptor.h>
 #include <grid/geometry_info.h>
-#include <basic/forward-declarations.h>
+#include <grid/forward_declarations.h>
 
 
 

@@ -30,7 +30,7 @@ CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
 # DEAL_II_USE_MT=true
 
 ifeq ($(DEAL_II_USE_MT),true)
-  INCLUDE    += -I $(ACE_ROOT)
+  INCLUDE    += -I$(ACE_ROOT)
   CXXFLAGS.g += -DDEAL_II_USE_MT -threads
   CXXFLAGS.o += -DDEAL_II_USE_MT -threads
 

@@ -1,8 +1,8 @@
 /*      $Id$                 */
 
 #include <base/function.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
 #include <base/quadrature.h>
@@ -11,7 +11,7 @@
 #include <numerics/matrices.h>
 #include <numerics/assembler.h>
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 #include <algorithm>
 #include <set>

@@ -6,9 +6,9 @@
 /*----------------------------   function.h     ---------------------------*/
 
 
-#include <base/forward-declarations.h>
+#include <base/forward_declarations.h>
 #include <base/exceptions.h>
-#include <base/functiontime.h>
+#include <base/function_time.h>
 #include <base/subscriptor.h>
 #include <vector>
 

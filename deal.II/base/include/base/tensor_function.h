@@ -12,8 +12,8 @@
 #include <base/smartpointer.h>
 #include <base/function.h>
 #include <base/point.h>
-#include <base/functiontime.h>
-#include <base/forward-declarations.h>
+#include <base/function_time.h>
+#include <base/forward_declarations.h>
 
 
 

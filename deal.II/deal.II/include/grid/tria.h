@@ -6,9 +6,9 @@
 /*----------------------------   tria.h     ---------------------------*/
 
 #include <vector>
-#include <basic/forward-declarations.h>
-#include <lac/forward-declarations.h>
-#include <base/forward-declarations.h>
+#include <grid/forward_declarations.h>
+#include <lac/forward_declarations.h>
+#include <base/forward_declarations.h>
 #include <base/point.h>
 #include <grid/geometry_info.h>
 #include <base/subscriptor.h>

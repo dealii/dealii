@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #include <lac/vector.h>
-#include <basic/histogram.h>
+#include <numerics/histogram.h>
 #include <algorithm>
 #include <cmath>
 

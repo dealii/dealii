@@ -6,8 +6,8 @@
 /*----------------------------   problem_assembler.h     ---------------------------*/
 
 #include <base/exceptions.h>
-#include <grid/dof.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <fe/fe_values.h>
 #include <vector>
 

@@ -5,7 +5,7 @@
 
 #include <fe/q1_mapping.h>
 #include <grid/tria_iterator.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 
 #include <cmath>
 

@@ -6,10 +6,10 @@
 #include <numerics/base.h>
 #include <numerics/matrices.h>
 #include <numerics/vectors.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <grid/tria_iterator.h>
-#include <basic/data_out.h>
-#include <basic/dof_tools.h>
+#include <numerics/data_out.h>
+#include <dofs/dof_tools.h>
 #include <base/function.h>
 #include <fe/fe.h>
 #include <base/quadrature.h>

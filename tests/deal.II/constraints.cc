@@ -17,16 +17,16 @@
 // was correct.
 
 
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <fe/fe_lib.lagrange.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <base/parameter_handler.h>
-#include <grid/dof_constraints.h>
-#include <basic/grid_out.h>
+#include <dofs/dof_constraints.h>
+#include <grid/grid_out.h>
 #include <base/logstream.h>
 
 #include <fstream>

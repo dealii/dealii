@@ -10,7 +10,7 @@
  */
 
 #include <cmath>
-#include <lac/sparsematrix.templates.h>
+#include <lac/sparse_matrix.templates.h>
 
 
 #define TYPEMAT long double
@@ -20,14 +20,14 @@ template class SparseMatrix<TYPEMAT>;
 
 #define TYPE2 float
 
-#include <lac/sparsematrix.2.templates>
+#include <lac/sparse_matrix.2.templates>
 
 #undef TYPE2
 #define TYPE2 double
 
-#include <lac/sparsematrix.2.templates>
+#include <lac/sparse_matrix.2.templates>
 
 #undef TYPE2
 #define TYPE2 long double
 
-#include <lac/sparsematrix.2.templates>
+#include <lac/sparse_matrix.2.templates>

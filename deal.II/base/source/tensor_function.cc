@@ -1,7 +1,7 @@
 // $Id$
 
 
-#include <base/tensorfunction.h>
+#include <base/tensor_function.h>
 #include <vector>
 #include <base/tensor.h>
 #include <cmath>

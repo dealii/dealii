@@ -8,24 +8,24 @@
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/solver_richardson.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <grid/mg_dof.h>
-#include <grid/dof_constraints.h>
-#include <grid/dof_accessor.h>
-#include <grid/mg_dof_accessor.h>
+#include <dofs/mg_dof_handler.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/mg_dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_values.h>
 #include <numerics/multigrid.h>
 #include <numerics/multigrid.templates.h>
 #include <numerics/mg_smoother.h>
-#include <basic/dof_tools.h>
+#include <dofs/dof_tools.h>
 
 #include "helmholtz.h"
 
