@@ -20,6 +20,10 @@ h1.head { text-align:center;
 h2 { color:#a00000;
    }
 
+div.right {
+  text-align: right;
+}
+
 td { vertical-align: top; }
 
 dt { font-weight: bold; }
