@@ -24,6 +24,7 @@
 #include <numerics/matrices.h>
 #include <dofs/dof_tools.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
@@ -35,6 +36,7 @@
 #include <vector>
 #include <cmath>
 
+//TODO:[GK] Move templates containing vector arguments to vectors.templates.h
 
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
@@ -60,11 +62,11 @@ inline double sqr_point (const Tensor<1,dim> &p)
 
 
 
-template <int dim>
+template <int dim, class VECTOR>
 void VectorTools::interpolate (const Mapping<dim>    &mapping,
 			       const DoFHandler<dim> &dof,
 			       const Function<dim>   &function,
-			       Vector<double>        &vec)
+			       VECTOR                &vec)
 {
   Assert (dof.get_fe().n_components() == function.n_components,
 	  ExcComponentMismatch());
@@ -221,10 +223,10 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
 }
 
 
-template <int dim>
+template <int dim, class VECTOR>
 void VectorTools::interpolate (const DoFHandler<dim> &dof,
 			       const Function<dim>   &function,
-			       Vector<double>        &vec)
+			       VECTOR                &vec)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
@@ -234,12 +236,13 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 
 
 
-template <int dim> void
+template <int dim, class InVector, class OutVector>
+void
 VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
 			  const DoFHandler<dim>           &dof_2,
 			  const FullMatrix<double>        &transfer,
-			  const Vector<double>            &data_1,
-			  Vector<double>                  &data_2)
+			  const InVector                  &data_1,
+			  OutVector                       &data_2)
 {
   Vector<double> cell_data_1(dof_1.get_fe().dofs_per_cell);
   Vector<double> cell_data_2(dof_2.get_fe().dofs_per_cell);
@@ -1460,20 +1463,55 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 
 // explicit instantiations
 template
-void VectorTools::interpolate (const Mapping<deal_II_dimension>    &,
-			       const DoFHandler<deal_II_dimension> &,
-			       const Function<deal_II_dimension>   &,
-			       Vector<double>                      &);
+void VectorTools::interpolate (const Mapping<deal_II_dimension>&,
+			       const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       Vector<double>&);
 template
-void VectorTools::interpolate (const DoFHandler<deal_II_dimension> &,
-			       const Function<deal_II_dimension>   &,
-			       Vector<double>                      &);
+void VectorTools::interpolate (const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       Vector<double>&);
 template
-void VectorTools::interpolate(const DoFHandler<deal_II_dimension> &,
-			      const DoFHandler<deal_II_dimension> &,
-			      const FullMatrix<double> &,
-			      const Vector<double>     &,
-			      Vector<double>           &);
+void VectorTools::interpolate (const Mapping<deal_II_dimension>&,
+			       const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       Vector<float>&);
+template
+void VectorTools::interpolate (const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       Vector<float>&);
+template
+void VectorTools::interpolate (const Mapping<deal_II_dimension>&,
+			       const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       BlockVector<double>&);
+template
+void VectorTools::interpolate (const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       BlockVector<double>&);
+template
+void VectorTools::interpolate (const Mapping<deal_II_dimension>&,
+			       const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       BlockVector<float>&);
+template
+void VectorTools::interpolate (const DoFHandler<deal_II_dimension>&,
+			       const Function<deal_II_dimension>&,
+			       BlockVector<float>&);
+
+template
+void VectorTools::interpolate(const DoFHandler<deal_II_dimension>&,
+			      const DoFHandler<deal_II_dimension>&,
+			      const FullMatrix<double>&,
+			      const Vector<double>&,
+			      Vector<double>&);
+template
+void VectorTools::interpolate(const DoFHandler<deal_II_dimension>&,
+			      const DoFHandler<deal_II_dimension>&,
+			      const FullMatrix<double>&,
+			      const BlockVector<double>&,
+			      BlockVector<double>&);
+
 template
 void VectorTools::project (const DoFHandler<deal_II_dimension>   &,
 			   const ConstraintMatrix                &,

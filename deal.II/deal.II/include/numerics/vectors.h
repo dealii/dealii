@@ -325,21 +325,21 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for further information.
 				      */
-    template <int dim>
+    template <int dim, class VECTOR>
     static void interpolate (const Mapping<dim>    &mapping,
 			     const DoFHandler<dim> &dof,
 			     const Function<dim>   &function,
-			     Vector<double>        &vec);
+			     VECTOR                &vec);
     
 				     /**
 				      * Calls the @p{interpolate}
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    template <int dim>
-    static void interpolate (const DoFHandler<dim>    &dof,
-			     const Function<dim>      &function,
-			     Vector<double>           &vec);
+    template <int dim, class VECTOR>
+    static void interpolate (const DoFHandler<dim> &dof,
+			     const Function<dim>   &function,
+			     VECTOR                &vec);
 
 				     /**
 				      * Interpolate different finite
@@ -361,12 +361,12 @@ class VectorTools
 				      * make the result continuous
 				      * again.
 				      */
-    template <int dim>
+    template <int dim, class InVector, class OutVector>
     static void interpolate (const DoFHandler<dim>    &dof_1,
 			     const DoFHandler<dim>    &dof_2,
 			     const FullMatrix<double> &transfer,
-			     const Vector<double>     &data_1,
-			     Vector<double>           &data_2);
+			     const InVector           &data_1,
+			     OutVector                &data_2);
 			  
 				     /**
 				      * Compute the projection of
