@@ -26,6 +26,44 @@ documentation, etc</a>.
 <h3>General</h3>
 
 <ol>
+  <li> <p> 
+       New: The finite element classes have been redesigned from
+       scratch to allow also elements that depend on the actual cell
+       shape, like Raviart-Thomas, BDM or edge elements. Presently, we
+       have implemented continuous and discontinous Lagrange elements,
+       that can be easily extended to higher degree. E.g. for
+       continuous FEs we've already implemented elements up to degree
+       four, for discontinuous FEs up to degree 10.
+       </p>
+
+       <p> 
+       Furthermore we have totally reimplemented the mapping
+       between unit and real cell.  In future we won't be restricted
+       to Q<sub>1</sub> mapping any more, but we will have
+       Q<sub>p</sub> mappings of arbitrary degree p. Presently
+       implemented are mappings up to degree four in 2d, and degree
+       three in 3d. This allows to approximate curved boundaries not
+       only by straight lines (linear approximation) but also by
+       quadratic, cubic, etc approximation. The finite elements will
+       be able to be combined with arbitrary mappings. So in future we
+       can use subparametric, iso- as well as superparametric
+       elements.
+       </p>
+
+       <p>
+       The new implementation uses a totally new structure of
+       communication between <code>FEValues</code>, the
+       <code>FiniteElements</code> and the Mappings. Despite of this,
+       the new structure will almost not be 'visible' to the user of
+       <acronym>deal.II</acronym> as we tried to retain the interface
+       to the user (mainly that of <code>FEValues</code>) as far as
+       possible.
+       </p>
+
+       <br>
+       (RH & GK 2001/03/13)
+       </p>
+
   <li> <p>
        New: There is now some support to include and use routines from the 
        <a href="http://www.cse.clrc.ac.uk/Activity/HSL" 
@@ -89,6 +127,7 @@ documentation, etc</a>.
        <br>
        (Ralf Hartmann 2001/01/22)
        </p>
+
   <li> <p>
        New: function <code>contract</code> for two arguments of
        <code class="class">Tensor&lt;1,dim&gt;</code>
