@@ -26,6 +26,11 @@ template <int dim> class Quadrature;
   the transformation from the unit cell to the real cell and the integration
   points in real space are calculated each time we move on to a new cell.
 
+  The unit cell is defined to be the tensor product of the interval $[0,1]$
+  in the present number of dimensions. In part of the literature, the convention
+  is used that the unit cell be the tensor product of the intervale $[-1,1]$,
+  which is to distinguished properly.
+
   Objects of this class store a multitude of different values needed to
   do the assemblage steps on real cells rather than on the unit cell. Among
   these values are the values and gradients of the shape functions at the
