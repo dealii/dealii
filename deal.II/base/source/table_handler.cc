@@ -14,6 +14,7 @@
 
 #include <base/table_handler.h>
 
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 
@@ -211,61 +212,84 @@ void TableHandler::write_text(std::ostream &out) const
   std::vector<std::string> sel_columns;
   get_selected_columns(sel_columns);
 
+  const unsigned int nrows  = n_rows();
+  const unsigned int n_cols = sel_columns.size();
 
-// write the caption line
+				   // first compute the widths of each
+				   // entry of the table, in order to
+				   // have a nicer alignement
+  std::vector<std::vector<unsigned int> >
+    entry_widths (nrows, std::vector<unsigned int>(n_cols));
+  for (unsigned int i=0; i<nrows; ++i)
+    for (unsigned int j=0; j<n_cols; ++j)
+      {
+					 // get key and entry here
+	std::string key=sel_columns[j];
+	const std::map<std::string, Column>::const_iterator
+	  col_iter=columns.find(key);
+	Assert(col_iter!=columns.end(), ExcInternalError());
+	  
+	const Column & column = col_iter->second;
+
+					 // write it into a dummy
+					 // stream, just to get its
+					 // size upon output
+	std::ostringstream dummy_out;
+	dummy_out << std::setprecision(column.precision);
+
+	if (col_iter->second.scientific)
+	  dummy_out.setf (std::ios::scientific, std::ios::floatfield);
+	else
+	  dummy_out.setf (std::ios::fixed, std::ios::floatfield);
+	column.entries[i]->write_text (dummy_out);
+	dummy_out << std::ends;
+
+					 // get size, note that we are
+					 // not interested in the
+					 // trailing \0
+	entry_widths[i][j] = dummy_out.str().length()-1;
+      };
+
+				   // next compute the width each row
+				   // has to have to suit all entries
+  std::vector<unsigned int> column_widths (n_cols, 0);
+  for (unsigned int i=0; i<nrows; ++i)
+    for (unsigned int j=0; j<n_cols; ++j)
+      column_widths[j] = std::max(entry_widths[i][j],
+				  column_widths[j]);
+
+				   // write the caption line
   for (unsigned int j=0; j<column_order.size(); ++j)
     {
-      std::string key=column_order[j];
-      unsigned int column_string_size=0;
-
-      const std::map<std::string, std::vector<std::string> >::const_iterator 
-	super_iter=supercolumns.find(key);
-
-				      
-      if (super_iter!=supercolumns.end())   // if supercolumn
-	{
-	  std::vector<std::string>::const_iterator col_key=super_iter->second.begin();
-	  for (;col_key!=super_iter->second.end(); ++col_key)
-	    {
-	      const std::map<std::string, Column>::const_iterator
-		col_iter=columns.find(*col_key);
-	      if (col_iter->second.scientific &&
-		  col_iter->second.precision>1)
-		column_string_size+=16;
-	      else
-		column_string_size+=8;
-	    }
-	}
-      else
-	{
-	  const std::map<std::string, Column>::const_iterator
-		col_iter=columns.find(key);
-	  if (col_iter->second.scientific &&
-	      col_iter->second.precision>1)
-	    column_string_size=16;
-	  else
-	    column_string_size=8;
-	}
-      column_string_size-=1;
-	
-      if (key.size()>column_string_size)
-	key.erase(column_string_size);
+      const std::string & key = column_order[j];
       
-      out.setf(std::ios::left);
-      out << std::setw(column_string_size)
-	  << key << "\t";
+				       // if the key of this column is
+				       // wider than the widest entry,
+				       // then adjust
+      if (key.length() > column_widths[j])
+	column_widths[j] = key.length();
+
+				       // now write key. try to center
+				       // it somehow
+      const unsigned int front_padding = (column_widths[j]-key.length())/2,
+			  rear_padding = (column_widths[j]-key.length()) -
+					 front_padding;
+      for (unsigned int i=0; i<front_padding; ++i)
+	out << ' ';
+      out << key;
+      for (unsigned int i=0; i<rear_padding; ++i)
+	out << ' ';
+
+				       // finally column break
+      out << ' ';
     }
   out << std::endl;
-
-  const unsigned int nrows=n_rows();
+  
   for (unsigned int i=0; i<nrows; ++i)
-    {
-      const unsigned int n_cols=sel_columns.size();
-      
+    {    
       for (unsigned int j=0; j<n_cols; ++j)
 	{
 	  std::string key=sel_columns[j];
-					   // avoid `column[key]'
 	  const std::map<std::string, Column>::const_iterator
 	    col_iter=columns.find(key);
 	  Assert(col_iter!=columns.end(), ExcInternalError());
@@ -278,10 +302,9 @@ void TableHandler::write_text(std::ostream &out) const
 	    out.setf(std::ios::scientific, std::ios::floatfield);
 	  else
 	    out.setf(std::ios::fixed, std::ios::floatfield);
-	  column.entries[i]->write_tex(out);
-	  
-	  if (j<n_cols-1)
-	    out << "\t";
+	  out << std::setw(column_widths[j]);
+	  column.entries[i]->write_text(out);
+	  out << " ";
 	}
       out << std::endl;
     }
