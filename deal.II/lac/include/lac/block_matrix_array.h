@@ -30,6 +30,7 @@
 #  define STRINGSTREAM std::ostrstream
 #endif
 
+//TODO:[GK] Obtain aux vector from VectorMemory
 
 template <typename> class BlockVector;
 
@@ -91,34 +92,34 @@ class BlockMatrixArray : public Subscriptor
 				     /**
 				      * Matrix-vector multiplication.
 				      */
-    template <class VECTOR>
-    void vmult (BlockVector<VECTOR>& dst,
-		const BlockVector<VECTOR>& src) const;
+    template <class number>
+    void vmult (BlockVector<number>& dst,
+		const BlockVector<number>& src) const;
   
 				     /**
 				      * Matrix-vector multiplication
 				      * adding to @p{dst}.
 				      */
-    template <class VECTOR>
-    void vmult_add (BlockVector<VECTOR>& dst,
-		    const BlockVector<VECTOR>& src) const;
+    template <class number>
+    void vmult_add (BlockVector<number>& dst,
+		    const BlockVector<number>& src) const;
   
 				     /**
 				      * Transposed matrix-vector
 				      * multiplication.
 				      */
-    template <class VECTOR>
-    void Tvmult (BlockVector<VECTOR>& dst,
-		 const BlockVector<VECTOR>& src) const;
+    template <class number>
+    void Tvmult (BlockVector<number>& dst,
+		 const BlockVector<number>& src) const;
   
 				     /**
 				      * Transposed matrix-vector
 				      * multiplication adding to
 				      * @p{dst}.
 				      */
-    template <class VECTOR>
-    void Tvmult_add (BlockVector<VECTOR>& dst,
-		     const BlockVector<VECTOR>& src) const;
+    template <class number>
+    void Tvmult_add (BlockVector<number>& dst,
+		     const BlockVector<number>& src) const;
 
 				     /**
 				      * Print the block structure as a
@@ -126,7 +127,7 @@ class BlockMatrixArray : public Subscriptor
 				      */
     void print_latex (ostream& out) const;
     
-  private:
+  protected:
 				     /**
 				      * Internal data structure.
 				      *
@@ -187,6 +188,7 @@ class BlockMatrixArray : public Subscriptor
 				      */
     vector<Entry> entries;
 
+  private:
 				     /**
 				      * Number of blocks per column.
 				      */
@@ -197,6 +199,122 @@ class BlockMatrixArray : public Subscriptor
     unsigned int block_cols;
 };
 
+
+/**
+ * Inversion of a block-triangular matrix.
+ *
+ * In this block matrix, the inverses of the diagonal blocks are
+ * stored together with the off-diagonal blocks of a block
+ * matrix. Then, forward or backward insertion is performed
+ * block-wise. The diagonal blocks are NOT inverted for this purpose!
+ *
+ * While block indices may be duplicated (see @see{BlockMatrixArray})
+ * to add blocks, this is not allowed on the diagonal. A short
+ * computation reveals why.
+ *
+ * Like for all preconditioners, the preconditioning operation is
+ * performed by the @p{vmult} member function.
+ *
+ * The implementation may be a little clumsy, but it should be
+ * sufficient as long as the block sizes are much larger than the
+ * number of blocks.
+ *
+ * @author Guido Kanschat, 2001
+ */
+template <class MATRIX>
+class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
+{
+  public:
+				     /**
+				      * Constructor. This matrix must be
+				      * block-quadratic. The additional
+				      * parameter allows for backward
+				      * insertion instead of forward.
+				      */
+    BlockTrianglePrecondition(unsigned int block_rows,
+			      bool backward = false);
+
+ 
+				     /**
+				      * Preconditioning.
+				      */
+    template <class number>
+    void vmult (BlockVector<number>& dst,
+		const BlockVector<number>& src) const;
+  
+				     /**
+				      * Preconditioning
+				      * adding to @p{dst}.
+				      */
+    template <class number>
+    void vmult_add (BlockVector<number>& dst,
+		    const BlockVector<number>& src) const;
+  
+				     /**
+				      * Transposed preconditioning
+				      */
+    template <class number>
+    void Tvmult (BlockVector<number>& dst,
+		 const BlockVector<number>& src) const;
+  
+				     /**
+				      * Transposed preconditioning
+				      * adding to @p{dst}.
+				      */
+    template <class number>
+    void Tvmult_add (BlockVector<number>& dst,
+		     const BlockVector<number>& src) const;
+
+				     /**
+				      * Make function of base class available.
+				      */
+    BlockMatrixArray<MATRIX>::enter;
+
+				     /**
+				      * Make function of base class available.
+				      */
+    BlockMatrixArray<MATRIX>::print_latex;
+
+				     /**
+				      * Make function of base class available.
+				      */
+    BlockMatrixArray<MATRIX>::n_block_rows;
+
+				     /**
+				      * Make function of base class available.
+				      */
+    BlockMatrixArray<MATRIX>::n_block_cols;
+    BlockMatrixArray<MATRIX>::Subscriptor::subscribe;
+    BlockMatrixArray<MATRIX>::Subscriptor::unsubscribe;
+
+
+				     /**
+				      * Multiple diagonal element.
+				      */
+    DeclException1(ExcMultipleDiagonal,
+		   unsigned int,
+		   << "Inverse diagonal entries may not be added in block "
+		   << arg1);
+    
+  private:
+				     /**
+				      * Add all off-diagonal
+				      * contributions and return the
+				      * entry of the diagonal element
+				      * for one row.
+				      */
+    template <class number>
+    void do_row (BlockVector<number>& dst,
+		 unsigned int row_num) const;
+    
+				     /**
+				      * Flag for backward insertion.
+				      */
+    bool backward;
+};
+
+
+//----------------------------------------------------------------------//
 
 template <class MATRIX>
 inline
@@ -236,18 +354,18 @@ BlockMatrixArray<MATRIX>::enter (const MATRIX& matrix,
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class number>
 inline
 void
-BlockMatrixArray<MATRIX>::vmult_add (BlockVector<VECTOR>& dst,
-				     const BlockVector<VECTOR>& src) const
+BlockMatrixArray<MATRIX>::vmult_add (BlockVector<number>& dst,
+				     const BlockVector<number>& src) const
 {
   Assert (dst.n_blocks() == block_rows,
 	  ExcDimensionMismatch(dst.n_blocks(), block_rows));
   Assert (src.n_blocks() == block_cols,
 	  ExcDimensionMismatch(src.n_blocks(), block_cols));
 
-  static Vector<VECTOR> aux;
+  static Vector<number> aux;
   
   typename vector<Entry>::const_iterator m = entries.begin();
   typename vector<Entry>::const_iterator end = entries.end();
@@ -279,11 +397,11 @@ BlockMatrixArray<MATRIX>::vmult_add (BlockVector<VECTOR>& dst,
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class number>
 inline
 void
-BlockMatrixArray<MATRIX>::vmult (BlockVector<VECTOR>& dst,
-				 const BlockVector<VECTOR>& src) const
+BlockMatrixArray<MATRIX>::vmult (BlockVector<number>& dst,
+				 const BlockVector<number>& src) const
 {
   dst = 0.;
   vmult_add (dst, src);
@@ -293,11 +411,11 @@ BlockMatrixArray<MATRIX>::vmult (BlockVector<VECTOR>& dst,
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class number>
 inline
 void
-BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<VECTOR>& dst,
-				      const BlockVector<VECTOR>& src) const
+BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<number>& dst,
+				      const BlockVector<number>& src) const
 {
   Assert (dst.n_blocks() == block_cols,
 	  ExcDimensionMismatch(dst.n_blocks(), block_cols));
@@ -307,7 +425,7 @@ BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<VECTOR>& dst,
   typename vector<Entry>::const_iterator m = entries.begin();
   typename vector<Entry>::const_iterator end = entries.end();
   
-  static Vector<VECTOR> aux;
+  static Vector<number> aux;
   
   for (; m != end ; ++m)
     {
@@ -335,11 +453,11 @@ BlockMatrixArray<MATRIX>::Tvmult_add (BlockVector<VECTOR>& dst,
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class number>
 inline
 void
-BlockMatrixArray<MATRIX>::Tvmult (BlockVector<VECTOR>& dst,
-				  const BlockVector<VECTOR>& src) const
+BlockMatrixArray<MATRIX>::Tvmult (BlockVector<number>& dst,
+				  const BlockVector<number>& src) const
 {
   dst = 0.;
   Tvmult_add (dst, src);
@@ -394,6 +512,7 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
 	      pair<const MATRIX*, string> (m->matrix, string("M")));
 	  STRINGSTREAM stream;
 	  stream << matrix_number++;
+	  stream << ends;
 	  x.first->second += stream.str();
 	}
 
@@ -403,6 +522,7 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
       stream << matrix_names.find(m->matrix)->second;
       if (m->transpose)
 	stream << "^T";
+      stream << ends;
       array(m->row, m->col) += stream.str();
     }
   for (unsigned int i=0;i<n_block_rows();++i)
@@ -413,5 +533,136 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
 	       : "&\t");
   cout << "\\end{array}" << endl;
 }
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX>
+BlockTrianglePrecondition<MATRIX>::BlockTrianglePrecondition(
+  unsigned int block_rows,
+  bool backward)
+		:
+		BlockMatrixArray<MATRIX> (block_rows, block_rows),
+  backward(backward)
+{}
+
+
+template <class MATRIX>
+template <class number>
+inline
+void
+BlockTrianglePrecondition<MATRIX>::do_row (
+  BlockVector<number>& dst,
+  unsigned int row_num) const
+{
+  const typename BlockMatrixArray<MATRIX>::Entry* diagonal = 0;
+  
+  typename vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
+    m = entries.begin();
+  typename vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
+    end = entries.end();
+  
+  static Vector<number> aux;
+  aux.reinit(dst.block(row_num), true);
+
+  for (; m != end ; ++m)
+    {
+      const unsigned int i=m->row;
+      if (i != row_num)
+	continue;
+      const unsigned int j=m->col;
+      if (((j > i) && !backward) || ((j < i) && backward))
+	continue;
+      if (j == i)
+	{
+	  Assert (diagonal == 0, ExcMultipleDiagonal(j));
+	  diagonal = m;
+	} else {
+	  if (m->transpose)
+	    m->matrix->Tvmult(aux, dst.block(j));
+	  else
+	    m->matrix->vmult(aux, dst.block(j));
+	  dst.block(i).add (-1 * m->prefix, aux);
+	}
+    }
+  if (diagonal->transpose)
+    diagonal->matrix->Tvmult(aux, dst.block(row_num));
+  else
+    diagonal->matrix->vmult(aux, dst.block(row_num));
+  dst.block(row_num).equ (diagonal->prefix, aux);
+  
+}
+
+
+
+template <class MATRIX>
+template <class number>
+inline
+void
+BlockTrianglePrecondition<MATRIX>::vmult_add (
+  BlockVector<number>& dst,
+  const BlockVector<number>& src) const
+{
+  Assert (dst.n_blocks() == n_block_rows(),
+	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  Assert (src.n_blocks() == n_block_cols(),
+	  ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+
+  BlockVector<number>& aux;
+  aux.reinit(dst);
+  vmult(aux, src);
+  dst.add(aux);
+}
+
+
+
+template <class MATRIX>
+template <class number>
+inline
+void
+BlockTrianglePrecondition<MATRIX>::vmult (
+  BlockVector<number>& dst,
+  const BlockVector<number>& src) const
+{
+  Assert (dst.n_blocks() == n_block_rows(),
+	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  Assert (src.n_blocks() == n_block_cols(),
+	  ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+
+  dst.equ(1., src);
+
+  if (backward)
+    {
+      for (unsigned int i=n_block_rows(); i>0;)
+	do_row(dst, --i);
+    } else {
+      for (unsigned int i=0; i<n_block_rows(); ++i)
+	do_row(dst, i);
+    }
+  
+}
+
+template <class MATRIX>
+template <class number>
+inline
+void
+BlockTrianglePrecondition<MATRIX>::Tvmult (
+  BlockVector<number>&,
+  const BlockVector<number>&) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <class MATRIX>
+template <class number>
+inline
+void
+BlockTrianglePrecondition<MATRIX>::Tvmult_add (
+  BlockVector<number>&,
+  const BlockVector<number>&) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
 
 #endif
