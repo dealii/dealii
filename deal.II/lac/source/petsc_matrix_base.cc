@@ -47,7 +47,7 @@ namespace PETScWrappers
                                        // relative to the rows this process
                                        // actually stores (remember that
                                        // matrices can be distributed)
-      signed int local_row;
+      signed int local_row = -1;
       if (dynamic_cast<const PETScWrappers::SparseMatrix *>(matrix) != 0)
         {
           local_row = this->a_row;
