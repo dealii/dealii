@@ -94,8 +94,11 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
         GXX_VERSION=MIPSpro
       else
   
-        dnl Intel's ICC C++ compiler?
-        is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
+        dnl Intel's ICC C++ compiler? On Linux, it uses -V, on Windows
+	dnl it is -help
+        is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
+        is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel(R) C++ Compiler'`"
+	is_intel_icc="$is_intel_icc1$is_intel_icc2"
         if test "x$is_intel_icc" != "x" ; then
           AC_MSG_RESULT(C++ compiler is Intel ICC)
           GXX_VERSION=intel_icc
