@@ -87,7 +87,7 @@ plot_faces(Mapping<dim> &mapping,
   deallog.push(name);
 
   QGauss4<dim-1> q;
-  const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
+  const unsigned int nq = (unsigned int) (.01 + std::pow(q.n_quadrature_points, 1./(dim-1)));
 
   FEFaceValues<dim> fe_values(mapping, fe, q,
 			      UpdateFlags(update_q_points
@@ -131,7 +131,7 @@ plot_subfaces(Mapping<dim> &mapping,
   deallog.push(name);
 
   QGauss4<dim-1> q;
-  const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
+  const unsigned int nq = (unsigned int) (.01 + std::pow(q.n_quadrature_points, 1./(dim-1)));
 
   FESubfaceValues<dim> fe_values(mapping, fe, q,
 				 UpdateFlags(update_q_points
@@ -288,7 +288,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
   if (2)
     {
       Boundary<2> *boundary1=new HyperBallBoundary<2>(Point<2>(3,1), 2);
-      Boundary<2> *boundary2=new HyperBallBoundary<2>(Point<2>(2,5), sqrt(5));
+      Boundary<2> *boundary2=new HyperBallBoundary<2>(Point<2>(2,5), std::sqrt(5.));
       boundary_ptr.push_back(boundary1);
       boundary_ptr.push_back(boundary2);      
       tria=new Triangulation<2>();
@@ -304,9 +304,9 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       tria->set_boundary(2,*boundary2);
       tria->begin_active()->face(1)->set_boundary_indicator(1);
       tria->begin_active()->face(2)->set_boundary_indicator(2);
-      double pi=acos(-1);
-      double alpha=2*atan(0.5);
-      exact_areas.push_back(4+pi-2.5*(alpha-sin(alpha)));
+      double pi=std::acos(-1.);
+      double alpha=2*std::atan(0.5);
+      exact_areas.push_back(4+pi-2.5*(alpha-std::sin(alpha)));
       for (unsigned int i=0; i<=3; ++i)
 	show[2][i]=1;
     }
@@ -329,7 +329,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
   if (4 && false)
     {
       Boundary<2> *boundary1=new HyperBallBoundary<2>(Point<2>(2.5,-0.5),
-						      sqrt(1.5*1.5+0.5*0.5));
+						      std::sqrt(1.5*1.5+0.5*0.5));
       boundary_ptr.push_back(boundary1);
       tria=new Triangulation<2>();
       tria_ptr.push_back(tria);
@@ -386,9 +386,9 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
     {
       Point<3> m(2,2,2);
       Point<3> v(3,3,3);
-      double r=sqrt((m-v).square()),
+      double r=std::sqrt((m-v).square()),
 	     h=r-1.5,
-	    pi=acos(-1);
+	    pi=std::acos(-1.);
       Boundary<3> *boundary1=new HyperBallBoundary<3>(m, r);
       boundary_ptr.push_back(boundary1);
       
@@ -404,7 +404,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
   if (3)
     {
       Point<3> p(0,0,0);
-      const double r=sqrt(3.);
+      const double r=std::sqrt(3.);
       Boundary<3> *boundary0=new HyperBallBoundary<3>(p, r);
       boundary_ptr.push_back(boundary0);
 
@@ -413,7 +413,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       GridGenerator::hyper_cube(*tria, -1, 1.);
       tria->set_boundary(0, *boundary0);
       tria->refine_global(1);
-      const double pi=acos(-1);
+      const double pi=std::acos(-1.);
       exact_areas.push_back(4/3.*pi*r*r*r/8.);
       for (unsigned int i=0; i<4; ++i)
 	show[3][i]=1;
