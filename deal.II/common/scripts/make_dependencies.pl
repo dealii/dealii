@@ -29,7 +29,7 @@
 %include_files = ();
 
 
-# fill include pathes
+# fill include paths
 while ($ARGV[0] =~ /^-I/) {
     $_ = shift;
     /^-I(.*)/;
