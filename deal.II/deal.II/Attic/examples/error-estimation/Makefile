@@ -11,7 +11,7 @@ target   = error-estimation
 # the archives ./Obj.a and ./Obj.g.a. By default, the debug version
 # is used to link. It you don't like that, change the following
 # variable to "off"
-debug-mode = on
+debug-mode = off
 
 # If you want your program to be linked with extra object or library
 # files, specify them here:
@@ -23,7 +23,9 @@ run-parameters  = ee.gauss.prm
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = $(target) ee.singular.prm ; gnuplot make_ps ; ./strip_comments
+additional-run-action = $(target) ee.singular.prm ; \
+                        gnuplot make_ps ; \
+                        perl -pi -e 's/^\#.*$$\\${}n//g' data-*/*.inp
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the

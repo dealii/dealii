@@ -80,8 +80,6 @@ class PoissonProblem : public ProblemBase<dim>,
     vector<double> l2_error, linfty_error;
     vector<double> h1_error, estimated_error;
     vector<int>    n_dofs;
-
-    vector<double> laplacian;
 };
 
 
@@ -292,6 +290,8 @@ void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
 		     "global\\|true error\\|estimated error");
   prm.declare_entry ("Refinement fraction", "0.3",
 		     ParameterHandler::RegularExpressions::Double);
+  prm.declare_entry ("Maximum cells", "3000",
+		     ParameterHandler::RegularExpressions::Integer);
   prm.declare_entry ("Output base filename", "");
   prm.declare_entry ("Output format", "ucd"
 		     "ucd\\|gnuplot");
@@ -358,7 +358,8 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   QGauss3<dim>                    quadrature;
 
   unsigned int refine_step = 0;
-  while (tria->n_active_cells() < 2000)
+  const unsigned int max_cells = prm.get_integer("Maximum cells");
+  while (tria->n_active_cells() < max_cells)
     {
       cout << "Refinement step " << refine_step
 	   << ", using " << tria->n_active_cells() << " active cells on "
@@ -382,7 +383,6 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 
       dVector       l2_error_per_cell, linfty_error_per_cell, h1_error_per_cell;
       dVector       estimated_error_per_cell;
-      dVector       laplacian_per_cell;
       QGauss3<dim>  q;
   
       cout << "    Calculating L2 error... ";
@@ -412,28 +412,16 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       cout << estimated_error_per_cell.l2_norm() << endl;
       estimated_error.push_back (estimated_error_per_cell.l2_norm());
 
-      laplacian_per_cell = estimated_error_per_cell;
-      DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
-					    endc = dof->end();
-      for (unsigned int i=0; cell!=endc; ++cell, ++i)
-	laplacian_per_cell(i) /= (cell->diameter() * cell->diameter() / 24);
-      cout << "    Computing second derivative maximum... "
-	   <<  laplacian_per_cell.linfty_norm()
-	   << endl;
-      laplacian.push_back (laplacian_per_cell.linfty_norm());
-      
       dVector l2_error_per_dof, linfty_error_per_dof;
       dVector h1_error_per_dof, estimated_error_per_dof;
-      dVector laplacian_per_dof;
+      dVector error_ratio;
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
 					  linfty_error_per_dof);
       dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
       dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
 					  estimated_error_per_dof);
-      dof->distribute_cell_to_dof_vector (laplacian_per_cell,
-					  laplacian_per_dof);
-  
+      error_ratio.ratio (h1_error_per_dof, estimated_error_per_dof);
   
       DataOut<dim> out;
       fill_data (out);
@@ -441,7 +429,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
       out.add_data_vector (h1_error_per_dof, "H1-Error");
       out.add_data_vector (estimated_error_per_dof, "Estimated Error");
-      out.add_data_vector (laplacian_per_dof, "Second derivative pointwise");
+      out.add_data_vector (error_ratio, "Ratio True:Estimated Error");
       String filename = prm.get ("Output base filename");
       switch (refine_mode) 
 	{
@@ -523,8 +511,7 @@ void PoissonProblem<dim>::print_history (const ParameterHandler &prm,
        << endl;
   ofstream out(filename);
   out << "# n_dofs    l2_error linfty_error "
-      << "h1_error estimated_error "
-      << "laplacian"
+      << "h1_error estimated_error"
       << endl;
   for (unsigned int i=0; i<n_dofs.size(); ++i)
     out << n_dofs[i]
@@ -533,7 +520,6 @@ void PoissonProblem<dim>::print_history (const ParameterHandler &prm,
 	<< linfty_error[i] << "  "
 	<< h1_error[i] << "  "
 	<< estimated_error[i] << "  "
-	<< laplacian[i]
 	<< endl;
 
   double average_l2=0,
