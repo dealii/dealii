@@ -106,6 +106,8 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 		  restriction[1](3,0) = 1;
 		  restriction[1](4,3) = 1;
 		  break;
+		  
+	    default:
 	    {
 					       // in case we don't
 					       // have the matrices
