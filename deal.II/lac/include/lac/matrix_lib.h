@@ -22,6 +22,9 @@ template<typename number> class BlockVector;
  * <i>M<sub>1</sub>M<sub>2</sub></i> by performing multiplication with
  * both factors consecutively.
  *
+ * Here an example multiplying two different FullMatrix objects:
+ * @include product_matrix.cc
+ *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
 template<class VECTOR>
