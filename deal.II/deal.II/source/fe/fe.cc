@@ -302,6 +302,11 @@ compute_2nd (const Mapping<dim>                   &mapping,
 	     InternalDataBase                     &fe_internal,
 	     FEValuesData<dim>                    &data) const
 {
+  Assert ((fe_internal.update_each | fe_internal.update_once)
+	  & update_second_derivatives,
+	  ExcInternalError());
+  Assert (data.shape_2nd_derivatives.size() == dofs_per_cell,
+	  ExcInternalError());
 				   // Number of quadrature points
   const unsigned int n_q_points = data.shape_2nd_derivatives[0].size();
 
