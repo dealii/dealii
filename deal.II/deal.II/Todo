@@ -185,3 +185,6 @@ old argument 'const unsigned int selected_component'.
 
 
 Update documentation on Boundaries in Triangulation<dim> (Guido!)
+
+Fix MGTransferPrebuilt::build_matrices, think about diagonals in
+square sparse matrices.
