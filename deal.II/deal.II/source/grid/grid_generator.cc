@@ -758,32 +758,39 @@ GridGenerator::cylinder (Triangulation<3> &tria,
 				   // and transform it to yz
   const double d = radius/std::sqrt(2.0);
   const double a = d/(1+std::sqrt(2.0));
-  const Point<3> vertices[24] = {
-    Point<3>(-half_length, -d,-d),
-      Point<3>(-half_length,  d,-d),
-      Point<3>(-half_length, -a,-a),
-      Point<3>(-half_length,  a,-a),
-      Point<3>(-half_length, -a, a),
-      Point<3>(-half_length,  a, a),
-      Point<3>(-half_length, -d, d),
-      Point<3>(-half_length,  d, d),
-    Point<3>(0, -d,-d),
-      Point<3>(0,  d,-d),
-      Point<3>(0, -a,-a),
-      Point<3>(0,  a,-a),
-      Point<3>(0, -a, a),
-      Point<3>(0,  a, a),
-      Point<3>(0, -d, d),
-      Point<3>(0,  d, d),
-    Point<3>(half_length, -d,-d),
-      Point<3>(half_length,  d,-d),
-      Point<3>(half_length, -a,-a),
-      Point<3>(half_length,  a,-a),
-      Point<3>(half_length, -a, a),
-      Point<3>(half_length,  a, a),
-      Point<3>(half_length, -d, d),
-      Point<3>(half_length,  d, d),
+  Point<3> vertices[24] = {
+    Point<3>(-d, -half_length,-d),
+      Point<3>( d, -half_length,-d),
+      Point<3>(-a, -half_length,-a),
+      Point<3>( a, -half_length,-a),
+      Point<3>(-a, -half_length, a),
+      Point<3>( a, -half_length, a),
+      Point<3>(-d, -half_length, d),
+      Point<3>( d, -half_length, d),
+      Point<3>(-d, 0,-d),
+      Point<3>( d, 0,-d),
+      Point<3>(-a, 0,-a),
+      Point<3>( a, 0,-a),
+      Point<3>(-a, 0, a),
+      Point<3>( a, 0, a),
+      Point<3>(-d, 0, d),
+      Point<3>( d, 0, d),
+      Point<3>(-d, half_length,-d),
+      Point<3>( d, half_length,-d),
+      Point<3>(-a, half_length,-a),
+      Point<3>( a, half_length,-a),
+      Point<3>(-a, half_length, a),
+      Point<3>( a, half_length, a),
+      Point<3>(-d, half_length, d),
+      Point<3>( d, half_length, d),
       };
+				   // Turn cylinder such that y->x
+  for (unsigned int i=0;i<24;++i)
+    {
+      const double h = vertices[i](1);
+      vertices[i](1) = -vertices[i](0);
+      vertices[i](0) = h;
+    }
   
   int cell_vertices[10][8] = {
 	{0,1,3,2,8,9,11,10},
