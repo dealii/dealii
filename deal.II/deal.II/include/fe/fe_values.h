@@ -19,17 +19,307 @@ template <int dim> class Quadrature;
 
 
 
+/**
+   This class offers a multitude of arrays and other fields which are used by
+   the derived classes #FEValues# and #FEFaceValues#. In principle, it is the
+   back end of the front end for the unification of a certain finite element
+   and a quadrature formula which evaluates certain aspects of the finite
+   element at quadrature points.
+   
+   This class is an optimization which avoids evaluating the shape functions
+   at the quadrature points each time a quadrature takes place. Rather, the
+   values and gradients (and possibly higher order derivatives in future
+   versions of this library) are evaluated once and for all on the unit
+   cell or face before doing the quadrature itself. Only the Jacobian matrix of
+   the transformation from the unit cell or face to the real cell or face and
+   the integration points in real space are calculated each time we move on
+   to a new face.
+
+   Actually, this class does none of the evaluations at startup itself; this is
+   all done by the derived classes. It only offers the basic functionality,
+   like providing those fields that are common to the derived classes and
+   access to these fields. Any computations are in the derived classes. See there
+   for more information.
+
+   @author Wolfgang Bangerth, 1998
+*/
+template <int dim>
+class FEValuesBase {
+  public:
+        
+				     /**
+				      * Number of quadrature points.
+				      */
+    const unsigned int n_quadrature_points;
+
+				     /**
+				      * Total number of shape functions
+				      * per cell. If we use this base class
+				      * to evaluate a finite element on
+				      * faces of cells, this is still the
+				      * number of degrees of freedom per
+				      * cell, not per face.
+				      */
+    const unsigned int total_dofs;
+
+				     /**
+				      * Constructor. Set up the array sizes
+				      * with #n_q_points# quadrature points,
+				      * #n_ansatz_points# ansatz points (on
+				      * the cell or face), #n_dof# ansatz
+				      * functions per cell and with the
+				      * given pattern to update the fields
+				      * when the #reinit# function of the
+				      * derived classes is called. The
+				      * fields themselves are not set up,
+				      * this must happen in the derived
+				      * class's constructor, only the sizes
+				      * are set correctly.
+				      */
+    FEValuesBase (const unsigned int n_q_points,
+		  const unsigned int n_ansatz_points,
+		  const unsigned int n_dofs,
+		  const UpdateFlags update_flags);
+    
+    				     /**
+				      * Return the gradient of the #i#th shape
+				      * function at the #j# quadrature point.
+				      * If you want to get the derivative in
+				      * one of the coordinate directions, use
+				      * the appropriate function of the #Point#
+				      * class to extract one component. Since
+				      * only a reference to the gradient's value
+				      * is returned, there should be no major
+				      * performance drawback.
+				      * The function returns the gradient on the
+				      * real element, not the reference element.
+				      */
+    const Point<dim> & shape_grad (const unsigned int i,
+				   const unsigned int j) const;
+
+				     /** 
+				      * Return a pointer to the matrix holding
+				      * all gradients of shape functions at all
+				      * integration points, on the present cell.
+				      * For the format of this matrix, see the
+				      * documentation for the matrix itself.
+				      */
+    const vector<vector<Point<dim> > > & get_shape_grads () const;
+    
+				     /**
+				      * Return the gradients of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * #cell# at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #gradients# object already has the
+				      * right size.
+				      */
+    void get_function_grads (const dVector       &fe_function,
+			     vector<Point<dim> > &gradients) const;
+
+				     /**
+				      * Return the position of the #i#th
+				      * quadrature point in real space.
+				      *
+				      * If this object is used to evaluate
+				      * finite elements on faces of cells,
+				      * and for curved boundary cells, using
+				      * biquadratic or higher mappings
+				      * of the unit cell to the real cell,
+				      * these points may not be on the
+				      * plane submannifold on which the
+				      * vertices of the face lie.
+				      */
+    const Point<dim> & quadrature_point (const unsigned int i) const;
+
+				     /**
+				      * Return a pointer to the vector of
+				      * quadrature points.
+				      */
+    const vector<Point<dim> > & get_quadrature_points () const;
+
+				     /**
+				      * Return the point in real space where
+				      * the #i#th ansatz function is located
+				      * (location is in the sense of where it
+				      * assumes its nominal properties, e.g. at
+				      * the vertex of a cell, at the center of
+				      * a line, etc).
+				      *
+				      * This function is needed for the
+				      * interpolation problem: if we want to
+				      * transfer a continuous function to a
+				      * finite element function by interpolation
+				      * we have to take the continuous
+				      * function's value at the ansatz function
+				      * locations.
+				      *
+				      * For the evaluation of finite elements on
+				      * faces of cells, #i# is the number
+				      * of the ansatz function on the face, not
+				      * on the cell.
+				      */
+    const Point<dim> & ansatz_point (const unsigned int i) const;
+
+				     /**
+				      * Return a pointer to the vector of points
+				      * denoting the location of the ansatz
+				      * functions.
+				      */
+    const vector<Point<dim> > & get_ansatz_points () const;
+    
+				     /**
+				      * Return the Jacobi determinant times
+				      * the weight of the #i#th quadrature
+				      * point.
+				      *
+				      * If faces of cells are concerned,
+				      * the jacobi determinant is that of the
+				      * transformation of the unit face to
+				      * the present face, not of the unit
+				      * cell to the real cell (unlike for
+				      * the #jacobi_matrix# array of the
+				      * derived classes which store the cell
+				      * transformation's Jacobi matrix in
+				      * all cases).
+				      */
+    double JxW (const unsigned int i) const;
+
+				     /**
+				      * Return a pointer to the array holding
+				      * the JxW values at the different
+				      * quadrature points.
+				      */
+    const vector<double> & get_JxW_values () const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The index " << arg1
+		    << " is out of range, it should be less than " << arg2);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcAccessToUninitializedField);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcCannotInitializeField);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongVectorSize,
+		    int, int,
+		    << "Vector has wrong size " << arg1
+		    << ", expected size " << arg2);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotImplemented);
+    
+  protected:
+    				     /**
+				      * Store the gradients of the shape
+				      * functions at the quadrature points.
+				      * Since unfortunately the full matrix
+				      * classes of DEAL are not templated,
+				      * we have to store them in an
+				      * archetypic style.
+				      *
+				      * This field is reset each time
+				      * #reinit# is called and contains the
+				      * gradients on the real element, rather
+				      * than on the reference element.
+				      */
+    vector<vector<Point<dim> > >  shape_gradients;
+
+				     /**
+				      * Store an array of the weights of the
+				      * quadrature points. This array is
+				      * set up upon construction.
+				      *
+				      * If faces rather than cells are
+				      * considered, the weights are stored
+				      * only once still, since they are
+				      * not transformed and are thus the same
+				      * for all faces.
+				      */
+    vector<double>       weights;
+
+				     /**
+				      * Store an array of weights times the
+				      * Jacobi determinant at the quadrature
+				      * points. This function is reset each time
+				      * #reinit# is called. The Jacobi determinant
+				      * is actually the reciprocal value of the
+				      * Jacobi matrices stored in this class,
+				      * see the general documentation of this
+				      * class for more information.
+				      */
+    vector<double>       JxW_values;
+
+				     /**
+				      * Array of quadrature points. This array
+				      * is set up upon calling #reinit# and
+				      * contains the quadrature points on the
+				      * real element, rather than on the
+				      * reference element.
+				      */
+    vector<Point<dim> >  quadrature_points;
+
+    				     /**
+				      * Array of points denoting the off-point
+				      * of the ansatz functions. In real space
+				      * (no-one seems to need the off-point
+				      * on the unit cell, so no function is
+				      * provided for this).
+				      */
+    vector<Point<dim> >  ansatz_points;
+    
+				     /**
+				      * Store the jacobi matrices at the
+				      * different quadrature points. This field
+				      * is set each time #reinit# is called.
+				      *
+				      * If faces rather than cells are considered
+				      * this is the Jacobi matrix of the
+				      * transformation of the unit cell to the
+				      * real cell, not of the unit face to the
+				      * face. We need this full matrix for the
+				      * transformation of the gradients to the
+				      * real cell.
+				      */
+    vector<dFMatrix>     jacobi_matrices;
+
+				     /**
+				      * Store which fields are to be updated by
+				      * the reinit function.
+				      */
+    UpdateFlags         update_flags;
+
+				     /**
+				      * Store the cell selected last time
+				      * the #reinit# function was called
+				      * to make access
+				      * to the #get_function_*# functions
+				      * safer.
+				      */
+    DoFHandler<dim>::cell_iterator present_cell;
+};
+
 
 
 /**
-  Represent a finite element evaluated with a specific quadrature rule.
-  This class is an optimization which avoids evaluating the shape functions
-  at the quadrature points each time a quadrature takes place. Rather, the
-  values and gradients (and possibly higher order derivatives in future
-  versions of this library) are evaluated once and for all on the unit
-  cell before doing the quadrature itself. Only the Jacobian matrix of
-  the transformation from the unit cell to the real cell and the integration
-  points in real space are calculated each time we move on to a new cell.
+  Represent a finite element evaluated with a specific quadrature rule on
+  a cell.
 
   The unit cell is defined to be the tensor product of the interval $[0,1]$
   in the present number of dimensions. In part of the literature, the convention
@@ -103,22 +393,14 @@ template <int dim> class Quadrature;
   \item #reinit#: initialize the #FEValues# object for a certain cell.
     See above for more information.
   \end{itemize}
+
+   @author Wolfgang Bangerth, 1998  
   */
 template <int dim>
-class FEValues {
+class FEValues : public FEValuesBase<dim> {
   public:
 
     
-    
-				     /**
-				      * Number of quadrature points.
-				      */
-    const unsigned int n_quadrature_points;
-
-				     /**
-				      * Total number of shape functions.
-				      */
-    const unsigned int total_dofs;
     
 				     /**
 				      * Constructor. Fill all arrays with the
@@ -167,94 +449,6 @@ class FEValues {
     void get_function_values (const dVector      &fe_function,
 			      vector<double>     &values) const;
 
-				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at the #j# quadrature point.
-				      * If you want to get the derivative in
-				      * one of the coordinate directions, use
-				      * the appropriate function of the #Point#
-				      * class to extract one component. Since
-				      * only a reference to the gradient's value
-				      * is returned, there should be no major
-				      * performance drawback.
-				      * The function returns the gradient on the
-				      * real element, not the reference element.
-				      */
-    const Point<dim> & shape_grad (const unsigned int i,
-				   const unsigned int j) const;
-
-				     /** 
-				      * Return a pointer to the matrix holding
-				      * all gradients of shape functions at all
-				      * integration points, on the present cell.
-				      * For the format of this matrix, see the
-				      * documentation for the matrix itself.
-				      */
-    const vector<vector<Point<dim> > > & get_shape_grads () const;
-    
-				     /**
-				      * Return the gradients of the finite
-				      * element function characterized
-				      * by #fe_function# restricted to
-				      * #cell# at the quadrature points.
-				      *
-				      * The function assumes that the
-				      * #gradients# object already has the
-				      * right size.
-				      */
-    void get_function_grads (const dVector       &fe_function,
-			     vector<Point<dim> > &gradients) const;
-
-				     /**
-				      * Return the position of the #i#th
-				      * quadrature point in real space.
-				      */
-    const Point<dim> & quadrature_point (const unsigned int i) const;
-
-				     /**
-				      * Return a pointer to the vector of
-				      * quadrature points.
-				      */
-    const vector<Point<dim> > & get_quadrature_points () const;
-
-				     /**
-				      * Return the point in real space where
-				      * the #i#th ansatz function is located
-				      * (location is in the sense of where it
-				      * assumes its nominal properties, e.g. at
-				      * the vertex of a cell, at the center of
-				      * a line, etc).
-				      *
-				      * This function is needed for the
-				      * interpolation problem: if we want to
-				      * transfer a continuous function to a
-				      * finite element function by interpolation
-				      * we have to take the continuous
-				      * function's value at the ansatz function
-				      * locations.
-				      */
-    const Point<dim> & ansatz_point (const unsigned int i) const;
-
-				     /**
-				      * Return a pointer to the vector of points
-				      * denoting the location of the ansatz
-				      * functions.
-				      */
-    const vector<Point<dim> > & get_ansatz_points () const;
-    
-				     /**
-				      * Return the Jacobi determinant times
-				      * the weight of the #i#th quadrature
-				      * point.
-				      */
-    double JxW (const unsigned int i) const;
-
-				     /**
-				      * Return a pointer to the array holding
-				      * the JxW values at the different
-				      * quadrature points.
-				      */
-    const vector<double> & get_JxW_values () const;
     
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -278,29 +472,6 @@ class FEValues {
 		 const FiniteElement<dim> &,
 		 const Boundary<dim> &);
 
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The index " << arg1
-		    << " is out of range, it should be less than " << arg2);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcAccessToUninitializedField);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcCannotInitializeField);
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcWrongVectorSize,
-		    int, int,
-		    << "Vector has wrong size " << arg1
-		    << ", expected size " << arg2);
-    
   private:
 				     /**
 				      * Store the values of the shape functions
@@ -314,21 +485,6 @@ class FEValues {
 
 				     /**
 				      * Store the gradients of the shape
-				      * functions at the quadrature points.
-				      * Since unfortunately the full matrix
-				      * classes of DEAL are not templated,
-				      * we have to store them in an
-				      * archetypic style.
-				      *
-				      * This field is reset each time
-				      * #reinit# is called and contains the
-				      * gradients on the real element, rather
-				      * than on the reference element.
-				      */
-    vector<vector<Point<dim> > >  shape_gradients;
-
-				     /**
-				      * Store the gradients of the shape
 				      * functions at the quadrature points on
 				      * the unit cell.
 				      * This field is set up upon construction
@@ -337,33 +493,6 @@ class FEValues {
 				      */
     vector<vector<Point<dim> > >   unit_shape_gradients;
     
-				     /**
-				      * Store an array of the weights of the
-				      * quadrature points. This array is
-				      * set up upon construction.
-				      */
-    vector<double>       weights;
-
-				     /**
-				      * Store an array of weights times the
-				      * Jacobi determinant at the quadrature
-				      * points. This function is reset each time
-				      * #reinit# is called. The Jacobi determinant
-				      * is actually the reciprocal value of the
-				      * Jacobi matrices stored in this class,
-				      * see the general documentation of this
-				      * class for more information.
-				      */
-    vector<double>       JxW_values;
-
-				     /**
-				      * Array of quadrature points. This array
-				      * is set up upon calling #reinit# and
-				      * contains the quadrature points on the
-				      * real element, rather than on the
-				      * reference element.
-				      */
-    vector<Point<dim> >  quadrature_points;
 
 				     /**
 				      * Array of quadrature points in the unit
@@ -373,50 +502,14 @@ class FEValues {
 				      */
     vector<Point<dim> >  unit_quadrature_points;
     
-				     /**
-				      * Array of points denoting the off-point
-				      * of the ansatz functions. In real space
-				      * (no-one seems to need the off-point
-				      * on the unit cell, so no function is
-				      * provided for this).
-				      */
-    vector<Point<dim> >  ansatz_points;
-    
-				     /**
-				      * Store the jacobi matrices at the
-				      * different quadrature points. This field
-				      * is set each time #reinit# is called.
-				      */
-    vector<dFMatrix>     jacobi_matrices;
-
-				     /**
-				      * Store which fields are to be updated by
-				      * the reinit function.
-				      */
-    UpdateFlags         update_flags;
-
-				     /**
-				      * Store the cell selected last time
-				      * the #reinit# function was called
-				      * to make access
-				      * to the #get_function_*# functions
-				      * safer.
-				      */
-    DoFHandler<dim>::cell_iterator present_cell;
 };
 
 
 
 
 /**
-  Represent a finite element evaluated with a specific quadrature rule.
-  This class is an optimization which avoids evaluating the shape functions
-  at the quadrature points each time a quadrature takes place. Rather, the
-  values and gradients (and possibly higher order derivatives in future
-  versions of this library) are evaluated once and for all on the unit
-  face before doing the quadrature itself. Only the Jacobian matrix of
-  the transformation from the unit face to the real face and the integration
-  points in real space are calculated each time we move on to a new face.
+  Represent a finite element evaluated with a specific quadrature rule on
+  the face of a cell.
 
   The unit face is defined to be the tensor product of the interval $[0,1]$
   in the present number of dimensions minus one. In part of the literature,
@@ -480,26 +573,8 @@ class FEValues {
   available without compicated matrix-vector-multiplications.
   */
 template <int dim>
-class FEFaceValues {
+class FEFaceValues : public FEValuesBase<dim> {
   public:
-
-    
-    
-				     /**
-				      * Number of quadrature points on
-				      * the face.
-				      */
-    const unsigned int n_quadrature_points;
-
-				     /**
-				      * Total number of shape functions
-				      * on the cell adjacent to this face.
-				      * This number is not the same as the
-				      * number of shape functions of which
-				      * the center is located on the face.
-				      */
-    const unsigned int total_dofs;
-    
 				     /**
 				      * Constructor. Fill all arrays with the
 				      * values of the shape functions of the
@@ -550,109 +625,6 @@ class FEFaceValues {
 			      vector<double>     &values) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at the #j# quadrature point.
-				      * If you want to get the derivative in
-				      * one of the coordinate directions, use
-				      * the appropriate function of the #Point#
-				      * class to extract one component. Since
-				      * only a reference to the gradient's value
-				      * is returned, there should be no major
-				      * performance drawback.
-				      * The function returns the gradient on the
-				      * real element, not the reference element.
-				      */
-    const Point<dim> & shape_grad (const unsigned int i,
-				   const unsigned int j) const;
-
-				     /** 
-				      * Return a pointer to the matrix holding
-				      * all gradients of shape functions at all
-				      * integration points, on the present cell.
-				      * For the format of this matrix, see the
-				      * documentation for the matrix itself.
-				      */
-    const vector<vector<Point<dim> > > & get_shape_grads () const;
-    
-				     /**
-				      * Return the gradients of the finite
-				      * element function characterized
-				      * by #fe_function# restricted to
-				      * #cell# at the quadrature points.
-				      *
-				      * The function assumes that the
-				      * #gradients# object already has the
-				      * right size.
-				      */
-    void get_function_grads (const dVector       &fe_function,
-			     vector<Point<dim> > &gradients) const;
-
-				     /**
-				      * Return the position of the #i#th
-				      * quadrature point in real space.
-				      *
-				      * For curved boundary cells, using
-				      * biquadratic or higher mappings
-				      * of the unit cell to the real cell,
-				      * these points may not be on the
-				      * plane submannifold on which the
-				      * vertices of the face lie.
-				      */
-    const Point<dim> & quadrature_point (const unsigned int i) const;
-
-				     /**
-				      * Return a pointer to the vector of
-				      * quadrature points.
-				      */
-    const vector<Point<dim> > & get_quadrature_points () const;
-
-				     /**
-				      * Return the point in real space where
-				      * the #i#th ansatz function is located
-				      * (location is in the sense of where it
-				      * assumes its nominal properties, e.g. at
-				      * the vertex of a cell, at the center of
-				      * a line, etc).
-				      *
-				      * This function is needed for the
-				      * interpolation problem: if we want to
-				      * transfer a continuous function to a
-				      * finite element function by interpolation
-				      * we have to take the continuous
-				      * function's value at the ansatz function
-				      * locations.
-				      */
-    const Point<dim> & ansatz_point (const unsigned int i) const;
-
-				     /**
-				      * Return a pointer to the vector of points
-				      * denoting the location of the ansatz
-				      * functions.
-				      */
-    const vector<Point<dim> > & get_ansatz_points () const;
-    
-				     /**
-				      * Return the Jacobi determinant times
-				      * the weight of the #i#th quadrature
-				      * point. The Jacobi determinant is that
-				      * of the transformation of the unit
-				      * face to the real face, not of the
-				      * alike cells.
-				      */
-    double JxW (const unsigned int i) const;
-
-				     /**
-				      * Return a pointer to the array holding
-				      * the JxW values at the different
-				      * quadrature points. The Jacobi
-				      * determinant is that
-				      * of the transformation of the unit
-				      * face to the real face, not of the
-				      * alike cells.
-				      */
-    const vector<double> & get_JxW_values () const;
-
-				     /**
 				      * Return the outward normal vector to
 				      * the cell at the #i#th quadrature
 				      * point. The length of the vector
@@ -691,36 +663,6 @@ class FEFaceValues {
 		 const FiniteElement<dim>             &fe,
 		 const Boundary<dim>                  &boundary);
 
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The index " << arg1
-		    << " is out of range, it should be less than " << arg2);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcAccessToUninitializedField);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcCannotInitializeField);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcWrongVectorSize,
-		    int, int,
-		    << "Vector has wrong size " << arg1
-		    << ", expected size " << arg2);
   private:
 				     /**
 				      * Store the values of the shape functions
@@ -736,25 +678,6 @@ class FEFaceValues {
 
 				     /**
 				      * Store the gradients of the shape
-				      * functions at the quadrature points.
-				      * Since unfortunately the full matrix
-				      * classes of DEAL are not templated,
-				      * we have to store them in an
-				      * archetypic style.
-				      *
-				      * This field is reset each time
-				      * #reinit# is called and contains the
-				      * gradients on the real element, rather
-				      * than on the reference element. This
-				      * function does the transformation from
-				      * the unit cell to the real cell using
-				      * the #unit_shape_gradients# for the
-				      * selected face.
-				      */
-    vector<vector<Point<dim> > >  shape_gradients;
-
-				     /**
-				      * Store the gradients of the shape
 				      * functions at the quadrature points on
 				      * the unit cell.
 				      * This field is set up upon construction
@@ -765,36 +688,6 @@ class FEFaceValues {
 				      */
     vector<vector<Point<dim> > >   unit_shape_gradients[2*dim];
     
-				     /**
-				      * Store an array of the weights of the
-				      * quadrature points. This array is
-				      * set up upon construction.
-				      *
-				      * Since these weights are not transformed
-				      * they are the same for all faces.
-				      */
-    vector<double>       weights;
-
-				     /**
-				      * Store an array of weights times the
-				      * Jacobi determinant at the quadrature
-				      * points. This function is reset each time
-				      * #reinit# is called. The Jacobi determinant
-				      * is actually the reciprocal value of the
-				      * Jacobi matrices stored in this class,
-				      * see the general documentation of this
-				      * class for more information.
-				      */
-    vector<double>       JxW_values;
-
-				     /**
-				      * Array of quadrature points. This array
-				      * is set up upon calling #reinit# and
-				      * contains the quadrature points on the
-				      * real element, rather than on the
-				      * reference element.
-				      */
-    vector<Point<dim> >  quadrature_points;
 
 				     /**
 				      * Array of quadrature points on the
@@ -818,31 +711,9 @@ class FEFaceValues {
     vector<Point<dim> >  global_unit_quadrature_points[2*dim];
     
 				     /**
-				      * Array of points denoting the off-point
-				      * of the ansatz functions. In real space
-				      * (no-one seems to need the off-point
-				      * on the unit cell, so no function is
-				      * provided for this).
-				      */
-    vector<Point<dim> >  ansatz_points;
-    
-				     /**
-				      * Store the jacobi matrices at the
-				      * different quadrature points. This field
-				      * is set each time #reinit# is called.
-				      * This is the Jacobi matrix of the
-				      * transformation of the unit cell to the
-				      * real cell, not of the unit face to the
-				      * face. We need this full matrix for the
-				      * transformation of the gradients to the
-				      * real cell.
-				      */
-    vector<dFMatrix>     jacobi_matrices;
-
-				     /**
 				      * List of values denoting the determinant
 				      * of the transformation from the unit face
-				      * to the real face. Neede to actually
+				      * to the real face. Needed to actually
 				      * compute the JxW values.
 				      */
     vector<double>       face_jacobi_determinants;
@@ -855,21 +726,6 @@ class FEFaceValues {
     vector<Point<dim> >  normal_vectors;
     
 				     /**
-				      * Store which fields are to be updated by
-				      * the reinit function.
-				      */
-    UpdateFlags          update_flags;
-
-				     /**
-				      * Store the cell selected last time
-				      * the #reinit# function was called
-				      * to make access
-				      * to the #get_function_*# functions
-				      * safer.
-				      */
-    DoFHandler<dim>::cell_iterator present_cell;
-
-				     /**
 				      * Store the number of the face selected
 				      * last time the #reinit# function was
 				      * called.
@@ -881,8 +737,53 @@ class FEFaceValues {
 
 
 
-/*------------------------ Inline functions: FEValues ----------------------------*/
+/*------------------------ Inline functions: FEValuesBase ------------------------*/
 
+
+
+
+template <int dim>
+inline
+const vector<vector<Point<dim> > > &
+FEValuesBase<dim>::get_shape_grads () const {
+  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+  return shape_gradients;
+};
+
+
+
+template <int dim>
+inline
+const vector<Point<dim> > &
+FEValuesBase<dim>::get_quadrature_points () const {
+  Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
+  return quadrature_points;
+};
+
+
+
+template <int dim>
+inline
+const vector<Point<dim> > &
+FEValuesBase<dim>::get_ansatz_points () const {
+  Assert (update_flags & update_ansatz_points, ExcAccessToUninitializedField());
+  return ansatz_points;
+};
+
+
+
+template <int dim>
+inline
+const vector<double> &
+FEValuesBase<dim>::get_JxW_values () const {
+  Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  return JxW_values;
+};
+
+
+
+
+/*------------------------ Inline functions: FEValues ----------------------------*/
 
 
 template <int dim>
@@ -893,49 +794,6 @@ const dFMatrix & FEValues<dim>::get_shape_values () const {
 
 
 
-
-template <int dim>
-inline
-const vector<vector<Point<dim> > > &
-FEValues<dim>::get_shape_grads () const {
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
-  return shape_gradients;
-};
-
-
-
-template <int dim>
-inline
-const vector<Point<dim> > &
-FEValues<dim>::get_quadrature_points () const {
-  Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
-  return quadrature_points;
-};
-
-
-
-template <int dim>
-inline
-const vector<Point<dim> > &
-FEValues<dim>::get_ansatz_points () const {
-  Assert (update_flags & update_ansatz_points, ExcAccessToUninitializedField());
-  return ansatz_points;
-};
-
-
-
-template <int dim>
-inline
-const vector<double> &
-FEValues<dim>::get_JxW_values () const {
-  Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
-  return JxW_values;
-};
-
-
-
-
-
 /*------------------------ Inline functions: FEFaceValues ------------------------*/
 
 
@@ -943,47 +801,6 @@ template <int dim>
 inline
 const dFMatrix & FEFaceValues<dim>::get_shape_values () const {
   return shape_values[selected_face];
-};
-
-
-
-
-template <int dim>
-inline
-const vector<vector<Point<dim> > > &
-FEFaceValues<dim>::get_shape_grads () const {
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
-  return shape_gradients;
-};
-
-
-
-template <int dim>
-inline
-const vector<Point<dim> > &
-FEFaceValues<dim>::get_quadrature_points () const {
-  Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
-  return quadrature_points;
-};
-
-
-
-template <int dim>
-inline
-const vector<Point<dim> > &
-FEFaceValues<dim>::get_ansatz_points () const {
-  Assert (update_flags & update_ansatz_points, ExcAccessToUninitializedField());
-  return ansatz_points;
-};
-
-
-
-template <int dim>
-inline
-const vector<double> &
-FEFaceValues<dim>::get_JxW_values () const {
-  Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
-  return JxW_values;
 };
 
 
