@@ -298,10 +298,38 @@ class KellyErrorEstimator
     				     /**
 				      * All data needed by the several functions
 				      * of the error estimator is gathered in
-				      * this struct. It is passed as an reference
-				      * to the seperate functions in the object.
-				      * Global data is not possible because no
-				      * real object is created.
+				      * this struct. It is passed as a reference
+				      * to the seperate functions in this class.
+				      *
+				      * The reason for invention of
+				      * this object is two-fold:
+				      * first, class member data is
+				      * not possible because no real
+				      * object is created (all
+				      * functions are #static#), which
+				      * is a historical
+				      * reason. Second, if we don't
+				      * collect the data the various
+				      * functions need somewhere at a
+				      * central place, that would mean
+				      * that the functions would have
+				      * to allocate them upon
+				      * need. However, then some
+				      * variables would be allocated
+				      * over and over again, which can
+				      * take a significant amount of
+				      * time (10-20 per cent) and most
+				      * importantly, memory allocation
+				      * requires synchronisation in
+				      * multithreaded mode. While that
+				      * is done by the C++ library and
+				      * has not to be handcoded, it
+				      * nevertheless seriously damages
+				      * tha ability to efficiently run
+				      * the functions of this class in
+				      * parallel, since they are quite
+				      * often blocked by these
+				      * synchronisation points.
 				      */
     struct Data
     {
@@ -354,11 +382,23 @@ class KellyErrorEstimator
 					  * element function on one face
 					  */
 	vector< vector<Point<dim> > > normal_vectors;
-	
-	vector< vector<double> >                  coefficient_values1;
-	vector< vector<Vector<double> > >         coefficient_values;
 
-	vector< vector<double> >                  JxW_values;
+					 /**
+					  * Two arrays needed for the
+					  * values of coefficients in
+					  * the jumps, if they are
+					  * given.
+					  */
+	vector< vector<double> >          coefficient_values1;
+	vector< vector<Vector<double> > > coefficient_values;
+
+					 /**
+					  * Array for the products of
+					  * Jacobian determinants and
+					  * weights of quadraturs
+					  * points.
+					  */
+	vector< vector<double> >          JxW_values;
 
 					 /**
 					  * A constructor of the
