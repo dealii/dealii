@@ -23,32 +23,34 @@
  *
  * #check()# can be replaced in derived classes to allow for more
  * sophisticated tests.
+ *
+ *
+ * \section{State}
+ * The return states of the check function are of type #State#, which is an
+ * enum local to this class. It indicates the state the
+ * solver is in.
+ *
+ * The possible values of State are
+ * <OL>
+ * <LI> #iterate = 0#: continue
+ * the iteration.
+ * <LI> #success#: the goal is reached,
+ * the iterative method can terminate
+ * successfully.
+ * <LI> #failure#!: the iterative
+ * method should stop because
+ * convergence cannot be achieved or at
+ * least was not achieved within the given
+ * maximal number of iterations.
+ * </OL>
  */
 class SolverControl : public Subscriptor
 {
   public:
-				     /**
-				      * Return states of the check
-				      * function, which indicate the state the
-				      * solver is in.
-				      *
-				      * The possible values of State are
-				      * <OL>
-				      * <LI> #iterate = 0#: continue
-				      * the iteration.
-				      * <LI> #success#: the goal is reached,
-				      * the iterative method can terminate
-				      * successfully.
-				      * <LI> #failure#!: the iterative
-				      * method should stop because
-				      * convergence cannot be achieved or at
-				      * least was not achieved within the given
-				      * maximal number of iterations.
-				      * </OL>
-				      */
+
     enum State
     {
-	  iterate = 0, success, failure
+      iterate = 0, success, failure
     };
     
 				     /**
@@ -155,6 +157,8 @@ class SolverControl : public Subscriptor
 				      */
     const bool         log_result;
 };
+
+
 
 
 
