@@ -583,7 +583,7 @@
  * smaller (for example by one order of magnitude) than the time
  * needed to read the data from a file, and also to actually generate
  * the triangulation from this data using the
- * Triangulation<tt><dim>::create_triangulation</tt> function.
+ * Triangulation::create_triangulation() function.
  *
  * @author Wolfgang Bangerth, 2000, Michael Anderson 2003
  */

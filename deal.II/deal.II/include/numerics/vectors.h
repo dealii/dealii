@@ -153,7 +153,7 @@ class ConstraintMatrix;
  * <li> Creation of right hand side vectors:
  *   The @p create_right_hand_side function computes the vector
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
- *   MatrixCreator<tt>::create_*</tt> functions which take a right hand side do,
+ *   <tt>MatrixCreator::create_*</tt> functions which take a right hand side do,
  *   but without assembling a matrix.
  *
  * <li> Creation of boundary right hand side vectors: The
@@ -268,17 +268,17 @@ class ConstraintMatrix;
  * 
  *   To get the global <i>L<sup>1</sup></i> error, you have to sum up the
  *   entries in @p difference, e.g. using
- *   Vector<tt><double>::l1_norm</tt> function.  For the global <i>L<sup>2</sup></i>
+ *   <tt>Vector<double>::l1_norm</tt> function.  For the global <i>L<sup>2</sup></i>
  *   difference, you have to sum up the squares of the entries and
  *   take the root of the sum, e.g. using
- *   Vector<tt><double>::l2_norm</tt>.  These two operations
+ *   <tt>Vector<double>::l2_norm</tt>.  These two operations
  *   represent the $l_1$ and $l_2$ norms of the vectors, but you need
  *   not take the absolute value of each entry, since the cellwise
  *   norms are already positive.
  *  
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
- *   using the Vector<tt><double>::linfty_norm</tt> function.
+ *   using the <tt>Vector<double>::linfty_norm</tt> function.
  *
  *   For the global <i>H<sup>1</sup></i> norm and seminorm, the same rule applies as for the
  *   <i>L<sup>2</sup></i> norm: compute the $l_2$ norm of the cell error vector.

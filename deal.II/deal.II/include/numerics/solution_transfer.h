@@ -138,12 +138,12 @@
  * solution vector on the current (original) grid.
  * Each entry of this vector belongs to one of the
  * DoFs of the discretisation. If we now refine the grid then the calling of
- * DoFHandler<tt>::distribute_dofs(...)</tt> will change at least some of the
+ * DoFHandler::distribute_dofs() will change at least some of the
  * DoF indices. Hence we need to store the DoF indices of all active cells
  * before the refinement. The @p user_pointer of each active cell
  * is used to point to the vector of these DoF indices of that cell, all other
  * @p user_pointers are cleared. All this is
- * done by <tt>prepare_for_pure_refinement()</tt>.
+ * done by prepare_for_pure_refinement().
  *
  * In the function <tt>refine_interpolate(in,out)</tt> and on each cell where the
  * @p user_pointer is set (i.e. the cells that were active in the original grid)

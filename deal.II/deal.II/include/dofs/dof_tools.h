@@ -183,11 +183,11 @@ class DoFTools
 				      * of hanging nodes.  They have
 				      * to be taken care of by a call
 				      * to
-				      * ConstraintMatrix<tt>::condense()</tt>
+				      * ConstraintMatrix::condense()
 				      * afterwards.
 				      *
 				      * Remember using
-				      * SparsityPattern<tt>::compress()</tt>
+				      * SparsityPattern::compress()
 				      * after generating the pattern.
 				      *
 				      * The actual type of the
@@ -316,14 +316,14 @@ class DoFTools
 				      * nodes.  The sparsity pattern
 				      * is not compressed, since if
 				      * you want to call
-				      * ConstraintMatrix<tt>::condense(1)</tt>
+				      * ConstraintMatrix::condense()
 				      * afterwards, new entries have
 				      * to be added. However, if you
 				      * don't want to call
-				      * ConstraintMatrix<tt>::condense(1)</tt>,
+				      * ConstraintMatrix::condense(),
 				      * you have to compress the
 				      * matrix yourself, using
-				      * SparsityPattern<tt>::compress()</tt>.
+				      * SparsityPattern::compress()
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be

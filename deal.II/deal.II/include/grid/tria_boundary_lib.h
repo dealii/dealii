@@ -29,11 +29,11 @@
  * @p cylinder function of GridGenerator. It should be used for
  * the hull of the cylinder only (boundary indicator 0).
  *
- *   This class is derived from StraightBoundary rather than from
- *   Boundary, which would seem natural, since this way we can use the
- *   StraightBoundary<tt><dim>::in_between(neighbors)</tt> function.
+ * This class is derived from StraightBoundary rather than from
+ * Boundary, which would seem natural, since this way we can use the
+ * StraightBoundary::in_between() function.
  *
- *   @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001
  */
 template <int dim>
 class CylinderBoundary : public StraightBoundary<dim>
@@ -151,7 +151,7 @@ class CylinderBoundary : public StraightBoundary<dim>
  *
  *   This class is derived from StraightBoundary rather than from
  *   Boundary, which would seem natural, since this way we can use the
- *   StraightBoundary<tt><dim>::in_between(neighbors)</tt> function.
+ *   StraightBoundary::in_between() function.
  *
  *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */

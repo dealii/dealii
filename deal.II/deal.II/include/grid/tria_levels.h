@@ -239,7 +239,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  stored in this list. A line is
 					  *  called active if it has no
 					  *  children. The function
-					  *  TriaIterator<tt>::active()</tt>
+					  *  TriaAccessor::has_children()
 					  *  tests for this.
 					  */
 	std::vector<int>  children;
@@ -267,7 +267,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 					  *  already been processed.
 					  *
 					  *  You can clear all used flags using
-					  *  Triangulation<tt>::clear_user_flags()</tt>.
+					  *  Triangulation::clear_user_flags().
 					  */
 	std::vector<bool> user_flags;
 

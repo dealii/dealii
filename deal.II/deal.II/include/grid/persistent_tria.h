@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -91,10 +91,10 @@
  * constitute a triangulation; it only becomes one after @p restore is first
  * called. Note also that the @p execute_coarsening_and_refinement stores
  * all necessary flags for later reconstruction using the @p restore function.
- * Triangulation<tt><dim>::clear ()</tt> resets the underlying triangulation to a
+ * Triangulation::clear() resets the underlying triangulation to a
  * virgin state, but does not affect the stored refinement flags needed for
  * later reconstruction and does also not touch the coarse grid which is
- * used withing <tt>restore()</tt>.
+ * used within restore().
  *
  * @author Wolfgang Bangerth, 1999
  */

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -109,7 +109,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * generate output for. The usual
 				      * way would, of course, be to
 				      * use an object of type
-				      * DoFHandler<tt><dim>::fec_iterator</tt>,
+				      * <tt>DoFHandler<dim>::face_iterator</tt>,
 				      * but since we have to describe
 				      * faces to objects of type
 				      * FEValues, we can only

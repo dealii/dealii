@@ -41,7 +41,7 @@ template <int dim> class MGDoFHandler;
 
 /**
  *  Structure which is passed to the
- *  Triangulation<tt><dim>::create_triangulation</tt> function. It
+ *  <tt>Triangulation<dim>::create_triangulation</tt> function. It
  *  contains all data needed to construct a cell, namely the indices
  *  of the vertices and the material indicator.
  */
@@ -102,7 +102,7 @@ struct CellData
 
 
 /**
- *  Structure to be passed to the Triangulation<tt><dim>::create_triangulation</tt>
+ *  Structure to be passed to the Triangulation<dim>::create_triangulation
  *  function to describe boundary information.
  *
  *  This structure is the same for all dimensions, since we use an input
@@ -819,8 +819,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        by providing a list of vertices and a list of cells. Each such cell
  *        consists of a vector storing the indices of the vertices of this cell
  *        in the vertex list. To see how this works, you can take a look at the
- *        GridIn<tt><dim>::read_*</tt> functions. The appropriate function to be
- *        called is <tt>Triangulation<dim>::create_triangulation ()</tt>.
+ *        GridIn<dim>::read_* functions. The appropriate function to be
+ *        called is create_triangulation().
  *
  *        Creating the hierarchical information needed for this
  *        library from cells storing only vertex information can be

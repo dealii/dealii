@@ -74,7 +74,7 @@ namespace PETScWrappers
  * created. The functions assume that the matrix is initialized with a
  * sparsity pattern (SparsityPattern) corresponding to the given degree
  * of freedom handler, i.e. the sparsity structure is already as needed.
- * You can do this by calling the DoFHandler<tt><dim>::make_sparsity_pattern</tt>
+ * You can do this by calling the DoFTools::make_sparsity_pattern()
  * function.
  *
  * Furthermore it is assumed that no relevant data is in the matrix. All

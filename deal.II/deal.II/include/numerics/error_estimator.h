@@ -49,7 +49,7 @@ template <int dim> class FESubfaceValues;
  *  the conormal derivative $a\frac{du}{dn} = g$.
  *
  *  The error estimator returns a vector of estimated errors per cell which
- *  can be used to feed the Triangulation<tt><dim>::refine_*</tt> functions. This
+ *  can be used to feed the <tt>Triangulation<dim>::refine_*</tt> functions. This
  *  vector contains elements of data type @p float, rather than @p double,
  *  since accuracy is not so important here, and since this can save rather
  *  a lot of memory, when using many cells.
