@@ -25,16 +25,9 @@ using namespace std;
 
 
 // static variables
-template <>
 const unsigned int GridReorderingInfo<2>::rotational_states_of_cells;
-
-template <>
 const unsigned int GridReorderingInfo<2>::rotational_states_of_faces;
-
-template <>
 const unsigned int GridReorderingInfo<3>::rotational_states_of_cells;
-
-template <>
 const unsigned int GridReorderingInfo<3>::rotational_states_of_faces;
 
 template <int dim>
