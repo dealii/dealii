@@ -428,7 +428,8 @@ namespace MemoryConsumption
   };
 
 
-
+  
+  inline
   unsigned int memory_consumption (const std::string &s)
   {
     return sizeof(s) + s.length();
