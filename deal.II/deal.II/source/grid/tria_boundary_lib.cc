@@ -246,6 +246,10 @@ Point<dim>
 HalfHyperBallBoundary<dim>::
 get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
 {
+				   // check whether center of object is
+				   // at x==0, since then it belongs
+				   // to the plane part of the
+				   // boundary
   const Point<dim> line_center = line->center();
   if (line_center(0) == center(0))
     return line_center;
@@ -280,6 +284,44 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
     return quad_center;
   else
     return HyperBallBoundary<dim>::get_new_point_on_quad (quad);
+};
+
+
+
+template <int dim>
+void
+HalfHyperBallBoundary<dim>::
+get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				 typename std::vector<Point<dim> > &points) const
+{
+				   // check whether center of object is
+				   // at x==0, since then it belongs
+				   // to the plane part of the
+				   // boundary
+  const Point<dim> line_center = line->center();
+  if (line_center(0) == center(0))
+    return StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
+  else
+    return HyperBallBoundary<dim>::get_intermediate_points_on_line (line, points);
+};
+
+
+
+template <int dim>
+void
+HalfHyperBallBoundary<dim>::
+get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				 typename std::vector<Point<dim> > &points) const
+{
+				   // check whether center of object is
+				   // at x==0, since then it belongs
+				   // to the plane part of the
+				   // boundary
+  const Point<dim> quad_center = quad->center();
+  if (quad_center(0) == center(0))
+    return StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
+  else
+    return HyperBallBoundary<dim>::get_intermediate_points_on_quad (quad, points);
 };
 
 

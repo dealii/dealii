@@ -59,8 +59,9 @@ class HyperBallBoundary : public StraightBoundary<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
 				     /**
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
 				      * base class.
 				      *
 				      * Calls
@@ -71,8 +72,9 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
 				      * base class.
 				      *
 				      * Only implemented for @p{dim=3}
@@ -131,7 +133,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
  * might be useful for computations with rotational symmetry, where
  * one dimension is the radius from the axis of rotation.
  *
- * @author Wolfgang Bangerth, 1999
+ * @author Wolfgang Bangerth, 1999, 2001
  */
 template <int dim>
 class HalfHyperBallBoundary : public HyperBallBoundary<dim>
@@ -158,6 +160,32 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
 				      */
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      *
+				      * Calls
+				      * @p{get_intermediate_points_between_points}.
+				      */
+    virtual void
+    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				     typename std::vector<Point<dim> > &points) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      *
+				      * Only implemented for @p{dim=3}
+				      * and for @p{points.size()==1}.
+				      */
+    virtual void
+    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				     typename std::vector<Point<dim> > &points) const;
 };
 
 
