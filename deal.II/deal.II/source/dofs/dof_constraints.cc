@@ -24,6 +24,8 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <set>
+
 
 
 inline
@@ -222,9 +224,60 @@ void ConstraintMatrix::close ()
 
 
 
+void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
+{
+				   // first check whether the
+				   // constraints in the two objects
+				   // are for different degrees of
+				   // freedom
+  if (true)
+    {
+				       // first insert all dofs in
+				       // this object into a list...
+      std::set<unsigned int> this_dofs;
+      for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
+	   line!=lines.end(); ++line)
+	this_dofs.insert (line->line);
+
+				       // ...then check whether it
+				       // appears in the other object
+				       // as well. note that we have
+				       // to do this in a somewhat
+				       // complicated style since the
+				       // two objects may not be
+				       // sorted
+      for (std::vector<ConstraintLine>::const_iterator
+	     line=other_constraints.lines.begin();
+	   line!=other_constraints.lines.end(); ++line)
+	AssertThrow (this_dofs.find (line->line) == this_dofs.end(),
+		     ExcDoFIsConstrainedFromBothObjects (line->line));
+    };
+
+				   // store the previous state with
+				   // respect to sorting
+  const bool object_was_sorted = sorted;
+  sorted = false;
+
+				   // append new lines at the end
+  lines.insert (lines.end(),
+		other_constraints.lines.begin(),
+		other_constraints.lines.end());
+
+				   // if the object was sorted before,
+				   // then make sure it is so
+				   // afterwards as well. otherwise
+				   // leave everything in the unsorted
+				   // state
+  if (object_was_sorted == true)
+    close ();
+};
+
+
+
 void ConstraintMatrix::clear ()
 {
-  lines = std::vector<ConstraintLine>();
+  std::vector<ConstraintLine> tmp;
+  lines.swap (tmp);
   sorted = false;
 };
 

@@ -161,6 +161,32 @@ class ConstraintMatrix : public Subscriptor
     void close ();
 
 				     /**
+				      * Merge the constraints
+				      * represented by the object
+				      * given as argument into the
+				      * constraints represented by
+				      * this object. Both objects may
+				      * or may not be closed (by
+				      * having their function
+				      * @p{close} called before), if
+				      * this object was closed before,
+				      * then it will be closed
+				      * afterwards as well.
+				      *
+				      * Note that the constraints in
+				      * each of the two objects (the
+				      * old one represented by this
+				      * object and the argument) may
+				      * not refer to the same degree
+				      * of freedom, since this may
+				      * result in incompatible
+				      * constraints. If this is
+				      * nevertheless the case, an
+				      * exception is thrown.
+				      */
+    void merge (const ConstraintMatrix &other_constraints);
+    
+				     /**
 				      * Clear all entries of this matrix. Reset
 				      * the flag determining whether new entries
 				      * are accepted or not.
@@ -433,6 +459,13 @@ class ConstraintMatrix : public Subscriptor
 		    << "You tried to constrain DoF " << arg1
 		    << " to DoF " << arg2
 		    << ", but that one is also constrained. This is not allowed!");
+				     /**
+				      * Exception.
+				      */
+    DeclException1 (ExcDoFIsConstrainedFromBothObjects,
+		    int,
+		    << "Degree of freedom " << arg1
+		    << " is constrained from both object in a merge operation.");
     
   private:
 
