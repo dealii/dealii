@@ -43,7 +43,7 @@
  * interpolations in time may be added in the future.
  *
  *
- * \secion{Example of Use}
+ * \section{Example of Use}
  *
  * The following little example shall illustrate the different steps
  * of use of this class. It is assumed that the finite element used is
