@@ -980,13 +980,28 @@ void MinimizationProblem<1>::refine_grid ()
 
 
 
+                                 // Before going over to the framework
+                                 // functions, we still need to look at the
+                                 // implementation of the function that
+                                 // computes the energy of a nodal vector in
+                                 // the functional considered in this example
+                                 // program. Its idea is simple: take a nodal
+                                 // vector and the ``DoFHandler'' object it is
+                                 // living on, then loop over all cells and
+                                 // add up the local contributions to the
+                                 // energy:
 template <int dim>
 double
 MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
                                   const Vector<double>  &function)
 {
-  double energy = 0.;
-
+                                   // First define the quadrature formula and
+                                   // a ``FEValues'' object with which to
+                                   // compute the values of the input function
+                                   // at the quadrature points. Note again
+                                   // that the integrand is a polynomial of
+                                   // degree six, so a 4-point Gauss formula
+                                   // is appropriate:
   QGauss4<dim>  quadrature_formula;
   FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
 			   UpdateFlags(update_values    |
@@ -996,31 +1011,48 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
 
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
+                                   // Then, just as when we integrated the
+                                   // linear system, we need two variables
+                                   // that will hold the values and gradients
+                                   // of the given function at the quadrature
+                                   // points:
   std::vector<double>         local_solution_values (n_q_points);
   std::vector<Tensor<1,dim> > local_solution_grads (n_q_points);
-  
+
+                                   // With this, define an energy variable,
+                                   // and loop over all the cells:
+  double energy = 0.;
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
+                                       // On each cell, initialize the
+                                       // ``FEValues'' object, and extract
+                                       // values and gradients of the given
+                                       // function:
       fe_values.reinit (cell);
       fe_values.get_function_values (function,
                                      local_solution_values);
       fe_values.get_function_grads (function,
                                     local_solution_grads);
-      
+
+                                       // Then loop over all quadrature points
+                                       // on this cell, and add up the
+                                       // contribution of each to the global
+                                       // energy:
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         energy += (std::pow (fe_values.quadrature_point(q_point)(0)
                              -
-                             std::pow (local_solution_values[q_point],
-                                       3),
+                             std::pow (local_solution_values[q_point], 3),
                              2) *
-                   gradient_power (local_solution_grads[q_point],
-                                   6) *
+                   gradient_power (local_solution_grads[q_point], 6) *
                    fe_values.JxW (q_point));
     }
-  
+
+                                   // Once we have done this, return the
+                                   // integrated value.
   return energy;
 }
 
