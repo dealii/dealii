@@ -12,19 +12,22 @@ kdoc.dof  = $(wildcard ../../deal.II/include/grid/dof*.h) \
             $(wildcard ../../deal.II/include/fe/*.h)
 kdoc.num  = $(wildcard ../../deal.II/include/numerics/*.h)
 
-#user projects
-kdoc.transport = $(wildcard ../../projects/transport/trans_dg/*.h)
-
+# user projects. the projects should be independant of each other, so
+# we need not take care of cross-dependencies each time 
+kdoc.transport     = $(wildcard ../../projects/transport/trans_dg/*.h)
+kdoc.wave-equation = $(wildcard ../../projects/wave-equation/include/*.h)
+kdoc.projects      = $(kdoc.transport) $(kdoc.wave-equation)
 
 
 
 kdoc.all  = $(kdoc.base) $(kdoc.lac) $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.num) \
-            $(kdoc.transport)
+            $(kdoc.projects)
 
 all-include-files = $(wildcard ../../deal.II/include/*/*.h \
                                ../../lac/include/lac/*.h   \
                                ../../base/include/base/*.h \
                                ../../projects/transport/trans_dg/*.h \
+                               ../../projects/wave-equation/include/*.h \
                      )
 
 
@@ -38,7 +41,9 @@ cvslog:
 
 # make sure that the *.kdoc files exist by
 # using the dependancies and the following rules.
-kdoc: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc kdoc/transport.kdoc $(kdoc.all) kdoc-rerun
+kdoc: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc\
+      kdoc/transport.kdoc kdoc/wave-equation.kdoc \
+      $(kdoc.all) kdoc-rerun
 
 kdoc-rerun:
 	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dbase \
@@ -55,6 +60,8 @@ kdoc-rerun:
 		numerics $(kdoc.num:../..%=../../..%)
 	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dtransport   \
 		transport $(kdoc.transport:../..%=../../..%)
+	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dwave-equation   \
+		wave-equation $(kdoc.wave-equation:../..%=../../..%)
 # output the names of the files which were not processed since they should
 # be added to one of the above lists.
 	@echo -------------------------------------------------------------
@@ -90,8 +97,13 @@ kdoc/transport.kdoc: $(kdoc.transport)
 	@cd kdoc ; perl $(KDOCFLAGS) -dtransport   \
 		transport $(kdoc.transport:../..%=../../..%)
 
+kdoc/wave-equation.kdoc: $(kdoc.wave-equation)
+	@cd kdoc ; perl $(KDOCFLAGS) -dwave-equation   \
+		wave-equation $(kdoc.wave-equation:../..%=../../..%)
 
-kdoc/names.html: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc kdoc/transport.kdoc
+
+kdoc/names.html: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc \
+                 kdoc/transport.kdoc kdoc/wave-equation.kdoc
 	@cd kdoc ; perl ../scripts/index.pl *.kdoc > names.html
 
 
