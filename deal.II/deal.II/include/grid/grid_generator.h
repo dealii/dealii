@@ -140,7 +140,7 @@ class GridGenerator
 				      * for the surfaces in
 				      * @p{y}-direction are 2 and 3,
 				      * the ones for @p{z} are 4 and
-				      * 6.
+				      * 5.
 				      * 
 				      * The triangulation needs to be
 				      * void upon calling this
@@ -150,7 +150,7 @@ class GridGenerator
     static void hyper_rectangle (Triangulation<dim> &tria,
 				 const Point<dim>& p1,
 				 const Point<dim>& p2,
-				 bool colorize = false);
+				 const bool colorize = false);
 
 				     /**
 				      * Hypercube with a layer of
@@ -307,6 +307,16 @@ class GridGenerator
 				      * Exception
 				      */
     DeclException0 (ExcInvalidRadii);
+
+  private:
+				     /**
+				      * Perform the action specified
+				      * by the @p{colorize} flag of
+				      * the @ref{hyper_rectangle}
+				      * function of this class.
+				      */
+    template <int dim>
+    static void colorize_hyper_rectangle (Triangulation<dim> &tria);
 };
 
 
