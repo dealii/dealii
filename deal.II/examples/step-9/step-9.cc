@@ -77,6 +77,7 @@
 #  define	M_PI		3.14159265358979323846
 #endif
 
+				 // @sect3{AdvectionProblem class declaration}
 
 				 // Following we declare the main
 				 // class of this program. It is very
@@ -183,6 +184,7 @@ class AdvectionProblem
 
 
 
+				 // @sect3{Equation data declaration}
 
 				 // Next we declare a class that
 				 // describes the advection
@@ -494,6 +496,7 @@ BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
 
 
 
+				 // @sect3{GradientEstimation class declaration}
 
 				 // Now, finally, here comes the class
 				 // that will compute the difference
@@ -620,7 +623,7 @@ class GradientEstimation
 
 
 
-
+				 // @sect3{AdvectionProblem class implementation}
 
 
 				 // Now for the implementation of the
@@ -1410,6 +1413,7 @@ void AdvectionProblem<dim>::run ()
 
 
 
+				 // @sect3{GradientEstimation class implementation}
 
 				 // Now for the implementation of the
 				 // ``GradientEstimation'' class. The
@@ -2029,6 +2033,8 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
     };
 };
 
+
+				 // @sect3{Main function}
 
 				 // The ``main'' function is exactly
 				 // like in previous examples, with

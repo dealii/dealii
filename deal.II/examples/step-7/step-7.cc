@@ -73,19 +73,26 @@
 #include <fstream>
 
 
+				 // @sect3{Equation data}
 
-				 // Since we want to compare the
-				 // exactly known continuous solution
-				 // to the computed one, we need a
-				 // function object which represents
-				 // the continuous solution. On the
-				 // other hand, we need the right hand
-				 // side function, and that one of
-				 // course shares some characteristics
-				 // with the solution. In order to
-				 // reduce dependencies which arise if
-				 // we have to change something in
-				 // both classes at the same time, we
+				 // Before implementing the classes
+				 // that actually solve something, we
+				 // first declare and define some
+				 // function classes that represent
+				 // right hand side and solution
+				 // classes. Since we want to compare
+				 // the exactly known continuous
+				 // solution to the computed one, we
+				 // need a function object which
+				 // represents the continuous
+				 // solution. On the other hand, we
+				 // need the right hand side function,
+				 // and that one of course shares some
+				 // characteristics with the
+				 // solution. In order to reduce
+				 // dependencies which arise if we
+				 // have to change something in both
+				 // classes at the same time, we
 				 // exclude the common characteristics
 				 // of both functions into a base
 				 // class.
@@ -331,6 +338,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 };
 
 
+				 // @sect3{The Laplace solver class}
 
 				 // Then we need the class that does
 				 // all the work. It is mostly the
@@ -1732,6 +1740,7 @@ void LaplaceProblem<dim>::run ()
     }
 };
 
+				 // @sect3{Main function}
 
 				 // The main function is mostly as
 				 // before. The only difference is
