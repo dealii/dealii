@@ -610,7 +610,15 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 
 
 
-
+/**
+ * Base class for a time step in time dependent problems. This class provides
+ * barely more than the basic framework, defining the necessary virtual
+ * functions (namely #sleep# and #wake_up#), the interface to previous
+ * and following grids, and some functions to be called before a new loop
+ * over all time steps is started.
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
 class TimeStepBase : public Subscriptor
 {
   public:
