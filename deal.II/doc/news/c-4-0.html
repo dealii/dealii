@@ -88,7 +88,10 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        now takes a second parameter that indicates a shift for each
        vertex of the given patches to be merged. This is sometimes
        nice if one wants to generate "exploded" views of a collection
-       of subdomains.
+       of subdomains. It is also templatized on the first argument, so
+       can merge in some other <code
+       class="class">DataOut_DoFData</code> that create the same type
+       of patches but are otherwise different.
        <br>
        (WB 2002/06/30)
        </p>
