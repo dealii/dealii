@@ -598,9 +598,9 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 
 	for (unsigned int i=0; i<face_dofs.size(); ++i)
 	  {
-	    pair<unsigned int, unsigned int>
+	    const pair<unsigned int, unsigned int>
 	      index = fe.face_system_to_component_index(i);
-	    double s = dof_values[i](index.first);
+	    const double s = dof_values[i](index.first);
 	    if (s != HUGE_VAL)
 	      boundary_values[face_dofs[i]] = s;
 	  }

@@ -48,11 +48,11 @@ class TableEntryBase
 
 
 /**
- * A #TableEntry# stores the value of an table entry.
+ * A #TableEntry# stores the value of a table entry.
  * The value type of this table entry is arbitrary. For
- * a #TableEntry<typename value_type># with not common value
- * type overload the output function.
- * This class is not to be used by the user.
+ * a #TableEntry<typename value_type># with a non-common value
+ * type you may want to specialize the output functions in order
+ * to get nicer output. This class is not to be used by the user.
  *
  * For more detail see the #TableHandler# class.
  *
@@ -95,32 +95,38 @@ class TableEntry : public TableEntryBase
     const value_type val;
 };
 
+
+
+
 /**
  * The #TableHandler# stores #TableEntries# of arbitrary value type and 
- * writes the table as text or in tex format to a tex file. The value type
- * actually may vary from column to column as from row to row. 
+ * writes the table as text or in tex format to an output stream. The value
+ * type actually may vary from column to column and from row to row. 
  *
  * \subsection{Usage}
  *
- * The most important function is the template function 
+ * The most important function is the templatized function 
  * #add_value(const string &key, const value_type value)#, that adds a column
  * with the name #key# to the table if this column does not yet exist and adds the 
- * value of #value_type# (e.g. unsigned int, double, string, ...) to this column.
+ * value of #value_type# (e.g. #unsigned int#, #double#, #string#, ...) to this column.
  * After the table is complete there are different possibilities of output, e.g.
  * into a tex file with #write_tex(ofstream &file)# or as text with 
- * #write_text (ostream &out)#. Two (or more) columns may be merged into a
- * 'supercolumn' by twice (or multiple) calling #add_column_to_supercolumn(...)#,
- * see there. Additionally there is a function to set for each column 
- * the precision of the output of numbers, and there are several functions to
- * prescribe the format and the captions the columns are written with in tex mode.
+ * #write_text (ostream &out)#. 
+ *
+ * Two (or more) columns may be merged into a "supercolumn" by twice
+ * (or multiple) calling #add_column_to_supercolumn(...)#, see
+ * there. Additionally there is a function to set for each column the
+ * precision of the output of numbers, and there are several functions
+ * to prescribe the format and the captions the columns are written
+ * with in tex mode.
  *
  * \subsection{Example}
  * This is a simple example demonstrating the usage of this class. The first column
- * includes the numbers i=1..n, the second 1^2...n^2, the third sqrt(1)...sqrt(n),
+ * includes the numbers #i=1..n#, the second $1^2$...$n^2$, the third $sqrt(1)...sqrt(n)$,
  * where the second and third columns are merged into one supercolumn 
- * with the superkey `squares and roots'. Additionally the first column is
- * aligned to the right (the default was `centered') and the precision of
- * the square roots are given to be 6 (instead of 4 as default).
+ * with the superkey #squares and roots#. Additionally the first column is
+ * aligned to the right (the default was #centered#) and the precision of
+ * the square roots are set to be 6 (instead of 4 as default).
  *
  * \begin{verbatim}
  * TableHandler table();
@@ -163,55 +169,66 @@ class TableHandler
 				      * to the column.
 				      */
     template <typename value_type>
-    void add_value(const string &key, const value_type value);
+    void add_value (const string     &key,
+		    const value_type  value);
     
 				     /**
 				      * Creates a sypercolumn (if not yet
 				      * existent) and includes column to it.
 				      * The keys of the column and the supercolumn
-				      * are key and superkey respectively.
-				      * To merge two columns c1 and c2 to
-				      * a supercolumn sc, hence call
+				      * are #key# and #superkey#, respectively.
+				      * To merge two columns #c1# and #c2# to
+				      * a supercolumn #sc# hence call
 				      * #add_column_to_supercolumn(c1,sc)# and
 				      * #add_column_to_supercolumn(c2,sc)#.
 				      *
 				      * Concerning the order of the columns,
 				      * the supercolumn replaces the first
 				      * column that is added to the supercolumn.
-				      * Within the supercolumn the order
+				      * Within the supercolumn
 				      * the order of output follows the order
 				      * the columns are added to the supercolumn.
 				      */
-    void add_column_to_supercolumn(const string &key, const string &superkey);
+    void add_column_to_supercolumn (const string &key,
+				    const string &superkey);
 
 				     /**
 				      * Change the order of columns and
 				      * supercolumns in the table.
 				      */
-    void set_column_order(const vector<string> &new_order);
+    void set_column_order (const vector<string> &new_order);
     
 				     /**
 				      * Sets the output format of a column.
 				      */
-    void set_precision(const string &key, const unsigned int precision);
+    void set_precision (const string &key,
+			const unsigned int precision);
 
 				     /**
 				      * Sets the caption of the column #key#
-				      * for tex output.
+				      * for tex output. You may want to chose
+				      * this different from #key#, if it 
+				      * contains formulas or similar constructs.
 				      */
-    void set_tex_caption(const string &key, const string &tex_caption);
+    void set_tex_caption (const string &key,
+			  const string &tex_caption);
 
 				     /**
 				      * Sets the caption the the supercolumn
-				      * #superkey# for tex output.
+				      * #superkey# for tex output. You may want
+				      * to chose this different from #superkey#,
+				      * if it contains formulas or similar
+				      * constructs.
 				      */
-    void set_tex_supercaption(const string &superkey, const string &tex_supercaption);
+    void set_tex_supercaption (const string &superkey,
+			       const string &tex_supercaption);
 
 				     /**
 				      * Sets the tex output format of a column.
-				      * e.g. "c", "r", "l".
+				      * e.g. #c#, #r#, #l#, or #p{3cm}#.
 				      */
-    void set_tex_format(const string &key, const string &format);
+    void set_tex_format (const string &key,
+			 const string &format);
 
 				     /**
 				      * Write table as formatted text, e.g.
@@ -262,11 +279,15 @@ class TableHandler
 
   protected:
 
-
+				     /**
+				      * Structure encapsulating all the data
+				      * that is needed to describe one column
+				      * of a table.
+				      */
     struct Column
     {
 					 /**
-					  * Constructor needed by stl_map.h
+					  * Constructor needed by STL maps.
 					  */
 	Column();
 
@@ -280,6 +301,15 @@ class TableHandler
 					  */
 	~Column();
 	
+					 /**
+					  * List of entries within this column.
+					  * They may actually be of very 
+					  * different type, since we use the
+					  * templated #TableEntry<T># class
+					  * for actual values, which is only
+					  * a wrapper for #T#, but is derived
+					  * from #TableEntryBase#.
+					  */
 	vector<TableEntryBase *> entries;
 	
 					 /**
@@ -306,13 +336,14 @@ class TableHandler
 
 					 /**
 					  * Double or float entries are written with
-					  * this (by the user set) precision.
+					  * this precision (set by the user).
 					  * The default is 4.
 					  */
 	unsigned int precision;
 
 					 /**
-					  * Flag that may be used by derived classes.
+					  * Flag that may be used by derived 
+					  * classes for arbitrary purposes.
 					  */
 	unsigned int flag;
     };
@@ -320,13 +351,14 @@ class TableHandler
 				     /**
 				      * Help function that gives a vector of
 				      * the keys of all columns that are mentioned
-				      * in column_order, where each supercolumn key
+				      * in #column_order#, where each supercolumn key
 				      * is replaced by its subcolumn keys.
 				      *
 				      * This function implicitly checks the
-				      * consistency of the data.
+				      * consistency of the data. The result is
+				      * returned in #sel_columns#.
 				      */
-    void get_selected_columns(vector<string> &sel_columns) const;
+    void get_selected_columns (vector<string> &sel_columns) const;
     
 				     /**
 				      * Builtin function, that checks if
@@ -338,8 +370,8 @@ class TableHandler
 
 				     /**
 				      * Stores the column and 
-				      * supercolumn keys in the user wanted
-				      * order.
+				      * supercolumn keys in the order desired
+				      * by the user.
 				      * By default this is the order of
 				      * adding the columns. This order may be
 				      * changed by #set_column_order(...)#.
@@ -357,6 +389,11 @@ class TableHandler
 				      * the keys of its subcolumns in the right order.
 				      * It is allowed that a supercolumn has got
 				      * the same key as a column.
+				      *
+				      * Note that we do not use a #multimap#
+				      * here since the order of column
+				      * keys for each supercolumn key is
+				      * relevant.
 				      */
     map<string, vector<string> > supercolumns;
 

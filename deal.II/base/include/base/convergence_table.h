@@ -10,21 +10,21 @@
 
 /**
  * The #ConvergenceTable# class is an application to the #TableHandler# class and
- * stores some convergence data as residuals of the cg-method, or some evaluated
- * $L^2$-errors of discrete solutions, etc,
- * and evaluates convergence rates or orders.
- * The already implemented #RateMode# is #ConvergenceTable::standard#, 
+ * stores some convergence data, such as residuals of the cg-method, or some evaluated
+ * $L^2$-errors of discrete solutions, etc, and evaluates convergence rates or orders.
+ *
+ * The already implemented #RateMode#s are #ConvergenceTable::standard#, 
  * where the convergence rate is the quotient of two following rows, and 
  * #ConvergenceTable::standard_order#, that evaluates the order of convergence.
  * These standard evaluations are useful for global refinement, for local refinement
  * this may not be a appropriate method, as the convergence rates should be
  * set in relation to the number of cells or the number of DoFs. The
- * implementations of these not standard methods is left to the fantasy of a
+ * implementations of these non-standard methods is left to the fantasy of a
  * fanatic user.
  *
  * \subsection{Usage}
  * The number of cells and the number of DoFs are added to the table by
- * calling #add_run(unsigned int ncells, unsigned int ndofs#. The
+ * calling #add_run(unsigned int ncells, unsigned int ndofs)#. The
  * data is added by #add_value(...)# of the base class #TableHandler#.
  * Before the output of the table the function #evaluate_convergence_rates#
  * may be (also multiply) called. 
@@ -40,16 +40,17 @@ class ConvergenceTable: public TableHandler
 				      */
     ConvergenceTable();
     
-    enum RateMode
-    {
+    enum RateMode {
 	  none, standard, standard_order, n_cells, n_dofs
     };
+
 				     /**
 				      * Adds the basic information
 				      * (number of cells, number of DoFs)
 				      * of a new run.
 				      */
-    void add_run(unsigned int ncells, unsigned int ndofs);
+    void add_run (unsigned int ncells, 
+		  unsigned int ndofs);
 
 				     /**
 				      * Evaluates the convergence rates of the
@@ -57,7 +58,8 @@ class ConvergenceTable: public TableHandler
 				      * merges the rate column and this column
 				      * to a supercolumn.
 				      */
-    void evaluate_convergence_rates(const string &key, const RateMode conv_rate);
+    void evaluate_convergence_rates (const string &key, 
+				     const RateMode conv_rate);
 
 				     /**
 				      * Evaluate the convergence rates of

@@ -53,20 +53,24 @@ TableHandler::Column::Column(const string &tex_caption):
 		tex_caption(tex_caption),
 		tex_format("c"),
 		precision(4),
-		flag(0)  {}
+		flag(0)  
+{}
 
 
 TableHandler::Column::Column():
 		tex_caption(),
 		tex_format("c"),
 		precision(4),
-		flag(0)  {}
+		flag(0)  
+{}
+
 
 
 TableHandler::Column::~Column()
 {
   for (unsigned int i=0; i<entries.size(); ++i)
     delete entries[i];
+  entries.clear();
 }
 
 /*---------------------------------------------------------------------*/
@@ -77,7 +81,8 @@ TableHandler::TableHandler()
 
 
 template <typename number>
-void TableHandler::add_value(const string &key, number value)
+void TableHandler::add_value (const string &key, 
+			      const number value)
 {
   if (!columns.count(key))
     {
@@ -95,7 +100,8 @@ void TableHandler::add_value(const string &key, number value)
 
 
 
-void TableHandler::add_column_to_supercolumn(const string &key, const string &superkey)
+void TableHandler::add_column_to_supercolumn (const string &key,
+					      const string &superkey)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
 
@@ -139,7 +145,7 @@ void TableHandler::add_column_to_supercolumn(const string &key, const string &su
 
 
 
-void TableHandler::set_column_order(const vector<string> &new_order)
+void TableHandler::set_column_order (const vector<string> &new_order)
 {
   for (unsigned int j=0; j<new_order.size(); ++j)
     Assert(supercolumns.count(new_order[j]) || columns.count(new_order[j]),
@@ -149,14 +155,16 @@ void TableHandler::set_column_order(const vector<string> &new_order)
 }
 
 
-void TableHandler::set_tex_caption(const string &key, const string &tex_caption)
+void TableHandler::set_tex_caption (const string &key, 
+				    const string &tex_caption)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   columns[key].tex_caption=tex_caption;
 }
 
 
-void TableHandler::set_tex_supercaption(const string &superkey, const string &tex_supercaption)
+void TableHandler::set_tex_supercaption (const string &superkey,
+					 const string &tex_supercaption)
 {
   Assert(supercolumns.count(superkey), ExcSuperColumnNotExistent(superkey));
   Assert(tex_supercaptions.count(superkey), ExcInternalError());
@@ -164,7 +172,8 @@ void TableHandler::set_tex_supercaption(const string &superkey, const string &te
 }
 
 
-void TableHandler::set_tex_format(const string &key, const string &tex_format)
+void TableHandler::set_tex_format (const string &key,
+				   const string &tex_format)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   Assert(tex_format=="l" || tex_format=="c" || tex_format=="r",
@@ -172,11 +181,16 @@ void TableHandler::set_tex_format(const string &key, const string &tex_format)
   columns[key].tex_format=tex_format;
 }
 
-void TableHandler::set_precision(const string &key, unsigned int precision)
+
+
+void TableHandler::set_precision (const string &key,
+				  unsigned int precision)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   columns[key].precision=precision;
 }
+
+
 
 void TableHandler::write_text(ostream &out) const
 {
@@ -348,8 +362,10 @@ unsigned int TableHandler::check_n_rows() const
   string first_name=col_iter->first;
 
   for (++col_iter; col_iter!=columns.end(); ++col_iter)
-    Assert(col_iter->second.entries.size()==n, ExcWrongNumberOfDataEntries(
-      col_iter->first, col_iter->second.entries.size(), first_name, n));
+    Assert(col_iter->second.entries.size()==n, 
+	   ExcWrongNumberOfDataEntries(col_iter->first, 
+				       col_iter->second.entries.size(), 
+				       first_name, n));
 
   return n;
 }
@@ -387,6 +403,8 @@ void TableHandler::get_selected_columns(vector<string> &sel_columns) const
 }
 
 
+
+// explicit instantiations
 template class TableEntry<double>;
 template class TableEntry<float>;
 template class TableEntry<int>;

@@ -8,10 +8,12 @@
 
 ConvergenceTable::ConvergenceTable():
 		n_cells_string("n cells"),
-		n_dofs_string("n dofs")   {}
+		n_dofs_string("n dofs")   
+{}
 
 
-void ConvergenceTable::add_run(unsigned int ncells, unsigned int ndofs)
+void ConvergenceTable::add_run (unsigned int ncells,
+				unsigned int ndofs)
 {
   add_value(n_cells_string, ncells);
   add_value(n_dofs_string, ndofs);
@@ -43,12 +45,16 @@ void ConvergenceTable::evaluate_convergence_rates(const string &key,
     {
       case standard:
 	    rate_key+="s";
+					     // no value availble for the
+					     // first row
 	    add_value(rate_key, string("-"));
 	    for (unsigned int i=1; i<n; ++i)
 	      add_value(rate_key, values[i-1]/values[i]);
 	    break;
       case standard_order:
 	    rate_key+="so";
+					     // no value availble for the
+					     // first row
 	    add_value(rate_key, string("-"));
 	    for (unsigned int i=1; i<n; ++i)
 	      add_value(rate_key, log(values[i-1]/values[i])/log(2));
