@@ -48,11 +48,65 @@
  * @ref{FullMatrix}, as long as it satisfies a number of requirements,
  * stated with the member functions of this class.
  *
+ * The generation of patches through the @p{build_patches} function
+ * can be modified by giving it an object holding certain flags. See
+ * the documentation of the members of the @ref{Options} class for a
+ * description of these flags.
+ *
  * @author Wolfgang Bangerth, 2001
  */
 class MatrixOut : public DataOutInterface<2,2>
 {
   public:
+				     /**
+				      * Class holding various
+				      * variables which are used to
+				      * modify the output of the
+				      * @ref{MatrixOut} class.
+				      */
+    class Options 
+    {
+      public:
+					 /**
+					  * If @p{true}, only show the
+					  * absolute values of the
+					  * matrix entries, rather
+					  * than their true values
+					  * including the
+					  * sign. Default value is
+					  * @p{false}.
+					  */
+	bool         show_absolute_values;
+
+					 /**
+					  * If larger than one, do not
+					  * show each element of the
+					  * matrix, but rather an
+					  * average over a number of
+					  * entries. The number of
+					  * output patches is
+					  * accordingly smaller. This
+					  * flag determines how large
+					  * each shown block shall be
+					  * (in rows/columns). For
+					  * example, if it is two,
+					  * then always four entries
+					  * are collated into one.
+					  *
+					  * Default value is one.
+					  */
+	unsigned int block_size;
+
+					 /**
+					  * Default constructor. Set
+					  * all elements of this
+					  * structure to their default
+					  * values.
+					  */
+	Options (const bool         show_absolute_values = false,
+		 const unsigned int block_size           = 1);
+    };
+    
 				     /**
 				      * Destructor. Declared in order
 				      * to make it virtual.
@@ -70,6 +124,12 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * write the data into a files,
 				      * using one of the supported
 				      * output formats.
+				      *
+				      * You may give a structure
+				      * holding various options. See
+				      * the description of the fields
+				      * of this structure for more
+				      * information.
 				      *
 				      * Note that this function
 				      * requires that we can extract
@@ -92,7 +152,8 @@ class MatrixOut : public DataOutInterface<2,2>
 				      */
     template <class Matrix>
     void build_patches (const Matrix      &matrix,
-			const std::string &name);
+			const std::string &name,
+			const Options     &options = Options());
     
   private:
     
@@ -167,7 +228,25 @@ class MatrixOut : public DataOutInterface<2,2>
     static double get_element (const Matrix       &matrix,
 			       const unsigned int  i,
 			       const unsigned int  j);
-    
+
+				     /**
+				      * Get the value of the matrix at
+				      * gridpoint @p{(i,j)}. Depending
+				      * on the given flags, this can
+				      * mean different things, for
+				      * example if only absolute
+				      * values shall be shown then the
+				      * absolute value of the matrix
+				      * entry is taken. If the block
+				      * size is larger than one, then
+				      * an average of several matrix
+				      * entries is taken.
+				      */
+    template <class Matrix>
+    static double get_gridpoint_value (const Matrix       &matrix,
+				       const unsigned int  i,
+				       const unsigned int  j,
+				       const Options      &options);    
 };
 
 
@@ -215,19 +294,65 @@ MatrixOut::get_element (const Matrix       &matrix,
 
 
 template <class Matrix>
+inline
+double
+MatrixOut::get_gridpoint_value (const Matrix       &matrix,
+				const unsigned int  i,
+				const unsigned int  j,
+				const Options      &options)
+{
+				   // special case if block size is
+				   // one since we then don't need all
+				   // that loop overhead
+  if (options.block_size == 1)
+    {
+      if (options.show_absolute_values == true)
+	return std::fabs(get_element (matrix, i, j));
+      else
+	return get_element (matrix, i, j);
+    };
+
+				   // if blocksize greater than one,
+				   // then compute average of elements
+  double average = 0;
+  unsigned int n_elements = 0;
+  for (unsigned int row=i*options.block_size;
+       row < std::min(matrix.m(), (i+1)*options.block_size); ++row)
+    for (unsigned int col=j*options.block_size;
+	 col < std::min(matrix.m(), (j+1)*options.block_size); ++col, ++n_elements)
+      if (options.show_absolute_values == true)
+	average += std::fabs(get_element (matrix, row, col));
+      else
+	average += get_element (matrix, row, col);
+  average /= n_elements;
+  return average;
+};
+
+
+
+template <class Matrix>
 void
 MatrixOut::build_patches (const Matrix      &matrix,
-			  const std::string &name)
+			  const std::string &name,
+			  const Options     &options)
 {
+  const unsigned int
+    gridpoints_x = (matrix.n() / options.block_size
+		    +
+		    (matrix.n() % options.block_size != 0 ? 1 : 0)),
+    gridpoints_y = (matrix.m() / options.block_size
+		    +
+		    (matrix.m() % options.block_size != 0 ? 1 : 0));
+		
 				   // first clear old data and set it
 				   // to virgin state
   patches.clear ();
-  patches.resize ((matrix.n()-1) * (matrix.m()-1));
+  patches.resize ((gridpoints_x-1) * (gridpoints_y-1));
 
 				   // now build the patches
   unsigned int index=0;
-  for (unsigned int i=0; i<matrix.m()-1; ++i)
-    for (unsigned int j=0; j<matrix.n()-1; ++j, ++index)
+  for (unsigned int i=0; i<gridpoints_y-1; ++i)
+    for (unsigned int j=0; j<gridpoints_x-1; ++j, ++index)
       {
 					 // within each patch, order
 					 // the points in such a way
@@ -257,14 +382,20 @@ MatrixOut::build_patches (const Matrix      &matrix,
 	patches[index].vertices[2](1) = static_cast<signed int>(-i-1);
 	patches[index].vertices[3](0) = j+1;
 	patches[index].vertices[3](1) = static_cast<signed int>(-i);
-
+					 // next scale all the patch
+					 // coordinates by the block
+					 // size, to get original
+					 // coordinates
+	for (unsigned int v=0; v<4; ++v)
+	  patches[index].vertices[v] *= options.block_size;
+	
 	patches[index].n_subdivisions = 1;
 
 	patches[index].data.reinit (1,4);
-	patches[index].data(0,0) = get_element(matrix, i, j);
-	patches[index].data(0,1) = get_element(matrix, i, j+1);
-	patches[index].data(0,2) = get_element(matrix, i+1, j);
-	patches[index].data(0,3) = get_element(matrix, i+1, j+1);
+	patches[index].data(0,0) = get_gridpoint_value(matrix, i,   j,   options);
+	patches[index].data(0,1) = get_gridpoint_value(matrix, i,   j+1, options);
+	patches[index].data(0,2) = get_gridpoint_value(matrix, i+1, j,   options);
+	patches[index].data(0,3) = get_gridpoint_value(matrix, i+1, j+1, options);
       };
 
 				   // finally set the name

@@ -3,6 +3,15 @@
 #include <lac/matrix_out.h>
 
 
+MatrixOut::Options::Options (const bool         show_absolute_values,
+			     const unsigned int block_size)
+		:
+		show_absolute_values (show_absolute_values),
+		block_size (block_size)
+{};
+
+
+
 MatrixOut::~MatrixOut () 
 {};
 
