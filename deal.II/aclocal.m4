@@ -330,6 +330,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSG="$CXXFLAGS -DDEBUG"
           CXXFLAGSO="$CXXFLAGS"
           CXXFLAGSPIC="-KPIC"
+          LDFLAGSPIC="-G"
           ;;
   
       portland_group)
