@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -780,8 +780,8 @@ void FE_Nedelec<dim>::initialize_unit_support_points ()
 	for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	  {
 	    const unsigned int
-	      vertex_index_0 = GeometryInfo<dim>::vertices_adjacent_to_line(line,0),
-	      vertex_index_1 = GeometryInfo<dim>::vertices_adjacent_to_line(line,1);
+	      vertex_index_0 = GeometryInfo<dim>::line_to_cell_vertices(line,0),
+	      vertex_index_1 = GeometryInfo<dim>::line_to_cell_vertices(line,1);
 	    
 	    const Point<dim>
 	      vertex_0 = GeometryInfo<dim>::unit_cell_vertex(vertex_index_0),
@@ -829,8 +829,8 @@ void FE_Nedelec<dim>::initialize_unit_face_support_points ()
 	for (unsigned int line=0; line<GeometryInfo<dim-1>::lines_per_cell; ++line)
 	  {
 	    const unsigned int
-	      vertex_index_0 = GeometryInfo<dim-1>::vertices_adjacent_to_line(line,0),
-	      vertex_index_1 = GeometryInfo<dim-1>::vertices_adjacent_to_line(line,1);
+	      vertex_index_0 = GeometryInfo<dim-1>::line_to_cell_vertices(line,0),
+	      vertex_index_1 = GeometryInfo<dim-1>::line_to_cell_vertices(line,1);
       
 	    const Point<dim-1>
 	      vertex_0 = GeometryInfo<dim-1>::unit_cell_vertex(vertex_index_0),
