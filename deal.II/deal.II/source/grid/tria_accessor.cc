@@ -249,6 +249,16 @@ unsigned int TriaObjectAccessor<1, dim>::number_of_children () const
 }
 
 
+
+template <int dim>
+bool
+TriaObjectAccessor<1,dim>::get_face_orientation (const unsigned int) const
+{
+  Assert (false, ExcInternalError());
+  return true;
+}
+
+
 /*------------------------ Functions: QuadAccessor ---------------------------*/
 
 template <int dim>
@@ -573,6 +583,7 @@ double TriaObjectAccessor<2, 2>::measure () const
 	  x[0]*y[1]/2.0-x[3]*y[2]/2.0+x[1]*y[2]/2.0-x[2]*y[1]/2.0);
 }
 
+
 #endif
 
 
@@ -664,6 +675,17 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
       return sum;
     };
 }
+
+
+
+template <int dim>
+bool
+TriaObjectAccessor<2,dim>::get_face_orientation (const unsigned int) const
+{
+  Assert (false, ExcInternalError());
+  return true;
+}
+
 
 
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/

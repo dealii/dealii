@@ -675,6 +675,22 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      */
     unsigned int number_of_children () const;
 
+                                     /**
+                                      * Enquire some information about
+                                      * whether the face with the
+                                      * given number is in standard
+                                      * orientation or not. This
+                                      * information is only useful
+                                      * (and available) in 3d, see the
+                                      * documentation of the
+                                      * respective class. For all
+                                      * other dimensions, this
+                                      * function should not be called
+                                      * and triggers and assertion if
+                                      * done so.
+                                      */
+    bool get_face_orientation (const unsigned int face) const;
+    
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -1118,6 +1134,22 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      */
     unsigned int number_of_children () const;
     
+                                     /**
+                                      * Enquire some information about
+                                      * whether the face with the
+                                      * given number is in standard
+                                      * orientation or not. This
+                                      * information is only useful
+                                      * (and available) in 3d, see the
+                                      * documentation of the
+                                      * respective class. For all
+                                      * other dimensions, this
+                                      * function should not be called
+                                      * and triggers and assertion if
+                                      * done so.
+                                      */
+    bool get_face_orientation (const unsigned int face) const;
+
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -1582,6 +1614,22 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * refined, one is returned.
 				      */
     unsigned int number_of_children () const;
+
+                                     /**
+                                      * Enquire some information about
+                                      * whether the face with the
+                                      * given number is in standard
+                                      * orientation or not. This
+                                      * information is only useful
+                                      * (and available) in 3d, see the
+                                      * documentation of the
+                                      * respective class. For all
+                                      * other dimensions, this
+                                      * function should not be called
+                                      * and triggers and assertion if
+                                      * done so.
+                                      */
+    bool get_face_orientation (const unsigned int face) const;
 
   private:
     				     /**
