@@ -90,7 +90,7 @@
  * For the requirements on matrices and vectors in order to work with
  * this class, see the documentation of the @ref{Solver} base class.
  *
- * @author Wolfgang Bangerth, Ralf Hartmann.
+ * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
 template <class VECTOR = Vector<double> >
 class SolverGMRES : public Solver<VECTOR>
@@ -434,8 +434,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
     {
       r=this->memory.alloc();
       x_=this->memory.alloc();
-      r->reinit(x.size());
-      x_->reinit(x.size());
+      r->reinit(x);
+      x_->reinit(x);
 
       gamma_=new ::Vector<double> (gamma.size());
     }
