@@ -11,17 +11,20 @@
 //
 //----------------------------  multithread_info.cc  ----------------
 
+
 #include <base/multithread_info.h>
 
 #if defined(__linux__)
-
-#include <fstream.h>
-#include <string>
+#  include <fstream.h>
+#  include <string>
 #endif
 
 #if defined(__sun__)
-#include <unistd.h>
+#  include <unistd.h>
 #endif
+
+
+
 
 #ifdef DEAL_II_USE_MT
 
@@ -37,7 +40,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 
   AssertThrow(cpuinfo,ExcProcNotPresent());
   
-  while((cpuinfo))
+  while(cpuinfo)
     {
       cpuinfo >> search;
       if (search.find("processor")!=string::npos)
@@ -48,12 +51,15 @@ unsigned int MultithreadInfo::get_n_cpus()
   return nCPU;
 }
 
+
 #elif defined(__sun__)
+
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
   return sysconf(_SC_NPROCESSORS_ONLN);
 }
+
 
 #else
 
@@ -66,8 +72,8 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 #endif
 
-				 // not in multithreadmode
-#else
+
+#else				 // not in multithreadmode
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
@@ -76,7 +82,6 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 #endif
 
-MultithreadInfo multithread_info;
 
 MultithreadInfo::MultithreadInfo () :
                 n_cpus (get_n_cpus()),
@@ -86,4 +91,6 @@ MultithreadInfo::MultithreadInfo () :
 
 
 
+// definition of the variable which is declared `extern' in the .h file
+MultithreadInfo multithread_info;
 
