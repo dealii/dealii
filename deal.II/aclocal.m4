@@ -133,7 +133,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
 #include <cmath>
     ],
     [
-	double d;
+	double d=0;
 	isnan (d);
     ],
     [
@@ -151,7 +151,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
 #include <cmath>
     ],
     [
-	double d;
+	double d=0;
 	isnan (d);
     ],
     [

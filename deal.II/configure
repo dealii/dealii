@@ -1530,7 +1530,7 @@ echo "configure:1523: checking whether isnan is declared with debug flags" >&5
     
 int main() {
 
-	double d;
+	double d=0;
 	isnan (d);
     
 ; return 0; }
@@ -1562,7 +1562,7 @@ echo "configure:1555: checking whether isnan is declared with optimized flags" >
     
 int main() {
 
-	double d;
+	double d=0;
 	isnan (d);
     
 ; return 0; }
