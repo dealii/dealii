@@ -874,9 +874,9 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
       std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
-      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+      Assert (data.shape_gradients.n_rows() == dofs_per_cell * dim,
 	      ExcInternalError());
-      Assert (data.shape_values.n_cols() == n_q_points,
+      Assert (data.shape_gradients.n_cols() == n_q_points,
 	      ExcInternalError());
 
                                        // loop over all shape
@@ -934,107 +934,295 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
     compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
   
   fe_data.first_cell = false;
+};
+
+
+
+template <int dim>
+void
+FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
+				      const typename DoFHandler<dim>::cell_iterator &cell,
+				      const unsigned int                    face,
+				      const Quadrature<dim-1>              &quadrature,
+				      typename Mapping<dim>::InternalDataBase       &mapping_data,
+				      typename Mapping<dim>::InternalDataBase       &fedata,
+				      FEValuesData<dim>                    &data) const
+{
+ 				   // convert data object to internal
+ 				   // data for this class. fails with
+ 				   // an exception if that is not
+ 				   // possible
+  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+
+                                   // offset determines which data set
+				   // to take (all data sets for all
+				   // faces are stored contiguously)
+  const unsigned int offset = face * quadrature.n_quadrature_points;
+
+  				   // get the flags indicating the
+				   // fields that have to be filled
+  const UpdateFlags flags(fe_data.current_update_flags());
+
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
+				  
+				   // fill shape function
+				   // values. these are vector-valued,
+				   // so we have to transform
+				   // them. since the output format
+				   // (in data.shape_values) is a
+				   // sequence of doubles (one for
+				   // each non-zero shape function
+				   // value, and for each quadrature
+				   // point, rather than a sequence of
+				   // small vectors, we have to use a
+				   // number of conversions
+  if (flags & update_values)
+    {
+      Assert (fe_data.shape_values.n_cols() ==
+              GeometryInfo<dim>::faces_per_cell * n_q_points,
+              ExcInternalError());
+      
+      std::vector<Tensor<1,dim> > shape_values (n_q_points);
+
+      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+	      ExcInternalError());
+      Assert (data.shape_values.n_cols() == n_q_points,
+	      ExcInternalError());
+      
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+					   // first transform shape
+					   // values...
+	  Assert (fe_data.shape_values[k].size() == n_q_points,
+		  ExcInternalError());
+	  mapping.transform_covariant(&*shape_values.begin(),
+                                      &*shape_values.end(),
+                                      fe_data.shape_values[k].begin()+offset,
+                                      mapping_data);
+
+					   // then copy over to target:
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    for (unsigned int d=0; d<dim; ++d)
+	      data.shape_values[k*dim+d][q] = shape_values[q][d];
+	};
+    };
+  
+      
+  if (flags & update_gradients)
+    {
+      Assert (fe_data.shape_gradients.n_cols() ==
+              GeometryInfo<dim>::faces_per_cell * n_q_points,
+              ExcInternalError());
+
+      std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
+      std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
+
+      Assert (data.shape_gradients.n_rows() == dofs_per_cell * dim,
+	      ExcInternalError());
+      Assert (data.shape_gradients.n_cols() == n_q_points,
+	      ExcInternalError());
+
+                                       // loop over all shape
+                                       // functions, and treat the
+                                       // gradients of each shape
+                                       // function at all quadrature
+                                       // points
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+                                           // treat the gradients of
+                                           // this particular shape
+                                           // function at all
+                                           // q-points. if Dv is the
+                                           // gradient of the shape
+                                           // function on the unit
+                                           // cell, then
+                                           // (J^-T)Dv(J^-1) is the
+                                           // value we want to have on
+                                           // the real cell. so, we
+                                           // will have to apply a
+                                           // covariant transformation
+                                           // to Dv twice. since the
+                                           // interface only allows
+                                           // multiplication with
+                                           // (J^-1) from the right,
+                                           // we have to trick a
+                                           // little in between
+	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
+		  ExcInternalError());
+                                           // do first transformation
+	  mapping.transform_covariant(&*shape_grads1.begin(),
+                                      &*shape_grads1.end(),
+                                      fe_data.shape_gradients[k].begin()+offset,
+                                      mapping_data);
+                                           // transpose matrix
+          for (unsigned int q=0; q<n_q_points; ++q)
+            shape_grads2[q] = transpose(shape_grads1[q]);
+                                           // do second transformation
+	  mapping.transform_covariant(&*shape_grads1.begin(),
+                                      &*shape_grads1.end(),
+                                      &*shape_grads2.begin(),
+                                      mapping_data);
+                                           // transpose back
+          for (unsigned int q=0; q<n_q_points; ++q)
+            shape_grads2[q] = transpose(shape_grads1[q]);
+          
+					   // then copy over to target:
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    for (unsigned int d=0; d<dim; ++d)
+	      data.shape_gradients[k*dim+d][q] = shape_grads2[q][d];
+	};
+    }
+
+  if (flags & update_second_derivatives)
+    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+  
+  fe_data.first_cell = false;
 }
 
 
 
 template <int dim>
 void
-FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &/*mapping*/,
-				      const typename DoFHandler<dim>::cell_iterator &/*cell*/,
-				      const unsigned int                    /*face*/,
-				      const Quadrature<dim-1>              &/*quadrature*/,
-				      typename Mapping<dim>::InternalDataBase       &/*mapping_data*/,
-				      typename Mapping<dim>::InternalDataBase       &/*fedata*/,
-				      FEValuesData<dim>                    &/*data*/) const
+FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
+					 const typename DoFHandler<dim>::cell_iterator &cell,
+					 const unsigned int                    face,
+					 const unsigned int                    subface,
+					 const Quadrature<dim-1>              &quadrature,
+					 typename Mapping<dim>::InternalDataBase       &mapping_data,
+					 typename Mapping<dim>::InternalDataBase       &fedata,
+					 FEValuesData<dim>                    &data) const
 {
-//TODO!!  
-//  				   // convert data object to internal
-//  				   // data for this class. fails with
-//  				   // an exception if that is not
-//  				   // possible
-//    InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+ 				   // convert data object to internal
+ 				   // data for this class. fails with
+ 				   // an exception if that is not
+ 				   // possible
+  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
-//  				   // offset determines which data set
-//  				   // to take (all data sets for all
-//  				   // faces are stored contiguously)
-//    const unsigned int offset = face * quadrature.n_quadrature_points;
-  
-//    const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
+                                   // offset determines which data set
+				   // to take (all data sets for all
+				   // faces are stored contiguously)
+  const unsigned int offset = ((face * GeometryInfo<dim>::subfaces_per_face + subface)
+                               * quadrature.n_quadrature_points);
 
-//    for (unsigned int k=0; k<dofs_per_cell; ++k)
-//      {
-//        for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-//  	if (flags & update_values)
-//  	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+  				   // get the flags indicating the
+				   // fields that have to be filled
+  const UpdateFlags flags(fe_data.current_update_flags());
+
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
+				  
+				   // fill shape function
+				   // values. these are vector-valued,
+				   // so we have to transform
+				   // them. since the output format
+				   // (in data.shape_values) is a
+				   // sequence of doubles (one for
+				   // each non-zero shape function
+				   // value, and for each quadrature
+				   // point, rather than a sequence of
+				   // small vectors, we have to use a
+				   // number of conversions
+  if (flags & update_values)
+    {
+      Assert (fe_data.shape_values.n_cols() ==
+              GeometryInfo<dim>::faces_per_cell * n_q_points,
+              ExcInternalError());
       
-//        if (flags & update_gradients)
-//    {
-//  	  Assert (data.shape_gradients[k].size() + offset <=
-//  		  fe_data.shape_gradients[k].size(),
-//  		  ExcInternalError());    
-//  	mapping.transform_covariant(data.shape_gradients[k],
-//  				    fe_data.shape_gradients[k],
-//  				    mapping_data, offset);
-// }  
-//      }
+      std::vector<Tensor<1,dim> > shape_values (n_q_points);
 
-//    if (flags & update_second_derivatives)
-//      compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-  
-//    fe_data.first_cell = false;
-}
-
-
-
-template <int dim>
-void
-FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &/*mapping*/,
-					 const typename DoFHandler<dim>::cell_iterator &/*cell*/,
-					 const unsigned int                    /*face*/,
-					 const unsigned int                    /*subface*/,
-					 const Quadrature<dim-1>              &/*quadrature*/,
-					 typename Mapping<dim>::InternalDataBase       &/*mapping_data*/,
-					 typename Mapping<dim>::InternalDataBase       &/*fedata*/,
-					 FEValuesData<dim>                    &/*data*/) const
-{
-//TODO!!  
-//  				   // convert data object to internal
-//  				   // data for this class. fails with
-//  				   // an exception if that is not
-//  				   // possible
-//    InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-
-//  				   // offset determines which data set
-//  				   // to take (all data sets for all
-//  				   // sub-faces are stored contiguously)
-//    const unsigned int offset = (face * GeometryInfo<dim>::subfaces_per_face + subface)
-//  			      * quadrature.n_quadrature_points;
-
-//    const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
-//    for (unsigned int k=0; k<dofs_per_cell; ++k)
-//      {
-//        for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-//  	if (flags & update_values)
-//  	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+	      ExcInternalError());
+      Assert (data.shape_values.n_cols() == n_q_points,
+	      ExcInternalError());
       
-//        if (flags & update_gradients)
-//  {
-//    Assert (data.shape_gradients[k].size() + offset<=
-//  		  fe_data.shape_gradients[k].size(),
-//  		  ExcInternalError());
-//  	mapping.transform_covariant(data.shape_gradients[k],
-//  				    fe_data.shape_gradients[k],
-//  				    mapping_data, offset);
-// };  
-//      }
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+					   // first transform shape
+					   // values...
+	  Assert (fe_data.shape_values[k].size() == n_q_points,
+		  ExcInternalError());
+	  mapping.transform_covariant(&*shape_values.begin(),
+                                      &*shape_values.end(),
+                                      fe_data.shape_values[k].begin()+offset,
+                                      mapping_data);
+
+					   // then copy over to target:
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    for (unsigned int d=0; d<dim; ++d)
+	      data.shape_values[k*dim+d][q] = shape_values[q][d];
+	};
+    };
   
-//    if (flags & update_second_derivatives)
-//      compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+      
+  if (flags & update_gradients)
+    {
+      Assert (fe_data.shape_gradients.n_cols() ==
+              GeometryInfo<dim>::faces_per_cell * n_q_points,
+              ExcInternalError());
+
+      std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
+      std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
+
+      Assert (data.shape_gradients.n_rows() == dofs_per_cell * dim,
+	      ExcInternalError());
+      Assert (data.shape_gradients.n_cols() == n_q_points,
+	      ExcInternalError());
+
+                                       // loop over all shape
+                                       // functions, and treat the
+                                       // gradients of each shape
+                                       // function at all quadrature
+                                       // points
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+                                           // treat the gradients of
+                                           // this particular shape
+                                           // function at all
+                                           // q-points. if Dv is the
+                                           // gradient of the shape
+                                           // function on the unit
+                                           // cell, then
+                                           // (J^-T)Dv(J^-1) is the
+                                           // value we want to have on
+                                           // the real cell. so, we
+                                           // will have to apply a
+                                           // covariant transformation
+                                           // to Dv twice. since the
+                                           // interface only allows
+                                           // multiplication with
+                                           // (J^-1) from the right,
+                                           // we have to trick a
+                                           // little in between
+	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
+		  ExcInternalError());
+                                           // do first transformation
+	  mapping.transform_covariant(&*shape_grads1.begin(),
+                                      &*shape_grads1.end(),
+                                      fe_data.shape_gradients[k].begin()+offset,
+                                      mapping_data);
+                                           // transpose matrix
+          for (unsigned int q=0; q<n_q_points; ++q)
+            shape_grads2[q] = transpose(shape_grads1[q]);
+                                           // do second transformation
+	  mapping.transform_covariant(&*shape_grads1.begin(),
+                                      &*shape_grads1.end(),
+                                      &*shape_grads2.begin(),
+                                      mapping_data);
+                                           // transpose back
+          for (unsigned int q=0; q<n_q_points; ++q)
+            shape_grads2[q] = transpose(shape_grads1[q]);
+          
+					   // then copy over to target:
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    for (unsigned int d=0; d<dim; ++d)
+	      data.shape_gradients[k*dim+d][q] = shape_grads2[q][d];
+	};
+    }
+
+  if (flags & update_second_derivatives)
+    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
   
-//    fe_data.first_cell = false;
-}
+  fe_data.first_cell = false;
+};
 
 
 
@@ -1066,16 +1254,31 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
 	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
-	  
-//TODO: fix for higher orders. correct now for lowest order, all dimensions  
-//TODO!!
-// can this be done in a way that is dimension and degree independent?
+
+  switch (degree)
+    {
+      case 1:
+      {
+                                         // only on non-adjacent faces
+                                         // are the values actually
+                                         // zero. list these in a
+                                         // table
+        const unsigned int opposite_faces_2d[GeometryInfo<2>::faces_per_cell]
+          = { 2, 3, 0, 1};
+        const unsigned int opposite_faces_3d[GeometryInfo<3>::faces_per_cell]
+          = { 1, 0, 4, 5, 2, 3};
+        switch (dim)
+          {
+            case 2:  return (face_index != opposite_faces_2d[shape_index]);
+            case 3:  return (face_index != opposite_faces_3d[shape_index]);
+            default: Assert (false, ExcNotImplemented());
+          };
+      };
+      
+      default:  // other degree
+            Assert (false, ExcNotImplemented());
+    };
   
-				   // all degrees of freedom are on
-				   // lines, so also on a face. the
-				   // question is whether it has
-				   // support on this particular face
-  Assert (false, ExcNotImplemented());
   return true;
 }
 

@@ -24,8 +24,6 @@
 // the child cell are obtained from the degrees of freedom on the
 // mother cell
 //
-// TODO: [Anna] check whether the following paragraph is correct. if so, then please multiply the values in the eight following matrices by two
-
 // note the following: since the shape functions themselves and not
 // only the gradients are transformed using the mapping object from
 // the unit cell to the real cell, the actual values of the function

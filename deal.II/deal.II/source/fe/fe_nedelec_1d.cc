@@ -13,8 +13,8 @@
 
 
 
-// only compile this file if in 1d. note that Nedelec elemets do not
-// make much sense in 1d, so this file only contains dummy
+// only compile this file if in 1d. note that Nedelec elements do not
+// make much sense in 1d anyway, so this file only contains dummy
 // implementations to avoid linker errors due to missing symbols
 #if deal_II_dimension == 1
 
