@@ -289,7 +289,8 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
 
 
 template <int dim>
-void * KellyErrorEstimator<dim>::estimate_some (Data &data, unsigned int this_thread) 
+void * KellyErrorEstimator<dim>::estimate_some (Data               &data,
+						const unsigned int  this_thread) 
 {
   
 				   // make up a fe face values object for the
@@ -554,10 +555,10 @@ integrate_over_irregular_face (Data &,
 
 template <int dim>
 void KellyErrorEstimator<dim>::
-integrate_over_regular_face (Data &data,
-			     int this_thread,
+integrate_over_regular_face (Data                       &data,
+			     const unsigned int          this_thread,
 			     const active_cell_iterator &cell,
-			     const unsigned int         face_no,
+			     const unsigned int          face_no,
 			     FEFaceValues<dim>          &fe_face_values_cell,
 			     FEFaceValues<dim>          &fe_face_values_neighbor)
 {
@@ -708,8 +709,8 @@ integrate_over_regular_face (Data &data,
 
 template <int dim>
 void KellyErrorEstimator<dim>::
-integrate_over_irregular_face (Data &data,
-			       int this_thread,
+integrate_over_irregular_face (Data                       &data,
+			       const unsigned int          this_thread,
 			       const active_cell_iterator &cell,
 			       const unsigned int          face_no,
 			       FEFaceValues<dim>          &fe_face_values,
