@@ -152,37 +152,60 @@ class FiniteElement : public FiniteElementBase<dim>
   protected:
 
 				     /**
-				      * Given a set of flags indicating
-				      * what quantities are requested
-				      * from a @p{FEValues} object,
-				      * return which of these can be
-				      * precomputed once and for
-				      * all. Often, the values of
-				      * shape function at quadrature
-				      * points can be precomputed, for
-				      * example, in which case the
-				      * return value of this function
-				      * would be the logical and of
-				      * the input @p{flags} and
-				      * @p{update_values}.
+				      * Determine the values a finite
+				      * element should compute on
+				      * initialization of data for
+				      * @p{FEValues}.
+				      *
+				      * Given a set of flags
+				      * indicating what quantities are
+				      * requested from a @p{FEValues}
+				      * object, @p{update_once} and
+				      * @p{update_each} compute which
+				      * values must really be
+				      * computed. Then, the
+				      * @p{fill_*_values} functions
+				      * are called with the result of
+				      * these.
+				      *
+				      * Furthermore, values must be
+				      * computed either on the unit
+				      * cell or on the physical
+				      * cell. For instance, the
+				      * function values of @p{FE_Q} do
+				      * only depend on the quadrature
+				      * points on the unit
+				      * cell. Therefore, this flags
+				      * will be returned by
+				      * @p{update_once}. The gradients
+				      * require computation of the
+				      * covariant transformation
+				      * matrix. Therefore,
+				      * @p{update_covariant_transformation}
+				      * and @p{update_gradients} will
+				      * be returned by
+				      * @p{update_each}.
+				      *
+				      * For an example see the same
+				      * function in the derived class
+				      * @p{FE_Q}.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
   
 				     /**
-				      * This is the opposite to the
-				      * above function: given a set of
-				      * flags indicating what we want
-				      * to know, return which of these
-				      * need to be computed each time
-				      * we visit a new cell.
+				      * Complementary function for
+				      * @p{update_once}.
 				      *
-				      * If for the computation of one
-				      * quantity something else is
-				      * also required (for example, we
-				      * often need the covariant
-				      * transformation when gradients
-				      * need to be computed), include
-				      * this in the result as well.
+				      * While @p{update_once} returns
+				      * the values to be computed on
+				      * the unit cell for yielding the
+				      * required data, this function
+				      * determines the values that
+				      * must be recomputed on each
+				      * cell.
+				      *
+				      * Refer to @p{update_once} for
+				      * more details.
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
   
