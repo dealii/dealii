@@ -383,7 +383,7 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 					 // the different boundary parts. We want the
 					 // @p{function} to hold on all parts of the
 					 // boundary
-	std::map<unsigned char,const Function<dim>*> boundary_functions;
+	FMap<dim>::FunctionMap boundary_functions;
 	for (unsigned char c=0; c<255; ++c)
 	  boundary_functions[c] = &function;
 	project_boundary_values (dof, boundary_functions, q_boundary,
@@ -750,7 +750,7 @@ template <int dim>
 void
 VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				      const DoFHandler<dim>    &dof,
-				      const std::map<unsigned char,const Function<dim>*> &boundary_functions,
+				      const FMap<dim>::FunctionMap &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {
@@ -765,8 +765,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_to_boundary_mapping;
   std::set<unsigned char> selected_boundary_components;
-  for (typename std::map<unsigned char,const Function<dim>*>::const_iterator
-	 i=boundary_functions.begin();
+  for (typename FMap<dim>::FunctionMap::const_iterator i=boundary_functions.begin();
        i!=boundary_functions.end(); ++i)
     selected_boundary_components.insert (i->first);
   
@@ -843,7 +842,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 template <int dim>
 void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
-				      const std::map<unsigned char,const Function<dim>*> &boundary_functions,
+				      const FMap<dim>::FunctionMap &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {
@@ -1268,6 +1267,15 @@ void VectorTools::interpolate(const DoFHandler<deal_II_dimension> &,
 			      const Vector<double>     &,
 			      Vector<double>           &);
 template
+void VectorTools::project (const DoFHandler<deal_II_dimension>   &,
+			   const ConstraintMatrix                &,
+			   const Quadrature<deal_II_dimension>   &,
+			   const Function<deal_II_dimension>     &,
+			   Vector<double>                        &,
+			   const bool,
+			   const Quadrature<deal_II_dimension-1> &,
+			   const bool);
+template
 void VectorTools::create_right_hand_side (const Mapping<deal_II_dimension>    &,
 					  const DoFHandler<deal_II_dimension> &,
 					  const Quadrature<deal_II_dimension> &,
@@ -1278,6 +1286,12 @@ void VectorTools::create_right_hand_side (const DoFHandler<deal_II_dimension> &,
 					  const Quadrature<deal_II_dimension> &,
 					  const Function<deal_II_dimension>   &,
 					  Vector<double>                      &);
+template
+void VectorTools::interpolate_boundary_values (const DoFHandler<deal_II_dimension> &,
+					       const unsigned char,
+					       const Function<deal_II_dimension>   &,
+					       std::map<unsigned int,double>       &,
+					       const std::vector<bool>    &);
 template
 void VectorTools::integrate_difference (const Mapping<deal_II_dimension>    &,
 					const DoFHandler<deal_II_dimension> &,
@@ -1296,8 +1310,14 @@ void VectorTools::integrate_difference (const DoFHandler<deal_II_dimension> &,
 					const NormType                      &,
 					const Function<deal_II_dimension>   *);
 template
+void VectorTools::project_boundary_values (const Mapping<deal_II_dimension>     &,
+					   const DoFHandler<deal_II_dimension>  &,
+					   const FMap<deal_II_dimension>::FunctionMap &,
+					   const Quadrature<deal_II_dimension-1>&,
+					   std::map<unsigned int,double>        &);
+template
 void VectorTools::project_boundary_values (const DoFHandler<deal_II_dimension>  &,
-					   const std::map<unsigned char,const Function<deal_II_dimension>*>&,
+					   const FMap<deal_II_dimension>::FunctionMap &,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
 template
@@ -1324,13 +1344,8 @@ void VectorTools::interpolate_boundary_values (const Mapping<deal_II_dimension> 
 					       std::map<unsigned int,double>       &,
 					       const std::vector<bool>    &);
 template
-void VectorTools::interpolate_boundary_values (const DoFHandler<deal_II_dimension> &,
-					       const unsigned char,
-					       const Function<deal_II_dimension>   &,
-					       std::map<unsigned int,double>       &,
-					       const std::vector<bool>    &);
-template
-void VectorTools::project (const DoFHandler<deal_II_dimension>   &,
+void VectorTools::project (const Mapping<deal_II_dimension>      &,
+			   const DoFHandler<deal_II_dimension>   &,
 			   const ConstraintMatrix                &,
 			   const Quadrature<deal_II_dimension>   &,
 			   const Function<deal_II_dimension>     &,
