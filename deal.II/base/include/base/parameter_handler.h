@@ -168,7 +168,7 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const unsigned int min_int_value =
+      static const int min_int_value =
 #ifdef HAVE_STD_NUMERIC_LIMITS
           std::numeric_limits<int>::min();
 #else
@@ -183,7 +183,7 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const unsigned int max_int_value =
+      static const int max_int_value =
 #ifdef HAVE_STD_NUMERIC_LIMITS
           std::numeric_limits<int>::max();
 #else
@@ -308,7 +308,7 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const unsigned int min_double_value =
+      static const double min_double_value =
 #ifdef HAVE_STD_NUMERIC_LIMITS
           std::numeric_limits<double>::min();
 #else
@@ -323,7 +323,7 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const unsigned int max_double_value =
+      static const double max_double_value =
 #ifdef HAVE_STD_NUMERIC_LIMITS
           std::numeric_limits<double>::max();
 #else
@@ -342,8 +342,8 @@ namespace Patterns
 					* such that no bounds are
 					* enforced on parameters.
 					*/
-      Double (const int lower_bound = min_double_value,
-	      const int upper_bound = max_double_value);
+      Double (const double lower_bound = min_double_value,
+	      const double upper_bound = max_double_value);
 	
 				       /**
 					* Return @p{true} if the
