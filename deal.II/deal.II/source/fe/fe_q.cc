@@ -1200,4 +1200,4 @@ FE_Q<dim>::get_degree () const
 
 
 
-template FE_Q<deal_II_dimension>;
+template class FE_Q<deal_II_dimension>;

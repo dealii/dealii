@@ -584,4 +584,4 @@ FE_DGQ<dim>::get_degree () const
 
 
 
-template FE_DGQ<deal_II_dimension>;
+template class FE_DGQ<deal_II_dimension>;
