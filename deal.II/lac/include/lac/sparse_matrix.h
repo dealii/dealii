@@ -2187,7 +2187,7 @@ namespace internals
     Iterator<number,Constness>::
     operator > (const Iterator& other) const
     {
-      return !((*this < other) || (*this == other));
+      return (other < *this);
     }
     
   }
