@@ -9,6 +9,8 @@ DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 		write_preamble (write_preamble)
 {};
 
+
+
 DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 				       const bool bicubic_patch,
 				       const bool external_data) :
@@ -16,6 +18,8 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 		bicubic_patch(bicubic_patch),
 		external_data(external_data)
 {};
+
+
 
 void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 {

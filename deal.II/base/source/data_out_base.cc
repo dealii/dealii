@@ -1760,11 +1760,14 @@ void DataOutInterface<dim>::write (ostream &out,
     };
 };
 
+
+
 template <int dim>
 void DataOutInterface<dim>::set_format(OutputFormat fmt)
 {
   default_format = fmt;
 }
+
 
 
 template <int dim>
@@ -1840,7 +1843,8 @@ string DataOutInterface<dim>::default_suffix (OutputFormat output_format)
 
 template <int dim>
 DataOutInterface<dim>::OutputFormat
-DataOutInterface<dim>::parse_output_format (const string &format_name) {
+DataOutInterface<dim>::parse_output_format (const string &format_name)
+{
   if (format_name == "ucd")
     return ucd;
 
