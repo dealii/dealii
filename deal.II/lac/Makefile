@@ -42,9 +42,11 @@ lib/o/%.o :
 ifeq ($(enable-shared),yes)
   lib: $(LIBDIR)/liblac.g.so $(LIBDIR)/liblac.so
   libg: $(LIBDIR)/liblac.g.so
+  libo: $(LIBDIR)/liblac.so
 else
   lib: $(LIBDIR)/liblac.g.a $(LIBDIR)/liblac.a
   libg: $(LIBDIR)/liblac.g.a
+  libo: $(LIBDIR)/liblac.a
 endif
 
 
