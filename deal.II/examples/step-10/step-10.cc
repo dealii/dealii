@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 2001 */
+/* Author: Wolfgang Bangerth, Ralf Hartmann, University of Heidelberg, 2001 */
 
 #include <base/quadrature_lib.h>
 #include <base/convergence_table.h>
