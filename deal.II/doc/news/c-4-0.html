@@ -258,7 +258,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
-
        New: There is now a new <code class="class">PolynomialsP</code>
        class which is based on <code
        class="class">Polynomials::Monomial</code> and <code
@@ -487,6 +486,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: There is now a new <code class="class">FE_Poly</code>
+       class which is templatized for polynomial spaces like <code
+       class="class">TensorProductPolynomials</code>, <code
+       class="class">PolynomialSpace</code> or <code
+       class="class">PolynomialsP</code>. Many finite element classes
+       are now derived from this class and the implementation of all
+       common functionality is now moved from these finite element
+       classes to <code class="class">FE_Poly</code>.
+       <br>
+       (RH 2004/03/18)
+       </p>
+
   <li> <p> New: The new function <code
        class="member">MatrixTools::local_apply_boundary_values</code> folds
        boundary value information into local matrices and vectors before they
