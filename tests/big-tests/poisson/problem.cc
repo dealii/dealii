@@ -460,5 +460,4 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 
 
 
-template class PoissonProblem<1>;
 template class PoissonProblem<2>;
