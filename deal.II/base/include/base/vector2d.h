@@ -105,6 +105,15 @@ class vector2d : public Subscriptor
 					  * this row.
 					  */
 	const_iterator end () const;
+
+					 /**
+					  * Return the number of
+					  * elements between @p{begin}
+					  * and @p{end}, i.e. the
+					  * number of columns of the
+					  * matrix.
+					  */
+	unsigned int size () const;
 	
       protected:
 					 /**
@@ -206,6 +215,15 @@ class vector2d : public Subscriptor
 					  * version.
 					  */
 	iterator end ();
+
+					 /**
+					  * Return the number of
+					  * elements between @p{begin}
+					  * and @p{end}, i.e. the
+					  * number of columns of the
+					  * matrix.
+					  */
+	unsigned int size () const;
 	
       private:
 					 /**
@@ -534,6 +552,16 @@ vector2d<T>::ConstRowAccessor::end () const
 
 template <typename T>
 inline
+unsigned int
+vector2d<T>::ConstRowAccessor::size () const
+{
+  return parent.n_cols();
+};
+
+
+
+template <typename T>
+inline
 vector2d<T>::NonConstRowAccessor::
 NonConstRowAccessor (vector2d<T>        &parent,
 		     const unsigned int  row)
@@ -584,6 +612,16 @@ typename vector2d<T>::NonConstRowAccessor::iterator
 vector2d<T>::NonConstRowAccessor::end ()
 {
   return row_start+parent.n_cols();
+};
+
+
+
+template <typename T>
+inline
+unsigned int
+vector2d<T>::NonConstRowAccessor::size () const
+{
+  return parent.n_cols();
 };
 
 

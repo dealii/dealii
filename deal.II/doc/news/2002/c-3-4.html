@@ -96,6 +96,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: Row accessors for the <code class="class">vector2d</code>
+       class now have a member function <code
+       class="member">size</code> that returns the size of the row,
+       i.e. the number of columns of the table.
+       <br>
+       (WB 2002/07/24)
+       </p>
+
+  <li> <p> 
        Fixed: In EPS output, colors were set to invalid values if the
        values of the field that is used for coloring are all
        equal. This happens, for example, in the very first time step
