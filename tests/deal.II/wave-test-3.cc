@@ -1,6 +1,6 @@
 //----------------------------  wave-test-3.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    wave-test-3.cc,v 1.45 2003/04/09 15:49:54 wolf Exp
+//    Version: 
 //
 //    std::copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by Wolfgang Bangerth
 //
@@ -7535,11 +7535,11 @@ void UserMatrix::precondition (Vector<double> &dst,
 
 
 
-const FE_Q<2>   FEHelper<2>::fe_linear(1)
-const FE_Q<2>   FEHelper<2>::fe_quadratic_sub(2)
+const FE_Q<2>   FEHelper<2>::fe_linear(1);
+const FE_Q<2>   FEHelper<2>::fe_quadratic_sub(2);
 #if 2 < 3
-const FE_Q<2>   FEHelper<2>::fe_cubic_sub(3)
-const FE_Q<2>   FEHelper<2>::fe_quartic_sub(4)
+const FE_Q<2>   FEHelper<2>::fe_cubic_sub(3);
+const FE_Q<2>   FEHelper<2>::fe_quartic_sub(4);
 #endif
     
 const QGauss2<2> FEHelper<2>::q_gauss_2;
