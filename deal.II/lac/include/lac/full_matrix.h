@@ -138,7 +138,7 @@ class FullMatrix : public Table<2,number>
 				      * matrices are possible sources.
 				      */
     template <class MATRIX>
-    FullMatrix<number>& operator = (const MATRIX&);
+    FullMatrix<number>& copy_from (const MATRIX&);
     
 				     /**
 				      * Comparison operator. Be
@@ -769,16 +769,15 @@ void FullMatrix<number>::fill (const number2* src)
 
 template <typename number>
 template <class MATRIX>
-FullMatrix<number>&
-FullMatrix<number>::operator = (const MATRIX& M)
+void
+FullMatrix<number>::copy_from (const MATRIX& M)
 {
   reinit (M.m(), M.n());
   typename MATRIX::const_iterator entry;
   const typename MATRIX::const_iterator end = M.end();
   for (entry = M.begin();entry != end;++entry)
     el(entry->row(), entry->column()) = entry->value();
-  return *this;
-}
+ }
 
 /*----------------------------   fullmatrix.h     ---------------------------*/
 
