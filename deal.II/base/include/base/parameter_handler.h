@@ -22,6 +22,10 @@
 #include <string>
 
 
+//TODO: Allow long input lines to be broken by appending a backslash character
+//TODO: Provide an "include" command for parameter files
+
+
 // public classes; to be declared below
 class ParameterHandler;
 class MultipleParameterLoop;
@@ -761,11 +765,12 @@ namespace Patterns
  *   structure.
  *
  *   
- *   @section ParameterHandlerDeclaration Declaration of entries
+ *   <h3>Declaring entries</h3>
  *   
  *   In order to use the facilities of a ParameterHandler object, one first has
  *   to make known the different entries the input file may or may not contain. This
  *   is done in the following way:
+ *   
  *   @code
  *     ...
  *     ParameterHandler prm;
@@ -854,7 +859,7 @@ namespace Patterns
  *   @endcode
  *
  *
- *   @section ParameterHandlerInput Input files and special characters
+ *   <h3>Input files and special characters</h3>
  *
  *   For the first example above the input file would look like the following:
  *   @verbatim
@@ -884,7 +889,7 @@ namespace Patterns
  *   <tt>=</tt> sign.
  *
  *   
- *   @section ParameterHandlerReading Reading data from input sources
+ *   <h3>Reading data from input sources</h3>
  *   
  *   In order to read input you can use three possibilities: reading from an <tt>std::istream</tt> object,
  *   reading from a file of which the name is given and reading from a string in memory in
@@ -914,7 +919,7 @@ namespace Patterns
  *   written to <tt>std::cerr</tt>.
  *
  *   
- *   @section ParameterHandlerAccess Getting entry values out of a ParameterHandler object
+ *   <h3>Getting entry values out of a ParameterHandler object</h3>
  *   
  *   Each class gets its data out of a ParameterHandler object by
  *   calling the get()  member functions like this:
@@ -953,7 +958,7 @@ namespace Patterns
  *   input file.
  *   
  *   
- *   @section ParameterHandlerStyle Style guide for data retrieval
+ *   <h3>Style guide for data retrieval</h3>
  *   
  *   We propose that every class which gets data out of a
  *   ParameterHandler object provides a function named
@@ -962,7 +967,7 @@ namespace Patterns
  *   should call the <tt>BaseClass::get_parameters</tt> function.
  *
  *
- *   @section ParameterHandlerLarge Experience with large parameter lists
+ *   <h3>Experience with large parameter lists</h3>
  *  
  *   Experience has shown that in programs defining larger numbers of parameters (more than,
  *   say, fifty) it is advantageous to define an additional class holding these parameters.
@@ -976,18 +981,8 @@ namespace Patterns
  *   up your main class with dozens or more variables denoting the parameters.
  *
  *
- *   @section ParameterHandlerFuture Possible future extensions
  *   
- *   <ul>
- *   <li> Allow long input lines to be broken by appending a backslash character
- *     (just like C macros and shell input).
- *   <li> Provide an <tt>input filename</tt> command for the input file to enable users to put the
- *     most common parameters into separate files.
- *   </ul>
- *
- *
- *   
- *   @section Example Worked Example
+ *   <h3>Worked Example</h3>
  *
  *   This is the code:
  *   @code
@@ -1197,8 +1192,7 @@ namespace Patterns
  *                Matrix1=Sparse, Matrix2=Full
  *   @endverbatim
  *
- *   
- *   @section References References
+ *   <h3>References</h3>
  *
  *   This class is inspired by the <tt>MenuSystem</tt> class of <tt>DiffPack</tt>.
  *
@@ -1696,7 +1690,7 @@ class ParameterHandler
  *   program.
  *
  *   
- *   @section ParameterHandlerUsage Usage
+ *   <h3>Usage</h3>
  *   
  *   The usage of this class is similar to the ParameterHandler class. First the
  *   entries and subsections have to be declared, then a loop is performed in which
@@ -1786,7 +1780,7 @@ class ParameterHandler
  *   run.
  *
  *   
- *   @section ParameterHandlerUsageSyntax Syntax for variant and array entry values
+ *   <h3>Syntax for variant and array entry values</h3>
  *   
  *   Variant values are specified like <tt>prefix{ v1 | v2 | v3 | ... }postfix</tt>. Whitespace
  *   to the right of the opening brace <tt>{</tt> is ignored as well as to the left of the
@@ -1799,7 +1793,7 @@ class ParameterHandler
  *   <tt>prefix{{ v1 | v2 | v3 }}postfix</tt>.
  *   
  *
- *   @section ParameterHandlerExample Worked example
+ *   <h3>Worked example</h3>
  *   
  *   Given the above extensions to the example program for the ParameterHandler and the
  *   following input file
@@ -1861,7 +1855,8 @@ class ParameterHandler
  *   the number of the run.
  *   
  *   
- *   @section ParameterHandlerReferences References
+ *   <h3>References</h3>
+ *
  *   This class is inspired by the <tt>Multipleloop</tt> class of <tt>DiffPack</tt>.
  *
  *   @author Wolfgang Bangerth, October 1997
