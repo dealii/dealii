@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,11 +13,79 @@
 
 
 #include <lac/matrix_lib.templates.h>
+#include <lac/sparse_matrix.h>
 
 MeanValueFilter::MeanValueFilter(unsigned int component)
 		:
 		component(component)
 {}
+
+
+template<typename number, typename vnumber>
+ProductSparseMatrix<number, vnumber>::ProductSparseMatrix(
+  const MatrixType& mat1,
+  const MatrixType& mat2,
+  VectorMemory<VectorType>& mem)
+		:
+		m1(&mat1), m2(&mat2),
+		mem(&mem)
+{
+  Assert(mat1.n() == mat2.m(), ExcDimensionMismatch(mat1.n(),mat2.m()));
+}
+
+
+template<typename number, typename vnumber>
+void
+ProductSparseMatrix<number, vnumber>::vmult (VectorType& dst, const VectorType& src) const
+{
+  VectorType* v = mem->alloc();
+  v->reinit(m1->n());
+  m2->vmult (*v, src);
+  m1->vmult (dst, *v);
+  mem->free(v);
+}
+
+
+template<typename number, typename vnumber>
+void
+ProductSparseMatrix<number, vnumber>::vmult_add (VectorType& dst, const VectorType& src) const
+{
+  VectorType* v = mem->alloc();
+  v->reinit(m1->n());
+  m2->vmult (*v, src);
+  m1->vmult_add (dst, *v);
+  mem->free(v);
+}
+
+
+template<typename number, typename vnumber>
+void
+ProductSparseMatrix<number, vnumber>::Tvmult (VectorType& dst, const VectorType& src) const
+{
+  VectorType* v = mem->alloc();
+  v->reinit(m1->n());
+  m1->Tvmult (*v, src);
+  m2->Tvmult (dst, *v);
+  mem->free(v);
+}
+
+
+template<typename number, typename vnumber>
+void
+ProductSparseMatrix<number, vnumber>::Tvmult_add (VectorType& dst, const VectorType& src) const
+{
+  VectorType* v = mem->alloc();
+  v->reinit(m1->n());
+  m1->Tvmult (*v, src);
+  m2->Tvmult_add (dst, *v);
+  mem->free(v);
+}
+
+
+template class ProductSparseMatrix<double, double>;
+template class ProductSparseMatrix<double, float>;
+template class ProductSparseMatrix<float, double>;
+template class ProductSparseMatrix<float, float>;
 
 template void MeanValueFilter::filter(Vector<float>&) const;
 template void MeanValueFilter::filter(Vector<double>&) const;

@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -20,18 +20,13 @@ default: run-tests
 
 ############################################################
 
-tests_x = $(sort \
-            sparse_matrices \
-            block_matrices \
-            block_vector \
-            block_vector_iterator \
-            full_matrix \
-            matrix_out \
-            solver \
-            eigen \
-            sparsity_pattern \
-            sparse_ilu \
-            vector-vector)
+tests_x = vector-vector \
+	full_matrix sparsity_pattern sparse_matrices \
+	block_vector block_vector_iterator block_matrices \
+	matrix_lib matrix_out \
+	solver eigen \
+	sparse_ilu
+
 
 # from above list of regular expressions, generate the real set of
 # tests

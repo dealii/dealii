@@ -9,6 +9,7 @@
 
 template<typename number> class Vector;
 template<typename number> class BlockVector;
+template<typename number> class SparseMatrix;
 
 /*! @addtogroup Matrix2
  *@{
@@ -93,6 +94,92 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 				      * Memory for auxiliary vector.
 				      */
     SmartPointer<VectorMemory<VECTOR> > mem;
+};
+
+
+/**
+ * Poor man's matrix product of two sparse matrices. Stores two
+ * matrices #m1 and #m2 of arbitrary type SparseMatrix and implements
+ * matrix-vector multiplications for the product
+ * <i>M<sub>1</sub>M<sub>2</sub></i> by performing multiplication with
+ * both factors consecutively.
+ *
+ * The documentation of @ProductMatrix applies with exception that
+ * these matrices here may be rectangular.
+ *
+ * @author Guido Kanschat, 2000, 2001, 2002, 2005
+ */
+template<typename number, typename vector_number>
+class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
+{
+  public:
+				     /**
+				      * Define the type of matrices used.
+				      */
+    typedef SparseMatrix<number> MatrixType;
+    
+				     /**
+				      * Define the type of vectors we
+				      * plly this matrix to.
+				      */
+    typedef Vector<vector_number> VectorType;
+    
+				     /**
+				      * Constructor.  Additionally to
+				      * the two constituting matrices, a
+				      * memory pool for the auxiliary
+				      * vector must be provided.
+				      */
+    ProductSparseMatrix(const MatrixType& m1,
+			const MatrixType& m2,
+			VectorMemory<VectorType>& mem);
+
+				     /**
+				      * Matrix-vector product <i>w =
+				      * m1 * m2 * v</i>.
+				      */
+    virtual void vmult (VectorType&       w,
+			const VectorType& v) const;
+    
+				     /**
+				      * Tranposed matrix-vector
+				      * product <i>w = m2<sup>T</sup>
+				      * * m1<sup>T</sup> * v</i>.
+				      */
+    virtual void Tvmult (VectorType&       w,
+			 const VectorType& v) const;
+    
+				     /**
+				      * Adding matrix-vector product
+				      * <i>w += m1 * m2 * v</i>
+				      */
+    virtual void vmult_add (VectorType&       w,
+			    const VectorType& v) const;
+    
+				     /**
+				      * Adding, tranposed
+				      * matrix-vector product <i>w +=
+				      * m2<sup>T</sup> *
+				      * m1<sup>T</sup> * v</i>.
+				      */
+    virtual void Tvmult_add (VectorType&       w,
+			     const VectorType& v) const;
+    
+  private:
+				     /**
+				      * The left matrix of the product.
+				      */
+    SmartPointer<const MatrixType> m1;
+    
+				     /**
+				      * The right matrix of the product.
+				      */
+    SmartPointer<const MatrixType> m2;
+    
+				     /**
+				      * Memory for auxiliary vector.
+				      */
+    SmartPointer<VectorMemory<VectorType> > mem;
 };
 
 
