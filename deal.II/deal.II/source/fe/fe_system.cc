@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -156,7 +156,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe,
                 base_elements(1)
 {
   base_elements[0] = ElementPair(fe.clone(), n_elements);
-  base_elements[0].first->subscribe ();
+  base_elements[0].first->subscribe (typeid(*this).name());
   initialize ();
 }
 
@@ -175,9 +175,9 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
                 base_elements(2)
 {
   base_elements[0] = ElementPair(fe1.clone(), n1);
-  base_elements[0].first->subscribe ();
+  base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
-  base_elements[1].first->subscribe ();
+  base_elements[1].first->subscribe (typeid(*this).name());
   initialize ();
 }
 
@@ -202,11 +202,11 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
                 base_elements(3)
 {
   base_elements[0] = ElementPair(fe1.clone(), n1);  
-  base_elements[0].first->subscribe ();
+  base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
-  base_elements[1].first->subscribe ();
+  base_elements[1].first->subscribe (typeid(*this).name());
   base_elements[2] = ElementPair(fe3.clone(), n3);
-  base_elements[2].first->subscribe ();
+  base_elements[2].first->subscribe (typeid(*this).name());
   initialize ();
 }
 
@@ -219,7 +219,7 @@ FESystem<dim>::~FESystem ()
 				   // the constructor
   for (unsigned i=0; i<base_elements.size(); ++i)
     {
-      base_elements[i].first->unsubscribe();
+      base_elements[i].first->unsubscribe(typeid(*this).name());
       delete base_elements[i].first;
       base_elements[i].first = 0;
     }
