@@ -15,7 +15,7 @@ debug-mode = off
 
 # If you want your program to be linked with extra object or library
 # files, specify them here:
-user-libs = ../../../mia/control.o
+user-libs =
 
 # To run the program, use "make run"; to give parameters to the program,
 # give the parameters to the following variable:

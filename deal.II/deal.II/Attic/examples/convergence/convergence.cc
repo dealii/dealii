@@ -16,13 +16,12 @@
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 
-#include <map.h>
-#include <fstream.h>
+#include <map>
+#include <fstream>
 #include <cmath>
 #include <string>
-extern "C" {
-#  include <stdlib.h>
-}
+#include <cstdlib>
+
 
 
 
