@@ -386,8 +386,8 @@ void
 dSMatrix::vmult (dVector& dst, const dVector& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
-  Assert(n() == src.n(), ExcDimensionsDontMatch(n(),src.n()));
+  Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
+  Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
 
   for (unsigned int i=0; i<m(); ++i)
     {
@@ -403,8 +403,8 @@ void
 dSMatrix::Tvmult (dVector& dst, const dVector& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert(n() == dst.n(), ExcDimensionsDontMatch(n(),dst.n()));
-  Assert(m() == src.n(), ExcDimensionsDontMatch(m(),src.n()));
+  Assert(n() == dst.size(), ExcDimensionsDontMatch(n(),dst.size()));
+  Assert(m() == src.size(), ExcDimensionsDontMatch(m(),src.size()));
 
   unsigned int i;
   
@@ -426,8 +426,8 @@ double
 dSMatrix::matrix_norm (const dVector& v) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert(m() == v.n(), ExcDimensionsDontMatch(m(),v.n()));
-  Assert(n() == v.n(), ExcDimensionsDontMatch(n(),v.n()));
+  Assert(m() == v.size(), ExcDimensionsDontMatch(m(),v.size()));
+  Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
 
   double sum = 0.;
   for (unsigned int i=0;i<m();i++)
@@ -447,9 +447,9 @@ double
 dSMatrix::residual (dVector& dst, const dVector& u, const dVector& b)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
-  Assert(m() == b.n(), ExcDimensionsDontMatch(m(),b.n()));
-  Assert(n() == u.n(), ExcDimensionsDontMatch(n(),u.n()));
+  Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
+  Assert(m() == b.size(), ExcDimensionsDontMatch(m(),b.size()));
+  Assert(n() == u.size(), ExcDimensionsDontMatch(n(),u.size()));
 
   double s,norm=0.;   
   
@@ -472,7 +472,7 @@ dSMatrix::Jacobi_precond (dVector& dst, const dVector& src, const double om)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
 
-  const unsigned int n = src.n();
+  const unsigned int n = src.size();
 
   for (unsigned int i=0;i<n;++i)
     {
@@ -486,7 +486,7 @@ dSMatrix::SSOR_precond (dVector& dst, const dVector& src, const double om)
   Assert (cols != 0, ExcMatrixNotInitialized());
 
   int p;
-  unsigned int  n = src.n();
+  const unsigned int  n = src.size();
   unsigned int  j;
   
   for (unsigned i=0; i<n; i++)
@@ -527,7 +527,7 @@ dSMatrix::SOR (dVector& dst, const double om)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert(n() == m(), ExcDimensionsDontMatch(n(),m()));
-  Assert(m() == dst.n(), ExcDimensionsDontMatch(m(),dst.n()));
+  Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
 
   for (unsigned int i=0;i<m();i++)
     {
@@ -548,7 +548,7 @@ dSMatrix::SSOR (dVector& dst, const double om)
   Assert (cols != 0, ExcMatrixNotInitialized());
 
   int p;
-  unsigned int  n = dst.n();
+  const unsigned int  n = dst.size();
   unsigned int  j;
   double s;
   

@@ -145,7 +145,7 @@ void ProblemBase<dim>::solve () {
   double tolerance = 1.e-16;
   
   Control                          control1(max_iter,tolerance);
-  PrimitiveVectorMemory<dVector>   memory(right_hand_side.n());
+  PrimitiveVectorMemory<dVector>   memory(right_hand_side.size());
   CG<dSMatrix,dVector>             cg(control1,memory);
 
 				   // solve

@@ -49,8 +49,8 @@ void dFMatrix::reinit (const unsigned int mm, const unsigned int nn)
 void dFMatrix::vmult (dVector& dst, const dVector& src,
 		      const bool adding) const
 {
-  Assert(dst.n() == m(), ExcDimensionMismatch(dst.n(), m()));
-  Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
+  Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
+  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   double s;
   if ((n()==3) && (m()==3))
@@ -173,8 +173,8 @@ void dFMatrix::vmult (dVector& dst, const dVector& src,
 void dFMatrix::gsmult (dVector& dst, const dVector& src, const iVector& gl) const
 {
   Assert(n() == m(), ExcNotQuadratic());
-  Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
-  Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
+  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
   Assert(gl.n() == n(), ExcDimensionMismatch(gl.n(), n()));
 
   double s;
@@ -303,8 +303,8 @@ void dFMatrix::gsmult (dVector& dst, const dVector& src, const iVector& gl) cons
 
 void dFMatrix::Tvmult (dVector& dst, const dVector& src, const bool adding) const
 {
-  Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
-  Assert(src.n() == m(), ExcDimensionMismatch(src.n(), m()));
+  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
 
   unsigned int i,j;
   double s;
@@ -323,9 +323,9 @@ void dFMatrix::Tvmult (dVector& dst, const dVector& src, const bool adding) cons
 double dFMatrix::residual (dVector& dst, const dVector& src,
 			  const dVector& right) const
 {
-  Assert(dst.n() == m(), ExcDimensionMismatch(dst.n(), m()));
-  Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
-  Assert(right.n() == m(), ExcDimensionMismatch(right.n(), m()));
+  Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
+  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  Assert(right.size() == m(), ExcDimensionMismatch(right.size(), m()));
 
   unsigned int i,j;
   double s, res = 0.;
@@ -345,8 +345,8 @@ double dFMatrix::residual (dVector& dst, const dVector& src,
 void dFMatrix::forward (dVector& dst, const dVector& src) const
 {
   Assert(n() == m(), ExcNotQuadratic());
-  Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
-  Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
+  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   unsigned int i,j;
   unsigned int nu = MIN(m(),n());
@@ -362,8 +362,8 @@ void dFMatrix::forward (dVector& dst, const dVector& src) const
 void dFMatrix::backward (dVector& dst, const dVector& src) const
 {
   Assert(n() == m(), ExcNotQuadratic());
-  Assert(dst.n() == n(), ExcDimensionMismatch(dst.n(), n()));
-  Assert(src.n() == n(), ExcDimensionMismatch(src.n(), n()));
+  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   unsigned int j;
   unsigned int nu = MIN(m(),n());

@@ -505,7 +505,7 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 void ConstraintMatrix::condense (const dVector &uncondensed,
 				 dVector       &condensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (condensed.n()+n_constraints() == uncondensed.n(),
+  Assert (condensed.size()+n_constraints() == uncondensed.size(),
 	  ExcWrongDimension());
   
 				   // store for each line of the vector
@@ -514,11 +514,11 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
 				   // -1, this line will be condensed away
   vector<int> new_line;
 
-  new_line.reserve (uncondensed.n());
+  new_line.reserve (uncondensed.size());
 
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
-  unsigned int n_rows = uncondensed.n();
+  unsigned int n_rows = uncondensed.size();
 
   if (next_constraint == lines.end()) 
 				     // if no constraint is to be handled
@@ -553,7 +553,7 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
-  for (unsigned int row=0; row<uncondensed.n(); ++row)
+  for (unsigned int row=0; row<uncondensed.size(); ++row)
     if (new_line[row] != -1)
 				       // line not constrained
 				       // copy entry
@@ -581,7 +581,7 @@ void ConstraintMatrix::condense (dVector &vec) const {
     return;
   
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  for (unsigned int row=0; row<vec.n(); ++row)
+  for (unsigned int row=0; row<vec.size(); ++row)
     if (row == next_constraint->line)
 				       // line must be distributed
       {
@@ -605,7 +605,7 @@ void ConstraintMatrix::condense (dVector &vec) const {
 void ConstraintMatrix::distribute (const dVector &condensed,
 				   dVector       &uncondensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (condensed.n()+n_constraints() == uncondensed.n(),
+  Assert (condensed.size()+n_constraints() == uncondensed.size(),
 	  ExcWrongDimension());
 
 				   // store for each line of the new vector
@@ -614,11 +614,11 @@ void ConstraintMatrix::distribute (const dVector &condensed,
 				   // -1, this line was condensed away
   vector<int> old_line;
 
-  old_line.reserve (uncondensed.n());
+  old_line.reserve (uncondensed.size());
 
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   unsigned int                           shift           = 0;
-  unsigned int n_rows = uncondensed.n();
+  unsigned int n_rows = uncondensed.size();
 
   if (next_constraint == lines.end()) 
 				     // if no constraint is to be handled
@@ -653,7 +653,7 @@ void ConstraintMatrix::distribute (const dVector &condensed,
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
-  for (unsigned int line=0; line<uncondensed.n(); ++line) 
+  for (unsigned int line=0; line<uncondensed.size(); ++line) 
     if (old_line[line] != -1)
 				       // line was not condensed away
       uncondensed(line) = condensed(old_line[line]);

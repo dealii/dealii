@@ -33,8 +33,8 @@ dVector::dVector (const unsigned int n) :
 
 dVector::dVector (const dVector& v) :
 		VectorBase(v),
-		dim(v.n()),
-		maxdim(v.n()),
+		dim(v.size()),
+		maxdim(v.size()),
 		val(0)
 {
   if (dim)
@@ -67,7 +67,7 @@ void dVector::reinit (const unsigned int n, const bool fast)
 
 void dVector::reinit (const dVector& v, const bool fast)
 {
-  const unsigned int n = v.n();
+  const unsigned int n = v.size();
   if (n>maxdim)
   {
     if (val) delete[] val;
@@ -170,7 +170,7 @@ double dVector::mean_value () const
   for (unsigned int i=(dim/4)*4; i<dim; ++i)
     sum0 += val[i];
   
-  return (sum0+sum1+sum2+sum3)/n();
+  return (sum0+sum1+sum2+sum3)/size();
 };
 
 
@@ -510,7 +510,7 @@ const char* dVector::name () const
 void dVector::print (FILE* f, const char* format) const
 {
   if (!format) format = " %5.2f";
-  for (unsigned int j=0;j<n();j++)
+  for (unsigned int j=0;j<size();j++)
     fprintf(f, format, val[j]);
   fputc('\n',f);
 }
@@ -520,7 +520,7 @@ void dVector::print (FILE* f, const char* format) const
 void dVector::print (const char* format) const
 {
   if (!format) format = " %5.2f";
-  for (unsigned int j=0;j<n();j++)
+  for (unsigned int j=0;j<size();j++)
     printf (format, val[j]);
   printf ("\n");
 }
@@ -528,6 +528,6 @@ void dVector::print (const char* format) const
 
 
 void dVector::print (ostream &out) const {
-  for (unsigned int i=0; i<n(); ++i)
+  for (unsigned int i=0; i<size(); ++i)
     out << val[i] << endl;
 };

@@ -1731,11 +1731,11 @@ void Triangulation<2>::print_gnuplot (ostream &out,
 template <int dim>
 void Triangulation<dim>::refine (const dVector &criteria,
 				 const double   threshold) {
-  Assert (criteria.n() == n_active_cells(),
-	  ExcInvalidVectorSize(criteria.n(), n_active_cells()));
+  Assert (criteria.size() == n_active_cells(),
+	  ExcInvalidVectorSize(criteria.size(), n_active_cells()));
 
   active_cell_iterator cell = begin_active();
-  const unsigned int n_cells = criteria.n();
+  const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (criteria(index) > threshold)
@@ -1749,12 +1749,12 @@ void Triangulation<dim>::refine_fixed_number (const dVector &criteria,
 					      const double   fraction) {
   dVector tmp(criteria);
   nth_element (tmp.begin(),
-	       tmp.begin()+static_cast<int>(fraction*tmp.n()),
+	       tmp.begin()+static_cast<int>(fraction*tmp.size()),
 	       tmp.end(),
 	       greater<double>());
 
   refine (criteria, *(tmp.begin() +
-		      static_cast<int>(fraction*tmp.n())));
+		      static_cast<int>(fraction*tmp.size())));
 };
 
 

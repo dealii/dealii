@@ -1470,8 +1470,8 @@ unsigned int DoFHandler<2>::max_transfer_entries (const unsigned int max_level_d
 template <int dim>
 void DoFHandler<dim>::distribute_cell_to_dof_vector (const dVector &cell_data,
 						     dVector       &dof_data) const {
-  Assert (cell_data.n()==tria->n_active_cells(),
-	  ExcWrongSize (cell_data.n(), tria->n_active_cells()));
+  Assert (cell_data.size()==tria->n_active_cells(),
+	  ExcWrongSize (cell_data.size(), tria->n_active_cells()));
 
 				   // assign the right size to the output vector
   dof_data.reinit (n_dofs());

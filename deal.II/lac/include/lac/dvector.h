@@ -151,7 +151,7 @@ class dVector : public VectorBase
 				      *  Inquire Dimension. returns Dimension , 
 				      *             INLINE
 				      */
-    unsigned int n () const;
+    unsigned int size () const;
 
 				     /**
 				      * Make the #dVector# class a bit like the
@@ -388,7 +388,7 @@ class dVector : public VectorBase
 
 
 
-inline unsigned int dVector::n () const
+inline unsigned int dVector::size () const
 {
   return dim;
 }

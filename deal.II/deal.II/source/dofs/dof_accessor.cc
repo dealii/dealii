@@ -316,7 +316,7 @@ DoFCellAccessor<1>::get_dof_values (const dVector  &values,
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
-  Assert (values.n() == dof_handler->n_dofs(),
+  Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
 
   vector<double>::iterator next_dof_value=dof_values.begin();
@@ -337,7 +337,7 @@ DoFCellAccessor<2>::get_dof_values (const dVector  &values,
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,
 	  ExcVectorDoesNotMatch());
-  Assert (values.n() == dof_handler->n_dofs(),
+  Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
 
   vector<double>::iterator next_dof_value=dof_values.begin();
