@@ -10,11 +10,11 @@ D=..
 # files for data_out_base.cc, which is why we use the several
 # intermediate o-files-base* rules
 cc-files     = $(shell echo source/*.cc)
-o-files-base1= $(addprefix lib/o/, $(patsubst source/%,%,$(cc-files:.cc=.o)))
+o-files-base1= $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=.o)))
 o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1))
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
-go-files     = $(patsubst lib/o/%,lib/go/%,$(o-files-base3:.o=.go))
+go-files     = $(o-files-base3:.o=.go)
 h-files      = $(sort $(shell echo include/lac/*.h))
 
 forward-declarations = $D/lac/include/lac/forward_declarations.h
@@ -30,10 +30,10 @@ else
   MT = ==
 endif
 
-lib/go/%.go :
+$(LIBDIR)/lac/%.go :
 	@echo =====lac==============debug======$(MT)== $(<F)
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-lib/o/%.o :
+$(LIBDIR)/lac/%.o :
 	@echo =====lac==============optimized==$(MT)== $(<F)
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
@@ -71,7 +71,7 @@ $(LIBDIR)/liblac.g.so: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/o/*.o lib/go/*.go lib/Makefile.dep
+	-rm -f *~ include/*~ include/*/*~ lib/Makefile.dep
 
 
 #Rule to generate the dependency file. This file is
@@ -81,7 +81,7 @@ clean:
 #of this file.
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
+	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/lac" $(cc-files) \
 		> lib/Makefile.dep
 
 # include all the dependencies

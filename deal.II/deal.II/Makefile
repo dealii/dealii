@@ -47,12 +47,12 @@ forward-declarations = $D/deal.II/include/grid/forward_declarations.h
 # would be the same for both debug and non-debug versions, if we
 # don't care about different directories
 tmp1        = $(notdir $(cc-files))
-o-files-1d  = $(addprefix lib/1d/o/,  $(tmp1:.cc=_1d.o) )
-go-files-1d = $(addprefix lib/1d/go/, $(tmp1:.cc=_1d.go))
-o-files-2d  = $(addprefix lib/2d/o/,  $(tmp1:.cc=_2d.o) )
-go-files-2d = $(addprefix lib/2d/go/, $(tmp1:.cc=_2d.go))
-o-files-3d  = $(addprefix lib/3d/o/,  $(tmp1:.cc=_3d.o) )
-go-files-3d = $(addprefix lib/3d/go/, $(tmp1:.cc=_3d.go))
+o-files-1d  = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.o) )
+go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.go))
+o-files-2d  = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.o) )
+go-files-2d = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.go))
+o-files-3d  = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.o) )
+go-files-3d = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.go))
 
 o-files  = $(o-files-1d)  $(o-files-2d)  $(o-files-3d)
 go-files = $(go-files-1d) $(go-files-2d) $(go-files-3d)
@@ -67,24 +67,24 @@ else
   MT = ==
 endif
 
-lib/1d/go/%.go :
+$(LIBDIR)/1d/%.go :
 	@echo =====deal.II====1d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
-lib/1d/o/%.o :
+$(LIBDIR)/1d/%.o :
 	@echo =====deal.II====1d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
-lib/2d/go/%.go :
+$(LIBDIR)/2d/%.go :
 	@echo =====deal.II====2d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
-lib/2d/o/%.o :
+$(LIBDIR)/2d/%.o :
 	@echo =====deal.II====2d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
-lib/3d/go/%.go :
+$(LIBDIR)/3d/%.go :
 	@echo =====deal.II====3d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
-lib/3d/o/%.o :
+$(LIBDIR)/3d/%.o :
 	@echo =====deal.II====3d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
@@ -153,13 +153,10 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 #of this file.
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
-		| $(PERL) -p -e 's!^lib/(g?o/.*):!lib/DIM_PLACEHOLDER/$$1:!g;' \
+	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
+		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!(\.g?o):!_DIM_PLACEHOLDER$$1:!g;' \
-	        | $(PERL) -pe 's!^lib/DIM_PLACEHOLDER/(.*):!lib/1d/$$1 lib/2d/$$1 lib/3d/$$1:!g;'\
-	        | $(PERL) -pe 's!(lib/1d/[^ ]+)_DIM_PLACEHOLDER!$$1_1d!g;' \
-	        | $(PERL) -pe 's!(lib/2d/[^ ]+)_DIM_PLACEHOLDER!$$1_2d!g;' \
-	        | $(PERL) -pe 's!(lib/3d/[^ ]+)_DIM_PLACEHOLDER!$$1_3d!g;' \
+	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
 		> lib/Makefile.dep
 
 # include all the dependencies

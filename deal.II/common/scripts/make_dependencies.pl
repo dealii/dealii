@@ -3,7 +3,7 @@
 
 
 #Make a dependency file tree
-#usage: make_dep -Iinc_path1 -Iinc_path2 ... files
+#usage: make_dep -Iinc_path1 -Iinc_path2 ... -Bbasepath files
 
 #This program makes for each of the given files a makefile dependency
 #list, also considering nested includes. It only considers included
@@ -13,7 +13,7 @@
 #lib/o/.o-file: file included_files
 #lib/go/.go-file: file included_files
 
-#Author: Wolfgang Bangerth, 1998, 1999
+#Author: Wolfgang Bangerth, 1998, 1999, 2000, 2001, 2002
 
 
 
@@ -37,6 +37,12 @@ while ($ARGV[0] =~ /^-I/) {
 	@include_path = (@include_path, $_);
     }
 }
+
+# get base path
+$_ = shift;
+/^-B(.*)/;
+$basepath = $1;
+
 
 #fill list of files to be processed
 while ($ARGV[0]) {
@@ -67,7 +73,7 @@ foreach $file (@input_files) {
     @include_file_list = sort (split (' ', $include_files{$file}));
 
     # write rule for the .o file
-    print "lib/o/$basename.o:";
+    print "$basepath/$basename.o:";
     print "\\\n    $file";
     foreach $f (@include_file_list) {
 	print "\\\n    $f";
@@ -75,7 +81,7 @@ foreach $file (@input_files) {
     print "\n";
 
     # write rule for the .go file
-    print "lib/go/$basename.go:";
+    print "$basepath/$basename.go:";
     print "\\\n    $file";
     foreach $f (@include_file_list) {
 	print "\\\n    $f";

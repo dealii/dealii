@@ -11,7 +11,7 @@ D=..
 # files for data_out_base.cc, which is why we use the several
 # intermediate o-files-base* rules
 cc-files     = $(shell echo source/*.cc)
-o-files-base1= $(addprefix lib/o/, $(patsubst source/%,%,$(cc-files:.cc=.o)))
+o-files-base1= $(addprefix $(LIBDIR)/base/, $(patsubst source/%,%,$(cc-files:.cc=.o)))
 o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
                $(patsubst %.o,%_1d.o,$(filter %data_out_base.o, $(o-files-base1))) \
                $(patsubst %.o,%_2d.o,$(filter %data_out_base.o, $(o-files-base1))) \
@@ -19,7 +19,7 @@ o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
                $(patsubst %.o,%_4d.o,$(filter %data_out_base.o, $(o-files-base1)))
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
-go-files     = $(patsubst lib/o/%,lib/go/%,$(o-files-base3:.o=.go))
+go-files     = $(o-files-base3:.o=.go)
 h-files      = $(sort $(shell echo include/base/*.h))
 
 forward-declarations = $D/base/include/base/forward_declarations.h
@@ -55,11 +55,11 @@ else
   MT = ==
 endif
 
-lib/go/%.go :
+$(LIBDIR)/base/%.go :
 	@echo =====base=============debug======$(MT)== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
-lib/o/%.o :
+$(LIBDIR)/base/%.o :
 	@echo =====base=============optimized==$(MT)== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS.o) $(maybe-define-dimension) -c $< -o $@
@@ -98,7 +98,7 @@ $(LIBDIR)/libbase.g.so: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/o/*.o lib/go/*.go lib/Makefile.dep
+	-rm -f *~ include/*~ include/*/*~ lib/Makefile.dep
 
 
 #Rule to generate the dependency file. This file is
@@ -112,8 +112,8 @@ clean:
 #appended
 lib/Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
-		| $(PERL) -p -e 's!(lib/g?o/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
+	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
+		| $(PERL) -p -e 's!(.*/base/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
 		> lib/Makefile.dep
 
 
