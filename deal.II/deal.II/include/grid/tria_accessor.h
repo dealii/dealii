@@ -168,7 +168,7 @@ class TriaAccessor
 				      *  can be in, refer to the
 				      *  @ref{TriaRawIterator} documentation.
 				      */
-    IteratorState::IteratorState state () const;
+    IteratorState::IteratorStates state () const;
 
 				     /**
 				      * Return a pointer to the triangulation

@@ -28,7 +28,7 @@ namespace IteratorState
  *   The three states an iterator can be in: valid, past-the-end and
  *   invalid.
  */
-  enum IteratorState
+  enum IteratorStates
   {
 	valid,
 	past_the_end,

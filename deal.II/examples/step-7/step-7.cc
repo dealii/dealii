@@ -35,6 +35,7 @@
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
+#include <fe/mapping_q.h>
 #include <numerics/matrices.h>
 #include <numerics/error_estimator.h>
 #include <numerics/data_out.h>
@@ -165,6 +166,14 @@ SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
 = { Point<2>(-0.5, +0.5), 
     Point<2>(-0.5, -0.5), 
     Point<2>(+0.5, -0.5)   };
+
+				 // ...and finally for 3d:
+template <>
+const Point<3>
+SolutionBase<3>::source_centers[SolutionBase<3>::n_source_centers]
+= { Point<3>(-0.5, +0.5, -0.5), 
+    Point<3>(-0.5, -0.5, +0.5), 
+    Point<3>(+0.5, -0.5, 0.0)   };
 
 				 // There remains to assign a value to
 				 // the half-width of the
@@ -780,7 +789,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // cell (rather than on the unit
 				   // cell) to evaluate the right hand
 				   // side function.
-  FEValues<dim>  fe_values (*fe, quadrature_formula, 
+  MappingQ<dim> mapping(3);
+  FEValues<dim>  fe_values (mapping, *fe, quadrature_formula, 
 			    UpdateFlags(update_values    |
 					update_gradients |
 					update_q_points  |
@@ -1051,15 +1061,21 @@ void LaplaceProblem<dim>::assemble_system ()
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
-  SolverControl           solver_control (1000, 1e-12);
+  SolverControl           solver_control (30, 1e-4);
   PrimitiveVectorMemory<> vector_memory;
   SolverCG<>              cg (solver_control, vector_memory);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  cg.solve (system_matrix, solution, system_rhs,
-	    preconditioner);
+  try
+    {
+      cg.solve (system_matrix, solution, system_rhs,
+		preconditioner);
+    }
+  catch (...)
+    {
+    };
 
   hanging_node_constraints.distribute (solution);
 };
@@ -1322,7 +1338,11 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<7; ++cycle)
+  const unsigned int n_cycles = (refinement_mode == global_refinement ?
+				 (dim == 2 ? 7 : 3)
+				 :
+				 (dim == 2 ? 12 : 7));
+  for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
     {
 				       // The first action in each
 				       // iteration of the outer loop

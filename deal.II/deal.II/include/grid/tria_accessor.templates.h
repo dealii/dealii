@@ -86,7 +86,7 @@ TriaAccessor<dim>::index () const
 
 template <int dim>
 inline
-IteratorState::IteratorState
+IteratorState::IteratorStates
 TriaAccessor<dim>::state () const
 {
   if ((present_level>=0) && (present_index>=0))

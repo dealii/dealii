@@ -288,7 +288,7 @@ class TriaRawIterator :
     TriaRawIterator (Triangulation<dim> *parent,
 		     const int           level,
 		     const int           index,
-		     const typename Accessor::AccessorData *local_data = 0);
+		     const typename AccessorType::AccessorData *local_data = 0);
 
 				     /**
 				      * This is a conversion operator
@@ -465,7 +465,7 @@ class TriaRawIterator :
 				     /**
 				      *  Return the state of the iterator.
 				      */
-    IteratorState::IteratorState state () const;
+    IteratorState::IteratorStates state () const;
 
 				     /**
 				      * Print the iterator to @p{out}. The
@@ -901,7 +901,7 @@ TriaRawIterator<dim,Accessor>::operator -> ()
 
 template <int dim, typename Accessor>
 inline
-IteratorState::IteratorState
+IteratorState::IteratorStates
 TriaRawIterator<dim,Accessor>::state () const
 {
   return accessor.state ();
