@@ -82,7 +82,7 @@ makefile.rules.html: $D/common/Makefile.template
 	@$(PERL) makefile2html < $< > $@
 
 validate-xrefs:
-	$(PERL) $D/doc/auto/scripts/validate-xrefs.pl \
+	@$(PERL) $D/common/scripts/validate-xrefs.pl \
 		$(filter-out makefiles.1.html makefiles.2.html, \
 		  $(shell echo *.html))
 

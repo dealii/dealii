@@ -9,7 +9,7 @@ default:
 
 
 validate-xrefs:
-	$(PERL) $D/doc/auto/scripts/validate-xrefs.pl *.html
+	$(PERL) $D/common/scripts/validate-xrefs.pl *.html
 
 
 .PHONY: default validate-xrefs
