@@ -46,7 +46,8 @@ class SolverControl : public Subscriptor
 				      * maximal number of iterations.
 				      * </OL>
 				      */
-    enum State {
+    enum State
+    {
 	  iterate = 0, success, failure
     };
     
@@ -63,10 +64,14 @@ class SolverControl : public Subscriptor
 				      * be checked and the number of
 				      * the iteration step) shall be
 				      * printed to #deallog# stream.
-				      * Default is: do not print.
+				      * Default is: do not print. Similarly,
+				      *  #log_result#
+				      * specifies the whether the final result is logged
+				      * to #deallog#. Default is yes.
 				      */
     SolverControl (const unsigned int n, const double tol,
-		   const bool log_history = false);
+		   const bool log_history = false,
+		   const bool log_result = true);
     
 				     /**
 				      * Virtual destructor is needed
@@ -142,6 +147,13 @@ class SolverControl : public Subscriptor
 				      * Log convergence history to #deallog#?
 				      */
     const bool         log_history;
+				     /**
+				      * Log iteration result to #deallog#?
+				      * If true, after finishing the iteration, a
+				      * statement about failure or success together with
+				      * #lstep# and #lvalue# are logged.
+				      */
+    const bool         log_result;
 };
 
 

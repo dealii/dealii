@@ -9,12 +9,14 @@
 
 SolverControl::SolverControl (const unsigned int maxiter,
 			      const double tolerance,
-			      const bool log_history) :
+			      const bool log_history,
+			      const bool log_result) :
 		maxsteps(maxiter),
 		tol(tolerance),
 		lvalue(1.e300),
 		lstep(0),
-		log_history(log_history)
+		log_history(log_history),
+		log_result(log_result)
 {};
 
 
@@ -33,14 +35,16 @@ SolverControl::check (const unsigned int step,
   lvalue = check_value;
   if (step>=maxsteps)
     {
-      deallog << "Failure step " << step
-	      << " value " << check_value << endl;
+      if (log_result)
+	deallog << "Failure step " << step
+		<< " value " << check_value << endl;
       return failure;
     }
   if (check_value <= tol)
     {
-      deallog << "Convergence step " << step
-	      << " value " << check_value << endl;      
+      if (log_result)
+	deallog << "Convergence step " << step
+		<< " value " << check_value << endl;      
       return success;
     }
   return iterate;
