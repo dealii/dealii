@@ -17,7 +17,7 @@ examples:
 	cd examples ; make
 
 lib-clean:
-	rm -f *~ include/*~ include/*/*~ lib/lib* lib/*o lib/st*
+	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/* lib/go/* lib/st*
 
 
 doc-clean:
