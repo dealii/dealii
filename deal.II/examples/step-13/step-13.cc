@@ -908,7 +908,11 @@ namespace LaplaceSolver
 				   // down to the base class's
 				   // constructor, or are stored and
 				   // used to generate a
-				   // ``DoFHandler'' object later.
+				   // ``DoFHandler'' object
+				   // later. Since finite elements and
+				   // quadrature formula should match,
+				   // it is also passed a quadrature
+				   // object.
 				   //
 				   // The ``solve_problem'' sets up
 				   // the data structures for the
@@ -930,6 +934,7 @@ namespace LaplaceSolver
     public:
       Solver (Triangulation<dim>       &triangulation,
 	      const FiniteElement<dim> &fe,
+	      const Quadrature<dim>    &quadrature,
 	      const Function<dim>      &boundary_values);
       virtual
       ~Solver ();
@@ -954,6 +959,7 @@ namespace LaplaceSolver
 				       // examples:
     protected:
       const SmartPointer<const FiniteElement<dim> >  fe;
+      const SmartPointer<const Quadrature<dim> >     quadrature;
       DoFHandler<dim>                                dof_handler;
       Vector<double>                                 solution;
       const SmartPointer<const Function<dim> >       boundary_values;
@@ -1038,10 +1044,12 @@ namespace LaplaceSolver
   template <int dim>
   Solver<dim>::Solver (Triangulation<dim>       &triangulation,
 		       const FiniteElement<dim> &fe,
+		       const Quadrature<dim>    &quadrature,
 		       const Function<dim>      &boundary_values)
 		  :
 		  Base<dim> (triangulation),
 		  fe (&fe),
+                  quadrature (&quadrature),
 		  dof_handler (triangulation),
 		  boundary_values (&boundary_values)
   {};
@@ -1227,15 +1235,12 @@ namespace LaplaceSolver
 				const typename DoFHandler<dim>::active_cell_iterator &end_cell,
 				Threads::ThreadMutex                                 &mutex) const
   {
-				     //TODO: adaptive
-    QGauss4<dim>  quadrature_formula;
-
-    FEValues<dim> fe_values (*fe, quadrature_formula, 
+    FEValues<dim> fe_values (*fe, *quadrature, 
 			     UpdateFlags(update_gradients |
 					 update_JxW_values));
 
     const unsigned int   dofs_per_cell = fe->dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+    const unsigned int   n_q_points    = quadrature->n_quadrature_points;
 
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
@@ -1437,6 +1442,7 @@ namespace LaplaceSolver
     public:
       PrimalSolver (Triangulation<dim>       &triangulation,
 		    const FiniteElement<dim> &fe,
+		    const Quadrature<dim>    &quadrature,
 		    const Function<dim>      &rhs_function,
 		    const Function<dim>      &boundary_values);
     protected:
@@ -1452,11 +1458,13 @@ namespace LaplaceSolver
   PrimalSolver<dim>::
   PrimalSolver (Triangulation<dim>       &triangulation,
 		const FiniteElement<dim> &fe,
+		const Quadrature<dim>    &quadrature,
 		const Function<dim>      &rhs_function,
 		const Function<dim>      &boundary_values)
 		  :
 		  Base<dim> (triangulation),
-		  Solver<dim> (triangulation, fe, boundary_values),
+		  Solver<dim> (triangulation, fe,
+			       quadrature, boundary_values),
                   rhs_function (&rhs_function)
   {};
 
@@ -1472,16 +1480,13 @@ namespace LaplaceSolver
   PrimalSolver<dim>::
   assemble_rhs (Vector<double> &rhs) const 
   {
-				     //TODO: adaptive
-    QGauss4<dim>  quadrature_formula;
-
-    FEValues<dim> fe_values (*fe, quadrature_formula, 
+    FEValues<dim> fe_values (*fe, *quadrature, 
 			     UpdateFlags(update_values    |
 					 update_q_points  |
 					 update_JxW_values));
 
     const unsigned int   dofs_per_cell = fe->dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+    const unsigned int   n_q_points    = quadrature->n_quadrature_points;
 
     Vector<double>       cell_rhs (dofs_per_cell);
     std::vector<double>  rhs_values (n_q_points);
@@ -1553,6 +1558,7 @@ namespace LaplaceSolver
     public:
       RefinementGlobal (Triangulation<dim>       &coarse_grid,
 			const FiniteElement<dim> &fe,
+			const Quadrature<dim>    &quadrature,
 			const Function<dim>      &rhs_function,
 			const Function<dim>      &boundary_values);
 
@@ -1565,11 +1571,12 @@ namespace LaplaceSolver
   RefinementGlobal<dim>::
   RefinementGlobal (Triangulation<dim>       &coarse_grid,
 		    const FiniteElement<dim> &fe,
+		    const Quadrature<dim>    &quadrature,
 		    const Function<dim>      &rhs_function,
 		    const Function<dim>      &boundary_values)
 		  :
 		  Base<dim> (coarse_grid),
-                  PrimalSolver<dim> (coarse_grid, fe,
+                  PrimalSolver<dim> (coarse_grid, fe, quadrature,
 				     rhs_function, boundary_values)
   {};
 
@@ -1610,6 +1617,7 @@ namespace LaplaceSolver
     public:
       RefinementKelly (Triangulation<dim>       &coarse_grid,
 		       const FiniteElement<dim> &fe,
+		       const Quadrature<dim>    &quadrature,
 		       const Function<dim>      &rhs_function,
 		       const Function<dim>      &boundary_values);
 
@@ -1622,11 +1630,13 @@ namespace LaplaceSolver
   RefinementKelly<dim>::
   RefinementKelly (Triangulation<dim>       &coarse_grid,
 		   const FiniteElement<dim> &fe,
+		   const Quadrature<dim>    &quadrature,
 		   const Function<dim>      &rhs_function,
 		   const Function<dim>      &boundary_values)
 		  :
 		  Base<dim> (coarse_grid),
-    PrimalSolver<dim> (coarse_grid, fe, rhs_function, boundary_values)
+                  PrimalSolver<dim> (coarse_grid, fe, quadrature,
+				     rhs_function, boundary_values)
   {};
 
 
@@ -1860,7 +1870,8 @@ void solve_problem (const std::string &solver_name)
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (2);
-  const FE_Q<dim> fe(1);
+  const FE_Q<dim>          fe(1);
+  const QGauss4<dim>       quadrature;
   const RightHandSide<dim> rhs_function;
   const Solution<dim>      boundary_values;
 
@@ -1872,10 +1883,12 @@ void solve_problem (const std::string &solver_name)
   LaplaceSolver::Base<dim> * solver = 0;
   if (solver_name == "global")
     solver = new LaplaceSolver::RefinementGlobal<dim> (triangulation, fe,
+						       quadrature,
 						       rhs_function,
 						       boundary_values);
   else if (solver_name == "kelly")
     solver = new LaplaceSolver::RefinementKelly<dim> (triangulation, fe,
+						      quadrature,
 						      rhs_function,
 						      boundary_values);
   else
