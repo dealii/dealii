@@ -1132,6 +1132,97 @@ class TriaDimensionInfo<2> {
  *   vertex with the same number of the old quad.
  *
  *
+ *   \subsection{Implementational conventions for three spatial dimensions}
+ *
+ *   By convention, we will use the following numbering for vertices, lines and
+ *   faces of hexehedra in three space dimensions. Before giving these 
+ *   conventions we declare the following sketch to be the standard way of
+ *   drawing 3d pictures of hexhedra:
+ *   \begin{verbatim}
+ *         *-------*        *-------*
+ *        /|       |       /       /|
+ *       / |       |      /       / |
+ *      /  |       |     /       /  |
+ *     *   |       |    *-------*   |
+ *     |   *-------*    |       |   *
+ *     |  /       /     |       |  /
+ *     | /       /      |       | /
+ *     |/       /       |       |/
+ *     *-------*        *-------*
+ *   \end{verbatim}
+ *   The left part of the picture shows the left, bottom and back face of the
+ *   cube, while the right one shall be the top, right and front face. You may
+ *   recover the whole cube by moving the two parts together into one.
+ *
+ *   \subsubsection{Vertices}
+ *
+ *   The vertices on the front face are numbered exactly the same way as are
+ *   the vertices on a quadrilateral. The vertices on the back face are numbered
+ *   similarly by moving the front face to the back (no turning, no twisting, 
+ *   just a shift):
+ *   \begin{verbatim}
+ *         7-------6        7-------6
+ *        /|       |       /       /|
+ *       / |       |      /       / |
+ *      /  |       |     /       /  |
+ *     3   |       |    3-------2   |
+ *     |   4-------5    |       |   5
+ *     |  /       /     |       |  /
+ *     | /       /      |       | /
+ *     |/       /       |       |/
+ *     0-------1        0-------1
+ *   \end{verbatim}
+ *
+ *   \subsubsection{Lines}
+ *
+ *   Here, the same holds as for the vertices: the lines of the front face are
+ *   numbered as for the quadrilateral, for the back face they are just shifted.
+ *   Finally, the four lines connecting front and back face are numbered:
+ *   \begin{verbatim}
+ *         *---6---*        *-------*
+ *        /|       |       /       /|
+ *      11 |       5      11     10 |
+ *      /  7       |     /       /  |
+ *     *   |       |    *---2---*   |
+ *     |   *---4---*    |       |   *
+ *     |  /       /     |       1  /
+ *     3 8       9      3       | 9
+ *     |/       /       |       |/
+ *     *---0---*        *---0---*
+ *   \end{verbatim}
+ *   The direction of the front and back lines is as for the respective faces, while
+ *   the connecting faces always point to the back:
+ *   \begin{verbatim}
+ *         *--->---*        *--->---*
+ *        /|       |       /       /|
+ *       ^ |       ^      ^       ^ ^
+ *      /  ^       |     /       /  |
+ *     *   |       |    *--->---*   |
+ *     |   *--->---*    |       |   *
+ *     |  /       /     |       ^  /
+ *     ^ ^       ^      ^       | ^
+ *     |/       /       |       |/
+ *     *--->---*        *--->---*
+ *   \end{verbatim}
+ *
+ *   \subsubsection{Faces}
+ *
+ *   The faces are numbered in the same order as the lines were numbered: front
+ *   face, back face, then the four side faces:
+ *   \begin{verbatim}
+ *         *-------*        *-------*
+ *        /|       |       /       /|
+ *       / |   2   |      /  5    / |
+ *      /  |       |     /       /  |
+ *     *   |       |    *-------*   |
+ *     | 6 *-------*    |       | 4 *
+ *     |  /       /     |       |  /
+ *     | /   3   /      |   1   | /
+ *     |/       /       |       |/
+ *     *-------*        *-------*
+ *   \end{verbatim}
+ *
+ *
  *   \subsection{Warning}
  *
  *   It seems impossible to preserve #const#ness of a triangulation through
