@@ -8,8 +8,14 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl author: Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001
+dnl authors: Wolfgang Bangerth, Guido Kanschat, and others 
+dnl          1999, 2000, 2001, 2002
 dnl
+
+
+dnl -------------------------------------------------------------
+dnl                          Administrativa
+dnl -------------------------------------------------------------
 
 dnl switch off caching, since that leads to insurmountable trouble if
 dnl you call ./configure subsequently on different systems without
@@ -18,7 +24,19 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_REVISION($Revision$)
 AC_INIT(base)
+
+dnl Where the output config file is located
 AC_CONFIG_HEADER(base/include/base/config.h)
+
+dnl Have the auxiliary tools like config.guess etc in contrib/config
+AC_CONFIG_AUX_DIR(contrib/config)
+
+
+
+
+dnl -------------------------------------------------------------
+dnl                    Globals: Paths and versions
+dnl -------------------------------------------------------------
 
 dnl    Set the path to the deal.II libraries to `pwd`
 DEAL2_DIR=`pwd`
@@ -26,13 +44,14 @@ AC_SUBST(DEAL2_DIR)
 
 dnl    Set major and minor version numbers of the deal.II library,
 dnl    both as preprocessor variables and in Makefiles
+DEAL_II_VERSION="`cat Version`"
 DEAL_II_MAJOR=`cat Version | perl -pi -e 's/^(\d+)\..*/$1/;'`
 DEAL_II_MINOR=`cat Version | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
 AC_DEFINE_UNQUOTED(DEAL_II_MAJOR, $DEAL_II_MAJOR, 
                    [Major version number of deal.II])
 AC_DEFINE_UNQUOTED(DEAL_II_MINOR, $DEAL_II_MINOR, 
                    [Minor version number of deal.II])
-AC_MSG_RESULT(Configuring deal.II version `cat Version`)
+AC_MSG_RESULT(Configuring deal.II version $DEAL_II_VERSION)
 AC_SUBST(DEAL_II_MAJOR)
 AC_SUBST(DEAL_II_MINOR)
 
@@ -43,145 +62,152 @@ dnl AC_SUBST(target_os)
 
 dnl    Set the language for which subsequent tests shall be
 dnl    performed to C++
-AC_LANG_CPLUSPLUS
+AC_LANG(C++)
 
 
 
 
 dnl -------------------------------------------------------------
-dnl Find external programs
+dnl                          C/C++ compilers
 dnl -------------------------------------------------------------
 
-dnl    Find a C compiler, which is used when building
-dnl    shared libaries. This modifies the variable CC.
-dnl    In order to get the absolute path of the compiler, use the
-dnl    second line
-AC_PROG_CC
-AC_PATH_PROG(CC,$CC)
+AC_MSG_RESULT()
+AC_MSG_RESULT(---------------- configuring C/C++ compilers ----------------)
 
-
-
-dnl Find the right C++ compiler. Note that for historical reasons, the
-dnl compiler name and version is in the name GXX_VERSION, even if the
-dnl compiler is not GCC.
+dnl Find a C compiler. This modifies the variable CC.
+dnl In order to get the absolute path of the compiler, use the
+dnl second line
+dnl
+dnl Likewise, find the right C++ compiler. Note that for historical 
+dnl reasons, the compiler name and version is in the name GXX_VERSION,
+dnl even if the compiler is not GCC.
 dnl
 dnl Note that on MIPS systems, the AC_PROG_CXX call erroneously sets
 dnl -g in CXXFLAGS, which is not exactly what we want, so we store
 dnl the old value temporarily
+AC_PROG_CC
+AC_PATH_PROG(CC,$CC)
+
 OLDCXXFLAGS="$CXXFLAGS"
 AC_PROG_CXX
 CXXFLAGS="$OLDCXXFLAGS"
 AC_PATH_PROG(CXX,$CXX) 
 
-if test "$GXX" = yes ; then
-  # find out the right version
-  GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-  case "$GXX_VERSION_STRING" in
-    *"egcs-1.1"*)
-	AC_MSG_RESULT(compiler is egcs-1.1)
-	GXX_VERSION=egcs1.1
-	;;
-    *2.95*)
-	AC_MSG_RESULT(compiler is gcc-2.95)
-	GXX_VERSION=gcc2.95
-	;;
-    *2.96*)
-	AC_MSG_RESULT(compiler is gcc-2.96)
-	GXX_VERSION=gcc2.96
-	;;
-    *2.97*)
-	AC_MSG_RESULT(compiler is gcc-2.97)
-	GXX_VERSION=gcc2.97
-	;;
-    *3.0*)
-	AC_MSG_RESULT(compiler is gcc-3.0)
-	GXX_VERSION=gcc3.0
-	;;
-    *3.1*)
-	AC_MSG_RESULT(compiler is gcc-3.1)
-	GXX_VERSION=gcc3.1
-	;;
-    *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-	dnl These compilers are too old to support a useful subset
-	dnl of modern C++, so we don't support them
-	AC_MSG_RESULT(compiler is $GXX_VERSION_STRING)
-	AC_MSG_ERROR(compiler is not supported)
-	;;
-    *)
-	AC_MSG_RESULT(compiler is unknown but accepted gcc version)
-	GXX_VERSION=gcc-other
-	;;
-  esac
-else
 
-  dnl Check for IBM xlC. For some reasons, depending on some environment variables,
-  dnl moon position, and other reasons unknown to me, the compiler displays
-  dnl different names in the first line of output, so check various possibilities
-  is_ibm_xlc="`($CXX 2>&1) | egrep 'VisualAge C++|C Set ++|C for AIX Compiler'`"
-  if test "x$is_ibm_xlc" != "x"  ; then
-    dnl Ah, this is IBM's C++ compiler. Unfortunately, we don't presently
-    dnl know how to check the version number, so assume that is sufficiently
-    dnl high...
-    AC_MSG_RESULT(compiler is IBM xlC)
-    GXX_VERSION=ibm_xlc
-  else
+dnl Next determine which C++ compiler we have here and set compilation
+dnl flags accordingly. Note that for historical reasons the name and
+dnl version of the compiler is written to the variable GXX_VERSION.
+DEAL_II_DETERMINE_CXX_BRAND
+DEAL_II_SET_CXX_FLAGS
+DEAL_II_SET_CXX_DEBUG_FLAG
 
-    # Check whether we are dealing with the MIPSpro C++ compiler
-    is_mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
-    if test "x$is_mips_pro" != "x" ; then
-      AC_MSG_RESULT(compiler is MIPSpro C++ compiler)
-      GXX_VERSION=MIPSpro
-    else
-
-      # Intel's ICC C++ compiler?
-      is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
-      if test "x$is_intel_icc" != "x" ; then
-        AC_MSG_RESULT(compiler is Intel ICC)
-        GXX_VERSION=intel_icc
-      else
-
-        # Or DEC's cxx compiler?
-        is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
-        if test "x$is_dec_cxx" != "x" ; then
-          AC_MSG_RESULT(compiler is Compaq cxx)
-          GXX_VERSION=compaq_cxx
-        else
-
-          is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
-          if test "x$is_sun_cc" != "x" ; then
-            AC_MSG_RESULT(compiler is Sun Workshop compiler)
-            GXX_VERSION=sun_workshop
-          else
-
-	    is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
-	    if test "x$is_kai_cc" != "x" ; then
-	      AC_MSG_RESULT(compile is KAI C++)
-	      GXX_VERSSION=kai_cc
-	    else
-
-              dnl  Aw, nothing suitable found...
-              AC_MSG_ERROR(Unrecognized compiler, sorry)
-              exit 1
-            fi
-	  fi
-        fi
-      fi
-    fi
-  fi
-fi
 AC_SUBST(GXX_VERSION)
+AC_SUBST(CXXFLAGSG)
+AC_SUBST(CXXFLAGSO)
+AC_SUBST(CXXFLAGSPIC)
+AC_SUBST(LIBS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(LDFLAGSPIC)
+
+
+
 
 
 
 
 dnl -------------------------------------------------------------
-dnl Next test whether shared libraries support is requested. This
-dnl has to be done before other flags are set, as they might depend
-dnl on whether we want to use shared libs.
-dnl 
-dnl Default to shared libs is yes, but value will be adjusted to 
-dnl operating system below.
+dnl                          Multithreading
 dnl -------------------------------------------------------------
+
+dnl Test whether multithreading support is requested. This
+dnl does not tell deal.II to actually use it, but the
+dnl compiler flags are set to allow for it.
+DEAL_II_CHECK_MULTITHREADING
+DEAL_II_SET_MULTITHREADING_FLAGS
+AC_SUBST(enablemultithreading)
+
+dnl Next also check whether the MT code shall be used through ACE
+DEAL_II_CHECK_USE_ACE
+DEAL_II_SET_ACE_FLAGS
+AC_SUBST(withmultithreading)
+
+
+
+
+
+dnl --------------------------------------------------------------
+dnl                   Kludges and C++ compatibility
+dnl --------------------------------------------------------------
+
+dnl Various kludges for various systems: some systems need special
+dnl treatment for some things. Since they sometimes depend on 
+dnl whether other flags are set (e.g. the need for defining
+dnl -D__EXTENSIONS__ depends on whether we use/not use threading
+dnl options), this is done after checking for multithreading
+
+DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, 
+                           [CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG"])
+DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, 
+                           [CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO"])
+DEAL_II_CHECK_IBM_XLC_ERROR
+DEAL_II_HAVE_STD_ITERATOR
+DEAL_II_HAVE_STD_STRINGSTREAM
+DEAL_II_HAVE_STD_NUMERIC_LIMITS
+DEAL_II_HAVE_STD_OSTREAM_HEADER
+DEAL_II_HAVE_STD_IOSFWD_HEADER
+DEAL_II_HAVE_LRAND48_DECLARED
+DEAL_II_CHECK_GETRUSAGE
+DEAL_II_CHECK_ISNAN
+DEAL_II_CHECK_RAND_R
+AC_CHECK_FUNCS(gethostname)
+
+
+
+
+dnl -------------------------------------------------------------
+dnl                        Fortran 77 compilers
+dnl -------------------------------------------------------------
+
+AC_MSG_RESULT()
+AC_MSG_RESULT(----------------- configuring F77 compilers -----------------)
+
+dnl Find path to a Fortran 77 compiler. By default try to find a
+dnl vendor compiler which is usually named `f77', and only if that could
+dnl not be found, use `g77' instead. The reasoning is that usually vendor
+dnl compilers are much better adapted to the system at hand, and since
+dnl Fortran code is often used for efficiency reasons, this is
+dnl important. Likewise, if external Fortran code is imported, it is
+dnl usually code that is well tested and does not need much debugging, so
+dnl good optimizations are helpful again.
+dnl
+dnl It is possible that no Fortran 77 compiler was found. Don't care,
+dnl it may be that we don't need one (but we check below, when we must
+dnl have it).
+AC_PATH_PROGS(F77, [f77 g77])
+
+dnl Next determine which C++ compiler we have here and set compilation
+dnl flags accordingly. Note that for historical reasons the name and
+dnl version of the compiler is written to the variable GXX_VERSION.
+DEAL_II_DETERMINE_F77_BRAND
+DEAL_II_SET_F77_FLAGS
+
+AC_SUBST(F77_VERSION)
+AC_SUBST(F77FLAGSO)
+AC_SUBST(F77FLAGSG)
+AC_SUBST(F77FLAGSPIC)
+AC_SUBST(F77LIBS)
+
+
+
+
+
+dnl --------------------------------------------------------------
+dnl                         Shared libraries
+dnl --------------------------------------------------------------
+
+AC_MSG_RESULT()
+AC_MSG_RESULT(-------------- configuring shared/static libs ---------------)
+
 AC_ARG_ENABLE(shared,
 [  --enable-shared Set compiler flags to generate shared libraries],
     enableshared=$enableval,
@@ -198,687 +224,15 @@ case "$target" in
 	   ;;
 esac
 
-
-dnl Output results; set compile flags accordingly further below
-if test $enableshared = yes ; then
-  AC_MSG_RESULT(configuring for shared libraries)
-  lib_suffix=.so;
-else
-  AC_MSG_RESULT(configuring for static libraries)
-  lib_suffix=.a;
-fi
-
-
 AC_SUBST(enableshared)
-AC_SUBST(lib_suffix)
-
-
-
-
-
-dnl -------------------------------------------------------------
-dnl Set compiler flags to their default values. They will be 
-dnl modified according to other options further down below
-dnl
-dnl CXXFLAGSO are the flags for optimized mode
-dnl CXXFLAGSG are the flags for debug mode
-dnl -------------------------------------------------------------
-if test "$GXX" = yes ; then
-  CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
-  CXXFLAGSG="$CXXFLAGS -DDEBUG -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
-
-  dnl set some flags that are specific to some versions of the
-  dnl compiler:
-  dnl - egcs1.1 yielded incorrect code with some loop unrolling
-  dnl - after egcs1.1, the optimization flag -fstrict-aliasing was
-  dnl   introduced, which enables better optimizations for
-  dnl   well-written C++ code. we believe that deal.II falls into that
-  dnl   category and thus enable the flag 
-  dnl - egcs1.1 yielded incorrect code with vtable-thunks. thus disable
-  dnl   them for egcs1.1. however, if on Linux, disabling them
-  dnl   prevents programs from being linked, so take the risk of broken
-  dnl   thunks on this platform
-
-  case "$GXX_VERSION" in
-    egcs1.1)
-        case "$target" in
-	  *linux*)
-	      ;;
-
-	  *)
-	      CXXFLAGSG = "$CXXFLAGSG -fno-vtable-thunks"
-	      CXXFLAGSO = "$CXXFLAGSO -fno-vtable-thunks"
-	      ;;
-	esac
-	;;
-
-    dnl All other gcc versions
-    *)
-	CXXFLAGSO="$CXXFLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
-	;;
-  esac
-
-  dnl - after gcc2.95, some flags were deemed obsolete for C++
-  dnl   (and are only supported for C any more), so only define them for
-  dnl   previous compilers
-
-  case "$GXX_VERSION" in
-    egcs1.1 | gcc2.95)
-	CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
-	CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
-	;;
-
-    *)
-	;;
-  esac
-
-  dnl Some gcc compiler versions have a problem when using an unsigned count
-  dnl in the std::advance function. Unfortunately, this also happens 
-  dnl occasionally from within the standard library, so we can't prevent the
-  dnl warning messages. Since this is annoying, switch of the flag -W which
-  dnl causes this.
-  DEAL_II_CHECK_ADVANCE_WARNING
-  if test "x$DEAL_II_ADVANCE_WARNING" = "xyes" ; then
-    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W //g;'`"
-  fi
-
-else
-
-  if test "x$GXX_VERSION" = "xibm_xlc" ; then
-	CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all"
-	CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all"
-  else
-
-    if test "x$GXX_VERSION" = "xMIPSpro" ; then
-        CXXFLAGSG="$CXXFLAGS -DDEBUG -LANG:std"
-        CXXFLAGSO="$CXXFLAGS -LANG:alias_const=ON -LANG:std -w"
-
-    else
-      
-      if test "x$GXX_VERSION" = "xintel_icc" ; then
-	dnl Disable some compiler warnings, as they often are wrong on
-	dnl out code:
-	dnl #175: `subscript out of range' (doesn't take into account that
-	dnl       some code is only reachable for some dimensions)
-	dnl #327: `NULL reference is not allowed' (this happens when we
-	dnl       write "*static_cast<double*>(0)" or some such thing,
-	dnl       which we do to create invalid references)
-	dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
-	dnl       (allowed for compatibility)' (I don't understand what the
-	dnl       compiler means)
-        CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -DDEBUG -inline_debug_info"
-        CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -unroll -w0"
-
-      else
-
-	if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
-	  dnl Disable some warning messages:
-	  dnl #175: `subscript out of range' (detected when instantiating a template
-	  dnl       and looking at the indices of an array of template dependent
-	  dnl       size, this error is triggered in a branch that is not taken
-	  dnl       for the present space dimension)
-          dnl #236 and
-	  dnl #237: `controlling expression is constant' (in while(true), or switch(dim))
-	  dnl #381: `extra ";" ignored' (at function or namespace closing brace)
-	  dnl #487: `Inline function ... cannot be explicitly instantiated' (also
-	  dnl       reported when we instantiate the entire class)
-	  dnl #1136:`conversion to integral type of smaller size could lose data'
-	  dnl       (occurs rather often in addition of int and x.size(), because the latter
-	  dnl       is size_t=long unsigned int on Alpha)
-	  dnl #1156:`meaningless qualifiers not compatible with "..." and "..."'
-	  dnl       (cause unknown, happens when taking the address of a template
-	  dnl       member function)
-	  dnl #111 and
-	  dnl #1182:`statement either is unreachable or causes unreachable code'
-	  dnl       (happens in switch(dim) clauses for other dimensions than
-	  dnl       the present one)
-	  dnl
-	  dnl Also disable the following error:
-	  dnl #265: `class "..." is inaccessible' (happens when we try to initialize
-	  dnl       a static member variable in terms of another static member variable
-	  dnl       of the same class if the latter is not public and therefore not
-	  dnl       accessible at global scope in general. I nevertheless think that
-	  dnl       this is valid.)
-	  dnl
-	  dnl Besides this, choose the most standard conforming mode of the compiler,
-	  dnl i.e. -model ansi and -std strict_ansi. Unfortunately, we have to
-	  dnl also add the flag -implicit_local (generating implicit instantiations of 
-	  dnl template with the `weak' link flag) since otherwise not all templates
-	  dnl are instantiated (also some from the standards library are missing).
-
-	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
-	  CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
-
-	  for i in 175 236 237 381 487 1136 1156 111 1182 265 ; do
-	    CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
-	    CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
-	  done
-
-	  dnl If we use -model ansi to compile the files, we also have to specify 
-	  dnl it for linking
-	  LDFLAGS="$LDFLAGS -model ansi"
-
-	  dnl For some reason, cxx also forgets to add the math lib to the linker
-	  dnl line, so we do that ourselves
-	  LDFLAGS="$LDFLAGS -lm"
-
-          dnl if necessary: -shared, -pthread 
-          dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
-          dnl                -pch? -noimplicit_include?
-        else
-
-	  if test "x$GXX_VERSION" = "xsun_workshop" ; then
-	    CXXFLAGSG="$CXXFLAGS -DDEBUG"
-	    CXXFLAGSO="$CXXFLAGS -fast"
-
-	  else
-
-            dnl Other compiler
-            AC_MSG_ERROR(No compiler options for this C++ compiler
-                         specified at present)
-            exit 1
-	  fi
-        fi
-      fi
-    fi
-  fi
-fi
-
-AC_SUBST(CXXFLAGSG)
-AC_SUBST(CXXFLAGSO)
-AC_SUBST(LIBS)
-AC_SUBST(LDFLAGS)
-
-
-
-
-dnl We still need to set the flag for debug output. We will usually
-dnl use -ggdb, but on DEC Alpha OSF1, this leads to stabs symbols that are
-dnl too long for the system assembler. We will therefore check whether the
-dnl assembler can handle these symbols by a rather perverse function with
-dnl many templates, and if the assembler can't handle them, then use
-dnl -gstabs instead. This reduces debugging possibilities, but no other
-dnl way is known at present.
-dnl
-dnl For all compilers other than gcc, use -g instead and don't check.
-if test "$GXX" = yes ; then
-  AC_MSG_CHECKING(whether -ggdb works for long symbols)
-  case "$target" in
-     dnl On Alpha, use the special treatment
-     alpha*-osf*)
-      	  CXXFLAGS="-ggdb $CXXFLAGSG"
- 	  AC_TRY_COMPILE(
- 	    [
-#include <string>
-#include <map>
-
-typedef map<string,map<string,pair<string,string> > > T;
-
-bool f(T& t1, const T* t2) {
-  t1["s"] = map<string,pair<string,string> >();
-  map<string,map<string,pair<string,string> > >::const_iterator i2=t1.begin();
-  map<string,map<string,pair<string,string> > >::const_iterator i1=t2->begin();
-  return (i1==i2);
-}
-	    ],
-	    [
-		  ;
-	    ],
-	    [
-              CXXFLAGSG="-ggdb $CXXFLAGSG"
-	      AC_MSG_RESULT(yes)
-	    ],
-	    [
-              CXXFLAGSG="-gstabs $CXXFLAGSG"
-	      AC_MSG_RESULT(no -- using -gstabs)
-	    ])
-	  ;;
-
-     dnl For all other systems assume that -ggdb works (we can't make the test 
-     dnl above the default, as stabs are not the default debugging format on many
-     dnl systems, and we only want to use it where necessary
-     *)
-	  AC_MSG_RESULT(yes)
-          CXXFLAGSG="-ggdb $CXXFLAGSG"
-	  ;;
-  esac
-
-else
-  dnl Non-gcc compilers use -g instead of -ggdb
-  CXXFLAGSG="-g $CXXFLAGSG"
-fi
-
-
-
-dnl Next set flags for shared libraries, if so needed. This is simple,
-dnl as most compilers want to see -fPIC. Some others need -KPIC, however
-if test $enableshared = yes ; then
-  case "$GXX_VERSION" in
-        *egcs* | *gcc* | *ibm_xlc*)
-                CFLAGS="$CFLAGS -fPIC"
-                CXXFLAGSG="$CXXFLAGSG -fPIC"
-                CXXFLAGSO="$CXXFLAGSO -fPIC"
-                LDFLAGS="$LDFLAGS -fPIC"
-                ;;
-        *MIPSpro*)
-                CFLAGS="$CFLAGS -KPIC"
-                CXXFLAGSG="$CXXFLAGSG -KPIC"
-                CXXFLAGSO="$CXXFLAGSO -KPIC"
-                LDFLAGS="$LDFLAGS -KPIC"
-                ;;
-	intel_icc)
-                CFLAGS="$CFLAGS -KPIC"
-                CXXFLAGSG="$CXXFLAGSG -KPIC"
-                CXXFLAGSO="$CXXFLAGSO -KPIC"
-                LDFLAGS="$LDFLAGS -KPIC"
-                ;;
-
-	compaq_cxx)
-		CFLAGS="$CFLAGS -shared"
-                CXXFLAGSG="$CXXFLAGSG -shared"
-                CXXFLAGSO="$CXXFLAGSO -shared"
-                LDFLAGS="$LDFLAGS -shared"
-                ;;
-
-	sun_workshop)
-		CFLAGS="$CFLAGS -KPIC"
-                CXXFLAGSG="$CXXFLAGSG -KPIC"
-                CXXFLAGSO="$CXXFLAGSO -KPIC"
-		;;
-
-        *)
-                AC_MSG_ERROR(No shared lib options for this compiler specified)
-                exit 1
-  esac
-fi
-
-
-
-
-
-
-dnl -------------------------------------------------------------
-dnl Multithreading
-dnl -------------------------------------------------------------
-
-dnl    Test whether multithreading support is requested. This
-dnl    does not tell deal.II to actually use it, but the
-dnl    compiler flags are set to allow for it,
-AC_ARG_ENABLE(multithreading,
-[  --enable-multithreading Set compiler flags to allow for multithreaded programs],
-    enablemultithreading=$enableval,
-    enablemultithreading=no)
-AC_SUBST(enablemultithreading)
-
-
-dnl Adjust compiler parameters if multithreading is desired:
-dnl - Use the right -threads/-pthread/-mthread option
-dnl - Set preprocessor directives if necessary
-dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
-dnl - _REENTRANT is a flag that is used in the standard UNIX
-dnl   headers to make reentrant functions (with suffix _r) declared
-dnl
-dnl Do not use AC_DEFINE when using these two flags, since that would
-dnl put them into config.h, instead of the compiler flags. Then, however,
-dnl it would be necessary to include config.h as _first_ file in all
-dnl files, since the flags change the things we include. It is therefore
-dnl better to put the flags into the command line, since then we have them
-dnl defined for all include files.
-if test "$enablemultithreading" = yes ; then
-  if test "$GXX" = yes ; then
-    DEAL_II_GET_THREAD_FLAGS
-    DEAL_II_THREAD_CPPFLAGS
-
-    CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC -D_REENTRANT"
-    CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC -D_REENTRANT"
-  else
-    if test "x$GXX_VERSION" = "xibm_xlc" ; then
-      CXXFLAGSG = "$CXXFLAGSG -threaded"  
-      CXXFLAGSO = "$CXXFLAGSO -threaded"
-    else
-      dnl Other compiler
-      AC_MSG_ERROR(No threading compiler options for this C++ compiler
-                   specified at present)
-      exit 1
-    fi
-  fi
-fi
-
-
-
-
-dnl    Test whether the user wants the multithread code in the 
-dnl    library to be used
-AC_ARG_WITH(multithreading,
-[  --with-multithreading=DIR use DIR as path to the ACE library],
-    withmultithreading=$withval,
-    withmultithreading=no)
-if test "$withmultithreading" != no ; then
-  AC_MSG_CHECKING(for ACE)
-  if test -d "$withmultithreading" ; then
-    AC_MSG_RESULT(found)
-  else
-    AC_MSG_RESULT(not found)
-    AC_MSG_ERROR(Invalid ACE path)
-  fi
-
-  AC_DEFINE(DEAL_II_USE_MT, 1, 
-            [Flag indicating whether the library shall be compiler for
-             multithreaded applications])
-fi
-AC_SUBST(withmultithreading)
-
-
-
-
-dnl Possibly remove -ansi -pedantic from compiler flags again, since ACE
-dnl yields hundreds of error messages with these flags. do that
-dnl only conditionally
-if test "$enablemultithreading" = yes ; then
-  if test "$GXX" = yes ; then
-    DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
-    if test "x$deal_II_ace_remove_ansi" = "xyes" ; then
-      CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
-      CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-ansi//g;'`"
-    fi
-    if test "x$deal_II_ace_remove_pedantic" = "xyes" ; then
-      CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-pedantic//g;'`"
-      CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-pedantic//g;'`"
-    fi
-  fi
-fi
 
 
 
 dnl --------------------------------------------------------------
-dnl Check for possibly disabled backward compatibility functions
+dnl                   Backward compatibility functions
 dnl --------------------------------------------------------------
-AC_ARG_ENABLE(compat-blocker,
-[  --enable-compat-blocker=mapping Block functions that implicitely assume a Q1 mapping],
-    enable_compat_blocker=$enableval,
-    enable_compat_blocker="")
-dnl Replace the comma-separated list by a space-separated one
-disable_compat=`echo $enable_compat_blocker | perl -pi -e 's/,/ /g;'`
-dnl Check that each entry is an allowed one
-for i in $disable_compat ; do 
-  case $i in
-    mapping)
-	AC_MSG_RESULT(Disabling backward compatibility feature: "$i")
-	;;
-    *) 
-	AC_MSG_ERROR(Backward compatibility feature "$i" unknown)
-	;;
-  esac
-done
-dnl Now for each known feature, either disable it or enable it.
-dnl Default is to enable. In order to have these flags in config.h,
-dnl it is necessary to AC_DEFINE them actually by name, rather than
-dnl by some loop variable, since otherwise autoheader can't generate
-dnl an entry for config.h for this variable
-for i in mapping ; do
-  uppercase=`echo $i | perl -pi -e 'tr/a-z/A-Z/;'`
-  if test -n "`echo $disable_compat | grep $i`"  ; then
-    compat_value=false
-  else
-    compat_value=true
-  fi
+DEAL_II_CHECK_COMPAT_BLOCKER
 
-  case $i in
-    mapping)
-	AC_DEFINE_UNQUOTED(DEAL_II_COMPAT_MAPPING,$compat_value,
-			   [Backward compatibility support for functions
-                            and classes that do not take an explicit mapping
-                            variable, but rather use a default Q1 mapping instead])
-	;;
-    *)
-	AC_MSG_ERROR(Backward compatibility feature "$i" unknown)
-	;;
-  esac
-done
-
-
-
-dnl --------------------------------------------------------------
-dnl Various kludges for various systems: some systems need special
-dnl treatment for some things. Since they sometimes depend on 
-dnl whether other flags are set (e.g. the need for defining
-dnl -D__EXTENSIONS__ depends on whether we use/not use threading
-dnl options), this is done after checking for multithreading
-dnl --------------------------------------------------------------
-
-
-dnl On some systems (well, DEC Alphas are the only ones we know of),
-dnl gcc2.95 throws the hands in the air if it sees one of the AssertThrow
-dnl calls, and dies with an internal compiler error. If this is the case,
-dnl we disable AssertThrow and simply replace it with an `abort' if the
-dnl condition is not satisfied. Check this for debug and optimized mode
-dnl compiler flags, and define `DISABLE_ASSERT_THROW' if necessary.
-DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG")
-DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO")
-
-dnl IBM's xlC compiler has a problem with some kind of code that does not
-dnl "using namespace std;" Try to work around if necessary
-DEAL_II_CHECK_IBM_XLC_ERROR
-
-dnl See whether we can use the std::iterator, std::stringstream, 
-dnl and std::numeric_limits classes, and other compiler features
-DEAL_II_HAVE_STD_ITERATOR
-DEAL_II_HAVE_STD_STRINGSTREAM
-DEAL_II_HAVE_STD_NUMERIC_LIMITS
-DEAL_II_HAVE_STD_OSTREAM_HEADER
-DEAL_II_HAVE_STD_IOSFWD_HEADER
-
-
-
-dnl ======================================================================
-dnl With all the right flags in place now, check for operating system
-dnl properties like header files and accessibility of special functions
-dnl with these flags.
-
-dnl See whether we have to declare lrand48 ourselves with -ansi
-DEAL_II_HAVE_LRAND48_DECLARED
-
-dnl See whether getrusage() is declared properly, and for the present
-dnl flags. likewise for other functions as well
-DEAL_II_CHECK_GETRUSAGE
-DEAL_II_CHECK_ISNAN
-DEAL_II_CHECK_RAND_R
-AC_CHECK_FUNCS(gethostname)
-
-
-dnl ======================================================================
-dnl Find path to a Fortran 77 compiler. By default try to find a
-dnl vendor compiler which is usually names `f77', and only if that could
-dnl not be found, use `g77' instead. The reasoning is that usually vendor
-dnl compilers are much better adapted to the system at hand, and since
-dnl Fortran code is often used for efficiency reasons, this is
-dnl important. Likewise, if external Fortran code is imported, it is
-dnl usually code that is well tested and does not need much debugging, so
-dnl good optimizations are helpful again.
-AC_PATH_PROG(F77,f77)
-if test "x$F77" = "x" ; then
-    dnl Could not find an executable names `f77'. Try `g77'
-    AC_PATH_PROG(F77,g77)
-fi
-dnl It is possible that no Fortran 77 compiler was found. Don't care,
-dnl it may be that we don't need one (but we check below, when we must
-dnl have it).
-
-dnl Next try to find out something about the name and version of the compiler
-if test "x$F77" != "x" ; then
-  F77_VERSION_STRING="`($F77 -v 2>&1)`"
-  if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
-    dnl Yes, this is a GNU g77 version. find out the right version
-    G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
-    case "$G77_VERSION_STRING" in
-      *"egcs-1.1"*)
-	  AC_MSG_RESULT(compiler is egcs-1.1)
-  	  F77_VERSION=egcs1.1
-	  ;;
-      *2.95*)
-	  AC_MSG_RESULT(compiler is gcc-2.95)
-	  F77_VERSION=gcc2.95
-	  ;;
-      *2.96*)
-	  AC_MSG_RESULT(compiler is gcc-2.96)
-	  F77_VERSION=gcc2.96
-	  ;;
-      *2.97*)
-	  AC_MSG_RESULT(compiler is gcc-2.97)
-	  F77_VERSION=gcc2.97
-	  ;;
-      *3.0*)
-	  AC_MSG_RESULT(compiler is gcc-3.0)
-	  F77_VERSION=gcc3.0
-	  ;;
-      *3.1*)
-	  AC_MSG_RESULT(compiler is gcc-3.1)
-	  F77_VERSION=gcc3.1
-	  ;;
-      *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-	  dnl These compilers are too old to support a useful subset
-	  dnl of modern C++, so we don't support them
-	  AC_MSG_RESULT(compiler is $G77_VERSION_STRING)
-	  AC_MSG_ERROR(compiler is not supported)
-	  ;;
-      *)
-	  AC_MSG_RESULT(compiler is unknown but accepted gcc version)
-	  F77_VERSION=gcc-other
-	  ;;
-    esac
-
-    dnl For g77 versions, it is simple which flags to use since we already
-    dnl know them mostly from the C++ compiler
-    F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
-    F77FLAGSO="$FFLAGS -O2"
-
-    dnl Some flags can only be set for some compilers as others either
-    dnl did not accept them or were buggy on them (see the explanation
-    dnl for CXXFLAGS for an explanation of some of these cases)
-    if test "x$F77_VERSION" != "xegcs1.1" ; then
-      F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
-    fi
-
-    dnl If necessary, add shared lib flags
-    if test $enableshared = yes ; then
-      F77FLAGSG="$F77FLAGSG -fPIC"
-      F77FLAGSO="$F77FLAGSO -fPIC"
-    fi
-
-    dnl Then we have to set the set of libraries we have to link with
-    dnl when linking C++ and Fortran code with the C++ compiler. For
-    dnl g77, this is only libg2c
-    F77LIBS="$F77LIBS -lg2c"
-
-  else
-
-    dnl No GNU g77 version, something else. Try to find out what it is:
-    if test -n "`echo $F77_VERSION_STRING | grep \"XL Fortran for AIX\"`" ; then
-
-      dnl This is the "XL Fortran for AIX" compiler
-      F77_VERSION=AIXF77
-      AC_MSG_RESULT(compiler is AIX Fortran77)
-      F77FLAGSG="$FFLAGS -g"
-      F77FLAGSO="$FFLAGS -O3 -w"
-      F77LIBS="$F77LIBS -lxlf90"  
-
-      dnl Note: presently, we don't support shared libs on AIX, so we don't need
-      dnl to set -PIC or the like for this compiler (nonetheless, I couldn't find
-      dnl the right name of that flag anyway)
-
-    else
-
-      dnl Umh, still something else unknown. Try to find it out by a different
-      dnl method (-V instead of -v):
-      F77_VERSION_STRING=`($F77 -V 2>&1)`
-      if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" ; then
-
-        dnl OK, this is the Sun Fortran77 compiler
-	AC_MSG_RESULT(compiler is Sun WorkShop f77)
-	F77_VERSION="SunF77"
-	F77FLAGSG="$FFLAGS -silent -g"
-	F77FLAGSO="$FFLAGS -silent -O3 -w"
-	F77LIBS="$F77LIBS -lF77 -lsunmath -lM77"
-	LDFLAGS="$LDFLAGS"
-
-	dnl If necessary, add shared lib flags
-	if test $enableshared = yes ; then
-	  F77FLAGSG="$F77FLAGSG -PIC"
-	  F77FLAGSO="$F77FLAGSO -PIC"
-	fi
-
-      else
-
-	dnl If we can detect IRIX's f77 somehow, then the following flags might
-	dnl be appropriate:
-        F77_VERSION_STRING=`($F77 -version 2>&1)`
-	if test -n "`echo $F77_VERSION_STRING | grep MIPSpro`" ; then
-	  AC_MSG_RESULT(compiler is MIPSpro f77)
-	  F77_VERSION="MIPSproF77"
-	  F77FLAGSG="$FFLAGS -ansi -g"
-	  F77FLAGSO="$FFLAGS -O3 -woffall"
-	  F77LIBS="$F77LIBS -lftn"
-
-	  dnl If necessary, add shared lib flags
-	  if test $enableshared = yes ; then
-	    F77FLAGSG="$F77FLAGSG -shared -KPIC"
-	    F77FLAGSO="$F77FLAGSO -shared -KPIC"
-          else
-	    F77FLAGSG="$F77FLAGSG -non_shared"
-	    F77FLAGSO="$F77FLAGSO -non_shared"
-	  fi
-
-        else
-
-  	  dnl Now, this is a hard case, we have no more clues...
-          F77_VERSION=
-	  AC_MSG_RESULT(compiler is unkown. no flags set!)
-        fi
-      fi
-    fi
-  fi
-fi
-AC_SUBST(F77_VERSION)
-AC_SUBST(F77FLAGSO)
-AC_SUBST(F77FLAGSG)
-AC_SUBST(F77LIBS)
-
-
-dnl    Find path to perl
-AC_PATH_PROG(PERL, perl)
-AC_SUBST(PERL)
-
-
-
-
-dnl ------------------------------------------------------------
-dnl   Check whether some of the HSL functions have been dropped
-dnl   into their respective place in the contrib subdir.
-dnl   Check for the following functions to be there:
-dnl     MA27: needs files ma27.f
-dnl     MA47: needs files ma47.f ma47.dep
-dnl ------------------------------------------------------------
-AC_MSG_CHECKING(for HSL subroutines)
-hsl_subroutines=""
-if test -r contrib/hsl/source/ma27.f ; then
-  hsl_subroutines="$hsl_subroutines MA27"
-  AC_DEFINE(HAVE_HSL_MA27, 1, [Availability of the MA27 algorithm from HSL])
-fi
-
-if test -r contrib/hsl/source/ma47.f -a -r contrib/hsl/source/ma47dep.f ; then
-  hsl_subroutines="$hsl_subroutines MA47"
-  AC_DEFINE(HAVE_HSL_MA47, 1, [Availability of the MA47 algorithm from HSL])
-fi
-
-
-if test "x$hsl_subroutines" != "x" ; then
-  AC_MSG_RESULT($hsl_subroutines)
-  USE_CONTRIB_HSL=yes
-else
-  AC_MSG_RESULT(none found)
-  USE_CONTRIB_HSL=no
-fi
-AC_SUBST(USE_CONTRIB_HSL)
 
 
 
@@ -905,150 +259,89 @@ AC_SUBST(enablemultigrid)
 
 
 
+
 dnl -------------------------------------------------------------
-dnl Documentation tools
+dnl                  Existence of additional libraries
 dnl -------------------------------------------------------------
 
+AC_MSG_RESULT()
+AC_MSG_RESULT(---------------- configuring additional libs ----------------)
 
-dnl    Find the kdoc directory for documentation. kdoc2 is in
-dnl    the contrib directory, but you might want another one
-AC_ARG_WITH(kdoc,
-[  --with-kdoc=DIR use kdoc installed in DIR],
-    kdocdir=$withval,
-    kdocdir=${DEAL2_DIR}/contrib/kdoc/bin)
-AC_MSG_CHECKING(for kdoc)
-dnl lets see whether the file exists if not the default was taken
-if test "$kdocdir" != ${DEAL2_DIR}/contrib/kdoc/bin ; then
-  if test -r $kdocdir/kdoc ; then
-    AC_MSG_RESULT(found)
-  else
-    AC_MSG_RESULT(not found)
-    AC_MSG_ERROR(Invalid kdoc path $kdocdir/kdoc)
-  fi
+DEAL_II_CONFIGURE_TECPLOT
+AC_SUBST(TECPLOT_LIBRARY_PATH)
+AC_SUBST(TECPLOT_INCLUDE_PATH)
 
-  if test -r "$kdocdir/Version" ; then
-    kdocversion=`cat $kdocdir/Version` ;
-  else
-    kdocversion=1;
-  fi
-else
-  kdocversion=`cat ${DEAL2_DIR}/contrib/kdoc/src/Version`
-  AC_MSG_RESULT(using default version $kdocversion)
-fi
+DEAL_II_CONFIGURE_HSL
+AC_SUBST(USE_CONTRIB_HSL)
 
+
+
+
+dnl -------------------------------------------------------------
+dnl                   Consistency of compiler flags
+dnl -------------------------------------------------------------
+
+AC_MSG_RESULT()
+AC_MSG_RESULT(------------------ checking compiler flags ------------------)
+
+dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
+DEAL_II_CHECK_CXXFLAGS_CONSISTENCY
+DEAL_II_CHECK_F77FLAGS_CONSISTENCY
+
+
+
+
+dnl -------------------------------------------------------------
+dnl                       Third party programs
+dnl -------------------------------------------------------------
+
+AC_MSG_RESULT()
+AC_MSG_RESULT(---------------- configuring other programs -----------------)
+
+DEAL_II_CHECK_KDOC
 AC_SUBST(kdocdir)
 AC_SUBST(kdocversion)
 
-
-
-dnl    Find the doc++ program
-AC_ARG_WITH(docxx,
-[  --with-docxx=PATH use the doc++ executable pointed to by PATH],
-    docxx=$withval,
-    docxx=to-be-determined)
-if test "$docxx" = to-be-determined ; then
-  AC_PATH_PROG(docxx,"doc++")
-else
-  AC_MSG_CHECKING(for doc++)
-  if test -x "$docxx" ; then
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
-    docxx=
-  fi
-fi
+DEAL_II_CHECK_DOCXX
 AC_SUBST(docxx)
 
-
-
-
-
-dnl    Find the Tecplot libraries and headers if available
-dnl
-DEAL_II_CONFIGURE_TECPLOT
+AC_PATH_PROG(PERL, perl)
+AC_SUBST(PERL)
 
 
 
 
 dnl -------------------------------------------------------------
-dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
-dnl -------------------------------------------------------------
-AC_LANG_CPLUSPLUS
-CXXFLAGS="$CXXFLAGSG"
-AC_MSG_CHECKING(for consistency of CXXFLAGSG flags)
-AC_TRY_COMPILE(
-  [],
-  [;],
-  [
-    AC_MSG_RESULT(yes)
-  ],
-  [
-    AC_MSG_ERROR(invalid combination of flags!)
-    exit 1;
-  ])
-
-CXXFLAGS="$CXXFLAGSO"
-AC_MSG_CHECKING(for consistency of CXXFLAGSO flags)
-AC_TRY_COMPILE(
-  [],
-  [;],
-  [
-    AC_MSG_RESULT(yes)
-  ],
-  [
-    AC_MSG_ERROR(invalid combination of flags!)
-    exit 1;
-  ])
-
-
-dnl     Err, well -- we'd like to have checked these flags, but autoconf
-dnl     has a problem here: when writing the compile file, a newline is
-dnl     missing, leading to an error when executing ./configure. So:
-dnl     while this is not fixed in autoconf, disable the respective tests
-dnl AC_LANG_FORTRAN77
-dnl FFLAGS="$F77FLAGSG"
-dnl AC_MSG_CHECKING(for consistency of F77FLAGSG flags)
-dnl AC_TRY_COMPILE(
-dnl   [],
-dnl   [],
-dnl   [
-dnl     AC_MSG_RESULT(yes)
-dnl   ],
-dnl   [
-dnl     AC_MSG_ERROR(invalid combination of flags!)
-dnl     exit 1;
-dnl   ])
-dnl 
-dnl FFLAGS="$F77FLAGSO"
-dnl AC_MSG_CHECKING(for consistency of F77FLAGSO flags)
-dnl AC_TRY_COMPILE(
-dnl   [],
-dnl   [],
-dnl   [
-dnl     AC_MSG_RESULT(yes)
-dnl   ],
-dnl   [
-dnl     AC_MSG_ERROR(invalid combination of flags!)
-dnl     exit 1;
-dnl   ])
-
-
-
-dnl -------------------------------------------------------------
-dnl Configure other packages
+dnl                     Configure subdirectories
 dnl -------------------------------------------------------------
 
 dnl    Configure the `tests' directory, if that is installed. also
 dnl    configure the programs in the contrib directory
-AC_CONFIG_SUBDIRS(tests contrib)
-
+AC_CONFIG_SUBDIRS(contrib tests)
 
 
 
 
 dnl -------------------------------------------------------------
-dnl Output results
+dnl                          Output results
 dnl -------------------------------------------------------------
+
+AC_MSG_RESULT()
+AC_MSG_RESULT(--------------------- generating output ---------------------)
 
 dnl    Write output to the global options file
 AC_OUTPUT(common/Make.global_options common/Makefile.template doc/Makefile doc/auto/Makefile doc/auto/kdoc/Makefile)
+
+
+echo
+echo
+echo -------------------------------------------------------------
+echo
+echo "     The deal.II library is now configured.  In order to"
+echo "     compile it and to generate the documentation,  just"
+echo "     call the 'make' command without arguments. For more"
+echo "     information, see the Readme file."
+echo
+echo -------------------------------------------------------------
+echo
+

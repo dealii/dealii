@@ -111,6 +111,15 @@ CXXFLAGS.o   = @DEFS@ @CXXFLAGSO@  $(INCLUDE)
 F77FLAGS.g   = @DEFS@ @F77FLAGSG@  $(INCLUDE)
 F77FLAGS.o   = @DEFS@ @F77FLAGSO@  $(INCLUDE)
 
+ifeq ($(enable-shared),yes)
+  CXXFLAGS.g += @CXXFLAGSPIC@
+  CXXFLAGS.o += @CXXFLAGSPIC@
+
+  F77FLAGS.g += @F77FLAGSPIC@
+  F77FLAGS.o += @F77FLAGSPIC@
+
+  LDFLAGS    += @LDFLAGSPIC@
+endif
 
 
 # if multithread support in the library is requested, then set the

@@ -11,6 +11,13 @@ define([AC_CACHE_SAVE], )dnl
 AC_REVISION($Revision$)
 AC_INIT(kdoc)
 
+dnl Have the auxiliary tools like config.guess etc in contrib/config
+AC_CONFIG_AUX_DIR(config)
+
+
+AC_MSG_RESULT()
+AC_MSG_RESULT(---------------- configuring contrib subdir -----------------)
+
 
 dnl    Set the path to the deal.II/contrib directory
 DEAL2_CONTRIB_DIR=`pwd`
