@@ -73,13 +73,13 @@ class DoFDimensionInfo<1> {
  */
 class DoFDimensionInfo<2> {
   public:
-    typedef TriaRawIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >    raw_line_iterator;
-    typedef TriaIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >       line_iterator;
-    typedef TriaActiveIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > > active_line_iterator;
+    typedef TriaRawIterator<2,DoFObjectAccessor<1, 2> >    raw_line_iterator;
+    typedef TriaIterator<2,DoFObjectAccessor<1, 2> >       line_iterator;
+    typedef TriaActiveIterator<2,DoFObjectAccessor<1, 2> > active_line_iterator;
     
-    typedef TriaRawIterator<2,DoFCellAccessor<2> >               raw_quad_iterator;
-    typedef TriaIterator<2,DoFCellAccessor<2> >                  quad_iterator;
-    typedef TriaActiveIterator<2,DoFCellAccessor<2> >            active_quad_iterator;
+    typedef TriaRawIterator<2,DoFCellAccessor<2> >         raw_quad_iterator;
+    typedef TriaIterator<2,DoFCellAccessor<2> >            quad_iterator;
+    typedef TriaActiveIterator<2,DoFCellAccessor<2> >      active_quad_iterator;
 
     typedef void * raw_hex_iterator;
     typedef void * hex_iterator;
@@ -103,17 +103,17 @@ class DoFDimensionInfo<2> {
  */
 class DoFDimensionInfo<3> {
   public:
-    typedef TriaRawIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >    raw_line_iterator;
-    typedef TriaIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >       line_iterator;
-    typedef TriaActiveIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > > active_line_iterator;
+    typedef TriaRawIterator<3,DoFObjectAccessor<1, 3> >    raw_line_iterator;
+    typedef TriaIterator<3,DoFObjectAccessor<1, 3> >       line_iterator;
+    typedef TriaActiveIterator<3,DoFObjectAccessor<1, 3> > active_line_iterator;
 
-    typedef TriaRawIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >    raw_quad_iterator;
-    typedef TriaIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >       quad_iterator;
-    typedef TriaActiveIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > > active_quad_iterator;
+    typedef TriaRawIterator<3,DoFObjectAccessor<2, 3> >    raw_quad_iterator;
+    typedef TriaIterator<3,DoFObjectAccessor<2, 3> >       quad_iterator;
+    typedef TriaActiveIterator<3,DoFObjectAccessor<2, 3> > active_quad_iterator;
 
-    typedef TriaRawIterator<3,DoFCellAccessor<3> >               raw_hex_iterator;
-    typedef TriaIterator<3,DoFCellAccessor<3> >                  hex_iterator;
-    typedef TriaActiveIterator<3,DoFCellAccessor<3> >            active_hex_iterator;
+    typedef TriaRawIterator<3,DoFCellAccessor<3> >         raw_hex_iterator;
+    typedef TriaIterator<3,DoFCellAccessor<3> >            hex_iterator;
+    typedef TriaActiveIterator<3,DoFCellAccessor<3> >      active_hex_iterator;
 
     typedef raw_hex_iterator    raw_cell_iterator;
     typedef hex_iterator        cell_iterator;
@@ -1429,12 +1429,9 @@ class DoFHandler  :  public Subscriptor,
     vector<int>               vertex_dofs;
     
     
-    friend class DoFObjectAccessor<1, dim, TriaObjectAccessor<1, dim> >;
-    friend class DoFObjectAccessor<1, dim, CellAccessor<dim> >;
-    friend class DoFObjectAccessor<2, dim, TriaObjectAccessor<2, dim> >;
-    friend class DoFObjectAccessor<2, dim, CellAccessor<dim> >;
-    friend class DoFObjectAccessor<3, dim, TriaObjectAccessor<3, dim> >;
-    friend class DoFObjectAccessor<3, dim, CellAccessor<dim> >;
+    friend class DoFObjectAccessor<1, dim>;
+    friend class DoFObjectAccessor<2, dim>;
+    friend class DoFObjectAccessor<3, dim>;
 };
 
 

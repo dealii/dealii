@@ -27,7 +27,7 @@ MGDoFObjectAccessor<1, dim,BaseClass>::MGDoFObjectAccessor (Triangulation<dim> *
 						     const int           index,
 						     const AccessorData *local_data) :
 		MGDoFAccessor<dim> (local_data),
-		DoFObjectAccessor<1, dim,BaseClass>(tria,level,index,local_data) {};
+		DoFObjectAccessor<1, dim>(tria,level,index,local_data) {};
 
 
 
@@ -143,7 +143,7 @@ template <int dim, typename BaseClass>
 void
 MGDoFObjectAccessor<1, dim,BaseClass>::copy_from (const MGDoFObjectAccessor<1, dim,BaseClass> &a)
 {
-  DoFObjectAccessor<1, dim,BaseClass>::copy_from (a);
+  DoFObjectAccessor<1, dim>::copy_from (a);
   set_mg_dof_handler (a.mg_dof_handler);
 };
 
@@ -158,7 +158,7 @@ MGDoFObjectAccessor<2, dim,BaseClass>::MGDoFObjectAccessor (Triangulation<dim> *
 						     const int           index,
 						     const AccessorData *local_data) :
 		MGDoFAccessor<dim> (local_data),
-		DoFObjectAccessor<2, dim,BaseClass>(tria,level,index,local_data)
+		DoFObjectAccessor<2, dim>(tria,level,index,local_data)
 {};
 
 
@@ -294,7 +294,7 @@ MGDoFObjectAccessor<2, dim,BaseClass>::child (const unsigned int i) const {
 template <int dim, typename BaseClass>
 void
 MGDoFObjectAccessor<2, dim,BaseClass>::copy_from (const MGDoFObjectAccessor<2, dim,BaseClass> &a) {
-  DoFObjectAccessor<2, dim,BaseClass>::copy_from (a);
+  DoFObjectAccessor<2, dim>::copy_from (a);
   set_mg_dof_handler (a.mg_dof_handler);
 };
 
@@ -309,7 +309,7 @@ MGDoFObjectAccessor<3, dim,BaseClass>::MGDoFObjectAccessor (Triangulation<dim> *
 						   const int           index,
 						   const AccessorData *local_data) :
 		MGDoFAccessor<dim> (local_data),
-		DoFObjectAccessor<3, dim,BaseClass>(tria,level,index,local_data) {};
+		DoFObjectAccessor<3, dim>(tria,level,index,local_data) {};
 
 
 
@@ -465,7 +465,7 @@ MGDoFObjectAccessor<3, dim,BaseClass>::child (const unsigned int i) const {
 template <int dim, typename BaseClass>
 void
 MGDoFObjectAccessor<3, dim,BaseClass>::copy_from (const MGDoFObjectAccessor<3, dim,BaseClass> &a) {
-  DoFObjectAccessor<3, dim,BaseClass>::copy_from (a);
+  DoFObjectAccessor<3, dim>::copy_from (a);
   set_mg_dof_handler (a.mg_dof_handler);
 };
 

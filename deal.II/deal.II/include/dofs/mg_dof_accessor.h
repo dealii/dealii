@@ -86,7 +86,7 @@ class MGDoFAccessor {
 
 template <int celldim, int dim, typename BaseClass>
 class MGDoFObjectAccessor :  public MGDoFAccessor<dim>,
-			     public DoFObjectAccessor<celldim, dim, BaseClass>
+			     public DoFObjectAccessor<celldim, dim>
 {};
 
 
@@ -158,7 +158,7 @@ class MGDoFObjectAccessor<0, dim, BaseClass>
  */
 template <int dim, typename BaseClass>
 class MGDoFObjectAccessor<1, dim, BaseClass> :  public MGDoFAccessor<dim>,
-						public DoFObjectAccessor<1, dim, BaseClass>
+						public DoFObjectAccessor<1, dim>
 {
   public:
 				     /**
@@ -255,7 +255,8 @@ class MGDoFObjectAccessor<1, dim, BaseClass> :  public MGDoFAccessor<dim>,
  * @see DoFLineAccessor
  */
 template <int dim, typename BaseClass>
-class MGDoFObjectAccessor<2, dim, BaseClass> :  public MGDoFAccessor<dim>, public DoFObjectAccessor<2, dim, BaseClass> {
+class MGDoFObjectAccessor<2, dim, BaseClass> :  public MGDoFAccessor<dim>,
+						public DoFObjectAccessor<2, dim> {
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -358,7 +359,7 @@ class MGDoFObjectAccessor<2, dim, BaseClass> :  public MGDoFAccessor<dim>, publi
  */
 template <int dim, typename BaseClass>
 class MGDoFObjectAccessor<3, dim, BaseClass> :  public MGDoFAccessor<dim>,
-						public DoFObjectAccessor<3, dim, BaseClass>
+						public DoFObjectAccessor<3, dim>
 {
   public:
 				     /**

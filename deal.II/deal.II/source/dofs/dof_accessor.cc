@@ -25,9 +25,9 @@
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<1, dim,BaseClass>::set_dof_index (const unsigned int i,
-						    const int index) const {
+template <int dim>
+void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
+					       const int index) const {
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -42,10 +42,10 @@ void DoFObjectAccessor<1, dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<1, dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const int index) const {
+template <int dim>
+void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
+						      const unsigned int i,
+						      const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
@@ -60,8 +60,8 @@ void DoFObjectAccessor<1, dim,BaseClass>::set_vertex_dof_index (const unsigned i
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<1, dim,BaseClass>::
+template <int dim>
+void DoFObjectAccessor<1, dim>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -85,8 +85,8 @@ distribute_local_to_global (const Vector<double> &local_source,
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<1, dim,BaseClass>::
+template <int dim>
+void DoFObjectAccessor<1, dim>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -118,9 +118,9 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 /*------------------------- Functions: DoFQuadAccessor -----------------------*/
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<2, dim,BaseClass>::set_dof_index (const unsigned int i,
-						    const int index) const {
+template <int dim>
+void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
+					       const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -134,8 +134,8 @@ void DoFObjectAccessor<2, dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<2, dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
+template <int dim>
+void DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -152,8 +152,8 @@ void DoFObjectAccessor<2, dim,BaseClass>::set_vertex_dof_index (const unsigned i
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<2, dim,BaseClass>::
+template <int dim>
+void DoFObjectAccessor<2, dim>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -178,8 +178,8 @@ distribute_local_to_global (const Vector<double> &local_source,
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<2, dim,BaseClass>::
+template <int dim>
+void DoFObjectAccessor<2, dim>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -213,8 +213,8 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 /*------------------------- Functions: DoFObjectAccessor -----------------------*/
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<3, dim,BaseClass>::set_dof_index (const unsigned int i,
+template <int dim>
+void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 						    const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -229,8 +229,8 @@ void DoFObjectAccessor<3, dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<3, dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
+template <int dim>
+void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -247,8 +247,8 @@ void DoFObjectAccessor<3, dim,BaseClass>::set_vertex_dof_index (const unsigned i
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<3, dim,BaseClass>::
+template <int dim>
+void DoFObjectAccessor<3, dim>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -274,8 +274,8 @@ distribute_local_to_global (const Vector<double> &local_source,
 
 
 
-template <int dim, typename BaseClass>
-void DoFObjectAccessor<3, dim,BaseClass>::
+template <int dim>
+void DoFObjectAccessor<3, dim>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -316,11 +316,11 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 #if deal_II_dimension == 1
 
 template <>
-DoFCellAccessor<1>::face_iterator
+TriaIterator<1, DoFObjectAccessor<0,1> >
 DoFCellAccessor<1>::face (const unsigned int) const
 {
   Assert (false, ExcNotUsefulForThisDimension());
-  return face_iterator();
+  return TriaIterator<1, DoFObjectAccessor<0,1> >();
 };
 
 
@@ -422,7 +422,7 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 #if deal_II_dimension == 2
 
 template <>
-DoFCellAccessor<2>::face_iterator
+TriaIterator<2, DoFObjectAccessor<1,2> >
 DoFCellAccessor<2>::face (const unsigned int i) const
 {
   return line(i);
@@ -449,7 +449,7 @@ template <int dim>
 template <typename number>
 void
 DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
-				    Vector<number>       &local_values) const
+				      Vector<number>       &local_values) const
 {
   Assert (dim==2, ExcInternalError());
   
@@ -535,7 +535,7 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 #if deal_II_dimension == 3
 
 template <>
-DoFCellAccessor<3>::face_iterator
+TriaIterator<3, DoFObjectAccessor<2, 3> >
 DoFCellAccessor<3>::face (const unsigned int i) const
 {
   return quad(i);
@@ -800,7 +800,7 @@ DoFCellAccessor<deal_II_dimension>::set_dof_values_by_interpolation(const Vector
 
 
 #if deal_II_dimension == 1
-template class DoFObjectAccessor<1, 1,CellAccessor<1> >;
+template class DoFObjectAccessor<1, 1>;
 template class DoFCellAccessor<1>;
 
 template class TriaRawIterator<1,DoFCellAccessor<1> >;
@@ -809,38 +809,33 @@ template class TriaActiveIterator<1,DoFCellAccessor<1> >;
 #endif
 
 #if deal_II_dimension == 2
-template class DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> >;
-template class DoFObjectAccessor<2, 2,TriaObjectAccessor<2, 2> >;
-template class DoFObjectAccessor<2, 2,CellAccessor<2> >;
+template class DoFObjectAccessor<1, 2>;
+template class DoFObjectAccessor<2, 2>;
 template class DoFCellAccessor<2>;
 
-template class TriaRawIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >;
-template class TriaRawIterator<2,DoFObjectAccessor<2, 2,TriaObjectAccessor<2, 2> > >;
-template class TriaRawIterator<2,DoFCellAccessor<2> >;
-template class TriaIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >;
-template class TriaIterator<2,DoFCellAccessor<2> >;
-template class TriaActiveIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >;
+template class TriaRawIterator   <2,DoFObjectAccessor<1, 2> >;
+template class TriaIterator      <2,DoFObjectAccessor<1, 2> >;
+template class TriaActiveIterator<2,DoFObjectAccessor<1, 2> >;
+template class TriaRawIterator   <2,DoFCellAccessor<2> >;
+template class TriaIterator      <2,DoFCellAccessor<2> >;
 template class TriaActiveIterator<2,DoFCellAccessor<2> >;
 #endif
 
 
 
 #if deal_II_dimension == 3
-template class DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> >;
-template class DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> >;
-template class DoFObjectAccessor<3, 3,TriaObjectAccessor<3, 3> >;
-template class DoFObjectAccessor<3, 3,CellAccessor<3> >;
+template class DoFObjectAccessor<1, 3>;
+template class DoFObjectAccessor<2, 3>;
 template class DoFCellAccessor<3>;
 
-template class TriaRawIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
-template class TriaRawIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
-template class TriaRawIterator<3,DoFObjectAccessor<3, 3,TriaObjectAccessor<3, 3> > >;
-template class TriaRawIterator<3,DoFCellAccessor<3> >;
-template class TriaIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
-template class TriaIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
-template class TriaIterator<3,DoFCellAccessor<3> >;
-template class TriaActiveIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
-template class TriaActiveIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
+template class TriaRawIterator   <3,DoFObjectAccessor<1, 3> >;
+template class TriaIterator      <3,DoFObjectAccessor<1, 3> >;
+template class TriaActiveIterator<3,DoFObjectAccessor<1, 3> >;
+template class TriaRawIterator   <3,DoFObjectAccessor<2, 3> >;
+template class TriaIterator      <3,DoFObjectAccessor<2, 3> >;
+template class TriaActiveIterator<3,DoFObjectAccessor<2, 3> >;
+template class TriaRawIterator   <3,DoFCellAccessor<3> >;
+template class TriaIterator      <3,DoFCellAccessor<3> >;
 template class TriaActiveIterator<3,DoFCellAccessor<3> >;
 #endif
 
