@@ -691,7 +691,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_IOSFWD_HEADER, dnl
     [
 #include <iosfwd>
 void f (const std::ostream &out);
-void g () { f(cout); };
+void g () { f(std::cout); };
     ],
     [
     ],
