@@ -321,7 +321,14 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
 
-  const unsigned int n_q_points     = GeometryInfo<dim>::vertices_per_cell;
+				   // before we start the loop:
+				   // create a quadrature rule that
+				   // actually has the points on this
+				   // patch
+  QTrapez<1>     q_trapez;
+  QIterated<dim> patch_points (q_trapez, n_subdivisions);
+
+  const unsigned int n_q_points     = patch_points.n_quadrature_points;
   const unsigned int n_components   = this->dofs->get_fe().n_components();
   const unsigned int n_datasets     = this->dof_data.size() * n_components +
 				      this->cell_data.size();
