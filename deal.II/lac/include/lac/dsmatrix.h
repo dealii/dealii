@@ -70,10 +70,47 @@ public:
     int n_cols () const;
     int bandwidth () const;
 
-    friend class ConstraintMatrix;
-    friend class DoFHandler<1>;
-    friend class DoFHandler<2>;
+				     /**
+				      * Return whether the structure is
+				      * compressed or not.
+				      */
+    bool is_compressed () const;
+    
+				     /**
+				      * This is kind of an expert mode: get
+				      * access to the rowstart array, but
+				      * readonly.
+				      *
+				      * You should use this interface very
+				      * carefully and only if you are absolutely
+				      * sure to know what you do. You should
+				      * also note that the structure of these
+				      * arrays may change over time.
+				      * If you change the layout yourself, you
+				      * should also rename this function to
+				      * avoid programs relying on outdated
+				      * information!
+				      */
+    const int * get_rowstart_indices () const;
 
+				     /**
+				      * This is kind of an expert mode: get
+				      * access to the colnums array, but
+				      * readonly.
+				      *
+				      * You should use this interface very
+				      * carefully and only if you are absolutely
+				      * sure to know what you do. You should
+				      * also note that the structure of these
+				      * arrays may change over time.
+				      * If you change the layout yourself, you
+				      * should also rename this function to
+				      * avoid programs relying on outdated
+				      * information!
+				      */
+    const int * get_column_numbers () const;
+    
+    
 				     /**
 				      * Exception
 				      */
@@ -142,7 +179,58 @@ class dSMatrix
     void set (int i, int j, double value);
 				     //
     void add (int i, int j, double value);
-    
+
+				     /**
+				      * Return the value of the entry (i,j).
+				      * This may be an expensive operation
+				      * and you should always take care
+				      * where to call this function.
+				      * In order to avoid abuse, this function
+				      * throws an exception if the wanted
+				      * element does not exist in the matrix.
+				      */
+    double operator () (const int i, const int j) const;
+
+				     /**
+				      * Return the main diagonal element in
+				      * the #i#th row. This function throws an
+				      * error if the matrix is not square.
+				      *
+				      * This function is considerably faster
+				      * than the #operator()#, since for
+				      * square matrices, the diagonal entry is
+				      * always the first to be stored in each
+				      * row and access therefore does not
+				      * involve searching for the right column
+				      * number.
+				      */
+    double diag_element (const int i) const;
+
+    				     /**
+				      * This is kind of an expert mode: get
+				      * access to the #i#th element of this
+				      * matrix. The elements are stored in
+				      * a consecutive way, refer to the
+				      * #dSMatrixStruct# class for more details.
+				      *
+				      * You should use this interface very
+				      * carefully and only if you are absolutely
+				      * sure to know what you do. You should
+				      * also note that the structure of these
+				      * arrays may change over time.
+				      * If you change the layout yourself, you
+				      * should also rename this function to
+				      * avoid programs relying on outdated
+				      * information!
+				      */
+    double global_entry (const int i) const;
+
+				     /**
+				      * Same as above, but with write access.
+				      * You certainly know what you do?
+				      */
+    double & global_entry (const int i);
+
 				     //
     void vmult (dVector& dst,const dVector& src) const;
 				     //
@@ -189,8 +277,16 @@ class dSMatrix
 		    int, int,
 		    << "The entry with index <" << arg1 << ',' << arg2
 		    << "> does not exist.");
-
-  friend class ConstraintMatrix;
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidIndex1,
+		    int,
+		    << "The index " << arg1 << " is not in the allowed range.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixNotSquare);
 };
 
 
@@ -209,6 +305,27 @@ int dSMatrixStruct::n_rows () const {
 inline
 int dSMatrixStruct::n_cols () const {
   return cols;
+};
+
+
+
+inline
+bool dSMatrixStruct::is_compressed () const {
+  return compressed;
+};
+
+
+
+inline
+const int * dSMatrixStruct::get_rowstart_indices () const {
+  return rowstart;
+};
+
+
+
+inline
+const int * dSMatrixStruct::get_column_numbers () const {
+  return colnums;
 };
 
 
@@ -244,15 +361,32 @@ inline
 void dSMatrix::add (int i, int j, double value) {
   Assert (cols->operator()(i,j) != -1,
 	  ExcInvalidIndex(i,j));
-  val[cols->operator()(i,j)]+= value;
+  val[cols->operator()(i,j)] += value;
 };
 
 
 
 
 
+inline
+double dSMatrix::operator () (const int i, const int j) const {
+  Assert (cols->operator()(i,j) != -1,
+	  ExcInvalidIndex(i,j));
+  return val[cols->operator()(i,j)];
+};
 
 
+
+inline
+double dSMatrix::diag_element (const int i) const {
+  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert ((0<=i) && (i<max_len), ExcInvalidIndex1(i));
+  
+				   // Use that the first element in each
+				   // row of a square matrix is the main
+				   // diagonal
+  return val[cols->rowstart[i]];
+};
 
 
 
@@ -262,3 +396,5 @@ void dSMatrix::add (int i, int j, double value) {
 /* end of #ifndef __dsmatrix_H */
 #endif
 /*----------------------------   dsmatrix.h     ---------------------------*/
+
+
