@@ -246,9 +246,9 @@ struct SparseDirectMA27::DetachedModeData
                             sizeof(T) * N - count);
             if (ret < 0)
               {
-                abort ();
                 std::cerr << "****** error " << ret << " on server side!"
                           << std::endl;
+                abort ();
               }
             else
               count += ret;
