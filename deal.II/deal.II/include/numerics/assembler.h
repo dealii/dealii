@@ -43,6 +43,15 @@ class Equation {
 				      * Virtual function which assembles the
 				      * cell matrix and the right hand side
 				      * on a given cell.
+				      *
+				      * This function assumes the cell matrix
+				      * and right hand side to have the right
+				      * size and to be empty. Functions of
+				      * derived classes should check for
+				      * this.
+				      * For that purpose, the two exceptions
+				      * #ExcWrongSize# and #ExcObjectNotEmpty#
+				      * are declared.
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
@@ -52,6 +61,15 @@ class Equation {
 				     /**
 				      * Virtual function which only assembles
 				      * the cell matrix on a given cell.
+				      *
+				      * This function assumes the cell matrix
+				      * and right hand side to have the right
+				      * size and to be empty. Functions of
+				      * derived classes should check for
+				      * this.
+				      * For that purpose, the two exceptions
+				      * #ExcWrongSize# and #ExcObjectNotEmpty#
+				      * are declared.
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
@@ -60,6 +78,15 @@ class Equation {
 				     /**
 				      * Virtual function which only assembles
 				      * the right hand side on a given cell.
+				      *
+				      * This function assumes the cell matrix
+				      * and right hand side to have the right
+				      * size and to be empty. Functions of
+				      * derived classes should check for
+				      * this.
+				      * For that purpose, the two exceptions
+				      * #ExcWrongSize# and #ExcObjectNotEmpty#
+				      * are declared.
 				      */
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
@@ -76,6 +103,17 @@ class Equation {
 				      * Exception
 				      */
     DeclException0 (ExcPureVirtualFunctionCalled);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongSize,
+		    int, int,
+		    << "Object has wrong size " << arg1
+		    << ", but should have " << arg2 << ".");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcObjectNotEmpty);
     
   protected:
 				     /**
@@ -126,13 +164,19 @@ struct AssemblerData {
 
 				     /**
 				      * Pointer to the matrix to be assembled
-				      * by this object.
+				      * by this object. Elements are summed
+				      * up by the assembler, so you may want
+				      * to clear this object (set all entries
+				      * to zero) before use.
 				      */
     dSMatrix               &matrix;
 
 				     /**
 				      * Pointer to the vector to be assembled
-				      * by this object.
+				      * by this object. Elements are summed
+				      * up by the assembler, so you may want
+				      * to clear this object (set all entries
+				      * to zero) before use.
 				      */
     dVector                &rhs_vector;
     
@@ -197,7 +241,12 @@ class Assembler : public DoFCellAccessor<dim> {
     
 				     /**
 				      * Assemble on the present cell using
-				      * the given equation object.
+				      * the given equation objectand the data
+				      * passed to the constructor. The elements
+				      * of the local matrix and right hand side
+				      * are added to the global matrix and
+				      * vector so you may want to clear the
+				      * matrix before use.
 				      */
     void assemble (const Equation<dim> &);
 
