@@ -99,8 +99,10 @@
  *
  * @sect3{Note on parallelization}
  *
+ * @sect4{Synchronisation}
+ * 
  * Due to the use of global variables through COMMON blocks, the calls
- * to the sparse direct solver routines is not multithreading-capable,
+ * to the sparse direct solver routines are not multithreading-safe,
  * i.e. at each time there may only be one call to these functions
  * active. You have to synchronise your calls to the functions
  * provided by this class using mutexes (see the @ref{Threads}
@@ -120,7 +122,36 @@
  * be performed from outside, it is left to the user of this class to
  * do so.
  *
- * @author Wolfgang Bangerth, 2000, 2001
+ * @sect4{Detached mode}
+ *
+ * As an alternative, you can call the function @p{set_detached_mode}
+ * right after calling the constructor. This lets the program fork, so
+ * that we now have two programs that communicate via pipes. Now
+ * everytime you call one of the functions of this class, it relays
+ * the data to the other program and lets it execute the respective
+ * function. The results are then transfered back. Since the MA27
+ * functions are only called in the detached program, they will now no
+ * longer interfere with the respective calls to other functions with
+ * different data, so no synchronisation is necessary any more.
+ *
+ * The advantage of this approach is that as many instances of this
+ * class may be active at any time as you want. This is handy, if your
+ * programs spens a significant amount of time in them, and you are
+ * using many threads, for example in a machine with 4 or more
+ * processors. The disadvantage, of course, is that the data has to
+ * copied to and from the detached program, which might make things
+ * slower (though, as we use block writes, this should not be so much
+ * of a factor).
+ *
+ * Since no more synchronisation is necessary, the
+ * @p{get_synchronisation_lock} returns a reference to a member
+ * variable when the detached mode is set. Thus, you need not change
+ * your program: you can still acquire and release the lock as before,
+ * it will only have no effect now, since different objects of this
+ * class no longer share the lock, i.e. you will get it always without
+ * waiting.
+ * 
+ * @author Wolfgang Bangerth, 2000, 2001, 2002
  */
 class SparseDirectMA27 : public Subscriptor
 {
@@ -139,6 +170,34 @@ class SparseDirectMA27 : public Subscriptor
 		      const double LA_increase_factor    = 1.2,
 		      const bool   suppress_output       = true);
 
+                                     /**
+                                      * Destructor.
+                                      */
+    ~SparseDirectMA27 ();
+    
+                                     /**
+                                      * Set the detached mode (see the
+                                      * general class documentation
+                                      * for a description of what this
+                                      * is).
+                                      *
+                                      * This function must not be
+                                      * called after @p{initialize}
+                                      * (or the two-argument @p{solve}
+                                      * function has been called. If
+                                      * it is to be called, then only
+                                      * right after construction of
+                                      * the object, and before first
+                                      * use.
+                                      */
+    void set_detached_mode ();
+
+                                     /**
+                                      * Return whether the detached
+                                      * mode is set.
+                                      */
+    bool detached_mode_set () const;
+    
 				     /**
 				      * Initialize some data
 				      * structures. This function
@@ -265,8 +324,43 @@ class SparseDirectMA27 : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcDifferentSparsityPatterns);
-    
+
   private:
+                                     /**
+                                      * Declare a local type which
+                                      * will store the data necessary
+                                      * to communicate with a detached
+                                      * solver. To avoid adding
+                                      * various system include files,
+                                      * the actual declaration of this
+                                      * class is in the implementation
+                                      * file.
+                                      */
+    struct DetachedModeData;
+    
+                                     /**
+                                      * Store in the constructor
+                                      * whether the MA27 routines
+                                      * shall deliver output to stdout
+                                      * or not.
+                                      */
+    const bool suppress_output;
+
+                                     /**
+                                      * Store whether
+                                      * @p{set_detached_mode} has been
+                                      * called.
+                                      */
+    bool detached_mode;
+
+                                     /**
+                                      * Pointer to a structure that
+                                      * will hold the data necessary
+                                      * to uphold communication with a
+                                      * detached solver.
+                                      */
+    DetachedModeData *detached_mode_data;
+    
 				     /**
 				      * Store the three values passed
 				      * to the cinstructor. See the
@@ -366,10 +460,11 @@ class SparseDirectMA27 : public Subscriptor
     int IFLAG;
 
 				     /**
-				      * Mutex for synchronising access
+				      * Mutexes for synchronising access
 				      * to this class.
 				      */
-    static Threads::ThreadMutex synchronisation_lock;
+    static Threads::ThreadMutex static_synchronisation_lock;
+    mutable Threads::ThreadMutex non_static_synchronisation_lock;
     
 				     /**
 				      * Fill the @p{A} array from the
@@ -377,6 +472,77 @@ class SparseDirectMA27 : public Subscriptor
 				      * matrix.
 				      */
     void fill_A (const SparseMatrix<double> &matrix);
+
+				     /**
+				      * Call the respective function
+				      * with the given args, either
+				      * locally or remote.
+				      */
+    void call_ma27ad (const unsigned int *N,
+                      const unsigned int *NZ,
+                      const unsigned int *IRN,
+                      const unsigned int *ICN,
+                      unsigned int       *IW,
+                      const unsigned int *LIW,
+                      unsigned int       *IKEEP,
+                      unsigned int       *IW1,
+                      unsigned int       *NSTEPS,
+                      int                *IFLAG);
+
+				     /**
+				      * Call the respective function
+				      * with the given args, either
+				      * locally or remote.
+				      */
+    void call_ma27bd (const unsigned int *N,
+                      const unsigned int *NZ,
+                      const unsigned int *IRN,
+                      const unsigned int *ICN,
+                      double             *A,
+                      const unsigned int *LA,
+                      unsigned int       *IW,
+                      const unsigned int *LIW,
+                      const unsigned int *IKEEP,
+                      const unsigned int *NSTEPS,
+                      unsigned int       *MAXFRT,
+                      unsigned int       *IW1,
+                      int                *IFLAG);
+    
+				     /**
+				      * Call the respective function
+				      * with the given args, either
+				      * locally or remote.
+				      */
+    void call_ma27cd (const unsigned int *N,
+                      const double       *A,
+                      const unsigned int *LA,
+                      const unsigned int *IW,
+                      const unsigned int *LIW,
+                      const unsigned int *MAXFRT,
+                      double             *RHS,
+                      const unsigned int *IW1,
+                      const unsigned int *NSTEPS) const;
+
+				     /**
+				      * Call the respective function
+				      * with the given args, either
+				      * locally or remote.
+				      */
+    void call_ma27x1 (unsigned int *NRLNEC);
+
+				     /**
+				      * Call the respective function
+				      * with the given args, either
+				      * locally or remote.
+				      */
+    void call_ma27x2 (unsigned int *NIRNEC);
+
+				     /**
+				      * Call the respective function
+				      * with the given args, either
+				      * locally or remote.
+				      */
+    void call_ma27x3 (const unsigned int *LP);
 };
 
 
@@ -444,6 +610,9 @@ class SparseDirectMA27 : public Subscriptor
  * to assume that.) Since such cross-function synchronisation can only
  * be performed from outside, it is left to the user of this class to
  * do so.
+ *
+ * A detached mode as for MA27 has not yet been implemented for this
+ * class.
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
@@ -606,7 +775,15 @@ class SparseDirectMA47 : public Subscriptor
     DeclException0 (ExcDifferentMatrices);
     
   private:
-				     /**
+                                     /**
+                                      * Store in the constructor
+                                      * whether the MA47 routines
+                                      * shall deliver output to stdout
+                                      * or not.
+                                      */
+    const bool suppress_output;
+
+    				     /**
 				      * Store the three values passed
 				      * to the cinstructor. See the
 				      * documentation of this class
@@ -705,6 +882,57 @@ class SparseDirectMA47 : public Subscriptor
 				      * matrix.
 				      */
     void fill_A (const SparseMatrix<double> &matrix);
+
+                                     /**
+                                      * Call the @p{ma47id} function
+                                      * with the given args.
+                                      */
+    void call_ma47id (double       *CNTL,
+                      unsigned int *ICNTL);
+
+                                     /**
+                                      * Call the @p{ma47ad} function
+                                      * with the given args.
+                                      */
+    void call_ma47ad (const unsigned int *n_rows,
+                      const unsigned int *n_nonzero_elements,
+                      unsigned int       *row_numbers,
+                      unsigned int       *column_numbers,
+                      unsigned int       *IW,
+                      const unsigned int *LIW,
+                      unsigned int       *KEEP,
+                      const unsigned int *ICNTL,
+                      int                *INFO);
+
+                                     /**
+                                      * Call the @p{ma47bd} function
+                                      * with the given args.
+                                      */
+    void call_ma47bd (const unsigned int *n_rows,
+                      const unsigned int *n_nonzero_elements,
+                      const unsigned int *column_numbers,
+                      double             *A,
+                      const unsigned int *LA,
+                      unsigned int       *IW,
+                      const unsigned int *LIW,
+                      const unsigned int *KEEP,
+                      const double       *CNTL,
+                      const unsigned int *ICNTL,
+                      unsigned int       *IW,
+                      int                *INFO);
+
+                                     /**
+                                      * Call the @p{ma47bd} function
+                                      * with the given args.
+                                      */
+    void call_ma47cd (const unsigned int *n_rows,
+                      const double       *A,
+                      const unsigned int *LA,
+                      const unsigned int *IW,
+                      const unsigned int *LIW,
+                      double             *rhs_and_solution,
+                      unsigned int       *IW1,
+                      const unsigned int *ICNTL);
 };
 
 
