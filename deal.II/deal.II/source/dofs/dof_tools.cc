@@ -358,6 +358,24 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
       if (cell->face(face)->has_children()) 
 	cell->face(face)->set_user_flag();
 
+				   // have space for the degrees of
+				   // freedom on mother and child
+				   // lines
+  vector<unsigned int> dofs_on_mother(2*fe.dofs_per_vertex+
+				      fe.dofs_per_line);
+  vector<unsigned int> dofs_on_children(fe.dofs_per_vertex+
+					2*fe.dofs_per_line);
+
+  Assert(2*fe.dofs_per_vertex+fe.dofs_per_line ==
+	 fe.constraints().n(),
+	 ExcDimensionMismatch(2*fe.dofs_per_vertex+
+			      fe.dofs_per_line,
+			      fe.constraints().n()));
+  Assert(fe.dofs_per_vertex+2*fe.dofs_per_line ==
+	 fe.constraints().m(),
+	 ExcDimensionMismatch(3*fe.dofs_per_vertex+
+			      2*fe.dofs_per_line,
+			      fe.constraints().m()));
 
 				   // loop over all lines; only on lines
 				   // there can be constraints.
@@ -365,44 +383,27 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 				     // if dofs on this line are subject
 				     // to constraints
     if (line->user_flag_set() == true)
-      {
-					 // reserve space to gather
-					 // the dof numbers. We could
-					 // get them when we need them,
-					 // but it seems easier to gather
-					 // them only once.
-	vector<unsigned int> dofs_on_mother;
-	vector<unsigned int> dofs_on_children;
-	dofs_on_mother.reserve (2*fe.dofs_per_vertex+
-				fe.dofs_per_line);
-	dofs_on_children.reserve (fe.dofs_per_vertex+
-				  2*fe.dofs_per_line);
-
-	Assert(2*fe.dofs_per_vertex+fe.dofs_per_line ==
-	       fe.constraints().n(),
-	       ExcDimensionMismatch(2*fe.dofs_per_vertex+
-				      fe.dofs_per_line,
-				      fe.constraints().n()));
-	Assert(fe.dofs_per_vertex+2*fe.dofs_per_line ==
-	       fe.constraints().m(),
-	       ExcDimensionMismatch(3*fe.dofs_per_vertex+
-				      2*fe.dofs_per_line,
-				      fe.constraints().m()));
-	
+      {	
 					 // fill the dofs indices. Use same
 					 // enumeration scheme as in
 					 // #FiniteElement::constraints()#
+	unsigned int next_index = 0;
 	for (unsigned int vertex=0; vertex<2; ++vertex)
 	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	    dofs_on_mother.push_back (line->vertex_dof_index(vertex,dof));
+	    dofs_on_mother[next_index++] = line->vertex_dof_index(vertex,dof);
 	for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-	  dofs_on_mother.push_back (line->dof_index(dof));
-
+	  dofs_on_mother[next_index++] = line->dof_index(dof);
+	Assert (next_index == dofs_on_mother.size(),
+		ExcInternalError());
+	
+	next_index = 0;
 	for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	  dofs_on_children.push_back (line->child(0)->vertex_dof_index(1,dof));
+	  dofs_on_children[next_index++] = line->child(0)->vertex_dof_index(1,dof);
 	for (unsigned int child=0; child<2; ++child)
 	  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-	    dofs_on_children.push_back (line->child(child)->dof_index(dof));
+	    dofs_on_children[next_index++] = line->child(child)->dof_index(dof);
+	Assert (next_index == dofs_on_children.size(),
+		ExcInternalError());
 
 					 // for each row in the constraint
 					 // matrix for this line:
@@ -450,6 +451,32 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 	cell->face(face)->set_user_flag();
 
 
+				   // allocate space for dof indices
+  vector<unsigned int> dofs_on_mother(4*fe.dofs_per_vertex+
+				      4*fe.dofs_per_line+
+				      fe.dofs_per_quad);
+  vector<unsigned int> dofs_on_children(5*fe.dofs_per_vertex+
+					12*fe.dofs_per_line+
+					4*fe.dofs_per_quad);
+  Assert(4*fe.dofs_per_vertex+
+	 4*fe.dofs_per_line+
+	 fe.dofs_per_quad
+	 ==
+	 fe.constraints().n(),
+	 ExcDimensionMismatch(4*fe.dofs_per_vertex+
+			      4*fe.dofs_per_line+
+			      fe.dofs_per_quad,
+			      fe.constraints().n()));
+  Assert(5*fe.dofs_per_vertex+
+	 12*fe.dofs_per_line+
+	 4*fe.dofs_per_quad
+	 ==
+	 fe.constraints().m(),
+	 ExcDimensionMismatch(5*fe.dofs_per_vertex+
+			      12*fe.dofs_per_line+
+			      4*fe.dofs_per_quad,
+			      fe.constraints().m()));
+	
 				   // loop over all faces; only on faces
 				   // there can be constraints.
   for (face=dof_handler.begin_face(); face != endf; ++face)
@@ -457,51 +484,18 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 				     // to constraints
     if (face->user_flag_set() == true)
       {
-					 // reserve space to gather
-					 // the dof numbers. We could
-					 // get them when we need them,
-					 // but it seems easier to gather
-					 // them only once.
-	vector<unsigned int> dofs_on_mother;
-	vector<unsigned int> dofs_on_children;
-	dofs_on_mother.reserve (4*fe.dofs_per_vertex+
-				4*fe.dofs_per_line+
-				fe.dofs_per_quad);
-	dofs_on_children.reserve (5*fe.dofs_per_vertex+
-				  12*fe.dofs_per_line+
-				  4*fe.dofs_per_quad);
-
-	Assert(4*fe.dofs_per_vertex+
-	       4*fe.dofs_per_line+
-	       fe.dofs_per_quad
-	       ==
-	       fe.constraints().n(),
-	       ExcDimensionMismatch(4*fe.dofs_per_vertex+
-				      4*fe.dofs_per_line+
-				      fe.dofs_per_quad,
-				      fe.constraints().n()));
-	Assert(5*fe.dofs_per_vertex+
-	       12*fe.dofs_per_line+
-	       4*fe.dofs_per_quad
-	       ==
-	       fe.constraints().m(),
-	       ExcDimensionMismatch(5*fe.dofs_per_vertex+
-				      12*fe.dofs_per_line+
-				      4*fe.dofs_per_quad,
-				      fe.constraints().m()));
-	
-					 // fill the dofs indices. Use same
-					 // enumeration scheme as in
-					 // #FiniteElement::constraints()#
+	unsigned int next_index = 0;
 	for (unsigned int vertex=0; vertex<4; ++vertex)
 	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	    dofs_on_mother.push_back (face->vertex_dof_index(vertex,dof));
+	    dofs_on_mother[next_index++] = face->vertex_dof_index(vertex,dof);
 	for (unsigned int line=0; line<4; ++line)
 	  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-	    dofs_on_mother.push_back (face->line(line)->dof_index(dof));
+	    dofs_on_mother[next_index++] = face->line(line)->dof_index(dof);
 	for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
-	  dofs_on_mother.push_back (face->dof_index(dof));
-
+	  dofs_on_mother[next_index++] = face->dof_index(dof);
+	Assert (next_index == dofs_on_mother.size(),
+		ExcInternalError());
+	
 					 // dof numbers on vertex at the center
 					 // of the face, which is vertex 2 of
 					 // child zero, or vertex 3 of child 1
@@ -517,39 +511,43 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 		(face->child(0)->vertex_dof_index(2,0) ==
 		 face->child(3)->vertex_dof_index(1,0)),
 		ExcInternalError());
+	next_index = 0;
 	for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	  dofs_on_children.push_back (face->child(0)->vertex_dof_index(2,dof));
+	  dofs_on_children[next_index++] = face->child(0)->vertex_dof_index(2,dof);
 	
 					 // dof numbers on the centers of
 					 // the lines bounding this face
 	for (unsigned int line=0; line<4; ++line)
 	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	    dofs_on_children.push_back (face->line(line)->child(0)->vertex_dof_index(1,dof));
+	    dofs_on_children[next_index++] = face->line(line)->child(0)->vertex_dof_index(1,dof);
 
 					 // next the dofs on the lines interior
 					 // to the face; the order of these
 					 // lines is laid down in the
 					 // FiniteElement class documentation
 	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(0)->line(1)->dof_index(dof));
+	  dofs_on_children[next_index++] = face->child(0)->line(1)->dof_index(dof);
 	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(1)->line(2)->dof_index(dof));
+	  dofs_on_children[next_index++] = face->child(1)->line(2)->dof_index(dof);
 	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(2)->line(3)->dof_index(dof));
+	  dofs_on_children[next_index++] = face->child(2)->line(3)->dof_index(dof);
 	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(3)->line(0)->dof_index(dof));
+	  dofs_on_children[next_index++] = face->child(3)->line(0)->dof_index(dof);
 
 					 // dofs on the bordering lines
 	for (unsigned int line=0; line<4; ++line)
 	  for (unsigned int child=0; child<2; ++child)
 	    for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-	      dofs_on_children.push_back (face->line(line)->child(child)->dof_index(dof));
+	      dofs_on_children[next_index++] = face->line(line)->child(child)->dof_index(dof);
 	
 					 // finally, for the dofs interior
 					 // to the four child faces
 	for (unsigned int child=0; child<4; ++child)
 	  for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
-	    dofs_on_children.push_back (face->child(child)->dof_index(dof));
+	    dofs_on_children[next_index++] = face->child(child)->dof_index(dof);
+	
+	Assert (next_index == dofs_on_children.size(),
+		ExcInternalError());
 
 	Assert (dofs_on_children.size() ==
 	       fe.constraints().m(),
