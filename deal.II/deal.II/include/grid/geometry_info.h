@@ -320,6 +320,31 @@ struct GeometryInfo<1>
 				      */
     static unsigned int vertices_adjacent_to_line (const unsigned int line,
 						   const unsigned int vertex);
+
+				     /**
+				      * Given a point @p{p} in unit
+				      * coordinates, return the number
+				      * of the child cell in which it
+				      * would lie in. If the point
+				      * lies on the interface of two
+				      * children, return any one of
+				      * their indices. The result is
+				      * always less than
+				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      *
+				      * The order of child cells is
+				      * described the documentation of
+				      * the @ref{Triangulation} class.
+				      */
+    static unsigned int child_cell_from_point (const Point<1> &p);
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidCoordinate,
+		    double,
+		    << "The coordinates must satisfy 0 <= x_i <= 1, "
+		    << "but here we have x_i=" << arg1);
 };
 
 
@@ -519,6 +544,31 @@ struct GeometryInfo<2>
 				      */
     static unsigned int vertices_adjacent_to_line (const unsigned int line,
 						   const unsigned int vertex);
+
+				     /**
+				      * Given a point @p{p} in unit
+				      * coordinates, return the number
+				      * of the child cell in which it
+				      * would lie in. If the point
+				      * lies on the interface of two
+				      * children, return any one of
+				      * their indices. The result is
+				      * always less than
+				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      *
+				      * The order of child cells is
+				      * described the documentation of
+				      * the @ref{Triangulation} class.
+				      */
+    static unsigned int child_cell_from_point (const Point<2> &p);
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidCoordinate,
+		    double,
+		    << "The coordinates must satisfy 0 <= x_i <= 1, "
+		    << "but here we have x_i=" << arg1);
 };
 
 
@@ -716,6 +766,31 @@ struct GeometryInfo<3>
 				      */
     static unsigned int vertices_adjacent_to_line (const unsigned int line,
 						   const unsigned int vertex);
+
+				     /**
+				      * Given a point @p{p} in unit
+				      * coordinates, return the number
+				      * of the child cell in which it
+				      * would lie in. If the point
+				      * lies on the interface of two
+				      * children, return any one of
+				      * their indices. The result is
+				      * always less than
+				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      *
+				      * The order of child cells is
+				      * described the documentation of
+				      * the @ref{Triangulation} class.
+				      */
+    static unsigned int child_cell_from_point (const Point<3> &p);
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidCoordinate,
+		    double,
+		    << "The coordinates must satisfy 0 <= x_i <= 1, "
+		    << "but here we have x_i=" << arg1);
 };
 
 
@@ -907,6 +982,51 @@ GeometryInfo<3>::vertices_adjacent_to_line (const unsigned int line,
 
   return vertex_indices[line][vertex];
 }
+
+
+
+inline
+unsigned int
+GeometryInfo<1>::child_cell_from_point (const Point<1> &p)
+{
+  Assert ((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
+  
+  return (p[0] <= 0.5 ? 0 : 1);
+}
+
+
+
+inline
+unsigned int
+GeometryInfo<2>::child_cell_from_point (const Point<2> &p)
+{
+  Assert ((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
+  Assert ((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
+  
+  return (p[0] <= 0.5 ?
+	  (p[1] <= 0.5 ? 0 : 3) :
+	  (p[1] <= 0.5 ? 1 : 2));
+}
+
+
+
+inline
+unsigned int
+GeometryInfo<3>::child_cell_from_point (const Point<3> &p)
+{
+  Assert ((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
+  Assert ((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
+  Assert ((p[2] >= 0) && (p[2] <= 1), ExcInvalidCoordinate(p[2]));
+  
+  return (p[0] <= 0.5 ?
+	  (p[1] <= 0.5 ?
+	   (p[2] <= 0.5 ? 0 : 3) :
+	   (p[2] <= 0.5 ? 4 : 7)) :
+	  (p[1] <= 0.5 ?
+	   (p[2] <= 0.5 ? 1 : 2) :
+	   (p[2] <= 0.5 ? 5 : 6)));
+}
+
 
 
 
