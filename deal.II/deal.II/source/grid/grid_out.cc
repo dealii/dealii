@@ -242,29 +242,29 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 	  case 1:
 		out << cell->vertex(0)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(1)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl;
 		break;
 
 	  case 2:
 		out << cell->vertex(0)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(1)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(2)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(3)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(0)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl  // double new line for gnuplot 3d plots
 		    << std::endl;
 		break;
@@ -273,66 +273,66 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 						 // front face
 		out << cell->vertex(0)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(1)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(2)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(3)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(0)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl;
 						 // back face
 		out << cell->vertex(4)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(5)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(6)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(7)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(4)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl;
 
 						 // now for the four connecting lines
 		out << cell->vertex(0)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(4)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl;
 		out << cell->vertex(1)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(5)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl;
 		out << cell->vertex(2)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(6)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl;
 		out << cell->vertex(3)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << cell->vertex(7)
 		    << ' ' << cell->level()
-		    << ' ' << (unsigned int) cell->material_id() << std::endl
+		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl;
 		break;
 	};
