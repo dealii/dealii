@@ -12,6 +12,8 @@
 
 
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
+#include <base/smartpointer.h>
 
 
 //forward declarations
@@ -27,7 +29,7 @@ class ostream;
 
    @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth
    */
-class SparseMatrixStruct
+class SparseMatrixStruct : public Subscriptor
 {
   public:
 				     /**
@@ -422,7 +424,7 @@ CLASS
    @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth 1998
    */
 template <typename number>
-class SparseMatrix
+class SparseMatrix : public Subscriptor
 {
   public:
 				     /**
@@ -910,7 +912,7 @@ class SparseMatrix
     DeclException0 (ExcInvalidConstructorCall);
     
   private:
-    const SparseMatrixStruct * cols;
+    SmartPointer<const SparseMatrixStruct> cols;
     number* val;
     unsigned int max_len;
     bool is_ilu;
