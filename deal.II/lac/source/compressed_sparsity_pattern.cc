@@ -131,9 +131,7 @@ CompressedSparsityPattern::exists (const unsigned int i,
 {
   Assert (i<rows, ExcInvalidIndex(i,rows));
   Assert (j<cols, ExcInvalidIndex(j,cols));
-//TODO: Ask Wolfgang on how to use column_indices
-  Assert(false, ExcNotImplemented());
-  return true;
+  return (column_indices[i].find(j) != column_indices[i].end());
 }
 
 
