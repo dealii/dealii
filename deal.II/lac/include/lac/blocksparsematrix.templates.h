@@ -169,9 +169,11 @@ void BlockSparseMatrix<number, inverse_type>::invert_diagblocks()
 	for (unsigned int column_cell=0, column=cell*blocksize;
 	     column_cell<blocksize; ++column_cell, ++column)
 	  M_cell(row_cell,column_cell)=(*this)(row,column);
-      if (blocksize<=4)
-	inverse[cell].invert(M_cell);
-      else
+      try
+	{
+	  inverse[cell].invert(M_cell);
+	}
+      catch (ExcNotImplemented &)
 	{
 	  M_cell.gauss_jordan();
 	  inverse[cell]=M_cell;
