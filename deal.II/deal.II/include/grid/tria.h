@@ -2923,10 +2923,22 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /**
 				      * Exception
 				      */
+    DeclException4 (ExcQuadInexistant,
+                    int, int, int, int,
+		    << "When trying to give a boundary indicator to a quad: "
+		    << "the quad with bounding lines " << arg1 << ", " << arg2
+		    << ", " << arg3 << ", " << arg4 << " does not exist.");
+		                     /**
+				      * Exception
+				      */				      
     DeclException0 (ExcInteriorLineCantBeBoundary);
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcInteriorQuadCantBeBoundary);
+                                     /**
+				      * Exception
+				      */				      
     DeclException0 (ExcInternalError);
 				     /**
 				      * Exception

@@ -1322,10 +1322,157 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				   // now set boundary indicators
 				   // where given
 				   //
-				   // not yet implemented
-  AssertThrow ((subcelldata.boundary_lines.size() == 0) &&
-	       (subcelldata.boundary_quads.size() == 0),
-	       ExcNotImplemented());
+				   // first do so for lines
+  vector<CellData<1> >::const_iterator boundary_line
+    = subcelldata.boundary_lines.begin();
+  vector<CellData<1> >::const_iterator end_boundary_line
+    = subcelldata.boundary_lines.end();
+  for (; boundary_line!=end_boundary_line; ++boundary_line)
+    {
+      line_iterator line;
+      pair <int, int> line_vertices(make_pair(boundary_line->vertices[0],
+					      boundary_line->vertices[1]));
+      if (needed_lines.find(line_vertices) != needed_lines.end())
+					 // line found in this
+					 // direction
+	line = needed_lines[line_vertices];
+ 	  	  
+      else
+	{
+					   // look wether it exists in
+					   // reverse direction
+	  swap (line_vertices.first, line_vertices.second);
+	  if (needed_lines.find(line_vertices) != needed_lines.end())
+	    line = needed_lines[line_vertices];
+	  else
+	    {
+					       // line does not exist
+	      AssertThrow (false, ExcLineInexistant(line_vertices.first,
+						    line_vertices.second));
+	      line = end_line();
+	    };
+	};
+				       // Assert that only exterior
+				       // lines are given a boundary
+				       // indicator
+      AssertThrow (line->boundary_indicator() == 0,
+		   ExcInteriorLineCantBeBoundary());
+ 		    
+      line -> set_boundary_indicator (boundary_line->material_id);
+    };       
+
+
+				   // now go on with boundary faces
+  vector<CellData<2> >::const_iterator boundary_quad
+    = subcelldata.boundary_quads.begin();
+  vector<CellData<2> >::const_iterator end_boundary_quad
+    = subcelldata.boundary_quads.end();
+  for (; boundary_quad!=end_boundary_quad; ++boundary_quad)
+    {
+      quad_iterator quad;
+      line_iterator line[4];
+      vector <int> quad_vertices(4);
+ 
+				       // first find the lines that
+				       // are made up of the given
+				       // vertices, then build up a
+				       // quad from these lines
+				       // finally use the find
+				       // function of the map template
+				       // to find the quad
+      pair <int, int> line_vertices[4]
+	= { make_pair (boundary_quad->vertices[0], boundary_quad->vertices[1]),
+	    make_pair (boundary_quad->vertices[1], boundary_quad->vertices[2]),
+	    make_pair (boundary_quad->vertices[3], boundary_quad->vertices[2]),
+	    make_pair (boundary_quad->vertices[0], boundary_quad->vertices[3]) };
+       
+      for (unsigned int i=0; i<4; ++i)
+	{
+					   // check whether line
+					   // already exists
+	  if (needed_lines.find(line_vertices[i]) != needed_lines.end())
+	    line[i] = needed_lines[line_vertices[i]];
+	  else
+					     // look wether it exists
+					     // in reverse direction
+	  {
+	    swap (line_vertices[i].first, line_vertices[i].second);
+ 	    if (needed_lines.find(line_vertices[i]) != needed_lines.end())
+ 	      line[i] = needed_lines[line_vertices[i]];
+ 	    else
+ 	      {
+						 // line does not exist
+ 		AssertThrow (false, ExcLineInexistant(line_vertices[i].first,
+ 		                                      line_vertices[i].second));
+		line[i] = end_line();
+ 	      };
+ 	  };
+	};  
+      
+ 
+				       // Set up 2 quads that are
+				       // built up fromt the lines for
+				       // reasons of comparison to
+				       // needed_quads.  The second
+				       // quad is the reversed version
+				       // of the first quad in order
+				       // find the quad regardless of
+				       // its orientation.  This is
+				       // introduced for convenience
+				       // and because boundary quad
+				       // orientation does not carry
+				       // any information.
+      Quad quad_compare_1(line[0]->index(), line[1]->index(), line[2]->index(), line[3]->index());
+      Quad quad_compare_2(line[3]->index(), line[2]->index(), line[1]->index(), line[0]->index());      
+      
+				       // try to find the quad with
+				       // lines situated as
+				       // constructed above.  if it
+				       // could not be found, rotate
+				       // the boundary lines 3 times
+				       // until it is found or it does
+				       // not exist.
+      unsigned int n_rotations=0;
+      bool not_found_quad_1;
+      while ( (not_found_quad_1=(needed_quads.find(quad_compare_1) == needed_quads.end())) && 
+	      (                  needed_quads.find(quad_compare_2) == needed_quads.end()) &&
+	      (n_rotations<4))
+ 	{
+ 	  rotate(line, line+1, line+4);
+					   // update the quads with
+					   // rotated lines
+	  for (unsigned int i=0; i<4; ++i)
+	    {
+	      quad_compare_1.set_line(i,   line[i]->index());
+	      quad_compare_2.set_line(3-i, line[i]->index());
+	    };
+ 	      
+ 	  ++n_rotations;
+ 	};  
+ 
+      if (n_rotations==4)
+	{
+ 	                        // quad does not exist
+ 	  AssertThrow (false, ExcQuadInexistant(line[0]->index(), line[1]->index(),
+ 	                                        line[2]->index(), line[3]->index()));
+ 	  quad = end_quad();
+ 	}
+ 
+				       // exception not thrown,
+				       // therefore assign the quad
+				       // appropriately
+      if (not_found_quad_1)
+	quad = needed_quads[quad_compare_2];
+      else
+	quad = needed_quads[quad_compare_1];
+
+				       // check whether this face is
+				       // really an exterior one
+      AssertThrow(quad->boundary_indicator()==0,
+		  ExcInteriorQuadCantBeBoundary());
+      quad->set_boundary_indicator (boundary_quad->material_id); 
+    };
+        						    			       
 
 
 				   /////////////////////////////////////////

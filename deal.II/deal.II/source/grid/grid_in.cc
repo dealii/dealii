@@ -121,7 +121,7 @@ void GridIn<dim>::read_ucd (istream &in)
 	      };
 	}
       else
-	if ((cell_type == "line") && (dim == 2))
+	if ((cell_type == "line") && ((dim == 2) || (dim == 3)))
 					   // boundary info
 	  {
 	    subcelldata.boundary_lines.push_back (CellData<1>());
@@ -137,20 +137,51 @@ void GridIn<dim>::read_ucd (istream &in)
 						 // vertex with this index exists
 		subcelldata.boundary_lines.back().vertices[i]
 		  = vertex_indices[subcelldata.boundary_lines.back().vertices[i]];
-	    else 
-	      {
-						 // no such vertex index
-		AssertThrow (false,
-			     ExcInvalidVertexIndex(cell,
-						   subcelldata.boundary_lines.back().vertices[i]));
-		subcelldata.boundary_lines.back().vertices[i] = -1;
-	      };
+	      else 
+		{
+						   // no such vertex index
+		  AssertThrow (false,
+			       ExcInvalidVertexIndex(cell,
+						     subcelldata.boundary_lines.back().vertices[i]));
+		  subcelldata.boundary_lines.back().vertices[i] = -1;
+		};
 	  }
 	else
-					   // cannot read this
-	  AssertThrow (false, ExcUnknownIdentifier(cell_type));
+	  if ((cell_type == "quad") && (dim == 3))
+					     // boundary info
+	    {
+ 	      subcelldata.boundary_quads.push_back (CellData<2>());
+ 	      in >> subcelldata.boundary_quads.back().vertices[0]
+ 	         >> subcelldata.boundary_quads.back().vertices[1]
+ 		 >> subcelldata.boundary_quads.back().vertices[2]
+ 		 >> subcelldata.boundary_quads.back().vertices[3];
+	      
+ 	      subcelldata.boundary_quads.back().material_id = material_id;
+	      
+					       // transform from ucd to
+					       // consecutive numbering
+ 	      for (unsigned int i=0; i<4; ++i)
+ 	        if (vertex_indices.find (subcelldata.boundary_quads.back().vertices[i]) !=
+ 		    vertex_indices.end())
+ 		                                   // vertex with this index exists
+		  subcelldata.boundary_quads.back().vertices[i]
+		    = vertex_indices[subcelldata.boundary_quads.back().vertices[i]];
+ 	        else
+ 	          {
+						     // no such vertex index
+ 	            Assert (false,
+ 		            ExcInvalidVertexIndex(cell,
+ 			                          subcelldata.boundary_quads.back().vertices[i]));
+ 		    subcelldata.boundary_quads.back().vertices[i] = -1;
+ 		  };
+	      
+	    }
+	  else
+					     // cannot read this
+	    AssertThrow (false, ExcUnknownIdentifier(cell_type));
     };
 
+  
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 

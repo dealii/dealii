@@ -470,6 +470,24 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Extended: The <code class="class">Triangulation</code>
+       class can handle boundary information in 3d as well
+       (i.e. lines and quads in 3d with special material IDs).
+       <br>
+       (<a href="mailto://ms@biomech.tu-graz.ac.at">Michael 
+        Stadler</a> 2000/10/11)
+       </p>       
+
+  <li> <p>
+       Extended: The <code class="class">GridIn</code>
+       class can now read 3D UCD data, including boundary information
+       (i.e. lines and quads in 3d with special material IDs).
+       <br>
+       (<a href="mailto://ms@biomech.tu-graz.ac.at">Michael
+        Stadler</a> 2000/10/11)
+       </p>       
+
+  <li> <p>
        Extended: The <code class="member">GridIn::delete_unused_vertices</code>
        function now eliminates vertices from the input that are not
        referenced by any of the cells in the input file. This makes is
