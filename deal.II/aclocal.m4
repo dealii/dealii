@@ -76,6 +76,7 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 	AC_MSG_RESULT("no flag found!")
 	AC_MSG_ERROR("Could not determine multithreading flag for this platform. Aborting!")
   fi
+  LDFLAGS = "-$thread_flag $LDFLAGS"
   AC_MSG_RESULT("-$thread_flag")
 ])
 
