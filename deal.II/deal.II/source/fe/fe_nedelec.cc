@@ -439,7 +439,7 @@ FE_Nedelec<1>::shape_grad_component (const unsigned int ,
 template <>
 Tensor<1,2>
 FE_Nedelec<2>::shape_grad_component (const unsigned int i,
-				     const Point<2>    &p,
+				     const Point<2>    &,
 				     const unsigned int component) const
 {
   const unsigned int dim = 2;
