@@ -1,3 +1,24 @@
+%  docxx.sty
+%
+%  Copyright (c) 1996 Roland Wunderling, Malte Zoeckler
+%  Copyright (c) 1999 Dragos Acostachioaie
+%
+%  This file is part of DOC++.
+%
+%  DOC++ is free software; you can redistribute it and/or
+%  modify it under the terms of the GNU General Public
+%  License as published by the Free Software Foundation; either
+%  version 2 of the license, or (at your option) any later version.
+%
+%  This program is distributed in the hope that it will be useful,
+%  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%  General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public
+%  License along with this program; if not, write to the Free
+%  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+%
 %
 % Switch off special characters except {}\ for the rest of the text.
 %
@@ -36,13 +57,13 @@
 {\obeyspaces\gdef {\ }}
 
 \def\ccverbatim{\strut\begingroup
-            \catcode`\\=12 \catcode`\{=12
-            \catcode`\}=12 \catcode`\$=12
-            \catcode`\&=12 \catcode`\#=12
-            \catcode`\%=12 \catcode`\~=12
-            \catcode`\_=12 \catcode`\^=12
-            \catcode`\|=12 \catcode`\/=12
-            \obeyspaces\tt}
+	    \catcode`\\=12 \catcode`\{=12
+	    \catcode`\}=12 \catcode`\$=12
+	    \catcode`\&=12 \catcode`\#=12
+	    \catcode`\%=12 \catcode`\~=12
+	    \catcode`\_=12 \catcode`\^=12
+	    \catcode`\|=12 \catcode`\/=12
+	    \obeyspaces\tt}
 \def{\let\par=\endgraf \ccverbatim \parskip=0pt \ccfinish}
 {\catcode`\=0 catcode`\=12
 gdefccfinish#1{#1endgroup}}
@@ -60,9 +81,9 @@
    \def\name{#1}%
    \def\empty{}%
    \ifx\name\empty%
-        {\tt #2}%
+	{\tt #2}%
    \else%
-        #1 ({\tt #2})%
+	#1 ({\tt #2})%
    \fi%
 }
 
@@ -114,91 +135,91 @@
 \def\cxxitem#1#2#3#4#5{\noindent{%
     \setbox5\hbox{#5 }%
     \ifdim\wd5>\cxxIdWidth%
-        \setbox5\hbox{\hbox to \cxxIdWidth{\hss#5}}%
+	\setbox5\hbox{\hbox to \cxxIdWidth{\hss#5}}%
     \else
-        \setbox5\hbox{\hbox to \cxxIdWidth{#5\hss}}%
+	\setbox5\hbox{\hbox to \cxxIdWidth{#5\hss}}%
     \fi%
     \setbox1\hbox{{%
-        \catcode`\&=4%
-        \catcode`\_=8%
-        \def{\ccverbatim \ccfinish}#1%
+	\catcode`\&=4%
+	\catcode`\_=8%
+	\def{\ccverbatim \ccfinish}#1%
     }}%
     \setbox2\hbox{{%
-        \catcode`\&=4%
-        \catcode`\_=8%
-        \def{\ccverbatim \ccfinish}\textbf{#2} #3%
+	\catcode`\&=4%
+	\catcode`\_=8%
+	\def{\ccverbatim \ccfinish}\textbf{#2} #3%
     }}%
     \setbox4\hbox{\parbox[t]{\cxxMemoWidth}{{%
-        \raggedright\sloppy%
-        \catcode`\&=4%
-        \catcode`\_=8%
-        \def{\ccverbatim \ccfinish}{\em #4}
-        \cxxStrut%
-        \def\page{#5}%
-        \ifx\page\empty%
-            \hss%
-        \else%
-            \ \dotfill%
-            \hbox to 0pt{\hbox to \cxxPageWidth{\hss%
-                \pageref{\presentlib.cxx.#5}%
-            }\hss}%
-        \fi%
+	\raggedright\sloppy%
+	\catcode`\&=4%
+	\catcode`\_=8%
+	\def{\ccverbatim \ccfinish}{\em #4}
+	\cxxStrut%
+	\def\page{#5}%
+	\ifx\page\empty%
+	    \hss%
+	\else%
+	    \ \dotfill%
+	    \hbox to 0pt{\hbox to \cxxPageWidth{\hss%
+		\pageref{cxx.#5}%
+	    }\hss}%
+	\fi%
     }}}%
     %
     \ifdim\wd1>\cxxTypeWidth%
-        \hbox to \hsize{\unhbox5\hbox to \cxxTypeWidth{\unhbox1\hss}\hss}\\\nopagebreak%
-        \setbox5\hbox{\hskip\cxxIdWidth}%
-        \setbox1\hbox{\hskip\cxxTypeWidth}%
+	\hbox to \hsize{\unhbox5\hbox to \cxxTypeWidth{\unhbox1\hss}\hss}\\\nopagebreak%
+	\setbox5\hbox{\hskip\cxxIdWidth}%
+	\setbox1\hbox{\hskip\cxxTypeWidth}%
     \else%
-        \setbox1\hbox{\hbox to \cxxTypeWidth{\unhbox1\hss}}%
+	\setbox1\hbox{\hbox to \cxxTypeWidth{\unhbox1\hss}}%
     \fi%
     \ifdim\wd2>\cxxProtoWidth%
-        \ifdim\wd2<\cxxProtoMemoWidth%
-            \def\tmp{#4}%
-            \ifx\tmp\empty%
-                \def\tmp{#5}%
-                \ifx\tmp\empty%
-                    \hbox to \hsize{\unhbox5\unhbox1\unhbox2\hss\cxxStrut}\\%
-                \else%
-                    \hbox to \hsize{\unhbox5\unhbox1\unhbox2
-                        \dotfill\hbox to \cxxPageWidth{\hss\pageref{\presentlib.cxx.#5}}%
-                        \cxxStrut}\\%
-                \fi%
-            \else%
-                \hbox to \hsize{\unhbox5\unhbox1\unhbox2\hss}\\\nopagebreak%
-                \hbox to \hsize{%
-                    \hskip\cxxIdWidth%
-                    \hskip\cxxTypeWidth%
-                    \hskip\cxxProtoWidth%
-                    \unhbox4\hss%
-                }\\%
-            \fi%
-        \else%
-            \hbox to \hsize{%
-                \unhbox5%
-                \unhbox1%
-                \parbox[t]{\cxxProtoMemoWidth}{%
-                    \setbox255\hbox{\textbf{#2} (}%
-                    \hangindent=\wd255\hangafter=1%
-                    \raggedright\sloppy%
-                    {\catcode`\&=4\catcode`\_=8%
-                        \def{\ccverbatim \ccfinish}\textbf{#2} #3\strut}%
-                }\hss%
-            }\\\nopagebreak%
-            \hbox to \hsize{%
-                \hskip\cxxIdWidth%
-                \hskip\cxxTypeWidth%
-                \hskip\cxxProtoWidth%
-                \unhbox4\hss%
-            }\\%
-        \fi%
+	\ifdim\wd2<\cxxProtoMemoWidth%
+	    \def\tmp{#4}%
+	    \ifx\tmp\empty%
+		\def\tmp{#5}%
+		\ifx\tmp\empty%
+		    \hbox to \hsize{\unhbox5\unhbox1\unhbox2\hss\cxxStrut}\\%
+		\else%
+		    \hbox to \hsize{\unhbox5\unhbox1\unhbox2
+			\dotfill\hbox to \cxxPageWidth{\hss\pageref{cxx.#5}}%
+			\cxxStrut}\\%
+		\fi%
+	    \else%
+		\hbox to \hsize{\unhbox5\unhbox1\unhbox2\hss}\\\nopagebreak%
+		\hbox to \hsize{%
+		    \hskip\cxxIdWidth%
+		    \hskip\cxxTypeWidth%
+		    \hskip\cxxProtoWidth%
+		    \unhbox4\hss%
+		}\\%
+	    \fi%
+	\else%
+	    \hbox to \hsize{%
+		\unhbox5%
+		\unhbox1%
+		\parbox[t]{\cxxProtoMemoWidth}{%
+		    \setbox255\hbox{\textbf{#2} (}%
+		    \hangindent=\wd255\hangafter=1%
+		    \raggedright\sloppy%
+		    {\catcode`\&=4\catcode`\_=8%
+			\def{\ccverbatim \ccfinish}\textbf{#2} #3\strut}%
+		}\hss%
+	    }\\\nopagebreak%
+	    \hbox to \hsize{%
+		\hskip\cxxIdWidth%
+		\hskip\cxxTypeWidth%
+		\hskip\cxxProtoWidth%
+		\unhbox4\hss%
+	    }\\%
+	\fi%
     \else%
-        \hbox to \hsize{%
-            \unhbox5%
-            \unhbox1%
-            \hbox to \cxxProtoWidth{\unhbox2\hss}%
-            \unhbox4\hss%
-        }\\%
+	\hbox to \hsize{%
+	    \unhbox5%
+	    \unhbox1%
+	    \hbox to \cxxProtoWidth{\unhbox2\hss}%
+	    \unhbox4\hss%
+	}\\%
     \fi%
 }}
 
@@ -238,7 +259,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%       Numbered Frame box
+%	Numbered Frame box
 %
 \newlength{\cxxBoxLen}%
 \newlength{\cxxBoxHt}%
@@ -362,7 +383,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%       Pagestyle for documentation.
+%	Pagestyle for documentation.
 %
 \newsavebox{\cxxHeadName}
 \newcommand{\ps@docxx}{%
@@ -373,33 +394,31 @@
 }
 \newcommand{\makeHeadLine}[2]{
     \global\sbox{\cxxHeadName}{\vbox to 0pt{\vss%
-        \hbox to \textwidth{%
-            \hbox to 0pt{\strut\hbox to 1cm{\hss}\quad#1\hss}%
-            \hfil#2\hfil%
-        }%
-        \vskip 1pt%
-        \hbox to \textwidth{\hrulefill}%
+	\hbox to \textwidth{%
+	    \hbox to 0pt{\strut\hbox to 1cm{\hss}\quad#1\hss}%
+	    \hfil#2\hfil%
+	}%
+	\vskip 1pt%
+	\hbox to \textwidth{\hrulefill}%
     }}%
 }
 \newcommand{\headlinetext}{\usebox{\cxxHeadName}}
 \providecommand{\cxxCopyright}{%
     \vtop{%
-        \hbox to \textwidth{{
-            \tiny\sf This page has been automatically generated with DOC++
-        \hss}}%
-        \vskip -20pt
-        \hbox to \textwidth{
-            \hbox{{\tiny\sf DOC++ is \copyright 1995 by }}
-            \vtop{{\hbox{ \tiny\sf Roland Wunderling \& Malte Z\"ockler}%
-            }}\hss
-        \hss}%
+	\hbox to \textwidth{{
+	    \tiny\sf This page was generated with the help of DOC++
+	\hss}}%
+	\vskip -20pt
+	\hbox to \textwidth{
+	    \hbox{{\tiny\sf http://www.linuxsupportline.com/~doc++ }}
+	\hss}%
     }%
 }
 \def\footlinetext{\hbox to \textwidth{
     \vtop{%
-        \hbox to \textwidth{\hrulefill}%
-        \vskip -20pt%
-        \cxxCopyright%
+	\hbox to \textwidth{\hrulefill}%
+	\vskip -20pt%
+	\cxxCopyright%
     }%
     \hss\vtop{\vskip 10pt\hbox{\today\hspace*{3cm}\textrm{\thepage} }}
 }}
@@ -421,11 +440,11 @@
     \end{center}
     \if\cxxVersionStr\empty%
     \else%
-        \begin{center}
-        \small\sf
-        --- Version \cxxVersionStr\ ---
-        \end{center}
-        \global\def\cxxVersionStr{}
+	\begin{center}
+	\small\sf
+	--- Version \cxxVersionStr\ ---
+	\end{center}
+	\global\def\cxxVersionStr{}
     \fi
     \vfill
     \large
@@ -436,11 +455,11 @@
     \vfill
     \if\cxxAuthorStr\empty%
     \else%
-        \begin{center}
-        \sf\cxxAuthorStr
-        \end{center}
-        \global\def\cxxAuthorStr{}
-        \vfill
+	\begin{center}
+	\sf\cxxAuthorStr
+	\end{center}
+	\global\def\cxxAuthorStr{}
+	\vfill
     \fi
     \pagebreak
     \makeHeadLine{}{#2}
@@ -448,7 +467,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%       environment for contents
+%	environment for contents
 %
 \newcounter{cxxContentsDepth}
 \setcounter{cxxContentsDepth}{0}
@@ -462,12 +481,12 @@
 
 \newenvironment{cxxContents}{
     \ifcase \value{cxxContentsDepth}
-        \vskip 40pt
-        \hbox to \hsize{\hskip 8pt\hskip\cxxContentsLengthIncr\Huge\bf Contents\hss}
-        \vskip 40pt
-        \bf
-    \else                                       % >1
-        \rm
+	\vskip 40pt
+	\hbox to \hsize{\hskip 8pt\hskip\cxxContentsLengthIncr\Huge\bf Contents\hss}
+	\vskip 40pt
+	\bf
+    \else					% >1
+	\rm
     \fi
     \begingroup
     \addtocounter{cxxContentsDepth}{1}
@@ -478,11 +497,11 @@
     \advance\cxxContentsLength     by  \cxxContentsLengthIncr
     \advance\cxxContentsLengthIncr by  -8pt
     \ifcase \value{cxxContentsDepth}
-        \vskip 12pt
-    \or 
-        \vskip 9pt
+	\vskip 12pt
+    \or	
+	\vskip 9pt
     \else
-        \vskip 3pt
+	\vskip 3pt
     \fi
     \endgroup
 }
@@ -491,21 +510,21 @@
     \def\emtpty{}
     \def\memo{#3}
     \ifx\memo\empty
-        \setbox0\hbox{\parbox[t]{\cxxContentsLength}{\strut#2 \dotfill }}
+	\setbox0\hbox{\parbox[t]{\cxxContentsLength}{\strut#2 \dotfill }}
     \else
-        \setbox0\hbox{\parbox[t]{\cxxContentsLength}{\strut#2 --- {\em #3} \dotfill }}
+	\setbox0\hbox{\parbox[t]{\cxxContentsLength}{\strut#2 --- {\em #3} \dotfill }}
     \fi
-    \setbox1\hbox{\vtop{\vskip\dp0\vskip-\ht0\vskip-1.5pt\hbox to 20pt{\hss\rm \pageref{\presentlib.cxx.#1}}}}
+    \setbox1\hbox{\vtop{\vskip\dp0\vskip-\ht0\vskip-1.5pt\hbox to 20pt{\hss\rm \pageref{cxx.#1}}}}
     \hbox to \textwidth{%
-        \hss\hbox to \cxxContentsLengthIncr{#1\hss}%
-        \unhbox0\unhbox1%
+	\hss\hbox to \cxxContentsLengthIncr{#1\hss}%
+	\unhbox0\unhbox1%
     }
 }}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%       environment for class graph
+%	environment for class graph
 %
 \newdimen\cxxClassGraphShift
 \newdimen\cxxClassGraphLength
@@ -525,65 +544,65 @@
     \par\medskip
     \begingroup
     \newcommand{\cxxCGSpace}[1]{%
-        \vtop to \cxxClassGraphTotV{\hbox to \cxxClassGraphShift{%
-            \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
-        ##1}}%
+	\vtop to \cxxClassGraphTotV{\hbox to \cxxClassGraphShift{%
+	    \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
+	##1}}%
     }
     \newcommand{\cxxSlashHline}{%
-        \vrule width 0.1\cxxClassGraphShift height 3.5pt depth -3pt%
-        \vrule width 0.1\cxxClassGraphShift height 0pt depth 0pt%
-        \vrule width 0.1\cxxClassGraphShift height 3.5pt depth -3pt%
-        \vrule width 0.1\cxxClassGraphShift height 0pt depth 0pt%
-        \vrule width 0.1\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.1\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.1\cxxClassGraphShift height 0pt depth 0pt%
+	\vrule width 0.1\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.1\cxxClassGraphShift height 0pt depth 0pt%
+	\vrule width 0.1\cxxClassGraphShift height 3.5pt depth -3pt%
     }
     \newcommand{\cxxDotHline}{%
-        \vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
-        \vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
-        \vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
-        \vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
-        \vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
-        \vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
-        \vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
-        \vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
-        \vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
+	\vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
+	\vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
+	\vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.05\cxxClassGraphShift height 0pt depth 0pt%
+	\vrule width 0.06\cxxClassGraphShift height 3.5pt depth -3pt%
     }
     \newcommand{\cxxHline}{%
-        \vrule width 0.5\cxxClassGraphShift height 3.5pt depth -3pt%
+	\vrule width 0.5\cxxClassGraphShift height 3.5pt depth -3pt%
     }
     \newcommand{\cxxVup}{\hbox to 0pt{\hss%
-        \vrule width 0.5pt height \cxxClassGraphHeight depth -3pt%
+	\vrule width 0.5pt height \cxxClassGraphHeight depth -3pt%
     \hss}}
     \newcommand{\cxxVlow}{\hbox to 0pt{\hss%
-        \vtop to 0pt{\vskip-3pt%
-            \hbox{\vrule width 0.5pt height 13pt depth \cxxClassGraphDepth}%
-        \vss}%
+	\vtop to 0pt{\vskip-3pt%
+	    \hbox{\vrule width 0.5pt height 13pt depth \cxxClassGraphDepth}%
+	\vss}%
     \hss}}
     \newcommand{\cxxLinkUp}{\hbox to 0pt{\hss\hskip 0.5\cxxClassGraphShift%
-        \raise0.7\cxxClassGraphHeight\hbox to 0pt{\hss\textbf{\symbol{94}}\hss}}}%
+	\raise0.7\cxxClassGraphHeight\hbox to 0pt{\hss\textbf{\symbol{94}}\hss}}}%
     \newcommand{\cxxLinkDown}{\hbox to 0pt{\hss\hskip 0.5\cxxClassGraphShift%
-        \raise-0.6\cxxClassGraphHeight\vbox to 0pt{%
-            \hbox to 0pt{\hss\textbf{$\lor$}\hss}\vss}}}%
+	\raise-0.6\cxxClassGraphHeight\vbox to 0pt{%
+	    \hbox to 0pt{\hss\textbf{$\lor$}\hss}\vss}}}%
     \newcommand{\cxxLinkLeft}{\hbox to 0pt{\hss\hskip 0.0\cxxClassGraphShift%
-        \raise0.0\cxxClassGraphHeight\hbox to 0pt{\textbf{\tt\<}\hss}}}%
+	\raise0.0\cxxClassGraphHeight\hbox to 0pt{\textbf{\tt\<}\hss}}}%
     \newcommand{\cxxLinkRight}{\hbox to 0pt{\hss\hskip 1.0\cxxClassGraphShift%
-        \raise0.0\cxxClassGraphHeight\hbox to 0pt{\hss\textbf{\tt\>}}}}%
+	\raise0.0\cxxClassGraphHeight\hbox to 0pt{\hss\textbf{\tt\>}}}}%
     \newcommand{\cxxInheritanceEntry}[5][]{
-        \hbox to \hsize{\hss%
-            \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
-            ##2%
-            \def\tmp{##1}%
-            \ifx\tmp\empty%
-                \def\tmp{##5}%
-                \ifx\tmp\empty%
-                    \rBox[1pt]{##3}{##4}{0.24\hsize}%
-                \else%
-                    \lBox[1pt]{##3}{##4}{0.24\hsize}%
-                \fi%
-            \else%
-                \cBox[2pt]{##3}{##4}{0.24\hsize}%
-            \fi%
-            ##5\hfill%
-        }\vskip-1pt
+	\hbox to \hsize{\hss%
+	    \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
+	    ##2%
+	    \def\tmp{##1}%
+	    \ifx\tmp\empty%
+		\def\tmp{##5}%
+		\ifx\tmp\empty%
+		    \rBox[1pt]{##3}{##4}{0.24\hsize}%
+		\else%
+		    \lBox[1pt]{##3}{##4}{0.24\hsize}%
+		\fi%
+	    \else%
+		\cBox[2pt]{##3}{##4}{0.24\hsize}%
+	    \fi%
+	    ##5\hfill%
+	}\vskip-1pt
     }
     \newcommand{\cxxNone}{\cxxCGSpace{\hss}}
     \newcommand{\cxxLong}{\cxxCGSpace{\hss\cxxVup\cxxVlow\hss}}
@@ -595,22 +614,22 @@
     \newcommand{\cxxProleft}{\cxxCGSpace{\cxxSlashHline\cxxVlow\hss}}
     \newcommand{\cxxPrileft}{\cxxCGSpace{\cxxDotHline\cxxVlow\hss}}
     \newcommand{\cxxLastPubLeft}{\cxxCGSpace{\cxxHline%
-                        \cxxVup\cxxLinkDown\cxxVlow\hss}}
+    		    	\cxxVup\cxxLinkDown\cxxVlow\hss}}
     \newcommand{\cxxLastProLeft}{\cxxCGSpace{\cxxSlashHline%
-                        \cxxVup\cxxLinkDown\cxxVlow\hss}}
+    		    	\cxxVup\cxxLinkDown\cxxVlow\hss}}
     \newcommand{\cxxLastPriLeft}{\cxxCGSpace{\cxxDotHline%
-                        \cxxVup\cxxLinkDown\cxxVlow\hss}}
+    		    	\cxxVup\cxxLinkDown\cxxVlow\hss}}
     \newcommand{\cxxLastPubleft}{\cxxCGSpace{\cxxHline%
-                        \cxxVlow\cxxLinkDown\hss}}
+    		    	\cxxVlow\cxxLinkDown\hss}}
     \newcommand{\cxxLastProleft}{\cxxCGSpace{\cxxSlashHline%
-                        \cxxVlow\cxxLinkDown\hss}}
+    		    	\cxxVlow\cxxLinkDown\hss}}
     \newcommand{\cxxLastPrileft}{\cxxCGSpace{\cxxDotHline%
-                                \cxxVlow\cxxLinkDown\hss}}
+    				\cxxVlow\cxxLinkDown\hss}}
     \newcommand{\cxxLinkPubLeft}{\cxxCGSpace{\cxxLinkLeft\cxxHline\cxxVup\cxxVlow\hss}}
     \newcommand{\cxxLinkProLeft}{\cxxCGSpace{\cxxLinkLeft\cxxSlashHline%
-                                \cxxVup\cxxVlow\hss}}
+    				\cxxVup\cxxVlow\hss}}
     \newcommand{\cxxLinkPriLeft}{\cxxCGSpace{\cxxLinkLeft\cxxDotHline%
-                                \cxxVup\cxxVlow\hss}}
+    				\cxxVup\cxxVlow\hss}}
     \newcommand{\cxxLinkPubleft}{\cxxCGSpace{\cxxLinkLeft\cxxHline\cxxVlow\hss}}
     \newcommand{\cxxLinkProleft}{\cxxCGSpace{\cxxLinkLeft\cxxSlashHline\cxxVlow\hss}}
     \newcommand{\cxxLinkPrileft}{\cxxCGSpace{\cxxLinkLeft\cxxDotHline\cxxVlow\hss}}
@@ -624,16 +643,16 @@
 
     \newcommand{\cxxLinkPubRight}{\cxxCGSpace{\hss\cxxVup\cxxVlow\cxxHline\cxxLinkRight}}
     \newcommand{\cxxLinkProRight}{\cxxCGSpace{\hss\cxxVup\cxxVlow%
-                                   \cxxSlashHline\cxxLinkRight}}
+    				   \cxxSlashHline\cxxLinkRight}}
     \newcommand{\cxxLinkPriRight}{\cxxCGSpace{\hss\cxxVup\cxxVlow%
-                                   \cxxDotHline\cxxLinkRight}}
+				   \cxxDotHline\cxxLinkRight}}
     \newcommand{\cxxLinkPubright}{\cxxCGSpace{\hss\cxxVup\cxxHline\cxxLinkRight}}
     \newcommand{\cxxLinkProright}{\cxxCGSpace{\hss\cxxVup\cxxSlashHline\cxxLinkRight}}
     \newcommand{\cxxLinkPriright}{\cxxCGSpace{\hss\cxxVup\cxxDotHline\cxxLinkRight}}
 
     \newcommand{\cxxFirstPubRight}{\cxxCGSpace{\hss\cxxVup\cxxLinkUp\cxxVlow\cxxHline}}
     \newcommand{\cxxFirstProRight}{\cxxCGSpace{\hss\cxxVup\cxxLinkUp\cxxVlow%
-                                   \cxxSlashHline}}
+    				   \cxxSlashHline}}
     \newcommand{\cxxFirstPriRight}{\cxxCGSpace{\hss\cxxVup\cxxLinkUp\cxxVlow\cxxDotHline}}
     \newcommand{\cxxFirstPubright}{\cxxCGSpace{\hss\cxxVup\cxxLinkUp\cxxHline}}
     \newcommand{\cxxFirstProright}{\cxxCGSpace{\hss\cxxVup\cxxLinkUp\cxxSlashHline}}
@@ -645,25 +664,25 @@
 \newenvironment{cxxClassGraph}{
     \begin{cxxInheritance}
     \newcommand{\cxxClassGraphEntry}[4]{
-        \hbox to \hsize{\hss%
-            \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
-            ##1%
-            \def\tmp{##4}%
-            \rBox[1pt]{##2}{##3}{0.24\hsize}%
-            ##4%
-            \hskip\cxxClassGraphShift\dotfill%
-            \hbox to \cxxClassGraphShift{\hss\pageref{\presentlib.cxx.##2}}%
-        }\vskip-1pt
+	\hbox to \hsize{\hss%
+	    \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
+	    ##1%
+	    \def\tmp{##4}%
+	    \rBox[1pt]{##2}{##3}{0.24\hsize}%
+	    ##4%
+	    \hskip\cxxClassGraphShift\dotfill%
+	    \hbox to \cxxClassGraphShift{\hss\pageref{cxx.##2}}%
+	}\vskip-1pt
     }
     \newcommand{\cxxClassGraphEntryUnknownPackage}[3]{
-        \hbox to \hsize{\hss%
-            \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
-            ##1%
-            \def\tmp{##3}%
-            \rBox[1pt]{}{##2}{0.24\hsize}%
-            ##3%
-            \hskip\cxxClassGraphShift\hfill%
-        }\vskip-1pt
+	\hbox to \hsize{\hss%
+	    \vrule width0pt height \cxxClassGraphHeight depth \cxxClassGraphDepth%
+	    ##1%
+	    \def\tmp{##3}%
+	    \rBox[1pt]{}{##2}{0.24\hsize}%
+	    ##3%
+	    \hskip\cxxClassGraphShift\hfill%
+	}\vskip-1pt
     }
     \clearpage
     \pagebreak\strut
@@ -680,11 +699,11 @@
 %
 % environment for generic manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newdimen\cxxgenericstart
 \cxxgenericstart=\labelwidth
@@ -699,7 +718,7 @@
 \newlength{\cxxSize}
 \newenvironment{cxxgeneric}[5]{
 %
-%       some local definitions
+%	some local definitions
 %
     \def\empty{}
     \def\type{#1}
@@ -707,23 +726,23 @@
     \def\memo{#4}
     \def\id  {#5}
 %
-%       pagebreak ?
+%	pagebreak ?
 %
 \ifcase \value{cxxDepth}
-        \clearpage                      %  0
-        \pagebreak
-        \makeHeadLine{#5}{#2}
-        \setlength{\cxxSize}{2pt}
-\or                                     %  1
-        \strut\bigskip\bigskip\goodbreak%
-        \setlength{\cxxSize}{1pt}
-\else                                   % >2
-        \strut\bigskip\bigskip\goodbreak%
-        \setlength{\cxxSize}{0.5pt}
+	\clearpage			%  0
+	\pagebreak
+	\makeHeadLine{#5}{#2}
+	\setlength{\cxxSize}{2pt}
+\or					%  1
+	\strut\bigskip\bigskip\goodbreak%
+	\setlength{\cxxSize}{1pt}
+\else					% >2
+	\strut\bigskip\bigskip\goodbreak%
+	\setlength{\cxxSize}{0.5pt}
 \fi
 \addtocounter{cxxDepth}{1}
 %
-%       write synopsis
+%	write synopsis
 %
 \setbox0\hbox{ }%
 \setbox1\hbox{\strut\large #1 {\bf#2} }%
@@ -738,57 +757,57 @@
 \addtolength{\cxxTitleLen}{-8\wd0}%
 \hbox{\aBox[\cxxSize]{\id}{\vbox{\vskip 1.5\parskip%
     \hbox to \cxxSideLen{\strut%
-        \hbox to 4\wd0{}%
-        \ifdim\wd3<\cxxTitleLen%
-            \parbox[b]{\cxxTitleLen}{%
-                \begin{raggedright}
-                \noindent\large #1 {\bf#2} #3
-                \end{raggedright}
-            }
-        \else%
-            \ifdim\wd1>0.7\cxxTitleLen%
-                \parbox[b]{\cxxTitleLen}{%
-                    \begin{raggedright}
-                    \noindent\large #1 {\bf#2} #3
-                    \end{raggedright}
-                }
-            \else%
-                \addtolength{\cxxTitleLen}{-\wd1}%
-                \unhbox1%
-                \parbox[t]{\cxxTitleLen}{%
-                    \advance\lineskip 7pt%
-                    \begin{raggedright}
-                    \noindent\large\strut #3
-                    \end{raggedright}
-                }
-            \fi%
-        \fi%
-        \hss\strut%
+	\hbox to 4\wd0{}%
+	\ifdim\wd3<\cxxTitleLen%
+	    \parbox[b]{\cxxTitleLen}{%
+		\begin{raggedright}
+		\noindent\large #1 {\bf#2} #3
+		\end{raggedright}
+	    }
+	\else%
+	    \ifdim\wd1>0.7\cxxTitleLen%
+		\parbox[b]{\cxxTitleLen}{%
+		    \begin{raggedright}
+		    \noindent\large #1 {\bf#2} #3
+		    \end{raggedright}
+		}
+	    \else%
+		\addtolength{\cxxTitleLen}{-\wd1}%
+		\unhbox1%
+		\parbox[t]{\cxxTitleLen}{%
+		    \advance\lineskip 7pt%
+		    \begin{raggedright}
+		    \noindent\large\strut #3
+		    \end{raggedright}
+		}
+	    \fi%
+	\fi%
+	\hss\strut%
     }\vskip\parskip}%
 }}
 % \parbox[b]{\cxxSideLen}{\begingroup
-%       \catcode`\&=12%
-%       \catcode`\_=12%
-%       \begin{flushleft}
-%           \quad\large%
-%           \ifx\type\empty
-%               \ifx\args\empty
-%                   \strut{\bf #2}\\
-%               \else
-%                   \strut{\bf #2}\ \args
-%               \fi
-%           \else
-%               \strut\type\ {\bf #2}\ \args
-%           \fi
-%       \end{flushleft}
+% 	\catcode`\&=12%
+% 	\catcode`\_=12%
+% 	\begin{flushleft}
+% 	    \quad\large%
+% 	    \ifx\type\empty
+% 		\ifx\args\empty
+% 		    \strut{\bf #2}\\
+% 		\else
+% 		    \strut{\bf #2}\ \args
+% 		\fi
+% 	    \else
+% 		\strut\type\ {\bf #2}\ \args
+% 	    \fi
+% 	\end{flushleft}
 % \endgroup}}}%
 \ifx\memo\empty\else
     \vskip 10pt
     \begin{flushright}
-        \it\memo
+	\it\memo
     \end{flushright}
 \fi
-\label{\presentlib.cxx.\id}
+\label{cxx.\id}
 \begingroup
 \def\cxxExceptionsStr{}
 \def\cxxParameterStr{}
@@ -814,11 +833,11 @@
 %
 % environment for function manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxfunction}[5]{
 \begin{cxxgeneric}{#1}{#2}{#3}{#4}{#5}
@@ -831,11 +850,11 @@
 %
 % environment for manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxentry}[5]{
 \begin{cxxgeneric}{#1}{#2}{#3}{#4}{#5}}{\end{cxxgeneric}}
@@ -844,11 +863,11 @@
 %
 % environment for union manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxunion}[5]{
 \begin{cxxgeneric}{#1}{#2}{#3}{#4}{#5}
@@ -861,11 +880,11 @@
 %
 % environment for typedef manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxtypedef}[5]{
 \begin{cxxgeneric}{#1}{#2}{}{#4}{#5}
@@ -878,11 +897,11 @@
 %
 % environment for macro manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxmacro}[5]{
 \begin{cxxgeneric}{\#define}{#2}{#3}{#4}{#5}}{\end{cxxgeneric}}
@@ -891,24 +910,37 @@
 %
 % environment for class manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxclass}[5]{
 \begin{cxxgeneric}{#1}{#2}{#3}{#4}{#5}}{\end{cxxgeneric}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% environment for namespace manual entries
+% arguments are:
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
+%
+\newenvironment{cxxnamespace}[5]{
+\begin{cxxgeneric}{#1}{#2}{#3}{#4}{#5}}{\end{cxxgeneric}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 % environment for interface manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxinterface}[5]{
 \begin{cxxgeneric}{#1}{#2}{#3}{#4}{#5}}{\end{cxxgeneric}}
@@ -917,11 +949,11 @@
 %
 % environment for variable manual entries
 % arguments are:
-%       #1      type
-%       #2      name
-%       #3      args
-%       #4      memo
-%       #5      number
+%	#1	type
+%	#2	name
+%	#3	args
+%	#4	memo
+%	#5	number
 %
 \newenvironment{cxxvariable}[5]{
 \begin{cxxgeneric}{#1}{#2}{#3}{#4}{#5}
@@ -991,7 +1023,7 @@
 %
 % environment for commented listing
 % arguments are:
-%       #1      Section title
+%	#1	Section title
 %
 \newenvironment{cxximplementation}[1]{
 \goodbreak
