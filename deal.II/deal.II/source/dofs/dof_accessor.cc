@@ -503,6 +503,59 @@ DoFCellAccessor<2>::get_dof_values (const dVector &values,
 
 
 
+template <int dim>
+void
+DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
+						   dVector       &interpolated_values) const {
+  const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
+  
+  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (interpolated_values.size() == total_dofs,
+	  ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  ExcVectorDoesNotMatch());
+
+  if (!has_children())
+				     // if this cell has no children: simply
+				     // return the exact values on this cell
+    get_dof_values (values, interpolated_values);
+  else
+				     // otherwise clobber them from the children
+    {
+      dVector tmp1(total_dofs);
+      dVector tmp2(total_dofs);
+      
+      interpolated_values.clear ();
+
+      for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
+	   ++child)
+	{
+					   // get the values from the present
+					   // child, if necessary by
+					   // interpolation itself
+	  child(child)->get_interpolated_dof_values (values,
+						     tmp1);
+					   // interpolate these to the mother
+					   // cell
+	  dof_handler->get_fe()->restrict(child).vmult (tmp2, tmp1);
+	  
+					   // now write those entries in tmp2
+					   // which are != 0 into the output
+					   // vector. Note that we may not
+					   // add them up, since we would then
+					   // end in adding up the contribution
+					   // from nodes on boundaries of
+					   // children more than once.
+	  for (unsigned int i=0; i<total_dofs; ++i)
+	    if (tmp2(i) != 0)
+	      interpolated_values(i) = tmp2(i);
+    };
+};
+
+
+
+
 
 
 

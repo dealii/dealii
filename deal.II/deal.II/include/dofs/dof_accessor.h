@@ -599,6 +599,27 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
     void get_dof_values (const dVector &values,
 			 dVector       &dof_values) const;
 
+				     /**
+				      * Return the interpolation of the given
+				      * finite element function to the present
+				      * cell. In the simplest case, the cell
+				      * is a terminal one, i.e. has no children;
+				      * then, the returned value is the vector
+				      * of nodal values on that cell. You could
+				      * then as well get the desired values
+				      * through the #get_dof_values# function
+				      * In the other case, when the cell has
+				      * children, we use the restriction
+				      * matrices provided by the finite element
+				      * class to compute the interpolation
+				      * from the children to the present cell.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand.
+				      */
+    void get_interpolated_dof_values (const dVector &values,
+				      dVector       &interpolated_values) const;
+    
 
     				     /**
 				      *  Exception

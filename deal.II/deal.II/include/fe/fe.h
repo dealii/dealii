@@ -260,7 +260,7 @@ struct FiniteElementBase :
 				      * constraints then.
 				      */
     const dFMatrix & constraints () const;
-    
+
 				     /**
 				      * Comparison operator. We also check for
 				      * equality of the constraint matrix,
@@ -330,7 +330,8 @@ struct FiniteElementBase :
 				      *
 				      * To compute the interpolation of a
 				      * finite element field to a cell, you
-				      * may use the #interpolation# function.
+				      * may use the #get_interpolated_dof_values#
+				      * function of the #DoFCellAccessor# class.
 				      * See there for more information.
 				      *
 				      * Upon assembling the transfer matrix
@@ -510,7 +511,6 @@ struct FiniteElementBase :
  *   the assumption does not hold, then the distribution has to happen
  *   with all nodes on the small and the large cells. This is not
  *   implemented in the #DoFHandler# class as of now.
- * \end{itemize}
  *
  * @author Wolfgang Bangerth, 1998
  */

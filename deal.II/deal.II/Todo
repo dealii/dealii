@@ -156,3 +156,17 @@ Remove all fe& in vectors.h
 
 No support points for non-Lagrangian elements? Check for Langrange in
 interpolation?
+
+
+Implement the random distortion in Triangulation for hanging nodes
+  also. Hanging nodes need to be reset to the correct mean value
+  at the end, which is simple for 2D but difficult for 3D. Maybe take
+  a look at how we get to the original location of the point in the
+  execute_refinement function and copy the relevant lines.
+
+
+Review DoFCellAccessor<dim>::get_interpolated_dof_values: it may be
+  necessary to write not the non-zero values, but those for which
+  the corresponding row of the transfer (restriction) matrix
+  has nonzero entries. This also catches those zeroes which should
+  really be written but are not because the nodal value was zero.
