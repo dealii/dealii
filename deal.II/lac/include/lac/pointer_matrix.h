@@ -4,6 +4,7 @@
 #define __deal2__pointer_matrix_h
 
 #include <base/subscriptor.h>
+#include <base/smartpointer.h>
 #include <lac/vector_memory.h>
 
 /**
