@@ -775,20 +775,19 @@ void ParameterHandler::log_parameters_section (LogStream           &out)
 				   // traverse entry list
   Section::EntryType::const_iterator ptr;
 
-				   // first find out the longest entry name
-  unsigned int longest_entry = 0;
-  for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
-    if (ptr->first.length() > longest_entry)
-      longest_entry = ptr->first.length();
-
 				   // print entries one by one
   for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
     {
+      if ((pc->entries.find(ptr->first) != pc->entries.end()) &&
+	  (pc->entries[ptr->first].first != pd->entries[ptr->first].first))
 				       // check whether this entry is listed
 				       // in the Changed tree and actually
 				       // differs from the default value
-      out << ptr->first << setw(longest_entry-ptr->first.length()+2) << "= "
-	  << ptr->second.first << endl;
+	  out << ptr->first << ": "
+	      << pc->entries[ptr->first].first << endl;
+      else
+	  out << ptr->first << ": "
+	      << ptr->second.first << endl;
     };
 
 

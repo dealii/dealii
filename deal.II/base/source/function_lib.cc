@@ -799,7 +799,7 @@ double
 JumpFunction<dim>::value (const Point<dim>   &p,
 			  const unsigned int) const
 {
-  double x = steepness*(cosine*p(0)+sine*p(1));
+  double x = steepness*(-cosine*p(0)+sine*p(1));
   return -atan(x);
 }
 
@@ -816,7 +816,7 @@ JumpFunction<dim>::value_list (const vector<Point<dim> > &p,
 
   for (unsigned int i=0;i<p.size();++i)
     {
-      double x = steepness*(cosine*p[i](0)+sine*p[i](1));
+      double x = steepness*(-cosine*p[i](0)+sine*p[i](1));
       values[i] = -atan(x);
     }
 }
@@ -827,7 +827,7 @@ double
 JumpFunction<dim>::laplacian (const Point<dim>   &p,
 			      const unsigned int) const
 {
-  double x = steepness*(cosine*p(0)+sine*p(1));
+  double x = steepness*(-cosine*p(0)+sine*p(1));
   double r = 1+x*x;
   return 2*steepness*steepness*x/(r*r);
 }
@@ -846,7 +846,7 @@ JumpFunction<dim>::laplacian_list (const vector<Point<dim> > &p,
   
   for (unsigned int i=0;i<p.size();++i)
     {
-      double x = steepness*(cosine*p[i](0)+sine*p[i](1));
+      double x = steepness*(-cosine*p[i](0)+sine*p[i](1));
       double r = 1+x*x;
       values[i] = f*x/(r*r);
     }
@@ -859,7 +859,7 @@ Tensor<1,dim>
 JumpFunction<dim>::gradient (const Point<dim>   &p,
 			     const unsigned int) const
 {
-  double x = steepness*(cosine*p(0)+sine*p(1));
+  double x = steepness*(-cosine*p(0)+sine*p(1));
   double r = -steepness*(1+x*x);
   Tensor<1,dim> erg;
   erg[0] = cosine*r;
