@@ -362,6 +362,8 @@ void LaplaceProblem<dim>::refine_grid ()
   triangulation.execute_coarsening_and_refinement ();
 };
 
+
+
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
@@ -410,6 +412,7 @@ void LaplaceProblem<dim>::run ()
       output_results (cycle);
     };
 
+				   // ...
   DataOut<dim>::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
   
