@@ -25,11 +25,17 @@ AC_PROG_CXX
 if test $GXX = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-  if test -n `echo $GXX_VERSION_STRING | grep egcs-1.1` ; then
-    AC_MSG_RESULT(Found egcs-1.1)
+  if test -n "`echo $GXX_VERSION_STRING | grep egcs-1.1`" ; then
+    AC_MSG_RESULT(Compiler is egcs-1.1)
     GXX_VERSION=egcs1.1
   else
-    GXX_VERSION=other
+    if test -n "`echo $GXX_VERSION_STRING | grep 'gcc version 2.95'`" ; then
+      AC_MSG_RESULT(Compiler is gcc-2.95)
+      GXX_VERSION=gcc2.95
+    else
+      AC_MSG_RESULT(Compiler is unknown but accepted)
+      GXX_VERSION=other
+    fi
   fi
 else
   AC_MSG_ERROR(No configuration options for this C++ compiler

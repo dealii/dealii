@@ -670,11 +670,17 @@ fi
 if test $GXX = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-  if test -n `echo $GXX_VERSION_STRING | grep egcs-1.1` ; then
-    echo "$ac_t""Found egcs-1.1" 1>&6
+  if test -n "`echo $GXX_VERSION_STRING | grep egcs-1.1`" ; then
+    echo "$ac_t""Compiler is egcs-1.1" 1>&6
     GXX_VERSION=egcs1.1
   else
-    GXX_VERSION=other
+    if test -n "`echo $GXX_VERSION_STRING | grep 'gcc version 2.95'`" ; then
+      echo "$ac_t""Compiler is gcc-2.95" 1>&6
+      GXX_VERSION=gcc2.95
+    else
+      echo "$ac_t""Compiler is unknown and accepted" 1>&6
+      GXX_VERSION=other
+    fi
   fi
 else
   { echo "configure: error: No configuration options for this C++ compiler
@@ -692,7 +698,7 @@ OS=`uname`
 # Extract the first word of "perl", so it can be a program name with args.
 set dummy perl; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:696: checking for $ac_word" >&5
+echo "configure:702: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_PERL'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -747,7 +753,7 @@ fi
 
 if test $withmultithreading != no ; then
   echo $ac_n "checking checking for ACE""... $ac_c" 1>&6
-echo "configure:751: checking checking for ACE" >&5
+echo "configure:757: checking checking for ACE" >&5
   if test -d $withmultithreading ; then
     echo "$ac_t""found" 1>&6
   else
