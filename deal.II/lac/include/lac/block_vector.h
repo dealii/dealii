@@ -481,6 +481,14 @@ class BlockVector
 				      * file, but not more.
 				      */
     void block_read (istream &in);
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
 				     //@}
 
   protected:

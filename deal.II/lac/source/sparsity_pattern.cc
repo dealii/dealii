@@ -611,3 +611,12 @@ SparsityPattern::bandwidth () const
   return b;
 };
 
+
+
+unsigned int
+SparsityPattern::memory_consumption () const
+{
+  return (sizeof(*this) +
+	  max_dim * sizeof(unsigned int) +
+	  max_vec_len * sizeof(unsigned int));
+};

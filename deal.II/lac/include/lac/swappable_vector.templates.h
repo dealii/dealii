@@ -14,6 +14,7 @@
 #define __deal2__swappable_vector_templates_h
 
 
+#include <base/memory_consumption.h>
 #include <lac/swappable_vector.h>
 #include <fstream>
 #include <iostream>
@@ -258,6 +259,18 @@ const string &
 SwappableVector<number>::get_filename () const 
 {
   return filename;
+};
+
+
+
+template <typename number>
+unsigned int
+SwappableVector<number>::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (filename) +
+	  sizeof(lock) +
+	  MemoryConsumption::memory_consumption (data_is_preloaded) +
+	  Vector<number>::memory_consumption ());
 };
 
 

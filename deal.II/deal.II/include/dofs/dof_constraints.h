@@ -386,6 +386,13 @@ class ConstraintMatrix : public Subscriptor
 				      */
     void print (ostream &) const;
 
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
 
 				     /**
 				      * Exception

@@ -20,10 +20,10 @@
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
 					     const Point<dim>& dir)
-  :
-  Function<dim> (f.n_components, f.get_time()),
-  f(f),
-  direction(dir)
+		:
+		Function<dim> (f.n_components, f.get_time()),
+		f(f),
+		direction(dir)
 {
   set_h();
   set_formula();
@@ -57,15 +57,15 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 {
   switch (formula)
     {
-    case Euler:
-      return (f.value(p+incr, component)-f.value(p-incr, component))/(2*h);
-    case UpwindEuler:
-      return (f.value(p, component)-f.value(p-incr, component))/h;
-    case FourthOrder:
-      return (-f.value(p+2*incr, component) + 8*f.value(p+incr, component)
-	      -8*f.value(p-incr, component) + f.value(p-2*incr, component))/(12*h);
-    default:
-      Assert(false, ExcInvalidFormula());
+      case Euler:
+	    return (f.value(p+incr, component)-f.value(p-incr, component))/(2*h);
+      case UpwindEuler:
+	    return (f.value(p, component)-f.value(p-incr, component))/h;
+      case FourthOrder:
+	    return (-f.value(p+2*incr, component) + 8*f.value(p+incr, component)
+		    -8*f.value(p-incr, component) + f.value(p-2*incr, component))/(12*h);
+      default:
+	    Assert(false, ExcInvalidFormula());
     }
   return 0.;
 }
@@ -145,6 +145,17 @@ FunctionDerivative<dim>::value_list (const vector<Point<dim> > &points,
       Assert(false, ExcInvalidFormula());
     }
 }
+
+
+
+template <int dim>
+unsigned int
+FunctionDerivative<dim>::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
 
 
 template FunctionDerivative<1>;

@@ -499,6 +499,12 @@ class SparsityPattern : public Subscriptor
 				      */
     const unsigned int * get_column_numbers () const;
 
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 
 				     /**
 				      * Exception

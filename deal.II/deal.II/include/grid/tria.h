@@ -398,6 +398,13 @@ struct TriaNumberCache<1>
 				      * by default.
 				      */
     TriaNumberCache ();
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -451,6 +458,13 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
 				      * by default.
 				      */
     TriaNumberCache ();
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -504,6 +518,13 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
 				      * by default.
 				      */
     TriaNumberCache ();
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -2842,6 +2863,20 @@ class Triangulation : public TriaDimensionInfo<dim>,
     unsigned int max_adjacent_cells () const;
     				     /*@}*/
 
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * This function is made virtual,
+				      * since a triangulation object
+				      * might be accessed through a
+				      * pointer to this base class,
+				      * even if the actual object is a
+				      * derived class.
+				      */
+    virtual unsigned int memory_consumption () const;
+    
 
 				     /**
 				      *  @name Exceptions
@@ -2981,7 +3016,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				  vector<bool>       &v,
 				  const unsigned int  magic_number2,
 				  istream            &in);
-    
+
   private:
 				     /**
 				      *  Refine all cells on all levels which
@@ -3089,7 +3124,13 @@ class Triangulation : public TriaDimensionInfo<dim>,
     vector<bool>                     vertices_used;
 
 				     /**
-				      *  Collection of boundary objects.
+				      *  Collection of boundary
+				      *  objects. We only need 255
+				      *  objects rather than 256,
+				      *  since the indicator 255 is
+				      *  reserved for interior faces
+				      *  and can thus never be
+				      *  associated with a boundary.
 				      */
     const Boundary<dim>* boundary[255];
 

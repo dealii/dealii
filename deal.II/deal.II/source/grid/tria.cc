@@ -12,6 +12,7 @@
 //----------------------------  tria.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <grid/tria.h>
 #include <grid/tria_levels.h>
 #include <grid/tria_boundary.h>
@@ -7392,6 +7393,27 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 
   AssertThrow (in, ExcIO());
 };
+
+
+
+template <int dim>
+unsigned int
+Triangulation<dim>::memory_consumption () const 
+{
+  unsigned int mem = 0;
+  mem += MemoryConsumption::memory_consumption(levels);
+  for (unsigned int i=0; i<levels.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (*levels[i]);
+  mem += MemoryConsumption::memory_consumption (vertices);
+  mem += MemoryConsumption::memory_consumption (vertices_used);
+  mem += sizeof(boundary);
+  mem += sizeof(smooth_grid);
+  mem += MemoryConsumption::memory_consumption (number_cache);
+
+  return mem;
+};
+
+  
 
 
 template <int dim>

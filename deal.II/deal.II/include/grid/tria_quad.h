@@ -61,6 +61,13 @@ class Quad
     void set_line (const int i, const int index);
     
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    static unsigned int memory_consumption ();
+
+				     /**
 				      *  Exception
 				      */ 
     DeclException1 (ExcRange,
@@ -104,5 +111,13 @@ void Quad::set_line (const int i, const int index)
   lines[i] = index;
 };
 
+
+
+inline
+unsigned int
+Quad::memory_consumption ()
+{
+  return sizeof(Quad);
+};
 
 #endif

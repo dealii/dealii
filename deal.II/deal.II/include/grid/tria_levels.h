@@ -157,6 +157,13 @@ class TriangulationLevel<0>
     void monitor_memory (const unsigned int true_dimension) const;
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      *  Exception
 				      */
     DeclException3 (ExcMemoryWasted,
@@ -318,6 +325,13 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 				      *  @ref{TriangulationLevel} classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -353,21 +367,26 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					  */
 	vector<Quad> quads;
 					 /**
-					  *  Same as for the @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
-					  *  array, but since there are four
-					  *  children, the index points to the
-					  *  first while the other three are
-					  *  following immediately afterwards.
+					  *  Same as for the
+					  *  @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
+					  *  array, but since there
+					  *  are four children, the
+					  *  index points to the first
+					  *  while the other three are
+					  *  following immediately
+					  *  afterwards.
 					  */
 	vector<int>  children;
 
 					 /**
-					  *  Same as for @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  Same as for
+					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
 	vector<bool> used;
 
 					 /**
-					  *  Same as for @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  Same as for
+					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
 	vector<bool> user_flags;
 
@@ -425,6 +444,13 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *  @ref{TriangulationLevel} classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -450,7 +476,8 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 				      *  level.
 				      *
 				      *  It is fully analogous to the
-				      *  @ref{TriangulationLevel<1>::LinesData} structure inherited from
+				      *  @ref{TriangulationLevel<1>::LinesData}
+				      *  structure inherited from
 				      *  @ref{Triangulation<1>}.
 				      */
     struct HexesData
@@ -460,21 +487,26 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 					  */
 	vector<Hexahedron> hexes;
 					 /**
-					  *  Same as for the @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
-					  *  array, but since there are four
-					  *  children, the index points to the
-					  *  first while the other three are
-					  *  following immediately afterwards.
+					  *  Same as for the
+					  *  @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
+					  *  array, but since there
+					  *  are four children, the
+					  *  index points to the first
+					  *  while the other three are
+					  *  following immediately
+					  *  afterwards.
 					  */
 	vector<int>  children;
 
 					 /**
-					  *  Same as for @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  Same as for
+					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
 	vector<bool> used;
 
 					 /**
-					  *  Same as for @ref{TriangulationLevel<1>::LinesData}@p{::used}.
+					  *  Same as for
+					  *  @ref{TriangulationLevel<1>::LinesData}@p{::used}.
 					  */
 	vector<bool> user_flags;
 
@@ -532,6 +564,13 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 				      *  @ref{TriangulationLevel} classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 

@@ -406,11 +406,30 @@ class JumpFunction : public Function<dim>
 				 vector<double>            &values,
 				 const unsigned int         component = 0) const;
 
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    unsigned int memory_consumption () const;
+
   protected:
 				     /**
 				      * Advection vector.
 				      */
     const Point<dim> direction;
+
 				     /**
 				      * Steepness (maximal derivative)
 				      * of the slope.

@@ -667,4 +667,14 @@ void Vector<Number>::block_read (istream &in)
   AssertThrow (in, ExcIO());
 }
 
+
+
+template <typename Number>
+unsigned int
+Vector<Number>::memory_consumption () const
+{
+  return sizeof(*this) + (maxdim * sizeof(Number));
+};
+
+
 #endif

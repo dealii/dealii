@@ -16,6 +16,7 @@
 
 #include <base/exceptions.h>
 #include <base/logstream.h>
+#include <base/memory_consumption.h>
 #include <lac/precondition_block.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -195,6 +196,22 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 	}
     }
 }
+
+
+
+template <typename number, typename inverse_type>
+unsigned int
+PreconditionBlock<number,inverse_type>::memory_consumption () const
+{
+  unsigned int mem = sizeof(*this);
+  for (unsigned int i=0; i<var_inverse.size(); ++i)
+    mem += MemoryConsumption::memory_consumption(var_inverse[i]);
+  for (unsigned int i=0; i<var_diagonal.size(); ++i)
+    mem += MemoryConsumption::memory_consumption(var_diagonal[i]);
+  return mem;
+};
+
+
 
 
 /*--------------------- PreconditionBlockJacobi -----------------------*/

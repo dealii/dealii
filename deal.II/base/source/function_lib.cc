@@ -888,6 +888,17 @@ JumpFunction<dim>::gradient_list (const vector<Point<dim> > &p,
 }
 
 
+
+template <int dim>
+unsigned int
+JumpFunction<dim>::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
 template SquareFunction<1>;
 template SquareFunction<2>;
 template SquareFunction<3>;

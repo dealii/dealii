@@ -125,6 +125,14 @@ class Quadrature : public Subscriptor
 				      */
     const vector<double> & get_weights () const;
 
+    				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object.
+				      */
+    unsigned int memory_consumption () const;
+
   protected:
 				     /**
 				      * List of quadrature points. To be filled

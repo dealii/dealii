@@ -15,6 +15,7 @@
 #include <base/data_out_base.h>
 #include <base/parameter_handler.h>
 #include <base/thread_management.h>
+#include <base/memory_consumption.h>
 
 #include <iomanip>
 #include <ctime>
@@ -30,6 +31,20 @@ DataOutBase::Patch<dim,spacedim>::Patch () :
 {
   Assert (dim<=spacedim, ExcInvalidCombinationOfDimensions(dim,spacedim));
   Assert (spacedim<=3, ExcNotImplemented());
+};
+
+
+
+template <int dim, int spacedim>
+unsigned int
+DataOutBase::Patch<dim,spacedim>::memory_consumption () const
+{
+  return (sizeof(vertices) / sizeof(vertices[0]) * 
+	  MemoryConsumption::memory_consumption(vertices[0])
+	  +
+	  MemoryConsumption::memory_consumption(n_subdivisions)
+	  +
+	  MemoryConsumption::memory_consumption(data));
 };
 
 
@@ -1774,7 +1789,6 @@ DataOutBase::write_gmv_reorder_data_vectors (const vector<Patch<dim,spacedim> > 
 
 
 
-
 /* --------------------------- class DataOutInterface ---------------------- */
 
 
@@ -2029,6 +2043,21 @@ void DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm)
   gmv_flags.parse_parameters (prm);
   prm.leave_subsection ();
 }
+
+
+template <int dim, int spacedim>
+unsigned int 
+DataOutInterface<dim,spacedim>::memory_consumption () const
+{
+  return (sizeof (default_fmt) +
+	  MemoryConsumption::memory_consumption (ucd_flags) +
+	  MemoryConsumption::memory_consumption (gnuplot_flags) +
+	  MemoryConsumption::memory_consumption (povray_flags) +
+	  MemoryConsumption::memory_consumption (eps_flags) +
+	  MemoryConsumption::memory_consumption (gmv_flags));
+};
+
+
 
 
 // explicit instantiations. functions in DataOutBase are instantiated by

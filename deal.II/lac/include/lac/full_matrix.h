@@ -561,6 +561,13 @@ class FullMatrix : public Subscriptor
 				      */
     void print_formatted (ostream &out,
 			  const unsigned int presicion=3) const;
+    
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 
 				     /**
 				      * Exception

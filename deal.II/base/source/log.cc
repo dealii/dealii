@@ -14,6 +14,7 @@
 
 #include <base/logstream.h>
 #include <base/job_identifier.h>
+#include <base/memory_consumption.h>
 
 #include <sys/resource.h>
 #include <iomanip>
@@ -141,3 +142,21 @@ LogStream::operator << (void (f)(LogStream &))
 }
 
 
+
+unsigned int
+LogStream::memory_consumption () const
+{
+  unsigned int mem = sizeof(*this);
+				   // to determine size of stack
+				   // elements, we have to copy the
+				   // stack since we can't access
+				   // elements from further below
+  stack<string> tmp;
+  while (tmp.size() > 0)
+    {
+      mem += MemoryConsumption::memory_consumption (tmp.top());
+      tmp.pop ();
+    };
+  
+  return mem;
+};

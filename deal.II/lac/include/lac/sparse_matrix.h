@@ -692,6 +692,13 @@ class SparseMatrix : public Subscriptor
 			  const unsigned int  width       = 0,
 			  const char         *zero_string = " ",
 			  const double        denominator = 1.) const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
     
 				     /**
 				      * Exception

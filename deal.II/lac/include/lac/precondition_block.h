@@ -165,6 +165,13 @@ class PreconditionBlock
     unsigned int block_size () const;
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      * Determine, whether inverses
 				      * have been computed.
 				      */

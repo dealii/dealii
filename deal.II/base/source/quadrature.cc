@@ -14,6 +14,7 @@
 
 #include <grid/geometry_info.h>
 #include <base/quadrature.h>
+#include <base/memory_consumption.h>
 #include <cmath>
 
 
@@ -175,6 +176,16 @@ const vector<double> & Quadrature<0>::get_weights () const
 {
   Assert (false, ExcInternalError());
   return weights;
+};
+
+
+
+template <int dim>
+unsigned int
+Quadrature<dim>::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (quadrature_points) +
+	  MemoryConsumption::memory_consumption (weights));
 };
 
 

@@ -65,6 +65,13 @@ class Hexahedron
     void set_quad (const int i, const int index);
     
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    static unsigned int memory_consumption ();
+
+				     /**
 				      *  Exception
 				      */ 
     DeclException1 (ExcRange,
@@ -112,5 +119,13 @@ void Hexahedron::set_quad (const int i, const int index)
   quads[i] = index;
 };
 
+
+
+inline
+unsigned int
+Hexahedron::memory_consumption ()
+{
+  return sizeof(Hexahedron);
+};
 
 #endif

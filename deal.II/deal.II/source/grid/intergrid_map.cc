@@ -12,6 +12,7 @@
 //----------------------------  intergrid_map.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <grid/tria_accessor.h>
@@ -196,7 +197,17 @@ InterGridMap<GridClass,dim>::get_destination_grid () const
   return *destination_grid;
 };
 
-  
+
+
+template <template <int> class GridClass, int dim>
+unsigned int
+InterGridMap<GridClass,dim>::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (mapping) +
+	  MemoryConsumption::memory_consumption (source_grid) +
+	  MemoryConsumption::memory_consumption (destination_grid));
+};
+
 
   
 // explicit instantiations

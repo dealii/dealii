@@ -12,6 +12,7 @@
 //----------------------------  tria.all_dimensions.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <grid/tria.h>
 #include <grid/tria_levels.h>
 #include <grid/tria_boundary.h>
@@ -177,6 +178,16 @@ void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) c
 
 
 
+unsigned int
+TriangulationLevel<0>::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (refine_flags) +
+	  MemoryConsumption::memory_consumption (coarsen_flags) +
+	  MemoryConsumption::memory_consumption (neighbors));
+};
+
+
+
 void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 {
   const unsigned int new_size = new_lines +
@@ -257,6 +268,19 @@ void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) c
 
 
 
+unsigned int
+TriangulationLevel<1>::memory_consumption () const
+{
+  return (TriangulationLevel<0>::memory_consumption() +
+	  MemoryConsumption::memory_consumption (lines.lines) +
+	  MemoryConsumption::memory_consumption (lines.children) +
+	  MemoryConsumption::memory_consumption (lines.used) +
+	  MemoryConsumption::memory_consumption (lines.user_flags) +
+	  MemoryConsumption::memory_consumption (lines.material_id) +
+	  MemoryConsumption::memory_consumption (lines.user_pointers));
+};
+  
+
 void TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
 {
   const unsigned int new_size = new_quads +
@@ -324,6 +348,20 @@ void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (quads.quads.size(), quads.user_pointers.size()));
 
   TriangulationLevel<1>::monitor_memory (true_dimension);
+};
+
+
+
+unsigned int
+TriangulationLevel<2>::memory_consumption () const
+{
+  return (TriangulationLevel<1>::memory_consumption() +
+	  MemoryConsumption::memory_consumption (quads.quads) +
+	  MemoryConsumption::memory_consumption (quads.children) +
+	  MemoryConsumption::memory_consumption (quads.used) +
+	  MemoryConsumption::memory_consumption (quads.user_flags) +
+	  MemoryConsumption::memory_consumption (quads.material_id) +
+	  MemoryConsumption::memory_consumption (quads.user_pointers));
 };
 
 
@@ -399,6 +437,20 @@ void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) c
 
 
 
+unsigned int
+TriangulationLevel<3>::memory_consumption () const
+{
+  return (TriangulationLevel<2>::memory_consumption() +
+	  MemoryConsumption::memory_consumption (hexes.hexes) +
+	  MemoryConsumption::memory_consumption (hexes.children) +
+	  MemoryConsumption::memory_consumption (hexes.used) +
+	  MemoryConsumption::memory_consumption (hexes.user_flags) +
+	  MemoryConsumption::memory_consumption (hexes.material_id) +
+	  MemoryConsumption::memory_consumption (hexes.user_pointers));
+};
+
+
+
 TriaNumberCache<1>::TriaNumberCache () :
 		n_lines (0),
 		n_active_lines (0) 
@@ -406,6 +458,16 @@ TriaNumberCache<1>::TriaNumberCache () :
 						 // default constructed
 {};
 
+
+
+unsigned int
+TriaNumberCache<1>::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (n_lines) +
+	  MemoryConsumption::memory_consumption (n_lines_level) +
+	  MemoryConsumption::memory_consumption (n_active_lines) +
+	  MemoryConsumption::memory_consumption (n_active_lines_level));
+};
 
 
 TriaNumberCache<2>::TriaNumberCache () :
@@ -417,9 +479,33 @@ TriaNumberCache<2>::TriaNumberCache () :
 
 
 
+unsigned int
+TriaNumberCache<2>::memory_consumption () const
+{
+  return (TriaNumberCache<1>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (n_quads) +
+	  MemoryConsumption::memory_consumption (n_quads_level) +
+	  MemoryConsumption::memory_consumption (n_active_quads) +
+	  MemoryConsumption::memory_consumption (n_active_quads_level));
+};
+
+
+
 TriaNumberCache<3>::TriaNumberCache () :
 		n_hexes (0),
 		n_active_hexes (0) 
 						 // all other fields are
 						 // default constructed
 {};
+
+
+
+unsigned int
+TriaNumberCache<3>::memory_consumption () const
+{
+  return (TriaNumberCache<2>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (n_hexes) +
+	  MemoryConsumption::memory_consumption (n_hexes_level) +
+	  MemoryConsumption::memory_consumption (n_active_hexes) +
+	  MemoryConsumption::memory_consumption (n_active_hexes_level));
+};

@@ -585,6 +585,13 @@ class FEValuesBase
     const DoFHandler<dim>::cell_iterator & get_cell() const;
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcAccessToUninitializedField);
@@ -787,6 +794,7 @@ class FEValuesBase
 };
 
 
+
 /**
  * Represent a finite element evaluated with a specific quadrature rule on
  * a cell.
@@ -851,6 +859,13 @@ class FEValues : public FEValuesBase<dim>
 				      * and the given finite element.
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &);
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 
   private:
 				     /**
@@ -1009,6 +1024,13 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      */
     DoFHandler<dim>::face_iterator get_face() const;
 
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
 
   protected:
 				     /**
@@ -1088,6 +1110,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      */
     DoFHandler<dim>::face_iterator present_face;
 };
+
 
 
 /**

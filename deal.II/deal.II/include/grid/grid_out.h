@@ -548,6 +548,12 @@ class GridOut
 				      */
     static string get_output_format_names ();
 
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 
 				     /**
 				      * Exception

@@ -201,6 +201,13 @@ class PersistentTriangulation : public Triangulation<dim>
     virtual void read_flags(istream &in);
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    virtual unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception.
 				      */
     DeclException0 (ExcFunctionNotUseful);

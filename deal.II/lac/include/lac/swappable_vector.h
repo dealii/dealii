@@ -222,6 +222,13 @@ class SwappableVector : public Vector<number>
     const string & get_filename () const;
    
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception.
 				      */ 
     DeclException0 (ExcSizeZero);

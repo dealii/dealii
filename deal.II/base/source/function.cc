@@ -175,6 +175,18 @@ void Function<dim>::vector_laplacian_list (const vector<Point<dim> > &points,
     this->vector_laplacian (points[i], laplacians[i]);
 }
 
+
+
+template <int dim>
+unsigned int
+Function<dim>::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
 //------------------------------------------------------------//
 
 template <int dim>
@@ -341,6 +353,17 @@ void ConstantFunction<dim>::vector_value_list (const vector<Point<dim> > &points
     };
 };
 
+
+
+template <int dim>
+unsigned int
+ConstantFunction<dim>::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
 //------------------------------------------------------------//
 
 template <int dim>
@@ -381,6 +404,17 @@ void ComponentSelectFunction<dim>::vector_value_list (const vector<Point<dim> > 
       values[i](selected) = function_value;
     }
 }
+
+
+
+template <int dim>
+unsigned int
+ComponentSelectFunction<dim>::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
 
 
 // explicit instantiations

@@ -339,6 +339,16 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 };
 
 
+
+template <typename number>
+unsigned int
+SparseILU<number>::memory_consumption () const
+{
+  return SparseMatrix<number>::memory_consumption ();
+};
+
+
+
 /*----------------------------   sparse_ilu.templates.h     ---------------------------*/
 
 #endif

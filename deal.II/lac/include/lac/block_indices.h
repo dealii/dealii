@@ -117,6 +117,13 @@ class BlockIndices
 				      * objects.
 				      */
     void swap (BlockIndices &b);
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
     
   private:
 				     /**
@@ -268,6 +275,16 @@ BlockIndices::swap (BlockIndices &b)
 
   for (unsigned int i=0; i<=n_blocks; ++i)
     std::swap (start_indices[i], b.start_indices[i]);
+};
+
+
+
+inline
+unsigned int
+BlockIndices::memory_consumption () const
+{
+  return (sizeof(*this) + 
+	  start_indices.size() * sizeof(start_indices[0]));
 };
 
 

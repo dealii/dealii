@@ -175,6 +175,13 @@ class InterGridMap
 				      * destination grid.
 				      */
     const GridClass<dim> & get_destination_grid () const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
     
 				     /**
 				      * Exception

@@ -53,6 +53,13 @@ class Line
     void set_vertex (const int i, const int index);
     
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    static unsigned int memory_consumption ();
+
+				     /**
 				      *  Exception
 				      */
     DeclException1 (ExcRange,
@@ -71,7 +78,7 @@ class Line
 /*----------------------------- Inline Function: Line ------------------------*/
 
 
-inline                               // wahrlich inline hier!
+inline                               // truly in-line here!
 Line::Line (const int i0, const int i1)
 {
   end_points[0] = i0;
@@ -96,6 +103,15 @@ void Line::set_vertex (const int i, const int index)
   Assert ((i==0) || (i==1),
 	  ExcRange(i));
   end_points[i] = index;
+};
+
+
+
+inline
+unsigned int
+Line::memory_consumption ()
+{
+  return sizeof(Line);
 };
 
 

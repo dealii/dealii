@@ -196,6 +196,13 @@ class SparseILU : protected SparseMatrix<number>
 		const Vector<somenumber> &src) const;
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotSquare);

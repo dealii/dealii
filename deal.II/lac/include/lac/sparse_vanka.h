@@ -264,6 +264,13 @@ class SparseVanka
     void apply_preconditioner (Vector<number2>       &dst,
 			       const Vector<number2> &src,
 			       const vector<bool>    *dof_mask = 0) const;    
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
     
   private:
 				     /**
@@ -519,6 +526,13 @@ class SparseBlockVanka : public SparseVanka<number>
     void vmult (Vector<number2>       &dst,
 		     const Vector<number2> &src) const;
     
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
   private:
 				     /**
 				      * Store the number of blocks.

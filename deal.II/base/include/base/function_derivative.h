@@ -16,16 +16,6 @@
 #include <base/exceptions.h>
 #include <base/function.h>
 
-/**
- * Names of difference formulas.
- */
-enum DifferenceFormula
-{
-  Euler,
-  UpwindEuler,
-  FourthOrder
-};
-
 
 /**
  * Derivative of a function object.  The value access functions of
@@ -45,77 +35,105 @@ enum DifferenceFormula
 template <int dim>
 class FunctionDerivative : public Function<dim>
 {
-public:
-				   /**
-				    * Constructor. Provided are the
-				    * function to compute derivatives
-				    * of and the direction vector of
-				    * the differentiation.
-				    */
-  FunctionDerivative (const Function<dim>& f,
-		      const Point<dim>& direction);
-
-				   /**
-				    * Set step size of the difference
-				    * formula. This is set to the
-				    * default in the constructor.
-				    */
-  void set_h (double h_new = 1.e-6);
-  
-				   /**
-				    * Choose the difference formula.
-				    * This is set to the default in
-				    * the constructor.
-				    *
-				    * Formulas implemented right now
-				    * are first order backward Euler
-				    * (@p{UpwindEuler}), second order
-				    * symmetric Euler (@p{Euler}) and
-				    * a symmetric fourth order formula
-				    * (@p{FourthOrder}).
-				    */
-  void set_formula (DifferenceFormula formula = Euler);
-  
-				   /**
-				    * Function value at one point.
-				    */
-  virtual double value (const Point<dim>   &p,
-			const unsigned int  component = 0) const;
-  
-				   /**
-				    * Function values at multiple points.
-				    */
-  virtual void value_list (const vector<Point<dim> > &points,
-			   vector<double>            &values,
-			   const unsigned int         component = 0) const;
+  public:
+				     /**
+				      * Names of difference formulas.
+				      */
+    enum DifferenceFormula
+    {
+	  Euler,
+	  UpwindEuler,
+	  FourthOrder
+    };
 
 
-  DeclException0(ExcInvalidFormula);
-  
-private:
-				   /**
-				    * Function for differentiation.
-				    */
-  const Function<dim>& f;
-				   /**
-				    * Differentiation vector.
-				    */
-  Point<dim> direction;
-  
-				   /**
-				    * Step size of the difference formula.
-				    */
-  double h;
-				   /**
-				    * Difference formula.
-				    */
-  DifferenceFormula formula;
-				   /**
-				    * Helper object. Contains the
-				    * increment vector for the
-				    * formula.
-				    */
-  Point<dim> incr;
+				     /**
+				      * Constructor. Provided are the
+				      * function to compute derivatives
+				      * of and the direction vector of
+				      * the differentiation.
+				      */
+    FunctionDerivative (const Function<dim>& f,
+			const Point<dim>& direction);
+    
+				     /**
+				      * Set step size of the difference
+				      * formula. This is set to the
+				      * default in the constructor.
+				      */
+    void set_h (double h_new = 1.e-6);
+    
+				     /**
+				      * Choose the difference formula.
+				      * This is set to the default in
+				      * the constructor.
+				      *
+				      * Formulas implemented right now
+				      * are first order backward Euler
+				      * (@p{UpwindEuler}), second order
+				      * symmetric Euler (@p{Euler}) and
+				      * a symmetric fourth order formula
+				      * (@p{FourthOrder}).
+				      */
+    void set_formula (DifferenceFormula formula = Euler);
+    
+				     /**
+				      * Function value at one point.
+				      */
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+    
+				     /**
+				      * Function values at multiple points.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values,
+			     const unsigned int         component = 0) const;    
+
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    unsigned int memory_consumption () const;
+    
+    DeclException0(ExcInvalidFormula);
+    
+  private:
+				     /**
+				      * Function for differentiation.
+				      */
+    const Function<dim>& f;
+				     /**
+				      * Differentiation vector.
+				      */
+    Point<dim> direction;
+    
+				     /**
+				      * Step size of the difference formula.
+				      */
+    double h;
+				     /**
+				      * Difference formula.
+				      */
+    DifferenceFormula formula;
+				     /**
+				      * Helper object. Contains the
+				      * increment vector for the
+				      * formula.
+				      */
+    Point<dim> incr;
 };
 
 #endif

@@ -311,6 +311,13 @@ class BlockSparsityPattern : public Subscriptor
     bool is_compressed () const;
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception
 				      */
     DeclException1 (ExcInvalidSize,

@@ -460,6 +460,14 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>
     void print (ostream &out) const;
 
 
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+
 				     /**@name Exceptions*/
 				     /*@{*/
 				     /**
@@ -507,7 +515,8 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>
  *   @em{used} lines, quads, cells, etc.
  */
 template <int dim, typename Accessor>
-class TriaIterator : public TriaRawIterator<dim,Accessor> {
+class TriaIterator : public TriaRawIterator<dim,Accessor> 
+{
   public:
 				     /**
 				      *  Empty constructor. Such an object
@@ -653,7 +662,8 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
  *   refined and thus a cell on which calculations on the finest level are done.
  */
 template <int dim, typename Accessor>
-class TriaActiveIterator : public TriaIterator<dim,Accessor> {
+class TriaActiveIterator : public TriaIterator<dim,Accessor> 
+{
   public:
 				     /**
 				      *  Empty constructor. Such an object
@@ -936,6 +946,16 @@ void
 TriaRawIterator<dim,Accessor>::print (ostream &out) const
 {
   out << accessor.level() << "." << accessor.index();
+};
+
+
+
+template <int dim, typename Accessor>
+inline
+unsigned int
+TriaRawIterator<dim,Accessor>::memory_consumption () const
+{
+  return sizeof(TriaRawIterator<dim,Accessor>);
 };
 
 

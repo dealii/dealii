@@ -172,7 +172,8 @@
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FECrissCross : public FiniteElement<dim> {
+class FECrissCross : public FiniteElement<dim> 
+{
   public:
     				     /**
 				      * Constructor
@@ -348,6 +349,7 @@ class FECrissCross : public FiniteElement<dim> {
 };
 
 
+
 /**
  * Quadrature formula for the criss-cross element. This quadrature
  * formula uses one point at the barycenter of each of the four subtriangles.
@@ -356,7 +358,8 @@ class FECrissCross : public FiniteElement<dim> {
  * formula is not implemented for one space dimension.
  */
 template <int dim>
-class QCrissCross1 : public Quadrature<dim> {
+class QCrissCross1 : public Quadrature<dim> 
+{
   public:
     QCrissCross1 ();
 

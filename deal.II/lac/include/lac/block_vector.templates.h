@@ -14,6 +14,7 @@
 #define __deal2__block_vector_templates_h
 
 
+#include <base/memory_consumption.h>
 #include <lac/block_vector.h>
 #include <cmath>
 #include <algorithm>
@@ -466,6 +467,7 @@ void BlockVector<Number>::print (ostream &out,
 }
 
 
+
 template <typename Number>
 void BlockVector<Number>::block_write (ostream &out) const
 {
@@ -476,6 +478,7 @@ void BlockVector<Number>::block_write (ostream &out) const
 }
 
 
+
 template <typename Number>
 void BlockVector<Number>::block_read (istream &in)
 {
@@ -484,5 +487,21 @@ void BlockVector<Number>::block_read (istream &in)
       components[i].block_read(in);
     }  
 }
+
+
+template <typename Number>
+unsigned int
+BlockVector<Number>::memory_consumption () const
+{
+  unsigned int mem = sizeof(num_blocks);
+  for (unsigned int i=0; i<components.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (components[i]);
+  mem += MemoryConsumption::memory_consumption (block_indices);
+  return mem;
+};
+
+
+
+
 
 #endif

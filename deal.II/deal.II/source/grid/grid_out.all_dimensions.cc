@@ -117,8 +117,18 @@ GridOut::parse_output_format (const string &format_name)
 };
 
 
-string GridOut::get_output_format_names () {
+string GridOut::get_output_format_names () 
+{
   return "gnuplot|eps";
 };
 
 
+unsigned int
+GridOut::memory_consumption () const
+{
+  return (sizeof(ucd_flags) +
+	  sizeof(gnuplot_flags) +
+	  sizeof(eps_flags_1) +
+	  sizeof(eps_flags_2) +
+	  sizeof(eps_flags_3));
+};

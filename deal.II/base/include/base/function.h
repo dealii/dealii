@@ -255,6 +255,24 @@ class Function : public FunctionTime,
 				      */
     virtual void vector_laplacian_list (const vector<Point<dim> > &points,
 					vector<Vector<double> >   &values) const;
+
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -455,6 +473,24 @@ class ConstantFunction : public ZeroFunction<dim>
     virtual void vector_value_list (const vector<Point<dim> > &points,
 				    vector<Vector<double> >   &values) const;
 
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    unsigned int memory_consumption () const;
+
   protected:
 				     /**
 				      * Store the constant function value.
@@ -504,6 +540,24 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 				      */
     virtual void vector_value_list (const vector<Point<dim> > &points,
 				    vector<Vector<double> >   &values) const;
+
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    unsigned int memory_consumption () const;
 
   protected:
     const unsigned int selected;

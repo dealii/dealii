@@ -350,6 +350,19 @@ class FiniteElementBase : public Subscriptor,
     bool restriction_is_additive (const unsigned int component) const;
 
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * This function is made virtual,
+				      * since finite element objects
+				      * are usually accessed through
+				      * pointers to their base class,
+				      * rather than the class itself.
+				      */
+    virtual unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception
 				      */
     DeclException2 (ExcWrongFieldDimension,

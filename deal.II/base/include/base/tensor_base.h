@@ -213,6 +213,14 @@ class Tensor<1,dim>
 				      */
     void unroll (Vector<double> &result) const;
 
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object.
+				      */
+    static unsigned int memory_consumption ();
+
   protected:
 				     /**
 				      * Help function for unroll.
@@ -448,6 +456,16 @@ void Tensor<1,dim>::clear ()
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = 0;
+};
+
+
+
+template <int dim>
+inline
+unsigned int
+Tensor<1,dim>::memory_consumption ()
+{
+  return sizeof(Tensor<1,dim>);
 };
 
 

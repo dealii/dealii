@@ -162,6 +162,14 @@ class Tensor
 				      */
     void clear ();
 
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object.
+				      */
+    static unsigned int memory_consumption ();
+
 // 				     /**
 // 				      * Exception
 // 				      */
@@ -196,9 +204,7 @@ class Tensor
 
 
 /*--------------------------- Inline functions -----------------------------*/
-// in the following, declarations of operators look rather weird because they are
-// split over several lines. this is necessary, however, because otherwise doc++
-// gets really confused about this all... :-(
+
 
 
 template <int rank_, int dim>
@@ -365,6 +371,16 @@ void Tensor<rank_,dim>::clear ()
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i].clear();
+};
+
+
+
+template <int rank_, int dim>
+inline
+unsigned int
+Tensor<rank_,dim>::memory_consumption ()
+{
+  return sizeof(Tensor<rank_,dim>);
 };
 
 

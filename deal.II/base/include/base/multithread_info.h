@@ -66,6 +66,24 @@ class MultithreadInfo
     unsigned int n_default_threads;
 
 				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    static unsigned int memory_consumption ();
+
+				     /**
 				      * Exception
 				      */
     DeclException0(ExcProcNotPresent);

@@ -14,6 +14,7 @@
 
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <base/memory_consumption.h>
 #include <base/quadrature.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
@@ -362,6 +363,29 @@ double FEValuesBase<dim>::JxW (const unsigned int i) const
 };
 
 
+
+template <int dim>
+unsigned int
+FEValuesBase<dim>::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (shape_values) +
+	  MemoryConsumption::memory_consumption (shape_gradients) +
+	  MemoryConsumption::memory_consumption (shape_2nd_derivatives) +
+	  MemoryConsumption::memory_consumption (weights) +
+	  MemoryConsumption::memory_consumption (JxW_values) +
+	  MemoryConsumption::memory_consumption (quadrature_points) +
+	  MemoryConsumption::memory_consumption (support_points) +
+	  MemoryConsumption::memory_consumption (jacobi_matrices) +
+	  MemoryConsumption::memory_consumption (jacobi_matrices_grad) +
+	  MemoryConsumption::memory_consumption (shape_values_transform) +
+	  MemoryConsumption::memory_consumption (selected_dataset) +
+	  MemoryConsumption::memory_consumption (jacobi_matrices) +
+	  sizeof(update_flags) +
+	  MemoryConsumption::memory_consumption (present_cell) +
+	  MemoryConsumption::memory_consumption (fe));
+};
+
+
 /*------------------------------- FEValues -------------------------------*/
 
 template <int dim>
@@ -502,6 +526,19 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 };
 
 
+
+template <int dim>
+unsigned int
+FEValues<dim>::memory_consumption () const
+{
+  return (FEValuesBase<dim>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (unit_shape_gradients) +
+	  MemoryConsumption::memory_consumption (unit_shape_2nd_derivatives) +
+	  MemoryConsumption::memory_consumption (unit_shape_gradients_transform) +
+	  MemoryConsumption::memory_consumption (unit_quadrature_points));
+};
+
+
 /*------------------------------- FEFaceValuesBase --------------------------*/
 
 
@@ -548,6 +585,24 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   
   return normal_vectors[i];
+};
+
+
+
+
+template <int dim>
+unsigned int
+FEFaceValuesBase<dim>::memory_consumption () const
+{
+  return (FEValuesBase<dim>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (unit_shape_gradients) +
+	  MemoryConsumption::memory_consumption (unit_shape_2nd_derivatives) +
+	  MemoryConsumption::memory_consumption (unit_shape_gradients_transform) +
+	  MemoryConsumption::memory_consumption (unit_face_quadrature_points) +
+	  MemoryConsumption::memory_consumption (unit_quadrature_points) +
+	  MemoryConsumption::memory_consumption (face_jacobi_determinants) +
+	  MemoryConsumption::memory_consumption (normal_vectors) +
+	  MemoryConsumption::memory_consumption (present_face));
 };
 
 

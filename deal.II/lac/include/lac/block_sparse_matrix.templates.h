@@ -14,6 +14,7 @@
 #define __deal2__block_sparse_matrix_templates_h
 
 
+#include <base/memory_consumption.h>
 #include <lac/block_sparse_matrix.h>
 
 
@@ -116,6 +117,19 @@ const BlockSparsityPattern &
 BlockSparseMatrix<number,rows,columns>::get_sparsity_pattern () const
 {
   return *sparsity_pattern;
+};
+
+
+
+template <typename number, int  rows, int columns>
+unsigned int
+BlockSparseMatrix<number,rows,columns>::memory_consumption () const
+{
+  unsigned int mem = sizeof(*this);
+  for (unsigned int r=0; r<rows; ++r)
+    for (unsigned int c=0; c<columns; ++c)
+      mem += MemoryConsumption::memory_consumption(sub_objects[r][c]);
+  return mem;
 };
 
 

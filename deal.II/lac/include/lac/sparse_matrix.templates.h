@@ -1004,4 +1004,14 @@ void SparseMatrix<number>::print_formatted (ostream &out,
 //  out.setf (0, ios::floatfield);                 // reset output format
 };
 
+
+
+template <typename number>
+unsigned int
+SparseMatrix<number>::memory_consumption () const
+{
+  return sizeof(*this) + max_len*sizeof(number);
+};
+
+
 #endif

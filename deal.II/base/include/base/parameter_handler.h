@@ -86,6 +86,45 @@ namespace Patterns
 					  * this function.
 					  */
 	virtual PatternBase * clone () const = 0;
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object. To
+					  * avoid unnecessary
+					  * overhead, we do not force
+					  * derivd classes to provide
+					  * this function as a virtual
+					  * overloaded one, but rather
+					  * try to cast the present
+					  * object to one of the known
+					  * derived classes and if
+					  * that fails then take the
+					  * size of this base class
+					  * instead and add 32 byte
+					  * (this value is arbitrary,
+					  * it should account for
+					  * virtual function tables,
+					  * and some possible data
+					  * elements). Since there are
+					  * usually not many thousands
+					  * of objects of this type
+					  * around, and since the
+					  * @p{memory_consumption}
+					  * mechanism is used to find
+					  * out where memory in the
+					  * range of many megabytes
+					  * is, this seems like a
+					  * reasonable approximation.
+					  *
+					  * On the other hand, if you
+					  * know that your class
+					  * deviates from this
+					  * assumption significantly,
+					  * you can still overload
+					  * this function.
+					  */
+	virtual unsigned int memory_consumption () const;
     };
     
 				     /**
@@ -361,6 +400,13 @@ namespace Patterns
 					  */
 	virtual PatternBase * clone () const;
 
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object.
+					  */
+	unsigned int memory_consumption () const;
+
       private:
 					 /**
 					  * List of valid strings as
@@ -433,6 +479,13 @@ namespace Patterns
 					  * function.
 					  */
 	virtual PatternBase * clone () const;
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object.
+					  */
+	unsigned int memory_consumption () const;
 
 					 /**
 					  * Exception.
@@ -1007,7 +1060,7 @@ class ParameterHandler
 				      * Return status of this object:
 				      * @p{true}=clean or @p{false}=error occured.
 				      */
-    bool ok() const;
+    bool ok () const;
 
 				     /**
 				      * clear status bit and contents.
@@ -1107,14 +1160,22 @@ class ParameterHandler
 				    */
     void log_parameters (LogStream& out);
 
-				   /**
-				    * Log parameters in
-				    * subsection. The subsection is
-				    * determined by the
-				    * @p{subsection_path} member *
-				    * variable.
-				    */
-  void log_parameters_section (LogStream& out);
+				     /**
+				      * Log parameters in
+				      * subsection. The subsection is
+				      * determined by the
+				      * @p{subsection_path} member *
+				      * variable.
+				      */
+    void log_parameters_section (LogStream& out);    
+
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object.
+				      */
+    unsigned int memory_consumption () const;
 
 				     /**
 				      * Exception
@@ -1158,55 +1219,85 @@ class ParameterHandler
 				      * entry content and regexp, and
 				      * list of subsections.
 				      */
-    struct Section {
+    struct Section 
+    {
 	~Section ();
 
 	typedef map<string, pair<string,Patterns::PatternBase*> > EntryType;
 	
 	EntryType             entries;
 	map<string, Section*> subsections;
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 				     /**
-				      * Path of presently selected subsections;
-				      * empty list means top level
+				      * Path of presently selected
+				      * subsections; empty list means
+				      * top level
 				      */
     vector<string> subsection_path;
 
 				     /**
-				      * List of default values organized as a
-				      * tree of subsections
+				      * List of default values
+				      * organized as a tree of
+				      * subsections
 				      */
     Section defaults;
     
 				     /**
-				      * Analogue list of changed entries. The
-				      * tree of subsections is there even if there
-				      * are no changed entry values in a
-				      * subsection; therefore @p{enter_subsection}
-				      * has to create the tree in both @p{Defaults}
-				      * and @p{changed_entries}.
+				      * Analogue list of changed
+				      * entries. The tree of
+				      * subsections is there even if
+				      * there are no changed entry
+				      * values in a subsection;
+				      * therefore @p{enter_subsection}
+				      * has to create the tree in both
+				      * @p{Defaults} and
+				      * @p{changed_entries}.
 				      */
     Section changed_entries;
 
 				     /**
 				      * Scan one line of input.
-				      * @p{lineno} is the number of the line presently
-				      * scanned (for the logs if there are messages).
-				      * @return @p{false} if line contained stuff
-				      * that could not be understood, the uppermost
-				      * subsection was to be left by an @p{END} or
-				      * @p{end} statement, a value for a non-declared
-				      * entry was given or teh entry value did not
-				      * match the regular expression. @p{true}
-				      * otherwise
+				      * @p{lineno} is the number of
+				      * the line presently scanned
+				      * (for the logs if there are
+				      * messages).  @return @p{false}
+				      * if line contained stuff that
+				      * could not be understood, the
+				      * uppermost subsection was to be
+				      * left by an @p{END} or @p{end}
+				      * statement, a value for a
+				      * non-declared entry was given
+				      * or teh entry value did not
+				      * match the regular
+				      * expression. @p{true} otherwise
 				      */
     bool scan_line (string line, const unsigned int lineno);
 
 				     /**
-				      * Get a pointer to the @p{Section} structure
-				      * in the @p{Defaults} tree
-				      * for the subsection we are presently in.
+				      * Get a pointer to the
+				      * @p{Section} structure in the
+				      * @p{Defaults} tree for the
+				      * subsection we are presently
+				      * in.
 				      */
     Section*       get_present_defaults_subsection ();
     
@@ -1229,6 +1320,7 @@ class ParameterHandler
 
     friend class MultipleParameterLoop;
 };
+
 
 
 /**
@@ -1455,7 +1547,8 @@ class MultipleParameterLoop : public ParameterHandler
 				      * This is the class the helper class or the
 				      * problem class has to be derived of.
 				      */
-    class UserClass {
+    class UserClass 
+    {
       public:
 					 /**
 					  * @p{create_new} must provide a clean
@@ -1515,13 +1608,24 @@ class MultipleParameterLoop : public ParameterHandler
 				      */
     void loop (UserClass &uc);
 
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object.
+				      */
+    unsigned int memory_consumption () const;
+
   private:
 				     /**
-				      *	Declare what a multiple entry is: a variant
-				      *	entry (in curly braces @p{{}}) or an
-				      * array (in double curly braces @p{{{}}}).
+				      * Declare what a multiple entry
+				      * is: a variant * entry (in
+				      * curly braces @p{{}}) or an
+				      * array (in double curly braces
+				      * @p{{{}}}).
 				      */
-    enum MultipleEntryType {
+    enum MultipleEntryType 
+    {
 	  variant, array
     };
 
@@ -1529,7 +1633,8 @@ class MultipleParameterLoop : public ParameterHandler
 				      * An object in the list of entries with
 				      * multiple values.
 				      */
-    class Entry {
+    class Entry 
+    {
       public:
 					 /**
 					  * Constructor
@@ -1577,6 +1682,14 @@ class MultipleParameterLoop : public ParameterHandler
 					  * entry or an array.
 					  */
 	MultipleEntryType      type;
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 				     /**

@@ -12,6 +12,7 @@
 //----------------------------  fe_system.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <fe/fe_system.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
@@ -1067,6 +1068,26 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 	}    
     }
 }
+
+
+
+template <int dim>
+unsigned int
+FESystem<dim>::memory_consumption () const 
+{
+				   // neglect size of data stored in
+				   // @p{base_elements} due to some
+				   // problems with teh
+				   // compiler. should be neglectable
+				   // after all, considering the size
+				   // of the data of the subelements
+  unsigned int mem = (FiniteElement<dim>::memory_consumption () +
+		      sizeof (base_elements));
+  for (unsigned int i=0; i<base_elements.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (*base_elements[i].first);
+  return mem;
+};
+
 
 
 // explicit instantiations

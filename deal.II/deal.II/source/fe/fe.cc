@@ -13,6 +13,7 @@
 
 
 #include <fe/fe.h>
+#include <base/memory_consumption.h>
 #include <base/quadrature.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -243,6 +244,28 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
   return ((static_cast<const FiniteElementData<dim>&>(*this) ==
 	   static_cast<const FiniteElementData<dim>&>(f)) &&
 	  (interface_constraints == f.interface_constraints));
+};
+
+
+
+template <int dim>
+unsigned int
+FiniteElementBase<dim>::memory_consumption () const
+{
+  return (sizeof(FiniteElementData<dim>) +
+	  MemoryConsumption::
+	  memory_consumption<FullMatrix<double>, sizeof(restriction)/sizeof(restriction[0])>
+	  (restriction)+
+	  MemoryConsumption::memory_consumption
+	  <FullMatrix<double>, sizeof(prolongation)/sizeof(prolongation[0])>
+	  (prolongation) +
+	  MemoryConsumption::memory_consumption (interface_constraints) +
+	  MemoryConsumption::memory_consumption (system_to_component_table) +
+	  MemoryConsumption::memory_consumption (face_system_to_component_table) +
+	  MemoryConsumption::memory_consumption (component_to_system_table) +
+	  MemoryConsumption::memory_consumption (face_component_to_system_table) +
+	  MemoryConsumption::memory_consumption (component_to_base_table) +
+	  MemoryConsumption::memory_consumption (restriction_is_additive_flags));
 };
 
 

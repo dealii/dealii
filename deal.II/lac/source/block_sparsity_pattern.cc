@@ -11,6 +11,7 @@
 //
 //----------------------------  block_block_sparsity_pattern.cc  ---------------------------
 
+#include <base/memory_consumption.h>
 #include <lac/block_sparsity_pattern.h>
 
 
@@ -214,3 +215,19 @@ BlockSparsityPattern::is_compressed () const
   return true;
 };
 
+
+unsigned int
+BlockSparsityPattern::memory_consumption () const
+{
+  unsigned int mem = 0;
+  mem += (MemoryConsumption::memory_consumption (rows) +
+	  MemoryConsumption::memory_consumption (columns) +
+	  MemoryConsumption::memory_consumption (sub_objects) +
+	  MemoryConsumption::memory_consumption (row_indices) +
+	  MemoryConsumption::memory_consumption (column_indices));
+  for (unsigned int r=0; r<rows; ++r)
+    for (unsigned int c=0; c<columns; ++c)
+      mem += MemoryConsumption::memory_consumption (*sub_objects[r][c]);
+  
+  return mem;
+};

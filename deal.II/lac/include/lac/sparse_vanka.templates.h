@@ -14,6 +14,7 @@
 #define __deal2__sparse_vanka_templates_h
 
 
+#include <base/memory_consumption.h>
 #include <lac/sparse_vanka.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
@@ -363,6 +364,22 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 };
 
 
+
+template <typename number>
+unsigned int
+SparseVanka<number>::memory_consumption () const
+{
+  unsigned int mem = (sizeof(*this) +
+		      MemoryConsumption::memory_consumption (selected));
+  for (unsigned int i=0; i<inverses.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (*inverses[i]);
+  
+  return mem;
+};
+
+
+
+
 template <typename number>
 SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 					    const vector<bool>         &selected,
@@ -575,5 +592,19 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
 #endif
     }
 }
+
+
+
+template <typename number>
+unsigned int
+SparseBlockVanka<number>::memory_consumption () const
+{
+  unsigned int mem = SparseVanka<number>::memory_consumption();
+  for (unsigned int i=0; i<dof_masks.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (dof_masks[i]);
+  return mem;
+};
+
+	  
 
 #endif

@@ -12,6 +12,7 @@
 //----------------------------  persistent_tria.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <grid/persistent_tria.h>
 #include <grid/magic_numbers.h>
 #include <iostream>
@@ -158,6 +159,18 @@ PersistentTriangulation<dim>::read_flags(istream &in)
 
   AssertThrow (in, ExcIO());
 }
+
+
+
+template <int dim>
+unsigned int
+PersistentTriangulation<dim>::memory_consumption () const
+{
+  return (Triangulation<dim>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (coarse_grid) +
+	  MemoryConsumption::memory_consumption (refine_flags) +
+	  MemoryConsumption::memory_consumption (coarsen_flags));
+};
 
 
 // explicit instantiations

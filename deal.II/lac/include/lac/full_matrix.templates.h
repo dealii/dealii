@@ -1458,4 +1458,14 @@ FullMatrix<number>::least_squares(Vector<number2>& dst, Vector<number2>& src)
   return sqrt(sum);
 }
 
+
+
+template <typename number>
+unsigned int
+FullMatrix<number>::memory_consumption () const
+{
+  return sizeof(*this) + val_size*sizeof(number);
+};
+
+
 #endif

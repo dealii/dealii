@@ -12,6 +12,7 @@
 //----------------------------  dof_handler.cc  ---------------------------
 
 
+#include <base/memory_consumption.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_levels.h>
 #include <dofs/dof_accessor.h>
@@ -1249,6 +1250,24 @@ template <int dim>
 const Triangulation<dim> & DoFHandler<dim>::get_tria () const
 {
   return *tria;
+};
+
+
+
+template <int dim>
+unsigned int
+DoFHandler<dim>::memory_consumption () const
+{
+  unsigned int mem = (MemoryConsumption::memory_consumption (tria) +
+		      MemoryConsumption::memory_consumption (selected_fe) +
+		      MemoryConsumption::memory_consumption (tria) +
+		      MemoryConsumption::memory_consumption (levels) +
+		      MemoryConsumption::memory_consumption (used_dofs) +
+		      MemoryConsumption::memory_consumption (vertex_dofs));
+  for (unsigned int i=0; i<levels.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (*levels[i]);
+  
+  return mem;
 };
 
 

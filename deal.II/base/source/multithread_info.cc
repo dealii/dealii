@@ -90,6 +90,15 @@ MultithreadInfo::MultithreadInfo () :
 
 
 
+unsigned int
+MultithreadInfo::memory_consumption ()
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (MultithreadInfo);
+};
+
+
 
 // definition of the variable which is declared `extern' in the .h file
 MultithreadInfo multithread_info;

@@ -32,15 +32,15 @@
  *
  * The usual usage of this class is through the pregenerated object
  * @p{deallog}. Typical steps are
- * <OL>
- * <LI> @p{deallog.attach(ostream)}: write logging information into a file.
- * <LI> @p{deallog.depth_console(n)}: restrict output on screen to outer loops.
- * <LI> Before entering a new phase of your program, e.g. a new loop,
- * @p{deallog.push("loopname")}.
- * <LI> @p{deallog << anything << endl;} to write logging information
- * (Usage of @p{endl} is mandatory!).
- * <LI> @p{deallog.pop()} when leaving that stage entered with @p{push}.
- * </OL>
+ * @begin{itemize}
+ * @item @p{deallog.attach(ostream)}: write logging information into a file.
+ * @item @p{deallog.depth_console(n)}: restrict output on screen to outer loops.
+ * @item Before entering a new phase of your program, e.g. a new loop,
+ *       @p{deallog.push("loopname")}.
+ * @item @p{deallog << anything << endl;} to write logging information
+ *       (Usage of @p{endl} is mandatory!).
+ * @item @p{deallog.pop()} when leaving that stage entered with @p{push}.
+ * @end{itemize}
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
@@ -213,10 +213,24 @@ class LogStream
 				      */
     LogStream & operator << (void (f)(LogStream &));
 
+
 				     /**
-				      * Declare this function as a friend.
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
 				      */
-    friend void endl (LogStream &);
+    unsigned int memory_consumption () const;
 
     				     /**
 				      * Exception
@@ -230,6 +244,11 @@ class LogStream
 				      * the contents of the prefix stack.
 				      */
     void print_line_head();
+
+				     /**
+				      * Declare this function as a friend.
+				      */
+    friend void endl (LogStream &);
 };
 
 

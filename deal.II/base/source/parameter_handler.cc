@@ -14,6 +14,7 @@
 
 #include <base/parameter_handler.h>
 #include <base/logstream.h>
+#include <base/memory_consumption.h>
 #include <fstream>
 #include <iomanip>
 #include <strstream>
@@ -28,6 +29,23 @@ namespace Patterns
 
   PatternBase::~PatternBase ()
   {};
+
+
+  unsigned int
+    PatternBase::memory_consumption () const
+    {
+      if (dynamic_cast<const Integer*>(this) != 0)
+	return sizeof(Integer);
+      else if (dynamic_cast<const Double*>(this) != 0)
+	return sizeof(Double);
+      else if (dynamic_cast<const Bool*>(this) != 0)
+	return sizeof(Bool);
+      else if (dynamic_cast<const Anything*>(this) != 0)
+	return sizeof(Anything);
+      else
+	return sizeof(*this) + 32;
+    };
+  
 
 
 
@@ -195,6 +213,13 @@ namespace Patterns
   };
 
 
+  unsigned int
+    Selection::memory_consumption () const
+    {
+      return (sizeof(PatternBase) +
+	      MemoryConsumption::memory_consumption(sequence));
+    };
+  
 
   MultipleSelection::MultipleSelection (const string &seq)
   {
@@ -285,6 +310,14 @@ namespace Patterns
   {
     return new MultipleSelection(sequence);
   };
+
+
+  unsigned int
+    MultipleSelection::memory_consumption () const
+    {
+      return (sizeof(PatternBase) +
+	      MemoryConsumption::memory_consumption(sequence));
+    };
 
 
 
@@ -767,7 +800,7 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 
 
 
-void ParameterHandler::log_parameters_section (LogStream           &out)
+void ParameterHandler::log_parameters_section (LogStream &out)
 {
   Section *pd = get_present_defaults_subsection ();
   Section *pc = get_present_changed_subsection ();
@@ -1002,7 +1035,20 @@ const ParameterHandler::Section* ParameterHandler::get_present_changed_subsectio
 };
 
 
-ParameterHandler::Section::~Section () {
+
+unsigned int 
+ParameterHandler::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (status) +
+	  MemoryConsumption::memory_consumption (subsection_path) +
+	  MemoryConsumption::memory_consumption (defaults) +
+	  MemoryConsumption::memory_consumption (changed_entries));
+};
+
+
+
+ParameterHandler::Section::~Section () 
+{
   entries.clear ();
 
   map<string, Section*>::iterator p;
@@ -1010,9 +1056,25 @@ ParameterHandler::Section::~Section () {
   for (p=subsections.begin(); p!=subsections.end(); ++p)
     delete p->second;
 
-
-subsections.clear ();
+  subsections.clear ();
 };
+
+
+
+unsigned int 
+ParameterHandler::Section::memory_consumption () const
+{
+  unsigned int mem = 0;
+  for (EntryType::const_iterator i=entries.begin(); i!=entries.end(); ++i)
+    mem += (MemoryConsumption::memory_consumption (i->first) +
+	    MemoryConsumption::memory_consumption (i->second.first) +
+	    MemoryConsumption::memory_consumption (*i->second.second));
+  for (map<string, Section*>::const_iterator i=subsections.begin(); i!=subsections.end(); ++i)
+    mem += (MemoryConsumption::memory_consumption (i->first) +
+	    MemoryConsumption::memory_consumption (*(i->second)));
+  return mem;
+};
+
 
 
 
@@ -1224,6 +1286,19 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 
 
 
+
+unsigned int 
+MultipleParameterLoop::memory_consumption () const
+{
+  unsigned int mem = ParameterHandler::memory_consumption ();
+  for (unsigned int i=0; i<multiple_choices.size(); ++i)
+    mem += multiple_choices[i].memory_consumption ();
+  
+  return mem;
+};
+
+
+
 MultipleParameterLoop::Entry::Entry (const vector<string> &ssp,
 				     const string& Name,
 				     const string& Value) :
@@ -1278,4 +1353,14 @@ void MultipleParameterLoop::Entry::split_different_values ()
     type = variant;
 };
 
+
+unsigned int 
+MultipleParameterLoop::Entry::memory_consumption () const
+{
+  return (MemoryConsumption::memory_consumption (subsection_path) +
+	  MemoryConsumption::memory_consumption (entry_name) +
+	  MemoryConsumption::memory_consumption (entry_value) +
+	  MemoryConsumption::memory_consumption (different_values) +
+	  sizeof (type));
+};
 

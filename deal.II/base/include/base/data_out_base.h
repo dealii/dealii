@@ -419,6 +419,24 @@ class DataOutBase
 	Patch ();
 
 					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
+	
+					 /**
 					  * Exception
 					  */
 	DeclException2 (ExcInvalidCombinationOfDimensions,
@@ -471,6 +489,24 @@ class DataOutBase
 					  * all previous contents of this object.
 					  */
 	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 				     /**
@@ -509,6 +545,24 @@ class DataOutBase
 					  * all previous contents of this object.
 					  */
 	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
     };
 
     				     /**
@@ -520,39 +574,39 @@ class DataOutBase
 				      */
     struct PovrayFlags 
     {
-                                     /**
-				       * Normal vector interpolation,
-				       * if set to true
-				       *
-				       * default = false
-				       */
-      bool smooth;
+					 /**
+					  * Normal vector interpolation,
+					  * if set to true
+					  *
+					  * default = false
+					  */
+	bool smooth;
+	
+					 /**
+					  * Use bicubic patches (b-splines)
+					  * instead of triangles.
+					  *
+					  * default = false
+					  */
+	bool bicubic_patch;
 
-                                      /**
-				       * Use bicubic patches (b-splines)
-				       * instead of triangles.
-				       *
-				       * default = false
-				       */
-      bool bicubic_patch;
-
-                                      /**
-				       * include external "data.inc"
-				       * with camera, light and
-				       * texture definition for the
-				       * scene.
-				       *
-				       * default = false
-				       */
-      bool external_data;
-
-                                      /**
-				       * Constructor.
-				       */
-      PovrayFlags (const bool smooth = false,
-		   const bool bicubic_patch = false,
-		   const bool external_data = false);
-
+					 /**
+					  * include external "data.inc"
+					  * with camera, light and
+					  * texture definition for the
+					  * scene.
+					  *
+					  * default = false
+					  */
+	bool external_data;
+	
+					 /**
+					  * Constructor.
+					  */
+	PovrayFlags (const bool smooth = false,
+		     const bool bicubic_patch = false,
+		     const bool external_data = false);
+	
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -570,6 +624,24 @@ class DataOutBase
 					  * all previous contents of this object.
 					  */
 	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 
@@ -847,6 +919,24 @@ class DataOutBase
 					  * all previous contents of this object.
 					  */
 	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
     };
 
     				     /**
@@ -885,6 +975,24 @@ class DataOutBase
 					  * all previous contents of this object.
 					  */
 	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 				     /**
@@ -952,6 +1060,23 @@ class DataOutBase
 			   const GmvFlags                     &flags,
 			   ostream                            &out);
 
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    static unsigned int memory_consumption ();
 
 				     /**
 				      * Exception
@@ -1353,6 +1478,24 @@ class DataOutInterface : private DataOutBase
 				      */
     void parse_parameters (ParameterHandler &prm);
     
+				     /**
+				      * Determine an estimate for
+				      * the memory consumption (in
+				      * bytes) of this
+				      * object. Since sometimes
+				      * the size of objects can
+				      * not be determined exactly
+				      * (for example: what is the
+				      * memory consumption of an
+				      * STL @p{map} type with a
+				      * certain number of
+				      * elements?), this is only
+				      * an estimate. however often
+				      * quite close to the true
+				      * value.
+				      */
+    unsigned int memory_consumption () const;
+
 				     /**
 				      * Exception
 				      */

@@ -14,6 +14,7 @@
 
 #include <base/data_out_base.h>
 #include <base/parameter_handler.h>
+#include <base/memory_consumption.h>
 
 
 DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
@@ -45,6 +46,15 @@ void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
 };
 
 
+unsigned int
+DataOutBase::UcdFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
 
 void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 {};
@@ -53,6 +63,17 @@ void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 void DataOutBase::GnuplotFlags::parse_parameters (ParameterHandler &/*prm*/)
 {};
+
+
+
+unsigned int
+DataOutBase::GnuplotFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
 
 
 
@@ -73,6 +94,16 @@ void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &prm)
   smooth        = prm.get_bool ("Use smooth triangles");
   bicubic_patch = prm.get_bool ("Use bicubic patches");
   external_data = prm.get_bool ("Include external file");
+};
+
+
+
+unsigned int
+DataOutBase::PovrayFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
 };
 
 
@@ -267,6 +298,16 @@ void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
 
 
 
+unsigned int
+DataOutBase::EpsFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
+
 void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
 {};
 
@@ -274,3 +315,21 @@ void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 void DataOutBase::GmvFlags::parse_parameters (ParameterHandler &/*prm*/)
 {};
+
+
+unsigned int
+DataOutBase::GmvFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
+
+unsigned int DataOutBase::memory_consumption ()
+{
+  return 0;
+};
+
+

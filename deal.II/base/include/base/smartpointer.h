@@ -154,6 +154,17 @@ class SmartPointer
 				      * variable which we are given.
 				      */
     void swap (T *&tt);
+
+				     /**
+				      * Return an estimate of the
+				      * amount of memory (in bytes)
+				      * used by this class. Note in
+				      * particular, that this only
+				      * includes the amount of memory
+				      * used by @it{this} object, not
+				      * by the object pointed to.
+				      */
+    unsigned int memory_consumption () const;
     
   private:
 				     /**
@@ -292,6 +303,16 @@ void SmartPointer<T>::swap (T *&tt)
   if (t != 0)
     t->subscribe ();
 };
+
+
+
+template <typename T>
+inline
+unsigned int SmartPointer<T>::memory_consumption () const
+{
+  return sizeof(SmartPointer<T>);
+};
+
 
 
 

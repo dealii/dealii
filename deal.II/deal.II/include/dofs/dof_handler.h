@@ -1001,6 +1001,20 @@ class DoFHandler  :  public Subscriptor,
     const Triangulation<dim> & get_tria () const;
     
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * This function is made virtual,
+				      * since a dof handler object
+				      * might be accessed through a
+				      * pointers to thisr base class,
+				      * although the actual object
+				      * might be a derived class.
+				      */
+    virtual unsigned int memory_consumption () const;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidTriangulation);

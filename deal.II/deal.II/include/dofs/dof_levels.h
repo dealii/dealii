@@ -91,6 +91,13 @@ class DoFLevel<1>
 				      * detailed information.
 				      */
     vector<unsigned int> line_dofs;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -111,6 +118,13 @@ class DoFLevel<2> : public DoFLevel<1>
 				      * detailed information.
 				      */
     vector<unsigned int> quad_dofs;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
@@ -131,6 +145,13 @@ class DoFLevel<3> : public DoFLevel<2>
 				      * detailed information.
 				      */
     vector<unsigned int> hex_dofs;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 };
 
 
