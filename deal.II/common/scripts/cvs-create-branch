@@ -5,6 +5,10 @@ if (test ! -r configure -a ! -d deal.II); then
 	exit 1
 fi
 
+if (test ! -d tests); then
+    echo Please checkout tests in order to tag consistently
+fi
+
 CVS='cvs'
 
 ######################################################################
