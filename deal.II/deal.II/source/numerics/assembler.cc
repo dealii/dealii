@@ -116,23 +116,15 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
   
 
 				   // fill cell matrix and vector if required
+  DoFHandler<dim>::cell_iterator this_cell (*this);
   if (assemble_matrix && assemble_rhs) 
-    equation.assemble (cell_matrix, cell_vector, fe_values,
-		       Triangulation<dim>::cell_iterator(tria,
-							 present_level,
-							 present_index));
+    equation.assemble (cell_matrix, cell_vector, fe_values, this_cell);
   else
     if (assemble_matrix)
-      equation.assemble (cell_matrix, fe_values,
-			 Triangulation<dim>::cell_iterator(tria,
-							   present_level,
-							   present_index));
+      equation.assemble (cell_matrix, fe_values, this_cell);
     else
       if (assemble_rhs)
-	equation.assemble (cell_vector, fe_values,
-			   Triangulation<dim>::cell_iterator(tria,
-							     present_level,
-							     present_index));
+	equation.assemble (cell_vector, fe_values, this_cell);
       else
 	Assert (false, ExcNoAssemblingRequired());
 
