@@ -43,7 +43,7 @@ void test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
-  tria.refine_global (3);
+  tria.refine_global (2);
 
 				   // we now have a number of cells,
 				   // flag them with some subdomain
@@ -175,7 +175,7 @@ int main ()
 {
   logfile.precision(4);
   deallog.attach(logfile);
-  deallog.depth_console(0);
+  deallog.depth_console(10);
 
   test<1> ();
   test<2> ();
