@@ -26,7 +26,8 @@ FullMatrix<number>::FullMatrix (const unsigned int m, const unsigned int n)
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix (const FullMatrix &m) 
+FullMatrix<number>::FullMatrix (const FullMatrix &m):
+		Subscriptor()
 {
   init (m.dim_image, m.dim_range);
   if (dim_range*dim_image != 0)
