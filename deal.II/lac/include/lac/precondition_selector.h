@@ -110,7 +110,7 @@ class PreconditionSelector
 				      * preconditioning that was specified in
 				      * the constructor.
 				      */    
-    virtual void operator() (Vector &dst, const Vector &src) const;
+    virtual void vmult (Vector &dst, const Vector&src) const;
 
 				     /**
 				      * Get the names of all implemented
@@ -174,8 +174,8 @@ void PreconditionSelector<Matrix,Vector>::use_matrix(const Matrix &M)
 }
 
 template <class Matrix, class Vector>
-void PreconditionSelector<Matrix,Vector>::operator() (Vector &dst,
-						      const Vector &src) const
+void PreconditionSelector<Matrix,Vector>::vmult (Vector &dst,
+						 const Vector &src) const
 {
   if (preconditioning=="none")
     {
