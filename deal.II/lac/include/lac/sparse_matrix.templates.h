@@ -14,6 +14,7 @@
 #define __deal2__sparse_matrix_templates_h
 
 
+#include <base/template_constraints.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -79,7 +80,8 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
+SparseMatrix<number>::SparseMatrix (const SparsityPattern &c)
+                :
 		cols(0),
 		val(0),
 		max_len(0)
@@ -295,7 +297,7 @@ SparseMatrix<number>::vmult (OutVector& dst,
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
-  Assert (&src != &dst, ExcSourceEqualsDestination());
+  Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
   
   const unsigned int n_rows = m();
 
@@ -328,7 +330,7 @@ SparseMatrix<number>::vmult (OutVector& dst,
 	 const unsigned int) const;
       const mem_fun_p comp
 	= (&SparseMatrix<number>::
-           template threaded_vmult<InVector,OutVector>);
+           template threaded_vmult<OutVector,InVector>);
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
 	threads += Threads::spawn (*this, comp) (dst, src,
@@ -394,7 +396,7 @@ SparseMatrix<number>::Tvmult (OutVector& dst,
   Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
-  Assert (&src != &dst, ExcSourceEqualsDestination());
+  Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   dst = 0;
 
@@ -420,7 +422,7 @@ SparseMatrix<number>::vmult_add (OutVector& dst,
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
-  Assert (&src != &dst, ExcSourceEqualsDestination());
+  Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   const unsigned int  n_rows     = m();
   const number       *val_ptr    = &val[cols->rowstart[0]];
@@ -448,7 +450,7 @@ SparseMatrix<number>::Tvmult_add (OutVector& dst,
   Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
-  Assert (&src != &dst, ExcSourceEqualsDestination());
+  Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   for (unsigned int i=0;i<m();i++)
     for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
