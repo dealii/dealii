@@ -417,6 +417,7 @@ class LineAccessor :  public TriaAccessor<dim> {
     				     /**
 				      * Return the length of the line. If the
 				      * line describes part of the boundary
+				      * (e.g. if it is face to a cell in 2D)
 				      * and is not a straight one, ask the
 				      * finite element class for the correct
 				      * length!
@@ -649,6 +650,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				     /**
 				      * Return the diameter of the quad. If the
 				      * quad describes part of the boundary
+				      * (e.g. if it is face to a cell in 3D)
 				      * and is not a plane one, ask the
 				      * finite element class for the correct
 				      * length!
@@ -659,7 +661,9 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      * fact that this definitely is not the
 				      * diameter of all quadrilaterals; however
 				      * it may serve as an approximation and
-				      * is exact in many cases.
+				      * is exact in many cases, especially
+				      * if the quadrilateral is not too much
+				      * distorted.
 				      */
     double diameter () const;
     
