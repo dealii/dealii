@@ -21,7 +21,6 @@
 #include <multigrid/mg_transfer.h>
 
 #include <algorithm>
-#include <fstream>
 
 
 //TODO: This file is included from nowhere. It should either go away entirely, or be included at least from some .h or .cc file
