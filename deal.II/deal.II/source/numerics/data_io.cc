@@ -51,6 +51,8 @@ void DataIn<dim>::read_ucd (istream &in) {
   Assert (tria != 0, ExcNoTriangulationSelected());
   Assert ((1<=dim) && (dim<=2), ExcNotImplemented());
 
+  if (!in)
+    throw GlobalExcIO ();
 
 				   // skip comments at start of file
   char c;
@@ -170,7 +172,10 @@ void DataIn<dim>::read_ucd (istream &in) {
 
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
-  
+
+  if (!in)
+    throw GlobalExcIO ();
+
   tria->create_triangulation (vertices, cells, subcelldata);
 };
 
@@ -237,7 +242,7 @@ void DataOut<dim>::write_ucd (ostream &out) const {
   
   DoFHandler<dim>::active_cell_iterator cell,
 					endc = dofs->end();
-  unsigned int n_vertex_dofs;
+  unsigned int n_vertex_dofs = 0;
 
 				   // first loop over all cells to
 				   // find out how many degrees of
@@ -254,7 +259,6 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	     ++vertex) 
 	  is_vertex_dof[cell->vertex_dof_index(vertex,0)] = true;
 
-      n_vertex_dofs = 0;
       for (unsigned i=0; i!=is_vertex_dof.size(); ++i)
 	if (is_vertex_dof[i] == true)
 	  ++n_vertex_dofs;
@@ -384,6 +388,9 @@ void DataOut<dim>::write_ucd (ostream &out) const {
     };
 				   // no cell data
 				   // no model data
+  if (!out)
+    throw GlobalExcIO ();
+
 };
 
 
@@ -453,6 +460,9 @@ void DataOut<dim>::write_ucd_faces (ostream &out,
 
 	++index;
       };	  
+
+  if (!out)
+    throw GlobalExcIO ();
 };
 
       
@@ -562,6 +572,9 @@ void DataOut<dim>::write_gnuplot (ostream &out) const {
 		Assert (false, ExcNotImplemented());
 	};
     };
+
+  if (!out)
+    throw GlobalExcIO ();
 };
 
 
@@ -655,6 +668,9 @@ void DataOut<2>::write_povray (ostream &out) const {
 	  << endl;
     };
   out << "}";     
+
+  if (!out)
+    throw GlobalExcIO ();
 };
 
       

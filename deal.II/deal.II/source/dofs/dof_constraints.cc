@@ -703,4 +703,7 @@ void ConstraintMatrix::print (ostream &out) const {
       out << "    " << lines[i].line
 	  << " " << lines[i].entries[j].first
 	  << ":  " << lines[i].entries[j].second << endl;
+
+  if (!out)
+    throw GlobalExcIO ();
 };

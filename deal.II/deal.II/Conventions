@@ -55,5 +55,11 @@ Here are some conventions for source code of the deal.II library:
   input parameters shall precede the output parameters, unless there
   are good reasons to change this order.
 
-11./ Each class has to have at least 200 pages of documentation ;-)
+11./ Exceptions are used for internal parameter checking and for
+  consistency checks through the Assert macro. Exception handling
+  like done by the C++ language (try/throw/catch) are used to
+  handle run time errors (like I/O failures) which must be on
+  in any case, not only in debug mode.
+
+12./ Each class has to have at least 200 pages of documentation ;-)
 

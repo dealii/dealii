@@ -397,6 +397,10 @@ ostream & operator << (ostream &out, const Point<dim> &p) {
   for (unsigned int i=0; i<dim-1; ++i)
     out << p(i) << ' ';
   out << p(dim-1);
+
+  if (!out)
+    throw GlobalExcIO ();
+
   return out;
 };
 
@@ -405,6 +409,10 @@ template <>
 inline
 ostream & operator << (ostream &out, const Point<1> &p) {
   out << p(0);
+
+  if (!out)
+    throw GlobalExcIO ();
+
   return out;
 };
   

@@ -117,6 +117,9 @@ ParameterHandler::~ParameterHandler () {};
 
 
 bool ParameterHandler::read_input (istream &input) {
+  if (!input)
+    throw GlobalExcIO ();
+
   string line;
   int lineno=0;
   while (input) 
@@ -333,6 +336,9 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
 				   // given as "style"
   Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
 
+  if (!out)
+    throw GlobalExcIO ();
+
   switch (style) 
     {
       case Text:
@@ -374,7 +380,10 @@ void ParameterHandler::print_parameters_section (ostream &out,
 				   // assert that only known formats are
 				   // given as "style"
   Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
-  
+
+  if (!out)
+    throw GlobalExcIO ();
+
   Section *pd = get_present_defaults_subsection ();
   Section *pc = get_present_changed_subsection ();
 
@@ -694,10 +703,14 @@ MultipleParameterLoop::~MultipleParameterLoop () {};
 
 
 bool MultipleParameterLoop::read_input (istream &input) {
+  if (!input)
+    throw GlobalExcIO ();
+
   bool x = ParameterHandler::read_input (input);
   if (x) init_branches ();
   return x;
 };
+
 
 
 bool MultipleParameterLoop::read_input (const string &filename) {
@@ -715,6 +728,7 @@ bool MultipleParameterLoop::read_input (const string &filename) {
 				   // MultipleParameterLoop::Readinput(istream &, ostream &)
 				   // which itself calls init_branches.
 };
+
 
 
 bool MultipleParameterLoop::read_input_from_string (const char *s) {

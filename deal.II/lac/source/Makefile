@@ -3,7 +3,7 @@
 CXX       = c++
 INCLUDE   = -I../include -I../../base/include
 CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti -fno-exceptions \
+            -Winline -Woverloaded-virtual -fno-rtti \
             $(INCLUDE)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \

@@ -128,6 +128,11 @@ Remove the workaround with the BoundaryHelper class which was
   (previous ones worked flawless)
 
 
+Check the pattern matching in the parameter handler module using
+  the C++ exception handling mechanism rather than Asserts, since
+  this should be on also when debug mode is off.
+
+
 
 
 

@@ -1903,10 +1903,16 @@ void Triangulation<dim>::print_gnuplot (ostream &out, const unsigned int level) 
 			       active_cell_iterator(end()) :
 			       begin_active (level+1));
 
+  if (!out)
+    throw GlobalExcIO ();
+
   out << "#Active cells on level " << level
       << ": " << n_active_cells (level) << endl;
   for (; cell != endc; ++cell)
     print_gnuplot (out, cell);
+
+  if (!out)
+    throw GlobalExcIO ();
 };
 
 
@@ -1916,9 +1922,15 @@ void Triangulation<dim>::print_gnuplot (ostream &out, const unsigned int level) 
 template <>
 void Triangulation<1>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
+  if (!out)
+    throw GlobalExcIO ();
+
   out << cell->vertex(0) << " " << cell->level() << endl
       << cell->vertex(1) << " " << cell->level() << endl
       << endl;
+
+  if (!out)
+    throw GlobalExcIO ();
 };
 
 #endif
@@ -1929,6 +1941,9 @@ void Triangulation<1>::print_gnuplot (ostream &out,
 template <>
 void Triangulation<2>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
+  if (!out)
+    throw GlobalExcIO ();
+
   out << cell->vertex(0) << " " << cell->level() << endl
       << cell->vertex(1) << " " << cell->level() << endl
       << cell->vertex(2) << " " << cell->level() << endl
@@ -1936,6 +1951,9 @@ void Triangulation<2>::print_gnuplot (ostream &out,
       << cell->vertex(0) << " " << cell->level() << endl
       << endl  // double new line for gnuplot 3d plots
       << endl;
+
+  if (!out)
+    throw GlobalExcIO ();  
 };
 
 #endif
@@ -3512,6 +3530,9 @@ void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
   for (unsigned int position=0; position<N; ++position)
     flags[position/8] |= (v[position] ? (1<<(position%8)) : 0);
 
+  if (!out)
+    throw GlobalExcIO ();
+
 				   // format:
 				   // 0. magic number
 				   // 1. number of flags
@@ -3522,8 +3543,11 @@ void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
     out << static_cast<unsigned int>(flags[i]) << " ";
   
   out << endl << magic_number2 << endl;
-
+  
   delete[] flags;
+
+  if (!out)
+    throw GlobalExcIO ();
 };
 
 
@@ -3533,6 +3557,9 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 					   vector<bool>       &v,
 					   const unsigned int  magic_number2,
 					   istream            &in) {
+  if (!in)
+    throw GlobalExcIO ();
+
   unsigned int magic_number;
   in >> magic_number;
   Assert (magic_number==magic_number1, ExcGridReadError());
@@ -3556,6 +3583,9 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
   Assert (magic_number==magic_number2, ExcGridReadError());
 
   delete[] flags;
+
+  if (!in)
+    throw GlobalExcIO ();
 };
 
 
