@@ -164,7 +164,7 @@ LogStream::print_line_head()
  * Unfortunately, the information in /proc/pid/stat is updated slowly,
  * therefore, the information is quite unreliable.
  *
- * Furthermore, the cunstructor of ifstream caused another memory leak.
+ * Furthermore, the constructor of ifstream caused another memory leak.
  *
  * Still, this code might be usefull sometimes, so I kept it here.
  * When we have more information about the kernel, this should be
