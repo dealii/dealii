@@ -105,5 +105,3 @@
  *
  * @author Wolfgang Bangerth, 2004
  */
-
- /*@}*/
