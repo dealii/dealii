@@ -18,6 +18,10 @@
 #include <base/exceptions.h>
 #endif
 
+#ifndef QUIET_SUBSCRIPTOR
+#include <typeinfo>
+#include <string>
+#endif
 
 /**
  * Handling of subscriptions.
@@ -39,13 +43,19 @@ class Subscriptor
 				      */
     Subscriptor();
 
+#ifndef QUIET_SUBSCRIPTOR
 				     /**
 				      * Destructor, asserting that the counter
 				      * is zero.
 				      */
-    
+    virtual ~Subscriptor();
+#else
+				     /**
+				      * Destructor, asserting that the counter
+				      * is zero.
+				      */
     ~Subscriptor();
-    
+#endif
 				     /**
 				      * Copy-constructor.
 				      *
@@ -86,7 +96,17 @@ class Subscriptor
 				      * object.
 				      */
     unsigned int n_subscriptions () const;
-    
+
+#ifndef QUIET_SUBSCRIPTOR
+				     /**
+				      * Exception:
+				      * Object may not be deleted, since
+				      * it is used.
+				      */
+    DeclException2(ExcInUse,
+		   int, string&,
+		   << "Object of class " << arg2 << " is still used by " << arg1 << " other objects.");
+#else
 				     /**
 				      * Exception:
 				      * Object may not be deleted, since
@@ -95,6 +115,8 @@ class Subscriptor
     DeclException1(ExcInUse,
 		   int,
 		   << "This object is still used by " << arg1 << " other objects.");
+#endif
+
 				     /**
 				      * Exception: object should be used
 				      * when #unsubscribe# is called.
@@ -119,6 +141,17 @@ class Subscriptor
 				      * objects also.
 				      */
     mutable unsigned int counter;
+#ifndef QUIET_SUBSCRIPTOR
+				     /**
+				      * Storage for the class name.
+				      * Since the name of the derived
+				      * class is neither available in
+				      * the destructor, nor in the
+				      * constructor, we obtain it in
+				      * between and store it here.
+				      */
+    mutable string classname;
+#endif
 };
 
 

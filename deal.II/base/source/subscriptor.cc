@@ -25,17 +25,30 @@ Subscriptor::Subscriptor (const Subscriptor &) :
 {};
 
 
-Subscriptor::~Subscriptor () {
+Subscriptor::~Subscriptor ()
+{
+#ifndef QUIET_SUBSCRIPTOR
+  Assert (counter == 0, ExcInUse(counter, classname ));
+#else
   Assert (counter == 0, ExcInUse(counter));
-};
+#endif
+}
 
 
-Subscriptor & Subscriptor::operator = (const Subscriptor &) {
+Subscriptor & Subscriptor::operator = (const Subscriptor &)
+{
   return *this;
 };
 
 
-void Subscriptor::subscribe () const {
+void Subscriptor::subscribe () const
+{
+#ifdef DEBUG
+#ifndef QUIET_SUBSCRIPTOR
+  if(classname.size() == 0)
+    classname = string(typeid(*this).name());
+#endif
+#endif
   ++counter;
 };
 
