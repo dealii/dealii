@@ -287,14 +287,6 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
 }
 
 
-template<int dim>
-unsigned int
-PolynomialSpace<dim>::n() const
-{
-  return n_pols;
-}
-
-  
 template class PolynomialSpace<1>;
 template class PolynomialSpace<2>;
 template class PolynomialSpace<3>;

@@ -133,6 +133,18 @@ class PolynomialSpace
     unsigned int n () const;
 
 				     /**
+				      * Degree of the space. This is
+				      * by definition the number of
+				      * polynomials given to the
+				      * constructor, NOT the maximal
+				      * degree of a polynomial in this
+				      * vector. The latter value is
+				      * never checked and therefore
+				      * left to the application.
+				      */
+    unsigned int degree () const;
+    
+				     /**
 				      * Exception.
 				      */
     DeclException3 (ExcDimensionMismatch2,
@@ -202,5 +214,24 @@ PolynomialSpace (const std::vector<Pol> &pols)
 {}
 
 
+template<int dim>
+inline
+unsigned int
+PolynomialSpace<dim>::n() const
+{
+  return n_pols;
+}
+
+  
+
+template<int dim>
+inline
+unsigned int
+PolynomialSpace<dim>::degree() const
+{
+  return polynomials.size();
+}
+
+  
 
 #endif
