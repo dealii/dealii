@@ -10,7 +10,10 @@ Move the exceptions in the Tensor package (tensor_base.h and tensor.h)
 
 Think about the determinant function in the tensor package. Is it
   useful, can it be generalized?
-
+> There are only non-zero alternating real valued n-forms, so a determinant
+> exists only for Tensor<dim,dim>
+> Alternating exterior forms of lower index return tensors.
+> Guido
 
 Put Tensor<1,dim>::array_size directly into the array type. At
   present, egcs 1.1.2 chokes on that.
@@ -24,8 +27,9 @@ Check the pattern matching in the parameter handler module using
 
 Fill in docs for the timer class. Hopefully finally find a way to
   let it measure times larger than half an hour.
-
+> Operating system dependence. Grrr. Guido
 
 Review the TensorIndex class. Better documentation, remove general
   template. Move constructors to the back of the file, rather than
   inline in the classes. Find out whether it is really needed.
+> Remove !? Guido
