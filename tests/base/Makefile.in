@@ -27,7 +27,7 @@ tensor.exe         : tensor.go             $(libraries)
 timer.exe          : timer.go              $(libraries)
 
 
-tests = logtest quadrature_test reference tensor timer
+tests = logtest quadrature_test reference tensor timer polynomial_test
 
 ############################################################
 
