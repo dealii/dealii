@@ -202,7 +202,7 @@ class MinimizationProblem
     void run ();
     
   private:
-    void initialize ();
+    void initialize_solution ();
     void setup_system_on_mesh ();
     void assemble_step ();
     double line_search (const Vector<double> & update) const;
@@ -243,15 +243,91 @@ MinimizationProblem<dim>::MinimizationProblem (const unsigned int run_number)
 {}
 
 
-                                 // And so is the function that prepares the
-                                 // member variables of this class for
-                                 // assembling the linear system in each
-                                 // nonlinear step. This has all been shown
-                                 // before in previous example programs. Note,
-                                 // however, that all this works in 1d just as
-                                 // in any other space dimension, and would
-                                 // not require any changes if we were to use
-                                 // the program in another space dimension.
+                                 // Then, here is the function that
+                                 // initializes the solution before the first
+                                 // non-linear iteration, by setting the
+                                 // initial values to the random function
+                                 // described above and making sure that the
+                                 // boundary values are set correctly. We will
+                                 // then only seek updates to this function
+                                 // with zero boundary values, so that the
+                                 // boundary values are always correct.
+template <>
+void MinimizationProblem<1>::initialize_solution () 
+{
+                                   // The first part is to assign the correct
+                                   // size to the vector, and use library
+                                   // function that takes a function object,
+                                   // and interpolates the given vector living
+                                   // on a ``DoFHandler'' to this function
+                                   // object:
+  present_solution.reinit (dof_handler.n_dofs());
+  VectorTools::interpolate (dof_handler,
+                            InitializationValues(),
+                            present_solution);
+
+                                   // Then we still have to make sure that we
+                                   // get the boundary values right. This
+                                   // could have been done inside the
+                                   // ``InitializationValues'' class, but it
+                                   // is instructive to see how it can also be
+                                   // done, in particular since it is so
+                                   // simple in 1d. First, start out with an
+                                   // arbitrary cell on level 0, i.e. the
+                                   // coarse mesh:
+  DoFHandler<1>::cell_iterator cell;
+  cell = dof_handler.begin(0);
+                                   // Then move as far to the left as
+                                   // possible. Note that while in two or more
+                                   // space dimensions, there is is no
+                                   // guarantee as to the coordinate
+                                   // directions of a given face number of a
+                                   // cell, in 1d the zeroth face (and
+                                   // neighbor) is always the one to the left,
+                                   // and the first one the one to the
+                                   // right. Similarly, the zeroth child is
+                                   // the left one, the first child is the
+                                   // right one.
+  while (cell->at_boundary(0) == false)
+    cell = cell->neighbor(0);
+                                   // Now that we are at the leftmost coarse
+                                   // grid cell, go recursively through its
+                                   // left children until we find a terminal
+                                   // one:
+  while (cell->has_children() == true)
+    cell = cell->child(0);
+                                   // Then set the value of the solution
+                                   // corresponding to the zeroth degree of
+                                   // freedom and the zeroth vertex of the
+                                   // cell to zero. Note that the zeroth
+                                   // vertex is the left one, and that zero is
+                                   // the only valid second argument to the
+                                   // call to ``vertex_dof_index'', since we
+                                   // have a scalar finite element; thus,
+                                   // there is only a single component.
+  present_solution(cell->vertex_dof_index(0,0)) = 0;
+
+                                   // Now do all the same with the right
+                                   // boundary value, and set it to one:
+  cell = dof_handler.begin(0);
+  while (cell->at_boundary(1) == false)
+    cell = cell->neighbor(1);
+  while (cell->has_children())
+    cell = cell->child(1);
+  present_solution(cell->vertex_dof_index(1,0)) = 1;
+}
+
+
+                                 // The function that prepares the member
+                                 // variables of this class for assembling the
+                                 // linear system in each nonlinear step is
+                                 // also not very interesting. This has all
+                                 // been shown before in previous example
+                                 // programs. Note, however, that all this
+                                 // works in 1d just as in any other space
+                                 // dimension, and would not require any
+                                 // changes if we were to use the program in
+                                 // another space dimension.
                                  //
                                  // Note that this function is only called
                                  // when the mesh has been changed (or before
@@ -299,7 +375,7 @@ void MinimizationProblem<dim>::assemble_step ()
   residual.reinit (dof_handler.n_dofs());
 
                                    // Then we initialize a ``FEValues'' object
-                                   // with a 3-point Gauss quadrature
+                                   // with a 4-point Gauss quadrature
                                    // formula. This object will be used to
                                    // compute the values and gradients of the
                                    // shape functions at the quadrature
@@ -319,75 +395,157 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // ``x-u^3'' terms; to get these from the
                                    // ``FEValues'' object, we need to pass it
                                    // the ``update_q_points'' flag.
-  QGauss3<dim>  quadrature_formula;
+                                   //
+                                   // It is a simple calculation to figure out
+                                   // that for linear elements, the integrals
+                                   // in the right hand side semilinear form
+                                   // is a polynomial of sixth order. Thus,
+                                   // the appropriate quadrature formula is
+                                   // the one we have chosen here.
+  QGauss4<dim>  quadrature_formula;
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |
 				       update_q_points  |
 				       update_JxW_values));
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+                                   // Next, here are the usual two convenience
+                                   // variables, followed by declarations for
+                                   // the local contributions to matrix and
+                                   // right hand side, as well as an array to
+                                   // hold the indices of the local degrees of
+                                   // freedom on each cell:
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  
+
+                                   // The next two variables are needed since
+                                   // the problem we consider is nonlinear,
+                                   // and thus the right hand side depends on
+                                   // the previous solution (in a Newton
+                                   // method, for example, the left hand side
+                                   // matrix would also depend on the previous
+                                   // solution, but as explained in the
+                                   // introduction, we only use a simple
+                                   // gradient-type method in which the matrix
+                                   // is a scaled Laplace-type matrix). In
+                                   // order to compute the values of the
+                                   // integrand for the right hand side, we
+                                   // therefore need to have the values and
+                                   // gradients of the previous solution at
+                                   // the quadrature points. We will get them
+                                   // from the ``FEValues'' object above, and
+                                   // will put them into the following two
+                                   // variables:
   std::vector<double>         local_solution_values (n_q_points);
   std::vector<Tensor<1,dim> > local_solution_grads (n_q_points);
-  
+
+                                   // Now, here comes the main loop over all
+                                   // the cells of the mesh:
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
+                                       // First, clear the objects that hold
+                                       // the local matrix and right hand side
+                                       // contributions for this cell:
       cell_matrix.clear ();
       cell_rhs.clear ();
 
+                                       // Then initialize the values and
+                                       // gradients of the shape functions at
+                                       // the quadrature points of this cell:
       fe_values.reinit (cell);
 
+                                       // And get the values and gradients of
+                                       // the previous solution at the
+                                       // quadrature points. To get them, we
+                                       // don't actually have to do much,
+                                       // except for giving the ``FEValues''
+                                       // object the global node vector from
+                                       // which to compute this data, and a
+                                       // reference to the objects into which
+                                       // to put them. After the calls, the
+                                       // ``local_solution_values'' and
+                                       // ``local_solution_values'' variables
+                                       // will contain values and gradients
+                                       // for each of the quadrature points on
+                                       // this cell.
       fe_values.get_function_values (present_solution,
                                      local_solution_values);
       fe_values.get_function_grads (present_solution,
                                     local_solution_grads);
-      
+
+                                       // Then loop over all quadrature
+                                       // points:
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {
+                                           // Have convenience variables for
+                                           // the values and gradient of the
+                                           // solution at the present
+                                           // quadrature point, as well as the
+                                           // location in real space of this
+                                           // quadrature point, and of the
+                                           // expression (x-u^3), since it
+                                           // appears so often:
           const double u = local_solution_values[q_point],
                        x = fe_values.quadrature_point(q_point)(0);
           const double x_minus_u3 = (x-std::pow(u,3));
-
           const Tensor<1,dim> u_prime = local_solution_grads[q_point];
-          
+
+                                           // Then do the double loop over all
+                                           // shape functions to compute the
+                                           // local contribution to the
+                                           // matrix. The terms are simple
+                                           // equivalents of the formula
+                                           // stated in the introduction. Note
+                                           // how we extract the size of an
+                                           // element from the iterator to the
+                                           // present cell:
           for (unsigned int i=0; i<dofs_per_cell; ++i)
-            {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j)
-                  += (fe_values.shape_grad(i,q_point) *
-                      fe_values.shape_grad(j,q_point) * cell->diameter() * cell->diameter() +
-                      fe_values.shape_value(i,q_point) *
-                      fe_values.shape_value(j,q_point)) *
-                  fe_values.JxW(q_point);
-              
-              cell_rhs(i) += -((6. * x_minus_u3 *
-                                gradient_power (local_solution_grads[q_point],
-                                                4) *
-                                fe_values.shape_value(i,q_point)
-                                *
-                                (x_minus_u3 *
-                                 (u_prime * 
-                                  fe_values.shape_grad(i,q_point))
-                                 -
-                                 (u_prime*u_prime) * u * u *
-                                 fe_values.shape_value(i,q_point))
-                                )
-                               *
-                               fe_values.JxW(q_point));
-            }
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              cell_matrix(i,j)
+                += (fe_values.shape_grad(i,q_point) *
+                    fe_values.shape_grad(j,q_point) *
+                    cell->diameter() *
+                    cell->diameter()
+                    +
+                    fe_values.shape_value(i,q_point) *
+                    fe_values.shape_value(j,q_point)) *
+                fe_values.JxW(q_point);
+
+                                           // And here comes the loop over all
+                                           // local degrees of freedom to form
+                                           // the right hand side. The formula
+                                           // looks a little convoluted, but
+                                           // is again a simple image of what
+                                           // was given in the introduction:
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            cell_rhs(i) += -((6. * x_minus_u3 *
+                              gradient_power (u_prime, 4) *
+                              fe_values.shape_value(i,q_point)
+                              *
+                              (x_minus_u3 *
+                               (u_prime * 
+                                fe_values.shape_grad(i,q_point))
+                               -
+                               (u_prime*u_prime) * u * u *
+                               fe_values.shape_value(i,q_point))
+                              )
+                             *
+                             fe_values.JxW(q_point));
         }
       
-
+                                       // After summing up all the
+                                       // contributions, we have to transfer
+                                       // them to the global objects. This is
+                                       // done in the same way as always
+                                       // before:
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -400,9 +558,63 @@ void MinimizationProblem<dim>::assemble_step ()
 	}
     }
 
+                                   // Now that we have all the local
+                                   // contributions summed up, we have to
+                                   // eliminate hanging node constraints and
+                                   // boundary values. Hanging nodes are
+                                   // simple:
   hanging_node_constraints.condense (matrix);
   hanging_node_constraints.condense (residual);
 
+                                   // Boundary values are, too, but with a
+                                   // twist this time: in all previous example
+                                   // programs, we have used that by default
+                                   // (i.e. unless something else is set), all
+                                   // boundaries have indicator zero. To
+                                   // figure out what boundary indicator a
+                                   // face of a cell had, the library
+                                   // functions would query an iterator
+                                   // designating this face, which would in
+                                   // turn pluck out this value from some of
+                                   // the data structures in the
+                                   // library. Unfortunately, in 1d cells have
+                                   // no faces: these would only be points,
+                                   // and we don't associated anything in the
+                                   // library with points except for their
+                                   // coordinates. Thus there are no face
+                                   // iterators, and no way to figure out
+                                   // which boundary indicator it may have. On
+                                   // the other hand, in 1d, there can only be
+                                   // two boundaries anyway for a connected
+                                   // domain: the left end point and the right
+                                   // end point. And in contrast to the case
+                                   // in higher dimensions, where the
+                                   // (changeable) default is zero for all
+                                   // boundary parts, in 1d the convention is
+                                   // that the left boundary point has
+                                   // indicator zero, while the right boundary
+                                   // point has indicator one. Since there are
+                                   // no face iterators, it is also not
+                                   // possible to change this, but you will
+                                   // hardly ever have to. So in order to
+                                   // assign zero boundary values on both
+                                   // sides, in 1d we not only need to
+                                   // evaluate boundary values for indicator
+                                   // zero, but also for indicator one. If
+                                   // this program is ever going to be run in
+                                   // higher dimensions, then we should only
+                                   // evaluate for indicator zero, which is
+                                   // why we have placed the ``if'' statement
+                                   // in front of the second function call.
+                                   //
+                                   // Note that we need zero boundary
+                                   // conditions on both ends, since the space
+                                   // in which search for the solution has
+                                   // fixed boundary conditions zero and one,
+                                   // and we have set the initial values to
+                                   // already satisfy them. Thus, the updates
+                                   // computed in each nonlinear step must
+                                   // have zero boundary values.
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -498,28 +710,6 @@ void MinimizationProblem<dim>::do_step ()
 
   const double step_length = line_search (update);
   present_solution.add (step_length, update);
-}
-
-
-
-template <>
-void MinimizationProblem<1>::initialize () 
-{
-  dof_handler.distribute_dofs (fe);
-  present_solution.reinit (dof_handler.n_dofs());
-  VectorTools::interpolate (dof_handler,
-                            InitializationValues(),
-                            present_solution);
-  DoFHandler<1>::cell_iterator cell;
-  cell = dof_handler.begin(0);
-  while (cell->has_children())
-    cell = cell->child(0);
-  present_solution(cell->vertex_dof_index(0,0)) = 0;
-  
-  cell = dof_handler.begin(0);
-  while (cell->has_children())
-    cell = cell->child(1);
-  present_solution(cell->vertex_dof_index(1,0)) = 1;
 }
 
 
@@ -729,7 +919,8 @@ void MinimizationProblem<dim>::run ()
 {
   GridGenerator::hyper_cube (triangulation, 0., 1.);
   triangulation.refine_global (4);
-  initialize ();
+  dof_handler.distribute_dofs (fe);
+  initialize_solution ();
 
   double last_energy = energy (dof_handler, present_solution);
   
