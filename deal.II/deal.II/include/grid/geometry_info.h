@@ -122,7 +122,37 @@ struct GeometryInfo
 				      * \end{verbatim}
 				      */
     static const unsigned int dx_to_deal[vertices_per_cell];
+    
+				     /**
+				      * For each face of the reference
+				      * cell, this field stores the
+				      * coordinate direction in which
+				      * its normal vector points.
+				      *
+				      * Remark that this is only the
+				      * coordinate number. The acual
+				      * direction of the normal vector
+				      * is obtained by multiplying the
+				      * unit vector in this direction
+				      * with #unit_normal_orientation.
+				      */
+    static const unsigned int unit_normal_direction[faces_per_cell];
 
+				     /**
+				      * Orientation of the unit normal
+				      * vector of a face of the
+				      * reference cell.
+				      *
+				      * Each value is either
+				      * <tt>1</tt> or <tt>-1</tt>,
+				      * corresponding to a normal
+				      * vector pointing in the
+				      * positive or negative
+				      * coordinate direction,
+				      * respectively.
+				      */
+    static const int unit_normal_orientation[faces_per_cell];
+    
 				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of
@@ -498,6 +528,36 @@ struct GeometryInfo<1>
     static const unsigned int dx_to_deal[vertices_per_cell];
 
 				     /**
+				      * For each face of the reference
+				      * cell, this field stores the
+				      * coordinate direction in which
+				      * its normal vector points.
+				      *
+				      * Remark that this is only the
+				      * coordinate number. The acual
+				      * direction of the normal vector
+				      * is obtained by multiplying the
+				      * unit vector in this direction
+				      * with #unit_normal_orientation.
+				      */
+    static const unsigned int unit_normal_direction[faces_per_cell];
+
+				     /**
+				      * Orientation of the unit normal
+				      * vector of a face of the
+				      * reference cell.
+				      *
+				      * Each value is either
+				      * <tt>1</tt> or <tt>-1</tt>,
+				      * corresponding to a normal
+				      * vector pointing in the
+				      * positive or negative
+				      * coordinate direction,
+				      * respectively.
+				      */
+    static const int unit_normal_orientation[faces_per_cell];
+    
+				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of
 				      * the mother cell.
@@ -781,6 +841,36 @@ struct GeometryInfo<2>
 				      */
     static const unsigned int dx_to_deal[vertices_per_cell];
 
+				     /**
+				      * For each face of the reference
+				      * cell, this field stores the
+				      * coordinate direction in which
+				      * its normal vector points.
+				      *
+				      * Remark that this is only the
+				      * coordinate number. The acual
+				      * direction of the normal vector
+				      * is obtained by multiplying the
+				      * unit vector in this direction
+				      * with #unit_normal_orientation.
+				      */
+    static const unsigned int unit_normal_direction[faces_per_cell];
+
+				     /**
+				      * Orientation of the unit normal
+				      * vector of a face of the
+				      * reference cell.
+				      *
+				      * Each value is either
+				      * <tt>1</tt> or <tt>-1</tt>,
+				      * corresponding to a normal
+				      * vector pointing in the
+				      * positive or negative
+				      * coordinate direction,
+				      * respectively.
+				      */
+    static const int unit_normal_orientation[faces_per_cell];
+    
 				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of
@@ -1067,6 +1157,36 @@ struct GeometryInfo<3>
 				      */
     static const unsigned int dx_to_deal[vertices_per_cell];
 
+				     /**
+				      * For each face of the reference
+				      * cell, this field stores the
+				      * coordinate direction in which
+				      * its normal vector points.
+				      *
+				      * Remark that this is only the
+				      * coordinate number. The acual
+				      * direction of the normal vector
+				      * is obtained by multiplying the
+				      * unit vector in this direction
+				      * with #unit_normal_orientation.
+				      */
+    static const unsigned int unit_normal_direction[faces_per_cell];
+
+				     /**
+				      * Orientation of the unit normal
+				      * vector of a face of the
+				      * reference cell.
+				      *
+				      * Each value is either
+				      * <tt>1</tt> or <tt>-1</tt>,
+				      * corresponding to a normal
+				      * vector pointing in the
+				      * positive or negative
+				      * coordinate direction,
+				      * respectively.
+				      */
+    static const int unit_normal_orientation[faces_per_cell];
+    
 				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of

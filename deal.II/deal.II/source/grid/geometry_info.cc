@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -76,6 +76,28 @@ const unsigned int GeometryInfo<2>::dx_to_deal[GeometryInfo<2>::vertices_per_cel
 
 const unsigned int GeometryInfo<3>::dx_to_deal[GeometryInfo<3>::vertices_per_cell]
 = { 0, 3, 4, 7, 1, 2, 5, 6};
+
+//TODO: Use these values in mappings.
+const unsigned int
+GeometryInfo<1>::unit_normal_direction[GeometryInfo<1>::faces_per_cell]
+= { 0, 0 };
+const int
+GeometryInfo<1>::unit_normal_orientation[GeometryInfo<1>::faces_per_cell]
+= { -1, 1 };
+
+const unsigned int
+GeometryInfo<2>::unit_normal_direction[GeometryInfo<2>::faces_per_cell]
+= { 1, 0, 1, 0 };
+const int
+GeometryInfo<2>::unit_normal_orientation[GeometryInfo<2>::faces_per_cell]
+= { -1, 1, 1, -1 };
+
+const unsigned int
+GeometryInfo<3>::unit_normal_direction[GeometryInfo<3>::faces_per_cell]
+= { 1, 1, 2, 0, 2, 0 };
+const int
+GeometryInfo<3>::unit_normal_orientation[GeometryInfo<3>::faces_per_cell]
+= { -1, 1, -1, 1, 1, -1 };
 
 
 
