@@ -834,52 +834,35 @@ MappingQ1<dim>::transform_contravariant (std::vector<Point<dim> >       &dst,
 template <int dim>
 Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
   const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p,
-  const typename Mapping<dim>::InternalDataBase *const m_data) const
+  const Point<dim> &p) const
 {
-				   // If m_data!=0 use this
-				   // InternalData.
-				   //
-				   // Otherwise use the get_data
-				   // function to create an
-				   // InternalData with data vectors
-				   // already of the right size; And
-				   // compute shape values and mapping
-				   // support points.
-				   //
-				   // Let, at the end, mdata be a
-				   // pointer to the given or the new
-				   // created InternalData
-  const InternalData *mdata;
-  InternalData *mdata_local=0;
-  if (m_data==0)
-    {
-      static Point<dim> dummy_p;
-      static Quadrature<dim> dummy_quadrature(dummy_p);
-      mdata_local=dynamic_cast<InternalData *> (get_data(update_transformation_values,
-							 dummy_quadrature));
-      Assert(mdata_local!=0, ExcInternalError());
-      
-      compute_shapes(std::vector<Point<dim> > (1, p), *mdata_local);
-
-      compute_mapping_support_points(cell, mdata_local->mapping_support_points);      
-      
-      mdata=mdata_local;
-    }
-  else
-//TODO: can we assume that m_data->mapping_support_points is initialized    
-    mdata = dynamic_cast<const InternalData *> (m_data);
+  				   // Use the get_cell_data function
+				   // to create an InternalData with
+				   // data vectors already of the
+				   // right size and with mapping
+				   // support points set.
+  InternalData *mdata=get_cell_data(cell, update_transformation_values);
   Assert(mdata!=0, ExcInternalError());
 
-				   // use now the InternalData, that
-				   // mdata is pointing to, to compute
-				   // the point in real space.
-  Point<dim> p_real;
-  for (unsigned int i=0; i<mdata->mapping_support_points.size(); ++i)
-    p_real+=mdata->mapping_support_points[i] * mdata->shape(0,i);
+  return transform_unit_to_real_cell_internal(cell, p, *mdata);
+}
 
-  if (m_data==0)
-    delete mdata_local;
+
+template <int dim>
+Point<dim> MappingQ1<dim>::transform_unit_to_real_cell_internal (
+  const typename Triangulation<dim>::cell_iterator cell,
+  const Point<dim> &p,
+  const InternalData &data) const
+{
+  const unsigned int n_mapping_points=data.mapping_support_points.size();
+  Assert(data.shape_values.size()==n_mapping_points, ExcInternalError());
+  
+				   // use now the InternalData to
+				   // compute the point in real space.
+  Point<dim> p_real;
+  for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
+    p_real+=data.mapping_support_points[i] * data.shape(0,i);
+
   return p_real;
 }
 
@@ -890,23 +873,16 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
   const typename Triangulation<dim>::cell_iterator cell,
   const Point<dim> &p) const
 {
-				   // Use the get_data
-				   // function to create an
-				   // InternalData with data vectors
-				   // already of the right size.
-  static Point<dim> dummy_p;
-  static Quadrature<dim> dummy_quadrature(dummy_p);
-  Quadrature<dim> dummy_q(Point<dim>());
-  InternalData *mdata=
-    dynamic_cast<InternalData *> (get_data(update_transformation_values
-					   | update_transformation_gradients,
-					   dummy_quadrature));
+				   // Use the get_cell_data function
+				   // to create an InternalData with
+				   // data vectors already of the
+				   // right size and with mapping
+				   // support points set.
+  InternalData *mdata=get_cell_data(cell,
+				    update_transformation_values
+				    | update_transformation_gradients);
   Assert(mdata!=0, ExcInternalError());
-
-				   // compute the mapping support
-				   // points
   std::vector<Point<dim> > &points=mdata->mapping_support_points;
-  compute_mapping_support_points(cell, points);
   
 				   // Newton iteration to solve
 				   // f(x)=p(x)-p=0
@@ -924,7 +900,7 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
   compute_shapes(std::vector<Point<dim> > (1, p_unit), *mdata);
   
 				   // f(x)
-  Point<dim> p_real(transform_unit_to_real_cell(cell, p_unit, mdata));
+  Point<dim> p_real(transform_unit_to_real_cell_internal(cell, p_unit, *mdata));
   Point<dim> f = p_real-p;
 
   const double eps=1e-15*cell->diameter();
@@ -957,12 +933,36 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
       compute_shapes(std::vector<Point<dim> > (1, p_unit), *mdata);
       
 				       // f(x)
-      p_real=transform_unit_to_real_cell(cell, p_unit, mdata);
+      p_real=transform_unit_to_real_cell_internal(cell, p_unit, *mdata);
       f = p_real-p;
     }
-  
+
+  delete mdata;
   return p_unit;
 }
+
+
+template <int dim>
+MappingQ1<dim>::InternalData*
+MappingQ1<dim>::get_cell_data(const typename Triangulation<dim>::cell_iterator cell,
+			      const UpdateFlags update_flags) const
+{
+  static Point<dim> dummy_p;
+  static Quadrature<dim> dummy_quadrature(dummy_p);
+
+  InternalData *mdata=dynamic_cast<InternalData *> (
+    get_data(update_flags, dummy_quadrature));
+  Assert(mdata!=0, ExcInternalError());
+
+				   // compute the mapping support
+				   // points
+  std::vector<Point<dim> > &points=mdata->mapping_support_points;
+  compute_mapping_support_points(cell, points);
+
+  return mdata;
+}
+
+  
 
 
 
@@ -975,7 +975,7 @@ MappingQ1<dim>::contravariant_transformation (std::vector<tensor_>       &dst,
 					      const Mapping<dim>::InternalDataBase &mapping_data,
 					      const unsigned int src_offset) const
 {
-  Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());
+  Assert(tensor_::dimension==dim && tensor_::rank==1, Mapping<dim>::ExcInvalidData());
   const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
   const InternalData &data=*data_ptr;
@@ -1009,7 +1009,7 @@ MappingQ1<dim>::covariant_transformation (std::vector<tensor_>       &dst,
 					  const Mapping<dim>::InternalDataBase &mapping_data,
 					  const unsigned int src_offset) const
 {
-  Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());
+  Assert(tensor_::dimension==dim && tensor_::rank==1, Mapping<dim>::ExcInvalidData());
   const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
   const InternalData &data=*data_ptr;
