@@ -13,6 +13,7 @@
 
 //TODO:[WB] Figure out why postscript output changes output-precision.
 
+#include <base/logstream.h>
 #include <grid/tria_boundary_lib.h>
 #include <numerics/time_dependent.h>
 #include <dofs/dof_handler.h>
@@ -2004,8 +2005,8 @@ template <int dim>
 void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 					      Vector<double> &j2) {
   const double y_offset = 1.0;
-  const unsigned int n_q_points = quadrature_face->n_quadrature_points;
-  const unsigned int dofs_per_cell = fe->dofs_per_cell;
+  const unsigned int n_q_points = this->quadrature_face->n_quadrature_points;
+  const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
   
   j1.reinit (this->dof->n_dofs());
   j2.reinit (this->dof->n_dofs());
@@ -2017,7 +2018,7 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 
   std::vector<unsigned int> cell_dof_indices (dofs_per_cell);
 
-  FEFaceValues<dim> fe_face_values (*fe, *quadrature_face,
+  FEFaceValues<dim> fe_face_values (*this->fe, *this->quadrature_face,
 				    UpdateFlags(update_values         |
 						update_JxW_values     |
 						update_q_points));
@@ -2063,13 +2064,13 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
 					     Vector<double> &j2) {
   const unsigned int face_dofs = this->fe->dofs_per_face;
   
-  j1.reinit (dof->n_dofs());
-  j2.reinit (dof->n_dofs());
+  j1.reinit (this->dof->n_dofs());
+  j2.reinit (this->dof->n_dofs());
 
   typename DoFHandler<dim>::active_cell_iterator cell, endc;
   typename DoFHandler<dim>::face_iterator        face;
-  cell = dof->begin_active();
-  endc = dof->end();
+  cell = this->dof->begin_active();
+  endc = this->dof->end();
 
   std::vector<unsigned int> face_dof_indices (face_dofs);
 
@@ -2109,22 +2110,22 @@ void SplitSignal<1>::compute_functionals (Vector<double> &,
 template <int dim>
 void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
 					    Vector<double> &j2) {
-  const unsigned int dofs_per_cell = fe->dofs_per_cell;
-  const unsigned int n_q_points = quadrature_face->n_quadrature_points;
+  const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+  const unsigned int n_q_points = this->quadrature_face->n_quadrature_points;
   
-  j1.reinit (dof->n_dofs());
-  j2.reinit (dof->n_dofs());
+  j1.reinit (this->dof->n_dofs());
+  j2.reinit (this->dof->n_dofs());
 
   if ((time<=1.6) || (time>1.8))
     return;
   
   typename DoFHandler<dim>::active_cell_iterator cell, endc;
   typename DoFHandler<dim>::face_iterator        face;
-  cell = dof->begin_active();
-  endc = dof->end();
+  cell = this->dof->begin_active();
+  endc = this->dof->end();
 
-  std::vector<unsigned int> dof_indices (fe->dofs_per_cell);
-  FEFaceValues<dim> fe_face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
+  std::vector<unsigned int> dof_indices (this->fe->dofs_per_cell);
+  FEFaceValues<dim> fe_face_values (*this->fe, *this->quadrature_face, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
@@ -2152,7 +2153,7 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
 	      for (unsigned int j=0; j<n_q_points; ++j)
 		sum += fe_face_values.shape_value(i,j)*fe_face_values.JxW(j);
 
-	      j1(dof_indices[i]) += sum * time_step / 2;
+	      j1(dof_indices[i]) += sum * this->time_step / 2;
 	    };
 	};
 }
@@ -2215,21 +2216,21 @@ void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
 template <int dim>
 void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
 					    Vector<double> &j2) {
-  const unsigned int dofs_per_cell = fe->dofs_per_cell;
-  const unsigned int n_q_points = quadrature->n_quadrature_points;
+  const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+  const unsigned int n_q_points = this->quadrature->n_quadrature_points;
   
-  j1.reinit (dof->n_dofs());
-  j2.reinit (dof->n_dofs());
+  j1.reinit (this->dof->n_dofs());
+  j2.reinit (this->dof->n_dofs());
   
-  if ((time<=2.5-time_step) || (time>2.5))
+  if ((this->time<=2.5-this->time_step) || (this->time>2.5))
     return;
 
   typename DoFHandler<dim>::active_cell_iterator cell, endc;
-  cell = dof->begin_active();
-  endc = dof->end();
+  cell = this->dof->begin_active();
+  endc = this->dof->end();
 
-  std::vector<unsigned int> dof_indices (fe->dofs_per_cell);
-  FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
+  std::vector<unsigned int> dof_indices (this->fe->dofs_per_cell);
+  FEValues<dim> fe_values (*this->fe, *this->quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
     if ((cell->center()(0) > -0.6) &&
@@ -2257,21 +2258,21 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
 template <int dim>
 void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
 					       Vector<double> &j2) {
-  const unsigned int dofs_per_cell = fe->dofs_per_cell;
-  const unsigned int n_q_points = quadrature->n_quadrature_points;
+  const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+  const unsigned int n_q_points = this->quadrature->n_quadrature_points;
   
-  j1.reinit (dof->n_dofs());
-  j2.reinit (dof->n_dofs());
+  j1.reinit (this->dof->n_dofs());
+  j2.reinit (this->dof->n_dofs());
   
-  if ((time<=2.4-time_step) || (time>2.4))
+  if ((this->time<=2.4-this->time_step) || (time>2.4))
     return;
 
   typename DoFHandler<dim>::active_cell_iterator cell, endc;
-  cell = dof->begin_active();
-  endc = dof->end();
+  cell = this->dof->begin_active();
+  endc = this->dof->end();
 
-  std::vector<unsigned int> dof_indices (fe->dofs_per_cell);
-  FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
+  std::vector<unsigned int> dof_indices (this->fe->dofs_per_cell);
+  FEValues<dim> fe_values (*this->fe, *this->quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
     if ((cell->center()(0) > -0.03) &&
@@ -2287,7 +2288,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
 	      sum += fe_values.shape_value(i,j)
 		     *fe_values.JxW(j);
 	    
-	    j1(dof_indices[i]) += sum / time_step;
+	    j1(dof_indices[i]) += sum / this->time_step;
 	  };
       };
 }
@@ -2299,19 +2300,19 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
 template <int dim>
 void HuyghensWave<dim>::compute_functionals (Vector<double> &j1,
 					     Vector<double> &j2) {
-  j1.reinit (dof->n_dofs());
-  j2.reinit (dof->n_dofs());
+  j1.reinit (this->dof->n_dofs());
+  j2.reinit (this->dof->n_dofs());
   
-  if ((time < 0.5) || (time > 0.69)) 
+  if ((this->time < 0.5) || (this->time > 0.69)) 
     return;
   
   Point<dim> p;
   p(0) = 0.75;
   const Point<dim> evaluation_point (p);
 
-  const typename DoFHandler<dim>::cell_iterator endc = dof->end(3);
+  const typename DoFHandler<dim>::cell_iterator endc = this->dof->end(3);
   bool point_found = false;
-  for (typename DoFHandler<dim>::cell_iterator cell=dof->begin(3);
+  for (typename DoFHandler<dim>::cell_iterator cell=this->dof->begin(3);
        (cell!=endc) && !point_found; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex) 
       if (cell->vertex(vertex) == evaluation_point)
@@ -2320,7 +2321,7 @@ void HuyghensWave<dim>::compute_functionals (Vector<double> &j1,
 	  while (terminal_cell->has_children())
 	    terminal_cell = terminal_cell->child(vertex);
 	  
-	  j1(cell->vertex_dof_index(vertex,0)) = time*time_step;
+	  j1(cell->vertex_dof_index(vertex,0)) = this->time*this->time_step;
 	  point_found = true;
 
 	  break;
@@ -2438,20 +2439,20 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
   const double y_offset = 300000000;
 
   typename DoFHandler<dim>::active_cell_iterator cell, endc;
-  cell = dof->begin_active ();
-  endc = dof->end ();
+  cell = this->dof->begin_active ();
+  endc = this->dof->end ();
 
-  FEValues<dim> fe_values (*fe, *quadrature,
+  FEValues<dim> fe_values (*this->fe, *this->quadrature,
 			   UpdateFlags(update_values         |
 				       update_gradients      |
 				       update_JxW_values     |
 				       update_q_points));
-  FullMatrix<double>  cell_matrix (fe->dofs_per_cell, fe->dofs_per_cell);
-  Vector<double>   local_u (fe->dofs_per_cell);
-  Vector<double>   local_v (fe->dofs_per_cell);
+  FullMatrix<double>  cell_matrix (this->fe->dofs_per_cell, this->fe->dofs_per_cell);
+  Vector<double>   local_u (this->fe->dofs_per_cell);
+  Vector<double>   local_v (this->fe->dofs_per_cell);
   
-  std::vector<double> density_values(quadrature->n_quadrature_points);
-  std::vector<double> stiffness_values(quadrature->n_quadrature_points);
+  std::vector<double> density_values(this->quadrature->n_quadrature_points);
+  std::vector<double> stiffness_values(this->quadrature->n_quadrature_points);
 
   double total_energy = 0;
   
@@ -2471,15 +2472,15 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
 
 
       fe_values.reinit (cell);
-      cell->get_dof_values (*u, local_u);
-      cell->get_dof_values (*v, local_v);
+      cell->get_dof_values (*this->u, local_u);
+      cell->get_dof_values (*this->v, local_v);
 
       cell_matrix.clear ();
-      density->value_list (fe_values.get_quadrature_points(),
+      this->density->value_list (fe_values.get_quadrature_points(),
 			   density_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-	for (unsigned int i=0; i<fe->dofs_per_cell; ++i) 
-	  for (unsigned int j=0; j<fe->dofs_per_cell; ++j)
+	for (unsigned int i=0; i<this->fe->dofs_per_cell; ++i) 
+	  for (unsigned int j=0; j<this->fe->dofs_per_cell; ++j)
 	    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
 				 fe_values.shape_value(j,point)) *
 				fe_values.JxW(point) *
@@ -2488,11 +2489,11 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
       total_energy += 1./2. * cell_matrix.matrix_norm_square (local_v);
 
       cell_matrix.clear ();
-      stiffness->value_list (fe_values.get_quadrature_points(),
+      this->stiffness->value_list (fe_values.get_quadrature_points(),
 			     stiffness_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-	for (unsigned int i=0; i<fe->dofs_per_cell; ++i) 
-	  for (unsigned int j=0; j<fe->dofs_per_cell; ++j)
+	for (unsigned int i=0; i<this->fe->dofs_per_cell; ++i) 
+	  for (unsigned int j=0; j<this->fe->dofs_per_cell; ++j)
 	    cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
 				 fe_values.shape_grad(j,point)) *
 				fe_values.JxW(point) *
@@ -2534,8 +2535,8 @@ void EvaluateIntegratedValueAtOrigin<dim>::reset () {
 
 template <int dim>
 double EvaluateIntegratedValueAtOrigin<dim>::evaluate () {
-  typename DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
-					endc = dof->end();
+  typename DoFHandler<dim>::active_cell_iterator cell = this->dof->begin_active(),
+					endc = this->dof->end();
 
   double     value_at_origin = 0;
   Point<dim> origin;
@@ -2546,7 +2547,7 @@ double EvaluateIntegratedValueAtOrigin<dim>::evaluate () {
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 	if (cell->vertex(vertex) == origin) 
 	  {
-	    value_at_origin = (*u)(cell->vertex_dof_index(vertex,0));
+	    value_at_origin = (*this->u)(cell->vertex_dof_index(vertex,0));
 	    origin_found = true;
 	  };
     };
@@ -2554,7 +2555,7 @@ double EvaluateIntegratedValueAtOrigin<dim>::evaluate () {
   Assert (origin_found, ExcVertexNotFound());
 
   if (time > 0)
-    integrated_value += value_at_origin * time_step;
+    integrated_value += value_at_origin * this->time_step;
       
   return value_at_origin;
 }
@@ -2597,26 +2598,26 @@ double EvaluateSeismicSignal<1>::evaluate ()
 
 template <int dim>
 double EvaluateSeismicSignal<dim>::evaluate () {
-  const unsigned int n_q_points = quadrature_face->n_quadrature_points;
+  const unsigned int n_q_points = this->quadrature_face->n_quadrature_points;
 
-  std::ofstream out((base_file_name + ".seismic").c_str());
+  std::ofstream out((this->base_file_name + ".seismic").c_str());
   AssertThrow (out, typename EvaluationBase<dim>::ExcIO());
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
-					endc = dof->end();
+  typename DoFHandler<dim>::active_cell_iterator cell = this->dof->begin_active(),
+					endc = this->dof->end();
   double u_integrated=0;
-  FEFaceValues<dim> face_values (*fe, *quadrature_face,
+  FEFaceValues<dim> face_values (*this->fe, *this->quadrature_face,
 				 UpdateFlags(update_values         |
 					     update_JxW_values     |
 					     update_q_points));
-  std::vector<double>    face_u (fe->dofs_per_face);
+  std::vector<double>    face_u (this->fe->dofs_per_face);
   
   for (; cell!=endc; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
       if (cell->face(face)->center()(1) == 1.0)
 	{
 	  face_values.reinit (cell, face);
-	  face_values.get_function_values (*u, face_u);
+	  face_values.get_function_values (*this->u, face_u);
 	  const std::vector<Point<dim> > &q_points   (face_values.get_quadrature_points());
 	  
 	  double local_integral = 0;
@@ -2630,13 +2631,13 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 	      << ' '
 	      << cell->face(face)->vertex(0)(0)
 	      << "  "
-	      << (*u)(cell->face(face)->vertex_dof_index(0,0))
+	      << (*this->u)(cell->face(face)->vertex_dof_index(0,0))
 	      << std::endl
 	      << time
 	      << ' '
 	      << cell->face(face)->vertex(1)(0)
 	      << "  "
-	      << (*u)(cell->face(face)->vertex_dof_index(1,0))
+	      << (*this->u)(cell->face(face)->vertex_dof_index(1,0))
 	      << std::endl
 	      << std::endl;
 	};
@@ -2644,7 +2645,7 @@ double EvaluateSeismicSignal<dim>::evaluate () {
   out.close ();
   
   if (time!=0)
-    result += u_integrated*time_step;
+    result += u_integrated*this->time_step;
   
   return u_integrated;
 }
@@ -2690,12 +2691,12 @@ double EvaluateSplitSignal<dim>::evaluate () {
   if ((time<=1.6) || (time>1.8))
     return 0;
 
-  const unsigned int n_q_points = quadrature_face->n_quadrature_points;
-  typename DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
-					endc = dof->end();
+  const unsigned int n_q_points = this->quadrature_face->n_quadrature_points;
+  typename DoFHandler<dim>::active_cell_iterator cell = this->dof->begin_active(),
+					endc = this->dof->end();
   double u_integrated=0;
-  FEFaceValues<dim> face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
-  std::vector<double>    face_u (fe->dofs_per_face);
+  FEFaceValues<dim> face_values (*this->fe, *this->quadrature_face, UpdateFlags(update_values | update_JxW_values));
+  std::vector<double>    face_u (this->fe->dofs_per_face);
   
   for (; cell!=endc; ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
@@ -2714,7 +2715,7 @@ double EvaluateSplitSignal<dim>::evaluate () {
 	    continue;
 
 	  face_values.reinit (cell, face_no);
-	  face_values.get_function_values (*u, face_u);
+	  face_values.get_function_values (*this->u, face_u);
 	  
 	  double local_integral = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
@@ -2724,7 +2725,7 @@ double EvaluateSplitSignal<dim>::evaluate () {
 	};
 
   if (time!=0)
-    result += u_integrated*time_step / 2;
+    result += u_integrated*this->time_step / 2;
   
   return u_integrated;
 }
@@ -2906,9 +2907,9 @@ double EvaluateHuyghensWave<dim>::evaluate ()
   p(0) = 0.75;
   const Point<dim> evaluation_point (p);
 
-  const typename DoFHandler<dim>::cell_iterator endc = dof->end(3);
+  const typename DoFHandler<dim>::cell_iterator endc = this->dof->end(3);
   bool point_found = false;
-  for (typename DoFHandler<dim>::cell_iterator cell=dof->begin(3);
+  for (typename DoFHandler<dim>::cell_iterator cell=this->dof->begin(3);
        (cell!=endc) && !point_found; ++cell)
     for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
       if (cell->vertex(vertex) == evaluation_point)
@@ -2917,7 +2918,7 @@ double EvaluateHuyghensWave<dim>::evaluate ()
 	  while (terminal_cell->has_children())
 	    terminal_cell = terminal_cell->child(vertex);
 	  
-	  value_at_origin = (*u)(cell->vertex_dof_index(vertex,0));
+	  value_at_origin = (*this->u)(cell->vertex_dof_index(vertex,0));
 	  point_found = true;
 	  
 	  break;
@@ -2927,8 +2928,8 @@ double EvaluateHuyghensWave<dim>::evaluate ()
 
   if ((time > 0.5) && (time < 0.69)) 
     {
-      integrated_value += value_at_origin * time_step;
-      weighted_value += value_at_origin * time_step * time;
+      integrated_value += value_at_origin * this->time_step;
+      weighted_value += value_at_origin * this->time_step * time;
     };
   
   return value_at_origin;
@@ -3030,7 +3031,7 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
   if (sweep_no != parameters.number_of_sweeps-1)
     refine_grids ();
 
-  write_statistics (sweep_info);
+  write_statistics (this->sweep_info);
 
   end_sweep ();
   
@@ -3243,7 +3244,7 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
     {
       deallog << "    Writing summary.";
       
-      sweep_info.write_summary (parameters.eval_list,
+      this->sweep_info.write_summary (parameters.eval_list,
 				logfile);
       AssertThrow (logfile, ExcIO());
 
@@ -4743,15 +4744,15 @@ std::string TimeStepBase_Wave<dim>::tmp_filename_base (const std::string &branch
 {
   return (parameters.tmp_directory +
 	  branch_signature + 's' +
-	  int_to_string (sweep_no, 2) + 't' +
-	  int_to_string (timestep_no, 4));
+	  int_to_string (this->sweep_no, 2) + 't' +
+	  int_to_string (this->timestep_no, 4));
 }
 
 
 template <int dim>
 void TimeStepBase_Wave<dim>::attach_sweep_info (SweepInfo &si)
 {
-  sweep_info = &si;
+  this->sweep_info = &si;
 }
 
 
@@ -4795,12 +4796,12 @@ void TimeStep_Wave<dim>::wake_up (const unsigned int wakeup_level)
     {
       Assert (dof_handler==0, ExcInternalError());
 
-      sweep_info->get_timers().grid_generation.start();
+      this->sweep_info->get_timers().grid_generation.start();
 
-      dof_handler = new DoFHandler<dim>(*tria);
+      dof_handler = new DoFHandler<dim>(*this->tria);
       dof_handler->distribute_dofs (fe);
 
-      if (parameters.renumber_dofs)
+      if (this->parameters.renumber_dofs)
 	DoFRenumbering::Cuthill_McKee (*dof_handler);
 
 
@@ -4808,41 +4809,41 @@ constraints.clear ();
       DoFTools::make_hanging_node_constraints (*dof_handler, constraints);
       constraints.close ();
 
-      sweep_info->get_timers().grid_generation.stop();
+      this->sweep_info->get_timers().grid_generation.stop();
       
       Assert (u.size()==0, ExcInternalError ());
       Assert (v.size()==0, ExcInternalError ());
 
-      switch (next_action)
+      switch (this->next_action)
 	{
 	  case primal_problem:
 	  case dual_problem:
 	  {
-	    Assert (((next_action == primal_problem) &&
+	    Assert (((this->next_action == primal_problem) &&
 		     (static_cast<const TimeStep_Wave<dim>*>(&get_timestep_primal())
 		      == this))
 		    ||
-		    ((next_action == dual_problem) &&
+		    ((this->next_action == dual_problem) &&
 		     (static_cast<const TimeStep_Wave<dim>*>(&get_timestep_dual())
 		      == this)),
 		    ExcInternalError());
 	    
 	    u.reinit (dof_handler->n_dofs(),
-		      parameters.extrapolate_old_solutions && (timestep_no!=0));
+		      this->parameters.extrapolate_old_solutions && (this->timestep_no!=0));
 	    v.reinit (dof_handler->n_dofs(),
-		      parameters.extrapolate_old_solutions && (timestep_no!=0));
+		      this->parameters.extrapolate_old_solutions && (this->timestep_no!=0));
 	    break;
 	  };
 	   
 	  case postprocess:
 	  {
-	    sweep_info->get_timers().postprocessing.start();
+	    this->sweep_info->get_timers().postprocessing.start();
 	    std::ifstream tmp_in(tmp_filename_base(branch_signature()).c_str());
 	    u.block_read (tmp_in);
 	    v.block_read (tmp_in);
 	    tmp_in.close ();
 
-	    sweep_info->get_timers().postprocessing.stop();
+	    this->sweep_info->get_timers().postprocessing.stop();
 		    
 	    break;
 	  };
@@ -4942,18 +4943,18 @@ void TimeStep_Wave<dim>::create_matrices ()
   const unsigned int dofs_per_cell       = fe.dofs_per_cell,
 		     n_q_points       = quadrature.n_quadrature_points;
 
-  const bool   density_constant = parameters.density_constant,
-	     stiffness_constant = parameters.stiffness_constant;
+  const bool   density_constant = this->parameters.density_constant,
+	     stiffness_constant = this->parameters.stiffness_constant;
 
   std::vector<double> density_values   (n_q_points, 1.);
   std::vector<double> stiffness_values (n_q_points, 1.);
 
   if (density_constant)
     fill_n (density_values.begin(), n_q_points,
-	    parameters.density->value(Point<dim>()));
+	    this->parameters.density->value(Point<dim>()));
   if (stiffness_constant)
     fill_n (stiffness_values.begin(), n_q_points,
-	    parameters.stiffness->value(Point<dim>()));
+	    this->parameters.stiffness->value(Point<dim>()));
 
 
 FEValues<dim>  fe_values (fe, quadrature,
@@ -4980,10 +4981,10 @@ FEValues<dim>  fe_values (fe, quadrature,
       if (!density_constant || !stiffness_constant)
 	{
 	  if (!density_constant)
-	    parameters.density->value_list (fe_values.get_quadrature_points (),
+	    this->parameters.density->value_list (fe_values.get_quadrature_points (),
 					    density_values);
 	  if (!stiffness_constant)
-	    parameters.stiffness->value_list (fe_values.get_quadrature_points (),
+	    this->parameters.stiffness->value_list (fe_values.get_quadrature_points (),
 					      stiffness_values);
 	};
       
@@ -5024,29 +5025,29 @@ void TimeStep_Wave<dim>::transfer_old_solutions (Vector<double> &old_u,
   const Vector<double>  *old_grid_u = 0,
 			*old_grid_v = 0;
   
-  switch (next_action)
+  switch (this->next_action)
     {
       case primal_problem:
-	    Assert (previous_timestep != 0, ExcInternalError());
+	    Assert (this->previous_timestep != 0, ExcInternalError());
 	    
 	    old_dof_handler = (static_cast<const TimeStepBase_Wave<dim>*>
-			       (previous_timestep)->get_timestep_primal()).dof_handler;
+			       (this->previous_timestep)->get_timestep_primal()).dof_handler;
 	    old_grid_u      = &(static_cast<const TimeStepBase_Wave<dim>*>
-				(previous_timestep)->get_timestep_primal()).u;
+				(this->previous_timestep)->get_timestep_primal()).u;
 	    old_grid_v      = &(static_cast<const TimeStepBase_Wave<dim>*>
-				(previous_timestep)->get_timestep_primal()).v;
+				(this->previous_timestep)->get_timestep_primal()).v;
 	    
 	    break;
 
       case dual_problem:
-	    Assert (next_timestep != 0, ExcInternalError());
+	    Assert (this->next_timestep != 0, ExcInternalError());
 	    
 	    old_dof_handler = (static_cast<const TimeStepBase_Wave<dim>*>
-			       (next_timestep)->get_timestep_dual()).dof_handler;
+			       (this->next_timestep)->get_timestep_dual()).dof_handler;
 	    old_grid_u      = &(static_cast<const TimeStepBase_Wave<dim>*>
-				(next_timestep)->get_timestep_dual()).u;
+				(this->next_timestep)->get_timestep_dual()).u;
 	    old_grid_v      = &(static_cast<const TimeStepBase_Wave<dim>*>
-				(next_timestep)->get_timestep_dual()).v;
+				(this->next_timestep)->get_timestep_dual()).v;
 
 	    break;
     };
@@ -5100,7 +5101,7 @@ std::pair<double,double>
 TimeStep_Wave<dim>::compute_energy () {
   std::pair<double,double> energy;
   
-  switch (next_action)
+  switch (this->next_action)
     {
       case primal_problem:
 	    energy.first = 0.5*laplace_matrix.matrix_norm_square (u);
@@ -5205,39 +5206,39 @@ template <int dim>
 void TimeStep_Dual<dim>::do_initial_step () {
   deallog << "  Dual problem: time="
        << time
-       << ", step=" << timestep_no
-       << ", sweep=" << sweep_no
+       << ", step=" << this->timestep_no
+       << ", sweep=" << this->sweep_no
        << ". "
-       << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs";
+       << this->tria->n_active_cells() << " cells, "
+       << this->dof_handler->n_dofs() << " dofs";
   
-  sweep_info->get_data().dual_dofs += dof_handler->n_dofs() * 2;
+  this->sweep_info->get_data().dual_dofs += this->dof_handler->n_dofs() * 2;
 
   Vector<double> tmp_u_bar, tmp_v_bar;
 
-  parameters.dual_functional->reset (*this);
-  parameters.dual_functional->
+  this->parameters.dual_functional->reset (*this);
+  this->parameters.dual_functional->
     compute_endtime_vectors (tmp_u_bar, tmp_v_bar);
-  u.reinit (tmp_u_bar.size());
-  v.reinit (tmp_v_bar.size());
+  this->u.reinit (tmp_u_bar.size());
+  this->v.reinit (tmp_v_bar.size());
   if ((tmp_u_bar.linfty_norm() > 0) || (tmp_v_bar.linfty_norm() > 0))
     {
-      UserMatrix system_matrix (system_sparsity,
-				parameters.preconditioning);
-      system_matrix.copy_from (mass_matrix);
+      UserMatrix system_matrix (this->system_sparsity,
+				this->parameters.preconditioning);
+      system_matrix.copy_from (this->mass_matrix);
       constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
       const unsigned int
-	solver_steps1 = solve (system_matrix, u, tmp_u_bar),
-	solver_steps2 = solve (system_matrix, v, tmp_v_bar);
+	solver_steps1 = solve (system_matrix, this->u, tmp_u_bar),
+	solver_steps2 = solve (system_matrix, this->v, tmp_v_bar);
 
-      statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
-								   dof_handler->n_dofs(),
+      this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
+								   this->dof_handler->n_dofs(),
 								   solver_steps1, solver_steps2,
 								   compute_energy ());
     }
   else
-    statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
-								 dof_handler->n_dofs(),
+    this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
+								 this->dof_handler->n_dofs(),
 								 0, 0,
 								 std::make_pair (0.0, 0.0));
   deallog << "." << std::endl;
@@ -5249,42 +5250,42 @@ void TimeStep_Dual<dim>::do_timestep ()
 {
   deallog << "  Dual problem: time="
        << time
-       << ", step=" << timestep_no
-       << ", sweep=" << sweep_no
+       << ", step=" << this->timestep_no
+       << ", sweep=" << this->sweep_no
        << ". "
-       << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs";
+       << this->tria->n_active_cells() << " cells, "
+       << this->dof_handler->n_dofs() << " dofs";
 
-  sweep_info->get_data().dual_dofs += dof_handler->n_dofs() * 2;
+  this->sweep_info->get_data().dual_dofs += this->dof_handler->n_dofs() * 2;
 
   const double time_step = get_forward_timestep ();
 
-  Vector<double> right_hand_side1 (dof_handler->n_dofs());
-  Vector<double> right_hand_side2 (dof_handler->n_dofs());
+  Vector<double> right_hand_side1 (this->dof_handler->n_dofs());
+  Vector<double> right_hand_side2 (this->dof_handler->n_dofs());
   
   Vector<double> old_u, old_v;
   if (parameters.extrapolate_old_solutions)
     {
-      old_u.reinit (dof_handler->n_dofs());
-      old_v.reinit (dof_handler->n_dofs());
+      old_u.reinit (this->dof_handler->n_dofs());
+      old_v.reinit (this->dof_handler->n_dofs());
 
       transfer_old_solutions (old_u, old_v);
     };
     
   assemble_vectors (right_hand_side1, right_hand_side2);
 
-  UserMatrix system_matrix (system_sparsity, parameters.preconditioning);
-  system_matrix.copy_from (mass_matrix);
+  UserMatrix system_matrix (this->system_sparsity, parameters.preconditioning);
+  system_matrix.copy_from (this->mass_matrix);
   system_matrix.add_scaled (time_step * time_step *
-			    parameters.theta *
-			    parameters.theta,
-			    laplace_matrix);
+			    this->parameters.theta *
+			    this->parameters.theta,
+			    this->laplace_matrix);
   constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
 	
   if (parameters.extrapolate_old_solutions)
     {
-      v  = old_v;
-      v.add (time_step, old_u);
+      this->v  = old_v;
+      this->v.add (time_step, old_u);
     };
 
 
@@ -5293,41 +5294,41 @@ void TimeStep_Dual<dim>::do_timestep ()
     {
       static const ZeroFunction<dim> boundary_values;
       
-      VectorTools::interpolate_boundary_values (*dof_handler, 0, boundary_values,
+      VectorTools::interpolate_boundary_values (*this->dof_handler, 0, boundary_values,
 						     boundary_value_list);
       MatrixTools::apply_boundary_values (boundary_value_list,
-					  system_matrix, v,
+					  system_matrix, this->v,
 					  right_hand_side1);
     };
   
-  const unsigned int solver_steps1 = solve (system_matrix, v, right_hand_side1);
+  const unsigned int solver_steps1 = solve (system_matrix, this->v, right_hand_side1);
 	
-  system_matrix.copy_from (mass_matrix);
-  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
+  system_matrix.copy_from (this->mass_matrix);
+  this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
   if (true)
     {
       Vector<double> tmp (right_hand_side2.size());
-      laplace_matrix.vmult (tmp, v);
-      right_hand_side2.add (-parameters.theta*time_step, tmp);
+      this->laplace_matrix.vmult (tmp, this->v);
+      right_hand_side2.add (-this->parameters.theta*time_step, tmp);
     };
-  constraints.condense (right_hand_side2);
+  this->constraints.condense (right_hand_side2);
   if (dim != 1)
     MatrixTools::apply_boundary_values (boundary_value_list,
-					system_matrix, u,
+					system_matrix, this->u,
 					right_hand_side2);
   
-  if (parameters.extrapolate_old_solutions)
+  if (this->parameters.extrapolate_old_solutions)
     {
-      u  = v;
-      u -= old_v;
-      u.scale (2./time_step);
-      u -= old_u;
+      this->u  = this->v;
+      this->u -= old_v;
+      this->u.scale (2./time_step);
+      this->u -= old_u;
     };
   
   const unsigned int solver_steps2 = solve (system_matrix, u, right_hand_side2);
 
-  statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
-							       dof_handler->n_dofs(),
+  this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
+							       this->dof_handler->n_dofs(),
 							       solver_steps1,
 							       solver_steps2,
 							       compute_energy ());
@@ -5339,12 +5340,12 @@ void TimeStep_Dual<dim>::do_timestep ()
 template <int dim>
 void TimeStep_Dual<dim>::solve_dual_problem ()
 {
-  sweep_info->get_timers().dual_problem.start();
-  if (next_timestep == 0)
+  this->sweep_info->get_timers().dual_problem.start();
+  if (this->next_timestep == 0)
     do_initial_step ();
   else
     do_timestep ();
-  sweep_info->get_timers().dual_problem.stop();
+  this->sweep_info->get_timers().dual_problem.stop();
 }
 
 
@@ -5360,14 +5361,14 @@ void TimeStep_Dual<dim>::wake_up (const unsigned int wakeup_level)
 {
   TimeStep_Wave<dim>::wake_up (wakeup_level);
   
-  sweep_info->get_timers().dual_problem.start();
+  this->sweep_info->get_timers().dual_problem.start();
   if ((wakeup_level==0) && (next_action==dual_problem))
     {
       Assert (system_sparsity.empty(), ExcInternalError());
       
       create_matrices ();
     };
-  sweep_info->get_timers().dual_problem.stop();
+  this->sweep_info->get_timers().dual_problem.stop();
 }
 
 
@@ -5775,7 +5776,7 @@ TimeStep_ErrorEstimation<dim>::TimeStep_ErrorEstimation ()
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::estimate_error ()
 {
-  sweep_info->get_timers().error_estimation.start();
+  this->sweep_info->get_timers().error_estimation.start();
 
   deallog << "[ee]";
   
@@ -5794,9 +5795,9 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 						    estimated_error_per_cell.end(),
 						    0.0);
   statistic_data = StatisticData (accumulated_error);
-  sweep_info->get_data().accumulated_error += accumulated_error;
+  this->sweep_info->get_data().accumulated_error += accumulated_error;
 
-  sweep_info->get_timers().error_estimation.stop();
+  this->sweep_info->get_timers().error_estimation.stop();
 }
 
 
@@ -6581,11 +6582,11 @@ TimeStep<dim>::TimeStep (const double               time,
 template <int dim>
 void TimeStep<dim>::wake_up (const unsigned int wakeup_level)
 {
-  sweep_info->get_timers().grid_generation.start();
+  this->sweep_info->get_timers().grid_generation.start();
   TimeStepBase_Wave<dim>::wake_up (wakeup_level);
-  sweep_info->get_timers().grid_generation.stop();
+  this->sweep_info->get_timers().grid_generation.stop();
 
-  switch (next_action)
+  switch (this->next_action)
     {
       case primal_problem:
 	    TimeStep_Primal<dim>::wake_up (wakeup_level);
@@ -6619,7 +6620,7 @@ void TimeStep<dim>::wake_up (const unsigned int wakeup_level)
 template <int dim>
 void TimeStep<dim>::sleep (const unsigned int sleep_level)
 {  
-  switch (next_action)
+  switch (this->next_action)
     {
       case primal_problem:
 	    TimeStep_Primal<dim>::sleep (sleep_level);
@@ -6649,9 +6650,9 @@ void TimeStep<dim>::sleep (const unsigned int sleep_level)
 	    Assert (false, ExcInternalError());
     };
 
-  sweep_info->get_timers().grid_generation.start();
+  this->sweep_info->get_timers().grid_generation.start();
   TimeStepBase_Wave<dim>::sleep (sleep_level);
-  sweep_info->get_timers().grid_generation.stop();
+  this->sweep_info->get_timers().grid_generation.stop();
 }
 
 
@@ -6730,7 +6731,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
     estimate_error ();
 
-  sweep_info->get_timers().postprocessing.start();
+  this->sweep_info->get_timers().postprocessing.start();
 
   statistic_data.evaluation_results.clear();
   for (typename std::list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
@@ -6856,7 +6857,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 
 
 deallog << std::endl;
-  sweep_info->get_timers().postprocessing.stop();
+  this->sweep_info->get_timers().postprocessing.stop();
 }
 
 
@@ -6973,8 +6974,8 @@ void TimeStep_Primal<dim>::do_initial_step ()
        << dof_handler->n_dofs() << " dofs";
 
 
-  sweep_info->get_data().cells       += tria->n_active_cells();
-  sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
+  this->sweep_info->get_data().cells       += tria->n_active_cells();
+  this->sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
 
 #if 2 == 1
   VectorTools::interpolate (*dof_handler, *parameters.initial_u, u);
@@ -7008,8 +7009,8 @@ void TimeStep_Primal<dim>::do_timestep ()
        << tria->n_active_cells() << " cells, "
        << dof_handler->n_dofs() << " dofs";
   
-  sweep_info->get_data().cells       += tria->n_active_cells();
-  sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
+  this->sweep_info->get_data().cells       += tria->n_active_cells();
+  this->sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
 
 
 const double time_step = get_backward_timestep ();
@@ -7105,12 +7106,12 @@ if (parameters.extrapolate_old_solutions)
 template <int dim>
 void TimeStep_Primal<dim>::solve_primal_problem ()
 {
-  sweep_info->get_timers().primal_problem.start();
+  this->sweep_info->get_timers().primal_problem.start();
   if (timestep_no == 0)
     do_initial_step ();
   else
     do_timestep ();
-  sweep_info->get_timers().primal_problem.stop();
+  this->sweep_info->get_timers().primal_problem.stop();
 }
 
 
@@ -7126,14 +7127,14 @@ void TimeStep_Primal<dim>::wake_up (const unsigned int wakeup_level)
 {
   TimeStep_Wave<dim>::wake_up (wakeup_level);
   
-  sweep_info->get_timers().primal_problem.start();
+  this->sweep_info->get_timers().primal_problem.start();
   if ((wakeup_level==0) && (next_action==primal_problem))
     {
       Assert (system_sparsity.empty(), ExcInternalError());
       
       create_matrices ();
     };
-  sweep_info->get_timers().primal_problem.stop();
+  this->sweep_info->get_timers().primal_problem.stop();
 }
 
 
