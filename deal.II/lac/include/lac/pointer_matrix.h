@@ -18,13 +18,29 @@
 template<class VECTOR>
 class PointerMatrixBase : public Subscriptor
 {
-public:
-				   /**
-				    * Virtual destructor.  Does
-				    * nothing except making sure that
-				    * the destructor of the derived
-				    * class is called.
-				    */
+  public:
+				     /**
+				      * Value type of this
+				      * matrix. since the matrix
+				      * itself is unknown, we take the
+				      * value type of the
+				      * vector. Therefore, matrix
+				      * entries must be convertible to
+				      * vector entries.
+				      *
+				      * This was defined to make this
+				      * matrix a possible template
+				      * argument to
+				      * @ref{BlockMatrixArray}.
+				      */
+    typedef typename VECTOR::value_type value_type;
+    
+				     /**
+				      * Virtual destructor.  Does
+				      * nothing except making sure that
+				      * the destructor of the derived
+				      * class is called.
+				      */
   virtual ~PointerMatrixBase ();
 
 				   /**
