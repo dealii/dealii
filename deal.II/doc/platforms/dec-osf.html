@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II Readme -- Installation Instructions</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Installation instructions for DEC OSF V4.0 </h1>
+
+    <p>
+    We have tried to compile <acronym>deal.II</acronym> on DEC Alpha
+    workstations under OSF1 V4.0. The main problem seems to be that on
+    this operating system, that the GNU BinUtils are not supported, so
+    we have to use the system assembler. That, however, has a built-in
+    limit for the size of symbol names, which is quickly exceeded in
+    the template-heavy parts of the code. Typical error messages from
+    the assembler therefore spill out several pages of symbols with an
+    interspersed note that that symbol exceeded the maximum line
+    length of the assembler.
+    </p>
+
+    <p>
+    Unfortunately, when using gcc2.95 or previous versions or gcc
+    there seems no real way to avoid this. Later versions of gcc will
+    use a different scheme (called <em>squangling</em>, an
+    amalgamation of <em>squeezing</em> and <em>mangling</em>) to mangle C++
+    names into symbol names that generate shorter symbols. However,
+    this scheme is not readily available on gcc2.95. However, if you
+    are willing to recompile and reinstall gcc, you can switch on the
+    squangling scheme by slighly modifying one of gcc's source
+    files. The full details of this are listed
+    <a href="http://gcc.gnu.org/fom_serv/cache/41.html" target="_top">on 
+    this page</a>. With this scheme switched on, we were able to
+    compile the library.
+    </p>
+
+    <p>
+    Problems do not end here, though. The system assembler, due to its
+    limited line length, also rejects long lines of debugging
+    information. We avoid this by not using the -ggdb switch of gcc,
+    but rather use -gstabs. This generates less debugging information,
+    but the lines are also shorter, so the assembler can digest
+    them. However, you should be aware that this can, in some cases,
+    reduce your ability to debug programs, due to missing information
+    in the debugger.
+    </p>
+
+    <p>
+    Another problem occured when gcc generated an internal compiler
+    error when compiling the AssertThrow macro. (Note that we have
+    also observed this effect on DEC Alpha stations running Linux
+    instead of OSF.) In order to avoid this problem, on systems where
+    this happens we changed the behaviour of this macro to simply
+    abort the program, instead of throwing an exception. This then
+    does not allow you to catch exceptions that are generated on other
+    systems, but it was the only way we were able to make the compiler
+    work. If anyone should have a better idea, we would be eager to
+    hear about it.
+    </p>
+
+    <p>
+    The decisions to use -gstabs over -ggdb, and whether the
+    AssertThrow macro works correctly are done at configure time, and
+    are not hard-coded into the library. Thus, if your system has a
+    patch for the system assembler installed that allows it to accept
+    longer debugging information lines, or if your compiler accepts
+    the AssertThrow macro, then the restrictions above do not
+    apply. If you install a patch to the assembler or the compiler to
+    avoid these problems, re-configure the deal.II library and
+    re-compile it for the changes to take full effect.
+    </p>
+
+
+  </body>
+</html>
