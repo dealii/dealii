@@ -11,7 +11,7 @@
 #number of pathes). The output looks like this:
 #
 #lib/o/.o-file: file included_files
-#lib/go/.go-file: file included_files
+#lib/go/.g.o-file: file included_files
 
 #Author: Wolfgang Bangerth, 1998, 1999, 2000, 2001, 2002
 
@@ -81,7 +81,7 @@ foreach $file (@input_files) {
     print "\n";
 
     # write rule for the .go file
-    print "$basepath/$basename.go:";
+    print "$basepath/$basename.g.o:";
     print "\\\n    $file";
     foreach $f (@include_file_list) {
 	print "\\\n    $f";

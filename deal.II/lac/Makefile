@@ -14,7 +14,7 @@ o-files-base1= $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=
 o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1))
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
-go-files     = $(o-files-base3:.o=.go)
+go-files     = $(o-files-base3:.o=.g.o)
 h-files      = $(sort $(shell echo include/lac/*.h))
 
 forward-declarations = $D/lac/include/lac/forward_declarations.h
@@ -30,7 +30,7 @@ else
   MT = ==
 endif
 
-$(LIBDIR)/lac/%.go :
+$(LIBDIR)/lac/%.g.o :
 	@echo =====lac==============debug======$(MT)== $(<F)
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 $(LIBDIR)/lac/%.o :

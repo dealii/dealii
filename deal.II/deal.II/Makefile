@@ -48,11 +48,11 @@ forward-declarations = $D/deal.II/include/grid/forward_declarations.h
 # don't care about different directories
 tmp1        = $(notdir $(cc-files))
 o-files-1d  = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.o) )
-go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.go))
+go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.g.o))
 o-files-2d  = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.o) )
-go-files-2d = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.go))
+go-files-2d = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.g.o))
 o-files-3d  = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.o) )
-go-files-3d = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.go))
+go-files-3d = $(addprefix $(LIBDIR)/3d/, $(tmp1:.cc=_3d.g.o))
 
 o-files  = $(o-files-1d)  $(o-files-2d)  $(o-files-3d)
 go-files = $(go-files-1d) $(go-files-2d) $(go-files-3d)
@@ -67,21 +67,21 @@ else
   MT = ==
 endif
 
-$(LIBDIR)/1d/%.go :
+$(LIBDIR)/1d/%.g.o :
 	@echo =====deal.II====1d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
 $(LIBDIR)/1d/%.o :
 	@echo =====deal.II====1d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
-$(LIBDIR)/2d/%.go :
+$(LIBDIR)/2d/%.g.o :
 	@echo =====deal.II====2d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
 $(LIBDIR)/2d/%.o :
 	@echo =====deal.II====2d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
-$(LIBDIR)/3d/%.go :
+$(LIBDIR)/3d/%.g.o :
 	@echo =====deal.II====3d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
 $(LIBDIR)/3d/%.o :
@@ -155,7 +155,7 @@ Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
-		| $(PERL) -pe 's!(\.g?o):!_DIM_PLACEHOLDER$$1:!g;' \
+		| $(PERL) -pe 's!((\.g)?.o):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
 		> Makefile.dep
 

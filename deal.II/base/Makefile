@@ -19,7 +19,7 @@ o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
                $(patsubst %.o,%_4d.o,$(filter %data_out_base.o, $(o-files-base1)))
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
-go-files     = $(o-files-base3:.o=.go)
+go-files     = $(o-files-base3:.o=.g.o)
 h-files      = $(sort $(shell echo include/base/*.h))
 
 forward-declarations = $D/base/include/base/forward_declarations.h
@@ -55,7 +55,7 @@ else
   MT = ==
 endif
 
-$(LIBDIR)/base/%.go :
+$(LIBDIR)/base/%.g.o :
 	@echo =====base=============debug======$(MT)== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
@@ -113,7 +113,7 @@ clean:
 Makefile.dep: $(cc-files) $(forward-declarations) $(h-files) Makefile
 	@echo ============================ Remaking Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
-		| $(PERL) -p -e 's!(.*/base/data_out_base)(.g?o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
+		| $(PERL) -p -e 's!(.*/base/data_out_base)((.g)?.o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
 		> Makefile.dep
 
 
