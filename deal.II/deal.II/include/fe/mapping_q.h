@@ -434,7 +434,7 @@ class MappingQ : public MappingQ1<dim>
 				      * mapping of cells at the
 				      * boundary.
 				      */
-    TensorProductPolynomials<dim>* tensor_pols;
+    TensorProductPolynomials<dim> *tensor_pols;
     
     				     /**
 				      * Number of the Qp tensor
@@ -453,6 +453,7 @@ class MappingQ : public MappingQ1<dim>
 				     /**
 				      * Needed for inner faces.
 				      */
+//TODO: can we make this variable static?    
     StraightBoundary<dim> straight_boundary;
 
 				     /**
@@ -462,6 +463,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Used to test the covariant
 				      * transformation.
 				      */
+//TODO: why have two ways to compute? if they both work, choose one and remove the other    
     bool alternative_normals_computation;
 
 				     /**
@@ -472,6 +474,7 @@ class MappingQ : public MappingQ1<dim>
 				      *
 				      * The default value is false.
 				      */
+//TODO: remove use_mapping_q_on_all_cells as it is set to false in the constructor and never set again    
     bool use_mapping_q_on_all_cells;
 };
 

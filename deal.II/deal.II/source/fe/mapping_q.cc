@@ -48,7 +48,9 @@ MappingQ<1>::MappingQ (unsigned int):
 		tensor_pols(0),
 		n_shape_functions(2),
 		renumber(0),
+//TODO: why have two ways to compute? if they both work, choose one and remove the other    
 		alternative_normals_computation(false),
+//TODO: remove use_mapping_q_on_all_cells as it is set to false in the constructor and never set again    
 		use_mapping_q_on_all_cells(false)
 {}
 
@@ -61,8 +63,8 @@ MappingQ<1>::~MappingQ ()
 
 
 
-template<typename number> static
-number power(number x, unsigned int y)
+template<typename number>
+static number power(const number x, const unsigned int y)
 {
   number value=1;
   for (unsigned int i=0; i<y; ++i)
@@ -72,7 +74,7 @@ number power(number x, unsigned int y)
 
 
 template<int dim>
-MappingQ<dim>::MappingQ (unsigned int p):
+MappingQ<dim>::MappingQ (const unsigned int p):
 		laplace_on_quad_vector(0),
 		laplace_on_hex_vector(0),
 		degree(p),
@@ -82,7 +84,9 @@ MappingQ<dim>::MappingQ (unsigned int p):
 		tensor_pols(0),
 		n_shape_functions(0),
 		renumber(0),
+//TODO: why have two ways to compute? if they both work, choose one and remove the other    
 		alternative_normals_computation(false),
+//TODO: remove use_mapping_q_on_all_cells as it is set to false in the constructor and never set again    
 		use_mapping_q_on_all_cells(false)
 {
 				   // Construct the tensor product
