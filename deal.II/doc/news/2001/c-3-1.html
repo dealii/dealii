@@ -126,8 +126,16 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+
+       New: The function <code class="class">Logstream</code>::<code
+       class="member">get_prefix</code> allows access to the prefix
+       string used for log-files.
+       <br>
+       (GK 2001/04/26)
+
+  <li> <p>
        New: There is now a global function <code
-       class="member">trace</code> that computes the trace of a tensor
+       class="function">trace</code> that computes the trace of a tensor
        of rank 2.
        <br>
        (WB 2001/04/12)
@@ -193,7 +201,7 @@ documentation, etc</a>.
        (GK 2001/03/05)
        </p>
 
-  <li> <p> New: <code class="class">Logstream</code>.<code
+  <li> <p> New: <code class="class">Logstream</code>::<code
        class="member">log_time_differences (bool)</code> makes <code
        class="class">Logstream</code> print the time since the last
        log line instead of accumulated time since program start.
@@ -202,7 +210,7 @@ documentation, etc</a>.
        </p>
 
 
-  <li> <p> Fix: <code class="class">Logstream</code>.<code
+  <li> <p> Fix: <code class="class">Logstream</code>::<code
        class="member">pop()</code> does not perform anything on empty
        stacks.
        <br>
@@ -262,7 +270,8 @@ documentation, etc</a>.
 
   <li> <p>
        New: There is now a function <code
-       class="member">Vector::scale(Vector)</code>
+       class="class">Vector</code>::<code
+       class="member">scale(Vector)</code>
        that scales each element of the vector by the corresponding
        element of the argument.
        <br>
@@ -273,7 +282,8 @@ documentation, etc</a>.
        return void now. If the solver has not converged within the
        maximum number of iterations or encounters a breakdown, it
        throws an exception of type <code
-       class="class">SolverControl::NoConvergence</code> instead of
+       class="class">SolverControl</code>::<code
+       class="member">NoConvergence</code> instead of
        returning a special value.
        <br>
        (GK 2001/03/29)
@@ -363,9 +373,11 @@ documentation, etc</a>.
 
   <li> <p>
        New: There are now functions <code
-       class="member">DoFTools::map_dofs_to_support_points</code> and 
+       class="class">DoFTools</code>::<code
+       class="member">map_dofs_to_support_points</code> and 
        <code
-       class="member">DoFTools::map_support_points_to_dofs</code> that
+       class="class">DoFTools</code>::<code
+       class="member">map_support_points_to_dofs</code> that
        generate a map between DoF indices and the support points of
        these DoFs, and the other way round.
        <br>
@@ -404,23 +416,24 @@ documentation, etc</a>.
        
   <li> <p>
        Fixed: the <code
-       class="member">DoFRenumbering::Cuthill_McKee</code> function
-       did not work correctly when giving the <code
-       class="member">reversed_numbering</code> flag (off-by-one
-       indexing). This is now fixed.
+       class="class">DoFRenumbering</code>::<code
+       class="member">Cuthill_McKee</code> function
+       did not work correctly when giving the <code>reversed_numbering</code>
+       flag (off-by-one indexing). This is now fixed.
        <br>
        (<a href="mailto:or@winfos.com">Oliver Rheinbach</a> 2001/04/12)
        </p>
        
   <li> <p>
-       Changed: A <code class="class">typedef FunctionMap</code> was
+       Changed: A <code>typedef FunctionMap</code> was
        declared in at least four places previously (in classes <code
        class="class">DoFHandler</code>, <code
        class="class">MatrixTools</code>, <code
        class="class">VectorTools</code>, and <code
        class="class">KellyErrorEstimator</code>). It is now unified in
        one place and is called <code
-       class="class">FunctionMap<dim>::type</code> (it is a local
+       class="class">FunctionMap&lt;dim&gt;</code>::<code
+       class="member">type</code> (it is a local
        typedef in a class called <code
        class="class">FunctionMap</code>). This type is defined in the
        file <tt>dofs/function_map.h</tt>.
@@ -432,16 +445,19 @@ documentation, etc</a>.
        Fixed: When using Neuman boundary functions in the 
        <code class="class">KellyErrorEstimator</code> class, it was
        assumed that the function object had <code
-       class="member">Function::vector_value</code> overloaded, even
+       class="class">Function</code>::<code
+       class="member">vector_value</code> overloaded, even
        in the scalar case. We now use <code
-       class="member">Function::value</code> instead.
+       class="member">Function</code>::<code
+       class="member">value</code> instead.
        <br>
        (WB 2001/04/09)
        </p>
        
   <li> <p>
        New: The various <code
-       class="member">MatrixCreator::create_*_matrix</code> functions
+       class="class">MatrixCreator</code>::<code
+       class="member">create_*_matrix</code> functions
        are now using multiple threads to do their work, if the library
        is configured to use multithreading.
        <br>
@@ -756,7 +772,8 @@ documentation, etc</a>.
 
   <li> <p>
        Fix: the <code
-       class="member">DoFTools::compute_intergrid_constraints</code>
+       class="class">DoFTools</code>::<code
+       class="member">compute_intergrid_constraints</code>
        function took memory quadratic in the number of degrees of
        freedom. This is now reduced to linear behaviour, with a
        constant that depends on the number of levels by which the two
@@ -800,7 +817,8 @@ documentation, etc</a>.
 
   <li> <p>
        New: There is now a function
-       <code class="member">ConstraintMatrix::merge</code> that merges
+       <code class="class">ConstraintMatrix</code>::<code
+       class="member">merge</code> that merges
        the constraints represented by two constraint matrices into one
        object.
        <br>
