@@ -321,10 +321,7 @@ class Vector {
     
 				     /**
 				      * Scale each element of the vector by the
-				      * given factor. This function was
-				      * previously called #equ(Number)#, which
-				      * in my eyes is an extremely unintuitive
-				      * naming and was thus replaced.
+				      * given factor.
 				      */
     void scale (const Number factor);
     
