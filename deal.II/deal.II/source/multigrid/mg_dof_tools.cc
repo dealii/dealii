@@ -20,6 +20,7 @@
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/block_vector.h>
+#include <lac/vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <multigrid/mg_dof_handler.h>
@@ -616,13 +617,13 @@ template void MGTools::reinit_vector<deal_II_dimension> (
   MGLevelObject<Vector<double> >&,
   const std::vector<bool>&,
   const std::vector<unsigned int>&,
-  std::vector<std::vector<unsigned int> >&);
+  const std::vector<std::vector<unsigned int> >&);
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<Vector<float> >&,
   const std::vector<bool>&,
   const std::vector<unsigned int>&,
-  std::vector<std::vector<unsigned int> >&);
+  const std::vector<std::vector<unsigned int> >&);
 
 
 template void MGTools::count_dofs_per_component<deal_II_dimension> (
