@@ -182,15 +182,19 @@ namespace FE_Nedelec_3d
 {
   static const double constraint_q1[] =
   {
-	0
-//TODO[WB]	
-//  	.25,.25,.25,.25,
-//  	.5,.5,0.,0.,
-//  	0.,.5,.5,0.,
-//  	0.,0.,.5,.5,
-//  	.5,0.,0.,.5
+	0, .5, 0, .5,  // first the four interior lines
+	.5, 0, .5, 0,
+	0, .5, 0, .5,
+	.5, 0, .5, 0,
+	1, 0, 0, 0,  // then the two child lines of each of the four outer ones.
+	1, 0, 0, 0,  // since the shape functions are constant on each line, 
+	0, 1, 0, 0,  // the two child lines get the same weights
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1,
+	0, 0, 0, 1
   };
-
 };
 
 

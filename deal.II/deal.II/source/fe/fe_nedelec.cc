@@ -703,6 +703,12 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
   if (flags & update_values)
     {
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
+
+      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+	      ExcInternalError());
+      Assert (data.shape_values.n_cols() == n_q_points,
+	      ExcInternalError());
+      
       for (unsigned int k=0; k<dofs_per_cell; ++k)
 	{
 					   // first transform shape
@@ -715,12 +721,9 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 					  mapping_data);
 
 					   // then copy over to target:
-	  Assert (data.shape_values[k].size() == n_q_points*dim,
-		  ExcInternalError());
-	  unsigned index = 0;
 	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d=0; d<dim; ++d, ++index)
-	      data.shape_values[k][index] = shape_values[q][d];
+	    for (unsigned int d=0; d<dim; ++d)
+	      data.shape_values[k*dim+d][q] = shape_values[q][d];
 	};
     };
   
