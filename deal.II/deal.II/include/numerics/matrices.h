@@ -36,6 +36,13 @@ template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
 
+#ifdef DEAL_II_USE_PETSC
+namespace PETScWrappers
+{
+  class MatrixBase;
+  class VectorBase;
+}
+#endif
 
 
 /**
@@ -654,7 +661,7 @@ class MatrixCreator
  * modifying the matrix and right hand side vectors for boundary
  * values.
  * 
- * @author Wolfgang Bangerth, 1998, 2000
+ * @author Wolfgang Bangerth, 1998, 2000, 2004
  */
 class MatrixTools : public MatrixCreator
 {
@@ -699,6 +706,28 @@ class MatrixTools : public MatrixCreator
 			   BlockVector<double>                 &right_hand_side,
 			   const bool           eliminate_columns = true);
 
+				     /**
+				      * Apply dirichlet boundary conditions to
+				      * the system matrix and vectors as
+				      * described in the general
+				      * documentation. This function works on
+				      * the classes that are used to wrap
+				      * PETSc objects.
+				      *
+				      * For a replacement function,
+				      * see the documentation of the
+				      * @ref{FilteredMatrix} class in
+				      * the @p{LAC} sublibrary.
+				      */
+#ifdef DEAL_II_USE_PETSC
+    static void
+    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			   PETScWrappers::MatrixBase  &matrix,
+			   PETScWrappers::VectorBase  &solution,
+			   PETScWrappers::VectorBase  &right_hand_side,
+			   const bool             eliminate_columns = true);
+#endif
+    
 				     /**
 				      * Exception
 				      */
