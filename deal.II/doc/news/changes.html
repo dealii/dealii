@@ -152,6 +152,16 @@ inconvenience this causes.
 
 <ol>  
   <li> <p>
+       Fixed: The class <code
+       class="class">FunctionParser</code> had a bug that prevented it
+       to function properly with non vector valued functions. This is now
+       fixed. In addition now the class can parse a string with 
+       semicolons in it to generate a vector valued function from it.
+       <br>
+       (Luca Heltai, 2005/03/31)
+       </p>
+
+  <li> <p>
        New: The new function <code
        class="member">double_contract</code> contracts two tensors of
        rank 4 and 2 into a tensor of rank 2, by contracting over two
