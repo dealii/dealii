@@ -437,6 +437,26 @@ void contract (Tensor<1,dim>       &dest,
 
 
 /**
+ * Contract a tensor of rank 1 with a tensor of rank 2. The result is
+ * @p{dest[i] = sum_j src1[j] src2[j][i]}.
+ *
+ * @author Guido Kanschat, 2001
+ */
+template <int dim>
+inline
+void contract (Tensor<1,dim>       &dest,
+	       const Tensor<1,dim> &src1,
+	       const Tensor<2,dim> &src2)
+{
+  dest.clear ();
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      dest[i] += src1[j] * src2[j][i];
+};
+
+
+
+/**
  * Contract a tensor of rank 2 with a tensor of rank 2. The result is
  * @p{dest[i][k] = sum_j src1[i][j] src2[j][k]}.
  *
