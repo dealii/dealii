@@ -107,9 +107,16 @@ EOT
     ;
 
 
-# output the list of test cases
+# output the list of test cases. always put four in a row
+$col = 0;
 foreach $name (sort keys %testcase) {
-    print "<tr><td>$testcase{$name} <td>$name\n";
+    if ($col == 0) {
+	print "<tr>\n";
+    }
+    print "   <td>$testcase{$name} <td>$name\n";
+
+    # next column. if at end, wrap around
+    $col = ($col+1)%4;
 }
 
 print <<'EOT'
