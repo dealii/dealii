@@ -1,5 +1,12 @@
-// 	$Id$	
-// test for correctness of gradients on a given cell
+// 	$Id$
+
+// test for correctness of gradients on a given cell. originally, this
+// file did the testing itself, by comparing the computed results with
+// builtin values; this would be unnecessary now, by simply comparing
+// against a prebuilt output file, but it works this way also. if the
+// computations fail at some time, the "ok" will be replaced by
+// "WRONG!", which would let the comparison against the stored .expect
+// file fail also.
 
 // deal_II_libraries.g=-ldeal_II_2d.g
 // deal_II_libraries=-ldeal_II_2d
