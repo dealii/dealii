@@ -85,7 +85,16 @@ class BlockSparsityPattern : public Subscriptor
     BlockSparsityPattern & operator = (const BlockSparsityPattern &);
 
 				     /**
-				      *
+				      * This function collects the
+				      * sizes of the sub-objects and
+				      * stores them in internal
+				      * arrays, in order to be able to
+				      * relay global indices into the
+				      * matrix to indices into the
+				      * subobjects. You *must* call
+				      * this function each time after
+				      * you have changed the size of
+				      * the sub-objects.
 				      */
     void collect_sizes ();
     
@@ -286,18 +295,6 @@ BlockSparsityPattern<rows,columns>::operator = (const BlockSparsityPattern<rows,
 
 
 template <int rows, int columns>
-inline
-SparsityPattern &
-BlockSparsityPattern<rows,columns>::block (const unsigned int row,
-					   const unsigned int column)
-{
-  return sub_objects[row][column];
-};
-
-
-
-
-template <int rows, int columns>
 void
 BlockSparsityPattern<rows,columns>::collect_sizes ()
 {
@@ -332,6 +329,17 @@ BlockSparsityPattern<rows,columns>::collect_sizes ()
 				   // finally initialize the row
 				   // indices with this array
   column_indices.reinit (col_sizes);
+};
+
+
+
+template <int rows, int columns>
+inline
+SparsityPattern &
+BlockSparsityPattern<rows,columns>::block (const unsigned int row,
+					   const unsigned int column)
+{
+  return sub_objects[row][column];
 };
 
 
