@@ -17,8 +17,6 @@ o-files      = $(o-files-base3)
 go-files     = $(o-files-base3:.o=.g.o)
 h-files      = $(sort $(shell echo include/lac/*.h))
 
-forward-declarations = $D/lac/include/lac/forward_declarations.h
-
 # get options which hold for all files of the project
 include $D/common/Make.global_options
 
@@ -48,8 +46,6 @@ else
   libg: $(LIBDIR)/liblac.g.a
   libo: $(LIBDIR)/liblac.a
 endif
-
-forward: $(forward-declarations)
 
 $(LIBDIR)/liblac.a: $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
@@ -86,10 +82,6 @@ Makefile.dep: $(cc-files) $(h-files) Makefile
 
 # include all the dependencies
 include Makefile.dep
-
-# include a rule which tells how to remake the forward declarations file
-include $D/common/scripts/forward_declarations
-
 
 .PHONY: clean
 .PHONY: lib lib.a lib.g.a

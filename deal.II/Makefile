@@ -18,7 +18,6 @@ help:
 	@echo "=    1dg 2dg 3dg: deal.II debug version for specified dimension        ="
 	@echo "=    1do 2do 3do: deal.II optimized version for specified dimension    ="
 	@echo "=    1d 2d 3d   : deal.II debug and optimized for specified dimension  ="
-	@echo "=    forward    : forward_declarations.h for all libraries             ="
 	@echo "=                                                                      ="
 	@echo "=    contrib    : additional libraries in contrib, if there are any    ="
 	@echo "=                                                                      ="
@@ -70,16 +69,11 @@ deps:
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
 
-base: baseg baseo forward
-lac: lacg laco forward
-1d: 1dg 1do forward
-2d: 2dg 2do forward
-3d: 3dg 3do forward
-
-forward:
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) forward
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) forward
-	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) forward
+base: baseg baseo
+lac: lacg laco
+1d: 1dg 1do
+2d: 2dg 2do
+3d: 3dg 3do
 
 $(LIBDIR):
 	mkdir $@
@@ -87,13 +81,13 @@ $(LIBDIR):
 baseg base lacg lac 1dg 1d 2dg 2d 3dg 3d all debug contrib : $(LIBDIR)
 
 all: deps
-	$(MAKE) $(MAKEOPTIONS) contrib base lac 2d 1d 3d forward
+	$(MAKE) $(MAKEOPTIONS) contrib base lac 2d 1d 3d
 
 debug: deps
-	$(MAKE) $(MAKEOPTIONS) contrib baseg lacg 2dg 1dg 3dg forward
+	$(MAKE) $(MAKEOPTIONS) contrib baseg lacg 2dg 1dg 3dg
 
 optimized: deps
-	$(MAKE) $(MAKEOPTIONS) contrib baseo laco 2do 1do 3do forward
+	$(MAKE) $(MAKEOPTIONS) contrib baseo laco 2do 1do 3do
 
 contrib:
 	cd $D/contrib ; $(MAKE)
@@ -120,11 +114,10 @@ TODO:
              > $@
 
 
-TAGS: $(filter-out %/forward_declarations.h,                                \
-                  $(shell echo $D/base/source/*.cc $D/base/include/*/*.h    \
-                               $D/lac/source/*.cc $D/lac/include/*/*.h      \
-                               $D/deal.II/source/*/*.cc $D/deal.II/include/*/*.h \
-                               $D/tests/*/*.cc $D/tests/*/*.h ))
+TAGS: $(shell echo $D/base/source/*.cc $D/base/include/*/*.h    \
+                   $D/lac/source/*.cc $D/lac/include/*/*.h      \
+                   $D/deal.II/source/*/*.cc $D/deal.II/include/*/*.h \
+                   $D/tests/*/*.cc $D/tests/*/*.h )
 	@cd $D/common ; etags $^
 
 

@@ -36,10 +36,6 @@ endif
 cc-files     = $(shell echo source/*/*.cc)
 h-files      = $(sort $(shell echo include/*/*.h))
 
-forward-declarations = $D/deal.II/include/grid/forward_declarations.h
-
-forward: $(forward-declarations)
-
 
 # strip subdirectories from cc file names, preprend a "lib/[g]o"
 # and change the suffix. We place the object files with or without
@@ -162,9 +158,6 @@ Makefile.dep: $(cc-files) $(h-files) Makefile
 
 # include all the dependencies
 include Makefile.dep
-
-# include a rule which tells how to remake the forward declarations file
-include $D/common/scripts/forward_declarations
 
 
 
