@@ -392,6 +392,38 @@ class MGBase : public Subscriptor
 			      const Vector<double> &rhs) = 0;
 
 				     /**
+				      * Additional multiplication on a
+				      * refinement edge.  Using DGFEM,
+				      * the application of the global
+				      * matrix to a function on the
+				      * fine level produces results on
+				      * the surrounding cells of the
+				      * coarse level. Therefore,
+				      * additionally to the fine level
+				      * matrix, we need an operator
+				      * from the fine level to the
+				      * coarse level, taking care of
+				      * this multiplication.
+				      *
+				      * Like @ref{level_vmult}, it is
+				      * expected to add the negative
+				      * product of the matrix and
+				      * @p{src} to @p{dst}. Here,
+				      * @p{src} is a vector on the
+				      * fine level and @p{dst} is a
+				      * vector on the coarse level.
+				      *
+				      * This function has an empty
+				      * implementation here and must
+				      * be overloaded in a multigrid
+				      * class for discontinuous
+				      * methods.
+				      */
+    virtual void edge_vmult (const unsigned int    level,
+			     Vector<double>       &dst,
+			     const Vector<double> &src);
+
+				     /**
 				      * Print a level vector using
 				      * @ref{DoFHandler}.
 				      */
