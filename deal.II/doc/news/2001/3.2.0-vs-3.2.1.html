@@ -15,6 +15,14 @@
 
 <ol>
   <li> <p>
+       Fixed: an error in the definition of the <code
+       class="member">SolverMinRes::solve</code> function prevented
+       its compilation under some circumstances.
+       <br>
+       (WB 2001/11/14)
+       </p>
+
+  <li> <p>
        Fixed: upon breakdown, the <code
        class="class">SolverBicgstab</code> forgot to increment the
        iteration counter for the breakdown cycle. This is now fixed.
