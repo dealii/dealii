@@ -112,7 +112,15 @@ void DataIn<dim>::read_ucd (istream &in) {
 					   // transform from ucd to
 					   // consecutive numbering
 	  for (unsigned int i=0; i<(1<<dim); ++i)
-	    cells.back()[i] = vertex_indices[cells.back()[i]];
+	    if (vertex_indices.find (cells.back()[i]) != vertex_indices.end())
+					       // vertex with this index exists
+	      cells.back()[i] = vertex_indices[cells.back()[i]];
+	    else 
+	      {
+						 // no such vertex index
+		Assert (false, ExcInvalidVertexIndex(cell, cells.back()[i]));
+		cells.back()[i] = -1;
+	      };
 	};
     };
 
@@ -139,10 +147,10 @@ void DataOut<dim>::attach_dof_handler (DoFHandler<dim> &d) {
 
 
 template <int dim>
-void DataOut<dim>::add_data_vector (dVector &vec,
-				    String  &name,
-				    String  &units) {
-  DataEntry new_entry = {&vec, name, units};
+void DataOut<dim>::add_data_vector (const dVector &vec,
+				    const String  &name,
+				    const String  &units) {
+  DataEntry new_entry (&vec, name, units);
   data.push_back (new_entry);
 };
 
@@ -313,7 +321,8 @@ void DataOut<dim>::write_gnuplot (ostream &out) const {
 		    out << cell->vertex(vertex)
 			<< "   ";
 		    for (unsigned int i=0; i!=data.size(); ++i)
-		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0)) << ' ';
+		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
 		    out << endl;
 		  };
 		
@@ -321,10 +330,26 @@ void DataOut<dim>::write_gnuplot (ostream &out) const {
 
 	  case 2:
 						 // two dimension: output
-						 // grid
-		for (unsigned int vertex=0; vertex<4; ++vertex)
-		  out << cell->vertex(vertex) << endl;
-		out << cell->vertex(0) << endl << endl;
+						 // grid and data as a sequence
+						 // of lines in 3d
+		for (unsigned int vertex=0; vertex<4; ++vertex) 
+		  {
+		    out << cell->vertex(vertex) << "   ";
+		    for (unsigned int i=0; i!=data.size(); ++i)
+		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
+		    out << endl;
+		  };
+						 // first vertex again
+		out << cell->vertex(0) << "   ";
+		for (unsigned int i=0; i!=data.size(); ++i)
+		  out << (*data[i].data)(cell->vertex_dof_index(0,0))
+		      << ' ';
+		out << endl
+		    << endl
+		    << endl;      // end of cell; two newlines, since this
+						 // stops continuous drawing
+						 // of lines
 
 		break;
 

@@ -1,12 +1,13 @@
 /* $Id$ */
 
+#include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <basic/magic_numbers.h>
 #include <iostream.h>
 #include <algo.h>
-
-
+#include <map.h>
+#include <cmath>
 
 template <int dim>
 Triangulation<dim>::Triangulation () {
@@ -128,9 +129,233 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 
 
 void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
-					     const vector<vector<int> > &cells) {
-  const unsigned int dim=1;
-  Assert (false, ExcInternalError());
+					     const vector<vector<int> > &c) {
+  const unsigned int dim=2;
+
+  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
+  Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+  Assert (n_quads() == 0, ExcTriangulationNotEmpty());
+
+				   // copy vertices
+  vertices = v;
+  vertices_used = vector<bool> (v.size(), true);
+
+				   // copy cells. This is needed since we
+				   // may need to change entries
+  vector<vector<int> > cells(c);
+
+  
+				   // make up a list of the needed lines
+				   // each line is a pair of vertices. The list
+				   // is kept sorted and it is guaranteed
+				   // that each line is inserted only once.
+				   // While the key of such an entry is the
+				   // pair of vertices, the thing it points
+				   // to is an iterator pointing to the line
+				   // object itself. In the first run, these
+				   // iterators are all invalid ones, but they
+				   // are filled afterwards
+  map<pair<int,int>,line_iterator,less<pair<int,int> > > needed_lines;
+  for (unsigned int cell=0; cell<cells.size(); ++cell)
+    {
+#ifdef DEBUG
+				       // in debug mode: check whether vertex
+				       // indices are valid ones
+      for (unsigned int vertex=0; vertex<4; ++vertex)
+	Assert ((0<=cells[cell][vertex]) &&
+		(cells[cell][vertex]<(signed int)vertices.size()),
+		ExcInvalidVertexIndex (cell, cells[cell][vertex], vertices.size()));
+#endif
+      
+      pair<int,int> line_vertices[4] = {   // note the order of the vertices
+	    make_pair (cells[cell][0], cells[cell][1]),
+	    make_pair (cells[cell][1], cells[cell][2]),
+	    make_pair (cells[cell][0], cells[cell][3]),
+	    make_pair (cells[cell][3], cells[cell][2])};
+
+				       // note the following: if the sense
+				       // of the vertices of a cell is correct,
+				       // but the vertices are given in an
+				       // order which makes the sense of one line
+				       // ambiguous when viewed from the two
+				       // adjacent cells, we can heal this by
+				       // shifting the vertex indices of one
+				       // cell by two (diagonally exchanging
+				       // the two vertices from which the
+				       // four lines originate and to which
+				       // they converge).
+				       // If two lines are wrong, we could heal
+				       // this by rotating by one or three
+				       // vertices, but deciding this is
+				       // difficult and not implemented.
+      for (unsigned int line=0; line<4; ++line)
+	if (needed_lines.find(make_pair(line_vertices[line].second,
+					      line_vertices[line].first))
+	    !=
+	    needed_lines.end())
+	  {
+					     // rotate vertex numbers
+	    rotate (cells[cell].begin(), cells[cell].begin()+2, cells[cell].end());
+					     // remake lines
+	    line_vertices[0] = make_pair (cells[cell][0], cells[cell][1]);
+	    line_vertices[1] = make_pair (cells[cell][1], cells[cell][2]);
+	    line_vertices[2] = make_pair (cells[cell][0], cells[cell][3]);
+	    line_vertices[3] = make_pair (cells[cell][3], cells[cell][2]);
+					     // allow for only one such
+					     // rotation
+	    break;
+	  };
+      
+      
+      for (unsigned int line=0; line<4; ++line)
+	{
+					   // assert that the line was not
+					   // already inserted in reverse
+					   // order. This happens in spite of
+					   // the vertex rotation above, if the
+					   // sense of the cell was incorrect.
+					   //
+					   // Here is what usually happened when
+					   // this exception is thrown:
+					   // consider these two cells
+					   // and the vertices
+					   //  3---4---5
+					   //  |   |   |
+					   //  0---1---2
+					   // If in the input vector the
+					   // two cells are given with
+					   // vertices <0 1 4 3> and
+					   // <4 1 2 5>, in the first cell
+					   // the middle line would have
+					   // direction 1->4, while in
+					   // the second it would be 4->1.
+					   // This will cause the exception.
+	  Assert (needed_lines.find(make_pair(line_vertices[line].second,
+					      line_vertices[line].first))
+		  ==
+		  needed_lines.end(),
+		  ExcGridHasInvalidCell(cell));
+		  
+					   // insert line, with invalid iterator
+					   // if line already exists, then
+					   // nothing bad happens here
+	  needed_lines[line_vertices[line]] = end_line();
+	};
+    };
+  
+
+#ifdef DEBUG
+				   // in debug mode: check the every vertex has
+				   // at least two adjacent lines
+  if (true) 
+    {
+      vector<unsigned short int> vertex_touch_count (v.size(), 0);
+      map<pair<int,int>,line_iterator,less<pair<int,int> > >::iterator i;
+      for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
+	{
+					   // touch the vertices of this line
+	  ++vertex_touch_count[(*i).first.first];
+	  ++vertex_touch_count[(*i).first.second];
+	};
+
+				       // assert minimum touch count is at
+				       // least two
+      Assert (* (min_element(vertex_touch_count.begin(),
+			     vertex_touch_count.end())) >= 2,
+	      ExcGridHasInvalidVertices());
+    };
+#endif
+	
+  				   // reserve enough space
+  levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
+  levels[0]->TriangulationLevel<1>::reserve_space (needed_lines.size());
+  levels[0]->TriangulationLevel<2>::reserve_space (cells.size());
+
+				   // make up lines
+  if (true) 
+    {
+      raw_line_iterator line = begin_raw_line();
+      map<pair<int,int>,line_iterator,less<pair<int,int> > >::iterator i;
+      for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
+	{
+	  line->set (Line((*i).first.first, (*i).first.second));
+	  line->set_used_flag ();
+	  (*i).second = line;
+	};
+    };
+
+
+				   // store for each line index
+				   // the adjacent cells
+  map<int,vector<cell_iterator>, less<int> > adjacent_cells;
+
+				   // finally make up cells
+  if (true) 
+    {
+      raw_cell_iterator cell = begin_raw_quad();
+      for (unsigned int c=0; c<cells.size(); ++c, ++cell)
+	{
+					   // list of iterators of lines
+	  const line_iterator lines[4] = {
+		needed_lines[make_pair(cells[c][0], cells[c][1])],
+		needed_lines[make_pair(cells[c][1], cells[c][2])],
+		needed_lines[make_pair(cells[c][3], cells[c][2])],
+		needed_lines[make_pair(cells[c][0], cells[c][3])]};
+	  
+	  cell->set (Quad(lines[0]->index(),
+			  lines[1]->index(),
+			  lines[2]->index(),
+			  lines[3]->index()));
+	  
+	  cell->set_used_flag ();
+	  
+					   // note that this cell is adjacent
+					   // to the four lines
+	  for (unsigned int line=0; line<4; ++line)
+	    adjacent_cells[lines[line]->index()].push_back (cell);
+	  
+					   // make some checks on the vertices
+					   // and their ordering
+	  Assert (lines[0]->vertex_index(0) == lines[3]->vertex_index(0),
+		  ExcInternalErrorOnCell(c));
+	  Assert (lines[0]->vertex_index(1) == lines[1]->vertex_index(0),
+		  ExcInternalErrorOnCell(c));
+	  Assert (lines[1]->vertex_index(1) == lines[2]->vertex_index(1),
+		  ExcInternalErrorOnCell(c));
+	  Assert (lines[2]->vertex_index(0) == lines[3]->vertex_index(1),
+		  ExcInternalErrorOnCell(c));
+	};
+    };
+  
+
+#ifdef DEBUG
+  map<int,vector<cell_iterator>, less<int> >::const_iterator adj;
+  for (adj=adjacent_cells.begin(); adj!=adjacent_cells.end(); ++adj)
+				     // assert that every line has one or
+				     // two adjacent cells
+    Assert (((*adj).second.size() >= 1) &&
+	    ((*adj).second.size() <= 2),
+	    ExcInternalError());
+#endif
+
+
+				   // update neighborship info
+  for (cell_iterator cell=begin(); cell!=end(); ++cell)
+    for (unsigned int side=0; side<4; ++side)
+      if (adjacent_cells[cell->line(side)->index()][0] == cell)
+					 // first adjacent cell is this one
+	{
+	  if (adjacent_cells[cell->line(side)->index()].size() == 2)
+					     // there is another adjacent cell
+	    cell->set_neighbor (side,
+				adjacent_cells[cell->line(side)->index()][1]);
+	}
+				   // first adjacent cell is not this one,
+				   // -> it must be the neighbor we are
+				   // looking for
+      else
+	cell->set_neighbor (side,
+			    adjacent_cells[cell->line(side)->index()][0]);
 };
 
 
@@ -204,6 +429,69 @@ void Triangulation<2>::create_hypercube (const double left,
   levels[0]->neighbors.push_back (make_pair(-1,-1));
 
   levels[0]->refine_flags.insert (levels[0]->refine_flags.end(), 1, false);
+};
+
+
+
+void Triangulation<1>::create_hyper_L (const double, const double) {
+  Assert (false, ExcInternalError());
+};
+
+
+
+void Triangulation<2>::create_hyper_L (const double a, const double b) {
+  const unsigned int dim=2;
+  const Point<dim> vertices[8] = { Point<dim> (a,a),
+				   Point<dim> ((a+b)/2,a),
+				   Point<dim> (b,a),
+				   Point<dim> (a,(a+b)/2),
+				   Point<dim> ((a+b)/2,(a+b)/2),
+				   Point<dim> (b,(a+b)/2),
+				   Point<dim> (a,b),
+				   Point<dim> ((a+b)/2,b)  };
+  const int cell_vertices[3][4] = {{0, 1, 4, 3},
+				   {1, 2, 5, 4},
+				   {3, 4, 7, 6}};
+  vector<vector<int> > cells (3, vector<int>(4,-1));
+  for (unsigned int i=0; i<3; ++i)
+    for (unsigned int j=0; j<4; ++j)
+      cells[i][j] = cell_vertices[i][j];
+  
+  create_triangulation (vector<Point<dim> >(&vertices[0], &vertices[8]),
+			cells);
+};
+
+
+
+void Triangulation<1>::create_hyper_ball (const Point<1>, const double) {
+  Assert (false, ExcInternalError());
+};
+
+
+
+void Triangulation<2>::create_hyper_ball (const Point<2> p, const double radius) {
+  const unsigned int dim=2;
+  const double a = 0.453;         // equilibrate cell sizes
+  const Point<dim> vertices[8] = { p+Point<dim>(-1,-1)*radius/sqrt(2),
+				   p+Point<dim>(+1,-1)*radius/sqrt(2),
+				   p+Point<dim>(-1,-1)*radius/sqrt(2)*a,
+				   p+Point<dim>(+1,-1)*radius/sqrt(2)*a,
+				   p+Point<dim>(-1,+1)*radius/sqrt(2)*a,
+				   p+Point<dim>(+1,+1)*radius/sqrt(2)*a,
+				   p+Point<dim>(-1,+1)*radius/sqrt(2),
+				   p+Point<dim>(+1,+1)*radius/sqrt(2) };
+  const int cell_vertices[5][4] = {{0, 1, 3, 2},
+				   {0, 2, 4, 6},
+				   {2, 3, 5, 4},
+				   {1, 7, 5, 3},
+				   {6, 4, 5, 7}};
+  vector<vector<int> > cells (5, vector<int>(4,-1));
+  for (unsigned int i=0; i<5; ++i)
+    for (unsigned int j=0; j<4; ++j)
+      cells[i][j] = cell_vertices[i][j];
+  
+  create_triangulation (vector<Point<dim> >(&vertices[0], &vertices[8]),
+			cells);
 };
 
 
