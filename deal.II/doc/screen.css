@@ -37,3 +37,5 @@ table.navbar { }
 code.program { color: #700000; }
 code.class { color: #009000; }
 code.member { color: #006000; }
+code.function { color: #006000; }
+code.global { color: #005030; }
