@@ -59,7 +59,7 @@
  * returning the solution to the system @p{Ax=b} on the coarsest level
  * in @p{x}.
  * 
- * @author Guido Kanschat, 1999, 2001, 2002
+ * @author Guido Kanschat, 1999, 2001, 2002, Ralf Hartmann 2002
  */
 template <class VECTOR>
 class Multigrid : public Subscriptor
@@ -99,7 +99,14 @@ class Multigrid : public Subscriptor
 	      const MGSmoother<VECTOR>& post_smooth,
 	      const unsigned int            minlevel = 0,
 	      const unsigned int            maxlevel = 1000000);
-    
+
+
+				     /**
+				      * Reinit this class according to
+				      * @p{minlevel} and @p{maxlevel}.
+				      */
+    void reinit (const unsigned int minlevel,
+		 const unsigned int maxlevel);
 
 				     /**
 				      * Execute one step of the
@@ -333,10 +340,22 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 		post_smooth(&post_smooth),
 		edge_down(0),
 		edge_up(0)
+{}
+
+
+template <class VECTOR>
+void
+Multigrid<VECTOR>::reinit(const unsigned int min_level,
+			  const unsigned int max_level)
 {
-};
+  minlevel=min_level;
+  maxlevel=max_level;
+  defect.resize(minlevel, maxlevel);
+  solution.resize(minlevel, maxlevel);
+  t.resize(minlevel, maxlevel);
+}
 
-
+  
 /* --------------------------- inline functions --------------------- */
 
 
