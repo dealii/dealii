@@ -661,7 +661,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 			Threads::encapsulate (&SparseMatrix<number>::
 					      template threaded_residual<somenumber>)
 			.collect_args (this, dst, u, b,
-				       make_pair<unsigned int,unsigned int>
+				       std::make_pair<unsigned int,unsigned int>
 				       (n_rows * i / n_threads,
 					n_rows * (i+1) / n_threads),
 				       &partial_norms[i]));

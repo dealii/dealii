@@ -76,8 +76,8 @@ SparseVanka<number>::compute_inverses ()
 					 selected.end(),
 					 true);
 
-  const unsigned int n_inverses_per_thread = max(n_inverses / n_threads,
-						 1U);
+  const unsigned int n_inverses_per_thread = std::max(n_inverses / n_threads,
+						      1U);
   
 				   // set up start and end index for
 				   // each of the threads. note that
