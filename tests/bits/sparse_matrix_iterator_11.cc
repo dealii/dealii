@@ -35,12 +35,19 @@ void test ()
   SparseMatrix<double> A(sparsity);
 
   SparseMatrix<double>::iterator k = A.begin(),
-                                 j = k++;
+                                 j = ++A.begin();
+
   Assert (k < j, ExcInternalError());
-  Assert (k != j, ExcInternalError());
+  Assert (j > k, ExcInternalError());
 
   Assert (!(j < k), ExcInternalError());
+  Assert (!(k > j), ExcInternalError());
+
+  Assert (k != j, ExcInternalError());
   Assert (!(k == j), ExcInternalError());
+
+  Assert (k == k, ExcInternalError());
+  Assert (!(k != k), ExcInternalError());
   
   deallog << "OK" << std::endl;
 }
