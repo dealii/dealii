@@ -17,15 +17,15 @@ class CurvedLine :
 	
 	if (y<x)
 	  if (y<1-x)
-	    middle(1) = 0.03*sin(6*3.141592*middle(0));
+	    middle(1) = 0.04*sin(6*3.141592*middle(0));
 	  else
-	    middle(0) = 1+0.03*sin(6*3.141592*middle(1));
+	    middle(0) = 1+0.04*sin(6*3.141592*middle(1));
 	
 	else
 	  if (y<1-x)
-	    middle(0) = 0.03*sin(6*3.141592*middle(1));
+	    middle(0) = 0.04*sin(6*3.141592*middle(1));
 	  else
-	    middle(1) = 1+0.03*sin(6*3.141592*middle(0));
+	    middle(1) = 1+0.04*sin(6*3.141592*middle(0));
 
 	return middle;
       };
@@ -210,7 +210,7 @@ void PoissonProblem<dim>::make_random_grid () {
 
 template <int dim>
 void PoissonProblem<dim>::run (ParameterHandler &prm) {
-  cout << "Test case = " << prm.get ("Test run") << endl
+  cout << "Test case = " << prm.get ("Test run")
        << endl;
   
   cout << "    Making grid..." << endl;
@@ -240,9 +240,11 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << "    Solving..." << endl;
   solve ();
 
-  cout << "    Writing to file <" << prm.get("Output file") << ">..." << endl;
+  cout << "    Writing to file <" << prm.get("Output file") << ">..."
+       << endl
+       << endl;
+  
   DataOut<dim> out;
-
   ofstream gnuplot(prm.get("Output file"));
   fill_data (out); 
   out.write_gnuplot (gnuplot);

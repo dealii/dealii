@@ -1,0 +1,25 @@
+set data style lines
+set noxtics
+set noytics
+set noztics
+set nokey
+set para
+set term postscript eps
+
+!echo "  Making <fig.zoom_in.eps>"
+set output "fig.zoom_in.eps"
+splot "gnuplot.zoom_in"
+
+!echo "  Making <fig.ball.eps>"
+set output "fig.ball.eps"
+splot "gnuplot.ball"
+
+!echo "  Making <fig.curved_line.eps>"
+set output "fig.curved_line.eps"
+splot "gnuplot.curved_line"
+
+!echo "  Making <fig.random.eps>"
+set output "fig.random.eps"
+splot "gnuplot.random"
+
+
