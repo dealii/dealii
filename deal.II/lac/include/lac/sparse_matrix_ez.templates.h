@@ -17,6 +17,7 @@
 #include <lac/sparse_matrix_ez.h>
 #include <lac/vector.h>
 
+#include <iostream>
 #include <algorithm>
 #include <cmath>
 
