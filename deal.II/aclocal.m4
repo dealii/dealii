@@ -487,10 +487,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
             CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias"
           dnl For icc8:
-          dnl 1/ set most pickiest check: strict_ansi (removed due to problems (GK))
+          dnl 1/ set most pickiest check: strict_ansi
           dnl 2/ to avoid the annoying `LOOP WAS VECTORIZED' remarks
           dnl    use -vec_report0 for reducing output
           else if test "x$GXX_VERSION" = "xintel_icc8" ; then
+            CXXFLAGSG="$CXXFLAGSG -strict_ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias -vec_report0"
           fi fi
 	
