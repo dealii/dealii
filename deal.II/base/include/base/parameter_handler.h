@@ -39,14 +39,6 @@ enum OutputStyle {
 
 
 
-/**
-  Declare what a multiple entry is: a variant
-  entry ({...}) or an array ({{...}})
-  */
-enum MultipleEntryType {
-      variant, array
-};
-
       
 
 /**
@@ -1024,6 +1016,14 @@ class MultipleParameterLoop : public ParameterHandler {
     void loop (UserClass &uc);
 
   private:
+				     /**
+				      *	Declare what a multiple entry is: a variant
+				      *	entry ({...}) or an array ({{...}})
+				      */
+    enum MultipleEntryType {
+	  variant, array
+    };
+
 				     /**
 				      * An object in the list of entries with
 				      * multiple values.
