@@ -1413,7 +1413,7 @@ double
 VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
 				 const DoFHandler<dim> &dof,
 				 const Quadrature<dim> &quadrature,
-				 InVector              &v,
+				 const InVector        &v,
 				 const unsigned int     component)
 {
   Assert (component < dof.get_fe().n_components(),
@@ -1449,7 +1449,7 @@ template <int dim, class InVector>
 double
 VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 				 const Quadrature<dim> &quadrature,
-				 InVector              &v,
+				 const InVector        &v,
 				 const unsigned int     component)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1709,48 +1709,48 @@ template
 double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
 					const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					Vector<double>&,
+					const Vector<double>&,
 					const unsigned int);
 template
 double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					Vector<double>&,
+					const Vector<double>&,
 					const unsigned int);
 
 template
 double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
 					const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					BlockVector<double>&,
+					const BlockVector<double>&,
 					const unsigned int);
 template
 double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					BlockVector<double>&,
+					const BlockVector<double>&,
 					const unsigned int);
 
 template
 double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
 					const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					Vector<float>&,
+					const Vector<float>&,
 					const unsigned int);
 template
 double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					Vector<float>&,
+					const Vector<float>&,
 					const unsigned int);
 
 template
 double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>&,
 					const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					BlockVector<float>&,
+					const BlockVector<float>&,
 					const unsigned int);
 template
 double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension>&,
 					const Quadrature<deal_II_dimension>&,
-					BlockVector<float>&,
+					const BlockVector<float>&,
 					const unsigned int);
 
 

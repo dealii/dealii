@@ -852,7 +852,7 @@ class VectorTools
     static double compute_mean_value (const Mapping<dim>    &mapping,
 				      const DoFHandler<dim> &dof,
 				      const Quadrature<dim> &quadrature,
-				      InVector              &v,
+				      const InVector        &v,
 				      const unsigned int     component);
     
 				     /**
@@ -863,7 +863,7 @@ class VectorTools
     template <int dim, class InVector>
     static double compute_mean_value (const DoFHandler<dim> &dof,
 				      const Quadrature<dim> &quadrature,
-				      InVector              &v,
+				      const InVector        &v,
 				      const unsigned int     component);
 
 				     /**
