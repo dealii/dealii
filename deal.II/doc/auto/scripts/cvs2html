@@ -1186,7 +1186,7 @@ for ($dd=0;$dd<=$#alldirs;$dd++)
       }
       else
       {
-        $revnumber = "<Error in revnumber>";
+        $revnumber = "[Error_in_revnumber]";
       }
 
       $line = getnextline;
@@ -1197,7 +1197,7 @@ for ($dd=0;$dd<=$#alldirs;$dd++)
       }
       else
       {
-        $revdate = "<Error in revdate>";
+        $revdate = "[Error_in_revdate]";
       }
 
       if ($line =~ /author: ([a-zA-Z]*);/)
@@ -1206,7 +1206,7 @@ for ($dd=0;$dd<=$#alldirs;$dd++)
       }
       else
       {
-        $author = "<Error in author>";
+        $author = "[Error_in_author]";
       }
 
       if ($line =~ /lines: ([+\-0-9 ]*)$/)
