@@ -821,7 +821,7 @@ namespace Threads
  * information on use and internals of this class see the report on
  * this subject.
  *
- * @author Ralf Hartmann, 2000
+ * @author Wolfgang Bangerth, Ralf Hartmann, 2000
  */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
   class FunData6 : public FunDataBase
@@ -1618,7 +1618,7 @@ namespace Threads
  * more information on use and internals of this class see the report
  * on this subject.
  *
- * @author Ralf Hartmann, 2000
+ * @author Wolfgang Bangerth, Ralf Hartmann, 2000
  */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
   class MemFunData6 : public FunDataBase
