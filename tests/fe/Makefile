@@ -48,6 +48,8 @@ rt_3.exe                : rt_3.g.$(OBJEXT)                $(libraries)
 rt_4.exe                : rt_4.g.$(OBJEXT)                $(libraries)
 rt_5.exe                : rt_5.g.$(OBJEXT)                $(libraries)
 rt_6.exe                : rt_6.g.$(OBJEXT)                $(libraries)
+dgp_monomial_1.exe	: dgp_monomial_1.g.$(OBJEXT)      $(libraries)
+dgp_monomial_2.exe	: dgp_monomial_2.g.$(OBJEXT)      $(libraries)
 system_1.exe            : system_1.g.$(OBJEXT)            $(libraries)
 shapes.exe              : shapes.g.$(OBJEXT)              $(libraries)
 transfer.exe		: transfer.g.$(OBJEXT)	          $(libraries)
@@ -59,6 +61,7 @@ tests = fe_data_test traits fe_tools fe_tools_test mapping \
 	dgq_1 \
 	q_1 q_2 q_3 q_4 \
 	rt_1 rt_2 rt_3 rt_4 rt_5 rt_6 \
+	dgp_monomial_1 dgp_monomial_2 \
 	system_1 \
         non_primitive_1 non_primitive_2 \
         nedelec nedelec_2 nedelec_3 up_and_down
