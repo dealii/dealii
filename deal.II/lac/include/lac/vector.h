@@ -485,29 +485,34 @@ class Vector
 		const bool          across     = true) const;
 
 				     /**
-				      * Write the vector en bloc to a file. This
-				      * is done in a binary mode, so the output
-				      * is neither readable by humans nor 
-				      * (probably) by other computers using
-				      * a different operating system of number
-				      * format.
+				      * Write the vector en bloc to a
+				      * file. This is done in a binary
+				      * mode, so the output is neither
+				      * readable by humans nor
+				      * (probably) by other computers
+				      * using a different operating
+				      * system of number format.
 				      */
     void block_write (std::ostream &out) const;
 
 				     /**
-				      * Read a vector en block from a file. This
-				      * is done using the inverse operations to
-				      * the above function, so it is reasonably
-				      * fast because the bitstream is not
-				      * interpreted.
+				      * Read a vector en block from a
+				      * file. This is done using the
+				      * inverse operations to the
+				      * above function, so it is
+				      * reasonably fast because the
+				      * bitstream is not interpreted.
 				      *
-				      * The vector is resized if necessary.
+				      * The vector is resized if
+				      * necessary.
 				      *
-				      * A primitive form of error checking is
-				      * performed which will recognize the
-				      * bluntest attempts to interpret some
-				      * data as a vector stored bitwise to a
-				      * file, but not more.
+				      * A primitive form of error
+				      * checking is performed which
+				      * will recognize the bluntest
+				      * attempts to interpret some
+				      * data as a vector stored
+				      * bitwise to a file, but not
+				      * more.
 				      */
     void block_read (std::istream &in);
 
@@ -527,28 +532,37 @@ class Vector
   protected:
 
 				     /**
-				      * Dimension. Actual number of components
-				      * contained in the vector.
-				      * Get this number by calling @p{size()}.
+				      * Dimension. Actual number of
+				      * components contained in the
+				      * vector.  Get this number by
+				      * calling @p{size()}.
 				      */
     unsigned int dim;
 
 				     /**
-				      * Amount of memory actually reserved for
-				      * this vector. This number may be greater
-				      * than @p{dim} if a @p{reinit} was called with
-				      * less memory requirements than the vector
-				      * needed last time. At present @p{reinit}
-				      * does not free memory when the number of
+				      * Amount of memory actually
+				      * reserved for this vector. This
+				      * number may be greater than
+				      * @p{dim} if a @p{reinit} was
+				      * called with less memory
+				      * requirements than the vector
+				      * needed last time. At present
+				      * @p{reinit} does not free
+				      * memory when the number of
 				      * needed elements is reduced.
 				      */
     unsigned int maxdim;
 
 				     /**
-				      * Pointer to the array of components.
+				      * Pointer to the array of
+				      * elements of this vector.
 				      */
     Number *val;
 
+                                     /**
+                                      * Make all other vector types
+                                      * friends.
+                                      */
     template <typename Number2> friend class Vector;    
 };
 
