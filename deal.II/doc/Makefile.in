@@ -89,7 +89,7 @@ class_index.html: $(shell echo $D/base/include/base/*.h \
 		 "<h2><a href=\"auto/kdoc/$$dirbasename/index.html\""\
                  " target=\"body\">"                                 \
                  "$$dirbasename sub-library</a></h2>\n"              \
-		 "</td></tr>\n\n"                                    \
+		 "</td>\n</tr>\n\n"                                  \
 	       >> $@ ;                                               \
 	    $(PERL) ../common/scripts/forward_declarations.pl             \
 	            `echo $$dir/*.h |                                     \
@@ -100,17 +100,21 @@ class_index.html: $(shell echo $D/base/include/base/*.h \
 	       | uniq                                                     \
 	       | $(PERL) -pi -e 's/&/&amp;/g; s/</&lt;/g; s/>/&gt;/g;'    \
 	       | $(PERL) -pi -e 's/;\n/\n/g;'                             \
-	       | $(PERL) -e '$$i=0; while (<>) {                          \
-					chop;                             \
-					print "  <tr>\n" if $$i==0;       \
-					print "    <td>$$_</td>\n";       \
-					$$i++;                            \
-					if ($$i == 3) {                   \
-					  print "  </tr>\n\n";            \
-					  $$i = 0;                        \
-					}                                 \
-				   }                                      \
-			     if ($$i != 0) { print "  </tr>\n\n"; }'      \
+	       | $(PERL) -e '   @classes = ();                            \
+				while (<>) {                              \
+				  chop;                                   \
+				  @classes = (@classes, $$_);             \
+				}                                         \
+				print "  <tr>\n";                         \
+				$$n_classes = $$#classes + 1;             \
+				for ($$col=0; $$col<3; $$col++) {         \
+				  print "    <td>\n";                     \
+				  for ($$i=0; $$i<$$n_classes/3; $$i++) { \
+				    print "      $$classes[$$i+$$col*($$n_classes+1)/3]<br>\n";\
+				  }                                       \
+				  print "    </td>\n";                    \
+				}                                         \
+				print "  </tr>\n\n";'                     \
 	     >> $@ ;                                                      \
 	    echo "\n\n" >> $@ ;                                           \
 	  fi                                                              \
