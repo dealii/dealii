@@ -737,8 +737,8 @@ BlockSparseMatrix<number>::Accessor::Accessor (
 
   if (r < matrix->m())
     {
-      pair<unsigned int,unsigned int> indices = matrix->sparsity_pattern
-						->get_row_indices().global_to_local(r);
+      std::pair<unsigned int,unsigned int> indices
+	= matrix->sparsity_pattern->get_row_indices().global_to_local(r);
       block_row = indices.first;
       base_iterator = matrix->block(indices.first, 0).begin(indices.second);
       row_start = matrix->sparsity_pattern
