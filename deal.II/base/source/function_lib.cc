@@ -1,15 +1,15 @@
-//----------------------------  function_lib.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
+//    Copyright (C) 1998 - 2005 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  function_lib.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <base/tensor.h>
@@ -1330,9 +1330,10 @@ namespace Functions
                   fourier_coefficients (fourier_coefficients),
                   weights (weights)
   {
-    Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
+    Assert (fourier_coefficients.size() > 0, ExcZero());
     Assert (fourier_coefficients.size() == weights.size(),
-	    ExcInvalidArraySize());
+	    ExcDimensionMismatch(fourier_coefficients.size(),
+				 weights.size()));
   }
   
   
@@ -1401,9 +1402,10 @@ namespace Functions
                     fourier_coefficients (fourier_coefficients),
                     weights (weights)
   {
-    Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
+    Assert (fourier_coefficients.size() > 0, ExcZero());
     Assert (fourier_coefficients.size() == weights.size(),
-	    ExcInvalidArraySize());
+	    ExcDimensionMismatch(fourier_coefficients.size(),
+				 weights.size()));
   }
   
   
