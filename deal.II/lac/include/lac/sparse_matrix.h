@@ -128,6 +128,12 @@ class SparseMatrix : public Subscriptor
 				      * empty (i.e. the dimensions are
 				      * zero), then all memory is
 				      * freed.
+				      *
+				      * If the sparsity pattern has
+				      * not changed, then the effect
+				      * of this function is simply to
+				      * reset all matrix entries to
+				      * zero.
 				      */
     virtual void reinit ();
 
@@ -149,6 +155,9 @@ class SparseMatrix : public Subscriptor
 				      * as that of this matrix or as
 				      * long as #reinit# is not called
 				      * with a new sparsity structure.
+				      *
+				      * The elements of the matrix are
+				      * set to zero by this function.
 				      */
     virtual void reinit (const SparsityPattern &sparsity);
 

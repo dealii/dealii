@@ -118,6 +118,12 @@ class BlockSparseMatrix : public Subscriptor
 				      * want to update the size of the
 				      * matrix. It only calls #reinit#
 				      * on the sub-matrices.
+				      *
+				      * If the sparsity pattern has
+				      * not changed, then the effect
+				      * of this function is simply to
+				      * reset all matrix entries to
+				      * zero.
 				      */
     virtual void reinit ();
 
@@ -134,6 +140,9 @@ class BlockSparseMatrix : public Subscriptor
 				      * sub-matrices with the block
 				      * sparsity patterns of the
 				      * parameter.
+				      *
+				      * The elements of the matrix are
+				      * set to zero by this function.
 				      */
     virtual void reinit (const BlockSparsityPattern<rows,columns> &sparsity);
 
