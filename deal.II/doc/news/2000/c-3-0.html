@@ -343,7 +343,7 @@
        </p>
 
   <li> <p>
-       New: <code class="member">PreconditionBlockSSOR::set_omega</code>
+       New: <code class="member">PreconditionBlockSOR::set_omega</code>
        allows to change the relaxation parameter.
        <br>
        (GK 2000/04/12)
@@ -364,6 +364,16 @@
 <h3>deal.II</h3>
 
 <ol>
+
+  <li> <p>
+       New: Class <code class="class">DoFRenumbering</code> now has
+       functions for cell-wise downstream renumbering for
+       discontinuous elements. The parameters of the function <code
+       class="member">sort_selected_dofs_back</code> have been
+       switched to match the interfaces of all other functions in this
+       class.
+       <br>
+       (GK 2000 Jour de Bastille)
 
   <li> <p>
        New: Function <code class="class">VectorTools</code><code
