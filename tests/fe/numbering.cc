@@ -183,7 +183,7 @@ void check (const FE_Q<dim> &fe)
   FETools::hierarchic_to_lexicographic_numbering (fe, h2l);
   Assert (hierarchic_to_lexicographic_numbering == h2l,
 	  ExcInternalError());
-};
+}
 
 
 
@@ -195,7 +195,7 @@ void check_dim ()
       FE_Q<dim> fe(degree);
       check (fe);
     };
-};
+}
 
 
 int main ()
@@ -208,6 +208,6 @@ int main ()
   check_dim<1> ();
   check_dim<2> ();
   check_dim<3> ();
-};
+}
 
 
