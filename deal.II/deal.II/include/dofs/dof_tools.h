@@ -25,6 +25,22 @@ class DoFTools
 {
   public:
 				     /**
+				      * Generate sparsity pattern for fluxes.
+				      * This is a replacement of the
+				      * function
+				      * #make_sparsity_pattern# for
+				      * discontinuous methods. Since
+				      * the fluxes include couplings
+				      * between neighboring elements,
+				      * the normal couplings and these
+				      * extra matrix entries are
+				      * considered.
+				      */
+    template<int dim>
+    static void make_flux_sparsity_pattern (const DoFHandler<dim>&,
+				     SparseMatrixStruct &);
+    
+				     /**
 				      * Extract the indices of the degrees
 				      * of freedom belonging to certain
 				      * components. The bit vector #select#

@@ -1974,7 +1974,8 @@ void DoFHandler<3>::make_hanging_node_constraints (ConstraintMatrix &constraints
 
 
 template <int dim>
-void DoFHandler<dim>::make_sparsity_pattern (SparseMatrixStruct &sparsity) const {
+void DoFHandler<dim>::make_sparsity_pattern (SparseMatrixStruct &sparsity) const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (sparsity.n_rows() == n_dofs(),
 	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs()));
@@ -1993,10 +1994,8 @@ void DoFHandler<dim>::make_sparsity_pattern (SparseMatrixStruct &sparsity) const
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  sparsity.add (dofs_on_this_cell[i],
 			dofs_on_this_cell[j]);
-    };
-};
-
-
+    }
+}
 
 template <int dim>
 void

@@ -449,7 +449,7 @@ class DoFHandler  :  public Subscriptor,
 				      * have to compress the matrix yourself,
 				      * using #SparseMatrixStruct::compress()#.
 				      */
-    void make_sparsity_pattern (SparseMatrixStruct &) const; 
+    void make_sparsity_pattern (SparseMatrixStruct &) const;
 
 				     /**
 				      * This function does mistly the same as
@@ -494,7 +494,7 @@ class DoFHandler  :  public Subscriptor,
 				      */
     void make_sparsity_pattern (const vector<vector<bool> > &mask,
 				SparseMatrixStruct          &) const;
-    
+
     				     /**
 				      * Write the sparsity structure of the
 				      * matrix composed of the basis functions

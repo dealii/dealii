@@ -9,8 +9,76 @@
 #include <fe/fe.h>
 #include <fe/fe_system.h>
 #include <basic/dof_tools.h>
+#include <lac/sparsematrix.h>
 
+#if deal_II_dimension == 1
 
+//TODO: Implement make_flux_sparsity_pattern in 1d
+
+template <>
+void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<1>&,
+				      SparseMatrixStruct &)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#else
+
+//TODO: Check this function for potential of optimization. (G)
+
+template<int dim>
+void
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
+				      SparseMatrixStruct &sparsity)
+{
+  const unsigned int n_dofs = dof.n_dofs();
+  
+  Assert (sparsity.n_rows() == n_dofs,
+	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
+  Assert (sparsity.n_cols() == n_dofs,
+	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
+
+  const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
+  vector<int> dofs_on_this_cell(total_dofs);
+  vector<int> dofs_on_other_cell(total_dofs);
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+					endc = dof.end();
+  for (; cell!=endc; ++cell) 
+    {
+      cell->get_dof_indices (dofs_on_this_cell);
+				       // make sparsity pattern for this cell
+      for (unsigned int i=0; i<total_dofs; ++i)
+	for (unsigned int j=0; j<total_dofs; ++j)
+	  sparsity.add (dofs_on_this_cell[i],
+			dofs_on_this_cell[j]);
+
+				       // Loop over all interior neighbors
+      for (unsigned int face = 0;
+	   face < GeometryInfo<dim>::faces_per_cell;
+	   ++face)
+	{
+	  if (cell->face(face)->boundary_indicator() == 255)
+	    {
+	      DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(face);
+	      neighbor->get_dof_indices (dofs_on_other_cell);
+					       // only add one direction
+					       // The other is taken care of
+					       // by neighbor.
+	      for (unsigned int i=0; i<total_dofs; ++i)
+		{
+		  for (unsigned int j=0; j<total_dofs; ++j)
+		    {
+		      sparsity.add (dofs_on_this_cell[i],
+				    dofs_on_other_cell[j]);
+		    }
+		}
+	    }
+	} 
+    }
+}
+
+#endif
 
 template<int dim>
 void
@@ -79,6 +147,10 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 
 
 // explicit instantiations
+#if deal_II_dimension > 1
+template void DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+						    SparseMatrixStruct &sparsity);
+#endif
 template void DoFTools::extract_dofs(const DoFHandler<deal_II_dimension>& dof,
 				     const vector<bool>& local_select,
 				     vector<bool>& selected_dofs);
