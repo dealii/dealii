@@ -112,6 +112,16 @@ namespace GridOutFlags
 		  azimut_angle (azimut_angle),
 		  turn_angle (turn_angle)
   {}
+
+
+  XFig::XFig ()
+		  : fill_style (20), // filled
+    draw_boundary(true),
+    level_color(false),
+    level_depth(true),
+    n_boundary_face_points(0),
+    scaling(1.,1.)
+  {}
 }  // end namespace GridOutFlags
 
 
@@ -158,6 +168,13 @@ void GridOut::set_flags (const GridOutFlags::Eps<3> &flags)
 
 
 
+void GridOut::set_flags (const GridOutFlags::XFig &flags) 
+{
+  xfig_flags = flags;
+}
+
+
+
 std::string
 GridOut::default_suffix (const OutputFormat output_format) 
 {
@@ -173,7 +190,9 @@ GridOut::default_suffix (const OutputFormat output_format)
 
       case eps: 
 	    return ".eps";
-	    
+
+      case xfig:
+	    return ".fig";
       default: 
 	    Assert (false, ExcNotImplemented()); 
 	    return "";
@@ -197,6 +216,9 @@ GridOut::parse_output_format (const std::string &format_name)
   if (format_name == "eps")
     return eps;
   
+  if (format_name == "xfig")
+    return xfig;
+  
   AssertThrow (false, ExcInvalidState ());
 				   // return something weird
   return OutputFormat(-1);
@@ -206,7 +228,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names () 
 {
-  return "dx|gnuplot|eps|ucd";
+  return "dx|gnuplot|eps|ucd|xfig";
 }
 
 
@@ -218,5 +240,6 @@ GridOut::memory_consumption () const
 	  sizeof(gnuplot_flags) +
 	  sizeof(eps_flags_1) +
 	  sizeof(eps_flags_2) +
-	  sizeof(eps_flags_3));
+	  sizeof(eps_flags_3) +
+	  sizeof(xfig_flags));
 }

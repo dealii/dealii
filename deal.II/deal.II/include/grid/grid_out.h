@@ -393,6 +393,54 @@ namespace GridOutFlags
 	   const double       azimut_angle    = 60,
 	   const double       turn_angle      = 30);
   };
+				   /**
+				    * Flags fog XFig output.
+				    */
+  struct XFig
+  {
+				       /**
+					* Method for filling cells
+					*/
+      unsigned int fill_style;
+				       /**
+					* Draw boundary lines.
+					*/
+      bool draw_boundary;
+				       /**
+					* Change color depending on level.
+					*/
+      bool level_color;
+				       /**
+					* Code level to depth.
+					*/
+      bool level_depth;
+				       /**
+					* Additional points for curved
+					* boundaries.
+					*/
+      unsigned int n_boundary_face_points;
+
+				       /**
+					* Scaling of graph. The
+					* default is a unit length of
+					* one inch.
+					*/
+      Point<2> scaling;
+				       /**
+					* Offset of the graph. Before
+					* scaling, the coordinates are
+					* shifted by this
+					* value. Default is zero in
+					* each direction.
+					*/
+      Point<2> offset;
+      
+				       /**
+					* Constructor.
+					*/
+      XFig();
+  };
+  
 }
 
 
@@ -486,7 +534,7 @@ class GridOut
 				      * Declaration of a name for each of the
 				      * different output formats.
 				      */
-    enum OutputFormat { dx, gnuplot, eps, ucd };
+    enum OutputFormat { dx, gnuplot, eps, ucd, xfig };
 
 				     /**
 				      * Write triangulation in OpenDX
@@ -682,7 +730,14 @@ class GridOut
     void write_eps (const Triangulation<1> &tria,
 		    std::ostream           &out,
 		    const Mapping<1>       *mapping=0);
-    
+
+				     /**
+				      * Write XFig-file.
+				      */
+    template <int dim>
+    void write_xfig (const Triangulation<dim> &tria,
+		    std::ostream             &out,
+		    const Mapping<dim>       *mapping=0);
 				     /**
 				      * Write data and grid to @p{out} according
 				      * to the given data format. This function
@@ -727,6 +782,12 @@ class GridOut
 				      * three-dimensional triangulation
 				      */
     void set_flags (const GridOutFlags::Eps<3> &flags);
+
+    				     /**
+				      * Set flags for EPS output of a
+				      * three-dimensional triangulation
+				      */
+    void set_flags (const GridOutFlags::XFig &flags);
 
 				     /**
 				      * Provide a function which tells us which
@@ -833,8 +894,12 @@ class GridOut
 				      * function.
 				      */
     GridOutFlags::Eps<3>  eps_flags_3;
-
-
+    
+				     /**
+				      * Flags used for XFig output.
+				      */
+    GridOutFlags::XFig xfig_flags;
+    
 				     /**
 				      * Write the grid information about
 				      * faces to @p{out}. Only those faces

@@ -367,6 +367,26 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 }
 
 
+#if deal_II_dimension != 2
+
+template <int dim>
+void GridOut::write_xfig (const Triangulation<dim> &,
+			  std::ostream             &)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#else
+
+template <int dim>
+void GridOut::write_xfig (const Triangulation<dim> &,
+			  std::ostream             &)
+{
+  Assert (false, ExcNotImplemented());
+}
+#endif
+
+
 
 #if deal_II_dimension == 1
 
