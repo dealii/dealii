@@ -185,10 +185,10 @@ void LaplaceProblem<dim>::setup_system ()
 				   // element in the array to get its
 				   // index:
   const unsigned int first_boundary_dof
-    = std::distance (std::find (boundary_dofs.begin(),
+    = std::distance (boundary_dofs.begin(),
+		     std::find (boundary_dofs.begin(),
 				boundary_dofs.end(),
-				true),
-		     boundary_dofs.begin());
+				true));
 
 				   // Then generate a constraints
 				   // object with just this one
