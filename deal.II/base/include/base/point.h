@@ -140,6 +140,10 @@ class Point : public Tensor<1,dim> {
     DeclException1 (ExcInvalidIndex,
 		    int,
 		    << "Invalid index " << arg1);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidConstructorCalled);
 };
 
 
@@ -175,9 +179,33 @@ Point<1>::Point (const double x) {
 
 template <>
 inline
+Point<1>::Point (const double, const double) {
+  Assert (false, ExcInvalidConstructorCalled());
+};
+
+
+
+template <>
+inline
+Point<1>::Point (const double, const double, const double) {
+  Assert (false, ExcInvalidConstructorCalled());
+};
+
+
+
+template <>
+inline
 Point<2>::Point (const double x, const double y) {
   values[0] = x;
   values[1] = y;
+};
+
+
+
+template <>
+inline
+Point<2>::Point (const double, const double, const double) {
+  Assert (false, ExcInvalidConstructorCalled());
 };
 
 
