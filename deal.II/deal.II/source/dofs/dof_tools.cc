@@ -14,6 +14,7 @@
 
 #include <base/multithread_info.h>
 #include <base/thread_management.h>
+#include <base/quadrature_lib.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
@@ -23,6 +24,7 @@
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <fe/fe.h>
+#include <fe/fe_values.h>
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
@@ -1861,6 +1863,47 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>         &dof_h
 
 
 
+template <int dim>
+void
+DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
+				      const DoFHandler<dim>    &dof_handler,
+				      std::vector<Point<dim> > &support_points)
+{
+  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  
+				   // check whether fe has support
+				   // points
+  Assert (dof_handler.get_fe().has_support_points(),
+	  ExcFEHasNoSupportPoints());
+  Assert (support_points.size() == dof_handler.n_dofs(),
+	  ExcWrongSize (support_points.size(), dof_handler.n_dofs()));
+
+				   // now loop over all cells and
+				   // enquire the support points on
+				   // each of these
+  QMidpoint<dim> q_dummy;
+  FEValues<dim> fe_values (mapping, dof_handler.get_fe(),
+			   q_dummy, update_support_points);
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      cell->get_dof_indices (local_dof_indices);
+//TODO:[WB] Uncomment code once FEValues::get_support_points is available. Add a ChangeLog entry then.
+      Assert (false, ExcNotImplemented());
+//        const std::vector<Point<dim> > & support_points
+//  	= fe_values.get_support_points ();
+//        for (unsigned int i=0; i<dofs_per_cell; ++i)
+//  	support_points[local_dof_indices[i]] = support_points[i];
+    };
+};
+
+
+
 // explicit instantiations
 #if deal_II_dimension > 1
 template void
@@ -1962,3 +2005,11 @@ DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
 				       std::vector<unsigned int> &);
 
 #endif 
+
+
+
+template
+void
+DoFTools::map_dofs_to_support_points (const Mapping<deal_II_dimension>       &mapping,
+				      const DoFHandler<deal_II_dimension>    &dof_handler,
+				      std::vector<Point<deal_II_dimension> > &support_points);

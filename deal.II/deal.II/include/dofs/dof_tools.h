@@ -27,7 +27,7 @@ template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
 template <template <int> class GridClass, int dim> class InterGridMap;
-
+template <int dim> class Mapping;
 
 
 /**
@@ -137,7 +137,7 @@ template <template <int> class GridClass, int dim> class InterGridMap;
  * don't do it here) and not relevant in this context.
  *
  *
- * @author Wolfgang Bangerth and others, 1998, 1999, 2000
+ * @author Wolfgang Bangerth and others, 1998, 1999, 2000, 2001
  */
 class DoFTools
 {
@@ -870,8 +870,35 @@ class DoFTools
     map_dof_to_boundary_indices (const DoFHandler<dim>         &dof_handler,
 				 const std::set<unsigned char> &boundary_indicators,
 				 std::vector<unsigned int>     &mapping);
+
+				     /**
+				      * Return a list of support
+				      * points for all the degrees of
+				      * freedom handled by this DoF
+				      * handler object. This function,
+				      * of course, only works if the
+				      * finite element object used by
+				      * the DoF handler object
+				      * actually provides support
+				      * points, i.e. no edge elements
+				      * or the like. Otherwise, an
+				      * exception is thrown.
+				      *
+				      * The given array must have a
+				      * length of as many elements as
+				      * there are degrees of freedom.
+				      */
+    template <int dim>
+    static void
+    map_dofs_to_support_points (const Mapping<dim>       &mapping,
+				const DoFHandler<dim>    &dof_handler,
+				std::vector<Point<dim> > &support_points);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFEHasNoSupportPoints);
     
-				   
 				     /**
 				      * Exception
 				      */
