@@ -148,7 +148,7 @@ template <typename T>
 SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt) {
   if (t)
     t->unsubscribe();
-  t = (T*) tt;
+  t = static_cast<T*>(tt);
   if (tt)
     tt->subscribe();
   return *this;
