@@ -7,14 +7,14 @@ CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
             $(INCLUDE)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
-           -fno-rtti -fno-exceptions $(INCLUDE)
+           -fno-rtti $(INCLUDE)
 
 ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc/bin/c++
 endif
 
 ifeq ($(shell uname),SunOS)
-CXX       = /usr/local/gcc/gcc-2.8.1/bin/c++
+CXX       = /usr/local/gcc/egcs-19980803/bin/c++
 endif
 
 
