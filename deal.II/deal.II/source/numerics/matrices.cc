@@ -72,6 +72,11 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 					SparseMatrix<double>     &matrix,
 					const Function<dim> * const coefficient)
 {
+  Assert (matrix.m() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+  Assert (matrix.n() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadManager thread_manager;
 
@@ -230,6 +235,11 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 					Vector<double>           &rhs_vector,
 					const Function<dim> * const coefficient)
 {
+  Assert (matrix.m() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+  Assert (matrix.n() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadManager thread_manager;
 
@@ -856,6 +866,11 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 					   SparseMatrix<double>     &matrix,
 					   const Function<dim> * const coefficient)
 {
+  Assert (matrix.m() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+  Assert (matrix.n() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadManager thread_manager;
 
@@ -1019,6 +1034,11 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 					   Vector<double>           &rhs_vector,
 					   const Function<dim> * const coefficient)
 {
+  Assert (matrix.m() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+  Assert (matrix.n() == dof.n_dofs(),
+	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadManager thread_manager;
 
