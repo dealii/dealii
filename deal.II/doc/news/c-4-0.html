@@ -48,6 +48,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p> On AIX systems, the xlf Fortran77 compiler wasn't recognized 
+       due to the fact that when called with -v it generates many pages
+       of output, later leading to a shell error. This is not fixed.
+       <br>
+       (WB 2003/09/19)
+       </p>
+
   <li> <p> The elastic example program, step-8, had a bug in the way
        the system matrix is assembled. In effect, we were solving the
        wrong equation. This should now be fixed.
