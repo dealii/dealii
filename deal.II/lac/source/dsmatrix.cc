@@ -539,7 +539,7 @@ dSMatrix::matrix_norm (const dVector& v) const
 
 
 double
-dSMatrix::residual (dVector& dst, const dVector& u, const dVector& b)
+dSMatrix::residual (dVector& dst, const dVector& u, const dVector& b) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -564,21 +564,27 @@ dSMatrix::residual (dVector& dst, const dVector& u, const dVector& b)
 }
 
 void
-dSMatrix::Jacobi_precond (dVector& dst, const dVector& src, const double om)
+dSMatrix::precondition_Jacobi (dVector& dst, const dVector& src,
+			       const double om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
 
   const unsigned int n = src.size();
 
-  for (unsigned int i=0;i<n;++i)
-    {
-      dst(i) = om * src(i) * val[cols->rowstart[i]];
-    }
-}
+  for (unsigned int i=0; i<n; ++i)
+				     // note that for square matrices,
+				     // the diagonal entry is the first
+				     // in each row, i.e. at index
+				     // rowstart[i]
+    dst(i) = om * src(i) * val[cols->rowstart[i]];
+};
+
 
 void
-dSMatrix::SSOR_precond (dVector& dst, const dVector& src, const double om)
+dSMatrix::precondition_SSOR (dVector& dst, const dVector& src,
+			     const double om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -613,16 +619,23 @@ dSMatrix::SSOR_precond (dVector& dst, const dVector& src, const double om)
 }
 
 void
-dSMatrix::SOR_precond (dVector& dst, const dVector& src, const double om)
+dSMatrix::precondition_SOR (dVector& dst, const dVector& src,
+			    const double om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   dst = src;
   SOR(dst,om);
-}
+};
+
+
+void dSMatrix::precondition (dVector &dst, const dVector &src) const {
+  dst=src;
+};
+
 
 void
-dSMatrix::SOR (dVector& dst, const double om)
+dSMatrix::SOR (dVector& dst, const double om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -643,7 +656,7 @@ dSMatrix::SOR (dVector& dst, const double om)
 }
 
 void
-dSMatrix::SSOR (dVector& dst, const double om)
+dSMatrix::SSOR (dVector& dst, const double om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());

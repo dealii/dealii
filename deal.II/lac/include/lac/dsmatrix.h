@@ -593,22 +593,23 @@ class dSMatrix
     double matrix_norm (const dVector &v) const;
     
 				     //
-    double residual (dVector& dst, const dVector& x, const dVector& b);
+    double residual (dVector& dst, const dVector& x,
+		     const dVector& b) const;
 				     //
-    void Jacobi_precond (dVector& dst, const dVector& src,
-			 const double om = 1.);
+    void precondition_Jacobi (dVector& dst, const dVector& src,
+			      const double om = 1.) const;
 				     //
-    void SSOR_precond (dVector& dst, const dVector& src,
-		       const double om = 1.);
+    void precondition_SSOR (dVector& dst, const dVector& src,
+			    const double om = 1.) const;
 				     //
-    void SOR_precond (dVector& dst, const dVector& src,
-		      const double om = 1.);
+    void precondition_SOR (dVector& dst, const dVector& src,
+			   const double om = 1.) const;
 				     //
-    void SSOR (dVector& dst, const double om = 1.);
+    void SSOR (dVector& dst, const double om = 1.) const;
 				     //
-    void SOR (dVector& dst, const double om = 1.);
+    void SOR (dVector& dst, const double om = 1.) const;
 				     //
-    void precondition (dVector& dst, const dVector& src) { dst=src; }
+    void precondition (dVector& dst, const dVector& src) const;
 
 				     /**
 				      * Return a (constant) reference to the
