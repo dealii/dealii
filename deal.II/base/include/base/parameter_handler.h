@@ -474,12 +474,13 @@ namespace Patterns
 
                                    /**
                                     * This pattern matches a list of
-                                    * comma-separated values each of
-                                    * which have to match a pattern
-                                    * given to the constructor. With
-                                    * to additional parameters, the
-                                    * number of elements this list has
-                                    * to have can be specified.
+                                    * comma-separated values each of which
+                                    * have to match a pattern given to the
+                                    * constructor. With two additional
+                                    * parameters, the number of elements this
+                                    * list has to have can be specified. If
+                                    * none is specified, the list may have
+                                    * zero or more entries.
                                     */
   class List : public PatternBase
   {
