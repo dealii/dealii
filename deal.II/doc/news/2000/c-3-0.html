@@ -107,6 +107,27 @@
 
 <ol>
   <li> <p>
+       New: There are now a set of functions
+       <code class="member">outer_product</code> that for the outer
+       product of tensors.
+       <br>
+       (WB 2000/07/23)
+       </p>       
+
+  <li> <p>
+       New: The classes 
+       <code class="class">Patterns::Integer</code>
+       and <code class="class">Patterns::Double</code> now allow that
+       a range may be specified in which the parameter shall
+       be. Furthermore, instead of a class,
+       <code class="class">Patterns</code> is now a namespace, so it
+       can be reopened in case you want to write another pattern class
+       and want to put it into the same namespace.
+       <br>
+       (WB 2000/07/21)
+       </p>
+
+  <li> <p>
        New: classes <code class="class">QMilne</code> and <code
        class="class">QWeddle</code> for closed Newton-Cotes-formul&aelig; of
        orders 7 and 9, respectively.
@@ -372,20 +393,28 @@
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: <code class="class">class DerivativeApproximation</code>
+       approximates the norm of the gradient or second derivative of a
+       finite element field on each cell from finite difference
+       approximations.
+       <br>
+       (WB 2000/04/14 and 2000/07/23)
+       </p>
 
   <li> <p>
-       Fix: Include missing assertions in <code
+       Fix: Add a missing assertions in <code
        class="member">FEValuesBase::get_function_*</code>. If an <code
-       class="class">ExcAccessToUninitializedField</code> is thrown
+       class="class">ExcAccessToUninitializedField</code> is now thrown
        then probably an <code class="member">update_values</code> or
        <code class="member">update_gradients</code> is missing in the
-       <code class="class">UpdateFlags</code> of an used <code
-       class="class">FEValues</code>.  These assertions already
-       uncovered an error in <code
-       class="member">DataOut<dim>::build_some_patches</code>; an
-       error that would have occured after the implementation of new
-       <code class="class">FiniteElements</code> whose shape values
-       depend on the geometry of the real cell.
+       <code class="class">UpdateFlags</code> of a used <code
+       class="class">FEValues</code>. Adding this assertion uncovered
+       an error in <code
+       class="member">DataOut<dim>::build_some_patches</code> that is
+       now also fixed; an error that would have occured after the
+       implementation of new <code class="class">FiniteElements</code>
+       whose shape values depend on the geometry of the real cell.
        <br>
        (Ralf Hartmann 2000/07/20)
        </p>
@@ -650,14 +679,6 @@
        variables.
        <br>
        (WB 2000/04/15)
-       </p>
-
-  <li> <p>
-       New: <code class="class">class GradientEstimator</code>
-       estimates the norm of the gradient on each cell from finite
-       difference approximations. 
-       <br>
-       (WB 2000/04/14)
        </p>
 
   <li> <p>
