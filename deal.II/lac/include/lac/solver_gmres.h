@@ -105,10 +105,11 @@ class SolverGMRES : public Solver<VECTOR>
 					  * tmp vectors.
 					  */
 	unsigned int    max_n_tmp_vectors;
-					   /**
-					    * Flag for right preconditioning.
-					    */
-	  bool right_preconditioning;
+
+					 /**
+					  * Flag for right preconditioning.
+					  */
+	bool right_preconditioning;
     };
     
 				     /**
