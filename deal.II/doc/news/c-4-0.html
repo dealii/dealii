@@ -33,6 +33,25 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed and changed: The <code
+       class="class">SolutionTransfer</code><code
+       class="member">::(refine_)interpolate(const Vector &in, Vector
+       &out)</code> functions now require the <code
+       class="member">in</code> and <code class="member">out</code>
+       vectors being already of right sizes,
+       i.e. <code>in.size()=n_dofs_old</code> and
+       <code>out.size()=n_dofs_refined</code>. Furthermore, the <code
+       class="class">SolutionTransfer</code><code
+       class="member">::(refine_)interpolate(const
+       vector&lt;Vector&gt; &all_in, vector&lt;Vector&gt;
+       &all_out)</code> now check that the number of in and output
+       vectors are the same, i.e.
+       <code>all_in.size()=all_out.size()</code>.
+       <br>
+       (RH 2003/10/24)
+       </p>
+
+  <li> <p>
        Changed: The <code class="class">QProjector</code> has functions that
        project a lower-dimensional quadrature formula onto all faces or
        subfaces of a cell. In 3d, it now does this but also adds projections of
@@ -47,11 +66,12 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <tt>include/numerics/dof_renumbering.h</tt> has been moved to the 
        directory <tt>include/dofs</tt>, where it logically
        belongs. Furthermore, the sorting parameter of the function <code
-       class="class">DoFRenumbering</code>::<code
-       class="member">component_wise</code> has changed its meaning. See
+       class="class">DoFRenumbering</code><code
+       class="member">::component_wise</code> has changed its meaning. See
        the reference documentation for details.
        <br>
        (GK 2003/07/03)
+       </p>
 </ol>
 
 
@@ -257,16 +277,10 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
-       New: There is now a function <code
-       class="member">CellAccessor::neighbor_child_on_subface</code> 
-       Fixed: The <code
-       class="member">SolutionTransfer::interpolate</code>
-       function did not compute all output vectors if the number of
-       output vectors was different from the number of output
-       vectors. This was due to the fact that it stored the number of
-       output vectors before resizing that array. This is now fixed.
+       Changed: The <code
+<        class="member">SolutionTransfer::interpolate</code>      
        <br>
-       (Brent Bailey, WB 2003/10/22)
+       (Brent Bailey, WB 2003/10/22 and RH 2003/10/24)
        </p>
 
   <li> <p>
