@@ -4,6 +4,8 @@
 #define __solver_pgmres_H
 /*----------------------------   solver_pgmres.h     ---------------------------*/
 
+
+#include <base/logstream.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <lac/fullmatrix.h>
