@@ -858,7 +858,7 @@ MGDoFHandler<dim>::last_active_quad () const {
 
 
 template <int dim>
-void MGDoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &fe) {
+void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
 				   // first distribute global dofs
   DoFHandler<dim>::distribute_dofs (fe);
 

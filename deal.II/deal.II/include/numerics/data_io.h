@@ -332,8 +332,16 @@ class DataOut {
 
 				     /**
 				      * Write data and grid in GNUPLOT format.
+				      * Write a patch for each grid cell using
+				      * #accuracy# subintervals per dimension.
 				      */
-    void write_gnuplot (ostream &out) const;
+    void write_gnuplot (ostream &out, const unsigned accuracy=1) const;
+
+				     /**
+				      * Write data and grid in GNUPLOT format.
+				      * Only the edges between cells are written.
+				      */
+    void write_gnuplot_draft (ostream &out) const;
 
 				     /**
 				      * Write data of first vector and grid

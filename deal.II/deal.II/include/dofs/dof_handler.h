@@ -27,7 +27,7 @@ template <int dim, class Accessor> class TriaIterator;
 template <int dim, class Accessor> class TriaActiveIterator;
 
 template <int dim> class Triangulation;
-template <int dim> class FiniteElementBase;
+template <int dim> class FiniteElement;
 template <int dim> class Function;
 
 class dVector;
@@ -498,7 +498,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * don't need them after calling this
 				      * function, or if so store them.
 				      */
-    virtual void distribute_dofs (const FiniteElementBase<dim> &);
+    virtual void distribute_dofs (const FiniteElement<dim> &);
 
 				     /**
 				      * Renumber the degrees of freedom according
@@ -1242,7 +1242,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * function is inline, so it should
 				      * be reasonably fast.
 				      */
-    const FiniteElementBase<dim> & get_fe () const;
+    const FiniteElement<dim> & get_fe () const;
 
 				     /**
 				      * Return a constant reference to the
@@ -1324,7 +1324,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * dofs per line, but also restriction
 				      * and prolongation matrices, etc.
 				      */
-    SmartPointer<const FiniteElementBase<dim> > selected_fe;
+    SmartPointer<const FiniteElement<dim> > selected_fe;
 
   private:
 				     /**
@@ -1423,7 +1423,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 
 template <int dim>
 inline
-const FiniteElementBase<dim> & DoFHandler<dim>::get_fe () const {
+const FiniteElement<dim> & DoFHandler<dim>::get_fe () const {
   return *selected_fe;
 };
 

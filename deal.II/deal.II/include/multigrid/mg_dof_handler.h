@@ -139,7 +139,7 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      * don't need them after calling this
 				      * function, or if so store them.
 				      */
-    virtual void distribute_dofs (const FiniteElementBase<dim> &);
+    virtual void distribute_dofs (const FiniteElement<dim> &);
 
 				     /**
 				      * Renumber the degrees of freedom according

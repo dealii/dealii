@@ -317,6 +317,22 @@ QTrapez<1>::QTrapez () :
     };
 };
 
+template <>
+QIteratedTrapez<1>::QIteratedTrapez (const unsigned n) :
+		Quadrature<1> (n+1)
+{
+				   // Loop over INTERIOR points
+  for (unsigned int i=1; i<n; ++i) 
+    {
+      quadrature_points[i] = Point<1>(1.*i/n);
+      weights[i] = 1./n;
+    };
+  quadrature_points[0] = Point<1>(0.);
+  weights[0] = .5/n;
+  quadrature_points[n] = Point<1>(1.);
+  weights[n] = .5/n;
+}
+
 #endif
 
 
@@ -391,6 +407,12 @@ QTrapez<dim>::QTrapez () :
   Assert (dim<3, ExcInternalError());
 };
 
+template <int dim>
+QIteratedTrapez<dim>::QIteratedTrapez (const unsigned n) :
+		Quadrature<dim> (QIteratedTrapez<dim-1>(n), QIteratedTrapez<1>(n))
+{
+  Assert (dim<3, ExcInternalError());
+};
 
 
 
@@ -405,6 +427,7 @@ template class QGauss8<deal_II_dimension>;
 template class QMidpoint<deal_II_dimension>;
 template class QSimpson<deal_II_dimension>;
 template class QTrapez<deal_II_dimension>;
+template class QIteratedTrapez<deal_II_dimension>;
 
 
 #endif

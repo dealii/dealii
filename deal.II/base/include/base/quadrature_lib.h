@@ -146,8 +146,19 @@ class QTrapez : public Quadrature<dim> {
     QTrapez ();
 };
 
-
-
+/**
+ * Iterated trapezoidal rule.  The original reason for implementing
+ * this was gnuplot output for patches.  Before this comment is
+ * removed, please do not rely on the correctness of the quadrature
+ * weights.
+ */
+template <int dim>
+class QIteratedTrapez :
+  public Quadrature<dim>
+{
+public:
+  QIteratedTrapez(const unsigned intervals);
+};
 
 /*----------------------------   quadrature_lib.h     ---------------------------*/
 /* end of #ifndef __quadrature_lib_H */
