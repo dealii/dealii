@@ -4,7 +4,7 @@
 #define __smartpointer_H
 /*----------------------------   smartpointer.h     ---------------------------*/
 
-#ifndef #ifndef __subscriptor_H
+#ifndef __subscriptor_H
 #include <base/subscriptor.h>
 #endif
 
