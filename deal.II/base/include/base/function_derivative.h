@@ -49,19 +49,39 @@ class FunctionDerivative : public Function<dim>
 
 				     /**
 				      * Constructor. Provided are the
-				      * function to compute derivatives
-				      * of and the direction vector of
-				      * the differentiation.
+				      * function to compute
+				      * derivatives of, the direction
+				      * vector of the differentiation
+				      * and the step size @p{h} of the
+				      * difference formula.
 				      */
     FunctionDerivative (const Function<dim>& f,
-			const Point<dim>& direction);
+			const Point<dim>& direction,
+			const double h = 1.e-6);
     
 				     /**
-				      * Set step size of the difference
-				      * formula. This is set to the
-				      * default in the constructor.
+				      * Constructor. Provided are the
+				      * function to compute
+				      * derivatives of and the
+				      * direction vector of the
+				      * differentiation in each
+				      * quadrature point and the
+				      * difference step size.
+				      *
+				      * This is the constructor for a
+				      * variable velocity field. Most
+				      * probably, a new object of
+				      * @p{FunctionDerivative} has to
+				      * be constructed for each set of
+				      * quadrature points.
+				      *
+				      * The number of quadrature point
+				      * must still be the same, when
+				      * values are accessed.
 				      */
-    void set_h (double h_new = 1.e-6);
+    FunctionDerivative (const Function<dim>& f,
+			const vector<Point<dim> >& direction,
+			const double h = 1.e-6);
     
 				     /**
 				      * Choose the difference formula.
@@ -109,17 +129,12 @@ class FunctionDerivative : public Function<dim>
     unsigned int memory_consumption () const;
     
     DeclException0(ExcInvalidFormula);
-    
   private:
 				     /**
 				      * Function for differentiation.
 				      */
     const Function<dim>& f;
-				     /**
-				      * Differentiation vector.
-				      */
-    Point<dim> direction;
-    
+
 				     /**
 				      * Step size of the difference formula.
 				      */
@@ -133,7 +148,7 @@ class FunctionDerivative : public Function<dim>
 				      * increment vector for the
 				      * formula.
 				      */
-    Point<dim> incr;
+    vector<Point<dim> > incr;
 };
 
 #endif

@@ -19,24 +19,32 @@
 
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
-					     const Point<dim>& dir)
+					     const Point<dim>& dir,
+					     const double h)
 		:
 		Function<dim> (f.n_components, f.get_time()),
   f(f),
-  direction(dir)
+  h(h),
+  incr(1, h*dir)
 {
-  set_h();
   set_formula();
 }
 
 
 
 template <int dim>
-void
-FunctionDerivative<dim>::set_h (double h_new)
+FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
+					     const vector<Point<dim> >& dir,
+					     const double h)
+		:
+		Function<dim> (f.n_components, f.get_time()),
+  f(f),
+  h(h),
+  incr(dir.size())
 {
-  h = h_new;
-  incr = h*direction;
+  for (unsigned int i=0;i<incr.size ();++i)
+    incr[i] = h*dir[i];
+  set_formula();
 }
 
 
@@ -55,15 +63,18 @@ double
 FunctionDerivative<dim>::value (const Point<dim>   &p,
 				const unsigned int  component) const
 {
+  Assert (incr.size() == 1,
+	  ExcMessage ("FunctionDerivative was not initialized for constant direection"));
+
   switch (formula)
     {
       case Euler:
-	    return (f.value(p+incr, component)-f.value(p-incr, component))/(2*h);
+	    return (f.value(p+incr[0], component)-f.value(p-incr[0], component))/(2*h);
       case UpwindEuler:
-	    return (f.value(p, component)-f.value(p-incr, component))/h;
+	    return (f.value(p, component)-f.value(p-incr[0], component))/h;
       case FourthOrder:
-	    return (-f.value(p+2*incr, component) + 8*f.value(p+incr, component)
-		    -8*f.value(p-incr, component) + f.value(p-2*incr, component))/(12*h);
+	    return (-f.value(p+2*incr[0], component) + 8*f.value(p+incr[0], component)
+		    -8*f.value(p-incr[0], component) + f.value(p-2*incr[0], component))/(12*h);
       default:
 	    Assert(false, ExcInvalidFormula());
     }
@@ -77,6 +88,7 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 using namespace std;
 #endif
 
+//TODO:Optimize construction of vectors!
 
 template <int dim>
 void
@@ -85,7 +97,11 @@ FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &po
 				     const unsigned int              component) const
 {
   const unsigned int n = points.size();
-  
+  bool variable_direction = (incr.size() == 1) ? false : true;
+  if (variable_direction)
+    Assert (incr.size() == points.size(),
+	    ExcDimensionMismatch(incr.size(), points.size()));
+
   switch (formula)
     {
       case Euler:
@@ -95,8 +111,9 @@ FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &po
 	std::vector<double> e2(n);
 	for (unsigned int i=0;i<n;++i)
 	  {
-	    p1[i] = points[i]+incr;
-	    p2[i] = points[i]-incr;
+	    const unsigned int j = (variable_direction) ? i:0;
+	    p1[i] = points[i]+incr[j];
+	    p2[i] = points[i]-incr[j];
 	  }
 	f.value_list(p1, values, component);
 	f.value_list(p2, e2, component);
@@ -112,7 +129,10 @@ FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &po
 	std::vector<Point<dim> > p2(n);
 	std::vector<double> e2(n);
 	for (unsigned int i=0;i<n;++i)
-	  p2[i] = points[i]-incr;
+	  {
+	    const unsigned int j = (variable_direction) ? i:0;
+	    p2[i] = points[i]-incr[j];
+	  }
 	f.value_list(points, values, component);
 	f.value_list(p2, e2, component);
 	for (unsigned int i=0;i<n;++i)
@@ -130,10 +150,11 @@ FunctionDerivative<dim>::value_list (const typename std::vector<Point<dim> > &po
 	std::vector<double> e_m(n);
 	for (unsigned int i=0;i<n;++i)
 	  {
-	    p_p[i] = points[i]+incr;
-	    p_pp[i] = p_p[i]+incr;
-	    p_m[i] = points[i]-incr;
-	    p_mm[i] = p_m[i]-incr;
+	    const unsigned int j = (variable_direction) ? i:0;
+	    p_p[i] = points[i]+incr[j];
+	    p_pp[i] = p_p[i]+incr[j];
+	    p_m[i] = points[i]-incr[j];
+	    p_mm[i] = p_m[i]-incr[j];
 	  }
 	f.value_list(p_mm, values, component);
 	f.value_list(p_pp, e_pp, component);
