@@ -135,9 +135,9 @@ void MGTransferSelect<number>::restrict_and_add (
 
 // Explicit instantiations
 
-template MGTransferPrebuilt<float>;
-template MGTransferPrebuilt<double>;
-template MGTransferBlock<float>;
-template MGTransferBlock<double>;
-template MGTransferSelect<float>;
-template MGTransferSelect<double>;
+template class MGTransferPrebuilt<float>;
+template class MGTransferPrebuilt<double>;
+template class MGTransferBlock<float>;
+template class MGTransferBlock<double>;
+template class MGTransferSelect<float>;
+template class MGTransferSelect<double>;
