@@ -182,10 +182,29 @@ class PreconditionRelaxation
  * class used is required to have a function
  * @p{precondition_Jacobi(VECTOR&, const VECTOR&, double}
  *
+ * @sect2{Usage example}
+ * <pre>
+ *     // Declare related objects
+ *
+ * SparseMatrix<double> A;
+ * Vector<double> x;
+ * Vector<double> b;
+ * SolverCG<> solver(...);
+ *
+ * //...initialize and build A
+ *
+ *     // Define and initialize preconditioner
+ *
+ * PreconditionJacobi<SparseMatrix<double> > precondition;
+ * precondition.initialize (A, .6);
+ *
+ * solver.solve (A, x, b, precondition);
+ * </pre>
+ *
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
+class PreconditionJacobi : private PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -202,6 +221,12 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Make function of base class
+				      * publicly available.
+				      */
+    PreconditionRelaxation<MATRIX>::initialize;
 };
 
 
@@ -211,10 +236,30 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
  * @p{precondition_SOR(VECTOR&, const VECTOR&, double)} and
  * @p{precondition_TSOR(VECTOR&, const VECTOR&, double)}.
  *
+ *
+ * @sect2{Usage example}
+ * <pre>
+ *     // Declare related objects
+ *
+ * SparseMatrix<double> A;
+ * Vector<double> x;
+ * Vector<double> b;
+ * SolverCG<> solver(...);
+ *
+ * //...initialize and build A
+ *
+ *     // Define and initialize preconditioner
+ *
+ * PreconditionSOR<SparseMatrix<double> > precondition;
+ * precondition.initialize (A, .6);
+ *
+ * solver.solve (A, x, b, precondition);
+ * </pre>
+ *
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionSOR : public PreconditionRelaxation<MATRIX>
+class PreconditionSOR : private PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -229,6 +274,12 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Make function of base class
+				      * publicly available.
+				      */
+    PreconditionRelaxation<MATRIX>::initialize;
 };
 
 
@@ -238,10 +289,30 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
  * class used is required to have a function
  * @p{precondition_SSOR(VECTOR&, const VECTOR&, double}
  *
+ *
+ * @sect2{Usage example}
+ * <pre>
+ *     // Declare related objects
+ *
+ * SparseMatrix<double> A;
+ * Vector<double> x;
+ * Vector<double> b;
+ * SolverCG<> solver(...);
+ *
+ * //...initialize and build A
+ *
+ *     // Define and initialize preconditioner
+ *
+ * PreconditionSSOR<SparseMatrix<double> > precondition;
+ * precondition.initialize (A, .6);
+ *
+ * solver.solve (A, x, b, precondition);
+ * </pre>
+ *
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX = SparseMatrix<double> >
-class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
+class PreconditionSSOR : private PreconditionRelaxation<MATRIX>
 {
   public:
 				     /**
@@ -259,6 +330,12 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Make function of base class
+				      * publicly available.
+				      */
+    PreconditionRelaxation<MATRIX>::initialize;
 };
 
 
@@ -271,6 +348,45 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
  * Usually, the use of @p{ReductionControl} is preferred over the use of
  * the basic @p{SolverControl} in defining this solver.
  *
+ * @sect2{Usage example}
+ *
+ * Krylov space methods like @ref{SolverCG} or @ref{SolverBicgstab}
+ * become inefficient if soution down to machine accuracy is
+ * needed. This is due to the fact, that round-off errors spoil the
+ * orthogonality of the vector sequences. Therefore, a nested
+ * iteration of two methods is proposed: The outer method is
+ * @ref{SolverRichardson}, since it is robust with respect to round-of
+ * errors. The inner loop is an appropriate Krylov space method, since
+ * it is fast.
+ *
+ * <pre>
+ *     // Declare related objects
+ *
+ * SparseMatrix<double> A;
+ * Vector<double> x;
+ * Vector<double> b;
+ * GrowingVectorMemory<Vector<double> > mem;
+
+ * ReductionControl inner_control (10, 1.e-30, 1.e-2)
+ * SolverCG<Vector<double> > inner_iteration (inner_control, mem);
+ * PreconditionSSOR <SparseMatrix<double> > inner_precondition;
+ * inner_precondition.initialize (A, 1.2);
+ *
+ * PreconditionLACSolver precondition;
+ * precondition.initialize (inner_iteration, A, inner_precondition);
+ *
+ * SolverControl outer_control(100, 1.e-16);
+ * SolverRichardson<Vector<double> > outer_iteration;
+ *
+ * outer_iteration.solve (A, x, b, precondition);
+ * </pre>
+ *
+ * Each time we call the inner loop, reduction of the residual by a
+ * factor @p{1.e-2} is attempted. Since the right hand side vector of
+ * the inner iteration is the residual of the outer loop, the relative
+ * errors are far from machine accuracy, even if the errors of the
+ * outer loop are in the range of machine accuracy.
+ *
  * @author Guido Kanschat, 1999
  */
 template<class SOLVER, class MATRIX = SparseMatrix<double>, class PRECONDITION = PreconditionIdentity>
@@ -278,13 +394,20 @@ class PreconditionLACSolver
 {
   public:
 				     /**
-				      * Constructor.  Provide a solver
+				      * Constructor. All work is done
+				      * in initialize.
+				      */
+    PreconditionLACSolver ();
+
+				     /**
+				      * Initialization
+				      * function. Provide a solver
 				      * object, a matrix, and another
 				      * preconditioner for this.
 				      */
-    PreconditionLACSolver(SOLVER&,
-			  const MATRIX&,
-			  const PRECONDITION&);
+    void initialize (SOLVER&,
+		     const MATRIX&,
+		     const PRECONDITION&);
     
 				     /**
 				      * Execute preconditioning.
@@ -294,21 +417,23 @@ class PreconditionLACSolver
 
   private:
 				     /**
-				      * The solver class to use.
+				      * The solver object to use.
 				      */
-    SOLVER& solver;
+    SOLVER* solver;
 
 				     /**
 				      * The matrix in use.
 				      */
-    const MATRIX& matrix;
+    SmartPointer<const MATRIX> matrix;
     
 				     /**
 				      * The preconditioner to use.
 				      */
-    const PRECONDITION& precondition;
+    const PRECONDITION* precondition;
 };
 
+//TODO: Use SmartPointer for SOLVER and PRECONDITION above?
+// Another Subscriptor?
 
 
 /**
@@ -492,13 +617,23 @@ PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR& dst,
 
 template<class SOLVER, class MATRIX, class PRECONDITION>
 PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
-::PreconditionLACSolver(SOLVER& solver,
-			const MATRIX& matrix,
-			const PRECONDITION& precondition)
+::PreconditionLACSolver ()
 		:
-		solver(solver), matrix(matrix), precondition(precondition)
+		solver(0), matrix(0), precondition(0)
 {}
 
+
+template<class SOLVER, class MATRIX, class PRECONDITION>
+void
+PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
+::initialize (SOLVER& s,
+	      const MATRIX& m,
+	      const PRECONDITION& p)
+{
+  solver = s;
+  matrix = m;
+  precondition = p;
+}
 
 
 template<class SOLVER, class MATRIX, class PRECONDITION>
@@ -507,7 +642,10 @@ void
 PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR& dst,
 							  const VECTOR& src) const
 {
-  solver.solve(matrix, dst, src, precondition);
+  Assert (solver !=0 && matrix != 0 && precondition != 0,
+	  ExcNotInitialized());
+  
+  solver->solve(*matrix, dst, src, *precondition);
 }
 
 //////////////////////////////////////////////////////////////////////
