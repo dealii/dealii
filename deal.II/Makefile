@@ -120,12 +120,20 @@ TODO:
 	@grep //TODO ../base/include/*/*.h ../base/source/*.cc  ../lac/include/*/*.h ../lac/source/*.cc  ../deal.II/include/*/*.h ../deal.II/source/*/*.cc >> TODO
 #	@grep \#TODO Makefile Make.g* Makefile.template ../*/source/Makefile ../*/Makefile >> TODO
 
-clean:
-	cd ../base ; $(MAKE) clean
-	cd ../lac ; $(MAKE) clean
-	cd ../deal.II ; $(MAKE) clean
-	cd ../doc/auto ; $(MAKE) clean
+clean: clean-base clean-lac clean-dealII clean-doc
 	-rm TODO TAGS
+
+clean-base:
+	cd ../base ; $(MAKE) clean
+
+clean-lac:
+	cd ../lac ; $(MAKE) clean
+
+clean-dealII:
+	cd ../deal.II ; $(MAKE) clean
+
+clean-doc:
+	cd ../doc/auto ; $(MAKE) clean
 
 
 TAGS: $(filter-out %/forward-declarations.h,                                \
@@ -136,4 +144,5 @@ TAGS: $(filter-out %/forward-declarations.h,                                \
 	@etags $^
 
 
-.PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all online-doc printable-doc tex-doc clean TAGS TODO
+.PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all online-doc printable-doc tex-doc \
+        clean clean-base clean-lac clean-dealII clean-doc TAGS TODO
