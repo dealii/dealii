@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.39 
+# From configure.in Revision: 1.40 
 
 
 
@@ -1300,8 +1300,8 @@ fi
 
 
 
-echo $ac_n "checking whether -ggdb works""... $ac_c" 1>&6
-echo "configure:1305: checking whether -ggdb works" >&5
+echo $ac_n "checking whether -ggdb works for long symbols""... $ac_c" 1>&6
+echo "configure:1305: checking whether -ggdb works for long symbols" >&5
 case "$target" in
       alpha*-osf*)
 	CXXFLAGS="-ggdb $CXXFLAGSG"
@@ -1339,7 +1339,7 @@ else
   rm -rf conftest*
   
             CXXFLAGSG="-gstabs $CXXFLAGSG"
-	    echo "$ac_t""no" 1>&6
+	    echo "$ac_t""no -- using -gstabs" 1>&6
 	  
 fi
 rm -f conftest*

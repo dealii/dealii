@@ -164,7 +164,7 @@ dnl -------------------------------------------------------------
 
 if test $GXX = yes ; then
   CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
-  CXXFLAGSG="$CXXFLAGS -DDEBUG -ggdb -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
+  CXXFLAGSG="$CXXFLAGS -DDEBUG -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
 
   dnl set some flags that are specific to some versions of the
   dnl compiler:
@@ -220,6 +220,57 @@ fi
 
 AC_SUBST(CXXFLAGSG)
 AC_SUBST(CXXFLAGSO)
+
+
+
+dnl We still need to set the flag for debug output. We will usually
+dnl use -ggdb, but on DEC Alpha OSF1, this leads to stabs symbols that are
+dnl too long for the system assembler. We will therefore check whether the
+dnl assembler can handle these symbols by a rather perverse function with
+dnl many templates, and if the assembler can't handle them, then use
+dnl -gstabs instead. This reduces debugging possibilities, but no other
+dnl way is known at present.
+AC_MSG_CHECKING(whether -ggdb works for long symbols)
+case "$target" in
+   dnl On Alpha, use the special treatment
+   alpha*-osf*)
+	CXXFLAGS="-ggdb $CXXFLAGSG"
+	AC_TRY_COMPILE(
+	  [
+#include <string>
+#include <map>
+
+typedef map<string,map<string,pair<string,string> > > T;
+
+bool f(T& t1, const T* t2) {
+  t1["s"] = map<string,pair<string,string> >();
+  map<string,map<string,pair<string,string> > >::const_iterator i2=t1.begin();
+  map<string,map<string,pair<string,string> > >::const_iterator i1=t2->begin();
+  return (i1==i2);
+}
+	  ],
+	  [
+		;
+	  ],
+	  [
+            CXXFLAGSG="-ggdb $CXXFLAGSG"
+	    AC_MSG_RESULT(yes)
+	  ],
+	  [
+            CXXFLAGSG="-gstabs $CXXFLAGSG"
+	    AC_MSG_RESULT(no -- using -gstabs)
+	  ])
+	;;
+
+   dnl For all other systems assume that -ggdb works (we can't make the test 
+   dnl above the default, as stabs are not the default debugging format on many
+   dnl systems, and we only want to use it where necessary
+   *)
+	AC_MSG_RESULT(yes)
+        CXXFLAGSG="-ggdb $CXXFLAGSG"
+	;;
+esac
+
 
 
 
@@ -413,17 +464,6 @@ dnl -------------------------------------------------------------
 
 DEAL_II_CHECK_GETRUSAGE
 DEAL_II_CHECK_ISNAN
-
-case "$target" in
-   dnl On Alpha, there was an internal compiler error in exceptions.h.
-   dnl Disable "throw" for this platform
-   alpha*-linux*)
-	AC_DEFINE(NO_THROW)
-	;;
-esac
-
-
-
 
 
 
