@@ -2,7 +2,7 @@
 
 
 # generic targets
-default: autogen-doc tutorial
+default: autogen-doc tutorial development
 
 all: default autogen-doc-all
 
@@ -19,9 +19,12 @@ autogen-doc-all:
 tutorial:
 	cd tutorial ; $(MAKE)
 
+development:
+	cd development ; $(MAKE)
 
 clean:
 	cd auto ; $(MAKE) clean
 	cd tutorial ; $(MAKE) clean
+	cd development ; $(MAKE) clean
 
-.PHONY: default all autogen-doc autogen-doc-all tutorial clean
+.PHONY: default all autogen-doc autogen-doc-all tutorial clean development

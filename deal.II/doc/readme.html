@@ -112,7 +112,8 @@
     The most important result of <code>./configure</code> is the
     creation of the file <code>common/Make.global_options</code>. This
     file contains compiler options, paths, etc which you may want to
-    use in the Makefiles of your own projects. It is definitely a good
+    use in the <a href="development/index.html">Makefiles of your own
+    projects</a>. It is definitely a good
     idea to include it into your Makefile, to allow using the same
     flags for compilation between library files and the files of your
     project, and to access the paths of the library files. To find
@@ -233,6 +234,7 @@
       your application runs stably and are used in production mode.
     </ul>
 
+
     <a name="options">
     <h3>Configuration options</h3>
 
@@ -296,6 +298,33 @@
      Note that the multi-thread support in the library is still
      experimental. 
     </ul>
+
+    <p>
+
+    Please note that running ./configure stores the paths to some
+    programs, such as the compilers or the Perl interpreter. The
+    compiler which will be used when compiling the library (or your
+    own application) is therefore selected at the time of
+    configuration and independent of the present setting of your $PATH
+    environment value. The reason for this is that presently there are
+    still too many incompatibilities between different versions of
+    compilers and that compiling different parts of programs with
+    different compilers often leads to hard-to-find problems. By
+    storing the absolute paths of compilers, we can at least catch
+    those problems where different compiler revisions are located in
+    different directories.
+
+    <p>
+
+    If you want to use a new compiler version, you will therefore have
+    to re-run ./configure with the new compiler being in the $PATH
+    environment variable.
+
+    <p>
+
+    It is in general a good idea to run `cd common ; make clean'
+    before re-configuring.
+
 
 
     <a name="compiler">

@@ -1,0 +1,94 @@
+    </ul>
+    
+    <a name="generic">
+    <h3>Generic Makefiles</h3>
+
+    <p>
+    In this section, we provide templates for Makefiles for
+    applications based on the <acronym>deal.II</acronym>
+    libraries. They show how to use the information provided by the
+    variables explained above.
+    </p>
+
+    <p>
+    At present, we have two Makefiles, one for 
+    <a href="makefile.small.html" target="body">small projects</a>
+    consisting of only one C++ file, and one for 
+    <a href="makefile.large.html" target="body">large projects</a>.
+    Both Makefiles need slight modifications before they will work in
+    your project. The places for modifications are marked.
+
+    <ul>
+      <li> <p>
+           <a href="makefile.small.html" target="body">Small
+           projects</a>: This Makefile is targeted at applications which
+           are written to simply try something, or prove an
+           assumption. Such applications are the 
+           <a href="../tutorial/chapter-2.step-by-step/index.html" target="_top">step-by-step
+           examples</a>. These small problems are probably not the
+           usual case in real life, but you may want to take a look at
+           this file in order to get an idea on how it works, or you
+           go directly to the large projects file.
+	   </p>
+
+	   <p>
+	   You can find this Makefile
+	   <a href="Makefile.small" target="_top">here</a>.
+	   </p>
+
+      <li> <p>
+           <a href="makefile.large.html" target="body">Large
+           projects</a>: This file is targeted at larger projects, and
+           for this file to work, we already assume a certain
+           subdirectory structure of your project. In particular, it
+           assumes that in your project directory the following
+           subdirectories exist (where <code>project</code> is the
+           directory in which the whole project is located):
+	   <ul>
+	   <li> <code>project/source</code>
+	   <li> <code>project/include</code>
+	   <li> <code>project/lib</code>
+                <ul>
+		  <li> <code>project/lib/1d</code>
+		  <li> <code>project/lib/2d</code>
+		  <li> <code>project/lib/3d</code>
+                </ul>
+	   </ul>
+	   Include files need to be placed into
+           <code>project/include</code>, while implementation files
+           are to be in <code>project/source</code>. The executable
+           will be in <code>project/lib</code> and the compiled object
+           files will be in <code>project/lib/?d</code>, depending on
+           the dimension for which the project is compiled. Using this
+           directory structure, it is possible to quickly switch
+           between dimensions in which a program shall run in,
+           enabling us to develop applications which run in 1d, 2d, or
+           3d without long compilation times. Furthermore, placing
+           object files in different directories prevents cluttering
+           directories with unnecessarily many files.
+	   </p>
+
+	   <p>
+	   The dimension for which the project shall be compiled is
+	   not stated in the source code, as in the small projects
+	   Makefile, but is determined by a flag which is given in the
+	   Makefile. To determine the dimension for which a project is
+	   compiled in your source file, use the preprocessor constant
+	   `deal_II_dimension' which is set by the Makefile and passed
+	   through the compiler.
+	   </p>
+
+	   <p>
+	   You can find this Makefile
+	   <a href="Makefile.large" target="_top">here</a>.
+	   </p>
+    </ul> 
+
+    <hr>
+    
+    <address>
+      <a href="mailto:deal@hermes.iwr.uni-heidelberg.de">The deal.II group</a></address>
+
+  </body>
+</html>
+

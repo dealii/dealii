@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <link href="audio.css" rel="StyleSheet" title="deal.II Homepage" media="aural">
+    <title>The deal.II Homepage - Makefiles</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II"></head>
+  <body>
+
+
+    <h2>Makefiles for <acronym>deal.II</acronym> projects</h2>
+
+    <p>
+    The file <code>common/Make.global_options</code> exports several
+    make variables to other Makefiles which 
+    include it. You will want to include this file into the Makefiles of
+    your project to use the same compiler flags and to access the pathes
+    to libraries. This page documents <a href="#flags">available
+    flags</a>, documents the <a href="#values">values which are used
+    in your local installation</a>, and shows two 
+    <a href="#generic">generic Makefiles</a> which you may want to use
+    in your own projects.
+    </p>
+
+    <a name="flags">
+    <h3>Available flags</h3>
+
+    <p>
+    Following is a list of all available flags which are exported to
+    other Makefiles, sorted into different categories:
+    </p>
+
+    <ul>
+    <li><h4>General</h4></h4>
+
+    <dl>
+      <dt> <code>CXX</code> </dt>
+      <dd> <p>
+           Executable name of the C++ compiler
+           </p>
+      </dd>
+
+
+      <dt> <code>CC</code> </dt>
+      <dd> <p>
+           Executable name of the C compiler, which
+           is used to generate shared libraries
+           </p>
+      </dd>
+
+
+      <dt> <code>PERL</code> </dt>
+      <dd> <p>
+           Executable name of the `perl' program
+           </p>
+      </dd>
+    </dl>
+
+
+
+    <li><h4>Paths to libraries</h4>
+
+    <dl>
+      <dt> <code>lib-path-base</code> </dt>
+      <dd> <p>
+           Path to the library files of the /base library
+           </p>
+      </dd>
+
+
+      <dt> <code>lib-path-lac</code> </dt>
+      <dd> <p>
+           Same for the /lac library
+           </p>
+      </dd>
+
+
+      <dt> <code>lib-path-deal2</code> </dt>
+      <dd> <p>
+           Same for the /deal.II library
+           </p>
+      </dd>
+
+
+      <dt> <code>LIBPATH</code> </dt>
+      <dd> <p>
+           All the library pathes prefixed by -L, i.e. the
+           flags needed by the compiler to find the libraries
+           when they are linked in using -lbase -llac -ldeal_II_2d
+           (for example). These -L paths are appended to what
+           was in $(LIBPATH) before.
+           </p>
+      </dd>
+    </dl>
+
+
+
+    <li><h4>Paths and filenames of libraries</h4>
+
+    <dl>
+      <dt> <code>lib-base.o</code> </dt>
+      <dd> <p>
+           Path and filename of the base library in optimized
+           mode. depending on whether shared libraries were
+           or were not enabled, the suffix of the value of this
+           variable is either .so or .a
+           </p>
+      </dd>
+
+
+      <dt> <code>lib-base.g</code> </dt>
+      <dd> <p>
+           Same, for the library in debug mode
+           </p>
+      </dd>
+
+
+      <dt> <code>lib-lac.o lib-lac.g</code> </dt>
+      <dd> <p>
+           Same for the lac libraries 
+           </p>
+      </dd>
+
+      <dt> <code>lib-deal2-1d.o lib-deal2-1d.g
+                 lib-deal2-2d.o lib-deal2-2d.g
+                 lib-deal2-3d.o lib-deal2-3d.g</code> </dt>
+      <dd> <p>
+           Same for the deal.II libraries in the various dimensions
+           </p>
+      </dd>
+    </dl>
+
+
+
+    <li><h4>Pathes to include files</h4>
+
+    <dl>
+      <dt> <code>include-path-base</code> </dt>
+      <dd> <p>
+           Same as for lib-path-base, but contains the paths
+           to the include files of the /base library
+           </p>
+      </dd>
+
+
+      <dt> <code>include-path-lac</code> </dt>
+      <dd> <p>
+           Same for the /lac library
+           </p>
+      </dd>
+
+
+      <dt> <code>include-path-deal2</code> </dt>
+      <dd> <p>
+           Same for the /deal.II library
+           </p>
+      </dd>
+
+
+      <dt> <code>INCLUDE</code> </dt>
+      <dd> <p>
+           All the include pathes prefixed by -I
+           </p>
+      </dd>
+    </dl>
+
+
+    <li><h4>Compiler flags</h4>
+
+    <dl>
+      <dt> <code>CXXFLAGS.g</code> </dt>
+      <dd> <p>
+           Compiler flags for debug mode
+           </p>
+      </dd>
+
+
+      <dt> <code>CXXFLAGS.o</code> </dt>
+      <dd> <p>
+           Compiler flags for optimized mode
+           </p>
+      </dd>
+    </dl>
+
+
+
+    <li><h4>Variables in multithreading mode</h4>
+ 
+    <p>
+    If --with-multithreading was given to ./configure, $(INCLUDE) and
+    $(LIBPATH) are augmented by the ACE include and library paths, and
+    the following symbols are meaningful:
+
+    <dl>
+      <dt> <code>ACE_ROOT</code> </dt>
+      <dd> <p>
+           Path to the ACE library as given to ./configure
+           </p>
+      </dd>
+
+
+      <dt> <code>lib-ACE</code> </dt>
+      <dd> <p>
+           Path and name of the ACE library
+           </p>
+      </dd>
+
+
+      <dt> <code>with-multithreading</code> </dt>
+      <dd> <p>
+           This symbol is 'no' if the flag was not given
+           to ./configure and not 'no' (it actually equals
+           $(ACE_ROOT)) if -with-multithreading=... was
+           given
+           </p>
+      </dd>
+    </dl>
+
+    <p>
+    Note that in multithread mode, the compiler flags are augmented by
+    the definition of the preprocessor variable
+    <code>DEAL_II_USE_MT</code>, which you can use to find out whether
+    your program shall use multithreading or not. 
+    </p>
+
+    </ul>
+
+
+
+    <a name="values">
+    <h3>Values of available flags</h3>
+    
+    In the copy of the library (your local one, or the one on the
+    <acronym>deal.II</acronym> homepage) to which the file which you
+    are presently viewing belongs, the flags documented above have the
+    following values:
+    
+    <ul>
+

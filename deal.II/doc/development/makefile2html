@@ -1,0 +1,62 @@
+# Copyright (C) 1999, 2000 by Wolfgang Bangerth, Univerisity of Heidelberg.de
+
+
+# ignore the first few lines
+$_ = <>;
+while ( m!^#\*\s*\$Id$!) {
+    $_ = <>;
+}
+
+# have two states, in which the program can be:
+# comment-mode and program-mode
+$comment_mode = 0;
+$program_mode = 1;
+$state =  $comment_mode;
+
+print "<p>\n";
+
+while (<>) {
+    # ignore cvs tag
+    next if m!^#\*\s*\$Id:!;
+
+    # substitute special characters
+    s/&/&amp;/g;
+    s/</&lt;/g;
+    s/>/&gt;/g;
+    s/\t/        /g;
+
+    if (($state == $program_mode) && m!^\s*#!)
+    {     
+	$state = $comment_mode;
+	print "</code></pre>\n";
+	print "\n";
+	print "<p>\n";
+    }
+    # if in comment mode and no comment line: toggle state.
+    # don't do so, if only a blank line
+    elsif (($state == $comment_mode) && !m!^\s*#! && !m!^\s*$!)
+    {     
+	$state = $program_mode;
+	print "</p>\n";
+	print "\n";
+	print "<pre><code>\n";
+    }
+    
+    if ($state == $comment_mode) 
+    {
+	m!\s*#\s*(.*)!;
+	print $1, "\n";
+	print "</p>\n\n<p>" if  $1 =~ m!^\s*$!;
+    }
+    else
+    {
+	print "        $_";
+    }
+}
+
+if ($state == $program_mode) {
+   print "</code></pre>\n";
+}
+
+
+
