@@ -78,8 +78,6 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 				   // already have built.
   for (int level=maxlevel; level>=static_cast<int>(minlevel); --level)
     {
-      DoFHandler<dim>::active_cell_iterator
-	global_cell = mg_dof_handler->DoFHandler<dim>::begin_active(level);
       MGDoFHandler<dim>::active_cell_iterator
 	level_cell = mg_dof_handler->begin_active(level);
       const MGDoFHandler<dim>::active_cell_iterator
@@ -91,13 +89,14 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
-      for (; level_cell!=level_end; ++level_cell, ++global_cell)
+      for (; level_cell!=level_end; ++level_cell)
 	{
+	  DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
 					   // get the dof numbers of
 					   // this cell for the global
 					   // and the level-wise
 					   // numbering
-	  global_cell->get_dof_indices(global_dof_indices);
+	  global_cell.get_dof_indices(global_dof_indices);
 	  level_cell->get_mg_dof_indices (level_dof_indices);
 
 					   // transfer the global
@@ -146,8 +145,6 @@ Multigrid<dim>::copy_from_mg(Vector<number> &dst) const
   vector<unsigned int> global_dof_indices (dofs_per_cell);
   vector<unsigned int> level_dof_indices (dofs_per_cell);
 
-  DoFHandler<dim>::active_cell_iterator
-    global_cell = mg_dof_handler->DoFHandler<dim>::begin_active();
   MGDoFHandler<dim>::active_cell_iterator
     level_cell = mg_dof_handler->begin_active();
   const MGDoFHandler<dim>::active_cell_iterator
@@ -159,15 +156,16 @@ Multigrid<dim>::copy_from_mg(Vector<number> &dst) const
 
 				   // Is the level monotonuosly increasing?
 
-  for (; level_cell != endc; ++level_cell, ++global_cell)
+  for (; level_cell != endc; ++level_cell)
     {
+      DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
       const unsigned int level = level_cell->level();
       
 				       // get the dof numbers of
 				       // this cell for the global
 				       // and the level-wise
 				       // numbering
-      global_cell->get_dof_indices (global_dof_indices);
+      global_cell.get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
 				       // copy level-wise data to
@@ -188,6 +186,9 @@ Multigrid<dim>::print_vector (const unsigned int level,
 			      const Vector<double>& v,
 			      const char* name) const
 {
+  if (level!=maxlevel)
+    return;
+  
   const DoFHandler<dim>* dof = mg_dof_handler;
   
   Vector<double> out_vector(dof->n_dofs());
