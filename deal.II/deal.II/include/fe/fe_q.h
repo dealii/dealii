@@ -283,7 +283,7 @@ class FE_Q : public FiniteElement<dim>
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim> &p) const;
 
-//TODO:[RH] make get_renumber private or move it some other place    
+//TODO:[WB,RH] make get_renumber private or move it some other place    
 				     /**
 				      * Read-only access to the
 				      * renumber vector.
