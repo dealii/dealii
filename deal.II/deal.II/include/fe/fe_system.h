@@ -112,6 +112,18 @@ class FESystem //<dim>
     FESystem (const FE1 &fe1, const unsigned int n1,
 	      const FE2 &fe2, const unsigned int n2);
 
+    				     /** 
+				      * Constructor for mixed
+				      * discretizations with three
+				      * base elements.
+				      *
+				      * See the other constructor.
+				      */
+    template <class FE1, class FE2, class FE3>
+    FESystem (const FE1 &fe1, const unsigned int n1,
+	      const FE2 &fe2, const unsigned int n2,
+	      const FE3 &fe3, const unsigned int n3);
+
 				     /**
 				      * Destructor.
 				      */
@@ -423,14 +435,27 @@ class FESystem //<dim>
 			  const unsigned int            N);
     
 				     /**
-				      * Same as above for mixed elements.
+				      * Same as above for mixed elements
+				      * with two different sub-elements.
 				      */
     static FiniteElementData<dim>
     multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 			  const unsigned int            N1,
 			  const FiniteElementData<dim> &fe2,
 			  const unsigned int            N2);
-    
+
+    				     /**
+				      * Same as above for mixed elements
+				      * with three different sub-elements.
+				      */
+    static FiniteElementData<dim>
+    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+			  const unsigned int            N1,
+			  const FiniteElementData<dim> &fe2,
+			  const unsigned int            N2,
+			  const FiniteElementData<dim> &fe3,
+			  const unsigned int            N3);
+
 				     /**
 				      * This function is simply singled out of
 				      * the constructor. It sets up the
@@ -476,6 +501,7 @@ FESystem<dim>::n_base_elements() const
 }
 
 
+
 template<int dim>
 inline unsigned
 FESystem<dim>::element_multiplicity(unsigned index) const
@@ -484,12 +510,14 @@ FESystem<dim>::element_multiplicity(unsigned index) const
 }
 
 
+
 template <int dim>
 inline const FiniteElement<dim>&
 FESystem<dim>::base_element(unsigned index) const
 {
   return *base_elements[index].first;
 }
+
 
 
 template <int dim>
@@ -503,6 +531,8 @@ FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
   base_elements[0].first -> subscribe ();
   initialize ();
 };
+
+
 
 template <int dim>
 template <class FE1, class FE2>
@@ -520,6 +550,34 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
   base_elements[0].first -> subscribe ();
   base_elements[1] = ElementPair(new FE2, n2);
   base_elements[1].first -> subscribe ();
+  initialize ();
+};
+
+
+
+template <int dim>
+template <class FE1, class FE2, class FE3>
+FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
+			 const FE2 &fe2, const unsigned int n2,
+			 const FE3 &fe3, const unsigned int n3)
+		:
+		FiniteElement (multiply_dof_numbers(fe1, n1,
+						    fe2, n2,
+						    fe3, n3)),
+		base_elements(3),
+		component_to_base_table(n_components)
+{
+  Assert(fe1.n_transform_functions == fe2.n_transform_functions,
+	 ExcElementTransformNotEqual());
+  Assert(fe1.n_transform_functions == fe3.n_transform_functions,
+	 ExcElementTransformNotEqual());
+  
+  base_elements[0] = ElementPair(new FE1, n1);
+  base_elements[0].first -> subscribe ();
+  base_elements[1] = ElementPair(new FE2, n2);
+  base_elements[1].first -> subscribe ();
+  base_elements[2] = ElementPair(new FE3, n3);
+  base_elements[2].first -> subscribe ();
   initialize ();
 };
 
