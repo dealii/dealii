@@ -45,10 +45,20 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
-				   // reserve one slot for each cell and set
-				   // it to zero
-  error.reinit (dof.get_tria().n_active_cells());
-
+				   // create a map of integrals indexed by
+				   // the corresponding face. In this map
+				   // we store the integrated jump of the
+				   // gradient for each face. By doing so,
+				   // we can check whether we have already
+				   // integrated along this face by testing
+				   // whether the respective face is already
+				   // a key in this map.
+				   // At the end of the function, we again
+				   // loop over the cells and collect the
+				   // conrtibutions of the different faces
+				   // of the cell.
+  map<DoFHandler<dim>::face_iterator, double> face_integrals;
+  
 				   // number of integration points per face
   const unsigned int n_q_points = quadrature.n_quadrature_points;
   
@@ -70,20 +80,42 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
 				   // loop over all cells
-  for (unsigned int present_cell=0; cell!=endc; ++cell, ++present_cell)
+  for (; cell!=endc; ++cell)
 				     // loop over all faces of this cell
     for (unsigned int face_no=0; face_no<2*dim; ++face_no)
       {
+					 // if we already visited this
+					 // face: do nothing
+	if (face_integrals.find(cell->face(face_no)) !=
+	    face_integrals.end())
+	  continue;
+
+					 // if the neighboring cell is less
+					 // refined than the present one, then
+					 // do nothing since we integrate
+					 // over the subfaces when we visit
+					 // the coarse cells.
+	if (cell->at_boundary(face_no) == false)
+	  if (cell->neighbor(face_no)->level() < cell->level())
+	    continue;
+	
+					 // if this face is part of the boundary
+					 // but not of the neumann boundary
+					 // -> nothing to do. However, to make
+					 // things easier when summing up the
+					 // contributions of the faces of cells,
+					 // we enter this face into the list
+					 // of faces with contribution zero.
 	const unsigned char boundary_indicator
 	  = cell->face(face_no)->boundary_indicator();
 	if ((boundary_indicator != 255) &&
-	    neumann_bc.find(boundary_indicator)==neumann_bc.end())
-					   // this face is part of the boundary
-					   // but not of the neumann boundary
-					   // -> nothing to do
-	  continue;
+	    neumann_bc.find(boundary_indicator)==neumann_bc.end()) 
+	  {
+	    face_integrals[cell->face(face_no)] = 0;
+	    continue;
+	  };
 
-	
+
 					 // initialize data of the restriction
 					 // of this cell to the present face
 	fe_face_values_cell.reinit (cell, face_no, fe, boundary);
@@ -200,15 +232,36 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 		   phi.begin(), ptr_fun(sqr));
 
 					 // perform integration by multiplication
-					 // with weights and summation. Add the
-					 // contribution of this face to the
-					 // estimator of this cell
-	
-	error(present_cell)
-	  += sqrt(inner_product (phi.begin(), phi.end(),
-				 fe_face_values_cell.get_JxW_values().begin(),
-				 0.0)) * cell->diameter();
+					 // with weights and summation.
+	face_integrals[cell->face(face_no)]
+	  = (inner_product (phi.begin(), phi.end(),
+			    fe_face_values_cell.get_JxW_values().begin(),
+			    0.0) *
+	     cell->diameter() / 24);
       };
+
+
+				   // finally add up the contributions of the
+				   // faces for each cell
+  
+				   // reserve one slot for each cell and set
+				   // it to zero
+  error.reinit (dof.get_tria().n_active_cells());
+
+  unsigned int present_cell=0;
+  for (cell=dof.begin_active(); cell!=endc; ++cell, ++present_cell)
+    {
+				       // loop over all faces of this cell
+      for (unsigned int face_no=0; face_no<2*dim; ++face_no) 
+	{
+	  Assert (face_integrals.find(cell->face(face_no)) !=
+		  face_integrals.end(),
+		  ExcInternalError());
+	  error(present_cell) += face_integrals[cell->face(face_no)];
+	};
+	   
+      error(present_cell) = sqrt(error(present_cell));
+    };
 };
 
 
