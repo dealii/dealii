@@ -729,9 +729,10 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	    };
 	};
 
-				       // Assert that only exterior lines
-				       // are given a boundary indicator
-      if (! (line->boundary_indicator() == 0))
+				       // assert that we only set
+				       // boundary info once
+      if (line->boundary_indicator() != 0 &&
+	  line->boundary_indicator() != 255)
 	{
 					   // clear will only work if
 					   // there are no
@@ -743,6 +744,22 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 					   // so temporarily disable
 					   // subscriptions, clear, and
 					   // then set them again
+	  const unsigned int n=n_subscriptions();
+	  for (unsigned int i=0; i<n; ++i)
+	    unsubscribe();
+	  clear ();
+	  for (unsigned int i=0; i<n; ++i)
+	    subscribe();
+	  
+	  AssertThrow (false, ExcMultiplySetLineInfoOfLine(
+	    line_vertices.first, line_vertices.second));
+	};
+      
+				       // Assert that only exterior lines
+				       // are given a boundary indicator
+      if (line->boundary_indicator() == 255)
+	{
+					   // same as above
 	  const unsigned int n=n_subscriptions();
 	  for (unsigned int i=0; i<n; ++i)
 	    unsubscribe();

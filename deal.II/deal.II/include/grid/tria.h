@@ -2993,6 +2993,13 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * Exception
 				      */
     DeclException0 (ExcInteriorQuadCantBeBoundary);
+    				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcMultiplySetLineInfoOfLine,
+		    int, int,
+		    << "In SubCellData the line info of the line with vertex indices "
+		    << arg1 << " and " << arg2 << " is multiply set.");
 				     /**
 				      * Exception
 				      */
