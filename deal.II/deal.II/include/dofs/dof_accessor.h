@@ -17,6 +17,25 @@ class dVector;
 
 /**
   Define the basis for accessors to the degrees of freedom.
+
+  Note that it is allowed to construct an object of which the
+  #dof_handler# pointer is a Null pointer. Such an object would
+  result in a strange kind of behaviour, though every reasonable
+  operating system should disallow access through that pointer.
+  The reason we do not check for the null pointer in the
+  constructor which gets passed the #DoFHandler# pointer is that
+  if we did we could not make dof iterators member of other classes
+  (like in the #FEValues# class) if we did not know about the
+  #DoFHandler# object to be used upon construction of that object.
+  Through the way this class is implemented here, we allow the
+  creation of a kind of virgin object which only gets useful if
+  assigned to from another object before first usage.
+
+  Opposite to construction, it is not possible to copy an object
+  which has an invalid dof handler pointer. This is to guarantee
+  that every iterator which is once assigned to is a valid
+  object. However, this assertion only holds in debug mode, when
+  the #Assert# macro is switched on.
   */
 template <int dim>
 class DoFAccessor {
@@ -38,7 +57,16 @@ class DoFAccessor {
 				      * Reset the DoF handler pointer.
 				      */
     void set_dof_handler (DoFHandler<dim> *dh) {
+      Assert (dh != 0, ExcInvalidObject());
       dof_handler = dh;
+    };
+
+				     /**
+				      * Copy operator.
+				      */
+    DoFAccessor<dim> & operator = (const DoFAccessor<dim> &da) {
+      set_dof_handler (da.dof_handler);
+      return *this;
     };
     
 				     /**

@@ -268,11 +268,10 @@ DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 template <int dim, class BaseClass>
 void DoFQuadAccessor<dim,BaseClass>::copy_from (const DoFQuadAccessor<dim,BaseClass> &a) {
-  Assert (a.dof_handler != 0, ExcInvalidObject());
-
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
+
 
 
 
