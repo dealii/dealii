@@ -42,10 +42,8 @@ plot_shape_functions(Mapping<dim>& mapping,
   FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_values));
   fe.reinit(c);
   
-  sprintf(fname, "Shapes%dd-%s.output", dim, name);
-  std::ofstream gnuplot(fname);
-  gnuplot.setf(std::ios::fixed);
-  gnuplot.precision (PRECISION);
+  sprintf(fname, "Shapes%dd-%s", dim, name);
+  deallog.push(fname);
 
   unsigned int k=0;
   for (unsigned int mz=0;mz<=((dim>2) ? div : 0) ;++mz)
@@ -54,19 +52,20 @@ plot_shape_functions(Mapping<dim>& mapping,
 	{
 	  for (unsigned int mx=0;mx<=div;++mx)
 	    {
-	      gnuplot << q.point(k);
+	      deallog << q.point(k);
 	  
 	      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 		{
-		  gnuplot << " " << fe.shape_value(i,k) + 1.;
+		  deallog << " " << fe.shape_value(i,k) + 1.;
 		}
-	      gnuplot << std::endl;
+	      deallog << std::endl;
 	      k++;
 	    }
-	  gnuplot << std::endl;
+	  deallog << std::endl;
 	}
-      gnuplot << std::endl;
+      deallog << std::endl;
     }
+  deallog.pop();
 }
 
 
@@ -98,10 +97,8 @@ plot_face_shape_functions(Mapping<dim>& mapping,
   FESubfaceValues<dim> sub(mapping, finel, q, UpdateFlags(update_values
     | update_q_points));
 
-  sprintf(fname, "ShapesFace%dd-%s.output", dim, name);
-  std::ofstream gnuplot(fname);
-  gnuplot.setf(std::ios::fixed);
-  gnuplot.precision (PRECISION);
+  sprintf(fname, "ShapesFace%dd-%s", dim, name);
+  deallog.push(fname);
   
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     {
@@ -114,18 +111,18 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 	    {
 	      for (unsigned int mx=0;mx<=div;++mx)
 		{
-		  gnuplot << fe.quadrature_point(k);
+		  deallog << fe.quadrature_point(k);
 		  
 		  for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 		    {
-		      gnuplot << " " << fe.shape_value(i,k) + 1.;
+		      deallog << " " << fe.shape_value(i,k) + 1.;
 		    }
-		  gnuplot << std::endl;
+		  deallog << std::endl;
 		  k++;
 		}
-	      gnuplot << std::endl;
+	      deallog << std::endl;
 	    }
-	  gnuplot << std::endl;
+	  deallog << std::endl;
 	} else {
 	  for (unsigned int s=0;s<GeometryInfo<dim>::subfaces_per_face; ++s)
 	    {
@@ -136,21 +133,22 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 		{
 		  for (unsigned int mx=0;mx<=div;++mx)
 		    {
-		      gnuplot << sub.quadrature_point(k);
+		      deallog << sub.quadrature_point(k);
 		      
 		      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 			{
-			  gnuplot << " " << sub.shape_value(i,k) + 1.;
+			  deallog << " " << sub.shape_value(i,k) + 1.;
 			}
-		      gnuplot << std::endl;
+		      deallog << std::endl;
 		      k++;
 		    }
-		  gnuplot << std::endl;
+		  deallog << std::endl;
 		}
-	      gnuplot << std::endl;	      
+	      deallog << std::endl;	      
 	    }
 	}
     }
+  deallog.pop();
 }
 
 
