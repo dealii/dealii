@@ -28,7 +28,9 @@ template <int dim> class MappingQ;
  *
  * The constructor of this class takes the degree @p{p} of this finite
  * element. However, presently, only lowest order elements
- * (i.e. @p{p==1}) are implemented.
+ * (i.e. @p{p==1}) are implemented. For a general overview of this
+ * element and its properties, see the report by Anna Schneebeli that
+ * is linked from the general documentation page of the library.
  *
  *
  * @sect3{Restriction on transformations}
