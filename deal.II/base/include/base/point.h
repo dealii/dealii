@@ -46,11 +46,14 @@ class Point : public Tensor<1,dim>
 {
   public:
 				     /**
-				      * Constructor. Initialize all entries
-				      * to zero if @p{initialize==true}; this
-				      * is the default behaviour.
+				      * Standard constructor. Creates an origin.
 				      */
-    explicit Point (const bool initialize = true);
+    Point ();
+				     /**
+				      * Constructor. Initialize all entries
+				      * to zero if @p{initialize==true}.
+				      */
+    explicit Point (const bool initialize);
 
 				     /**
 				      * Convert a tensor to a point. Since no
@@ -104,14 +107,14 @@ class Point : public Tensor<1,dim>
 				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
-    Point<dim>   operator + (const Tensor<1,dim> &) const;
+    Point<dim>   operator + (const Tensor<1,dim>&) const;
 
 				     /**
 				      *  Subtract two point vectors. If possible, use
 				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
-    Point<dim>   operator - (const Tensor<1,dim> &) const;
+    Point<dim>   operator - (const Tensor<1,dim>&) const;
 
 				     /**
 				      * The opposite vector.
@@ -167,6 +170,13 @@ class Point : public Tensor<1,dim>
 };
 
 /*------------------------------- Inline functions: Point ---------------------------*/
+
+
+template <int dim>
+inline
+Point<dim>::Point ()
+{};
+
 
 
 template <int dim>
