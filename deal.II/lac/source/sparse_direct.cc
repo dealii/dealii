@@ -275,7 +275,7 @@ namespace CommunicationsLog
  */
 void die (const std::string &text, const pid_t child)
 {
-  std::cerr << "+++++ detached_ma27 driver: " << text
+  std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
             << std::endl;
   CommunicationsLog::list_communication (child);
   std::abort ();
@@ -289,7 +289,7 @@ void die (const std::string &text, const pid_t child)
 template <typename T1, typename T2>
 void die (const std::string &text, const T1 t1, const T2 t2, const pid_t child)
 {
-  std::cerr << "+++++ detached_ma27 driver: " << text
+  std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
             << " code1=" << t1 << ", code2=" << t2
             << std::endl;
   CommunicationsLog::list_communication (child);
