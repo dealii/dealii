@@ -25,7 +25,7 @@ BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ ()
                 :
 		row_indices (0),
 		column_indices (0)
-{};
+{}
 
 
 
@@ -36,7 +36,7 @@ BlockSparseMatrixEZ (const unsigned int rows,
                 :
 		row_indices (rows),
 		column_indices (cols)
-{};
+{}
 
 
 
@@ -73,7 +73,7 @@ operator = (const BlockSparseMatrixEZ<number> &m)
     for (unsigned int c=0; c<n_block_cols(); ++c)
       block(r,c) = m.block(r,c);
   return *this;
-};
+}
 
  
 
@@ -85,7 +85,7 @@ BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ (
 		row_indices(m.row_indices),
 		column_indices(m.column_indices),
 		blocks(m.blocks)
-{};
+{}
 
  
 
@@ -97,7 +97,7 @@ BlockSparseMatrixEZ<number>::reinit (const unsigned int rows,
   row_indices.reinit(rows, 0);
   column_indices.reinit(cols, 0);
   blocks.reinit(rows, cols);  
-};
+}
 
 
 
@@ -108,7 +108,7 @@ BlockSparseMatrixEZ<number>::clear ()
   row_indices.reinit(0, 0);
   column_indices.reinit(0, 0);
   blocks.reinit(0, 0);  
-};
+}
 
 
 
@@ -121,7 +121,7 @@ BlockSparseMatrixEZ<number>::empty () const
       if (block(r,c).empty () == false)
 	return false;
   return true;
-};
+}
 
 
 
@@ -162,7 +162,7 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
 				   // finally initialize the row
 				   // indices with this array
   column_indices.reinit (col_sizes);
-};
+}
 
 
 

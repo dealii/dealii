@@ -334,7 +334,7 @@ BlockSparseMatrixEZ<Number>::block (const unsigned int row,
   Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
   
   return blocks[row][column];
-};
+}
 
 
 
@@ -348,7 +348,7 @@ BlockSparseMatrixEZ<Number>::block (const unsigned int row,
   Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
   
   return blocks[row][column];
-};
+}
 
 
 
@@ -358,7 +358,7 @@ unsigned int
 BlockSparseMatrixEZ<Number>::m () const
 {
   return n_rows();
-};
+}
 
 
 
@@ -368,7 +368,7 @@ unsigned int
 BlockSparseMatrixEZ<Number>::n () const
 {
   return n_cols();
-};
+}
 
 
 
@@ -385,7 +385,7 @@ BlockSparseMatrixEZ<Number>::set (const unsigned int i,
   block(row_index.first,col_index.first).set (row_index.second,
 					      col_index.second,
 					      value);
-};
+}
 
 
 
@@ -402,7 +402,7 @@ BlockSparseMatrixEZ<Number>::add (const unsigned int i,
   block(row_index.first,col_index.first).add (row_index.second,
 					      col_index.second,
 					      value);
-};
+}
 
 
 template <typename Number>
@@ -424,7 +424,7 @@ BlockSparseMatrixEZ<Number>::vmult (BlockVector<somenumber>       &dst,
 	block(row,col).vmult_add (dst.block(row),
 				  src.block(col));
     };
-};
+}
 
 
 
@@ -446,7 +446,7 @@ BlockSparseMatrixEZ<Number>::vmult_add (
 	block(row,col).vmult_add (dst.block(row),
 				  src.block(col));
     };
-};
+}
 
 
 
@@ -471,7 +471,7 @@ BlockSparseMatrixEZ<Number>::Tvmult (
 	block(row,col).Tvmult_add (dst.block(col),
 				   src.block(row));
     };
-};
+}
 
 
 
@@ -493,7 +493,7 @@ BlockSparseMatrixEZ<Number>::Tvmult_add (
 	block(row,col).Tvmult_add (dst.block(col),
 				   src.block(row));
     };
-};
+}
 
 
 #endif //__deal2__block_sparse_matrix_ez_h
