@@ -121,7 +121,8 @@ namespace internal
 	unsigned int row_block;
 	
 					 /**
-					  * First row of block.
+					  * The global number of the first row
+					  * of the block we are presently in.
 					  */
 	unsigned int row_start;	
 	
