@@ -160,9 +160,9 @@ void GridGenerator::hyper_cube(Triangulation<dim> &tria,
 #if deal_II_dimension == 1
 
 template <>
-void GridGenerator::hyper_cube_slit<> (Triangulation<1> &,
-				       const double,
-				       const double)
+void GridGenerator::hyper_cube_slit (Triangulation<1> &,
+				     const double,
+				     const double)
 {
   Assert (false, ExcInternalError());
 };
@@ -170,9 +170,9 @@ void GridGenerator::hyper_cube_slit<> (Triangulation<1> &,
 
 
 template <>
-void GridGenerator::hyper_L<> (Triangulation<1> &,
-			       const double,
-			       const double)
+void GridGenerator::hyper_L (Triangulation<1> &,
+			     const double,
+			     const double)
 {
   Assert (false, ExcInternalError());
 };
@@ -180,9 +180,9 @@ void GridGenerator::hyper_L<> (Triangulation<1> &,
 
 
 template <>
-void GridGenerator::hyper_ball<> (Triangulation<1> &,
-				  const Point<1> &,
-				  const double)
+void GridGenerator::hyper_ball (Triangulation<1> &,
+				const Point<1> &,
+				const double)
 {
   Assert (false, ExcInternalError());
 };
@@ -190,11 +190,12 @@ void GridGenerator::hyper_ball<> (Triangulation<1> &,
 
 
 template <>
-void GridGenerator::hyper_shell<> (Triangulation<1> &,
-				   const Point<1> &,
-				   const double,
-				   const double,
-				   const unsigned int) {
+void GridGenerator::hyper_shell (Triangulation<1> &,
+				 const Point<1> &,
+				 const double,
+				 const double,
+				 const unsigned int)
+{
   Assert (false, ExcInternalError());
 };
 
