@@ -52,10 +52,11 @@ poisson: $(go-files) $(LIBFILES.g)
 
 run: poisson
 	poisson poisson.prm
+	gnuplot make_ps
 
 
 clean:
-	rm -f *.o *.go *~ poisson
+	rm -f *.o *.go *~ poisson gnuplot.* *.eps
 
 
 
