@@ -208,9 +208,9 @@ void ConstraintMatrix::close ()
 				       // another node times 0
 				       // appears. obviously,
 				       // 0*something can be omitted
-      line->entries.erase (remove_if (line->entries.begin(),
-				      line->entries.end(),
-				      &check_zero_weight),
+      line->entries.erase (std::remove_if (line->entries.begin(),
+                                           line->entries.end(),
+                                           &check_zero_weight),
                            line->entries.end());
 
 				       // now sort the remainder
