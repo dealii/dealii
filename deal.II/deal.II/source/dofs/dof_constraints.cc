@@ -101,6 +101,55 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 
 
 
+void ConstraintMatrix::add_entries (const unsigned int                        line,
+				    const vector<pair<unsigned int,double> > &col_val_pairs)
+{
+  Assert (sorted==false, ExcMatrixIsClosed());
+
+  vector<ConstraintLine>::iterator line_ptr;
+  const vector<ConstraintLine>::const_iterator start=lines.begin();
+				   // the usual case is that the line where
+				   // a value is entered is the one we
+				   // added last, so we search backward
+  for (line_ptr=&lines.back(); line_ptr!=start; --line_ptr)
+    if (line_ptr->line == line)
+      break;
+
+				   // if the loop didn't break, then
+				   // line_ptr must be begin().
+				   // we have an error if that doesn't
+				   // point to 'line' then
+  Assert (line_ptr->line==line, ExcLineInexistant(line));
+
+				   // if in debug mode, check whether an
+				   // entry for this column already
+				   // exists and if its the same as
+				   // the one entered at present
+				   //
+				   // in any case: skip this entry if
+				   // an entry for this column already
+				   // exists, since we don't want to
+				   // enter it twice
+  for (vector<pair<unsigned int,double> >::const_iterator col_val_pair = col_val_pairs.begin();
+       col_val_pair!=col_val_pairs.end(); ++col_val_pair)
+    {
+      for (vector<pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
+	   p != line_ptr->entries.end(); ++p)
+	if (p->first == col_val_pair->first)
+	  {
+					     // entry exists, break
+					     // innermost loop
+	    Assert (p->second == col_val_pair->second,
+		    ExcEntryAlreadyExists(line, column, p->second, value));
+	    break;
+	  };
+      
+      line_ptr->entries.push_back (*col_val_pair);
+    };
+};
+
+
+
 void ConstraintMatrix::close ()
 {
   Assert (sorted==false, ExcMatrixIsClosed());

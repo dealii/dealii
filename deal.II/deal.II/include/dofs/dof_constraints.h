@@ -131,6 +131,18 @@ class ConstraintMatrix : public Subscriptor
 		    const double value);
 
 				     /**
+				      * Add a whole series of entries,
+				      * denoted by pairs of column
+				      * indices and values, to a line
+				      * of constraints. This function
+				      * is equivalent to calling the
+				      * preceeding function more
+				      * several times, but is faster.
+				      */
+    void add_entries (const unsigned int                        line,
+		      const vector<pair<unsigned int,double> > &col_val_pairs);
+
+				     /**
 				      * Close the filling of entries. Since the
 				      * lines of a matrix of this type are
 				      * usually filled in an arbitrary order and
