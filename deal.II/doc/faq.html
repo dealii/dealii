@@ -40,6 +40,8 @@
        <acronym>deal.II</acronym>?</a>
   <li> <a href="#problem-howto">How do I solve problem XXX with
        <acronym>deal.II</acronym>?</a>
+  <li> <a href="#time-dependent">There is no tutorial program for
+       time-dependent problems!</a>
   <li> <a href="#contribute">I want to contribute to the development
        of <acronym>deal.II</acronym>!</a>
   </ol>
@@ -368,6 +370,46 @@
   the examples programs, then you have to write something up
   yourself. The example programs may nevertheless be a good guide on
   how to program with <acronym>deal.II</acronym>.
+  </p>
+
+
+  <a name="time-dependent"></a>
+  <h3>There is no tutorial program for
+       time-dependent problems!</h3>
+
+  <p>
+  While there are a number of projects in which deal.II is used to
+  write solvers for time-dependent problems, there is indeed no
+  tutorial program showing this. The reason for this is two-fold:
+  first, writing tutorial programs takes awfully long, on the order of
+  at least one full work week, and a time-dependent program would
+  likely be large and complex so may even take longer. These days, the
+  main authors of the library unfortunately lack the time for projects
+  of this size unless it would be directly related to one of their
+  ongoing projects, and would therefore be a side-product of what they
+  do anyway.
+  </p>
+
+  <p>
+  The second reason is that over time we have found out that there is
+  not much common ground in time-dependent solvers: most of our
+  time-dependent projects build on deal.II serve very different
+  purposes, from research into error estimators to solving actual
+  engineering problems. They may change the mesh between each
+  successive step, once in a while, or never. They may use explicit or
+  implicit time stepping schemes. Since they differ in so many
+  aspects, there are only few aspects specific to their
+  time-dependentness that can be moved to the library, and example
+  programs would be very different depending on the purpose for which
+  it was written. Furthermore, unlike most of the other tutorial
+  programs, it may not serve as a template for your own project unless
+  it happens to have the same objectives. It may therefore not be
+  terribly useful to a lot of people.
+  </p>
+
+  <p>
+  That said, if someone has a nice program to contribute as an example
+  program: we would be delighted to take it in!
   </p>
 
 
