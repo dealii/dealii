@@ -551,6 +551,12 @@ enum MeshSmoothing {
       none                               = 0x0,
       limit_level_difference_at_vertices = 0x1,     
       eliminate_unrefined_islands        = 0x2,
+
+      eliminate_refined_islands          = 0x4,
+      
+      smoothing_on_refinement            = (limit_level_difference_at_vertices |
+					    eliminate_unrefined_islands),
+      smoothing_on_coarsening            = (eliminate_refined_islands),
       maximum_smoothing                  = 0xffffffff
 };
 
@@ -982,18 +988,25 @@ enum MeshSmoothing {
  *   Some degradation of approximation properties has been observed
  *   for grids which are too unstructured. Therefore, the #prepare_refinement#
  *   function which is automatically called by the #execute_refinement# function
- *   can do some smoothing of the triangulation. For this purpose the
+ *   can do some smoothing of the triangulation. The same holds for the
+ *   #prepare_coarsening# function called by #execute_coarsening#.Note that
+ *   mesh smoothing is only done for two or more space dimensions, no smoothing
+ *   is available at present for one spatial dimension. In the sequel,
+ *   let #execute_*# stand for any of #execute_refinement#, #execute_coarsening#
+ *   or #execute_refinement_and_coarsening#.
+ *
+ *   For the purpose of smoothing, the
  *   #Triangulation# constructor takes an argument specifying whether a
- *   smoothing step shall be performed on the grid each time #execute_refinement#
+ *   smoothing step shall be performed on the grid each time #execute_*#
  *   is called. The default is that such a step not be done, since this results
  *   in additional cells being produced, which may not be necessary in all
- *   cases. If switched on, calling #execute_refinement# results in
+ *   cases. If switched on, calling #execute_*# results in
  *   flagging additional cells for refinement to avoid
  *   vertices as the ones mentioned. The algorithms for both regularisation
  *   and smoothing of triangulations are described below in the section on
  *   technical issues. The reason why this parameter must be given to the
- *   constructor rather than to #execute_refinement# is that it would result
- *   in algorithmic problems if you called #execute_refinement# once without
+ *   constructor rather than to #execute_*# is that it would result
+ *   in algorithmic problems if you called #execute_*# once without
  *   and once with smoothing, since then in some refinement steps would need
  *   to be refined twice.
  *
@@ -1063,6 +1076,31 @@ enum MeshSmoothing {
  *     and is at the boundary on one side. It is thus not a true island, as the
  *     name of the flag may indicate. However, no better name came to mind to
  *     the author by now.
+ *
+ *   \item #eliminate_refined_islands#:
+ *     This algorithm seeks for isolated cells which are refined. An
+ *     island is defined similar as above, i.e. a cell is flagged for coarsening
+ *     if it is refined but more of its neighbors are not refined than are
+ *     refined. For example, in 2D, a cell's refinement is reverted if at most
+ *     one of its neighbors is also refined (or refined but flagged for
+ *     coarsening). This option is a bit dangerous, since if you consider a
+ *     chain of refined cells (e.g. along a kink in the solution), the cells
+ *     at the two ends will be coarsened, after which the next outermost cells
+ *     would need to be coarsened. Therefore, only one loop of flagging cells
+ *     like this is done to avoid eating up the whole chain of refined cells
+ *     (`chain reaction'...).
+ *
+ *     This algorithm also takes into account cells which are not actually
+ *     refined but are flagged for refinement. If necessary, it takes away the
+ *     refinement flag.
+ *
+ *   \item #smoothing_on_refinement#:
+ *     This flag sums up all smoothing algorithms which may be performed upon
+ *     refinement by flagging some more cells for refinement.
+ *
+ *   \item #smoothing_on_coarsening#:
+ *     This flag sums up all smoothing algorithms which may be performed upon
+ *     coarsening by flagging some more cells for coarsening.
  *
  *   \item #maximum_smoothing#:
  *     This flag includes all the above ones and therefore combines all
@@ -1589,6 +1627,9 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  The function resets all refinement
 				      *  flags to false.
 				      *
+                                      *  See the general docs for more
+                                      *  information.
+                                      *
 				      *  This function is dimension specific.
 				      */ 
     void execute_refinement ();
@@ -1601,12 +1642,21 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * and several other constraints hold (see
 				      * the general doc of this class).
 				      *
-				      * The function resets all refinement
-				      * flags to false.
+				      * The function resets all coarsen
+				      * flags to false. It uses the user flags,
+                                      * so make sure to save them if you still
+                                      * need them after calling this function.
 				      *
-				      * This function is dimension specific.
+                                      * See the general docs for more
+                                      * information.
 				      */
     void execute_coarsening ();
+
+				     /**
+				      * Execute both refinement and coarsening
+				      * of the triangulation.
+				      */
+    void execute_refinement_and_coarsening ();
 				     /*@}*/
 
 				     /**
@@ -2368,6 +2418,19 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      */
 
     void prepare_refinement ();
+
+				     /**
+				      * Prepare some flags for the actual
+				      * coarsening step. This includes setting
+                                      * user flags on all cells of which the
+                                      * children need to be deleted, clearing
+                                      * the coarsen flags, deleting coarsen
+                                      * flags from cells which may not be
+                                      * deleted (e.g. because one neighbor is
+                                      * more refined than the cell), doing
+                                      * some smoothing, etc.
+                                      */
+    void prepare_coarsening ();
 
 				     /**
 				      *  Array of pointers pointing to the
