@@ -19,16 +19,16 @@ user-libs =
 
 # To run the program, use "make run"; to give parameters to the program,
 # give the parameters to the following variable:
-run-parameters  = 1
+run-parameters  = 2 1
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = grid_test 2 ; grid_test 3 ; grid_test 4 ; gnuplot make_ps
+additional-run-action = grid_test 2 2 ; grid_test 2 3 ; grid_test 2 4 ; grid_test 3 1 ; grid_test 3 2 ; grid_test 3 3 ; grid_test 3 4 ; gnuplot make_ps
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
 # following list
-delete-files = grid.? *.eps
+delete-files = results/[123]d*
 
 
 
@@ -49,8 +49,8 @@ h-files     = $(wildcard *.h)
 lib-h-files = $(wildcard ../../include/*/*.h)
 
 # list of libraries needed to link with
-libs     = ./Obj.a   ../../lib/libdeal_II_2d.a   ../../../lac/lib/liblac.a   ../../../base/lib/libbase.a
-libs.g   = ./Obj.g.a ../../lib/libdeal_II_2d.g.a ../../../lac/lib/liblac.g.a ../../../base/lib/libbase.g.a
+libs     = ./Obj.a   ../../lib/libdeal_II_2d.g.a ../../lib/libdeal_II_3d.a   ../../../lac/lib/liblac.a   ../../../base/lib/libbase.a
+libs.g   = ./Obj.g.a ../../lib/libdeal_II_2d.g.a ../../lib/libdeal_II_3d.g.a ../../../lac/lib/liblac.g.a ../../../base/lib/libbase.g.a
 
 
 # check whether we use debug mode or not

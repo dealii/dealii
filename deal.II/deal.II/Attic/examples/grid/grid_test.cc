@@ -31,7 +31,7 @@ class Ball :
 
 	for (int i=0; i<dim; ++i)
 	  middle(i) -= .5;
-	middle /= (sqrt(middle.square())*sqrt(2));
+	middle *= sqrt(dim) / (sqrt(middle.square())*2);
 	for (int i=0; i<dim; ++i)
 	  middle(i) += .5;
 	
@@ -44,33 +44,38 @@ template <int dim>
 class CurvedLine :
   public StraightBoundary<dim> {
   public:
-      virtual Point<dim> in_between (const PointArray &neighbors) const {
-	Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
-	double x=middle(0),
-	       y=middle(1);
-	
-	if (y<x)
-	  if (y<1-x)
-	    middle(1) = 0.04*sin(6*3.141592*middle(0));
-	  else
-	    middle(0) = 1+0.04*sin(6*3.141592*middle(1));
-	
-	else
-	  if (y<1-x)
-	    middle(0) = 0.04*sin(6*3.141592*middle(1));
-	  else
-	    middle(1) = 1+0.04*sin(6*3.141592*middle(0));
-
-	return middle;
-      };
+      virtual Point<dim> in_between (const PointArray &neighbors) const;
 };
 
 
 
-// since gcc can't resolve "test<2>()", do template parameter
-// passing this way...
 template <int dim>
-void test (const int test_case, const Point<dim> &) {
+Point<dim> CurvedLine<dim>::in_between (const PointArray &neighbors) const  {
+  Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
+  double x=middle(0),
+	 y=middle(1);
+  
+  if (y<x)
+    if (y<1-x)
+      middle(1) = 0.04*sin(6*3.141592*middle(0));
+    else
+      middle(0) = 1+0.04*sin(6*3.141592*middle(1));
+  
+  else
+    if (y<1-x)
+      middle(0) = 0.04*sin(6*3.141592*middle(1));
+    else
+      middle(1) = 1+0.04*sin(6*3.141592*middle(0));
+  
+  return middle;
+};
+
+
+
+template <int dim>
+void test (const int test_case) {
+  cout << "Running testcase " << test_case
+       << " in " << dim << " dimensions." << endl;
   Triangulation<dim> tria;
   tria.create_hypercube();
   
@@ -133,21 +138,23 @@ void test (const int test_case, const Point<dim> &) {
 	tria.begin_active()->set_refine_flag();
 	tria.execute_refinement ();
 	
-	Triangulation<dim>::active_cell_iterator cell, endc;
-	for (int i=0; i<7; ++i) 
-	  {
-	    cell = tria.begin_active();
-	    endc = tria.end();
+ 	Triangulation<dim>::active_cell_iterator cell, endc;
+	const unsigned int steps[4] = { 0, 10, 7, 2 };
+ 	for (unsigned int i=0; i<steps[dim]; ++i) 
+ 	  {
+ 	    cell = tria.begin_active();
+ 	    endc = tria.end();
 	    
-					     // refine all
-					     // boundary cells
-	    for (; cell!=endc; ++cell)
-	      if (cell->at_boundary())
-		cell->set_refine_flag();
+ 					     // refine all
+ 					     // boundary cells
+ 	    for (; cell!=endc; ++cell)
+ 	      if (cell->at_boundary())
+ 		cell->set_refine_flag();
 	    
-	    tria.execute_refinement();
-	  };
-	
+ 	    tria.execute_refinement();
+ 	  };
+
+	tria.set_boundary (0);
 	break;
       }
 
@@ -158,7 +165,7 @@ void test (const int test_case, const Point<dim> &) {
 	tria.execute_refinement ();
 	
 	Triangulation<dim>::active_cell_iterator cell, endc;
-	for (int i=0; i<(dim==2 ? 13 : 30); ++i) 
+	for (int i=0; i<(dim==2 ? 13 : (dim==3 ? 7 : 30)); ++i) 
 	  {
 	    int n_levels = tria.n_levels();
 	    cell = tria.begin_active();
@@ -184,7 +191,9 @@ void test (const int test_case, const Point<dim> &) {
   
 	
 				   // output the grid
-  string filename("grid.");
+  string filename("results/");
+  filename += ('0'+dim);
+  filename += "d.";
   filename += ('0'+test_case);
   
   ofstream out(filename.c_str());
@@ -197,18 +206,22 @@ void test (const int test_case, const Point<dim> &) {
 
 
 int main (int argc, char **argv) {
-  if (argc!=2) 
+  if (argc!=3) 
     {
-      cout << "Usage: grid_test testcase" << endl << endl
+      cout << "Usage: grid_test dimension testcase" << endl << endl
+	   << "Dimension: 2 or 3" << endl << endl
 	   << "Testcases:" << endl
-	   << "  1: continuous refinement of the unit square always in the middle" << endl
-	   << "  2: refinement of the circle at the boundary" << endl
+	   << "  1: continuous refinement of the unit square/cube always in the middle" << endl
+	   << "  2: refinement of the circle/sphere at the boundary" << endl
 	   << "  3: refinement of a wiggled area at the boundary" << endl
 	   << "  4: random refinement" << endl << endl;
       return 1;
     };
 
-  test (argv[1][0]-'0', Point<2>());
+  if (argv[1][0] == '2')
+    test<2> (argv[2][0]-'0');
+  else
+    test<3> (argv[2][0]-'0');
 
   return 0;
 };

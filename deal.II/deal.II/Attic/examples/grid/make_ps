@@ -2,23 +2,42 @@ set size 0.721,1
 set data style lines
 set noxtics
 set noytics
+set noztics
 set noxzeroaxis
 set noyzeroaxis
+#set nozzeroaxis
 set nokey
 set term postscript eps
 
-!echo "  Making <grid.1.eps>"
-set output "grid.1.eps"
-plot "grid.1"
+!echo "  Making <results/2d.1.eps>"
+set output "results/2d.1.eps"
+plot "results/2d.1"
 
-!echo "  Making <grid.2.eps>"
-set output "grid.2.eps"
-plot "grid.2"
+!echo "  Making <results/2d.2.eps>"
+set output "results/2d.2.eps"
+plot "results/2d.2"
 
-!echo "  Making <grid.3.eps>"
-set output "grid.3.eps"
-plot "grid.3"
+!echo "  Making <results/2d.3.eps>"
+set output "results/2d.3.eps"
+plot "results/2d.3"
 
-!echo "  Making <grid.4.eps>"
-set output "grid.4.eps"
-plot "grid.4"
+!echo "  Making <results/2d.4.eps>"
+set output "results/2d.4.eps"
+plot "results/2d.4"
+
+
+!echo "  Making <results/3d.1.eps>"
+set output "results/3d.1.eps"
+splot "results/3d.1"
+
+!echo "  Making <results/3d.2.eps>"
+set output "results/3d.2.eps"
+splot "results/3d.2"
+
+!echo "  Making <results/3d.3.eps>"
+set output "results/3d.3.eps"
+splot "results/3d.3"
+
+!echo "  Making <results/3d.4.eps>"
+set output "results/3d.4.eps"
+splot "results/3d.4"
