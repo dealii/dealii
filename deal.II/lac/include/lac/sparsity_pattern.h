@@ -64,22 +64,27 @@ namespace internals
                   const unsigned int     index);
 
                                          /**
+                                          * Constructor. Construct the end
+                                          * accessor for the given sparsity
+                                          * pattern.
+                                          */
+        Accessor (const SparsityPattern *matrix);
+
+                                         /**
                                           * Row number of the element
-                                          * represented by this
-                                          * object. This
+                                          * represented by this object. This
                                           * function can only be called for
-                                          * entries for which is_valid_entry() is
-                                          * true.
+                                          * entries for which is_valid_entry()
+                                          * is true.
                                           */
         unsigned int row () const;
 
                                          /**
                                           * Index in row of the element
-                                          * represented by this
-                                          * object. This
+                                          * represented by this object. This
                                           * function can only be called for
-                                          * entries for which is_valid_entry() is
-                                          * true.
+                                          * entries for which is_valid_entry()
+                                          * is true.
                                           */
         unsigned int index () const;
 
@@ -1572,6 +1577,16 @@ namespace internals
                     sparsity_pattern(sparsity_pattern),
                     a_row(r),
                     a_index(i)
+    {}
+
+
+    inline
+    Accessor::
+    Accessor (const SparsityPattern *sparsity_pattern)
+                    :
+                    sparsity_pattern(sparsity_pattern),
+                    a_row(sparsity_pattern->n_rows()),
+                    a_index(0)
     {}
 
 

@@ -91,6 +91,11 @@ namespace internals
                   const unsigned int  row,
                   const unsigned int  index);
 
+                                         /**
+                                          * Constructor. Construct the end
+                                          * accessor for the given matrix.
+                                          */
+        Accessor (MatrixType         *matrix);
 
                                          /**
                                           * Copy constructor to get from a
@@ -221,6 +226,12 @@ namespace internals
                   const unsigned int  index);
         
                                          /**
+                                          * Constructor. Construct the end
+                                          * accessor for the given matrix.
+                                          */
+        Accessor (MatrixType         *matrix);
+
+                                         /**
                                           * Value of this matrix entry,
                                           * returned as a read- and writable
                                           * reference.
@@ -297,6 +308,12 @@ namespace internals
                   const unsigned int row,
                   const unsigned int index);
 
+                                         /**
+                                          * Constructor. Create the end
+                                          * iterator for the given matrix.
+                                          */
+        Iterator (MatrixType *matrix);
+        
                                          /**
                                           * Conversion constructor to get from
                                           * a non-const iterator to a const
@@ -1895,6 +1912,17 @@ namespace internals
     template <typename number>
     inline
     Accessor<number,true>::
+    Accessor (const MatrixType *matrix)
+                    :
+                    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern()),
+                    matrix (matrix)
+    {}
+    
+
+
+    template <typename number>
+    inline
+    Accessor<number,true>::
     Accessor (const NonConstAccessor &a)
                     :
                     SparsityPatternIterators::Accessor (a),
@@ -2018,7 +2046,18 @@ namespace internals
                                                         row, index),
                     matrix (matrix)
     {}
-                    
+
+
+
+    template <typename number>
+    inline
+    Accessor<number,false>::
+    Accessor (MatrixType         *matrix)
+                    :
+                    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern()),
+                    matrix (matrix)
+    {}
+    
 
 
     template <typename number>
@@ -2050,6 +2089,16 @@ namespace internals
               const unsigned int i)
                     :
                     accessor(matrix, r, i)
+    {}
+
+
+
+    template <typename number, bool Constness>
+    inline
+    Iterator<number, Constness>::
+    Iterator (MatrixType *matrix)
+                    :
+                    accessor(matrix)
     {}
 
 
@@ -2162,7 +2211,7 @@ inline
 typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::end () const
 {
-  return const_iterator(this, m(), 0);
+  return const_iterator(this);
 }
 
 
