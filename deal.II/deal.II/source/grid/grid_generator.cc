@@ -114,9 +114,9 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
     for (unsigned int i1=0;i1<4;++i1)
       vertices[k++] = Point<2>(coords[i1], coords[i0]);
 
-  const unsigned char materials[9] = { 6,4,6,
-				       2,0,2,
-				       6,4,6 
+  const unsigned char materials[9] = { 5, 4, 6,
+				       1, 0, 2,
+				       9, 8,10
   };
   
   vector<CellData<2> > cells(9);

@@ -122,8 +122,8 @@ class GridGenerator
 				      * id's according tho the
 				      * following scheme: extending
 				      * over the inner cube in
-				      * x-direction: 2. In y-direction
-				      * 4, in z-direction 8. The cells
+				      * (+/-) x-direction: 1/2. In y-direction
+				      * 4/8, in z-direction 16/32. The cells
 				      * at corners and edges (3d) get
 				      * these values bitwise or'd.
 				      */
