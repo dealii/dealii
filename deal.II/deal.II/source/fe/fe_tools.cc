@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 2000 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,28 +67,8 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 	    interpolation_matrix(i,j)=0.;
 	}  
     }
-  
-/*
-  vector<Point<dim> > unit_support_points (fe2.dofs_per_cell);
-  fe2.get_unit_support_points (unit_support_points);
-  
-  for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	
-    {
-      const unsigned int i1
-	= fe2.system_to_component_index(i).first;
-      for (unsigned int j=0; j<fe1.dofs_per_cell; ++j)
-	{
-	  const unsigned int j1
-	    = fe1.system_to_component_index(j).first;
-	  if (i1==j1)
-	    interpolation_matrix(i,j) =
-	      fe1.shape_value (j, unit_support_points[i]);
-	  else
-	    interpolation_matrix(i,j)=0.;
-	}
-    }
-*/
 }
+
 
 
 template <int dim, typename number>
@@ -173,7 +153,7 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 
   vector<unsigned int> index_multiplicity(dof2.n_dofs(),0);
   vector<unsigned int> dofs (dofs_per_cell2);
-  u2=0;
+  u2.clear ();
   
   for (; cell1!=endc1, cell2!=endc2; ++cell1, ++cell2) 
     {
@@ -189,7 +169,7 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
   for (unsigned int i=0; i<dof2.n_dofs(); ++i)
     {
       Assert(index_multiplicity[i]!=0, ExcInternalError());
-      u2(i)/=static_cast<double>(index_multiplicity[i]);
+      u2(i) /= index_multiplicity[i];
     }
 }
 
@@ -260,6 +240,7 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
       cell1->set_dof_values(u1_diff_local, u1_difference);
     }
 }
+
 
 
 template <int dim, typename number>
