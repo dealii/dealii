@@ -1893,11 +1893,15 @@ void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
 				   // number of cells to be sorted per part
   const unsigned cells_per_part
     = static_cast<int>(fraction_of_error * criteria.size() / n_sorting_parts);
+				   // let tmp be the cellwise square of the
+				   // error, which is what we have to sum
+				   // up and compare with
+				   // #fraction_of_error*total_error#.
   dVector tmp(criteria);
   transform (tmp.begin(), tmp.end(), tmp.begin(), sqr);
+  const double total_error = tmp.l1_norm();
   
   dVector partial_sums(criteria.size());
-  const double total_error = sqr(criteria.l2_norm());
   for (unsigned int part=0; part<n_sorting_parts; ++part)
     {
 				       // partially sort next part of range
@@ -1905,6 +1909,19 @@ void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
 		    tmp.begin()+(part+1)*cells_per_part,
 		    tmp.end(),
 		    greater<double>());
+				       // compute partial sum of the range
+				       // as yet sorted. In principle it
+				       // would be sufficient to only sum up
+				       // the newly sorted part and give the
+				       // partial sum an initial value equal
+				       // to the previously last partial sum,
+				       // but at present I do not know how
+				       // to do so in an easy way. Think
+				       // about it and fix it if you want!
+				       // (This way doesn't eat up much
+				       // computing time anyway, much less
+				       // than the sorting, so I don't care
+				       // about fixing this myself.)
       partial_sum (tmp.begin(),
 		   tmp.begin()+(part+1)*cells_per_part,
 		   partial_sums.begin());
@@ -1919,7 +1936,7 @@ void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
 					   // fraction of the error. We only
 					   // need to search the newly created
 					   //region
-	  dVector::const_iterator threshold_ptr
+	  const dVector::const_iterator threshold_ptr
 	    = lower_bound (partial_sums.begin()+part*cells_per_part,
 			   partial_sums.begin()+(part+1)*cells_per_part,
 			   fraction_of_error*total_error);
@@ -1932,6 +1949,8 @@ void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
 	    refine (criteria, sqrt(*threshold_ptr));
 	  else
 	    refine (criteria,
+						     // revert partial sum into
+						     // a single value
 		    sqrt(*threshold_ptr - *(threshold_ptr-1)));
 	  return;
 	};
