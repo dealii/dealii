@@ -10,9 +10,6 @@ Rewrite code like
   using the STL count() operation with a member function predicate if
   available.
 
-Change function args of DoFHandler::transfer_cell to
-  cell_iterators when "typename" keyword is available (i.e.
-  if gcc2.8 is available)
 
 Write monitors to control whether enough memory was allocated for
   the vectors (i.e. after a process, whether size()==capacity()).

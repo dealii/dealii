@@ -132,8 +132,8 @@ int main () {
 //  tria.set_boundary (&boundary);
   
   tria.refine_global (1);
-//  (--tria.last_active())->set_refine_flag();
-//  tria.execute_refinement ();
+  (--tria.last_active())->set_refine_flag();
+  tria.execute_refinement ();
 //  tria.begin_active(2)->set_refine_flag();
 //  tria.execute_refinement ();
   tria.refine_global (2);
@@ -170,7 +170,13 @@ int main () {
   cout << dof.n_dofs() << " degrees of freedom." << endl;
 
   cout << "Assembling matrices..." << endl;
-  problem.assemble (equation, quadrature, fe);
+  FEValues<2>::UpdateStruct update_flags;
+  update_flags.update_q_points = true;
+  update_flags.update_gradients = true;
+  update_flags.update_jacobians = true;
+  update_flags.update_JxW_values = true;
+  ProblemBase<2>::DirichletBC d;
+  problem.assemble (equation, quadrature, fe, update_flags, d);
 
   cout << "Solving..." << endl;
   problem.solve ();
