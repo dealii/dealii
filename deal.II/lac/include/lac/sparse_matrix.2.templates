@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,25 +45,25 @@ template TYPE2 SparseMatrix<TYPEMAT>::residual (Vector<TYPE2> &,
 
 template void SparseMatrix<TYPEMAT>::precondition_SSOR (Vector<TYPE2> &,
 						      const Vector<TYPE2> &,
-						      TYPEMAT) const;
+						      const TYPEMAT) const;
 
 template void SparseMatrix<TYPEMAT>::precondition_SOR (Vector<TYPE2> &,
 						     const Vector<TYPE2> &,
-						     TYPEMAT) const;
+						     const TYPEMAT) const;
 
 template void SparseMatrix<TYPEMAT>::precondition_TSOR (Vector<TYPE2> &,
 						     const Vector<TYPE2> &,
-						     TYPEMAT) const;
+						     const TYPEMAT) const;
 
 template void SparseMatrix<TYPEMAT>::precondition_Jacobi (Vector<TYPE2> &,
 							const Vector<TYPE2> &,
-							TYPEMAT) const;
+							const TYPEMAT) const;
 
-template void SparseMatrix<TYPEMAT>::SOR (Vector<TYPE2> &, TYPEMAT) const;
-template void SparseMatrix<TYPEMAT>::TSOR (Vector<TYPE2> &, TYPEMAT) const;
-template void SparseMatrix<TYPEMAT>::SSOR (Vector<TYPE2> &, TYPEMAT) const;
-template void SparseMatrix<TYPEMAT>::SOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, TYPEMAT) const;
-template void SparseMatrix<TYPEMAT>::TSOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, TYPEMAT) const;
-template void SparseMatrix<TYPEMAT>::SSOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::SOR (Vector<TYPE2> &, const TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::TSOR (Vector<TYPE2> &, const TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::SSOR (Vector<TYPE2> &, const TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::SOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, const TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::TSOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, const TYPEMAT) const;
+template void SparseMatrix<TYPEMAT>::SSOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, const TYPEMAT) const;
 
 

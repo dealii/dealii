@@ -262,7 +262,7 @@ class SparseVanka
     template<typename number2>
     void apply_preconditioner (Vector<number2>         &dst,
 			       const Vector<number2>   &src,
-			       const std::vector<bool> *dof_mask = 0) const;    
+			       const std::vector<bool> * const dof_mask = 0) const;    
 
 				     /**
 				      * Determine an estimate for the
