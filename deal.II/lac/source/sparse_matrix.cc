@@ -45,13 +45,14 @@ SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &s) :
 
 SparseMatrixStruct::SparseMatrixStruct (const unsigned int m,
 					const unsigned int n,
-					const unsigned int max_per_row) 
+					const unsigned int max_per_row,
+					const unsigned int long_rows) 
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
 		  colnums(0)
 {
-  reinit (m,n,max_per_row);
+  reinit (m,n,max_per_row,long_rows);
 };
 
 
@@ -63,7 +64,7 @@ SparseMatrixStruct::SparseMatrixStruct (const unsigned int n,
 		  rowstart(0),
 		  colnums(0)
 {
-  reinit (n,n,max_per_row);
+  reinit (n,n,max_per_row,0);
 };
 
 
@@ -185,13 +186,14 @@ SparseMatrixStruct::operator = (const SparseMatrixStruct &s)
 void
 SparseMatrixStruct::reinit (const unsigned int m,
 			    const unsigned int n,
-			    const unsigned int max_per_row)
+			    const unsigned int max_per_row,
+			    const unsigned int long_rows)
 {
-  Assert ((max_per_row>0) || ((m==0) && (n==0)), ExcInvalidNumber(max_per_row));
   rows = m;
   cols = n;
-  vec_len = m * max_per_row;
+  vec_len = m * max_per_row + (n-max_per_row) * long_rows;
   max_row_len = max_per_row;
+  n_long_rows = long_rows;
 
 				   // delete empty matrices
   if ((m==0) || (n==0))
@@ -200,7 +202,7 @@ SparseMatrixStruct::reinit (const unsigned int m,
       if (colnums)   delete[] colnums;
       rowstart = 0;
       colnums = 0;
-      max_vec_len = vec_len = max_dim = rows = cols = 0;
+      max_vec_len = vec_len = max_dim = rows = cols = max_row_len = n_long_rows = 0;
       compressed = false;
       return;
     };
@@ -219,8 +221,13 @@ SparseMatrixStruct::reinit (const unsigned int m,
       colnums = new int[max_vec_len];
     };
   
+  unsigned int start = 0;
   for (unsigned int i=0; i<=rows; i++)
-    rowstart[i] = i * max_per_row;
+    {
+      rowstart[i] = start;
+      start += (i<n_long_rows) ? n : max_per_row;
+    }
+  
   fill_n (&colnums[0], vec_len, -1);
 
   if (rows == cols)
@@ -243,7 +250,8 @@ SparseMatrixStruct::compress ()
 
 				   // reserve temporary storage to
 				   // store the entries of one row
-  int *tmp_entries = new int[max_row_len];
+  int safe_row_len = (n_long_rows != 0) ? n_cols() : max_row_len;
+  int *tmp_entries = new int[safe_row_len];
 
 				   // Traverse all rows
   for (unsigned int line=0; line<rows; ++line)
