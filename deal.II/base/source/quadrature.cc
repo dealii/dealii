@@ -18,11 +18,11 @@ Quadrature<dim>::Quadrature (const unsigned int n_q) :
 		weights (n_q, 0) {};
 
 
-// template <>
-// Quadrature<0>::Quadrature (const Quadrature<-1> &,
-// 			   const Quadrature<1> &) {
-//   Assert (false, ExcInternalError());
-// };
+template <>
+Quadrature<0>::Quadrature (const Quadrature<-1> &,
+			   const Quadrature<1> &) {
+  Assert (false, ExcInternalError());
+};
 
 
 
