@@ -1397,18 +1397,26 @@ void FESystem<dim>::build_interface_constraints ()
                   }
                 else
                                                    // on one of the four sub-quads
-                  {   
+                  {
                                                      // for the
                                                      // meaning of all
                                                      // this, see the
                                                      // 2d part
                     const unsigned int index_in_quad
-                      = (m-5*this->dofs_per_vertex-12*this->dofs_per_line) % this->dofs_per_line;
+                      = (m-5*this->dofs_per_vertex-12*this->dofs_per_line) %
+                      this->dofs_per_quad;
+                    Assert (index_in_quad < this->dofs_per_quad,
+                            ExcInternalError());
                     const unsigned int sub_quad
-                      = (m-5*this->dofs_per_vertex-12*this->dofs_per_line) / this->dofs_per_line;
+                      = ((m-5*this->dofs_per_vertex-12*this->dofs_per_line) /
+                         this->dofs_per_quad);
                     Assert (sub_quad < 4, ExcInternalError());
 
-                    const unsigned int tmp1 = 4*this->dofs_per_vertex+4*this->dofs_per_line+index_in_quad;
+                    const unsigned int tmp1 = 4*this->dofs_per_vertex +
+                                              4*this->dofs_per_line +
+                                              index_in_quad;
+                    Assert (tmp1 < this->face_system_to_base_table.size(),
+                            ExcInternalError());
                     m_index.first = this->face_system_to_base_table[tmp1].first;
 
                     Assert (this->face_system_to_base_table[tmp1].second >=
