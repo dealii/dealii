@@ -258,14 +258,7 @@ class ConstraintMatrix {
 				      */
     void print (ostream &) const;
 
-    
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcLineExists,
-		    unsigned int,
-		    << "The line " << arg1
-		    << " which is to be created already exists.");
+
 				     /**
 				      * Exception
 				      */

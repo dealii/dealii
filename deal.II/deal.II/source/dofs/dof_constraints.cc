@@ -25,12 +25,13 @@ ConstraintMatrix::ConstraintMatrix () :
 
 
 void ConstraintMatrix::add_line (const unsigned int line) {
-				   // check whether line already exists
   Assert (sorted==false, ExcMatrixIsClosed());
-#ifdef DEBUG
+
+				   // check whether line already exists;
+				   // it may, but then we need to quit
   for (unsigned int i=0; i!=lines.size(); ++i)
-    Assert (lines[i].line != line, ExcLineExists(line));
-#endif
+    if (lines[i].line == line)
+      return;
 
 				   // push a new line to the end of the
 				   // list
@@ -46,15 +47,20 @@ void ConstraintMatrix::add_entry (const unsigned int line,
   Assert (sorted==false, ExcMatrixIsClosed());
 
   vector<ConstraintLine>::iterator line_ptr;
-  if (lines.back().line == line)
-    line_ptr = &lines.back();
-  else
-    {
-      for (line_ptr = &lines.back()-1; line_ptr>=lines.begin(); --line_ptr)
-	if (line_ptr->line == line)
-	  break;
-      Assert (false, ExcLineInexistant(line));
-    };
+  const vector<ConstraintLine>::const_iterator start=lines.begin();
+				   // the usual case is that the line where
+				   // a value is entered is the one we
+				   // added last, so we search backward
+  for (line_ptr=&lines.back(); line_ptr!=start; --line_ptr)
+    if (line_ptr->line == line)
+      break;
+
+				   // if the loop didn't break, then
+				   // line_ptr must be begin().
+				   // we have an error if that doesn't
+				   // point to 'line' then
+  Assert (line_ptr->line==line, ExcLineInexistant(line));
+
 
 #ifdef DEBUG
 				   // if in debug mode, check whether an
