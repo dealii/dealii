@@ -664,6 +664,8 @@ FESystem<dim>::build_cell_table()
   for (unsigned int base=0 ; base < n_base_elements() ; ++base)
     for (unsigned int m = 0; m < element_multiplicity(base); ++m)
       component_to_base_table[total_index++] = base;
+  Assert (total_index == component_to_base_table.size(),
+	  ExcInternalError());
 
 				   // Initialize index table
 				   // Multi-component base elements have
@@ -793,17 +795,12 @@ template <int dim>
 void
 FESystem<dim>::build_face_table()
 {
-  unsigned total_index = 0;
-  for (unsigned int base=0 ; base < n_base_elements() ; ++base)
-    for (unsigned int m = 0; m < element_multiplicity(base); ++m)
-      component_to_base_table[total_index++] = base;
-
 				   // Initialize index table
 				   // Multi-component base elements have
 				   // to be thought of.
   
 				   // 1. Vertices
-  total_index = 0;
+  unsigned int total_index = 0;
   for (unsigned int vertex_number= 0 ; vertex_number < GeometryInfo<dim>::vertices_per_face ;
        ++vertex_number)
     {
@@ -1419,6 +1416,26 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
     for (unsigned int component=0; component<fe3.n_components(); ++component)
       tmp.push_back (fe3.restriction_is_additive (component));
   return tmp;
+};
+
+
+
+template <int dim>
+const FiniteElement<dim> &
+FESystem<dim>::base_element (const unsigned int index) const
+{
+  Assert (index < base_elements.size(), 
+	  ExcIndexRange(index, 0, base_elements.size()));
+  return *base_elements[index].first;
+};
+
+
+
+template <int dim>
+unsigned int
+FESystem<dim>::n_base_elements () const
+{
+  return base_elements.size();
 };
 
 

@@ -197,28 +197,25 @@ class FESystem : public FiniteElement<dim>
     virtual unsigned int n_base_elements () const;
 
 				     /**
-				      * How often is a composing element used.
-				      *
+				      * How often is a composing
+				      * element used.
 				      */
     unsigned int element_multiplicity (const unsigned int index) const;
 
 				     /**
-				      * Access to a composing element.
-				      *
-				      * If you assemble your system
-				      * matrix, you usually will not
-				      * want to have an FEValues object
-				      * with a lot of equal entries. Ok,
-				      * so initialize your FEValues with
-				      * the @p{base_element} you get by
-				      * this function. In a mixed
-				      * discretization, you can choose
-				      * the different base element types
-				      * by index.
-				      *
+				      * Access to a composing
+				      * element. The index needs to be
+				      * smaller than the number of
+				      * base elements. Note that the
+				      * number of base elements may in
+				      * turn be smaller than the
+				      * number of components of the
+				      * system element, if the
+				      * multiplicities are greater
+				      * than one.
 				      */
-    virtual const FiniteElement<dim> & base_element(const unsigned int index) const;
-
+    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -626,14 +623,6 @@ template <> void FESystem<1>::initialize_unit_face_support_points ();
 
 /* ------------------------- inline functions ------------------------- */
 
-template<int dim>
-inline unsigned int
-FESystem<dim>::n_base_elements() const
-{
-  return base_elements.size();
-};
-
-
 
 template<int dim>
 inline unsigned int
@@ -643,19 +632,6 @@ FESystem<dim>::element_multiplicity (const unsigned int index) const
 	  ExcIndexRange(index, 0, base_elements.size()));
   return base_elements[index].second;
 };
-
-
-
-template <int dim>
-inline const FiniteElement<dim> &
-FESystem<dim>::base_element (const unsigned int index) const
-{
-  Assert (index < base_elements.size(), 
-	  ExcIndexRange(index, 0, base_elements.size()));
-  return *base_elements[index].first;
-};
-
-
 
 
 

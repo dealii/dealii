@@ -113,7 +113,7 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
                 face_system_to_component_table(dofs_per_face),
                 component_to_system_table(components, std::vector<unsigned>(dofs_per_cell)),
 		face_component_to_system_table(components, std::vector<unsigned>(dofs_per_face)),
-		component_to_base_table(components),
+		component_to_base_table (components, 0),
 		restriction_is_additive_flags(restriction_is_additive_flags)
 {
   Assert(restriction_is_additive_flags.size()==fe_data.components,
@@ -441,17 +441,6 @@ FiniteElement<dim>::get_subface_data (const UpdateFlags        flags,
   return get_data (flags, mapping,
 		   QProjector<dim>::project_to_all_subfaces(quadrature));
 }
-
-
-
-template <int dim>
-unsigned int
-FiniteElement<dim>::n_base_elements() const
-{
-				   // default implementation
-  return 1;
-}
-
 
 
 

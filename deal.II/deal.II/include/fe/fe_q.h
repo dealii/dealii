@@ -292,6 +292,23 @@ class FE_Q : public FiniteElement<dim>
     unsigned int get_degree () const;
     
 				     /**
+				      * Number of base elements in a
+				      * mixed discretization. Since
+				      * this is a scalar element,
+				      * return one.
+				      */
+    virtual unsigned int n_base_elements () const;
+    
+				     /**
+				      * Access to base element
+				      * objects. Since this element is
+				      * scalar, @p{base_element(0)} is
+				      * @p{this}, and all other
+				      * indices throw an error.
+				      */
+    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
+    
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.

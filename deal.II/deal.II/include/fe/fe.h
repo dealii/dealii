@@ -69,24 +69,38 @@ class FiniteElement : public FiniteElementBase<dim>
     virtual ~FiniteElement ();
     
 				     /**
-				      * Number of base elements in a mixed
-				      * discretization. This function returns
-				      * 1 for primitive elements.
+				      * Number of base elements in a
+				      * mixed discretization.
+				      *
+				      * Note that even for vector
+				      * valued finite elements, the
+				      * number of components needs not
+				      * coincide with the number of
+				      * base elements, since they may
+				      * be reused. For example, if you
+				      * create a @ref{FESystem} with
+				      * three identical finite element
+				      * classes by using the
+				      * constructor that takes one
+				      * finite element and a
+				      * multiplicity, then the number
+				      * of base elements is still one,
+				      * although the number of
+				      * components of the finite
+				      * element is equal to the
+				      * multiplicity.
 				      */
-    virtual unsigned int n_base_elements () const;
+    virtual unsigned int n_base_elements () const = 0;
     
 				     /**
 				      * Access to base element
-				      * objects.  By default,
-				      * #base_element(0)# is #this#.
-				      * This function is overloaded by
-				      * system elements to allow
-				      * access to the different
-				      * components of mixed
-				      * discretizations.
+				      * objects. If the element is
+				      * scalar, then
+				      * @p{base_element(0)} is
+				      * @p{this}.
 				      */
-    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
-    
+    virtual const FiniteElement<dim> & base_element (const unsigned int index) const = 0;
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)

@@ -625,7 +625,7 @@ class FiniteElementBase : public Subscriptor,
 				      * shape functions of the base
 				      * element.
 				      */
-    unsigned int component_to_base(unsigned int index) const;
+    unsigned int component_to_base (unsigned int index) const;
 
 				     /**
 				      * Access the @p{restriction_is_additive_flag}
@@ -881,6 +881,17 @@ class FiniteElementBase : public Subscriptor,
 				      * the result allows access to
 				      * shape functions of the base
 				      * element.
+				      *
+				      * This variable is set to the
+				      * correct size by the
+				      * constructor of this class, but
+				      * needs to be initialized by
+				      * derived classes, unless its
+				      * size is one and the only entry
+				      * is a zero, which is the case
+				      * for scalar elements. In that
+				      * case, the initialization by
+				      * the base class is sufficient.
 				      */
     std::vector<unsigned int> component_to_base_table;
 

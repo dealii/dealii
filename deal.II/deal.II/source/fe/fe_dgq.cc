@@ -563,6 +563,26 @@ FE_DGQ<dim>::fill_fe_subface_values (const Mapping<dim>                   &mappi
 }
 
 
+
+template <int dim>
+unsigned int
+FE_DGQ<dim>::n_base_elements () const
+{
+  return 1;
+};
+
+
+
+template <int dim>
+const FiniteElement<dim> &
+FE_DGQ<dim>::base_element (const unsigned int index) const
+{
+  Assert (index==0, ExcIndexRange(index, 0, 1));
+  return *this;
+};
+
+
+
 template <int dim>
 unsigned int
 FE_DGQ<dim>::memory_consumption () const

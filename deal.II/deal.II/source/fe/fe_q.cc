@@ -1193,6 +1193,25 @@ FE_Q<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping
 
 template <int dim>
 unsigned int
+FE_Q<dim>::n_base_elements () const
+{
+  return 1;
+};
+
+
+
+template <int dim>
+const FiniteElement<dim> &
+FE_Q<dim>::base_element (const unsigned int index) const
+{
+  Assert (index==0, ExcIndexRange(index, 0, 1));
+  return *this;
+};
+
+
+
+template <int dim>
+unsigned int
 FE_Q<dim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());
