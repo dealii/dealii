@@ -53,10 +53,10 @@ print "=====Announcing version $version=====\n";
 
 if ($test)
 {
-    @recipients = ('wolf', 'guido.kanschat@gmx.net', 'hartmann');
+    @recipients = ('wolfgang@dealii.org', 'guido.kanschat@gmx.net', 'ralf@dealii.org');
 } else {
     @recipients = (
-		  'deal@iwr.uni-heidelberg.de',
+		  'dealii@dealii.org',
 #		  'kc@isc.tamu.edu',
 		  'tveldhui@extreme.indiana.edu',
 		  'sullivan@mathcom.com',
@@ -76,8 +76,8 @@ foreach $r (@recipients)
 
     if ($test)
     {
-	system ("mailx -s 'deal.II Version $version released' -r deal\@iwr.uni-heidelberg.de $r < $file");
+	system ("mailx -s 'deal.II Version $version released'  $r < $file");
     } else {
-	system ("mailx -s 'deal.II Version $version released' -r deal\@iwr.uni-heidelberg.de $r < $file");
+	system ("mailx -s 'deal.II Version $version released'  $r < $file");
     }
 }
