@@ -36,8 +36,8 @@
     developed and tested on Unix or Unix-like systems only. It can be
     used positively on
     <ul>
-      <li>Linux ELF with gcc 2.95.x, gcc 3.0 and Intel ICC;
-      <li>Sun Solaris 2.5, 2.6, and 7, with and gcc 2.95.x and gcc 3.0;
+      <li>Linux ELF with gcc 2.95.x, gcc 3.0.x and Intel ICC;
+      <li>Sun Solaris 2.5, 2.6, and 7, with and gcc 2.95.x and gcc 3.0.x;
       <li>IBM AIX 4.2, with gcc 2.95.x (with some restrictions on
           the use of shared libraries).
     </ul>
@@ -79,14 +79,17 @@
     <ul>
       <li> <p>
            A fairly complete C++ compiler. We use 
-           <a href="http://gcc.gnu.org" target="_top">gcc2.95</a> but
-           other compilers might work as well. egcs1.x 
+           <a href="http://gcc.gnu.org" target="_top">gcc2.95 or
+           gcc3.0</a> but other compilers might work as well. 
+	   DEC's/Compaq's cxx compiler also works. egcs1.x 
 	   and older gcc versions will not work, however. Also, Sun
            Workshop C++ 5.0 will not work since it does not support
            template member functions, and IBM C Set++ 3.0 will not
            work since they only have non-ISO header file names (with
-           appended .h; probably, version 3.0 is not the most recent
-           one, but we don't have access to newer ones). 
+           appended .h. Version 5.0 does not work since they do not
+           allow the declaration of explicit specializations and a
+           larger number of other techniques that are used in the
+           library. 
 	   </p>
 
 	   <p>
