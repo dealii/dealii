@@ -31,12 +31,10 @@ CXX       = /home/wolf/bin/gcc/bin/c++
 endif
 
 %.go : %.cc Makefile
-	@echo ======================== Compiling (DEBUG): $<
-#	@echo $(CXX) ... -c $< -o $@
+	@echo "======================== Compiling (DEBUG):" $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 %.o : %.cc Makefile
-	@echo ======================== Compiling (OPT):   $<
-#	@echo $(CXX) ... -c $< -o $@
+	@echo "======================== Compiling (OPT):  " $<
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 

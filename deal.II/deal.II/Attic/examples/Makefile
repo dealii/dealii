@@ -17,7 +17,7 @@ compile: $(compile)
 run    : $(run)
 # for cleaning up: do this also for the present directory
 clean  : $(clean)
-	rm -f *~
+	-rm -f *~
 
 
 # define the action of the targets for the specific subdirectories
@@ -28,4 +28,4 @@ $(run) :
 	cd $(@:.run=) ; make run
 
 $(clean) :
-	cd $(@:.clean=) ; make clean
+	-cd $(@:.clean=) ; make clean

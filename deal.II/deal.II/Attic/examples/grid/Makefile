@@ -38,6 +38,8 @@ delete-files = grid.? *.eps
 
 include ../../Make.global_options
 
+#deal include base path
+D = ../../..
 
 # get lists of files we need
 cc-files    = $(wildcard *.cc)

@@ -38,6 +38,8 @@ delete-files = grid* sparsity* *.eps
 
 include ../../Make.global_options
 
+#deal include base path
+D = ../../..
 
 # get lists of files we need
 cc-files    = $(wildcard *.cc)
@@ -92,7 +94,7 @@ Obj.g.a: ./Obj.g.a($(go-files))
 
 
 clean:
-	rm -f *.o *.go *~ Makefile.dep Obj.a Obj.g.a $(target) $(delete-files)
+	-rm -f *.o *.go *~ Makefile.dep Obj.a Obj.g.a $(target) $(delete-files)
 
 
 
