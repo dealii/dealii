@@ -34,6 +34,13 @@ SolverControl::check (const unsigned int step,
   
   lstep  = step;
   lvalue = check_value;
+
+  if ((step==0) && log_result)
+    {
+      deallog << "Starting value " << check_value << endl;
+    }
+  
+
   if (step>=maxsteps)
     {
       if (log_result)
