@@ -882,6 +882,41 @@ unsigned int ElasticProblem<dim>::solve ()
                                  // a vector that indicates which subdomain
                                  // each cell belongs to. This will make for
                                  // some nice pictures of partitioned domains.
+                                 //
+                                 // In practice, the present implementation of
+                                 // the output function is a major bottleneck
+                                 // of this program, since generating
+                                 // graphical output is expensive and doing so
+                                 // only on one process does, of course, not
+                                 // scale if we significantly increase the
+                                 // number of processes. In effect, this
+                                 // function will consume most of the run-time
+                                 // if you go to very large numbers of
+                                 // unknowns and processes, and real
+                                 // applications should limit the number of
+                                 // times they generate output through this
+                                 // function.
+                                 //
+                                 // The solution to this is to have each
+                                 // process generate output data only for it's
+                                 // own local cells, and write them to
+                                 // separate files, one file per process. This
+                                 // would distribute the work of generating
+                                 // the output to all processes equally. In a
+                                 // second step, separate from running this
+                                 // program, we would then take all the output
+                                 // files for a given cycle and merge these
+                                 // parts into one single output file. This
+                                 // has to be done sequentially, but can be
+                                 // done on a different machine, and should be
+                                 // relatively cheap. However, the necessary
+                                 // functionality for this is not yet
+                                 // implemented in the library, and since we
+                                 // are too close to the next release, we do
+                                 // not want to do such major destabilizing
+                                 // changes any more. It will be fixed in
+                                 // later releases of the library and this
+                                 // example program, though.
 template <int dim>
 void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 {
@@ -893,7 +928,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
                                    // distributed vector, which is in fact
                                    // simple:
   const PETScWrappers::Vector localized_solution (solution);
-                                   // The thing to realize, however, is that
+                                   // The thing to notice, however, is that
                                    // we do this localization operation on all
                                    // processes, not only the one that
                                    // actually needs the data. This can't be
