@@ -50,8 +50,8 @@
  * An object of this class can be used in the same form as all
  * PreconditionBlock preconditioners:
  * @code
- * SparseLUImplementation<double> lu;
- * lu.initialize(matrix, SparseLUImplementation<double>::AdditionalData(...));
+ * SparseLUDecomposition<double> lu;
+ * lu.initialize(matrix, SparseLUDecomposition<double>::AdditionalData(...));
  *
  * somesolver.solve (A, x, f, lu);
  * @endcode
