@@ -1023,14 +1023,13 @@ void DataOut<2>::write_povray_mesh (ostream &out) const {
 
 
 
-#if deal_II_dimension == 3
-
-template <>
-void DataOut<3>::write_povray_mesh (ostream &) const {
+template <int dim>
+void DataOut<dim>::write_povray_mesh (ostream &) const {
+				   // this is for all other dimensions that
+				   // are not explicitely specialized
   Assert (false, ExcNotImplemented());
 };
 
-#endif
 
 
 
@@ -1328,20 +1327,25 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
 #endif
 
 
-#if deal_II_dimension == 3
 
-template <>
-void DataOut<3>::write_epsgrid (ostream &/*out*/) const {
+
+template <int dim>
+void DataOut<dim>::write_epsgrid (ostream &/*out*/) const {
+				   // this is for all other dimensions that
+				   // are not explicitely specialized
   Assert (false, ExcNotImplemented());
 };
 
 
-template <>
-void DataOut<3>::write_eps (ostream &/*out*/) const {
+template <int dim>
+void DataOut<dim>::write_eps (ostream &/*out*/,
+			      const eps_output_data &/*EOD*/) const {
+				   // this is for all other dimensions that
+				   // are not explicitely specialized
   Assert (false, ExcNotImplemented());
 };
 
-#endif
+
 
 
 template <int dim>
