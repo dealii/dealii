@@ -1,16 +1,16 @@
-After almost one year of development, version 5.0 of the deal.II
+After almost two years of development, version 5.0 of the deal.II
 object-oriented finite element library has been released. It is
 available from the deal.II home-page at
 
                    http://www.dealii.org
 
-Version 5.0 is a major step for this library. The most important change 
-is the addition of interfaces to the PETSc library to provide a second
-set of linear system support classes besides the original deal.II ones.
-Via PETSc and an interface to METIS, parallel finite element computations
-on clusters of computers have become as simple as sequential ones. 
-Through this, the library has proven to support computations with more 
-than 10 million unknowns. 
+Version 5.0 is another major step for this library. The most important
+change is the addition of interfaces to the PETSc library to provide a
+second set of linear system support classes besides the original
+deal.II ones.  Via PETSc and an interface to METIS, parallel finite
+element computations on clusters of computers have become as simple as
+sequential ones.  Through this, the library has proven to support
+computations with more than 10 million unknowns.
 
 In addition to this, the most noteworthy changes are:
 - Two new example programs, demonstrating one-dimensional nonlinear 
