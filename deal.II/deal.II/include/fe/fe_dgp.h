@@ -179,7 +179,7 @@ class FE_DGP : public FiniteElement<dim>
                                       * returns one, and all other
                                       * indices will throw an error.
                                       */
-    virtual unsigned int element_multiplicity (const unsigned int index);
+    virtual unsigned int element_multiplicity (const unsigned int index) const;
     
 				     /**
 				      * Check for non-zero values on a face.

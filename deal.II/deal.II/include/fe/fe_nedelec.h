@@ -263,7 +263,7 @@ class FE_Nedelec : public FiniteElement<dim>
                                       * returns one, and all other
                                       * indices will throw an error.
                                       */
-    virtual unsigned int element_multiplicity (const unsigned int index);
+    virtual unsigned int element_multiplicity (const unsigned int index) const;
     
 				     /**
 				      * This function returns
