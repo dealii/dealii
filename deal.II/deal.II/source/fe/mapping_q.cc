@@ -83,9 +83,18 @@ MappingQ<1>::~MappingQ ()
 template<typename number>
 static number power(const number x, const unsigned int y)
 {
+				   // since the power to which x is
+				   // raised is usually the space
+				   // dimension, and since this is
+				   // rarely larger than three, the
+				   // following code is optimal and
+				   // cannot be further optimized by
+				   // grouping of operands to reduce
+				   // the number of multiplications
+				   // from O(x) to O(log x)
   number value=1;
   for (unsigned int i=0; i<y; ++i)
-    value*=x;
+    value *= x;
   return value;
 }
 
