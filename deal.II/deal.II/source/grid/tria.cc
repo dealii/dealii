@@ -9,6 +9,7 @@
 #include <lac/dvector.h>
 #include <iostream>
 #include <algorithm>
+#include <numeric>
 #include <map>
 #include <cmath>
 
@@ -1747,6 +1748,10 @@ void Triangulation<dim>::refine (const dVector &criteria,
 template <int dim>
 void Triangulation<dim>::refine_fixed_number (const dVector &criteria,
 					      const double   fraction) {
+				   // correct number of cells is
+				   // checked in #refine#
+  Assert ((fraction>0) && (fraction<=1), ExcInvalidParameterValue());
+  
   dVector tmp(criteria);
   nth_element (tmp.begin(),
 	       tmp.begin()+static_cast<int>(fraction*tmp.size()),
@@ -1757,6 +1762,75 @@ void Triangulation<dim>::refine_fixed_number (const dVector &criteria,
 		      static_cast<int>(fraction*tmp.size())));
 };
 
+
+inline
+double sqr(double a) {
+  return a*a;
+};
+
+
+template <int dim>
+void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
+						const double       fraction_of_error,
+						const unsigned int n_sorting_parts) {
+				   // correct number of cells is
+				   // checked in #refine#
+  Assert ((fraction_of_error>0) && (fraction_of_error<=1),
+	  ExcInvalidParameterValue());
+
+				   // number of cells to be sorted per part
+  const unsigned cells_per_part
+    = static_cast<int>(fraction_of_error * criteria.size() / n_sorting_parts);
+  dVector tmp(criteria);
+  transform (tmp.begin(), tmp.end(), tmp.begin(), sqr);
+  
+  dVector partial_sums(criteria.size());
+  const double total_error = sqr(criteria.l2_norm());
+  for (unsigned int part=0; part<n_sorting_parts; ++part)
+    {
+				       // partially sort next part of range
+      partial_sort (tmp.begin()+part*cells_per_part,
+		    tmp.begin()+(part+1)*cells_per_part,
+		    tmp.end(),
+		    greater<double>());
+      partial_sum (tmp.begin(),
+		   tmp.begin()+(part+1)*cells_per_part,
+		   partial_sums.begin());
+      
+				       // check whether the sorted
+				       // region already is enough
+      if (*(partial_sums.begin()+(part+1)*cells_per_part-1) >=
+	  (fraction_of_error*total_error))
+	{
+					   // find first entry in the partial
+					   // sum which is greater than the
+					   // fraction of the error. We only
+					   // need to search the newly created
+					   //region
+	  dVector::const_iterator threshold_ptr
+	    = lower_bound (partial_sums.begin()+part*cells_per_part,
+			   partial_sums.begin()+(part+1)*cells_per_part,
+			   fraction_of_error*total_error);
+	  Assert (threshold_ptr<partial_sums.begin()+(part+1)*cells_per_part,
+		  ExcInternalError());
+
+					   // now find the corresponding
+					   // criterion and call refine
+	  if (threshold_ptr==partial_sums.begin())
+	    refine (criteria, sqrt(*threshold_ptr));
+	  else
+	    refine (criteria,
+		    sqrt(*threshold_ptr - *(threshold_ptr-1)));
+	  return;
+	};
+    };
+				   // this should not have happened: when
+				   // we come to this point, we have either
+				   // used more cells than the given fraction
+				   // to reach the fraction_of_error, or
+				   // something has gone terribly wrong.
+  Assert (false, ExcInternalError());
+};
 
 
 
