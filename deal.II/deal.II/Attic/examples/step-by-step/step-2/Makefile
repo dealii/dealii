@@ -1,10 +1,11 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998
+# Copyright W. Bangerth, University of Heidelberg, 1999
 
 # Template for makefiles for the examples subdirectory. In principle,
 # everything should be done automatically if you set the target file
-# here correctly:
-target   = step-2
+# here correctly. We get deduce it from the files in the present
+# directory:
+target   = $(basename $(shell echo step-*.cc))
 
 # All dependencies between files should be updated by the included
 # file Makefile.dep if necessary. Object files are compiled into
@@ -12,24 +13,6 @@ target   = step-2
 # is used to link. It you don't like that, change the following
 # variable to "off"
 debug-mode = on
-
-# If you want your program to be linked with extra object or library
-# files, specify them here:
-user-libs =
-
-# To run the program, use "make run"; to give parameters to the program,
-# give the parameters to the following variable:
-run-parameters  = 
-
-# To execute additional action apart from running the program, fill
-# in this list:
-additional-run-action =
-
-# To specify which files are to be deleted by "make clean" (apart from
-# the usual ones: object files, executables, backups, etc), fill in the
-# following list
-delete-files = *gnuplot *inp *history
-
 
 
 
@@ -42,77 +25,68 @@ D = ../../../..
 include $D/common/Make.global_options
 
 # get lists of files we need
-cc-files    = $(filter-out *%, $(shell echo *.cc))
-o-files     = $(cc-files:.cc=.o)
-go-files    = $(cc-files:.cc=.go)
-h-files     = $(filter-out *%, $(shell echo *.h))
-lib-h-files = $(filter-out *%, $(shell echo ../../include/*/*.h))
+
 
 # list of libraries needed to link with
-libs     = ./Obj.a   -ldeal_II_2d  -llac -lbase
-libs.g   = ./Obj.g.a -ldeal_II_2d.g -llac.g -lbase.g
+libs     = -ldeal_II_2d  -llac -lbase
+libs.g   = -ldeal_II_2d.g -llac.g -lbase.g
 
 
 # check whether we use debug mode or not
 ifeq ($(debug-mode),on)
-libraries = $(libs.g)
-flags     = $(CXXFLAGS.g)
+  libraries = $(target).go $(libs.g)
+  flags     = $(CXXFLAGS.g)
+else
+  libraries = $(target).go $(libs)
+  flags     = $(CXXFLAGS.o)
 endif
 
-ifeq ($(debug-mode),off)
-libraries = $(libs)
-flags     = $(CXXFLAGS)
-endif
 
 
-
-# make rule for the target
+# make rule for the target. $^ is the object file $(target).g?o
 $(target) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) $(flags) -o $@ $^ $(user-libs)
+	@$(CXX) $(flags) -o $@ $^
 
 # rule how to run the program
 run: $(target)
-	$(target) $(run-parameters)
-	$(additional-run-action)
+	@echo ============================ Running $@
+	@./$(target)
 
 
 # rule to make object files
 %.go : %.cc
 	@echo ============================ Compiling with debugging information:   $<
-	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 %.o : %.cc
 	@echo ============================ Compiling with optimization:   $<
-	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-# rules which files the libraries depend upon
-Obj.a: ./Obj.a($(o-files))
-Obj.g.a: ./Obj.g.a($(go-files))
-
-
 clean:
-	-rm -f *.o *.go *~ Makefile.dep Obj.a Obj.g.a $(target) $(delete-files)
+	-rm -f *.o *.go *~ Makefile.dep $(target) *gmv *gnuplot *gpl *eps
 
 
 
 .PHONY: clean
 
 
-#Rule to generate the dependency file. This file is
-#automagically remade whenever needed, i.e. whenever
-#one of the cc-/h-files changed. Make detects whether
-#to remake this file upon inclusion at the bottom
-#of this file.
+# Rule to generate the dependency file. This file is
+# automagically remade whenever needed, i.e. whenever
+# one of the cc-/h-files changed. Make detects whether
+# to remake this file upon inclusion at the bottom
+# of this file.
 #
-#use perl to generate rules for the .go files as well
-#as to make rules not for tria.o and the like, but
-#rather for libnumerics.a(tria.o)
-Makefile.dep: $(cc-files) $(h-files) $(lib-h-files)
+# Since the script prefixes the output names by lib/g?o, we have to
+# strip that again (the script was written for the main libraries and
+# large projects where object files are put into subdirs)
+Makefile.dep: $(target).cc Makefile \
+              $(shell echo $D/base/include/base/*.h \
+                           $D/lac/include/lac/*.h  \
+                           $D/deal.II/include/*/*.h)
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/Make_dep.pl ./Obj $(INCLUDE) $(cc-files) \
+	@perl $D/common/scripts/make_dependencies.pl  $(INCLUDE) $(target).cc \
+		| perl -pi -e 's!lib/g?o/!!g;' \
 		> Makefile.dep
 
 
