@@ -14,9 +14,11 @@
 
 #include <base/table_handler.h>
 
-#include <sstream>
+#include <strstream>
 #include <iostream>
 #include <iomanip>
+
+//TODO:[WB] (compiler) use i/ostringstream instead of i/ostrstream if they become available
 
 
 TableEntryBase::TableEntryBase ()
@@ -234,7 +236,7 @@ void TableHandler::write_text(std::ostream &out) const
 					 // write it into a dummy
 					 // stream, just to get its
 					 // size upon output
-	std::ostringstream dummy_out;
+	std::ostrstream dummy_out;
 	dummy_out << std::setprecision(column.precision);
 
 	if (col_iter->second.scientific)
@@ -247,7 +249,7 @@ void TableHandler::write_text(std::ostream &out) const
 					 // get size, note that we are
 					 // not interested in the
 					 // trailing \0
-	entry_widths[i][j] = dummy_out.str().length()-1;
+	entry_widths[i][j] = strlen(dummy_out.str());
       };
 
 				   // next compute the width each row
