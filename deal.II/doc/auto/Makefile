@@ -130,13 +130,13 @@ kdoc/names.html: $(kdoc.libray-files)
 latex/abc.tex: latex/base.tex1 latex/lac.tex1 latex/dealII.tex1
 	@cat latex/header.tex                              > $@
 	@echo "\\\\chapter{Base library}"                 >> $@
-	@echo "\\\\def\\\\presentlib{base}                >> $@
+	@echo "\\\\def\\\\presentlib{base}"               >> $@
 	@cat latex/base.tex1                              >> $@
 	@echo "\\\\chapter{Linear algebra library}"       >> $@
-	@echo "\\\\def\\\\presentlib{lac}                 >> $@
+	@echo "\\\\def\\\\presentlib{lac}"                >> $@
 	@cat latex/lac.tex1                               >> $@
 	@echo "\\\\chapter{deal.II library}"              >> $@
-	@echo "\\\\def\\\\presentlib{dealII}              >> $@
+	@echo "\\\\def\\\\presentlib{dealII}"             >> $@
 	@cat latex/dealII.tex1                            >> $@
 	@cat latex/footer.tex                             >> $@
 #	rm $^
