@@ -362,4 +362,221 @@ namespace MemoryConsumption
 
 
 
+// now comes the implementation of these functions
+
+namespace MemoryConsumption
+{
+  inline
+  unsigned int memory_consumption (const bool) 
+  {
+    return sizeof(bool);
+  };
+  
+  
+  
+  inline
+  unsigned int memory_consumption (const char)
+  {
+    return sizeof(char);
+  };
+  
+
+
+  inline
+  unsigned int memory_consumption (const short int) 
+  {
+    return sizeof(short int);
+  };
+  
+
+
+  inline
+  unsigned int memory_consumption (const short unsigned int) 
+  {
+    return sizeof(short unsigned int);
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const int) 
+  {
+    return sizeof(int);
+  };
+  
+
+
+  inline
+  unsigned int memory_consumption (const unsigned int) 
+  {
+    return sizeof(unsigned int);
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const float)
+  {
+    return sizeof(float);
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const double)
+  {
+    return sizeof(double);
+  };
+
+
+  
+  inline
+  unsigned int memory_consumption (const std::string &s)
+  {
+    return sizeof(s) + s.length();
+  };  
+
+
+// if necessary try to work around a bug in the IBM xlC compiler
+#ifdef XLC_WORK_AROUND_STD_BUG
+  using namespace std;
+#endif
+
+  template <typename T>
+  unsigned int memory_consumption (const typename std::vector<T> &v)
+  {
+    unsigned int mem = sizeof(std::vector<T>);
+    const unsigned int n = v.size();
+    for (unsigned int i=0; i<n; ++i)
+      mem += memory_consumption(v[i]);
+    mem += (v.capacity() - n)*sizeof(T);
+    return mem;
+  };
+
+
+
+  template <typename T, int N>
+  unsigned int memory_consumption (const T (&v)[N])
+  {
+    unsigned int mem = 0;
+    for (unsigned int i=0; i<N; ++i)
+      mem += memory_consumption(v[i]);
+    return mem;
+  };
+
+
+
+  inline
+  unsigned int memory_consumption (const std::vector<bool> &v)
+  {
+    return v.capacity() / 8 + sizeof(v);
+  };
+
+
+  
+  inline
+  unsigned int memory_consumption (const std::vector<int> &v)
+  {
+    return (v.capacity() * sizeof(int) +
+	    sizeof(v));
+  };
+    
+    
+
+  inline
+  unsigned int memory_consumption (const std::vector<double> &v)
+  {
+    return (v.capacity() * sizeof(double) +
+	    sizeof(v));
+  };
+    
+    
+
+  inline
+  unsigned int memory_consumption (const std::vector<float> &v)
+  {
+    return (v.capacity() * sizeof(float) +
+	    sizeof(v));
+  };
+    
+    
+	
+  inline
+  unsigned int memory_consumption (const std::vector<char> &v)
+  {
+    return (v.capacity() * sizeof(char) +
+	    sizeof(v));
+  };
+    
+
+    
+  inline
+  unsigned int memory_consumption (const std::vector<unsigned char> &v)
+  {
+    return (v.capacity() * sizeof(unsigned char) +
+	    sizeof(v));
+  };
+
+
+    
+  template <typename T>
+  inline
+  unsigned int memory_consumption (const typename std::vector<T *> &v)
+  {
+    return (v.capacity() * sizeof(T *) +
+	    sizeof(v));
+  };
+    
+
+				    
+  template <typename A, typename B>
+  inline
+  unsigned int memory_consumption (const typename std::pair<A,B> &p)
+  {
+    return (memory_consumption(p.first) +
+	    memory_consumption(p.second));
+  };
+
+  
+		
+  template <typename T>
+  inline
+  unsigned int
+  memory_consumption (const T * const)
+  {
+    return sizeof(T*);
+  };
+
+
+		
+  template <typename T>
+  inline
+  unsigned int
+  memory_consumption (T * const)
+  {
+    return sizeof(T*);
+  };
+
+  
+	
+  inline
+  unsigned int
+  memory_consumption (void * const)
+  {
+    return sizeof(void*);
+  };
+    
+    
+	
+  template <typename T>
+  inline
+  unsigned int
+  memory_consumption (const T &t)
+  {
+    return t.memory_consumption();
+  };
+}
+
+
+
 #endif
