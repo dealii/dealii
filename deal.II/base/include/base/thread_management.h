@@ -670,6 +670,37 @@ namespace Threads
 #endif  
 
   
+
+
+  				   /**
+				    * Given a class, argument types,
+				    * and the return type, generate a
+				    * local typedef denoting a pointer
+				    * to such a member function.
+				    */
+  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class RetType>
+  struct MemFunPtr10
+  {
+      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10);
+  };
+
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
+				   /**
+				    * Same as above, but for the case
+				    * of a member function marked
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
+				    */
+  template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class RetType>
+  struct MemFunPtr10<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10, RetType>
+  {
+      typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const;
+  };
+#endif  
+
+  
   
 /**
  * Class used to store a pointer temporarily and delete the object
@@ -3745,6 +3776,186 @@ namespace Threads
   };
   
   
+/**
+ * Class to store the parameters of a function with 10 arguments. For
+ * more information on use and internals of this class see the report
+ * on this subject.
+ *
+ * @author Wolfgang Bangerth, Ralf Hartmann, 2001
+ */
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  class MemFunData10 : public FunDataBase
+  {
+    public:
+				       /**
+					* Typedef a pointer to a member
+					* function which we will call
+					* from this class.
+					*/
+      typedef typename MemFunPtr10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::type FunPtr;
+
+				       /**
+					* Constructor. Store pointer to
+					* the function and the values of
+					* the arguments.
+					*/
+      MemFunData10 (FunPtr fun_ptr,
+		    Class *object,
+		    Arg1   arg1,
+		    Arg2   arg2,
+		    Arg3   arg3,
+		    Arg4   arg4,
+		    Arg5   arg5,
+		    Arg6   arg6,
+		    Arg7   arg7,
+		    Arg8   arg8,
+		    Arg9   arg9,
+		    Arg10  arg10);
+
+				       /**
+					* Copy constructor.
+					*/
+      MemFunData10 (const MemFunData10 &fun_data10);
+
+				       /**
+					* Virtual constructor.
+					*/
+      virtual FunDataBase * clone () const;
+
+    private:
+
+				       /**
+					* Pointer to the function to be
+					* called and values of the
+					* arguments to be passed.
+					*/
+      FunPtr fun_ptr;
+
+				       /**
+					* Pointer to the object which
+					* we shall work on.
+					*/
+      Class *object;
+ 
+				       /**
+					* Values of the arguments of the
+					* function to be called.
+					*/
+      Arg1   arg1;
+      Arg2   arg2;
+      Arg3   arg3;
+      Arg4   arg4;
+      Arg5   arg5;
+      Arg6   arg6;
+      Arg7   arg7;
+      Arg8   arg8;
+      Arg9   arg9;
+      Arg10  arg10;
+      
+				       /**
+					* Static function used as entry
+					* point for the new thread.
+					*/
+      static void * thread_entry_point (void *arg);
+
+				       /**
+					* Helper class, used to collect
+					* the values of the parameters
+					* which we will pass to the
+					* function, once we know its
+					* type.
+					*/
+      class ArgCollector
+      {
+	public:
+					   /**
+					    * Typedef the function
+					    * pointer type of the
+					    * underlying class to a
+					    * local type.
+					    */
+	  typedef typename MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::FunPtr FunPtr;
+	
+					   /**
+					    * Constructor. Take and store a
+					    * pointer to the function which
+					    * is to be called.
+					    */
+	  ArgCollector (FunPtr fun_ptr);
+    
+					   /**
+					    * Take the arguments with
+					    * which we want to call the
+					    * function and produce and
+					    * object of the desired type
+					    * from that.
+					    */
+	  FunEncapsulation collect_args (Class *object,
+					 Arg1 arg1,
+					 Arg2 arg2,
+					 Arg3 arg3,
+					 Arg4 arg4,
+					 Arg5 arg5,
+					 Arg6 arg6,
+					 Arg7 arg7,
+					 Arg8 arg8,
+					 Arg9 arg9,
+					 Arg10 arg10);
+    
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1,
+					 Arg2   arg2,
+					 Arg3   arg3,
+					 Arg4   arg4,
+					 Arg5   arg5,
+					 Arg6   arg6,
+					 Arg7   arg7,
+					 Arg8   arg8,
+					 Arg9   arg9,
+					 Arg10  arg10);
+	private:
+					   /**
+					    * Space to temporarily store
+					    * the function pointer.
+					    */
+	  FunPtr fun_ptr;
+      };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
+      friend 
+      typename MemFunData10<Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
+					   Arg4_, Arg5_, Arg6_,
+					   Arg7_, Arg8_, Arg9_, Arg10_));
+
+#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
+      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
+      friend 
+      typename MemFunData10<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
+					   Arg4_, Arg5_, Arg6_,
+					   Arg7_, Arg8_, Arg9_, Arg10_) const);
+#endif
+  };
+  
+  
 
 				   /**
 				    * Encapsulate a function pointer
@@ -4285,6 +4496,41 @@ namespace Threads
   inline
   typename MemFunData9<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const);
+#endif
+ 
+				   /**
+				    * Encapsulate a member function
+				    * pointer into an object with
+				    * which a new thread can later be
+				    * spawned.  For more information
+				    * on use and internals of this
+				    * class see the report on this
+				    * subject.
+				    *
+				    * This function exists once for
+				    * each number of parameters.
+				    */
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
+  inline
+  typename MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
+  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10));
+
+#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
+                                   /**
+				    * Same as the previous function,
+				    * but for member functions marked
+				    * @p{const}. This function should
+				    * not be necessary, since the
+				    * compiler should deduce a
+				    * constant class as template
+				    * argument, but we have to work
+				    * around a bug in Intel's icc
+				    * compiler with this.  
+                                    */
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
+  inline
+  typename MemFunData10<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
+  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const);
 #endif
  
   
@@ -6678,6 +6924,154 @@ namespace Threads
   }
 
 
+/* ---------------------- MemFunData10 implementation ------------------------ */
+  
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::MemFunData10 (FunPtr  fun_ptr,
+												Class  *object,
+												Arg1    arg1,
+												Arg2    arg2,
+												Arg3    arg3,
+												Arg4    arg4,
+												Arg5    arg5,
+												Arg6    arg6,
+												Arg7    arg7,
+												Arg8    arg8,
+												Arg9    arg9,
+												Arg10   arg10) :
+		  FunDataBase (&MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point),
+		  fun_ptr (fun_ptr),
+		  object (object),
+		  arg1 (arg1),
+		  arg2 (arg2),
+		  arg3 (arg3),
+		  arg4 (arg4),
+		  arg5 (arg5),
+		  arg6 (arg6),
+		  arg7 (arg7),
+		  arg8 (arg8),
+		  arg9 (arg9),
+		  arg10 (arg10)
+  {}
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::MemFunData10 (const MemFunData10 &fun_data) :
+		  FunDataBase (fun_data),
+		  fun_ptr (fun_data.fun_ptr),
+		  object (fun_data.object),
+		  arg1 (fun_data.arg1),
+		  arg2 (fun_data.arg2),
+		  arg3 (fun_data.arg3),
+		  arg4 (fun_data.arg4),
+		  arg5 (fun_data.arg5),
+		  arg6 (fun_data.arg6),
+		  arg7 (fun_data.arg7),
+		  arg8 (fun_data.arg8),
+		  arg9 (fun_data.arg9),
+		  arg10(fun_data.arg10)		  
+  {}
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  FunDataBase *
+  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::clone () const 
+  {
+    return new MemFunData10 (*this);
+  }
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  void *
+  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::thread_entry_point (void *arg) 
+  {
+				     // convenience typedef, since we
+				     // will need that class name
+				     // several times below
+    typedef MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType> ThisClass;
+  
+    FunEncapsulation *fun_encapsulation
+      = reinterpret_cast<FunEncapsulation*>(arg);
+    const ThisClass *fun_data
+      = dynamic_cast<const ThisClass*> (fun_encapsulation->fun_data_base);
+
+				     // copy the parameters
+    ThisClass::FunPtr fun_ptr = fun_data->fun_ptr;
+    Class            *object  = fun_data->object;
+    Arg1              arg1    = fun_data->arg1;
+    Arg2              arg2    = fun_data->arg2;
+    Arg3              arg3    = fun_data->arg3;
+    Arg4              arg4    = fun_data->arg4;
+    Arg5              arg5    = fun_data->arg5;
+    Arg6              arg6    = fun_data->arg6;
+    Arg7              arg7    = fun_data->arg7;
+    Arg8              arg8    = fun_data->arg8;
+    Arg9              arg9    = fun_data->arg9;
+    Arg10             arg10   = fun_data->arg10;
+
+
+				     // copying of parameters is done,
+				     // now we can release the lock on
+				     // @p{fun_data}
+    fun_data->lock.release ();
+
+				     // call the function
+    (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+  
+    return 0;
+  }
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::ArgCollector (FunPtr fun_ptr) :
+		  fun_ptr (fun_ptr)
+  {}
+
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  FunEncapsulation
+  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::collect_args (Class *object,
+													      Arg1   arg1,
+													      Arg2   arg2,
+													      Arg3   arg3,
+													      Arg4   arg4,
+													      Arg5   arg5,
+													      Arg6   arg6,
+													      Arg7   arg7,
+													      Arg8   arg8,
+													      Arg9   arg9,
+													      Arg10  arg10)
+  {
+    return new MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>(fun_ptr, object,
+										    arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+  }
+  
+
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::ArgCollector::collect_args (Class &object,
+													      Arg1   arg1,
+													      Arg2   arg2,
+													      Arg3   arg3,
+													      Arg4   arg4,
+													      Arg5   arg5,
+													      Arg6   arg6,
+													      Arg7   arg7,
+													      Arg8   arg8,
+													      Arg9   arg9,
+													      Arg10  arg10)
+  {
+    return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+  }
+
+
 /* ---------------------------------------------------------------- */
 
   inline
@@ -6954,6 +7348,24 @@ namespace Threads
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
   typename MemFunData9<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const)
+  {
+    return fun_ptr;
+  }
+#endif
+  
+
+  
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
+  typename MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
+  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10))
+  {
+    return fun_ptr;
+  }
+
+#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
+  typename MemFunData10<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
+  encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const)
   {
     return fun_ptr;
   }
