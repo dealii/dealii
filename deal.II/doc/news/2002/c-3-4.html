@@ -616,6 +616,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: The <code class="class">GridReordering</code> tried to be
+       thread-safe in the initialization of some data, but was not due to a
+       typo. This is now fixed.
+       <br>
+       (WB 2003/01/28)
+       </p>
+
+  <li> <p> 
        Changed: The <code class="member">FEValues::get_cell</code> and
        <code class="member">FEValues::get_face</code> functions have
        been removed, since they limited our inability to use this

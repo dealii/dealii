@@ -423,7 +423,7 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 				   // wanted to read in two grids at
 				   // the same time, for whatever
 				   // reason).
-  Threads::ThreadMutex initialization_lock;
+  static Threads::ThreadMutex initialization_lock;
   initialization_lock.acquire ();
 
   static bool already_initialized = false;
