@@ -203,13 +203,18 @@ SolverGMRES<VECTOR>::solve (const MATRIX& A,
 				   // but whoever wrote this code in the first
 				   // place should get stoned, IMHO! (WB)
 
+				   // This code was definitely NOT
+				   // written by the fathers of DEAL
+				   // and it is very unclear to me,
+				   // why such a strange piece of code
+				   // should be here. It has a lot of
+				   // flaws, the old GMRES of DEAL did
+				   // not have. (GK)
+//TODO: Check, why there are two different start residuals.
+//TODO: Allocate vectors only when needed.
+
   deallog.push("GMRES");
 
-				   // Originally, here was a strange computation of
-				   // the number of auxiliary vectors, using
-				   // non-standardized members of the matrix.
-				   // Since it is up to the user to decide on the
-				   // number of auxiliary vectors, this was removed. GK
   const unsigned int n_tmp_vectors = (additional_data.max_n_tmp_vectors);
 
 				   // allocate an array of n_tmp_vectors
@@ -217,6 +222,10 @@ SolverGMRES<VECTOR>::solve (const MATRIX& A,
 				   // object; resize them but do not set their
 				   // values since they will be overwritten soon
 				   // anyway.
+
+				   // This is really bad since vectors
+				   // should only be allocated if
+				   // really needed. (GK)
   vector<VECTOR*> tmp_vectors (n_tmp_vectors, 0);
   for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
     {
