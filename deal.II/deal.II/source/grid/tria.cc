@@ -67,6 +67,10 @@ Triangulation<dim>::~Triangulation ()
 template <int dim>
 void Triangulation<dim>::clear () 
 {
+				   // only allow this operation if there
+				   // are no subscribers any more
+  Assert (n_subscriptions() == 0, ExcInternalError());
+  
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
   levels.clear ();
