@@ -25,7 +25,9 @@ template <int dim> class MappingQ;
 
 
 /**
- * Implementation of continuous Nedelec elements for the space H_curl.
+ * Implementation of continuous Nedelec elements for the space
+ * H_curl. Note, however, that continuity only concerns the tangential
+ * component of the vector field.
  *
  * The constructor of this class takes the degree @p{p} of this finite
  * element. However, presently, only lowest order elements
