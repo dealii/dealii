@@ -74,6 +74,20 @@
 
 <ol>
   <li> <p>
+       New: there is now a function
+       <code class="member">SparseMatrix::el</code> that does mostly
+       the same as <code class="member">SparseMatrix::operator()</code>,
+       but returns a zero if elements of the matrix are accessed that
+       are not in the sparsity pattern. Thus, the new function allows
+       to actually traverse rows or columns of the matrix without
+       taking care of the sparsity pattern, while
+       <code class="member">SparseMatrix::operator()</code> should be
+       used to write algorithms more efficiently.
+       <br>
+       (WB 2000/06/02)
+       </p>
+
+  <li> <p>
        Fix: 
        <code class="member">SparsityPattern::print_gnuplot</code>
        wrote rows and columns exchanged. Since most matrices have
