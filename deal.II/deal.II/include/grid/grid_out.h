@@ -449,8 +449,16 @@ class GridOut
     template <int dim>
     void write_gnuplot (const Triangulation<dim> &tria,
 			std::ostream             &out,
-			const Mapping<dim> *mapping=0);
+			const Mapping<dim>       *mapping=0);
 
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d.
+				      */
+    void write_gnuplot (const Triangulation<1> &tria,
+			std::ostream           &out,
+			const Mapping<1>       *mapping=0);
+    
 				     /**
 				      * Write the triangulation in the
 				      * ucd format.
@@ -550,6 +558,16 @@ class GridOut
     void write_eps (const Triangulation<dim> &tria,
 		    std::ostream             &out,
 		    const Mapping<dim>       *mapping=0);
+
+				     /**
+				      * Declaration of the
+				      * specialization of above
+				      * function for 1d. This function
+				      * is presently not implemented.
+				      */
+    void write_eps (const Triangulation<1> &tria,
+		    std::ostream           &out,
+		    const Mapping<1>       *mapping=0);
     
 				     /**
 				      * Write data and grid to @p{out} according
@@ -725,6 +743,15 @@ class GridOut
 			  std::ostream             &out) const;
 
 				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d. Does
+				      * nothing.
+				      */
+    void write_ucd_faces (const Triangulation<1> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+    
+				     /**
 				      * Return the number of faces in the
 				      * triangulation which have a boundary
 				      * indicator not equal to zero. Only
@@ -744,26 +771,14 @@ class GridOut
 				      */
     template <int dim>
     unsigned int n_boundary_faces (const Triangulation<dim> &tria) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for
+				      * 1d. Simply returns zero.
+				      */
+    unsigned int n_boundary_faces (const Triangulation<1> &tria) const;
 };
-
-
-
-/* -------------- declaration of explicit specializations ------------- */
-
-template <>
-unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const;
-template <>
-void GridOut::write_ucd_faces (const Triangulation<1> &,
-			       const unsigned int,
-			       std::ostream &) const;
-template <>
-void GridOut::write_gnuplot (const Triangulation<1> &tria,
-			     std::ostream           &out,
-			     const Mapping<1>       *);
-template <>
-void GridOut::write_eps (const Triangulation<1> &,
-			 std::ostream &,
-			 const Mapping<1> *);
 
 
 

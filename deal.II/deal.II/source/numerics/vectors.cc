@@ -286,7 +286,6 @@ VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
 
 #if deal_II_dimension == 1
 
-template <>
 void VectorTools::project (const Mapping<1>       &,
 			   const DoFHandler<1>    &,
 			   const ConstraintMatrix &,
@@ -548,7 +547,6 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 
 #if deal_II_dimension == 1
 
-template <>
 void
 VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 					  const DoFHandler<1>      &dof,
@@ -622,7 +620,6 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 
 
 
-template <>
 void
 VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
 					  const DoFHandler<1>           &dof,
@@ -804,7 +801,6 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
 
 #if deal_II_dimension == 1
 
-template <>
 void
 VectorTools::project_boundary_values (const Mapping<1>       &mapping,
 				      const DoFHandler<1>    &dof,

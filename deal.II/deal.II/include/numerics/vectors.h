@@ -26,7 +26,6 @@ template <int dim> class Mapping;
 template <int dim> class DoFHandler;
 class ConstraintMatrix;
 
-//TODO:[WB] replace template functions and specializations with overloaded functions
 
 
 /**
@@ -404,6 +403,22 @@ class VectorTools
 			 const bool                project_to_boundary_first = false);
 
 				     /**
+				      * Declaration of specialization
+				      * of the previous function for
+				      * 1d. At present, it is not
+				      * implemented.
+				      */
+    static void project (const Mapping<1>         &mapping,
+			 const DoFHandler<1>      &dof,
+			 const ConstraintMatrix   &constraints,
+			 const Quadrature<1>      &quadrature,
+			 const Function<1>        &function,
+			 Vector<double>           &vec,
+			 const bool                enforce_zero_boundary = false,
+			 const Quadrature<0>      &q_boundary = *static_cast<const Quadrature<0>*>(0),
+			 const bool                project_to_boundary_first = false);
+    
+				     /**
 				      * Calls the @p{project}
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
@@ -500,6 +515,17 @@ class VectorTools
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
 				     /**
+				      * Declaration of specialization
+				      * of the previous function for
+				      * 1d.
+				      */
+    static void interpolate_boundary_values (const Mapping<1>              &mapping,
+					     const DoFHandler<1>           &dof,
+					     const FunctionMap<1>::type    &function_map,
+					     std::map<unsigned int,double> &boundary_values,
+					     const std::vector<bool>       &component_mask = std::vector<bool>());
+
+				     /**
 				      * Same function as above, but
 				      * taking only one pair of
 				      * boundary indicator and
@@ -516,6 +542,18 @@ class VectorTools
 					     const DoFHandler<dim>         &dof,
 					     const unsigned char            boundary_component,
 					     const Function<dim>           &boundary_function,
+					     std::map<unsigned int,double> &boundary_values,
+					     const std::vector<bool>       &component_mask = std::vector<bool>());
+
+				     /**
+				      * Declaration of specialization
+				      * of the previous function for
+				      * 1d.
+				      */
+    static void interpolate_boundary_values (const Mapping<1>              &mapping,
+					     const DoFHandler<1>           &dof,
+					     const unsigned char            boundary_component,
+					     const Function<1>             &boundary_function,
 					     std::map<unsigned int,double> &boundary_values,
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
     
@@ -569,6 +607,20 @@ class VectorTools
 					 const DoFHandler<dim>    &dof,
 					 const typename FunctionMap<dim>::type &boundary_functions,
 					 const Quadrature<dim-1>  &q,
+					 std::map<unsigned int,double> &boundary_values);
+
+				     /**
+				      * Declaration of specialization
+				      * of the previous function for
+				      * 1d. Since in 1d projection
+				      * equals interpolation, the
+				      * interpolation function is
+				      * called.
+				      */
+    static void project_boundary_values (const Mapping<1>           &mapping,
+					 const DoFHandler<1>        &dof,
+					 const FunctionMap<1>::type &boundary_functions,
+					 const Quadrature<0>        &q,
 					 std::map<unsigned int,double> &boundary_values);
     
 				     /**
@@ -748,41 +800,6 @@ class VectorTools
   DeclException0 (ExcNonInterpolatingFE);
 };
 
-
-/* -------------- declaration of explicit specializations ------------- */
-
-template <> void VectorTools::project (
-  const Mapping<1>       &,
-  const DoFHandler<1>    &,
-  const ConstraintMatrix &,
-  const Quadrature<1>    &,
-  const Function<1>      &,
-  Vector<double>         &,
-  const bool              ,
-  const Quadrature<0>    &,
-  const bool              );
-
-template <> void VectorTools::interpolate_boundary_values (
-  const Mapping<1>         &,
-  const DoFHandler<1>      &dof,
-  const unsigned char       boundary_component,
-  const Function<1>        &boundary_function,
-  std::map<unsigned int,double> &boundary_values,
-  const std::vector<bool>       &component_mask_);
-
-template <> void VectorTools::interpolate_boundary_values (
-  const Mapping<1>              &mapping,
-  const DoFHandler<1>           &dof,
-  const FunctionMap<1>::type    &function_map,
-  std::map<unsigned int,double> &boundary_values,
-  const std::vector<bool>       &component_mask);
-
-template <> void VectorTools::project_boundary_values (
-  const Mapping<1>       &mapping,
-  const DoFHandler<1>    &dof,
-  const FunctionMap<1>::type &boundary_functions,
-  const Quadrature<0>  &,
-  std::map<unsigned int,double> &boundary_values);
 
 
 #endif

@@ -302,8 +302,18 @@ class DoFTools
     static void
     make_boundary_sparsity_pattern (const DoFHandler<dim>           &dof,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
-				    SparsityPattern                 &sparsity_pattern); 
+				    SparsityPattern                 &sparsity_pattern);
 
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    make_boundary_sparsity_pattern (const DoFHandler<1>             &dof,
+				    const std::vector<unsigned int> &dof_to_boundary_mapping,
+				    SparsityPattern                 &sparsity_pattern);
+
+    
 				     /**
 				      * Write the sparsity structure of the
 				      * matrix composed of the basis functions
@@ -341,6 +351,17 @@ class DoFTools
 				    const typename FunctionMap<dim>::type &boundary_indicators,
 				    const std::vector<unsigned int>  &dof_to_boundary_mapping,
 				    SparsityPattern    &sparsity); 
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    make_boundary_sparsity_pattern (const DoFHandler<1>             &dof,
+				    const FunctionMap<1>::type      &boundary_indicators,
+				    const std::vector<unsigned int> &dof_to_boundary_mapping,
+				    SparsityPattern                 &sparsity); 
+
 
 				     /**
 				      * Generate sparsity pattern for
@@ -418,11 +439,26 @@ class DoFTools
 				      * since you may want to enter other
 				      * constraints later on yourself.
 				      */
-    template <int dim>
     static void
-    make_hanging_node_constraints (const DoFHandler<dim> &dof_handler,
+    make_hanging_node_constraints (const DoFHandler<1> &dof_handler,
 				   ConstraintMatrix      &constraints);
 
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
+				   ConstraintMatrix    &constraints);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
+				   ConstraintMatrix    &constraints);
+    
 				     /**
 				      * Take a vector of values which live on
 				      * cells (e.g. an error per cell) and
@@ -555,6 +591,16 @@ class DoFTools
 			   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
 				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    extract_boundary_dofs (const DoFHandler<1>        &dof_handler,
+			   const std::vector<bool>    &component_select,
+			   std::vector<bool>          &selected_dofs,
+			   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+
+				     /**
 				      * Select all dofs that will be
 				      * constrained by interface
 				      * constraints, i.e. all hanging
@@ -566,10 +612,25 @@ class DoFTools
 				      * contents of this array or
 				      * overwritten.
 				      */
-    template <int dim>
     static void
-    extract_hanging_node_dofs (const DoFHandler<dim> &dof_handler,
-			       std::vector<bool>     &selected_dofs);
+    extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
+			       std::vector<bool>   &selected_dofs);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
+			       std::vector<bool>   &selected_dofs);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
+			       std::vector<bool>   &selected_dofs);
 
 				     /**
 				      * Count how many degrees of
@@ -818,7 +879,30 @@ class DoFTools
 				   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				   ConstraintMatrix                   &constraints);
 
-//TODO:[WB] document this function. put it in the news file
+
+				     /**
+				      * This function generates a
+				      * matrix such that when a vector
+				      * of data with as many elements
+				      * as there are degrees of
+				      * freedom of this component on
+				      * the coarse grid is multiplied
+				      * to this matrix, we obtain a
+				      * vector with as many elements
+				      * are there are global degrees
+				      * of freedom on the fine
+				      * grid. All the elements of the
+				      * other components of the finite
+				      * element fields on the fine
+				      * grid are not touched.
+				      *
+				      * The output of this function is
+				      * a compressed format that can
+				      * be given to the @p{reinit}
+				      * functions of the
+				      * @ref{SparsityPattern} ad
+				      * @ref{SparseMatrix} classes.
+				      */
     template <int dim>
     static void
     compute_intergrid_transfer_representation (const DoFHandler<dim>              &coarse_grid,
@@ -861,6 +945,14 @@ class DoFTools
 				 std::vector<unsigned int>  &mapping);
 
 				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    map_dof_to_boundary_indices (const DoFHandler<1>        &dof_handler,
+				 std::vector<unsigned int>  &mapping);
+    
+				     /**
 				      * Same as the previous function,
 				      * except that only those parts
 				      * of the boundary are considered
@@ -877,6 +969,15 @@ class DoFTools
 				 const std::set<unsigned char> &boundary_indicators,
 				 std::vector<unsigned int>     &mapping);
 
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    map_dof_to_boundary_indices (const DoFHandler<1>           &dof_handler,
+				 const std::set<unsigned char> &boundary_indicators,
+				 std::vector<unsigned int>     &mapping);
+    
 				     /**
 				      * Return a list of support
 				      * points for all the degrees of
@@ -1032,54 +1133,6 @@ class DoFTools
 				 const typename DoFHandler<dim>::active_cell_iterator &end);
 };
 
-
-
-/* -------------- declaration of explicit specializations ------------- */
-
-template <>
-void
-DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
-					  const FunctionMap<1>::type  &function_map,
-					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					  SparsityPattern    &sparsity);
-template <>
-void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
-					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					       SparsityPattern    &sparsity);
-template <>
-void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
-					      ConstraintMatrix &);
-template <>
-void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &,
-					      ConstraintMatrix &);
-template <>
-void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &,
-					      ConstraintMatrix &);
-template <>
-void
-DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
-				 const std::vector<bool>  &component_select,
-				 std::vector<bool>        &selected_dofs,
-				 const std::set<unsigned char> &boundary_indicators);
-template <>
-void
-DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
-				     std::vector<bool>   &selected_dofs);
-template <>
-void
-DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
-				     std::vector<bool>   &selected_dofs);
-template <>
-void
-DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
-				     std::vector<bool>   &selected_dofs);
-template <>
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    const std::set<unsigned char> &boundary_indicators,
-					    std::vector<unsigned int> &mapping);
-template <>
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    std::vector<unsigned int> &mapping);
 
 
 

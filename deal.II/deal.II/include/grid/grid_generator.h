@@ -15,15 +15,13 @@
 
 
 #include <base/exceptions.h>
+#include <map>
+
 template <int dim> class Point;
 template <int dim> class Triangulation;
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 
-
-//TODO:[WB] replace template functions and specializations with overloaded functions
-
-#include <map>
 
 /**
  * This class offers triangulations of some standard domains such as hypercubes,
@@ -176,13 +174,25 @@ class GridGenerator
 				      * 4/8, in z-direction 16/32. The cells
 				      * at corners and edges (3d) get
 				      * these values bitwise or'd.
+				      *
+				      * Presently only available in 2d
+				      * and 3d.
 				      */
-    template<int dim>
-    static void enclosed_hyper_cube (Triangulation<dim> &tria,
-	 			     const double        left = 0.,
-				     const double        right= 1.,
-				     const double        thickness = 1.,
-				     bool                colorize = false);
+    static void enclosed_hyper_cube (Triangulation<2> &tria,
+	 			     const double      left = 0.,
+				     const double      right= 1.,
+				     const double      thickness = 1.,
+				     const bool        colorize = false);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void enclosed_hyper_cube (Triangulation<3> &tria,
+	 			     const double      left = 0.,
+				     const double      right= 1.,
+				     const double      thickness = 1.,
+				     const bool        colorize = false);
 
 				     /**
 				      * Initialize the given
@@ -198,11 +208,47 @@ class GridGenerator
 				      * The triangulation needs to be
 				      * void upon calling this
 				      * function.
+				      *
+				      * This function is declared to
+				      * exist for triangulations of
+				      * all space dimensions, but
+				      * throws an error if called in
+				      * 1d.
+				      *
+				      * This function is presently not
+				      * implemented in 3d, since we
+				      * fear that it might not be
+				      * possible to represent a simple
+				      * grid making up a ball with the
+				      * requirements on the direction
+				      * of lines and faces imposed by
+				      * the triangulation classes. We
+				      * hope that more complicated
+				      * arrangements than the obvious
+				      * one made up of 7 cells can
+				      * cope with this situation, but
+				      * this has not been implemented
+				      * yet.
 				      */    
-    template <int dim>
-    static void hyper_ball (Triangulation<dim> &tria,
-			    const Point<dim>   &center = Point<dim>(),
-			    const double        radius = 1.);
+    static void hyper_ball (Triangulation<1> &tria,
+			    const Point<1>   &center = Point<1>(),
+			    const double      radius = 1.);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_ball (Triangulation<2> &tria,
+			    const Point<2>   &center = Point<2>(),
+			    const double      radius = 1.);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_ball (Triangulation<3> &tria,
+			    const Point<3>   &center = Point<3>(),
+			    const double      radius = 1.);
 
 				     /**
 				      * Initialize the given
@@ -217,11 +263,32 @@ class GridGenerator
 				      * The triangulation needs to be
 				      * void upon calling this
 				      * function.
+				      *
+				      * This function is declared to
+				      * exist for triangulations of
+				      * all space dimensions, but
+				      * throws an error if called in
+				      * 1d.
 				      */
-    template <int dim>
-    static void hyper_L (Triangulation<dim> &tria,
-			 const double        left = -1.,
-			 const double        right= 1.);
+    static void hyper_L (Triangulation<1> &tria,
+			 const double      left = -1.,
+			 const double      right= 1.);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_L (Triangulation<2> &tria,
+			 const double      left = -1.,
+			 const double      right= 1.);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_L (Triangulation<3> &tria,
+			 const double      left = -1.,
+			 const double      right= 1.);
     
                                      /**
 				      * Initialize the given
@@ -230,13 +297,36 @@ class GridGenerator
 				      * from @p{(x=0,y=-1)} to
 				      * @p{(0,0)} in 2d.
 				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
+				      * The triangulation needs to be
+				      * void upon calling this
+				      * function.
+				      *
+				      * This function is declared to
+				      * exist for triangulations of
+				      * all space dimensions, but
+				      * throws an error if called in
+				      * 1d. It is also not presently
+				      * implemented in 3d.
 				      */
-    template <int dim>
-    static void hyper_cube_slit (Triangulation<dim> &tria,
-				 const double        left = 0.,
-				 const double        right= 1.);
+    static void hyper_cube_slit (Triangulation<1> &tria,
+				 const double      left = 0.,
+				 const double      right= 1.);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_cube_slit (Triangulation<2> &tria,
+				 const double      left = 0.,
+				 const double      right= 1.);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_cube_slit (Triangulation<3> &tria,
+				 const double      left = 0.,
+				 const double      right= 1.);
 
 				     /**
 				      * Produce a hyper-shell,
@@ -257,10 +347,36 @@ class GridGenerator
 				      * The triangulation needs to be
 				      * void upon calling this
 				      * function.
+				      *
+				      * This function is declared to
+				      * exist for triangulations of
+				      * all space dimensions, but
+				      * throws an error if called in
+				      * 1d. It is also currently not
+				      * implemented in 3d.
 				      */
-    template <int dim>
-    static void hyper_shell (Triangulation<dim> &tria,
-			     const Point<dim>   &center,
+    static void hyper_shell (Triangulation<1>   &tria,
+			     const Point<1>     &center,
+			     const double        inner_radius,
+			     const double        outer_radius,
+			     const unsigned int  n_cells = 0);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_shell (Triangulation<2>   &tria,
+			     const Point<2>     &center,
+			     const double        inner_radius,
+			     const double        outer_radius,
+			     const unsigned int  n_cells = 0);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void hyper_shell (Triangulation<3>   &tria,
+			     const Point<3>     &center,
 			     const double        inner_radius,
 			     const double        outer_radius,
 			     const unsigned int  n_cells = 0);
@@ -300,10 +416,12 @@ class GridGenerator
 				      * The triangulation needs to be
 				      * void upon calling this
 				      * function.
+				      *
+				      * At present, this function only
+				      * exists in 2d.
 				      */
-    template <int dim>
-    static void half_hyper_shell (Triangulation<dim> &tria,
-				  const Point<dim>   &center,
+    static void half_hyper_shell (Triangulation<2>   &tria,
+				  const Point<2>     &center,
 				  const double        inner_radius,
 				  const double        outer_radius,
 				  const unsigned int  n_cells = 0);
@@ -327,10 +445,20 @@ class GridGenerator
 				      * triangulations, but the given
 				      * triangulation is changed
 				      * (overwritten).
+				      *
+				      * In 1d, this function is not
+				      * currently implemented.
 				      */
     template <int dim>
     static void laplace_transformation (Triangulation<dim> &tria,
 					const std::map<unsigned int,Point<dim> > &new_points);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void laplace_transformation (Triangulation<1> &tria,
+					const std::map<unsigned int,Point<1> > &new_points);
     
 				     /**
 				      * Exception
@@ -348,99 +476,25 @@ class GridGenerator
     static void colorize_hyper_rectangle (Triangulation<dim> &tria);
 
 				     /**
-				      * Multiply called by the
-				      * @p{laplace_transformation}
-				      * function. Solves the Laplace
-				      * equation for one of the
-				      * @p{dim} dimension.
+				      * Declaration of the above
+				      * function for 1d.
 				      */
-    static void laplace_solve (const SparseMatrix<double> &S,
+    static void colorize_hyper_rectangle (Triangulation<1> &tria);
+    
+				     /**
+				      * Solve the Laplace equation for
+				      * @p{laplace_transformation}
+				      * function for one of the
+				      * @p{dim} space
+				      * dimensions. Externalized into
+				      * a function of its own in order
+				      * to allow parallel execution.
+				      */
+    static void laplace_solve (const SparseMatrix<double>          &S,
 			       const std::map<unsigned int,double> &m,
-			       Vector<double> &u);
+			       Vector<double>                      &u);
 };
 
-
-
-/* -------------- declaration of explicit specializations ------------- */
-
-template <>
-void
-GridGenerator::colorize_hyper_rectangle (Triangulation<1> &);
-template <>
-void GridGenerator::hyper_cube_slit (Triangulation<1> &,
-				     const double,
-				     const double);
-template <>
-void GridGenerator::hyper_L (Triangulation<1> &,
-			     const double,
-			     const double);
-template <>
-void GridGenerator::hyper_ball (Triangulation<1> &,
-				const Point<1> &,
-				const double);
-template <>
-void GridGenerator::hyper_shell (Triangulation<1> &,
-				 const Point<1> &,
-				 const double,
-				 const double,
-				 const unsigned int);
-template <>
-void
-GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
-				const double left,
-				const double right);
-template <>
-void
-GridGenerator::hyper_L (Triangulation<2> &tria,
-			const double a,
-			const double b);
-template <>
-void
-GridGenerator::hyper_ball (Triangulation<2> &tria,
-			   const Point<2>    &p,
-			   const double      radius);
-template <>
-void GridGenerator::hyper_shell (Triangulation<2>   &tria,
-				 const Point<2>     &center,
-				 const double        inner_radius,
-				 const double        outer_radius,
-				 const unsigned int  n_cells);
-template <>
-void
-GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
-				 const Point<2>     &center,
-				 const double        inner_radius,
-				 const double        outer_radius,
-				 const unsigned int  n_cells);
-template <>
-void GridGenerator::hyper_cube_slit (Triangulation<3> &,
-				     const double,
-				     const double);
-template<>
-void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
-					 const double l,
-					 const double r,
-					 const double d,
-					 bool colorize);
-template <>
-void
-GridGenerator::hyper_L (Triangulation<3> &tria,
-			const double a,
-			const double b);
-template <>
-void
-GridGenerator::hyper_ball (Triangulation<3> &tria,
-			   const Point<3>   &p,
-			   const double radius);
-template <>
-void GridGenerator::hyper_shell (Triangulation<3>   &,
-				 const Point<3>     &,
-				 const double        ,
-				 const double        ,
-				 const unsigned int  );
-template <>
-void GridGenerator::laplace_transformation (Triangulation<1> &,
-					    const std::map<unsigned int,Point<1> > &);
 
 
 #endif

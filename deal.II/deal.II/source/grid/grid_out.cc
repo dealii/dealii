@@ -159,7 +159,6 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 
 #if deal_II_dimension == 1
 
-template <>
 unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
 {
   return 0;
@@ -188,7 +187,6 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
 
 #if deal_II_dimension == 1
 
-template <>
 void GridOut::write_ucd_faces (const Triangulation<1> &,
 			       const unsigned int,
 			       std::ostream &) const
@@ -234,7 +232,6 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 
 #if deal_II_dimension==1
 
-template <>
 void GridOut::write_gnuplot (const Triangulation<1> &tria,
 			     std::ostream           &out,
 			     const Mapping<1>       *) 
@@ -498,7 +495,6 @@ struct LineEntry
 
 #if deal_II_dimension==1
 
-template <>
 void GridOut::write_eps (const Triangulation<1> &,
 			 std::ostream &,
 			 const Mapping<1> *) 

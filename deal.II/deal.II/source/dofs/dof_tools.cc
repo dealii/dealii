@@ -117,12 +117,11 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
 
 #if deal_II_dimension == 1
 
-template <>
 void
-DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
-					  const DoFHandler<1>::FunctionMap  &function_map,
-					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-					  SparsityPattern    &sparsity)
+DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>             &dof_handler,
+					  const FunctionMap<1>::type      &function_map,
+					  const std::vector<unsigned int> &dof_to_boundary_mapping,
+					  SparsityPattern                 &sparsity)
 {
   const unsigned int dofs_per_vertex = dof_handler.get_fe().dofs_per_vertex;
   std::vector<unsigned int> boundary_dof_boundary_indices (dofs_per_vertex);
@@ -161,7 +160,6 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
 
 
 
-template <>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
 					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
 					       SparsityPattern    &sparsity)
@@ -508,7 +506,6 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 
 #if deal_II_dimension == 1
 
-template <>
 void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
 					      ConstraintMatrix &)
 {
@@ -521,7 +518,6 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<1> &,
 
 #if deal_II_dimension == 2
 
-template <>
 void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 					      ConstraintMatrix    &constraints)
 {
@@ -609,7 +605,6 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 
 #if deal_II_dimension == 3
 
-template <>
 void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 					      ConstraintMatrix    &constraints)
 {
@@ -942,7 +937,7 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
 
 #else
 
-template <>
+
 void
 DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
 				 const std::vector<bool>  &component_select,
@@ -1000,7 +995,6 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
 
 #if deal_II_dimension == 1
 
-template <>
 void
 DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
 				     std::vector<bool>   &selected_dofs)
@@ -1018,7 +1012,6 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
 
 #if deal_II_dimension == 2
 
-template <>
 void
 DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
 				     std::vector<bool>   &selected_dofs)
@@ -1058,7 +1051,6 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
 
 #if deal_II_dimension == 3
 
-template <>
 void
 DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
 				     std::vector<bool>   &selected_dofs)
@@ -1969,7 +1961,7 @@ DoFTools::compute_intergrid_weights_3 (const DoFHandler<dim>              &coars
 
 #if deal_II_dimension == 1
 
-template <>
+
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 					    const std::set<unsigned char> &boundary_indicators,
 					    std::vector<unsigned int> &mapping)
@@ -2010,7 +2002,6 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 
 
 
-template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 					    std::vector<unsigned int> &mapping)
 {
