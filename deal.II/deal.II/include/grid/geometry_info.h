@@ -159,9 +159,34 @@ struct GeometryInfo
 				      * 3 and 2, etc.
 				      *
 				      * For three spatial dimensions,
-				      * the exact order of the children is
-				      * laid down in the documentation of
-				      * the @ref{Triangulation} class.
+				      * the exact order of the
+				      * children is laid down in the
+				      * documentation of the
+				      * @ref{Triangulation} class.
+				      * However, it must be noted that
+				      * this class and function only
+				      * deals with faces in standard
+				      * orientation. In 3d, faces can
+				      * exist in two orientations,
+				      * though, and if a face is in
+				      * the wrong orientation, then
+				      * this function may not give you
+				      * what you want. You can inquire
+				      * about the face orientation
+				      * using the
+				      * @p{cell->face_orientation}
+				      * function, and the function to
+				      * ask for a neighbor's cell
+				      * behind a given face and
+				      * subface is
+				      * @p{cell->neighbor_child_on_subface}.
+				      * The latter function, in
+				      * contrast to the present one,
+				      * also takes into account the
+				      * actual orientation of the
+				      * faces of a cell and will
+				      * return the correct result in
+				      * all cases.
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface);
@@ -510,9 +535,35 @@ struct GeometryInfo<1>
 				      * 3 and 2, etc.
 				      *
 				      * For three spatial dimensions,
-				      * the exact order of the children is
-				      * laid down in the documentation of
-				      * the @ref{Triangulation} class.
+				      * the exact order of the
+				      * children is laid down in the
+				      * documentation of the
+				      * @ref{Triangulation}
+				      * class. However, it must be
+				      * noted that this class and
+				      * function only deals with faces
+				      * in standard orientation. In
+				      * 3d, faces can exist in two
+				      * orientations, though, and if a
+				      * face is in the wrong
+				      * orientation, then this
+				      * function may not give you what
+				      * you want. You can inquire
+				      * about the face orientation
+				      * using the
+				      * @p{cell->face_orientation}
+				      * function, and the function to
+				      * ask for a neighbor's cell
+				      * behind a given face and
+				      * subface is
+				      * @p{cell->neighbor_child_on_subface}.
+				      * The latter function, in
+				      * contrast to the present one,
+				      * also takes into account the
+				      * actual orientation of the
+				      * faces of a cell and will
+				      * return the correct result in
+				      * all cases.
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface);
@@ -769,9 +820,35 @@ struct GeometryInfo<2>
 				      * 3 and 2, etc.
 				      *
 				      * For three spatial dimensions,
-				      * the exact order of the children is
-				      * laid down in the documentation of
-				      * the @ref{Triangulation} class.
+				      * the exact order of the
+				      * children is laid down in the
+				      * documentation of the
+				      * @ref{Triangulation}
+				      * class. However, it must be
+				      * noted that this class and
+				      * function only deals with faces
+				      * in standard orientation. In
+				      * 3d, faces can exist in two
+				      * orientations, though, and if a
+				      * face is in the wrong
+				      * orientation, then this
+				      * function may not give you what
+				      * you want. You can inquire
+				      * about the face orientation
+				      * using the
+				      * @p{cell->face_orientation}
+				      * function, and the function to
+				      * ask for a neighbor's cell
+				      * behind a given face and
+				      * subface is
+				      * @p{cell->neighbor_child_on_subface}.
+				      * The latter function, in
+				      * contrast to the present one,
+				      * also takes into account the
+				      * actual orientation of the
+				      * faces of a cell and will
+				      * return the correct result in
+				      * all cases.
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface);
@@ -1030,9 +1107,34 @@ struct GeometryInfo<3>
 				      * 3 and 2, etc.
 				      *
 				      * For three spatial dimensions,
-				      * the exact order of the children is
-				      * laid down in the documentation of
-				      * the @ref{Triangulation} class.
+				      * the exact order of the
+				      * children is laid down in the
+				      * documentation of the
+				      * @ref{Triangulation}
+				      * class. However, it must be
+				      * noted that this class and
+				      * function only deals with faces
+				      * in standard orientation. In
+				      * 3d, faces can exist in two
+				      * orientations, though, and if a
+				      * face is in the wrong
+				      * orientation, then this
+				      * function may not give you what
+				      * you want. You can inquire
+				      * about the face orientation
+				      * using the
+				      * @p{cell->face_orientation}
+				      * function, and the function to
+				      * ask for a neighbor's cell
+				      * behind a given face and
+				      * subface is
+				      * @p{cell->neighbor_child_on_subface}.
+				      * The latter function, in contrast
+				      * to the present one, also takes
+				      * into account the actual
+				      * orientation of the faces of a
+				      * cell and will return the
+				      * correct result in all cases.
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface);

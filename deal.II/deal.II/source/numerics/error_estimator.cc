@@ -802,11 +802,13 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
       
       const active_cell_iterator neighbor = cell->neighbor(face_no);
       
-				       // find which number the current
-				       // face has relative to the neighboring
-				       // cell
-      const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
-      Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
+				       // find which number the
+				       // current face has relative to
+				       // the neighboring cell
+      const unsigned int neighbor_neighbor
+        = cell->neighbor_of_neighbor (face_no);
+      Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell,
+              ExcInternalError());
       
 				       // get restriction of finite element
 				       // function of @p{neighbor} to the
@@ -984,38 +986,24 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 				   // index the number of the
 				   // quadrature point
   
-				   // store which number @p{cell} has in the
-				   // list of neighbors of @p{neighbor}
-  const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
-  Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
+				   // store which number @p{cell} has
+				   // in the list of neighbors of
+				   // @p{neighbor}
+  const unsigned int neighbor_neighbor
+    = cell->neighbor_of_neighbor (face_no);
+  Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell,
+          ExcInternalError());
   
 				   // loop over all subfaces
-  for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face;
+  for (unsigned int subface_no=0;
+       subface_no<GeometryInfo<dim>::subfaces_per_face;
        ++subface_no)
     {
 				       // get an iterator pointing to the
 				       // cell behind the present subface
-      static const unsigned int subface_translation[4]
-        = { 0, 3, 2, 1 };
-                                       // see whether face and
-                                       // the neighbor's
-                                       // counterface share the
-                                       // same indexing of
-                                       // children. if not so,
-                                       // translate child
-                                       // indices
-      const bool face_orientations_match
-        = (neighbor->face_orientation(neighbor_neighbor) ==
-           cell->face_orientation(face_no));
-      const unsigned int neighbor_child_index
-        = (GeometryInfo<dim>::
-           child_cell_on_face(neighbor_neighbor,
-                              (face_orientations_match ?
-                               subface_no :
-                               subface_translation[subface_no])));
       const active_cell_iterator neighbor_child
-	= neighbor->child(neighbor_child_index);
-      Assert (!neighbor->child(neighbor_child_index)->has_children(),
+        = cell->neighbor_child_on_subface (face_no, subface_no);
+      Assert (!neighbor_child->has_children(),
 	      ExcInternalError());
       
 				       // restrict the finite element

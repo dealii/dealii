@@ -18,136 +18,13 @@
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
-#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_q1.h>
 
 #include <cmath>
 #include <algorithm>
 
 
-namespace internal
-{
-  template <int dim>
-  DataSetDescriptor<dim>
-  DataSetDescriptor<dim>::cell ()
-  {
-    return 0;
-  }
-
-
-  template <int dim>
-  DataSetDescriptor<dim>
-  DataSetDescriptor<dim>::
-  face (const typename DoFHandler<dim>::cell_iterator &cell,
-        const unsigned int face_no,
-        const unsigned int n_quadrature_points)
-  {
-    Assert (dim != 1, ExcInternalError());
-    Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-            ExcInternalError());
-    Assert (n_quadrature_points > 0, ExcInternalError());
-    
-    switch (dim)
-      {
-        case 1:
-        case 2:
-              return face_no * n_quadrature_points;
-
-                                               // in 3d, we have to
-                                               // account for faces
-                                               // that have reverse
-                                               // orientation. thus,
-                                               // we have to store
-                                               // _two_ data sets per
-                                               // face or subface
-        case 3:
-              return ((face_no +
-                       (cell->face_orientation(face_no) == true ?
-                        0 : GeometryInfo<dim>::faces_per_cell))
-                      * n_quadrature_points);
-
-        default:
-              Assert (false, ExcInternalError());
-      }
-    return static_cast<unsigned int>(-1);
-  }
-
-
-
-  template <int dim>
-  DataSetDescriptor<dim>
-  DataSetDescriptor<dim>::
-  sub_face (const typename DoFHandler<dim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int subface_no,
-            const unsigned int n_quadrature_points)
-  {
-    Assert (dim != 1, ExcInternalError());
-    Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-            ExcInternalError());
-                                     // the trick with +1 prevents
-                                     // that we get a warning in 1d
-    Assert (subface_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
-            ExcInternalError());
-    Assert (n_quadrature_points > 0, ExcInternalError());
-
-    Assert (cell->has_children() == false,
-            ExcMessage ("You can't use subface data for cells that are "
-                        "already refined. Iterate over their children "
-                        "instead in these cases."));
-    
-    switch (dim)
-      {
-        case 1:
-        case 2:
-              return ((face_no * GeometryInfo<dim>::subfaces_per_face +
-                       subface_no)
-                      * n_quadrature_points);
-
-                                               // for 3d, same as above:
-        case 3:
-              return (((face_no * GeometryInfo<dim>::subfaces_per_face +
-                        subface_no)
-                       + (cell->face_orientation(face_no) == true ?
-                          0 :
-                          GeometryInfo<dim>::faces_per_cell *
-                          GeometryInfo<dim>::subfaces_per_face)
-                       )
-                      * n_quadrature_points);
-        default:
-              Assert (false, ExcInternalError());
-      }
-    return static_cast<unsigned int>(-1);              
-  }
-
-
-  template <int dim>
-  unsigned int
-  DataSetDescriptor<dim>::offset () const
-  {
-    return dataset_offset;
-  }
-
-
-
-  template <int dim>
-  DataSetDescriptor<dim>::
-  DataSetDescriptor (const unsigned int dataset_offset)
-                  :
-                  dataset_offset (dataset_offset)
-  {}
-
-
-  template <int dim>
-  DataSetDescriptor<dim>::
-  DataSetDescriptor ()
-                  :
-                  dataset_offset (static_cast<unsigned int>(-1))
-  {}
-}
-
-  
-  
 
 
 template <int dim>
@@ -625,7 +502,7 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
     for (unsigned int point=0; point<n_q_points; ++point)
       for (unsigned int k=0; k<data.n_shape_functions; ++k)
         quadrature_points[point]
-          += data.shape(point+data_set.offset(),k)
+          += data.shape(point+data_set,k)
              * data.mapping_support_points[k];
   
                                    // then Jacobians
@@ -635,7 +512,7 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
         for (unsigned int i=0; i<dim; ++i)
           for (unsigned int j=0; j<dim; ++j)
             data.contravariant[point][i][j]
-              += (data.derivative(point+data_set.offset(), k)[j]
+              += (data.derivative(point+data_set, k)[j]
                   *
                   data.mapping_support_points[k][i]);
 
@@ -811,7 +688,9 @@ MappingQ1<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterat
   
   compute_fill_face (cell, face_no, false,
 		     n_q_points,
-		     DataSetDescriptor::face (cell, face_no, n_q_points),
+		     DataSetDescriptor::face (face_no,
+                                              cell->face_orientation(face_no),
+                                              n_q_points),
 		     q.get_weights(),
 		     data,
 		     quadrature_points,
@@ -841,7 +720,9 @@ MappingQ1<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_ite
   
   compute_fill_face (cell, face_no, true,
 		     n_q_points,
-		     DataSetDescriptor::sub_face (cell, face_no, sub_no, n_q_points),
+		     DataSetDescriptor::sub_face (face_no, sub_no,
+                                                  cell->face_orientation(face_no),
+                                                  n_q_points),
 		     q.get_weights(),
 		     data,
 		     quadrature_points,
@@ -1163,7 +1044,3 @@ MappingQ1<dim>::transform_real_to_unit_cell_internal (
 //----------------------------------------------------------------------//
 
 template class MappingQ1<deal_II_dimension>;
-namespace internal
-{
-  template class DataSetDescriptor<deal_II_dimension>;
-}

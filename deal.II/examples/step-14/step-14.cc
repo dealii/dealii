@@ -3557,9 +3557,7 @@ namespace LaplaceSolver
 					 // assertion will be removed
 					 // anyway.
 	const active_cell_iterator neighbor_child
-	  = neighbor->child(GeometryInfo<dim>::
-			    child_cell_on_face(neighbor_neighbor,
-					       subface_no));
+          = cell->neighbor_child_on_subface (face_no, subface_no);
 	Assert (neighbor_child->face(neighbor_neighbor) ==
 		cell->face(face_no)->child(subface_no),
 		ExcInternalError());

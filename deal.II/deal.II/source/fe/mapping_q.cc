@@ -22,7 +22,6 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <dofs/dof_accessor.h>
-#include <fe/mapping_q1.h>
 #include <fe/fe_tools.h>
 
 #include <numeric>
@@ -339,8 +338,9 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
   const unsigned int n_q_points=q.n_quadrature_points;
   this->compute_fill_face (cell, face_no, false,
                            n_q_points,
-                           MappingQ1<dim>::DataSetDescriptor::
-                           face (cell, face_no, n_q_points),
+                           QProjector<dim>::DataSetDescriptor::
+                           face (face_no, cell->face_orientation(face_no),
+                                 n_q_points),
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
@@ -395,8 +395,10 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
   const unsigned int n_q_points=q.n_quadrature_points;
   this->compute_fill_face (cell, face_no, true,
                            n_q_points,
-                           MappingQ1<dim>::DataSetDescriptor::
-                           sub_face (cell, face_no, sub_no, n_q_points),
+                           QProjector<dim>::DataSetDescriptor::
+                           sub_face (face_no, sub_no,
+                                     cell->face_orientation(face_no),
+                                     n_q_points),
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,

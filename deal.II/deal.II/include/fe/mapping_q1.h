@@ -16,47 +16,19 @@
 
 #include <base/config.h>
 #include <base/table.h>
-#include <cmath>
+#include <base/quadrature.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/mapping.h>
 
+#include <cmath>
+
+
+
+
 
 /*!@addtogroup fe */
 /*@{*/
-
-namespace internal
-{
-  template <int dim>
-  class DataSetDescriptor
-  {
-    public:
-      DataSetDescriptor ();
-      
-      static DataSetDescriptor cell ();
-      
-      static
-      DataSetDescriptor
-      face (const typename DoFHandler<dim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int n_quadrature_points);
-
-      static
-      DataSetDescriptor
-      sub_face (const typename DoFHandler<dim>::cell_iterator &cell,
-                const unsigned int face_no,
-                const unsigned int subface_no,
-                const unsigned int n_quadrature_points);
-
-      unsigned int offset () const;
-      
-    private:
-      const unsigned int dataset_offset;
-
-      DataSetDescriptor (const unsigned int dataset_offset);
-  };
-}
-
 
 
 /**
@@ -385,12 +357,17 @@ class MappingQ1 : public Mapping<dim>
     DeclException0 (ExcAccessToUninitializedField);
 
   protected:
+
                                      /**
-                                      * Typedef the right data set
-                                      * descriptor to a local type to
-                                      * make use somewhat simpler.
+                                      * Declare a convenience typedef
+                                      * for the class that describes
+                                      * offsets into quadrature
+                                      * formulas projected onto faces
+                                      * and subfaces.
                                       */
-    typedef internal::DataSetDescriptor<dim> DataSetDescriptor;    
+    typedef
+    typename QProjector<dim>::DataSetDescriptor
+    DataSetDescriptor;
     
 				     /**
 				      * Implementation of the interface in

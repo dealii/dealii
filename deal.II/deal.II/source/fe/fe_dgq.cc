@@ -18,7 +18,6 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>
-#include <fe/mapping_q1.h>
 #include <fe/mapping.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_values.h>
@@ -766,7 +765,7 @@ FE_DGQ<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
   
   if (flags & update_second_derivatives)
     this->compute_2nd (mapping, cell,
-                       internal::DataSetDescriptor<dim>::cell().offset(),
+                       QProjector<dim>::DataSetDescriptor::cell(),
                        mapping_data, fe_data, data);
 }
 
@@ -791,10 +790,10 @@ FE_DGQ<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
 				   // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
-  const unsigned int offset
-    = (internal::DataSetDescriptor<dim>::
-       face (cell, face,
-             quadrature.n_quadrature_points)).offset();
+  const typename QProjector<dim>::DataSetDescriptor offset
+    = (QProjector<dim>::DataSetDescriptor::
+       face (face, cell->face_orientation(face),
+             quadrature.n_quadrature_points));
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
@@ -842,10 +841,10 @@ FE_DGQ<dim>::fill_fe_subface_values (const Mapping<dim>                   &mappi
 				   // offset determines which data set
 				   // to take (all data sets for all
 				   // sub-faces are stored contiguously)
-  const unsigned int offset
-    = (internal::DataSetDescriptor<dim>::
-       sub_face (cell, face, subface,
-                 quadrature.n_quadrature_points)).offset();
+  const typename QProjector<dim>::DataSetDescriptor offset
+    = (QProjector<dim>::DataSetDescriptor::
+       sub_face (face, subface, cell->face_orientation(face),
+                 quadrature.n_quadrature_points));
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 

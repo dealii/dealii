@@ -865,6 +865,10 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
 	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+  Assert (cell->has_children() == false,
+          ExcMessage ("You can't use subface data for cells that are "
+                      "already refined. Iterate over their children "
+                      "instead in these cases."));
   
   this->present_cell  = cell;
   this->my_orientation = this->orientation_table[face_no];

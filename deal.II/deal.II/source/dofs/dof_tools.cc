@@ -373,7 +373,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	      if (neighbor->level() < cell->level())
 		continue;
 
-	      unsigned int neighbor_face = cell->neighbor_of_neighbor(face);
+	      const unsigned int neighbor_face
+                = cell->neighbor_of_neighbor(face);
 
 	      if (neighbor->has_children())
 		{
@@ -381,35 +382,35 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		       sub_nr != GeometryInfo<dim>::subfaces_per_face;
 		       ++sub_nr)
 		    {
-		      typename DoFHandler<dim>::cell_iterator sub_neighbor
-			= neighbor->
-			child(GeometryInfo<dim>::child_cell_on_face(neighbor_face, sub_nr));
+		      const typename DoFHandler<dim>::cell_iterator
+                        sub_neighbor
+			= cell->neighbor_child_on_subface (face, sub_nr);
 
 		      sub_neighbor->get_dof_indices (dofs_on_other_cell);
 		      for (unsigned int i=0; i<total_dofs; ++i)
-			{
-			  for (unsigned int j=0; j<total_dofs; ++j)
-			    {
-			      sparsity.add (dofs_on_this_cell[i],
-					    dofs_on_other_cell[j]);
-			      sparsity.add (dofs_on_other_cell[i],
-					    dofs_on_this_cell[j]);
-			    }
-			}
+                        for (unsigned int j=0; j<total_dofs; ++j)
+                          {
+                            sparsity.add (dofs_on_this_cell[i],
+                                          dofs_on_other_cell[j]);
+                            sparsity.add (dofs_on_other_cell[i],
+                                          dofs_on_this_cell[j]);
+                          }
+			
 		      sub_neighbor->face(neighbor_face)->set_user_flag ();
 		    }
-		} else {
+		}
+              else
+                {
 		  neighbor->get_dof_indices (dofs_on_other_cell);
 		  for (unsigned int i=0; i<total_dofs; ++i)
-		    {
-		      for (unsigned int j=0; j<total_dofs; ++j)
-			{
-			  sparsity.add (dofs_on_this_cell[i],
-					dofs_on_other_cell[j]);
-			  sparsity.add (dofs_on_other_cell[i],
-					dofs_on_this_cell[j]);
-			}
-		    }
+                    for (unsigned int j=0; j<total_dofs; ++j)
+                      {
+                        sparsity.add (dofs_on_this_cell[i],
+                                      dofs_on_other_cell[j]);
+                        sparsity.add (dofs_on_other_cell[i],
+                                      dofs_on_this_cell[j]);
+                      }
+		
 		  neighbor->face(neighbor_face)->set_user_flag (); 
 		}
 	    } 
@@ -575,7 +576,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  typename DoFHandler<dim>::face_iterator cell_face = cell->face(face);
+	  const typename DoFHandler<dim>::face_iterator
+            cell_face = cell->face(face);
 	  if (cell_face->user_flag_set ())
 	    continue;
 
@@ -589,16 +591,12 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		      const bool j_non_zero_i = support_on_face (j, face);
 		      
 		      if (flux_dof_mask(i,j) == 'f')
-			{
-			  sparsity.add (dofs_on_this_cell[i],
-					dofs_on_this_cell[j]);
-			}
+                        sparsity.add (dofs_on_this_cell[i],
+                                      dofs_on_this_cell[j]);
 		      if (flux_dof_mask(i,j) == 'a')
-			{
-			  if (i_non_zero_i && j_non_zero_i)
-			    sparsity.add (dofs_on_this_cell[i],
-					  dofs_on_this_cell[j]);
-			}
+                        if (i_non_zero_i && j_non_zero_i)
+                          sparsity.add (dofs_on_this_cell[i],
+                                        dofs_on_this_cell[j]);
 		    }
 		}
 	    }
@@ -611,7 +609,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	      if (neighbor->level() < cell->level())
 		continue;
 
-	      unsigned int neighbor_face = cell->neighbor_of_neighbor(face);
+	      const unsigned int
+                neighbor_face = cell->neighbor_of_neighbor(face);
 
 	      if (neighbor->has_children())
 		{
@@ -619,9 +618,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		       sub_nr != GeometryInfo<dim>::subfaces_per_face;
 		       ++sub_nr)
 		    {
-		      typename DoFHandler<dim>::cell_iterator sub_neighbor
-			= neighbor->
-			child(GeometryInfo<dim>::child_cell_on_face(neighbor_face, sub_nr));
+		      const typename DoFHandler<dim>::cell_iterator
+                        sub_neighbor
+			= cell->neighbor_child_on_subface (face, sub_nr);
 
 		      sub_neighbor->get_dof_indices (dofs_on_other_cell);
 		      for (unsigned int i=0; i<total_dofs; ++i)
@@ -693,7 +692,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 			}
 		      sub_neighbor->face(neighbor_face)->set_user_flag ();
 		    }
-		} else {
+		}
+              else
+                {
 		  neighbor->get_dof_indices (dofs_on_other_cell);
 		  for (unsigned int i=0; i<total_dofs; ++i)
 		    {

@@ -32,15 +32,26 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3 style="color:red">Incompatibilities</h3>
 
 <ol>
+  <li> <p>
+       Changed: The <code class="class">QProjector</class> has functions that
+       project a lower-dimensional quadrature formula onto all faces or
+       subfaces of a cell. In 3d, it now does this but also adds projections of
+       these quadrature formula onto the faces from the other side. We need
+       this due to the fact that we now support faces in 3d that have a normal
+       vector opposite to the standard direction.
+       <br> 
+       (WB 2003/10/17)
+       </p>
+
   <li> <p> Moved and changed: The header file
-  <tt>include/numerics/dof_renumbering.h</tt> has been moved to the
-  directory <tt>include/dofs</tt>, where it logically
-  belongs. Furthermore, the sorting parameter of the function <code
-  class="class">DoFRenumbering</code>::<code
-  class="member">component_wise</code> has changed its meaning. See
-  the reference documentation for details.
-  <br>
-  (GK 2003/07/03)
+       <tt>include/numerics/dof_renumbering.h</tt> has been moved to the 
+       directory <tt>include/dofs</tt>, where it logically
+       belongs. Furthermore, the sorting parameter of the function <code
+       class="class">DoFRenumbering</code>::<code
+       class="member">component_wise</code> has changed its meaning. See
+       the reference documentation for details.
+       <br>
+       (GK 2003/07/03)
 </ol>
 
 
@@ -48,6 +59,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p>
+       Augmented: The <code
+       class="member">GeometryInfo::child_cell_on_face</code> 
+       results in a result that might not be what you expect in 3d in some
+       cases. A warning has been added to the documentation, as well as a
+       reference to the function to call instead.
+       <br> 
+       (WB 2003/10/17)
+       </p>
+
   <li> <p> Fixed: The step-14 program had a bug in the rare case that
        there are more CPUs in a machine than there are cells. This is
        now fixed.
@@ -235,6 +256,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: There is now a function <code
+       class="member">CellAccessor::neighbor_child_on_subface</code> 
+       that should be called instead of using <code
+       class="member">GeometryInfo::child_cell_on_face</code> in most cases.
+       <br> 
+       (WB 2003/10/17)
+       </p>
+
   <li> <p>
        New: <code class="class">GridGenerator</code> has a new
        function <code class="member">subdivided_hyper_rectangle</code> 

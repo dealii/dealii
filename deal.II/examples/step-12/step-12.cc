@@ -959,9 +959,9 @@ void DGMethod<dim>::assemble_system1 ()
 						       // `behind' the
 						       // current
 						       // subface.
-		      typename DoFHandler<dim>::active_cell_iterator neighbor_child=
-			neighbor->child(GeometryInfo<dim>::
-					child_cell_on_face(neighbor2,subface_no));
+		      typename DoFHandler<dim>::active_cell_iterator
+                        neighbor_child
+                        = cell->neighbor_child_on_subface (face_no, subface_no);
 		      
 						       // As these are
 						       // quite
@@ -1123,9 +1123,10 @@ void DGMethod<dim>::assemble_system1 ()
 		      const unsigned int neighbor_face_no=faceno_subfaceno.first,
 				      neighbor_subface_no=faceno_subfaceno.second;
 
-		      Assert (neighbor->neighbor(neighbor_face_no)
-			      ->child(GeometryInfo<dim>::child_cell_on_face(
-				face_no,neighbor_subface_no)) == cell, ExcInternalError());
+		      Assert (neighbor->neighbor_child_on_subface (neighbor_face_no,
+                                                                   neighbor_subface_no)
+                              == cell,
+                              ExcInternalError());
 
 						       // Reinit the
 						       // appropriate
@@ -1310,9 +1311,8 @@ void DGMethod<dim>::assemble_system2 ()
 		       subface_no<GeometryInfo<dim>::subfaces_per_face;
 		       ++subface_no)
 		    {
-		      typename DoFHandler<dim>::cell_iterator neighbor_child=
-			neighbor->child(GeometryInfo<dim>::child_cell_on_face(
-			  neighbor2,subface_no));
+		      typename DoFHandler<dim>::cell_iterator neighbor_child
+                        = cell->neighbor_child_on_subface (face_no, subface_no);
 		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
 			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());

@@ -878,6 +878,120 @@ QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
 
 
 
+template <int dim>
+typename QProjector<dim>::DataSetDescriptor
+QProjector<dim>::DataSetDescriptor::cell ()
+{
+  return 0;
+}
+
+
+template <int dim>
+typename QProjector<dim>::DataSetDescriptor
+QProjector<dim>::DataSetDescriptor::
+face (const unsigned int face_no,
+      const bool         face_orientation,
+      const unsigned int n_quadrature_points)
+{
+  Assert (dim != 1, ExcInternalError());
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+          ExcInternalError());
+  Assert (n_quadrature_points > 0, ExcInternalError());
+    
+  switch (dim)
+    {
+      case 1:
+      case 2:
+            return face_no * n_quadrature_points;
+
+                                             // in 3d, we have to
+                                             // account for faces
+                                             // that have reverse
+                                             // orientation. thus,
+                                             // we have to store
+                                             // _two_ data sets per
+                                             // face or subface
+      case 3:
+            return ((face_no +
+                     (face_orientation == true ?
+                      0 : GeometryInfo<dim>::faces_per_cell))
+                    * n_quadrature_points);
+
+      default:
+            Assert (false, ExcInternalError());
+    }
+  return static_cast<unsigned int>(-1);
+}
+
+
+
+template <int dim>
+typename QProjector<dim>::DataSetDescriptor
+QProjector<dim>::DataSetDescriptor::
+sub_face (const unsigned int face_no,
+          const unsigned int subface_no,
+          const bool         face_orientation,
+          const unsigned int n_quadrature_points)
+{
+  Assert (dim != 1, ExcInternalError());
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+          ExcInternalError());
+                                   // the trick with +1 prevents
+                                   // that we get a warning in 1d
+  Assert (subface_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
+          ExcInternalError());
+  Assert (n_quadrature_points > 0, ExcInternalError());
+
+  switch (dim)
+    {
+      case 1:
+      case 2:
+            return ((face_no * GeometryInfo<dim>::subfaces_per_face +
+                     subface_no)
+                    * n_quadrature_points);
+
+                                             // for 3d, same as above:
+      case 3:
+            return (((face_no * GeometryInfo<dim>::subfaces_per_face +
+                      subface_no)
+                     + (face_orientation == true ?
+                        0 :
+                        GeometryInfo<dim>::faces_per_cell *
+                        GeometryInfo<dim>::subfaces_per_face)
+                     )
+                    * n_quadrature_points);
+      default:
+            Assert (false, ExcInternalError());
+    }
+  return static_cast<unsigned int>(-1);              
+}
+
+
+template <int dim>
+QProjector<dim>::DataSetDescriptor::operator unsigned int () const
+{
+  return dataset_offset;
+}
+
+
+
+template <int dim>
+QProjector<dim>::DataSetDescriptor::
+DataSetDescriptor (const unsigned int dataset_offset)
+                :
+                dataset_offset (dataset_offset)
+{}
+
+
+template <int dim>
+QProjector<dim>::DataSetDescriptor::
+DataSetDescriptor ()
+                :
+                dataset_offset (static_cast<unsigned int>(-1))
+{}
+
+
+
 // ------------------------------------------------------------ //
 
 

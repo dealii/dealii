@@ -19,7 +19,6 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/mapping_cartesian.h>
-#include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 
 #include <cmath>
@@ -135,13 +134,29 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 				     std::vector<Point<dim> > &quadrature_points,
 				     std::vector<Point<dim> > &normal_vectors) const
 {
-  UpdateFlags update_flags(data.current_update_flags());
+  const UpdateFlags update_flags(data.current_update_flags());
 
   const unsigned int npts = quadrature_points.size ();
 
-  typedef typename internal::DataSetDescriptor<dim> DataSetDescriptor;
-  unsigned int offset = DataSetDescriptor::cell().offset();
+  const typename QProjector<dim>::DataSetDescriptor offset
+    = (face_no == invalid_face_number
+       ?
+       QProjector<dim>::DataSetDescriptor::cell()
+       :
+       (sub_no == invalid_face_number
+        ?
+					 // called from FEFaceValues
+        QProjector<dim>::DataSetDescriptor::face (face_no,
+                                                  cell->face_orientation(face_no),
+                                                  quadrature_points.size())
+        :
+					 // called from FESubfaceValues
+        QProjector<dim>::DataSetDescriptor::sub_face (face_no, sub_no,
+                                                      cell->face_orientation(face_no),
+                                                      quadrature_points.size())
+        ));
   
+                                   // some more sanity checks
   if (face_no != invalid_face_number)
     {
 				       // Add 1 on both sides of
@@ -151,23 +166,11 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
       Assert (face_no+1 < GeometryInfo<dim>::faces_per_cell+1,
 	      ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-      if (sub_no == invalid_face_number)
-					 // called from FEFaceValues
-	offset = DataSetDescriptor::face (cell, face_no,
-                                          quadrature_points.size()).offset();
-      else
-	{
-					   // called from
-                                           // FESubfaceValue (do the
-                                           // +1 trick to avoid a
-                                           // warning about comparison
-                                           // always being false in
-                                           // 1d)
-	  Assert (sub_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
-		  ExcIndexRange (sub_no, 0, GeometryInfo<dim>::subfaces_per_face));
-	  offset = DataSetDescriptor::sub_face (cell, face_no, sub_no,
-                                                quadrature_points.size()).offset();
-	}
+      Assert ((sub_no == invalid_face_number)
+              ||
+              (sub_no+1 < GeometryInfo<dim>::subfaces_per_face+1),
+              ExcIndexRange (sub_no, 0,
+                             GeometryInfo<dim>::subfaces_per_face));
     }
   else
 				     // invalid face number, so
@@ -365,17 +368,14 @@ MappingCartesian<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell
       J *= data.length[d];
   
   if (data.current_update_flags() & update_JxW_values)
-    {
-      for (unsigned int i=0; i<JxW_values.size();++i)
-	JxW_values[i] = J * q.weight(i);
-    }
+    for (unsigned int i=0; i<JxW_values.size();++i)
+      JxW_values[i] = J * q.weight(i);
 
   if (data.current_update_flags() & update_boundary_forms)
-    {
-      for (unsigned int i=0; i<boundary_forms.size();++i)
-	boundary_forms[i] = J * normal_vectors[i];
-    }
+    for (unsigned int i=0; i<boundary_forms.size();++i)
+      boundary_forms[i] = J * normal_vectors[i];
 }
+
 
 
 template <int dim>
@@ -411,16 +411,12 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::c
       J *= data.length[d];
   
   if (data.current_update_flags() & update_JxW_values)
-    {
-      for (unsigned int i=0; i<JxW_values.size();++i)
-	JxW_values[i] = J * q.weight(i) / GeometryInfo<dim>::subfaces_per_face;
-    }
+    for (unsigned int i=0; i<JxW_values.size();++i)
+      JxW_values[i] = J * q.weight(i) / GeometryInfo<dim>::subfaces_per_face;
 
   if (data.current_update_flags() & update_boundary_forms)
-    {
-      for (unsigned int i=0; i<boundary_forms.size();++i)
-	boundary_forms[i] = J * normal_vectors[i];
-    }
+    for (unsigned int i=0; i<boundary_forms.size();++i)
+      boundary_forms[i] = J * normal_vectors[i];
 }
 
 
@@ -476,8 +472,8 @@ MappingCartesian<dim>::transform_covariant (Tensor<1,dim>       *begin,
     {
       for (unsigned int d=0;d<dim;++d)
 	(*begin)[d] = (*src)[d]/data.length[d];
-      begin++;
-      src++;
+      ++begin;
+      ++src;
     }
 }
 
@@ -502,8 +498,8 @@ MappingCartesian<dim>::transform_covariant (Tensor<2,dim>       *begin,
       for (unsigned int d=0; d<dim; ++d)
         for (unsigned int p=0; p<dim; ++p)
 	(*begin)[d][p] = (*src)[d][p] / data.length[p];
-      begin++;
-      src++;
+      ++begin;
+      ++src;
     }
 }
 
@@ -561,8 +557,8 @@ MappingCartesian<dim>::transform_contravariant (Tensor<2,dim>       *begin,
       for (unsigned int d=0; d<dim; ++d)
         for (unsigned int p=0; p<dim; ++p)
 	(*begin)[d][p] = data.length[d] * (*src)[d][p];
-      begin++;
-      src++;
+      ++begin;
+      ++src;
     }
 }
 
@@ -596,7 +592,7 @@ MappingCartesian<dim>::transform_unit_to_real_cell (
 
   Point<dim> p_real = cell->vertex(0);
   for (unsigned int d=0; d<dim; ++d)
-    p_real(d) +=length[d]*p(d);
+    p_real(d) += length[d]*p(d);
 
   return p_real;
 }
