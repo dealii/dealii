@@ -11,38 +11,40 @@ help:
 	@echo " (4) 1d 2d 3d: (2) and deal.II for specified dimension"
 	@echo " (5) all: 1d, 2d and 3d"
 	@echo
-#	@echo The following additional parameters may be specified to make:
-#	@echo 
-#	@echo
+	@echo The following additional parameters may be specified to make:
+	@echo PAR=-jn where n is the number of parallel processes
+	@echo
+
+MAKEOPTIONS = $(PAR)
 
 baseg:
-	cd ../base/source ; $(MAKE) lib.g.a
+	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a
 
 base:
-	cd ../base/source ; $(MAKE) lib.g.a lib.a
+	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a lib.a
 
 lacg: baseg
-	cd ../lac/source ; $(MAKE) lib.g.a
+	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a
 
 lac: base
-	cd ../lac/source ; $(MAKE) lib.g.a lib.a
+	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) lib.g.a lib.a
 
 1d: baseg lacg base lac
-	cd ../deal.II/source ; $(MAKE) 1d
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 1d
 
 2d: base lac
-	cd ../deal.II/source ; $(MAKE) 2d
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 2d
 
 3d: base lac
-	cd ../deal.II/source ; $(MAKE) 3d
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 3d
 
 1dg: baseg lacg
-	cd ../deal.II/source ; $(MAKE) 1dg
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 1dg
 
 2dg: baseg lacg
-	cd ../deal.II/source ; $(MAKE) 2dg
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 2dg
 
 3dg: baseg lacg
-	cd ../deal.II/source ; $(MAKE) 3dg
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 3dg
 
 all: base lac 2d 1d 3d
