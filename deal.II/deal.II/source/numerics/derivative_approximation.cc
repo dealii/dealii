@@ -1,4 +1,4 @@
-//----------------------------  gradient_estimator.cc  ---------------------------
+//----------------------------  derivative_approximation.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  gradient_estimator.cc  ---------------------------
+//----------------------------  derivative_approximation.cc  ---------------------------
 
 
 #include <base/quadrature_lib.h>
@@ -21,7 +21,7 @@
 #include <dofs/dof_handler.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <numerics/gradient_estimator.h>
+#include <numerics/derivative_approximation.h>
 
 
 template <typename T>
