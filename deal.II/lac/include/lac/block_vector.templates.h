@@ -493,6 +493,7 @@ BlockVector<Number>& BlockVector<Number>::operator = (const Number s)
 {
   for (unsigned int i=0;i<num_blocks;++i)
     {
+      if (components[i].size() != 0)
       components[i] = s;
     }
   return *this;

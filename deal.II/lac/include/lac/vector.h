@@ -646,7 +646,9 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
   if (n==0) 
     {
       if (val) delete[] val;
-      val = 0;
+				       // one entry must be allocated
+				       // for begin() and end()
+      val = new value_type[1];
       maxdim = dim = 0;
       return;
     };
@@ -689,6 +691,7 @@ inline
 typename Vector<Number>::iterator 
 Vector<Number>::begin () 
 {
+  Assert (val!=0, ExcEmptyVector());
   return &val[0];
 }
 
@@ -699,6 +702,7 @@ inline
 typename Vector<Number>::const_iterator 
 Vector<Number>::begin () const 
 {
+  Assert (val!=0, ExcEmptyVector());
   return &val[0];
 }
 
@@ -709,6 +713,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::end () 
 {
+  Assert (val!=0, ExcEmptyVector());
   return &val[dim];
 }
 
@@ -719,6 +724,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::end () const
 {
+  Assert (val!=0, ExcEmptyVector());
   return &val[dim];
 }
 
@@ -769,7 +775,7 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   std::fill (begin(), end(), s);
   return *this;
 }

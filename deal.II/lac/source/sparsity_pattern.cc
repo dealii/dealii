@@ -257,13 +257,13 @@ SparsityPattern::reinit (const unsigned int               m,
   cols = n;
 
 				   // delete empty matrices
-  if ((m==0) || (n==0))
+  if (m==0)
     {
       if (rowstart)  delete[] rowstart;
       if (colnums)   delete[] colnums;
-      rowstart = 0;
-      colnums = 0;
-      max_vec_len = max_dim = rows = cols = 0;
+      rowstart = new unsigned int[0];
+      colnums = new unsigned int[0];
+      max_vec_len = max_dim = 0;
 				       // if dimension is zero: ignore
 				       // max_per_row
       max_row_length = 0;
@@ -532,7 +532,7 @@ SparsityPattern::empty () const
 				   // know at how many places I missed
 				   // something in adding it, so I try to
 				   // be cautious. wb)
-  if ((rowstart==0) || (rows==0) || (cols==0))
+  if (rowstart==0)
     {
       Assert (rowstart==0, ExcInternalError());
       Assert (rows==0, ExcInternalError());

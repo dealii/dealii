@@ -95,7 +95,7 @@ Vector<Number>::swap (Vector<Number> &v)
 template <typename Number>
 bool Vector<Number>::all_zero () const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   
   const_iterator p = begin(),
 		 e = end();
@@ -110,7 +110,7 @@ template <typename Number>
 template <typename Number2>
 Number Vector<Number>::operator * (const Vector<Number2>& v) const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   
   if (this == reinterpret_cast<const Vector<Number>*>(&v))
     return norm_sqr();
@@ -146,7 +146,7 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 template <typename Number>
 Number Vector<Number>::norm_sqr () const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -176,7 +176,7 @@ Number Vector<Number>::norm_sqr () const
 template <typename Number>
 Number Vector<Number>::mean_value () const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -206,7 +206,7 @@ Number Vector<Number>::mean_value () const
 template <typename Number>
 Number Vector<Number>::l1_norm () const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -243,7 +243,7 @@ Number Vector<Number>::l2_norm () const
 template <typename Number>
 Number Vector<Number>::lp_norm (const Number p) const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -274,7 +274,7 @@ Number Vector<Number>::lp_norm (const Number p) const
 template <typename Number>
 Number Vector<Number>::linfty_norm () const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   Number max0=0.,
 	 max1=0.,
@@ -300,7 +300,7 @@ Number Vector<Number>::linfty_norm () const
 template <typename Number>
 Vector<Number>& Vector<Number>::operator += (const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   add (v);
   return *this;
@@ -310,7 +310,7 @@ Vector<Number>& Vector<Number>::operator += (const Vector<Number>& v)
 template <typename Number>
 Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
 
   iterator i_ptr = begin(),
@@ -326,7 +326,7 @@ Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
 template <typename Number>
 void Vector<Number>::add (const Number v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -338,7 +338,7 @@ void Vector<Number>::add (const Number v)
 template <typename Number>
 void Vector<Number>::add (const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
 
   iterator i_ptr = begin(),
@@ -352,7 +352,7 @@ void Vector<Number>::add (const Vector<Number>& v)
 template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
 
   iterator i_ptr = begin(),
@@ -367,7 +367,7 @@ template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v,
 			  const Number b, const Vector<Number>& w)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
   iterator i_ptr = begin(),
@@ -382,7 +382,7 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -396,7 +396,7 @@ template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a,
                            const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -411,7 +411,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& v, const Number b,
                            const Vector<Number>& w)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
   iterator i_ptr = begin(),
@@ -429,7 +429,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& w, const Number c,
                            const Vector<Number>& y)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
   Assert (dim == y.dim, ExcDimensionMismatch(dim, y.dim));
@@ -448,7 +448,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
 template <typename Number>
 void Vector<Number>::scale (const Number factor)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   iterator             ptr  = begin();
   const const_iterator eptr = end();
@@ -462,7 +462,7 @@ template <typename Number>
 template <typename Number2>
 void Vector<Number>::scale (const Vector<Number2> &s)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == s.dim, ExcDimensionMismatch(dim, s.dim));
   
   iterator             ptr  = begin();
@@ -478,7 +478,7 @@ template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 			  const Number b, const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == u.dim, ExcDimensionMismatch(dim, u.dim));
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   iterator i_ptr = begin(),
@@ -495,7 +495,7 @@ template <typename Number>
 template <typename Number2>
 void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (dim == u.dim, ExcDimensionMismatch(dim, u.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -509,7 +509,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
 template <typename Number>
 void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   Assert (a.dim == b.dim, ExcDimensionMismatch (a.dim, b.dim));
 
 				   // no need to reinit with zeros, since
@@ -531,7 +531,7 @@ Vector<Number>::operator = (const Vector<Number>& v)
 {
   if (v.dim != dim)
     reinit (v.dim, true);
-  if (dim!=0)
+  if (val!=0)
     std::copy (v.begin(), v.end(), begin());
   
   return *this;
@@ -546,7 +546,7 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 {
   if (v.size() != dim)
     reinit (v.size(), true);
-  if (dim!=0)
+  if (val!=0)
     std::copy (v.begin(), v.end(), begin());
   
   return *this;
@@ -557,7 +557,7 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 template <typename Number>
 void Vector<Number>::print (const char* format) const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
   if (!format) format = " %5.2f";
   for (unsigned int j=0;j<size();j++)
     std::printf (format, val[j]);
@@ -572,7 +572,7 @@ void Vector<Number>::print (std::ostream      &out,
 			    const bool         scientific,
 			    const bool         across) const
 {
-  Assert (dim!=0, ExcEmptyVector());
+  Assert (val!=0, ExcEmptyVector());
 
   out.precision (precision);
   if (scientific)

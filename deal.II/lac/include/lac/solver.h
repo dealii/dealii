@@ -20,6 +20,9 @@ template <typename number> class Vector;
 template <class VECTOR>    class VectorMemory;
 class SolverControl;
 
+/*! @addtogroup Solvers
+ * @{
+ */
 
 /**
  * Base class for iterative solvers.  This class defines possible
@@ -173,6 +176,9 @@ class Solver : public Subscriptor
 				      */
     VectorMemory<VECTOR> &memory;
 };
+/*!
+ * @}
+ */
 
 
 /*-------------------------------- Inline functions ------------------------*/
@@ -192,6 +198,5 @@ Solver<VECTOR>::Solver(SolverControl &cn, VectorMemory<VECTOR> &mem)
 		: cntrl(cn),
 		  memory(mem)
 {}
-
 
 #endif
