@@ -79,6 +79,7 @@ template <int dim>
 class TestCases : public MultipleParameterLoop::UserClass{
   public:
     TestCases ();
+    ~TestCases ();
     
     virtual void create_new (const unsigned int run_no);
     virtual void declare_parameters (ParameterHandler &prm);
@@ -94,6 +95,14 @@ class TestCases : public MultipleParameterLoop::UserClass{
 template <int dim>
 TestCases<dim>::TestCases () :
 		tria(0), dof(0) {};
+
+
+template <int dim>
+TestCases<dim>::~TestCases () 
+{
+  if (tria) delete tria;
+  if (dof)  delete dof;
+};
 
 
 
