@@ -18,7 +18,7 @@
 
 #include <vector>
 #include <map>
-#include <list>
+#include <set>
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
 
@@ -984,7 +984,7 @@ class DoFHandler  :  public Subscriptor,
 				      * consideration.
 				      */
     unsigned int
-    n_boundary_dofs (const list<unsigned char> &boundary_indicators) const;
+    n_boundary_dofs (const set<unsigned char> &boundary_indicators) const;
 
 				     /**
 				      * Return a constant reference to the

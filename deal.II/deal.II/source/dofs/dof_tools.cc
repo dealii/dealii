@@ -823,12 +823,21 @@ template <int dim>
 void
 DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
 				 const vector<bool>    &component_select,
-				 vector<bool>          &selected_dofs)
+				 vector<bool>          &selected_dofs,
+				 const set<unsigned char> &boundary_indicators)
 {
   Assert (component_select.size() == dof_handler.get_fe().n_components(),
 	  ExcWrongSize (component_select.size(),
 			dof_handler.get_fe().n_components()));
+  Assert (boundary_indicators.find (255) == boundary_indicators.end(),
+	  ExcInvalidBoundaryIndicator());
 
+				   // let's see whether we have to
+				   // check for certain boundary
+				   // indicators or whether we can
+				   // accept all
+  const bool check_boundary_indicator = (boundary_indicators.size() != 0);
+  
 				   // clear and reset array by default
 				   // values
   selected_dofs.clear ();
@@ -838,6 +847,9 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
        cell!=dof_handler.end(); ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
       if (cell->at_boundary(face))
+	if (! check_boundary_indicator ||
+	    (boundary_indicators.find (cell->face(face)->boundary_indicator())
+	     != boundary_indicators.end()))
 	{
 	  cell->face(face)->get_dof_indices (face_dof_indices);
 	  for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
@@ -1583,7 +1595,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
 
 template <>
 void DoFTools::map_dof_to_boundary_indices (const DoFHandler<1> &dof_handler,
-					    const list<unsigned char> &,
+					    const set<unsigned char> &,
 					    vector<unsigned int> &)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
@@ -1626,15 +1638,12 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim> &dof_handler,
 
 
 template <int dim>
-void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handler,
-					    const list<unsigned char> &boundary_indicators,
-					    vector<unsigned int>      &mapping)
+void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>    &dof_handler,
+					    const set<unsigned char> &boundary_indicators,
+					    vector<unsigned int>     &mapping)
 {
   Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-  Assert (find (boundary_indicators.begin(),
-		boundary_indicators.end(),
-		255) ==
-	  boundary_indicators.end(),
+  Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
 
   mapping.clear ();
@@ -1652,9 +1661,7 @@ void DoFTools::map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handl
   typename DoFHandler<dim>::active_face_iterator face = dof_handler.begin_active_face(),
 						 endf = dof_handler.end_face();
   for (; face!=endf; ++face)
-    if (find (boundary_indicators.begin(),
-	      boundary_indicators.end(),
-	      face->boundary_indicator()) !=
+    if (boundary_indicators.find (face->boundary_indicator()) !=
 	boundary_indicators.end())
       {
 	face->get_dof_indices (dofs_on_face);
@@ -1761,7 +1768,7 @@ DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
 template
 void
 DoFTools::map_dof_to_boundary_indices (const DoFHandler<deal_II_dimension> &,
-				       const list<unsigned char> &,
+				       const set<unsigned char> &,
 				       vector<unsigned int> &);
 
 #endif 

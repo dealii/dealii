@@ -1154,7 +1154,7 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const
 
 
 template <>
-unsigned int DoFHandler<1>::n_boundary_dofs (const list<unsigned char> &) const
+unsigned int DoFHandler<1>::n_boundary_dofs (const set<unsigned char> &) const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcNotImplemented());
@@ -1216,13 +1216,10 @@ DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 
 template <int dim>
 unsigned int
-DoFHandler<dim>::n_boundary_dofs (const list<unsigned char> &boundary_indicators) const
+DoFHandler<dim>::n_boundary_dofs (const set<unsigned char> &boundary_indicators) const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (find (boundary_indicators.begin(),
-		boundary_indicators.end(),
-		255) ==
-	  boundary_indicators.end(),
+  Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
   
   set<int> boundary_dofs;

@@ -16,7 +16,7 @@
 
 #include <base/exceptions.h>
 #include <vector>
-#include <list>
+#include <set>
 
 class SparsityPattern;
 template <typename number> class Vector;
@@ -514,12 +514,24 @@ class DoFTools
 				      * belong to specified components
 				      * of the solution. The function
 				      * returns its results in the
-				      * last parameter which contains
-				      * @p{true} is a degree of freedom
-				      * is at the boundary and belongs
-				      * to one of the selected
+				      * last non-default-valued
+				      * parameter which contains
+				      * @p{true} if a degree of
+				      * freedom is at the boundary and
+				      * belongs to one of the selected
 				      * components, and @p{false}
 				      * otherwise.
+				      *
+				      * By specifying the
+				      * @p{boundary_indicator}
+				      * variable, you can select which
+				      * boundary indicators the faces
+				      * have to have on which the
+				      * degrees of freedom are located
+				      * that shall be extracted. If it
+				      * is an empty list, then all
+				      * boundary indicators are
+				      * accepted.
 				      *
 				      * The size of @p{component_select}
 				      * shall equal the number of
@@ -535,7 +547,8 @@ class DoFTools
     static void
     extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
 			   const vector<bool>    &component_select,
-			   vector<bool>          &selected_dofs);
+			   vector<bool>          &selected_dofs,
+			   const set<unsigned char> &boundary_indicators = set<unsigned char>());
 
 				     /**
 				      * Select all dofs that will be
@@ -829,9 +842,9 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    map_dof_to_boundary_indices (const DoFHandler<dim>     &dof_handler,
-				 const list<unsigned char> &boundary_indicators,
-				 vector<unsigned int>      &mapping);
+    map_dof_to_boundary_indices (const DoFHandler<dim>    &dof_handler,
+				 const set<unsigned char> &boundary_indicators,
+				 vector<unsigned int>     &mapping);
     
 				   
 				     /**

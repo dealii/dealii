@@ -515,6 +515,28 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Extend: <code class="member">DoFTools::extract_boundary_dofs</code>
+       now allows to also specify which boundary conditions shall be
+       considered. 
+       <br>
+       (WB 2000/12/04)
+       </p>
+
+  <li> <p>
+       New: some arguments of the functions 
+       <code class="member">DoFHandler::n_boundary_dofs</code>,
+       <code class="member">DoFTools::extract_boundary_dofs</code>,
+       and
+       <code class="member">DoFTools::map_dof_to_boundary_indices</code> 
+       are changed from <code class="class">list</code> to
+       <code class="class">set</code>, since that resembles more
+       closely the purpose of the parameter, and makes computations
+       slightly faster.
+       <br>
+       (WB 2000/12/04)
+       </p>
+
+  <li> <p>
        New: almost all classes that store data now have a function
        <code class="member">memory_consumption</code> that returns an
        estimate of the amount of memory (in bytes) used up by this
