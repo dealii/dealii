@@ -22,6 +22,7 @@
 #include <base/exceptions.h>
 #include <base/point.h>
 #include <grid/tria_iterator_base.h>
+#include <grid/forward_declarations.h>
 
 
 // note: in non-debug mode, i.e. with optimizations, the file
