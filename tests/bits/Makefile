@@ -47,6 +47,7 @@ dof_tools_10.exe        : dof_tools_10.g.$(OBJEXT)        $(libraries)
 dof_tools_11.exe        : dof_tools_11.g.$(OBJEXT)        $(libraries)
 dof_tools_12.exe        : dof_tools_12.g.$(OBJEXT)        $(libraries)
 dof_tools_13.exe        : dof_tools_13.g.$(OBJEXT)        $(libraries)
+dof_tools_14.exe        : dof_tools_14.g.$(OBJEXT)        $(libraries)
 gerold_1.exe            : gerold_1.g.$(OBJEXT)            $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)               $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
@@ -58,7 +59,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
         dof_tools_02a dof_tools_02b dof_tools_02c dof_tools_02d \
 	dof_tools_03 dof_tools_04 dof_tools_05 dof_tools_06 \
         dof_tools_07 dof_tools_08 dof_tools_09 dof_tools_10 \
-	dof_tools_11 dof_tools_12 dof_tools_13 \
+	dof_tools_11 dof_tools_12 dof_tools_13 dof_tools_14 \
 	roy_1 \
         denis_1 \
 	unit_support_points parameter_handler_1
