@@ -30,7 +30,34 @@ template <int dim> class MappingQ;
  * Lagrangian polynomials. The shape functions are Lagrangian
  * interpolants of an equidistant grid of points on the unit cell. The
  * points are numbered in lexicographical order, with @p x running
- * fastest.
+ * fastest, then @p y, then @z (if these coordinates are present for a
+ * given space dimension at all). For example, these are the node
+ * orderings for <tt>FE_DGQ(1)</tt> in 3d:
+ *  @verbatim
+ *         6-------7        6-------7
+ *        /|       |       /       /|
+ *       / |       |      /       / |
+ *      /  |       |     /       /  |
+ *     2   |       |    2-------3   |
+ *     |   4-------5    |       |   5
+ *     |  /       /     |       |  /
+ *     | /       /      |       | /
+ *     |/       /       |       |/
+ *     0-------1        0-------1
+ *  @endverbatim
+ * and <tt>FE_DGQ(2)</tt>:
+ *  @verbatim
+ *        24--25---26       24---25--26
+ *        /|       |       /       /|
+ *      15 |       |     15  16   17|
+ *      /  21 22   23    /       /  23
+ *     6   |       |    6---7---8   |
+ *     |  18--19---20   |       |   20
+ *     3  /       /     3   4   5  /
+ *     | 9  10   11     |       | 11
+ *     |/       /       |       |/
+ *     0---1---2        0---1---2
+ *  @endverbatim
  *
  * @author Ralf Hartmann, 2001, 2004, Guido Kanschat 2001
  */
