@@ -108,6 +108,33 @@ class GridGenerator
 			    const double        right= 1.);
 
 				     /**
+				      * Hypercube with a layer of
+				      * hypercubes around it. The
+				      * first two parameters give the
+				      * lower and upper bound of the
+				      * inner hypercube in all
+				      * coordinate directions. @p
+				      * thickness marks the size of
+				      * the layer cells.
+				      *
+				      * If the flag colorize is set,
+				      * the outer cells get material
+				      * id's according tho the
+				      * following scheme: extending
+				      * over the inner cube in
+				      * x-direction: 2. In y-direction
+				      * 4, in z-direction 8. The cells
+				      * at corners and edges (3d) get
+				      * these values bitwise or'd.
+				      */
+    template<int dim>
+    static void enclosed_hyper_cube (Triangulation<dim> &tria,
+	 			     const double        left = 0.,
+				     const double        right= 1.,
+				     const double        thickness = 1.,
+				     bool                colorize = false);
+
+				     /**
 				      * Initialize the given triangulation with a
 				      * hyperball, i.e. a circle or a ball.
 				      * See the general documentation for a
