@@ -587,9 +587,9 @@ namespace Functions
   
 /**
  * Given a wavenumber vector generate a cosine function. The
- * wavenumber coefficient is given as a @p{d}-dimensional point @p{k}
- * in Fourier space, and the function is then recovered as @p{f(x) =
- * cos(\sum_i k_i x_i) = Re(\exp(i k.x))}.
+ * wavenumber coefficient is given as a $d$-dimensional point $k$
+ * in Fourier space, and the function is then recovered as $f(x) =
+ * \cos(\sum_i k_i x_i) = Re(\exp(i k.x))$.
  *
  * The class has its name from the fact that it resembles one
  * component of a Fourier cosine decomposition.
@@ -646,9 +646,9 @@ namespace Functions
   
 /**
  * Given a wavenumber vector generate a sine function. The
- * wavenumber coefficient is given as a @p{d}-dimensional point @p{k}
- * in Fourier space, and the function is then recovered as @p{f(x) =
- * sin(\sum_i k_i x_i) = Im(\exp(i k.x))}.
+ * wavenumber coefficient is given as a $d$-dimensional point $k$
+ * in Fourier space, and the function is then recovered as $f(x) =
+ * \sin(\sum_i k_i x_i) = Im(\exp(i k.x))$.
  *
  * The class has its name from the fact that it resembles one
  * component of a Fourier sine decomposition.
@@ -705,9 +705,9 @@ namespace Functions
 /**
  * Given a sequence of wavenumber vectors and weights generate a sum
  * of sine functions. Each wavenumber coefficient is given as a
- * @p{d}-dimensional point @p{k} in Fourier space, and the entire
+ * $d$-dimensional point $k$ in Fourier space, and the entire
  * function is then recovered as
- * @p{f(x) = \sum_j w_j sin(\sum_i k_i x_i) = Im(\sum_j w_j \exp(i k.x))}.
+ * $f(x) = \sum_j w_j sin(\sum_i k_i x_i) = Im(\sum_j w_j \exp(i k.x))$.
  *
  * @author Wolfgang Bangerth, 2001
  */
@@ -771,9 +771,9 @@ namespace Functions
 /**
  * Given a sequence of wavenumber vectors and weights generate a sum
  * of cosine functions. Each wavenumber coefficient is given as a
- * @p{d}-dimensional point @p{k} in Fourier space, and the entire
+ * $d$-dimensional point $k$ in Fourier space, and the entire
  * function is then recovered as
- * @p{f(x) = \sum_j w_j cos(\sum_i k_i x_i) = Re(\sum_j w_j \exp(i k.x))}.
+ * $f(x) = \sum_j w_j cos(\sum_i k_i x_i) = Re(\sum_j w_j \exp(i k.x))$.
  *
  * @author Wolfgang Bangerth, 2001
  */
@@ -905,7 +905,11 @@ namespace Functions
 /**
  * Cut-off function in L-infinity for an arbitrary ball.  This
  * function is the characteristic function of a ball around @p{center}
- * with a specified @p{radius}. If vector valued, it can be restricted
+ * with a specified @p{radius}, that is,
+ * \f[
+ * f = \chi(B_r(c)).
+ * \f]
+ * If vector valued, it can be restricted
  * to a single component.
  *
  * @author Guido Kanschat, 2001, 2002
