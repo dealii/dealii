@@ -296,7 +296,7 @@ FE_Nedelec<dim>::shape_value_component (const unsigned int i,
 		  case 2: return (component == 0 ? p(1) : 0);
 							 // (0, 1-x)
 		  case 3: return (component == 0 ? 0 : 1-p(0));
-
+                        
 							 // there are
 							 // only four
 							 // shape
@@ -402,7 +402,7 @@ FE_Nedelec<dim>::shape_value_component (const unsigned int i,
 template <int dim>
 Tensor<1,dim>
 FE_Nedelec<dim>::shape_grad_component (const unsigned int i,
-				       const Point<dim> &/*p*/,
+				       const Point<dim> &p,
 				       const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
@@ -448,6 +448,79 @@ FE_Nedelec<dim>::shape_grad_component (const unsigned int i,
 	  };
       };
 
+      case 3:  // 3d
+      {
+	switch (degree)
+	  {
+					     // first order Nedelec
+					     // elements
+	    case 1:
+	    {
+					       // on the unit cell,
+					       // the gradients of
+					       // these shape
+					       // functions are
+					       // linear. we pack them
+					       // into an array,
+					       // knowing that it may
+					       // be expensive to
+					       // recompute the whole
+					       // array each
+					       // time. maybe some
+					       // clever compiler can
+					       // optimize this out,
+					       // seeing that except
+					       // for one element all
+					       // the other ones are
+					       // dead stores...
+					       //
+					       // the format is: first
+					       // index=shape function
+					       // number; second
+					       // index=vector
+					       // component, thrid
+					       // index=component
+					       // within gradient
+	      const double x = p(0),
+			   y = p(1),
+			   z = p(2);
+	      static const double unit_gradients[12][3][3]
+		= { { {0,-(1-z), -(1-y)}, {0,0,0}, {     0,      0, 0} },
+		    { {0,     0,      0}, {0,0,0}, { (1-y),     -x, 0} },
+                    { {0,    -z,  (1-y)}, {0,0,0}, {     0,      0, 0} },
+		    { {0,     0,      0}, {0,0,0}, {-(1-y), -(1-x), 0} },
+                    
+                    { {0, (1-z),     -y}, {0,0,0}, {     0,      0, 0} },
+		    { {0,     0,      0}, {0,0,0}, {     y,      x, 0} },
+                    { {0,     z,      y}, {0,0,0}, {     0,      0, 0} },
+		    { {0,     0,      0}, {0,0,0}, {    -y,  (1-x), 0} },
+                    
+                    { {0, 0, 0}, {-(1-z), 0, -(1-x)}, {0, 0, 0} },
+                    { {0, 0, 0}, { (1-z), 0,     -x}, {0, 0, 0} },
+                    { {0, 0, 0}, {     z, 0,      x}, {0, 0, 0} },
+                    { {0, 0, 0}, {    -z, 0,  (1-x)}, {0, 0, 0} } };
+                                               // note: simple check
+                                               // whether this can at
+                                               // all be: build the
+                                               // sum over all these
+                                               // tensors. since the
+                                               // sum of the shape
+                                               // functions is a
+                                               // constant, the
+                                               // gradient must
+                                               // necessarily be
+                                               // zero. this is in
+                                               // fact the case here,
+                                               // so test successfull
+	      return Tensor<1,dim>(unit_gradients[i][component]);
+	    };
+
+					     // no other degrees
+					     // implemented
+	    default:
+		  Assert (false, ExcNotImplemented());
+	  };
+      };
 				       // presently no other space
 				       // dimension implemented
       default:

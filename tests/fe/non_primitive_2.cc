@@ -226,10 +226,10 @@ test ()
 				   // for the stokes equation the
 				   // pressure does not couple to
 				   // itself
-  std::vector<std::vector<bool> > mask (dim+1, std::vector<bool> (dim+1, true));
-  mask[dim][dim] = false;
+//   std::vector<std::vector<bool> > mask (dim+1, std::vector<bool> (dim+1, true));
+//   mask[dim][dim] = false;
   
-  DoFTools::make_sparsity_pattern (dof_handler, mask, sparsity);
+  DoFTools::make_sparsity_pattern (dof_handler, /*mask,*/ sparsity);
   sparsity.compress ();
   
   SparseMatrix<double> A2 (sparsity);
@@ -257,7 +257,7 @@ test ()
 
 int main ()
 {
-  std::ofstream logfile("non_primitive_1.output");
+  std::ofstream logfile("non_primitive_2.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
