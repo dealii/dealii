@@ -45,7 +45,7 @@
  * The usual usage of this class is as follows:
  *
  * @code
- * ConditionalOStream pout(this_mpi_process==0);
+ * ConditionalOStream pout(std::cout, this_mpi_process==0);
  *
  *                                  // all processes print following
  *                                  // information to standard output
