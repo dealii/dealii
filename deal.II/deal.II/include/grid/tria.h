@@ -2728,6 +2728,19 @@ class Triangulation
     unsigned int n_levels () const;
 
 				     /**
+				      * Return the total number of vertices.
+				      * Some of them may not be used, which
+				      * usually happens upon coarsening of
+				      * a triangulation when some vertices are
+				      * discarded, but we do not want to
+				      * renumber the remaining one, leading to
+				      * holes in the numbers of used vertices.
+				      * You can get the number of used vertices
+				      * using #n_used_vertices# function.
+				      */
+    unsigned int n_vertices () const;
+    
+				     /**
 				      * Return the number of vertices that are
 				      * presently in use, i.e. belong to at least
 				      * one used element.
