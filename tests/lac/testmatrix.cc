@@ -14,6 +14,7 @@
 
 #include "testmatrix.h"
 #include <lac/sparse_matrix.h>
+#include <lac/vector.h>
 
 FDMatrix::FDMatrix(unsigned int nx, unsigned int ny)
 		:
@@ -107,141 +108,6 @@ FDMatrix::gnuplot_print(ostream& s, const Vector<number>& V) const
    s << endl;
 }
 
-FDMGTransfer::FDMGTransfer(unsigned int nx, unsigned int ny,
-			   unsigned int nlevels)
-		:
-		structures(nlevels), matrices(nlevels)
-{
-  unsigned int power = 1 << nlevels;
-  
-  Assert ((nx%power)==0, ExcDivide(nx,power));
-  Assert ((ny%power)==0, ExcDivide(ny,power));
-  
-  nx /= power;
-  ny /= power;
-  
-  for (unsigned int level = 0; level < nlevels; ++ level)
-    {
-      build_matrix(nx,ny,structures[level],matrices[level]);
-      nx *= 2;
-      ny *= 2;
-    }
-}
-
-void
-FDMGTransfer::build_matrix(unsigned int nx, unsigned int ny,
-			   SparsityPattern& structure, SparseMatrix<double>& matrix)
-{
-  structure.reinit((nx-1)*(ny-1),(2*nx-1)*(2*ny-1),9);
-  
-				   // Traverse all points of coarse grid
-  for (unsigned int i=1 ; i<ny; ++i)
-    for (unsigned int j=1 ; j<nx; ++j)
-      {
-					 // coarse grid point number
-	unsigned int ncoarse =j+(nx-1)*i -(nx-1) -1;
-					 // same point on fine grid
-	unsigned int nfine = 2*j+(4*nx-2)*i -(2*nx-1) -1;
-	
-	structure.add(ncoarse,nfine);
-					 // left
-	if (j>0)
-	  {
-	    structure.add(ncoarse,nfine-1);
-					     // lower left
-	    if (i>0)
-	      structure.add(ncoarse,nfine-(2*nx-1)-1);
-					     // upper left
-	    if (i<ny)
-	      structure.add(ncoarse,nfine+(2*nx-1)-1);
-	  }
-					 // right
-	if (j<nx)
-	  {
-	    structure.add(ncoarse, nfine+1);
-					     // lower right
-	    if (i>0)
-	      structure.add(ncoarse,nfine-(2*nx-1)+1);
-					     // upper right
-	    if (i<ny)
-	      structure.add(ncoarse,nfine+(2*nx-1)+1);
-	  }
-
-					     // lower
-	    if (i>0)
-	      structure.add(ncoarse,nfine-(2*nx-1));
-					     // upper
-	    if (i<ny)
-	      structure.add(ncoarse,nfine+(2*nx-1));
-      }
-
-  structure.compress();
-  matrix.reinit(structure);
-  
-  for (unsigned int i=1 ; i<ny; ++i)
-    for (unsigned int j=1 ; j<nx; ++j)
-      {
-					 // coarse grid point number
-	unsigned int ncoarse =j+(nx-1)*i -(nx-1) -1;
-					 // same point on fine grid
-	unsigned int nfine =2*j+(4*nx-2)*i -(2*nx-1) -1;
-	
-	matrix.set(ncoarse,nfine,1.);
-					 // left
-	if (j>0)
-	  {
-	    matrix.set(ncoarse,nfine-1,.5);
-					     // lower left
-	    if (i>0)
-	      matrix.set(ncoarse,nfine-(2*nx-1)-1,.25);
-					     // upper left
-	    if (i<ny)
-	      matrix.set(ncoarse,nfine+(2*nx-1)-1,.25);
-	  }
-					 // right
-	if (j<nx)
-	  {
-	    matrix.set(ncoarse,nfine+1,.5);
-					     // lower right
-	    if (i>0)
-	      matrix.set(ncoarse,nfine-(2*nx-1)+1,.25);
-					     // upper right
-	    if (i<ny)
-	      matrix.set(ncoarse,nfine+(2*nx-1)+1,.25);
-	  }
-
-					     // lower
-	    if (i>0)
-	      matrix.set(ncoarse,nfine-(2*nx-1),.5);
-					     // upper
-	    if (i<ny)
-	      matrix.set(ncoarse,nfine+(2*nx-1),.5);
-      }
-  
-}
-
-void
-FDMGTransfer::prolongate (const unsigned int   to_level,
-			  Vector<double>       &dst,
-			  const Vector<double> &src) const
-{
-  Assert((to_level>0) && (to_level<=matrices.size()),
-	 ExcIndexRange(to_level, 0, matrices.size()+1));
-  
-  matrices[to_level-1].Tvmult(dst,src);
-}
-
-
-void
-FDMGTransfer::restrict_and_add (const unsigned int   from_level,
-				Vector<double>       &dst,
-				const Vector<double> &src) const
-{
-  Assert((from_level>0) && (from_level<=matrices.size()),
-	 ExcIndexRange(from_level, 0, matrices.size()+1));
-
-  matrices[from_level-1].vmult(dst,src);
-}
 
 
 template void FDMatrix::laplacian(SparseMatrix<long double>&) const;

@@ -165,7 +165,6 @@ class Point : public Tensor<1,dim>
     DeclException0 (ExcInvalidConstructorCalled);
 };
 
-
 /*------------------------------- Inline functions: Point ---------------------------*/
 
 

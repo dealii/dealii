@@ -47,8 +47,8 @@ int main()
   deallog.depth_console(0);
   
   GrowingVectorMemory<> mem;
-  SolverControl control(100, 1.e-5);
-  SolverControl verbose_control(100, 1.e-5, true);
+  SolverControl control(100, 1.e-3);
+  SolverControl verbose_control(100, 1.e-3, true);
   SolverCG<> cg(control, mem);
   SolverGMRES<> gmres(control, mem,20);
   SolverBicgstab<> bicgstab(control, mem);

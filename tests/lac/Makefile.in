@@ -23,11 +23,9 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs.g   = $(lib-deal2-2d.g) \
-           $(lib-lac.g)      \
+libs.g   = $(lib-lac.g)      \
            $(lib-base.g)
-libs     = $(lib-deal2-2d.o) \
-           $(lib-lac.o)      \
+libs     = $(lib-lac.o)      \
            $(lib-base.o)
 
 
@@ -61,7 +59,6 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 
 
-# mgbase.check mg.check are removed until the sutructure of the
 # multigrid classes will be fixed.
 all: vector-vector.check block_vector.check block_matrices.check full_matrix.check solver.check
 exe: $(all:.check=.testcase) benchmark
