@@ -260,7 +260,7 @@ struct CellwiseError
     {
 	CellwiseError (const unsigned int n_errors);
 	std::vector<ErrorOnCell>                    errors;
-	typename ErrorOnCell* next_free_slot;
+	ErrorOnCell* next_free_slot;
     };
 
     Vector<float> estimated_error_per_cell;
