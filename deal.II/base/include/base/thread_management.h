@@ -15,10 +15,11 @@
 
 
 #ifdef DEAL_II_USE_MT
-#  include <base/exceptions.h>
 #  include <ace/Thread_Manager.h>
 #  include <ace/Synch.h>
 #endif
+
+#include <base/exceptions.h>
 
 #include <utility>
 #include <vector>
