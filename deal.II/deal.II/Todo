@@ -186,5 +186,19 @@ old argument 'const unsigned int selected_component'.
 
 Update documentation on Boundaries in Triangulation<dim> (Guido!)
 
+
+Make DataOut_Patch local to DataOutBase, as noted in the comment,
+  whenever the compiler happily accepts that.
+
+
 Fix MGTransferPrebuilt::build_matrices, think about diagonals in
 square sparse matrices.
+
+
+In GridOut::write_ucd, a vector of vertices is built along with
+  another vector stating which of these are used. These are actually
+  the same arrays as exist already in the triangulation, but I did not
+  want to write just another access function. However, someone should
+  take a look whether re-building these arrays is a large wast of
+  computing time and memory, or whether it is justifiable.
+
