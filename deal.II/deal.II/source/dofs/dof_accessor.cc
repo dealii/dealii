@@ -935,19 +935,19 @@ DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<Vector<float>,double>
-(const Vector<double>&, Vector<float>&) const;
-template
-void
-DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<Vector<double>,float>
-(const Vector<double>&, Vector<float>&) const;
-template
-void
 DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<Vector<double>,float>
-(const Vector<float>&, Vector<double>&) const;
+(const Vector<double>&, Vector<float>&) const;
 template
 void
 DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<Vector<float>,double>
+(const Vector<double>&, Vector<float>&) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<Vector<float>,double>
+(const Vector<float>&, Vector<double>&) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<Vector<double>,float>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
