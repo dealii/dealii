@@ -17,6 +17,7 @@ help:
 	@echo "= (7) printable-doc: generate the documentation in Postscript format.   ="
 	@echo "=     You need to have Doc++ and LaTeX installed for that.              ="
 	@echo "= (8) tex-doc: same, but only generate the LaTeX file, don't compile it ="
+	@echo "= (9) clean: removes all object files, libraries, etc in all subdirs    ="
 	@echo "=                                                                       ="
 	@echo "=The following additional parameters may be specified to make:          ="
 	@echo "=  PAR=-jn where n is the number of parallel processes for parallel     ="
@@ -94,8 +95,14 @@ tex-doc:
 	@echo
 	@echo
 
+clean:
+	cd ../base ; make clean
+	cd ../lac ; make clean
+	cd ../deal.II ; make clean
+	cd ../doc/auto ; make clean
+
 
 TAGS:
 	etags ../base/source/*.cc ../base/include/*/*.h ../lac/source/*.cc ../lac/include/*/*.h ../deal.II/source/*/*.cc ../deal.II/include/*/*.h
 
-.PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all online-doc printable-doc tex-doc TAGS
+.PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all online-doc printable-doc tex-doc clean TAGS
