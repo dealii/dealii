@@ -177,7 +177,7 @@ namespace
         }
         return 0;
     }
-};
+}
 
 
 //---------------------------------------------------------------------------
@@ -320,7 +320,7 @@ namespace
         }
         return true;
     }
-};
+}
 
 bool FunctionParser::isValidName(const std::string& name) const
 {
@@ -457,7 +457,7 @@ namespace
     {
         while(F[Ind] && isspace(F[Ind])) ++Ind;
     }
-};
+}
 
 // Returns an iterator to the variable with the same name as 'F', or to
 // Variables.end() if no such variable exists:
