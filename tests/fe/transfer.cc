@@ -50,7 +50,7 @@ print_matrix(std::ostream& of,
   MGDoFHandler<dim> dof(tr);
   dof.distribute_dofs(finel);
 
-  MGTransferPrebuilt transfer;
+  MGTransferPrebuilt<double> transfer;
   transfer.build_matrices(dof);
 
   unsigned int n_coarse = dof.n_dofs(level-1);
