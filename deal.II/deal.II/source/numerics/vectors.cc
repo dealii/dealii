@@ -91,8 +91,8 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 				   // avoided to evaluate
 				   // the vectorfunction multiply at
 				   // the same point on a cell.
-  std::vector<Point<dim> > unit_support_points;
-  fe.get_unit_support_points(unit_support_points);
+  const typename std::vector<Point<dim> > &
+    unit_support_points = fe.get_unit_support_points();
   Assert (unit_support_points.size() != 0,
 	  ExcNonInterpolatingFE());
 
@@ -630,8 +630,9 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 				   // support points. this wil be used
 				   // to obtain the quadrature points
 				   // on the real cell's face
-  typename std::vector<Point<dim-1> > unit_support_points;
-  fe.get_unit_face_support_points(unit_support_points);
+  const typename std::vector<Point<dim-1> >
+    & unit_support_points = fe.get_unit_face_support_points();
+  
 				   // check whether there are support
 				   // points on the face, if not, then
 				   // this FE does not allow to be

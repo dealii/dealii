@@ -50,8 +50,8 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 				   // the unit support points of the
 				   // fe2 element.
   std::vector<double> phantom_weights(fe2.dofs_per_cell,1.);
-  std::vector<Point<dim> > fe2_support_points (fe2.dofs_per_cell);
-  fe2.get_unit_support_points (fe2_support_points);
+  const typename std::vector<Point<dim> > &
+    fe2_support_points = fe2.get_unit_support_points ();
   Quadrature<dim> fe2_support_points_quadrature(fe2_support_points,
 						phantom_weights);
 

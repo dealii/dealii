@@ -170,47 +170,7 @@ class FESystem : public FiniteElement<dim>
 				      * pointers to their base class,
 				      * rather than the class itself.
 				      */
-    virtual unsigned int memory_consumption () const;
-    
-				     /**
-				      * Return the support points of
-				      * the trial functions on the
-				      * unit cell.
-				      *
-				      * The order of points in the
-				      * array matches that returned by
-				      * the @p{cell->get_dof_indices}
-				      * function, but:
-				      *
-				      * If one of the base elements
-				      * has no support points, then it
-				      * makes no sense to define
-				      * support points for the
-				      * composed element, so return an
-				      * empty array to demonstrate
-				      * that fact.
-				      */
-    virtual void get_unit_support_points (typename std::vector<Point<dim> > &) const;    
-
-				     /**
-				      * Return the support points of
-				      * the trial functions on the
-				      * first face of the unit cell.
-				      *
-				      * The order of points in the
-				      * array matches that returned by
-				      * the @p{cell->get_dof_indices}
-				      * function, but:
-				      *
-				      * If one of the base elements
-				      * has no support points, then it
-				      * makes no sense to define
-				      * support points for the
-				      * composed element, so return an
-				      * empty array to demonstrate
-				      * that fact.
-				      */
-    virtual void get_unit_face_support_points (typename std::vector<Point<dim-1> > &) const;    
+    virtual unsigned int memory_consumption () const;    
   
   protected:
 				     /**
@@ -339,6 +299,24 @@ class FESystem : public FiniteElement<dim>
 				      */
     typename std::vector<ElementPair> base_elements;
 
+
+				     /**
+				      * Initialize the
+				      * @p{unit_support_points} field
+				      * of the @ref{FiniteElementBase}
+				      * class. Called from the
+				      * constructor.
+				      */
+    void initialize_unit_support_points ();
+
+				     /**
+				      * Initialize the
+				      * @p{unit_face_support_points} field
+				      * of the @ref{FiniteElementBase}
+				      * class. Called from the
+				      * constructor.
+				      */
+    void initialize_unit_face_support_points ();
 
 				     /**
 				      * Helper function used in the constructor:

@@ -67,42 +67,6 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * are deleted properly.
 				      */
     virtual ~FiniteElement ();
-
-				     /**
-				      * Return the support points of the
-				      * trial functions on the unit cell.
-				      *
-				      * The order of points in the
-				      * array matches that returned by
-				      * the #cell->get_dof_indices#
-				      * function, but:
-				      *
-				      * If the shape functions are not
-				      * Lagrangian interpolants at
-				      * some points, the size of the
-				      * array will be zero after
-				      * calling this function. This is
-				      * the standard behavior, if the
-				      * function is not overloaded.
-				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &points) const;    
-    
-				     /**
-				      * Return the support points of
-				      * the trial functions on the
-				      * first face of the unit cell.
-				      *
-				      * The order of points in
-				      * the array matches that returned by
-				      * the #cell->get_dof_indices# function.
-				      *
-				      * If the shape functions are not
-				      * Lagrangian interpolants at some
-				      * points, the size of the array
-				      * will be zero. This is the standard behavior,
-				      * if the function is not overloaded.
-				      */
-    virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &points) const;    
     
 				     /**
 				      * Number of base elements in a mixed

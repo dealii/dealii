@@ -221,6 +221,56 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 
 
 template <int dim>
+const std::vector<Point<dim> > &
+FiniteElementBase<dim>::get_unit_support_points () const
+{
+				   // a finite element may define
+				   // support points, but only if
+				   // there are as many as there are
+				   // degrees of freedom
+  Assert ((unit_support_points.size() == 0) ||
+	  (unit_support_points.size() == dofs_per_cell),
+	  ExcInternalError());
+  return unit_support_points;
+};
+
+
+
+template <int dim>
+bool
+FiniteElementBase<dim>::has_support_points () const
+{
+  return (unit_support_points.size() != 0);
+};
+
+
+
+template <int dim>
+const std::vector<Point<dim-1> > &
+FiniteElementBase<dim>::get_unit_face_support_points () const
+{
+				   // a finite element may define
+				   // support points, but only if
+				   // there are as many as there are
+				   // degrees of freedom on a face
+  Assert ((unit_face_support_points.size() == 0) ||
+	  (unit_face_support_points.size() == dofs_per_face),
+	  ExcInternalError());
+  return unit_face_support_points;
+};
+
+
+
+template <int dim>
+bool
+FiniteElementBase<dim>::has_face_support_points () const
+{
+  return (unit_face_support_points.size() != 0);
+};
+
+
+
+template <int dim>
 unsigned int
 FiniteElementBase<dim>::memory_consumption () const
 {
@@ -332,26 +382,6 @@ FiniteElement<dim>::~FiniteElement ()
 {}
 
 
-
-template <int dim>
-void
-FiniteElement<dim>::get_unit_support_points (std::vector<Point<dim> > &points) const
-{
-				   // default implementation
-  points.resize(0);
-}
-
-
-    
-template <int dim>
-void
-FiniteElement<dim>::get_unit_face_support_points (std::vector<Point<dim-1> > &points) const
-{
-				   // default implementation
-  points.resize(0);
-}
-
-    
 
 template <int dim>
 Mapping<dim>::InternalDataBase*

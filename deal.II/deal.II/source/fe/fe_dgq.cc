@@ -161,6 +161,46 @@ FE_DGQ<dim>::FE_DGQ (unsigned int degree)
 				     // matrix undefined, set size to zero
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
       restriction[i].reinit(0);
+
+  
+				   // finally fill in support points
+  if (degree == 0)
+    {
+				       // constant elements, take
+				       // midpoint
+      unit_support_points.resize(1);
+      for (unsigned int i=0; i<dim; ++i)
+	unit_support_points[0](i) = 0.5;
+    }
+  else
+    {
+				       // number of points: (degree+1)^dim
+      unsigned int n = degree+1;
+      for (unsigned int i=1; i<dim; ++i)
+	n *= degree+1;
+      
+      unit_support_points.resize(n);
+      
+      const double step = 1./degree;
+      Point<dim> p;
+      
+      unsigned int k=0;
+      for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
+	for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
+	  for (unsigned int ix=0; ix<=degree; ++ix)
+	    {
+	      p(0) = ix * step;
+	      if (dim>1)
+		p(1) = iy * step;
+	      if (dim>2)
+		p(2) = iz * step;
+	      
+	      unit_support_points[k++] = p;
+	    };
+    };
+
+				   // note: no face support points for
+				   // DG elements
 };
 
 
@@ -184,31 +224,6 @@ FE_DGQ<dim>::clone() const
 }
 
 
-
-template <int dim>
-void
-FE_DGQ<dim>::get_unit_support_points (std::vector<Point<dim> > &points) const
-{
-  if (degree>0)
-    compute_support_points (points, degree);
-  else
-    {
-				       // constant elements, take
-				       // midpoint
-      points.resize(1);
-      for (unsigned int i=0; i<dim; ++i)
-	points[0](i)=0.5;
-    }
-}
-
-    
-template <int dim>
-void
-FE_DGQ<dim>::get_unit_face_support_points (std::vector<Point<dim-1> > &points) const
-{
-				   // no face support points
-  points.resize(0);
-}
 
 
 //----------------------------------------------------------------------
@@ -256,37 +271,6 @@ FE_DGQ<dim>::update_each (const UpdateFlags flags) const
   return out;
 }
 
-
-template <int dim>
-void
-FE_DGQ<dim>::compute_support_points (std::vector<Point<dim> > &support_points,
-				     const unsigned int degree)
-{
-  Assert(degree>0, ExcInternalError());
-				   // number of points: (degree+1)^dim
-  unsigned int n = degree+1;
-  for (unsigned int i=1;i<dim;++i)
-    n *= degree+1;
-
-  support_points.resize(n);
-  
-  const double step = 1./degree;
-  Point<dim> p;
-  
-  unsigned int k=0;
-  for (unsigned int iz=0;iz <= ((dim>2) ? degree : 0) ; ++iz)
-    for (unsigned int iy=0;iy <= ((dim>1) ? degree : 0) ; ++iy)
-      for (unsigned int ix=0;ix<=degree;++ix)
-        {
-	  p(0) = ix * step;
-	  if (dim>1)
-	    p(1) = iy * step;
-	  if (dim>2)
-	    p(2) = iz * step;
-	  
-	  support_points[k++] = p;
-	}
-}
 
 
 template <int dim>

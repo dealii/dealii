@@ -39,40 +39,6 @@ class FE_DGQ : public FiniteElement<dim>
     ~FE_DGQ ();
 
 				     /**
-				      * Return the support points of the
-				      * trial functions on the unit cell.
-				      *
-				      * The order of points in
-				      * the array matches that returned by
-				      * the #cell->get_dof_indices# function, but:
-				      *
-				      * If the shape functions are not
-				      * Lagrangian interpolants at some
-				      * points, the size of the array
-				      * will be zero. This is the standard behavior,
-				      * if the function is not overloaded.
-				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &) const;    
-    
-				     /**
-				      * Return the support points of
-				      * the trial functions on the
-				      * first face of the unit cell.
-				      *
-				      * The order of points in
-				      * the array matches that returned by
-				      * the #cell->get_dof_indices# function.
-				      *
-				      * If the shape functions are not
-				      * Lagrangian interpolants at some
-				      * points, the size of the array
-				      * will be zero. This is the standard behavior,
-				      * if the function is not overloaded.
-				      */
-    virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &) const;
-
-
-				     /**
 				      * Return the polynomial degree
 				      * of this finite element,
 				      * i.e. the value passed to the
@@ -227,13 +193,6 @@ class FE_DGQ : public FiniteElement<dim>
 				      */
     virtual UpdateFlags update_each (UpdateFlags flags) const;
   
-				     /**
-				      * Compute support points, only
-				      * for @p{degree>0}.
-				      */
-    static void compute_support_points (std::vector<Point<dim> > &support_points,
-					const                     unsigned int degree);
-
 				     /**
 				      * Compute renumbering for rotation
 				      * of degrees of freedom.

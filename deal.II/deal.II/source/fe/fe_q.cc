@@ -570,7 +570,13 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
       default:
 	    Assert (false,ExcNotImplemented());
     }
-}
+
+				   // finally fill in support points
+				   // on cell and face
+  initialize_unit_support_points ();
+  initialize_unit_face_support_points ();
+};
+
 
 
 template <int dim>
@@ -593,53 +599,21 @@ FE_Q<dim>::clone() const
 
 
 
-template <int dim>
-void
-FE_Q<dim>::get_unit_support_points (std::vector<Point<dim> > &points) const
-{
-  compute_support_points (degree, renumber, points);
-}
-
-
-    
-template <int dim>
-void
-FE_Q<dim>::get_unit_face_support_points (std::vector<Point<dim-1> > &points) const
-{
-  FE_Q<dim-1>::compute_support_points (degree, face_renumber, points);
-}
-
-
-#if deal_II_dimension == 1
-
-template <>
-void
-FE_Q<1>::get_unit_face_support_points (std::vector<Point<0> > &points) const
-{
-  points.resize(0);
-}
-
-#endif
-
-
-
 //----------------------------------------------------------------------
 // Auxiliary functions
 //----------------------------------------------------------------------
 
 
+
 template <int dim>
-void
-FE_Q<dim>::compute_support_points (const unsigned int               degree,
-				   const std::vector<unsigned int> &renumber,
-				   std::vector<Point<dim> >        &support_points)
+void FE_Q<dim>::initialize_unit_support_points ()
 {
 				   // number of points: (degree+1)^dim
   unsigned int n = degree+1;
   for (unsigned int i=1; i<dim; ++i)
     n *= degree+1;
-
-  support_points.resize(n);
+  
+  unit_support_points.resize(n);
   
   const double step = 1./degree;
   Point<dim> p;
@@ -648,16 +622,59 @@ FE_Q<dim>::compute_support_points (const unsigned int               degree,
   for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
     for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
       for (unsigned int ix=0; ix<=degree; ++ix)
-        {
+	{
 	  p(0) = ix * step;
 	  if (dim>1)
 	    p(1) = iy * step;
 	  if (dim>2)
 	    p(2) = iz * step;
 	  
-	  support_points[renumber[k++]] = p;
-	}
-}
+	  unit_support_points[renumber[k++]] = p;
+	};
+};
+
+
+#if deal_II_dimension == 1
+
+template <>
+void FE_Q<1>::initialize_unit_face_support_points ()
+{
+				   // no faces in 1d, so nothing to do
+};
+
+#endif
+
+
+template <int dim>
+void FE_Q<dim>::initialize_unit_face_support_points ()
+{
+  const unsigned int codim = dim-1;
+  
+				   // number of points: (degree+1)^codim
+  unsigned int n = degree+1;
+  for (unsigned int i=1; i<codim; ++i)
+    n *= degree+1;
+  
+  unit_face_support_points.resize(n);
+  
+  const double step = 1./degree;
+  Point<codim> p;
+  
+  unsigned int k=0;
+  for (unsigned int iz=0; iz <= ((codim>2) ? degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((codim>1) ? degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=degree; ++ix)
+	{
+	  p(0) = ix * step;
+	  if (codim>1)
+	    p(1) = iy * step;
+	  if (codim>2)
+	    p(2) = iz * step;
+	  
+	  unit_face_support_points[face_renumber[k++]] = p;
+	};
+};
+
 
 
 template <int dim>

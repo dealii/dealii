@@ -231,104 +231,6 @@ FESystem<dim>::clone() const
 
 
 template <int dim>
-void
-FESystem<dim>::
-get_unit_support_points (typename std::vector<Point<dim> > &unit_support_points) const
-{
-				   // generate unit support points
-				   // from unit support points of sub
-				   // elements
-  unit_support_points.resize(dofs_per_cell);
-  
-  typename std::vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
-  unsigned int comp = 0;
-  for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
-    {
-      const unsigned int
-	base_element_dofs_per_cell = base_element(base_el).dofs_per_cell;
- 
-      base_element(base_el).get_unit_support_points (base_unit_support_points);
-      
-				       // if one of the base elements
-				       // has no support points, then
-				       // it makes no sense to define
-				       // support points for the
-				       // composed element, so return
-				       // an empty array to
-				       // demonstrate that fact
-      if (base_unit_support_points.size()==0)
-	{
-	  unit_support_points.resize(0);
-	  return;
-	}
-
-				       // otherwise distribute the
-				       // support points of this base
-				       // element to all degrees of
-				       // freedom contributed by this
-				       // base element
-      Assert(base_unit_support_points.size()==base_element_dofs_per_cell,
-	     ExcInternalError());
-      for (unsigned int n=0; n<element_multiplicity(base_el); ++n, ++comp)
-	for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
-	  unit_support_points[component_to_system_index(comp,i)]
-	    = base_unit_support_points[i];
-    }
-}
-
-
-
-template <int dim>
-void
-FESystem<dim>::
-get_unit_face_support_points (typename std::vector<Point<dim-1> > &unit_support_points) const
-{
-				   // generate unit face support points
-				   // from unit support points of sub
-				   // elements
-  unit_support_points.resize(dofs_per_face);
-  
-  typename std::vector<Point<dim-1> >
-    base_unit_support_points (base_element(0).dofs_per_cell);
-  
-  unsigned int comp = 0;
-  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
-    {
-      const unsigned int
-	base_element_dofs_per_face = base_element(base_el).dofs_per_face;
- 
-      base_element(base_el).get_unit_face_support_points (base_unit_support_points);
-      
-				       // if one of the base elements
-				       // has no support points, then
-				       // it makes no sense to define
-				       // support points for the
-				       // composed element, so return
-				       // an empty array to
-				       // demonstrate that fact
-      if (base_unit_support_points.size()==0)
-	{
-	  unit_support_points.resize(0);
-	  return;
-	}
-
-				       // otherwise distribute the
-				       // support points of this base
-				       // element to all degrees of
-				       // freedom contributed by this
-				       // base element
-      Assert(base_unit_support_points.size()==base_element_dofs_per_face,
-	     ExcNotImplemented());
-      for (unsigned int n=0; n<element_multiplicity(base_el); ++n, ++comp)
-	for (unsigned int i=0; i<base_element_dofs_per_face; ++i)
-	  unit_support_points[face_component_to_system_index(comp,i)]
-	    = base_unit_support_points[i];
-    }
-}
-
-
-
-template <int dim>
 UpdateFlags
 FESystem<dim>::update_once (const UpdateFlags flags) const
 {
@@ -1181,6 +1083,11 @@ void FESystem<dim>::initialize ()
 //FESystem(FE_Q<dim> (3), 2) and for FESystem<dim>(FE_Q<dim> (1), 2,
 //FE_Q<dim> (3), 1) and for FESystem<dim>(FE_Q<dim> (4), 2))
   build_interface_constraints ();
+
+				   // finally fill in support points
+				   // on cell and face
+  initialize_unit_support_points ();
+  initialize_unit_face_support_points ();
 };
 
 
@@ -1198,6 +1105,144 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
   
   return FiniteElementData<dim> (dpo, fe_data.n_components() * N);
 };
+
+
+
+
+template <int dim>
+void
+FESystem<dim>::
+initialize_unit_support_points ()
+{
+				       // if one of the base elements
+				       // has no support points, then
+				       // it makes no sense to define
+				       // support points for the
+				       // composed element, so return
+				       // an empty array to
+				       // demonstrate that
+				       // fact
+  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+    if (!base_element(base_el).has_support_points())
+      {
+	unit_support_points.resize(0);
+	return;
+      };
+
+				   // generate unit support points
+				   // from unit support points of sub
+				   // elements
+  unit_support_points.resize(dofs_per_cell);
+  
+  unsigned int comp = 0;
+  for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
+    {
+				       // we know that there are
+				       // support points on the cell,
+				       // so collect them
+      const unsigned int
+	base_element_dofs_per_cell = base_element(base_el).dofs_per_cell;
+ 
+      const typename std::vector<Point<dim> >
+	& base_unit_support_points = base_element(base_el).get_unit_support_points ();
+      
+				       // otherwise distribute the
+				       // support points of this base
+				       // element to all degrees of
+				       // freedom contributed by this
+				       // base element
+      Assert(base_unit_support_points.size()==base_element_dofs_per_cell,
+	     ExcInternalError());
+      for (unsigned int n=0; n<element_multiplicity(base_el); ++n, ++comp)
+	for (unsigned int i=0; i<base_element_dofs_per_cell; ++i)
+	  unit_support_points[component_to_system_index(comp,i)]
+	    = base_unit_support_points[i];
+    }
+}
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+FESystem<1>::
+initialize_unit_face_support_points ()
+{
+				   // no faces no work
+};
+
+#endif
+
+
+template <int dim>
+void
+FESystem<dim>::
+initialize_unit_face_support_points ()
+{
+				       // if one of the base elements
+				       // has no support points, then
+				       // it makes no sense to define
+				       // support points for the
+				       // composed element, so return
+				       // an empty array to
+				       // demonstrate that fact (note
+				       // that we ask whether the base
+				       // element has no support
+				       // points at all, not only none
+				       // on the face!)
+  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+    if (!base_element(base_el).has_support_points())
+      {
+	unit_face_support_points.resize(0);
+	return;
+      };
+  
+
+				   // generate unit face support points
+				   // from unit support points of sub
+				   // elements
+  unit_face_support_points.resize(dofs_per_face);
+  
+  unsigned int comp = 0;
+  for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
+    {
+				       // in some cases, finite
+				       // elements have support points
+				       // (we have made sure that they
+				       // have above) but don't have
+				       // any on the face (e.g. DG
+				       // elements). in that case,
+				       // don't even bother with this
+				       // base element and directly go
+				       // to the next one:
+      if (!base_element(base_el).has_face_support_points())
+	{
+	  comp += element_multiplicity(base_el);
+	  continue;
+	};
+
+				       // otherwise, we know that
+				       // there are support points on
+				       // the face, so collect them
+      const unsigned int
+	base_element_dofs_per_face = base_element(base_el).dofs_per_face;
+ 
+      const typename std::vector<Point<dim-1> > &
+	base_unit_support_points = base_element(base_el).get_unit_face_support_points ();
+      
+				       // distribute the support
+				       // points of this base element
+				       // to all degrees of freedom
+				       // contributed by this base
+				       // element
+      Assert(base_unit_support_points.size()==base_element_dofs_per_face,
+	     ExcNotImplemented());
+      for (unsigned int n=0; n<element_multiplicity(base_el); ++n, ++comp)
+	for (unsigned int i=0; i<base_element_dofs_per_face; ++i)
+	  unit_face_support_points[face_component_to_system_index(comp,i)]
+	    = base_unit_support_points[i];
+    }
+}
 
 
 

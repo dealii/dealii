@@ -375,18 +375,6 @@ class FiniteElementBase : public Subscriptor,
 				      */
     FiniteElementBase (const FiniteElementData<dim> &fe_data,
 		       const std::vector<bool> &restriction_is_additive_flags);
-    
-                                     /**
-				      * Compute second derivatives by
-				      * finite differences of
-				      * gradients.
-				      */
-    void compute_2nd (const Mapping<dim>                      &mapping,
-		      const DoFHandler<dim>::cell_iterator    &cell,
-		      const unsigned int                       offset,
-		      typename Mapping<dim>::InternalDataBase &mapping_internal,
-		      InternalDataBase                        &fe_internal,
-		      FEValuesData<dim>                       &data) const;
 
 				     /**
 				      * Projection from a fine grid
@@ -503,8 +491,8 @@ class FiniteElementBase : public Subscriptor,
 				     /**
 				      * Compute system index from components.
 				      */
-    unsigned int component_to_system_index (unsigned int component,
-					    unsigned int component_index) const;
+    unsigned int component_to_system_index (const unsigned int component,
+					    const unsigned int component_index) const;
   
 				     /**
 				      * Compute component and index from
@@ -515,13 +503,13 @@ class FiniteElementBase : public Subscriptor,
 				      * component.
 				      */
     std::pair<unsigned int,unsigned int>
-    system_to_component_index (unsigned int index) const; 
+    system_to_component_index (const unsigned int index) const; 
     
 				     /**
 				      * Compute system index from components on a face.
 				      */
-    unsigned int face_component_to_system_index (unsigned int component,
-						 unsigned int component_index) const;
+    unsigned int face_component_to_system_index (const unsigned int component,
+						 const unsigned int component_index) const;
   
 				     /**
 				      * Compute component and index from system
@@ -532,7 +520,7 @@ class FiniteElementBase : public Subscriptor,
 				      * component.
 				      */
     std::pair<unsigned int,unsigned int>
-    face_system_to_component_index (unsigned int index) const;
+    face_system_to_component_index (const unsigned int index) const;
     
  				     /**
 				      * The base element establishing a
@@ -556,6 +544,109 @@ class FiniteElementBase : public Subscriptor,
 				      */
     bool restriction_is_additive (const unsigned int component) const;
 
+				     /**
+				      * Return the support points of
+				      * the trial functions on the
+				      * unit cell, if the derived
+				      * finite element defines some.
+				      * Finite elements that allow
+				      * some kind of interpolation
+				      * operation usually have support
+				      * points. On the other hand,
+				      * elements that define their
+				      * degrees of freedom by, for
+				      * example, moments on faces, or
+				      * as derivatives, don't have
+				      * support points. In that case,
+				      * the returned field is empty.
+				      *
+				      * If the finite element defines
+				      * support points, then their
+				      * number equals the number of
+				      * degrees of freedom of the
+				      * element.  The order of points
+				      * in the array matches that
+				      * returned by the
+				      * @p{cell->get_dof_indices}
+				      * function.
+				      */
+    const std::vector<Point<dim> > & get_unit_support_points () const;    
+
+				     /**
+				      * Return whether a finite
+				      * element has defined support
+				      * points. If the result is true,
+				      * then a call to the
+				      * @p{get_unit_support_points}
+				      * yields a non-empty array.
+				      */
+    bool has_support_points () const;
+    
+				     /**
+				      * Return the support points of
+				      * the trial functions on the
+				      * unit face, if the derived
+				      * finite element defines some.
+				      * Finite elements that allow
+				      * some kind of interpolation
+				      * operation usually have support
+				      * points. On the other hand,
+				      * elements that define their
+				      * degrees of freedom by, for
+				      * example, moments on faces, or
+				      * as derivatives, don't have
+				      * support points. In that case,
+				      * the returned field is empty
+				      *
+				      * Note that elements that have
+				      * support points need not
+				      * necessarily have some on the
+				      * faces, even if the
+				      * interpolation points are
+				      * located physically on a
+				      * face. For example, the
+				      * discontinuous elements have
+				      * interpolation points on the
+				      * vertices, and for higher
+				      * degree elements also on the
+				      * faces, but they are not
+				      * defined to be on faces since
+				      * in that case degrees of
+				      * freedom from both sides of a
+				      * face (or from all adjacent
+				      * elements to a vertex) would be
+				      * identified with each other,
+				      * which is not what we would
+				      * like to have). Logically,
+				      * these degrees of freedom are
+				      * therefore defined to belong to
+				      * the cell, rather than the face
+				      * or vertex. In that case, the
+				      * returned element would
+				      * therefore have length zero.
+				      *
+				      * If the finite element defines
+				      * support points, then their
+				      * number equals the number of
+				      * degrees of freedom on the face
+				      * (@p{dofs_per_face}). The order
+				      * of points in the array matches
+				      * that returned by the
+				      * @p{cell->get_dof_indices}
+				      * function.
+				      */
+    const std::vector<Point<dim-1> > & get_unit_face_support_points () const;    
+
+				     /**
+				      * Return whether a finite
+				      * element has defined support
+				      * points on faces. If the result
+				      * is true, then a call to the
+				      * @p{get_unit_support_points}
+				      * yields a non-empty array.
+				      */
+    bool has_face_support_points () const;
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -721,6 +812,49 @@ class FiniteElementBase : public Subscriptor,
 				      */
     const std::vector<bool> restriction_is_additive_flags;
 
+				     /**
+				      * List of support points on the
+				      * unit cell, in case the finite
+				      * element has any. The
+				      * constructor leaves this field
+				      * empty, derived classes may
+				      * write in some contents.
+				      *
+				      * Finite elements that allow
+				      * some kind of interpolation
+				      * operation usually have support
+				      * points. On the other hand,
+				      * elements that define their
+				      * degrees of freedom by, for
+				      * example, moments on faces, or
+				      * as derivatives, don't have
+				      * support points. In that case,
+				      * this field remains empty.
+				      */
+    std::vector<Point<dim> > unit_support_points;
+
+				     /**
+				      * Same for the faces. See the
+				      * description of the
+				      * @p{get_unit_face_support_points}
+				      * function for a discussion of
+				      * what contributes a face
+				      * support point.
+				      */
+    std::vector<Point<dim-1> > unit_face_support_points;
+
+                                     /**
+				      * Compute second derivatives by
+				      * finite differences of
+				      * gradients.
+				      */
+    void compute_2nd (const Mapping<dim>                      &mapping,
+		      const DoFHandler<dim>::cell_iterator    &cell,
+		      const unsigned int                       offset,
+		      typename Mapping<dim>::InternalDataBase &mapping_internal,
+		      InternalDataBase                        &fe_internal,
+		      FEValuesData<dim>                       &data) const;
+    
 				     /**
 				      * Allow the FESystem class to
 				      * access the restriction and

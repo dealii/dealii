@@ -40,44 +40,6 @@ class FE_Q : public FiniteElement<dim>
 				      */
     ~FE_Q ();
 
-				     /**
-				      * Return the support points of
-				      * the trial functions on the
-				      * unit cell.
-				      *
-				      * The order of points in the
-				      * array matches that returned by
-				      * the @p{cell->get_dof_indices}
-				      * function, but:
-				      *
-				      * If the shape functions are not
-				      * Lagrangian interpolants at
-				      * some points, the size of the
-				      * array will be zero. This is
-				      * the standard behavior, if the
-				      * function is not overloaded.
-				      */
-    virtual void get_unit_support_points (std::vector<Point<dim> > &) const;    
-    
-				     /**
-				      * Return the support points of
-				      * the trial functions on the
-				      * first face of the unit cell.
-				      *
-				      * The order of points in the
-				      * array matches that returned by
-				      * the @p{cell->get_dof_indices}
-				      * function.
-				      *
-				      * If the shape functions are not
-				      * Lagrangian interpolants at
-				      * some points, the size of the
-				      * array will be zero. This is
-				      * the standard behavior, if the
-				      * function is not overloaded.
-				      */
-    virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &) const;
-
 //TODO: make get_renumber private or move it some other place    
 				     /**
 				      * Read-only access to the
@@ -304,13 +266,23 @@ class FE_Q : public FiniteElement<dim>
 					std::vector<unsigned int>      &numbering);
 
 				     /**
-				      * Compute support points.
+				      * Initialize the
+				      * @p{unit_support_points} field
+				      * of the @ref{FiniteElementBase}
+				      * class. Called from the
+				      * constructor.
 				      */
-    static void compute_support_points (const unsigned int               degree,
-					const std::vector<unsigned int> &renumber,
-					std::vector<Point<dim> >        &support_points);
+    void initialize_unit_support_points ();
 
-
+				     /**
+				      * Initialize the
+				      * @p{unit_face_support_points} field
+				      * of the @ref{FiniteElementBase}
+				      * class. Called from the
+				      * constructor.
+				      */
+    void initialize_unit_face_support_points ();
+    
 				     /**
 				      * Compute flags for initial
 				      * update only.
