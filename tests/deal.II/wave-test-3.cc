@@ -13,16 +13,24 @@
 
 
 #include <grid/tria_boundary_lib.h>
-#include <base/parameter_handler.h>
-#include <base/forward_declarations.h>
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <numerics/time_dependent.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_tools.h>
+#include <lac/sparse_matrix.h>
+#include <lac/full_matrix.h>
+#include <base/parameter_handler.h>
+#include <base/exceptions.h>
+#include <base/timer.h>
+
+#include <base/forward_declarations.h>
+#include <lac/forward_declarations.h>
+#include <grid/forward_declarations.h>
 
 #include <fstream>
 #include <string>
+#include <vector>
+#include <iostream>
+#include <list>
 
 ofstream logfile("wave-test-3.output");
 
@@ -192,7 +200,6 @@ class TimeStep_Dual :  public TimeStep_Wave<dim>
 };
 
 
-#include <lac/full_matrix.h>
 
 
 template <int dim>
@@ -292,7 +299,6 @@ struct CellwiseError
 };
 
 
-#include <vector>
 
 
 template <int dim>
@@ -620,11 +626,6 @@ class HuyghensWave : public DualFunctional<dim> {
 };
 
 
-#include <grid/forward_declarations.h>
-#include <base/forward_declarations.h>
-#include <lac/forward_declarations.h>
-#include <base/exceptions.h>
-#include <string>
 
 
 /**
@@ -1015,9 +1016,6 @@ class SweepData
 };
 
 
-#include <base/timer.h>
-#include <iostream>
-#include <list>
 
 
 /**
@@ -1068,7 +1066,6 @@ template <int dim>
 };
 
 
-#include <lac/sparse_matrix.h>
 
 
 /**
@@ -1125,11 +1122,6 @@ class UserMatrix :  public SparseMatrix<double> {
     Preconditioning preconditioning;
 };
 
-
-#include <base/exceptions.h>
-#include <grid/forward_declarations.h>
-
-#include <string>
 
 
 string int_to_string (const unsigned int i, const unsigned int digits);
@@ -1194,11 +1186,6 @@ struct FEHelper {
     static const Quadrature<dim-1>  & get_quadrature_face (const string &name);
 };
 
-
-#include <base/forward_declarations.h>
-#include <grid/forward_declarations.h>
-#include <list>
-#include <string>
 
 template <int dim> class DualFunctional;
 template <int dim> class EvaluationBase;
@@ -1791,7 +1778,6 @@ class WaveParameters
 };
 
 
-#include <numerics/time_dependent.h>
 
 template <int dim> class WaveParameters;
 template <int dim> class DataOutStack;

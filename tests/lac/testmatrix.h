@@ -1,8 +1,8 @@
 // $Id$
 
-#include <lac/forward_declarations.h>
 #include <base/exceptions.h>
 #include <multigrid/mg_base.h>
+#include <lac/forward_declarations.h>
 
 /**
  * Finite difference matrix on uniform grid.
