@@ -352,9 +352,9 @@ class MatrixCreator
  *
  * \subsection{Boundary conditions}
  *
- * The #apply_boundar_values# function inserts boundary conditions of
+ * The #apply_boundary_values# function inserts boundary conditions of
  * into a system of equations.  To actually do this you have to specify
- * a list of degree of freedom indices along with the value this degree of
+ * a list of degree of freedom indices along with the values these degrees of
  * freedom shall assume. To see how to get such a list, see the discussion
  * of the #VectorTools::interpolate_boundary_values# function.
  *
@@ -371,6 +371,43 @@ class MatrixCreator
  * eliminating all coupling between this degree of freedom and others. Now
  * also the column consists only of zeroes, apart from the main diagonal entry.
  *
+ * Finding which rows contain an entry in the column for which we are
+ * presently performing a Gauss elimination step is either difficult
+ * or very simple, depending on the circumstances. If the sparsity
+ * pattern is symmetric (whether the matrix is symmetric is irrelevant
+ * here), then we can infer the rows which have a nonzero entry in the
+ * present column by looking at which columns in the present row are
+ * nonempty. In this case, we only need to look into a fixed number of
+ * rows and need not search all rows. On the other hand, if the
+ * sparsity pattern is nonsymmetric, then we need to use an iterative
+ * solver which can handle nonsymmetric matrices in any case, so there
+ * may be no need to do the Gauss elimination anyway. In fact, this is
+ * the way the function works: it takes a parameter
+ * (#elininate_columns#) that specifies whether the sparsity pattern
+ * is symmetric; if so, then the column is eliminated and the right
+ * hand side is also modified accordingly. If not, then only the row
+ * is deleted and the column is not touched at all, and all right hand
+ * side values apart from the one corresponding to the present row
+ * remain unchanged.
+ *
+ * If the sparsity pattern for your matrix is non-symmetric, you must
+ * set the value of this parameter to #false# in any case, since then
+ * we can't eliminate the column without searching all rows, which
+ * would be too expensive (if #N# be the number of rows, and #m# the
+ * number of nonzero elements per row, then eliminating one column is
+ * an #O(N*log(m))# operation, since searching in each row takes
+ * #log(m)# operations). If your sparsity pattern is symmetric, but
+ * your matrix is not, then you might specify #false# as well. If your
+ * sparsity pattern and matrix are both symmetric, you might want to
+ * specify #true# (the complexity of eliminating one row is then
+ * #O(m*log(m))#, since we only have to search #m# rows for the
+ * respective element of the column). Given the fact that #m# is
+ * roughly constant, irrespective of the discretization, and that the
+ * number of boundary nodes is #sqrt(N)# in 2d, the algorithm for
+ * symmetric sparsity patterns is #O(sqrt(N)*m*log(m))#, while it
+ * would be #O(N*sqrt(N)*m*log(m))# for the general case; the latter
+ * is too expensive to be performed.
+ *
  * It seems as if we had to make clear not to overwrite the lines of other
  * boundary nodes when doing the Gauss elimination step. However, since we
  * reset the right hand side when passing such a node, it is not a problem
@@ -381,33 +418,22 @@ class MatrixCreator
  * the right hand side. We need therefore not take special care of other
  * boundary nodes.
  * 
- * To make solving faster, we preset the solution vector with the right boundary
- * values. Since boundary nodes can never be hanging nodes, and since all other
- * entries of the solution vector are zero, we need not condense the solution
- * vector if the condensation process is done in-place. If done by copying
- * matrix and vectors to smaller ones, it would also be necessary to condense
- * the solution vector to preserve the preset boundary values.
- * 
- * It it not clear whether the deletion of coupling between the boundary degree
- * of freedom and other dofs really forces the corresponding entry in the
- * solution vector to have the right value when using iterative solvers,
- * since their search directions may contain components in the direction
- * of the boundary node. For this reason, we perform a very simple line
- * balancing by not setting the main diagonal entry to unity, but rather
- * to the value it had before deleting this line, or to the first nonzero
- * main diagonal entry if it is zero from a previous Gauss elimination
- * step. Of course we have to change
- * the right hand side appropriately. This is not a very good
- * strategy, but it at least should give the main diagonal entry a value
- * in the right order of dimension, which makes the solving process a bit
- * more stable. A refined algorithm would set the entry to the mean of the
- * other diagonal entries, but this seems to be too expensive.
- *
- * Because of the mentioned question, whether or not a preset solution value
- * which does not couple with other degrees of freedom remains its value or
- * not during solving iteratively, it may or may not be necessary to set
- * the correct value after solving again. This question is an open one as of
- * now and may be answered by future experience.
+ * To make solving faster, we preset the solution vector with the
+ * right boundary values. It it not clear whether the deletion of
+ * coupling between the boundary degree of freedom and other dofs
+ * really forces the corresponding entry in the solution vector to
+ * have the right value when using iterative solvers, since their
+ * search directions may contain components in the direction of the
+ * boundary node. For this reason, we perform a very simple line
+ * balancing by not setting the main diagonal entry to unity, but
+ * rather to the value it had before deleting this line, or to the
+ * first nonzero main diagonal entry if it is zero for some reason.
+ * Of course we have to change the right hand side appropriately. This
+ * is not a very good strategy, but it at least should give the main
+ * diagonal entry a value in the right order of dimension, which makes
+ * the solvution process a bit more stable. A refined algorithm would
+ * set the entry to the mean of the other diagonal entries, but this
+ * seems to be too expensive.
  *
  * 
  * @author Wolfgang Bangerth, 1998
@@ -425,7 +451,8 @@ class MatrixTools : public MatrixCreator<dim>
     static void apply_boundary_values (const map<unsigned int,double> &boundary_values,
 				       SparseMatrix<double>  &matrix,
 				       Vector<double>        &solution,
-				       Vector<double>        &right_hand_side);
+				       Vector<double>        &right_hand_side,
+				       const bool             eliminate_columns = true);
 
 				     /**
 				      * Exception

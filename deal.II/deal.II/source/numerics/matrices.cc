@@ -34,7 +34,8 @@ template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
-					     const Function<dim> * const a) {
+					     const Function<dim> * const a)
+{
   Vector<double> dummy;    // no entries, should give an error if accessed
   UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values);
   if (a != 0)
@@ -57,13 +58,15 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 };
 
 
+
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim>      &rhs,
 					     Vector<double>           &rhs_vector,
-					     const Function<dim> * const a) {
+					     const Function<dim> * const a)
+{
   UpdateFlags update_flags = UpdateFlags(update_values |
 					 update_q_points |
 					 update_JxW_values);
@@ -85,9 +88,11 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 };
 
 
+
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
-					     SparseMatrix<double>     &matrix) {
+					     SparseMatrix<double>     &matrix)
+{
   const FiniteElement<dim> &fe = dof.get_fe();
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
@@ -119,7 +124,8 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 						    const FunctionMap      &,
 						    Vector<double>         &,
 						    vector<unsigned int>   &,
-						    const Function<1>      *) {
+						    const Function<1>      *)
+{
   Assert (false, ExcNotImplemented());
 };
 
@@ -133,7 +139,8 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 						      const FunctionMap        &rhs,
 						      Vector<double>           &rhs_vector,
 						      vector<unsigned int>     &dof_to_boundary_mapping,
-						      const Function<dim>      *a) {
+						      const Function<dim>      *a)
+{
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
   const bool         fe_is_system  = (n_components != 1);
@@ -404,11 +411,13 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 };
 
 
+
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						SparseMatrix<double>     &matrix,
-						const Function<dim> * const a) {
+						const Function<dim> * const a)
+{
   const unsigned int n_components  = dof.get_fe().n_components();
   Assert ((n_components==1) || (a==0), ExcNotImplemented());
 
@@ -433,6 +442,8 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
     }
   while ((++assembler).state() == valid);
 };
+
+
 
 /*
 
@@ -468,6 +479,8 @@ void MatrixCreator<dim>::create_level_laplace_matrix (unsigned int level,
 
 */
 
+
+
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
@@ -500,11 +513,15 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 };
 
 
+
 template <int dim>
-void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
-					      SparseMatrix<double>  &matrix,
-					      Vector<double>   &solution,
-					      Vector<double>   &right_hand_side) {
+void
+MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
+					 SparseMatrix<double>  &matrix,
+					 Vector<double>   &solution,
+					 Vector<double>   &right_hand_side,
+					 const bool        preserve_symmetry)
+{
   Assert (matrix.n() == matrix.m(),
 	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
   Assert (matrix.n() == right_hand_side.size(),
@@ -583,47 +600,63 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
 	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_nonzero_diagonal_entry;
 	};
-      
-				       // store the only nonzero entry
-				       // of this line for the Gauss
-				       // elimination step
-      const double diagonal_entry = matrix.diag_element(dof_number);
 
-				       // do the Gauss step
-      for (unsigned int row=0; row<n_dofs; ++row) 
+
+				       // if the user wants to have
+				       // the symmetry of the matrix
+				       // preserved, and if the
+				       // sparsity pattern is
+				       // symmetric, then do a Gauss
+				       // elimination step with the
+				       // present row
+      if (preserve_symmetry)
 	{
-					   // we need not handle the
-					   // row we have already cleared
-	  if (row == dof_number)
-	    continue;
-
-					   // check whether the line has
-					   // an entry in the row corresponding
-					   // to the dof presently worked with.
-					   // note again: the first entry is
-					   // the diagonal entry which we
-					   // cannot be interested in; following
-					   // are the other entries in sorted
-					   // order, so we can use a binary
-					   // search
-					   //
-					   // if this row contains an element
-					   // for this dof, *p==dof_number
-	  const unsigned int * p = lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
-					       &sparsity_colnums[sparsity_rowstart[row+1]],
-					       dof_number);
-					   // check whether this line has
-					   // an entry in the regarding column
-					   // (check for ==dof_number and
-					   // != next_row, since if
-					   // row==dof_number-1, *p is a
-					   // past-the-end pointer but points
-					   // to dof_number anyway...)
-	  if ((*p == dof_number) &&
-	      (p != &sparsity_colnums[sparsity_rowstart[row+1]]))
-					     // this line has an entry
-					     // in the regarding column
+					   // store the only nonzero entry
+					   // of this line for the Gauss
+					   // elimination step
+	  const double diagonal_entry = matrix.diag_element(dof_number);
+	  
+					   // we have to loop over all
+					   // rows of the matrix which
+					   // have a nonzero entry in
+					   // the column which we work
+					   // in presently. if the
+					   // sparsity pattern is
+					   // symmetric, then we can
+					   // get the positions of
+					   // these rows cheaply by
+					   // looking at the nonzero
+					   // column numbers of the
+					   // present row. we need not
+					   // look at the first entry,
+					   // since that is the
+					   // diagonal element and
+					   // thus the present row
+	  for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
 	    {
+	      const unsigned int row = sparsity_colnums[j];
+
+					       // find the position of
+					       // element
+					       // (row,dof_number)
+	      const unsigned int *
+		p = lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
+				&sparsity_colnums[sparsity_rowstart[row+1]],
+				dof_number);
+
+					       // check whether this line has
+					       // an entry in the regarding column
+					       // (check for ==dof_number and
+					       // != next_row, since if
+					       // row==dof_number-1, *p is a
+					       // past-the-end pointer but points
+					       // to dof_number anyway...)
+					       //
+					       // there should be such an entry!
+	      Assert ((*p == dof_number) &&
+		      (p != &sparsity_colnums[sparsity_rowstart[row+1]]),
+		      ExcInternalError());
+
 	      const unsigned int global_entry
 		= (p - &sparsity_colnums[sparsity_rowstart[0]]);
 	      
@@ -636,7 +669,6 @@ void MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &bo
 	    };
 	};
 
-
 				       // preset solution vector
       solution(dof_number) = dof->second;
     };
@@ -648,13 +680,16 @@ MassMatrix<dim>::MassMatrix (const Function<dim> * const rhs,
 			     const Function<dim> * const a) :
 		Equation<dim> (1),
 		right_hand_side (rhs),
-		coefficient (a)   {};
+		coefficient (a)
+{};
+
 
 
 template <int dim>
 void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 				const FEValues<dim>     &fe_values,
-				const typename DoFHandler<dim>::cell_iterator &) const {
+				const typename DoFHandler<dim>::cell_iterator &) const
+{
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
@@ -735,11 +770,13 @@ void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
 };
 
 
+
 template <int dim>
 void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				Vector<double>      &rhs,
 				const FEValues<dim> &fe_values,
-				const DoFHandler<dim>::cell_iterator &) const {
+				const DoFHandler<dim>::cell_iterator &) const
+{
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
@@ -800,10 +837,12 @@ void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 };
 
 
+
 template <int dim>
 void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 				const FEValues<dim> &fe_values,
-				const DoFHandler<dim>::cell_iterator &) const {
+				const DoFHandler<dim>::cell_iterator &) const
+{
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
@@ -833,6 +872,7 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 };
 
 
+
 template <int dim>
 LaplaceMatrix<dim>::LaplaceMatrix (const Function<dim> * const rhs,
 				   const Function<dim> * const a) :
@@ -841,11 +881,13 @@ LaplaceMatrix<dim>::LaplaceMatrix (const Function<dim> * const rhs,
 		coefficient (a) {};
 
 
+
 template <int dim>
 void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
 				   Vector<double>             &rhs,
 				   const FEValues<dim>        &fe_values,
-				   const DoFHandler<dim>::cell_iterator &) const {
+				   const DoFHandler<dim>::cell_iterator &) const
+{
   Assert (right_hand_side != 0, ExcNoRHSSelected());
   
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
@@ -909,10 +951,12 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
 };
 
 
+
 template <int dim>
 void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				   const FEValues<dim> &fe_values,
-				   const DoFHandler<dim>::cell_iterator &) const {
+				   const DoFHandler<dim>::cell_iterator &) const
+{
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
 
@@ -963,10 +1007,12 @@ void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 };
 
 
+
 template <int dim>
 void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 				   const FEValues<dim> &fe_values,
-				   const DoFHandler<dim>::cell_iterator &) const {
+				   const DoFHandler<dim>::cell_iterator &) const
+{
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
@@ -995,6 +1041,7 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 		rhs_values[point] *
 		weights[point];
 };
+
 
 
 template<int dim>
@@ -1031,6 +1078,9 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 	result(i,j) = fe.shape_value(j,i);
 }
 
+
+
+// explicit instantiations
 
 template class MatrixCreator<deal_II_dimension>;
 template class MatrixTools<deal_II_dimension>;

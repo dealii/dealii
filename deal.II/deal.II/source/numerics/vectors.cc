@@ -437,7 +437,8 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
   constraints.condense (tmp);
   if (boundary_values.size() != 0)
     MatrixTools<dim>::apply_boundary_values (boundary_values,
-					     mass_matrix, vec, tmp);
+					     mass_matrix, vec, tmp,
+					     true);
 
   SolverControl           control(1000,1e-16);
   PrimitiveVectorMemory<> memory;

@@ -83,7 +83,12 @@ class DoFTools
 				      * #make_sparsity_pattern# just
 				      * loops over all cells and
 				      * enters all couplings local to
-				      * that cell.
+				      * that cell. As the generation
+				      * of the sparsity pattern is
+				      * irrespective of the equation
+				      * which is solved later on, the
+				      * resulting sparsity pattern is
+				      * symmetric.
 				      *
 				      * Since this process is purely
 				      * local, the sparsity pattern
@@ -157,13 +162,18 @@ class DoFTools
 				      * than to the degrees of freedom
 				      * contained in there.
 				      *
-				      * This function is designed to accept
-				      * a mask, like the one shown above,
-				      * through the #mask# parameter, which
-				      * contains boolean values. It builds
-				      * the matrix structure just like the
-				      * previous function, but does not create
-				      * elements if not specified by the mask.
+				      * This function is designed to
+				      * accept a mask, like the one
+				      * shown above, through the
+				      * #mask# parameter, which
+				      * contains boolean values. It
+				      * builds the matrix structure
+				      * just like the previous
+				      * function, but does not create
+				      * elements if not specified by
+				      * the mask. If the mask is
+				      * symmetric, then so will be the
+				      * resulting sparsity pattern.
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
