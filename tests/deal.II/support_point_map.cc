@@ -86,7 +86,7 @@ check ()
       GridGenerator::hyper_ball(tr, Point<dim>(), 1);
     }
   else
-    GridGenerator::hyper_cube(tr, -1./sqrt(dim),1./sqrt(dim));
+    GridGenerator::hyper_cube(tr, -1./std::sqrt(static_cast<double>(dim)),1./std::sqrt(static_cast<double>(dim)));
   if (dim != 1)
     {
       static const HyperBallBoundary<dim> boundary;
