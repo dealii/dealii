@@ -284,6 +284,21 @@ block_matrices.testcase: $(block_matrices-o-files) $(libraries)
 	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
+############################################################
+
+
+intergrid_map-cc-files = intergrid_map.cc 
+
+ifeq ($(debug-mode),on)
+intergrid_map-o-files = $(intergrid_map-cc-files:.cc=.go)
+else
+intergrid_map-o-files = $(intergrid_map-cc-files:.cc=.o)
+endif
+
+intergrid_map.testcase: $(intergrid_map-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS) $(lib-deal2-1d.g) $(lib-deal2-3d.g)
+
 
 ############################################################
 # Continue with other targets if needed
