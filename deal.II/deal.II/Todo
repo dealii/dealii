@@ -36,6 +36,11 @@ Add support for fast assemblage of mass matrices.
 
 Make AssemblerData a local class to Assembler again if gcc2.8 supports it.
 
+Let ParameterHandler and DataIn/Out throw exceptions. Make more tests
+  on the input.
+  
+
+
 
 
 DEAL:

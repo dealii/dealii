@@ -4,9 +4,8 @@ Here are some conventions for source code of the deal.II library:
 1./ Functions which return the number of something (number of cells,
   degrees of freedom, etc) should start with n_*
 
-2./ Function which set a bit or flag should start with set_* (an
-  unfortunate relict is the flag_refine function); functions which
-  clear bits of flags should be named clear_*
+2./ Function which set a bit or flag should start with set_*;
+  functions which clear bits of flags should be named clear_*
 
 3./ After each function, at least three empty lines are expected to
   enable better readability. One empty line occurs in functions to
