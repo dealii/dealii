@@ -110,7 +110,7 @@ DoFPrintSolverStep<dim, SOLVER, VECTOR>::print_vectors (const unsigned int step,
   out.add_data_vector(r, "residual");
   out.add_data_vector(d, "update");
 
-  ostrstream filename;
+  std::ostrstream filename;
   filename << basename
 	   << setw(3) << setfill('0') << step
 	   << out.default_suffix() << ends;
