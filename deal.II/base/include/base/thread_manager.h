@@ -610,13 +610,15 @@ class ThreadManager : public ACE_Thread_Manager
     struct Mem_Fun_Data5
     {
 	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3, Arg4, Arg5);
-	Class *object;
-	Arg1   arg1;
-	Arg2   arg2;
-	Arg3   arg3;
-	Arg4   arg4;
-	Arg5   arg5;
-	MemFun mem_fun;
+	typedef void   (Class::*VoidMemFun) (Arg1, Arg2, Arg3, Arg4, Arg5);
+	Class     *object;
+	Arg1       arg1;
+	Arg2       arg2;
+	Arg3       arg3;
+	Arg4       arg4;
+	Arg5       arg5;
+	MemFun     mem_fun;
+	VoidMemFun void_mem_fun;
 
 	Mem_Fun_Data5 (Class *object,
 		       Arg1   arg1,
@@ -631,7 +633,24 @@ class ThreadManager : public ACE_Thread_Manager
 			arg3 (arg3),
 			arg4 (arg4),
 			arg5 (arg5),
-			mem_fun (mem_fun) {};
+			mem_fun (mem_fun),
+			void_mem_fun (0) {};
+
+	Mem_Fun_Data5 (Class     *object,
+		       Arg1       arg1,
+		       Arg2       arg2,
+		       Arg3       arg3,
+		       Arg4       arg4,
+		       Arg5       arg5,
+		       VoidMemFun void_mem_fun) :
+			object (object),
+			arg1 (arg1),
+			arg2 (arg2),
+			arg3 (arg3),
+			arg4 (arg4),
+			arg5 (arg5),
+			mem_fun (0),
+			void_mem_fun (void_mem_fun) {};
     };
 
     
@@ -653,14 +672,17 @@ class ThreadManager : public ACE_Thread_Manager
     struct Mem_Fun_Data6
     {
 	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-	Class *object;
-	Arg1   arg1;
-	Arg2   arg2;
-	Arg3   arg3;
-	Arg4   arg4;
-	Arg5   arg5;
-	Arg6   arg6;
-	MemFun mem_fun;
+	typedef void   (Class::*VoidMemFun) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
+
+	Class     *object;
+	Arg1       arg1;
+	Arg2       arg2;
+	Arg3       arg3;
+	Arg4       arg4;
+	Arg5       arg5;
+	Arg6       arg6;
+	MemFun     mem_fun;
+	VoidMemFun void_mem_fun;
 
 	Mem_Fun_Data6 (Class *object,
 		       Arg1   arg1,
@@ -677,7 +699,26 @@ class ThreadManager : public ACE_Thread_Manager
 			arg4 (arg4),
 			arg5 (arg5),
 			arg6 (arg6),
-			mem_fun (mem_fun) {};
+			mem_fun (mem_fun),
+			void_mem_fun (0) {};
+
+	Mem_Fun_Data6 (Class     *object,
+		       Arg1       arg1,
+		       Arg2       arg2,
+		       Arg3       arg3,
+		       Arg4       arg4,
+		       Arg5       arg5,
+		       Arg6       arg6,
+		       VoidMemFun void_mem_fun) :
+			object (object),
+			arg1 (arg1),
+			arg2 (arg2),
+			arg3 (arg3),
+			arg4 (arg4),
+			arg5 (arg5),
+			arg6 (arg6),
+			mem_fun (0),
+			void_mem_fun (void_mem_fun) {};
     };
     
 				     /**
@@ -3709,11 +3750,21 @@ void * ThreadManager::thread_entry_point5 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->object->*(arg->mem_fun))(arg->arg1,
-					arg->arg2,
-					arg->arg3,
-					arg->arg4,
-					arg->arg5);
+  if (arg->mem_fun != 0)
+    return (arg->object->*(arg->mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3,
+					  arg->arg4,
+					  arg->arg5);
+  else
+    {
+      (arg->object->*(arg->void_mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3,
+					  arg->arg4,
+					  arg->arg5);
+      return;
+    };
 };
 
 
@@ -3733,12 +3784,23 @@ void * ThreadManager::thread_entry_point6 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->object->*(arg->mem_fun))(arg->arg1,
-					arg->arg2,
-					arg->arg3,
-					arg->arg4,
-					arg->arg5,
-					arg->arg6);
+  if (arg->mem_fun != 0)
+    return (arg->object->*(arg->mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3,
+					  arg->arg4,
+					  arg->arg5,
+					  arg->arg6);
+  else
+    {
+      (arg->object->*(arg->void_mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3,
+					  arg->arg4,
+					  arg->arg5,
+					  arg->arg6);
+      return 0;
+    };
 };
 
 
