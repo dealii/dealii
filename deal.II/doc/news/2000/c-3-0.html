@@ -110,6 +110,16 @@
        </p>
 
   <li> <p>
+       Fix: the 
+       <code class="member">FullMatrix::mmult</code> and
+       <code class="member">FullMatrix::Tmmult</code> code don't
+       resize their output argument any more, as this is not common
+       style in the library. Furthermore, 
+       <code class="member">FullMatrix::Tmmult</code> was utterly
+       broken. 
+       </p>
+
+  <li> <p>
        Change: the <code class="member">matrix_norm</code> functions
        of sparse and full matrices are renamed to 
        <code class="member">matrix_norm_square</code>, since they in
