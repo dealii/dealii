@@ -38,6 +38,16 @@
 
 
 
+static
+inline
+double sqr (const double x)
+{
+  return x*x;
+};
+
+
+
+
 #if deal_II_dimension == 1
 
 template <>
@@ -133,10 +143,6 @@ KellyErrorEstimator<dim>::Data::Data(const DoFHandler<dim>   &dof,
 
 #endif
 
-
-inline static double sqr (const double x) {
-  return x*x;
-};
 
 
 #if deal_II_dimension == 1
