@@ -235,8 +235,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	              else
   
                         dnl  Aw, nothing suitable found...
-                        AC_MSG_ERROR([Unrecognized compiler -- sorry])
-                        exit 1
+                        AC_MSG_RESULT(Unrecognized compiler --- you will probably run into trouble. Try to go ahead and get help from developers@dealii.org)
+                        GXX_VERSION=unknown_cc
                       fi
                     fi
                   fi
