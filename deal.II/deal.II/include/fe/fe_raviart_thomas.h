@@ -68,7 +68,7 @@ template <int dim> class MappingQ;
  * kind of interpolation. On the other hand, for the lowest order
  * elements, the values of generating functionals are the (constant)
  * tangential values of the shape functions. We would therefore really
- * like to take the mean value of the tangential values of the child
+ * like to take the mean value of the normal values of the child
  * faces, and make this the value of the mother face. Then, however,
  * taking a mean value of two piecewise constant function is not an
  * interpolation, but a restriction. Since this is not possible, we
@@ -84,8 +84,8 @@ template <int dim> class MappingQ;
  *
  * @sect3{Numbering of the degrees of freedom (DoFs)}
  *
- * Nedelec elements have their degrees of freedom on edges, with shape
- * functions being vector valued and pointing in tangential
+ * Raviart-Thomas elements have their degrees of freedom on edges, with shape
+ * functions being vector valued and pointing in normal
  * direction. We use the standard enumeration and direction of edges
  * in deal.II, yielding the following shape functions in 2d:
  *
@@ -139,7 +139,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 {
   public:
 				     /**
-				      * Constructor for the Nedelec
+				      * Constructor for the Raviart-Thomas
 				      * element of degree @p p.
 				      */
     FE_RaviartThomas (const unsigned int p);
