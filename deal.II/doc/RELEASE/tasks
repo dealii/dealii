@@ -25,17 +25,15 @@ when a new release shall be issued:
 8/ run `make validate-xrefs' on the branch to check that the changes
   do not point to nirvana
 
-	from the deal home directory
+9/ cvs tag all files with Version-x-y-z
 
-10/ cvs tag all files with Version-x-y-z
+10/ tell your friends to tag their programs
 
-11/ tell your friends to tag their programs
+11/ cvs export -r Version-x-y-z and form a tarball of that
 
-12/ cvs export -r Version-x-y-z and form a tarball of that
+12/ put it on the web server
 
-13/ put it on the web server
+13/ wait overnight
 
-14/ wait overnight
-
-15/ announce the release
+14/ announce the release
        follow the instructions in ./announce.pl
