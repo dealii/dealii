@@ -67,6 +67,21 @@ FullMatrix<number>::all_zero () const
 };
 
 
+
+template <typename number>
+FullMatrix<number> &
+FullMatrix<number>::operator *= (const double factor)
+{
+  number       *p = data();
+  const number *e = data() + n()*m();
+  while (p != e)
+    *p++ *= factor;
+
+  return *this;
+};
+
+
+
 template <typename number>
 template <typename number2>
 void
