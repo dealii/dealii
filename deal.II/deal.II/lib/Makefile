@@ -14,7 +14,7 @@ default:
 # remove all object files, libraries and temporary (st*) files
 clean: clean_1d clean_2d clean_3d
 	@echo "Cleaning present directory..."
-	-@rm -f st* lib*
+	-@rm -f st* lib* Makefile.dep
 
 clean_1d:
 	@echo "Cleaning 1d directory..."

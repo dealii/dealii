@@ -47,7 +47,7 @@ lib/liblac.g.a: $(forward-declarations) $(go-files)
 
 clean:
 	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/*.o lib/go/*.go \
-               include/base/forward_declarations.h*
+               include/base/forward_declarations.h* lib/Makefile.dep
 
 
 
