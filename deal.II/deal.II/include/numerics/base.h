@@ -25,7 +25,8 @@
 #include <string>
 
 template <int dim> class DataOut;
-
+template <int dim> class Assembler;
+template <int dim> class Equation;
 
 /**
  * The use of this class is now deprecated!

@@ -20,7 +20,11 @@
 #include <base/exceptions.h>
 #include <vector>
 
+class SparsityPattern;
+template <typename number> class Vector;
+template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
+class ConstraintMatrix;
 template <template <int> class GridClass, int dim> class InterGridMap;
 
 /**
