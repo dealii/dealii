@@ -13,23 +13,45 @@
 # ** Note that the first line might be wrong depending **
 # ** on the location of your perl program.             **
 # ** The program requires:                             **
-# **             perl version 5.003                    **
+# **             perl version 5.003 or newer           **
 #
 # cvs2html should run on any Unix compatible machine
 # with the above programs. 
-# Test machine: Linux RedHat 5.2 with Perl 5.004
+# Test machine: Linux RedHat 6.2 with Perl 5.005
 #
 # Usage :
 #
 #  type cvs2html with no arguments to display basic help
 #  or type cvs2html -h to get more help
 
-# 1.58 2000-01-04  Jon Berndt            Added a -i option to invoke 
-#                                        backgound image
+
+# Changelog        
+# Ver  Date        Who did it            What happened
+# -------------------------------------------------------------------------
+# 1.67 2000-08-21  Kirby Vandivort       Update to cvs2html to fix html 
+#                                        markup display in cvs comments
 #
-# 1.59 2000-01-12  Dag Brück and         Two additional Y2K bugs in 
-#                  Henrik Carlqvist      the dates presented
+# 1.66 2000-08-11  Kirby Vandivort       Added support for an
+#                                        parameter -P controlled location
+#                                        of cvs
 #
+# 1.65 2000-06-24  Peter Toft            Added support for filenames 
+#                                        containing whitespaces -
+#                                        requested by John Stone
+#
+# 1.64 2000-06-11  Peter Toft            Better documentation in the start
+#                                        of the program
+#
+# 1.63 2000-06-11  Peter Toft            Bug fix due to input from Andreas 
+#                                        Wieweg. Line breaks disappeared
+#
+# 1.62 2000-06-11  Peter Toft            Same chronolog entry (-p) only if time
+#                                        difference is small enough. See the
+#                                        variable $commit_smalltimedifference
+#
+# 1.61 2000-06-10  Peter Toft            Made option -p work even better
+#                                        Have a look at the chronological 
+#                                        file when using -p -c 
 #
 # 1.60 2000-06-05  Peter Toft            Bug -> when using -o DIRNAME
 #                                        acted very bad.
@@ -37,19 +59,12 @@
 #                                        the chronolog also contain the 
 #                                        cvs log entries
 #
-# 1.61 2000-06-10  Peter Toft            Made option -p work even better
-#                                        Have a look at the chronological 
-#                                        file when using -p -c 
+# 1.59 2000-01-12  Dag Brück and         Two additional Y2K bugs in 
+#                  Henrik Carlqvist      the dates presented
 #
-# 1.62 2000-06-11  Peter Toft            Same chronolog entry (-p) only if time
-#                                        difference is small enough. See the
-#                                        variable $commit_smalltimedifference
+# 1.58 2000-01-04  Jon Berndt            Added a -i option to invoke 
+#                                        backgound image
 #
-# 1.63 2000-06-11  Peter Toft            Bug fix due to input from 
-#                                        Andreas Wieweg. Line breaks disappeared
-#
-# 1.64 2000-06-11  Peter Toft            Better documentation in the start
-#                                        of the program
 # ---- ----------  --------------------  -------------------------------
 #
 # This program is protected by the GPL, and all modifications of
@@ -72,6 +87,8 @@
 #  Carlo Wood <carlo@runaway.xs4all.nl>
 #  Kirby Vandivort <kvandivo@ks.uiuc.edu>
 #  Dag Brück <dag@Dynasim.se>
+
+
 #
 # Copyright under GPL 1997,1998,1999,2000 by
 # Peter Toft (pto@sslug.dk) + the persons above
@@ -126,7 +143,7 @@ $backcolor = "#AAAAAA";
 $differencebackground = "#AABBAA";
 
 # Get the options. The ones with a colon means the an extra argument follows.
-&Getopts('r:abc:C:d:efhkl:n:N:s:vo:D:E:L:O:w:i:p');
+&Getopts('r:abc:C:d:efhkl:n:N:s:vo:D:E:L:O:w:i:pP:');
 
 # Colors and font to show the diff type of code changes when using -a
 $diffcolorHeading='#909090';  # color of 'Line'-heading of each diffed file
@@ -149,6 +166,9 @@ $whitespace="-w";
 # The timedifference in seconds which we consider as the same
 # commit time
 $commit_smalltimedifference = 10;
+
+# default CVS location (default assumes in path)
+$cvsLocation="cvs";
 
 ###############################################################
 # Subfunctions
@@ -195,6 +215,7 @@ sub shorthelp {
   print "         [-e] [-f] [-d \"MMM DD [YYYY]\"] [-D DD] [-i IMAGE] [-h]\n";
   print "         [-v] [-w FRAMEWIDTH] [-s PERCENTAGE] [-N MAXCHRONO]\n";
   print "         [-rREV1:REV2] [-c/-C CFILENAME] -O/o HTMLNAME\n";
+  print "         [-P CVSPATH]\n";
 }
 
 sub showhelp {
@@ -260,6 +281,10 @@ sub showhelp {
   print " bar in eigher pixels or percentage.\n\n";
 
   print " Use -i IMAGENAME to replace the background with IMAGENAME\n\n";
+
+  print " Use -P CVSPATH to specify an explicit location cvs.  The\n";
+  print " default value is simply 'cvs', which means that cvs is in your\n";
+  print " path.\n\n";
 
   print " The html file also contains anchors, if a file foo.html\n";
   print " containing a file e.g., foofoo.m is generated then it is\n";
@@ -387,7 +412,8 @@ sub generate_diff_file
   if ($opt_k) {
       $kkon = "-kk";
   }
-  @diffar = `cvs diff $kkon $whitespace -u -r $revnumber -r $oldrevnumber $currentdir/$filename\n`;
+
+  @diffar = `$cvsLocation diff $kkon $whitespace -u -r $revnumber -r $oldrevnumber $currentdir/$filename\n`;
   print DIFFFILE "<h2>Difference for $currentdir/$filename from version $revnumber to $oldrevnumber</h2>\n";
 
   print DIFFFILE "<table border=0 cellspacing=0 cellpadding=0 width=100%>\n";
@@ -647,6 +673,12 @@ if ($opt_l)
 if (($opt_L) && ($opt_E))
 {
   $htmllinkrel=$opt_L;
+}
+
+# Explicit path to cvs
+if ($opt_P)
+{
+  $cvsLocation=$opt_P;
 }
 
 # Get the environment variable CVSROOT for this CVS repository
@@ -990,7 +1022,10 @@ for ($dd=0;$dd<=$#alldirs;$dd++)
   while ($contin ==1)
   {
     $namlin = <NAMEFILE>;
-    ($readnameline) = $namlin =~ /^\/([a-zA-Z0-9-+_\.(...)]*)\/.*$/;
+    ($readnameline) = $namlin =~ /^\/([ a-zA-Z0-9-+_\.(...)]*)\/.*$/;
+    $_ = $readnameline;
+    s/ /~/g;
+    $readnameline = $_;
     if (length($namlin)>0)
     {
       if (length($readnameline)>0)
@@ -1046,8 +1081,11 @@ for ($dd=0;$dd<=$#alldirs;$dd++)
   }
   next if (length ($cvsnames) <= 0); # Log is empty so proceed to next directory
 
-  $cvsnames = join (' ', sort (split ' ', $cvsnames));
-  @cvslogarray=`cvs log $revisionlimiter $cvsnames `;
+  $_ = join ('" "', sort (split ' ', $cvsnames));
+  s/~/ /g;
+  $cvsnames = '"'.$_.'"';
+
+  @cvslogarray = `$cvsLocation log $revisionlimiter $cvsnames `;
 
   $line = getnextline;
 
@@ -1083,7 +1121,7 @@ for ($dd=0;$dd<=$#alldirs;$dd++)
       $line = getnextline;
       ($lfilename) = $line =~ /^.*: (.*)$/;
 
-      ($filename) = $lfilename =~ (/^.*\/([a-zA-Z0-9-+_\.(...)]*)$/);
+      ($filename) = $lfilename =~ (/^.*\/([ a-zA-Z0-9-+_\.(...)]*)$/);
       if (length($filename) == 0)
       {
         $filename = $lfilename;
@@ -1581,12 +1619,18 @@ if ($dochrono)
 	$cind = $chronocounter-$ii+$cindexlow;
       }
       $index = $cindex[$cind];
-      @lcvslog = `cvs log -N -r$chronoversion[$index] $chrononame[$index]`;
+
+      @lcvslog = `$cvsLocation log -N -r$chronoversion[$index] "$chrononame[$index]"`;
       @llcvslog = ();
       $headerstill = -1;
       foreach $jj (0 .. ($#lcvslog-1)) {
 	if ($headerstill == 0) {
-	  @llcvslog = (@llcvslog,@lcvslog[$jj]);
+	  $_=@lcvslog[$jj];
+	  s/&/&amp;/g;
+	  s/\"/&quot;/g;
+	  s/</&lt;/g;
+	  s/>/&gt;/g;
+	  @llcvslog = (@llcvslog,$_);       
 	}
 	else {
 	  $headerstill = $headerstill - 1;
