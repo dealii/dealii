@@ -1710,7 +1710,8 @@ TableBase<N,T>::TableBase (const TableBase<N,T> &src)
                 val_size (0)
 {
   reinit (src.table_size);
-  fill (src.data());
+  if (src.n_elements() != 0)
+    fill (src.data());
 };
 
 
