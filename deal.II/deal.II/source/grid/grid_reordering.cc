@@ -784,6 +784,8 @@ void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
 
 
 
+#if deal_II_dimension == 1
+
 template <>
 void GridReordering<1>::reorder_cells (vector<CellData<1> > &)
 {
@@ -791,13 +793,16 @@ void GridReordering<1>::reorder_cells (vector<CellData<1> > &)
 				   // in 1d...
 };
 
+#endif
 
 
 
 // explicit instantiations. only require the main function, it should
-// then claim whatever templates it needs
+// then claim whatever templates it needs. note that in 1d, the
+// respective function is already specialized
+#if deal_II_dimension >= 2
 template
 void
 GridReordering<deal_II_dimension>::
 reorder_cells (vector<CellData<deal_II_dimension> > &);
-
+#endif
