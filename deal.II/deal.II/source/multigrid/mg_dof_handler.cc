@@ -1356,7 +1356,7 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 
   				   // for the quads
   if (this->selected_fe->dofs_per_quad > 0)
-    for (unsigned int q=0; q<GeometryInfo<3>::lines_per_cell; ++q)
+    for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
       {
 	quad_iterator quad = cell->quad(q);
 	
@@ -1365,7 +1365,7 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // numbered (check only first dof)
 	if (quad->mg_dof_index(0) == DoFHandler<3>::invalid_dof_index)
 					   // if not: distribute dofs
-	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
+	  for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
 	    quad->set_mg_dof_index (d, next_free_dof++);	    
       };
 

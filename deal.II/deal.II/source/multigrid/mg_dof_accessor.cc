@@ -475,7 +475,7 @@ void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int ve
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (vertex<4, ExcIndexRange (i,0,4));
+  Assert (vertex<8, ExcIndexRange (vertex,0,8));
   Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
@@ -511,7 +511,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->mg_dof_index(d);
-  for (unsigned int quad=0; quad<12; ++quad)
+  for (unsigned int quad=0; quad<6; ++quad)
     for (unsigned int d=0; d<dofs_per_quad; ++d)
       *next++ = this->quad(quad)->mg_dof_index(d);
   for (unsigned int d=0; d<dofs_per_hex; ++d)
