@@ -367,9 +367,10 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 				       // resolve entries, since if
 				       // not there is no need to copy
 				       // the line one-to-one
-      tmp.resize (0);
-      tmp_other_lines.resize (0);
-      tmp_other_lines.resize (line->entries.size());
+      tmp.clear ();
+      tmp_other_lines.clear ();
+      tmp_other_lines.reserve (line->entries.size());
+
       
       bool entries_to_resolve = false;
       
@@ -393,31 +394,39 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 					       // end iterator
 	      ConstraintLine index_comparison;
 	      index_comparison.line = line->entries[i].first;
-	      tmp_other_lines[i] =
-		std::lower_bound (other_constraints.lines.begin (),
-				  other_constraints.lines.end (),
-				  index_comparison);
-	      if ((tmp_other_lines[i] != other_constraints.lines.end ()) &&
-		  (tmp_other_lines[i]->line != index_comparison.line))
-		tmp_other_lines[i] = other_constraints.lines.end ();
+
+	      std::vector<ConstraintLine>::const_iterator
+		it = std::lower_bound (other_constraints.lines.begin (),
+				       other_constraints.lines.end (),
+				       index_comparison);
+	      if ((it != other_constraints.lines.end ()) &&
+		  (it->line != index_comparison.line))
+		it = other_constraints.lines.end ();
+
+	      tmp_other_lines.push_back (it);
 	    }
 	  else
 	    {
-	      tmp_other_lines[i] = other_constraints.lines.end ();
+	      std::vector<ConstraintLine>::const_iterator
+		it = other_constraints.lines.end ();
+	      
 	      for (std::vector<ConstraintLine>::const_iterator
 		     p=other_constraints.lines.begin();
 		   p!=other_constraints.lines.end(); ++p)
 		if (p->line == line->entries[i].first)
 		  {
-		    tmp_other_lines[i] = p;
+		    it = p;
 		    break;
-		  };	      
+		  }
+
+	      tmp_other_lines.push_back (it);
 	    };
 	  
-	  if (tmp_other_lines[i] != other_constraints.lines.end ())
+	  if (tmp_other_lines.back() != other_constraints.lines.end ())
 	    entries_to_resolve = true;
 	};
-  
+      Assert (tmp_other_lines.size() == line->entries.size(),
+	      ExcInternalError());
 
 				       // now we have for each entry
 				       // in the present line whether
