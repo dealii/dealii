@@ -1429,7 +1429,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 
 				   // Here we create the
 				   // preconditioner,
-  PreconditionBlockSSOR<double> preconditioner;
+  PreconditionBlockSSOR<SparseMatrix<double> > preconditioner;
 
 				   // we asigned the matrix to it and
 				   // set the right block size.
