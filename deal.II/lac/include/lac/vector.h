@@ -15,8 +15,12 @@
 
 
 /**
- *  Numerical Vector of data.
- *
+ *  Numerical Vector of data.  For this class there are different
+ * types of functions available. The first type of function mesures
+ * the norm of the vector in order to mesure its length in a suitable
+ * norm. The second type support the abgebraic operation for
+ * vectors. The third und last type helps us to manipulate the
+ * components of the vector.
  * As opposed to the array of the C++ standard library called #vector#, this class implements
  * an element of a vector space suitable for numerical computations.
  *
