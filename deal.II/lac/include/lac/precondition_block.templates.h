@@ -299,7 +299,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
   if (!this->inverses_ready())
     {
       FullMatrix<number> M_cell(this->blocksize);
-      for (unsigned int cell=0; cell<nblocks; ++cell)
+      for (unsigned int cell=0; cell < this->nblocks; ++cell)
 	{
 	  for (row=cell*this->blocksize, row_cell=0;
 	       row_cell<this->blocksize;
@@ -325,7 +325,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 	}
     }
   else
-    for (unsigned int cell=0; cell<nblocks; ++cell)
+    for (unsigned int cell=0; cell < this->nblocks; ++cell)
       {
 	for (row=cell*this->blocksize, row_cell=0;
 	     row_cell<this->blocksize;
@@ -435,7 +435,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
   if (!this->inverses_ready())
     {
       FullMatrix<number> M_cell(this->blocksize);
-      for (unsigned int cell=0; cell<nblocks; ++cell)
+      for (unsigned int cell=0; cell < this->nblocks; ++cell)
 	{
 	  for (row = block_start, row_cell = 0;
 	       row_cell < this->blocksize;
@@ -470,7 +470,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
 	}
     }
   else
-    for (unsigned int cell=0; cell<nblocks; ++cell)
+    for (unsigned int cell=0; cell < this->nblocks; ++cell)
       {
 	for (row = block_start, row_cell = 0;
 	     row_cell<this->blocksize;
@@ -539,7 +539,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
 				       // row, column are the global numbering
 				       // of the unkowns.
   unsigned int row, row_cell, block_start = 0;
-  unsigned int block_end=this->blocksize *nblocks;
+  unsigned int block_end=this->blocksize * this->nblocks;
   number2 b_cell_row;
 
   if (!this->inverses_ready())
@@ -678,7 +678,7 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &d
   Vector<inverse_type> cell_dst(this->blocksize);
   
 				   // Multiply with diagonal blocks
-  for (unsigned int cell=0; cell<nblocks; ++cell)
+  for (unsigned int cell=0; cell < this->nblocks; ++cell)
     {
       unsigned int row = cell*this->blocksize;
       
@@ -708,7 +708,7 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &
   Vector<inverse_type> cell_dst(this->blocksize);
   
 				   // Multiply with diagonal blocks
-  for (unsigned int cell=0; cell<nblocks; ++cell)
+  for (unsigned int cell=0; cell < this->nblocks; ++cell)
     {
       unsigned int row = cell*this->blocksize;
       
