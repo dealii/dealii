@@ -181,10 +181,11 @@
  *  a face was refined or not. The same applies for boundary faces, see
  *  above.
  *  
- *  @author Wolfgang Bangerth, 1998
+ *  @author Wolfgang Bangerth, 1998, 1999; parallelization by Thomas Richter, 2000
  */
 template <int dim>
-class KellyErrorEstimator {
+class KellyErrorEstimator
+{
   public:
 
 				     /**
@@ -237,16 +238,15 @@ class KellyErrorEstimator {
 				      * bit-vector.
 				      *
 				      * The estimator supports
-				      * multithreading and splits
-				      * the cells to 4 (default)
+				      * multithreading and splits the
+				      * cells to #N_THREADS# (default)
 				      * threads. The number of threads
 				      * to be used in multithreaded
-				      * mode can be set with the
-				      * last parameter of the
-				      * error estimator.
-				      * Multithreading is only
-				      * implemented in two and three
-				      * dimensions. 
+				      * mode can be set with the last
+				      * parameter of the error
+				      * estimator.  Multithreading is
+				      * only implemented in two and
+				      * three dimensions.
 				      */
 
     static void estimate (const DoFHandler<dim>   &dof,
@@ -330,6 +330,7 @@ class KellyErrorEstimator {
 					  * of multithreading	  
 					  */ 
 	vector< vector<vector<double> > >         phi;
+
 					 /**
 					  * A vector for the gradients of
 					  * the finite element function
@@ -343,10 +344,12 @@ class KellyErrorEstimator {
 					  * quadrature point.
 					  */
 	vector< vector<vector<Tensor<1,dim> > > > psi;
+
 					 /**
 					  * The same vector for a neighbor cell
 					  */
 	vector< vector<vector<Tensor<1,dim> > > > neighbor_psi;
+
 					 /**
 					  * The normal vectors of the finite
 					  * element function on one face
@@ -367,9 +370,9 @@ class KellyErrorEstimator {
 	     const Quadrature<dim-1> &quadrature,
 	     const FunctionMap       &neumann_bc,
 	     const Vector<double>    &solution,
-	     vector<bool>            component_mask_,
+	     vector<bool>             component_mask_,
 	     const Function<dim>     *coefficients,
-	     unsigned int            n_threads);
+	     unsigned int             n_threads);
     };
 
     
@@ -387,7 +390,8 @@ class KellyErrorEstimator {
 				      * The Errorestimator in one dimension
 				      * is implemented seperatly.
 				      */
-    static void * estimate_some(Data &data, unsigned int this_thread);
+    static void * estimate_some (Data &data,
+				 const unsigned int this_thread);
     				
 				     /**
 				      * Actually do the computation on a face
@@ -409,12 +413,12 @@ class KellyErrorEstimator {
 				      */
 
 
-    static void integrate_over_regular_face (Data &data,
-					     int this_thread,
+    static void integrate_over_regular_face (Data                       &data,
+					     const unsigned int          this_thread,
 					     const active_cell_iterator &cell,
-					     const unsigned int   face_no,
-					     FEFaceValues<dim>   &fe_face_values_cell,
-					     FEFaceValues<dim>   &fe_face_values_neighbor);
+					     const unsigned int          face_no,
+					     FEFaceValues<dim>          &fe_face_values_cell,
+					     FEFaceValues<dim>          &fe_face_values_neighbor);
     
     
 				     /**
@@ -425,12 +429,12 @@ class KellyErrorEstimator {
 				      * so that the integration is a bit more
 				      * complex.
 				      */
-    static void integrate_over_irregular_face (Data &data,
-					       int this_thread,
+    static void integrate_over_irregular_face (Data                       &data,
+					       const unsigned int          this_thread,
 					       const active_cell_iterator &cell,
-					       const unsigned int   face_no,
-					       FEFaceValues<dim>    &fe_face_values,
-					       FESubfaceValues<dim> &fe_subface_values);
+					       const unsigned int          face_no,
+					       FEFaceValues<dim>          &fe_face_values,
+					       FESubfaceValues<dim>       &fe_subface_values);
 };
 
 
