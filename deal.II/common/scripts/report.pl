@@ -55,13 +55,25 @@ for ($i=1;$i<$next_index;$i++)
 # finally output a table of results
 foreach $date (sort {$b cmp $a} keys %results)
 {
+    # if this is not the first iteration, and if the month has changed,
+    # then put in a break into the table to avoid overly long tables
+    # which browsers take infinitely long to render
+    $date ~ /\d+-(\d+)-\d+/;
+    $this_month = $2;
+    if ((defined $oldmonth) && ($this_month != $old_month)) {
+	print "</table>\n\n<table>\n"
+    }
+
     print "<tr><td>$date  ";
     foreach $name (sort keys %testcase)
     {
 	$_ = $results{$date}{$name};
 	print '<th> ', $_;
     }
-    print "\n";
+    print "</tr></td>\n";
+
+    # store old month name for the next iteration of the loop
+    $old_month = $this_month;
 }
 
 print << 'EOT'
