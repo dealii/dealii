@@ -395,7 +395,7 @@ void dFMatrix::forward (dVector& dst, const dVector& src) const
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   unsigned int i,j;
-  unsigned int nu = MIN(m(),n());
+  unsigned int nu = (m()<n() ? m() : n());
   double s;
   for (i=0; i<nu; ++i)
     {
@@ -412,7 +412,7 @@ void dFMatrix::backward (dVector& dst, const dVector& src) const
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   unsigned int j;
-  unsigned int nu = MIN(m(),n());
+  unsigned int nu = (m()<n() ? m() : n());
   double s;
   for (int i=nu-1; i>=0; --i)
     {

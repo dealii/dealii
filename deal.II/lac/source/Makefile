@@ -26,11 +26,9 @@ h-files  = $(wildcard ../include/*/*.h)
 
 %.go : %.cc Makefile
 	@echo ============================ Compiling with debugging information:   $<
-	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 %.o : %.cc Makefile
 	@echo ============================ Compiling with optimization:   $<
-	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
