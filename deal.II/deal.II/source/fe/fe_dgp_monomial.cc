@@ -644,7 +644,7 @@ FE_DGPMonomial<dim>::element_multiplicity (const unsigned int index) const
 
 template <>
 bool
-FE_DGPMonomial<1>::has_support_on_face (const unsigned int shape_index,
+FE_DGPMonomial<1>::has_support_on_face (const unsigned int,
 					const unsigned int face_index) const
 {
   return face_index==1 || (face_index==0 && get_degree()==0);
