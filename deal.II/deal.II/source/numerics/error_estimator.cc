@@ -171,8 +171,11 @@ estimate (const Mapping<1>                    &mapping,
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());  
   
-  Assert (component_mask_.size() == n_components, ExcInvalidComponentMask());
-  Assert (std::count(component_mask_.begin(), component_mask_.end(), true) > 0,
+  Assert ((component_mask_.size() == 0) ||
+          (component_mask_.size() == n_components), ExcInvalidComponentMask());
+  Assert ((component_mask_.size() == 0) ||
+          (std::count(component_mask_.begin(), component_mask_.end(),
+                      true) > 0),
 	  ExcInvalidComponentMask());
 
   Assert ((coefficient == 0) ||
@@ -548,7 +551,7 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
                                     const typename FunctionMap<dim>::type &neumann_bc,
                                     const std::vector<const Vector<double>*> &solutions,
                                     std::vector<Vector<float>*>              &errors,
-                                    const std::vector<bool>                  &component_mask,
+                                    const std::vector<bool>                  &component_mask_,
                                     const Function<dim>                 *coefficients,
                                     const unsigned int                   n_threads_)
 {
@@ -564,8 +567,11 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());  
   
-  Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+  Assert ((component_mask_.size() == 0) ||
+          (component_mask_.size() == n_components), ExcInvalidComponentMask());
+  Assert ((component_mask_.size() == 0) ||
+          (std::count(component_mask_.begin(), component_mask_.end(),
+                      true) > 0),
 	  ExcInvalidComponentMask());
 
   Assert ((coefficients == 0) ||
@@ -577,6 +583,13 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
 	    ExcInvalidSolutionVector());
   
+				   // if no mask given: treat all components
+  std::vector<bool> component_mask ((component_mask_.size() == 0)    ?
+				    std::vector<bool>(n_components, true) :
+				    component_mask_);
+  Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
+  Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
+	  ExcInvalidComponentMask());
 	  
 				   // if NOT multithreaded, set n_threads to one
   unsigned int n_threads = n_threads_;
