@@ -1119,7 +1119,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
   Assert(selected_dofs.size() == dof_handler.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
 				   // preset all values by false
-  fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
   const FiniteElement<dim> &fe   = dof_handler.get_fe();
   
@@ -1172,6 +1172,38 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
 };
 
 #endif
+
+
+
+template <int dim>
+void
+DoFTools::extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
+				  const unsigned int     subdomain_id,
+				  std::vector<bool>     &selected_dofs)
+{
+  Assert(selected_dofs.size() == dof_handler.n_dofs(),
+	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
+				   // preset all values by false
+  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+
+  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  
+				   // this function is similar to the
+				   // make_sparsity_pattern function,
+				   // see there for more information
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    if (cell->subdomain_id() == subdomain_id)
+      {
+	cell->get_dof_indices (local_dof_indices);
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  selected_dofs[local_dof_indices[i]] = true;
+      };
+};
 
 
 
@@ -2362,7 +2394,13 @@ DoFTools::extract_boundary_dofs (const DoFHandler<deal_II_dimension> &,
 				 const std::set<unsigned char> &);
 #endif 
 
+template
+void
+DoFTools::extract_subdomain_dofs (const DoFHandler<deal_II_dimension> &dof_handler,
+				  const unsigned int     subdomain_id,
+				  std::vector<bool>     &selected_dofs);
 
+  
 template
 void
 DoFTools::count_dofs_per_component (const DoFHandler<deal_II_dimension> &dof_handler,

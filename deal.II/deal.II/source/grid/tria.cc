@@ -263,6 +263,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
       next_free_line->set_used_flag ();
       next_free_line->set_material_id (cells[cell].material_id);
       next_free_line->clear_user_pointer ();
+      next_free_line->set_subdomain_id (0);
       
 				       // note that this cell
 				       // is adjacent to these vertices
@@ -626,6 +627,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  cell->set_used_flag ();
 	  cell->set_material_id (cells[c].material_id);
 	  cell->clear_user_pointer ();
+	  cell->set_subdomain_id (0);
+	  
 					   // note that this cell is adjacent
 					   // to the four lines
 	  for (unsigned int line=0; line<4; ++line)
@@ -810,7 +813,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
  * Since this comparison is not canonical, we do not include it into the
  * general Quad class.
  */
-struct QuadComparator {
+struct QuadComparator
+{
     inline bool operator () (const Quad &q1, const Quad &q2) const
       {
 					 // here is room to optimize the
@@ -1256,6 +1260,8 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  cell->set_material_id (cells[c].material_id);
 	  cell->clear_user_flag ();
 	  cell->clear_user_pointer ();
+	  cell->set_subdomain_id (0);
+	  
 					   // note that this cell is adjacent
 					   // to the four lines
 	  for (unsigned int quad=0; quad<6; ++quad)
@@ -1775,7 +1781,8 @@ using namespace std;
 
 
 template <int dim>
-void Triangulation<dim>::save_refine_flags (std::vector<bool> &v) const {
+void Triangulation<dim>::save_refine_flags (std::vector<bool> &v) const
+{
   v.resize (n_active_cells(), false);
   std::vector<bool>::iterator  i = v.begin();
   active_cell_iterator cell = begin_active(),
@@ -1785,8 +1792,10 @@ void Triangulation<dim>::save_refine_flags (std::vector<bool> &v) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_refine_flags (std::ostream &out) const {
+void Triangulation<dim>::save_refine_flags (std::ostream &out) const
+{
   std::vector<bool> v;
   save_refine_flags (v);
   write_bool_vector (mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end,
@@ -1794,8 +1803,10 @@ void Triangulation<dim>::save_refine_flags (std::ostream &out) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_refine_flags (std::istream &in) {
+void Triangulation<dim>::load_refine_flags (std::istream &in)
+{
   std::vector<bool> v;
   read_bool_vector (mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end,
 		    in);
@@ -1803,8 +1814,10 @@ void Triangulation<dim>::load_refine_flags (std::istream &in) {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_refine_flags (const std::vector<bool> &v) {
+void Triangulation<dim>::load_refine_flags (const std::vector<bool> &v)
+{
   Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
@@ -1818,8 +1831,10 @@ void Triangulation<dim>::load_refine_flags (const std::vector<bool> &v) {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_coarsen_flags (std::vector<bool> &v) const {
+void Triangulation<dim>::save_coarsen_flags (std::vector<bool> &v) const
+{
   v.resize (n_active_cells(), false);
   std::vector<bool>::iterator  i = v.begin();
   active_cell_iterator cell = begin_active(),
@@ -1829,8 +1844,10 @@ void Triangulation<dim>::save_coarsen_flags (std::vector<bool> &v) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_coarsen_flags (std::ostream &out) const {
+void Triangulation<dim>::save_coarsen_flags (std::ostream &out) const
+{
   std::vector<bool> v;
   save_coarsen_flags (v);
   write_bool_vector (mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end,
@@ -1838,8 +1855,10 @@ void Triangulation<dim>::save_coarsen_flags (std::ostream &out) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_coarsen_flags (std::istream &in) {
+void Triangulation<dim>::load_coarsen_flags (std::istream &in)
+{
   std::vector<bool> v;
   read_bool_vector (mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end,
 		    in);
@@ -1847,8 +1866,10 @@ void Triangulation<dim>::load_coarsen_flags (std::istream &in) {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v) {
+void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v)
+{
   Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
@@ -1865,7 +1886,8 @@ void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v) {
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::clear_user_pointers () {
+void Triangulation<1>::clear_user_pointers ()
+{
   cell_iterator cell = begin(),
 		endc = end();
   for (; cell!=endc; ++cell)
@@ -1873,8 +1895,10 @@ void Triangulation<1>::clear_user_pointers () {
 };
 
 
+
 template <>
-void Triangulation<1>::clear_user_flags () {
+void Triangulation<1>::clear_user_flags ()
+{
   cell_iterator cell = begin(),
 		endc = end();
   for (; cell!=endc; ++cell)
@@ -1887,7 +1911,8 @@ void Triangulation<1>::clear_user_flags () {
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::clear_user_pointers () {
+void Triangulation<2>::clear_user_pointers ()
+{
   line_iterator line = begin_line(),
 		endl = end_line();
   for (; line!=endl; ++line)
@@ -1900,8 +1925,10 @@ void Triangulation<2>::clear_user_pointers () {
 };
 
 
+
 template <>
-void Triangulation<2>::clear_user_flags () {
+void Triangulation<2>::clear_user_flags ()
+{
   line_iterator line = begin_line(),
 		endl = end_line();
   for (; line!=endl; ++line)
@@ -1920,7 +1947,8 @@ void Triangulation<2>::clear_user_flags () {
 #if deal_II_dimension == 3
 
 template <>
-void Triangulation<3>::clear_user_pointers () {
+void Triangulation<3>::clear_user_pointers ()
+{
   line_iterator line = begin_line(),
 		endl = end_line();
   for (; line!=endl; ++line)
@@ -1938,8 +1966,10 @@ void Triangulation<3>::clear_user_pointers () {
 };
 
 
+
 template <>
-void Triangulation<3>::clear_user_flags () {
+void Triangulation<3>::clear_user_flags ()
+{
   line_iterator line = begin_line(),
 		endl = end_line();
   for (; line!=endl; ++line)
@@ -1961,7 +1991,8 @@ void Triangulation<3>::clear_user_flags () {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags (std::ostream &out) const {
+void Triangulation<dim>::save_user_flags (std::ostream &out) const
+{
   save_user_flags_line (out);
   
   if (dim>=2)
@@ -1975,8 +2006,10 @@ void Triangulation<dim>::save_user_flags (std::ostream &out) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_user_flags (std::vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags (std::vector<bool> &v) const
+{
 				   // clear vector and append
 				   // all the stuff later on
   v.clear ();
@@ -2003,6 +2036,7 @@ void Triangulation<dim>::save_user_flags (std::vector<bool> &v) const {
 };
 
 
+
 template <int dim>
 void Triangulation<dim>::load_user_flags (std::istream &in)
 {
@@ -2017,6 +2051,7 @@ void Triangulation<dim>::load_user_flags (std::istream &in)
   if (dim >= 4)
     Assert (false, ExcNotImplemented());
 };
+
 
 
 template <int dim>
@@ -2054,8 +2089,10 @@ void Triangulation<dim>::load_user_flags (const std::vector<bool> &v)
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_user_flags_line (std::vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags_line (std::vector<bool> &v) const
+{
   v.resize (n_lines(), false);
   std::vector<bool>::iterator  i = v.begin();
   line_iterator line = begin_line(),
@@ -2065,8 +2102,10 @@ void Triangulation<dim>::save_user_flags_line (std::vector<bool> &v) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_user_flags_line (std::ostream &out) const {
+void Triangulation<dim>::save_user_flags_line (std::ostream &out) const
+{
   std::vector<bool> v;
   save_user_flags_line (v);
   write_bool_vector (mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end,
@@ -2074,8 +2113,10 @@ void Triangulation<dim>::save_user_flags_line (std::ostream &out) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_user_flags_line (std::istream &in) {
+void Triangulation<dim>::load_user_flags_line (std::istream &in)
+{
   std::vector<bool> v;
   read_bool_vector (mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end,
 		    in);
@@ -2083,8 +2124,10 @@ void Triangulation<dim>::load_user_flags_line (std::istream &in) {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_user_flags_line (const std::vector<bool> &v) {
+void Triangulation<dim>::load_user_flags_line (const std::vector<bool> &v)
+{
   Assert (v.size() == n_lines(), ExcGridReadError());
   
   line_iterator line = begin_line(),
@@ -2101,49 +2144,64 @@ void Triangulation<dim>::load_user_flags_line (const std::vector<bool> &v) {
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::save_user_flags_quad (std::ostream &) const {
+void Triangulation<1>::save_user_flags_quad (std::ostream &) const
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const {
+void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<1>::load_user_flags_quad (std::istream &) {
+void Triangulation<1>::load_user_flags_quad (std::istream &)
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &) {
+void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &)
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<1>::save_user_flags_hex (std::ostream &) const {
+void Triangulation<1>::save_user_flags_hex (std::ostream &) const
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const {
+void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<1>::load_user_flags_hex (std::istream &) {
+void Triangulation<1>::load_user_flags_hex (std::istream &)
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &) {
+void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &)
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
@@ -2151,7 +2209,8 @@ void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &) {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_quad (std::vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags_quad (std::vector<bool> &v) const
+{
   v.resize (n_quads(), false);
   std::vector<bool>::iterator  i = v.begin();
   quad_iterator quad = begin_quad(),
@@ -2161,8 +2220,10 @@ void Triangulation<dim>::save_user_flags_quad (std::vector<bool> &v) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_user_flags_quad (std::ostream &out) const {
+void Triangulation<dim>::save_user_flags_quad (std::ostream &out) const
+{
   std::vector<bool> v;
   save_user_flags_quad (v);
   write_bool_vector (mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end,
@@ -2170,8 +2231,10 @@ void Triangulation<dim>::save_user_flags_quad (std::ostream &out) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_user_flags_quad (std::istream &in) {
+void Triangulation<dim>::load_user_flags_quad (std::istream &in)
+{
   std::vector<bool> v;
   read_bool_vector (mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end,
 		    in);
@@ -2179,8 +2242,10 @@ void Triangulation<dim>::load_user_flags_quad (std::istream &in) {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_user_flags_quad (const std::vector<bool> &v) {
+void Triangulation<dim>::load_user_flags_quad (const std::vector<bool> &v)
+{
   Assert (v.size() == n_quads(), ExcGridReadError());
   
   quad_iterator quad = begin_quad(),
@@ -2197,25 +2262,32 @@ void Triangulation<dim>::load_user_flags_quad (const std::vector<bool> &v) {
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::save_user_flags_hex (std::ostream &) const {
+void Triangulation<2>::save_user_flags_hex (std::ostream &) const
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const {
+void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<2>::load_user_flags_hex (std::istream &) {
+void Triangulation<2>::load_user_flags_hex (std::istream &)
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
 
+
 template <>
-void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &) {
+void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &)
+{
   Assert (false, ExcFunctionNotUseful());
 };
 
@@ -2224,7 +2296,8 @@ void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &) {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_hex (std::vector<bool> &v) const {
+void Triangulation<dim>::save_user_flags_hex (std::vector<bool> &v) const
+{
   v.resize (n_hexs(), false);
   std::vector<bool>::iterator  i = v.begin();
   hex_iterator hex = begin_hex(),
@@ -2234,8 +2307,10 @@ void Triangulation<dim>::save_user_flags_hex (std::vector<bool> &v) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::save_user_flags_hex (std::ostream &out) const {
+void Triangulation<dim>::save_user_flags_hex (std::ostream &out) const
+{
   std::vector<bool> v;
   save_user_flags_hex (v);
   write_bool_vector (mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end,
@@ -2243,8 +2318,10 @@ void Triangulation<dim>::save_user_flags_hex (std::ostream &out) const {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_user_flags_hex (std::istream &in) {
+void Triangulation<dim>::load_user_flags_hex (std::istream &in)
+{
   std::vector<bool> v;
   read_bool_vector (mn_tria_hex_user_flags_begin, v, mn_tria_hex_user_flags_end,
 		    in);
@@ -2252,8 +2329,10 @@ void Triangulation<dim>::load_user_flags_hex (std::istream &in) {
 };
 
 
+
 template <int dim>
-void Triangulation<dim>::load_user_flags_hex (const std::vector<bool> &v) {
+void Triangulation<dim>::load_user_flags_hex (const std::vector<bool> &v)
+{
   Assert (v.size() == n_hexs(), ExcGridReadError());
   
   hex_iterator hex = begin_hex(),
@@ -2274,295 +2353,370 @@ void Triangulation<dim>::load_user_flags_hex (const std::vector<bool> &v) {
 
 template <>
 TriaDimensionInfo<1>::raw_cell_iterator
-Triangulation<1>::begin_raw (const unsigned int level) const {
+Triangulation<1>::begin_raw (const unsigned int level) const
+{
   return begin_raw_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::active_cell_iterator
-Triangulation<1>::begin_active (const unsigned int level) const {
+Triangulation<1>::begin_active (const unsigned int level) const
+{
   return begin_active_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::raw_cell_iterator
-Triangulation<1>::last_raw () const {
+Triangulation<1>::last_raw () const
+{
   return last_raw_line ();
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::raw_cell_iterator
-Triangulation<1>::last_raw (const unsigned int level) const {
+Triangulation<1>::last_raw (const unsigned int level) const
+{
   return last_raw_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::cell_iterator
-Triangulation<1>::last () const {
+Triangulation<1>::last () const
+{
   return last_line ();
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::cell_iterator
-Triangulation<1>::last (const unsigned int level) const {
+Triangulation<1>::last (const unsigned int level) const
+{
   return last_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::active_cell_iterator
-Triangulation<1>::last_active () const {
+Triangulation<1>::last_active () const
+{
   return last_active_line ();
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::active_cell_iterator
-Triangulation<1>::last_active (const unsigned int level) const {
+Triangulation<1>::last_active (const unsigned int level) const
+{
   return last_active_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::raw_face_iterator
-Triangulation<1>::begin_raw_face (const unsigned int) const {
+Triangulation<1>::begin_raw_face (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::face_iterator
-Triangulation<1>::begin_face (const unsigned int) const {
+Triangulation<1>::begin_face (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::active_face_iterator
-Triangulation<1>::begin_active_face (const unsigned int) const {
+Triangulation<1>::begin_active_face (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_face_iterator
-Triangulation<1>::end_face () const {
+Triangulation<1>::end_face () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_face_iterator
-Triangulation<1>::last_raw_face () const {
+Triangulation<1>::last_raw_face () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_face_iterator
-Triangulation<1>::last_raw_face (const unsigned int) const {
+Triangulation<1>::last_raw_face (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::face_iterator
-Triangulation<1>::last_face () const {
+Triangulation<1>::last_face () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::face_iterator
-Triangulation<1>::last_face (const unsigned int) const {
+Triangulation<1>::last_face (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::active_face_iterator
-Triangulation<1>::last_active_face () const {
+Triangulation<1>::last_active_face () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::active_face_iterator
-Triangulation<1>::last_active_face (const unsigned int) const {
+Triangulation<1>::last_active_face (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_quad_iterator
-Triangulation<1>::begin_raw_quad (const unsigned int) const {
+Triangulation<1>::begin_raw_quad (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::quad_iterator
-Triangulation<1>::begin_quad (const unsigned int) const {
+Triangulation<1>::begin_quad (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::active_quad_iterator
-Triangulation<1>::begin_active_quad (const unsigned int) const {
+Triangulation<1>::begin_active_quad (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_quad_iterator
-Triangulation<1>::end_quad () const {
+Triangulation<1>::end_quad () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_quad_iterator
-Triangulation<1>::last_raw_quad (const unsigned int) const {
+Triangulation<1>::last_raw_quad (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_quad_iterator
-Triangulation<1>::last_raw_quad () const {
+Triangulation<1>::last_raw_quad () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::quad_iterator
-Triangulation<1>::last_quad (const unsigned int) const {
+Triangulation<1>::last_quad (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::quad_iterator
-Triangulation<1>::last_quad () const {
+Triangulation<1>::last_quad () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::active_quad_iterator
-Triangulation<1>::last_active_quad (const unsigned int) const {
+Triangulation<1>::last_active_quad (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::active_quad_iterator
-Triangulation<1>::last_active_quad () const {
+Triangulation<1>::last_active_quad () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_hex_iterator
-Triangulation<1>::begin_raw_hex (const unsigned int) const {
+Triangulation<1>::begin_raw_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::hex_iterator
-Triangulation<1>::begin_hex (const unsigned int) const {
+Triangulation<1>::begin_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::active_hex_iterator
-Triangulation<1>::begin_active_hex (const unsigned int) const {
+Triangulation<1>::begin_active_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_hex_iterator
-Triangulation<1>::end_hex () const {
+Triangulation<1>::end_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_hex_iterator
-Triangulation<1>::last_raw_hex (const unsigned int) const {
+Triangulation<1>::last_raw_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::raw_hex_iterator
-Triangulation<1>::last_raw_hex () const {
+Triangulation<1>::last_raw_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::hex_iterator
-Triangulation<1>::last_hex (const unsigned int) const {
+Triangulation<1>::last_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<1>::hex_iterator
-Triangulation<1>::last_hex () const {
+Triangulation<1>::last_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::active_hex_iterator
-Triangulation<1>::last_active_hex (const unsigned int) const {
+Triangulation<1>::last_active_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
 
 
+
 template <>
 TriaDimensionInfo<1>::active_hex_iterator
-Triangulation<1>::last_active_hex () const {
+Triangulation<1>::last_active_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
@@ -2574,209 +2728,263 @@ Triangulation<1>::last_active_hex () const {
 
 template <>
 TriaDimensionInfo<2>::raw_cell_iterator
-Triangulation<2>::begin_raw (const unsigned int level) const {
+Triangulation<2>::begin_raw (const unsigned int level) const
+{
   return begin_raw_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::active_cell_iterator
-Triangulation<2>::begin_active (const unsigned int level) const {
+Triangulation<2>::begin_active (const unsigned int level) const
+{
   return begin_active_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::raw_cell_iterator
-Triangulation<2>::last_raw () const {
+Triangulation<2>::last_raw () const
+{
   return last_raw_quad ();
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::raw_cell_iterator
-Triangulation<2>::last_raw (const unsigned int level) const {
+Triangulation<2>::last_raw (const unsigned int level) const
+{
   return last_raw_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::cell_iterator
-Triangulation<2>::last () const {
+Triangulation<2>::last () const
+{
   return last_quad ();
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::cell_iterator
-Triangulation<2>::last (const unsigned int level) const {
+Triangulation<2>::last (const unsigned int level) const
+{
   return last_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::active_cell_iterator
-Triangulation<2>::last_active () const {
+Triangulation<2>::last_active () const
+{
   return last_active_quad ();
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::active_cell_iterator
-Triangulation<2>::last_active (const unsigned int level) const {
+Triangulation<2>::last_active (const unsigned int level) const
+{
   return last_active_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::raw_face_iterator
-Triangulation<2>::begin_raw_face (const unsigned int level) const {
+Triangulation<2>::begin_raw_face (const unsigned int level) const
+{
   return begin_raw_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::face_iterator
-Triangulation<2>::begin_face (const unsigned int level) const {
+Triangulation<2>::begin_face (const unsigned int level) const
+{
   return begin_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::active_face_iterator
-Triangulation<2>::begin_active_face (const unsigned int level) const {
+Triangulation<2>::begin_active_face (const unsigned int level) const
+{
   return begin_active_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::raw_face_iterator
-Triangulation<2>::end_face () const {
+Triangulation<2>::end_face () const
+{
   return end_line ();
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::raw_face_iterator
-Triangulation<2>::last_raw_face () const {
+Triangulation<2>::last_raw_face () const
+{
   return last_raw_line ();
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::raw_face_iterator
-Triangulation<2>::last_raw_face (const unsigned int level) const {
+Triangulation<2>::last_raw_face (const unsigned int level) const
+{
   return last_raw_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::face_iterator
-Triangulation<2>::last_face () const {
+Triangulation<2>::last_face () const
+{
   return last_line ();
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::face_iterator
-Triangulation<2>::last_face (const unsigned int level) const {
+Triangulation<2>::last_face (const unsigned int level) const
+{
   return last_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::active_face_iterator
-Triangulation<2>::last_active_face () const {
+Triangulation<2>::last_active_face () const
+{
   return last_active_line ();
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::active_face_iterator
-Triangulation<2>::last_active_face (const unsigned int level) const {
+Triangulation<2>::last_active_face (const unsigned int level) const
+{
   return last_active_line (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<2>::raw_hex_iterator
-Triangulation<2>::begin_raw_hex (const unsigned int) const {
+Triangulation<2>::begin_raw_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::hex_iterator
-Triangulation<2>::begin_hex (const unsigned int) const {
+Triangulation<2>::begin_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::active_hex_iterator
-Triangulation<2>::begin_active_hex (const unsigned int) const {
+Triangulation<2>::begin_active_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::raw_hex_iterator
-Triangulation<2>::end_hex () const {
+Triangulation<2>::end_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::raw_hex_iterator
-Triangulation<2>::last_raw_hex (const unsigned int) const {
+Triangulation<2>::last_raw_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::raw_hex_iterator
-Triangulation<2>::last_raw_hex () const {
+Triangulation<2>::last_raw_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::hex_iterator
-Triangulation<2>::last_hex (const unsigned int) const {
+Triangulation<2>::last_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::hex_iterator
-Triangulation<2>::last_hex () const {
+Triangulation<2>::last_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::active_hex_iterator
-Triangulation<2>::last_active_hex (const unsigned int) const {
+Triangulation<2>::last_active_hex (const unsigned int) const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
+
 
 
 template <>
 TriaDimensionInfo<2>::active_hex_iterator
-Triangulation<2>::last_active_hex () const {
+Triangulation<2>::last_active_hex () const
+{
   Assert (false, ExcFunctionNotUseful());
   return 0;
 };
-
 
 #endif
 
@@ -2785,114 +2993,146 @@ Triangulation<2>::last_active_hex () const {
 
 template <>
 TriaDimensionInfo<3>::raw_cell_iterator
-Triangulation<3>::begin_raw (const unsigned int level) const {
+Triangulation<3>::begin_raw (const unsigned int level) const
+{
   return begin_raw_hex (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::active_cell_iterator
-Triangulation<3>::begin_active (const unsigned int level) const {
+Triangulation<3>::begin_active (const unsigned int level) const
+{
   return begin_active_hex (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::raw_cell_iterator
-Triangulation<3>::last_raw () const {
+Triangulation<3>::last_raw () const
+{
   return last_raw_hex ();
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::raw_cell_iterator
-Triangulation<3>::last_raw (const unsigned int level) const {
+Triangulation<3>::last_raw (const unsigned int level) const
+{
   return last_raw_hex (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::cell_iterator
-Triangulation<3>::last () const {
+Triangulation<3>::last () const
+{
   return last_hex ();
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::cell_iterator
-Triangulation<3>::last (const unsigned int level) const {
+Triangulation<3>::last (const unsigned int level) const
+{
   return last_hex (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::active_cell_iterator
-Triangulation<3>::last_active () const {
+Triangulation<3>::last_active () const
+{
   return last_active_hex ();
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::active_cell_iterator
-Triangulation<3>::last_active (const unsigned int level) const {
+Triangulation<3>::last_active (const unsigned int level) const
+{
   return last_active_hex (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::raw_face_iterator
-Triangulation<3>::begin_raw_face (const unsigned int level) const {
+Triangulation<3>::begin_raw_face (const unsigned int level) const
+{
   return begin_raw_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::face_iterator
-Triangulation<3>::begin_face (const unsigned int level) const {
+Triangulation<3>::begin_face (const unsigned int level) const
+{
   return begin_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::active_face_iterator
-Triangulation<3>::begin_active_face (const unsigned int level) const {
+Triangulation<3>::begin_active_face (const unsigned int level) const
+{
   return begin_active_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::raw_face_iterator
-Triangulation<3>::end_face () const {
+Triangulation<3>::end_face () const
+{
   return end_quad ();
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::raw_face_iterator
-Triangulation<3>::last_raw_face () const {
+Triangulation<3>::last_raw_face () const
+{
   return last_raw_quad ();
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::raw_face_iterator
-Triangulation<3>::last_raw_face (const unsigned int level) const {
+Triangulation<3>::last_raw_face (const unsigned int level) const
+{
   return last_raw_quad (level);
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::face_iterator
-Triangulation<3>::last_face () const {
+Triangulation<3>::last_face () const
+{
   return last_quad ();
 };
 
 
+
 template <>
 TriaDimensionInfo<3>::face_iterator
-Triangulation<3>::last_face (const unsigned int level) const {
+Triangulation<3>::last_face (const unsigned int level) const
+{
   return last_quad (level);
 };
+
 
 
 template <>
@@ -2901,6 +3141,7 @@ Triangulation<3>::last_active_face () const
 {
   return last_active_quad ();
 };
+
 
 
 template <>
@@ -3908,6 +4149,7 @@ void Triangulation<1>::execute_refinement () {
 	    first_child->clear_children ();
 	    first_child->set (Line (cell->vertex_index(0), next_unused_vertex));
 	    first_child->set_material_id (cell->material_id());
+	    first_child->set_subdomain_id (cell->subdomain_id());	    
 	    
 					     // reset neighborship info
 					     // (refer to \Ref{TriangulationLevel<0>}
@@ -3951,6 +4193,7 @@ void Triangulation<1>::execute_refinement () {
 	    second_child->set (Line (next_unused_vertex, cell->vertex_index(1)));
 	    second_child->set_neighbor (0, first_child);
 	    second_child->set_material_id (cell->material_id());
+	    second_child->set_subdomain_id (cell->subdomain_id());	    
 	    if (cell->neighbor(1).state() != valid)
 	      second_child->set_neighbor (1, cell->neighbor(1));
 	    else
@@ -4595,6 +4838,11 @@ void Triangulation<2>::execute_refinement () {
 	    subcells[1]->set_material_id (cell->material_id());
 	    subcells[2]->set_material_id (cell->material_id());
 	    subcells[3]->set_material_id (cell->material_id());
+
+	    subcells[0]->set_subdomain_id (cell->subdomain_id());
+	    subcells[1]->set_subdomain_id (cell->subdomain_id());
+	    subcells[2]->set_subdomain_id (cell->subdomain_id());
+	    subcells[3]->set_subdomain_id (cell->subdomain_id());
 	  };
     };
 
@@ -5659,6 +5907,7 @@ void Triangulation<3>::execute_refinement ()
 		new_hexes[i]->clear_children();
 						 // inherit material properties
 		new_hexes[i]->set_material_id (hex->material_id());
+		new_hexes[i]->set_subdomain_id (hex->subdomain_id());		
 	      };
 
 

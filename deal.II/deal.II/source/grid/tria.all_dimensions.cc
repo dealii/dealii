@@ -154,6 +154,11 @@ TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
 			    total_cells - coarsen_flags.size(),
 			    false);
       
+      subdomain_ids.reserve (total_cells);
+      subdomain_ids.insert (subdomain_ids.end(),
+			    total_cells - subdomain_ids.size(),
+			    0);
+      
       neighbors.reserve (total_cells*(2*dimension));
       neighbors.insert (neighbors.end(),
 			total_cells*(2*dimension) - neighbors.size(),
@@ -185,6 +190,10 @@ TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const
 	  neighbors.size()<256,
 	  ExcMemoryWasted ("neighbors",
 			   neighbors.size(), neighbors.capacity()));
+  Assert (subdomain_ids.size() ==  subdomain_ids.capacity() ||
+	  subdomain_ids.size()<256,
+	  ExcMemoryWasted ("subdomain_ids",
+			   subdomain_ids.size(), subdomain_ids.capacity()));
   Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
 	  ExcMemoryInexact (refine_flags.size(), neighbors.size()));
   Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
