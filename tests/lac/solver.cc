@@ -28,14 +28,15 @@ check_method( SOLVER& solver, const MATRIX& A,
   solver.solve(A,u,f,P);
 }
 
-main()
+int main()
 {
   ofstream logfile("solver.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   
-  PrimitiveVectorMemory<Vector<double>  > mem;
-  SolverControl control(50, 1.e-5);
+  GrowingVectorMemory<Vector<double>  > mem;
+  SolverControl control(100, 1.e-5);
+  SolverControl verbose_control(100, 1.e-5, true);
   SolverCG<SparseMatrix<float> , Vector<double>  > cg(control, mem);
   SolverGMRES<SparseMatrix<float> , Vector<double>  > gmres(control, mem,20);
   SolverBicgstab<SparseMatrix<float> , Vector<double>  > bicgstab(control, mem);
@@ -44,10 +45,10 @@ main()
 
   for (unsigned int size=4; size <= 40; size *= 3)
     {
-      deallog << "Size " << size << endl;
-      
       unsigned int dim = (size-1)*(size-1);
 
+      deallog << "Size " << size << " Unknowns " << dim << endl;
+      
 				       // Make matrix
       FDMatrix testproblem(size, size);
       SparseMatrixStruct structure(dim, dim, 5);
@@ -56,7 +57,7 @@ main()
       SparseMatrix<float>  A(structure);
       testproblem.laplacian(A);
 
-      PreconditionIdentity<Vector<double>  >
+      PreconditionIdentity
 	prec_no;
       PreconditionRelaxation<SparseMatrix<float> , Vector<double> >
 	prec_sor(A, &SparseMatrix<float> ::template precondition_SOR<double>, 1.2);

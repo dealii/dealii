@@ -136,9 +136,9 @@ int main()
 	  SolverControl cgcontrol(20,0., false, false);
 	  PrimitiveVectorMemory<Vector<double> > cgmem;
 	  SolverCG<SparseMatrix<double>, Vector<double> > cgsolver(cgcontrol, cgmem);
-	  PreconditionIdentity<Vector<double> > cgprec;
+	  PreconditionIdentity cgprec;
 	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<double>, Vector<double> >,
-	    SparseMatrix<double>, PreconditionIdentity<Vector<double> > >
+	    SparseMatrix<double>, PreconditionIdentity>
 	    coarse(cgsolver, mgA[tr.n_levels()-2], cgprec);
 	  
 	  MGSmootherRelaxation<double>

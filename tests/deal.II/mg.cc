@@ -104,7 +104,7 @@ int main()
 	  SolverControl control(100, 1.e-12);
 	  SolverCG<SparseMatrix<double>, Vector<double> >solver(control, mem);
 	  
-	  PreconditionIdentity<Vector<double> > precondition;
+	  PreconditionIdentity precondition;
 	  solver.solve(A,u,f,precondition);
 	  
 	  u = 0.;
@@ -124,9 +124,9 @@ int main()
 	  SolverControl cgcontrol(10,0., false, false);
 	  PrimitiveVectorMemory<Vector<double> > cgmem;
 	  SolverCG<SparseMatrix<double>, Vector<double> > cgsolver(cgcontrol, cgmem);
-	  PreconditionIdentity<Vector<double> > cgprec;
+	  PreconditionIdentity cgprec;
 	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<double>, Vector<double> >,
-	    SparseMatrix<double>, PreconditionIdentity<Vector<double> > >
+	    SparseMatrix<double>, PreconditionIdentity>
 	    coarse(cgsolver, mgA[0], cgprec);
 	  
 	  MGSmootherLAC smoother(mgA);

@@ -1,10 +1,9 @@
 
-DEAL::Size 4
+DEAL::Size 4 Unknowns 9
 DEAL::SOR-diff:0
 DEAL:no:cg::Starting 
 DEAL:no:cg::Starting 
 DEAL:no:cg::Convergence step 2 
-DEAL:no:Bicgstab::Go!
 DEAL:no:Bicgstab::Starting 
 DEAL:no:Bicgstab::Convergence step 3 
 DEAL:no:GMRES::Starting 
@@ -17,33 +16,30 @@ DEAL:ssor:Richardson::Convergence step 15
 DEAL:ssor:cg::Starting 
 DEAL:ssor:cg::Starting 
 DEAL:ssor:cg::Convergence step 4 
-DEAL:ssor:Bicgstab::Go!
 DEAL:ssor:Bicgstab::Starting 
 DEAL:ssor:Bicgstab::Convergence step 3 
 DEAL:ssor:GMRES::Starting 
 DEAL:ssor:GMRES::Starting 
 DEAL:ssor:GMRES::Convergence step 3 
 DEAL:ssor:QMRS::Starting 
-DEAL:ssor:QMRS::Convergence step 11 
+DEAL:ssor:QMRS::Convergence step 5 
 DEAL:sor:Richardson::Starting 
 DEAL:sor:Richardson::Convergence step 10 
 DEAL:sor:cg::Starting 
 DEAL:sor:cg::Starting 
-DEAL:sor:cg::Failure step 50 
-DEAL:sor:Bicgstab::Go!
+DEAL:sor:cg::Failure step 100 
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 5 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Convergence step 4 
 DEAL:sor:QMRS::Starting 
-DEAL:sor:QMRS::Convergence step 12 
-DEAL::Size 12
+DEAL:sor:QMRS::Failure step 100 
+DEAL::Size 12 Unknowns 121
 DEAL::SOR-diff:0
 DEAL:no:cg::Starting 
 DEAL:no:cg::Starting 
 DEAL:no:cg::Convergence step 16 
-DEAL:no:Bicgstab::Go!
 DEAL:no:Bicgstab::Starting 
 DEAL:no:Bicgstab::Convergence step 13 
 DEAL:no:GMRES::Starting 
@@ -52,67 +48,64 @@ DEAL:no:GMRES::Convergence step 16
 DEAL:no:QMRS::Starting 
 DEAL:no:QMRS::Convergence step 18 
 DEAL:ssor:Richardson::Starting 
-DEAL:ssor:Richardson::Failure step 50 
+DEAL:ssor:Richardson::Convergence step 88 
 DEAL:ssor:cg::Starting 
 DEAL:ssor:cg::Starting 
 DEAL:ssor:cg::Convergence step 10 
-DEAL:ssor:Bicgstab::Go!
 DEAL:ssor:Bicgstab::Starting 
 DEAL:ssor:Bicgstab::Convergence step 6 
 DEAL:ssor:GMRES::Starting 
 DEAL:ssor:GMRES::Starting 
 DEAL:ssor:GMRES::Convergence step 9 
 DEAL:ssor:QMRS::Starting 
-DEAL:ssor:QMRS::Convergence step 44 
+DEAL:ssor:QMRS::Convergence step 12 
 DEAL:sor:Richardson::Starting 
-DEAL:sor:Richardson::Failure step 50 
+DEAL:sor:Richardson::Failure step 100 
 DEAL:sor:cg::Starting 
 DEAL:sor:cg::Starting 
-DEAL:sor:cg::Failure step 50 
-DEAL:sor:Bicgstab::Go!
+DEAL:sor:cg::Failure step 100 
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 19 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Convergence step 24 
 DEAL:sor:QMRS::Starting 
-DEAL:sor:QMRS::Convergence step 43 
-DEAL::Size 36
+DEAL:sor:QMRS::Failure step 100 
+DEAL::Size 36 Unknowns 1225
 DEAL::SOR-diff:2.21867e-30
 DEAL:no:cg::Starting 
 DEAL:no:cg::Starting 
-DEAL:no:cg::Failure step 50 
-DEAL:no:Bicgstab::Go!
+DEAL:no:cg::Convergence step 58 
 DEAL:no:Bicgstab::Starting 
 DEAL:no:Bicgstab::Convergence step 45 
 DEAL:no:GMRES::Starting 
 DEAL:no:GMRES::Starting 
-DEAL:no:GMRES::Failure step 50 
+DEAL:no:GMRES::Failure step 100 
 DEAL:no:QMRS::Starting 
-DEAL:no:QMRS::Failure step 50 
+DEAL:no:QMRS::Convergence step 63 
 DEAL:ssor:Richardson::Starting 
-DEAL:ssor:Richardson::Failure step 50 
+DEAL:ssor:Richardson::Failure step 100 
 DEAL:ssor:cg::Starting 
 DEAL:ssor:cg::Starting 
 DEAL:ssor:cg::Convergence step 26 
-DEAL:ssor:Bicgstab::Go!
 DEAL:ssor:Bicgstab::Starting 
 DEAL:ssor:Bicgstab::Convergence step 18 
 DEAL:ssor:GMRES::Starting 
 DEAL:ssor:GMRES::Starting 
 DEAL:ssor:GMRES::Convergence step 25 
 DEAL:ssor:QMRS::Starting 
-DEAL:ssor:QMRS::Failure step 50 
+DEAL:ssor:QMRS::Convergence step 28 
 DEAL:sor:Richardson::Starting 
-DEAL:sor:Richardson::Failure step 50 
+DEAL:sor:Richardson::Failure step 100 
 DEAL:sor:cg::Starting 
 DEAL:sor:cg::Starting 
-DEAL:sor:cg::Failure step 50 
-DEAL:sor:Bicgstab::Go!
+DEAL:sor:cg::Failure step 100 
 DEAL:sor:Bicgstab::Starting 
-DEAL:sor:Bicgstab::Failure step 50 
+DEAL:sor:Bicgstab::Convergence step 59 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Starting 
-DEAL:sor:GMRES::Failure step 50 
+DEAL:sor:GMRES::Failure step 100 
 DEAL:sor:QMRS::Starting 
-DEAL:sor:QMRS::Failure step 50 
+DEAL:sor:QMRS::Failure step 100 
+DEAL::GrowingVectorMemory:Overall allocated vectors: 345
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 20

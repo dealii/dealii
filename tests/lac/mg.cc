@@ -76,7 +76,7 @@ class MGSmootherLAC
 
 typedef MGCoarseGridLACIteration<SolverCG<SparseMatrix<double> , Vector<double>  >,
 SparseMatrix<double>, /*PreconditionRelaxation<SparseMatrix<double> ,*/
-  PreconditionIdentity<Vector<double> > >
+  PreconditionIdentity >
 Coarse;
 
 
@@ -133,7 +133,7 @@ int main()
       FDMG multigrid(level, A, transfer);
 
 //      PreconditionRelaxation<SparseMatrix<double> , Vector<double> >
-      PreconditionIdentity<Vector<double> >
+      PreconditionIdentity
 	cgprec;//(A[minlevel], &SparseMatrix<double> ::template precondition_SSOR<double>, 1.2);
       
       Coarse coarsegrid(cgcg, A[minlevel], cgprec);

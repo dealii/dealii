@@ -13,13 +13,13 @@
  *
  * @author Guido Kanschat, 1999
  */
-template<class VECTOR>
 class PreconditionIdentity
 {
   public:
   				     /**
 				      * Execute preconditioning.
 				      */
+    template<class VECTOR>
     void operator() (VECTOR&, const VECTOR&) const;
 };
 
@@ -183,6 +183,49 @@ class PreconditionRelaxation
     double omega;
 };
 
+/**
+ * Preconditioner using an iterative solver.  This preconditioner uses
+ * a fully initialized LAC iterative solver for the approximate
+ * inverse of the matrix. Naturally, this solver needs another
+ * preconditionig method.
+ *
+ * Usually, the use of #ReductionControl# is preferred over the use of
+ * the basic #SolverControl in defining this solver.
+ *
+ * @author Guido Kanschat, 1999
+ */
+template<class SOLVER, class MATRIX, class PRECONDITION>
+class PreconditionLACSolver
+{
+  public:
+				     /**
+				      * Constructor.  Provide a solver
+				      * object, a matrix, and another
+				      * preconditioner for this.
+				      */
+    PreconditionLACSolver(SOLVER&,
+			  const MATRIX&,
+			  const PRECONDITION&);
+				     /**
+				      * Execute preconditioning.
+				      */
+    template<class VECTOR>
+    void operator() (VECTOR&, const VECTOR&) const;
+
+  private:
+				     /**
+				      * The solver class to use.
+				      */
+    SOLVER& solver;
+				     /**
+				      * The matrix in use.
+				      */
+    const MATRIX& matrix;
+				     /**
+				      * The preconditioner to use.
+				      */
+    const PRECONDITION& precondition;
+};
 
 
 
@@ -190,7 +233,7 @@ class PreconditionRelaxation
 
 template<class VECTOR>
 void
-PreconditionIdentity<VECTOR>::operator() (VECTOR& dst, const VECTOR& src) const
+PreconditionIdentity::operator() (VECTOR& dst, const VECTOR& src) const
 {
   dst = src;
 }
@@ -227,5 +270,27 @@ PreconditionRelaxation<MATRIX, VECTOR>::operator() (VECTOR& dst,
 {
   (matrix.*precondition)(dst, src, omega);
 }
+
+//////////////////////////////////////////////////////////////////////
+
+template<class SOLVER, class MATRIX, class PRECONDITION>
+PreconditionLACSolver<SOLVER, MATRIX, PRECONDITION>
+::PreconditionLACSolver(SOLVER& solver,
+			const MATRIX& matrix,
+			const PRECONDITION& precondition)
+		:
+		solver(solver), matrix(matrix), precondition(precondition)
+{}
+
+template<class SOLVER, class MATRIX, class PRECONDITION>
+template<class VECTOR>
+void
+PreconditionLACSolver<SOLVER, MATRIX, PRECONDITION>::operator() (VECTOR& dst,
+								 const VECTOR& src) const
+{
+  solver.solve(matrix, dst, src, precondition);
+}
+
+
 
 #endif
