@@ -22,69 +22,103 @@
 <h3>base</h3>
 
 <ol>
-  <li> New multithreading scheme is implemented.
+  <li> <p>
+       New multithreading scheme is implemented.
+       </p>
 
-  <li> Improved: <code class="class">Subscriptor</code> prints the
+  <li> <p>
+       Improved: <code class="class">Subscriptor</code> prints the
        real class name if a subscribed object is deleted.
+       </p>
 
-  <li> There is now a function <code class="member">invert
+  <li> <p>
+       There is now a function <code class="member">invert
        (Tensor<2,dim>)</code> that returns the inverse of a tensor of
        rank 2.
+       </p>
 </ol>
+
 
 
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       Change: the solver classes in LAC lost their first template
+       argument. Their names are now 
+       <code class="class">SolverXX&lt;VECTOR&gt;</code>, where
+       <code class="class">XX</code> denotes the name of the solver
+       (e.g. CG, GMRES, etc). Furthermore, the
+       inheritance from <code class="class">Solver</code> was made private
+       to reflect the logical structure.
+       </p>
 
-  <li> Change: the solver classes in LAC lost their first template
-  argument. Their names are now<code
-  class="class">Solver*&lt;VECTOR&gt;</code>. Furthermore, the
-  inheritance from <code class="class">Solver</code> was made private
-  to reflect the logical structure.
+  <li> <p>
+       New: <code class="class">EigenInverse</code> implements inverse
+       iteration by Wieland.
+       </p>
 
-  <li> New: <code class="class">EigenInverse</code> implements inverse
-  iteration by Wieland.
+  <li> <p>
+       New: <code class="class">EigenPower</code> implements power
+       method by von Mises
+       </p>
 
-  <li> New: <code class="class">EigenPower</code> implements power
-  method by von Mises
+  <li> <p>
+       New: <code class="member">PreconditionBlockSSOR::set_omega</code>
+       allows to change the relaxation parameter.
+       </p>
 
-  <li> New: <code class="member">PreconditionBlockSSOR::set_omega</code>
-  allows to change the relaxation parameter.
+  <li> <p>
+       Fix: <code class="class">SolverCG</code> counts steps properly.
+       </p>
 
-  <li> Fix: <code class="class">SolverCG</code> counts steps properly.
-
-  <li> New: <code class="class">Solver*</code>: There is a virtual function
-  <code>print_vectors</code> called in every step. It is void in the
-  solver itself but can be used to print intermediate iteration
-  vectors
-
+  <li> <p>
+       New: <code class="class">Solver*</code>: There is a virtual function
+       <code>print_vectors</code> called in every step. It is void in the
+       solver itself but can be used to print intermediate iteration
+       vectors.
+       </p>
 </ol>
+
+
+
 <h3>deal.II</h3>
 
 <ol>
-  <li> New: <code class="member">DataOut::clear_data_vectors</code>
-  allows to re-use an object without deleting the <code
-  class="class">DoFHandler</code>
+  <li> <p>
+       New: <code class="member">DataOut::clear_data_vectors</code>
+       allows to re-use an object without deleting the <code
+       class="class">DoFHandler</code>
+       </p>
 
-  <li> New: <code class="class">class DoFPrintSolverStep</code> prints
-  intermediate vectors of a solver as finite element functions using
-  <code class="class">DataOut</code>.
+  <li> <p>
+       New: <code class="class">class DoFPrintSolverStep</code> prints
+       intermediate vectors of a solver as finite element functions using
+       <code class="class">DataOut</code>.
+       </p>
 
-  <li> New: <code class="class">class GradientEstimator</code>
-  estimates the norm of the gradient on each cell from finite
-  difference approximations. 
+  <li> <p>
+       New: <code class="class">class GradientEstimator</code>
+       estimates the norm of the gradient on each cell from finite
+       difference approximations. 
+       </p>
 
-  <li> New: <code class="member">DoFTools::extract_boundary_dofs</code> 
-  finds all degrees of freedom which are at the boundary and belong to
-  specified components.
+  <li> <p>
+       New: <code class="member">DoFTools::extract_boundary_dofs</code> 
+       finds all degrees of freedom which are at the boundary and belong to
+       specified components.
+       </p>
 
-  <li> New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
-  allows to use different discretization grids for different
-  variables.
+  <li> <p>
+       New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
+       allows to use different discretization grids for different
+       variables.
+       </p>
 
-  <li> New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
-  functions return the grids for which the map was created.
+  <li> <p> 
+       New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
+       functions return the grids for which the map was created.
+       </p>
 </ol>
 
 <hr>
