@@ -253,7 +253,8 @@ class GridOut
 				      */
     template <int dim>
     struct EpsFlags : public EpsFlagsBase 
-    {};
+    {
+    };
 
 //#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
 //    template <>

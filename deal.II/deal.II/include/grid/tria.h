@@ -158,7 +158,8 @@ struct SubCellData
  */
 template <int dim>
 class TriaDimensionInfo
-{};
+{
+};
 
 
 
@@ -345,7 +346,8 @@ class TriaDimensionInfo<3>
  */
 template <int dim>
 struct TriaNumberCache
-{};
+{
+};
 
 /**
  * Cache class used to store the number of used and active elements

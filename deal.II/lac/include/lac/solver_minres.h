@@ -57,7 +57,9 @@ class SolverMinRes : private Solver<VECTOR>
 				      * solver. This solver does not
 				      * need additional data yet.
 				      */
-    struct AdditionalData {};
+    struct AdditionalData
+    {
+    };
 
 				     /**
 				      * Constructor.

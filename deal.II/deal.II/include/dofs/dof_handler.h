@@ -33,6 +33,7 @@ template <int dim, typename Accessor> class TriaIterator;
 template <int dim, typename Accessor> class TriaActiveIterator;
 template <int dim> class Triangulation;
 
+
 /**
  * Define some types which differ between the dimensions. This class
  * is analogous to the @ref{TriaDimensionInfo} class hierarchy.
@@ -44,7 +45,9 @@ template <int dim> class Triangulation;
  */
 template <int dim>
 class DoFDimensionInfo
-{};
+{
+};
+
 
 
 /**
@@ -1151,6 +1154,7 @@ class DoFHandler  :  public Subscriptor,
 };
 
 
+
 /* ----------------------- Inline functions ---------------------------------- */
 
 
@@ -1160,6 +1164,7 @@ unsigned int DoFHandler<dim>::n_dofs () const
 {
   return used_dofs;
 };
+
 
 
 template <int dim>

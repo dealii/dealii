@@ -85,11 +85,13 @@ class SolverQMRS : private Solver<VECTOR>
 		       double breakdown=1.e-16) :
 			exact_residual(exact_residual),
 			breakdown(breakdown)
-	  {}
+	  {};
+	
 					 /**
 					  * Flag for exact computation of residual.
 					  */
 	bool exact_residual;
+	
 					 /**
 					  * Breakdown threshold.
 					  */

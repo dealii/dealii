@@ -161,7 +161,8 @@ class MGDoFObjectAccessor_Inheritance<dim,dim>
 template <int celldim, int dim>
 class MGDoFObjectAccessor :  public MGDoFAccessor<dim>,
 			     public MGDoFObjectAccessor_Inheritance<celldim, dim>::BaseClass
-{};
+{
+};
 
 
 /**

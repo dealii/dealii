@@ -31,7 +31,8 @@ template <int celldim, int dim> class MGDoFObjectAccessor;
  */
 template <int dim>
 class MGDoFDimensionInfo
-{};
+{
+};
 
 
 
