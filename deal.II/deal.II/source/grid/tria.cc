@@ -1116,8 +1116,8 @@ typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::begin_raw_line (unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
-  Assert (levels[level]->lines.lines.size() != 0,
-	  ExcEmptyLevel (level));
+  if (levels[level]->lines.lines.size() == 0)
+    return end_line ();
   
   return raw_line_iterator ((Triangulation<dim>*)this,
 			    level,
@@ -1140,8 +1140,10 @@ typename TriaDimensionInfo<dim>::raw_quad_iterator
 Triangulation<dim>::begin_raw_quad (unsigned int level) const {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
-  Assert (levels[level]->quads.quads.size() != 0,
-	  ExcEmptyLevel (level));
+  
+  if (levels[level]->quads.quads.size() == 0)
+    return end_quad();
+  
   return raw_quad_iterator ((Triangulation<dim>*)this,
 			    level,
 			    0);
@@ -1217,7 +1219,7 @@ template <int dim>
 typename TriaDimensionInfo<dim>::active_quad_iterator
 Triangulation<dim>::begin_active_quad (unsigned int level) const {
   				   // level is checked in begin_raw
-  quad_iterator i = begin(level);
+  quad_iterator i = begin_quad (level);
   if (i.state() != valid)
     return i;
   while (i->has_children())
@@ -1511,6 +1513,11 @@ unsigned int Triangulation<dim>::n_lines () const {
 
 template <int dim>
 unsigned int Triangulation<dim>::n_lines (const unsigned int level) const {
+  if (levels[level]->lines.lines.size() == 0)
+    return 0;
+
+				   // only evaluate begin_/end_line if there
+				   // are lines.
   line_iterator line = begin_line (level),
 		endc = (level == levels.size()-1 ?
 			line_iterator(end_line()) :
@@ -1535,6 +1542,11 @@ unsigned int Triangulation<dim>::n_active_lines () const {
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_lines (const unsigned int level) const {
+  if (levels[level]->lines.lines.size() == 0)
+    return 0;
+
+				   // only evaluate begin_/end_line if there
+				   // are lines.
   active_line_iterator line = begin_active_line (level),
 		       endc = (level == levels.size()-1 ?
 			       active_line_iterator(end_line()) :
@@ -1566,6 +1578,11 @@ unsigned int Triangulation<1>::n_quads (const unsigned int) const {
 
 template <int dim>
 unsigned int Triangulation<dim>::n_quads (const unsigned int level) const {
+  if (levels[level]->quads.quads.size() == 0)
+    return 0;
+
+				   // only evaluate begin_/end_quad if there
+				   // are quads.
   quad_iterator quad = begin_quad (level),
 		endc = (level == levels.size()-1 ?
 			quad_iterator(end_quad()) :
@@ -1597,6 +1614,11 @@ unsigned int Triangulation<1>::n_active_quads (const unsigned int) const {
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const {
+  if (levels[level]->quads.quads.size() == 0)
+    return 0;
+
+				   // only evaluate begin_/end_quad if there
+				   // are quads.
   active_quad_iterator quad = begin_active_quad (level),
 		       endc = (level == levels.size()-1 ?
 			       active_quad_iterator(end_quad()) :
