@@ -51,10 +51,30 @@ extern "C" long int lrand48 (void);
 
 
 
-// The following two class is defined to be used in the compute_*
+// The following two classes are defined to be used in the compute_*
 // functions. Using them allows to use the same function to compute
 // level numbering for multigrid as well as numbering for the global
 // system matrix.
+template <class T>
+class WrapDoFIterator : private T
+{
+  public:
+    WrapDoFIterator (const T& t) : T(t) {}
+    void get_dof_indices (std::vector<unsigned int>& v) const
+      {
+	(*this)->get_dof_indices(v);
+      }
+    template <class T2>
+    bool operator != (const T2& i) const
+      {
+	return (! (T::operator==(i)));
+      }
+				     // Allow access to these operators of T
+    T::operator->;
+    T::operator++;
+    T::operator==;
+};
+
 template <class T>
 class WrapMGDoFIterator : private T
 {
@@ -62,7 +82,7 @@ class WrapMGDoFIterator : private T
     WrapMGDoFIterator (const T& t) : T(t) {}
     void get_dof_indices (std::vector<unsigned int>& v) const
       {
-	T::get_mg_dof_indices(v);
+	(*this)->get_mg_dof_indices(v);
       }
     bool operator != (const WrapMGDoFIterator<T>& i) const
       {
@@ -484,14 +504,17 @@ DoFRenumbering::component_wise (
   std::vector<unsigned int> renumbering (dof_handler.n_dofs(),
 					 DoFHandler<dim>::invalid_dof_index);
 
+  typedef
+    WrapDoFIterator<typename DoFHandler<dim>::active_cell_iterator> ITERATOR;
+
   typename DoFHandler<dim>::active_cell_iterator
-    start = dof_handler.begin_active();
+    istart = dof_handler.begin_active();
+  ITERATOR start = istart;
   const typename DoFHandler<dim>::cell_iterator
     end = dof_handler.end();
 
   unsigned int result =
-  compute_component_wise<dim,
-    typename DoFHandler<dim>::active_cell_iterator,
+  compute_component_wise<dim, ITERATOR,
     typename DoFHandler<dim>::cell_iterator>(renumbering,
 					     start, end,
 					     component_order_arg);
@@ -535,7 +558,7 @@ void DoFRenumbering::component_wise (
 	  ExcRenumberingIncomplete());
   
   if (renumbering.size()!=0)
-    dof_handler.renumber_dofs (renumbering);
+    dof_handler.renumber_dofs (level, renumbering);
 }
 
 
@@ -640,7 +663,7 @@ DoFRenumbering::compute_component_wise (
 				       // on each cell: get dof indices
 				       // and insert them into the global
 				       // list using their component
-      start->get_dof_indices (local_dof_indices);
+      start.get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	component_to_dof_map[component_list[i]].push_back (local_dof_indices[i]);
     };
