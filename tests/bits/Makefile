@@ -28,10 +28,12 @@ anna_3.exe              : anna_3.g.$(OBJEXT)              $(libraries)
 anna_5.exe              : anna_5.g.$(OBJEXT)              $(libraries)
 gerold_1.exe            : gerold_1.g.$(OBJEXT)            $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)               $(libraries)
+denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_5 \
 	gerold_1 \
-	roy_1
+	roy_1 \
+        denis_1
 
 ############################################################
 
