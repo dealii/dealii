@@ -85,7 +85,10 @@ MGDoFHandler<dim>::MGDoFHandler (Triangulation<dim> &tria) :
 
 
 template <int dim>
-MGDoFHandler<dim>::~MGDoFHandler () {};
+MGDoFHandler<dim>::~MGDoFHandler ()
+{
+  clear ();
+};
 
 
 #if deal_II_dimension == 1
@@ -1181,7 +1184,7 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
   DoFHandler<dim>::distribute_dofs (fe, offset);
 
 
-// reserve space for the MG dof numbers
+				   // reserve space for the MG dof numbers
   reserve_space ();
   mg_used_dofs.resize (tria->n_levels(), 0);
 
@@ -1370,6 +1373,19 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 
 
 template <int dim>
+void
+MGDoFHandler<dim>::clear ()
+{
+				   // release own memory
+  clear_space ();
+
+				   // let base class release its mem
+				   // as well
+  DoFHandler<dim>::clear ();  
+};
+
+
+template <int dim>
 unsigned int MGDoFHandler<dim>::n_dofs (const unsigned int level) const {
   Assert (level < mg_used_dofs.size(), ExcInvalidLevel(level));
   
@@ -1503,19 +1519,7 @@ void MGDoFHandler<1>::reserve_space () {
 
 				   //////////////////////////
 				   // DESTRUCTION
-  
-                                   // delete all levels and set them up
-                                   // newly, since vectors are
-                                   // troublesome if you want to change
-                                   // their size
-  for (unsigned int i=0; i<mg_levels.size(); ++i)
-    delete mg_levels[i];
-  mg_levels.resize (0);
-
-				   // also delete vector of vertex indices
-				   // this calls the destructor which
-				   // must free the space
-  mg_vertex_dofs.resize (0);
+  clear_space ();
 
 				   ////////////////////////////
 				   // CONSTRUCTION
@@ -1588,20 +1592,7 @@ void MGDoFHandler<2>::reserve_space () {
   
 				   ////////////////////////////
 				   // DESTRUCTION
-
-                                   // delete all levels and set them up
-                                   // newly, since vectors are
-                                   // troublesome if you want to change
-                                   // their size
-  for (unsigned int i=0; i<mg_levels.size(); ++i)
-    delete mg_levels[i];
-  mg_levels.clear ();
-
-				   // also delete vector of vertex indices
-				   // this calls the destructor which
-				   // must free the space
-  mg_vertex_dofs.clear ();
-
+  clear_space ();
 
 				   ////////////////////////////
 				   // CONSTRUCTION
@@ -1679,20 +1670,7 @@ void MGDoFHandler<3>::reserve_space () {
   
 				   ////////////////////////////
 				   // DESTRUCTION
-
-                                   // delete all levels and set them up
-                                   // newly, since vectors are
-                                   // troublesome if you want to change
-                                   // their size
-  for (unsigned int i=0; i<mg_levels.size(); ++i)
-    delete mg_levels[i];
-  mg_levels.clear ();
-
-				   // also delete vector of vertex indices
-				   // this calls the destructor which
-				   // must free the space
-  mg_vertex_dofs.clear ();
-
+  clear_space ();
 
 				   ////////////////////////////
 				   // CONSTRUCTION
@@ -1762,5 +1740,25 @@ void MGDoFHandler<3>::reserve_space () {
 #endif
 
 
+template <int dim>
+void MGDoFHandler<dim>::clear_space ()
+{
+                                   // delete all levels and set them up
+                                   // newly, since vectors are
+                                   // troublesome if you want to change
+                                   // their size
+  for (unsigned int i=0; i<mg_levels.size(); ++i)
+    delete mg_levels[i];
+  mg_levels.clear ();
+
+				   // also delete vector of vertex
+				   // indices
+  typename std::vector<MGVertexDoFs> tmp;
+  std::swap (mg_vertex_dofs, tmp);
+};
+
+
+
 // explicit instantiations
 template class MGDoFHandler<deal_II_dimension>;
+

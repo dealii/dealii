@@ -198,6 +198,13 @@ class MGDoFHandler : public DoFHandler<dim>
 				  const unsigned int offset = 0);
 
 				     /**
+				      * Clear all data of this object
+				      * and call the respective
+				      * function of the base class.
+				      */
+    virtual void clear ();
+
+				     /**
 				      * Actually do the renumbering based on
 				      * a list of new dof numbers for all the
 				      * dofs. 
@@ -907,24 +914,27 @@ class MGDoFHandler : public DoFHandler<dim>
     };
 
 
-/**
- * Distribute dofs on the given cell,
- * with new dofs starting with index
- * @p{next_free_dof}. Return the next
- * unused index number. The finite
- * element used is the one given to
- * @p{distribute_dofs}, which is copied
- * to @p{selected_fe}.
- *
- * This function is excluded from the
- * @p{distribute_dofs} function since
- * it can not be implemented dimension
- * independent.
- *
- * Note that unlike for the usual dofs,
- * here all cells and not only active
- * ones are allowed.
- */
+				     /**
+				      * Distribute dofs on the given
+				      * cell, with new dofs starting
+				      * with index
+				      * @p{next_free_dof}. Return the
+				      * next unused index number. The
+				      * finite element used is the one
+				      * given to @p{distribute_dofs},
+				      * which is copied to
+				      * @p{selected_fe}.
+				      *
+				      * This function is excluded from
+				      * the @p{distribute_dofs}
+				      * function since it can not be
+				      * implemented dimension
+				      * independent.
+				      *
+				      * Note that unlike for the usual
+				      * dofs, here all cells and not
+				      * only active ones are allowed.
+				      */
     unsigned int distribute_dofs_on_cell (cell_iterator &cell,
 					  unsigned int   next_free_dof);
     
@@ -934,6 +944,11 @@ class MGDoFHandler : public DoFHandler<dim>
 				      */
     void reserve_space ();
 
+				     /**
+				      * Free all used memory.
+				      */
+    void clear_space ();
+    
     				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Unlike the @p{levels}
