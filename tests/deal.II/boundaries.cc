@@ -85,7 +85,7 @@ check ()
   Triangulation<dim> tr;  
   if (dim==2)
     {
-      GridGenerator::hyper_ball(tr);
+      GridGenerator::hyper_ball(tr, Point<dim>(), 1);
     }
   else
     GridGenerator::hyper_cube(tr, -1./sqrt(dim),1./sqrt(dim));
@@ -137,7 +137,7 @@ check ()
       deallog << "Interpolated boundary values" << std::endl;
       std::map<unsigned int,double> interpolated_bv;
       VectorTools::interpolate_boundary_values (mapping, dof, function_map,
-						interpolated_bv);
+						interpolated_bv, std::vector<bool>());
       write_map (interpolated_bv);
 
 				       // project boundary values

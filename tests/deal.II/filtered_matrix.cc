@@ -101,7 +101,7 @@ check ()
   CosineFunction<dim> cosine;
   
   if (dim==2)
-    GridGenerator::hyper_ball(tr);
+    GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
   GridGenerator::hyper_cube(tr, -1,1);
   
@@ -163,7 +163,7 @@ check ()
 
 				   // interpolate boundary values
   std::map<unsigned int,double> bv;
-  VectorTools::interpolate_boundary_values (mapping, dof, 0, cosine, bv);
+  VectorTools::interpolate_boundary_values (mapping, dof, 0, cosine, bv, std::vector<bool>());
 				   // the cosine has too many zero
 				   // values on the boundary of the
 				   // domain, so reset the elements to

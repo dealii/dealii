@@ -77,7 +77,7 @@ check ()
   
   Triangulation<dim> tr;  
   if (dim==2)
-    GridGenerator::hyper_ball(tr);
+    GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
     GridGenerator::hyper_cube(tr, -1,1);
   tr.refine_global (1);
