@@ -588,33 +588,28 @@ dSMatrix::precondition_SSOR (dVector& dst, const dVector& src,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
 
-  int p;
   const unsigned int  n = src.size();
   unsigned int  j;
   
-  for (unsigned i=0; i<n; i++)
+  for (unsigned int row=0; row<n; ++row)
     {
-      dst(i) = src(i);
-      for (j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
-	{
-	  p = cols->colnums[j];
-	  if (p<(signed int)i)
-	    dst(i) -= om* val[j] * dst(p);
-	}
-      dst(i) /= val[cols->rowstart[i]];
+      dst(row) = src(row);
+      for (j=cols->rowstart[row]; j<cols->rowstart[row+1] ;j++)
+	if ((unsigned int)cols->colnums[j] < row)
+	  dst(row) -= om* val[j] * dst(cols->colnums[j]);
+      dst(row) /= val[cols->rowstart[row]];
     }
-  for (unsigned int i=0; i<n; i++)
-    dst(i) *= (2.-om)*val[cols->rowstart[i]];
+  for (unsigned int row=0; row<n; ++row)
+    dst(row) *= (2.-om)*val[cols->rowstart[row]];
   
-  for (int i=n-1; i>=0; i--)
+  for (int row=n-1; row>=0; --row)
     {
-      for (j=cols->rowstart[i];j<cols->rowstart[i+1];j++)
-	{
-	  p = cols->colnums[j];
-	  if (p>i) dst(i) -= om* val[j] * dst(p);
-	}
-      dst(i) /= val[cols->rowstart[i]];
+      for (j=cols->rowstart[row];j<cols->rowstart[row+1];j++)
+	if (cols->colnums[j] > row)
+	  dst(row) -= om* val[j] * dst(cols->colnums[j]);
+      dst(row) /= val[cols->rowstart[row]];
     }
 }
 
@@ -624,12 +619,15 @@ dSMatrix::precondition_SOR (dVector& dst, const dVector& src,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
+
   dst = src;
   SOR(dst,om);
 };
 
 
 void dSMatrix::precondition (dVector &dst, const dVector &src) const {
+  Assert (m() == n(), ExcMatrixNotSquare());
   dst=src;
 };
 
@@ -639,19 +637,17 @@ dSMatrix::SOR (dVector& dst, const double om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert(n() == m(), ExcDimensionsDontMatch(n(),m()));
-  Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
+  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
 
-  for (unsigned int i=0;i<m();i++)
+  for (unsigned int row=0; row<m(); ++row)
     {
-      double s = dst(i);
-      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
-	{
-	  int p = cols->colnums[j];
-	  if (p<(signed int)i)
-	    s -= val[j] * dst(p);
-	}
-      dst(i) = s * om / val[cols->rowstart[i]];
+      double s = dst(row);
+      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
+	if ((unsigned int)cols->colnums[j] < row)
+	  s -= val[j] * dst(cols->colnums[j]);
+
+      dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
 
