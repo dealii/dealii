@@ -48,6 +48,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p> When building with both sparse direct solver MA27 and the
+       TECPLOT libraries, the <code>detached_ma27</code> would not
+       link properly. This is now fixed.
+       <br>
+       (WB 2003/09/05)
+       </p>
+
   <li> <p> The script that builds the dependency lists for Makefiles
        has been rewritten in C++, since the previous perl script
        became just too slow after the addition of parts of
