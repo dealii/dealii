@@ -3724,7 +3724,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
                           specified in the PETSC_ARCH environment variable])
           fi
         else
-    	  AC_MSG_ERROR([If PETSc is used, you must specify the architectur
+    	  AC_MSG_ERROR([If PETSc is used, you must specify the architecture
                         either through the PETSC_ARCH environment variable,
                         or through the --with-petsc-arch flag])
         fi

@@ -7797,10 +7797,10 @@ echo "$as_me: error: PETSc has not been compiled for the architecture
    { (exit 1); exit 1; }; }
           fi
         else
-    	  { { echo "$as_me:$LINENO: error: If PETSc is used, you must specify the architectur
+    	  { { echo "$as_me:$LINENO: error: If PETSc is used, you must specify the architecture
                         either through the PETSC_ARCH environment variable,
                         or through the --with-petsc-arch flag" >&5
-echo "$as_me: error: If PETSc is used, you must specify the architectur
+echo "$as_me: error: If PETSc is used, you must specify the architecture
                         either through the PETSC_ARCH environment variable,
                         or through the --with-petsc-arch flag" >&2;}
    { (exit 1); exit 1; }; }
