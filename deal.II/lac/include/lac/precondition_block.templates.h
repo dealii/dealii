@@ -545,7 +545,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
   if (!this->inverses_ready())
     {
       FullMatrix<number> M_cell(this->blocksize);
-      for (int icell=nblocks-1; icell>=0 ; --icell)
+      for (int icell=this->nblocks-1; icell>=0 ; --icell)
 	{
 	  unsigned int cell = (unsigned int) icell;
 					   // Collect upper triangle
@@ -583,7 +583,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
 	}
     }
   else
-    for (int icell=nblocks-1; icell >=0 ; --icell)
+    for (int icell = this->nblocks-1; icell >= 0 ; --icell)
       {
 	unsigned int cell = (unsigned int) icell;
 	for (row=cell*this->blocksize, row_cell=0;
