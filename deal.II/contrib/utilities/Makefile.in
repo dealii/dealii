@@ -11,18 +11,20 @@ D = @DEAL2_DIR@
 include $D/common/Make.global_options
 debug-mode = off
 
-libraries = $(lib-deal2-1d.o) \
-            $(lib-deal2-2d.o) \
-            $(lib-deal2-3d.o) \
-            $(lib-lac.o)  \
-            $(lib-base.o)
+o = g.o
+l = g
+libraries = $(lib-deal2-1d.$l) \
+            $(lib-deal2-2d.$l) \
+            $(lib-deal2-3d.$l) \
+            $(lib-lac.$l)  \
+            $(lib-base.$l)
 
 ############################################################
 # First how to create executables, including all necessary
 # flags:
 ############################################################
 
-flags     = $(CXXFLAGS.o)
+flags     = $(CXXFLAGS.$l)
 
 ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
 flags += -Wno-missing-noreturn
@@ -34,17 +36,18 @@ endif
 %.o : %.cc Makefile
 	@echo =====optimized===== $<
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
-%.exe :
+%.exe : %.o
 	@echo =====linking======= $@
-	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) $(LDFLAGS) -o $@ $^
 
 
 default: embedding.exe interpolation.exe
 
 ############################################################
 
-embedding.exe    : embedding.o  $(libraries)
-interpolation.exe: interpolation.o $(libraries)
+embedding.exe    : embedding.$o  $(libraries)
+interpolation.exe: interpolation.$o $(libraries)
+gridio.exe    : gridio.$o  $(libraries)
 
 ############################################################
 # Automatic generation of dependencies
