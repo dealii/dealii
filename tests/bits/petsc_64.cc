@@ -57,7 +57,7 @@ int main (int argc,char **argv)
         test (v1);
 
 					 // check
-					 // PETScWrappers::MPI::SparseMatrix	
+					 // PETScWrappers::MPI::SparseMatrix
 	MPI_Comm mpi_communicator (MPI_COMM_WORLD);	
 	int n_jobs=1;
 	MPI_Comm_size (mpi_communicator, &n_jobs);
