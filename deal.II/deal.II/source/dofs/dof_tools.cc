@@ -1450,9 +1450,6 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				   // used by the dof handlers:
   const FiniteElement<dim> &coarse_fe = coarse_grid.get_fe();    
 
-  const unsigned int coarse_dofs_per_cell_component
-    = coarse_fe.base_element(coarse_fe.component_to_base(coarse_component)).dofs_per_cell;
-  
 				   // for each cell on the parameter grid:
 				   // find out which degrees of freedom on the
 				   // fine grid correspond in which way to
