@@ -2,7 +2,4 @@
 ====       Open Projects for the deal.II project     =====
 ==========================================================
 
-Write something to neatly output histograms, e.g. for errors on
-  different timesteps and their size's distribution
-
 Do statistics on error data and some other data sets.
