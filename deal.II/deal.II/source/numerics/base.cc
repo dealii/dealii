@@ -27,14 +27,23 @@ inline double sqr (double x) {
 
 
 template <int dim>
-ProblemBase<dim>::ProblemBase (Triangulation<dim> *tria,
-			       DoFHandler<dim>    *dof) :
-		tria(tria),
-		dof_handler(dof),
+ProblemBase<dim>::ProblemBase () :
+		tria(0),
+		dof_handler(0),
 		system_sparsity(1,1,1),   // dummy initialisation, is later reinit'd
 		system_matrix()           // dummy initialisation, is later reinit'd
-{
-  Assert (tria == &dof->get_tria(), ExcDofAndTriaDontMatch());
+{};
+
+
+
+template <int dim>
+void ProblemBase<dim>::set_tria_and_dof (Triangulation<dim> *t,
+					 DoFHandler<dim>    *d) {
+  tria        = t;
+  dof_handler = d;
+
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
+  Assert (tria == &dof_handler->get_tria(), ExcDofAndTriaDontMatch());
 };
 
 
@@ -50,6 +59,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
 				 const FiniteElement<dim>          &fe,
 				 const FEValues<dim>::UpdateStruct &update_flags,
 				 const DirichletBC                 &dirichlet_bc) {
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
+  
   system_sparsity.reinit (dof_handler->n_dofs(),
 			  dof_handler->n_dofs(),
 			  dof_handler->max_couplings_between_dofs());
@@ -103,6 +114,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
 
 template <int dim>
 void ProblemBase<dim>::solve () {
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
+  
   int    max_iter  = 4000;
   double tolerance = 1.e-16;
   
@@ -124,6 +137,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					     const Quadrature<dim>    &q,
 					     const FiniteElement<dim> &fe,
 					     const NormType           &norm) const {
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
   Assert (fe == dof_handler->get_selected_fe(), ExcInvalidFE());
 
   difference.erase (difference.begin(), difference.end());
@@ -256,6 +270,8 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 
 template <int dim>
 void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
+  
   out.clear_data_vectors ();
   out.attach_dof_handler (*dof_handler);
 
@@ -279,6 +295,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 					   dVector  &solution,
 					   dVector  &right_hand_side,
 					   const DirichletBC &dirichlet_bc) {
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
   
@@ -373,6 +390,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 void
 ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
 					  map<int,double>   &) const {
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
   Assert (false, ExcNotImplemented());
 };
 
@@ -383,6 +401,8 @@ template <int dim>
 void
 ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
 					    map<int,double>   &boundary_values) const {
+  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
+  
   DoFHandler<dim>::active_face_iterator face = dof_handler->begin_active_face(),
 					endf = dof_handler->end_face();
   DirichletBC::const_iterator function_ptr;
@@ -402,12 +422,14 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
 	face->get_dof_indices (face_dofs);
 
 //physical location
-	Assert (false, ExcNotImplemented());
-
+//	Assert (false, ExcNotImplemented());
+	dof_locations.insert (dof_locations.begin(),
+			      face_dofs.size(), Point<dim>());
+	
 	(*function_ptr).second->value_list (dof_locations, dof_values);
 
 					 // enter into list
-	for (unsigned int i=0; i<face_dofs.size(); ++i) 
+	for (unsigned int i=0; i<face_dofs.size(); ++i)
 	  boundary_values[face_dofs[i]] = dof_values[i];
       };
 };

@@ -218,14 +218,19 @@ class ProblemBase {
     typedef map<unsigned char,Function<dim>* > DirichletBC;
     
 				     /**
-				      * Constructor. Use this triangulation and
+				      * Constructor.
+				      */
+    ProblemBase ();
+
+				     /**
+				      * Use this triangulation and
 				      * degree of freedom object during the
 				      * lifetime of this object. The dof
 				      * object must refer to the given
 				      * triangulation.
 				      */
-    ProblemBase (Triangulation<dim> *tria,
-		 DoFHandler<dim>    *dof_handler);
+    void set_tria_and_dof (Triangulation<dim> *tria,
+			   DoFHandler<dim>    *dof_handler);
 
 				     /**
 				      * Destructor. Declare this only to have
@@ -337,6 +342,10 @@ class ProblemBase {
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoTriaSelected);
     
   protected:
 				     /**
