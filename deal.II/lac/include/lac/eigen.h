@@ -19,6 +19,8 @@
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <lac/solver_cg.h>
+#include <lac/solver_gmres.h>
+#include <lac/solver_minres.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 
@@ -111,9 +113,20 @@ class EigenPower : private Solver<VECTOR>
  * converge to zero for non-symmetric matrices with non-trivial Jordan
  * blocks, it can be replaced by checking the difference of successive
  * eigenvalues. Use @p{AdditionalData::use_residual} for switching
- * these options.
+ * this option.
  *
- * @author Guido Kanschat, 2000
+ * Usually, the initial guess entering this method is updated after
+ * each step, replacing it with the new approximation of the
+ * eigenvalue. Using a parameter @p{AdditionalData::relaxation}
+ * between 0 and 1, this update can be damped. With relaxation
+ * parameter 0, no update is performed. This damping allows for slower
+ * adaption of the shift value to make sure that the method converges
+ * to the eigenvalue closest to the initial guess. This can be aided
+ * by the parameter @p{AdditionalData::start_adaption}, which
+ * indicates the first iteration step in which the shift value should
+ * be adapted.
+ *
+ * @author Guido Kanschat, 2000, 2003
  */
 template <class VECTOR = Vector<double> >
 class EigenInverse : private Solver<VECTOR>
@@ -126,16 +139,30 @@ class EigenInverse : private Solver<VECTOR>
 				      */
     struct AdditionalData
     {
+                                         /**
+					  * Damping of the updated shift value.
+					  */
+        double relaxation;
+      
+					 /**
+					  * Start step of adaptive
+					  * shift parameter.
+					  */
+        unsigned int start_adaption;
 					 /**
 					  * Flag for the stopping criterion.
 					  */
-	bool use_residual;
+        bool use_residual;
 					 /**
 					  * Constructor.
 					  */
-	AdditionalData (bool use_residual = true):
-			use_residual(use_residual)
-	  {}
+	AdditionalData (double relaxation = 1.,
+			unsigned int start_adaption = 6,
+			bool use_residual = true):
+	  relaxation(relaxation),
+	  start_adaption(start_adaption),
+	  use_residual(use_residual)
+      {}
 	
     };
     
@@ -173,7 +200,7 @@ class EigenInverse : private Solver<VECTOR>
 
   protected:
 				     /**
-				      * Shift parameter.
+				      * Flags for execution.
 				      */
     AdditionalData additional_data;
 };
@@ -270,8 +297,8 @@ EigenPower<VECTOR>::solve (double       &value,
 
 template <class VECTOR>
 EigenInverse<VECTOR>::EigenInverse (SolverControl &cn,
-					    VectorMemory<VECTOR> &mem,
-					    const AdditionalData &data):
+				    VectorMemory<VECTOR> &mem,
+				    const AdditionalData &data):
 		Solver<VECTOR>(cn, mem),
 		additional_data(data)
 {}
@@ -289,7 +316,7 @@ EigenInverse<VECTOR>::solve (double       &value,
 			     const MATRIX &A,
 			     VECTOR       &x)
 {
-  deallog.push("Wieland");
+  deallog.push("Wielandt");
 
   SolverControl::State conv=SolverControl::iterate;
 
@@ -297,13 +324,13 @@ EigenInverse<VECTOR>::solve (double       &value,
   ShiftedMatrix <MATRIX> A_s(A, -value);
 
 				   // Define solver
-  ReductionControl inner_control (A.m(), 1.e-16, 1.e-8, false, false);
+  ReductionControl inner_control (5000, 1.e-16, 1.e-5, false, false);
   PreconditionIdentity prec;
-  SolverCG<VECTOR>
+  SolverGMRES<VECTOR>
     solver(inner_control, this->memory);
 
 				   // Next step for recomputing the shift
-  unsigned int goal = 10;
+  unsigned int goal = additional_data.start_adaption;
   
 				   // Auxiliary vector
   VECTOR* Vy = this->memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
@@ -345,7 +372,9 @@ EigenInverse<VECTOR>::solve (double       &value,
 
       if (iter==goal)
 	{
-	  A_s.shift(-value);
+	  const double new_shift = - additional_data.relaxation * value
+	    + (1.-additional_data.relaxation) * A_s.shift();
+	  A_s.shift(new_shift);
 	  ++goal;
 	}
       
@@ -355,7 +384,9 @@ EigenInverse<VECTOR>::solve (double       &value,
       if (additional_data.use_residual)
 	{
 	  y.equ (value, x);
-	  double res = A.residual (r,x,y);
+	  A.vmult(r,x);
+	  r.sadd(-1., value, x);
+	  double res = r.l2_norm();
 					   // Check the residual
 	  conv = this->control().check (iter, res);
 	} else {
