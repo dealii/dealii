@@ -106,7 +106,7 @@ namespace PETScWrappers
 
                                        /**
                                         * Change the dimension of the vector
-                                        * to @arg N. It is unspecified how
+                                        * to @p N. It is unspecified how
                                         * resizing the vector affects the
                                         * memory allocation of this object;
                                         * i.e., it is not guaranteed that
@@ -116,7 +116,7 @@ namespace PETScWrappers
                                         * the same amount of memory is used
                                         * for less data.
                                         *
-                                        * If @arg fast is false, the vector is
+                                        * If @p fast is false, the vector is
                                         * filled by zeros. Otherwise, the
                                         * elements are left an unspecified
                                         * state.
@@ -126,10 +126,10 @@ namespace PETScWrappers
     
                                        /**
                                         * Change the dimension to that of the
-                                        * vector @arg v. The same applies as
+                                        * vector @p v. The same applies as
                                         * for the other reinit() function.
                                         *
-                                        * The elements of @arg v are not
+                                        * The elements of @p v are not
                                         * copied, i.e.  this function is the
                                         * same as calling <tt>reinit (v.size(),
                                         * fast)</tt>.
@@ -141,7 +141,7 @@ namespace PETScWrappers
                                        /**
                                         * Create a vector of length @p{n}. For
                                         * this class, we create a sequential
-                                        * vector. @arg n denotes the total
+                                        * vector. @p n denotes the total
                                         * size of the vector to be
                                         * created.
                                         */

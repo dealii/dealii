@@ -630,15 +630,15 @@ class ConstraintMatrix : public Subscriptor
 
                                      /**
                                       * This function takes a vector of local
-                                      * contributions (@arg local_vector)
+                                      * contributions (@p local_vector)
                                       * corresponding to the degrees of
-                                      * freedom indices given in @arg
+                                      * freedom indices given in @p
                                       * local_dof_indices and distributes them
                                       * to the global vector. In most cases,
                                       * these local contributions will be the
                                       * result of an integration over a cell
                                       * or face of a cell. However, as long as
-                                      * @arg local_vector and @arg
+                                      * @p local_vector and @p
                                       * local_dof_indices have the same number
                                       * of elements, this function is happy
                                       * with whatever it is given.
@@ -646,11 +646,11 @@ class ConstraintMatrix : public Subscriptor
                                       * In contrast to the similar function in
                                       * the DoFAccessor class, this function
                                       * also takes care of constraints,
-                                      * i.e. of one of the elements of @arg
+                                      * i.e. of one of the elements of @p
                                       * local_dof_indices belongs to a
                                       * constrained node, then rather than
                                       * writing the corresponding element of
-                                      * @arg local_vector into @arg
+                                      * @p local_vector into @p
                                       * global_vector, the element is
                                       * distributed to the entries in the
                                       * global vector to which this particular
@@ -671,15 +671,15 @@ class ConstraintMatrix : public Subscriptor
 
                                      /**
                                       * This function takes a matrix of local
-                                      * contributions (@arg local_matrix)
+                                      * contributions (@p local_matrix)
                                       * corresponding to the degrees of
-                                      * freedom indices given in @arg
+                                      * freedom indices given in @p
                                       * local_dof_indices and distributes them
                                       * to the global matrix. In most cases,
                                       * these local contributions will be the
                                       * result of an integration over a cell
                                       * or face of a cell. However, as long as
-                                      * @arg local_matrix and @arg
+                                      * @p local_matrix and @p
                                       * local_dof_indices have the same number
                                       * of elements, this function is happy
                                       * with whatever it is given.
@@ -687,11 +687,11 @@ class ConstraintMatrix : public Subscriptor
                                       * In contrast to the similar function in
                                       * the DoFAccessor class, this function
                                       * also takes care of constraints,
-                                      * i.e. of one of the elements of @arg
+                                      * i.e. of one of the elements of @p
                                       * local_dof_indices belongs to a
                                       * constrained node, then rather than
                                       * writing the corresponding element of
-                                      * @arg local_matrix into @arg
+                                      * @p local_matrix into @p
                                       * global_matrix, the element is
                                       * distributed to the entries in the
                                       * global matrix to which this particular
@@ -704,7 +704,7 @@ class ConstraintMatrix : public Subscriptor
                                       * inverted, we need to do something with
                                       * the diagonal elements corresponding to
                                       * constrained nodes. Thus, if a degree
-                                      * of freedom in @arg local_dof_indices
+                                      * of freedom in @p local_dof_indices
                                       * is constrained, we distribute the
                                       * corresponding entries in the matrix,
                                       * but also add the absolute value of the

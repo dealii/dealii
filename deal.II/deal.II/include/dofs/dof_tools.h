@@ -809,10 +809,10 @@ class DoFTools
                                      /**
                                       * Count how many degrees of freedom are
                                       * uniquely associated with the given
-                                      * @arg subdomain index.
+                                      * @p subdomain index.
                                       *
                                       * Note that there may be rare cases
-                                      * where cells with the given @arg
+                                      * where cells with the given @p
                                       * subdomain index exist, but none of its
                                       * degrees of freedom are actually
                                       * associated with it. In that case, the
@@ -820,7 +820,7 @@ class DoFTools
                                       *
                                       * This function will generate an
                                       * exception if there are no cells with
-                                      * the given @arg subdomain index.
+                                      * the given @p subdomain index.
                                       */
     template <int dim>
     static unsigned int

@@ -299,7 +299,7 @@ namespace PETScWrappers
 
                                        /**
                                         * Set the element (<i>i,j</i>)
-                                        * to @arg value. Throws an
+                                        * to @p value. Throws an
                                         * error if the entry does not
                                         * exist. Still, it is allowed to
                                         * store zero values in
@@ -310,7 +310,7 @@ namespace PETScWrappers
                 const PetscScalar value);
 
                                        /**
-                                        * Add @arg value to the
+                                        * Add @p value to the
                                         * element (<i>i,j</i>).  Throws
                                         * an error if the entry does not
                                         * exist. Still, it is allowed to
@@ -560,7 +560,7 @@ namespace PETScWrappers
                                         * the residual is defined to be
                                         * <i>r=b-Mx</i>. Write the
                                         * residual into
-                                        * @arg dst. The
+                                        * @p dst. The
                                         * <i>l<sub>2</sub></i> norm of
                                         * the residual vector is
                                         * returned.
@@ -586,13 +586,13 @@ namespace PETScWrappers
 
                                        /**
                                         * STL-like iterator with the
-                                        * first entry of row @arg r.
+                                        * first entry of row @p r.
                                         */
       const_iterator begin (const unsigned int r) const;
 
                                        /**
                                         * Final iterator of row
-                                        * @arg r.
+                                        * @p r.
                                         */
       const_iterator end (const unsigned int r) const;
       

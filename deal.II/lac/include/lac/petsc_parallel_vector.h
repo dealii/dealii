@@ -99,7 +99,7 @@ namespace PETScWrappers
                                           * Copy the given vector. Resize the
                                           * present vector if necessary. Also
                                           * take over the MPI communicator of
-                                          * @arg v.
+                                          * @p v.
                                           */
         Vector & operator = (const Vector &v);
 
@@ -134,7 +134,7 @@ namespace PETScWrappers
 
                                          /**
                                           * Change the dimension of the vector
-                                          * to @arg N. It is unspecified how
+                                          * to @p N. It is unspecified how
                                           * resizing the vector affects the
                                           * memory allocation of this object;
                                           * i.e., it is not guaranteed that
@@ -143,17 +143,17 @@ namespace PETScWrappers
                                           * consumption, or if for efficiency
                                           * the same amount of memory is used
                                           *
-                                          * @arg local_size denotes how many
-                                          * of the @arg N values shall be
+                                          * @p local_size denotes how many
+                                          * of the @p N values shall be
                                           * stored locally on the present
                                           * process.
                                           * for less data.
                                           *
-                                          * @arg communicator denotes the MPI
+                                          * @p communicator denotes the MPI
                                           * communicator henceforth to be used
                                           * for this vector.
                                           * 
-                                          * If @arg fast is false, the vector
+                                          * If @p fast is false, the vector
                                           * is filled by zeros. Otherwise, the
                                           * elements are left an unspecified
                                           * state.
@@ -165,13 +165,13 @@ namespace PETScWrappers
     
                                          /**
                                           * Change the dimension to that of
-                                          * the vector @arg v, and also take
+                                          * the vector @p v, and also take
                                           * over the partitioning into local
                                           * sizes as well as the MPI
                                           * communicator. The same applies as
                                           * for the other @p{reinit} function.
                                           *
-                                          * The elements of @arg v are not
+                                          * The elements of @p v are not
                                           * copied, i.e. this function is the
                                           * same as calling
                                           * <tt>reinit(v.size(),
@@ -184,9 +184,9 @@ namespace PETScWrappers
                                          /**
                                           * Create a vector of length
                                           * @p{n}. For this class, we create a
-                                          * parallel vector. @arg n denotes
+                                          * parallel vector. @p n denotes
                                           * the total size of the vector to be
-                                          * created. @arg local_size denotes
+                                          * created. @p local_size denotes
                                           * how many of these elements shall
                                           * be stored locally.
                                           */

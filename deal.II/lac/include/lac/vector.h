@@ -206,7 +206,7 @@ class Vector
 				      * analogous to that of the STL
 				      * containers.
 				      *
-				      * If @arg fast is false, the vector is
+				      * If @p fast is false, the vector is
 				      * filled by zeros. Otherwise, the
 				      * elements are left an unspecified
 				      * state.

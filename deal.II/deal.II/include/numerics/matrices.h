@@ -754,7 +754,7 @@ class MatrixTools : public MatrixCreator
 				      * of rows corresponding to boundary
 				      * nodes, but the corresponding case of
 				      * deleting the respective columns
-				      * (i.e. if @arg eliminate_columns is @p
+				      * (i.e. if @p eliminate_columns is @p
 				      * true) is not presently implemented,
 				      * and probably will never because it is
 				      * too expensive without direct access to
