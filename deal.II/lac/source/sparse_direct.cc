@@ -113,7 +113,7 @@ namespace HSL
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
     };
-  };
+  }
 };
 #endif  // ifndef HAVE_HSL_MA27
 
@@ -187,7 +187,7 @@ namespace HSL
 				     "the respective files in the right place, "
 				     "re-configuring the library and re-building it!"));
     };    
-  };
+  }
 };
 #endif   // ifndef HAVE_HSL_MA47
 
