@@ -306,18 +306,16 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 				   // equally spaced along the line
   if (compute_ansatz_points) 
     {
-      ansatz_points.erase (ansatz_points.begin(), ansatz_points.end());
-      ansatz_points.reserve (total_dofs);
-
+      unsigned int next = 0;
 				       // first the dofs in the vertices
       for (unsigned int vertex=0; vertex<2; vertex++) 
 	for (unsigned int i=0; i<dofs_per_vertex; ++i)
-	  ansatz_points.push_back (cell->vertex(vertex));
+	  ansatz_points[next++] = cell->vertex(vertex);
       
 				       // now dofs on line
       for (unsigned int i=0; i<dofs_per_line; ++i) 
-	ansatz_points.push_back (cell->vertex(0) +
-				 Point<1>((i+1.0)/(total_dofs+1.0)*h));
+	ansatz_points[next++] = cell->vertex(0) +
+				Point<1>((i+1.0)/(total_dofs+1.0)*h);
     };
 };
 
@@ -328,6 +326,7 @@ void FiniteElement<1>::face_ansatz_points (const typename Triangulation<1>::face
 				   // is this function useful in 1D?
   Assert (false, ExcPureFunctionCalled());
 };
+
 
 
 bool FiniteElement<2>::operator == (const FiniteElement<2> &f) const {
