@@ -1,6 +1,10 @@
-// $Id$
+// testmatrix.h,v 1.15 2002/10/03 22:41:22 wolf Exp
 
 #include <base/exceptions.h>
+#include <iostream>
+
+template <typename number> class Vector;
+class SparsityPattern;
 
 /**
  * Finite difference matrix on uniform grid.
