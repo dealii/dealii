@@ -69,7 +69,7 @@ int main()
   logfile.setf(std::ios::fixed);
   logfile.precision(0);
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
   
   SparsityPattern sparsity1(2,3,3);
   SparsityPattern sparsity2(3,4,4);
