@@ -605,7 +605,9 @@ void Triangulation<2>::create_hyper_L (const double a, const double b) {
 template <>
 void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius) {
   const unsigned int dim=2;
-  const double a = 1./(1+sqrt(2)/2);         // equilibrate cell sizes
+  const double a = 1./(1+sqrt(2)); // equilibrate cell sizes at transition
+				   // from the inner part to the radial
+				   // cells
   const Point<dim> vertices[8] = { p+Point<dim>(-1,-1)*(radius/sqrt(2)),
 				   p+Point<dim>(+1,-1)*(radius/sqrt(2)),
 				   p+Point<dim>(-1,-1)*(radius/sqrt(2)*a),
