@@ -2304,6 +2304,7 @@ namespace LaplaceSolver
 		    error_indicators.end(),
 		    error_indicators.begin(),
 		    &fabs);
+				     // TODO: take fixed error fraction criterion!
     GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
 						     error_indicators,
 						     0.3, 0.03);
@@ -2383,34 +2384,92 @@ namespace LaplaceSolver
 				     // primal finite element
 				     // space. Fortunately, the
 				     // library provides functions for
-				     // these two actions. (In
-				     // general, for transformations
-				     // between different finite
-				     // elements, the ``FETools''
-				     // namespace provides a number of
-				     // functions.)
+				     // the interpolation into larger
+				     // or smaller finite element
+				     // spaces, so this is mostly
+				     // obvious.
+				     //
+				     // First, let's do that for the
+				     // primal solution: it is
+				     // cell-wise interpolated into
+				     // the finite element space in
+				     // which we have solved the dual
+				     // problem:
     Vector<double> primal_solution (DualSolver<dim>::dof_handler.n_dofs());
     FETools::interpolate (PrimalSolver<dim>::dof_handler,
 			  PrimalSolver<dim>::solution,
 			  DualSolver<dim>::dof_handler,
 			  primal_solution);
-				     //TODO!!
+    
+				     // Then for the interpolation of
+				     // the numerically approximated
+				     // dual solution z into the
+				     // finite element space of the
+				     // primal solution: interpolate
+				     // into this smaller finite
+				     // element space...
     Vector<double> tmp (PrimalSolver<dim>::dof_handler.n_dofs());
-    Vector<double> i_h_dual_solution (DualSolver<dim>::dof_handler.n_dofs());
     FETools::interpolate (DualSolver<dim>::dof_handler,
 			  DualSolver<dim>::solution,
 			  PrimalSolver<dim>::dof_handler,
 			  tmp);
+				     // ...but then remark that at
+				     // present the function that did
+				     // this does not respect hanging
+				     // node constraints. Doh. The
+				     // result is that the ``tmp''
+				     // vector is cell-wise of the
+				     // polynomial degree of the
+				     // primal finite element, but may
+				     // be discontinuous at hanging
+				     // nodes. Fix ``fix'' this by
+				     // building up the hanging node
+				     // constraints for this finite
+				     // element space, and apply them
+				     // to the computed interpolation:
     ConstraintMatrix primal_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
 					     primal_hanging_node_constraints);
     primal_hanging_node_constraints.close ();
     primal_hanging_node_constraints.distribute (tmp);
+				     // Note that this could probably
+				     // have been more efficient since
+				     // those constraints have been
+				     // used previously when
+				     // assembling matrix and right
+				     // hand side for the primal
+				     // problem. We leave the
+				     // optimization of the program in
+				     // this respect as an exercise.
+
+				     // Once we have the
+				     // down-interpolated field,
+				     // interpolate it back up to the
+				     // dual finite element space,
+				     // just as for the primal
+				     // solution above. This way, we
+				     // again have all information on
+				     // one level, and can work with
+				     // it more simply than
+				     // otherwise. Note that (as in
+				     // the primal case), since the
+				     // solution on the smaller finite
+				     // element space was continuous
+				     // also at hanging nodes (we
+				     // explicitly made it
+				     // continuous), it is also
+				     // conforming in the dual finite
+				     // element space, which must be
+				     // larger. There is thus no need
+				     // for more special actions.
+    Vector<double> i_h_dual_solution (DualSolver<dim>::dof_handler.n_dofs());
     FETools::interpolate (PrimalSolver<dim>::dof_handler,
 			  tmp,
 			  DualSolver<dim>::dof_handler,
 			  i_h_dual_solution);
-    
+
+				     // With all this in place,
+				     // compute z-zh:
     Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
     dual_weights = DualSolver<dim>::solution;
     dual_weights -= i_h_dual_solution;
@@ -3058,7 +3117,7 @@ namespace LaplaceSolver
 };
 
 
-
+				 // TODO!!
 
 template <int dim>
 void
