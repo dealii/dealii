@@ -346,11 +346,20 @@ class VectorTools
 				      * points to the finite element
 				      * space. It is assumed that the
 				      * number of components of
-				      * @p{function} matches that of the
-				      * finite element used by @p{dof}.
+				      * @p{function} matches that of
+				      * the finite element used by
+				      * @p{dof}.
 				      *
-				      * See the general documentation of this
-				      * class for further information.
+				      * Note that you may have to call
+				      * @p{hanging_nodes.distribute(data_2)}
+				      * with the hanging nodes from
+				      * space @p{dof_2} afterwards, to
+				      * make the result continuous
+				      * again.
+				      *
+				      * See the general documentation
+				      * of this class for further
+				      * information.
 				      */
     template <int dim, class VECTOR>
     static void interpolate (const Mapping<dim>    &mapping,
