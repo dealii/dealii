@@ -19,18 +19,26 @@ TensorFunction<rank_, dim>::~TensorFunction ()
 
 
 
-template <int rank_, int dim>
-double
-TensorFunction<rank_, dim>::operator () (TensorIndex<rank_> i,
-					 const Point<dim> &) const
-{
-  int k=i(0);
-  k++;
+// template <int rank_, int dim>
+// double
+// TensorFunction<rank_, dim>::operator () (TensorIndex<rank_> i,
+// 					 const Point<dim> &) const
+// {
+//   int k=i(0);
+//   k++;
   
-  Assert (false, ExcPureFunctionCalled());
-  return 0;
-};
+//   Assert (false, ExcPureFunctionCalled());
+//   return 0;
+// };
 
+
+template <int rank_, int dim>
+Tensor<rank_,dim>
+TensorFunction<rank_, dim>::operator() (const Point<dim> &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return Tensor<rank_,dim>();
+};
 
 
 template <int rank_, int dim>

@@ -71,10 +71,10 @@ class TensorFunction :
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<Tensor<rank_,dim> > &values) const;
 
-				   /**
-				    * Return one component of the value.
-				    */
-  virtual double operator() (TensorIndex<rank_> i, const Point<dim>& p) const;
+//				   /**
+//				    * Return one component of the value.
+//				    */
+//  virtual double operator() (TensorIndex<rank_> i, const Point<dim>& p) const;
   
 
 				     /**
