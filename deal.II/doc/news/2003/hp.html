@@ -32,6 +32,28 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: 
+       Implemented a couple of small modifications to get a first 1D
+       hp-example running. The <code class="class">Triangulation</code>
+       class was extended by a method to add
+       <code class="class">RefinementListener</code>s, which allow
+       other classes to be informed about Refinements. This is
+       needed for the <code class="class">hpDoFHandler</code>, which
+       administrates the <code class"member">active_fe_indices</code>
+       in the <code class="class">hpDoFLevel</code>s. Once this
+       was implemented, the other changes were straightforward. For
+       1D, the only thing which had to be changed for hp was the
+       <code class="member">reserve_space</code> method.
+       Last but not least, for the hp-example the
+       <code class"member">add</code> method was added to the
+       <code class"class">FECollection</code>. It allows the user to
+       add new <code class="class">FiniteElements</code>s to the
+       the <code class"class">FECollection</code>.
+       <br>
+       (Oliver Kayser-Herold 2003/06/1)
+       </p>
+
+  <li> <p> 
        Changed: Introduced the <code class="class">DoFHandler</code>
        as template parameter in classes <code class="class">DataOutStack</code>,
        <code class="class">DataOutFaces</code>, <code class="class">DataOut</code> and 
