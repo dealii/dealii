@@ -20,7 +20,7 @@ foreach $filename (@ARGV) {
             # our purpose
 	    $link = $1;
     
-	    if ( $link =~ /^mailto|http/i ) {
+	    if ( $link =~ /^mailto|http:\/\//i ) {
 	        # link is external. don't check it
 	        print "external link: $link\n" if $debug;
 	        next;
@@ -54,6 +54,11 @@ foreach $filename (@ARGV) {
 		# find its anchor
 		$external_file = $1;
 		$external_ref = $2;
+
+		# if the file name was prepended with http: (but is a local file, 
+		# so no double-slash), then split off http:
+		$external_file =~ s/^http://g;
+
 		print "external reference: $link\n" if $debug;
 		
 		open IN2, $external_file;
@@ -75,6 +80,11 @@ foreach $filename (@ARGV) {
 	    else {
 		# this must now be a regular file which is
 		# referenced. the file must be local
+
+		# if the file name was prepended with http: (but is a local file, 
+		# so no double-slash), then split off http:
+		$link =~ s/^http://g;
+
 		die "---Local file `$link' not found in file `$filename'\n"
 		    unless ((-r $link) && (-f $link));
 	    }
@@ -84,6 +94,7 @@ foreach $filename (@ARGV) {
 	while ( /img\s+src=\"?(.*?)[\s\"]/gi ) {
 	    # check whether the file for the image is present
 	    $link = $1;
+
 	    die "---Local image `$link' not found in file `$filename'\n"
 		unless ((-r $link) && (-f $link));
 	}
