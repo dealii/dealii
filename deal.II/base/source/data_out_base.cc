@@ -920,42 +920,86 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 		  if (flags.smooth)               // only if smooth triangles are used
 		    {
 		      Point<3> nrml[16];     // aproximate normal vectors in patch
+		      Point<3> h1,h2;
 		      for (unsigned int i=0; i<n_subdivisions+1;++i)
 			{
 			  for (unsigned int j=0; j<n_subdivisions+1;++j)
 			    {
-			      if (i==0) 
-				nrml[i*(n_subdivisions+1)+j](0)=-patch->data(0,i*(n_subdivisions+1)+j);
-			      else 
-				nrml[i*(n_subdivisions+1)+j](0)=-patch->data(0,(i-1)*(n_subdivisions+1)+j);
-			      if (i==n_subdivisions) 
-				nrml[i*(n_subdivisions+1)+j](0)+=patch->data(0,i*(n_subdivisions+1)+j);
-			      else 
-				nrml[i*(n_subdivisions+1)+j](0)+=patch->data(0,(i+1)*(n_subdivisions+1)+j);
-			      nrml[i*(n_subdivisions+1)+j](0)/=(1./n_subdivisions);
-			      if (i!=n_subdivisions&&i!=0) nrml[i*(n_subdivisions+1)+j](0)/=2;
+			      if (i==0)
+				{
+				  h1(0)=ver[(i+1)*(n_subdivisions+1)+j](0)-
+					ver[i*(n_subdivisions+1)+j](0);
+				  h1(1)=patch->data(0,(i+1)*(n_subdivisions+1)+j)-
+					patch->data(0,i*(n_subdivisions+1)+j);
+				  h1(2)=ver[(i+1)*(n_subdivisions+1)+j](1)-
+					ver[i*(n_subdivisions+1)+j](1);
+				}
+			      else
+				if (i==n_subdivisions)
+				  {
+				    h1(0)=ver[i*(n_subdivisions+1)+j](0)-
+					  ver[(i-1)*(n_subdivisions+1)+j](0);
+				    h1(1)=patch->data(0,i*(n_subdivisions+1)+j)-
+					  patch->data(0,(i-1)*(n_subdivisions+1)+j);
+				    h1(2)=ver[i*(n_subdivisions+1)+j](1)-
+					  ver[(i-1)*(n_subdivisions+1)+j](1);
+				  }
+				else
+				  {
+				    h1(0)=ver[(i+1)*(n_subdivisions+1)+j](0)-
+					  ver[(i-1)*(n_subdivisions+1)+j](0);
+				    h1(1)=patch->data(0,(i+1)*(n_subdivisions+1)+j)-
+					  patch->data(0,(i-1)*(n_subdivisions+1)+j);
+				    h1(2)=ver[(i+1)*(n_subdivisions+1)+j](1)-
+					  ver[(i-1)*(n_subdivisions+1)+j](1);
+				  };
 			      if (j==0)
-				nrml[i*(n_subdivisions+1)+j](2)=-patch->data(0,i*(n_subdivisions+1)+j);
+				{
+				  h2(0)=ver[i*(n_subdivisions+1)+j+1](0)-
+					ver[i*(n_subdivisions+1)+j](0);
+				  h2(1)=patch->data(0,i*(n_subdivisions+1)+j+1)-
+					patch->data(0,i*(n_subdivisions+1)+j);
+				  h2(2)=ver[i*(n_subdivisions+1)+j+1](1)-
+					ver[i*(n_subdivisions+1)+j](1);
+				}
 			      else
-				nrml[i*(n_subdivisions+1)+j](2)=-patch->data(0,i*(n_subdivisions+1)+j-1);
-			      if (j==n_subdivisions)
-				nrml[i*(n_subdivisions+1)+j](2)+=patch->data(0,i*(n_subdivisions+1)+j);
-			      else
-				nrml[i*(n_subdivisions+1)+j](2)+=patch->data(0,i*(n_subdivisions+1)+j+1);
-			      nrml[i*(n_subdivisions+1)+j](2)/=-(1./n_subdivisions);
-			      if (j!=n_subdivisions&&j!=0) nrml[i*(n_subdivisions+1)+j](2)/=2;
-			      nrml[i*(n_subdivisions+1)+j](1)=1.;
+				if (j==n_subdivisions)
+				  {
+				    h2(0)=ver[i*(n_subdivisions+1)+j](0)-
+					  ver[i*(n_subdivisions+1)+j-1](0);
+				    h2(1)=patch->data(0,i*(n_subdivisions+1)+j)-
+					  patch->data(0,i*(n_subdivisions+1)+j-1);
+				    h2(2)=ver[i*(n_subdivisions+1)+j](1)-
+					  ver[i*(n_subdivisions+1)+j-1](1);
+				  }
+				else
+				  {
+				    h2(0)=ver[i*(n_subdivisions+1)+j+1](0)-
+					  ver[i*(n_subdivisions+1)+j-1](0);
+				    h2(1)=patch->data(0,i*(n_subdivisions+1)+j+1)-
+					  patch->data(0,i*(n_subdivisions+1)+j-1);
+				    h2(2)=ver[i*(n_subdivisions+1)+j+1](1)-
+					  ver[i*(n_subdivisions+1)+j-1](1);
+				  };
+			      nrml[i*(n_subdivisions+1)+j](0)=h1(1)*h2(2)-h1(2)*h2(1);
+			      nrml[i*(n_subdivisions+1)+j](1)=h1(2)*h2(0)-h1(0)*h2(2);
+			      nrml[i*(n_subdivisions+1)+j](2)=h1(0)*h2(1)-h1(1)*h2(0);
 
 							       // normalize Vektor
 			      double norm=sqrt(
 				pow(nrml[i*(n_subdivisions+1)+j](0),2.)+
-				pow(nrml[i*(n_subdivisions+1)+j](1),2.)+1.);
+				pow(nrml[i*(n_subdivisions+1)+j](1),2.)+
+				pow(nrml[i*(n_subdivisions+1)+j](2),2.));
 			      
-			      for (unsigned int k=0;k<3;++k)  nrml[i*(n_subdivisions+1)+j](k)/=norm;
+			      if (nrml[i*(n_subdivisions+1)+j](1)<0)
+				norm*=-1.;
+			      
+			      for (unsigned int k=0;k<3;++k)
+				nrml[i*(n_subdivisions+1)+j](k)/=norm;
 			    }
 			}
 						       // writing smooth_triangles
-				
+		      
 						       // down/right triangle
 		      out << "smooth_triangle {" << std::endl << "\t<" 
 			  << ver[dl](0) << ","   
@@ -1017,7 +1061,7 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 			  << patch->data(0,dl+n_subdivisions+2)  << ","
 			  << ver[dl+n_subdivisions+2](1) << ">," << std::endl;
 		      out << "\t<" 
-			  << ver[dl+1](0) << "," 
+			  << ver[dl+1](0) << ","
 			  << patch->data(0,dl+1)  << ","
 			  << ver[dl+1](1) << ">}" << std::endl;
 		    };
