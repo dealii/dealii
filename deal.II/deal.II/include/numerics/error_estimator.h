@@ -156,6 +156,52 @@ class KellyErrorEstimator {
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
+
+  private:
+				     /**
+				      * Declare a data type to represent the
+				      * mapping between faces and integrated
+				      * jumps of gradients. See the general
+				      * doc of this class for more information.
+				      */
+    typedef map<DoFHandler<dim>::face_iterator,double> FaceIntegrals;
+
+				     /**
+				      * Redeclare an active cell iterator.
+				      * This is simply for convenience.
+				      */
+    typedef DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    
+				     /**
+				      * Actually do the computation on a face
+				      * which has no hanging nodes (it is
+				      * regular),  i.e.
+				      * either on the other side there is
+				      * nirvana (face is at boundary), or
+				      * the other side's refinement level
+				      * is the same as that of this side,
+				      * then handle the integration of
+				      * these both cases together.
+				      *
+				      * The meaning of the parameters becomes
+				      * clear when looking at the source
+				      * code. This function is only
+				      * externalized from #estimate_error#
+				      * to avoid ending up with a function
+				      * of 500 lines of code.
+				      */
+    static void integrate_over_regular_face (const active_cell_iterator &cell,
+					     const unsigned int   face_no,
+					     const FiniteElement<dim> &fe,
+					     const Boundary<dim>      &boundary,
+					     const FunctionMap   &neumann_bc,
+					     const unsigned int   n_q_points,
+					     FEFaceValues<dim>   &fe_face_values_cell,
+					     FEFaceValues<dim>   &fe_face_values_neighbor,
+					     FaceIntegrals       &face_integrals,
+					     const dVector       &solution);
+
+    static void integrate_over_irregular_face ();
 };
 
 
