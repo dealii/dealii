@@ -75,7 +75,7 @@ template <typename number> class Vector;
  * @author Ralf Hartmann, 1999
  */
 template<typename number, typename inverse_type = number>
-class PreconditionBlock: public Subscriptor
+class PreconditionBlock
 {
   public:
 				     /**
@@ -86,7 +86,7 @@ class PreconditionBlock: public Subscriptor
 				     /**
 				      * Destructor.
 				      */
-    virtual ~PreconditionBlock();
+    ~PreconditionBlock();
 
 				     /**
 				      * Initialize matrix and block
@@ -108,7 +108,7 @@ class PreconditionBlock: public Subscriptor
 				      * that it had directly after
 				      * calling the constructor.
 				      */
-    virtual void clear();
+    void clear();
 
 				     /**
 				      * Use only the inverse of the
@@ -248,9 +248,21 @@ class PreconditionBlock: public Subscriptor
  * Block Jacobi preconditioning.
  */
 template<typename number, typename inverse_type = number>
-class PreconditionBlockJacobi : public PreconditionBlock<number,inverse_type>
+class PreconditionBlockJacobi : public Subscriptor,
+				private PreconditionBlock<number,inverse_type>
 {
   public:
+				     /**
+				      * Make initialization function
+				      * publicly available.
+				      */
+    PreconditionBlock<number,inverse_type>::initialize;
+    
+				     /**
+				      * Make function public.
+				      */
+    PreconditionBlock<number,inverse_type>::invert_diagblocks;
+    
 				     /**
 				      * Execute block Jacobi
 				      * preconditioning.
@@ -283,7 +295,8 @@ class PreconditionBlockJacobi : public PreconditionBlock<number,inverse_type>
  * in the @p{operator ()} function of this class.
  */
 template<typename number, typename inverse_type = number>
-class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
+class PreconditionBlockSOR : public  Subscriptor,
+			     private PreconditionBlock<number,inverse_type>
 {
   public:
 				     /**
@@ -296,6 +309,17 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
 				      * Destructor.
 				      */
     virtual ~PreconditionBlockSOR();
+
+				     /**
+				      * Make initialization function
+				      * publicly available.
+				      */
+    PreconditionBlock<number,inverse_type>::initialize;
+    
+				     /**
+				      * Make function public.
+				      */
+    PreconditionBlock<number,inverse_type>::invert_diagblocks;
 
 				     /**
 				      * Set the relaxation parameter.
@@ -323,7 +347,7 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
 
   private:
 				     /**
-				      * Damping parameter.
+				      * Relaxation parameter.
 				      */
     number omega;
 };
