@@ -13,9 +13,9 @@ include $D/common/Make.global_options
 ifeq ($(kdocversion),1)
 KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc
 else
-KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p \
+KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a --private \
           --html-logo ../../../pictures/deal.II_3.0_1.150.jpg \
-          -L $D/doc/auto/kdoc -n
+          --libdir $D/doc/auto/kdoc --name
 endif
 
 kdoc.base     = $(shell echo $D/base/include/base/*.h)
@@ -60,7 +60,7 @@ kdoc-installed:
 # paths
 
 base.kdoc: kdoc-installed $(kdoc.base)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
 	$(^:kdoc-installed=)
 	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
@@ -69,40 +69,40 @@ base.kdoc: kdoc-installed $(kdoc.base)
 	  	
 
 lac.kdoc: kdoc-installed $(kdoc.lac)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base $(^:kdoc-installed=)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
+	--xref base $(^:kdoc-installed=)
 	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
 	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
 	done
 
 grid.kdoc: kdoc-installed $(kdoc.grid)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base -llac $(^:kdoc-installed=)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
+	--xref base --xref lac $(^:kdoc-installed=)
 	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
 	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
 	done
 
 dof.kdoc: kdoc-installed $(kdoc.dof)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base -llac -lgrid $(^:kdoc-installed=)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
+	--xref base --xref lac --xref grid $(^:kdoc-installed=)
 	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
 	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
 	done
 
 numerics.kdoc: kdoc-installed $(kdoc.numerics)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base -llac -lgrid -ldof $(^:kdoc-installed=)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
+	--xref base --xref lac --xref grid --xref dof $(^:kdoc-installed=)
 	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
 	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
 	done
 
 multigrid.kdoc: kdoc-installed $(kdoc.multigrid)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base -llac -lgrid -ldof -lnumerics $(^:kdoc-installed=)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
+	--xref base --xref lac --xref grid --xref dof --xref numerics $(^:kdoc-installed=)
 	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
 	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
