@@ -15,12 +15,12 @@ foreach $filename (@ARGV) {
     print "File: $filename\n" if $debug;
     while (<IN>) {
         # first find all hrefs
-        while ( /href=\"?(.*?)[\s\"]/g ) {
+        while ( /href=\"?(.*?)[\s\"]/gi ) {
 	    # then decide whether they are relevant for 
             # our purpose
 	    $link = $1;
     
-	    if ( $link =~ /^mailto|http/ ) {
+	    if ( $link =~ /^mailto|http/i ) {
 	        # link is external. don't check it
 	        print "external link: $link\n" if $debug;
 	        next;
@@ -35,7 +35,7 @@ foreach $filename (@ARGV) {
 	        open IN2, $filename;
 	        $found = 0;
 	        while ( <IN2> ) {
-		    if ( /<a name=\"?(.*?)[\s\"]/ ) {
+		    if ( /<a name=\"?(.*?)[\s\"]/i ) {
 		        if ( $1 eq $internal_ref) {
 			    print "                    found.\n" if $debug;
 			    $found = 1;
@@ -59,7 +59,7 @@ foreach $filename (@ARGV) {
 		open IN2, $external_file;
 		$found = 0;
 		while ( <IN2> ) {
-		    if ( /<a name=\"?(.*?)[\s\"]/ ) {
+		    if ( /<a name=\"?(.*?)[\s\"]/i ) {
 			if ( $1 eq $external_ref) {
 			    print "                    found.\n" if $debug;
 			    $found = 1;
