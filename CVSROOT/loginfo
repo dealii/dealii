@@ -17,7 +17,7 @@
 #
 # For example:
 #
-DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default.html
+DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default.1999.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default.1999.html
 #
 # The various DEAL libraries
 #
@@ -29,7 +29,7 @@ DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CV
 #
 ^lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac.html
 #
-^deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal.html
+^deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal.1999.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal.1999.html
 #
 ^examples.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/examples.html > /tmp/Texamples; mv /tmp/Texamples $CVSROOT/LOG/examples.html
 #
