@@ -19,7 +19,7 @@ kdoc.transport = $(wildcard ../../projects/transport/trans_dg/*.h)
 
 
 kdoc.all  = $(kdoc.base) $(kdoc.lac) $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.num) \
-            $(kdoc.ntrans)
+            $(kdoc.transport)
 
 all-include-files = $(wildcard ../../deal.II/include/*/*.h \
                                ../../lac/include/lac/*.h   \
@@ -38,7 +38,7 @@ cvslog:
 
 # make sure that the *.kdoc files exist by
 # using the dependancies and the following rules.
-kdoc: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc $(kdoc.all) kdoc-rerun
+kdoc: kdoc/base.kdoc kdoc/lac.kdoc kdoc/basic.kdoc kdoc/grid.kdoc kdoc/dof.kdoc kdoc/numerics.kdoc kdoc/transport.kdoc $(kdoc.all) kdoc-rerun
 
 kdoc-rerun:
 	@cd kdoc ; perl $(KDOCFLAGS) $(KDOCINCLUDE) -dbase \
