@@ -292,8 +292,9 @@ class PreconditionMG : public Subscriptor
 				      * This is the operator used by
 				      * LAC iterative solvers.
 				      */
-    void vmult (VECTOR       &dst,
-		const VECTOR &src) const;
+    template<class VECTOR2>
+    void vmult (VECTOR2       &dst,
+		const VECTOR2 &src) const;
     
 				     /**
 				      * Preconditioning operator.
@@ -301,8 +302,9 @@ class PreconditionMG : public Subscriptor
 				      * of the @p{MG} object passed to
 				      * the constructor.
 				      */
-  void vmult_add (VECTOR       &dst,
-		  const VECTOR &src) const;
+    template<class VECTOR2>
+    void vmult_add (VECTOR2       &dst,
+		    const VECTOR2 &src) const;
     
 				     /**
 				      * Tranposed preconditioning operator.
@@ -310,8 +312,9 @@ class PreconditionMG : public Subscriptor
 				      * Not implemented, but the
 				      * definition may be needed.
 				      */
-    void Tvmult (VECTOR       &dst,
-		const VECTOR &src) const;
+    template<class VECTOR2>
+    void Tvmult (VECTOR2       &dst,
+		const VECTOR2 &src) const;
     
 				     /**
 				      * Tranposed preconditioning operator.
@@ -319,8 +322,9 @@ class PreconditionMG : public Subscriptor
 				      * Not implemented, but the
 				      * definition may be needed.
 				      */
-    void Tvmult_add (VECTOR       &dst,
-		     const VECTOR &src) const;
+    template<class VECTOR2>
+    void Tvmult_add (VECTOR2       &dst,
+		     const VECTOR2 &src) const;
     
   private:
 				     /**
@@ -408,10 +412,11 @@ PreconditionMG<dim, VECTOR, TRANSFER>::empty () const
 }
 
 template<int dim, class VECTOR, class TRANSFER>
+template<class VECTOR2>
 void
 PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
-  VECTOR& dst,
-  const VECTOR& src) const
+  VECTOR2& dst,
+  const VECTOR2& src) const
 {
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
@@ -426,10 +431,11 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
 
 
 template<int dim, class VECTOR, class TRANSFER>
+template<class VECTOR2>
 void
 PreconditionMG<dim, VECTOR, TRANSFER>::vmult_add (
-  VECTOR& dst,
-  const VECTOR& src) const
+  VECTOR2& dst,
+  const VECTOR2& src) const
 {
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
@@ -444,20 +450,22 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult_add (
 
 
 template<int dim, class VECTOR, class TRANSFER>
+template<class VECTOR2>
 void
 PreconditionMG<dim, VECTOR, TRANSFER>::Tvmult (
-  VECTOR&,
-  const VECTOR&) const
+  VECTOR2&,
+  const VECTOR2&) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
 template<int dim, class VECTOR, class TRANSFER>
+template<class VECTOR2>
 void
 PreconditionMG<dim, VECTOR, TRANSFER>::Tvmult_add (
-  VECTOR&,
-  const VECTOR&) const
+  VECTOR2&,
+  const VECTOR2&) const
 {
   Assert(false, ExcNotImplemented());
 }
