@@ -8,7 +8,63 @@
 #include <fe/fe.h>
 
 
-
+/**
+ * This class provides an interface to group several equal elements together
+ * into one. To the outside world, the resulting object looks just like
+ * a usual finite element object, which is composed of several other finite
+ * elements of the same class each.
+ *
+ * Basically, this composed finite element has #N# times as many degrees of
+ * freedom (and therefore also #N# times as many shape functions) as a single
+ * object of the underlying finite element would have had. Among these,
+ * always #N# have the same properties, i.e. are represented by the same
+ * shape functions. These #N# shape functions for each degree of freedom
+ * of the basic finite element are numbered consecutively, i.e. for
+ * the common case of a velocity #(u,v,w)#, the sequence of basis functions
+ * would be #u1, v1, w1, u2, v2, w2, ..., uN, vN, wN#. The other possibility
+ * would have been #u1, ..., uN, v1, ..., vN, w1, ...wN#, but we chose the
+ * first way.
+ *
+ * Using this scheme, the overall numbering of degrees of freedom is as
+ * follows: for each subobject (vertex, line, quad, or hex), the degrees
+ * of freedom are numbered such that we run over all subelements first,
+ * before turning for the next dof on this subobject or for the next subobject.
+ * For example, for the bicubic element in one space dimension, and for
+ * two subobjects grouped together by this class, the ordering for
+ * the system #s=(u,v)# is:
+ * \begin{itemize}
+ * \item First vertex: #u0, v0 = s0, s1#
+ * \item Second vertex: #u1, v1 = s2, s3#
+ * \item First degree of freedom on the line (=cell):
+ *   #u2, v2 = s3, s4#
+ * \item Second degree of freedom on the line:
+ *   #u3, v3 = s5, s6#.
+ * \end{itemize}
+ *
+ * In the most cases, the composed element behaves as if it were a usual element
+ * with more degrees of freedom. Howeverm the underlying structure is visible in
+ * the restriction, prolongation and interface constraint matrices, which do not
+ * couple the degrees of freedom of the subobject. E.g. the continuity requirement
+ * is imposed for the shape functions of the subobjects separately; no requirement
+ * exist between shape functions of different subobjects, i.e. in the above
+ * example: on a hanging node, the respective value of the #u# velocity is only
+ * coupled to #u# at the vertices and the line on the larger cell next to this
+ * vertex, there is no interaction with #v# and #w# of this or the other cell.
+ *
+ * Likewise, the matrix computed by the #get_local_mass_matrix# function, which
+ * originally is defined to be $m_{ij} = \int_K \phi_i \phi_j dx$ contains
+ * only those $m_{ij}$ for which the respective shape functions belong to the
+ * same subobject, all other entries are set to zero. The matrix therefore is
+ * a block matrix, where each block is a diagonal matrix with entries equal to
+ * the entry at this block's position in the local mass matrix of a single
+ * finite element object. This behaviour is consistent with one common use
+ * of the mass matrix, which is in projecting functions onto the grid; in this
+ * case, one wants to project each component of the function (here it is a vector
+ * function) to the respective component of the finite element, without interaction
+ * of the different components.
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
 template <int dim>
 class FESystem : public FiniteElement<dim> {
   public:
@@ -36,7 +92,7 @@ class FESystem : public FiniteElement<dim> {
 				      * way as shown here, to let the compiler
 				      * deduce the template argument itself.
 				      *
-				      * Obviously, the tenplate finite element
+				      * Obviously, the template finite element
 				      * class needs to be of the same dimension
 				      * as is this object.
 				      */
