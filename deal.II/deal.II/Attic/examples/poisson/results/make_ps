@@ -30,3 +30,8 @@ splot "jump.gnuplot"
 set view 52,115
 set output "L-region.eps"
 splot "L-region.gnuplot"
+
+!echo "  Making <slit_domain.eps>"
+set view 52,115
+set output "slit_domain.eps"
+splot "slit_domain.gnuplot"
