@@ -19,9 +19,10 @@
 
 
 /**
- * Store the indices of the degrees of freedom which are located on the lines.
- * Declare it to have a template parameter, but do not actually declare
- * other types than those explicitly instantiated.
+ * Store the indices of the degrees of freedom which are located on
+ * objects of dimension @p{N}.  Declare this general template
+ * class, but do not actually use it. Rather, only specializations of
+ * this class are used.
  *
  * @author Wolfgang Bangerth, 1998
  */
