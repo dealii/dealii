@@ -21,7 +21,7 @@ include $D/deal.II/Make.global_options
 
 
 lib: ../lib/liblac.g.a ../lib/liblac.a
-
+libg: ../lib/liblac.g.a
 
 ../lib/liblac.a: $(forward-declarations) $(o-files)
 	@echo ======================================== Updating library:   $@
