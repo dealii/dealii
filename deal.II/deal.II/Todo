@@ -211,3 +211,7 @@ Move the GridOut::EpsFlags<3>::EpsFlags constructor into the
   appropriate .cc-file if the compiler supports this.
 
 
+Remove the hack in Make_forward_declarations when using gcc2.95. See
+  the cvs diffs of 1.6 to 1.7 for the reason.
+
+
