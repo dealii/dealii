@@ -409,12 +409,53 @@ class ExceptionBase : public std::exception
 
 /**
  * In this namespace functions in connection with the Assert and
- * AssertThrow mechanism are declared. They are solely for internal
- * purposes and are not for use outside the exception handling and
- * throwing mechanism.
+ * AssertThrow mechanism are declared.
  */
-namespace deal_II_exception_internals
+namespace deal_II_exceptions
 {
+
+				   /**
+				    * Set a string that is printed
+				    * upon output of the message
+				    * indicating a triggered
+				    * @p{Assert} statement. This
+				    * string, which is printed in
+				    * addition to the usual output may
+				    * indicate information that is
+				    * otherwise not readily available
+				    * unless we are using a
+				    * debugger. For example, with
+				    * distributed programs on cluster
+				    * computers, the output of all
+				    * processes is redirected to the
+				    * same console window. In this
+				    * case, it is convenient to set as
+				    * additional name the name of the
+				    * host on which the program runs,
+				    * so that one can see in which
+				    * instance of the program the
+				    * exception occured.
+				    *
+				    * The string pointed to by the
+				    * argument is copied, so needs not
+				    * be stored after the call to this
+				    * function.
+				    *
+				    * Previously set additional output
+				    * is replaced by the argument
+				    * given to this function.
+				    */
+  void set_additional_assert_output (const char * const p);
+  
+  
+/**
+ * The functions in this namespace are in connection with the Assert
+ * and AssertThrow mechanism but are solely for internal purposes and
+ * are not for use outside the exception handling and throwing
+ * mechanism.
+ */
+  namespace internals
+  {
 
 /**
  *  Relay exceptions from the @p{Assert} macro to the
@@ -426,18 +467,18 @@ namespace deal_II_exception_internals
  *
  *  @see ExceptionBase
  */
-  template <class exc>
-  inline
-  void issue_error_assert_1 (const char *file,
-			     int         line,
-			     const char *function,
-			     const char *cond,
-			     const char *exc_name,
-			     exc         e)
-  {
-    issue_error_assert (file,line,function,cond,exc_name,e);
-  };
-
+    template <class exc>
+    inline
+    void issue_error_assert_1 (const char *file,
+			       int         line,
+			       const char *function,
+			       const char *cond,
+			       const char *exc_name,
+			       exc         e)
+    {
+      issue_error_assert (file,line,function,cond,exc_name,e);
+    };
+    
 
 
 /**
@@ -447,12 +488,12 @@ namespace deal_II_exception_internals
  *
  *  @see ExceptionBase
  */
-  void issue_error_assert (const char *file,
-			   int         line,
-			   const char *function,
-			   const char *cond,
-			   const char *exc_name,
-			   ExceptionBase &         e);
+    void issue_error_assert (const char *file,
+			     int         line,
+			     const char *function,
+			     const char *cond,
+			     const char *exc_name,
+			     ExceptionBase &         e);
   
 
 /**
@@ -462,20 +503,20 @@ namespace deal_II_exception_internals
  *
  *  @see ExceptionBase
  */
-  template <class exc>
-  void issue_error_throw (const char *file,
-			  int         line,
-			  const char *function,
-			  const char *cond,
-			  const char *exc_name,
-			  exc         e)
-  {
-				     // Fill the fields of the
-				     // exception object
-    e.SetFields (file, line, function, cond, exc_name);
-    throw e;
-  };
-
+    template <class exc>
+    void issue_error_throw (const char *file,
+			    int         line,
+			    const char *function,
+			    const char *cond,
+			    const char *exc_name,
+			    exc         e)
+    {
+				       // Fill the fields of the
+				       // exception object
+      e.SetFields (file, line, function, cond, exc_name);
+      throw e;
+    };
+    
 
 /**
  * Abort the program. This function is used so that we need not
@@ -483,8 +524,12 @@ namespace deal_II_exception_internals
  * other files of the library and we would like to keep its include
  * list as short as possible.
  */
-  void abort ();
+    void abort ();
+
+  };
+  
 };
+
 
 
 #ifdef DEBUG  ////////////////////////////////////////
@@ -502,7 +547,7 @@ namespace deal_II_exception_internals
 #define Assert(cond, exc)                                           \
   {                                                                 \
     if (!(cond))                                                    \
-      deal_II_exception_internals::                                 \
+      deal_II_exceptions::internals::                               \
       issue_error_assert_1 (__FILE__,                               \
 			     __LINE__,                              \
 			     __PRETTY_FUNCTION__, #cond, #exc, exc);\
@@ -541,7 +586,7 @@ namespace deal_II_exception_internals
 #define AssertThrow(cond, exc)                                   \
   {                                                              \
     if (!(cond))                                                 \
-      deal_II_exception_internals::                              \
+      deal_II_exceptions::internals::                            \
       issue_error_throw (__FILE__,                               \
 			 __LINE__,                               \
 			 __PRETTY_FUNCTION__, #cond, #exc, exc); \
@@ -550,7 +595,7 @@ namespace deal_II_exception_internals
 #define AssertThrow(cond, exc)                                    \
   {                                                               \
     if (!(cond))                                                  \
-      deal_II_exception_internals::abort ();                      \
+      deal_II_exceptions::internals::abort ();                    \
   }
 #endif
 
