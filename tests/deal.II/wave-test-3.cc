@@ -249,6 +249,8 @@ class TimeStep_ErrorEstimation :  public virtual TimeStepBase_Wave<dim>
 	double estimated_error;
     };
 
+  public:
+    
     struct ErrorOnCell {
 	double part[8];
 	ErrorOnCell ();
@@ -257,13 +259,15 @@ class TimeStep_ErrorEstimation :  public virtual TimeStepBase_Wave<dim>
     };
 
 
-struct CellwiseError
+    struct CellwiseError
     {
 	CellwiseError (const unsigned int n_errors);
 	std::vector<ErrorOnCell>                    errors;
 	ErrorOnCell* next_free_slot;
     };
 
+  protected:
+    
     Vector<float> estimated_error_per_cell;
     FullMatrix<double> embedding_matrix;
     FullMatrix<double> interpolation_matrix;
@@ -3564,7 +3568,7 @@ class BoundaryValues {
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if (p(0)==0)
-	    return sin(pi*get_time()/0.4)*sin(pi*get_time()/0.4);
+	    return sin(pi*this->get_time()/0.4)*sin(pi*this->get_time()/0.4);
 	  else
 	    return 0;
 	};
@@ -3576,7 +3580,7 @@ class BoundaryValues {
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if (p(0)==0)
-	    return 2*pi/0.4*sin(pi*get_time()/0.4)*cos(pi*get_time()/0.4);
+	    return 2*pi/0.4*sin(pi*this->get_time()/0.4)*cos(pi*this->get_time()/0.4);
 	  else
 	    return 0;
 	};
@@ -3588,8 +3592,8 @@ class FastWaveFromLeft_u : public Function<dim> {
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
-	  if ((get_time()<0.2) && (p(0)==0))
-	    return sin(pi*get_time()/0.2)*sin(pi*get_time()/0.2);
+	  if ((this->get_time()<0.2) && (p(0)==0))
+	    return sin(pi*this->get_time()/0.2)*sin(pi*this->get_time()/0.2);
 	  else
 	    return 0;
 	};
@@ -3600,8 +3604,8 @@ class FastWaveFromLeft_u : public Function<dim> {
 	virtual double value (const Point<dim> &p,
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
-	  if ((get_time()<0.2) && (p(0)==0))
-	    return 2*pi/0.2*sin(pi*get_time()/0.2)*cos(pi*get_time()/0.2);
+	  if ((this->get_time()<0.2) && (p(0)==0))
+	    return 2*pi/0.2*sin(pi*this->get_time()/0.2)*cos(pi*this->get_time()/0.2);
 	  else
 	    return 0;
 	};
@@ -3614,7 +3618,7 @@ class WaveFromLeftCenter_u : public Function<dim> {
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if ((0.4 <= p(1)) && (p(1) <= 0.6) && (p(0) <= 0.5))
-	    return (p(1)-0.4)*(0.6-p(1)) * sin(pi*get_time()/0.2);
+	    return (p(1)-0.4)*(0.6-p(1)) * sin(pi*this->get_time()/0.2);
 	  else
 	    return 0;
 	};
@@ -3626,7 +3630,7 @@ class WaveFromLeftCenter_u : public Function<dim> {
 			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if ((0.4 <= p(1)) && (p(1) <= 0.6) && (p(0) <= 0.5))
-	    return pi/0.2*(p(1)-0.4)*(0.6-p(1)) * cos(pi*get_time()/0.2);
+	    return pi/0.2*(p(1)-0.4)*(0.6-p(1)) * cos(pi*this->get_time()/0.2);
 	  else
 	    return 0;
 	};
@@ -3643,10 +3647,10 @@ class WaveFromLeftBottom_u : public Function<dim> {
 
 	  const double period = 60;
 
-	  if ((get_time()>=period) || (r>=a))
+	  if ((this->get_time()>=period) || (r>=a))
 	    return 0;
 
-	  const double s = cos(r/a*pi/2)*sin(pi*get_time()/period);
+	  const double s = cos(r/a*pi/2)*sin(pi*this->get_time()/period);
 	  return s*s;
 	};
     };
@@ -3660,11 +3664,11 @@ class WaveFromLeftBottom_u : public Function<dim> {
 	  const double a  = 5000000;
 	  const double period = 60;
 
-	  if ((get_time()>=period) || (r>=a))
+	  if ((this->get_time()>=period) || (r>=a))
 	    return 0;
 	  else
 	    return (2*pi/period*cos(r/a*pi/2)*cos(r/a*pi/2)*
-		    sin(pi*get_time()/period)*cos(pi*get_time()/period));
+		    sin(pi*this->get_time()/period)*cos(pi*this->get_time()/period));
 	};
     };
 
@@ -4688,7 +4692,7 @@ wave_correction_relaxations (1,
 template <int dim>
 TimeStepBase_Wave<dim>::TimeStepBase_Wave ():
 		TimeStepBase_Tria<dim> (),
-		parameters (*static_cast<WaveParameters<dim>*>(0))
+  parameters (parameters)
 {}
 
 
@@ -4820,11 +4824,11 @@ constraints.clear ();
 	  case TimeStepBase::dual_problem:
 	  {
 	    Assert (((this->next_action == TimeStepBase::primal_problem) &&
-		     (static_cast<const TimeStep_Wave<dim>*>(&get_timestep_primal())
+		     (static_cast<const TimeStep_Wave<dim>*>(&this->get_timestep_primal())
 		      == this))
 		    ||
 		    ((this->next_action == TimeStepBase::dual_problem) &&
-		     (static_cast<const TimeStep_Wave<dim>*>(&get_timestep_dual())
+		     (static_cast<const TimeStep_Wave<dim>*>(&this->get_timestep_dual())
 		      == this)),
 		    ExcInternalError());
 	    
@@ -4838,7 +4842,7 @@ constraints.clear ();
 	  case TimeStepBase::postprocess:
 	  {
 	    this->sweep_info->get_timers().postprocessing.start();
-	    std::ifstream tmp_in(tmp_filename_base(branch_signature()).c_str());
+	    std::ifstream tmp_in(this->tmp_filename_base(branch_signature()).c_str());
 	    u.block_read (tmp_in);
 	    v.block_read (tmp_in);
 	    tmp_in.close ();
@@ -4870,7 +4874,7 @@ void TimeStep_Wave<dim>::sleep (const unsigned int sleep_level)
 	Assert (u.size() != 0, ExcInternalError());
 	Assert (v.size() != 0, ExcInternalError());
 
-	std::ofstream tmp_out(tmp_filename_base(branch_signature()).c_str());
+	std::ofstream tmp_out(this->tmp_filename_base(branch_signature()).c_str());
 	u.block_write (tmp_out);
 	v.block_write (tmp_out);
 	tmp_out.close ();
@@ -4905,7 +4909,7 @@ void TimeStep_Wave<dim>::sleep (const unsigned int sleep_level)
 template <int dim>
 void TimeStep_Wave<dim>::end_sweep ()
 {
-  std::string tmp_filename = tmp_filename_base(branch_signature());
+  std::string tmp_filename = this->tmp_filename_base(branch_signature());
   remove (tmp_filename.c_str());
 }
 
@@ -5228,13 +5232,13 @@ void TimeStep_Dual<dim>::do_initial_step () {
       system_matrix.copy_from (this->mass_matrix);
       this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
       const unsigned int
-	solver_steps1 = solve (system_matrix, this->u, tmp_u_bar),
-	solver_steps2 = solve (system_matrix, this->v, tmp_v_bar);
+	solver_steps1 = this->solve (system_matrix, this->u, tmp_u_bar),
+	solver_steps2 = this->solve (system_matrix, this->v, tmp_v_bar);
 
       this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
 								   this->dof_handler->n_dofs(),
 								   solver_steps1, solver_steps2,
-								   compute_energy ());
+								   this->compute_energy ());
     }
   else
     this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
@@ -5258,7 +5262,7 @@ void TimeStep_Dual<dim>::do_timestep ()
 
   this->sweep_info->get_data().dual_dofs += this->dof_handler->n_dofs() * 2;
 
-  const double time_step = get_forward_timestep ();
+  const double time_step = this->get_forward_timestep ();
 
   Vector<double> right_hand_side1 (this->dof_handler->n_dofs());
   Vector<double> right_hand_side2 (this->dof_handler->n_dofs());
@@ -5269,7 +5273,7 @@ void TimeStep_Dual<dim>::do_timestep ()
       old_u.reinit (this->dof_handler->n_dofs());
       old_v.reinit (this->dof_handler->n_dofs());
 
-      transfer_old_solutions (old_u, old_v);
+      this->transfer_old_solutions (old_u, old_v);
     };
     
   assemble_vectors (right_hand_side1, right_hand_side2);
@@ -5301,7 +5305,7 @@ void TimeStep_Dual<dim>::do_timestep ()
 					  right_hand_side1);
     };
   
-  const unsigned int solver_steps1 = solve (system_matrix, this->v, right_hand_side1);
+  const unsigned int solver_steps1 = this->solve (system_matrix, this->v, right_hand_side1);
 	
   system_matrix.copy_from (this->mass_matrix);
   this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
@@ -5325,13 +5329,13 @@ void TimeStep_Dual<dim>::do_timestep ()
       this->u -= old_u;
     };
   
-  const unsigned int solver_steps2 = solve (system_matrix, this->u, right_hand_side2);
+  const unsigned int solver_steps2 = this->solve (system_matrix, this->u, right_hand_side2);
 
   this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
 							       this->dof_handler->n_dofs(),
 							       solver_steps1,
 							       solver_steps2,
-							       compute_energy ());
+							       this->compute_energy ());
   
   deallog << "." << std::endl;
 }
@@ -5366,7 +5370,7 @@ void TimeStep_Dual<dim>::wake_up (const unsigned int wakeup_level)
     {
       Assert (this->system_sparsity.empty(), ExcInternalError());
       
-      create_matrices ();
+      this->create_matrices ();
     };
   this->sweep_info->get_timers().dual_problem.stop();
 }
@@ -5383,7 +5387,7 @@ void TimeStep_Dual<dim>::assemble_vectors (Vector<double> &right_hand_side1,
   this->parameters.dual_functional->reset (*this);
   this->parameters.dual_functional->compute_functionals (dual1, dual2);
 
-  const double timestep = get_forward_timestep();
+  const double timestep = this->get_forward_timestep();
   right_hand_side1.add (timestep, dual2);
   right_hand_side1.add (this->parameters.theta * timestep * timestep, dual1);
 
@@ -5449,7 +5453,7 @@ TimeStep_Dual<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &ol
     = static_cast<const TimeStepBase_Wave<dim>*>(this->next_timestep)->get_timestep_dual();
 
   const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
-  const double time_step = get_forward_timestep();
+  const double time_step = this->get_forward_timestep();
 
   if (!old_cell->has_children() && !new_cell->has_children()) 
     {
@@ -5565,7 +5569,7 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
     = static_cast<const TimeStepBase_Wave<dim>*>(this->next_timestep)->get_timestep_dual();
 
   const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
-  const double time_step = get_forward_timestep();
+  const double time_step = this->get_forward_timestep();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
@@ -5657,7 +5661,7 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
   unsigned int level_difference = 1;  
   
   const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
-  const double time_step = get_forward_timestep();
+  const double time_step = this->get_forward_timestep();
 
   FullMatrix<double>    cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double> local_old_dof_values_u (dofs_per_cell);
@@ -5826,7 +5830,7 @@ void TimeStep_ErrorEstimation<dim>::sleep (const unsigned int sleep_level)
       Assert (estimated_error_per_cell.size()!=0,
 	      ExcInternalError());
 
-      std::ofstream tmp_out(tmp_filename_base(branch_signature()).c_str());
+      std::ofstream tmp_out(this->tmp_filename_base(branch_signature()).c_str());
       estimated_error_per_cell.block_write (tmp_out);
       tmp_out.close ();
 
@@ -5849,7 +5853,7 @@ template <int dim>
 void
 TimeStep_ErrorEstimation<dim>::get_error_indicators (Vector<float> &indicators) const 
 {
-  std::ifstream in (tmp_filename_base(branch_signature()).c_str());
+  std::ifstream in (this->tmp_filename_base(branch_signature()).c_str());
   indicators.block_read (in);
 }
 
@@ -5863,8 +5867,8 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
   neumann_boundary[1] = &homogeneous_neumann_bc;
 
   const TimeStep_Wave<dim> &target = (which_variables==0 ?
-				      static_cast<const TimeStep_Wave<dim>&>(get_timestep_primal()) :
-				      static_cast<const TimeStep_Wave<dim>&>(get_timestep_dual ()));
+				      static_cast<const TimeStep_Wave<dim>&>(this->get_timestep_primal()) :
+				      static_cast<const TimeStep_Wave<dim>&>(this->get_timestep_dual ()));
 
   KellyErrorEstimator<dim>::estimate (*target.dof_handler,
 				      target.quadrature_face,
@@ -5898,10 +5902,10 @@ template <int dim>
 void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
   CellwiseError cellwise_error (this->tria->n_active_cells());
 
-  const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
+  const TimeStep_Primal<dim> &primal_problem     = this->get_timestep_primal(),
 			     &primal_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
 						   (this->previous_timestep)->get_timestep_primal();
-  const TimeStep_Dual<dim>   &dual_problem     = get_timestep_dual(),
+  const TimeStep_Dual<dim>   &dual_problem     = this->get_timestep_dual(),
 			     &dual_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
 						 (this->previous_timestep)->get_timestep_dual();
 
@@ -5991,15 +5995,15 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const typename DoFHandler<di
     };
 
 
-const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
+const TimeStep_Primal<dim> &primal_problem     = this->get_timestep_primal(),
 			     &primal_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
 						   (this->previous_timestep)->get_timestep_primal();
-  const TimeStep_Dual<dim>   &dual_problem     = get_timestep_dual(),
+  const TimeStep_Dual<dim>   &dual_problem     = this->get_timestep_dual(),
 			     &dual_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
 						 (this->previous_timestep)->get_timestep_dual();
 
-  const FiniteElement<dim> &primal_fe = get_timestep_primal().fe,
-			   &dual_fe   = get_timestep_dual().fe;
+  const FiniteElement<dim> &primal_fe = this->get_timestep_primal().fe,
+			   &dual_fe   = this->get_timestep_dual().fe;
 
   const unsigned int        dofs_per_cell_primal = primal_fe.dofs_per_cell,
 			    dofs_per_cell_dual   = dual_fe.dofs_per_cell;  
@@ -6134,10 +6138,10 @@ compute_error_on_new_children (const typename DoFHandler<dim>::cell_iterator &pr
 			       const Vector<double>  &local_v_bar_old,
 			       CellwiseError         &cellwise_error,
 			       FEValues<dim>  &fe_values) const {
-  const TimeStep_Primal<dim> &primal_problem = get_timestep_primal();
-  const TimeStep_Dual<dim>   &dual_problem   = get_timestep_dual();
+  const TimeStep_Primal<dim> &primal_problem = this->get_timestep_primal();
+  const TimeStep_Dual<dim>   &dual_problem   = this->get_timestep_dual();
 
-  const FiniteElement<dim> &dual_fe  = get_timestep_dual().fe;
+  const FiniteElement<dim> &dual_fe  = this->get_timestep_dual().fe;
   const unsigned int dofs_per_cell_dual = dual_fe.dofs_per_cell;
 
 
@@ -6340,7 +6344,7 @@ TimeStep_ErrorEstimation<dim>::error_formula (const typename DoFHandler<dim>::ac
 
   ErrorOnCell error_on_cell;
 
-  const unsigned int dofs_per_cell = get_timestep_dual().fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = this->get_timestep_dual().fe.dofs_per_cell;
   
   Vector<double> tmp1(dofs_per_cell);
   Vector<double> tmp2(dofs_per_cell);
@@ -6410,7 +6414,7 @@ std::vector<double> stiffness(fe_values.n_quadrature_points);
   tmp1  = local_v;
   tmp1 += local_v_old;
 
-  error_on_cell.part[2] = -(get_backward_timestep() / 4 *
+  error_on_cell.part[2] = -(this->get_backward_timestep() / 4 *
 			    mass_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
@@ -6420,7 +6424,7 @@ std::vector<double> stiffness(fe_values.n_quadrature_points);
   tmp2  = local_u_bar;
   tmp2 -= local_u_bar_old;
 
-  error_on_cell.part[3] = -(get_backward_timestep() / 12 *
+  error_on_cell.part[3] = -(this->get_backward_timestep() / 12 *
 			    mass_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
@@ -6430,7 +6434,7 @@ std::vector<double> stiffness(fe_values.n_quadrature_points);
   tmp1  = local_u;
   tmp1 += local_u_old;
 
-  error_on_cell.part[4] = (get_backward_timestep() / 4 *
+  error_on_cell.part[4] = (this->get_backward_timestep() / 4 *
 			   laplace_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
@@ -6440,7 +6444,7 @@ std::vector<double> stiffness(fe_values.n_quadrature_points);
   tmp2  = local_v_bar;
   tmp2 -= local_v_bar_old;
 
-  error_on_cell.part[5] = (get_backward_timestep() / 12 *
+  error_on_cell.part[5] = (this->get_backward_timestep() / 12 *
 			   laplace_matrix.matrix_scalar_product (tmp1, tmp2));
 
 
@@ -6476,8 +6480,8 @@ return error_on_cell;
 
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::make_interpolation_matrices () {
-  const FiniteElement<dim> &primal_fe = get_timestep_primal().fe,
-			   &dual_fe   = get_timestep_dual().fe;
+  const FiniteElement<dim> &primal_fe = this->get_timestep_primal().fe,
+			   &dual_fe   = this->get_timestep_dual().fe;
   
   embedding_matrix.reinit (dual_fe.dofs_per_cell,
 			   primal_fe.dofs_per_cell);
@@ -6643,7 +6647,7 @@ void TimeStep<dim>::sleep (const unsigned int sleep_level)
 
       case TimeStepBase_Tria<dim>::grid_refinement:
 	    if (sleep_level == 1)
-	      save_refine_flags ();
+	      this->save_refine_flags ();
 	    break;
 
       default:
@@ -6729,7 +6733,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 
   if ((this->sweep_no < this->parameters.number_of_sweeps-1) ||
       (this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
-    estimate_error ();
+    this->estimate_error ();
 
   this->sweep_info->get_timers().postprocessing.start();
 
@@ -6737,7 +6741,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
   for (typename std::list<EvaluationBase<dim>*>::const_iterator i = this->parameters.eval_list.begin();
        i != this->parameters.eval_list.end(); ++i)
     {
-      (*i)->reset_timelevel (get_timestep_primal());
+      (*i)->reset_timelevel (this->get_timestep_primal());
       statistic_data.evaluation_results.push_back ((*i)->evaluate());
     };
 
@@ -6754,9 +6758,9 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       typename DataOut<dim>::OutputFormat output_format
 	= DataOut<dim>::parse_output_format (this->parameters.output_format);
       
-      out.attach_dof_handler (*get_timestep_primal().dof_handler);
-      out.add_data_vector (get_timestep_primal().u, "u");
-      out.add_data_vector (get_timestep_primal().v, "v");
+      out.attach_dof_handler (*this->get_timestep_primal().dof_handler);
+      out.add_data_vector (this->get_timestep_primal().u, "u");
+      out.add_data_vector (this->get_timestep_primal().v, "v");
 
       Vector<double> u_bar, v_bar;
       
@@ -6764,13 +6768,13 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	  &&
 	  (this->sweep_no >= this->parameters.initial_energy_estimator_sweeps))
 	{
-	  u_bar.reinit (get_timestep_primal().u.size());
-	  v_bar.reinit (get_timestep_primal().u.size());
+	  u_bar.reinit (this->get_timestep_primal().u.size());
+	  v_bar.reinit (this->get_timestep_primal().u.size());
 	  
 	  if (this->parameters.primal_fe == this->parameters.dual_fe)
 	    {
-	      u_bar = get_timestep_dual().u;
-	      v_bar = get_timestep_dual().v;
+	      u_bar = this->get_timestep_dual().u;
+	      v_bar = this->get_timestep_dual().v;
 	    }
 	  else
 	    interpolate_dual_solution (u_bar, v_bar);
@@ -6792,8 +6796,8 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	    }
 	  else
 	    {
-	      estimated_error.reinit (get_timestep_primal().dof_handler->n_dofs());
-	      DoFTools::distribute_cell_to_dof_vector (*get_timestep_primal().dof_handler,
+	      estimated_error.reinit (this->get_timestep_primal().dof_handler->n_dofs());
+	      DoFTools::distribute_cell_to_dof_vector (*this->get_timestep_primal().dof_handler,
 						       this->estimated_error_per_cell,
 						       estimated_error);
 	    };
@@ -6816,11 +6820,11 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       this->sweep_data->data_out_stack->new_parameter_value (this->time,
 						       (this->timestep_no == 0 ?
 							0 :
-							get_backward_timestep() *
+							this->get_backward_timestep() *
 							this->parameters.write_stacked_interval));
-      this->sweep_data->data_out_stack->attach_dof_handler (*get_timestep_primal().dof_handler);
-      this->sweep_data->data_out_stack->add_data_vector (get_timestep_primal().u, "u");
-      this->sweep_data->data_out_stack->add_data_vector (get_timestep_primal().v, "v");
+      this->sweep_data->data_out_stack->attach_dof_handler (*this->get_timestep_primal().dof_handler);
+      this->sweep_data->data_out_stack->add_data_vector (this->get_timestep_primal().u, "u");
+      this->sweep_data->data_out_stack->add_data_vector (this->get_timestep_primal().v, "v");
 
       if ((this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
 	  &&
@@ -6828,13 +6832,13 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	{
 	  if (this->parameters.primal_fe == this->parameters.dual_fe)
 	    {
-	      this->sweep_data->data_out_stack->add_data_vector (get_timestep_dual().u, "dual_u");
-	      this->sweep_data->data_out_stack->add_data_vector (get_timestep_dual().v, "dual_v");
+	      this->sweep_data->data_out_stack->add_data_vector (this->get_timestep_dual().u, "dual_u");
+	      this->sweep_data->data_out_stack->add_data_vector (this->get_timestep_dual().v, "dual_v");
 	    }
 	  else
 	    {
-	      Vector<double> u_bar(get_timestep_primal().dof_handler->n_dofs());
-	      Vector<double> v_bar(get_timestep_primal().dof_handler->n_dofs());
+	      Vector<double> u_bar(this->get_timestep_primal().dof_handler->n_dofs());
+	      Vector<double> v_bar(this->get_timestep_primal().dof_handler->n_dofs());
 	      
 	      interpolate_dual_solution (u_bar, v_bar);
 	      
@@ -6881,7 +6885,7 @@ std::string TimeStep_Postprocess<dim>::branch_signature () const
 template <int dim>
 void TimeStep_Postprocess<dim>::end_sweep ()
 {
-  std::string tmp_filename = tmp_filename_base(branch_signature());
+  std::string tmp_filename = this->tmp_filename_base(branch_signature());
   remove (tmp_filename.c_str());
 }
 
@@ -6889,16 +6893,16 @@ void TimeStep_Postprocess<dim>::end_sweep ()
 template <int dim>
 void TimeStep_Postprocess<dim>::interpolate_dual_solution (Vector<double> &interpolated_u_bar,
 							   Vector<double> &interpolated_v_bar) const {
-  const unsigned int n_primal_dofs = get_timestep_primal().dof_handler->n_dofs();
+  const unsigned int n_primal_dofs = this->get_timestep_primal().dof_handler->n_dofs();
   
   interpolated_u_bar.reinit (n_primal_dofs);
   interpolated_v_bar.reinit (n_primal_dofs);
 
-  const TimeStep_Wave<dim> &target = get_timestep_dual ();
+  const TimeStep_Wave<dim> &target = this->get_timestep_dual ();
   
   typename DoFHandler<dim>::active_cell_iterator primal_cell, dual_cell, endc;
-  primal_cell = get_timestep_primal().dof_handler->begin_active();
-  endc        = get_timestep_primal().dof_handler->end();
+  primal_cell = this->get_timestep_primal().dof_handler->begin_active();
+  endc        = this->get_timestep_primal().dof_handler->end();
   dual_cell   = target.dof_handler->begin_active();
   
   for (; primal_cell != endc; ++primal_cell, ++dual_cell)
@@ -7009,7 +7013,7 @@ void TimeStep_Primal<dim>::do_timestep ()
   this->sweep_info->get_data().primal_dofs += this->dof_handler->n_dofs() * 2;
 
 
-  const double time_step = get_backward_timestep ();
+  const double time_step = this->get_backward_timestep ();
   
   Vector<double> right_hand_side1 (this->dof_handler->n_dofs());
   Vector<double> right_hand_side2 (this->dof_handler->n_dofs());
@@ -7020,11 +7024,11 @@ void TimeStep_Primal<dim>::do_timestep ()
       old_u.reinit (this->dof_handler->n_dofs());
       old_v.reinit (this->dof_handler->n_dofs());
 
-      transfer_old_solutions (old_u, old_v);
+      this->transfer_old_solutions (old_u, old_v);
     };
 
 
-assemble_vectors (right_hand_side1, right_hand_side2);
+  assemble_vectors (right_hand_side1, right_hand_side2);
 
   UserMatrix system_matrix (this->system_sparsity, this->parameters.preconditioning);
   system_matrix.copy_from (this->mass_matrix);
@@ -7054,7 +7058,7 @@ assemble_vectors (right_hand_side1, right_hand_side2);
 					  right_hand_side1);
     };
 
-  const unsigned int solver_steps1 = solve (system_matrix, this->u, right_hand_side1);
+  const unsigned int solver_steps1 = this->solve (system_matrix, this->u, right_hand_side1);
 		
   system_matrix.copy_from (this->mass_matrix);
   this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
@@ -7087,13 +7091,13 @@ if (this->parameters.extrapolate_old_solutions)
       this->v -= old_v;
     };
 
-  const unsigned int solver_steps2 = solve (system_matrix, this->v, right_hand_side2);
+  const unsigned int solver_steps2 = this->solve (system_matrix, this->v, right_hand_side2);
 
   this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
 							       this->dof_handler->n_dofs(),
 							       solver_steps1,
 							       solver_steps2,
-							       compute_energy ());
+							       this->compute_energy ());
   
   deallog << "." << std::endl;
 }
@@ -7128,7 +7132,7 @@ void TimeStep_Primal<dim>::wake_up (const unsigned int wakeup_level)
     {
       Assert (this->system_sparsity.empty(), ExcInternalError());
       
-      create_matrices ();
+      this->create_matrices ();
     };
   this->sweep_info->get_timers().primal_problem.stop();
 }
@@ -7199,7 +7203,7 @@ TimeStep_Primal<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &
     = static_cast<const TimeStepBase_Wave<dim>*>(this->previous_timestep)->get_timestep_primal();
 
   const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
-  const double time_step = get_backward_timestep();
+  const double time_step = this->get_backward_timestep();
 
   if (!old_cell->has_children() && !new_cell->has_children()) 
     {
@@ -7318,7 +7322,7 @@ TimeStep_Primal<dim>::collect_from_children (const typename DoFHandler<dim>::cel
     = static_cast<const TimeStepBase_Wave<dim>*>(this->previous_timestep)->get_timestep_primal();
 
   const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
-  const double time_step = get_backward_timestep();
+  const double time_step = this->get_backward_timestep();
 
 
 FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
@@ -7412,7 +7416,7 @@ TimeStep_Primal<dim>::distribute_to_children (const typename DoFHandler<dim>::ce
   unsigned int level_difference = 1;  
   
   const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
-  const double time_step = get_backward_timestep();
+  const double time_step = this->get_backward_timestep();
 
   FullMatrix<double>    cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double> local_old_dof_values_u (dofs_per_cell);
