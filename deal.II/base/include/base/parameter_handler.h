@@ -37,14 +37,6 @@ class MultipleParameterLoop;
 class LogStream;
 
 
-/**
- * List of possible output formats.
- */
-enum OutputStyle {
-      Text, LaTeX, HTML
-};
-
-
 
 /**
  * Declare some regexps which
@@ -1024,6 +1016,16 @@ namespace Patterns
 class ParameterHandler
 {
   public:
+				     /**
+				      * List of possible output
+				      * formats.
+				      */
+    enum OutputStyle {
+	  Text, LaTeX, HTML
+    };
+
+
+    
 				     /**
 				      * Constructor.
 				      */
