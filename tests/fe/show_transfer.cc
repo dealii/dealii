@@ -33,12 +33,13 @@
 
 char fname[50];
 
-#define TEST(el) { el fe; print_matrix(of, tr, fe, #el); }
+#define TEST(l,el) { el fe; print_matrix(of, tr, l, fe, #el); }
 
 template<int dim>
 inline void
 print_matrix(ostream& of,
 	     Triangulation<dim>& tr,
+	     unsigned int level,
 	     const FiniteElement<dim>& finel,
 	     const char* name)
 {
@@ -48,8 +49,8 @@ print_matrix(ostream& of,
   MGTransferPrebuilt transfer;
   transfer.build_matrices(dof);
 
-  unsigned int n_coarse = dof.n_dofs(0);
-  unsigned int n_fine = dof.n_dofs(1);
+  unsigned int n_coarse = dof.n_dofs(level-1);
+  unsigned int n_fine = dof.n_dofs(level);
   Vector<double> in(n_fine);
   Vector<double> out(n_coarse);
 
@@ -59,7 +60,7 @@ print_matrix(ostream& of,
       in = 0.;
       out = 0.;
       in(i) = 1.;
-      transfer.restrict_and_add(1,out,in);
+      transfer.restrict_and_add(level,out,in);
       out.print(of, 3, false);
     }
   of << endl;
@@ -72,19 +73,30 @@ main()
   Triangulation<2> tr;
 
   GridGenerator::hyper_cube(tr, -1., 1.);
-  tr.refine_global(1);
+  tr.refine_global(2);
 
   ofstream of("transfer.dat");
   
-  TEST(FEQ1<2>);
-  TEST(FEQ2<2>);
-  TEST(FEQ3<2>);
-  TEST(FEQ4<2>);
+  TEST(1,FEQ1<2>);
+  TEST(1,FEQ2<2>);
+  TEST(1,FEQ3<2>);
+  TEST(1,FEQ4<2>);
 
-  TEST(FEDG_Q0<2>);
-  TEST(FEDG_Q1<2>);
-  TEST(FEDG_Q2<2>);
-  TEST(FEDG_Q3<2>);
-  TEST(FEDG_Q4<2>);
+  TEST(1,FEDG_Q0<2>);
+  TEST(1,FEDG_Q1<2>);
+  TEST(1,FEDG_Q2<2>);
+  TEST(1,FEDG_Q3<2>);
+  TEST(1,FEDG_Q4<2>);
+
+  TEST(2,FEQ1<2>);
+  TEST(2,FEQ2<2>);
+  TEST(2,FEQ3<2>);
+  TEST(2,FEQ4<2>);
+
+  TEST(2,FEDG_Q0<2>);
+  TEST(2,FEDG_Q1<2>);
+  TEST(2,FEDG_Q2<2>);
+  TEST(2,FEDG_Q3<2>);
+  TEST(2,FEDG_Q4<2>);
   return 0;
 }
