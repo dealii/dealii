@@ -15,6 +15,8 @@ dnl
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(base)
+
+dnl Configure the `tests' directory, if that is installed.
 AC_CONFIG_SUBDIRS(tests)
 
 
