@@ -961,26 +961,32 @@ unsigned int ElasticProblem<dim>::solve ()
                                  // times they generate output through this
                                  // function.
                                  //
-                                 // The solution to this is to have each
-                                 // process generate output data only for it's
-                                 // own local cells, and write them to
-                                 // separate files, one file per process. This
-                                 // would distribute the work of generating
-                                 // the output to all processes equally. In a
-                                 // second step, separate from running this
-                                 // program, we would then take all the output
-                                 // files for a given cycle and merge these
-                                 // parts into one single output file. This
-                                 // has to be done sequentially, but can be
-                                 // done on a different machine, and should be
-                                 // relatively cheap. However, the necessary
-                                 // functionality for this is not yet
-                                 // implemented in the library, and since we
-                                 // are too close to the next release, we do
-                                 // not want to do such major destabilizing
-                                 // changes any more. It will be fixed in
-                                 // later releases of the library and this
-                                 // example program, though.
+                                 // The solution to this is to have
+                                 // each process generate output data
+                                 // only for it's own local cells, and
+                                 // write them to separate files, one
+                                 // file per process. This would
+                                 // distribute the work of generating
+                                 // the output to all processes
+                                 // equally. In a second step,
+                                 // separate from running this
+                                 // program, we would then take all
+                                 // the output files for a given cycle
+                                 // and merge these parts into one
+                                 // single output file. This has to be
+                                 // done sequentially, but can be done
+                                 // on a different machine, and should
+                                 // be relatively cheap. However, the
+                                 // necessary functionality for this
+                                 // is not yet implemented in the
+                                 // library, and since we are too
+                                 // close to the next release, we do
+                                 // not want to do such major
+                                 // destabilizing changes any
+                                 // more. This has been fixed in the
+                                 // meantime, though, and a better way
+                                 // to do things is explained in the
+                                 // step-18 example program.
 template <int dim>
 void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 {
