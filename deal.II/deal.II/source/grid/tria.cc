@@ -4294,7 +4294,9 @@ unsigned int Triangulation<dim>::max_adjacent_cells () const {
 
 
 template <int dim>
-void Triangulation<dim>::execute_coarsening_and_refinement () {
+void
+Triangulation<dim>::execute_coarsening_and_refinement ()
+{
   prepare_coarsening_and_refinement ();
 
   execute_coarsening();
@@ -4305,7 +4307,9 @@ void Triangulation<dim>::execute_coarsening_and_refinement () {
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::execute_refinement () {
+void
+Triangulation<1>::execute_refinement ()
+{
   const unsigned int dim = 1;
   
 				   // check whether a new level is
@@ -4560,7 +4564,9 @@ void Triangulation<1>::execute_refinement () {
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::execute_refinement () {
+void
+Triangulation<2>::execute_refinement ()
+{
   const unsigned int dim = 2;
   
 				   // check whether a new level is
@@ -5147,15 +5153,19 @@ void Triangulation<2>::execute_refinement () {
 	    subcells[1]->clear_user_pointer ();
 
 
-	    subcells[2]->set (Quad(new_lines[11]->index(),  new_lines[3]->index(),
-				   new_lines[4]->index(), new_lines[9]->index()));
+	    subcells[2]->set (Quad(new_lines[11]->index(),
+                                   new_lines[3]->index(),
+				   new_lines[4]->index(),
+                                   new_lines[9]->index()));
 	    subcells[2]->set_used_flag();
 	    subcells[2]->clear_children();
 	    subcells[2]->clear_user_pointer ();
 
 
-	    subcells[3]->set (Quad(new_lines[10]->index(),  new_lines[9]->index(),
-				   new_lines[5]->index(), new_lines[6]->index()));
+	    subcells[3]->set (Quad(new_lines[10]->index(),
+                                   new_lines[9]->index(),
+				   new_lines[5]->index(),
+                                   new_lines[6]->index()));
 	    subcells[3]->set_used_flag();
 	    subcells[3]->clear_children();
 	    subcells[3]->clear_user_pointer ();
@@ -5243,7 +5253,8 @@ void Triangulation<2>::execute_refinement () {
 #if deal_II_dimension == 3
 
 template <>
-void Triangulation<3>::execute_refinement ()
+void
+Triangulation<3>::execute_refinement ()
 {
   const unsigned int dim = 3;
 
@@ -5640,7 +5651,8 @@ void Triangulation<3>::execute_refinement ()
 		new_lines[i] = next_unused_line;
 		++next_unused_line;
 
-		Assert (new_lines[i]->used() == false, ExcCellShouldBeUnused());
+		Assert (new_lines[i]->used() == false,
+                        ExcCellShouldBeUnused());
 	      };
 
 					     // set the data of the
