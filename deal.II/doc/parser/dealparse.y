@@ -120,34 +120,40 @@ variable_declaration:
 typedef_declaration:
     TYPEDEF vartype identifier
       { cout << setw(OUTW) << "@Typedef:" << $3 << endl
-	   << cvs_id << endl
+	     << cvs_id << endl
 	     << setw(OUTW) << "@Type:" << $2 << endl
+	     << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
 	printdoc(cout); }
     | TYPEDEF  vartype '(' '*' identifier ')' argument_declaration
       { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $4 << endl
 	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
 	printdoc(cout); }
     | TYPEDEF  vartype '(' identifier ':' ':' '*' identifier ')' argument_declaration
       { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $8 << endl
 	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
 	printdoc(cout); }
     | TYPEDEF  vartype '(' '*' identifier ')' argument_declaration CONST
       { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $4 << endl
 	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
 	printdoc(cout); }
     | TYPEDEF  vartype '(' identifier ':' ':' '*' identifier ')' argument_declaration CONST
       { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $8 << endl
 	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
 	printdoc(cout); }
     | TYPEDEF vartype identifier array_dimensions
       { cout << setw(OUTW) << "@Typedef:" << $3 << endl
 	     << cvs_id << endl
 	     << setw(OUTW) << "@Type:" << $2 << endl
+	     << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	     << setw(OUTW) << "@Access:" << access_stack.top() << endl
 	     << setw(OUTW) << "@Array-Dimension:" << $4 << endl;
 	printdoc(cout); }

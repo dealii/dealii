@@ -1,0 +1,183 @@
+#!/usr/local/bin/perl
+#
+# $Id$
+#
+# Enter all names into the postgres database
+#
+# Variables and Typedefs are missing
+
+use DBI;
+
+$docindex = 0;
+
+open DOCFILE,">tmpdoc" || die "Could not open docfile";
+
+$db = DBI->connect('DBI:Pg:dbname=deal;host=gaia','deal','DEAL!!') ||
+    die $DBI::errstr;
+
+#$db->trace(2);
+
+$db->do('delete from classes;');
+$db->do('delete from inheritance;');
+$db->do('delete from roots;');
+$db->do('delete from exceptions;');
+$db->do('delete from functions;');
+
+$enterclass = $db->prepare('insert into classes (type, name, templates, fullname, scope, access, file, version, documentation) values (?, ?, ?, ?, ?, ?, ?, ?, ?);');
+
+$enterinheritance = $db->prepare('insert into inheritance (inheritor, inherits, access) values (?, ?, ?);');
+
+$enterroot = $db->prepare('insert into roots (name) values (?);');
+
+$enterexception = $db->prepare('insert into exceptions (name, scope, access, arguments, documentation) values (?, ?, ?, ?, ?);');
+
+$enterfunction = $db->prepare('insert into functions (type, name, templates, scope, access, file, version, parameters, virtual, const, documentation) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);');
+
+#$enterclass->trace(2);
+
+sub output;
+
+while(<>)
+{
+    if(/^\@\@\@/)
+    {
+	# Output depending on defined entity
+	output();
+	# Delete all variables
+	$template_description = "";
+	$classname = "";
+	$functionname = "";
+	$variablename = "";
+	$typedef = "";
+	$exception = "";
+	@inheritance = ();
+	$inclass = "";
+	$function_parameters = "";
+	$access = "";
+	$array = "";
+	$type =  "";
+	$const = 0;
+	$virtual = "";
+	$file = "";
+	$doc = "";
+    }
+    elsif (/\@Template-Description:(.*)/)
+    {
+	$template_description = $1;
+    }
+    elsif (/\@Class-Definition:(.*)/)
+    {
+	($temp, @inheritance) = split /\@/, $1;
+	($type, $classname) = split / /, $temp, 2;
+    }
+    elsif (/\@In-Class:(.*)/)
+    {
+	$inclass = $1;
+	$inclass =~ s/^:://;
+    }
+    elsif (/\@Function-Definition:(.*)/)
+    {
+	$functionname = $1;
+    }
+    elsif (/\@Variable-Declaration:(.*)/)
+    {
+	$variablename = $1;
+    }
+    elsif (/\@DeclException(.):(.*)/)
+    {
+	$exception = $2;
+	$exceptionargs = $1;
+    }
+    elsif (/\@Typedef(-Functionpointer)?:(.*)/)
+    {
+	$typedef = $2;
+    }
+    elsif (/\@Function-Parameters:(.*)/)
+    {
+	$function_parameters = $1;
+    }
+    elsif (/\@Access:(.*)/)
+    {
+	$access = $1;
+    }
+    elsif (/\@Array-Dimension:(.*)/)
+    {
+	$array = $1;
+    }
+    elsif (/\@(Return-)?Type:(.*)/)
+    {
+	$type = $2;
+    }
+    elsif (/\@Const:(.*)/)
+    {
+	$const = 1;
+    }
+    elsif (/\@Virtual:(.*)/)
+    {
+	$virtual = $1;
+    }
+    elsif (/^\s*\@/)
+    {
+#	print;
+    }
+    elsif (/^\s*\$(Id:)\s*(\S+)\s+(\S+)/)
+    {
+	$file = $2;
+	$version = $3;
+	$file =~ s/,v//;
+    }
+    elsif (/\s*\*/)
+    {
+	s/\s*\* ?//;
+	$doc .= $_;
+    }
+}
+
+$enterclass->finish;
+$enterinheritance->finish;
+$db->disconnect;
+
+sub output
+{
+    if ($classname)
+    {
+	print STDERR '.';
+#	print $type, ' ';
+#	print $inclass, '::' if ($inclass);
+#	print $classname, "  $file $version\n";
+	$fullname = "";
+	$fullname = $inclass . '::' if ($inclass);
+	$fullname .= $classname;
+	$enterclass->execute($type, $classname, $template_description, $fullname, $inclass,
+			     $access, $file, $version, $docindex);
+
+	print DOCFILE "\@\@\@$docindex\n$doc\n";
+	$docindex++;
+
+	foreach (@inheritance)
+	{
+	    m/\s*(\w+)\s+(.*)/;
+	    $enterinheritance->execute($fullname, $2, $1);
+	}
+	$enterroot->execute($fullname) unless (@inheritance);
+    }
+    elsif($exception)
+    {
+	$enterexception->execute($exception, $inclass, $access,
+				 $exceptionargs, $docindex);
+
+	print DOCFILE "\@\@\@$docindex\n$doc\n";
+	$docindex++;
+    }
+    elsif ($functionname)
+    {
+	$enterfunction->execute($type, $functionname, $template_description,
+				$inclass, $access, $file, $version,
+				$function_parameters,
+				$virtual, ($const) ? 't' : 'f', $docindex);
+
+	print DOCFILE "\@\@\@$docindex\n$doc\n";
+	$docindex++;
+    }
+}
+

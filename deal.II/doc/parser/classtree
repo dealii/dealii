@@ -1,0 +1,96 @@
+#!/usr/local/bin/perl -w
+#
+# $Id$
+#
+# Read a class name from stdin and print inheritance
+# in both directions.
+#
+
+use DBI;
+
+$db = DBI->connect('DBI:Pg:dbname=deal;host=gaia','deal','DEAL!!') ||
+    die $DBI::errstr;
+
+$prefix = " ";
+
+sub subtree
+{
+    my $name = shift(@_);
+    my $direction = shift(@_);
+
+    my $select;
+    my $result;
+
+    $prefix .= " ";
+
+    if ($direction eq 'up')
+    {
+	$select =
+	    $db->prepare('SELECT inherits FROM inheritance WHERE inheritor = ?;');
+	$result = $select->execute($name);
+	if ($result == 0)
+	{
+	    $name =~ s/<.*//;
+	    $result = $select->execute($name);
+	}
+    } else {
+	$select =
+	    $db->prepare('SELECT inheritor FROM inheritance WHERE inherits = ?;');
+	$result = $select->execute($name);
+	if ($result == 0)
+	{
+	    $select->finish;
+	    $select =
+		$db->prepare("SELECT inheritor FROM inheritance WHERE inherits ~ '^$name<';");
+	    $result = $select->execute;
+	}
+    }
+#    $select->trace(3);
+    
+    print STDERR "$prefix$name\n";
+
+    $name =~ s/_/\\_/g;
+    $name =~ s/</\$<\$/g;
+    $name =~ s/>/\$>\$/g;
+
+    print "\\begin{bundle}{\\fbox{$name}}%\n" if ($result != 0);
+    print "\\fbox{$name}%\n" unless ($result != 0);
+
+    my $othername;
+    $select->bind_columns(undef, \$othername);
+    while($select->fetch)
+    {
+	print '\chunk{';
+	subtree($othername, $direction);
+	print '}';
+    }
+    print '\end{bundle}',"\n" if ($result != 0);
+    $select->finish;
+
+    chop $prefix;
+}
+
+
+
+print << 'EOT'
+\documentclass{article}
+\usepackage{eepic,epic,times}
+\usepackage{a4wide,ecltree}
+\pagestyle{empty}
+\begin{document}
+\sffamily
+EOT
+    ;
+
+while (<>)
+{
+    chop;
+    subtree($_,'down');
+    print "\n\n";
+    subtree($_,'up');
+    print "\n\n";
+}
+
+print '\end{document}',"\n";
+
+$db->disconnect;
