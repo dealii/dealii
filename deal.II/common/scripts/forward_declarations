@@ -18,7 +18,7 @@
 #   'make' thinks it has to remake all object files
 # - delete the two temporary files
 $(forward-declarations): $(filter-out %forward-declarations%,$(h-files))
-	@echo ============================ Remaking $@
+	@echo ============================ Remaking $(@F)
 	@touch $@.old
 	@-cp $@ $@.old > /dev/null 2>&1
 	@perl $D/common/scripts/Make_forward_declarations.pl   \
