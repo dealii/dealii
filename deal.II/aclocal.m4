@@ -458,7 +458,12 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl       (valid, but annoying and sometimes hard to work around)
 	  dnl #858: `type qualifier on return type is meaningless'
 	  dnl       (on conversion operators to types that are already const)
-          dnl #1572: floating-point equality and inequality comparisons are unreliable
+          dnl #1572: `floating-point equality and inequality comparisons are 
+	  dnl        unreliable'
+	  dnl        (while true, this warning also triggers on comparisons
+	  dnl        with zero, or comparing two variables for which one is
+	  dnl        greater; there is about no way to write numeric code
+	  dnl        without triggering this warning many times over)
           CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd1572 -wd734 -wd858 -DDEBUG -inline_debug_info"
           CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll -w0 -wd424 -wd11"
           CXXFLAGSPIC="-KPIC"
