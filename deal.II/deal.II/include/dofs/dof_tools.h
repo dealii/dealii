@@ -268,10 +268,11 @@ class DoFTools
 				      * builds the matrix structure
 				      * just like the previous
 				      * function, but does not create
-				      * elements if not specified by
-				      * the mask. If the mask is
-				      * symmetric, then so will be the
-				      * resulting sparsity pattern.
+				      * matrix elements if not
+				      * specified by the mask. If the
+				      * mask is symmetric, then so
+				      * will be the resulting sparsity
+				      * pattern.
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
@@ -282,6 +283,19 @@ class DoFTools
 				      * or any other class that
 				      * satisfies similar
 				      * requirements.
+				      *
+				      * There is a complication if
+				      * some or all of the shape
+				      * functions of the finite
+				      * element in use are non-zero in
+				      * more than one component (in
+				      * deal.II speak: they are
+				      * non-primitive). In this case,
+				      * the mask element correspoding
+				      * to the first non-zero
+				      * component is taken, and the
+				      * mask elements of all following
+				      * components are ignored.
 				      */
     template <int dim, class SparsityPattern>
     static
@@ -509,47 +523,66 @@ class DoFTools
 				   ConstraintMatrix    &constraints);
     
 				     /**
-				      * Take a vector of values which live on
-				      * cells (e.g. an error per cell) and
-				      * distribute it to the dofs in such a
-				      * way that a finite element field results,
-				      * which can then be further processed,
-				      * e.g. for output. You should note that
-				      * the resulting field will not be
-				      * continuous at hanging nodes. This can,
-				      * however, easily be arranged by calling
-				      * the appropraite @p{distribute} function
-				      * of a @ref{ConstraintMatrix} object created
-				      * for this @ref{DoFHandler} object.
+				      * Take a vector of values which
+				      * live on cells (e.g. an error
+				      * per cell) and distribute it to
+				      * the dofs in such a way that a
+				      * finite element field results,
+				      * which can then be further
+				      * processed, e.g. for
+				      * output. You should note that
+				      * the resulting field will not
+				      * be continuous at hanging
+				      * nodes. This can, however,
+				      * easily be arranged by calling
+				      * the appropraite @p{distribute}
+				      * function of a
+				      * @ref{ConstraintMatrix} object
+				      * created for this
+				      * @ref{DoFHandler} object.
 				      *
-				      * It is assumed that the number of
-				      * elements in @p{cell_data} equals the
-				      * number of active cells. The size of
-				      * @p{dof_data} is adjusted to the right
-				      * size.
+				      * It is assumed that the number
+				      * of elements in @p{cell_data}
+				      * equals the number of active
+				      * cells. The size of
+				      * @p{dof_data} is adjusted to
+				      * the right size.
 				      *
-				      * Note that the input vector may be
-				      * a vector of any data type as long
-				      * as it is convertible to @p{double}.
-				      * The output vector, being a data
-				      * vector on the grid, always consists
-				      * of elements of type @p{double}.
+				      * Note that the input vector may
+				      * be a vector of any data type
+				      * as long as it is convertible
+				      * to @p{double}.  The output
+				      * vector, being a data vector on
+				      * the grid, always consists of
+				      * elements of type @p{double}.
 				      *
-				      * In case the finite element used by
-				      * this DoFHandler consists of more than
-				      * one component, you should give which
-				      * component in the output vector should
-				      * be used to store the finite element
-				      * field in; the default is zero (no other
-				      * value is allowed if the finite element
-				      * consists only of one component). All
-				      * other components of the vector remain
-				      * untouched, i.e. their contents are
-				      * not changed.
+				      * In case the finite element
+				      * used by this @ref{DoFHandler}
+				      * consists of more than one
+				      * component, you should give
+				      * which component in the output
+				      * vector should be used to store
+				      * the finite element field in;
+				      * the default is zero (no other
+				      * value is allowed if the finite
+				      * element consists only of one
+				      * component). All other
+				      * components of the vector
+				      * remain untouched, i.e. their
+				      * contents are not changed.
 				      *
-				      * It is assumed that the output vector
-				      * @p{dof_data} already has the right size,
+				      * It is assumed that the output
+				      * vector @p{dof_data} already
+				      * has the right size,
 				      * i.e. @p{n_dofs()} elements.
+				      *
+				      * This function cannot be used
+				      * if the finite element in use
+				      * has shape functions that are
+				      * non-zero in more than one
+				      * shape function (in deal.II
+				      * speak: they are
+				      * non-primitive).
 				      */
     template <int dim, typename Number>
     static void
@@ -659,6 +692,17 @@ class DoFTools
 				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
 				      * overwritten.
+				      *
+				      * Using the usual convention, if
+				      * a shape function is non-zero
+				      * in more than one component
+				      * (i.e. it is non-primitive),
+				      * then the element in the
+				      * component mask is used that
+				      * corresponds to the first
+				      * non-zero components. Elements
+				      * in the mask corresponding to
+				      * later components are ignored.
 				      */
     template <int dim>
     static void
@@ -1109,8 +1153,8 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    map_dofs_to_support_points (const Mapping<dim>                &mapping,
-				const DoFHandler<dim>             &dof_handler,
+    map_dofs_to_support_points (const Mapping<dim>       &mapping,
+				const DoFHandler<dim>    &dof_handler,
 				std::vector<Point<dim> > &support_points);
 
 				     /**
@@ -1128,7 +1172,7 @@ class DoFTools
 				      * explicitly specified
 				      * comparator object. This
 				      * function is therefore
-				      * templetized on the comparator
+				      * templatized on the comparator
 				      * object. Previous content of
 				      * the map object is deleted in
 				      * this function.
@@ -1150,7 +1194,10 @@ class DoFTools
 				      * Exception
 				      */
     DeclException0 (ExcFEHasNoSupportPoints);
-    
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcFENotPrimitive);
 				     /**
 				      * Exception
 				      */
