@@ -213,22 +213,24 @@ FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data) :
 // we drop this declaration again for the time being
 
 
-//template <>
-//void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
-//					  const Boundary<1> &,
-//					  vector<Point<1> > &support_points) const;
+template <>
+void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
+					   const Boundary<1> &,
+					   vector<Point<1> > &support_points) const;
 
 
 template <>
 void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const vector<Point<1> > &unit_points,
 				       vector<Tensor<2,1> >    &jacobians,
-				       const bool         compute_jacobians,
-				       vector<Point<1> > &support_points,
-				       const bool         compute_support_points,
-				       vector<Point<1> > &q_points,
-				       const bool         compute_q_points,
-				       const dFMatrix      &,
+				       const bool            compute_jacobians,
+				       vector<Tensor<3,1> > &jacobians_grad,
+				       const bool            compute_jacobians_grad,
+				       vector<Point<1> >    &support_points,
+				       const bool            compute_support_points,
+				       vector<Point<1> >    &q_points,
+				       const bool            compute_q_points,
+				       const dFMatrix       &,
 				       const vector<vector<Tensor<1,1> > > &,
 				       const Boundary<1> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
@@ -245,7 +247,12 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
   for (unsigned int i=0; i<q_points.size(); ++i) 
     {
       if (compute_jacobians)
-	jacobians[i](0,0) = 1./h;
+	jacobians[i][0][0] = 1./h;
+
+				       // gradient of jacobian is zero
+      if (compute_jacobians_grad)
+	jacobians_grad[i] = Tensor<3,1>();
+      
       if (compute_q_points)
 					 // assume a linear mapping from unit
 					 // to real space. overload this
@@ -270,6 +277,8 @@ void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &
 					    const vector<Point<1> > &,
 					    vector<Tensor<2,1> >    &,
 					    const bool               ,
+					    vector<Tensor<3,1> >    &,
+					    const bool               ,
 					    vector<Point<1> >       &,
 					    const bool               ,
 					    vector<Point<1> >       &,
@@ -292,6 +301,8 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 					       const vector<Point<0> > &,
 					       const vector<Point<1> > &,
 					       vector<Tensor<2,1> >    &,
+					       const bool               ,
+					       vector<Tensor<3,1> >    &,
 					       const bool               ,
 					       vector<Point<1> >       &,
 					       const bool               ,
@@ -318,9 +329,9 @@ void FiniteElement<1>::get_unit_support_points (vector<Point<1> > &support_point
   unsigned int next = 0;
 				   // first the dofs in the vertices
   for (unsigned int i=0; i<dofs_per_vertex; ++i)
-    support_points[next++] = Point<1>(0);
+    support_points[next++] = Point<1>(0.0);
   for (unsigned int i=0; i<dofs_per_vertex; ++i)
-    support_points[next++] = Point<1>(1);
+    support_points[next++] = Point<1>(1.0);
   
 				   // now dofs on line
   for (unsigned int i=0; i<dofs_per_line; ++i) 

@@ -436,16 +436,18 @@ void FECrissCross<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 template <>
 void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
-				      const vector<Point<1> >            &,
-				      vector<dFMatrix>    &,
-				      const bool,
-				      vector<Point<1> > &,
-				      const bool,
-				      vector<Point<1> > &,
-				      const bool,
-				      const dFMatrix      &,
-				      const vector<vector<Tensor<1,1> > > &,
-				      const Boundary<1> &) const {
+				       const vector<Point<1> > &,
+				       vector<Tensor<2,1> >    &,
+				       const bool            ,
+				       vector<Tensor<3,1> > &,
+				       const bool            ,
+				       vector<Point<1> >    &,
+				       const bool            ,
+				       vector<Point<1> >    &,
+				       const bool            ,
+				       const dFMatrix       &,
+				       const vector<vector<Tensor<1,1> > > &,
+				       const Boundary<1> &) const {
   Assert (false, ExcNotUseful());
 };
 
