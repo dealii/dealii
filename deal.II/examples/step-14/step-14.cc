@@ -1,3 +1,5 @@
+// TODO: bv for primal problem wrong!
+//       check Galerkin orthogonality
 /* $Id$ */
 /* Author: Wolfgang Bangerth, ETH Zurich, 2002 */
 
@@ -149,8 +151,8 @@ namespace Evaluation
     results_table.add_value ("u(x_0)", point_value);
 
     std::cout << "   Point value=" << point_value
-	      << ", exact value=1, error="
-	      << 1.-point_value << std::endl;
+	      << ", exact value=1.59492, error="
+	      << 1.594915543-point_value << std::endl;
   };
 
 };
@@ -449,7 +451,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::LinearSystem::solve (Vector<double> &solution) const
   {
-    SolverControl           solver_control (1000, 1e-12);
+    SolverControl           solver_control (1000, 1e-16);
     PrimitiveVectorMemory<> vector_memory;
     SolverCG<>              cg (solver_control, vector_memory);
 
@@ -723,28 +725,28 @@ double
 RightHandSide<dim>::value (const Point<dim>   &p,
 			   const unsigned int  /*component*/) const
 {
-//    double q = p(0);
-//    for (unsigned int i=1; i<dim; ++i)
-//      q += sin(10*p(i)+5*p(0)*p(0));
-//    const double u = exp(q);
-//    double t1 = 1,
-//  	 t2 = 0,
-//  	 t3 = 0;
-//    for (unsigned int i=1; i<dim; ++i)
-//      {
-//        t1 += cos(10*p(i)+5*p(0)*p(0)) * 10 * p(0);
-//        t2 += 10*cos(10*p(i)+5*p(0)*p(0)) -
-//  	    100*sin(10*p(i)+5*p(0)*p(0)) * p(0)*p(0);
-//        t3 += 100*cos(10*p(i)+5*p(0)*p(0))*cos(10*p(i)+5*p(0)*p(0)) -
-//  	    100*sin(10*p(i)+5*p(0)*p(0));
-//      };
-//    t1 = t1*t1;
+  double q = p(0);
+  for (unsigned int i=1; i<dim; ++i)
+    q += sin(10*p(i)+5*p(0)*p(0));
+  const double u = exp(q);
+  double t1 = 1,
+	 t2 = 0,
+	 t3 = 0;
+  for (unsigned int i=1; i<dim; ++i)
+    {
+      t1 += cos(10*p(i)+5*p(0)*p(0)) * 10 * p(0);
+      t2 += 10*cos(10*p(i)+5*p(0)*p(0)) -
+	    100*sin(10*p(i)+5*p(0)*p(0)) * p(0)*p(0);
+      t3 += 100*cos(10*p(i)+5*p(0)*p(0))*cos(10*p(i)+5*p(0)*p(0)) -
+	    100*sin(10*p(i)+5*p(0)*p(0));
+    };
+  t1 = t1*t1;
   
-//    return -u*(t1+t2+t3);
-  double s = 1;
-  for (unsigned int i=0; i<dim; ++i)
-    s *= sin(3.1415926536*p(i));
-  return dim*3.1415926536*3.1415926536*s;  
+  return -u*(t1+t2+t3);
+//    double s = 1;
+//    for (unsigned int i=0; i<dim; ++i)
+//      s *= sin(3.1415926536*p(i));
+//    return dim*3.1415926536*3.1415926536*s;  
 };
 
 
@@ -945,15 +947,26 @@ namespace LaplaceSolver
 
 				       /**
 					* Declare a data type to
-					* represent the mapping between
-					* faces and integrated jumps of
-					* gradients of each of the
-					* solution vectors. See the
-					* general documentation of this
-					* class for more information.
+					* represent the mapping
+					* between faces and integrated
+					* jumps of gradients of each
+					* of the solution
+					* vectors. Note that the terms
+					* on the edges do not carry an
+					* orientation, since if we
+					* consider it from one or the
+					* other adjacent cell, both
+					* the normal vector and the
+					* jump term change their
+					* sign. We can thus store the
+					* edge terms with faces,
+					* without reference to the
+					* cells from which we compute
+					* them.
 					*/
-      typedef typename std::pair<double,typename DoFHandler<dim>::active_cell_iterator> FaceEntry;
-      typedef typename std::map<typename DoFHandler<dim>::face_iterator,FaceEntry> FaceIntegrals;
+      typedef
+      typename std::map<typename DoFHandler<dim>::face_iterator,double>
+      FaceIntegrals;
 
 
 				       /**
@@ -1167,13 +1180,13 @@ namespace LaplaceSolver
 		    const Quadrature<dim>    &quadrature,
 		    const Quadrature<dim-1>  &face_quadrature,
 		    const Function<dim>      &rhs_function,
-		    const Function<dim>      &boundary_values,
+		    const Function<dim>      &bv,
 		    const DualFunctional::DualFunctionalBase<dim> &dual_functional)
 		  :
 		  Base<dim> (coarse_grid),
                   PrimalSolver<dim> (coarse_grid, primal_fe,
 				     quadrature, face_quadrature,
-				     rhs_function, boundary_values),
+				     rhs_function, bv),
                   DualSolver<dim> (coarse_grid, dual_fe,
 				   quadrature, face_quadrature,
 				   dual_functional)
@@ -1212,10 +1225,6 @@ namespace LaplaceSolver
   {
     Vector<float> error_indicators (triangulation->n_active_cells());
     estimate_error (error_indicators);
-    std::cout << "   Estimated error="
-	      << std::accumulate (error_indicators.begin(),
-				  error_indicators.end(), 0.)
-	      << std::endl;
     DataOut<dim> data_out;
     ofstream x("x");
     Vector<double> xe (error_indicators.begin(),
@@ -1223,7 +1232,7 @@ namespace LaplaceSolver
     data_out.attach_dof_handler (DualSolver<dim>::dof_handler);
     data_out.add_data_vector (xe, "e");
     data_out.build_patches ();
-    data_out.write_gnuplot (x);
+    data_out.write_gmv (x);
     
     std::transform (error_indicators.begin(),
 		    error_indicators.end(),
@@ -1236,50 +1245,42 @@ namespace LaplaceSolver
   };
   
 
+  
   template <int dim>
   void
   WeightedResidual<dim>::output_solution () const
   {
-    for (unsigned int solution_type=0; solution_type<2; ++solution_type)
-      {
-	DataOut<dim> data_out;
+    Vector<double> primal_solution (DualSolver<dim>::dof_handler.n_dofs());
+    FETools::interpolate (PrimalSolver<dim>::dof_handler,
+			  PrimalSolver<dim>::solution,
+			  DualSolver<dim>::dof_handler,
+			  primal_solution);    
 
-	switch (solution_type)
-	  {
-	    case 0:
-		  data_out.attach_dof_handler (PrimalSolver<dim>::dof_handler);
-		  data_out.add_data_vector (PrimalSolver<dim>::solution,
-					    "primal_solution");
-		  break;
-	    case 1:
-		  data_out.attach_dof_handler (DualSolver<dim>::dof_handler);
-		  data_out.add_data_vector (DualSolver<dim>::solution,
-					    "dual_solution");
-		  break;
-	    default:
-		  Assert (false, ExcInternalError());
-	  };
-	data_out.build_patches ();
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler (DualSolver<dim>::dof_handler);
+    data_out.add_data_vector (primal_solution,
+			      "primal_solution");
+    data_out.add_data_vector (DualSolver<dim>::solution,
+			      "dual_solution");
+    
+    data_out.build_patches (1);
   
 #ifdef HAVE_STD_STRINGSTREAM
-	std::ostringstream filename;
+    std::ostringstream filename;
 #else
-	std::ostrstream filename;
+    std::ostrstream filename;
 #endif
-	filename << "solution-"
-		 << (solution_type == 0 ?
-		     "primal-" : "dual-")
-		 << refinement_cycle
-		 << ".gnuplot"
-		 << std::ends;
+    filename << "solution-"
+	     << refinement_cycle
+	     << ".gnuplot"
+	     << std::ends;
 #ifdef HAVE_STD_STRINGSTREAM
-	std::ofstream out (filename.str().c_str());
+    std::ofstream out (filename.str().c_str());
 #else
-	std::ofstream out (filename.str());
+    std::ofstream out (filename.str());
 #endif
     
-	data_out.write (out, DataOut<dim>::gnuplot);
-      };
+    data_out.write (out, DataOut<dim>::gnuplot);
   };
 
 
@@ -1365,7 +1366,7 @@ namespace LaplaceSolver
       for (unsigned int face_no=0;
 	   face_no<GeometryInfo<dim>::faces_per_cell;
 	   ++face_no)
-	face_integrals[cell->face(face_no)].first = -1e20;
+	face_integrals[cell->face(face_no)] = -1e20;
 
 				     // Then set up a vector with
 				     // error indicators.  Reserve one
@@ -1399,7 +1400,7 @@ namespace LaplaceSolver
 				     // this, note that the cell terms
 				     // are already set, and that only
 				     // the edge terms need to be
-				     // collected. For this, loop over
+				     // collected. Thus, loop over
 				     // all cells and their faces,
 				     // make sure that the
 				     // contributions of each of the
@@ -1412,17 +1413,16 @@ namespace LaplaceSolver
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
 	   ++face_no)
 	{
-	  Assert(face_integrals.find(cell->face(face_no)) != face_integrals.end(),
+	  Assert(face_integrals.find(cell->face(face_no)) !=
+		 face_integrals.end(),
 		 ExcInternalError());
-	  if (true || (face_integrals[cell->face(face_no)].second
-		       ==
-		       cell))
-	    error_indicators(present_cell)
-	      += -0.5*face_integrals[cell->face(face_no)].first;
-	  else
-	    error_indicators(present_cell)
-	      -= -0.5*face_integrals[cell->face(face_no)].first;
+	  error_indicators(present_cell)
+	    += 0.5*face_integrals[cell->face(face_no)];
 	};
+    std::cout << "   Estimated error="
+	      << std::accumulate (error_indicators.begin(),
+				  error_indicators.end(), 0.)
+	      << std::endl;
   };
 
 
@@ -1536,24 +1536,20 @@ namespace LaplaceSolver
 					     // enter this face into
 					     // the list of faces with
 					     // a zero contribution to
-					     // the error, and also
-					     // mark the cell on which
-					     // we computed this
-					     // value.
+					     // the error.
 	    if (cell->face(face_no)->at_boundary()) 
 	      {
-		face_integrals[cell->face(face_no)].first = 0;
-		face_integrals[cell->face(face_no)].second = cell;
+		face_integrals[cell->face(face_no)] = 0;
 		continue;
 	      };
 	    
 					     // Next, note that since
 					     // we want to compute the
 					     // jump terms on each
-					     // face only once,
+					     // face only once
 					     // although we access it
-					     // twice if it is not at
-					     // the boundary, we have
+					     // twice (if it is not at
+					     // the boundary), we have
 					     // to define some rules
 					     // who is responsible for
 					     // computing on a face:
@@ -1635,10 +1631,10 @@ namespace LaplaceSolver
 					 // next cell for this
 					 // thread. Note again that
 					 // the cells for each of the
-					 // threads are
-					 // interleaved. If we are at
-					 // the end of our workload,
-					 // jump out of the loop.
+					 // threads are interleaved.
+					 // If we are at the end of
+					 // our workload, jump out
+					 // of the loop.
 	for (unsigned int t=0;
 	     ((t<n_threads) && (cell!=DualSolver<dim>::dof_handler.end()));
 	     ++t, ++cell, ++cell_index);
@@ -1682,7 +1678,9 @@ namespace LaplaceSolver
 					     cell_data.dual_weights);
 
 				     // ...and finally build the sum
-				     // over all quadrature points:
+				     // over all quadrature points and
+				     // store it with the present
+				     // cell:
     double sum = 0;
     for (unsigned int p=0; p<cell_data.fe_values.n_quadrature_points; ++p)
       sum += ((cell_data.rhs_values[p]+trace(cell_data.cell_grad_grads[p])) *
@@ -1806,13 +1804,12 @@ namespace LaplaceSolver
 				     // not already written to...
     Assert (face_integrals.find (cell->face(face_no)) != face_integrals.end(),
 	    ExcInternalError());
-    Assert (face_integrals[cell->face(face_no)].first == -1e20,
+    Assert (face_integrals[cell->face(face_no)] == -1e20,
 	    ExcInternalError());
 
 				     // ...then store computed value
 				     // at assigned location:
-    face_integrals[cell->face(face_no)].first = face_integral;
-    face_integrals[cell->face(face_no)].second = cell;
+    face_integrals[cell->face(face_no)] = face_integral;
   };
 
 
@@ -1938,10 +1935,8 @@ namespace LaplaceSolver
 	  face_integral += (face_data.jump_residual[p] *
 			    face_data.dual_weights[p] *
 			    face_data.fe_face_values_neighbor.JxW(p));
-	face_integrals[neighbor_child->face(neighbor_neighbor)].first
+	face_integrals[neighbor_child->face(neighbor_neighbor)]
 	  = face_integral;
-	face_integrals[neighbor_child->face(neighbor_neighbor)].second
-	  = cell;
       };
 
 				     // Once the contributions of all
@@ -1964,15 +1959,14 @@ namespace LaplaceSolver
 	Assert (face_integrals.find(face->child(subface_no)) !=
 		face_integrals.end(),
 		ExcInternalError());
-	Assert (face_integrals[face->child(subface_no)].first != -1e20,
+	Assert (face_integrals[face->child(subface_no)] != -1e20,
 		ExcInternalError());
       
-	sum += face_integrals[face->child(subface_no)].first;
+	sum += face_integrals[face->child(subface_no)];
       };
 				     // Finally store the value with
 				     // the parent face.
-    face_integrals[face].first = sum;
-    face_integrals[face].second = cell;    
+    face_integrals[face] = sum;
   };
   
 };
@@ -2006,7 +2000,7 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 	};
 
 
-      if (solver.n_dofs() < 2000)
+      if (solver.n_dofs() < 5000)
 	solver.refine_grid ();
       else
 	break;
@@ -2074,7 +2068,7 @@ void solve_problem (const std::string &solver_name)
   Triangulation<dim> triangulation;
 //  create_triangulation (triangulation);
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (2);
+  triangulation.refine_global (5);
   const FE_Q<dim>          primal_fe(1);
   const FE_Q<dim>          dual_fe(2);
   const QGauss4<dim>       quadrature;
