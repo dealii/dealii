@@ -71,6 +71,81 @@ enum MeshSmoothing {
 /*------------------------------------------------------------------------*/
 
 
+/**
+ *  Structure which is passed to the #Triangulation<dim>::create_triangulation#
+ *  function. It contains all data needed to construct a cell, namely the
+ *  indices of the vertices and the material indicator.
+ */
+template <int dim>
+struct CellData {
+    int           vertices[GeometryInfo<dim>::vertices_per_cell];
+    unsigned char material_id;
+};
+
+
+
+
+
+/**
+ *  Structure to be passed to the #Triangulation<dim>::create_triangulation#
+ *  function to describe boundary information.
+ *
+ *  This structure is the same for all dimensions, since we use an input
+ *  function which is the same for all dimensions. The content of objects
+ *  of this structure varies with the dimensions, however.
+ *
+ *  Since in one space dimension, there is no boundary information apart
+ *  from the two end points of the interval, this structure does not contain
+ *  anything and exists only for consistency, to allow a common interface
+ *  for all space dimensions. All fields should always be empty.
+ *
+ *  Boundary data in 2D consists
+ *  of a list of lines which belong to a given boundary component. A
+ *  boundary component is a list of lines which are given a common
+ *  number describing the boundary condition to hold on this part of the
+ *  boundary. The triangulation creation function gives lines not in this
+ *  list either the boundary indicator zero (if on the boundary) or 255
+ *  (if in the interior). Explicitely giving a line the indicator 255
+ *  will result in an error, as well as giving an interior line a boundary
+ *  indicator.
+ */
+struct SubCellData {
+				     /**
+				      * Each record of this vector describes
+				      * a line on the boundary and its boundary
+				      * indicator.
+				      */
+    vector<CellData<1> > boundary_lines;
+
+				     /**
+				      * Each record of this vector describes
+				      * a quad on the boundary and its boundary
+				      * indicator.
+				      */
+    vector<CellData<2> > boundary_quads;
+
+				     /**
+				      * This function checks whether the vectors
+				      * which may not be used in a given
+				      * dimension are really empty. I.e.,
+				      * whether the #boundary_*# arrays are
+				      * empty when in one space dimension
+				      * and whether the #boundary_quads#
+				      * array is empty when in two dimensions.
+				      *
+				      * Since this structure is the same for all
+				      * dimensions, the actual dimension has
+				      * to be given as a parameter.
+				      */
+    bool check_consistency (const unsigned int dim) const;
+};
+
+
+
+
+/*------------------------------------------------------------------------*/
+
+
 
 
 

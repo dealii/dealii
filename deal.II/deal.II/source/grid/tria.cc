@@ -17,6 +17,25 @@
 #include <cmath>
 
 
+
+bool SubCellData::check_consistency (const unsigned int dim) const {
+  switch (dim) 
+    {
+      case 1:
+	    return ((boundary_lines.size() == 0) &&
+		    (boundary_quads.size() == 0));
+      case 2:
+	    return (boundary_quads.size() == 0);
+    };
+  return true;
+};
+
+		    
+
+
+
+
+
 template <int dim>
 Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 		smooth_grid(smooth_grid)

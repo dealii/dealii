@@ -128,6 +128,7 @@ MGDoFHandler<1>::end () const {
 
 
 
+
 template <>
 MGDoFHandler<1>::raw_cell_iterator
 MGDoFHandler<1>::last_raw () const {
@@ -357,6 +358,7 @@ MGDoFHandler<1>::last_active_quad () const {
 #endif
 
 
+
 #if deal_II_dimension == 2
 
 template <>
@@ -517,6 +519,7 @@ MGDoFHandler<2>::last_active_face (const unsigned int level) const {
 };
 
 #endif
+
 
 
 
@@ -714,6 +717,7 @@ MGDoFHandler<dim>::end_quad (const unsigned int level) const {
 
 
 
+
 template <int dim>
 typename MGDoFDimensionInfo<dim>::active_quad_iterator
 MGDoFHandler<dim>::end_active_quad (const unsigned int level) const {
@@ -846,6 +850,7 @@ MGDoFHandler<dim>::last_active_quad () const {
 
 
 //------------------------------------------------------------------
+
 
 
 
@@ -1205,6 +1210,7 @@ void MGDoFHandler<dim>::renumber_dofs (const unsigned int      level,
 
 
 
+
 #if deal_II_dimension == 1
 
 template <>
@@ -1238,6 +1244,8 @@ void MGDoFHandler<1>::do_renumbering (const unsigned int level,
 };
 
 #endif
+
+
 
 
 #if deal_II_dimension == 2
@@ -1361,6 +1369,7 @@ void MGDoFHandler<1>::reserve_space () {
 #endif
 
 
+
 #if deal_II_dimension == 2
 
 template <>
@@ -1385,8 +1394,8 @@ void MGDoFHandler<2>::reserve_space () {
 				   // this calls the destructor which
 				   // must free the space
   mg_vertex_dofs.resize (0);
-
-
+  
+  
 				   ////////////////////////////
 				   // CONSTRUCTION
   
@@ -1404,6 +1413,7 @@ void MGDoFHandler<2>::reserve_space () {
 						 -1);
     };
 
+  
 				   // now allocate space for the
 				   // vertices. To this end, we need
 				   // to construct as many objects as
@@ -1418,8 +1428,14 @@ void MGDoFHandler<2>::reserve_space () {
 				   // vertex we pass by  belongs to
   mg_vertex_dofs.resize (tria->vertices.size());
 
-  vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
-  vector<unsigned int> max_level (tria->vertices.size(), 0);
+				   // here again, gcc2.8 fails to
+				   // construct the vector properly
+				   // using parameters to the constructor
+//  vector<unsigned int> min_level (tria->vertices.size(), tria->n_levels());
+//  vector<unsigned int> max_level (tria->vertices.size(), 0);
+  vector<unsigned int> min_level, max_level;
+  min_level.resize (tria->vertices.size(), tria->n_levels());
+  max_level.resize (tria->vertices.size(), 0);
 
   Triangulation<dim>::cell_iterator cell = tria->begin(),
 				    endc = tria->end();
@@ -1434,6 +1450,7 @@ void MGDoFHandler<2>::reserve_space () {
 	  max_level[vertex_index] = cell->level();
       };
 
+  
 				   // now allocate the needed space
   for (unsigned int vertex=0; vertex<tria->vertices.size(); ++vertex)
     {
