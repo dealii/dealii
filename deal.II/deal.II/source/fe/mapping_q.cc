@@ -806,7 +806,7 @@ MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>:
               apply_laplace_vector (laplace_on_hex_vector, a);
 	      break;
 	      
-	default 1:
+	default:
 	      Assert(false, ExcNotImplemented());
 	      break;
       };
@@ -924,7 +924,15 @@ MappingQ<dim>::add_line_support_points (const Triangulation<dim>::cell_iterator 
   if (degree==2)
     {
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
-	a.push_back(boundary->get_new_point_on_line(line));
+	{
+	  const typename Triangulation<dim>::line_iterator line = cell->line(line_no);
+	  const Boundary<dim> * const boundary
+	    = (line->at_boundary() ?
+	       &line->get_triangulation().get_boundary(line->boundary_indicator()) :
+	       &straight_boundary);
+	  
+	  a.push_back(boundary->get_new_point_on_line(line));
+	};
     }
   else
 				     // otherwise call the more
