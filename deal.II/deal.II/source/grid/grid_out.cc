@@ -1002,6 +1002,32 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  << "/x {lineto stroke} bind def" << std::endl
 	  << "/b {0 0 0 setrgbcolor} def" << std::endl
 	  << "/r {1 0 0 setrgbcolor} def" << std::endl;
+
+				       // in 2d, we can also plot cell
+				       // numbers, but this requires a
+				       // somewhat more lengthy
+				       // preamble. please don't ask
+				       // me what most of this means,
+				       // it is reverse engineered
+				       // from what GNUPLOT uses in
+				       // its output
+      if ((dim == 2) && (eps_flags_2.plot_cell_numbers == true))
+	{
+	  out << ("/R {rmoveto} bind def\n"
+		  "/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n"
+		  "dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n"
+		  "currentdict end definefont\n"
+		  "/MFshow {{dup dup 0 get findfont exch 1 get scalefont setfont\n"
+		  "[ currentpoint ] exch dup 2 get 0 exch rmoveto dup dup 5 get exch 4 get\n"
+		  "{show} {stringwidth pop 0 rmoveto}ifelse dup 3 get\n"
+		  "{2 get neg 0 exch rmoveto pop} {pop aload pop moveto}ifelse} forall} bind def\n"
+		  "/MFwidth {0 exch {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont\n"
+		  "5 get stringwidth pop add}\n"
+		  "{pop} ifelse} forall} bind def\n"
+		  "/MCshow { currentpoint stroke m\n"
+		  "exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n")
+	      << std::endl;
+	};
       
       out << "%%EndProlog" << std::endl
 	  << std::endl;
@@ -1018,6 +1044,25 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
     out << ((line->colorize && eps_flags_base.color_lines_on_user_flag) ? "r " : "b ")
 	<< (line->first  - offset) * scale << " m "
 	<< (line->second - offset) * scale << " x" << std::endl;
+
+				   // finally write the cell numbers
+				   // in 2d, if that is desired
+  if ((dim == 2) && (eps_flags_2.plot_cell_numbers == true))
+    {
+      out << "(Helvetica) findfont 140 scalefont setfont"
+	  << std::endl;
+      
+      typename Triangulation<dim>::active_cell_iterator
+	cell = tria.begin_active (),
+	endc = tria.end ();
+      for (; cell!=endc; ++cell)
+	out << (cell->center()(0)-offset(0))*scale << ' '
+	    << (cell->center()(1)-offset(1))*scale
+	    << " m" << std::endl
+	    << "[ [(Helvetica) 12.0 0.0 true true (" << cell << " )] "
+	    << "] -6 MCshow"
+	    << std::endl;
+    };
 
   out << "showpage" << std::endl;
   

@@ -29,8 +29,6 @@ template <int dim> class Mapping;
  * modify the default outfit of the grids written into a file. See the
  * different subclasses and the documentation of the @ref{GridOut}
  * class for more details.
- *
- * @author Wolfgang Bangerth, 1998, 2001
  */
 namespace GridOutFlags
 {
@@ -283,13 +281,27 @@ namespace GridOutFlags
   struct Eps<2> : public EpsFlagsBase 
   {
 				       /**
+					* If this flag is set, then we
+					* place the number of the cell
+					* into the middle of each
+					* cell. The default value is
+					* to not do this.
+					*
+					* The format of the cell
+					* number written is
+					* @p{level.index}.
+					*/
+      bool plot_cell_numbers;
+      
+				       /**
 					* Constructor.
 					*/
       Eps (const SizeType     size_type  = width,
 	   const unsigned int size       = 300,
 	   const double       line_width = 0.5,
 	   const bool         color_lines_on_user_flag = false,
-	   const unsigned int n_boundary_face_points = 2);
+	   const unsigned int n_boundary_face_points = 2,
+	   const bool         plot_cell_numbers = false);
   };
   
 				   /**
