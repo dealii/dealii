@@ -274,6 +274,7 @@ class KellyErrorEstimator {
 
 
 
+
 /*----------------------------   error_estimator.h     ---------------------------*/
 /* end of #ifndef __error_estimator_H */
 #endif

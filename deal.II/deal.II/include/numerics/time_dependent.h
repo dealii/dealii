@@ -1000,6 +1000,27 @@ class TimeStepBase : public Subscriptor
     void set_sweep_no (const unsigned int sweep_no);
     
 
+				     /**
+				      * Copy constructor. I can see no reason
+				      * why someone might want to use it, so
+				      * I don't provide it. Since this class
+				      * has pointer members, making it private
+				      * prevents the compiler to provide it's
+				      * own, incorrect one if anyone chose to
+				      * copy such an object.
+				      */
+    TimeStepBase (const TimeStepBase &);
+
+    				     /**
+				      * Copy operator. I can see no reason
+				      * why someone might want to use it, so
+				      * I don't provide it. Since this class
+				      * has pointer members, making it private
+				      * prevents the compiler to provide it's
+				      * own, incorrect one if anyone chose to
+				      * copy such an object.
+				      */
+    TimeStepBase & operator = (const TimeStepBase &);
 
 				     // make the manager object a friend
     friend class TimeDependent;

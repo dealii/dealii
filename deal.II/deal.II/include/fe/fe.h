@@ -142,6 +142,13 @@ class FiniteElementData
 		       const unsigned int n_components);
 
 				     /**
+				      * Declare this destructor virtual in
+				      * order to make the respective destructors
+				      * in derived classes virtual as well.
+				      */
+    virtual ~FiniteElementData ();
+    
+				     /**
 				      * Comparison operator. It is not clear to
 				      * me why we have to declare and implement
 				      * this one explicitely.

@@ -1476,6 +1476,29 @@ class DoFHandler
     SmartPointer<const FiniteElement<dim> > selected_fe;
 
   private:
+
+				     /**
+				      * Copy constructor. I can see no reason
+				      * why someone might want to use it, so
+				      * I don't provide it. Since this class
+				      * has pointer members, making it private
+				      * prevents the compiler to provide it's
+				      * own, incorrect one if anyone chose to
+				      * copy such an object.
+				      */
+    DoFHandler (const DoFHandler &);
+
+    				     /**
+				      * Copy operator. I can see no reason
+				      * why someone might want to use it, so
+				      * I don't provide it. Since this class
+				      * has pointer members, making it private
+				      * prevents the compiler to provide it's
+				      * own, incorrect one if anyone chose to
+				      * copy such an object.
+				      */
+    DoFHandler & operator = (const DoFHandler &);
+
 				     /**
 				      * Reserve enough space in the 
 				      * #levels[]# objects to store the
