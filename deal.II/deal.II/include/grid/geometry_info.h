@@ -16,20 +16,6 @@
 
 #include <base/exceptions.h>
 
-template <int _dim> struct GeometryInfo;
-
-/**
- * Pseudo-class for recursive functions in @ref{GeometryInfo}@p{<dim>}.
- */
-struct GeometryInfo<0>
-{
-    static const unsigned int vertices_per_cell = 1;
-    static const unsigned int lines_per_cell = 0;
-    static const unsigned int quads_per_cell = 0;
-    static const unsigned int hexes_per_cell = 0;
-    static const unsigned int children_per_cell = 0;
-};
-
 
 
 /**
@@ -189,6 +175,28 @@ struct GeometryInfo
 					    unsigned int subface);
 
 };
+
+
+
+/**
+ * Pseudo-class for recursive functions in
+ * @ref{GeometryInfo<1>}. Actually this class is a starting point for
+ * the induction ladder by which the higher @p{GeometryInfo} classes
+ * are built.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999
+ */
+template <>
+struct GeometryInfo<0>
+{
+    static const unsigned int vertices_per_cell = 1;
+    static const unsigned int lines_per_cell = 0;
+    static const unsigned int quads_per_cell = 0;
+    static const unsigned int hexes_per_cell = 0;
+    static const unsigned int children_per_cell = 0;
+};
+
+
 
 
 /*---------------------------- Inline functions --------------------------------*/
