@@ -147,6 +147,9 @@ void check_select(const FiniteElement<dim>& fe,
   deallog << std::endl;
 }
 
+/*
+ * The following code must be adapted to the new structures.
+
 template <int dim>
 void check_block(const FiniteElement<dim>& fe,
 		 const vector<bool>& selected,
@@ -216,6 +219,7 @@ void check_block(const FiniteElement<dim>& fe,
     deallog << ' ' << (int) v[2](i);
   deallog << std::endl;
 }
+*/
 
 int main()
 {
