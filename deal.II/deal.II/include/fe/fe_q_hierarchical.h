@@ -560,10 +560,9 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 				      * proper design.
 				      */
     static
-    void
+    std::vector<unsigned int>
     lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
-					   const unsigned int            degree,
-					   std::vector<unsigned int>    &numbering);
+					   const unsigned int            degree);
 
 				     /**
 				      * This is an analogon to the
@@ -571,10 +570,32 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 				      * on faces.
 				      */
     static
-    void
-    face_lexicographic_to_hierarchic_numbering (const unsigned int         degree,
-						std::vector<unsigned int> &numbering);
+    std::vector<unsigned int>
+    face_lexicographic_to_hierarchic_numbering (const unsigned int degree);
 
+				     /**
+				      * Initialize two auxiliary
+				      * fields that will be used in
+				      * setting up the various
+				      * matrices in the constructor.
+				      */
+    void build_dofs_cell (std::vector<FullMatrix<double> > &dofs_cell,
+			  std::vector<FullMatrix<double> > &dofs_subcell) const;
+    
+				     /**
+				      * Initialize the hanging node
+				      * constraints matrices. Called
+				      * from the constructor.
+				      */
+    void initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell);
+
+				     /**
+				      * Initialize the embedding
+				      * matrices. Called from the
+				      * constructor.
+				      */
+    void initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &dofs_cell,
+					       const std::vector<FullMatrix<double> > &dofs_subcell);
 
 				     /**
 				      * Initialize the
@@ -672,7 +693,7 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 				      * Mapping from lexicographic to
 				      * shape function numbering.
 				      */
-    std::vector<unsigned int> renumber;
+    const std::vector<unsigned int> renumber;
 
 				     /**
 				      * Inverse renumber
@@ -680,32 +701,13 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 				      * shape function numbering to
 				      * lexicographic numbering.
 				      */
-    std::vector<unsigned int> renumber_inverse;
+    const std::vector<unsigned int> renumber_inverse;
              
 				     /**
 				      * Mapping from lexicographic to
 				      * shape function numbering on first face.
 				      */
-    std::vector<unsigned int> face_renumber;
-
-                                     /**
-                                      * The matrix @p{dofs_cell} contains the 
-				      * values of the linear functionals of 
-                                      * the master 1d cell applied to the 
-				      * shape functions of the two 1d subcells.
-				      * The matrix @p{dofs_subcell} constains
-				      * the values of the linear functionals 
-				      * on each 1d subcell applied to the 
-				      * shape functions on the master 1d 
-				      * subcell. 
-				      * We use @p{dofs_cell} and 
-				      * @p{dofs_subcell} to compute the 
-				      * @p{prolongation}, @p{restriction} and 
-				      * @p{interface_constraints} matrices 
-				      * for all dimensions.
-				      */
-    std::vector<FullMatrix<double> > dofs_cell;
-    std::vector<FullMatrix<double> > dofs_subcell;
+    const std::vector<unsigned int> face_renumber;
 
 				     /**
 				      * Pointer to the tensor
@@ -782,8 +784,11 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ();
-template <> void FE_Q_Hierarchical<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int,
-								                   std::vector<unsigned int>&);
+template <>
+void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ();
+
+template <>
+std::vector<unsigned int>
+FE_Q_Hierarchical<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
 #endif

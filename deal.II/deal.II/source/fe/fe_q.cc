@@ -522,7 +522,18 @@ FE_Q<dim>::initialize_embedding ()
         this->prolongation[c].reinit (this->dofs_per_cell,
                                       this->dofs_per_cell);
         this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
-      };
+
+                                         // and make sure that the row
+                                         // sum is 1
+        for (unsigned int row=0; row<this->dofs_per_cell; ++row)
+          {
+            double sum = 0;
+            for (unsigned int col=0; col<this->dofs_per_cell; ++col)
+              sum += this->prolongation[c](row,col);
+            Assert (std::fabs(sum-1.) < 1e-14,
+                    ExcInternalError());
+          };
+      };  
 }
 
 

@@ -447,6 +447,28 @@ class FE_Nedelec : public FiniteElement<dim>
 				      */
     static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
 
+
+				     /**
+				      * Initialize the hanging node
+				      * constraints matrices. Called
+				      * from the constructor.
+				      */
+    void initialize_constraints ();
+
+				     /**
+				      * Initialize the embedding
+				      * matrices. Called from the
+				      * constructor.
+				      */
+    void initialize_embedding ();
+
+				     /**
+				      * Initialize the restriction
+				      * matrices. Called from the
+				      * constructor.
+				      */
+    void initialize_restriction ();
+    
 				     /**
 				      * Initialize the
 				      * @p{unit_support_points} field

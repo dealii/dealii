@@ -34,219 +34,13 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 {
   Assert (dim >= 2, ExcNotUsefulInThisDimension());
   
-				   // copy constraint matrices if they
-				   // are defined. otherwise leave them
-				   // at zero size
-  if (degree<Matrices::n_constraint_matrices+1)
-    {
-      this->interface_constraints.
-        TableBase<2,double>::reinit (this->interface_constraints_size());
-      this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
-    };
-
-				   // next copy over embedding
-				   // matrices if they are defined
-  if ((degree < Matrices::n_embedding_matrices+1) &&
-      (Matrices::embedding[degree-1][0] != 0))
-    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      {
-                                         // copy
-        this->prolongation[c].reinit (this->dofs_per_cell,
-                                      this->dofs_per_cell);
-        this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
-                                         // and make sure that the row
-                                         // sum is 0.5 (for usual
-                                         // elements, the row sum must
-                                         // be 1, but here the shape
-                                         // function is multiplied by
-                                         // the inverse of the
-                                         // Jacobian, which introduces
-                                         // a factor of 1/2 when going
-                                         // from mother to child)
-        for (unsigned int row=0; row<this->dofs_per_cell; ++row)
-          {
-            double sum = 0;
-            for (unsigned int col=0; col<this->dofs_per_cell; ++col)
-              sum += this->prolongation[c](row,col);
-            Assert (std::fabs(sum-.5) < 1e-14,
-                    ExcInternalError());
-          };
-      };
-
-				   // then fill restriction
-				   // matrices. they are hardcoded for
-				   // the first few elements
-  switch (dim)
-    {
-      case 2:   // 2d
-      {
-	switch (degree)
-	  {
-	    case 1:
-	    {
-                                               // this is a strange
-                                               // element, since it is
-                                               // both additive and
-                                               // then it is also
-                                               // not. ideally, we
-                                               // would like to have
-                                               // the value of the
-                                               // shape function on
-                                               // the coarse line to
-                                               // be the mean value of
-                                               // that on the two
-                                               // child ones. thus,
-                                               // one should make it
-                                               // additive. however,
-                                               // additivity only
-                                               // works if an element
-                                               // does not have any
-                                               // continuity
-                                               // requirements, since
-                                               // otherwise degrees of
-                                               // freedom are shared
-                                               // between adjacent
-                                               // elements, and when
-                                               // we make the element
-                                               // additive, that would
-                                               // mean that we end up
-                                               // adding up
-                                               // contributions not
-                                               // only from the child
-                                               // cells of this cell,
-                                               // but also from the
-                                               // child cells of the
-                                               // neighbor, and since
-                                               // we cannot know
-                                               // whether there even
-                                               // exists a neighbor we
-                                               // cannot simply make
-                                               // the element
-                                               // additive.
-					       //
-                                               // so, until someone
-                                               // comes along with a
-                                               // better alternative,
-                                               // we do the following:
-                                               // make the element
-                                               // non-additive, and
-                                               // simply pick the
-                                               // value of one of the
-                                               // child lines for the
-                                               // value of the mother
-                                               // line (note that we
-                                               // have to multiply by
-                                               // two, since the shape
-                                               // functions scale with
-                                               // the inverse
-                                               // Jacobian). we thus
-                                               // throw away the
-                                               // information of one
-                                               // of the child lines,
-                                               // but there seems to
-                                               // be no other way than
-                                               // that...
-                                               //
-                                               // note: to make things
-                                               // consistent, and
-                                               // restriction
-                                               // independent of the
-                                               // order in which we
-                                               // travel across the
-                                               // cells of the coarse
-                                               // grid, we have to
-                                               // make sure that we
-                                               // take the same small
-                                               // line when visiting
-                                               // its two neighbors,
-                                               // to get the value for
-                                               // the mother line. we
-                                               // take the first line
-                                               // always, in the
-                                               // canonical direction
-                                               // of lines
-              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-                this->restriction[c].reinit (this->dofs_per_cell,
-                                             this->dofs_per_cell);
-              
-	      this->restriction[0](0,0) = 2.;
-	      this->restriction[1](1,1) = 2.;
-	      this->restriction[3](2,2) = 2.;
-	      this->restriction[0](3,3) = 2.;
-
-	      break;
-	    };
-	    
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), leave them
-					       // empty. this does not
-					       // prevent the use of
-					       // this FE, but will
-					       // prevent the use of
-					       // these matrices
-              break;
-	    };
-	  };
-	
-	break;
-      };
-
-
-      case 3:   // 3d
-      {
-	switch (degree)
-	  {
-	    case 1:
-	    {
-					       // same principle as in
-					       // 2d, take one child
-					       // cell to get at the
-					       // values of each of
-					       // the 12 lines
-              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-                this->restriction[c].reinit (this->dofs_per_cell,
-                                             this->dofs_per_cell);
-	      this->restriction[0](0,0) = 2.;
-	      this->restriction[0](3,3) = 2.;
-	      this->restriction[1](1,1) = 2.;
-	      this->restriction[3](2,2) = 2.;
-              
-	      this->restriction[4](4,4) = 2.;
-	      this->restriction[4](7,7) = 2.;
-	      this->restriction[5](5,5) = 2.;
-	      this->restriction[7](6,6) = 2.;
-              
-	      this->restriction[0](8,8) = 2.;
-	      this->restriction[1](9,9) = 2.;
-	      this->restriction[2](10,10) = 2.;
-	      this->restriction[3](11,11) = 2.;
-              
-	      break;
-	    };
-	    
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), leave them
-					       // empty. this does not
-					       // prevent the use of
-					       // this FE, but will
-					       // prevent the use of
-					       // these matrices
-              break;
-	    };
-	  };
-	
-	break;
-      };
-      
-      default:
-	    Assert (false,ExcNotImplemented());
-    }
+				   // copy constraint and embedding
+				   // matrices if they are
+				   // defined. otherwise leave them at
+				   // invalid size
+  initialize_constraints ();
+  initialize_embedding ();
+  initialize_restriction ();
 
 				   // finally fill in support points
 				   // on cell and face
@@ -705,6 +499,236 @@ FE_Nedelec<3>::shape_grad_grad_component (const unsigned int i,
 //----------------------------------------------------------------------
 // Auxiliary functions
 //----------------------------------------------------------------------
+
+
+
+template <int dim>
+void
+FE_Nedelec<dim>::initialize_constraints ()
+{
+				   // copy constraint matrices if they
+				   // are defined. otherwise leave
+				   // them at zero size
+  if (degree<Matrices::n_constraint_matrices+1)
+    {
+      this->interface_constraints.
+        TableBase<2,double>::reinit (this->interface_constraints_size());
+      this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
+    };
+}
+
+
+
+template <int dim>
+void
+FE_Nedelec<dim>::initialize_embedding ()
+{
+  if ((degree < Matrices::n_embedding_matrices+1) &&
+      (Matrices::embedding[degree-1][0] != 0))
+    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+      {
+                                         // copy
+        this->prolongation[c].reinit (this->dofs_per_cell,
+                                      this->dofs_per_cell);
+        this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
+                                         // and make sure that the row
+                                         // sum is 0.5 (for usual
+                                         // elements, the row sum must
+                                         // be 1, but here the shape
+                                         // function is multiplied by
+                                         // the inverse of the
+                                         // Jacobian, which introduces
+                                         // a factor of 1/2 when going
+                                         // from mother to child)
+        for (unsigned int row=0; row<this->dofs_per_cell; ++row)
+          {
+            double sum = 0;
+            for (unsigned int col=0; col<this->dofs_per_cell; ++col)
+              sum += this->prolongation[c](row,col);
+            Assert (std::fabs(sum-.5) < 1e-14,
+                    ExcInternalError());
+          };
+      };
+}
+
+
+
+template <int dim>
+void
+FE_Nedelec<dim>::initialize_restriction ()
+{
+  switch (dim)
+    {
+      case 2:   // 2d
+      {
+	switch (degree)
+	  {
+	    case 1:
+	    {
+                                               // this is a strange
+                                               // element, since it is
+                                               // both additive and
+                                               // then it is also
+                                               // not. ideally, we
+                                               // would like to have
+                                               // the value of the
+                                               // shape function on
+                                               // the coarse line to
+                                               // be the mean value of
+                                               // that on the two
+                                               // child ones. thus,
+                                               // one should make it
+                                               // additive. however,
+                                               // additivity only
+                                               // works if an element
+                                               // does not have any
+                                               // continuity
+                                               // requirements, since
+                                               // otherwise degrees of
+                                               // freedom are shared
+                                               // between adjacent
+                                               // elements, and when
+                                               // we make the element
+                                               // additive, that would
+                                               // mean that we end up
+                                               // adding up
+                                               // contributions not
+                                               // only from the child
+                                               // cells of this cell,
+                                               // but also from the
+                                               // child cells of the
+                                               // neighbor, and since
+                                               // we cannot know
+                                               // whether there even
+                                               // exists a neighbor we
+                                               // cannot simply make
+                                               // the element
+                                               // additive.
+					       //
+                                               // so, until someone
+                                               // comes along with a
+                                               // better alternative,
+                                               // we do the following:
+                                               // make the element
+                                               // non-additive, and
+                                               // simply pick the
+                                               // value of one of the
+                                               // child lines for the
+                                               // value of the mother
+                                               // line (note that we
+                                               // have to multiply by
+                                               // two, since the shape
+                                               // functions scale with
+                                               // the inverse
+                                               // Jacobian). we thus
+                                               // throw away the
+                                               // information of one
+                                               // of the child lines,
+                                               // but there seems to
+                                               // be no other way than
+                                               // that...
+                                               //
+                                               // note: to make things
+                                               // consistent, and
+                                               // restriction
+                                               // independent of the
+                                               // order in which we
+                                               // travel across the
+                                               // cells of the coarse
+                                               // grid, we have to
+                                               // make sure that we
+                                               // take the same small
+                                               // line when visiting
+                                               // its two neighbors,
+                                               // to get the value for
+                                               // the mother line. we
+                                               // take the first line
+                                               // always, in the
+                                               // canonical direction
+                                               // of lines
+              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+                this->restriction[c].reinit (this->dofs_per_cell,
+                                             this->dofs_per_cell);
+              
+	      this->restriction[0](0,0) = 2.;
+	      this->restriction[1](1,1) = 2.;
+	      this->restriction[3](2,2) = 2.;
+	      this->restriction[0](3,3) = 2.;
+
+	      break;
+	    };
+	    
+	    default:
+	    {
+					       // in case we don't
+					       // have the matrices
+					       // (yet), leave them
+					       // empty. this does not
+					       // prevent the use of
+					       // this FE, but will
+					       // prevent the use of
+					       // these matrices
+              break;
+	    };
+	  };
+	
+	break;
+      };
+
+
+      case 3:   // 3d
+      {
+	switch (degree)
+	  {
+	    case 1:
+	    {
+					       // same principle as in
+					       // 2d, take one child
+					       // cell to get at the
+					       // values of each of
+					       // the 12 lines
+              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+                this->restriction[c].reinit (this->dofs_per_cell,
+                                             this->dofs_per_cell);
+	      this->restriction[0](0,0) = 2.;
+	      this->restriction[0](3,3) = 2.;
+	      this->restriction[1](1,1) = 2.;
+	      this->restriction[3](2,2) = 2.;
+              
+	      this->restriction[4](4,4) = 2.;
+	      this->restriction[4](7,7) = 2.;
+	      this->restriction[5](5,5) = 2.;
+	      this->restriction[7](6,6) = 2.;
+              
+	      this->restriction[0](8,8) = 2.;
+	      this->restriction[1](9,9) = 2.;
+	      this->restriction[2](10,10) = 2.;
+	      this->restriction[3](11,11) = 2.;
+              
+	      break;
+	    };
+	    
+	    default:
+	    {
+					       // in case we don't
+					       // have the matrices
+					       // (yet), leave them
+					       // empty. this does not
+					       // prevent the use of
+					       // this FE, but will
+					       // prevent the use of
+					       // these matrices
+              break;
+	    };
+	  };
+	
+	break;
+      };
+      
+      default:
+	    Assert (false,ExcNotImplemented());
+    }
+}
 
 
 

@@ -24,6 +24,18 @@
 
 #include <cmath>
 
+namespace 
+{
+  std::vector<unsigned int>
+  invert_numbering (const std::vector<unsigned int> &in)
+  {
+    std::vector<unsigned int> out (in.size());
+    for (unsigned int i=0; i<in.size(); ++i)
+      out[in[i]]=i;
+    return out;
+  }
+}
+
 
 
 template <int dim>
@@ -34,284 +46,44 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
                                                        false),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
-								      degree(degree),
-								      renumber(this->dofs_per_cell, 0),
-								      renumber_inverse(this->dofs_per_cell, 0),
-								      face_renumber(this->dofs_per_face, 0),
-								      polynomial_space(Polynomials::Hierarchical<double>::generate_complete_basis(degree))
+		degree(degree),
+		renumber(lexicographic_to_hierarchic_numbering (*this, degree)),
+		renumber_inverse(invert_numbering(renumber)),
+		face_renumber(face_lexicographic_to_hierarchic_numbering (degree)),
+		polynomial_space(Polynomials::Hierarchical<double>::generate_complete_basis(degree))
 {
-				   // do some internal book-keeping on
-				   // cells and faces. if in 1d, the
-				   // face function is empty
-  lexicographic_to_hierarchic_numbering (*this, degree, renumber);
-  face_lexicographic_to_hierarchic_numbering (degree, face_renumber);
-  
-				   // build inverse of renumbering
-				   // vector
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-    renumber_inverse[renumber[i]]=i;
+				   // The matrix @p{dofs_cell} contains the 
+				   // values of the linear functionals of 
+				   // the master 1d cell applied to the 
+				   // shape functions of the two 1d subcells.
+				   // The matrix @p{dofs_subcell} constains
+				   // the values of the linear functionals 
+				   // on each 1d subcell applied to the 
+				   // shape functions on the master 1d 
+				   // subcell. 
+				   // We use @p{dofs_cell} and 
+				   // @p{dofs_subcell} to compute the 
+				   // @p{prolongation}, @p{restriction} and 
+				   // @p{interface_constraints} matrices 
+				   // for all dimensions.
+  std::vector<FullMatrix<double> >
+    dofs_cell (GeometryInfo<1>::children_per_cell,
+	       FullMatrix<double> (2*this->dofs_per_vertex + this->dofs_per_line,
+				   2*this->dofs_per_vertex + this->dofs_per_line));
+  std::vector<FullMatrix<double> >
+    dofs_subcell (GeometryInfo<1>::children_per_cell,
+		  FullMatrix<double> (2*this->dofs_per_vertex + this->dofs_per_line,
+				      2*this->dofs_per_vertex + this->dofs_per_line));
+				   // build these fields, as they are
+				   // needed as auxiliary fields later
+				   // on
+  build_dofs_cell (dofs_cell, dofs_subcell);
 
-				   // build the dofs_subcell, dofs_cell 
-				   // matrices for use in building prolongation,
-                                   // restriction, and constraint matrices.
-  const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
+				   // then use them to initialize
+				   // other fields
+  initialize_constraints (dofs_subcell);
+  initialize_embedding_and_restriction (dofs_cell, dofs_subcell);
 
-  for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
-    {
-      dofs_cell.push_back (FullMatrix<double> (dofs_1d,dofs_1d) );
-      dofs_subcell.push_back (FullMatrix<double> (dofs_1d,dofs_1d) );
-
-      for (unsigned int j=0; j<dofs_1d; ++j)
-	{
-	  for (unsigned int k=0; k<dofs_1d; ++k)
-	    {	
-					       // upper diagonal block
-	      if ((j<=1) && (k<=1))
-		{
-		  if (((c==0) && (j==0) && (k==0)) || 
-		      ((c==1) && (j==1) && (k==1)))
-		    dofs_cell[c](j,k) = 1.;
-		  else 
-		    dofs_cell[c](j,k) = 0.;
-	  
-		  if      (((c==0) && (j==1)) || ((c==1) && (j==0)))
-		    dofs_subcell[c](j,k) = .5;
-		  else if (((c==0) && (k==0)) || ((c==1) && (k==1)))
-		    dofs_subcell[c](j,k) = 1.;
-		  else
-		    dofs_subcell[c](j,k) = 0.;
-		}
-					       // upper right block
-	      else if ((j<=1) && (k>=2))
-		{
-		  if (((c==0) && (j==1) && ((k % 2)==0)) ||
-		      ((c==1) && (j==0) && ((k % 2)==0)))
-		    dofs_subcell[c](j,k) = -1.;
-		}
-	                        // lower diagonal block
-	      else if ((j>=2) && (k>=2) && (j<=k))
-		{
-		  double factor = 1.;
-		  for (unsigned int i=1; i<=j;++i)
-		    factor *= ((double) (k-i+1))/((double) i);
-		  if (c==0)
-		    {
-		      dofs_subcell[c](j,k) = ((k+j) % 2 == 0) ? 
-					     std::pow(.5,static_cast<double>(k))*factor :
-					     -std::pow(.5,static_cast<double>(k))*factor;
-		      dofs_cell[c](j,k) = std::pow(2.,static_cast<double>(j))*factor;
-		    }
-		  else
-		    {
-		      dofs_subcell[c](j,k) = std::pow(.5,static_cast<double>(k))*factor;
-		      dofs_cell[c](j,k) = ((k+j) % 2 == 0) ? 
-					  std::pow(2.,static_cast<double>(j))*factor :
-					     -std::pow(2.,static_cast<double>(j))*factor;
-		    }
-		}
-	    }
-	}
-    }
-				   // fill constraint matrices
-  if (dim==2 || dim==3)
-    {
-      this->interface_constraints.reinit ( (dim==2) ? 1 + 2*(degree-1) : 
-					   5 + 12*(degree-1) + 4*(degree-1)*(degree-1),
-					   (dim==2) ? (degree+1) : 
-					   (degree+1)*(degree+1) );
-      switch (dim)
-	{
-	  case 2:
-						 // vertex node
-		for (unsigned int i=0; i<dofs_1d; ++i)
-		  this->interface_constraints(0,i) = dofs_subcell[0](1,i); 
-						 // edge nodes
-		for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
-		  for (unsigned int i=0; i<dofs_1d; ++i)
-		    for (unsigned int j=2; j<dofs_1d; ++j)
-		      this->interface_constraints(1 + c*(degree-1) + j - 2,i) = 
-			dofs_subcell[c](j,i);
-		break;
-	  case 3:
-		for (unsigned int i=0; i<dofs_1d * dofs_1d; i++)
-		  {
-						     // center vertex node	  
-		    this->interface_constraints(0,face_renumber[i]) = 
-		      dofs_subcell[0](1,i % dofs_1d) * 
-		      dofs_subcell[0](1,(i - (i % dofs_1d)) / dofs_1d);
-
-						     // boundary vertex nodes
-		    this->interface_constraints(1,face_renumber[i]) = 
-		      dofs_subcell[0](1, i % dofs_1d) * 
-		      dofs_subcell[0](0, (i - (i % dofs_1d)) / dofs_1d);
-		    this->interface_constraints(2,face_renumber[i]) = 
-		      dofs_subcell[1](1, i % dofs_1d) * 
-		      dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
-		    this->interface_constraints(3,face_renumber[i]) = 
-		      dofs_subcell[1](0, i % dofs_1d) * 
-		      dofs_subcell[1](1, (i - (i % dofs_1d)) / dofs_1d);
-		    this->interface_constraints(4,face_renumber[i]) = 
-		      dofs_subcell[0](0, i % dofs_1d) * 
-		      dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
-	  
-						     // interior edges
-		    for (unsigned int j=0; j<(degree-1); j++)
-		      {
-			this->interface_constraints(5 + j,face_renumber[i]) = 
-			  dofs_subcell[0](1, i % dofs_1d) * 
-			  dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-			this->interface_constraints(5 + (degree-1) + j,face_renumber[i]) = 
-			  dofs_subcell[1](2 + j, i % dofs_1d) * 
-			  dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
-			this->interface_constraints(5 + 2*(degree-1) + j,face_renumber[i]) = 
-			  dofs_subcell[0](1,i % dofs_1d) * 
-			  dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-			this->interface_constraints(5 + 3*(degree-1) + j,face_renumber[i]) = 
-			  dofs_subcell[0](2 + j,i % dofs_1d) * 
-			  dofs_subcell[1](0, (i - (i % dofs_1d)) / dofs_1d);
-		      }
-
-						     // boundary edges
-		    for (unsigned int j=0; j<(degree-1); j++)
-		      {
-							 // bottom edge 
-			this->interface_constraints(5 + 4*(degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[0](2 + j, i % dofs_1d) * 
-			  dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
-			this->interface_constraints(5 + 4*(degree-1) + (degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[1](2 + j, i % dofs_1d) * 
-			  dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
-							 // right edge
-			this->interface_constraints(5 + 4*(degree-1) + 2*(degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[1](1,     i % dofs_1d) * 
-			  dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-			this->interface_constraints(5 + 4*(degree-1) + 3*(degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[1](1,     i % dofs_1d) * 
-			  dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-							 // top edge
-			this->interface_constraints(5 + 4*(degree-1) + 4*(degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[0](2 + j, i % dofs_1d) * 
-			  dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
-			this->interface_constraints(5 + 4*(degree-1) + 5*(degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[1](2 + j, i % dofs_1d) * 
-			  dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
-							 // left edge
-			this->interface_constraints(5 + 4*(degree-1) + 6*(degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[0](0,     i % dofs_1d) * 
-			  dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-			this->interface_constraints(5 + 4*(degree-1) + 7*(degree-1) + j,face_renumber[i]) =
-			  dofs_subcell[0](0,     i % dofs_1d) * 
-			  dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-		      }
-
-						     // interior faces
-		    for (unsigned int j=0; j<(degree-1); j++)
-		      for (unsigned int k=0; k<(degree-1); k++)
-			{
-							   // subcell 0
-			  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1),face_renumber[i]) =
-			    dofs_subcell[0](2 + j, i % dofs_1d) * 
-			    dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
-							   // subcell 1
-			  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + (degree-1)*(degree-1),face_renumber[i]) =
-			    dofs_subcell[1](2 + j, i % dofs_1d) * 
-			    dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
-							   // subcell 2
-			  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 2*(degree-1)*(degree-1),face_renumber[i]) =
-			    dofs_subcell[1](2 + j, i % dofs_1d) * 
-			    dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
-							   // subcell 3
-			  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 3*(degree-1)*(degree-1),face_renumber[i]) =
-			    dofs_subcell[0](2 + j, i % dofs_1d) * 
-			    dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
-			}
-		  }
-		break;
-	}
-    };
-
-				   // fill prolongation and restriction 
-                                   // matrices
-  if (dim==1)
-    {
-      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-	{
-	  this->prolongation[c].reinit (this->dofs_per_cell,this->dofs_per_cell);
-	  this->prolongation[c].fill (dofs_subcell[c]);
-
-	  this->restriction[c].reinit (this->dofs_per_cell,this->dofs_per_cell);
-	  this->restriction[c].fill (dofs_cell[c]);
-	}
-    }
-  else if (dim==2 || dim==3)
-    {
-      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-	{
-	  this->prolongation[c].reinit (this->dofs_per_cell,this->dofs_per_cell);
-	  this->restriction[c].reinit (this->dofs_per_cell,this->dofs_per_cell);
-	}
-                                       // j loops over dofs in the subcell. 
-                                       // These are the rows in the 
-                                       // embedding matrix.
-      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	{
-					   // i loops over the dofs in the master 
-					   // cell. These are the columns in 
-					   // the embedding matrix.
-	  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	    {
-	      switch (dim)
-		{
-		  case 2:
-			for (unsigned int c=0; c<GeometryInfo<2>::children_per_cell; ++c)
-			  {
-			    unsigned int c0 = ((c==1) || (c==2)) ? 1 : 0;
-			    unsigned int c1 = ((c==2) || (c==3)) ? 1 : 0;
-
-			    this->prolongation[c](j,i) = 
-			      dofs_subcell[c0](renumber_inverse[j] % dofs_1d,
-					       renumber_inverse[i] % dofs_1d) *
-			      dofs_subcell[c1]((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d,
-					       (renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d);
-
-			    this->restriction[c](j,i) = 
-			      dofs_cell[c0](renumber_inverse[j] % dofs_1d,
-					    renumber_inverse[i] % dofs_1d) *
-			      dofs_cell[c1]((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d,
-					    (renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d);
-			  }
-			break;
-
-		  case 3:
-			for (unsigned int c=0; c<GeometryInfo<3>::children_per_cell; ++c)
-			  {
-			    unsigned int c0 = ((c==1) || (c==2) || (c==5) || (c==6)) ? 1 : 0;
-			    unsigned int c1 = ((c==4) || (c==5) || (c==6) || (c==7)) ? 1 : 0;
-			    unsigned int c2 = ((c==2) || (c==3) || (c==6) || (c==7)) ? 1 : 0;
-
-			    this->prolongation[c](j,i) = 
-			      dofs_subcell[c0](renumber_inverse[j] % dofs_1d,
-					       renumber_inverse[i] % dofs_1d) *
-			      dofs_subcell[c1](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d) % dofs_1d,
-					       ((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d) % dofs_1d) *
-			      dofs_subcell[c2](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d - (((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d,
-					       ((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d - (((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d);
-
-			    this->restriction[c](j,i) = 
-			      dofs_cell[c0](renumber_inverse[j] % dofs_1d,
-					    renumber_inverse[i] % dofs_1d) *
-			      dofs_cell[c1](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d) % dofs_1d,
-					    ((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d) % dofs_1d) *
-			      dofs_cell[c2](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d - (((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d,
-					    ((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d - (((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d);
-			  }
-			break;
-		}
-	    }
-	}
-    }
-  else
-    Assert (false, ExcNotImplemented());
 				   // finally fill in support points
 				   // on cell and face
   initialize_unit_support_points ();
@@ -403,6 +175,298 @@ FE_Q_Hierarchical<dim>::shape_grad_grad_component (const unsigned int i,
 //----------------------------------------------------------------------
 // Auxiliary functions
 //----------------------------------------------------------------------
+
+
+template <int dim>
+void
+FE_Q_Hierarchical<dim>::build_dofs_cell (std::vector<FullMatrix<double> > &dofs_cell,
+					 std::vector<FullMatrix<double> > &dofs_subcell) const
+{
+  const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
+
+  for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
+    for (unsigned int j=0; j<dofs_1d; ++j)
+      for (unsigned int k=0; k<dofs_1d; ++k)
+	{
+					   // upper diagonal block
+	  if ((j<=1) && (k<=1))
+	    {
+	      if (((c==0) && (j==0) && (k==0)) || 
+		  ((c==1) && (j==1) && (k==1)))
+		dofs_cell[c](j,k) = 1.;
+	      else 
+		dofs_cell[c](j,k) = 0.;
+	      
+	      if      (((c==0) && (j==1)) || ((c==1) && (j==0)))
+		dofs_subcell[c](j,k) = .5;
+	      else if (((c==0) && (k==0)) || ((c==1) && (k==1)))
+		dofs_subcell[c](j,k) = 1.;
+	      else
+		dofs_subcell[c](j,k) = 0.;
+	    }
+					   // upper right block
+	  else if ((j<=1) && (k>=2))
+	    {
+	      if (((c==0) && (j==1) && ((k % 2)==0)) ||
+		  ((c==1) && (j==0) && ((k % 2)==0)))
+		dofs_subcell[c](j,k) = -1.;
+	    }
+	                        // lower diagonal block
+	  else if ((j>=2) && (k>=2) && (j<=k))
+	    {
+	      double factor = 1.;
+	      for (unsigned int i=1; i<=j;++i)
+		factor *= ((double) (k-i+1))/((double) i);
+	      if (c==0)
+		{
+		  dofs_subcell[c](j,k) = ((k+j) % 2 == 0) ? 
+					 std::pow(.5,static_cast<double>(k))*factor :
+					 -std::pow(.5,static_cast<double>(k))*factor;
+		  dofs_cell[c](j,k) = std::pow(2.,static_cast<double>(j))*factor;
+		}
+	      else
+		{
+		  dofs_subcell[c](j,k) = std::pow(.5,static_cast<double>(k))*factor;
+		  dofs_cell[c](j,k) = ((k+j) % 2 == 0) ? 
+				      std::pow(2.,static_cast<double>(j))*factor :
+					 -std::pow(2.,static_cast<double>(j))*factor;
+		}
+	    }
+	}
+}
+
+
+
+template <int dim>
+void
+FE_Q_Hierarchical<dim>::
+initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
+{
+  const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
+
+  this->interface_constraints
+    .TableBase<2,double>::reinit (this->interface_constraints_size());
+
+  switch (dim)
+    {
+      case 1:
+      {
+					 // no constraints in 1d
+	break;
+      }
+       
+      case 2:
+      {
+					 // vertex node
+	for (unsigned int i=0; i<dofs_1d; ++i)
+	  this->interface_constraints(0,i) = dofs_subcell[0](1,i); 
+					 // edge nodes
+	for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
+	  for (unsigned int i=0; i<dofs_1d; ++i)
+	    for (unsigned int j=2; j<dofs_1d; ++j)
+	      this->interface_constraints(1 + c*(degree-1) + j - 2,i) = 
+		dofs_subcell[c](j,i);
+	break;
+      }
+       
+      case 3:
+      {
+	for (unsigned int i=0; i<dofs_1d * dofs_1d; i++)
+	  {
+					     // center vertex node	  
+	    this->interface_constraints(0,face_renumber[i]) = 
+	      dofs_subcell[0](1,i % dofs_1d) * 
+	      dofs_subcell[0](1,(i - (i % dofs_1d)) / dofs_1d);
+
+						 // boundary vertex nodes
+	    this->interface_constraints(1,face_renumber[i]) = 
+	      dofs_subcell[0](1, i % dofs_1d) * 
+	      dofs_subcell[0](0, (i - (i % dofs_1d)) / dofs_1d);
+	    this->interface_constraints(2,face_renumber[i]) = 
+	      dofs_subcell[1](1, i % dofs_1d) * 
+	      dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
+	    this->interface_constraints(3,face_renumber[i]) = 
+	      dofs_subcell[1](0, i % dofs_1d) * 
+	      dofs_subcell[1](1, (i - (i % dofs_1d)) / dofs_1d);
+	    this->interface_constraints(4,face_renumber[i]) = 
+	      dofs_subcell[0](0, i % dofs_1d) * 
+	      dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
+	  
+						 // interior edges
+	    for (unsigned int j=0; j<(degree-1); j++)
+	      {
+		this->interface_constraints(5 + j,face_renumber[i]) = 
+		  dofs_subcell[0](1, i % dofs_1d) * 
+		  dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
+		this->interface_constraints(5 + (degree-1) + j,face_renumber[i]) = 
+		  dofs_subcell[1](2 + j, i % dofs_1d) * 
+		  dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
+		this->interface_constraints(5 + 2*(degree-1) + j,face_renumber[i]) = 
+		  dofs_subcell[0](1,i % dofs_1d) * 
+		  dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
+		this->interface_constraints(5 + 3*(degree-1) + j,face_renumber[i]) = 
+		  dofs_subcell[0](2 + j,i % dofs_1d) * 
+		  dofs_subcell[1](0, (i - (i % dofs_1d)) / dofs_1d);
+	      }
+
+					     // boundary edges
+	    for (unsigned int j=0; j<(degree-1); j++)
+	      {
+						 // bottom edge 
+		this->interface_constraints(5 + 4*(degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[0](2 + j, i % dofs_1d) * 
+		  dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
+		this->interface_constraints(5 + 4*(degree-1) + (degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[1](2 + j, i % dofs_1d) * 
+		  dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
+						 // right edge
+		this->interface_constraints(5 + 4*(degree-1) + 2*(degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[1](1,     i % dofs_1d) * 
+		  dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
+		this->interface_constraints(5 + 4*(degree-1) + 3*(degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[1](1,     i % dofs_1d) * 
+		  dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
+						 // top edge
+		this->interface_constraints(5 + 4*(degree-1) + 4*(degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[0](2 + j, i % dofs_1d) * 
+		  dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
+		this->interface_constraints(5 + 4*(degree-1) + 5*(degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[1](2 + j, i % dofs_1d) * 
+		  dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
+						 // left edge
+		this->interface_constraints(5 + 4*(degree-1) + 6*(degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[0](0,     i % dofs_1d) * 
+		  dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
+		this->interface_constraints(5 + 4*(degree-1) + 7*(degree-1) + j,face_renumber[i]) =
+		  dofs_subcell[0](0,     i % dofs_1d) * 
+		  dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
+	      }
+
+					     // interior faces
+	    for (unsigned int j=0; j<(degree-1); j++)
+	      for (unsigned int k=0; k<(degree-1); k++)
+		{
+						   // subcell 0
+		  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1),face_renumber[i]) =
+		    dofs_subcell[0](2 + j, i % dofs_1d) * 
+		    dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
+						   // subcell 1
+		  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + (degree-1)*(degree-1),face_renumber[i]) =
+		    dofs_subcell[1](2 + j, i % dofs_1d) * 
+		    dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
+						   // subcell 2
+		  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 2*(degree-1)*(degree-1),face_renumber[i]) =
+		    dofs_subcell[1](2 + j, i % dofs_1d) * 
+		    dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
+						   // subcell 3
+		  this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 3*(degree-1)*(degree-1),face_renumber[i]) =
+		    dofs_subcell[0](2 + j, i % dofs_1d) * 
+		    dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
+		}
+	  }
+	break;
+      }
+       
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+}
+
+
+
+template <int dim>
+void
+FE_Q_Hierarchical<dim>::
+initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &dofs_cell,
+				      const std::vector<FullMatrix<double> > &dofs_subcell)
+{
+  const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
+
+  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+    {
+      this->prolongation[c].reinit (this->dofs_per_cell, this->dofs_per_cell);
+      this->restriction[c].reinit (this->dofs_per_cell, this->dofs_per_cell);
+    }
+
+				   // the 1d case is particularly
+				   // simple, so special case it:
+  if (dim==1)
+    {
+      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+	{
+	  this->prolongation[c].fill (dofs_subcell[c]);
+	  this->restriction[c].fill (dofs_cell[c]);
+	}
+      return;
+    }
+
+				   // for higher dimensions, things
+				   // are a little more tricky:
+  
+				   // j loops over dofs in the
+				   // subcell.  These are the rows in
+				   // the embedding matrix.
+				   //
+				   // i loops over the dofs in the
+				   // master cell. These are the
+				   // columns in the embedding matrix.
+  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+      switch (dim)
+	{
+	  case 2:
+	  {
+	    for (unsigned int c=0; c<GeometryInfo<2>::children_per_cell; ++c)
+	      {
+		unsigned int c0 = ((c==1) || (c==2)) ? 1 : 0;
+		unsigned int c1 = ((c==2) || (c==3)) ? 1 : 0;
+
+		this->prolongation[c](j,i) = 
+		  dofs_subcell[c0](renumber_inverse[j] % dofs_1d,
+				   renumber_inverse[i] % dofs_1d) *
+		  dofs_subcell[c1]((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d,
+				   (renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d);
+
+		this->restriction[c](j,i) = 
+		  dofs_cell[c0](renumber_inverse[j] % dofs_1d,
+				renumber_inverse[i] % dofs_1d) *
+		  dofs_cell[c1]((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d,
+				(renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d);
+	      }
+	    break;
+	  }
+	     
+	  case 3:
+	  {
+	    for (unsigned int c=0; c<GeometryInfo<3>::children_per_cell; ++c)
+	      {
+		unsigned int c0 = ((c==1) || (c==2) || (c==5) || (c==6)) ? 1 : 0;
+		unsigned int c1 = ((c==4) || (c==5) || (c==6) || (c==7)) ? 1 : 0;
+		unsigned int c2 = ((c==2) || (c==3) || (c==6) || (c==7)) ? 1 : 0;
+
+		this->prolongation[c](j,i) = 
+		  dofs_subcell[c0](renumber_inverse[j] % dofs_1d,
+				   renumber_inverse[i] % dofs_1d) *
+		  dofs_subcell[c1](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d) % dofs_1d,
+				   ((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d) % dofs_1d) *
+		  dofs_subcell[c2](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d - (((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d,
+				   ((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d - (((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d);
+
+		this->restriction[c](j,i) = 
+		  dofs_cell[c0](renumber_inverse[j] % dofs_1d,
+				renumber_inverse[i] % dofs_1d) *
+		  dofs_cell[c1](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d) % dofs_1d,
+				((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d) % dofs_1d) *
+		  dofs_cell[c2](((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d - (((renumber_inverse[j] - (renumber_inverse[j] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d,
+				((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d - (((renumber_inverse[i] - (renumber_inverse[i] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d);
+	      }
+	    break;
+	  }
+
+	  default:
+		Assert (false, ExcNotImplemented());
+	}
+}
 
 
 
@@ -548,12 +612,13 @@ FE_Q_Hierarchical<dim>::get_dpo_vector(const unsigned int deg)
 
 
 template <int dim>
-void
-FE_Q_Hierarchical<dim>::lexicographic_to_hierarchic_numbering (
-  const FiniteElementData<dim> &fe_data,
-  const unsigned int            degree,
-  std::vector<unsigned int>    &renumber)
+std::vector<unsigned int>
+FE_Q_Hierarchical<dim>::
+lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
+				       const unsigned int            degree)
 {
+  std::vector<unsigned int> renumber (fe_data.dofs_per_cell, 0);
+  
   const unsigned int n = degree+1;
 
 
@@ -624,7 +689,8 @@ FE_Q_Hierarchical<dim>::lexicographic_to_hierarchic_numbering (
 	      default:
 		    Assert(false, ExcNotImplemented());
 	    }
-      
+
+	  Assert (index < renumber.size(), ExcInternalError());
 	  renumber[index] = i;
 	}
     };
@@ -709,6 +775,7 @@ FE_Q_Hierarchical<dim>::lexicographic_to_hierarchic_numbering (
 	  for (unsigned int jx = 2; jx<=degree ;++jx)
 	    {
 	      unsigned int tensorindex = tensorstart + jx * incr;
+	      Assert (tensorindex < renumber.size(), ExcInternalError());
 	      renumber[tensorindex] = index++;
 	    }
 	}
@@ -758,6 +825,7 @@ FE_Q_Hierarchical<dim>::lexicographic_to_hierarchic_numbering (
 	      {
 		unsigned int tensorindex = tensorstart
 					   + jx * incx + jy * incy;
+		Assert (tensorindex < renumber.size(), ExcInternalError());
 		renumber[tensorindex] = index++;
 	      }
 	}
@@ -772,34 +840,36 @@ FE_Q_Hierarchical<dim>::lexicographic_to_hierarchic_numbering (
 		for (unsigned int jx = 2; jx<=degree; jx++)
 		  {
 		    const unsigned int tensorindex = jx + jy * n + jz * n * n;
+		    Assert (tensorindex < renumber.size(), ExcInternalError());
 		    renumber[tensorindex]=index++;
 		  }  
 	  } 
     }
+
+  return renumber;
 }
 
 
 
 template <int dim>
-void
-FE_Q_Hierarchical<dim>::face_lexicographic_to_hierarchic_numbering (
-  const unsigned int         degree,
-  std::vector<unsigned int> &numbering)
+std::vector<unsigned int>
+FE_Q_Hierarchical<dim>::
+face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
 {
   FiniteElementData<dim-1> fe_data(FE_Q_Hierarchical<dim-1>::get_dpo_vector(degree),1);
-  FE_Q_Hierarchical<dim-1>::lexicographic_to_hierarchic_numbering (fe_data,
-								   degree,
-								   numbering); 
+  return FE_Q_Hierarchical<dim-1>::lexicographic_to_hierarchic_numbering (fe_data,
+									  degree); 
 }
 
 
 #if (deal_II_dimension == 1)
 
 template <>
-void
-FE_Q_Hierarchical<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int,
-								  std::vector<unsigned int>&)
-{}
+std::vector<unsigned int>
+FE_Q_Hierarchical<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
+{
+  return std::vector<unsigned int> ();
+}
 
 #endif
 
