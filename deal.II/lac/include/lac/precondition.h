@@ -70,8 +70,7 @@ class PreconditionIdentity
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
-template<class MATRIX = SparseMatrix<double>,
-         class VECTOR = Vector<double> >
+template<class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
 class PreconditionUseMatrix
 {
   public:
@@ -154,8 +153,7 @@ class PreconditionUseMatrix
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
-template<class MATRIX = SparseMatrix<double>,
-         class VECTOR = Vector<double> >
+template<class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
 class PreconditionRelaxation
 {
   public:
@@ -218,9 +216,7 @@ class PreconditionRelaxation
  *
  * @author Guido Kanschat, 1999
  */
-template<class SOLVER,
-         class MATRIX       = SparseMatrix<double>,
-         class PRECONDITION = PreconditionIdentity>
+template<class SOLVER, class MATRIX       = SparseMatrix<double>, class PRECONDITION = PreconditionIdentity>
 class PreconditionLACSolver
 {
   public:
