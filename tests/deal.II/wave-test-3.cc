@@ -1,7 +1,7 @@
 // deal_II_libraries.g=-ldeal_II_2d.g
 // deal_II_libraries=-ldeal_II_2d
 
-
+#include <grid/tria_boundary_lib.h>
 #include <base/parameter_handler.h>
 #include <base/forward-declarations.h>
 #include <lac/forward-declarations.h>
@@ -6701,6 +6701,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 				       target.u :
 				       target.v),
 				      estimated_error_per_cell,
+				      vector<bool>(),
 				      parameters.stiffness);
 
 				   // if we are at the first time step, we
@@ -6719,6 +6720,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 					   target.v :
 					   target.u),
 					  v_estimator,
+					  vector<bool>(),
 					  parameters.density);
       estimated_error_per_cell += v_estimator;
     };
