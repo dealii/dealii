@@ -69,10 +69,10 @@ $(LIBDIR)/liblac.g.so: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/o/*.o lib/go/*.go
+	-rm -f *~ include/*~ include/*/*~ lib/o/*.o lib/go/*.go lib/Makefile.dep
 
 veryclean: clean
-	-rm include/base/forward_declarations.h* lib/Makefile.dep
+	-rm include/base/forward_declarations.h*
 
 
 #Rule to generate the dependency file. This file is
