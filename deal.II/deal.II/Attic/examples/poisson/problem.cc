@@ -174,6 +174,11 @@ void PoissonProblem<dim>::clear () {
     tria = 0;
   };
 
+				   // make it known to the underlying
+				   // ProblemBase that tria and dof
+				   // are already deleted
+  set_tria_and_dof (tria, dof);
+
 
   if (rhs != 0) 
     {
@@ -479,6 +484,10 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   out.write_gnuplot (gnuplot);
   gnuplot.close ();
 
+				   // release the lock of the DoF object to
+				   // the FE object
+  dof->clear ();
+  
   cout << endl;
 };
 

@@ -209,6 +209,11 @@ void PoissonProblem<dim>::clear () {
     dof = 0;
   };
 
+  				   // make it known to the underlying
+				   // ProblemBase that tria and dof
+				   // are already deleted
+  set_tria_and_dof (tria, dof);
+
   if (rhs != 0) 
     {
       delete rhs;
