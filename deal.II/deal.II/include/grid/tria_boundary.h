@@ -5,6 +5,19 @@
 /*----------------------------   boundary-function.h     ---------------------------*/
 
 #include <grid/point.h>
+#include <grid/geometry_info.h>
+
+
+
+/**
+ * Workaround for a bug in egcs snapshot 1998/08/03.
+ */
+template <int dim> struct BoundaryHelper;
+template <> struct BoundaryHelper<2> {
+    typedef const Point<2> *PointArray[GeometryInfo<2>::vertices_per_face];
+};
+    
+
 
 /**
  *   This class is used to represent a boundary to a triangulation.
@@ -41,8 +54,8 @@ class Boundary {
 				      *  Typedef an array of the needed number
 				      *  of old points.
 				      */
-    typedef const Point<dim>* PointArray[1<<(dim-1)];
-
+    typedef typename BoundaryHelper<dim>::PointArray PointArray;
+    
 				     /**
 				      *  This function calculates the position
 				      *  of the new vertex.
