@@ -6,9 +6,7 @@
 D=..
 
 
-# create lists of file names. note that we need several output
-# files for data_out_base.cc, which is why we use the several
-# intermediate o-files-base* rules
+# create lists of file names
 cc-files     = $(shell echo source/*.cc)
 o-files-base = $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=.$(OBJEXT))))
 o-files      = $(sort $(o-files-base))
