@@ -111,11 +111,13 @@ class SparseMatrix : public virtual Subscriptor
         
       public:
                                          /**
-                                          * Constructor.
+                                          * Constructor. Create an iterator
+                                          * into the matrix @p matrix for the
+                                          * given row and the index within it.
                                           */ 
-	const_iterator(const SparseMatrix<number> *matrix,
-		       const unsigned int          row,
-		       const unsigned short        index);
+	const_iterator (const SparseMatrix<number> *matrix,
+                        const unsigned int          row,
+                        const unsigned short        index);
 	  
                                          /**
                                           * Prefix increment.
@@ -144,6 +146,7 @@ class SparseMatrix : public virtual Subscriptor
                                           * position.
                                           */
 	bool operator == (const const_iterator&) const;
+
                                          /**
                                           * Inverse of <tt>==</tt>.
                                           */
