@@ -606,7 +606,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  and will give a linker error if
 				      *  used anyway.
 				      */
-    void operator = (const TriaObjectAccessor<3, dim> &);
+    void operator = (const TriaObjectAccessor<celldim, dim> &);
 
   protected:
 				     /**@name Advancement of iterators*/
