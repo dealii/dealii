@@ -483,6 +483,13 @@ namespace Threads
 
     private:
 				       /**
+					* Copy constructor. Made
+					* private since copying these
+					* kinds of objects is a no-go.
+					*/
+      PosixThreadManager (const PosixThreadManager &) {};
+      
+				       /**
 					* List of thread ids. This
 					* variable actually points to
 					* an object of type
@@ -493,7 +500,13 @@ namespace Threads
 					* files including it, we use a
 					* void pointer instead.
 					*/
-      void * const thread_id_list;
+      volatile void * const thread_id_list;
+
+				       /**
+					* Mutex by which we guard all
+					* accesses to the thread list.
+					*/
+      PosixThreadMutex list_mutex;
   };
   
   

@@ -233,7 +233,11 @@ namespace Threads
 				     // wait for all threads, and
 				     // release memory
     wait ();
-    delete reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
+    list_mutex.acquire ();
+    if (thread_id_list != 0)
+      delete reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
+    thread_id_list = 0;
+    list_mutex.release ();
   }
 
 
@@ -246,7 +250,10 @@ namespace Threads
     std::list<pthread_t> &tid_list
       = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
 
+    list_mutex.acquire ();
     tid_list.push_back (pthread_t());
+    pthread_t *tid = &tid_list.back();
+    list_mutex.release ();
 
                                      // start new thread. retry until
                                      // we either succeed or get an
@@ -254,11 +261,11 @@ namespace Threads
     int error = 0;
     do 
       {
-	error = pthread_create (&tid_list.back(), 0, fun_ptr, fun_data);
+	error = pthread_create (tid, 0, fun_ptr, fun_data);
       }
     while (error == EAGAIN);
 
-    Assert (error == 0, ExcInternalError());
+    AssertThrow (error == 0, ExcInternalError());
   }
   
 
@@ -266,12 +273,26 @@ namespace Threads
   void
   PosixThreadManager::wait () const
   {
+    list_mutex.acquire ();
     std::list<pthread_t> &tid_list
       = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
 
+				     // wait for all the threads in
+				     // turn
     for (std::list<pthread_t>::iterator i=tid_list.begin();
 	 i != tid_list.end(); ++i)
       pthread_join (*i, 0);
+
+				     // now we know that these threads
+				     // have finished, remove their
+				     // tid's from the list. this way,
+				     // when new threads are spawned
+				     // and waited for, we won't wait
+				     // for expired threads with their
+				     // invalid handles again
+    tid_list.clear ();
+    
+    list_mutex.release ();
   }
   
 #  endif

@@ -235,6 +235,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: The <code class="class">PosixThreadManager</code> called
+       its <code class="member">wait</code> function in the
+       destructor. If this had been called before already, then the
+       same threads would have been waited for twice, which invokes
+       undefined behavior. This is fixed by making sure that <code
+       class="member">wait</code> removes the id's of the threads it
+       has already waited for, and so calling it more than once will
+       not wait for threads which have already been waited for.
+       <br>
+       (Michael Anderson, WB 2003/01/16)
+       </p>
+
+  <li> <p> 
        Fixed: The <code class="class">Subscriptor</code> uses a counter to
        count how many <code class="class">SmartPointer</code> objects subscribe
        to the pointed-to object. This counter needs to be a volatile variable
@@ -242,7 +255,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        the assumption that the variable cannot change between two subsequent
        reads.
        <br>
-       (Michael Anderson, WB 2003/01/11)
+       (WB 2003/01/11)
        </p>
 
   <li> <p> 
