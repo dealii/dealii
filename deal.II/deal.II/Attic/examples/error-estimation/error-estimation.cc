@@ -182,7 +182,7 @@ void PoissonEquation<dim>::assemble (dVector             &,
 template <int dim>
 PoissonProblem<dim>::PoissonProblem () :
 		tria(0), dof(0), rhs(0),
-		boundary_values(0), boundary(Point<dim>(),1) {};
+		boundary_values(0), boundary() {};
 
 
 
@@ -240,7 +240,7 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   
   cout << "    Making grid... ";
   tria->set_boundary (&boundary);
-  tria->create_hyper_ball (Point<dim>(),+1);
+  tria->create_hyper_ball ();
   tria->refine_global (start_level);
   cout << tria->n_active_cells() << " active cells." << endl;
 
