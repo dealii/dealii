@@ -48,6 +48,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p> Fixed: The step-14 program had a bug in the rare case that
+       there are more CPUs in a machine than there are cells. This is
+       now fixed.
+       <br>
+       (WB 2003/09/23)
+       </p>
+
   <li> <p> Fixed: In the step-14 example program, overly conservative
        quadrature formulas were chosen (with 2N+1 quadrature points per space
        dimension, where N is the degree of polynomials). This is unnecessary,

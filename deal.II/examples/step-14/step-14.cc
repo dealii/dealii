@@ -3137,7 +3137,15 @@ namespace LaplaceSolver
     for (unsigned int t=0;
 	 (t<this_thread) && (cell!=dual_solver.dof_handler.end());
 	 ++t, ++cell);
-  
+
+				     // If there are no cells for this
+				     // thread (for example if there
+				     // are a total of less cells than
+				     // there are threads), then go
+				     // back right now
+    if (cell == dual_solver.dof_handler.end())
+      return;
+    
 				     // Next loop over all cells. The
 				     // check for loop end is done at
 				     // the end of the loop, along
