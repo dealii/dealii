@@ -6,7 +6,7 @@
 echo Running `pwd`/minimize_boost
 
 # path of the (original) boost library, e.g.
-O=/home/atlas2/hartmann/tmp
+O=/home/rhartman/tmp/boost-1.30.2
 # directory of the deal.II library
 Dtmp=`pwd`/../..
 cd $Dtmp && \
@@ -125,8 +125,12 @@ while test -s $B/files.txt; do
   # recompile and keep track of missing boost files
   # create files.txt which includes a list of all missing boost files
 # CHANGE FOLLOWING TWO LINES ACCORDING TO THE OUTPUT OF YOUR SPECIFIC COMPILER
+# linux, gcc2.95.3:
   cd $D/base && make $F | grep "No such file" > $B/files.txt
   perl -pi -e 's&^[^ ]* ([^:]*): .*&$1&g;' $B/files.txt
+# sgi, MIPSpro7.4:
+#  cd $D/base && gmake $F | grep "source file" > $B/files.txt
+#  perl -pi -e 's&.*\"(.*)\".*&$1&g;' $B/files.txt
   # if there are some boost files missing
   if test -s $B/files.txt; then
     # collect them from the original boost directory
@@ -143,7 +147,7 @@ echo Remove empty directories
 cd $B && find boost -type d > dirs.txt
 cp $B/dirs.txt $B/diff.txt
 while test -s $B/diff.txt; do
-  cd $B && rmdir --ignore-fail-on-non-empty `cat dirs.txt`
+  cd $B && rmdir `cat dirs.txt`
   cp $B/dirs.txt $B/dirs.old.txt
   cd $B && find boost -type d > dirs.txt
   rm $B/diff.txt
