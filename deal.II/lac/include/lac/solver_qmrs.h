@@ -4,7 +4,7 @@
 #define __lac__solver_qmrs_H
 /*----------------------------   solver_qmrs.h     ---------------------------*/
 
-
+//TODO: Check for programming errors!!!
 
 #include <lac/solver.h>
 #include <lac/solver_control.h>
@@ -20,6 +20,10 @@
  * This version of QMRS is adapted from
  * Freund/Nachtigal: Software for simplified Lanczos and QMR
  * algorithms, Appl. Num. Math. 19 (1995), pp. 319-341
+ *
+ * This version is for right preconditioning only, since then only the
+ * preconditioner is used: left preconditioning seems to require the
+ * inverse.
  *
  * Like all other solver classes, this class has a local structure called
  * #AdditionalData# which is used to pass additional parameters to the
@@ -116,7 +120,19 @@ class SolverQMRS : public Solver<Matrix,Vector>
     Vector *Vq;
     Vector *Vt;
     Vector *Vd;
+				     /**
+				      * Iteration vector.
+				      */
+    Vector *Vx;
+				     /**
+				      * RHS vector.
+				      */
+    const Vector *Vb;
     
+				     /**
+				      * Pointer to the matrix to be inverted.
+				      */
+    const Matrix* MA;
 				     /**
 				      * Within the iteration loop, the
 				      * square of the residual vector is
@@ -132,6 +148,17 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				      * Breakdown threshold.
 				      */
     AdditionalData additional_data;
+  private:
+				     /**
+				      * The iteration loop itself.
+				      */
+    template<class Preconditioner>
+    typename Solver<Matrix,Vector>::ReturnState 
+    iterate(const Preconditioner& precondition);
+				     /**
+				      * The current iteration step.
+				      */
+    unsigned int step;
 };
 
 
@@ -162,12 +189,10 @@ template<class Matrix, class Vector>
 template<class Preconditioner>
 typename Solver<Matrix,Vector>::ReturnState 
 SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
-				Vector       &x,
-				const Vector &b,
-				const Preconditioner& precondition)
+				  Vector       &x,
+				  const Vector &b,
+				  const Preconditioner& precondition)
 {
-  SolverControl::State conv=SolverControl::iterate;
-
   deallog.push("QMRS");
   
 				   // Memory allocation
@@ -176,87 +201,29 @@ SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
   Vq  = memory.alloc();
   Vt  = memory.alloc();
   Vd  = memory.alloc();
-				   // define some aliases for simpler access
-  Vector& v  = *Vv; 
-  Vector& p  = *Vp; 
-  Vector& q  = *Vq; 
-  Vector& t  = *Vt;
-  Vector& d  = *Vd;
+
+  MA = &A;
+  Vx = &x;
+  Vb = &b;
 				   // resize the vectors, but do not set
 				   // the values since they'd be overwritten
 				   // soon anyway.
-  v.reinit(x.size(), true);
-  p.reinit(x.size(), true);
-  q.reinit(x.size(), true);
-  t.reinit(x.size(), true);
-				   // This vector wants to be zero.
-  d.reinit(x.size());
+  Vv->reinit(x.size(), true);
+  Vp->reinit(x.size(), true);
+  Vq->reinit(x.size(), true);
+  Vt->reinit(x.size(), true);
 
-  int  it=0;
- 
-  double tau, rho, theta=0, sigma, alpha, psi, theta_old, rho_old, beta;
+  step = 0;
   
-  double res = A.residual(v,x,b);
-  conv = control().check(0,res);
-  if (conv) 
+  ReturnState state = breakdown;
+
+  do 
     {
-      memory.free(Vv);
-      memory.free(Vp);
-      memory.free(Vq);
-      memory.free(Vt);
-      memory.free(Vd);
-      deallog.pop();
-      return success;
-    };
-
-				   // Step 0
-  p.equ(1.,v);
-  precondition(q,p);
- 
-  tau = v.norm_sqr();
-  rho = q*v;
-
-  while (conv == SolverControl::iterate)
-    {
-      it++;
-				       // Step 1
-      A.vmult(t,p);
-				       // Step 2
-      sigma = q*t;
-      if (fabs(sigma) < additional_data.breakdown)
-	return ReturnState(breakdown);
-				       // Step 3
-      alpha = rho/sigma;
-      v.add(-alpha,t);
-				       // Step 4
-      theta_old = theta;
-      theta = v*v/tau;
-      psi = 1.*(1.+theta);
-      tau *= theta*psi;
-
-      d.sadd(psi*theta_old, psi*alpha, p);
-      x.add(d);
-				       // Step 5
-      if (additional_data.exact_residual)
-	res = A.residual(q,x,b);
-      else
-	res = sqrt((it+1)*tau);
-      conv = control().check(it,res);
-      if (conv) break;
-
-				       // Step 6
-      if (fabs(rho) < additional_data.breakdown)
-	return ReturnState(breakdown);
-				       // Step 7
-      rho_old = rho;
-      precondition(q,v);
-      rho = q*v;
-
-      beta = rho/rho_old;
-      p.sadd(beta,1.,v);
-      precondition(q,p);
-    };
-
+      if (step)
+	deallog << "Restart step " << step << endl;
+      state = iterate(precondition);
+    }
+  while (state == breakdown);
     
   // Deallocate Memory
  
@@ -270,12 +237,111 @@ SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
 
   deallog.pop();
  
-  if (conv == SolverControl::failure)
-    return exceeded;
-  else
-    return success;
+  return state;
 };
 
+template<class Matrix, class Vector>
+template<class Preconditioner>
+typename Solver<Matrix,Vector>::ReturnState 
+SolverQMRS<Matrix,Vector>::iterate(const Preconditioner& precondition)
+{
+/* Remark: the matrix A in the article is the preconditioned matrix.
+ * Therefore, we have to precondition x before we compute the first residual.
+ * In step 1 we replace p by q to avoid one preconditioning step.
+ * There are still two steps left, making this algorithm expensive.
+ */
+
+  SolverControl::State state = SolverControl::iterate;
+
+				   // define some aliases for simpler access
+  Vector& v  = *Vv; 
+  Vector& p  = *Vp; 
+  Vector& q  = *Vq; 
+  Vector& t  = *Vt;
+  Vector& d  = *Vd;
+  Vector& x  = *Vx;
+  const Vector& b = *Vb;
+  
+  const Matrix& A  = *MA;
+  
+  int  it=0;
+ 
+  double tau, rho, theta=0, sigma, alpha, psi, theta_old, rho_old, beta;
+  double res;
+
+  d.reinit(x);
+  
+				   // Apply right preconditioning to x
+  precondition(q,x);  
+				   // Preconditioned residual
+  res = A.residual(v, q, b);
+
+  if (control().check(step, res) == SolverControl::success)
+    return ReturnState(success);
+
+  p = v;
+  
+  precondition(q,p);
+ 
+  tau = v.norm_sqr();
+  //deallog << "tau:" << tau << endl;
+  rho = q*v;
+  //deallog << "rho:" << rho << endl;
+
+  
+  while (state == SolverControl::iterate)
+    {
+      step++; it++;
+				       // Step 1
+      A.vmult(t,q);
+				       // Step 2
+      sigma = q*t;
+
+//TODO: Find a really good breakdown criterion
+// The absolute one detects breakdown instead of convergence
+      if (fabs(sigma) < additional_data.breakdown)
+	return ReturnState(breakdown);
+				       // Step 3
+      alpha = rho/sigma;
+      //deallog << "alpha:" << alpha << endl;
+
+      v.add(-alpha,t);
+				       // Step 4
+      theta_old = theta;
+      theta = v*v/tau;
+      psi = 1./(1.+theta);
+      tau *= theta*psi;
+
+      //deallog << "psi:" << psi << endl;
+      //deallog << "theta:" << theta << endl;
+      //deallog << "tau:" << tau << endl;
+
+      d.sadd(psi*theta_old, psi*alpha, p);
+      x.add(d);
+				       // Step 5
+      if (additional_data.exact_residual)
+	res = A.residual(q,x,b);
+      else
+	res = sqrt((it+1)*tau);
+      state = control().check(step,res);
+      if (state == SolverControl::success)
+	return ReturnState(success);
+      else if (state == SolverControl::failure)
+	return ReturnState(exceeded);
+				       // Step 6
+      if (fabs(rho) < additional_data.breakdown)
+	return ReturnState(breakdown);
+				       // Step 7
+      rho_old = rho;
+      precondition(q,v);
+      rho = q*v;
+
+      beta = rho/rho_old;
+      p.sadd(beta,v);
+      precondition(q,p);
+    }
+  return ReturnState(exceeded);
+}
 
 
 
