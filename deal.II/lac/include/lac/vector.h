@@ -28,8 +28,6 @@
  */
 template <typename Number>
 class Vector {
-    friend class dFMatrix;
-
   protected:
 
 				     /**
