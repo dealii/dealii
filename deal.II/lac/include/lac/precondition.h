@@ -94,7 +94,7 @@ class PreconditionRelaxation
 				      * function of the matrix.
 				      */
     typedef void ( MATRIX::* function_ptr)(VECTOR&, const VECTOR&,
-					   typename MATRIX::entry_type) const;
+					   typename MATRIX::value_type) const;
     
 				     /**
 				      * Constructor.

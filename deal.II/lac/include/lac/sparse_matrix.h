@@ -428,7 +428,7 @@ class SparseMatrix
 				     /**
 				      * Type of matrix entries.
 				      */
-    typedef number entry_type;
+    typedef number value_type;
     
 				     /**
 				      * Constructor; initializes the matrix to
