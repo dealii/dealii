@@ -231,6 +231,19 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">PETScWrappers::MPI::SparseMatrix</code>
+       class had functions that allow to take a pre-existing sparsity pattern
+       as the basis for entry allocation. These function had an option to
+       allow pre-setting these entries in the underlying data structures, but
+       this option was disabled by default because of unresolved questions
+       about its effectiveness. This has now been fixed: The code now properly
+       initializes these elements, and makes the resulting matrix much faster
+       to use.
+       <br> 
+       (WB, 2005/04/04)
+       </p>
+
+  <li> <p>
        New: The <code class="class">ProductSparseMatrix</code>
        implements the product of two rectangular sparse matrices with
        the same <code class="member">value_type</code>

@@ -261,29 +261,13 @@ namespace PETScWrappers
                                           * significantly more efficient to
                                           * get memory allocation right from
                                           * the start.
-                                          *
-                                          * Despite the fact that it would
-                                          * seem to be an obvious win, setting
-                                          * the @p preset_nonzero_locations
-                                          * flag to @p true doesn't seem to
-                                          * accelerate program. Rather on the
-                                          * contrary, it seems to be able to
-                                          * slow down entire programs
-                                          * somewhat. This is suprising, since
-                                          * we can use efficient function
-                                          * calls into PETSc that allow to
-                                          * create multiple entries at once;
-                                          * nevertheless, given the fact that
-                                          * it is inefficient, the respective
-                                          * flag has a default value equal to
-                                          * @p false.
                                           */
         SparseMatrix (const MPI_Comm                  &communicator,
                       const CompressedSparsityPattern &sparsity_pattern,
                       const std::vector<unsigned int> &local_rows_per_process,
                       const std::vector<unsigned int> &local_columns_per_process,
                       const unsigned int               this_process,
-                      const bool                       preset_nonzero_locations = false);
+                      const bool                       preset_nonzero_locations = true);
 
                                          /**
                                           * This operator assigns a scalar to
@@ -368,29 +352,13 @@ namespace PETScWrappers
                                           * significantly more efficient to
                                           * get memory allocation right from
                                           * the start.
-                                          *
-                                          * Despite the fact that it would
-                                          * seem to be an obvious win, setting
-                                          * the @p preset_nonzero_locations
-                                          * flag to @p true doesn't seem to
-                                          * accelerate program. Rather on the
-                                          * contrary, it seems to be able to
-                                          * slow down entire programs
-                                          * somewhat. This is suprising, since
-                                          * we can use efficient function
-                                          * calls into PETSc that allow to
-                                          * create multiple entries at once;
-                                          * nevertheless, given the fact that
-                                          * it is inefficient, the respective
-                                          * flag has a default value equal to
-                                          * @p false.
                                           */
         void reinit (const MPI_Comm                  &communicator,
                      const CompressedSparsityPattern &sparsity_pattern,
                      const std::vector<unsigned int> &local_rows_per_process,
                      const std::vector<unsigned int> &local_columns_per_process,
                      const unsigned int               this_process,
-                     const bool                       preset_nonzero_locations = false);
+                     const bool                       preset_nonzero_locations = true);
         
                                          /**
                                           * Return a reference to the MPI
