@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.86 
+# From configure.in Revision: 1.87 
 
 
 
@@ -2674,7 +2674,7 @@ if test "${enable_multigrid+set}" = set; then
   enableval="$enable_multigrid"
   enablemultigrid=$enableval
 else
-  if test -r deal.II/source/multigrid ; then
+  if test -r deal.II/include/multigrid/multigrid.h ; then
       enablemultigrid=yes ;
     else
       enablemultigrid=no ;

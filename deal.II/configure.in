@@ -845,7 +845,7 @@ dnl    default is yes if multigrid directory present
 AC_ARG_ENABLE(multigrid,
 [  --enable-multigrid Include multigrid code in library],
     enablemultigrid=$enableval,
-    if test -r deal.II/source/multigrid ; then
+    if test -r deal.II/include/multigrid/multigrid.h ; then
       enablemultigrid=yes ;
     else
       enablemultigrid=no ;
