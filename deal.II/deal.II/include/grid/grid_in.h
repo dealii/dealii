@@ -274,7 +274,7 @@ class GridIn
 				      * what actually was created, if
 				      * it is known that the data is
 				      * not correct in some way, but
-				      * the @red{Triangulation} class
+				      * the @ref{Triangulation} class
 				      * refuses to generate a
 				      * triangulation because of these
 				      * errors. In particular, the
