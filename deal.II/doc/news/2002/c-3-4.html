@@ -564,6 +564,23 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       New/Changed: The <code class="class">SparseILU</code>, <code
+       class="class">SparseMIC</code> and <code
+       class="class">SparseLUDecomposition</code> now use the same
+       interface (<code class="class">initialize</code>, <code
+       class="class">vmult</code>, <code class="class">clear</code>)
+       as all <code class="class">PreconditionBlock</code> classes. In
+       virtue of an unified preconditioner interface it is now
+       recommended to use the new methods. The old methods (<code
+       class="class">reinit</code>, <code
+       class="class">decompose</code>, <code
+       class="class">apply_decomposition</code>) are now deprecated,
+       and will be removed in a later version.
+       <br>
+       (RH 2003/02/19)
+       </p>
+
+  <li> <p>
        Changed: The <code class="class">BlockVector</code> accessor classes
        have been moved to a namespace <code
        class="class">internal</code>. Since these classes are not (or should
