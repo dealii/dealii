@@ -122,12 +122,12 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 					   // into the global
 					   // coordinate system. they
 					   // are @p{A (1,c)} and @p{A
-					   // (1,b)} with @p{A} the
+					   // (1,-b-2c)} with @p{A} the
 					   // rotation matrix, since
 					   // the tangentials in the
 					   // coordinate system
 					   // relative to the line are
-					   // @p{(1,c)} and @p{(1,b)}
+					   // @p{(1,c)} and @p{(1,-b-2c)}
 					   // at the two vertices,
 					   // respectively. We then
 					   // have to make sure by
@@ -142,14 +142,16 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 	  coordinate_axis /= h;
 
 	  const double alpha = std::atan2(coordinate_axis[1], coordinate_axis[0]);
-	  const double b = ((face_vertex_normals[0][1] * std::sin(alpha)
-			     +face_vertex_normals[0][0] * std::cos(alpha)) /
-			    (face_vertex_normals[0][1] * std::cos(alpha)
-			     -face_vertex_normals[0][0] * std::sin(alpha))),
-		       c = ((face_vertex_normals[1][1] * std::sin(alpha)
-			     +face_vertex_normals[1][0] * std::cos(alpha)) /
-			    (face_vertex_normals[1][1] * std::cos(alpha)
-			     -face_vertex_normals[1][0] * std::sin(alpha)));
+	  const double c = -((face_vertex_normals[0][1] * std::sin(alpha)
+			      +face_vertex_normals[0][0] * std::cos(alpha)) /
+			     (face_vertex_normals[0][1] * std::cos(alpha)
+			      -face_vertex_normals[0][0] * std::sin(alpha)));
+	  const double b = ((face_vertex_normals[1][1] * std::sin(alpha)
+			      +face_vertex_normals[1][0] * std::cos(alpha)) /
+			     (face_vertex_normals[1][1] * std::cos(alpha)
+			      -face_vertex_normals[1][0] * std::sin(alpha)))
+			   -2*c;
+		       
 
 					   // next evaluate the so
 					   // determined cubic
