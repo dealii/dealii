@@ -27,12 +27,14 @@ class LagrangeEquidistant;
 //      see upcoming paper.
 
 
-//TODO:[RH,GK] more docs
 /**
  * Mapping class that uses Qp-mappings on boundary cells. The mapping
  * shape functions make use of tensor product polynomials with
  * equidistant (on the unit cell) support points.
- *  
+ *
+ * For more details about Qp-mappings, see the small `mapping' report
+ * in the `Reports' section of `Documentation'.
+ *
  * @author Ralf Hartmann, Guido Kanschat 2000, 2001
  */
 template <int dim>
