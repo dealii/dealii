@@ -126,6 +126,59 @@ class Quadrature {
 
 
 
+/**
+ * Quadrature formula constructed by iteration of another quadrature formula in
+ * each direction. In more than one space dimension, the resulting quadrature
+ * formula is constructed in the usual way by building the tensor product of
+ * the respective iterated quadrature formula in one space dimension.
+ *
+ * In one space dimension, the given base formula is copied and scaled onto
+ * a given number of subintervals of length #1/n_copies#. If the quadrature
+ * formula uses both end points of theunit interval, then in the interior
+ * of the iterated quadrature formula there would be quadrature points which
+ * are used twice; we merge them into one with a weight which is the sum
+ * of the weights of the left- and the rightmost quadrature point.
+ *
+ * Since all dimensions higher than one are built up by tensor products of
+ * one dimensional and #dim-1# dimensional quadrature formulae, the
+ * argument given to the constructor needs to be a quadrature formula in
+ * one space dimension, rather than in #dim# dimensions.
+ *
+ * @author Wolfgang Bangerth 1999
+ */
+template <int dim>
+class QIterated : public Quadrature<dim>
+{
+  public:
+				     /**
+				      * Constructor. Iterate the given
+				      * quadrature formula $n_copies$ times in
+				      * each direction.
+				      */
+    QIterated (const Quadrature<1> &base_quadrature,
+	       const unsigned int   n_copies);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcSumOfWeightsNotOne);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidQuadratureFormula);
+    
+  private:
+				     /**
+				      * check whether the given
+				      * quadrature formula has quadrature
+				      * points at the left and right end points
+				      * of the interval
+				      */
+    static bool uses_both_endpoints (const Quadrature<1> &base_quadrature);
+};
+
+
+
 
 /**
  *  This class is a helper class to facilitate the usage of quadrature formulae

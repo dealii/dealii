@@ -3,6 +3,8 @@
 
 
 #include <base/quadrature.h>
+#include <cmath>
+
 
 
 template <>
@@ -448,7 +450,134 @@ void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
 
 
 
+template <>
+bool
+QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature)
+{
+  bool at_left = false,
+      at_right = false;
+  for (unsigned int i=0; i<base_quadrature.n_quadrature_points; ++i)
+    {
+      if (base_quadrature.quad_point(i) == Point<1>(0.0))
+	at_left = true;
+      if (base_quadrature.quad_point(i) == Point<1>(1.0))
+	at_right = true;
+    };
+
+  return (at_left && at_right);
+};
+
+
+
+template <>
+QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
+			 const unsigned int   n_copies) :
+		Quadrature<1> (uses_both_endpoints(base_quadrature) ?
+			       (base_quadrature.n_quadrature_points-1) * n_copies + 1 :
+			       base_quadrature.n_quadrature_points * n_copies) 
+{
+				   // we don't have to skip some points
+				   // in order to get a reasonable quadrature
+				   // formula
+  if (!uses_both_endpoints(base_quadrature))
+    {
+      unsigned int next_point = 0;
+      for (unsigned int copy=0; copy<n_copies; ++copy)
+	for (unsigned int q_point=0; q_point<base_quadrature.n_quadrature_points; ++q_point)
+	  {
+	    quadrature_points[next_point] = Point<1>(base_quadrature.quad_point(q_point)(0) / n_copies
+						     +
+						     (1.0*copy)/n_copies);
+	    weights[next_point]           = base_quadrature.weight(q_point) / n_copies;
+
+	    ++next_point;
+	  };
+    }
+  else
+				     // skip doubly available points
+    {
+      unsigned int next_point = 0;
+
+				       // first find out the weights of
+				       // the left and the right boundary
+				       // points. note that these usually
+				       // are but need not necessarily be
+				       // the same
+      double double_point_weight = 0;
+      unsigned int n_end_points = 0;
+      for (unsigned int i=0; i<base_quadrature.n_quadrature_points; ++i)
+					 // add up the weight if this
+					 // is an endpoint
+	if ((base_quadrature.quad_point(i) == Point<1>(0.0)) ||
+	    (base_quadrature.quad_point(i) == Point<1>(1.0)))
+	  {
+	    double_point_weight += base_quadrature.weight(i);
+	    ++n_end_points;
+	  };
+				       // scale the weight correctly
+      double_point_weight /= n_copies;
+
+				       // make sure the base quadrature formula
+				       // has only one quadrature point
+				       // per end point
+      Assert (n_end_points == 2, ExcInvalidQuadratureFormula());
+      
+      
+      for (unsigned int copy=0; copy<n_copies; ++copy)
+	for (unsigned int q_point=0; q_point<base_quadrature.n_quadrature_points; ++q_point)
+	  {
+					     // skip the left point of this copy
+					     // since we have already entered it the
+					     // last time
+	    if ((copy > 0) &&
+		(base_quadrature.quad_point(q_point) == Point<1>(0.0)))
+	      continue;
+	    
+	    quadrature_points[next_point] = Point<1>(base_quadrature.quad_point(q_point)(0) / n_copies
+						     +
+						     (1.0*copy)/n_copies);
+
+					     // if this is the rightmost point of
+					     // one of the non-last copies: give
+					     // it the double weight
+	    if ((copy != n_copies-1) &&
+		(base_quadrature.quad_point(q_point) == Point<1>(1.0)))
+	      weights[next_point] = double_point_weight;
+	    else
+	      weights[next_point] = base_quadrature.weight(q_point) / n_copies;
+	    
+	    ++next_point;
+	  };
+    };
+
+#if DEBUG
+  double sum_of_weights = 0;
+  for (unsigned int i=0; i<n_quadrature_points; ++i)
+    sum_of_weights += weight(i);
+  Assert (fabs(sum_of_weights-1) < 1e-15,
+	  ExcSumOfWeightsNotOne());
+#endif
+};
+
+
+
+
+// construct higher dimensional quadrature formula by tensor product of lower
+// dimensional iterated quadrature formulae
+template <int dim>
+QIterated<dim>::QIterated (const Quadrature<1> &base_quadrature,
+			   const unsigned int   N):
+		Quadrature<dim> (QIterated<dim-1>(base_quadrature, N),
+				 QIterated<1>(base_quadrature, N))
+{};
+
+
+
+
 // explicit instantiations; note: we need them all for all dimensions
 template class Quadrature<1>;
 template class Quadrature<2>;
 template class Quadrature<3>;
+template class QIterated<1>;
+template class QIterated<2>;
+template class QIterated<3>;
