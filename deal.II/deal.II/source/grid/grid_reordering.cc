@@ -637,7 +637,9 @@ bool GridReordering<dim>::Cell::check_consistency (const unsigned int rot) const
     {
       const FaceData &face = faces[rot][face_no]->second;
 
-      for (unsigned int face_rot=0; face_rot<this->rotational_states_of_faces-1; ++face_rot)
+      for (unsigned int face_rot=0;
+	   face_rot<GridReorderingInfo<dim>::rotational_states_of_faces-1;
+	   ++face_rot)
 	{
 	  const FaceData &reverse_face = face.reverse_faces[face_rot]->second;
 	  if (reverse_face.use_count != 0)
