@@ -13,28 +13,94 @@
 #ifndef __deal2__precondition_h
 #define __deal2__precondition_h
 
+// This file contains simple preconditioners.
+
 #include <lac/vector_memory.h>
+#include <base/smartpointer.h>
 
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 
 
 /**
- * No preconditioning.
- * This class helps you, if you want to use a linear solver without
- * preconditioning. Since this is a strange idea, the documentation
- * here stays quite short.
+ * No preconditioning.  This class helps you, if you want to use a
+ * linear solver without preconditioning. All solvers in LAC require a
+ * preconditioner. Therefore, you must use the identity provided here
+ * to avoid preconditioning.
  *
  * @author Guido Kanschat, 1999
  */
 class PreconditionIdentity
 {
   public:
-  				     /**
-				      * Execute preconditioning.
+				     /**
+				      * Apply preconditioner.
 				      */
     template<class VECTOR>
-    void operator() (VECTOR&, const VECTOR&) const;
+    void vmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply transpose
+				      * preconditioner. Since this is
+				      * the identity, this function is
+				      * the same as
+				      * @ref{vmult}.
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void operator () (VECTOR&, const VECTOR&) const;
+};
+
+
+/**
+ * Jacobi preconditioner using matrix built-in function.  The MATRIX
+ * class used is required to have a function
+ * @p{precondition_Jacobi(VECTOR&, const VECTOR&, double}
+ *
+ * @author Guido Kanschat, 2000
+ */
+template <class MATRIX = SparseMatrix<double> >
+class PreconditionJacobi
+{
+  public:
+				     /**
+				      * Initialize matrix and
+				      * relaxation parameter. The
+				      * matrix is just stored in the
+				      * preconditioner object. The
+				      * relaxation parameter should be
+				      * larger than zero and smaller
+				      * than 2 for numerical
+				      * reasons. It defaults to 1.
+				      */
+    void initialize (const MATRIX& A, const double omega = 1.);
+				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply transpose
+				      * preconditioner. Since this is
+				      * a symmetric preconditioner,
+				      * this function is the same as
+				      * @ref{vmult}.
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+
+  private:
+				     /**
+				      * Pointer to the matrix object.
+				      */
+    SmartPointer<const MATRIX> A;
+				     /**
+				      * Relaxation parameter.
+				      */
+    double omega;
 };
 
 
@@ -315,11 +381,48 @@ class PreconditionedMatrix
 /* ---------------------------------- Inline functions ------------------- */
 
 template<class VECTOR>
-void
-PreconditionIdentity::operator() (VECTOR& dst, const VECTOR& src) const
+inline void
+PreconditionIdentity::operator () (VECTOR& dst, const VECTOR& src) const
 {
   dst = src;
 }
+
+template<class VECTOR>
+inline void
+PreconditionIdentity::vmult (VECTOR& dst, const VECTOR& src) const
+{
+  dst = src;
+}
+
+template<class VECTOR>
+inline void
+PreconditionIdentity::Tvmult (VECTOR& dst, const VECTOR& src) const
+{
+  dst = src;
+}
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX>
+inline void
+PreconditionJacobi<MATRIX>::initialize (const MATRIX& rA, double o)
+{
+  A = &rA;
+  omega = o;
+}
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionJacobi<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+{
+//TODO: Assert object not initialized
+  A->precondition_Jacobi (dst, src, omega);
+}
+
+
+//----------------------------------------------------------------------//
+
 
 template<class MATRIX, class VECTOR>
 PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX& M,
