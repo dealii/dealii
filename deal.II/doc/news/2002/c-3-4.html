@@ -34,6 +34,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: <acronym>deal.II</acronym> can now also be compiled with Red Hat's
+       version of the gcc compiler, gcc 2.96.
+       <br>
+       (WB 2002/10/14)
+       </p>
+
+  <li> <p> 
        Fixed: On CygWin, one header files has a <code>#define quad
        quad_t</code>. This is annoying, since we have local variables and
        member functions with the name <code>quad</code>, and in fact it breaks
