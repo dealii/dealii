@@ -6,6 +6,7 @@
 #include <grid/tria_iterator.h>
 #include <basic/data_io.h>
 #include <basic/function.h>
+#include <fe/quadrature.h>
 
 #include "../../../mia/control.h"
 #include "../../../mia/vectormemory.h"
@@ -148,16 +149,15 @@ void ProblemBase<dim>::solve () {
 
 template <int dim>
 void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_solution,
-					     vector<double>           &difference,
+					     dVector                  &difference,
 					     const Quadrature<dim>    &q,
 					     const FiniteElement<dim> &fe,
 					     const NormType           &norm) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
   Assert (fe == dof_handler->get_selected_fe(), ExcInvalidFE());
 
-  difference.erase (difference.begin(), difference.end());
-  difference.reserve (tria->n_cells());
-
+  difference.reinit (tria->n_active_cells());
+  
   FEValues<dim>::UpdateStruct update_flags;
   update_flags.q_points   = true;
   update_flags.jacobians  = true;
@@ -176,7 +176,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					endc = dof_handler->end();
   Triangulation<dim>::active_cell_iterator tria_cell = dof_handler->get_tria().begin_active();
   
-  for (; cell != endc; ++cell, ++tria_cell) 
+  for (unsigned int index=0; cell != endc; ++cell, ++tria_cell, ++index)
     {
       double diff=0;
 				       // initialize for this cell
@@ -209,6 +209,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					     // and assign that to the vector
 					     // \psi.
 	    const unsigned int n_dofs = fe.total_dofs;
+	    const unsigned int n_q_points = q.n_quadrature_points;
 	    const dFMatrix & shape_values = fe_values.get_shape_values();
 	    vector<double>   dof_values;
 	    cell->get_dof_values (solution, dof_values);
@@ -221,7 +222,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 				       psi);
 					     // then subtract finite element
 					     // solution
-	    for (unsigned int j=0; j<n_dofs; ++j) 
+	    for (unsigned int j=0; j<n_q_points; ++j) 
 	      for (unsigned int i=0; i<n_dofs; ++i)
 		psi[j] -= dof_values[i]*shape_values(i,j);
 
@@ -277,7 +278,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
       
 				       // append result of this cell
 				       // to the end of the vector
-      difference.push_back (diff);
+      difference(index) = diff;
     };
 };
 
