@@ -762,7 +762,7 @@ class FiniteElementBase : public Subscriptor,
 				      * return an index which base
 				      * element implements this
 				      * component, and which vector
-				      * component is this base element
+				      * component in this base element
 				      * this is. This information is
 				      * only of interest for
 				      * vector-valued finite elements
@@ -778,7 +778,8 @@ class FiniteElementBase : public Subscriptor,
 				      *
 				      * If this is a scalar finite
 				      * element, then the return value
-				      * is always equalt to zero.
+				      * is always equal to a pair of
+				      * zeros.
 				      */
     std::pair<unsigned int,unsigned int>
     component_to_base (const unsigned int component) const;
