@@ -1068,7 +1068,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  else
 	    out << cell->index();
 
-	  out << " )] "
+	  out << ")] "
 	      << "] -6 MCshow"
 	      << std::endl;
 	};
@@ -1103,7 +1103,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 		  << " m" << std::endl
 		  << "[ [(Helvetica) 10.0 0.0 true true ("
 		  << cell->vertex_index(vertex)
-		  << " )] "
+		  << ")] "
 		  << "] -6 MCshow"
 		  << std::endl;
 	    };
