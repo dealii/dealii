@@ -408,7 +408,7 @@ struct FiniteElementBase : public FiniteElementData<dim> {
  *   the present library).
  *
  *   Both these assumptions are used when interpolation of a continuous
- *   function to the finite element space is applied. At present, only two
+ *   function to the finite element space is applied. At present, only few
  *   places where this is used in the library come to mind to the author,
  *   namely the treating of boundary values in the #ProblemBase# class and
  *   the interpolation in the #VectorCreator# collection. You should also
@@ -416,6 +416,21 @@ struct FiniteElementBase : public FiniteElementData<dim> {
  *   made if you want to use elements of other classes. A hint may be the
  *   use of the #get_ansatz_points# and #get_face_ansatz_points# functions
  *   of this class.
+ *
+ * \item Vanishing of basis functions on faces: when projecting a function
+ *   to the boundary, use if made of the assumption that all basis functions
+ *   on a cell adjacent to the boundary vanish on the boundary except for those
+ *   on the boundary face itself. For Lagrange elements this is true, but it
+ *   may or may not be true in other cases.
+ *
+ *   This assumption is used in the #VectorTools::project_boundary_values#,
+ *   #MatrixCreator::create_boundary_mass_matrix#,
+ *   #DoFHandler::make_boundary_sparsity_pattern#,
+ *   #DoFHandler::map_dof_to_boundary_indices# and may be a few other places.
+ *   The places in the #DoFHandler# class are probably not that dangerous,
+ *   since wrong results will most likely lead to internal errors through
+ *   the #Assert# mechanism, but the first places will lead to undiscovered
+ *   errors if not thought of properly.
  * \end{itemize}
  *
  * @author Wolfgang Bangerth, 1998

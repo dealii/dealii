@@ -121,7 +121,7 @@ enum NormType {
  *   Within this function, boundary values are interpolated, i.e. a node is given
  *   the point value of the boundary function. In some cases, it may be necessary
  *   to use the L2-projection of the boundary function or any other method. For
- *   this purpose other functions refer to the #VectorTools::project_boundary_values#
+ *   this purpose to the #VectorTools::project_boundary_values#
  *   function below.
  *
  *   You should be aware that the boundary function may be evaluated at nodes
@@ -259,7 +259,12 @@ class VectorTools {
 				      * to Dirichlet boundary conditions
 				      * and the values they are to be
 				      * assigned, by interpolation around
-				      * the boundary.
+				      * the boundary. If the
+				      * #boundary_values# contained values
+				      * before, the new ones are added, or
+				      * the old one overwritten if a node
+				      * of the boundary part to be prjected
+				      * on already was in the variable.
 				      *
 				      * See the general doc for more
 				      * information.
@@ -273,7 +278,12 @@ class VectorTools {
 				     /**
 				      * Project #function# to the boundary
 				      * of the domain, using the given quadrature
-				      * formula for the faces.
+				      * formula for the faces. If the
+				      * #boundary_values# contained values
+				      * before, the new ones are added, or
+				      * the old one overwritten if a node
+				      * of the boundary part to be prjected
+				      * on already was in the variable.
 				      *
 				      * See the general documentation of this
 				      * class for further information.

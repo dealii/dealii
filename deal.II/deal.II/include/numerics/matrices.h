@@ -8,7 +8,6 @@
 
 #include <base/exceptions.h>
 #include <map>
-#include <set>
 
 template <int dim> class Triangulation;
 template <int dim> class DoFHandler;
@@ -231,6 +230,15 @@ class MatrixCreator {
 				       const Function<dim>      &rhs,
 				       dVector                  &rhs_vector,
 				       const Function<dim>      *a = 0);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotImplemented);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
 };
 
 
@@ -318,11 +326,6 @@ class MatrixTools : public MatrixCreator<dim> {
 				       dSMatrix              &matrix,
 				       dVector               &solution,
 				       dVector               &right_hand_side);
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotImplemented);
 };
 
 
