@@ -42,7 +42,7 @@ void dFMatrix::reinit (const unsigned int mm, const unsigned int nn)
       dim_range = nn;
       dim_image = mm;
 //      memset(val, 0, sizeof(double)*nn*mm);
-      for (unsigned int i=0; i<nn*mm; ++i) val[i] = 0;
+      clear ();
     }
 }
 
@@ -925,8 +925,10 @@ double dFMatrix::determinant () const {
 
 
 void dFMatrix::clear () {
-  for (unsigned int i=0; i<val_size; ++i)
-    val[i] = 0.;
+  double       *val_ptr = &val[0];
+  const double *end_ptr = &val[n()*m()];
+  while (val_prt != end_ptr)
+    *val_ptr++ = 0.;
 };
 
 
