@@ -28,7 +28,7 @@
 #include <dofs/dof_accessor.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <grid/grid_generator.h>
-#include <numerics/data_io.h>
+#include <numerics/data_out.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_values.h>
 #include <multigrid/multigrid.h>
@@ -69,10 +69,10 @@ extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 int main()
 {
   ofstream logfile("mglocal.output");
-  logfile.setf(ios::fixed);
-  logfile.precision (3);
+//  logfile.setf(ios::fixed);
+//  logfile.precision (3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
+//  deallog.depth_console(0);
 
   Helmholtz equation;
   RHSFunction<2> rhs;
@@ -82,7 +82,7 @@ int main()
   FEQ2<2> fe2;
   FEQ3<2> fe3;
   FEQ4<2> fe4;
-  for (unsigned int degree=1;degree<=1;degree++)
+  for (unsigned int degree=1;degree<=4;degree++)
     {
       Triangulation<2> tr;
       MGDoFHandler<2> mgdof(tr);
@@ -104,7 +104,7 @@ int main()
       cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
 
-      tr.refine_global(2);
+      tr.refine_global(1);
       dof.distribute_dofs(*fe);
       const unsigned int size = dof.n_dofs();
       deallog << "DoFs " << size << endl;
@@ -133,8 +133,8 @@ int main()
 	  Vector<double> u;
 	  u.reinit(f);
 	  PrimitiveVectorMemory<> mem;
-	  SolverControl control(20, 1.e-12, true);
-	  SolverRichardson<> solver(control, mem);
+	  SolverControl control(20, 1.e-8, true);
+	  SolverCG<> solver(control, mem);
 	  
 	  MGLevelObject<SparsityPattern> mgstruct(0, tr.n_levels()-1);
 	  MGLevelObject<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
@@ -173,6 +173,13 @@ Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer, tr.n_level
 	   
 	  solver.solve(A, u, f, mgprecondition);
 	  hanging_nodes.distribute(u);
+
+	  DataOut<2> out;
+	  ofstream ofile("out.gnuplot");
+	  out.attach_dof_handler(dof);
+	  out.add_data_vector(u,"u");
+	  out.build_patches(4);
+	  out.write_gnuplot(ofile);
 	}
       deallog.pop();
     }

@@ -391,7 +391,15 @@ class MGBase : public Subscriptor
 			      Vector<double>       &dst,
 			      const Vector<double> &src,
 			      const Vector<double> &rhs) = 0;
-  
+
+				     /**
+				      * Print a level vector using
+				      * @ref{DoFHandler}.
+				      */
+    virtual void print_vector (const unsigned int level,
+			       const Vector<double>& v,
+			       const char* name) const = 0;
+    
   private:
 				     /**
 				      * Auxiliary vector.

@@ -18,33 +18,8 @@
 #include <cmath>
 
 
-//TODO: this function is only for debugging purposes and should be removed sometimes
-template<class VECTOR>
-static
-void print_vector(ostream& s, const VECTOR& v, const char* text)
-{
-  const unsigned int n = (unsigned int)(sqrt(v.size())+.3);
-  unsigned int k=0;
-
-  s << endl << "splot '-' title '" << text << "'" << endl;
-  
-				   // write the vector entries in a
-				   // kind of square
-  for (unsigned int i=0;i<n;++i)
-    {
-      for (unsigned int j=0;j<n;++j)
-	s << '\n' << v(k++);
-      s << endl;
-    }
-  s << "e\npause -1" << endl;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-
-
 MGBase::~MGBase () 
-{};
+{}
 
 
 MGBase::MGBase(const MGTransferBase &transfer,
@@ -59,7 +34,7 @@ MGBase::MGBase(const MGTransferBase &transfer,
 {
   Assert(minlevel <= maxlevel,
 	 ExcSwitchedLevels(minlevel, maxlevel));
-};
+}
 
 
 void
@@ -67,11 +42,9 @@ MGBase::vcycle(const MGSmootherBase     &pre_smooth,
 	       const MGSmootherBase     &post_smooth,
 	       const MGCoarseGridSolver &coarse_grid_solver)
 {
-//  static int k=0;
-//  cout << "set title 'cycle " << ++k << "'\n";
-  
-  level_mgstep(maxlevel, pre_smooth, post_smooth, coarse_grid_solver);
-};
+  level_mgstep (maxlevel, pre_smooth, post_smooth, coarse_grid_solver);
+  abort ();
+}
 
 
 void
@@ -80,6 +53,11 @@ MGBase::level_mgstep(const unsigned int        level,
 		     const MGSmootherBase     &post_smooth,
 		     const MGCoarseGridSolver &coarse_grid_solver)
 {
+  char *name = new char[100];
+
+  sprintf(name, "MG%d-defect",level);
+  print_vector(level, defect[level], name);
+  
   solution[level] = 0.;
   
   if (level == minlevel)
@@ -91,15 +69,17 @@ MGBase::level_mgstep(const unsigned int        level,
 			   // smoothing of the residual by modifying s
   pre_smooth.smooth(level, solution[level], defect[level]);
 				   // t = d-As
+
+  sprintf(name, "MG%d-pre",level);
+  print_vector(level, solution[level], name);
+  
   t.reinit(solution[level].size());
   level_vmult(level, t, solution[level], defect[level]);
-//  print_vector(cout,t,"T");
   
 				   // make t rhs of lower level
 //TODO: this function adds the restricted t to defect[level-1].
 //TODO: why don't we have to clear it before?  
   transfer->restrict_and_add (level, defect[level-1], t);
-//  print_vector(cout,defect[level-1],"Dl-1");
   
 				   // do recursion
   level_mgstep(level-1, pre_smooth, post_smooth, coarse_grid_solver);
@@ -111,16 +91,22 @@ MGBase::level_mgstep(const unsigned int        level,
   t.reinit(solution[level].size());
 
 				   // do coarse grid correction
-//  print_vector(cout,solution[level-1],"Sl-1");
+
   transfer->prolongate(level, t, solution[level-1]);
-//  print_vector(cout,t,"T");
+
+  sprintf(name, "MG%d-cgc",level);
+  print_vector(level, t, name);
+
   solution[level] += t;
   
 				   // smoothing (modify solution again)
 //TODO: what happens here? smooth overwrites the solution[level],
 //TODO: so the previous two statements should have no effect. No?  
   post_smooth.smooth(level, solution[level], defect[level]);
-};
+
+  sprintf(name, "MG%d-post",level);
+  print_vector(level, solution[level], name);
+}
 
 
 //////////////////////////////////////////////////////////////////////

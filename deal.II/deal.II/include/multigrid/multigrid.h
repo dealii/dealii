@@ -106,6 +106,14 @@ class Multigrid : public MGBase
 			      const Vector<double> &rhs);
 
 				     /**
+				      * Print a level vector using
+				      * @ref{DoFHandler}.
+				      */
+    virtual void print_vector (const unsigned int level,
+			       const Vector<double>& v,
+			       const char* name) const;
+    
+				     /**
 				      * Read-only access to level matrices.
 				      */
     const SparseMatrix<double>& get_matrix (const unsigned int level) const;

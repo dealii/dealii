@@ -65,7 +65,8 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 
 
-all: grid_test.check dof_test.check fe_tables.check gradients.check \
+all: grid_generator.check grid_test.check dof_test.check \
+     fe_tables.check gradients.check \
      constraints.check mg.check mglocal.check wave-test-3.check second_derivatives.check
 
 exe: $(all:.check=.testcase) benchmark
@@ -167,6 +168,21 @@ grid_test-o-files = $(grid_test-cc-files:.cc=.o)
 endif
 
 grid_test.testcase: $(grid_test-o-files) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+grid_generator-cc-files = grid_generator.cc 
+
+ifeq ($(debug-mode),on)
+grid_generator-o-files = $(grid_generator-cc-files:.cc=.go)
+else
+grid_generator-o-files = $(grid_generator-cc-files:.cc=.o)
+endif
+
+grid_generator.testcase: $(grid_generator-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
 
