@@ -106,7 +106,7 @@ inline void
 PolynomialsP<dim>::directional_degrees(unsigned int n,
 				       unsigned int (&degrees)[dim]) const
 {
-  compute_index(n,degrees);
+  this->compute_index(n,degrees);
 }
 
 
