@@ -2911,6 +2911,12 @@ void Triangulation<dim>::prepare_refinement () {
 						       // refine cell and
 						       // update vertex levels
 		      cell->set_refine_flag();
+						       // note that we can only
+						       // enter this branch if the
+						       // cell is not yet flagged,
+						       // so we can't get into an
+						       // endless loop by setting
+						       // mesh_changed_in_...
 		      mesh_changed_in_this_loop = true;
 		      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
 			   ++v)
@@ -2926,6 +2932,12 @@ void Triangulation<dim>::prepare_refinement () {
 				   endc = end();
 	      for (; cell!=endc; ++cell) 
 		{
+						   // if cell is already flagged
+						   // for refinement: nothing to
+						   // do anymore
+		  if (cell->refine_flag_set())
+		    continue;
+		  
 		  unsigned int refined_neighbors = 0,
 			     unrefined_neighbors = 0;
 		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -2935,13 +2947,17 @@ void Triangulation<dim>::prepare_refinement () {
 						       // level below because of
 						       // the regularisation above
 		      if ((cell->neighbor_level(face) == cell->level()) &&
-			  (cell->neighbor(face)->refine_flag_set()))
+			  (cell->neighbor(face)->refine_flag_set() ||
+			   cell->neighbor(face)->has_children()))
 			++refined_neighbors;
 		      else
 			++unrefined_neighbors;
 
 		  if (unrefined_neighbors < refined_neighbors)
-		    cell->set_refine_flag ();
+		    {
+		      cell->set_refine_flag ();
+		      mesh_changed_in_this_loop = true;
+		    };
 		};
 	    };
 	}
