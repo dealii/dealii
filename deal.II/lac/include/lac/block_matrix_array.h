@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,138 +40,141 @@ template <typename> class BlockVector;
  * @p{BlockVector<VECTOR>}. @ref{SparseMatrix} is a possible entry
  * type.
  *
- * @author Guido Kanschat, 2000, 2001 */
+ * @author Guido Kanschat, 2000, 2001
+ */
 template <class MATRIX>
-class BlockMatrixArray :
-  public Subscriptor
+class BlockMatrixArray : public Subscriptor
 {
-public:
-				   /**
-				    * Constructor fixing the
-				    * dimensions.
-				    */
-  BlockMatrixArray (const unsigned int n_block_rows,
-		    const unsigned int n_block_cols);
-
-				   /**
-				    * Add a block matrix entry.
-				    */
-  void enter (const MATRIX& matrix,
-	      unsigned row,
-	      unsigned int col,
-	      double prefix = 1.,
-	      bool transpose = false);
-
-				   /**
-				    * Number of block-entries per
-				    * column.
-				    */
-  unsigned int n_block_rows () const;
-
-				   /**
-				    * Number of block-entries per
-				    * row.
-				    */
-  unsigned int n_block_cols () const;
-
-				   /**
-				    * Matrix-vector multiplication.
-				    */
-  template <class VECTOR>
-  void vmult (BlockVector<VECTOR>& dst,
-	      const BlockVector<VECTOR>& src) const;
-				   /**
-				    * Matrix-vector multiplication
-				    * adding to @p{dst}.
-				    */
-  template <class VECTOR>
-  void vmult_add (BlockVector<VECTOR>& dst,
-		  const BlockVector<VECTOR>& src) const;
-				   /**
-				    * Transposed matrix-vector
-				    * multiplication.
-				    */
-  template <class VECTOR>
-  void Tvmult (BlockVector<VECTOR>& dst,
-	       const BlockVector<VECTOR>& src) const;
-				   /**
-				    * Transposed matrix-vector
-				    * multiplication adding to
-				    * @p{dst}.
-				    */
-  template <class VECTOR>
-  void Tvmult_add (BlockVector<VECTOR>& dst,
-		   const BlockVector<VECTOR>& src) const;
-  
-private:
-				   /**
-				    * Internal data structure.
-				    *
-				    * For each entry of a
-				    * @p{BlockMatrixArray}, its
-				    * position, matrix, prefix and
-				    * optional transposition must be
-				    * stored. This structure
-				    * encapsulates all of them.
-				    *
-				    * @author Guido Kanschat, 2000, 2001
-				    */
-  class Entry
-  {
   public:
 				     /**
-				      * Constructor initializing all
-				      * data fields.
+				      * Constructor fixing the
+				      * dimensions.
 				      */
-    Entry (const MATRIX& matrix,
-	   unsigned row, unsigned int col,
-	   double prefix, bool transpose);
-    
-				     /**
-				      * Row number in the block
-				      * matrix.
-				      */
-    unsigned int row;
+    BlockMatrixArray (const unsigned int n_block_rows,
+		      const unsigned int n_block_cols);
 
 				     /**
-				      * Column number in the block
-				      * matrix.
+				      * Add a block matrix entry.
 				      */
-    unsigned int col;
+    void enter (const MATRIX& matrix,
+		unsigned row,
+		unsigned int col,
+		double prefix = 1.,
+		bool transpose = false);
 
 				     /**
-				      * Factor in front of the matrix
-				      * block.
+				      * Number of block-entries per
+				      * column.
 				      */
-    double prefix;
+    unsigned int n_block_rows () const;
 
 				     /**
-				      * Indicates that matrix block
-				      * must be transposed for
+				      * Number of block-entries per
+				      * row.
+				      */
+    unsigned int n_block_cols () const;
+
+				     /**
+				      * Matrix-vector multiplication.
+				      */
+    template <class VECTOR>
+    void vmult (BlockVector<VECTOR>& dst,
+		const BlockVector<VECTOR>& src) const;
+  
+				     /**
+				      * Matrix-vector multiplication
+				      * adding to @p{dst}.
+				      */
+    template <class VECTOR>
+    void vmult_add (BlockVector<VECTOR>& dst,
+		    const BlockVector<VECTOR>& src) const;
+  
+				     /**
+				      * Transposed matrix-vector
 				      * multiplication.
 				      */
-    bool transpose;
+    template <class VECTOR>
+    void Tvmult (BlockVector<VECTOR>& dst,
+		 const BlockVector<VECTOR>& src) const;
+  
+				     /**
+				      * Transposed matrix-vector
+				      * multiplication adding to
+				      * @p{dst}.
+				      */
+    template <class VECTOR>
+    void Tvmult_add (BlockVector<VECTOR>& dst,
+		     const BlockVector<VECTOR>& src) const;
+  
+  private:
+				     /**
+				      * Internal data structure.
+				      *
+				      * For each entry of a
+				      * @p{BlockMatrixArray}, its
+				      * position, matrix, prefix and
+				      * optional transposition must be
+				      * stored. This structure
+				      * encapsulates all of them.
+				      *
+				      * @author Guido Kanschat, 2000, 2001
+				      */
+    class Entry
+    {
+      public:
+					 /**
+					  * Constructor initializing all
+					  * data fields.
+					  */
+	Entry (const MATRIX& matrix,
+	       unsigned row, unsigned int col,
+	       double prefix, bool transpose);
+    
+					 /**
+					  * Row number in the block
+					  * matrix.
+					  */
+	unsigned int row;
+
+					 /**
+					  * Column number in the block
+					  * matrix.
+					  */
+	unsigned int col;
+
+					 /**
+					  * Factor in front of the matrix
+					  * block.
+					  */
+	double prefix;
+
+					 /**
+					  * Indicates that matrix block
+					  * must be transposed for
+					  * multiplication.
+					  */
+	bool transpose;
+
+					 /**
+					  * The matrix block itself.
+					  */
+	SmartPointer<const MATRIX> matrix;
+    };
+  
+				     /**
+				      * Array of block entries in the
+				      * matrix.
+				      */
+    vector<Entry> entries;
 
 				     /**
-				      * The matrix block itself.
+				      * Number of blocks per column.
 				      */
-    SmartPointer<const MATRIX> matrix;
-  };
-  
-				   /**
-				    * Array of block entries in the
-				    * matrix.
-				    */
-  vector<Entry> entries;
-
-				   /**
-				    * Number of blocks per column.
-				    */
-  unsigned int block_rows;
-				   /**
-				    * number of blocks per row.
-				    */
-  unsigned int block_cols;
+    unsigned int block_rows;
+				     /**
+				      * number of blocks per row.
+				      */
+    unsigned int block_cols;
 };
 
 
@@ -180,12 +183,12 @@ inline
 BlockMatrixArray<MATRIX>::Entry::Entry (const MATRIX& matrix,
 					unsigned row, unsigned int col,
 					double prefix, bool transpose)
-  :
-  row (row),
-  col (col),
-  prefix (prefix),
-  transpose (transpose),
-  matrix (&matrix)
+		:
+		row (row),
+		col (col),
+		prefix (prefix),
+		transpose (transpose),
+		matrix (&matrix)
 {}
 
 
@@ -194,8 +197,8 @@ template <class MATRIX>
 inline
 BlockMatrixArray<MATRIX>::BlockMatrixArray (const unsigned int n_block_rows,
 					    const unsigned int n_block_cols)
-  : block_rows (n_block_rows),
-    block_cols (n_block_cols)
+		: block_rows (n_block_rows),
+		  block_cols (n_block_cols)
 {}
 
 
