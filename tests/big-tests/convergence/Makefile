@@ -71,6 +71,13 @@ flags     = $(CXXFLAGS.o)
 endif
 
 
+# If in multithread mode, add the ACE library to the libraries which
+# we need to link with:
+ifneq ($(with-multithreading),no)
+  libraries += $(lib-ACE)
+endif
+
+
 
 # make rule for the target
 $(target) : $(libraries)
