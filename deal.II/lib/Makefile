@@ -57,9 +57,9 @@ endif
            $(lib-contrib-petsc-path.o)/libpetsc.so
   external-links-petsc:
 	@echo Setting up libraries for PETSc
-	@$(CXX) -shared -o libpetsc_g.so \
+	@$(CXX) -shared -o libpetsc.g.so \
 		-Wl,-rpath,$(lib-contrib-petsc-path.g) $(xlib.g)
-	@$(CXX) -shared -o libpetsc_o.so \
+	@$(CXX) -shared -o libpetsc.o.so \
 		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
 
 else
