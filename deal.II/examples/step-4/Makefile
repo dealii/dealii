@@ -51,7 +51,7 @@ $(target) : $(libraries)
 
 # rule how to run the program
 run: $(target)
-	@echo ============================ Running $@
+	@echo ============================ Running $<
 	@./$(target)
 
 
