@@ -124,45 +124,7 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
           cell.material_id = 0;
           cells.push_back (cell);
         }
-    }
-    
-                                     // associate edges and faces on
-                                     // the outer boundary with
-                                     // boundary indicator 1. do this
-                                     // the same way as above, just
-                                     // this time with faces (edges
-                                     // follow from this
-                                     // immediately. some edges are
-                                     // duplicated since they belong
-                                     // to more than one cell, but
-                                     // that doesn't harm us here)
-    {
-      const unsigned int connectivity[8][2]
-        = { { 17,18 }, { 18, 19 }, { 19, 20 }, { 20, 21 },
-            { 21,22 }, { 22, 23 }, { 23, 24 }, { 24, 17 }};
-
-      for (unsigned int i=0; i<8; ++i)
-        {
-          const CellData<2> face = 
-            { { connectivity[i][0]+n_vertices_per_surface,
-                connectivity[i][1]+n_vertices_per_surface,
-                connectivity[i][1],
-                connectivity[i][0] },
-              1 };
-          sub_cell_data.boundary_quads.push_back (face);
-
-          const CellData<1> edges[4] = 
-            { { { connectivity[i][0],    connectivity[i][1]    }, 1 },
-              { { connectivity[i][0]+n_vertices_per_surface,
-                  connectivity[i][1]+n_vertices_per_surface }, 1 },
-              { { connectivity[i][0]+n_vertices_per_surface,
-                  connectivity[i][0]    }, 1 },
-              { { connectivity[i][1]+n_vertices_per_surface,
-                  connectivity[i][1]    }, 1 } };
-          for (unsigned int i=0; i<4; ++i)
-            sub_cell_data.boundary_lines.push_back (edges[i]);
-        }
-    }
+    }    
   }
 
                                    // the second part is setting the
@@ -234,37 +196,6 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
         }
     }
 
-                                     // assign boundary indicators to
-                                     // the faces and edges of these
-                                     // cells
-    {
-                                       // these are the numbers of the
-                                       // vertices on the top surface
-                                       // of the cylinder, with one
-                                       // "wrap-around":
-      const unsigned int vertices[9] = 
-        { 9, 10, 11, 12, 13, 14, 15, 16, 9 };
-                                       // their counter-parts are the
-                                       // same +50
-      for (unsigned int i=0; i<8; ++i)
-        {
-                                           // generate a face
-          const CellData<2> face = 
-            { { vertices[i],      vertices[i+1] ,
-                vertices[i+1]+50, vertices[i]+50 }, 2 };
-          sub_cell_data.boundary_quads.push_back (face);
-
-                                           // same for the faces
-          const CellData<1> edges[4] =
-            { { { vertices[i],      vertices[i+1]    }, 2 },
-              { { vertices[i]+50,   vertices[i+1]+50 }, 2 },
-              { { vertices[i],      vertices[i]+50   }, 2 },
-              { { vertices[i+1],    vertices[i+1]+50 }, 2 } };
-          for (unsigned int j=0; j<4; ++j)
-            sub_cell_data.boundary_lines.push_back (edges[j]);
-        }
-    }  
-
 
                                      // finally top the building
                                      // with four closing cells and
@@ -285,25 +216,6 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
             cell.vertices[j]   = connectivity[i][j];
           cell.material_id   = 0;
           cells.push_back (cell);
-        }
-
-                                       // generate boundary
-                                       // information for these cells,
-                                       // too
-      for (unsigned int i=0; i<4; ++i)
-        {
-          const CellData<2> face = 
-            { { connectivity[i][0], connectivity[i][1],
-                connectivity[i][2], connectivity[i][3] }, 2 };
-          sub_cell_data.boundary_quads.push_back (face);
-
-          const CellData<1> edges[4] =
-            { { { connectivity[i][0], connectivity[i][1] }, 2 },
-              { { connectivity[i][1], connectivity[i][2] }, 2 },
-              { { connectivity[i][2], connectivity[i][3] }, 2 },
-              { { connectivity[i][3], connectivity[i][0] }, 2 } };
-          for (unsigned int j=0; j<4; ++j)
-            sub_cell_data.boundary_lines.push_back (edges[j]);
         }
     }
   }
