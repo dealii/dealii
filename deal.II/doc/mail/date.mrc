@@ -127,46 +127,29 @@ deal.II Mailinglist
 
 <!-- Message formatting -->
 
-<Excs>
-content-
-errors-to
-forward
-lines
-message-id
-mime-
-nntp-
-originator
-path
-precedence
-received
-replied
-return-path
-status
-via
-x-
-to
-reply-to
-from
-subject
-cc
-in-reply-to
-</Excs>
 
 SubjectHeader>
 <H1>$SUBJECTNA$</H1>
 </SubjectHeader>
 
 <FieldsBeg>
- <!--
 </FieldsBeg>
 
 <FieldsEnd>
- -->
 </FieldsEnd>
+
+<LabelBeg>
+ <!--
+</LabelBeg>
+
+<FldEnd>
+ -->
+</FldEnd>
 
 <HeadBodySep>
 <p>
-From <strong>$FROMNAME$</strong> at <strong>$FROMADDRDOMAIN$</strong>,
-<em>$GMTDATE$</em></p>
+<strong>$FROMNAME$</strong> ($FROMADDRNAME$ at $FROMADDRDOMAIN$)
+<BR>
+<strong>$GMTDATE$</strong></p>
 <HR>
 </HeadBodySep>
