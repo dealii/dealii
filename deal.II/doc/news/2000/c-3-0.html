@@ -470,6 +470,20 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Extended: The <code class="member">GridIn::delete_unused_vertices</code>
+       function now eliminates vertices from the input that are not
+       referenced by any of the cells in the input file. This makes is
+       simpler to delete some cells from the input file by hand,
+       without the need to update the vertex lists, which can be
+       tiring as several cells usually use each vertex. All functions
+       in the <code class="class">GridIn</code> reading grids in
+       several input files call this function before passing the data
+       to the triangulation object.
+       <br>
+       (WB 2000/09/26)
+       </p>       
+
+  <li> <p>
        New: The <code class="class">GridIn</code>
        class can now read the basics of grids in DB Mesh format.
        <br>

@@ -25,9 +25,13 @@ template <int dim> class Triangulation;
 /**
  * This class implements an input mechanism for grid data. It allows
  * to read a grid structure into a triangulation object. At present,
- * only UCD (unstructured cell data) is supported as input format for
- * grid data. Any numerical data after the block of topological
- * information is ignored.
+ * only UCD (unstructured cell data) and DB Mesh is supported as input
+ * format for grid data. Any numerical data after the block of
+ * topological information is ignored.
+ *
+ * Note: if you experience unexpected problems with the use of this
+ * class, be sure to read the documentation right until the end, and
+ * also read the documentation of the @ref{GridReordering} class.
  *
  * To read grid data, the triangulation to be fed with has to be empty.
  * When giving a file which does not contain the assumed information or
@@ -67,13 +71,14 @@ template <int dim> class Triangulation;
  * @end{itemize}
  *
  *
- * @sect3{Structure of input grid data}
+ * @sect3{Structure of input grid data. The GridReordering class}
  * 
- * It is your duty to use a correct numbering of vertices in the cell list,
- * i.e. for lines, you have to first give the vertex with the lower coordinate
- * value, then that with the higher coordinate value. For quadrilaterals in
- * two dimensions, the vertex indices in the @p{quad} list have to be such that
- * the vertices are numbered in counter-clockwise sense.
+ * It is your duty to use a correct numbering of vertices in the cell
+ * list, i.e. for lines in 1d, you have to first give the vertex with
+ * the lower coordinate value, then that with the higher coordinate
+ * value. For quadrilaterals in two dimensions, the vertex indices in
+ * the @p{quad} list have to be such that the vertices are numbered in
+ * counter-clockwise sense.
  *
  * In two dimensions, another difficulty occurs, which has to do with the sense
  * of a quadrilateral. A quad consists of four lines which have a direction,
@@ -92,60 +97,34 @@ template <int dim> class Triangulation;
  *   |   |   |
  *   0---1---2
  * @end{verbatim}
- * may be characterised by the vertex numbers (0 1 4 3) and (1 2 5 4), since
- * the middle line would get the direction @p{1->4} when viewed from both cells.
- * The numbering (0 1 4 3) and (5 4 1 2) would not be allowed, since the left
- * quad would give the common line the direction @p{1->4}, while the right one
- * would want to use @p{4->1}, leading to ambiguity. The @ref{Triangulation} object
- * is capable of detecting this special case, which can be eliminated by
- * rotating the indices of the right quad by two. However, it would not
- * know what to do if you gave the vertex indices (4 1 2 5), since then it
- * would have to rotate by one element or three, the decision which to take is
- * not yet implemented.
+ * may be characterised by the vertex numbers @p{(0 1 4 3)} and
+ * @p{(1 2 5 4)}, since the middle line would get the direction @p{1->4}
+ * when viewed from both cells.  The numbering @p{(0 1 4 3)} and
+ * @p{(5 4 1 2)} would not be allowed, since the left quad would give the
+ * common line the direction @p{1->4}, while the right one would want
+ * to use @p{4->1}, leading to an ambiguity. The @ref{Triangulation}
+ * object is capable of detecting this special case, which can be
+ * eliminated by rotating the indices of the right quad by
+ * two. However, it would not know what to do if you gave the vertex
+ * indices @p{(4 1 2 5)}, since then it would have to rotate by one
+ * element or three, the decision which to take is not yet
+ * implemented.
  *
- * There are more ambiguous cases, where the triangulation may not know what
- * to do at all without the use of very sophisticated algorithms. On such example
- * is the following:
- * @begin{verbatim}
- *   9---10-----11
- *   |   |    / |
- *   6---7---8  |
- *   |   |   |  |
- *   3---4---5  |
- *   |   |    \ |
- *   0---1------2
- * @end{verbatim}
- * Assume that you had numbered the vertices in the cells at the left boundary
- * in a way, that the following line directions are induced:
- * @begin{verbatim}
- *   9->-10-----11
- *   ^   ^    / |
- *   6->-7---8  |
- *   ^   ^   |  |
- *   3->-4---5  |
- *   ^   ^    \ |
- *   0->-1------2
- * @end{verbatim}
- * (This could for example be done by using the indices (0 1 4 3), (3 4 7 6),
- * (6 7 10 9) for the three cells). Now, you will not find a way of giving
- * indices for the right cells, without introducing either ambiguity for
- * one line or other, or without violating that within each cells, there must be
- * one vertex from which both lines are directed away and the opposite one to
- * which both adjacent lines point to.
+ * There are more ambiguous cases, where the triangulation may not
+ * know what to do at all without the use of sophisticated
+ * algorithms. Furthermore, similar problems exist in three space
+ * dimensions, where faces and lines have orientations that need to be
+ * taken care of.
  *
- * The solution in this case is to renumber one of the three left cells, e.g.
- * by reverting the sense of the line between vertices 7 and 10 by numbering
- * the top left cell by (9 6 7 10).
+ * For this reason, the @p{read_*} functions of this class that read
+ * in grids in various input formats call the @ref{GridReordering}
+ * class to bring the order of vertices that define the cells into an
+ * ordering that satisfies the requiremenets of the
+ * @ref{Triangulation} class. Be sure to read the documentation of
+ * that class if you experience unexpected problems when reading grids
+ * through this class.
  *
- * But this is a thing that the triangulation
- * object can't do for you, since it would involve backtracking to cells
- * already created when we find that we can't number the indices of one of
- * the rightmost cells consistently. It is neither clear how to do this
- * backtracking nor whether it can be done with a stopping algorithm, if
- * possible within polynomial time. This kind of numbering must be made
- * upon construction of the coarse grid, unfortunately.
- *
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 2000
  */
 template <int dim>
 class GridIn
@@ -249,6 +228,86 @@ class GridIn
 				      */
     static void skip_comment_lines (istream    &in,
 				    const char  comment_start);
+
+				     /**
+				      * Remove vertices that are not
+				      * referenced by any of the
+				      * cells. This function is called
+				      * by all @p{read_*} functions to
+				      * eliminate vertices that are
+				      * listed in the input files but
+				      * are not used by the cells in
+				      * the input file. While these
+				      * vertices should not be in the
+				      * input from the beginning, they
+				      * sometimes are, most often when
+				      * some cells have been removed
+				      * by hand without wanting to
+				      * update the vertex lists, as
+				      * they might be lengthy.
+				      *
+				      * This function is called by all
+				      * @p{read_*} functions as the
+				      * triangulation class requires
+				      * them to be called with used
+				      * vertices only. This is so,
+				      * since the vertices are copied
+				      * verbatim by that class, so we
+				      * have to eliminate unused
+				      * vertices beforehand.
+				      */
+    static void delete_unused_vertices (vector<Point<dim> >    &vertices,
+					vector<CellData<dim> > &cells,
+					SubCellData            &subcelldata);
+
+				     /**
+				      * This function can write the
+				      * raw cell data objects created
+				      * by the @p{read_*} functions in
+				      * Gnuplot format to a
+				      * stream. This is sometimes
+				      * handy if one would like to see
+				      * what actually was created, if
+				      * it is known that the data is
+				      * not correct in some way, but
+				      * the @red{Triangulation} class
+				      * refuses to generate a
+				      * triangulation because of these
+				      * errors. In particular, the
+				      * output of this class writes
+				      * out the cell numbers along
+				      * with the direction of the
+				      * faces of each cell. In
+				      * particular the latter
+				      * information is needed to
+				      * verify whether the cell data
+				      * objects follow the
+				      * requirements of the ordering
+				      * of cells and their faces,
+				      * i.e. that all faces need to
+				      * have unique directions and
+				      * specified orientations with
+				      * respect to neighboring cells
+				      * (see the documentations to
+				      * this class and the
+				      * @ref{GridReordering} class).
+				      *
+				      * The output of this function
+				      * consists of vectors for each
+				      * line bounding the cells
+				      * indicating the direction it
+				      * has with respect to the
+				      * orientation of this cell, and
+				      * the cell number. The whole
+				      * output is in a form such that
+				      * it can be read in by Gnuplot
+				      * and generate the full plot
+				      * without further ado by the
+				      * user.
+				      */
+    static void debug_output_grid (const vector<CellData<dim> > &cells,
+				   const vector<Point<dim> >    &vertices,
+				   ostream                      &out);
 };
 
 

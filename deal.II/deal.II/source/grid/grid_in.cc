@@ -20,138 +20,10 @@
 #include <algorithm>
 
 
-template <int dim>
-void
-delete_unused_vertices (vector<Point<dim> >    &vertices,
-			vector<CellData<dim> > &cells,
-			SubCellData            &subcelldata)
-{
-				   // first check which vertices are
-				   // actually used
-  vector<bool> vertex_used (vertices.size(), false);
-  for (unsigned int c=0; c<cells.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-      vertex_used[cells[c].vertices[v]] = true;
-
-				   // then renumber the vertices that
-				   // are actually used in the same
-				   // order as they were beforehand
-  const unsigned int invalid_vertex = static_cast<unsigned int>(-1);
-  vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
-  unsigned int next_free_number = 0;
-  for (unsigned int i=0; i<vertices.size(); ++i)
-    if (vertex_used[i] == true)
-      {
-	new_vertex_numbers[i] = next_free_number;
-	++next_free_number;
-      };
-
-				   // next replace old vertex numbers
-				   // by the new ones
-  for (unsigned int c=0; c<cells.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-      cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
-
-				   // same for boundary data
-  for (unsigned int c=0; c<subcelldata.boundary_lines.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
-      subcelldata.boundary_lines[c].vertices[v]
-	= new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
-  for (unsigned int c=0; c<subcelldata.boundary_quads.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-      subcelldata.boundary_quads[c].vertices[v]
-	= new_vertex_numbers[subcelldata.boundary_quads[c].vertices[v]];
-
-				   // finally copy over the vertices
-				   // which we really need to a new
-				   // array and replace the old one by
-				   // the new one
-  vector<Point<dim> > tmp;
-  tmp.reserve (count(vertex_used.begin(), vertex_used.end(), true));
-  for (unsigned int v=0; v<vertices.size(); ++v)
-    if (vertex_used[v] == true)
-      tmp.push_back (vertices[v]);
-  swap (vertices, tmp);
-};
 
 
 
 #include <fstream>
-void
-debug_output (const vector<CellData<3> > &cells,
-	      const vector<Point<3> >    &vertices,
-	      const string               &filename);
-void
-debug_output (const vector<CellData<1> > &cells,
-	      const vector<Point<1> >    &vertices,
-	      const string               &filename);
-void
-debug_output (const vector<CellData<2> > &cells,
-	      const vector<Point<2> >    &vertices,
-	      const string               &filename)
-{
-  double min_x = vertices[cells[0].vertices[0]](0),
-	 max_x = vertices[cells[0].vertices[0]](0),
-	 min_y = vertices[cells[0].vertices[0]](1),
-	 max_y = vertices[cells[0].vertices[0]](1);
-  
-  ofstream x(filename.c_str());
-  for (unsigned int i=0; i<cells.size(); ++i)
-    {
-      for (unsigned int v=0; v<4; ++v)
-	{
-	  const Point<2> &p = vertices[cells[i].vertices[v]];
-	  
-	  if (p(0) < min_x)
-	    min_x = p(0);
-	  if (p(0) > max_x)
-	    max_x = p(0);
-	  if (p(1) < min_y)
-	    min_y = p(1);
-	  if (p(1) > max_y)
-	    max_y = p(1);
-	};
-
-      x << "# cell " << i << endl;
-      Point<2> center;
-      for (unsigned int f=0; f<4; ++f)
-	center += vertices[cells[i].vertices[f]];
-      center /= 4;
-
-      x << "set label \"" << i << "\" at "
-	<< center(0) << ',' << center(1)
-	<< " center"
-	<< endl;
-
-				       // first two line right direction
-      for (unsigned int f=0; f<2; ++f)
-	x << "set arrow from "
-	  << vertices[cells[i].vertices[f]](0) << ',' << vertices[cells[i].vertices[f]](1)
-	  << " to "
-	  << vertices[cells[i].vertices[(f+1)%4]](0) << ',' << vertices[cells[i].vertices[(f+1)%4]](1)
-	  << endl;
-				       // other two lines reverse direction
-      for (unsigned int f=2; f<4; ++f)
-	x << "set arrow from "
-	  << vertices[cells[i].vertices[(f+1)%4]](0) << ',' << vertices[cells[i].vertices[(f+1)%4]](1)
-	  << " to "
-	  << vertices[cells[i].vertices[f]](0) << ',' << vertices[cells[i].vertices[f]](1)
-	  << endl;
-      x << endl;
-    };
-  
-
-  x << endl
-    << "pl [" << min_x << ':' << max_x << "]["
-    << min_y << ':' << max_y <<  "] "
-    << min_y << endl
-    << "pause -1" << endl;
-};
-
-      
-
-
-
 
 
 template <int dim>
@@ -285,6 +157,8 @@ void GridIn<dim>::read_ucd (istream &in)
 
   AssertThrow (in, ExcIO());
 
+				   // do some clean-up on vertices
+  delete_unused_vertices (vertices, cells, subcelldata);
   tria->create_triangulation (vertices, cells, subcelldata);
 };
 
@@ -447,10 +321,12 @@ void GridIn<dim>::read_dbmesh (istream &in)
 
 				   // do some clean-up on vertices
   delete_unused_vertices (vertices, cells, subcelldata);
-  
-  debug_output (cells, vertices, "x1");
+
+  ofstream x1("x1");
+  debug_output_grid (cells, vertices, x1);
   GridReordering<dim>::reorder_cells (cells);
-  debug_output (cells, vertices, "x2");
+  ofstream x2("x2");
+  debug_output_grid (cells, vertices, x2);
   tria->create_triangulation (vertices, cells, subcelldata);
 };
 
@@ -502,6 +378,143 @@ void GridIn<dim>::skip_comment_lines (istream    &in,
 };
 
 
+
+template <int dim>
+void
+GridIn<dim>::delete_unused_vertices (vector<Point<dim> >    &vertices,
+				     vector<CellData<dim> > &cells,
+				     SubCellData            &subcelldata)
+{
+				   // first check which vertices are
+				   // actually used
+  vector<bool> vertex_used (vertices.size(), false);
+  for (unsigned int c=0; c<cells.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      vertex_used[cells[c].vertices[v]] = true;
+
+				   // then renumber the vertices that
+				   // are actually used in the same
+				   // order as they were beforehand
+  const unsigned int invalid_vertex = static_cast<unsigned int>(-1);
+  vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
+  unsigned int next_free_number = 0;
+  for (unsigned int i=0; i<vertices.size(); ++i)
+    if (vertex_used[i] == true)
+      {
+	new_vertex_numbers[i] = next_free_number;
+	++next_free_number;
+      };
+
+				   // next replace old vertex numbers
+				   // by the new ones
+  for (unsigned int c=0; c<cells.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
+
+				   // same for boundary data
+  for (unsigned int c=0; c<subcelldata.boundary_lines.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+      subcelldata.boundary_lines[c].vertices[v]
+	= new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
+  for (unsigned int c=0; c<subcelldata.boundary_quads.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+      subcelldata.boundary_quads[c].vertices[v]
+	= new_vertex_numbers[subcelldata.boundary_quads[c].vertices[v]];
+
+				   // finally copy over the vertices
+				   // which we really need to a new
+				   // array and replace the old one by
+				   // the new one
+  vector<Point<dim> > tmp;
+  tmp.reserve (count(vertex_used.begin(), vertex_used.end(), true));
+  for (unsigned int v=0; v<vertices.size(); ++v)
+    if (vertex_used[v] == true)
+      tmp.push_back (vertices[v]);
+  swap (vertices, tmp);
+};
+
+
+
+template <int dim>
+void GridIn<dim>::debug_output_grid (const vector<CellData<dim> > &/*cells*/,
+				     const vector<Point<dim> >    &/*vertices*/,
+				     ostream                      &/*out*/)
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+#if deal_II_dimension == 2
+
+template <>
+void
+GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
+			      const vector<Point<2> >    &vertices,
+			      ostream                    &out)
+{
+  double min_x = vertices[cells[0].vertices[0]](0),
+	 max_x = vertices[cells[0].vertices[0]](0),
+	 min_y = vertices[cells[0].vertices[0]](1),
+	 max_y = vertices[cells[0].vertices[0]](1);
+  
+  for (unsigned int i=0; i<cells.size(); ++i)
+    {
+      for (unsigned int v=0; v<4; ++v)
+	{
+	  const Point<2> &p = vertices[cells[i].vertices[v]];
+	  
+	  if (p(0) < min_x)
+	    min_x = p(0);
+	  if (p(0) > max_x)
+	    max_x = p(0);
+	  if (p(1) < min_y)
+	    min_y = p(1);
+	  if (p(1) > max_y)
+	    max_y = p(1);
+	};
+
+      out << "# cell " << i << endl;
+      Point<2> center;
+      for (unsigned int f=0; f<4; ++f)
+	center += vertices[cells[i].vertices[f]];
+      center /= 4;
+
+      out << "set label \"" << i << "\" at "
+	  << center(0) << ',' << center(1)
+	  << " center"
+	  << endl;
+
+				       // first two line right direction
+      for (unsigned int f=0; f<2; ++f)
+	out << "set arrow from "
+	    << vertices[cells[i].vertices[f]](0) << ',' 
+	    << vertices[cells[i].vertices[f]](1)
+	    << " to "
+	    << vertices[cells[i].vertices[(f+1)%4]](0) << ',' 
+	    << vertices[cells[i].vertices[(f+1)%4]](1)
+	    << endl;
+				       // other two lines reverse direction
+      for (unsigned int f=2; f<4; ++f)
+	out << "set arrow from "
+	    << vertices[cells[i].vertices[(f+1)%4]](0) << ',' 
+	    << vertices[cells[i].vertices[(f+1)%4]](1)
+	    << " to "
+	    << vertices[cells[i].vertices[f]](0) << ',' 
+	    << vertices[cells[i].vertices[f]](1)
+	    << endl;
+      out << endl;
+    };
+  
+
+  out << endl
+      << "set nokey" << endl
+      << "pl [" << min_x << ':' << max_x << "]["
+      << min_y << ':' << max_y <<  "] "
+      << min_y << endl
+      << "pause -1" << endl;
+};
+
+#endif
 
 
 //explicit instantiations
