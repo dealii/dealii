@@ -295,10 +295,10 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
   number2 s;
   const unsigned int size_m = m(),
 		     size_n = n();
-  for (i=0; i<size_m; ++i)
+  for (i=0; i<size_n; ++i)
   {
     s = 0.;
-    for (j=0; j<size_n; ++j)
+    for (j=0; j<size_m; ++j)
       s += src(j) * el(j,i);
     if(!adding) dst(i) = s;
     else dst(i) += s;
