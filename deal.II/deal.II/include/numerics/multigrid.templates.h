@@ -1,4 +1,9 @@
-// $Id$
+/*----------------------------   multigrid.templates.h     ---------------------------*/
+/*      $Id$                 */
+#ifndef __multigrid.templates_H
+#define __multigrid.templates_H
+/*----------------------------   multigrid.templates.h     ---------------------------*/
+
 
 #include <grid/dof_constraints.h>
 #include <numerics/multigrid.h>
@@ -126,3 +131,10 @@ MG<dim>::copy_from_mg(Vector<number> &dst) const
   constraints->set_zero(dst);
 }
 
+
+
+
+/*----------------------------   multigrid.templates.h     ---------------------------*/
+/* end of #ifndef __multigrid.templates_H */
+#endif
+/*----------------------------   multigrid.templates.h     ---------------------------*/
