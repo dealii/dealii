@@ -1,11 +1,12 @@
 # $Id$
 
-######################################################################
+################################################################ 
 # This example program will only work if PETSc is installed. If this
 # is not the case, then simply redefine the main targets to to nothing
-ifeq ($(USE_CONTRIB_PETSC),yes)
+ifneq ($(USE_CONTRIB_PETSC),yes)
 default:
 run:
+endif
 #
 ################################################################
 
@@ -159,8 +160,3 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
-################################################################
-# If PETSc is not installed nothing needs to be done.
-else
-default:
-endif
