@@ -1036,9 +1036,6 @@ SparseMatrix<number>::PSOR (Vector<somenumber>& dst,
 	    {
 	      s -= val[j] * dst(col);
 	    }
-	  
-	  std::cerr << std::endl;
-	  
 	}
 
       dst(row) = s * om / val[cols->rowstart[row]];
