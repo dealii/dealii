@@ -21,8 +21,8 @@
 
 
 // forward declarations
-
 template<typename number> class Vector;
+
 
 
 /**
@@ -44,25 +44,6 @@ template<typename number> class Vector;
  * vector argument to functions. If there is no argument with a number
  * type, the matrix number type is used.
  *
- * <TABLE BORDER=1>
- * <TR><TH ALIGN=CENTER><B>this</B><TH ALIGN=CENTER><B>other
- * matrix</B><TH ALIGN=CENTER><B>vector</B><TH ALIGN=CENTER><B>rhs in
- * residual</B></TR>
- * <TR><TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>double</TR>
- * <TR><TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>float<TD ALIGN=CENTER>double</TR>
- * <TR><TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float</TR>
- * <TR><TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>double<TD ALIGN=CENTER>double</TR>
- * <TR><TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>double</TR>
- * <TR><TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float</TR>
- * <CAPTION>Instantiations provided in the library</CAPTION>
- * </TABLE>
- *
- * In the documentation of member functions, the following conventions are adopted:
- * \begin{itemize}
- *  \item THIS matrix is always named #A#.
- *  \item Matrices are always uppercase, vectors and scalars are lowercase.
- *  \item #Transp(A)# denotes the transpose of matrix A.
- * \end{itemize}
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
@@ -135,7 +116,7 @@ class FullMatrix : public Subscriptor
     FullMatrix<number>& operator = (const FullMatrix<number2>& src);
 
 
-/**
+				     /**
 				      * Fill rectangular block.
 				      *
 				      * The matrix #src# is copied
@@ -670,12 +651,14 @@ FullMatrix<number>::el (const unsigned int i, const unsigned int j)
 };
 
 
+
 template <typename number>
 inline number
 FullMatrix<number>::el (const unsigned int i, const unsigned int j) const
 {
   return val[i*dim_range+j];
 };
+
 
 
 template <typename number>
@@ -686,6 +669,7 @@ FullMatrix<number>::m() const
 };
 
 
+
 template <typename number>
 inline unsigned int
 FullMatrix<number>::n() const
@@ -693,13 +677,6 @@ FullMatrix<number>::n() const
   return dim_range;
 };
 
-
-// template <typename number>
-// inline number
-// FullMatrix<number>::el (const unsigned int i) const
-// {
-//   return val[i];
-// };
 
 
 template <typename number>
@@ -712,6 +689,7 @@ FullMatrix<number>::operator() (const unsigned int i, const unsigned int j) cons
 };
 
 
+
 template <typename number>
 inline number &
 FullMatrix<number>::operator() (const unsigned int i, const unsigned int j)
@@ -719,7 +697,7 @@ FullMatrix<number>::operator() (const unsigned int i, const unsigned int j)
   Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
   Assert (j<dim_range, ExcInvalidIndex (j, dim_range));
   return el(i,j);
-}
+};
 
 
 /*----------------------------   fullmatrix.h     ---------------------------*/
