@@ -4093,6 +4093,7 @@ template <int dim>
 unsigned int
 Triangulation<dim>::n_faces(unsigned int l) const
 {
+  Assert (dim<=3, ExcNotImplemented());
   if (dim==2) return n_lines(l);
   if (dim==3) return n_quads(l);
   return 0;
@@ -4104,12 +4105,15 @@ template <int dim>
 unsigned int
 Triangulation<dim>::n_active_faces(unsigned int l) const
 {
+  Assert (dim<=3, ExcNotImplemented());
   if (dim==2) return n_active_lines(l);
   if (dim==3) return n_active_quads(l);
   return 0;
 }
 
 
+//TODO:[GK] Implement this like above and remove specialization declaration in tria.h
+//TODO:[GK] Add a remark to Triangulation doc telling 1d-Triangulations have no face
 
 #if deal_II_dimension == 1
 
