@@ -394,16 +394,16 @@ MGTools::make_flux_sparsity_pattern_edge (
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
-  Table<2,bool> support_on_face(total_dofs, GeometryInfo<dim>::faces_per_cell);
+  Table<2,bool> support_on_face(dofs_per_cell, GeometryInfo<dim>::faces_per_cell);
   
   typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
-   Table<2,DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
+   Table<2,DoFTools::Coupling> flux_dof_mask(dofs_per_cell, dofs_per_cell);
 
    DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
   
-  for (unsigned int i=0; i<total_dofs; ++i)
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)
       support_on_face(i,f) = fe.has_support_on_face(i,f);
   
