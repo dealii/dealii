@@ -105,14 +105,14 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
                                        // and copy it
       PetscScalar *start_ptr;
       int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
-      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
       
       std::copy (start_ptr, start_ptr+dim, begin());
 
                                        // restore the representation of the
                                        // vector
       ierr = VecRestoreArray (static_cast<const Vec&>(v), &start_ptr);
-      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 }
 
@@ -653,14 +653,14 @@ Vector<Number>::operator = (const PETScWrappers::Vector &v)
                                        // and copy it
       PetscScalar *start_ptr;
       int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
-      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
       
       std::copy (start_ptr, start_ptr+dim, begin());
 
                                        // restore the representation of the
                                        // vector
       ierr = VecRestoreArray (static_cast<const Vec&>(v), &start_ptr);
-      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 
   return *this;
