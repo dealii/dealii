@@ -35,11 +35,11 @@ documentation, etc</a>.
        (GK 2001/03/14)
        </p>
 
-  <li> <p>
-       <a name="new_fe_mapping_design"></a>
-       <h4> New Design of <code class="class">FiniteElements</code>
-       and <code class="class">Mappings</code></h4>
-
+  <li> <a name="new_fe_mapping_design"></a>
+       <i> New Design of <code class="class">FiniteElements</code>
+       and <code class="class">Mappings</code></i>
+              
+       <p>
        New: The finite element
        classes have been redesigned from scratch to allow also
        elements that depend on the actual cell shape, like
@@ -72,9 +72,20 @@ documentation, etc</a>.
        <acronym>deal.II</acronym> as we tried to retain the interface
        to the user (mainly that of <code
        class="class">FEValues</code>) as far as possible.
-       <br>
+       </p>
 
        <p>
+       Together with this new design comes a reduction of 25000(!)
+       lines of <acronym>deal.II</acronym> code. This elimination
+       mainly affected code that previously was machine generated
+       (e.g. by maple). In view of almost unchanged execution times of
+       applications, the faster compilation and additional
+       functionality constitutes a significant improvement of
+       <acronym>deal.II</acronym>. Results produced by the new code
+       match those of the old design up to machine precision.
+       </p>
+       
+       <br>
        (RH & GK 2001/03/13)
        </p>
 
@@ -312,8 +323,8 @@ documentation, etc</a>.
        </p>
 
        <p>
-       There still exists a constructor of <code
-       class="class">FEValues</code> without a <code
+       For backward compatibility there still exists a constructor of
+       <code class="class">FEValues</code> without a <code
        class="class">Mapping</code> argument that uses a <code
        class="class">MappingQ1</code> by default.
        <br>
