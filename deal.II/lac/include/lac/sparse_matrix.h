@@ -33,8 +33,8 @@ namespace internals
   namespace SparseMatrixIterators
   {
                                      // forward declaration
-    template <typename number, bool Constness> class Iterator;
-    
+    template <typename number, bool Constness>
+    class Iterator;
 
                                      /**
                                       * General template for sparse matrix
@@ -103,19 +103,21 @@ namespace internals
                                           * Value of this matrix entry.
                                           */
         number value() const;
+
+                                         /**
+                                          * Return a reference to the matrix
+                                          * into which this accessor
+                                          * points. Note that in the present
+                                          * case, this is a constant
+                                          * reference.
+                                          */
+        MatrixType & get_matrix () const;
         
       private:
                                          /**
                                           * Pointer to the matrix we use.
                                           */
-        const MatrixType *matrix;
-        
-                                         /**
-                                          * Make iterator class a
-                                          * friend.
-                                          */
-        template <typename, bool>
-        friend class internals::SparseMatrixIterators::Iterator;
+        MatrixType *matrix;
     };
     
 
@@ -132,17 +134,28 @@ namespace internals
     template <typename number>
     class Accessor<number,false> : public SparsityPatternIterators::Accessor
     {
+      private:
+                                         /**
+                                          * Reference class. This is what the
+                                          * accessor class returns when you
+                                          * call the value() function. The
+                                          * reference acts just as if it were
+                                          * a reference to the actual value of
+                                          * a matrix entry, i.e. you can read
+                                          * and write it, you can add and
+                                          * multiply to it, etc, but since the
+                                          * matrix does not give away the
+                                          * address of this matrix entry, we
+                                          * have to go through functions to do
+                                          * all this.
+                                          */
         class Reference 
         {
-          private:
+          public:
                                              /**
-                                              * Constructor. Made private so
-                                              * as to only allow friend
-                                              * classes access to it.
+                                              * Constructor.
                                               */
             Reference (const Accessor *accessor);
-
-          public:
 
                                              /**
                                               * Conversion operator to the
@@ -190,23 +203,8 @@ namespace internals
                                               * presently point to.
                                               */
             const Accessor *accessor;
-
-                                             /**
-                                              * Make the accessor class a
-                                              * friend so as to allow it to
-                                              * generate objects of this
-                                              * type. To avoid trouble with
-                                              * some compilers simply mark all
-                                              * accessor classes as friends.
-                                              *
-                                              * We fully state the namespace
-                                              * of the accessor class to work
-                                              * around a bug in gcc2.95.
-                                              */
-            template <typename, bool>
-            friend class internals::SparseMatrixIterators::Accessor;
         };
-            
+
       public:
                                          /**
                                           * Typedef for the type (including
@@ -229,6 +227,15 @@ namespace internals
                                           */
         Reference value() const;
         
+                                         /**
+                                          * Return a reference to the matrix
+                                          * into which this accessor
+                                          * points. Note that in the present
+                                          * case, this is a non-constant
+                                          * reference.
+                                          */
+        MatrixType & get_matrix () const;
+
       private:
                                          /**
                                           * Pointer to the matrix we use.
@@ -236,19 +243,10 @@ namespace internals
         MatrixType *matrix;
 
                                          /**
-                                          * Make all other accessor classes
-                                          * friends.
+                                          * Make the inner reference class a
+                                          * friend if the compiler has a bug
+                                          * and requires this.
                                           */
-        template <typename, bool>
-        friend class internals::SparseMatrixIterators::Accessor;
-
-                                         /**
-                                          * Make iterator class a
-                                          * friend.
-                                          */
-        template <typename, bool>
-        friend class internals::SparseMatrixIterators::Iterator;
-
 #ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
         friend class Reference;
 #endif
@@ -367,12 +365,6 @@ namespace internals
                                           * accessor class.
                                           */
         Accessor<number,Constness> accessor;
-
-                                         /**
-                                          * Make all other iterators friends.
-                                          */
-        template <typename, bool>
-        friend class internals::SparseMatrixIterators::Iterator;
     };
     
   }
@@ -1847,9 +1839,19 @@ namespace internals
     template <typename number>
     inline
     number
-    Accessor<number, true>::value() const
+    Accessor<number, true>::value () const
     {
       return matrix->raw_entry(a_row, a_index);
+    }
+
+
+    
+    template <typename number>
+    inline
+    typename Accessor<number, true>::MatrixType &
+    Accessor<number, true>::get_matrix () const
+    {
+      return *matrix;
     }
 
 
@@ -1963,6 +1965,16 @@ namespace internals
 
 
           
+    template <typename number>
+    inline
+    typename Accessor<number, false>::MatrixType &
+    Accessor<number, false>::get_matrix () const
+    {
+      return *matrix;
+    }
+
+
+    
     template <typename number, bool Constness>
     inline
     Iterator<number, Constness>::
@@ -1990,26 +2002,7 @@ namespace internals
     Iterator<number, Constness> &
     Iterator<number,Constness>::operator++ ()
     {
-      Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
-
-                                       // move to next element
-      ++accessor.a_index;
-
-                                       // if at end of line: cycle until we
-                                       // find a row with a nonzero number of
-                                       // entries
-      while (accessor.a_index >=
-             accessor.matrix->get_sparsity_pattern().row_length(accessor.a_row))
-        {
-          accessor.a_index = 0;
-          ++accessor.a_row;
-
-                                           // if we happened to find the end
-                                           // of the matrix, then stop here
-          if (accessor.a_row == accessor.matrix->m())
-            break;
-        }
-      
+      accessor.advance ();
       return *this;
     }
 
@@ -2019,27 +2012,8 @@ namespace internals
     Iterator<number,Constness>
     Iterator<number,Constness>::operator++ (int)
     {
-      Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
-
-      const Iterator iter=*this;
-  
-      ++accessor.a_index;
-
-                                       // if at end of line: cycle until we
-                                       // find a row with a nonzero number of
-                                       // entries
-      while (accessor.a_index >=
-             accessor.matrix->get_sparsity_pattern().row_length(accessor.a_row))
-        {
-          accessor.a_index = 0;
-          ++accessor.a_row;
-
-                                           // if we happened to find the end
-                                           // of the matrix, then stop here
-          if (accessor.a_row == accessor.matrix->m())
-            break;
-        }
-
+      const Iterator iter = *this;
+      accessor.advance ();
       return iter;
     }
 
@@ -2068,7 +2042,7 @@ namespace internals
     Iterator<number,Constness>::
     operator == (const Iterator& other) const
     {
-      return (accessor.matrix  == other.accessor.matrix &&
+      return (&accessor.get_matrix() == &other.accessor.get_matrix() &&
               accessor.row()   == other.accessor.row() &&
               accessor.index() == other.accessor.index());
     }

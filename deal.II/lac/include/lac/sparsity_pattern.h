@@ -90,6 +90,18 @@ namespace internals
                                           * certain elements of the matrix.
                                           */
         unsigned int column() const;
+
+                                         /**
+                                          * Move the accessor to the next
+                                          * nonzero entry in the matrix. This
+                                          * function should actually only be
+                                          * called from iterator classes, but
+                                          * due to various problems with
+                                          * friends and templates in gcc 2.95,
+                                          * we can't make it protected. Don't
+                                          * use it in your own programs.
+                                          */
+        void advance ();
 	
       protected:
                                          /**
@@ -1541,6 +1553,31 @@ namespace internals
 
 
     inline
+    void
+    Accessor::advance ()
+    {      
+      Assert (a_row < sparsity_pattern->n_rows(), ExcIteratorPastEnd());
+  
+      ++a_index;
+
+                                       // if at end of line: cycle until we
+                                       // find a row with a nonzero number of
+                                       // entries
+      while (a_index >= sparsity_pattern->row_length(a_row))
+        {
+          a_index = 0;
+          ++a_row;
+
+                                           // if we happened to find the end
+                                           // of the matrix, then stop here
+          if (a_row == sparsity_pattern->n_rows())
+            break;
+        }
+    }
+    
+
+
+    inline
     Iterator::Iterator (const SparsityPattern *sparsity_pattern,
                         const unsigned int     r,
                         const unsigned int     i)
@@ -1554,26 +1591,7 @@ namespace internals
     Iterator &
     Iterator::operator++ ()
     {
-      Assert (accessor.a_row < accessor.sparsity_pattern->n_rows(),
-              ExcIteratorPastEnd());
-  
-      ++accessor.a_index;
-
-                                       // if at end of line: cycle until we
-                                       // find a row with a nonzero number of
-                                       // entries
-      while (accessor.a_index >=
-             accessor.sparsity_pattern->row_length(accessor.a_row))
-        {
-          accessor.a_index = 0;
-          ++accessor.a_row;
-
-                                           // if we happened to find the end
-                                           // of the matrix, then stop here
-          if (accessor.a_row == accessor.sparsity_pattern->n_rows())
-            break;
-        }
-
+      accessor.advance ();
       return *this;
     }
 
@@ -1583,28 +1601,8 @@ namespace internals
     Iterator
     Iterator::operator++ (int)
     {
-      Assert (accessor.a_row < accessor.sparsity_pattern->n_rows(),
-              ExcIteratorPastEnd());
-
-      const Iterator iter=*this;
-  
-      ++accessor.a_index;
-
-                                       // if at end of line: cycle until we
-                                       // find a row with a nonzero number of
-                                       // entries
-      while (accessor.a_index >=
-             accessor.sparsity_pattern->row_length(accessor.a_row))
-        {
-          accessor.a_index = 0;
-          ++accessor.a_row;
-
-                                           // if we happened to find the end
-                                           // of the matrix, then stop here
-          if (accessor.a_row == accessor.sparsity_pattern->n_rows())
-            break;
-        }
-
+      const Iterator iter = *this;
+      accessor.advance ();
       return iter;
     }
 
