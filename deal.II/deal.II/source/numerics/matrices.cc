@@ -671,9 +671,35 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			   cell_matrix(i,j));
 	      else
 		{
-//TODO:[?] We assume here that shape functions that have support also on the boundary also have their support point on the boundary (by having their indices in dof_is_on_face set true). This is not true, however, e.g. for discontinuous elements.
-						   // compare here for relative
-						   // smallness
+						   // assume that all
+						   // shape functions
+						   // that are nonzero
+						   // on the boundary
+						   // are also listed
+						   // in the
+						   // @p{dof_to_boundary}
+						   // mapping. if that
+						   // is not the case,
+						   // then the
+						   // boundary mass
+						   // matrix does not
+						   // make that much
+						   // sense anyway, as
+						   // it only contains
+						   // entries for
+						   // parts of the
+						   // functions living
+						   // on the boundary
+						   //
+						   // these, we may
+						   // compare here for
+						   // relative
+						   // smallness of all
+						   // entries in the
+						   // local matrix
+						   // which are not
+						   // taken over to
+						   // the global one
 		  Assert (std::fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
 			  ExcInternalError ());
 		};
