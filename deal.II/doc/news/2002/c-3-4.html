@@ -403,6 +403,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: The <code
+       class="member">FiniteElement::element_multiplicity</code> function was
+       previously only available in the <code class="class">FESystem</code>
+       class, where it actually returned a non-trivial value. However, in some
+       cases one would need to access this field also for general finite
+       elements, even if the returned value will be equal to one in all cases
+       other than a composed element.
+       <br>
+       (WB 2002/10/17)
+       </p>
+
+  <li> <p> 
        Fixed: The algorithm to generate neighbor information for patches from
        cells in <code class="member">DataOut::build_patches</code> was rather
        inefficient, tripling the time for patch generation when support for
