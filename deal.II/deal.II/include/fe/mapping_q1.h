@@ -514,4 +514,56 @@ class MappingQ1 : public Mapping<dim>
 };
 
 
+/* -------------- declaration of explicit specializations ------------- */
+
+
+template<> const unsigned int MappingQ1<1>::vertex_mapping[2];
+template<> const unsigned int MappingQ1<2>::vertex_mapping[4];
+template<> const unsigned int MappingQ1<3>::vertex_mapping[8];
+
+template<> void MappingQ1<1>::compute_shapes_virtual (
+  const std::vector<Point<1> > &unit_points,
+  InternalData& data) const;
+template<> void MappingQ1<2>::compute_shapes_virtual (
+  const std::vector<Point<2> > &unit_points,
+  InternalData &data) const;
+template<> void MappingQ1<3>::compute_shapes_virtual (
+  const std::vector<Point<3> > &unit_points,
+  InternalData &data) const;
+
+template <> void MappingQ1<1>::compute_fill_face (
+  const DoFHandler<1>::cell_iterator &,
+  const unsigned int,
+  const bool,
+  const unsigned int,
+  const unsigned int,
+  const std::vector<double> &,
+  InternalData &,
+  std::vector<Point<1> > &,
+  std::vector<double> &,
+  std::vector<Tensor<1,1> > &,
+  std::vector<Point<1> > &) const;
+
+template <> void MappingQ1<1>::fill_fe_face_values (
+  const DoFHandler<1>::cell_iterator &,
+  const unsigned,
+  const Quadrature<0>&,
+  Mapping<1>::InternalDataBase&,
+  std::vector<Point<1> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,1> >&,
+  std::vector<Point<1> >&) const;
+
+template <> void MappingQ1<1>::fill_fe_subface_values (
+  const DoFHandler<1>::cell_iterator &,
+  const unsigned,
+  const unsigned,
+  const Quadrature<0>&,
+  Mapping<1>::InternalDataBase&,
+  std::vector<Point<1> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,1> >&,
+  std::vector<Point<1> >&) const;
+
+
 #endif
