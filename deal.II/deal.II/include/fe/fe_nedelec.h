@@ -47,7 +47,7 @@ template <int dim> class MappingQ;
  * gradients of scalar shape functions on the real cell. They are thus
  * the inverse Jacobian matrix times the gradients of scalar shape
  * functions on the unit cell. The gradient of Nedelec shape functions
- * is then, by the product rule, the sum of first the derovative (with
+ * is then, by the product rule, the sum of first the derivative (with
  * respect to true coordinates) of the inverse Jacobian times the
  * gradient (in unit coordinates) of the scalar shape function, plus
  * second the inverse Jacobian times the derivative (in true
