@@ -1,4 +1,4 @@
-//----------------------------  subdomain_ids_01.cc  ---------------------------
+//----------------------------  subdomain_ids_03.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,9 +9,9 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  subdomain_ids_01.cc  ---------------------------
+//----------------------------  subdomain_ids_03.cc  ---------------------------
 
-// check DoFTools::extract_subdomain_dofs
+// check DoFRenumbering::compute_subdomain_wise
 
 
 #include "../tests.h"
@@ -26,13 +26,14 @@
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <dofs/dof_tools.h>
+#include <dofs/dof_renumbering.h>
 
 #include <fstream>
 #include <algorithm>
 #include <cmath>
 
 
-std::ofstream logfile("subdomain_ids_01.output");
+std::ofstream logfile("subdomain_ids_03.output");
 
 
 template <int dim>
@@ -68,21 +69,12 @@ void test ()
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
   deallog << dof_handler.n_dofs() << std::endl;
-  
-  std::vector<bool> selected_dofs (dof_handler.n_dofs());
-  for (unsigned int subdomain=0; subdomain<(1<<dim); ++subdomain)
-    {
-                                       // count number on dofs on
-                                       // subdomain. note that they add up to
-                                       // more than n_dofs() since the ones on
-                                       // the interfaces count for each
-                                       // subdomain
-      DoFTools::extract_subdomain_dofs (dof_handler, subdomain,
-                                        selected_dofs);
-      deallog << std::count (selected_dofs.begin(),
-                             selected_dofs.end(), true)
-              << std::endl;
-    }
+
+  std::vector<unsigned int> new_indices (dof_handler.n_dofs());
+  DoFRenumbering::compute_subdomain_wise (new_indices, dof_handler);
+
+  for (unsigned int i=0; i<new_indices.size(); ++i)
+    deallog << i << ' ' << new_indices[i] << std::endl;
 }
 
 

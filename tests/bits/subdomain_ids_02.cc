@@ -35,12 +35,6 @@
 std::ofstream logfile("subdomain_ids_02.output");
 
 
-DeclException2 (ExcNumberMismatch,
-		int, int,
-		<< "The numbers " << arg1 << " and " << arg2
-		<< " should be equal, but are not.");
-
-
 template <int dim>
 void test ()
 {

@@ -1,4 +1,4 @@
-//----------------------------  subdomain_ids_01.cc  ---------------------------
+//----------------------------  subdomain_ids_04.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,9 +9,9 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  subdomain_ids_01.cc  ---------------------------
+//----------------------------  subdomain_ids_04.cc  ---------------------------
 
-// check DoFTools::extract_subdomain_dofs
+// check DoFRenumbering::subdomain_wise
 
 
 #include "../tests.h"
@@ -26,13 +26,14 @@
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <dofs/dof_tools.h>
+#include <dofs/dof_renumbering.h>
 
 #include <fstream>
 #include <algorithm>
 #include <cmath>
 
 
-std::ofstream logfile("subdomain_ids_01.output");
+std::ofstream logfile("subdomain_ids_04.output");
 
 
 template <int dim>
@@ -68,21 +69,33 @@ void test ()
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
   deallog << dof_handler.n_dofs() << std::endl;
-  
-  std::vector<bool> selected_dofs (dof_handler.n_dofs());
-  for (unsigned int subdomain=0; subdomain<(1<<dim); ++subdomain)
-    {
-                                       // count number on dofs on
-                                       // subdomain. note that they add up to
-                                       // more than n_dofs() since the ones on
-                                       // the interfaces count for each
-                                       // subdomain
-      DoFTools::extract_subdomain_dofs (dof_handler, subdomain,
-                                        selected_dofs);
-      deallog << std::count (selected_dofs.begin(),
-                             selected_dofs.end(), true)
-              << std::endl;
-    }
+
+                                   // renumber by subdomain
+  DoFRenumbering::subdomain_wise (dof_handler);
+
+                                   // then get the subdomain association of
+                                   // all dofs. this should yield consecutive
+                                   // regions of dofs with increasing
+                                   // subdomain numbers. first output these
+                                   // numbers, then also check that this is
+                                   // indeed so
+  std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
+  DoFTools::get_subdomain_association (dof_handler, subdomain_association);
+
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    deallog << i << ' ' << subdomain_association[i] << std::endl;
+
+  unsigned int present_subdomain = 0;
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    if (subdomain_association[i] != present_subdomain)
+      {
+                                         // we must just have crossed the
+                                         // boundary to another subdomain
+        Assert (subdomain_association[i] == present_subdomain+1,
+                ExcInternalError());
+        ++present_subdomain;
+      }
+  Assert (present_subdomain == (1<<dim)-1, ExcInternalError());
 }
 
 
