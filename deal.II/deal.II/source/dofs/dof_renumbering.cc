@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -498,9 +498,9 @@ void DoFRenumbering::Cuthill_McKee (
 
 template <int dim>
 void
-DoFRenumbering::component_wise (
-  DoFHandler<dim>                 &dof_handler,
-  const std::vector<unsigned int> &component_order_arg)
+DoFRenumbering::
+component_wise (DoFHandler<dim>                 &dof_handler,
+                const std::vector<unsigned int> &component_order_arg)
 {
   std::vector<unsigned int> renumbering (dof_handler.n_dofs(),
 					 DoFHandler<dim>::invalid_dof_index);
@@ -531,10 +531,10 @@ DoFRenumbering::component_wise (
 
 
 template <int dim>
-void DoFRenumbering::component_wise (
-  MGDoFHandler<dim>& dof_handler,
-  unsigned int level,
-  const std::vector<unsigned int> &component_order_arg)
+void DoFRenumbering::
+component_wise (MGDoFHandler<dim> &dof_handler,
+                const unsigned int level,
+                const std::vector<unsigned int> &component_order_arg)
 {
   std::vector<unsigned int> renumbering (dof_handler.n_dofs(level),
 					 DoFHandler<dim>::invalid_dof_index);
@@ -566,11 +566,11 @@ void DoFRenumbering::component_wise (
 
 template <int dim, class ITERATOR, class ENDITERATOR>
 unsigned int
-DoFRenumbering::compute_component_wise (
-  std::vector<unsigned int>& new_indices,
-  ITERATOR& start,
-  const ENDITERATOR& end,
-  const std::vector<unsigned int> &component_order_arg)
+DoFRenumbering::
+compute_component_wise (std::vector<unsigned int>& new_indices,
+                        ITERATOR& start,
+                        const ENDITERATOR& end,
+                        const std::vector<unsigned int> &component_order_arg)
 {
 // Modify for hp
   const FiniteElement<dim>& fe = start->get_fe();
@@ -1104,9 +1104,8 @@ DoFRenumbering::random (DoFHandler<dim> &dof_handler)
 
 template <int dim>
 void
-DoFRenumbering::compute_random (
-  std::vector<unsigned int>& new_indices,
-  const DoFHandler<dim> &dof_handler)
+DoFRenumbering::compute_random (std::vector<unsigned int> &new_indices,
+                                const DoFHandler<dim>     &dof_handler)
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   Assert(new_indices.size() == n_dofs,
@@ -1116,6 +1115,68 @@ DoFRenumbering::compute_random (
     new_indices[i] = i;
   
   std::random_shuffle (new_indices.begin(), new_indices.end());
+}
+
+
+
+template <int dim>
+void
+DoFRenumbering::subdomain_wise (DoFHandler<dim> &dof_handler)
+{
+  std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
+					DoFHandler<dim>::invalid_dof_index);
+  compute_subdomain_wise(renumbering, dof_handler);
+
+  dof_handler.renumber_dofs(renumbering);
+}
+
+
+template <int dim>
+void
+DoFRenumbering::
+compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
+                        const DoFHandler<dim>     &dof_handler)
+{
+  const unsigned int n_dofs = dof_handler.n_dofs();
+  Assert (new_dof_indices.size() == n_dofs,
+	  ExcDimensionMismatch (new_dof_indices.size(), n_dofs));
+
+                                   // first get the association of each dof
+                                   // with a subdomain and determine the total
+                                   // number of subdomain ids used
+  std::vector<unsigned int> subdomain_association (n_dofs);
+  DoFTools::get_subdomain_association (dof_handler,
+                                       subdomain_association);
+  const unsigned int n_subdomains
+    = *std::max_element (subdomain_association.begin(),
+                         subdomain_association.end()) + 1;
+  
+                                   // then renumber the subdomains by first
+                                   // looking at those belonging to subdomain
+                                   // 0, then those of subdomain 1, etc. note
+                                   // that the algorithm is stable, i.e. if
+                                   // two dofs i,j have i<j and belong to the
+                                   // same subdomain, then they will be in
+                                   // this order also after reordering
+  std::fill (new_dof_indices.begin(), new_dof_indices.end(),
+             deal_II_numbers::invalid_unsigned_int);
+  unsigned int next_free_index = 0;
+  for (unsigned int subdomain=0; subdomain<n_subdomains; ++subdomain)
+    for (unsigned int i=0; i<n_dofs; ++i)
+      if (subdomain_association[i] == subdomain)
+        {
+          Assert (new_dof_indices[i] == deal_II_numbers::invalid_unsigned_int,
+                  ExcInternalError());
+          new_dof_indices[i] = next_free_index;
+          ++next_free_index;
+        }
+
+                                   // we should have numbered all dofs
+  Assert (next_free_index = n_dofs, ExcInternalError());
+  Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
+                     deal_II_numbers::invalid_unsigned_int)
+          == new_dof_indices.end(),
+          ExcInternalError());
 }
 
 
@@ -1225,8 +1286,18 @@ void DoFRenumbering::random<deal_II_dimension>
 (DoFHandler<deal_II_dimension> &);
 
 template
+void DoFRenumbering::subdomain_wise<deal_II_dimension>
+(DoFHandler<deal_II_dimension> &);
+
+template
 void
 DoFRenumbering::compute_random<deal_II_dimension>
+(std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension> &);
+
+template
+void
+DoFRenumbering::compute_subdomain_wise<deal_II_dimension>
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension> &);
 

@@ -235,7 +235,7 @@ class DoFRenumbering
 				      */    
     template <int dim>
     static void
-    compute_Cuthill_McKee (std::vector<unsigned int>&,
+    compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
 			   const DoFHandler<dim>&,
 			   const bool reversed_numbering = false,
 			   const bool use_constraints    = false,
@@ -352,7 +352,7 @@ class DoFRenumbering
 				      */    
     template <int dim, class ITERATOR, class ENDITERATOR>
     static unsigned int
-    compute_component_wise (std::vector<unsigned int>& new_index,
+    compute_component_wise (std::vector<unsigned int>& new_dof_indices,
 			    ITERATOR& start,
 			    const ENDITERATOR& end,
 			    const std::vector<unsigned int> &target_component);
@@ -393,7 +393,7 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    compute_cell_wise_dg (std::vector<unsigned int>&,
+    compute_cell_wise_dg (std::vector<unsigned int> &new_dof_indices,
 			  const DoFHandler<dim> &dof_handler,
 			  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
 
@@ -467,7 +467,7 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    compute_downstream_dg (std::vector<unsigned int>&,
+    compute_downstream_dg (std::vector<unsigned int> &new_dof_indices,
 			   const DoFHandler<dim>  &dof_handler,
 			   const Point<dim> &direction);
 
@@ -516,7 +516,7 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    compute_clockwise_dg (std::vector<unsigned int>&,
+    compute_clockwise_dg (std::vector<unsigned int> &new_dof_indices,
 			  const DoFHandler<dim>  &dof_handler,
 			  const Point<dim> &center,
 			  const bool counter);
@@ -551,7 +551,7 @@ class DoFRenumbering
 				      */
     template <int dim>
     static void
-    compute_sort_selected_dofs_back (std::vector<unsigned int>&,
+    compute_sort_selected_dofs_back (std::vector<unsigned int> &new_dof_indices,
 				     const DoFHandler<dim>&,
 				     const std::vector<bool>&selected_dofs);
 
@@ -574,9 +574,57 @@ class DoFRenumbering
 				      */   
     template <int dim>
     static void
-    compute_random (std::vector<unsigned int>&,
+    compute_random (std::vector<unsigned int> &new_dof_indices,
 		    const DoFHandler<dim> &dof_handler);
 
+				     /**
+				      * Renumber the degrees of freedom such
+				      * that they are associated with the
+				      * subdomain id of the cells they are
+				      * living on, i.e. first all degrees of
+				      * freedom that belong to cells with
+				      * subdomain zero, then all with
+				      * subdomain one, etc. This is useful
+				      * when doing parallel computations after
+				      * assigning subdomain ids using a
+				      * partitioner (see the
+				      * @p{GridTools::partition_triangulation}
+				      * function for this).
+				      *
+				      * Note that degrees of freedom
+				      * associated with faces, edges, and
+				      * vertices may be associated with
+				      * multiple subdomains if they are
+				      * sitting on partition boundaries. It
+				      * would therefore be undefined with
+				      * which subdomain they have to be
+				      * associated. For this, we use what we
+				      * get from the
+				      * @p{DoFTools::get_subdomain_association}
+				      * function.
+				      *
+				      * The algorithm is stable, i.e. if
+                                      * two dofs i,j have @p{i<j} and belong
+                                      * to the same subdomain, then they
+                                      * will be in this order also after
+                                      * reordering.
+				      */
+    template <int dim>
+    static void
+    subdomain_wise (DoFHandler<dim> &dof_handler);
+
+    				     /**
+				      * Computes the renumbering vector needed
+				      * by the @p{subdomain_wise}
+				      * function. Does not perform the
+				      * renumbering on the @p{DoFHandler} dofs
+				      * but returns the renumbering vector.
+				      */   
+    template <int dim>
+    static void
+    compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
+                            const DoFHandler<dim>     &dof_handler);
+    
 				     /**
 				      * Exception
 				      */

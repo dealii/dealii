@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1648,8 +1648,40 @@ DoFTools::extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
 {
   Assert(selected_dofs.size() == dof_handler.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-				   // preset all values by false
+
+                                   // preset all values by false
   std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+
+  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    if (cell->subdomain_id() == subdomain_id)
+      {
+	cell->get_dof_indices (local_dof_indices);
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  selected_dofs[local_dof_indices[i]] = true;
+      };
+}
+
+
+
+template <int dim>
+void
+DoFTools::
+get_subdomain_association (const DoFHandler<dim>     &dof_handler,
+                           std::vector<unsigned int> &subdomain_association)
+{
+  Assert(subdomain_association.size() == dof_handler.n_dofs(),
+	 ExcDimensionMismatch(subdomain_association.size(),
+                              dof_handler.n_dofs()));
+
+                                   // preset all values by an invalid value
+  std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
+               deal_II_numbers::invalid_unsigned_int);
 
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
@@ -1662,12 +1694,23 @@ DoFTools::extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == subdomain_id)
-      {
-	cell->get_dof_indices (local_dof_indices);
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  selected_dofs[local_dof_indices[i]] = true;
-      };
+    {
+      const unsigned int subdomain_id = cell->subdomain_id();
+      cell->get_dof_indices (local_dof_indices);
+
+                                       // set subdomain ids. if dofs already
+                                       // have their values set then they must
+                                       // be on partition interfaces. don't
+                                       // worry about that, just overwrite it
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        subdomain_association[local_dof_indices[i]] = subdomain_id;
+    };
+
+  Assert (std::find (subdomain_association.begin(),
+                     subdomain_association.end(),
+                     deal_II_numbers::invalid_unsigned_int)
+          == subdomain_association.end(),
+          ExcInternalError());
 }
 
 
@@ -2988,6 +3031,12 @@ DoFTools::extract_subdomain_dofs<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &dof_handler,
  const unsigned int     subdomain_id,
  std::vector<bool>     &selected_dofs);
+
+template
+void
+DoFTools::get_subdomain_association<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<unsigned int>           &subdomain_association);
 
   
 template
