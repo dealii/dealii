@@ -28,10 +28,27 @@ template <int dim> class MappingQ;
  * Implementation of Hierarchical finite elements @p{Qp} that yield the
  * finite element space of continuous, piecewise polynomials of degree
  * @p{p}. This class is realized using tensor product polynomials
- * based on a hierarchical basis of the interval @p{[-1,1]} suitable
- * for building an @p{hp} tensor product finite element. There are not
- * many differences between @p{FE_Q_Hierarchical} and @p{FE_Q}, except 
- * that we now allow the degree to be nonconstant for @p{p}-refinement.
+ * based on a hierarchical basis @p{Hierarchical} of the interval 
+ * @p{[0,1]} which is suitable for building an @p{hp} tensor product 
+ * finite element, if we assume that each element has a single degree.
+ * 
+ * There are not many differences between @p{FE_Q_Hierarchical} and 
+ * @p{FE_Q}, except that we add a function @p{embedding_dofs} that takes 
+ * a given integer @p{q}, between @p{1} and @p{p}, and 
+ * returns the numbering of basis functions of the element of order 
+ * @p{q} in basis of order @p{p}.  This function is 
+ * useful if one wants to make calculations using the hierarchical
+ * nature of these shape functions.
+ *
+ * The unit support points now are reduced to @p{0}, @p{1}, and @p{0.5} in 
+ * one dimension, and tensor products in higher dimensions. Thus, various 
+ * interpolation functions will only work correctly for the linear case. 
+ * Future work will involve writing projection--interpolation operators
+ * that can interpolate onto the higher order bubble functions.
+ *
+ * The various constraint, prolongation, and restriction matrices are 
+ * now available in all dimensions for all degrees @p{p}, currently up to 
+ * order 19.
  *
  * The constructor of this class takes the degree @p{p} of this finite
  * element.
@@ -43,32 +60,6 @@ template <int dim> class MappingQ;
  * polynomials of degree @p{p}. This @p{TensorProductPolynomials}
  * object provides all values and derivatives of the shape functions.
  *
- * Furthermore the constructor filles the @p{interface_constraints},
- * the @p{prolongation} (embedding) and the @p{restriction}
- * matrices. These are implemented only up to a certain degree, that
- * is listed in the following: (fix this eventually......)
- *
- * @begin{itemize}
- * @item @p{dim==1}
- *   @begin{itemize}
- *   @item the @p{interface_constraints} are not needed
- *   @item the @p{prolongation} matrices up to degree 4, and
- *   @item the @p{restriction} matrices up to degree 4.
- *   @end{itemize}
- * @item @p{dim==2}
- *   @begin{itemize}
- *   @item the @p{interface_constraints} up to degree 4,
- *   @item the @p{prolongation} matrices up to degree 3, and
- *   @item the @p{restriction} matrices up to degree 4.
- *   @end{itemize}
- * @item @p{dim==3}
- *   @begin{itemize}
- *   @item the @p{interface_constraints} up to degree 2,
- *   @item the @p{prolongation} matrices up to degree 2, and
- *   @item the @p{restriction} matrices up to degree 4.
- *   @end{itemize}
- * @end{itemize}
- *
  * @sect3{Numbering of the degrees of freedom (DoFs)}
  *
  * The original ordering of the shape functions represented by the
@@ -77,7 +68,7 @@ template <int dim> class MappingQ;
  * beginning with the shape functions whose support points are at the
  * vertices, then on the line, on the quads, and finally (for 3d) on
  * the hexes. To be explicit, these numberings are listed in the
- * following: (support points for @p{hp}??)
+ * following:
  *
  * @sect4{Q1 elements}
  * @begin{itemize}
