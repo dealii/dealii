@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II FAQ</title>
+    <meta name="author" content="The deal.II authors <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II">
+  </head>
+<body>
+
+  <h1>The <acronym>deal.II</acronym> FAQ</h1>
+
+  <ol>
+  <li> <a href="#compiler">How do I change the compiler?</a>
+  <li> <a href="#triangles">Can I use/implement triangles/tetrahedra in <acronym>deal.II</acronym>?</a>
+  </ol>
+
+  <h4><a name="#compiler"></a>How do I change the compiler?</h4>
+
+  See the <a href="http:readme.html#choose-compiler">according
+  section</a> in the <a href="http:readme.html">readme file</a>
+
+  <h4><a name="#triangles"></a>Can I use/implement
+  triangles/tetrahedra in <acronym>deal.II</acronym>?</h4>
+
+  No, you cannot do either. The basic data structures are too much
+  tailored to quadrilaterals and hexahedra. Implementing other cells
+  amounts to re-implementing nearly all grid and DoF classes from
+  scratch.
+
+</body>
+</html>

@@ -19,7 +19,7 @@
     <ul>
       <li> <a href="#prerequisites">System requirements</a>
       <li> <a href="#installation">Installation</a>
-      <li> <a href="#compiler">Compiler flags</a>
+      <li> <a href="#compiler-flags">Compiler flags</a>
       <li> <a href="#external-libs">Using third-party libraries and
              subroutines</a>
       <li> <a href="#problems">Problems, questions, mailing lists</a>
@@ -201,7 +201,7 @@
     </code></pre>
     which sets some paths and finds out what compiler you
     use. ./configure supports several flags which are discussed
-    further down <a href="#options">below</a>. 
+    further down <a href="#configuration-options">below</a>. 
 
     <p>
 
@@ -369,9 +369,31 @@
     </p>
 
 
-    <a name="options">
+    <a name="configuration-options"></a>
     <h3>Configuration options</h3>
 
+    <a name="choose-compiler"></a>
+    <h4>Changing the compiler</h4>
+
+    If <code>configure</code> uses a wrong compiler, there are two
+    options: first, you can prepend your search path by the directory
+    of the desired compiler. If you do not want to do this (and there
+    are reasons), try the following: If your full compiler paths are
+    <tt>mycc</tt> and <tt>myc++</tt> for your C and C++ compilers,
+    respectively, type into your <tt>csh</tt>:
+    <pre>
+      setenv CC  mycc
+      setenv CXX myc++
+      ./configure
+    </pre>
+    or into your <tt>bash</tt>
+    <pre>
+      export CC=mycc
+      export CXX=myc++
+      ./configure
+    </pre>
+
+    <h4>Selecting optional behavior</h4>
     You can give several flags to ./configure:
     <ul>
     <li>
@@ -515,8 +537,8 @@
 
 
 
-    <a name="compiler">
-    <h2>Compiler flags</h2>
+    <a name="compiler-flags">
+    <h4>Compiler flags</h4>
 
     <p>
     Since the ISO C++ standard is still quite new and compilers still
@@ -581,7 +603,7 @@
       enables programs to use interprocess communication and many
       other related services using a platform independent
       interface. On how to enable using this library, see the section on
-      <a href="#options">Configuration Options</a> above.
+      <a href="#configuration-options">Configuration Options</a> above.
       </p>
 
       <li>
