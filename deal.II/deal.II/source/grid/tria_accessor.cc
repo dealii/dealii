@@ -123,6 +123,32 @@ void * TriaObjectAccessor<1, dim>::user_pointer () const
 
 
 template <int dim>
+void
+TriaObjectAccessor<1, dim>::recursively_set_user_pointer (void *p) const
+{
+  set_user_pointer (p);
+
+  if (has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_set_user_pointer (p);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<1, dim>::recursively_clear_user_pointer () const
+{
+  clear_user_pointer ();
+
+  if (has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_clear_user_pointer ();
+}
+
+
+
+template <int dim>
 void TriaObjectAccessor<1, dim>::set_children (const int index) const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
@@ -320,6 +346,32 @@ void * TriaObjectAccessor<2, dim>::user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->quads.user_pointers[this->present_index];
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<2, dim>::recursively_set_user_pointer (void *p) const
+{
+  set_user_pointer (p);
+
+  if (has_children())
+    for (unsigned int c=0; c<4; ++c)
+      child(c)->recursively_set_user_pointer (p);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<2, dim>::recursively_clear_user_pointer () const
+{
+  clear_user_pointer ();
+
+  if (has_children())
+    for (unsigned int c=0; c<4; ++c)
+      child(c)->recursively_clear_user_pointer ();
 }
 
 
@@ -715,6 +767,32 @@ void * TriaObjectAccessor<3, dim>::user_pointer () const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index];
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<3, dim>::recursively_set_user_pointer (void *p) const
+{
+  set_user_pointer (p);
+
+  if (has_children())
+    for (unsigned int c=0; c<8; ++c)
+      child(c)->recursively_set_user_pointer (p);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<3, dim>::recursively_clear_user_pointer () const
+{
+  clear_user_pointer ();
+
+  if (has_children())
+    for (unsigned int c=0; c<8; ++c)
+      child(c)->recursively_clear_user_pointer ();
 }
 
 

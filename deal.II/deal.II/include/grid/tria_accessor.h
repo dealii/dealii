@@ -445,7 +445,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * to a @p{NULL} pointer.
 				      */
     void clear_user_pointer () const;
-
+    
 				     /**
 				      * Access the value of the user
 				      * pointer. It is in the
@@ -459,6 +459,45 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
 				      */
     void * user_pointer () const;
+
+				     /**
+				      * Set the user pointer of this
+				      * object and all its children to
+				      * the given value. This is
+				      * useful for example if all
+				      * cells of a certain subdomain,
+				      * or all faces of a certain part
+				      * of the boundary should have
+				      * user pointers pointing to
+				      * objects describing this part
+				      * of the domain or boundary.
+				      *
+				      * Note that the user pointer is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * user pointers pointing to the
+				      * describing object. In this
+				      * case, simply loop over all the
+				      * elements of the coarsest level
+				      * that has this information, and
+				      * use this function to
+				      * recursively set the user
+				      * pointer of all finer levels of
+				      * the triangulation.
+				      */
+    void recursively_set_user_pointer (void *p) const;
+
+				     /**
+				      * Clear the user pointer of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * @ref{recursively_set_user_pointer}
+				      * function.
+				      */
+    void recursively_clear_user_pointer () const;
 
 				     /**
 				      *  Pointer to the @p{i}th
@@ -833,6 +872,45 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * line to @p{p}.
 				      */
     void set_user_pointer (void *p) const;
+
+				     /**
+				      * Set the user pointer of this
+				      * object and all its children to
+				      * the given value. This is
+				      * useful for example if all
+				      * cells of a certain subdomain,
+				      * or all faces of a certain part
+				      * of the boundary should have
+				      * user pointers pointing to
+				      * objects describing this part
+				      * of the domain or boundary.
+				      *
+				      * Note that the user pointer is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * user pointers pointing to the
+				      * describing object. In this
+				      * case, simply loop over all the
+				      * elements of the coarsest level
+				      * that has this information, and
+				      * use this function to
+				      * recursively set the user
+				      * pointer of all finer levels of
+				      * the triangulation.
+				      */
+    void recursively_set_user_pointer (void *p) const;
+
+				     /**
+				      * Clear the user pointer of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * @ref{recursively_set_user_pointer}
+				      * function.
+				      */
+    void recursively_clear_user_pointer () const;
 
 				     /**
 				      * Reset the user pointer of this
@@ -1252,6 +1330,45 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
 				      */
     void * user_pointer () const;
+
+				     /**
+				      * Set the user pointer of this
+				      * object and all its children to
+				      * the given value. This is
+				      * useful for example if all
+				      * cells of a certain subdomain,
+				      * or all faces of a certain part
+				      * of the boundary should have
+				      * user pointers pointing to
+				      * objects describing this part
+				      * of the domain or boundary.
+				      *
+				      * Note that the user pointer is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * user pointers pointing to the
+				      * describing object. In this
+				      * case, simply loop over all the
+				      * elements of the coarsest level
+				      * that has this information, and
+				      * use this function to
+				      * recursively set the user
+				      * pointer of all finer levels of
+				      * the triangulation.
+				      */
+    void recursively_set_user_pointer (void *p) const;
+
+				     /**
+				      * Clear the user pointer of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * @ref{recursively_set_user_pointer}
+				      * function.
+				      */
+    void recursively_clear_user_pointer () const;
 
 				     /**
 				      *  Return a pointer to the @p{i}th
@@ -1694,6 +1811,45 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
 				      */
     void * user_pointer () const;
+
+				     /**
+				      * Set the user pointer of this
+				      * object and all its children to
+				      * the given value. This is
+				      * useful for example if all
+				      * cells of a certain subdomain,
+				      * or all faces of a certain part
+				      * of the boundary should have
+				      * user pointers pointing to
+				      * objects describing this part
+				      * of the domain or boundary.
+				      *
+				      * Note that the user pointer is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * user pointers pointing to the
+				      * describing object. In this
+				      * case, simply loop over all the
+				      * elements of the coarsest level
+				      * that has this information, and
+				      * use this function to
+				      * recursively set the user
+				      * pointer of all finer levels of
+				      * the triangulation.
+				      */
+    void recursively_set_user_pointer (void *p) const;
+
+				     /**
+				      * Clear the user pointer of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * @ref{recursively_set_user_pointer}
+				      * function.
+				      */
+    void recursively_clear_user_pointer () const;
 
 				     /**
 				      *  Return a pointer to the
