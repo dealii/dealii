@@ -43,7 +43,7 @@
                                  // program and that weren't in
                                  // step-8. First, we replace the
                                  // standard output ``std::cout'' by a
-                                 // new stream ``pout'' which is used
+                                 // new stream ``pcout'' which is used
                                  // in parallel computations for
                                  // generating output only on one of
                                  // the processes.
@@ -107,7 +107,9 @@
                                  // in that we let ``solve'' return a value,
                                  // namely the number of iterations it took to
                                  // converge, so that we can output this to
-                                 // the screen at the appropriate place.
+                                 // the screen at the appropriate place. In
+                                 // addition, we introduce a stream-like
+                                 // variable ``pcout'', explained below:
 template <int dim>
 class ElasticProblem 
 {
@@ -123,6 +125,33 @@ class ElasticProblem
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
+                                     // The first variable is basically only
+                                     // for convenience: in parallel program,
+                                     // if each process outputs status
+                                     // information, then there quickly is a
+                                     // lot of clutter. Rather, we would want
+                                     // to only have one process output
+                                     // everything once, for example the one
+                                     // with process number
+                                     // zero. ``ConditionalOStream'' does
+                                     // exactly this: it acts as if it were a
+                                     // stream, but only forwards to a real,
+                                     // underlying stream if a flag is set. By
+                                     // setting this condition to
+                                     // ``this_mpi_process==0'', we make sure
+                                     // that output is only generated from the
+                                     // first process and that we don't get
+                                     // the same lines of output over and over
+                                     // again, once per process.
+                                     //
+                                     // With this simple trick, we make sure
+                                     // that we don't have to guard each and
+                                     // every write to ``std::cout'' by a
+                                     // prefixed ``if(this_mpi_process==0)''.
+    ConditionalOStream pcout;
+
+                                     // The next few variables are taken
+                                     // verbatim from step-8:
     Triangulation<dim>   triangulation;
     DoFHandler<dim>      dof_handler;
 
@@ -366,6 +395,8 @@ ElasticProblem<dim>::get_this_mpi_process (const MPI_Comm &mpi_communicator)
 template <int dim>
 ElasticProblem<dim>::ElasticProblem ()
                 :
+                pcout (std::cout,
+                       get_this_mpi_process(mpi_communicator) == 0),
 		dof_handler (triangulation),
 		fe (FE_Q<dim>(1), dim),
                 mpi_communicator (MPI_COMM_WORLD),
@@ -1227,31 +1258,20 @@ void ElasticProblem<dim>::refine_grid ()
 
 
 
-                                 // Lastly, here is the driver
-                                 // function. It is almost unchanged
-                                 // from step-8, with the exception
-                                 // that we replace ``std::cout'' by
-                                 // the ``pout'' stream. By setting
-                                 // its condition to
-                                 // ``this_mpi_process==0'', we make
-                                 // sure that output is only generated
-                                 // from the first process and that we
-                                 // don't get the same lines of output
-                                 // over and over again, once per
-                                 // process. Apart from this, the only
-                                 // other cosmetic change is that we
-                                 // output how many degrees of freedom
-                                 // there are per process, and how
-                                 // many iterations it took for the
-                                 // linear solver to converge:
+                                 // Lastly, here is the driver function. It is
+                                 // almost unchanged from step-8, with the
+                                 // exception that we replace ``std::cout'' by
+                                 // the ``pcout'' stream. Apart from this, the
+                                 // only other cosmetic change is that we
+                                 // output how many degrees of freedom there
+                                 // are per process, and how many iterations
+                                 // it took for the linear solver to converge:
 template <int dim>
 void ElasticProblem<dim>::run () 
 {
-  pout.set_condition(this_mpi_process == 0);
-
   for (unsigned int cycle=0; cycle<10; ++cycle)
     {
-      pout << "Cycle " << cycle << ':' << std::endl;
+      pcout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
@@ -1261,27 +1281,27 @@ void ElasticProblem<dim>::run ()
       else
 	refine_grid ();
 
-      pout << "   Number of active cells:       "
-	   << triangulation.n_active_cells()
-	   << std::endl;
+      pcout << "   Number of active cells:       "
+            << triangulation.n_active_cells()
+            << std::endl;
 
       setup_system ();
 
-      pout << "   Number of degrees of freedom: "
-		<< dof_handler.n_dofs()
-		<< " (by partition:";
+      pcout << "   Number of degrees of freedom: "
+            << dof_handler.n_dofs()
+            << " (by partition:";
       for (unsigned int p=0; p<n_mpi_processes; ++p)
-	pout << (p==0 ? ' ' : '+')
-	     << (DoFTools::
-		 count_dofs_with_subdomain_association (dof_handler,
-							p));
-      pout << ")" << std::endl;
+	pcout << (p==0 ? ' ' : '+')
+              << (DoFTools::
+                  count_dofs_with_subdomain_association (dof_handler,
+                                                         p));
+      pcout << ")" << std::endl;
       
       assemble_system ();
       const unsigned int n_iterations = solve ();
   
-      pout << "   Solver converged in " << n_iterations
-	   << " iterations." << std::endl;
+      pcout << "   Solver converged in " << n_iterations
+            << " iterations." << std::endl;
       
       output_results (cycle);
     }

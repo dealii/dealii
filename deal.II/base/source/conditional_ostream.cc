@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,18 +14,17 @@
 #include <base/conditional_ostream.h>
 
 
-ConditionalOStream pout;
-
-
-ConditionalOStream::ConditionalOStream():
-		std_out(&std::cout),
-		active_flag(true)
+ConditionalOStream::ConditionalOStream(std::ostream &stream,
+                                       const bool    active)
+                :
+		output_stream (stream),
+		active_flag(active)
 {}
 
 
 void ConditionalOStream::set_condition(bool flag)
 {
-  active_flag=flag;
+  active_flag = flag;
 }
 
 

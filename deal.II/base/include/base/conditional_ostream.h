@@ -23,27 +23,40 @@
 
 
 /**
- * A class that allows printing to standard output, i.e. cout,
+ * A class that allows printing to an output stream, e.g. @p std::cout,
  * depending on the ConditionalOStream object being active (default)
  * or not. The condition of this object can be changed by
- * set_condition().
+ * set_condition() and in the constructor.
  *
- * The usual usage of this class is through the pregenerated object
- * <tt>pout</tt> which can be used within parallel computations as
- * follows:
+ * This class is mostly useful in parallel computations. Ordinarily, you would
+ * use @p std::cout to print messages like what the program is presently
+ * doing, or the number of degrees of freedom in each step. However, in
+ * parallel programs, this means that each of the MPI processes write to the
+ * screen, which yields many repetitions of the same text. To avoid it, one
+ * would have to have a designated process, say the one with MPI process
+ * number zero, do the output, and guard each write statement with an
+ * if-condition. This becomes cumbersome and clutters up the code. Rather than
+ * doing so, the present class can be used: objects of its type act just like
+ * a standard output stream, but they only print something based on a
+ * condition that can be set to, for example, <tt>mpi_process==0</tt>, so that
+ * only one process has a true condition and in all other processes writes to
+ * this object just disappear in nirvana.
+ *
+ * The usual usage of this class is as follows:
  *
  * @code
- * pout.set_condition(this_mpi_process==0);
+ * ConditionalOStream pout(this_mpi_process==0);
  *
  *                                  // all processes print following
  *                                  // information to standard output
- * cout << "Reading parameter file on process " << this_mpi_process << endl;
+ * std::cout << "Reading parameter file on process "
+ *           << this_mpi_process << std::endl;
  *
  *                                  // following is printed by
  *                                  // process 0 only
- * pout << "Solving ..." << endl;
+ * pout << "Solving ..." << std::endl;
  * solve();
- * pout << "done" << endl;
+ * pout << "done" << std::endl;
  * @endcode
  *
  * Here, `Reading parameter file on process xy' is printed by each
@@ -62,17 +75,20 @@
  *   system_matrix.print_formatted(cout);
  * @endcode
  *
- * @author Ralf Hartmann, 2004
+ * @author Ralf Hartmann, Wolfgang Bangerth, 2004
  */
 class ConditionalOStream
 {
   public:
 				     /**
-				      * Constructor. Per default the
-				      * condition of an object is
-				      * active.
+				      * Constructor. Set the stream to which
+				      * we want to write, and the condition
+				      * based on which writes are actually
+				      * forwarded. Per default the condition
+				      * of an object is active.
 				      */
-    ConditionalOStream();
+    ConditionalOStream (std::ostream &stream,
+                        const bool    active = true);
 
 				     /**
 				      * Depending on the
@@ -84,25 +100,41 @@ class ConditionalOStream
 				      * if and only if its condition
 				      * is active.
 				      */
-    void set_condition(bool active);
+    void set_condition (const bool active);
 
 				     /**
-				      * Give read access to the
-				      * condition of the object.
+				      * Return the condition of the object.
 				      */
     bool is_active() const;
 
     				     /**
-				      * Output a constant something
-				      * through this stream.
+				      * Output a constant something through
+				      * this stream. This function must be @p
+				      * const so that member objects of this
+				      * type can also be used from @p const
+				      * member functions of the surrounding
+				      * class.
 				      */
     template <typename T>
-    ConditionalOStream & operator << (const T &t);
+    const ConditionalOStream &
+    operator << (const T &t) const;
 
 				     /**
-				      * Treat ostream manipulators.
+				      * Treat ostream manipulators. This
+				      * function must be @p const so that
+				      * member objects of this type can also
+				      * be used from @p const member functions
+				      * of the surrounding class.
+				      *
+				      * Note that compilers want to see this
+				      * treated differently from the general
+				      * template above since functions like @p
+				      * std::endl are actually overloaded and
+				      * can't be bound directly to a template
+				      * type.
 				      */
-    ConditionalOStream & operator<< (std::ostream& (*p) (std::ostream&));
+    const ConditionalOStream &
+    operator<< (std::ostream& (*p) (std::ostream&)) const;
 
   private:
 				     /**
@@ -110,8 +142,14 @@ class ConditionalOStream
 				      * class could easily be extended
 				      * to treat streams different
 				      * to the standard output.
+				      *
+				      * This variable must be @p mutable so
+				      * that we can write to it in above @p
+				      * const @p operator<< functions. For the
+				      * reason why they, in turn, need to be
+				      * @p const, see there.
 				      */
-    std::ostream  *std_out;
+    mutable std::ostream  &output_stream;
 
 				     /**
 				      * Stores the actual condition
@@ -121,58 +159,29 @@ class ConditionalOStream
 };
 
 
+// --------------------------- inline and template functions -----------
+
 template <class T>
 inline
-ConditionalOStream &
-ConditionalOStream::operator<< (const T& t)
+const ConditionalOStream &
+ConditionalOStream::operator<< (const T& t) const
 {
-  if (active_flag)
-    *std_out << t;
+  if (active_flag == true)
+    output_stream << t;
 
   return *this;
 }
 
 
 inline
-ConditionalOStream &
-ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream&))
+const ConditionalOStream &
+ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream&)) const
 {
-  if (active_flag)
-    *std_out << p;
+  if (active_flag == true)
+    output_stream << p;
 
   return *this;
 }
 
-
-/**
- * Pregenerated object for conditional output to <tt>cout</tt>. Prints
- * to standard output depending on <tt>pout</tt> being active (default)
- * or not. The output can be disabled by set_condition(false).
- *
- * This object is particularly useful in the context of parallel
- * computations in order to avoid multiple but identical output by
- * several processes.
- *
- * @code
- * pout.set_condition(this_mpi_process==0);
- *
- *                                  // all processes print following
- *                                  // information to standard output
- * cout << "Reading parameter file on process " << this_mpi_process << endl;
- *
- *                                  // following is printed by
- *                                  // process 0 only
- * pout << "Solving ..." << endl;
- * solve();
- * pout << "done" << endl;
- * @endcode
- *
- * Here, `Reading parameter file on process xy' is printed by each
- * process separately. In contrast to that, `Solving ...' and `done'
- * is printed to standard output only once, namely by process 0.
- *
- * @author Ralf Hartmann, 2004
- */
-extern ConditionalOStream pout;
 
 #endif
