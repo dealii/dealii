@@ -325,8 +325,9 @@ class DoFRenumbering
 				      * vector.
 				      */    
     template <int dim>
-    static std::vector<unsigned int>
-    compute_component_wise (DoFHandler<dim>                 &dof_handler,
+    static void
+    compute_component_wise (std::vector<unsigned int>& new_index,
+			    const DoFHandler<dim>&     dof_handler,
 			    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
     
 				     /**
@@ -378,8 +379,9 @@ class DoFRenumbering
 				      * vector.
 				      */
     template <int dim>
-    static std::vector<unsigned int>
-    compute_cell_wise_dg (DoFHandler<dim> &dof_handler,
+    static void
+    compute_cell_wise_dg (std::vector<unsigned int>&,
+			  const DoFHandler<dim> &dof_handler,
 			  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
 
 				     /**
@@ -438,8 +440,9 @@ class DoFRenumbering
 				      * vector.
 				      */
     template <int dim>
-    static std::vector<unsigned int>
-    compute_downstream_dg (DoFHandler<dim>  &dof_handler,
+    static void
+    compute_downstream_dg (std::vector<unsigned int>&,
+			   const DoFHandler<dim>  &dof_handler,
 			   const Point<dim> &direction);
 
 				     /**
