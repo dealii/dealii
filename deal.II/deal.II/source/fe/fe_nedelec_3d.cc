@@ -182,6 +182,7 @@ namespace FE_Nedelec_3d
 {
   static const double constraint_q1[] =
   {
+	0
 //TODO[WB]	
 //  	.25,.25,.25,.25,
 //  	.5,.5,0.,0.,
