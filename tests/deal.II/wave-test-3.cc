@@ -1926,7 +1926,7 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
 	};
 
 
-fe_values.reinit (cell);
+      fe_values.reinit (cell);
       fe_values_primal.reinit (primal_cell);
       fe_values_primal.get_function_values (*v, local_v);
       fe_values_primal.get_function_grads (*u, local_u_grad);
@@ -1936,23 +1936,19 @@ fe_values.reinit (cell);
       stiffness->value_list (fe_values.get_quadrature_points(),
 			     stiffness_values);
       
-      const std::vector<std::vector<Tensor<1,dim> > > &shape_grads = fe_values.get_shape_grads ();
-      const FullMatrix<double>            &shape_values = fe_values.get_shape_values ();
-      const std::vector<double>      &JxW_values (fe_values.get_JxW_values());
-      
       std::vector<double> local_functional1 (dofs_per_cell, 0);
       std::vector<double> local_functional2 (dofs_per_cell, 0);
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	for (unsigned int point=0; point<n_q_points; ++point) 
 	  {
 	    local_functional1[shape_func] += local_u_grad[point] *
-					     shape_grads[shape_func][point] *
+					     fe_values.shape_grad(shape_func,point) *
 					     stiffness_values[point] *
-					     JxW_values[point];
+					     fe_values.JxW(point);
 	    local_functional2[shape_func] += local_v[point] *
-					     shape_values(shape_func,point) *
+					     fe_values.shape_value(shape_func,point) *
 					     density_values[point] *
-					     JxW_values[point];
+					     fe_values.JxW(point);
 	  };
 
       cell->get_dof_indices (cell_dof_indices);
@@ -2035,19 +2031,15 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 	  (face->vertex(1)(1) == y_offset))
 	{
 	  fe_face_values.reinit (cell, face_no);
-	  const FullMatrix<double>            &shape_values = fe_face_values.
-						    get_shape_values ();
-	  const std::vector<double>      &JxW_values (fe_face_values.
-						 get_JxW_values());
 	  const std::vector<Point<dim> > &q_points (fe_face_values.get_quadrature_points());
 
 	  std::vector<double> local_integral (dofs_per_cell, 0);
 	  for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	    for (unsigned int point=0; point<n_q_points; ++point)
-	      local_integral[shape_func] += shape_values(shape_func,point) *
+	      local_integral[shape_func] += fe_face_values.shape_value(shape_func,point) *
 					    (EvaluateSeismicSignal<dim>
 					     ::weight(q_points[point], time)) *
-					    JxW_values[point];
+					    fe_face_values.JxW(point);
 
 	  cell->get_dof_indices (cell_dof_indices);
 	  for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
@@ -2153,15 +2145,13 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
 	    continue;
 
 	  fe_face_values.reinit (cell, face_no);
-	  const FullMatrix<double> &shape_values = fe_face_values.get_shape_values ();
-	  const std::vector<double>     &JxW_values   = fe_face_values.get_JxW_values();
 	  cell->get_dof_indices (dof_indices);
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
 	      double sum=0;
 	      for (unsigned int j=0; j<n_q_points; ++j)
-		sum += shape_values(i,j)*JxW_values[j];
+		sum += fe_face_values.shape_value(i,j)*fe_face_values.JxW(j);
 
 	      j1(dof_indices[i]) += sum * time_step / 2;
 	    };
@@ -2205,14 +2195,11 @@ void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
       
       fe_values.reinit (cell);
 
-      const FullMatrix<double>  &shape_values = fe_values.get_shape_values ();
-      const std::vector<double>      &JxW_values (fe_values.get_JxW_values());
-
       std::vector<double> local_functional (dofs_per_cell, 0);
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	for (unsigned int point=0; point<n_q_points; ++point) 
-	  local_functional[shape_func] += shape_values(shape_func,point) *
-					   JxW_values[point];
+	  local_functional[shape_func] += fe_values.shape_value(shape_func,point) *
+					   fe_values.JxW(point);
 
       cell->get_dof_indices (cell_dof_indices);
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
@@ -2250,16 +2237,14 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
 	(cell->center()(0) < -0.4))
       {
 	fe_values.reinit (cell);
-	const FullMatrix<double>  &shape_values = fe_values.get_shape_values ();
-	const std::vector<double>      &JxW_values   = fe_values.get_JxW_values();
 	cell->get_dof_indices (dof_indices);
 	
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    double sum=0;
 	    for (unsigned int j=0; j<n_q_points; ++j)
-	      sum += shape_values(i,j)
-		     *JxW_values[j];
+	      sum += fe_values.shape_value(i,j)
+		     *fe_values.JxW(j);
 	    
 	    j1(dof_indices[i]) += sum;
 	  };
@@ -2294,16 +2279,14 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
 	(cell->center()(0) < 0.03))
       {
 	fe_values.reinit (cell);
-	const FullMatrix<double>  &shape_values = fe_values.get_shape_values ();
-	const std::vector<double>      &JxW_values   = fe_values.get_JxW_values();
 	cell->get_dof_indices (dof_indices);
 	
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    double sum=0;
 	    for (unsigned int j=0; j<n_q_points; ++j)
-	      sum += shape_values(i,j)
-		     *JxW_values[j];
+	      sum += fe_values.shape_value(i,j)
+		     *fe_values.JxW(j);
 	    
 	    j1(dof_indices[i]) += sum / time_step;
 	  };
@@ -2488,11 +2471,7 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
 	};
 
 
-fe_values.reinit (cell);
-      const FullMatrix<double>             &values    = fe_values.get_shape_values();
-      const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-      const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
+      fe_values.reinit (cell);
       cell->get_dof_values (*u, local_u);
       cell->get_dof_values (*v, local_v);
 
@@ -2502,9 +2481,9 @@ fe_values.reinit (cell);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<fe->dofs_per_cell; ++i) 
 	  for (unsigned int j=0; j<fe->dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (values(i,point) *
-				 values(j,point)) *
-				weights[point] *
+	    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
+				 fe_values.shape_value(j,point)) *
+				fe_values.JxW(point) *
 				density_values[point];
 
       total_energy += 1./2. * cell_matrix.matrix_norm_square (local_v);
@@ -2515,9 +2494,9 @@ fe_values.reinit (cell);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<fe->dofs_per_cell; ++i) 
 	  for (unsigned int j=0; j<fe->dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (gradients[i][point] *
-				 gradients[j][point]) *
-				weights[point] *
+	    cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				 fe_values.shape_grad(j,point)) *
+				fe_values.JxW(point) *
 				stiffness_values[point];
       total_energy += 1./2. * cell_matrix.matrix_norm_square (local_u);
     };
@@ -2639,14 +2618,13 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 	{
 	  face_values.reinit (cell, face);
 	  face_values.get_function_values (*u, face_u);
-	  const std::vector<double>      &JxW_values (face_values.get_JxW_values());
 	  const std::vector<Point<dim> > &q_points   (face_values.get_quadrature_points());
 	  
 	  double local_integral = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    local_integral += face_u[point] *
 			      weight (q_points[point], time) *
-			      JxW_values[point];
+			      face_values.JxW(point);
 	  u_integrated += local_integral;
 
 	  out << time
@@ -2738,12 +2716,11 @@ double EvaluateSplitSignal<dim>::evaluate () {
 
 	  face_values.reinit (cell, face_no);
 	  face_values.get_function_values (*u, face_u);
-	  const std::vector<double>      &JxW_values (face_values.get_JxW_values());
 	  
 	  double local_integral = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    local_integral += face_u[point] *
-			      JxW_values[point];
+			      face_values.JxW(point);
 	  u_integrated += local_integral;
 	};
 
@@ -2809,12 +2786,11 @@ double EvaluateOneBranch1d<1>::evaluate () {
       {
 	fe_values.reinit (cell);
 	fe_values.get_function_values (*u, cell_u);
-	const std::vector<double>    &JxW_values (fe_values.get_JxW_values());
 
 	double local_integral = 0;
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  local_integral += cell_u[point] *
-			    JxW_values[point];
+			    fe_values.JxW(point);
 	u_integrated += local_integral;
       };
   result += u_integrated;
@@ -2881,13 +2857,10 @@ double EvaluateSecondCrossing1d<1>::evaluate () {
       {
 	fe_values.reinit (cell);
 	fe_values.get_function_values (*u, cell_u);
-	const std::vector<double>    &JxW_values (fe_values.get_JxW_values());
-	const std::vector<Point<1> > &quadrature_points (fe_values.get_quadrature_points());
-	
 	double local_integral = 0;
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  local_integral += cell_u[point] *
-			    JxW_values[point];
+			    fe_values.JxW(point);
 	u_integrated += local_integral;
       };
   result += u_integrated;
@@ -4997,7 +4970,7 @@ FEValues<dim>  fe_values (fe, quadrature,
   FullMatrix<double> cell_laplace_matrix (dofs_per_cell, dofs_per_cell);
 
 
-for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell)
     {
       fe_values.reinit (cell);
@@ -5005,18 +4978,13 @@ for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_acti
       cell_laplace_matrix.clear ();
       cell->get_dof_indices (dof_indices_on_cell);
 
-      const FullMatrix<double>              &shape_values = fe_values.get_shape_values ();
-      const std::vector<std::vector<Tensor<1,dim> > > &shape_grads  = fe_values.get_shape_grads ();
-      const std::vector<double>                  &JxW_values   = fe_values.get_JxW_values ();
-
       if (!density_constant || !stiffness_constant)
 	{
-	  const std::vector<Point<dim> > &quadrature_points = fe_values.get_quadrature_points ();
 	  if (!density_constant)
-	    parameters.density->value_list (quadrature_points,
+	    parameters.density->value_list (fe_values.get_quadrature_points (),
 					    density_values);
 	  if (!stiffness_constant)
-	    parameters.stiffness->value_list (quadrature_points,
+	    parameters.stiffness->value_list (fe_values.get_quadrature_points (),
 					      stiffness_values);
 	};
       
@@ -5024,13 +4992,13 @@ for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_acti
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    {
-	      cell_mass_matrix(i,j) += (shape_values(i, q_point) *
-					shape_values(j, q_point) *
-					JxW_values[q_point]      *
+	      cell_mass_matrix(i,j) += (fe_values.shape_value(i, q_point) *
+					fe_values.shape_value(j, q_point) *
+					fe_values.JxW(q_point)      *
 					density_values[q_point]);
-	      cell_laplace_matrix(i,j) += (shape_grads[i][q_point] *
-					   shape_grads[j][q_point] *
-					   JxW_values[q_point]      *
+	      cell_laplace_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
+					   fe_values.shape_grad(j,q_point) *
+					   fe_values.JxW(q_point)      *
 					   stiffness_values[q_point]);
 	    };
 
@@ -5485,10 +5453,6 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
   if (!old_cell->has_children() && !new_cell->has_children()) 
     {
       fe_values.reinit (old_cell);
-      const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-      const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-      const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
       FullMatrix<double>    cell_matrix (dofs_per_cell, dofs_per_cell);
 
       std::vector<double> density_values(fe_values.n_quadrature_points);
@@ -5497,9 +5461,9 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (values(i,point) *
-				 values(j,point)) *
-				weights[point] *
+	    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
+				 fe_values.shape_value(j,point)) *
+				fe_values.JxW(point) *
 				density_values[point];
 
       Vector<double> tmp (dofs_per_cell);
@@ -5524,9 +5488,9 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (gradients[i][point] *
-				 gradients[j][point]) *
-				weights[point] *
+	    cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				 fe_values.shape_grad(j,point)) *
+				fe_values.JxW(point) *
 				stiffness_values[point];
       cell_matrix.vmult (local_A_v, old_dof_values_v);
 
@@ -5630,10 +5594,6 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
       else
 	{
 	  fe_values.reinit (old_child);
-	  const FullMatrix<double>             &values    = fe_values.get_shape_values();
-	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
 
@@ -5644,9 +5604,9 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (values(i,point) *
-				     values(j,point)) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_value(i,point) *
+				     fe_values.shape_value(j,point)) *
+				    fe_values.JxW(point) *
 				    density_values[point];
 
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
@@ -5659,9 +5619,9 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (gradients[i][point] *
-				     gradients[j][point]) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				     fe_values.shape_grad(j,point)) *
+				    fe_values.JxW(point) *
 				    stiffness_values[point];
 	  cell_matrix.vmult (local_A_v, local_old_dof_values_v);
 	  
@@ -5734,10 +5694,6 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
       else
 	{
 	  fe_values.reinit (new_child);
-	  const FullMatrix<double>             &values    = fe_values.get_shape_values();
-	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
 	  cell_matrix.clear ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
@@ -5745,9 +5701,9 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (values(i,point) *
-				     values(j,point)) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_value(i,point) *
+				     fe_values.shape_value(j,point)) *
+				    fe_values.JxW(point) *
 				    density_values[point];
 
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
@@ -5760,9 +5716,9 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (gradients[i][point] *
-				     gradients[j][point]) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				     fe_values.shape_grad(j,point)) *
+				    fe_values.JxW(point) *
 				    stiffness_values[point];
 	  cell_matrix.vmult (local_A_v, local_old_dof_values_v);
 
@@ -6400,12 +6356,6 @@ std::vector<double> stiffness(fe_values.n_quadrature_points);
   FullMatrix<double> laplace_matrix (tmp1.size(), tmp1.size());
   
   fe_values.reinit (cell);
-  const FullMatrix<double>             &values    = fe_values.get_shape_values();
-  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-  const std::vector<std::vector<Tensor<2,dim> > >&second_derivatives
-    = fe_values.get_shape_2nd_derivatives ();
-  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
   std::vector<double> density_values(fe_values.n_quadrature_points);
   parameters.density->value_list (fe_values.get_quadrature_points(),
 				  density_values);
@@ -6413,20 +6363,20 @@ std::vector<double> stiffness(fe_values.n_quadrature_points);
     for (unsigned int i=0; i<dofs_per_cell; ++i) 
       for (unsigned int j=0; j<dofs_per_cell; ++j)
 	{
-	  mass_matrix(i,j) += (values(i,point) *
-			       values(j,point)) *
-			      weights[point] *
+	  mass_matrix(i,j) += (fe_values.shape_value(i,point) *
+			       fe_values.shape_value(j,point)) *
+			      fe_values.JxW(point) *
 			      density_values[point];
 
 	  double laplace_phi_i = 0;
 	  for (unsigned int t=0; t<dim; ++t)
-	    laplace_phi_i += second_derivatives[i][point][t][t];
+	    laplace_phi_i += fe_values.shape_2nd_derivative(i,point)[t][t];
 	  
 
 
-	  laplace_matrix(i,j) += (gradients[i][point] *
-				  gradients[j][point]) *
-				 weights[point] *
+	  laplace_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				  fe_values.shape_grad(j,point)) *
+				 fe_values.JxW(point) *
 				 stiffness[point];
 	};
 
@@ -7259,19 +7209,15 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       fe_values.reinit (old_cell);
 
       FullMatrix<double>                    cell_matrix (dofs_per_cell, dofs_per_cell);
-      const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-      const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-      const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
       std::vector<double> density_values(fe_values.n_quadrature_points);
       parameters.density->value_list (fe_values.get_quadrature_points(),
 				      density_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (values(i,point) *
-				 values(j,point)) *
-				weights[point] *
+	    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
+				 fe_values.shape_value(j,point)) *
+				fe_values.JxW(point) *
 				density_values[point];
 
       Vector<double> tmp (dofs_per_cell);
@@ -7296,9 +7242,9 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (gradients[i][point] *
-				 gradients[j][point]) *
-				weights[point] *
+	    cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				 fe_values.shape_grad(j,point)) *
+				fe_values.JxW(point) *
 				stiffness_values[point];
       cell_matrix.vmult (local_A_u, old_dof_values_u);
 
@@ -7405,10 +7351,6 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
       else
 	{
 	  fe_values.reinit (old_child);
-	  const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
       
@@ -7419,9 +7361,9 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (values(i,point) *
-				     values(j,point)) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_value(i,point) *
+				     fe_values.shape_value(j,point)) *
+				    fe_values.JxW(point) *
 				    density_values[point];
 
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
@@ -7435,9 +7377,9 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (gradients[i][point] *
-				     gradients[j][point]) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				     fe_values.shape_grad(j,point)) *
+				    fe_values.JxW(point) *
 				    stiffness_values[point];
 	  cell_matrix.vmult (local_A_u, local_old_dof_values_u);
       
@@ -7510,10 +7452,6 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
       else
 	{
 	  fe_values.reinit (new_child);
-	  const FullMatrix<double>             &values = fe_values.get_shape_values ();
-	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
-
 	  cell_matrix.clear ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
@@ -7521,9 +7459,9 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (values(i,point) *
-				     values(j,point)) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_value(i,point) *
+				     fe_values.shape_value(j,point)) *
+				    fe_values.JxW(point) *
 				    density_values[point];
 
 	  cell_matrix.vmult (local_M_u, local_old_dof_values_u);
@@ -7536,9 +7474,9 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (gradients[i][point] *
-				     gradients[j][point]) *
-				    weights[point] *
+		cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				     fe_values.shape_grad(j,point)) *
+				    fe_values.JxW(point) *
 				    stiffness_values[point];
 	  cell_matrix.vmult (local_A_u, local_old_dof_values_u);
 
