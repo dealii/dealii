@@ -1536,6 +1536,20 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     *--->---*        *--->---*
  *   @end{verbatim}
  *
+ *   The fact that edges (just as vertices and faces) are entities
+ *   that are stored in their own right rather than constructed from
+ *   cells each time they are needed, means that adjacent cells
+ *   actually have pointers to edges that are thus shared between
+ *   them. This implies that the convention that sets of parallel
+ *   edges have parallel directions is not only a local
+ *   condition. Before a list of cells is passed to an object of this
+ *   class for creation of a triangulation, you therefore have to make
+ *   sure that cells are oriented in a compatible fashion, so that
+ *   edge directions are globally according to above
+ *   convention. However, the @ref{GridReordering} class can do this
+ *   for you, by reorienting cells and edges of an arbitrary list of
+ *   input cells that need not be already sorted.
+ *   
  *   @sect4{Faces}
  *
  *   The faces are numbered in the same order as the lines were numbered: front
@@ -1553,8 +1567,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     *-------*        *-------*
  *   @end{verbatim}
  *
- *   The direction of the faces is determined by the numbers the lines have within
- *   a given face. This is like follows:
+ *   The @em{standard} direction of the faces is determined by the
+ *   numbers the lines have within a given face. This is like follows:
  *   @begin{itemize}
  *   @item Faces 0 and 1:
  *    @begin{verbatim}
@@ -1599,7 +1613,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *    @end{verbatim}
  *   @end{itemize}
  * 
- *   Due to this numbering, the following lines are identical:
+ *   Due to this numbering, the following lines are identical in the
+ *   standard orientation:
  *   @begin{itemize}
  *   @item Line 0 of face 0, and line 0 of face 2;
  *   @item Line 1 of face 0, and line 3 of face 3;
@@ -1615,6 +1630,37 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   @item Line 3 of face 4, and line 2 of face 5.
  *   @end{itemize}
  *
+ *   This standard orientation of faces in 3d can also be depicted by
+ *   assigning a normal vector to each face. The direction of this
+ *   vector (pointing into or out of the cell) is implied by the
+ *   direction of its bounding lines: if you look onto a face and the
+ *   lines are numbered in counter-clockwise sense, then the normal is
+ *   pointing towards you. Thus, faces 0, 2, and 5 have normals that
+ *   point into the cell in standard face orientation, while the
+ *   normals of faces 1, 3, and 4 point outward. Note that opposite
+ *   faces have parallel normal vectors.
+ *
+ *   However, it turns out that a significant number of meshes cannot
+ *   satisfy this convention. This is due to the fact that the face
+ *   convention for one cell already implies something for the
+ *   neighbor, since they share a common face and fixing it for the
+ *   first cell also fixes the normal vectors of the opposite faces of
+ *   both cells. It is easy to construct cases of loops of cells for
+ *   which this leads to cases where we cannot find orientations for
+ *   all faces that are consistent with this convention.
+ *
+ *   For this reason, above convention is only what we call the
+ *   @em{standard orientation}. deal.II actually allows faces in 3d to
+ *   have either the standard direction, or its opposite, in which
+ *   case the lines that make up a cell would have reverted orders,
+ *   and the above line equivalences would not hold any more. You can
+ *   ask a cell whether a given face has standard orientation by
+ *   calling @p{cell->face_orientation(face_no)}: if the result is
+ *   @p{true}, then the face has standard orientation, otherwise its
+ *   normal vector is pointing the other direction. There are not very
+ *   many places in application programs where you need this
+ *   information actually, but a few places in the library make use of
+ *   this.
  *
  *   @sect4{Children}
  *
@@ -1645,6 +1691,27 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   You can get these numbers using the @ref{GeometryInfo<3>}@p{::child_cell_on_face}
  *   function. Each child is adjacent to the vertex with the same number.
  *
+ *   Note that, again, the above list only holds for faces in their
+ *   standard orientation. If a face is not in standard orientation,
+ *   then the children at positions 1 and 3 (counting from 0 to 3)
+ *   would be swapped.
+ *
+ *   The information which child cell is at which position of which
+ *   face is most often used when computing jump terms across faces
+ *   with hanging nodes, using objects of type
+ *   @ref{FESubfaceValues}. Sitting on one cell, you would look at
+ *   face and figure out which child of the neighbor is sitting on a
+ *   given subface between the present and the neighboring cell. To
+ *   avoid having to query the standard orientation of the faces of
+ *   the two cells every time in such cases, you should use a function
+ *   call like
+ *   @p{cell->neighbor_child_on_subface(face_no,subface_no)}, which
+ *   returns the correct result both in 2d (where face orientations
+ *   are immaterial) and 3d (where it is necessary to query the face
+ *   orientation and possibly swap the result of
+ *   @p{GeometryInfo<3>::child_cell_on_face}). In general, the use of
+ *   @p{GeometryInfo<3>::child_cell_on_face} is best avoided due to
+ *   these problems.
  *
  *   @sect4{Coordinate systems}
  *
