@@ -729,6 +729,11 @@ class FiniteElementBase : public Subscriptor,
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcFEHasNoSupportPoints);
+
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcEmbeddingVoid);
     
 				     /**
