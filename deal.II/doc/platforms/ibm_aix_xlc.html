@@ -34,22 +34,22 @@
 	 <p>
 	 <code>
 	 <pre>
-	 aixterm7:/u/sfb359/q71> cat t.cc
+	 aixterm7:/u/sfb359/q71&gt; cat t.cc
 	     class X {
-	       template <int dim> void f() {};
-	       template <int dim> void g();
+	       template &lt;int dim&gt; void f() {};
+	       template &lt;int dim&gt; void g();
 	     };
 
-	     template <int dim> 
+	     template &lt;int dim&gt; 
 	     void X::g () {
-	       void (X::*p) () = &X::template f<dim>;
+	       void (X::*p) () = &amp;X::template f&lt;dim&gt;;
 	     };
 
 	     // explicit instantiation
-	     template void X::g<1> ();
-	 aixterm7:/u/sfb359/q71> /usr/vacpp/bin/xlC -c t.cc -o /dev/null
+	     template void X::g&lt;1&gt; ();
+	 aixterm7:/u/sfb359/q71&gt; /usr/vacpp/bin/xlC -c t.cc -o /dev/null
 	     "t.cc", line 8.22: 1540-0130 (S) "X::f" is not declared.
-	     "t.cc", line 7.6: 1540-0700 (I) The previous message was produced while processing "X::g<1>()".
+	     "t.cc", line 7.6: 1540-0700 (I) The previous message was produced while processing "X::g&lt;1&gt;()".
 	 </pre>
 	 </code>
 	 </p>
@@ -58,20 +58,20 @@
          A compiler bug prevented us from compiling this snippet:
 	 <code>
 	 <pre>
-	 aixterm7:/u/sfb359/q71> cat t.cc
+	 aixterm7:/u/sfb359/q71&gt; cat t.cc
              namespace std {
-               template <class _Ty>                             class allocator {};
-               template<class _Ty, class _Ax = allocator<_Ty> > class vector{};
+               template &lt;class _Ty&gt;                             class allocator {};
+               template&lt;class _Ty, class _Ax = allocator&lt;_Ty&gt; &gt; class vector{};
              }
 
              struct X {};
-             template <int dim> void g (const std::vector<X> &x);
+             template &lt;int dim&gt; void g (const std::vector&lt;X&gt; &x);
 
              void f ()  {
-               std::vector<X> x;
-               g<1> (x);
+               std::vector&lt;X&gt; x;
+               g&lt;1&gt; (x);
              };
-         aixterm7:/u/sfb359/q71> /usr/vacpp/bin/xlC -c t.cc -o /dev/null
+         aixterm7:/u/sfb359/q71&gt; /usr/vacpp/bin/xlC -c t.cc -o /dev/null
              "t.cc", line 11.9: 1540-0130 (S) "allocator" is not declared.
              "t.cc", line 11.9: 1540-0700 (I) The previous message was produced while processing "g".
 	 </pre>
@@ -85,26 +85,26 @@
          There's another nasty bug that does not allow such code:
 	 <code>
 	 <pre>
-	 aixterm7:/u/sfb359/q71> cat t.cc
-             #include <vector>
+	 aixterm7:/u/sfb359/q71&gt; cat t.cc
+             #include &lt;vector&gt;
              class X{};
 
              void f() {
-               std::vector<X> v;
-               std::vector<X>::iterator       i1=v.begin();
-               std::vector<X>::const_iterator i2=v.begin();
+               std::vector&lt;X&gt; v;
+               std::vector&lt;X&gt;::iterator       i1=v.begin();
+               std::vector&lt;X&gt;::const_iterator i2=v.begin();
                bool x = (i1 != i2);
              };
-         aixterm7:/u/sfb359/q71> /usr/vacpp/bin/xlC -c t.cc -o /dev/null
+         aixterm7:/u/sfb359/q71&gt; /usr/vacpp/bin/xlC -c t.cc -o /dev/null
              "t.cc", line 8.16: 1540-0218 (S) The call does not match any parameter list for "operator!=".
-             "/usr/vacpp/include/xutility", line 247.14: 1540-1283 (I) "std::_Ptrit<X,int,X *,X &,X *,X &>::operator!=(const _Myt &) const" is not a viable candidate.
-             "t.cc", line 8.19: 1540-0256 (I) A parameter of type "const std::_Ptrit<X,int,X *,X &,X *,X &> &" cannot be initialized with an expression of type "std::vector<X,std::allocator<X> >::const_iterator".
-             "/usr/vacpp/include/utility", line 59.14: 1540-1283 (I) "template <class _T1, class _T2> std::operator!=(const pair<_T1,_T2> &, const pair<_T1,_T2> &)" is not a viable candidate.
-             "/usr/vacpp/include/xutility", line 362.14: 1540-1283 (I) "template <class _RI> std::operator!=(const reverse_iterator<_RI> &, const reverse_iterator<_RI> &)" is not a viable candidate.
-             "/usr/vacpp/include/xutility", line 477.14: 1540-1283 (I) "template <class _E, class _Tr> std::operator!=(const istreambuf_iterator<_E,_Tr> &, const istreambuf_iterator<_E,_Tr> &)" is not a viable candidate.
-             "/usr/vacpp/include/iterator", line 167.14: 1540-1283 (I) "template <class _Ty, class _E, class _Tr, class _Dist> std::operator!=(const istream_iterator<_Ty,_E,_Tr,_Dist> &, const istream_iterator<_Ty,_E,_Tr,_Dist> &)" is not a viable candidate.
-             "/usr/vacpp/include/xmemory", line 127.14: 1540-1283 (I) "template <class _Ty, class _U> std::operator!=(const allocator<_Ty> &, const allocator<_U> &)" is not a viable candidate.
-             "/usr/vacpp/include/vector", line 293.14: 1540-1283 (I) "template <class _Ty, class _A> std::operator!=(const vector<_Ty,_A> &, const vector<_Ty,_A> &)" is not a viable candidate.
+             "/usr/vacpp/include/xutility", line 247.14: 1540-1283 (I) "std::_Ptrit&lt;X,int,X *,X &amp;,X *,X &amp;&gt;::operator!=(const _Myt &amp;) const" is not a viable candidate.
+             "t.cc", line 8.19: 1540-0256 (I) A parameter of type "const std::_Ptrit&lt;X,int,X *,X &amp;,X *,X &amp;&gt; &amp;" cannot be initialized with an expression of type "std::vector&lt;X,std::allocator&lt;X&gt; &gt;::const_iterator".
+             "/usr/vacpp/include/utility", line 59.14: 1540-1283 (I) "template &lt;class _T1, class _T2&gt; std::operator!=(const pair&lt;_T1,_T2&gt; &amp;, const pair&lt;_T1,_T2&gt; &amp;)" is not a viable candidate.
+             "/usr/vacpp/include/xutility", line 362.14: 1540-1283 (I) "template &lt;class _RI&gt; std::operator!=(const reverse_iterator&lt;_RI&gt; &amp;, const reverse_iterator&lt;_RI&gt; &amp;)" is not a viable candidate.
+             "/usr/vacpp/include/xutility", line 477.14: 1540-1283 (I) "template &lt;class _E, class _Tr&gt; std::operator!=(const istreambuf_iterator&lt;_E,_Tr&gt; &amp;, const istreambuf_iterator&lt;_E,_Tr&gt; &amp;)" is not a viable candidate.
+             "/usr/vacpp/include/iterator", line 167.14: 1540-1283 (I) "template &lt;class _Ty, class _E, class _Tr, class _Dist&gt; std::operator!=(const istream_iterator&lt;_Ty,_E,_Tr,_Dist&gt; &amp;, const istream_iterator&lt;_Ty,_E,_Tr,_Dist&gt; &amp;)" is not a viable candidate.
+             "/usr/vacpp/include/xmemory", line 127.14: 1540-1283 (I) "template &lt;class _Ty, class _U&gt; std::operator!=(const allocator&lt;_Ty&gt; &amp;, const allocator&lt;_U&gt; &amp;)" is not a viable candidate.
+             "/usr/vacpp/include/vector", line 293.14: 1540-1283 (I) "template &lt;class _Ty, class _A&gt; std::operator!=(const vector&lt;_Ty,_A&gt; &amp;, const vector&lt;_Ty,_A&gt; &amp;)" is not a viable candidate.
 	 </pre>
 	 </code>
 	 </p>
@@ -116,8 +116,8 @@
 	 <pre>
 	 <code>
              "source/dofs/dof_accessor.cc", line 720.80: 1540-0216 (S) An
-             expression of type "const Vector<double>" cannot be converted to
-             "const Vector<double>". 
+             expression of type "const Vector&lt;double&gt;" cannot be converted to
+             "const Vector&lt;double&gt;". 
 	 </pre>
 	 </code>
 	 </p>
