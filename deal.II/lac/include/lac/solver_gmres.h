@@ -59,23 +59,38 @@
  * computational speed against memory. One of the few other
  * possibilities is to use a good preconditioner.
  *
- * Like all other solver classes, this class has a local structure called
- * @p{AdditionalData} which is used to pass additional parameters to the
- * solver, like damping parameters or the number of temporary vectors. We
- * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p{SolverSelector} and
- * other classes much easier and guarantees that these will continue to
- * work even if number or type of the additional parameters for a certain
- * solver changes.
+ * Like all other solver classes, this class has a local structure
+ * called @p{AdditionalData} which is used to pass additional
+ * parameters to the solver, like the number of temporary vectors for
+ * example. We use this additional structure instead of passing these
+ * values directly to the constructor because this makes the use of
+ * the @p{SolverSelector} and other classes much easier and guarantees
+ * that these will continue to work even if number or type of the
+ * additional parameters for a certain solver changes.
  *
- * For the GMRes method, the @p{AdditionalData} structure contains the number
- * of temporary vectors as commented upon above. By default, the number
- * of these vectors is set to 30.
+ * For the GMRes method, the @p{AdditionalData} structure contains the
+ * number of temporary vectors as commented upon above. By default,
+ * the number of these vectors is set to 30. The @p{AdditionalData}
+ * also containes a flag indicating the use of right or left
+ * preconditioning. The default is left preconditioning. Finally it
+ * includes a flag indicating whether or not the default residual is
+ * used as stopping criterion. By default, the left preconditioned
+ * GMRes uses the preconditioned residual and the right preconditioned
+ * GMRes uses the normal, i.e. unpreconditioned, residual as stopping
+ * criterion. If the @p{use_default_residual} flag is @p{false}, the
+ * left preconditioned GMRes uses as stopping criterion the
+ * unpreconditioned residual and the right preconditioned GMRes the
+ * preconditioned residual. But be aware that the non-default
+ * residuals are not automatically computed by the GMRes method but
+ * need to be computed in addition. This (especially for the left
+ * preconditioned GMRes) might lead to a significant loss in the
+ * solver performance. Therefore, the user should set
+ * @p{use_default_residual=false} only for debugging/testing purposes.
  *
  * For the requirements on matrices and vectors in order to work with
  * this class, see the documentation of the @ref{Solver} base class.
  *
- * @author Wolfgang Bangerth
+ * @author Wolfgang Bangerth, Ralf Hartmann.
  */
 template <class VECTOR = Vector<double> >
 class SolverGMRES : public Solver<VECTOR>
@@ -91,15 +106,20 @@ class SolverGMRES : public Solver<VECTOR>
 					 /**
 					  * Constructor. By default,
 					  * set the number of
-					  * temporary vectors to 30
-					  * and preconditioning from
-					  * left..
+					  * temporary vectors to 30,
+					  * preconditioning from left
+					  * and the residual of the
+					  * stopping criterion to the
+					  * default residual
+					  * (cf. class documentation).
 					  */
 	AdditionalData(const unsigned int max_n_tmp_vectors = 30,
-		       bool right_preconditioning = false)
+		       bool right_preconditioning = false,
+		       bool use_default_residual = true)
 			:
 			max_n_tmp_vectors(max_n_tmp_vectors),
-			right_preconditioning(right_preconditioning)
+			right_preconditioning(right_preconditioning),
+			use_default_residual(use_default_residual)
 	  {};
 	
 					 /**
@@ -109,9 +129,17 @@ class SolverGMRES : public Solver<VECTOR>
 	unsigned int    max_n_tmp_vectors;
 
 					 /**
-					  * Flag for right preconditioning.
+					  * Flag for right
+					  * preconditioning.
 					  */
 	bool right_preconditioning;
+
+					 /**
+					  * Flag for the default
+					  * residual that is used as
+					  * stopping criterion.
+					  */
+	bool use_default_residual;
     };
     
 				     /**
@@ -375,7 +403,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
                    h    (n_tmp_vectors-1);
 
 
-unsigned int dim = 0;
+  unsigned int dim = 0;
 
   SolverControl::State iteration_state = SolverControl::iterate;
   
@@ -383,12 +411,34 @@ unsigned int dim = 0;
 				   // left or a right preconditioner. at
 				   // present, left is default, but both
 				   // ways are implemented
-  const bool left_precondition = ! additional_data.right_preconditioning;
+  const bool left_precondition = !additional_data.right_preconditioning;
+				   // Per default the left
+				   // preconditioned GMRes uses the
+				   // preconditioned residual and the
+				   // right preconditioned GMRes uses
+				   // the unpreconditioned residual as
+				   // stopping criterion.
+  const bool use_default_residual = additional_data.use_default_residual;
 
 				   // define two aliases
   VECTOR &v = tmp_vectors(0, x);
   VECTOR &p = tmp_vectors(n_tmp_vectors-1, x);
 
+				   // Following vectors are needed
+				   // when not the default residuals
+				   // are used as stopping criterion
+  VECTOR *r=0;
+  VECTOR *x_=0;
+  ::Vector<double> *gamma_=0;
+  if (!use_default_residual)
+    {
+      r=this->memory.alloc();
+      x_=this->memory.alloc();
+      r->reinit(x.size());
+      x_->reinit(x.size());
+
+      gamma_=new ::Vector<double> (gamma.size());
+    }
 
 ///////////////////////////////////
 				   // outer iteration: loop until we
@@ -400,14 +450,16 @@ unsigned int dim = 0;
     {
 				       // reset this vector to the
 				       // right size
-      h.reinit (n_tmp_vectors-1);
+      h.reinit (n_tmp_vectors-1);      
       
       if (left_precondition)
 	{
 	  A.vmult(p,x);
 	  p.sadd(-1.,1.,b);
 	  precondition.vmult(v,p);
-	} else {
+	}
+      else
+	{
 	  A.vmult(v,x);
 	  v.sadd(-1.,1.,b);
 	};
@@ -415,26 +467,58 @@ unsigned int dim = 0;
       double rho = v.l2_norm();
 
 				       // check the residual here as
-				       // well since it may be that
-				       // we got the exact (or an almost
+				       // well since it may be that we
+				       // got the exact (or an almost
 				       // exact) solution vector at
 				       // the outset. if we wouldn't
 				       // check here, the next scaling
 				       // operation would produce
 				       // garbage
-      iteration_state = this->control().check (accumulated_iterations, rho);
-      if (iteration_state != SolverControl::iterate)
-	break;
+      if (use_default_residual)
+	{
+	  iteration_state = this->control().check (
+	    accumulated_iterations, rho);
+	  
+	  if (iteration_state != SolverControl::iterate)
+	    break;
+	}
+      else
+	{
+	  deallog << "default_res=" << rho << endl;
+
+	  if (left_precondition)
+	    {
+	      A.vmult(*r,x);
+	      r->sadd(-1.,1.,b);
+	    }
+	  else
+	    precondition.vmult(*r,v);
+	      
+	  double res = r->l2_norm();
+	  iteration_state = control().check (
+	    accumulated_iterations, res);
+
+	  if (iteration_state != SolverControl::iterate)
+	    {
+	      this->memory.free(r);
+	      this->memory.free(x_);
+
+	      delete gamma_;
+	      break;
+	    }
+	}
       
       gamma(0) = rho;
       
       v.scale (1./rho);
 
-				       // inner iteration doing at most as
-				       // many steps as there are temporary
-				       // vectors. the number of steps actually
-				       // been done is propagated outside
-				       // through the @p{dim} variable
+				       // inner iteration doing at
+				       // most as many steps as there
+				       // are temporary vectors. the
+				       // number of steps actually
+				       // been done is propagated
+				       // outside through the @p{dim}
+				       // variable
       for (unsigned int inner_iteration=0;
 	   ((inner_iteration < n_tmp_vectors-2)
 	    &&
@@ -487,15 +571,63 @@ unsigned int dim = 0;
 	  for (unsigned int i=0; i<dim; ++i)
 	    H(i,inner_iteration) = h(i);
 	  
-					   /*  residual  */
+					   /*  default residual  */
 	  rho = std::fabs(gamma(dim));
-    
-	  iteration_state = this->control().check (accumulated_iterations, rho);
-	};
 
+	  if (use_default_residual)
+	    iteration_state = this->control().check (
+	      accumulated_iterations, rho);
+  	  else
+  	    {
+	      deallog << "default_res=" << rho << endl;
+	      
+	      ::Vector<double> h_(dim);
+	      *x_=x;
+	      *gamma_=gamma;
+	      H1.reinit(dim+1,dim);
+	      
+	      for (unsigned int i=0; i<dim+1; ++i)
+		for (unsigned int j=0; j<dim; ++j)
+		  H1(i,j) = H(i,j);
+	      
+	      H1.backward(h_,*gamma_);
+	      
+	      if (left_precondition)
+		for (unsigned int i=0 ; i<dim; ++i)
+		  x_->add(h_(i), tmp_vectors[i]);
+	      else
+		{
+		  p = 0.;
+		  for (unsigned int i=0; i<dim; ++i)
+		    p.add(h_(i), tmp_vectors[i]);
+		  precondition.vmult(*r,p);
+		  x_->add(1.,*r);
+		};
+	      A.vmult(*r,*x_);
+	      r->sadd(-1.,1.,b);
+					       // Now *r contains the
+					       // unpreconditioned
+					       // residual!!
+	      if (left_precondition)
+		{
+		  const double res=r->l2_norm();
+		  
+		  iteration_state = control().check (
+		    accumulated_iterations, res);
+		}
+	      else
+		{
+		  precondition.vmult(*x_, *r);
+		  const double preconditioned_res=x_->l2_norm();
+		  
+		  iteration_state = control().check (
+		    accumulated_iterations, preconditioned_res);
+		}
+  	    }
+	};
 				       // end of inner iteration. now
-				       // calculate the solution from the
-				       // temporary vectors
+				       // calculate the solution from
+				       // the temporary vectors
       h.reinit(dim);
       H1.reinit(dim+1,dim);
 
@@ -522,6 +654,13 @@ unsigned int dim = 0;
     }
   while (iteration_state == SolverControl::iterate);
 
+  if (!use_default_residual)
+    {
+      this->memory.free(r);
+      this->memory.free(x_);
+
+      delete gamma_;
+    }
   
   deallog.pop();
 				   // in case of failure: throw
