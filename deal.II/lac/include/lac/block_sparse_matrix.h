@@ -227,6 +227,18 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 			      const number           omega = 1.) const;
 
 				     /**
+				      * Apply the Jacobi
+				      * preconditioner to a simple vector.
+				      *
+				      * The matrix must be a single
+				      * square block for this.
+				    */
+    template <typename number2>
+    void precondition_Jacobi (Vector<number2>       &dst,
+			      const Vector<number2> &src,
+			      const number           omega = 1.) const;
+
+				     /**
 				      * Print the matrix in the usual
 				      * format, i.e. as a matrix and
 				      * not as a list of nonzero
@@ -343,6 +355,21 @@ precondition_Jacobi (BlockVectorType       &dst,
     this->block(i,i).precondition_Jacobi (dst.block(i),
                                           src.block(i),
                                           omega);
+}
+
+
+template <typename number>
+template <typename number2>
+void
+BlockSparseMatrix<number>::
+precondition_Jacobi (Vector<number2>       &dst,
+		     const Vector<number2> &src,
+		     const number           omega) const
+{
+//TODO: Insert assertions
+                                   // do a diagonal preconditioning. uses only
+                                   // the diagonal blocks of the matrix
+  this->block(0,0).precondition_Jacobi (dst, src, omega);
 }
 
 
