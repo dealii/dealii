@@ -472,20 +472,24 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *
  *  In 3D this is a vector of the lines, one of quads and one of the
- *  hexaeders on this levels, as well as a the associated vectors holding
- *  information about the children of these lines, quads and hexs.
+ *  hexahedra on this levels, as well as a the associated vectors
+ *  holding information about the children of these lines, quads and
+ *  hexs. In addition, we store for each face of each hexahedron
+ *  whether its normal points in the standard direction (see the
+ *  Triangulation class) or in the opposite direction.
  *
  *  The vectors of lines and quads and their children are derived from
  *  @ref{TriangulationLevel<2>}.
  *
- *  @author Wolfgang Bangerth, 1998
+ *  @author Wolfgang Bangerth, 1998, 2003
  */
 template <>
 class TriangulationLevel<3> :  public TriangulationLevel<2>
 {
 				     /**
-				      *  This subclass groups together all that
-				      *  is needed to describe the hexs on one
+				      *  This subclass groups together
+				      *  all that is needed to
+				      *  describe the hexes on one
 				      *  level.
 				      *
 				      *  It is fully analogous to the
@@ -499,6 +503,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 					  *  Same as for the @p{lines} array.
 					  */
 	std::vector<Hexahedron> hexes;
+        
 					 /**
 					  *  Same as for the
 					  *  @ref{TriangulationLevel<1>::LinesData}@p{::chilren}
@@ -524,36 +529,91 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 	std::vector<bool> user_flags;
 
 					 /**
-					  * Store boundary and material data. In
-					  * two dimension, this field stores
-					  * the material id of a hex, which is a
-					  * number between 0 and 254. In more
-					  * than three dimensions, hexes have no
-					  * material id, but they may be at the
-					  * boundary; then, we store the
-					  * boundary indicator in this field,
-					  * which denotes to which part of the
-					  * boundary this line belongs and which
-					  * boundary conditions hold on this
-					  * part. The boundary indicator also
-					  * is a number between zero and 254;
-					  * the id 255 is reserved for hexes
-					  * in the interior and may be used
-					  * to check whether a hex is at the
-					  * boundary or not, which otherwise
-					  * is not possible if you don't know
-					  * which cell it belongs to.
+					  * Store boundary and
+					  * material data. In two
+					  * dimension, this field
+					  * stores the material id of
+					  * a hex, which is a number
+					  * between 0 and 254. In more
+					  * than three dimensions,
+					  * hexes have no material id,
+					  * but they may be at the
+					  * boundary; then, we store
+					  * the boundary indicator in
+					  * this field, which denotes
+					  * to which part of the
+					  * boundary this line belongs
+					  * and which boundary
+					  * conditions hold on this
+					  * part. The boundary
+					  * indicator also is a number
+					  * between zero and 254; the
+					  * id 255 is reserved for
+					  * hexes in the interior and
+					  * may be used to check
+					  * whether a hex is at the
+					  * boundary or not, which
+					  * otherwise is not possible
+					  * if you don't know which
+					  * cell it belongs to.
 					  */
 	std::vector<unsigned char> material_id;
 
-
 					 /**
-					  * Pointer which is not used by the
-					  * library but may be accessed an set
-					  * by the user to handle data local to
-					  * a line/quad/etc.
+					  * Pointer which is not used
+					  * by the library but may be
+					  * accessed an set by the
+					  * user to handle data local
+					  * to a line/quad/etc.
 					  */
 	std::vector<void*> user_pointers;
+
+                                         /**
+                                          * For edges, we enforce a
+                                          * standard convention that
+                                          * opposite edges should be
+                                          * parallel. Now, that's
+                                          * enforcable in most cases,
+                                          * and we have code that
+                                          * makes sure that if a mesh
+                                          * allows this to happen,
+                                          * that we have this
+                                          * convention. We also know
+                                          * that it is always possible
+                                          * to have opposite faces
+                                          * have parallel normal
+                                          * vectors. (For both things,
+                                          * see the Agelek, Anderson,
+                                          * Bangerth, Barth paper
+                                          * mentioned in the
+                                          * publications list.)
+                                          *
+                                          * The problem is that we
+                                          * originally had another
+                                          * condition, namely that
+                                          * faces 0, 2 and 6 have
+                                          * normals that point into
+                                          * the cell, while the other
+                                          * faces have normals that
+                                          * point outward. It turns
+                                          * out that this is not
+                                          * always possible. In
+                                          * effect, we have to store
+                                          * whether the normal vector
+                                          * of each face of each cell
+                                          * follows this convention or
+                                          * not. If this is so, then
+                                          * this variable stores a
+                                          * @p{true} value, otherwise
+                                          * a @p{false} value.
+                                          *
+                                          * In effect, this field has
+                                          * @p{6*n_cells} elements,
+                                          * being the number of cells
+                                          * times the six faces each
+                                          * has.
+                                          */
+        std::vector<bool> face_orientations;
     };
     
   public:
@@ -569,12 +629,15 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
     void reserve_space (const unsigned int new_quads);
 
 				     /**
-				      *  Check the memory consistency of the
-				      *  different containers. Should only be
-				      *  called with the prepro flag @p{DEBUG}
-				      *  set. The function should be called from
-				      *  the functions of the higher
-				      *  @ref{TriangulationLevel} classes.
+				      *  Check the memory consistency
+				      *  of the different
+				      *  containers. Should only be
+				      *  called with the prepro flag
+				      *  @p{DEBUG} set. The function
+				      *  should be called from the
+				      *  functions of the higher
+				      *  @ref{TriangulationLevel}
+				      *  classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 
