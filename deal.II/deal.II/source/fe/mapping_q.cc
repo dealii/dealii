@@ -620,51 +620,18 @@ MappingQ<dim>::compute_laplace_vector(std::vector<std::vector<double> > &lvs) co
 				   // S:=S_1*T
   S_1.mmult(S_1_T,T);
   
-				   // compute the inner
-				   // unit_support_points
-  std::vector<Point<dim> > inner_unit_support_points(n_inner);
-  const double step = 1./degree;
-  const unsigned int z_end=(dim==3) ? degree : 2;
-  unsigned int iall=0;
-  for (unsigned int iz=1; iz<z_end; ++iz)
-    for (unsigned int iy=1; iy<degree; ++iy)
-      for (unsigned int ix=1; ix<degree; ++ix, ++iall)
-	{
-	  Point<dim> &p=inner_unit_support_points[iall];
-	  p(0)=ix*step;
-	  p(1)=iy*step;
-	  if (dim==3)
-	    p(2)=iz*step;
-	}
-  Assert(iall==n_inner, ExcInternalError());
-  
-				   // Compute the shape values at
-				   // the inner
-				   // unit_support_points
-  InternalData support_data(n_shape_functions);
-  support_data.shape_values.resize(n_shape_functions * n_inner);
-  
-  compute_shapes(inner_unit_support_points, support_data);
-  
 				   // Resize and initialize the
 				   // lvs
   lvs.resize(n_inner);
-  for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-    lvs[unit_point].resize(n_outer, 0);
+  for (unsigned int i=0; i<n_inner; ++i)
+    lvs[i].resize(n_outer, 0);
   
 				   // fill this vector
-  for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+  for (unsigned int i=0; i<n_inner; ++i)
     {
-      std::vector<double> &lv=lvs[unit_point];
+      std::vector<double> &lv=lvs[i];
       for (unsigned int k=0; k<n_outer; ++k)
-	{
-	  double sum=0;
-	  for (unsigned int i=0; i<n_inner; ++i)
-	    sum+=support_data.shape(unit_point, n_outer+i)
-		 * S_1_T(i,k);
-	      
-	  lv[k]=-sum+support_data.shape(unit_point, k);
-	}
+	lv[k]=-S_1_T(i,k);
     }
 }
 
