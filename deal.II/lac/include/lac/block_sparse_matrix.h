@@ -236,7 +236,6 @@ class BlockSparseMatrix : public Subscriptor
 				      * matrix is of dimension
 				      * $m \times n$.
 				      */
-
     unsigned int n () const;
 
 				     /**
@@ -251,10 +250,12 @@ class BlockSparseMatrix : public Subscriptor
     unsigned int n_nonzero_elements () const;
     
 				     /**
-				      * Set the element @p{(i,j)} to @p{value}.
-				      * Throws an error if the entry does
-				      * not exist. Still, it is allowed to store
-				      * zero values in non-existent fields.
+				      * Set the element @p{(i,j)} to
+				      * @p{value}.  Throws an error if
+				      * the entry does not
+				      * exist. Still, it is allowed to
+				      * store zero values in
+				      * non-existent fields.
 				      */
     void set (const unsigned int i,
 	      const unsigned int j,
@@ -312,27 +313,49 @@ class BlockSparseMatrix : public Subscriptor
 				      * since in this case the
 				      * operation is cheaper.
 				      *
-				      * The source matrix may be a matrix
-				      * of arbitrary type, as long as its
-				      * data type is convertible to the
-				      * data type of this matrix.
+				      * The source matrix may be a
+				      * matrix of arbitrary type, as
+				      * long as its data type is
+				      * convertible to the data type
+				      * of this matrix.
 				      */
     template <typename somenumber>
     void add_scaled (const number factor,
 		     const BlockSparseMatrix<somenumber> &matrix);
     
 				     /**
-				      * Return the value of the entry (i,j).
-				      * This may be an expensive operation
-				      * and you should always take care
-				      * where to call this function.
-				      * In order to avoid abuse, this function
-				      * throws an exception if the wanted
-				      * element does not exist in the matrix.
+				      * Return the value of the entry
+				      * (i,j).  This may be an
+				      * expensive operation and you
+				      * should always take care where
+				      * to call this function.  In
+				      * order to avoid abuse, this
+				      * function throws an exception
+				      * if the wanted element does not
+				      * exist in the matrix.
 				      */
     number operator () (const unsigned int i,
 			const unsigned int j) const;
 
+				     /**
+				      * This function is mostly like
+				      * @p{operator()} in that it
+				      * returns the value of the
+				      * matrix entry @p{(i,j)}. The only
+				      * difference is that if this
+				      * entry does not exist in the
+				      * sparsity pattern, then instead
+				      * of raising an exception, zero
+				      * is returned. While this may be
+				      * convenient in some cases, note
+				      * that it is simple to write
+				      * algorithms that are slow
+				      * compared to an optimal
+				      * solution, since the sparsity
+				      * of the matrix is not used.
+				      */
+    number el (const unsigned int i,
+	       const unsigned int j) const;
 
 				     /**
 				      * Matrix-vector multiplication:
@@ -615,6 +638,21 @@ BlockSparseMatrix<number>::operator () (const unsigned int i,
     col_index = sparsity_pattern->column_indices.global_to_local (j);
   return block(row_index.first,col_index.first) (row_index.second,
 						 col_index.second);
+};
+
+
+
+template <typename number>
+inline
+number
+BlockSparseMatrix<number>::el (const unsigned int i,
+			       const unsigned int j) const
+{
+  const std::pair<unsigned int,unsigned int>
+    row_index = sparsity_pattern->row_indices.global_to_local (i),
+    col_index = sparsity_pattern->column_indices.global_to_local (j);
+  return block(row_index.first,col_index.first).el (row_index.second,
+						    col_index.second);
 };
 
 
