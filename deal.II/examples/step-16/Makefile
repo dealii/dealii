@@ -136,9 +136,7 @@ clean:
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion at the bottom of this file.
 Makefile.dep: $(target).cc Makefile \
-              $(shell echo $(include-path-base)/base/*.h    \
-                           $(include-path-lac)/lac/*.h      \
-                           $(include-path-deal2)/*/*.h)
+              $(shell echo $D/*/include/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
 		> Makefile.dep
