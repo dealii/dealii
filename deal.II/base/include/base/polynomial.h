@@ -129,9 +129,10 @@ class Polynomial : public Subscriptor
 				      * @p{double} and @p{long double}
 				      * was not significant, though.
 				      *
-				      *
 				      * The operation is performed in
-				      * place.
+				      * place, i.e. the coefficients
+				      * of the present object are
+				      * changed.
 				      */
     template <typename number2>
     void shift (const number2 offset);
