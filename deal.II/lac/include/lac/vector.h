@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -788,6 +788,7 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
+ * @relates Vector
  * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>

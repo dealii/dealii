@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -317,6 +317,7 @@ BlockIndices::memory_consumption () const
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two objects.
  *
+ * @relates BlockIndices
  * @author Wolfgang Bangerth, 2000
  */
 inline
