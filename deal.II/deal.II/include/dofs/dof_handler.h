@@ -1169,6 +1169,7 @@ template <> unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () c
 template <> unsigned int DoFHandler<2>::max_couplings_between_dofs () const;
 template <> unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const;
 template <> unsigned int DoFHandler<3>::max_couplings_between_dofs () const;
+template <> unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const;
 
 template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::begin_raw (const unsigned int level) const;
 template <> DoFHandler<1>::cell_iterator DoFHandler<1>::begin (const unsigned int level) const;
