@@ -152,6 +152,13 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      */
     virtual void free (const VECTOR * const);
 
+				     /**
+				      * Memory consumed by this class
+				      * and all currently allocated
+				      * vectors.
+				      */
+    unsigned int memory_consumption() const;
+
   private:
 				     /**
 				      * Type to enter into the
@@ -171,13 +178,6 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * Overall number of allocations.
 				      */
     unsigned int n_alloc;
-
-				     /**
-				      * Memory consumed by this class
-				      * and all currently allocated
-				      * vectors.
-				      */
-    unsigned int memory_consumption() const;
     
 				     /**
 				      * Mutex to synchronise access to
