@@ -1642,7 +1642,9 @@ void DGMethod<dim>::run ()
       const double difference=solution1.linfty_norm();
       if (difference>1e-13)
 	std::cout << "solution1 and solution2 differ!!" << std::endl;
-
+      else
+	std::cout << "solution1 and solution2 coincide." << std::endl;
+	
 				       // Finally we perform the
 				       // output.
       output_results (cycle);
