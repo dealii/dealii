@@ -702,7 +702,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  = (Point<dim>(1,0,0)
 	     - ((Point<dim>(1,0,0) * view_direction) * view_direction)
 	     - ((Point<dim>(1,0,0) * unit_vector1)   * unit_vector1));
-	const Point<dim> unit_vector2 = vector2 / sqrt(vector2.square());
+	const Point<dim> unit_vector2 = vector2 / std::sqrt(vector2.square());
 	
 	for (; line!=endline; ++line) 
 	  line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,

@@ -1175,7 +1175,7 @@ MGDoFHandler<dim>::last_active_hex () const {
 
 template <int dim>
 void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
-					 unsigned int offset)
+					 const unsigned int        offset)
 {
 				   // first distribute global dofs
   DoFHandler<dim>::distribute_dofs (fe, offset);

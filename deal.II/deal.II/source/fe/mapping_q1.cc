@@ -425,9 +425,9 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 	      Tensor<1,dim> tangential;
 	      tangential[(nindex-1)%dim] = 1.;
 	      data.unit_tangentials[i+nfaces].resize(n_original_q_points);
-	      fill (data.unit_tangentials[i+nfaces].begin(),
-		    data.unit_tangentials[i+nfaces].end(),
-		    tangential);
+	      std::fill (data.unit_tangentials[i+nfaces].begin(),
+			 data.unit_tangentials[i+nfaces].end(),
+			 tangential);
 	    }
 	}
     }

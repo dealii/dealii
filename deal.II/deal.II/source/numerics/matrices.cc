@@ -654,7 +654,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	  double max_diag_entry = 0;
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    if (std::fabs(cell_matrix(i,i)) > max_diag_entry)
-	      max_diag_entry = fabs(cell_matrix(i,i));
+	      max_diag_entry = std::fabs(cell_matrix(i,i));
 #endif  
 
 	  mutex.acquire ();

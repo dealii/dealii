@@ -138,7 +138,7 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
   if (compute_radius_automatically)
     {
       const Point<dim> vertex_relative = p0 - center;
-      r = sqrt(vertex_relative.square());
+      r = std::sqrt(vertex_relative.square());
     }
   else
     r=radius;
@@ -146,7 +146,7 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
   Assert(std::fabs(v0.square()-r*r)<eps, ExcInternalError());
   Assert(std::fabs(v1.square()-r*r)<eps, ExcInternalError());
   
-  const double alpha=std::acos((v0*v1)/sqrt(v0.square()*v1.square()));
+  const double alpha=std::acos((v0*v1)/std::sqrt(v0.square()*v1.square()));
   const double d_alpha=alpha/(n+1);
   const Point<dim> pm=0.5*(v0+v1);
   
@@ -181,7 +181,7 @@ HyperBallBoundary<dim>::get_intermediate_points_between_points (
       Assert(right_index<n, ExcInternalError());
       Assert(left_index+1>=1, ExcInternalError());
 	  
-      double d=h*tan(beta);
+      double d=h*std::tan(beta);
       points[right_index]=pm+d/length*(v1-v0);
       points[left_index]=pm-d/length*(v1-v0);
     }
