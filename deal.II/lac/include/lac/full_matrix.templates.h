@@ -1266,8 +1266,8 @@ FullMatrix<number>::gauss_jordan()
   for (unsigned int j=0; j<n(); ++j)
     {
 				       // pivotsearch
-      double max = fabs(el(j,j));
-      double r = j;
+      number       max = fabs(el(j,j));
+      unsigned int r   = j;
       for (unsigned int i=j+1; i<n(); ++i)
 	{
 	  if (fabs(el(i,j)) > max)
@@ -1287,7 +1287,7 @@ FullMatrix<number>::gauss_jordan()
 	}
 
 				       // transformation
-      const double hr = 1./el(j,j);
+      const number hr = 1./el(j,j);
       el(j,j) = hr;
       for (unsigned int k=0; k<n(); ++k)
 	{
