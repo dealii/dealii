@@ -8,14 +8,121 @@ static const char* OBJFILE = "DEAL $RCSfile$ $Revision$";
 
 #include <lac/dsmatrix.h>
 #include <ostream.h>
-#include <base/sort.h>
+
+
+/*----------------- from sort.h -------------------------*/
+
+
+//////////
+template<class T>
+inline void swap(T* a, T* b)
+{
+  T x = *a;
+  *a = *b;
+  *b = x;
+}
+
+//////////
+template<class T>
+inline void simple_sort(long n, T* field)
+{
+  long i,j;
+  for (i=1;i<n;i++)
+  {
+    for (j=i+1;j<=n;j++)
+    {
+      if (field[j] < field[i])
+      {
+	swap(field+i,field+j);
+      }
+    }
+  }
+}
+
+template<class T>
+inline void heapsort_sift(T* a, long l, long r)
+{
+  long i = l;
+  long j = 2*i;
+  T    x = a[i];
+
+  while (j<=r)
+  {
+    if (j<r) 
+    {
+      if (a[j] < a[j+1]) j++;
+    }
+    if (!(x < a[j])) break;
+    a[i] = a[j];
+    i = j;
+    j = 2*i;
+  }
+  a[i] = x;
+}
+
+
+//////////
+template<class T>
+inline void heapsort(int n, T* field)
+{
+  field--;
+
+  long l =(n/2)+1;
+  long r = n;
+
+  while (l>1)
+  {
+    l--;
+    heapsort_sift(field,l,r);
+  }
+  while (r>1)
+  {
+    swap(field+l,field+r);
+    r--;
+    heapsort_sift(field,l,r);
+  }
+}
+
+//////////
+template<class T>
+inline void _quicksort(long r, T* a, long l)
+{
+  long i = l;
+  long j = r;
+  T*   x = &a[(l+r)/2];
+  do
+  {
+    while (a[i] < *x) i++;
+    while (*x < a[j]) j--;
+    if (i<=j)
+    {
+      swap(a+i,a+j);
+      i++;
+      j--;
+    }
+  }
+  while (i<=j);
+  if (l<j) _quicksort(j,a,l);
+  if (i<r) _quicksort(r,a,i);
+}
+
+template<class T>
+inline void quicksort(long r, T* a)
+{
+  _quicksort(r,a,1);
+}
+
+
+/*----------------- from sort.h -------------------------*/
+
+
 
 void
 dSMatrixStruct::reinit(int m, int n, int max_per_row)
 {
-  THROW1(m<=0, IntError(IntError::IllegalDimension, m));
-  THROW1(n<=0, IntError(IntError::IllegalDimension, n));
-  THROW1(max_per_row<=0, IntError(IntError::IllegalDimension, max_per_row));
+//  THROW1(m<=0, IntError(IntError::IllegalDimension, m));
+//  THROW1(n<=0, IntError(IntError::IllegalDimension, n));
+//  THROW1(max_per_row<=0, IntError(IntError::IllegalDimension, max_per_row));
   rows = m;
   cols = n;
   vec_len = m * max_per_row;

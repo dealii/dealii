@@ -18,12 +18,12 @@ dVector::dVector(int n) : val(0)
 {
   dim = n;
   maxdim = n;
-  THROW1(n<0, IntError(IntError::IllegalDimension, n, "dVector"));
+  //THROW1(n<0, IntError(IntError::IllegalDimension, n, "dVector"));
 
   if (n)
     {
       val = new double[maxdim];
-      THROWUNCOND(!val, Error(Error::NoMem,"dVector::dVector"));
+      //THROWUNCOND(!val, Error(Error::NoMem,"dVector::dVector"));
       (*this) = 0.;
     }
 }
@@ -36,19 +36,19 @@ dVector::dVector(const dVector& v) : val(0)
   if (dim)
     {
       val = new double[maxdim];
-      THROWUNCOND(!val, Error(Error::NoMem,"dVector::dVector"));
+      //THROWUNCOND(!val, Error(Error::NoMem,"dVector::dVector"));
       for (int i=0;i<dim;i++) val[i] = v.val[i];
     }
 }
 
 void dVector::reinit(int n, int fast)
 {
-  THROW1(n<=0, IntError(IntError::IllegalDimension, n));
+  //THROW1(n<=0, IntError(IntError::IllegalDimension, n));
   if (n>maxdim)
   {
     if (val) delete[] val;
     val = new double[n];
-    THROWUNCOND(!val, Error(Error::NoMem,"dVector::reinit"));
+    //THROWUNCOND(!val, Error(Error::NoMem,"dVector::reinit"));
     maxdim = n;
   }
   dim = n;
@@ -62,7 +62,7 @@ void dVector::reinit(const dVector& v, int fast)
   {
     if (val) delete[] val;
     val = new double[n];
-    THROWUNCOND(!val, Error(Error::NoMem,"dVector::reinit"));
+    //THROWUNCOND(!val, Error(Error::NoMem,"dVector::reinit"));
     maxdim = n;
   }
   dim = n;
@@ -172,8 +172,8 @@ dVector& dVector::operator = (const dVector& v)
 void dVector::cadd(int i, const VectorBase& V, double s, int j)
 {
   const dVector& v = (const dVector&) V;
-  THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
-  THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
+  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
+  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
 
   val[i] += s*v.val[j];
 }
@@ -181,9 +181,9 @@ void dVector::cadd(int i, const VectorBase& V, double s, int j)
 void dVector::cadd(int i, const VectorBase& V, double s, int j, double t, int k)
 {
   const dVector& v = (const dVector&) V;
-  THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
-  THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
-  THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cadd"));
+  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
+  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
+  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cadd"));
 
   val[i] += s*v.val[j] + t*v.val[k];
 }
@@ -192,26 +192,26 @@ void dVector::cadd(int i, const VectorBase& V, double s, int j,
 		   double t, int k, double q, int l, double r, int m)
 {
   const dVector& v = (const dVector&) V;
-  THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
-  THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
-  THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cadd"));
-  THROW1((l<0) || (l>v.dim), IntError(IntError::Range,l,"cadd"));
-  THROW1((m<0) || (m>v.dim), IntError(IntError::Range,m,"cadd"));
+  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cadd"));
+  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cadd"));
+  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cadd"));
+  //THROW1((l<0) || (l>v.dim), IntError(IntError::Range,l,"cadd"));
+  //THROW1((m<0) || (m>v.dim), IntError(IntError::Range,m,"cadd"));
 
   val[i] += s*v.val[j] + t*v.val[k] + q*v.val[l] + r*v.val[m];
 }
 
 void dVector::czero(int i)
 {
-    THROW1((i<0) || (i>dim), IntError(IntError::Range,i));
+    //THROW1((i<0) || (i>dim), IntError(IntError::Range,i));
     val[i] = 0.;
 }
 
 void dVector::cequ(int i, const VectorBase& V, double s, int j)
 {
   const dVector& v = (const dVector&) V;
-  THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
-  THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
+  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
+  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
 
   val[i] = s*v.val[j];
 }
@@ -219,9 +219,9 @@ void dVector::cequ(int i, const VectorBase& V, double s, int j)
 void dVector::cequ(int i, const VectorBase& V, double s, int j, double t, int k)
 {
   const dVector& v = (const dVector&) V;
-  THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
-  THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
-  THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cequ"));
+  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
+  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
+  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cequ"));
 
   val[i] = s*v.val[j] + t*v.val[k];
 }
@@ -230,11 +230,11 @@ void dVector::cequ(int i, const VectorBase& V, double s, int j,
 		   double t, int k, double q, int l, double r, int m)
 {
   const dVector& v = (const dVector&) V;
-  THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
-  THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
-  THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cequ"));
-  THROW1((l<0) || (l>v.dim), IntError(IntError::Range,l,"cequ"));
-  THROW1((m<0) || (m>v.dim), IntError(IntError::Range,m,"cequ"));
+  //THROW1((i<0) || (i>dim), IntError(IntError::Range,i,"cequ"));
+  //THROW1((j<0) || (j>v.dim), IntError(IntError::Range,j,"cequ"));
+  //THROW1((k<0) || (k>v.dim), IntError(IntError::Range,k,"cequ"));
+  //THROW1((l<0) || (l>v.dim), IntError(IntError::Range,l,"cequ"));
+  //THROW1((m<0) || (m>v.dim), IntError(IntError::Range,m,"cequ"));
 
   val[i] = s*v.val[j] + t*v.val[k] + q*v.val[l] + r*v.val[m];
 }

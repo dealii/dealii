@@ -12,7 +12,7 @@ iVector::iVector()
 {
   dim=maxdim=1;
   val = new int[1];
-  THROWUNCOND(!val, Error(Error::NoMem,"iVector::iVector"));
+  //THROWUNCOND(!val, Error(Error::NoMem,"iVector::iVector"));
   val[0] = 0;
 }
 
@@ -20,10 +20,10 @@ iVector::iVector(int n)
 {
   dim = n;
   maxdim = n;
-  THROW1(n<=0, IntError(IntError::IllegalDimension, n, "iVector::iVector"));
+  //THROW1(n<=0, IntError(IntError::IllegalDimension, n, "iVector::iVector"));
 
   val = new int[maxdim];
-  THROWUNCOND(!val, Error(Error::NoMem,"iVector::iVector"));
+  //THROWUNCOND(!val, Error(Error::NoMem,"iVector::iVector"));
   (*this) = 0;
 }
 
@@ -36,12 +36,12 @@ iVector::iVector(const iVector& v)
 
 void iVector::reinit(int n, int fast)
 {
-  THROW1(n<=0, IntError(IntError::IllegalDimension, n, "iVector::reinit"));
+  //THROW1(n<=0, IntError(IntError::IllegalDimension, n, "iVector::reinit"));
   if (n>maxdim)
   {
     delete[] val;
     val = new int[n];
-    THROWUNCOND(!val, Error(Error::NoMem,"iVector::reinit"));
+    //THROWUNCOND(!val, Error(Error::NoMem,"iVector::reinit"));
     maxdim = n;
   }
   dim = n;
@@ -55,7 +55,7 @@ void iVector::reinit(const iVector& v, int fast)
   {
     delete[] val;
     val = new int[n];
-    THROWUNCOND(!val, Error(Error::NoMem,"iVector::reinit"));
+    //THROWUNCOND(!val, Error(Error::NoMem,"iVector::reinit"));
     maxdim = n;
   }
   dim = n;
