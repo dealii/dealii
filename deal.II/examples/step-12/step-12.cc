@@ -1520,8 +1520,9 @@ void DGMethod<dim>::refine_grid ()
 
 				   // and they are cell-wise scaled by
 				   // the factor $h^{1+d/2}$
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
   for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
     gradient_indicator(cell_no)*=std::pow(cell->diameter(), 1+1.0*dim/2);
 

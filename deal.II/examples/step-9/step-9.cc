@@ -1914,7 +1914,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // Now loop over all active
 				       // neighbors and collect the
 				       // data we need.
-      typename std::vector<DoFHandler<dim>::active_cell_iterator>::const_iterator
+      typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
 	{

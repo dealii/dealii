@@ -695,7 +695,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // do not use Neumann boundary
 				   // conditions, the map will not
 				   // contain entries.
-  FunctionMap<dim>::type neumann_boundary;
+  typename FunctionMap<dim>::type neumann_boundary;
 
 				   // Now we call the error
 				   // estimator. The parameters should
