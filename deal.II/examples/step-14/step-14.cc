@@ -1011,6 +1011,7 @@ namespace LaplaceSolver
       RefinementGlobal (Triangulation<dim>       &coarse_grid,
 			const FiniteElement<dim> &fe,
 			const Quadrature<dim>    &quadrature,
+			const Quadrature<dim-1>  &face_quadrature,
 			const Function<dim>      &rhs_function,
 			const Function<dim>      &boundary_values);
 
@@ -1024,12 +1025,14 @@ namespace LaplaceSolver
   RefinementGlobal (Triangulation<dim>       &coarse_grid,
 		    const FiniteElement<dim> &fe,
 		    const Quadrature<dim>    &quadrature,
+		    const Quadrature<dim-1>  &face_quadrature,
 		    const Function<dim>      &rhs_function,
 		    const Function<dim>      &boundary_values)
 		  :
 		  Base<dim> (coarse_grid),
                   PrimalSolver<dim> (coarse_grid, fe, quadrature,
-				     rhs_function, boundary_values)
+				     face_quadrature, rhs_function,
+				     boundary_values)
   {};
 
 
@@ -1088,6 +1091,128 @@ namespace LaplaceSolver
 					estimated_error_per_cell);
     GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
 						     estimated_error_per_cell,
+						     0.3, 0.03);
+    triangulation->execute_coarsening_and_refinement ();
+  };
+
+
+
+				   // @sect4{The RefinementWeightedKelly class}
+
+				   // This class is a variant of the
+				   // previous one, in that it allows
+				   // to weight the refinement
+				   // indicators we get from the
+				   // library's Kelly indicator by
+				   // some function. We include this
+				   // class since the goal of this
+				   // example program is to
+				   // demonstrate automatic refinement
+				   // criteria even for complex output
+				   // quantities such as point values
+				   // or stresses. If we did not solve
+				   // a dual problem and compute the
+				   // weights thereof, we would
+				   // probably be tempted to give a
+				   // hand-crafted weighting to the
+				   // indicators to account for the
+				   // fact that we are going to
+				   // evaluate these quantities. This
+				   // class implements such a weight,
+				   // and should serve as basis for
+				   // further experiments.
+  template <int dim>
+  class RefinementWeightedKelly : public PrimalSolver<dim>
+  {
+    public:
+      RefinementWeightedKelly (Triangulation<dim>       &coarse_grid,
+			       const FiniteElement<dim> &fe,
+			       const Quadrature<dim>    &quadrature,
+			       const Quadrature<dim-1>  &face_quadrature,
+			       const Function<dim>      &rhs_function,
+			       const Function<dim>      &boundary_values);
+
+      virtual void refine_grid ();
+  };
+
+
+
+  template <int dim>
+  RefinementWeightedKelly<dim>::
+  RefinementWeightedKelly (Triangulation<dim>       &coarse_grid,
+			   const FiniteElement<dim> &fe,
+			   const Quadrature<dim>    &quadrature,
+			   const Quadrature<dim-1>  &face_quadrature,
+			   const Function<dim>      &rhs_function,
+			   const Function<dim>      &boundary_values)
+		  :
+		  Base<dim> (coarse_grid),
+                  PrimalSolver<dim> (coarse_grid, fe, quadrature,
+				     face_quadrature,
+				     rhs_function, boundary_values)
+  {};
+
+
+
+				   // Now, here comes the main
+				   // function, including the
+				   // weighting:
+  template <int dim>
+  void
+  RefinementWeightedKelly<dim>::refine_grid ()
+  {
+				     // First compute some residual
+				     // based error indicators for all
+				     // cells by a method already
+				     // implemented in the
+				     // library. What exactly is
+				     // computed can be read in the
+				     // documentation of that class.
+    Vector<float> estimated_error (triangulation->n_active_cells());
+    KellyErrorEstimator<dim>::estimate (dof_handler,
+					*face_quadrature,
+					typename FunctionMap<dim>::type(),
+					solution,
+					estimated_error);
+
+				     // Now we are going to weight
+				     // these indicators by some
+				     // function that you might want
+				     // to change:
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
+      {
+					 // First we compute the
+					 // coordinates and mesh size
+					 // of this cell. To use the
+					 // mesh size, remove the
+					 // comment signs, the line
+					 // is only commented out to
+					 // avoid warnings by the
+					 // compiler.
+  	const double x = cell->center()(0); 
+  	const double y = cell->center()(1); 
+/*  	const double h = cell->diameter();  */
+
+					 // From this we compute the
+					 // weight with which we'd
+					 // like to multiply the
+					 // precomputed indicator. My
+					 // default is boring but
+					 // efficient. Do it better!
+	const double weight = 1./((x-0.75)*(x-0.75)+
+				  (y-0.75)*(y-0.75) +
+				  (0.1*0.1));
+
+					 // Finally use this weight:
+	estimated_error(cell_index) *= weight;
+      };
+    
+    
+    GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
+						     estimated_error,
 						     0.3, 0.03);
     triangulation->execute_coarsening_and_refinement ();
   };
@@ -1610,8 +1735,8 @@ namespace Data
 				     // And since we want that the
 				     // evaluation point (3/4,3/4) in
 				     // this example is a grid point,
-				     // we refine twice globally:
-    coarse_grid.refine_global (4);
+				     // we refine once globally:
+    coarse_grid.refine_global (1);
   };
 };
 
@@ -1707,9 +1832,37 @@ namespace Data
 				 // with the rest of the program.
 
 
-				 //TODO
+				 // @sect3{Dual functionals}
+
+				 // As with the other components of
+				 // the program, we put everything we
+				 // need to describe dual functionals
+				 // into a namespace of its own, and
+				 // define an abstract base class that
+				 // provides the interface the class
+				 // solving the dual problem needs for
+				 // its work.
+				 //
+				 // We will then implement two such
+				 // classes, for the evaluation of a
+				 // point value and of the derivative
+				 // of the solution at that point. For
+				 // these functionals we already have
+				 // the corresponding evaluation
+				 // objects, so they are comlementary.
 namespace DualFunctional
 {
+				   // @sect4{The DualFunctionalBase class}
+  
+				   // First start with the base class
+				   // for dual functionals. Since for
+				   // linear problems the
+				   // characteristics of the dual
+				   // problem play a role only in the
+				   // right hand side, we only need to
+				   // provide for a function that
+				   // assembles the right hand side
+				   // for a given discretization:
   template <int dim>
   class DualFunctionalBase : public Subscriptor
   {
@@ -1721,6 +1874,19 @@ namespace DualFunctional
   };
 
 
+				   // @sect4{The PointValueEvaluation class}
+  
+				   // As a first application, we
+				   // consider the functional
+				   // corresponding to the evaluation
+				   // of the solution's value at a
+				   // given point which again we
+				   // assume to be a vertex. Apart
+				   // from the constructor that takes
+				   // and stores the evaluation point,
+				   // this class consists only of the
+				   // function that implements
+				   // assembling the right hand side.
   template <int dim>
   class PointValueEvaluation : public DualFunctionalBase<dim>
   {
@@ -1731,6 +1897,7 @@ namespace DualFunctional
       void
       assemble_rhs (const DoFHandler<dim> &dof_handler,
 		    Vector<double>        &rhs) const;
+      
       DeclException1 (ExcEvaluationPointNotFound,
 		      Point<dim>,
 		      << "The evaluation point " << arg1
@@ -1749,46 +1916,93 @@ namespace DualFunctional
   {};
   
 
+				   // As for doing the main purpose of
+				   // the class, assembling the right
+				   // hand side, let us first consider
+				   // what is necessary: The right
+				   // hand side of the dual problem is
+				   // a vector of values J(phi_i),
+				   // where J is the error functional,
+				   // and phi_i is the i-th shape
+				   // function. Here, J is the
+				   // evaluation at the point x0,
+				   // i.e. J(phi_i)=phi_i(x0).
+				   //
+				   // Now, we have assumed that the
+				   // evaluation point is a
+				   // vertex. Thus, for the usual
+				   // finite elements we might be
+				   // using in this program, we can
+				   // take for granted that at such a
+				   // point exactly one shape function
+				   // is nonzero, and in particular
+				   // has the value one. Thus, we set
+				   // the right hand side vector to
+				   // all-zeros, then seek for the
+				   // shape function associated with
+				   // that point and set the
+				   // corresponding value of the right
+				   // hand side vector to one:
   template <int dim>
   void
   PointValueEvaluation<dim>::
   assemble_rhs (const DoFHandler<dim> &dof_handler,
 		Vector<double>        &rhs) const
   {
+				     // So, first set everything to
+				     // zeros...
     rhs.reinit (dof_handler.n_dofs());
+
+				     // ...then loop over cells and
+				     // find the evaluation point
+				     // among the vertices:
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
-    bool evaluation_point_found = false;
     for (; (cell!=endc) && !evaluation_point_found; ++cell)
       for (unsigned int vertex=0;
 	   vertex<GeometryInfo<dim>::vertices_per_cell;
 	   ++vertex)
 	if (cell->vertex(vertex) == evaluation_point)
 	  {
+					     // Ok, found, so set
+					     // corresponding entry,
+					     // and leave function
+					     // since we are finished:
 	    rhs(cell->vertex_dof_index(vertex,0)) = 1;
-
-	    evaluation_point_found = true;
-	    break;
+	    return;
 	  };
 
-    AssertThrow (evaluation_point_found,
-		 ExcEvaluationPointNotFound(evaluation_point));
+				     // Finally, a sanity check: if we
+				     // somehow got here, then we must
+				     // have missed the evaluation
+				     // point, so raise an exception
+				     // unconditionally:
+    AssertThrow (false, ExcEvaluationPointNotFound(evaluation_point));
   };
 
 
-
+				   // @sect4{The PointValueEvaluation class}
+  
+				   // As second application, we again
+				   // consider the evaluation of the
+				   // x-derivative of the solution at
+				   // one point. Again, the
+				   // declaration of the class, and
+				   // the implementation of its
+				   // constructor is not too
+				   // interesting:
   template <int dim>
   class PointXDerivativeEvaluation : public DualFunctionalBase<dim>
   {
     public:
-      PointXDerivativeEvaluation (const Point<dim> &evaluation_point,
-				  const double      tolerance);
+      PointXDerivativeEvaluation (const Point<dim> &evaluation_point);
 
       virtual
       void
       assemble_rhs (const DoFHandler<dim> &dof_handler,
 		    Vector<double>        &rhs) const;
+      
       DeclException1 (ExcEvaluationPointNotFound,
 		      Point<dim>,
 		      << "The evaluation point " << arg1
@@ -1796,74 +2010,152 @@ namespace DualFunctional
 
     protected:
       const Point<dim> evaluation_point;
-      const double     tolerance;
   };
 
 
   template <int dim>
   PointXDerivativeEvaluation<dim>::
-  PointXDerivativeEvaluation (const Point<dim> &evaluation_point,
-			      const double      tolerance)
+  PointXDerivativeEvaluation (const Point<dim> &evaluation_point)
 		  :
-		  evaluation_point (evaluation_point),
-		  tolerance (tolerance)
+		  evaluation_point (evaluation_point)
   {};
   
 
+				   // What is interesting is the
+				   // implementation of this
+				   // functional: here,
+				   // J(phi_i)=d/dx phi_i(x0).
+				   //
+				   // We could, as in the
+				   // implementation of the respective
+				   // evaluation object take the
+				   // average of the gradients of each
+				   // shape function phi_i at this
+				   // evaluation point. However, we
+				   // take a slightly different
+				   // approach: we simply take the
+				   // average over all cells that
+				   // surround this point. The
+				   // question which cells
+				   // ``surrounds'' the evaluation
+				   // point is made dependent on the
+				   // mesh width by including those
+				   // cells for which the distance of
+				   // the cell's midpoint to the
+				   // evaluation point is less than
+				   // the cell's diameter.
+				   //
+				   // Taking the average of the
+				   // gradient over the area/volume of
+				   // these cells leads to a dual
+				   // solution which is very close to
+				   // the one which would result from
+				   // the point evaluation of the
+				   // gradient. It is simple to
+				   // justify theoretically that this
+				   // does not change the method
+				   // significantly.
   template <int dim>
   void
   PointXDerivativeEvaluation<dim>::
   assemble_rhs (const DoFHandler<dim> &dof_handler,
 		Vector<double>        &rhs) const
   {
+				     // Again, first set all entries
+				     // to zero:
     rhs.reinit (dof_handler.n_dofs());
 
-    QTrapez<1>     q_trapez;
-    QIterated<dim> quadrature (q_trapez, 4);
-    FEValues<dim> fe_values (dof_handler.get_fe(), quadrature,
-			     update_gradients |
-			     update_q_points  |
-			     update_JxW_values);
+				     // Initialize a ``FEValues''
+				     // object with a quadrature
+				     // formula, have abbreviations
+				     // for the number of quadrature
+				     // points and shape functions...
+    QGauss4<dim> quadrature;
+    FEValues<dim>  fe_values (dof_handler.get_fe(), quadrature,
+			      update_gradients |
+			      update_q_points  |
+			      update_JxW_values);
     const unsigned int n_q_points = fe_values.n_quadrature_points;
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+
+				     // ...and have two objects that
+				     // are used to store the global
+				     // indices of the degrees of
+				     // freedom on a cell, and the
+				     // values of the gradients of the
+				     // shape functions at the
+				     // quadrature points:
     Vector<double> cell_rhs (dofs_per_cell);
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+				     // Finally have a variable in
+				     // which we will sum up the
+				     // area/volume of the cells over
+				     // which we integrate, by
+				     // integrating the unit functions
+				     // on these cells:
+    double total_volume = 0;
     
+				     // Then start the loop over all
+				     // cells, and select those cells
+				     // which are close enough to the
+				     // evaluation point:
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
-    double total_volume = 0;
-    
     for (; cell!=endc; ++cell)
-      if (cell->center().distance(evaluation_point) -
-	  cell->diameter()/2
-	  <
-	  tolerance)
+      if (cell->center().distance(evaluation_point) <=
+	  cell->diameter())
 	{
+					   // If we have found such a
+					   // cell, then initialize
+					   // the ``FEValues'' object
+					   // and integrate the
+					   // x-component of the
+					   // gradient of each shape
+					   // function, as well as the
+					   // unit function for the
+					   // total area/volume.
 	  fe_values.reinit (cell);
 	  cell_rhs.clear ();
 	  
 	  for (unsigned int q=0; q<n_q_points; ++q)
-	    if (fe_values.quadrature_point(q).distance(evaluation_point)
-		<
-		tolerance)
-	      {
-		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  cell_rhs(i) += fe_values.shape_grad(i,q)[0] *
-				 fe_values.JxW (q);
-		total_volume += fe_values.JxW (q);
-	      };
-	  
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		cell_rhs(i) += fe_values.shape_grad(i,q)[0] *
+			       fe_values.JxW (q);
+	      total_volume += fe_values.JxW (q);
+	    };
+
+					   // If we have the local
+					   // contributions,
+					   // distribute them to the
+					   // global vector:
 	  cell->get_dof_indices (local_dof_indices);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    rhs(local_dof_indices[i]) += cell_rhs(i);
 	};
 
+				     // After we have looped over all
+				     // cells, check whether we have
+				     // found any at all, by making
+				     // sure that their volume is
+				     // non-zero. If not, then the
+				     // results will be botched, as
+				     // the right hand side should
+				     // then still be zero, so throw
+				     // an exception:
+    AssertThrow (total_volume > 0,
+		 ExcEvaluationPointNotFound(evaluation_point));
+
+				     // Finally, we have by now only
+				     // integrated the gradients of
+				     // the shape functions, not
+				     // taking their mean value. We
+				     // fix this by dividing by the
+				     // measure of the volume over
+				     // which we have integrated:
     rhs.scale (1./total_volume);
-    
-    std::cout << "Total volume=" << total_volume
-	      << ", should have been " << 3.1415926*tolerance*tolerance
-	      << std::endl;
   };
   
 
@@ -2289,45 +2581,100 @@ namespace LaplaceSolver
   void
   WeightedResidual<dim>::refine_grid ()
   {
+				     // First call the function that
+				     // computes the cell-wise and
+				     // global error:
     Vector<float> error_indicators (triangulation->n_active_cells());
     estimate_error (error_indicators);
-    DataOut<dim> data_out;
-    std::ofstream x("x");
-    Vector<double> xe (error_indicators.begin(),
-		       error_indicators.end());
-    data_out.attach_dof_handler (DualSolver<dim>::dof_handler);
-    data_out.add_data_vector (xe, "e");
-    data_out.build_patches ();
-    data_out.write_gnuplot (x);
-    
-    std::transform (error_indicators.begin(),
-		    error_indicators.end(),
-		    error_indicators.begin(),
-		    &fabs);
-				     // TODO: take fixed error fraction criterion!
-    GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
-						     error_indicators,
-						     0.3, 0.03);
+
+				     // Then note that marking cells
+				     // for refinement or coarsening
+				     // only works if all indicators
+				     // are positive, to allow their
+				     // comparison. Thus, drop the
+				     // signs on all these indicators:
+    for (Vector<float>::iterator i=error_indicators.begin();
+	 i != error_indicators.end(); ++i)
+      *i = std::fabs (*i);
+
+				     // Finally, we can select between
+				     // different strategies for
+				     // refinement. The default here
+				     // is to refine those cells with
+				     // the largest error indicators
+				     // that make up for a total of 80
+				     // per cent of the error, while
+				     // we coarsen those with the
+				     // smallest indicators that make
+				     // up for the bottom 2 per cent
+				     // of the error.
+    GridRefinement::refine_and_coarsen_fixed_fraction (*triangulation,
+						       error_indicators,
+						       0.8, 0.02);
+
+				     // Alternatively, we might fall
+				     // back to refining and
+				     // coarsening a fixed fraction of
+				     // all cells, say 30 per cent for
+				     // refinement, and 3 per cent for
+				     // coarsening. If you want that,
+				     // uncomment the following lines,
+				     // and remove the lines above.
+/*      GridRefinement::refine_and_coarsen_fixed_number (*triangulation, */
+/*  						     error_indicators,   */
+/*  						     0.3, 0.03);         */
+
     triangulation->execute_coarsening_and_refinement ();
   };
   
 
-  
+				   // Since we want to output both the
+				   // primal and the dual solution, we
+				   // overload the ``output_solution''
+				   // function. The only interesting
+				   // feature of this function is that
+				   // the primal and dual solutions
+				   // are defined on different finite
+				   // element spaces, which is not the
+				   // format the ``DataOut'' class
+				   // expects. Thus, we have to
+				   // transfer them to a common finite
+				   // element space. Since we want the
+				   // solutions only to see them
+				   // qualitatively, we contend
+				   // ourselves with interpolating the
+				   // dual solution to the (smaller)
+				   // primal space. For the
+				   // interpolation, there is a
+				   // library function, the rest is
+				   // standard. Further down in the
+				   // ``estimate_error'' function we
+				   // explain that the result of the
+				   // interpolation is not a
+				   // conforming finite element field,
+				   // i.e. the interpolated dual
+				   // solution is no more
+				   // continuous. We could fix this
+				   // (and do so in the
+				   // ``estimate_error'' function),
+				   // but since this is only for
+				   // graphical output, we don't care
+				   // here.
   template <int dim>
   void
   WeightedResidual<dim>::output_solution () const
   {
-    Vector<double> primal_solution (DualSolver<dim>::dof_handler.n_dofs());
-    FETools::interpolate (PrimalSolver<dim>::dof_handler,
-			  PrimalSolver<dim>::solution,
-			  DualSolver<dim>::dof_handler,
-			  primal_solution);    
+    Vector<double> dual_solution (PrimalSolver<dim>::dof_handler.n_dofs());
+    FETools::interpolate (DualSolver<dim>::dof_handler,
+			  DualSolver<dim>::solution,
+			  PrimalSolver<dim>::dof_handler,
+			  dual_solution);    
 
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (DualSolver<dim>::dof_handler);
-    data_out.add_data_vector (primal_solution,
+    data_out.attach_dof_handler (PrimalSolver<dim>::dof_handler);
+    data_out.add_data_vector (PrimalSolver<dim>::solution,
 			      "primal_solution");
-    data_out.add_data_vector (DualSolver<dim>::solution,
+    data_out.add_data_vector (dual_solution,
 			      "dual_solution");
     
     data_out.build_patches ();
@@ -3118,104 +3465,248 @@ namespace LaplaceSolver
 
 
 				 // TODO!!
+template <int dim>
+struct Framework
+{
+  public:
+    typedef Evaluation::EvaluationBase<dim> Evaluator;
+    typedef std::list<Evaluator*>           EvaluatorList;
+
+    struct ProblemDescription 
+    {
+	unsigned int primal_fe_degree;
+	unsigned int dual_fe_degree;
+
+	const Data::SetUpBase<dim> *data;
+	const DualFunctional::DualFunctionalBase<dim> *dual_functional;
+
+	EvaluatorList evaluator_list;
+
+	unsigned int max_degrees_of_freedom;
+
+	enum RefinementCriterion {
+	      dual_weighted_error_estimator,
+	      global_refinement,
+	      weighted_kelly_indicator
+	};
+
+	RefinementCriterion refinement_criterion;
+    };
+    
+    static void run (const ProblemDescription &descriptor);
+};
+
+
 
 template <int dim>
-void
-run_simulation (LaplaceSolver::Base<dim>                     &solver,
-		const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
+void Framework<dim>::run (const ProblemDescription &descriptor)
 {
-  std::cout << "Refinement cycle: ";
+				   // First create a triangulation
+				   // from the given data object,
+  Triangulation<dim>
+    triangulation (Triangulation<dim>::smoothing_on_refinement);
+  descriptor.data->create_coarse_grid (triangulation);
+
+				   // then a set of finite elements
+				   // and appropriate quadrature
+				   // formula:
+  const FE_Q<dim>     primal_fe(descriptor.primal_fe_degree);
+  const FE_Q<dim>     dual_fe(descriptor.dual_fe_degree);
+  const QGauss<dim>   quadrature(2*descriptor.dual_fe_degree+1);
+  const QGauss<dim-1> face_quadrature(2*descriptor.dual_fe_degree+1);
+
+  LaplaceSolver::Base<dim> * solver = 0;
+  using namespace LaplaceSolver;
+  switch (descriptor.refinement_criterion)
+    {
+      case ProblemDescription::dual_weighted_error_estimator:
+	    solver
+	      = new WeightedResidual<dim> (triangulation,
+					   primal_fe,
+					   dual_fe,
+					   quadrature,
+					   face_quadrature,
+					   descriptor.data->get_right_hand_side(),
+					   descriptor.data->get_boundary_values(),
+					   *descriptor.dual_functional);
+	    break;
+      case ProblemDescription::global_refinement:
+	    solver
+	      = new RefinementGlobal<dim> (triangulation,
+					   primal_fe,
+					   quadrature,
+					   face_quadrature,
+					   descriptor.data->get_right_hand_side(),
+					   descriptor.data->get_boundary_values());
+	    break;
+      case ProblemDescription::weighted_kelly_indicator:
+	    solver
+	      = new RefinementWeightedKelly<dim> (triangulation,
+						  primal_fe,
+						  quadrature,
+						  face_quadrature,
+						  descriptor.data->get_right_hand_side(),
+						  descriptor.data->get_boundary_values());
+	    break;
+
+      default:
+	    AssertThrow (false, ExcInternalError());
+    };
+  
 
   for (unsigned int step=0; true; ++step)
     {
-      std::cout << step << " Solving "
-		<< solver.n_dofs()
+      std::cout << "Refinement cycle: "	<< step
 		<< std::endl;
+	    
+      solver->set_refinement_cycle (step);
+      solver->solve_problem ();
+      solver->output_solution ();
 
-      solver.set_refinement_cycle (step);
-      solver.solve_problem ();
-      solver.output_solution ();
-
-      for (typename std::list<Evaluation::EvaluationBase<dim> *>::const_iterator
-	     i = postprocessor_list.begin();
-	   i != postprocessor_list.end(); ++i)
+      for (typename EvaluatorList::const_iterator
+	     e = descriptor.evaluator_list.begin();
+	   e != descriptor.evaluator_list.end(); ++e)
 	{
-	  (*i)->set_refinement_cycle (step);
-	  solver.postprocess (**i);
+	  (*e)->set_refinement_cycle (step);
+	  solver->postprocess (**e);
 	};
 
-
-      if (solver.n_dofs() < 500000)
-	solver.refine_grid ();
+	    
+      if (solver->n_dofs() < descriptor.max_degrees_of_freedom)
+	solver->refine_grid ();
       else
 	break;
     };
-
+	
   std::cout << std::endl;
-};
 
-
-
-
-template <int dim>
-void solve_problem ()
-{
-  Triangulation<dim> triangulation (Triangulation<dim>::smoothing_on_refinement);
-  const FE_Q<dim>          primal_fe(1);
-  const FE_Q<dim>          dual_fe(2);
-  const QGauss4<dim>       quadrature;
-  const QGauss4<dim-1>     face_quadrature;
-
-  const Data::SetUpBase<dim> *data =
-    new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
-
-  data->create_coarse_grid (triangulation);
-  
-  const Point<dim> evaluation_point(0.75,0.75);
-  const DualFunctional::PointXDerivativeEvaluation<dim>
-    dual_functional (evaluation_point, 0.01);
-  
-  LaplaceSolver::Base<dim> * solver = 0;
-  solver = new LaplaceSolver::WeightedResidual<dim> (triangulation,
-						     primal_fe,
-						     dual_fe,
-						     quadrature,
-						     face_quadrature,
-						     data->get_right_hand_side(),
-						     data->get_boundary_values(),
-						     dual_functional);
-
-  TableHandler results_table;
-  Evaluation::PointValueEvaluation<dim>
-    postprocessor1 (Point<dim>(0.75,0.75), results_table);
-  Evaluation::PointXDerivativeEvaluation<dim>
-    postprocessor2 (Point<dim>(0.75,0.75), results_table);
-  Evaluation::GridOutput<dim>
-    postprocessor3 ("grid");
-
-  std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;
-  postprocessor_list.push_back (&postprocessor1);
-  postprocessor_list.push_back (&postprocessor2);
-  postprocessor_list.push_back (&postprocessor3);
-
-  run_simulation (*solver, postprocessor_list);
-
-  results_table.write_text (std::cout);
   delete solver;
-
-  std::cout << std::endl;
+  solver = 0;
 };
 
 
 
+
+				 // @sect3{The main function}
+
+				 // Here finally comes the main
+				 // function. It drives the whole
+				 // process by specifying a set of
+				 // parameters to be used for the
+				 // simulation (polynomial degrees,
+				 // evaluation and dual functionals,
+				 // etc), and passes them packed into
+				 // a structure to the frame work
+				 // class above.
 int main () 
 {
+  deallog.depth_console (0);
   try
     {
-      deallog.depth_console (0);
+				       // Describe the problem we want
+				       // to solve here by passing a
+				       // descriptor object to the
+				       // function doing the rest of
+				       // the work:
+      const unsigned int dim = 2;
+      Framework<dim>::ProblemDescription descriptor;
 
-      solve_problem<2> ();
+				       // First set the refinement
+				       // criterion we wish to use:
+      descriptor.refinement_criterion
+	= Framework<dim>::ProblemDescription::dual_weighted_error_estimator;
+				       // Here, we could as well have
+				       // used ``global_refinement''
+				       // or
+				       // ``weighted_kelly_indicator''. Note
+				       // that the information given
+				       // about dual finite elements,
+				       // dual functional, etc is only
+				       // important for the given
+				       // choice of refinement
+				       // criterion, and is ignored
+				       // otherwise.
+
+				       // Then set the polynomial
+				       // degrees of primal and dual
+				       // problem. We choose here
+				       // bi-linear and bi-quadratic
+				       // ones:
+      descriptor.primal_fe_degree = 1;
+      descriptor.dual_fe_degree   = 2;
+
+				       // Then set the description of
+				       // the test case, i.e. domain,
+				       // boundary values, and right
+				       // hand side. These are
+				       // prepackaged in classes. We
+				       // take here the description of
+				       // ``Exercise_2_3'', but you
+				       // can also use
+				       // ``CurvedRidges<dim>'':
+      descriptor.data = new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
+      
+				       // Next set first a dual
+				       // functional, then a list of
+				       // evaluation objects. We
+				       // choose as default the
+				       // evaluation of the
+				       // x-derivative at an
+				       // evaluation point,
+				       // represented by the classes
+				       // ``PointXDerivativeEvaluation''
+				       // in the namespaces of
+				       // evaluation and dual
+				       // functional classes. You can
+				       // also set the
+				       // ``PointValueEvaluation''
+				       // classes for the value
+				       // instead of the x-derivative
+				       // at the evaluation point.
+				       //
+				       // Note that dual functional
+				       // and evaluation objects
+				       // should match. However, you
+				       // can give as many evaluation
+				       // functionals as you want, so
+				       // you can have both point
+				       // value and derivative
+				       // evaluated after each step.
+				       // One such additional
+				       // evaluation is to output the
+				       // grid in each step.
+      const Point<dim> evaluation_point (0.75, 0.75);
+      descriptor.dual_functional
+	= new DualFunctional::PointXDerivativeEvaluation<dim> (evaluation_point);
+      
+      TableHandler results_table;
+      Evaluation::PointXDerivativeEvaluation<dim>
+	postprocessor1 (evaluation_point, results_table);
+      Evaluation::GridOutput<dim>
+	postprocessor2 ("grid");
+      
+      descriptor.evaluator_list.push_back (&postprocessor1);
+      descriptor.evaluator_list.push_back (&postprocessor2);
+
+				       // Set the maximal number of
+				       // degrees of freedom after
+				       // which we want the program to
+				       // stop refining the mesh
+				       // further:
+      descriptor.max_degrees_of_freedom = 20000;
+      
+				       // Finally pass the descriptor
+				       // object to a function that
+				       // runs the entire solution
+				       // with it:
+      Framework<dim>::run (descriptor);
+      
+      results_table.write_text (std::cout);
     }
+
+				   // Catch exceptions to give
+				   // information about things that
+				   // failed:
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
