@@ -287,21 +287,31 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> Improved: When eliminating nodes from a matrix using the <code
+       class="member">ConstraintMatrix::condense</code> functions, the
+       diagonal entry was set to one. It is now set to an entry that more
+       resembles the size of the other diagonal entries, so that we don't run
+       into scaling problems for applications that have very large or small
+       domains.
+       <br>
+       (WB 2004/03/02)
+       </p>
+
 
   <li> <p> New:<code class="class">FullMatrix</code> has new functions <code
-  class="member">add</code> and ,<code
-  class="member">Tadd</code>
-  allowing to add to a selected block of the matrix.
-  <br>
-  (GK 2004/02/12)
-  </p>
+       class="member">add</code> and ,<code
+       class="member">Tadd</code>
+       allowing to add to a selected block of the matrix.
+       <br>
+       (GK 2004/02/12)
+       </p>
   
   <li> <p> Improved: Initialization routines of class <code
-  class="class">SparseMatrix</code> have an additional parameter
-  controlling the storage of diagonal entries.
-  <br>
-  (GK 2003/11/18)
-  </p>
+       class="class">SparseMatrix</code> have an additional parameter
+       controlling the storage of diagonal entries.
+       <br>
+       (GK 2003/11/18)
+       </p>
 
   <li> <p> New: 
        <code class="class">SolverFGMRES</code> implements the flexible
