@@ -242,6 +242,17 @@ class FE_Q_Hierarchical : public FiniteElement<dim>
     FE_Q_Hierarchical (const unsigned int p);
     
 				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. This class returns
+				      * @p{FE_Q_Hierarchical<dim>(degree)},
+				      * with @p{dim} and @p{degree}
+				      * replaced by appropriate
+				      * values.
+				      */
+    virtual std::string get_name () const;
+
+				     /**
 				      * Return the value of the
 				      * @p{i}th shape function at the
 				      * point @p{p}.  @p{p} is a point

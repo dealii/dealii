@@ -247,6 +247,17 @@ class FE_Q : public FiniteElement<dim>
     FE_Q (const unsigned int p);
     
 				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. This class returns
+				      * @p{FE_Q<dim>(degree)}, with
+				      * @p{dim} and @p{degree}
+				      * replaced by appropriate
+				      * values.
+				      */
+    virtual std::string get_name () const;
+
+				     /**
 				      * Return the value of the
 				      * @p{i}th shape function at the
 				      * point @p{p}. See the
@@ -358,6 +369,26 @@ class FE_Q : public FiniteElement<dim>
     unsigned int get_degree () const;
     
 				     /**
+				      * Return the matrix
+				      * interpolating from the given
+				      * finite element to the present
+				      * one. The size of the matrix is
+				      * then @p{dofs_per_cell} times
+				      * @p{source.dofs_per_cell}.
+				      *
+				      * These matrices are only
+				      * available if the source
+				      * element is also a @p{FE_Q}
+				      * element. Otherwise, an
+				      * exception of type
+				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
+				      * is thrown.
+				      */
+    virtual void
+    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+			      FullMatrix<double>           &matrix) const;
+
+                                     /**
 				      * Number of base elements in a
 				      * mixed discretization. Since
 				      * this is a scalar element,
@@ -426,42 +457,6 @@ class FE_Q : public FiniteElement<dim>
 				      */
     struct Matrices
     {
-					 /**
-					  * Embedding matrices. For
-					  * each element type (the
-					  * first index) there are as
-					  * many embedding matrices as
-					  * there are children per
-					  * cell. The first index
-					  * starts with linear
-					  * elements and goes up in
-					  * polynomial degree. The
-					  * array may grow in the
-					  * future with the number of
-					  * elements for which these
-					  * matrices have been
-					  * computed. If for some
-					  * element, the matrices have
-					  * not been computed then you
-					  * may use the element
-					  * nevertheless but can not
-					  * access the respective
-					  * fields.
-					  */
-	static const double * const
-	embedding[][GeometryInfo<dim>::children_per_cell];
-
-					 /**
-					  * Number of elements (first
-					  * index) the above field
-					  * has. Equals the highest
-					  * polynomial degree for
-					  * which the embedding
-					  * matrices have been
-					  * computed.
-					  */
-	static const unsigned int n_embedding_matrices;
-
 					 /**
 					  * As the
 					  * @p{embedding_matrices}
@@ -858,41 +853,30 @@ template <>
 std::vector<unsigned int>
 FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
+template <>
+void FE_Q<1>::initialize_constraints ();
+
+template <>
+void FE_Q<2>::initialize_constraints ();
+
+template <>
+void FE_Q<3>::initialize_constraints ();
+
+
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template <> 
-const double * const 
-FE_Q<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
-
-template <>
-const unsigned int FE_Q<1>::Matrices::n_embedding_matrices;
-
 template <>
 const double * const FE_Q<1>::Matrices::constraint_matrices[];
 
 template <>
 const unsigned int FE_Q<1>::Matrices::n_constraint_matrices;
 
-template <> 
-const double * const 
-FE_Q<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
-
-template <>
-const unsigned int FE_Q<2>::Matrices::n_embedding_matrices;
-
 template <>
 const double * const FE_Q<2>::Matrices::constraint_matrices[];
 
 template <>
 const unsigned int FE_Q<2>::Matrices::n_constraint_matrices;
-
-template <> 
-const double * const 
-FE_Q<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
-
-template <>
-const unsigned int FE_Q<3>::Matrices::n_embedding_matrices;
 
 template <>
 const double * const FE_Q<3>::Matrices::constraint_matrices[];

@@ -63,7 +63,7 @@
  * coupled to @p{u} at the vertices and the line on the larger cell next to this
  * vertex, there is no interaction with @p{v} and @p{w} of this or the other cell.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, partial reimplementation Ralf Hartmann 2001.
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, partial reimplementation Ralf Hartmann 2001.
  */
 template <int dim>
 class FESystem : public FiniteElement<dim>
@@ -122,6 +122,24 @@ class FESystem : public FiniteElement<dim>
 				      * Destructor.
 				      */
     virtual ~FESystem ();
+
+				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. This element returns
+				      * a string that is composed of
+				      * the strings
+				      * @p{name1}...@p{nameN} returned
+				      * by the basis elements. From
+				      * these, we create a sequence
+				      * @p{FESystem<dim>[name1^m1-name2^m2-...-nameN^mN]},
+				      * where @p{mi} are the
+				      * multiplicities of the basis
+				      * elements. If a multiplicity is
+				      * equal to one, then the
+				      * superscript is omitted.
+				      */
+    virtual std::string get_name () const;
 
 				     /**
 				      * Return the value of the
@@ -273,11 +291,39 @@ class FESystem : public FiniteElement<dim>
 				      * the computation of these
 				      * values to the base elements.
 				      */
-    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-						     const Point<dim> &p,
-						     const unsigned int component) const;
+    virtual
+    Tensor<2,dim>
+    shape_grad_grad_component (const unsigned int i,
+                               const Point<dim> &p,
+                               const unsigned int component) const;
+    
+				     /**
+				      * Return the matrix
+				      * interpolating from the given
+				      * finite element to the present
+				      * one. The size of the matrix is
+				      * then @p{dofs_per_cell} times
+				      * @p{source.dofs_per_cell}.
+				      *
+				      * These matrices are available
+				      * if source and destination
+				      * element are both @p{FESystem}
+				      * elements, have the same number
+				      * of base elements with same
+				      * element multiplicity, and if
+				      * these base elements also
+				      * implement their
+				      * @p{get_interpolation_matrix}
+				      * functions. Otherwise, an
+				      * exception of type
+				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
+				      * is thrown.
+				      */
+    virtual void
+    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+			      FullMatrix<double>           &matrix) const;
 
-				     /** 
+                                     /** 
 				      * Number of different base
 				      * elements of this object.
 				      *

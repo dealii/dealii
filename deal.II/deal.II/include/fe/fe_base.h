@@ -24,6 +24,8 @@
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
 
+#include <string>
+
 template<int dim> class FESystem;
 
 
@@ -441,6 +443,26 @@ class FiniteElementBase : public Subscriptor,
 		       const std::vector<std::vector<bool> > &nonzero_components);
 
 				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. The general
+				      * convention is that this is the
+				      * class name, followed by the
+				      * space dimension in angle
+				      * brackets, and the polynomial
+				      * degree and whatever else is
+				      * necessary in parentheses. For
+				      * example, @p{FE_Q<2>(3)} is the
+				      * value returned for a cubic
+				      * element in 2d.
+				      *
+				      * Systems of elements have their
+				      * own naming convention, see the
+				      * @ref{FESystem} class.
+				      */
+    virtual std::string get_name () const = 0;
+    
+				     /**
 				      * Return the value of the
 				      * @p{i}th shape function at the
 				      * point @p{p}. @p{p} is a point
@@ -774,7 +796,31 @@ class FiniteElementBase : public Subscriptor,
                                       * just expresses.
                                       */
     bool constraints_are_implemented () const;
-    
+
+				     /**
+				      * Return the matrix
+				      * interpolating from the given
+				      * finite element to the present
+				      * one. The size of the matrix is
+				      * then @p{dofs_per_cell} times
+				      * @p{source.dofs_per_cell}.
+				      *
+				      * Derived elements will have to
+				      * implement this function. They
+				      * may only provide interpolation
+				      * matrices for certain source
+				      * finite elements, for example
+				      * those from the same family. If
+				      * they don't implement
+				      * interpolation from a given
+				      * element, then they must throw
+				      * an exception of type
+				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}.
+				      */
+    virtual void
+    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+			      FullMatrix<double>           &matrix) const;
+      
 				     /**
 				      * Comparison operator. We also
 				      * check for equality of the
@@ -1277,6 +1323,10 @@ class FiniteElementBase : public Subscriptor,
 		    << "The interface matrix has a size of " << arg1
 		    << "x" << arg2
 		    << ", which is not reasonable in the present dimension.");
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcInterpolationNotImplemented);
     
   protected:  
  				     /**

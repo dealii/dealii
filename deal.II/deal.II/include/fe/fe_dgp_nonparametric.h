@@ -53,6 +53,17 @@ class FE_DGPNonparametric : public FiniteElement<dim>
     FE_DGPNonparametric (const unsigned int k);
     
 				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. This class returns
+				      * @p{FE_DGPNonparametric<dim>(degree)},
+				      * with @p{dim} and @p{degree}
+				      * replaced by appropriate
+				      * values.
+				      */
+    virtual std::string get_name () const;
+
+				     /**
 				      * Return the value of the
 				      * @p{i}th shape function at the
 				      * point @p{p}. See the

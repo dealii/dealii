@@ -20,6 +20,11 @@
 #include <fe/fe_dgp.h>
 #include <fe/fe_values.h>
 
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 template <int dim>
@@ -69,6 +74,26 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
                                    // elements have neither support
                                    // nor face-support points, so
                                    // leave these fields empty
+}
+
+
+
+template <int dim>
+std::string
+FE_DGP<dim>::get_name () const
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream namebuf;
+#else
+  std::ostrstream namebuf;
+#endif
+  
+  namebuf << "FE_DGP<" << dim << ">(" << degree << ")";
+
+#ifndef HAVE_STD_STRINGSTREAM
+  namebuf << std::ends;
+#endif
+  return namebuf.str();
 }
 
 

@@ -20,6 +20,11 @@
 #include <fe/fe_dgp_nonparametric.h>
 #include <fe/fe_values.h>
 
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 template <int dim>
@@ -72,6 +77,26 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
                                    // elements have neither support
                                    // nor face-support points, so
                                    // leave these fields empty
+}
+
+
+
+template <int dim>
+std::string
+FE_DGPNonparametric<dim>::get_name () const
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream namebuf;
+#else
+  std::ostrstream namebuf;
+#endif
+  
+  namebuf << "FE_DGPNonparametric<" << dim << ">(" << degree << ")";
+
+#ifndef HAVE_STD_STRINGSTREAM
+  namebuf << std::ends;
+#endif
+  return namebuf.str();
 }
 
 

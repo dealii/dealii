@@ -21,6 +21,12 @@
 #include <fe/fe_nedelec.h>
 #include <fe/fe_values.h>
 
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
+
 
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
@@ -54,6 +60,26 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
   std::vector<std::pair<unsigned,unsigned> > tmp1, tmp2;
   this->system_to_component_table.swap (tmp1);
   this->face_system_to_component_table.swap (tmp2);
+}
+
+
+
+template <int dim>
+std::string
+FE_Nedelec<dim>::get_name () const
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream namebuf;
+#else
+  std::ostrstream namebuf;
+#endif
+  
+  namebuf << "FE_Nedelec<" << dim << ">(" << degree << ")";
+
+#ifndef HAVE_STD_STRINGSTREAM
+  namebuf << std::ends;
+#endif
+  return namebuf.str();
 }
 
 
@@ -1249,8 +1275,10 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
   if (flags & update_values)
     {
       Assert (fe_data.shape_values.n_cols() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points,
-              ExcInternalError());
+ 	      GeometryInfo<dim>::subfaces_per_face *
+              GeometryInfo<dim>::faces_per_cell *
+	      n_q_points,
+             ExcInternalError());
       
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
 
@@ -1279,7 +1307,9 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
   if (flags & update_gradients)
     {
       Assert (fe_data.shape_gradients.n_cols() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points,
+              GeometryInfo<dim>::faces_per_cell *
+	      GeometryInfo<dim>::subfaces_per_face *
+	      n_q_points,
               ExcInternalError());
 
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);

@@ -21,6 +21,11 @@
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 /* ----------------------- FESystem::InternalData ------------------- */
@@ -223,6 +228,35 @@ FESystem<dim>::~FESystem ()
 
 
 template <int dim>
+std::string
+FESystem<dim>::get_name () const
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream namebuf;
+#else
+  std::ostrstream namebuf;
+#endif
+
+  namebuf << "FESystem<" << dim << ">[";
+  for (unsigned int i=0; i<n_base_elements(); ++i)
+    {
+      namebuf << base_element(i).get_name();
+      if (element_multiplicity(i) != 1)
+	namebuf << '^' << element_multiplicity(i);
+      if (i != n_base_elements()-1)
+	namebuf << '-';
+    }
+  namebuf << ']';
+
+#ifndef HAVE_STD_STRINGSTREAM
+  namebuf << std::ends;
+#endif
+  return namebuf.str();
+}
+
+
+
+template <int dim>
 FiniteElement<dim>*
 FESystem<dim>::clone() const
 {
@@ -404,6 +438,96 @@ FESystem<dim>::shape_grad_grad_component (const unsigned int i,
 				    p,
 				    component_in_base));
 }
+
+
+
+template <int dim>
+void
+FESystem<dim>::
+get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
+			  FullMatrix<double>           &interpolation_matrix) const
+{
+  Assert (interpolation_matrix.m() == this->dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				this->dofs_per_cell));
+  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				x_source_fe.dofs_per_cell));
+
+                                   // there are certain conditions
+                                   // that the two elements have to
+                                   // satisfy so that this can work.
+                                   // 
+                                   // condition 1: the other element
+                                   // must also be a system element
+  AssertThrow ((x_source_fe.get_name().find ("FESystem<") == 0)
+               ||
+               (dynamic_cast<const FESystem<dim>*>(&x_source_fe) != 0),
+               typename FiniteElementBase<dim>::
+               ExcInterpolationNotImplemented());
+  
+				   // ok, source is a system element,
+				   // so we may be able to do the work
+  const FESystem<dim> &source_fe
+    = dynamic_cast<const FESystem<dim>&>(x_source_fe);
+
+                                   // condition 2: same number of
+                                   // basis elements
+  AssertThrow (n_base_elements() == source_fe.n_base_elements(),
+               typename FiniteElementBase<dim>::
+               ExcInterpolationNotImplemented());
+
+                                   // condition 3: same number of
+                                   // basis elements
+  for (unsigned int i=0; i<n_base_elements(); ++i)
+    AssertThrow (element_multiplicity(i) ==
+                 source_fe.element_multiplicity(i),
+                 typename FiniteElementBase<dim>::
+                 ExcInterpolationNotImplemented());
+
+                                   // ok, so let's try whether it
+                                   // works:
+  
+                                   // first let's see whether all the
+                                   // basis elements actually generate
+                                   // their interpolation matrices. if
+                                   // we get past the following loop,
+                                   // then apparently none of the
+                                   // called base elements threw an
+                                   // exception, so we're fine
+                                   // continuing and assembling the
+                                   // one big matrix from the small
+                                   // ones of the base elements
+  std::vector<FullMatrix<double> > base_matrices (n_base_elements());
+  for (unsigned int i=0; i<n_base_elements(); ++i)
+    {
+      base_matrices[i].reinit (base_element(i).dofs_per_cell,
+                               source_fe.base_element(i).dofs_per_cell);
+      base_element(i).get_interpolation_matrix (source_fe.base_element(i),
+                                                base_matrices[i]);
+    }
+
+                                   // first clear big matrix, to make
+                                   // sure that entries that would
+                                   // couple different bases (or
+                                   // multiplicity indices) are really
+                                   // zero. then assign entries
+  interpolation_matrix.clear ();
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
+      if (this->system_to_base_table[i].first ==
+          source_fe.system_to_base_table[j].first)
+        interpolation_matrix(i,j)
+          = (base_matrices[this->system_to_base_table[i].first.first]
+             (this->system_to_base_table[i].second,
+              source_fe.system_to_base_table[j].second));
+}
+
+
+
+//----------------------------------------------------------------------
+// Data field initialization
+//----------------------------------------------------------------------
 
 
 

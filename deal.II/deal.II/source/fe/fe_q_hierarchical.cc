@@ -23,6 +23,12 @@
 #include <fe/fe_values.h>
 
 #include <cmath>
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
+
 
 namespace 
 {
@@ -88,6 +94,26 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 				   // on cell and face
   initialize_unit_support_points ();
   initialize_unit_face_support_points ();
+}
+
+
+
+template <int dim>
+std::string
+FE_Q_Hierarchical<dim>::get_name () const
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream namebuf;
+#else
+  std::ostrstream namebuf;
+#endif
+  
+  namebuf << "FE_Q_Hierarchical<" << dim << ">(" << degree << ")";
+
+#ifndef HAVE_STD_STRINGSTREAM
+  namebuf << std::ends;
+#endif
+  return namebuf.str();
 }
 
 

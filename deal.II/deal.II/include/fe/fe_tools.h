@@ -483,7 +483,7 @@ class FETools
     DeclException4 (ExcMatrixDimensionMismatch,
 		    int, int, int, int,
 		    << "This is a " << arg1 << "x" << arg2 << " matrix, "
-		    << "but should be a " << arg1 << "x" << arg2 << " matrix.");
+		    << "but should be a " << arg3 << "x" << arg4 << " matrix.");
 };
 
 

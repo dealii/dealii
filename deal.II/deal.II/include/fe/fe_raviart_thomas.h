@@ -10,10 +10,11 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------
-#ifndef __deal2__fe_nedelec_h
-#define __deal2__fe_nedelec_h
+#ifndef __deal2__fe_raviart_thomas_h
+#define __deal2__fe_raviart_thomas_h
 
 #include <base/config.h>
+#include <base/tensor_product_polynomials.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
 
@@ -22,63 +23,18 @@ template <int dim> class MappingQ;
 
 
 /**
- * Implementation of continuous Nedelec elements for the space
- * H_curl. Note, however, that continuity only concerns the tangential
+ * Implementation of continuous Raviart-Thomas elements for the space
+ * H_div. Note, however, that continuity only concerns the normal
  * component of the vector field.
  *
  * The constructor of this class takes the degree @p{p} of this finite
- * element. However, presently, only lowest order elements
- * (i.e. @p{p==1}) are implemented. For a general overview of this
- * element and its properties, see the report by Anna Schneebeli that
- * is linked from the general documentation page of the library.
- *
- *
- * @sect3{Restriction on transformations}
- *
- * In some sense, the implementation of this element is not complete,
- * but you will rarely notice. Here is the fact: since the element is
- * vector-valued already on the unit cell, the Jacobian matrix (or its
- * inverse) is needed already to generate the @em{values} of the shape
- * functions on the cells in real space. This is in contrast to most
- * other elements, where you only need the Jacobian for the
- * @em{gradients}. Thus, to generate the gradients of Nedelec shape
- * functions, one would need to have the derivatives of the inverse of
- * the Jacobian matrix.
- *
- * Basically, the Nedelec shape functions can be understood as the
- * gradients of scalar shape functions on the real cell. They are thus
- * the inverse Jacobian matrix times the gradients of scalar shape
- * functions on the unit cell. The gradient of Nedelec shape functions
- * is then, by the product rule, the sum of first the derivative (with
- * respect to true coordinates) of the inverse Jacobian times the
- * gradient (in unit coordinates) of the scalar shape function, plus
- * second the inverse Jacobian times the derivative (in true
- * coordinates) of the gradient (in unit coordinates) of the scalar
- * shape functions. Note that each of the derivatives in true
- * coordinates can be expressed as inverse Jacobian times gradient in
- * unit coordinates.
- *
- * The problem is the derivative of the inverse Jacobian. This rank-3
- * tensor can actually be computed (and we did so in very early
- * versions of the library), but is a large task and very time
- * consuming, so we dropped it. Since it is not available, we simply
- * drop this first term.
- *
- * What this means for the present case: first the computation of
- * gradients of Nedelec shape functions is wrong. Second, you will not
- * notice this usually, for two reasons:
- *
- * The first reason is that the gradient of the Jacobian vanishes if
- * the cells are mapped by an affine mapping, to which the usual
- * bilinear mapping reduces if the cell is a parallelogram. Then the
- * gradient of the shape functions is computed exact, since the first
- * term is zero.
- *
- * Second, with the Nedelec elements, you will usually want to compute
- * the curl, and extract and sum up the respective elements of the
- * full gradient tensor. However, the curl of the Jacobian vanishes,
- * so for the curl of shape functions the first term is irrelevant,
- * and the curl will be computed correctly as well.
+ * element. The numbering of the degree of this element in the
+ * literature is somewhat funny: the degree is defined not as the
+ * polynomial degree of the finite element space, but as that of the
+ * normal component of the traces onto the boundary. Thus, the lowest
+ * order, zero, has linear shape functions, but on the faces, the
+ * traces of the normal component of these elements is constant on
+ * each face.
  * 
  * 
  * @sect3{Interpolation to finer and coarser meshes}
@@ -133,11 +89,11 @@ template <int dim> class MappingQ;
  *
  *   @begin{verbatim}
  *          2
- *      *--->---*
+ *      *---^---*
  *      |       |
- *     3^       ^1
+ *     3>       >1
  *      |       |
- *      *--->---*
+ *      *---^---*
  *          0
  *   @end{verbatim}
  *
@@ -174,23 +130,23 @@ template <int dim> class MappingQ;
  * implemented there.
  *
  *
- * @author Wolfgang Bangerth, Anna Schneebeli, 2002, 2003
+ * @author Wolfgang Bangerth, 2003
  */
 template <int dim>
-class FE_Nedelec : public FiniteElement<dim>
+class FE_RaviartThomas : public FiniteElement<dim>
 {
   public:
 				     /**
 				      * Constructor for the Nedelec
 				      * element of degree @p{p}.
 				      */
-    FE_Nedelec (const unsigned int p);
+    FE_RaviartThomas (const unsigned int p);
     
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p{FE_Nedelec<dim>(degree)}, with
+				      * @p{FE_RaviartThomas<dim>(degree)}, with
 				      * @p{dim} and @p{degree}
 				      * replaced by appropriate
 				      * values.
@@ -251,6 +207,26 @@ class FE_Nedelec : public FiniteElement<dim>
     unsigned int get_degree () const;
     
 				     /**
+				      * Return the matrix
+				      * interpolating from the given
+				      * finite element to the present
+				      * one. The size of the matrix is
+				      * then @p{dofs_per_cell} times
+				      * @p{source.dofs_per_cell}.
+				      *
+				      * These matrices are only
+				      * available if the source
+				      * element is also a Raviart
+				      * Thomas element. Otherwise, an
+				      * exception of type
+				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
+				      * is thrown.
+				      */
+    virtual void
+    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+			      FullMatrix<double>           &matrix) const;
+
+				     /**
 				      * Number of base elements in a
 				      * mixed discretization. Here,
 				      * this is of course equal to
@@ -310,74 +286,6 @@ class FE_Nedelec : public FiniteElement<dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
-
-				     /**
-				      * Declare a nested class which
-				      * will hold static definitions of
-				      * various matrices such as
-				      * constraint and embedding
-				      * matrices. The definition of
-				      * the various static fields are
-				      * in the files @p{fe_nedelec_[23]d.cc}
-				      * in the source directory.
-				      */
-    struct Matrices
-    {
-					 /**
-					  * Embedding matrices. For
-					  * each element type (the
-					  * first index) there are as
-					  * many embedding matrices as
-					  * there are children per
-					  * cell. The first index
-					  * starts with linear
-					  * elements and goes up in
-					  * polynomial degree. The
-					  * array may grow in the
-					  * future with the number of
-					  * elements for which these
-					  * matrices have been
-					  * computed. If for some
-					  * element, the matrices have
-					  * not been computed then you
-					  * may use the element
-					  * nevertheless but can not
-					  * access the respective
-					  * fields.
-					  */
-	static const double * const
-	embedding[][GeometryInfo<dim>::children_per_cell];
-
-					 /**
-					  * Number of elements (first
-					  * index) the above field
-					  * has. Equals the highest
-					  * polynomial degree for
-					  * which the embedding
-					  * matrices have been
-					  * computed.
-					  */
-	static const unsigned int n_embedding_matrices;
-
-					 /**
-					  * As the
-					  * @p{embedding_matrices}
-					  * field, but for the
-					  * interface constraints. One
-					  * for each element for which
-					  * it has been computed.
-					  */
-	static const double * const constraint_matrices[];
-
-					 /**
-					  * Like
-					  * @p{n_embedding_matrices},
-					  * but for the number of
-					  * interface constraint
-					  * matrices.
-					  */
-	static const unsigned int n_constraint_matrices;
-    };
 				     /**
 				      * Exception
 				      */
@@ -429,7 +337,7 @@ class FE_Nedelec : public FiniteElement<dim>
 			 const Quadrature<dim-1>                &quadrature,
 			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
 			 typename Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim>& data) const ;
+			 FEValuesData<dim>& data) const;
     
 				     /**
 				      * Implementation of the same
@@ -444,11 +352,54 @@ class FE_Nedelec : public FiniteElement<dim>
 			    const Quadrature<dim-1>                &quadrature,
 			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
 			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim>& data) const ;
+			    FEValuesData<dim>& data) const;
 
   private:
-    
 				     /**
+				      * Degree of the polynomials.
+				      */  
+    const unsigned int degree;
+
+                                     /**
+                                      * Spaces describing the
+                                      * anisotropic polynomial spaces
+                                      * for each vector component,
+                                      * i.e. there are @p{dim}
+                                      * elements of this field. The
+                                      * values for this member are
+                                      * created in
+                                      * @ref{create_polynomials}.
+                                      */
+    const std::vector<AnisotropicPolynomials<dim> > polynomials;
+
+                                     /**
+                                      * For each shape function, store
+                                      * to which vector component (on
+                                      * the unit cell, they are mixed
+                                      * on the real cell by the
+                                      * transformation) they belong,
+                                      * and which index they have
+                                      * within the anisotropic tensor
+                                      * product polynomial space
+                                      * describing this vector
+                                      * component.
+                                      *
+                                      * These values are computed by
+                                      * the @ref{compute_renumber}
+                                      * function.
+                                      */
+    const std::vector<std::pair<unsigned int, unsigned int> > renumber;
+    
+    
+                                     /**
+                                      * Generate the polynomial spaces
+                                      * for the @ref{polynomials}
+                                      * member.
+                                      */
+    static std::vector<AnisotropicPolynomials<dim> >
+    create_polynomials (const unsigned int degree);
+    
+    				     /**
 				      * Only for internal use. Its
 				      * full name is
 				      * @p{get_dofs_per_object_vector}
@@ -458,8 +409,25 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * be passed to the constructor of
 				      * @p{FiniteElementData}.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+    static std::vector<unsigned int>
+    get_dpo_vector (const unsigned int degree);
 
+				     /**
+				      * Compute the vector used for
+				      * the
+				      * @p{restriction_is_additive}
+				      * field passed to the base
+				      * class's constructor.
+				      */
+    static std::vector<bool>
+    get_ria_vector (const unsigned int degree);
+
+                                     /**
+                                      * Compute the values of the
+                                      * @p{renumber} field.
+                                      */
+    static std::vector<std::pair<unsigned int, unsigned int> >
+    compute_renumber (const unsigned int);
 
 				     /**
 				      * Initialize the hanging node
@@ -540,11 +508,6 @@ class FE_Nedelec : public FiniteElement<dim>
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
     
 				     /**
-				      * Degree of the polynomials.
-				      */  
-    const unsigned int degree;
-
-				     /**
 				      * Fields of cell-independent data.
 				      *
 				      * For information about the
@@ -605,113 +568,69 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * Allow access from other
 				      * dimensions.
 				      */
-    template <int dim1> friend class FE_Nedelec;
+    template <int dim1> friend class FE_RaviartThomas;
 };
 
 
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
-void FE_Nedelec<1>::initialize_unit_face_support_points ();
+void FE_RaviartThomas<1>::initialize_unit_face_support_points ();
 
 template <>
-double
-FE_Nedelec<1>::shape_value_component (const unsigned int ,
-                                      const Point<1>    &,
-                                      const unsigned int ) const;
+std::vector<unsigned int> FE_RaviartThomas<1>::get_dpo_vector (const unsigned int);
 
 template <>
-double
-FE_Nedelec<2>::shape_value_component (const unsigned int ,
-                                      const Point<2>    &,
-                                      const unsigned int ) const;
+std::vector<AnisotropicPolynomials<1> >
+FE_RaviartThomas<1>::create_polynomials (const unsigned int);
 
 template <>
-double
-FE_Nedelec<3>::shape_value_component (const unsigned int ,
-                                      const Point<3>    &,
-                                      const unsigned int ) const;
+std::vector<AnisotropicPolynomials<2> >
+FE_RaviartThomas<2>::create_polynomials (const unsigned int);
 
 template <>
-Tensor<1,1>
-FE_Nedelec<1>::shape_grad_component (const unsigned int ,
-                                     const Point<1>    &,
-                                     const unsigned int ) const;
+std::vector<AnisotropicPolynomials<3> >
+FE_RaviartThomas<3>::create_polynomials (const unsigned int);
 
 template <>
-Tensor<1,2>
-FE_Nedelec<2>::shape_grad_component (const unsigned int ,
-                                     const Point<2>    &,
-                                     const unsigned int ) const;
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_RaviartThomas<1>::compute_renumber (const unsigned int);
 
 template <>
-Tensor<1,3>
-FE_Nedelec<3>::shape_grad_component (const unsigned int ,
-                                     const Point<3>    &,
-                                     const unsigned int ) const;
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_RaviartThomas<2>::compute_renumber (const unsigned int);
 
 template <>
-Tensor<2,1>
-FE_Nedelec<1>::shape_grad_grad_component (const unsigned int ,
-                                          const Point<1>    &,
-                                          const unsigned int ) const;
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_RaviartThomas<3>::compute_renumber (const unsigned int);
 
 template <>
-Tensor<2,2>
-FE_Nedelec<2>::shape_grad_grad_component (const unsigned int ,
-                                          const Point<2>    &,
-                                          const unsigned int ) const;
+void
+FE_RaviartThomas<1>::initialize_constraints ();
 
 template <>
-Tensor<2,3>
-FE_Nedelec<3>::shape_grad_grad_component (const unsigned int ,
-                                          const Point<3>    &,
-                                          const unsigned int ) const;
-
-
-
-// declaration of explicit specializations of member variables, if the
-// compiler allows us to do that (the standard says we must)
-#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template <> 
-const double * const 
-FE_Nedelec<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
+void
+FE_RaviartThomas<2>::initialize_constraints ();
 
 template <>
-const unsigned int FE_Nedelec<1>::Matrices::n_embedding_matrices;
+void
+FE_RaviartThomas<3>::initialize_constraints ();
 
 template <>
-const double * const FE_Nedelec<1>::Matrices::constraint_matrices[];
+void
+FE_RaviartThomas<1>::initialize_embedding ();
 
 template <>
-const unsigned int FE_Nedelec<1>::Matrices::n_constraint_matrices;
-
-template <> 
-const double * const 
-FE_Nedelec<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
+void
+FE_RaviartThomas<1>::initialize_restriction ();
 
 template <>
-const unsigned int FE_Nedelec<2>::Matrices::n_embedding_matrices;
+void
+FE_RaviartThomas<2>::initialize_restriction ();
 
 template <>
-const double * const FE_Nedelec<2>::Matrices::constraint_matrices[];
+void
+FE_RaviartThomas<3>::initialize_restriction ();
 
-template <>
-const unsigned int FE_Nedelec<2>::Matrices::n_constraint_matrices;
-
-template <> 
-const double * const 
-FE_Nedelec<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
-
-template <>
-const unsigned int FE_Nedelec<3>::Matrices::n_embedding_matrices;
-
-template <>
-const double * const FE_Nedelec<3>::Matrices::constraint_matrices[];
-
-template <>
-const unsigned int FE_Nedelec<3>::Matrices::n_constraint_matrices;
-
-#endif
 
 #endif

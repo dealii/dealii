@@ -28,21 +28,80 @@
 #include <dofs/dof_accessor.h>
 
 
+
+namespace 
+{
+                                   // forwarder function for
+                                   // FE::get_interpolation_matrix. we
+                                   // will want to call that function
+                                   // for arbitrary FullMatrix<T>
+                                   // types, but it only accepts
+                                   // double arguments. since it is a
+                                   // virtual function, this can also
+                                   // not be changed. so have a
+                                   // forwarder function that calls
+                                   // that function directly if
+                                   // T==double, and otherwise uses a
+                                   // temporary
+  template <int dim>
+  void gim_forwarder (const FiniteElement<dim> &fe1,
+                      const FiniteElement<dim> &fe2,
+                      FullMatrix<double> &interpolation_matrix)
+  {
+    fe2.get_interpolation_matrix (fe1, interpolation_matrix);
+  }
+
+  
+  template <int dim, typename number>
+  void gim_forwarder (const FiniteElement<dim> &fe1,
+                      const FiniteElement<dim> &fe2,
+                      FullMatrix<number> &interpolation_matrix)
+  {
+    FullMatrix<double> tmp (interpolation_matrix.m(),
+                            interpolation_matrix.n());
+    fe2.get_interpolation_matrix (fe1, tmp);
+    interpolation_matrix = tmp;
+  }
+}
+
+
 template <int dim, typename number>
-void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
-				       const FiniteElement<dim> &fe2,
-				       FullMatrix<number> &interpolation_matrix)
+void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
+                                        const FiniteElement<dim> &fe2,
+                                        FullMatrix<number> &interpolation_matrix)
 {
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
-  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());  
   Assert(interpolation_matrix.m()==fe2.dofs_per_cell &&
 	 interpolation_matrix.n()==fe1.dofs_per_cell,
 	 ExcMatrixDimensionMismatch(interpolation_matrix.m(),
 				    interpolation_matrix.n(),
 				    fe2.dofs_per_cell,
 				    fe1.dofs_per_cell));
+
+				   // first try the easy way: maybe
+				   // the FE wants to implement things
+				   // itself:
+  bool fe_implements_interpolation = true;
+  try 
+    {
+      gim_forwarder (fe1, fe2, interpolation_matrix);
+    }
+  catch (typename FiniteElementBase<dim>::ExcInterpolationNotImplemented &)
+    {
+                                       // too bad....
+      fe_implements_interpolation = false;
+    }
+  if (fe_implements_interpolation == true)
+    return;
+
+				   // uh, so this was not the
+				   // case. hm. then do it the hard
+				   // way. note that this will only
+				   // work if the element is
+				   // primitive, so check this first
+  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
+  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());
 
 				   // Initialize FEValues for fe1 at
 				   // the unit support points of the
@@ -76,8 +135,6 @@ void FETools::get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
 {
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
-  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());  
   Assert(interpolation_matrix.m()==fe1.dofs_per_cell &&
 	 interpolation_matrix.n()==fe1.dofs_per_cell, 
 	 ExcMatrixDimensionMismatch(interpolation_matrix.m(),
@@ -104,8 +161,6 @@ void FETools::get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
 {
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
-  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());  
   Assert(difference_matrix.m()==fe1.dofs_per_cell &&
 	 difference_matrix.n()==fe1.dofs_per_cell, 
 	 ExcMatrixDimensionMismatch(difference_matrix.m(),

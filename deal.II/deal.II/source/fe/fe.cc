@@ -328,11 +328,28 @@ FiniteElementBase<dim>::interface_constraints_size () const
                           static_cast<unsigned int>(-1));
 }
 
+
+
+template <int dim>
+void
+FiniteElementBase<dim>::
+get_interpolation_matrix (const FiniteElementBase<dim> &,
+			  FullMatrix<double>           &) const
+{
+				   // by default, no interpolation
+				   // implemented. so throw exception,
+				   // as documentation says
+  AssertThrow (false,
+               typename FiniteElementBase<dim>::
+               ExcInterpolationNotImplemented());
+}
+
                                    
 
 
 template <int dim>
-bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
+bool
+FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 {
   return ((static_cast<const FiniteElementData<dim>&>(*this) ==
 	   static_cast<const FiniteElementData<dim>&>(f)) &&

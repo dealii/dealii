@@ -22,6 +22,123 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_values.h>
 
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
+
+
+
+// namespace for some functions that are used in this file. they are
+// specific to numbering conventions used for the FE_DGQ element, and
+// are thus not very interesting to the outside world
+namespace
+{
+				   // auxiliary type to allow for some
+				   // kind of explicit template
+				   // specialization of the following
+				   // functions
+  template <int dim> struct int2type {};
+
+
+				   // given an integer N, compute its
+				   // integer square root (if it
+				   // exists, otherwise give up)
+  unsigned int int_sqrt (const unsigned int N)
+  {
+    for (unsigned int i=0; i<=N; ++i)
+      if (i*i == N)
+	return i;
+    Assert (false, ExcInternalError());
+    return static_cast<unsigned int>(-1);
+  }
+
+
+				   // given an integer N, compute its
+				   // integer cube root (if it
+				   // exists, otherwise give up)
+  unsigned int int_cuberoot (const unsigned int N)
+  {
+    for (unsigned int i=0; i<=N; ++i)
+      if (i*i*i == N)
+	return i;
+    Assert (false, ExcInternalError());
+    return static_cast<unsigned int>(-1);
+  }
+
+
+				   // given N, generate i=0...N-1
+				   // equidistant points in the
+				   // interior of the interval [0,1]
+  Point<1>
+  generate_unit_point (const unsigned int i,
+		       const unsigned int N,
+		       const int2type<1>  )
+  {
+    Assert (i<N, ExcInternalError());
+    if (N==1)
+      return Point<1> (.5);
+    else
+      {
+        const double h = 1./(N-1);
+        return Point<1>(i*h);
+      }
+  }
+  
+    
+				   // given N, generate i=0...N-1
+				   // equidistant points in the domain
+				   // [0,1]^2
+  Point<2>
+  generate_unit_point (const unsigned int i,
+		       const unsigned int N,
+		       const int2type<2>  )
+  {
+    Assert (i<N, ExcInternalError());
+    
+    if (N==1)
+      return Point<2> (.5, .5);
+    else
+      {
+        Assert (N>=4, ExcInternalError());
+        const unsigned int N1d = int_sqrt(N);
+        const double h = 1./(N1d-1);
+        
+        return Point<2> (i%N1d * h,
+                         i/N1d * h);
+      }
+  }
+  
+
+  
+
+				   // given N, generate i=0...N-1
+				   // equidistant points in the domain
+				   // [0,1]^3
+  Point<3>
+  generate_unit_point (const unsigned int i,
+		       const unsigned int N,
+		       const int2type<3>  )
+  {
+    Assert (i<N, ExcInternalError());
+    if (N==1)
+      return Point<3> (.5, .5, .5);
+    else
+      {
+        Assert (N>=8, ExcInternalError());
+    
+        const unsigned int N1d = int_cuberoot(N);
+        const double h = 1./(N1d-1);
+
+        return Point<3> (i%N1d * h,
+                         (i/N1d)%N1d * h,
+                         i/(N1d*N1d) * h);
+      }
+  }
+}
+
+
 
 
 template <int dim>
@@ -205,6 +322,26 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 
 				   // note: no face support points for
 				   // DG elements
+}
+
+
+
+template <int dim>
+std::string
+FE_DGQ<dim>::get_name () const
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream namebuf;
+#else
+  std::ostrstream namebuf;
+#endif
+  
+  namebuf << "FE_DGQ<" << dim << ">(" << degree << ")";
+
+#ifndef HAVE_STD_STRINGSTREAM
+  namebuf << std::ends;
+#endif
+  return namebuf.str();
 }
 
 
@@ -411,6 +548,93 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 	}
     }
 }
+
+
+
+template <int dim>
+void
+FE_DGQ<dim>::
+get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
+			  FullMatrix<double>           &interpolation_matrix) const
+{
+				   // this is only implemented, if the
+				   // source FE is also a
+				   // DGQ element
+  AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
+               ||
+               (dynamic_cast<const FE_DGQ<dim>*>(&x_source_fe) != 0),
+               typename FiniteElementBase<dim>::
+               ExcInterpolationNotImplemented());
+  
+				   // ok, source is a Q element, so
+				   // we will be able to do the work
+  const FE_DGQ<dim> &source_fe
+    = dynamic_cast<const FE_DGQ<dim>&>(x_source_fe);
+
+  Assert (interpolation_matrix.m() == this->dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				this->dofs_per_cell));
+  Assert (interpolation_matrix.n() == source_fe.dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				source_fe.dofs_per_cell));
+  
+  
+				   // compute the interpolation
+				   // matrices in much the same way as
+				   // we do for the embedding matrices
+				   // from mother to child.
+  FullMatrix<double> cell_interpolation (this->dofs_per_cell,
+					 this->dofs_per_cell);
+  FullMatrix<double> source_interpolation (this->dofs_per_cell,
+					   source_fe.dofs_per_cell);
+  FullMatrix<double> tmp (this->dofs_per_cell,
+			  source_fe.dofs_per_cell);
+  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+    {
+                                       // generate a point on this
+                                       // cell and evaluate the
+                                       // shape functions there
+      const Point<dim> p = generate_unit_point (j, this->dofs_per_cell,
+                                                int2type<dim>());
+      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+        cell_interpolation(j,i)
+          = polynomial_space.compute_value (i, p);
+
+      for (unsigned int i=0; i<source_fe.dofs_per_cell; ++i)
+        source_interpolation(j,i)
+          = source_fe.polynomial_space.compute_value (i, p);
+    }
+
+                                   // then compute the
+                                   // interpolation matrix matrix
+                                   // for this coordinate
+                                   // direction
+  cell_interpolation.gauss_jordan ();
+  cell_interpolation.mmult (interpolation_matrix,
+                            source_interpolation);
+
+                                   // cut off very small values
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
+      if (std::fabs(interpolation_matrix(i,j)) < 1e-15)
+        interpolation_matrix(i,j) = 0.;
+
+				   // make sure that the row sum of
+				   // each of the matrices is 1 at
+				   // this point. this must be so
+				   // since the shape functions sum up
+				   // to 1
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    {
+      double sum = 0.;
+      for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
+        sum += interpolation_matrix(i,j);
+
+      Assert (std::fabs(sum-1) < 5e-14*std::max(degree,1U)*dim,
+              ExcInternalError());
+    }
+}
+
 
 
 

@@ -43,6 +43,17 @@ class FE_DGQ : public FiniteElement<dim>
     FE_DGQ (const unsigned int k);
     
 				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. This class returns
+				      * @p{FE_DGQ<dim>(degree)}, with
+				      * @p{dim} and @p{degree}
+				      * replaced by appropriate
+				      * values.
+				      */
+    virtual std::string get_name () const;
+
+				     /**
 				      * Return the value of the
 				      * @p{i}th shape function at the
 				      * point @p{p}. See the
@@ -152,6 +163,26 @@ class FE_DGQ : public FiniteElement<dim>
 				      * constructor.
 				      */
     unsigned int get_degree () const;
+    
+				     /**
+				      * Return the matrix
+				      * interpolating from the given
+				      * finite element to the present
+				      * one. The size of the matrix is
+				      * then @p{dofs_per_cell} times
+				      * @p{source.dofs_per_cell}.
+				      *
+				      * These matrices are only
+				      * available if the source
+				      * element is also a @p{FE_DGQ}
+				      * element. Otherwise, an
+				      * exception of type
+				      * @ref{FiniteElementBase<dim>::ExcInterpolationNotImplemented}
+				      * is thrown.
+				      */
+    virtual void
+    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+			      FullMatrix<double>           &matrix) const;
 
 				     /**
 				      * Number of base elements in a
