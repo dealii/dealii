@@ -194,8 +194,6 @@ sizeof(FE_Nedelec<3>::Matrices::embedding[0]);
 // Constraint matrices: how do the new value on child faces depend on
 // the values on the mother face if that face has a hanging node
 //
-// TODO: [Anna] check whether the following paragraph is correct. if so, then please multiply the values in the following matrix by two
-
 // Here, the same applies as for the embedding matrices: since the DoF
 // values are not only multiplied by the values of the shape function
 // on the unit cell, but also by the transformation, we have to
@@ -205,18 +203,18 @@ namespace FE_Nedelec_3d
 {
   static const double constraint_q1[] =
   {
-	0, .5, 0, .5,  // first the four interior lines
-	.5, 0, .5, 0,
-	0, .5, 0, .5,
-	.5, 0, .5, 0,
-	1, 0, 0, 0,  // then the two child lines of each of the four outer ones.
-	1, 0, 0, 0,  // since the shape functions are constant on each line, 
-	0, 1, 0, 0,  // the two child lines get the same weights
-	0, 1, 0, 0,
-	0, 0, 1, 0,
-	0, 0, 1, 0,
-	0, 0, 0, 1,
-	0, 0, 0, 1
+	0, .25, 0, .25,  // first the four interior lines
+	.25, 0, .25, 0,
+	0, .25, 0, .25,
+	.25, 0, .25, 0,
+	.5, 0, 0, 0,  // then the two child lines of each of the four outer
+	.5, 0, 0, 0,  // ones. since the shape functions are constant on each
+	0, .5, 0, 0,  // line, the two child lines get the same weights, modulo
+	0, .5, 0, 0,  // the issue with the division by length scaling
+	0, 0, .5, 0,
+	0, 0, .5, 0,
+	0, 0, 0, .5,
+	0, 0, 0, .5
   };
 };
 
