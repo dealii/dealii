@@ -269,7 +269,8 @@ class KellyErrorEstimator
 				      * implemented in two and three
 				      * dimensions.
 				      */
-    static void estimate (const DoFHandler<dim>   &dof,
+    static void estimate (const Mapping<dim>      &mapping,
+			  const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const FunctionMap       &neumann_bc,
 			  const Vector<double>    &solution,
@@ -278,6 +279,19 @@ class KellyErrorEstimator
 			  const Function<dim>     *coefficients   = 0,
 			  unsigned int             n_threads = multithread_info.n_default_threads);
 
+				     /**
+				      * Calls the @p{estimate}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */    
+    static void estimate (const DoFHandler<dim>   &dof,
+			  const Quadrature<dim-1> &quadrature,
+			  const FunctionMap       &neumann_bc,
+			  const Vector<double>    &solution,
+			  Vector<float>           &error,
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
+			  const Function<dim>     *coefficients   = 0,
+			  unsigned int             n_threads = multithread_info.n_default_threads);
 				     /**
 				      * Same function as above, but
 				      * accepts more than one solution
@@ -305,14 +319,29 @@ class KellyErrorEstimator
 				      * references, so we had to use a
 				      * vector of pointers.)
 				      */
-    static void estimate (const DoFHandler<dim>               &dof,
-			  const Quadrature<dim-1>             &quadrature,
-			  const FunctionMap                   &neumann_bc,
+    static void estimate (const Mapping<dim>          &mapping,
+			  const DoFHandler<dim>       &dof,
+			  const Quadrature<dim-1>     &quadrature,
+			  const FunctionMap           &neumann_bc,
 			  const std::vector<const Vector<double>*> &solutions,
-			  std::vector<Vector<float>*>              &errors,
-			  const std::vector<bool>                  &component_mask = std::vector<bool>(),
-			  const Function<dim>                 *coefficients   = 0,
-			  unsigned int                         n_threads = multithread_info.n_default_threads);
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<dim>         *coefficients   = 0,
+			  unsigned int                 n_threads = multithread_info.n_default_threads);
+
+				     /**
+				      * Calls the @p{estimate}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */    
+    static void estimate (const DoFHandler<dim>       &dof,
+			  const Quadrature<dim-1>     &quadrature,
+			  const FunctionMap           &neumann_bc,
+			  const std::vector<const Vector<double>*> &solutions,
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<dim>         *coefficients   = 0,
+			  unsigned int                 n_threads = multithread_info.n_default_threads);
 
     
 				     /**
@@ -374,7 +403,7 @@ class KellyErrorEstimator
 				      * functions of the error
 				      * estimator is gathered in this
 				      * struct. It is passed as a
-				      * reference to the seperate
+				      * reference to the separate
 				      * functions in this class.
 				      *
 				      * The reason for invention of
@@ -415,6 +444,7 @@ class KellyErrorEstimator
 				      */
     struct Data
     {
+	const Mapping<dim>                  &mapping;
 	const DoFHandler<dim>               &dof_handler;
 	const Quadrature<dim-1>             &quadrature;
 	const FunctionMap                   &neumann_bc;
@@ -500,7 +530,8 @@ class KellyErrorEstimator
 					  * class Data. All variables are
 					  * passed as references.
 					  */
-	Data(const DoFHandler<dim>               &dof,
+	Data(const Mapping<dim>                  &mapping,
+	     const DoFHandler<dim>               &dof,
 	     const Quadrature<dim-1>             &quadrature,
 	     const FunctionMap                   &neumann_bc,
 	     const std::vector<const Vector<double>*> &solutions,

@@ -39,10 +39,6 @@ using namespace std;
 
 
 
-//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
-static const MappingQ1<deal_II_dimension> mapping;
-
-
 
 static
 inline
@@ -55,7 +51,8 @@ double sqr (const double x)
 #if deal_II_dimension == 1
 
 template <>
-KellyErrorEstimator<1>::Data::Data(const DoFHandler<1>                 &,
+KellyErrorEstimator<1>::Data::Data(const Mapping<1>                    &,
+				   const DoFHandler<1>                 &,
 				   const Quadrature<0>                 &,
 				   const FunctionMap                   &,
 				   const std::vector<const Vector<double>*> &,
@@ -63,6 +60,7 @@ KellyErrorEstimator<1>::Data::Data(const DoFHandler<1>                 &,
 				   const Function<1>                   *,
 				   const unsigned int                   ,
 				   FaceIntegrals                       &):
+		mapping(* static_cast <const Mapping<1> *> (0)),
 		dof_handler(* static_cast <const DoFHandler<1> *> (0)),
 		quadrature(* static_cast <const Quadrature<0> *> (0)),
 		neumann_bc(* static_cast <const FunctionMap *> (0)),
@@ -75,7 +73,8 @@ KellyErrorEstimator<1>::Data::Data(const DoFHandler<1>                 &,
 #else
 
 template <int dim>
-KellyErrorEstimator<dim>::Data::Data(const DoFHandler<dim>               &dof_handler,
+KellyErrorEstimator<dim>::Data::Data(const Mapping<dim>                  &mapping,
+				     const DoFHandler<dim>               &dof_handler,
 				     const Quadrature<dim-1>             &quadrature,
 				     const FunctionMap                   &neumann_bc,
 				     const std::vector<const Vector<double>*> &solutions,
@@ -83,6 +82,7 @@ KellyErrorEstimator<dim>::Data::Data(const DoFHandler<dim>               &dof_ha
 				     const Function<dim>                 *coefficients,
 				     const unsigned int                   n_threads,
 				     FaceIntegrals                       &face_integrals):
+		mapping (mapping),
 		dof_handler (dof_handler),
 		quadrature (quadrature),
 		neumann_bc (neumann_bc),
@@ -149,7 +149,8 @@ KellyErrorEstimator<dim>::Data::Data(const DoFHandler<dim>               &dof_ha
 // the following function is still independent of dimension, but it
 // calls dimension dependent functions
 template <int dim>
-void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
+void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
+					 const DoFHandler<dim>   &dof_handler,
 					 const Quadrature<dim-1> &quadrature,
 					 const FunctionMap       &neumann_bc,
 					 const Vector<double>    &solution,
@@ -161,10 +162,25 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
 				   // just pass on to the other function
   const std::vector<const Vector<double>*> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
-  estimate (dof_handler, quadrature, neumann_bc, solutions, errors,
+  estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
 	    component_mask, coefficients, n_threads);
 };
 
+
+template <int dim>
+void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
+					 const Quadrature<dim-1> &quadrature,
+					 const FunctionMap       &neumann_bc,
+					 const Vector<double>    &solution,
+					 Vector<float>           &error,
+					 const std::vector<bool> &component_mask,
+					 const Function<dim>     *coefficients,
+					 unsigned int             n_threads)
+{
+  static const MappingQ1<dim> mapping;
+  estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
+	   error, component_mask, coefficients, n_threads);
+};
 
 
 
@@ -181,7 +197,8 @@ void KellyErrorEstimator<1>::estimate_some (Data &, const unsigned int)
 
 
 template <>
-void KellyErrorEstimator<1>::estimate (const DoFHandler<1>                 &dof_handler,
+void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapping,
+				       const DoFHandler<1>                 &dof_handler,
 				       const Quadrature<0>                 &,
 				       const FunctionMap                   &neumann_bc,
 				       const std::vector<const Vector<double>*> &solutions,
@@ -376,7 +393,7 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 				   // need not compute all values on the
 				   // neighbor cells, so using two objects
 				   // gives us a performance gain).
-  FEFaceValues<dim> fe_face_values_cell (mapping,
+  FEFaceValues<dim> fe_face_values_cell (data.mapping,
 					 data.dof_handler.get_fe(),
 					 data.quadrature,
 					 UpdateFlags(update_gradients      |
@@ -385,11 +402,11 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 						       (data.coefficients != 0))  ?
 						      update_q_points : 0) |
 						     update_normal_vectors)); 
-  FEFaceValues<dim> fe_face_values_neighbor (mapping,
+  FEFaceValues<dim> fe_face_values_neighbor (data.mapping,
 					     data.dof_handler.get_fe(),
 					     data.quadrature,
 					     update_gradients);
-  FESubfaceValues<dim> fe_subface_values (mapping,
+  FESubfaceValues<dim> fe_subface_values (data.mapping,
 					  data.dof_handler.get_fe(),
 					  data.quadrature,
 					  update_gradients);
@@ -503,7 +520,8 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 
 
 template <int dim>
-void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &dof_handler,
+void KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping,
+					 const DoFHandler<dim>               &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
 					 const FunctionMap                   &neumann_bc,
 					 const std::vector<const Vector<double>*> &solutions,
@@ -564,7 +582,8 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 				   // components
   std::vector<Data*> data_structures (n_threads);
   for (unsigned int i=0; i<n_threads; ++i)
-    data_structures[i] = new Data (dof_handler,
+    data_structures[i] = new Data (mapping,
+				   dof_handler,
 				   quadrature,
 				   neumann_bc,
 				   solutions,
@@ -634,6 +653,22 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 };
 
 #endif
+
+template <int dim>
+void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &dof_handler,
+					 const Quadrature<dim-1>             &quadrature,
+					 const FunctionMap                   &neumann_bc,
+					 const std::vector<const Vector<double>*> &solutions,
+					 std::vector<Vector<float>*>              &errors,
+					 const std::vector<bool>                  &component_mask,
+					 const Function<dim>                 *coefficients,
+					 unsigned int                         n_threads)
+{
+  static const MappingQ1<dim> mapping;
+  estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
+	   errors, component_mask, coefficients, n_threads);
+}
+
 
 
 #if deal_II_dimension == 1
