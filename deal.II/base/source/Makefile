@@ -65,7 +65,7 @@ libg: ../lib/libbase.g.a
 	@ar ruv $@ $(go-files)
 
 clean:
-	rm -f ../lib/o/*.o ../lib/o/*.go *~ ../lib/Makefile.dep ../lib/lib*
+	rm -f ../lib/o/*.o ../lib/go/*.go *~ ../lib/Makefile.dep ../lib/lib*
 
 
 
