@@ -1173,7 +1173,7 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
                                    // save some cycles for zero additions, but
                                    // only if it is safe for the matrix we are
                                    // working with
-  if ((MatrixType::Traits::zero_addition_can_be_elided == true)
+  if ((MatrixType::Traits.zero_addition_can_be_elided == true)
       &&
       (value == 0))
     return;
