@@ -130,8 +130,8 @@ check ()
   
   SparseMatrix<double> A(A_pattern);
   
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  const DoFHandler<dim>::cell_iterator end = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+  const typename DoFHandler<dim>::cell_iterator end = dof.end();
 
   for (; cell != end;++cell)
     {
