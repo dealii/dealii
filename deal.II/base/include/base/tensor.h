@@ -179,6 +179,13 @@ class Tensor
 				      */
     static unsigned int memory_consumption ();
 
+                                     /**
+                                      * Exception.
+                                      */
+    DeclException1 (ExcInvalidTensorIndex,
+                    int,
+                    << "Invalid tensor index " << arg1);
+
   private:
 				     /**
 				      * Array of tensors holding the
@@ -390,16 +397,6 @@ Tensor<rank_,dim>::memory_consumption ()
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
 
-/*  Exception class. This is certainly not the best possible place for its
-    declaration, but at present, local classes to any of Tensor<> can't
-    be properly accessed (haven't investigated why). If anyone has a better
-    idea, realize it!
-*/
-//TODO:[WB] (compiler) move the exceptions back into the Tensor class, if the compiler allows to do so. Also rename them back (i.e. drop the initial Tensor* from the name)
-DeclException1 (ExcInvalidTensorIndex,
-		int,
-		<< "Invalid tensor index " << arg1);
-
 
 /**
  * Output operator for tensors. Print the elements consecutively, with
@@ -552,7 +549,8 @@ void contract (Tensor<2,dim>       &dest,
 		      break;
 
 		default:
-		      Assert (false, ExcInvalidTensorIndex (index2));
+		      Assert (false,
+                              (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
 	      };
 	    break;
       case 2:
@@ -572,12 +570,13 @@ void contract (Tensor<2,dim>       &dest,
 		      break;
 
 		default:
-		      Assert (false, ExcInvalidTensorIndex (index2));
+		      Assert (false,
+                              (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
 	      };
 	    break;
 
       default:
-	    Assert (false, ExcInvalidTensorIndex (index1));
+	    Assert (false, (typename Tensor<2,dim>::ExcInvalidTensorIndex (index1)));
     };
 };
 
@@ -625,7 +624,8 @@ void contract (Tensor<2,dim>       &dest,
 	    break;
 
       default:
-	    Assert (false, ExcInvalidTensorIndex (index1));
+	    Assert (false,
+                    (typename Tensor<2,dim>::ExcInvalidTensorIndex (index1)));
     };
 };
 

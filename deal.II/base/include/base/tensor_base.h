@@ -231,6 +231,13 @@ class Tensor<1,dim>
 				      */
     static unsigned int memory_consumption ();
 
+                                     /**
+                                      * Exception
+                                      */
+    DeclException1 (ExcDimTooSmall,
+                    int,
+                    << "Given dimensions must be >= 1, but was " << arg1);
+
   private:
 				     /**
 				      * Store the values in a simple
@@ -283,16 +290,6 @@ class Tensor<1,dim>
 				      */
     friend class Point<dim>;
 };
-
-				 /**
-				  * Exception
-				  */
-//TODO:[WB] (compiler) move the exceptions back into the Tensor class, if the compiler allows to do so. Also rename them back (i.e. drop the initial Tensor* from the name)
-DeclException2(ExcWrongVectorSize, int, int, << "Tensor has " << arg1
-	       << " entries, but vector has size " << arg2);
-DeclException1 (ExcDimTooSmall,
-		int,
-		<< "Given dimensions must be >= 1, but was " << arg1);
 
 
 				 /**
