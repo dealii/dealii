@@ -76,12 +76,12 @@ class SubCellData;
  * for grid input as well as data output. If there are data vectors in
  * the input file, they are ignored, as we are only interested in the
  * grid in this class. The exact description of the format can be
- * found in the AVS Explorer manual (see @url{http://www.avs.com}).
- * The @p UCD format can be read by the @p read_ucd function.
+ * found in the AVS Explorer manual (see http://www.avs.com).
+ * The @p UCD format can be read by the read_ucd() function.
  *
  * <li> <tt>DB mesh</tt> format: this format is used by the @p BAMG mesh
  * generator (see
- * @url{http://www-rocq.inria.fr/gamma/cdrom/www/bamg/eng.htm}. The
+ * http://www-rocq.inria.fr/gamma/cdrom/www/bamg/eng.htm. The
  * documentation of the format in the @p BAMG manual is very
  * incomplete, so we don't actually parse many of the fields of the
  * output since we don't know their meaning, but the data that is read
