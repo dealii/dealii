@@ -13,8 +13,8 @@ include ../Makefile.paths
 include $D/common/Make.global_options
 debug-mode = on
 
-LIBS = $(lib-lac.g)  \
-       $(lib-base.g)
+libraries += $(lib-lac.g)  \
+             $(lib-base.g)
 
 default: run-tests 
 
