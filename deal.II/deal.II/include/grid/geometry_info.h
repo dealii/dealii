@@ -20,6 +20,7 @@ template <int dim> struct GeometryInfo;
  *  to think about their number in a dimension independent expression.
  *  This not only reduces thinking effort but also error possibilities.
  */
+template <>
 struct GeometryInfo<1> {
   public:
 				     /**
@@ -66,6 +67,7 @@ struct GeometryInfo<1> {
  *  to think about their number in a dimension independent expression.
  *  This not only reduces thinking effort but also error possibilities.
  */
+template <>
 struct GeometryInfo<2> {
   public:
 				     /**

@@ -754,6 +754,7 @@ class TriaSubstructAccessor;
  * and one for #CellAccessor<2>#, derived from
  * #QuadAccessor<2>#.
  */
+template <>
 class TriaSubstructAccessor<1> :  public LineAccessor<1> {
   public:
     				     /**
@@ -781,6 +782,7 @@ class TriaSubstructAccessor<1> :  public LineAccessor<1> {
  *
  * @see TriaSubstructAccessor<1>
  */
+template <>
 class TriaSubstructAccessor<2> : public QuadAccessor<2> {
   public:
     				     /**

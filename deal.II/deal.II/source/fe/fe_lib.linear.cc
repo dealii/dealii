@@ -8,6 +8,7 @@
 
 
 
+template <>
 FELinear<1>::FELinear () :
 		FiniteElement<1> (1, 0)
 {
@@ -42,6 +43,7 @@ FELinear<1>::FELinear () :
 
 
 
+template <>
 double
 FELinear<1>::shape_value(const unsigned int i,
 			 const Point<1>& p) const
@@ -57,6 +59,7 @@ FELinear<1>::shape_value(const unsigned int i,
 
 
 
+template <>
 Point<1>
 FELinear<1>::shape_grad(const unsigned int i,
 			const Point<1>&) const
@@ -68,10 +71,11 @@ FELinear<1>::shape_grad(const unsigned int i,
     case 1: return Point<1>(1.);
     }
   return Point<1>();
-}
+};
 
 
 
+template <>
 void FELinear<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				  const vector<Point<1> >            &unit_points,
 				  vector<dFMatrix>  &jacobians,
@@ -90,6 +94,7 @@ void FELinear<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 
 
 
+template <>
 void FELinear<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
 				     const Boundary<1>  &boundary,
 				     vector<Point<1> >  &ansatz_points) const {
@@ -98,6 +103,7 @@ void FELinear<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator
 
 
 
+template <>
 void FELinear<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
 					  const Boundary<1>  &,
 					  vector<Point<1> >  &) const {
@@ -106,6 +112,7 @@ void FELinear<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_ite
 
 
 
+template <>
 void FELinear<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 				      const Boundary<1>         &,
 				      const vector<Point<0> > &,
@@ -115,6 +122,7 @@ void FELinear<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 
 
 
+template <>
 void FELinear<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 					 const unsigned int           ,
 					 const vector<Point<0> > &,
@@ -124,6 +132,7 @@ void FELinear<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 
 
 
+template <>
 void FELinear<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 				      const unsigned int,
 				      const Boundary<1> &,
@@ -134,6 +143,7 @@ void FELinear<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 
 
+template <>
 void FELinear<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 				      const unsigned int,
 				      const unsigned int,
@@ -146,6 +156,7 @@ void FELinear<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 
 
+template <>
 FELinear<2>::FELinear () :
 		FiniteElement<2> (1, 0, 0)
 {
@@ -235,6 +246,7 @@ FELinear<2>::FELinear () :
 
 
 
+template <>
 double
 FELinear<2>::shape_value (const unsigned int i,
 			  const Point<2>& p) const
@@ -252,6 +264,7 @@ FELinear<2>::shape_value (const unsigned int i,
 
 
 
+template <>
 Point<2>
 FELinear<2>::shape_grad (const unsigned int i,
 			 const Point<2>& p) const
@@ -390,6 +403,7 @@ void FELinear<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face
 
 
 
+template <>
 void FELinear<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
 				      const Boundary<2>         &,
 				      const vector<Point<1> > &unit_points,
@@ -409,6 +423,7 @@ void FELinear<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
 
 
 
+template <>
 void FELinear<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
 					 const unsigned int,
 					 const vector<Point<1> > &unit_points,
@@ -430,6 +445,7 @@ void FELinear<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &fac
 
 
 
+template <>
 void FELinear<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 				      const unsigned int       face_no,
 				      const Boundary<2> &,
@@ -459,6 +475,7 @@ void FELinear<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 
 
 
+template <>
 void FELinear<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 				      const unsigned int       face_no,
 				      const unsigned int,
@@ -496,11 +513,13 @@ void FELinear<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
 
 
 
+template <>
 FEQuadratic<1>::FEQuadratic () :
 		FiniteElement<1> (1, 1) {};
 
 
 
+template <>
 void FEQuadratic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				     const vector<Point<1> >            &unit_points,
 				     vector<dFMatrix>  &jacobians,
@@ -519,6 +538,7 @@ void FEQuadratic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 
 
 
+template <>
 void FEQuadratic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
 					const Boundary<1>  &boundary,
 					vector<Point<1> >  &ansatz_points) const {
@@ -527,6 +547,7 @@ void FEQuadratic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_itera
 
 
 
+template <>
 void FEQuadratic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
 					     const Boundary<1>  &,
 					     vector<Point<1> >  &) const {
@@ -535,6 +556,7 @@ void FEQuadratic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_
 
 
 
+template <>
 void FEQuadratic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 					 const Boundary<1>         &,
 					 const vector<Point<0> > &,
@@ -544,6 +566,7 @@ void FEQuadratic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 
 
 
+template <>
 void FEQuadratic<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 					    const unsigned int           ,
 					    const vector<Point<0> > &,
@@ -553,6 +576,7 @@ void FEQuadratic<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &
 
 
 
+template <>
 void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					 const unsigned int,
 					 const Boundary<1> &,
@@ -563,6 +587,7 @@ void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 
 
+template <>
 void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 					 const unsigned int,
 					 const unsigned int,
@@ -574,6 +599,7 @@ void FEQuadratic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 
 
+template <>
 FEQuadratic<2>::FEQuadratic () :
 		FiniteElement<2> (1, 1, 1)
 {
@@ -706,11 +732,13 @@ void FEQuadratic<dim>::get_normal_vectors (const DoFHandler<dim>::cell_iterator 
 
 
 
+template <>
 FECubic<1>::FECubic () :
 		FiniteElement<1> (1, 2) {};
 
 
 
+template <>
 void FECubic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				 const vector<Point<1> >            &unit_points,
 				 vector<dFMatrix>  &jacobians,
@@ -729,6 +757,7 @@ void FECubic<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 
 
 
+template <>
 void FECubic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
 				    const Boundary<1>  &boundary,
 				    vector<Point<1> >  &ansatz_points) const {
@@ -737,6 +766,7 @@ void FECubic<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator 
 
 
 
+template <>
 void FECubic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
 					 const Boundary<1>  &,
 					 vector<Point<1> >  &) const {
@@ -745,6 +775,7 @@ void FECubic<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iter
 
 
 
+template <>
 void FECubic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 				     const Boundary<1>         &,
 				     const vector<Point<0> > &,
@@ -754,6 +785,7 @@ void FECubic<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
 
 
 
+template <>
 void FECubic<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 					const unsigned int           ,
 					const vector<Point<0> > &,
@@ -763,6 +795,7 @@ void FECubic<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
 
 
 
+template <>
 void FECubic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 				     const unsigned int,
 				     const Boundary<1> &,
@@ -773,6 +806,7 @@ void FECubic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 
 
+template <>
 void FECubic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 				     const unsigned int,
 				     const unsigned int,				     
@@ -783,6 +817,7 @@ void FECubic<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 
 
+template <>
 FECubic<2>::FECubic () :
 		FiniteElement<2> (1, 2, 4) {};
 

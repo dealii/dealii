@@ -152,7 +152,7 @@ class DoFAccessor {
  *
  * The same concept is used with #DoFQuadAccessor# classes etc.
  */
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
   public:
 				     /**
@@ -237,7 +237,7 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
  *
  * @see DoFLineAccessor
  */
-template <int dim, class BaseClass>
+template <int dim, typename BaseClass>
 class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
   public:
 				     /**
@@ -376,6 +376,7 @@ class DoFSubstructAccessor : public DoFAccessor<dim>,
  * and one for #DoFCellAccessor<2>#, derived from
  * #DoFQuadAccessor<2,CellAccessor<2> >#.
  */
+template <>
 class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
   public:
     				     /**
@@ -402,6 +403,7 @@ class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
  *
  * @see DoFSubstructAccessor<1>
  */
+template <>
 class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
   public:
     				     /**

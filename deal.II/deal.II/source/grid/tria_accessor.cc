@@ -528,12 +528,14 @@ template class QuadAccessor<2>;
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
 
 
+template <>
 bool CellAccessor<1>::at_boundary () const {
   return at_boundary(0) || at_boundary(1);
 };
 
 
 
+template <>
 unsigned char CellAccessor<1>::material_id () const {
   Assert (used(),
 	  typename TriaSubstructAccessor<1>::ExcRefineCellNotUsed());
@@ -542,6 +544,7 @@ unsigned char CellAccessor<1>::material_id () const {
 
 
 
+template <>
 void CellAccessor<1>::set_material_id (const unsigned char mat_id) const {
   Assert (used(),
 	  typename TriaSubstructAccessor<1>::ExcRefineCellNotUsed());
@@ -551,6 +554,7 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const {
 
 
 
+template <>
 Triangulation<1>::face_iterator
 CellAccessor<1>::face (const unsigned int) const {
   Assert (false, ExcNotUsefulForThisDimension());
@@ -562,12 +566,14 @@ CellAccessor<1>::face (const unsigned int) const {
 /*------------------------ Functions: CellAccessor<2> -----------------------*/
 
 
+template <>
 bool CellAccessor<2>::at_boundary () const {
   return at_boundary(0) || at_boundary(1) || at_boundary(2) || at_boundary(3);
 };
 
 
 
+template <>
 unsigned char CellAccessor<2>::material_id () const {
   Assert (used(),
 	  typename TriaSubstructAccessor<2>::ExcRefineCellNotUsed());
@@ -576,6 +582,7 @@ unsigned char CellAccessor<2>::material_id () const {
 
 
 
+template <>
 void CellAccessor<2>::set_material_id (const unsigned char mat_id) const {
   Assert (used(),
 	  typename TriaSubstructAccessor<2>::ExcRefineCellNotUsed());
@@ -585,6 +592,7 @@ void CellAccessor<2>::set_material_id (const unsigned char mat_id) const {
 
 
 
+template <>
 Triangulation<2>::face_iterator
 CellAccessor<2>::face (const unsigned int i) const {
   return line(i);

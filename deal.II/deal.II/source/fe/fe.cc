@@ -37,6 +37,7 @@ bool FiniteElementData<2>::operator== (const FiniteElementData<2> &f) const {
 
 
 
+template <>
 FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
 					 const unsigned int dofs_per_line,
 					 const unsigned int dofs_per_quad) :
@@ -57,6 +58,7 @@ FiniteElementBase<1>::FiniteElementBase (const unsigned int dofs_per_vertex,
 
 
 
+template <>
 FiniteElementBase<2>::FiniteElementBase (const unsigned int dofs_per_vertex,
 					 const unsigned int dofs_per_line,
 					 const unsigned int dofs_per_quad) :
@@ -120,7 +122,17 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 
 /*------------------------------- FiniteElement ----------------------*/
 
+// declare this function to be explicitely specialized before first use
+// egcs wants this, but gcc2.8.1 produces an internal compiler error, so
+// we drop this declaration again for the time being
 
+//template <>
+//void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
+//					  const Boundary<1> &,
+//					  vector<Point<1> > &ansatz_points) const;
+
+
+template <>
 void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const vector<Point<1> > &unit_points,
 				       vector<dFMatrix>  &jacobians,
@@ -173,6 +185,7 @@ void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 
 
 
+template <>
 void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &,
 					    const unsigned int       ,
 					    const vector<Point<0> > &,
@@ -240,6 +253,7 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 
 
 
+template <>
 void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
 					       const unsigned int       ,
 					       const unsigned int       ,
@@ -300,6 +314,7 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 
 
 
+template <>
 void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
 					  const Boundary<1> &,
 					  vector<Point<1> > &ansatz_points) const {

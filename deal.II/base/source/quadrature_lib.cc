@@ -5,6 +5,7 @@
 
 
 
+template <>
 QGauss2<1>::QGauss2 () :
 		Quadrature<1> (2)
 {
@@ -28,6 +29,7 @@ QGauss2<1>::QGauss2 () :
 
 
 
+template <>
 QGauss2<2>::QGauss2 () :
 		Quadrature<2> (4)
 {
@@ -61,6 +63,7 @@ QGauss2<2>::QGauss2 () :
 
 
 
+template <>
 QGauss3<1>::QGauss3 () :
 		Quadrature<1> (3)
 {
@@ -90,6 +93,7 @@ QGauss3<1>::QGauss3 () :
 
 
 
+template <>
 QGauss3<2>::QGauss3 () :
 		Quadrature<2> (9)
 {
@@ -143,6 +147,7 @@ QGauss3<2>::QGauss3 () :
 
 
 
+template <>
 QGauss4<1>::QGauss4 () :
 		Quadrature<1> (4)
 {
@@ -176,6 +181,7 @@ QGauss4<1>::QGauss4 () :
 
 
 
+template <>
 QGauss4<2>::QGauss4 () :
 		Quadrature<2> (16)
 {
@@ -250,6 +256,7 @@ QGauss4<2>::QGauss4 () :
 
 
 
+template <>
 QGauss5<1>::QGauss5 () :
 		Quadrature<1> (5)
 {
@@ -287,6 +294,7 @@ QGauss5<1>::QGauss5 () :
 
 
 
+template <>
 QGauss5<2>::QGauss5 () :
 		Quadrature<2> (25)
 {
@@ -403,6 +411,7 @@ QGauss5<2>::QGauss5 () :
 
 
 
+template <>
 QGauss6<1>::QGauss6 () :
 		Quadrature<1> (6)
 {
@@ -444,6 +453,7 @@ QGauss6<1>::QGauss6 () :
 
 
 
+template <>
 QGauss7<1>::QGauss7 () :
 		Quadrature<1> (7)
 {
@@ -489,6 +499,7 @@ QGauss7<1>::QGauss7 () :
 
 
 
+template <>
 QGauss8<1>::QGauss8 () :
 		Quadrature<1> (8)
 {
@@ -544,6 +555,7 @@ QGauss8<1>::QGauss8 () :
 
 
 
+template <>
 QMidpoint<1>::QMidpoint () :
 		Quadrature<1>(1)
 {
@@ -553,6 +565,7 @@ QMidpoint<1>::QMidpoint () :
 
 
 
+template <>
 QMidpoint<2>::QMidpoint () :
 		Quadrature<2>(1)
 {
@@ -563,6 +576,7 @@ QMidpoint<2>::QMidpoint () :
 
 
 
+template <>
 QSimpson<1>::QSimpson () :
 		Quadrature<1> (3)
 {
@@ -578,6 +592,7 @@ QSimpson<1>::QSimpson () :
 
 
 
+template <>
 QSimpson<2>::QSimpson () :
 		Quadrature<2> (9)
 {
@@ -603,6 +618,7 @@ QSimpson<2>::QSimpson () :
 
 
 
+template <>
 QTrapez<1>::QTrapez () :
 		Quadrature<1> (2)
 {
@@ -618,6 +634,7 @@ QTrapez<1>::QTrapez () :
 
 
 
+template <>
 QTrapez<2>::QTrapez () :
 		Quadrature<2> (4)
 {

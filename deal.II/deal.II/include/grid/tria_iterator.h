@@ -234,7 +234,7 @@ template <int dim> class Triangulation;
  *   @see TriaDimensionInfo
  *   @author Wolfgang Bangerth, 1998
  */
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
   public:
 				     /**
@@ -445,7 +445,7 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
  *   This specialization of \Ref{TriaRawIterator} provides access only to the
  *   {\it used} lines, quads, cells, etc.
  */
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 class TriaIterator : public TriaRawIterator<dim,Accessor> {
   public:
 				     /**
@@ -562,7 +562,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
  *   {\it active} lines, quads, cells, etc. An active cell is a cell which is not
  *   refined and thus a cell on which calculations on the finest level are done.
  */
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 class TriaActiveIterator : public TriaIterator<dim,Accessor> {
   public:
 				     /**
@@ -698,7 +698,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 const Accessor &
 TriaRawIterator<dim,Accessor>::operator * () const {
@@ -709,7 +709,7 @@ TriaRawIterator<dim,Accessor>::operator * () const {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 Accessor &
 TriaRawIterator<dim,Accessor>::operator * () {
@@ -719,7 +719,7 @@ TriaRawIterator<dim,Accessor>::operator * () {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 const Accessor *
 TriaRawIterator<dim,Accessor>::operator -> () const {
@@ -728,7 +728,7 @@ TriaRawIterator<dim,Accessor>::operator -> () const {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 Accessor *
 TriaRawIterator<dim,Accessor>::operator -> () {
@@ -738,7 +738,7 @@ TriaRawIterator<dim,Accessor>::operator -> () {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 IteratorState TriaRawIterator<dim,Accessor>::state () const {
   return accessor.state ();
@@ -746,7 +746,7 @@ IteratorState TriaRawIterator<dim,Accessor>::state () const {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 bool TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const {
   Assert (state() != invalid, ExcDereferenceInvalidObject());
@@ -762,7 +762,7 @@ bool TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const 
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor> &
 TriaRawIterator<dim,Accessor>::operator ++ () {
@@ -774,7 +774,7 @@ TriaRawIterator<dim,Accessor>::operator ++ () {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 TriaRawIterator<dim,Accessor> &
 TriaRawIterator<dim,Accessor>::operator -- () {
@@ -786,7 +786,7 @@ TriaRawIterator<dim,Accessor>::operator -- () {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 void TriaRawIterator<dim,Accessor>::print (ostream &out) const {
   out << accessor.level() << "." << accessor.index();
@@ -794,7 +794,7 @@ void TriaRawIterator<dim,Accessor>::print (ostream &out) const {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i) {
   i.print(out);
@@ -803,7 +803,7 @@ ostream & operator << (ostream &out, const TriaRawIterator<dim,Accessor> &i) {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i) {
   i.print(out);
@@ -812,7 +812,7 @@ ostream & operator << (ostream &out, const TriaIterator<dim,Accessor> &i) {
 
 
 
-template <int dim, class Accessor>
+template <int dim, typename Accessor>
 inline
 ostream & operator << (ostream &out, const TriaActiveIterator<dim,Accessor> &i) {
   i.print(out);
