@@ -19,14 +19,15 @@ MultiGridBase::MultiGridBase(MGTransferBase& transfer,
 			     unsigned maxlevel, unsigned minlevel,
 			     unsigned pre_smooth, unsigned post_smooth)
 		:
+		d(maxlevel-minlevel),
+		s(maxlevel-minlevel),
 		maxlevel(maxlevel), minlevel(minlevel),
 		transfer(&transfer),
 		n_pre_smooth(pre_smooth), n_post_smooth(post_smooth)
 {}
 
-
 void
-MultiGridBase::level_mgstep(unsigned level)
+MultiGridBase::level_mgstep(unsigned level, MGSmoother& smoother)
 {
   if (level == minlevel)
     {
@@ -35,7 +36,7 @@ MultiGridBase::level_mgstep(unsigned level)
     }
   
 				   // smoothing of the residual by modifying s
-  smooth(level, d[level], s[level], n_pre_smooth);
+//  smooth(level, d[level], s[level], n_pre_smooth);
 
 				   // t = d-As
   level_residual(level, t, s[level], d[level]);
@@ -43,31 +44,21 @@ MultiGridBase::level_mgstep(unsigned level)
 				   // make t rhs of lower level
   transfer->restrict(level, t, d[level-1]);
 				   // do recursion
-  level_mgstep(level-1);
+  level_mgstep(level-1, smoother);
 				   // do coarse grid correction
   transfer->prolongate(level, s[level], s[level-1]);
 
 				   // smoothing (modify s again)
-  post_smooth(level, d[level], s[level], n_post_smooth);
+//  post_smooth(level, d[level], s[level], n_post_smooth);
 }
 
 
 void
-MultiGridBase::post_smooth(unsigned level,
-			   Vector<float>& dst, const Vector<float>& src,
-			   unsigned steps)
+MultiGridBase::coarse_grid_solution(unsigned /*level*/,
+				    Vector<float>& /*dst*/,
+				    const Vector<float>& /*src*/)
 {
-  smooth(level, dst, src, steps);
-}
-
-
-
-void
-MultiGridBase::coarse_grid_solution(unsigned level,
-			  Vector<float>& dst,
-			  const Vector<float>& src)
-{
-  smooth(level, dst, src, 10 * (n_pre_smooth + n_post_smooth));
+//  smooth(level, dst, src, 10 * (n_pre_smooth + n_post_smooth));
 }
 
 
