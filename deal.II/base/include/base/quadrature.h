@@ -15,6 +15,7 @@
 
 
 #include <base/point.h>
+#include <base/subscriptor.h>
 #include <vector>
 
 
@@ -32,6 +33,7 @@
  * these. Therefore, a three-dimensional @ref{QGauss5} formula has 125
  * quadrature points.
  *
+ * @sect2{Mathematical background}
  * For each quadrature formula we denote by @p{m}, the maximal degree of
  * polynomials integrated exactly. This number is given in the
  * documentation of each formula. The order of the integration error
@@ -42,6 +44,7 @@
  * exact on tensor product polynomials of degree @p{m} in each space
  * direction, but they are still only of @p{m+1}st order.
  *
+ * @sect2{Implementation details}
  * Most integration formulae in more than one space dimension are
  * tensor products of quadrature formulae in one space dimension, or
  * more generally the tensor product of a formula in @p{(dim-1)}
@@ -66,7 +69,7 @@
  * @author Wolfgang Bangerth, 1998, 1999, 2000
  */
 template <int dim>
-class Quadrature
+class Quadrature : public Subscriptor
 {
   public:
 				     /**
