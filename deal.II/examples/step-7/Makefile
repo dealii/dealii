@@ -66,17 +66,15 @@ libs.o   = $(lib-deal2-2d.o) \
 
 
 # We now use the variable defined above which switch between debug and
-# optimized mode to select the correct compiler flags and the set of
-# libraries to link with. Included in the list of libraries is the
-# name of the object file which we will produce from the single C++
-# file. Note that by default we use the extension .go for object files
-# compiled in debug mode and .o for object files in optimized mode.
+# optimized mode to select the set of libraries to link with. Included
+# in the list of libraries is the name of the object file which we
+# will produce from the single C++ file. Note that by default we use
+# the extension .go for object files compiled in debug mode and .o for
+# object files in optimized mode.
 ifeq ($(debug-mode),on)
   libraries = $(target).g.o $(libs.g)
-  flags     = $(CXXFLAGS.g)
 else
   libraries = $(target).o $(libs.o)
-  flags     = $(CXXFLAGS.o)
 endif
 
 
