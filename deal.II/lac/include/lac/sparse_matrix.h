@@ -672,12 +672,12 @@ class SparseMatrix : public Subscriptor
 				      * output if applied to a large matrix!
 				      * Be careful with it.
 				      */
-    void print_formatted (ostream &out,
-			  const unsigned int presicion=3,
-			  bool scientific=true,
-			  unsigned int width=0,
-			  const char * zero_string = " ",
-			  const double denominator = 1.) const;
+    void print_formatted (ostream            &out,
+			  const unsigned int  precision   = 3,
+			  const bool          scientific  = true,
+			  const unsigned int  width       = 0,
+			  const char         *zero_string = " ",
+			  const double        denominator = 1.) const;
     
 				     /**
 				      * Exception
