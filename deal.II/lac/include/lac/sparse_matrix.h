@@ -1591,6 +1591,8 @@ SparseMatrix<number>::begin (const unsigned int r) const
   return const_iterator(this, r, 0);
 }
 
+
+
 template <typename number>
 inline
 typename SparseMatrix<number>::const_iterator

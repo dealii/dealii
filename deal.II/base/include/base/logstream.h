@@ -117,7 +117,7 @@ class LogStream
 				      * this function with @p{n=0}, no
 				      * console output will be written.
 				      */
-    void depth_console (unsigned int n);
+    void depth_console (const unsigned int n);
      
 				     /**
 				      * Maximum number of levels to be
@@ -128,7 +128,7 @@ class LogStream
 				      * with care, since it may spoile
 				      * the value of a log file.
 				      */
-    void depth_file (unsigned int n);
+    void depth_file (const unsigned int n);
 
                                      /**
 				      * Set time printing flag. If this flag
@@ -136,7 +136,7 @@ class LogStream
 				      * be prepended by the user time used
 				      * by the running program so far.
 				      */
-    void log_execution_time (bool flag);
+    void log_execution_time (const bool flag);
 
 				     /**
 				      * Output time differences
@@ -155,7 +155,7 @@ class LogStream
 				      * not changed by this function,
 				      * just the output.
 				      */
-    void log_time_differences (bool flag);
+    void log_time_differences (const bool flag);
     
 				     /**
 				      * Output a constant something
@@ -280,7 +280,7 @@ class LogStream
 				      * optional time information and
 				      * the contents of the prefix stack.
 				      */
-    void print_line_head();
+    void print_line_head ();
 
 				     /**
 				      * Actually do the work of

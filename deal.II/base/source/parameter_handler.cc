@@ -31,6 +31,7 @@
 # include <limits>
 #endif
 
+//TODO[WB]: Remove the "status" flag -- it's only a remnant of the DiffPack past of this class and doesn't really serve any useful purpose any more
 
 namespace Patterns
 {  
@@ -72,7 +73,8 @@ namespace Patterns
   
 
   Integer::Integer (const int lower_bound,
-		    const int upper_bound) :
+		    const int upper_bound)
+                  :
 		  lower_bound (lower_bound),
 		  upper_bound (upper_bound)
   {}
@@ -157,7 +159,8 @@ namespace Patterns
 #endif
   
   Double::Double (const double lower_bound,
-		  const double upper_bound) :
+		  const double upper_bound)
+                  :
 		  lower_bound (lower_bound),
 		  upper_bound (upper_bound)
   {}
@@ -495,7 +498,8 @@ namespace Patterns
 
 
 
-  Bool::Bool () :
+  Bool::Bool ()
+                  :
 		  Selection ("true|false")
   {}
 
@@ -538,7 +542,8 @@ namespace Patterns
 
 
 
-ParameterHandler::ParameterHandler () :
+ParameterHandler::ParameterHandler ()
+                :
 		status(true) {}
 
 
@@ -668,10 +673,12 @@ bool ParameterHandler::declare_entry (const std::string           &entry,
   if (p->entries.find (entry) != p->entries.end())
     return false;
 
+                                   // entry doesn't yet exist, but
+                                   // map::operator[] will create it
   p->entries[entry] = std::make_pair(default_value, pattern.clone());
 
-				   // check whether default answer matches
-				   // the pattern
+				   // check whether default answer
+				   // matches the pattern
   if (!pattern.match(default_value))
     return false;
 
@@ -738,8 +745,8 @@ const std::string & ParameterHandler::get (const std::string &entry_string) cons
     };
 
 
-// entry exists; now find out whether
-				   // it was changed:
+                                   // entry exists; now find out
+				   // whether it was changed:
   Section::EntryType::const_iterator ptr;
   ptr = pc->entries.find (entry_string);
   if (ptr != pc->entries.end())
@@ -840,7 +847,8 @@ void
 ParameterHandler::log_parameters (LogStream &out)
 {
   out.push("parameters");
-				   // dive recursively into the subsections
+				   // dive recursively into the
+				   // subsections
   log_parameters_section (out);
 
   out.pop();
@@ -1261,7 +1269,8 @@ ParameterHandler::Section::memory_consumption () const
 
 
 
-MultipleParameterLoop::MultipleParameterLoop() :
+MultipleParameterLoop::MultipleParameterLoop()
+                :
 		n_branches(0)
 {}
 
@@ -1484,7 +1493,8 @@ MultipleParameterLoop::memory_consumption () const
 
 MultipleParameterLoop::Entry::Entry (const std::vector<std::string> &ssp,
 				     const std::string              &Name,
-				     const std::string              &Value) :
+				     const std::string              &Value)
+                :
 		subsection_path (ssp), entry_name(Name), entry_value(Value)
 {}
 

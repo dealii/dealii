@@ -84,13 +84,15 @@ ActiveObjectMonitor::deregister_object (const Subscriptor *p)
 
 
 
-Subscriptor::Subscriptor () :
+Subscriptor::Subscriptor ()
+                :
 		counter (0),
 		object_info (0)
 {}
 
 
-Subscriptor::Subscriptor (const Subscriptor &) :
+Subscriptor::Subscriptor (const Subscriptor &)
+                :
 		counter (0),
 		object_info (0)
 {}
@@ -134,14 +136,15 @@ void Subscriptor::subscribe () const
 }
 
 
-void Subscriptor::unsubscribe () const {
+void Subscriptor::unsubscribe () const
+{
   Assert (counter>0, ExcNotUsed());
   Threads::ThreadMutex::ScopedLock lock (subscription_lock);
   --counter;
 }
 
 
-unsigned int Subscriptor::n_subscriptions () const 
+unsigned int Subscriptor::n_subscriptions () const
 {
   return counter;
 }

@@ -28,10 +28,10 @@ const unsigned int DataOutBase::Patch<dim,spacedim>::no_neighbor;
 
 
 template <int dim, int spacedim>
-DataOutBase::Patch<dim,spacedim>::Patch () :
+DataOutBase::Patch<dim,spacedim>::Patch ()
+                :
 		patch_index(no_neighbor),
 		n_subdivisions (1)
-
 				   // all the other data has a
 				   // constructor of its own, except
 				   // for the "neighbors" field, which
@@ -60,7 +60,8 @@ DataOutBase::Patch<dim,spacedim>::memory_consumption () const
 
 
 
-DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
+DataOutBase::UcdFlags::UcdFlags (const bool write_preamble)
+                :
 		write_preamble (write_preamble)
 {}
 
@@ -68,7 +69,8 @@ DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 
 DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 				       const bool bicubic_patch,
-				       const bool external_data) :
+				       const bool external_data)
+                :
 		smooth (smooth),
 		bicubic_patch(bicubic_patch),
 		external_data(external_data)
@@ -76,7 +78,8 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 
 
 DataOutBase::DXFlags::DXFlags (const bool write_multigrid,
-			       const bool write_neighbors) :
+			       const bool write_neighbors)
+                :
 		write_multigrid(write_multigrid),
 		write_neighbors(write_neighbors)
 {}
@@ -195,7 +198,8 @@ DataOutBase::EpsFlags::EpsFlags (const unsigned int  height_vector,
 				 const bool          draw_mesh,
 				 const bool          draw_cells,
 				 const bool          shade_cells,
-				 const ColorFunction color_function) :
+				 const ColorFunction color_function)
+                :
 		height_vector(height_vector),
 		color_vector(color_vector),
 		size_type(size_type),
@@ -425,10 +429,11 @@ DataOutBase::GmvFlags::memory_consumption () const
 
 
 
-DataOutBase::TecplotFlags::TecplotFlags (const char* tecplot_binary_file_name) :
-  tecplot_binary_file_name(tecplot_binary_file_name)
-{
-}
+DataOutBase::TecplotFlags::
+TecplotFlags (const char* tecplot_binary_file_name)
+                :
+                tecplot_binary_file_name(tecplot_binary_file_name)
+{}
 
 
 
@@ -3082,21 +3087,21 @@ namespace
 {
   class TecplotMacros
   {
-  public:
-    TecplotMacros(const unsigned int n_nodes = 0,
-		  const unsigned int n_vars = 0,
-		  const unsigned int n_cells = 0,
-		  const unsigned int n_vert = 0);
-    ~TecplotMacros();
-    float & nd(const unsigned int i, const unsigned int j);
-    int   & cd(const unsigned int i, const unsigned int j);
-    std::vector<float> nodalData;
-    std::vector<int>   connData;
-  private:
-    unsigned int n_nodes;
-    unsigned int n_vars;
-    unsigned int n_cells;
-    unsigned int n_vert;
+    public:
+      TecplotMacros(const unsigned int n_nodes = 0,
+                    const unsigned int n_vars = 0,
+                    const unsigned int n_cells = 0,
+                    const unsigned int n_vert = 0);
+      ~TecplotMacros();
+      float & nd(const unsigned int i, const unsigned int j);
+      int   & cd(const unsigned int i, const unsigned int j);
+      std::vector<float> nodalData;
+      std::vector<int>   connData;
+    private:
+      unsigned int n_nodes;
+      unsigned int n_vars;
+      unsigned int n_cells;
+      unsigned int n_vert;
   };
 
 
@@ -3104,7 +3109,8 @@ namespace
   TecplotMacros::TecplotMacros(const unsigned int n_nodes,
 			       const unsigned int n_vars,
 			       const unsigned int n_cells,
-			       const unsigned int n_vert) :
+			       const unsigned int n_vert)
+                  :
 		  n_nodes(n_nodes),
 		  n_vars(n_vars),
 		  n_cells(n_cells),
@@ -3118,13 +3124,13 @@ namespace
 
   inline
   TecplotMacros::~TecplotMacros()
-  {
-  }
+  {}
 
 
 
   inline
-  float & TecplotMacros::nd(const unsigned int i, const unsigned int j)
+  float & TecplotMacros::nd (const unsigned int i,
+                             const unsigned int j)
   {
     return nodalData[(i)*(n_nodes) + (j)]; 
   }
@@ -3132,7 +3138,8 @@ namespace
 
 
   inline
-  int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
+  int & TecplotMacros::cd (const unsigned int i,
+                           const unsigned int j)
   {
     return connData[(i) + (j)*(n_vert)]; 
   }
@@ -3154,22 +3161,27 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   
 #ifndef DEAL_II_HAVE_TECPLOT
   
-  // simply call the ASCII output function if the Tecplot API isn't present
+                                   // simply call the ASCII output
+                                   // function if the Tecplot API
+                                   // isn't present
   write_tecplot (patches, data_names, flags, out);
   return;
   
 #else
   
-  // Tecplot binary output only good for 2D & 3D
+                                   // Tecplot binary output only good
+                                   // for 2D & 3D
   if (dim == 1)
     {
       write_tecplot (patches, data_names, flags, out);
       return;
     };
 
-  // if the user hasn't specified a file name we should
-  // call the ASCII function and use the ostream @p{out}
-  // instead of doing something silly later
+                                   // if the user hasn't specified a
+                                   // file name we should call the
+                                   // ASCII function and use the
+                                   // ostream @p{out} instead of doing
+                                   // something silly later
   char* file_name = (char*) flags.tecplot_binary_file_name;
 
   if (file_name == NULL)
@@ -3197,7 +3209,8 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				   // and cells for later use
   unsigned int n_cells = 0,
                n_nodes = 0;
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator
+         patch=patches.begin();
        patch!=patches.end(); ++patch)
     switch (dim)
       {
@@ -4078,16 +4091,18 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_default_format(const OutputFormat fmt)
+void
+DataOutInterface<dim,spacedim>::set_default_format(const OutputFormat fmt)
 {
-  Assert(fmt != default_format, ExcNotImplemented());
+  Assert (fmt != default_format, ExcNotImplemented());
   default_fmt = fmt;
 }
 
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const DXFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const DXFlags &flags) 
 {
   dx_flags = flags;
 }
@@ -4095,7 +4110,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const DXFlags &flags)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const UcdFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const UcdFlags &flags) 
 {
   ucd_flags = flags;
 }
@@ -4103,7 +4119,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const UcdFlags &flags)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const GnuplotFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const GnuplotFlags &flags) 
 {
   gnuplot_flags = flags;
 }
@@ -4111,7 +4128,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const GnuplotFlags &flags)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const PovrayFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const PovrayFlags &flags) 
 {
   povray_flags = flags;
 }
@@ -4119,7 +4137,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const PovrayFlags &flags)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const EpsFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const EpsFlags &flags) 
 {
   eps_flags = flags;
 }
@@ -4127,7 +4146,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const EpsFlags &flags)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const GmvFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const GmvFlags &flags) 
 {
   gmv_flags = flags;
 }
@@ -4135,7 +4155,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const GmvFlags &flags)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const TecplotFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const TecplotFlags &flags) 
 {
   tecplot_flags = flags;
 }
@@ -4143,7 +4164,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const TecplotFlags &flags)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags) 
+void
+DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags) 
 {
   vtk_flags = flags;
 }
@@ -4152,7 +4174,8 @@ void DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags)
 
 template <int dim, int spacedim>
 std::string
-DataOutInterface<dim,spacedim>::default_suffix (const OutputFormat output_format_) const
+DataOutInterface<dim,spacedim>::
+default_suffix (const OutputFormat output_format_) const
 {
   OutputFormat output_format = output_format_;
   if (output_format == default_format)
@@ -4197,7 +4220,8 @@ DataOutInterface<dim,spacedim>::default_suffix (const OutputFormat output_format
 
 template <int dim, int spacedim>
 typename DataOutInterface<dim,spacedim>::OutputFormat
-DataOutInterface<dim,spacedim>::parse_output_format (const std::string &format_name)
+DataOutInterface<dim,spacedim>::
+parse_output_format (const std::string &format_name)
 {
   if (format_name == "dx")
     return dx;
@@ -4235,7 +4259,8 @@ DataOutInterface<dim,spacedim>::parse_output_format (const std::string &format_n
 
 
 template <int dim, int spacedim>
-std::string DataOutInterface<dim,spacedim>::get_output_format_names ()
+std::string
+DataOutInterface<dim,spacedim>::get_output_format_names ()
 {
   return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|vtk";
 }
@@ -4243,7 +4268,8 @@ std::string DataOutInterface<dim,spacedim>::get_output_format_names ()
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm) 
+void
+DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm) 
 {
   prm.declare_entry ("Output format", "gnuplot",
 		     Patterns::Selection (get_output_format_names ()));
@@ -4284,7 +4310,8 @@ void DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm)
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm) 
+void
+DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm) 
 {
   const std::string& output_name = prm.get ("Output format");
   default_fmt = parse_output_format (output_name);
@@ -4321,6 +4348,7 @@ void DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm)
   vtk_flags.parse_parameters (prm);
   prm.leave_subsection ();
 }
+
 
 
 template <int dim, int spacedim>

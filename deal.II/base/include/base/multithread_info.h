@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,7 @@ class MultithreadInfo
 				      * detection failed or if
 				      * detection is not supported.
 				      */
-    MultithreadInfo();
+    MultithreadInfo ();
 
 				     /**
 				      * The number of CPUs in the

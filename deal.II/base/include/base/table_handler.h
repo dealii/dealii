@@ -54,12 +54,12 @@ class TableEntryBase
                                      /**
                                       * Write the table entry as text.
                                       */
-    virtual void write_text (std::ostream &) const =0;
+    virtual void write_text (std::ostream &) const = 0;
     
                                      /**
                                       * Write the table entry in tex format.
                                       */
-    virtual void write_tex (std::ostream &) const =0;
+    virtual void write_tex (std::ostream &) const = 0;
 };
 
 
@@ -81,7 +81,7 @@ class TableEntry : public TableEntryBase
                                      /**
                                       * Constructor.
                                       */
-    TableEntry(const value_type value);
+    TableEntry (const value_type value);
 
                                      /**
                                       * Destructor.
@@ -92,7 +92,7 @@ class TableEntry : public TableEntryBase
                                       * Returns the value of this
                                       * table entry.
                                       */
-    value_type value() const;
+    value_type value () const;
 
                                      /**
                                       * Write the table entry as text.
@@ -180,7 +180,7 @@ class TableHandler
                                      /**
                                       * Constructor.
                                       */
-    TableHandler();
+    TableHandler ();
     
                                      /**
                                       * Adds a column (if not yet

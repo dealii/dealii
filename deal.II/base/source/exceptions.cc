@@ -25,14 +25,16 @@
 
 
 
-ExceptionBase::ExceptionBase () :
+ExceptionBase::ExceptionBase ()
+                :
 		file(""), line(0), function(""), cond(""), exc("")
 {}
 
 
 
 ExceptionBase::ExceptionBase (const char* f, const int l, const char *func,
-			      const char* c, const char *e) :
+			      const char* c, const char *e)
+                :
 		file(f), line(l), function(func), cond(c), exc(e)
 {}
 

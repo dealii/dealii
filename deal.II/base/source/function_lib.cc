@@ -1321,8 +1321,8 @@ namespace Functions
 		  const std::vector<double>      &weights)
 		  :
 		  Function<dim> (1),
-    fourier_coefficients (fourier_coefficients),
-    weights (weights)
+                  fourier_coefficients (fourier_coefficients),
+                  weights (weights)
   {
     Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
     Assert (fourier_coefficients.size() == weights.size(),

@@ -39,7 +39,8 @@ static inline Number sqr (const Number x)
 
 
 template <typename Number>
-Vector<Number>::Vector (const Vector<Number>& v) :
+Vector<Number>::Vector (const Vector<Number>& v)
+                :
 		dim(v.size()),
 		maxdim(v.size()),
 		val(0)
@@ -271,7 +272,8 @@ Number Vector<Number>::lp_norm (const Number p) const
 
 
 template <typename Number>
-Number Vector<Number>::linfty_norm () const {
+Number Vector<Number>::linfty_norm () const
+{
   Assert (dim!=0, ExcEmptyVector());
 
   Number max0=0.,
@@ -391,7 +393,8 @@ void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
 
 
 template <typename Number>
-void Vector<Number>::sadd (const Number x, const Number a, const Vector<Number>& v)
+void Vector<Number>::sadd (const Number x, const Number a,
+                           const Vector<Number>& v)
 {
   Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
@@ -405,7 +408,8 @@ void Vector<Number>::sadd (const Number x, const Number a, const Vector<Number>&
 
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a,
-			   const Vector<Number>& v, const Number b, const Vector<Number>& w)
+			   const Vector<Number>& v, const Number b,
+                           const Vector<Number>& w)
 {
   Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
@@ -422,7 +426,8 @@ void Vector<Number>::sadd (const Number x, const Number a,
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& v, const Number b,
-			   const Vector<Number>& w, const Number c, const Vector<Number>& y)
+			   const Vector<Number>& w, const Number c,
+                           const Vector<Number>& y)
 {
   Assert (dim!=0, ExcEmptyVector());
   Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));

@@ -505,7 +505,7 @@ template <class SparsityPatternBase>
 inline
 SparsityPatternBase &
 BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
-						  const unsigned int column)
+                                                      const unsigned int column)
 {
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));
@@ -518,7 +518,7 @@ template <class SparsityPatternBase>
 inline
 const SparsityPatternBase &
 BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
-			     const unsigned int column) const
+                                                      const unsigned int column) const
 {
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,8 @@ number abs (const number a)
 
 template <>
 QGauss<1>::QGauss (const unsigned int n)
-  : Quadrature<1> (n)
+                :
+                Quadrature<1> (n)
 {
   const unsigned int m = (n+1)/2;
   long double z;
@@ -71,7 +72,8 @@ QGauss<1>::QGauss (const unsigned int n)
 
 
 template <>
-QGauss2<1>::QGauss2 () :
+QGauss2<1>::QGauss2 ()
+                :
 		Quadrature<1> (2)
 {
 				   // points on [-1,1]
@@ -93,8 +95,10 @@ QGauss2<1>::QGauss2 () :
 }
 
 
+
 template <>
-QGauss3<1>::QGauss3 () :
+QGauss3<1>::QGauss3 ()
+                :
 		Quadrature<1> (3)
 {
 				   // points on [-1,1]
@@ -122,8 +126,10 @@ QGauss3<1>::QGauss3 () :
 }
 
 
+
 template <>
-QGauss4<1>::QGauss4 () :
+QGauss4<1>::QGauss4 () 
+                :
 		Quadrature<1> (4)
 {
 				   // points on [-1,1]
@@ -156,7 +162,8 @@ QGauss4<1>::QGauss4 () :
 
 
 template <>
-QGauss5<1>::QGauss5 () :
+QGauss5<1>::QGauss5 ()
+                :
 		Quadrature<1> (5)
 {
 				   // points on [-1,1]
@@ -192,8 +199,10 @@ QGauss5<1>::QGauss5 () :
 }
 
 
+
 template <>
-QGauss6<1>::QGauss6 () :
+QGauss6<1>::QGauss6 ()
+                :
 		Quadrature<1> (6)
 {
 				   // points on [-1,1]
@@ -233,8 +242,10 @@ QGauss6<1>::QGauss6 () :
 }
 
 
+
 template <>
-QGauss7<1>::QGauss7 () :
+QGauss7<1>::QGauss7 ()
+                :
 		Quadrature<1> (7)
 {
 				   // points on [-1,1]
@@ -280,7 +291,8 @@ QGauss7<1>::QGauss7 () :
 
 
 template <>
-QMidpoint<1>::QMidpoint () :
+QMidpoint<1>::QMidpoint ()
+                :
 		Quadrature<1>(1)
 {
   this->quadrature_points[0] = Point<1>(0.5);
@@ -288,8 +300,10 @@ QMidpoint<1>::QMidpoint () :
 }
 
 
+
 template <>
-QTrapez<1>::QTrapez () :
+QTrapez<1>::QTrapez ()
+                :
 		Quadrature<1> (2)
 {
   static const double xpts[] = { 0.0, 1.0 };
@@ -303,8 +317,10 @@ QTrapez<1>::QTrapez () :
 }
 
 
+
 template <>
-QSimpson<1>::QSimpson () :
+QSimpson<1>::QSimpson ()
+                :
 		Quadrature<1> (3)
 {
   static const double xpts[] = { 0.0, 0.5, 1.0 };
@@ -318,8 +334,10 @@ QSimpson<1>::QSimpson () :
 }
 
 
+
 template <>
-QMilne<1>::QMilne () :
+QMilne<1>::QMilne ()
+                :
 		Quadrature<1> (5)
 {
   static const double xpts[] = { 0.0, .25, .5, .75, 1.0 };
@@ -333,8 +351,10 @@ QMilne<1>::QMilne () :
 }
 
 
+
 template <>
-QWeddle<1>::QWeddle () :
+QWeddle<1>::QWeddle ()
+                :
 		Quadrature<1> (7)
 {
   static const double xpts[] = { 0.0, 1./6., 1./3., .5, 2./3., 5./6., 1.0 };
@@ -362,48 +382,89 @@ QGauss<dim>::QGauss (const unsigned int n)
 
 
 template <int dim>
-QGauss2<dim>::QGauss2 () :  Quadrature<dim> (QGauss2<dim-1>(), QGauss2<1>())  {}
+QGauss2<dim>::QGauss2 ()
+                :
+                Quadrature<dim> (QGauss2<dim-1>(), QGauss2<1>())
+{}
 
-template <int dim>
-QGauss3<dim>::QGauss3 () :
-		Quadrature<dim> (QGauss3<dim-1>(), QGauss3<1>()){}
-
-template <int dim>
-QGauss4<dim>::QGauss4 () :
-		Quadrature<dim> (QGauss4<dim-1>(), QGauss4<1>()){}
-
-template <int dim>
-QGauss5<dim>::QGauss5 () :
-		Quadrature<dim> (QGauss5<dim-1>(), QGauss5<1>()){}
-
-template <int dim>
-QGauss6<dim>::QGauss6 () :
-		Quadrature<dim> (QGauss6<dim-1>(), QGauss6<1>()){}
-
-template <int dim>
-QGauss7<dim>::QGauss7 () :
-		Quadrature<dim> (QGauss7<dim-1>(), QGauss7<1>()){}
 
 
 template <int dim>
-QMidpoint<dim>::QMidpoint () :
-		Quadrature<dim> (QMidpoint<dim-1>(), QMidpoint<1>()){}
+QGauss3<dim>::QGauss3 ()
+                :
+		Quadrature<dim> (QGauss3<dim-1>(), QGauss3<1>())
+{}
+
+
 
 template <int dim>
-QTrapez<dim>::QTrapez () :
-		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){}
+QGauss4<dim>::QGauss4 ()
+                :
+		Quadrature<dim> (QGauss4<dim-1>(), QGauss4<1>())
+{}
+
+
 
 template <int dim>
-QSimpson<dim>::QSimpson () :
-		Quadrature<dim> (QSimpson<dim-1>(), QSimpson<1>()){}
+QGauss5<dim>::QGauss5 ()
+                :
+		Quadrature<dim> (QGauss5<dim-1>(), QGauss5<1>())
+{}
+
+
 
 template <int dim>
-QMilne<dim>::QMilne () :
-		Quadrature<dim> (QMilne<dim-1>(), QMilne<1>()){}
+QGauss6<dim>::QGauss6 ()
+                :
+		Quadrature<dim> (QGauss6<dim-1>(), QGauss6<1>())
+{}
+
+
 
 template <int dim>
-QWeddle<dim>::QWeddle () :
-		Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>()){}
+QGauss7<dim>::QGauss7 ()
+                :
+		Quadrature<dim> (QGauss7<dim-1>(), QGauss7<1>())
+{}
+
+
+
+template <int dim>
+QMidpoint<dim>::QMidpoint ()
+                :
+		Quadrature<dim> (QMidpoint<dim-1>(), QMidpoint<1>())
+{}
+
+
+
+template <int dim>
+QTrapez<dim>::QTrapez ()
+                :
+		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>())
+{}
+
+
+
+template <int dim>
+QSimpson<dim>::QSimpson ()
+                :
+		Quadrature<dim> (QSimpson<dim-1>(), QSimpson<1>())
+{}
+
+
+
+template <int dim>
+QMilne<dim>::QMilne ()
+                :
+		Quadrature<dim> (QMilne<dim-1>(), QMilne<1>())
+{}
+
+
+template <int dim>
+QWeddle<dim>::QWeddle ()
+                :
+		Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>())
+{}
 
 
 // explicit specialization

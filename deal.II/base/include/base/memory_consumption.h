@@ -390,7 +390,7 @@ namespace MemoryConsumption
 namespace MemoryConsumption
 {
   inline
-  unsigned int memory_consumption (const bool) 
+  unsigned int memory_consumption (const bool)
   {
     return sizeof(bool);
   }

@@ -198,7 +198,7 @@ namespace internal
         public std::iterator<std::random_access_iterator_tag,
                              typename Types<number,constness>::NumberType>
 #else
-    random_access_iterator<typename Types<number,constness>::NumberType,int>
+        random_access_iterator<typename Types<number,constness>::NumberType,int>
 #endif      
     {
       private:
@@ -591,6 +591,8 @@ namespace internal
     };
   }  // namespace BlockVectorIterators
 }  // namespace internal
+
+
 
 /**
  * A vector composed of several blocks each representing a vector of
@@ -1306,7 +1308,7 @@ Number& BlockVector<Number>::operator() (const unsigned int i)
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator *= (const Number factor) 
+BlockVector<Number>::operator *= (const Number factor)
 {
   scale (factor);
   return *this;
@@ -1317,7 +1319,7 @@ BlockVector<Number>::operator *= (const Number factor)
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator /= (const Number factor) 
+BlockVector<Number>::operator /= (const Number factor)
 {
   scale (1./factor);
   return *this;
@@ -1551,7 +1553,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator == (const Iterator &i) const
+    Iterator<number,constness>::
+    operator == (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1563,7 +1566,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator == (const InverseConstnessIterator &i) const
+    Iterator<number,constness>::
+    operator == (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1575,7 +1579,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator != (const Iterator &i) const
+    Iterator<number,constness>::
+    operator != (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1587,7 +1592,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator != (const InverseConstnessIterator &i) const
+    Iterator<number,constness>::
+    operator != (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1599,7 +1605,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator < (const Iterator &i) const
+    Iterator<number,constness>::
+    operator < (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1611,7 +1618,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator < (const InverseConstnessIterator &i) const
+    Iterator<number,constness>::
+    operator < (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1623,7 +1631,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator <= (const Iterator &i) const
+    Iterator<number,constness>::
+    operator <= (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1635,7 +1644,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator <= (const InverseConstnessIterator &i) const
+    Iterator<number,constness>::
+    operator <= (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1647,7 +1657,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator > (const Iterator &i) const
+    Iterator<number,constness>::
+    operator > (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1659,7 +1670,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator > (const InverseConstnessIterator &i) const
+    Iterator<number,constness>::
+    operator > (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1671,7 +1683,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator >= (const Iterator &i) const
+    Iterator<number,constness>::
+    operator >= (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1683,7 +1696,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     bool
-    Iterator<number,constness>::operator >= (const InverseConstnessIterator &i) const
+    Iterator<number,constness>::
+    operator >= (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1695,7 +1709,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     typename Iterator<number,constness>::difference_type
-    Iterator<number,constness>::operator - (const Iterator &i) const
+    Iterator<number,constness>::
+    operator - (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1708,7 +1723,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     typename Iterator<number,constness>::difference_type
-    Iterator<number,constness>::operator - (const InverseConstnessIterator &i) const
+    Iterator<number,constness>::
+    operator - (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1721,7 +1737,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     Iterator<number,constness>
-    Iterator<number,constness>::operator + (const difference_type &d) const
+    Iterator<number,constness>::
+    operator + (const difference_type &d) const
     {
                                        // if the index pointed to is
                                        // still within the block we
@@ -1745,7 +1762,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     Iterator<number,constness>
-    Iterator<number,constness>::operator - (const difference_type &d) const
+    Iterator<number,constness>::
+    operator - (const difference_type &d) const
     {
                                        // if the index pointed to is
                                        // still within the block we
@@ -1769,7 +1787,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     Iterator<number,constness> &
-    Iterator<number,constness>::operator += (const difference_type &d)
+    Iterator<number,constness>::
+    operator += (const difference_type &d)
     {
                                        // if the index pointed to is
                                        // still within the block we
@@ -1796,7 +1815,8 @@ namespace internal
     template <typename number, bool constness>
     inline
     Iterator<number,constness> &
-    Iterator<number,constness>::operator -= (const difference_type &d)
+    Iterator<number,constness>::
+    operator -= (const difference_type &d)
     {
                                        // if the index pointed to is
                                        // still within the block we

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -104,9 +104,10 @@ class ConvergenceTable: public TableHandler
 				      *
 				      * Still not implemented.
 				      */
-    void evaluate_convergence_rates (const std::string &data_column_key,
-				     const std::string &reference_column_key,
-				     const RateMode     rate_mode);
+    void
+    evaluate_convergence_rates (const std::string &data_column_key,
+                                const std::string &reference_column_key,
+                                const RateMode     rate_mode);
 
 
 				     /**
@@ -126,8 +127,9 @@ class ConvergenceTable: public TableHandler
 				      * the @p{set_tex_supercaption (...)} function
 				      * of the base class @p{TableHandler}.
 				      */
-    void evaluate_convergence_rates (const std::string &data_column_key, 
-				     const RateMode     rate_mode);
+    void
+    evaluate_convergence_rates (const std::string &data_column_key, 
+                                const RateMode     rate_mode);
 
 				     /**
 				      * Omit this column @p{key} 
@@ -140,7 +142,8 @@ class ConvergenceTable: public TableHandler
 				      * omitting the column from convergence
 				      * rate evalution.
 				      */
-    void omit_column_from_convergence_rate_evaluation(const std::string &key);
+    void
+    omit_column_from_convergence_rate_evaluation(const std::string &key);
 
 				     /**
 				      * Evaluates convergence rates
@@ -168,8 +171,9 @@ class ConvergenceTable: public TableHandler
 				      * should omitted by calling the
 				      * @p{omit_column_from_convergence_rate_evaluation(..)}.
 				      */
-    void evaluate_all_convergence_rates(const std::string &reference_column_key,
-					const RateMode     rate_mode);
+    void
+    evaluate_all_convergence_rates(const std::string &reference_column_key,
+                                   const RateMode     rate_mode);
 
 				     /**
 				      * Evaluates convergence rates
@@ -195,7 +199,8 @@ class ConvergenceTable: public TableHandler
 				      * should omitted by calling the
 				      * @p{omit_column_from_convergence_rate_evaluation(..)}.
 				      */
-    void evaluate_all_convergence_rates(const RateMode rate_mode);
+    void
+    evaluate_all_convergence_rates(const RateMode rate_mode);
 
     				     /**
 				      * Exception

@@ -121,8 +121,8 @@ namespace Polynomials
 
   template <typename number>
   void
-  Polynomial<number>::scale(std::vector<number> &coefficients,
-                            const number         factor)
+  Polynomial<number>::scale (std::vector<number> &coefficients,
+                             const number         factor)
   {
     double f = 1.;
     for (typename std::vector<number>::iterator c = coefficients.begin();
@@ -137,7 +137,7 @@ namespace Polynomials
 
   template <typename number>
   void
-  Polynomial<number>::scale(const number factor)
+  Polynomial<number>::scale (const number factor)
   {
     scale (coefficients, factor);
   }
@@ -146,8 +146,8 @@ namespace Polynomials
 
   template <typename number>
   void
-  Polynomial<number>::multiply(std::vector<number> &coefficients,
-                               const number         factor)
+  Polynomial<number>::multiply (std::vector<number> &coefficients,
+                                const number         factor)
   {
     for (typename std::vector<number>::iterator c = coefficients.begin();
          c != coefficients.end(); ++c)
@@ -230,15 +230,15 @@ namespace Polynomials
   template <typename number>
   template <typename number2>
   void
-  Polynomial<number>::shift(const number2 offset)
+  Polynomial<number>::shift (const number2 offset)
   {
-    shift(coefficients, offset);
+    shift (coefficients, offset);
   }
 
 
   template <typename number>
   void
-  Polynomial<number>::print(std::ostream& out) const
+  Polynomial<number>::print (std::ostream& out) const
   {
     for (int i=degree();i>=0;--i)
       {

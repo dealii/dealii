@@ -79,9 +79,9 @@ class BlockSparseMatrix : public Subscriptor
 					  * access, a const matrix
 					  * pointer is sufficient.
 					  */
-	Accessor (const BlockSparseMatrix<number>*,
-		  unsigned int row,
-		  unsigned short index);
+	Accessor (const BlockSparseMatrix<number> *m,
+		  const unsigned int               row,
+		  const unsigned short             index);
 	
 					 /**
 					  * Row number of the element
@@ -744,17 +744,18 @@ class BlockSparseMatrix : public Subscriptor
 
 template <typename number>
 inline
-BlockSparseMatrix<number>::Accessor::Accessor (
-  const BlockSparseMatrix<number>* matrix,
-  unsigned int r,
-  unsigned short i)
-		: matrix(matrix),
-		  base_iterator(matrix->block(0,0).begin()),
-		  block_row(0),
-		  row_start(0),
-		  block_col(0),
-		  col_start(0),
-		  a_index(0)
+BlockSparseMatrix<number>::Accessor::
+Accessor (const BlockSparseMatrix<number> *matrix,
+          const unsigned int               r,
+          const unsigned short             i)
+		:
+                matrix(matrix),
+                base_iterator(matrix->block(0,0).begin()),
+		block_row(0),
+		row_start(0),
+		block_col(0),
+		col_start(0),
+		a_index(0)
 {
   Assert (i==0, ExcNotImplemented());
 
@@ -816,11 +817,12 @@ BlockSparseMatrix<number>::Accessor::value () const
 
 template <typename number>
 inline
-BlockSparseMatrix<number>::const_iterator::const_iterator(
-  const BlockSparseMatrix<number>* m,
-  unsigned int r,
-  unsigned short i)
-		: BlockSparseMatrix<number>::Accessor(m, r, i)
+BlockSparseMatrix<number>::const_iterator::
+const_iterator(const BlockSparseMatrix<number>* m,
+               unsigned int r,
+               unsigned short i)
+		:
+                BlockSparseMatrix<number>::Accessor(m, r, i)
 {}
 
 
@@ -919,7 +921,8 @@ BlockSparseMatrix<number>::const_iterator::operator-> () const
 template <typename number>
 inline
 bool
-BlockSparseMatrix<number>::const_iterator::operator == (const const_iterator& i) const
+BlockSparseMatrix<number>::const_iterator::
+operator == (const const_iterator& i) const
 {
   if (this->matrix != i->matrix)
     return false;
@@ -936,7 +939,8 @@ BlockSparseMatrix<number>::const_iterator::operator == (const const_iterator& i)
 template <typename number>
 inline
 bool
-BlockSparseMatrix<number>::const_iterator::operator != (const const_iterator& i) const
+BlockSparseMatrix<number>::const_iterator::
+operator != (const const_iterator& i) const
 {
   return !(*this == i);
 }
@@ -946,7 +950,8 @@ BlockSparseMatrix<number>::const_iterator::operator != (const const_iterator& i)
 template <typename number>
 inline
 bool
-BlockSparseMatrix<number>::const_iterator::operator < (const const_iterator& i) const
+BlockSparseMatrix<number>::const_iterator::
+operator < (const const_iterator& i) const
 {
   if (this->block_row<i->block_row)
     return true;
@@ -1357,9 +1362,9 @@ template <typename number>
 template <typename somenumber>
 void
 BlockSparseMatrix<number>::
-precondition_Jacobi (BlockVector<somenumber>          &dst,
+precondition_Jacobi (BlockVector<somenumber>       &dst,
 		     const BlockVector<somenumber> &src,
-		     const number                           omega) const
+		     const number                  omega) const
 {
   Assert (rows == columns, ExcMatrixNotBlockSquare());
   Assert (dst.n_blocks() == rows,
@@ -1374,6 +1379,7 @@ precondition_Jacobi (BlockVector<somenumber>          &dst,
 }
 
 
+
 template <typename number>
 inline
 typename BlockSparseMatrix<number>::const_iterator
@@ -1381,6 +1387,8 @@ BlockSparseMatrix<number>::begin () const
 {
   return const_iterator(this, 0, 0);
 }
+
+
 
 template <typename number>
 inline
@@ -1390,6 +1398,8 @@ BlockSparseMatrix<number>::end () const
   return const_iterator(this, m(), 0);
 }
 
+
+
 template <typename number>
 inline
 typename BlockSparseMatrix<number>::const_iterator
@@ -1398,6 +1408,8 @@ BlockSparseMatrix<number>::begin (unsigned int r) const
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r, 0);
 }
+
+
 
 template <typename number>
 inline

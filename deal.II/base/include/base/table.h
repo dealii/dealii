@@ -409,6 +409,7 @@ namespace internal
                                           * private.
                                           */
         Accessor ();
+        
                                          /**
                                           * Copy constructor. Not
                                           * needed, and invisible, so
@@ -897,7 +898,7 @@ class TableBase : public Subscriptor
                                       * don't know here whether
                                       * copying is expensive or not.
                                       */
-    const T & el (const TableIndices<N> &indices) const;    
+    const T & el (const TableIndices<N> &indices) const;
   
                                      /**
                                       * Direct read-only access to
@@ -953,7 +954,8 @@ class TableBase : public Subscriptor
  */
 template <int N,typename T>
 class Table : public TableBase<N,T>
-{};
+{
+};
 
 
 /**
@@ -1575,7 +1577,7 @@ TableIndices<1>::TableIndices ()
 
 
 inline
-TableIndices<1>::TableIndices (const unsigned int index1) 
+TableIndices<1>::TableIndices (const unsigned int index1)
 {
   this->indices[0] = index1;
 }
@@ -1620,7 +1622,7 @@ TableIndices<3>::TableIndices (const unsigned int index1,
 
 
 inline
-TableIndices<4>::TableIndices () 
+TableIndices<4>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = this->indices[2] = this->indices[3] = 0;
 }
@@ -1642,9 +1644,12 @@ TableIndices<4>::TableIndices (const unsigned int index1,
 
 
 inline
-TableIndices<5>::TableIndices () 
+TableIndices<5>::TableIndices ()
 {
-  this->indices[0] = this->indices[1] = this->indices[2] = this->indices[3] = this->indices[4] = 0;
+  this->indices[0] = this->indices[1]
+                   = this->indices[2]
+                   = this->indices[3]
+                   = this->indices[4] = 0;
 }
 
 
@@ -1666,7 +1671,7 @@ TableIndices<5>::TableIndices (const unsigned int index1,
 
 
 inline
-TableIndices<6>::TableIndices () 
+TableIndices<6>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = this->indices[2]
 		   = this->indices[3] = this->indices[4] = 0;
@@ -1788,7 +1793,7 @@ namespace internal
     template <int N, typename T, bool C, unsigned int P>
     inline
     Accessor<N,T,C,P-1>
-    Accessor<N,T,C,P>::operator [] (const unsigned int i) const 
+    Accessor<N,T,C,P>::operator [] (const unsigned int i) const
     {
       Assert (i < table.size()[N-P],
               ExcIndexRange (i, 0, table.size()[N-P]));
@@ -1857,7 +1862,7 @@ namespace internal
     template <int N, typename T, bool C>
     inline
     typename Accessor<N,T,C,1>::reference
-    Accessor<N,T,C,1>::operator [] (const unsigned int i) const 
+    Accessor<N,T,C,1>::operator [] (const unsigned int i) const
     {
       Assert (i < table.size()[N-1],
               ExcIndexRange (i, 0, table.size()[N-1]));
@@ -1910,7 +1915,7 @@ TableBase<N,T>::~TableBase ()
 
 template <int N, typename T>
 TableBase<N,T>&
-TableBase<N,T>::operator = (const TableBase<N,T>& m) 
+TableBase<N,T>::operator = (const TableBase<N,T>& m)
 {
   reinit (m.size());
   if (!empty())
@@ -1924,7 +1929,7 @@ TableBase<N,T>::operator = (const TableBase<N,T>& m)
 template <int N, typename T>
 template <typename T2>
 TableBase<N,T>&
-TableBase<N,T>::operator = (const TableBase<N,T2>& m) 
+TableBase<N,T>::operator = (const TableBase<N,T2>& m)
 {
   reinit (m.size());
   if (!empty())
@@ -2047,7 +2052,7 @@ TableBase<N,T>::memory_consumption () const
 template <int N, typename T>
 inline
 unsigned int
-TableBase<N,T>::position (const TableIndices<N> &indices) const 
+TableBase<N,T>::position (const TableIndices<N> &indices) const
 {
                                    // specialize this for the
                                    // different numbers of dimensions,
@@ -2130,7 +2135,7 @@ TableBase<N,T>::data () const
 
 
 template <typename T>
-Table<1,T>::Table () 
+Table<1,T>::Table ()
 {}
 
 
@@ -2316,7 +2321,7 @@ Table<2,T>::n_cols () const
 
 
 template <typename T>
-Table<3,T>::Table () 
+Table<3,T>::Table ()
 {}
 
 
@@ -2402,7 +2407,7 @@ Table<3,T>::operator () (const unsigned int i,
 
 
 template <typename T>
-Table<4,T>::Table () 
+Table<4,T>::Table ()
 {}
 
 
@@ -2500,7 +2505,7 @@ Table<4,T>::operator () (const unsigned int i,
 
 
 template <typename T>
-Table<5,T>::Table () 
+Table<5,T>::Table ()
 {}
 
 
@@ -2608,7 +2613,7 @@ Table<5,T>::operator () (const unsigned int i,
 
 
 template <typename T>
-Table<6,T>::Table () 
+Table<6,T>::Table ()
 {}
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -104,7 +104,7 @@ class Quadrature : public Subscriptor
 				      * @p{Quadrature<dim-1>}.
 				      */
     Quadrature (const SubQuadrature &,
-		const Quadrature<1>                     &);
+		const Quadrature<1> &);
     
 				     /**
 				      * Construct a quadrature formula
@@ -149,13 +149,15 @@ class Quadrature : public Subscriptor
     virtual ~Quadrature ();
     
 				     /**
-				      * Return the @p{i}th quadrature point.
+				      * Return the @p{i}th quadrature
+				      * point.
 				      */
     const Point<dim> & point (const unsigned int i) const;
 
 				     /**
-				      * Return a reference to the whole array of
-				      * quadrature points.
+				      * Return a reference to the
+				      * whole array of quadrature
+				      * points.
 				      */
     const std::vector<Point<dim> > & get_points () const;
     
@@ -193,6 +195,7 @@ class Quadrature : public Subscriptor
 				      */
     std::vector<double>      weights;
 };
+
 
 
 /**
@@ -255,8 +258,10 @@ class QIterated : public Quadrature<dim>
 				      * points at the left and right end points
 				      * of the interval.
 				      */
-    static bool uses_both_endpoints (const Quadrature<1> &base_quadrature);
+    static bool
+    uses_both_endpoints (const Quadrature<1> &base_quadrature);
 };
+
 
 
 /**
@@ -417,45 +422,54 @@ template <>
 const std::vector<double> & Quadrature<0>::get_weights () const;
 
 template <>
-void QProjector<1>::project_to_face (const Quadrature<0> &,
-				     const unsigned int,
-				     std::vector<Point<1> > &);
+void
+QProjector<1>::project_to_face (const Quadrature<0> &,
+                                const unsigned int,
+                                std::vector<Point<1> > &);
 template <>
-void QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
-				     const unsigned int        face_no,
-				     std::vector<Point<2> >   &q_points);
+void
+QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
+                                const unsigned int        face_no,
+                                std::vector<Point<2> >   &q_points);
 template <>
-void QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
-				     const unsigned int      face_no,
-				     std::vector<Point<3> > &q_points);
+void
+QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
+                                const unsigned int      face_no,
+                                std::vector<Point<3> > &q_points);
 
 template <>
-Quadrature<1> QProjector<1>::project_to_all_faces (const Quadrature<0> &quadrature);
+Quadrature<1>
+QProjector<1>::project_to_all_faces (const Quadrature<0> &quadrature);
 
 
 template <>
-void QProjector<1>::project_to_subface (const Quadrature<0> &,
-					const unsigned int,
-					const unsigned int,
-					std::vector<Point<1> > &);
+void
+QProjector<1>::project_to_subface (const Quadrature<0> &,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   std::vector<Point<1> > &);
 template <>
-void QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
-					const unsigned int      face_no,
-					const unsigned int      subface_no,
-					std::vector<Point<2> > &q_points);
+void
+QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
+                                   const unsigned int      face_no,
+                                   const unsigned int      subface_no,
+                                   std::vector<Point<2> > &q_points);
 template <>
-void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
-					const unsigned int      face_no,
-					const unsigned int      subface_no,
-					std::vector<Point<3> > &q_points);
+void
+QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
+                                   const unsigned int      face_no,
+                                   const unsigned int      subface_no,
+                                   std::vector<Point<3> > &q_points);
 
 template <>
-Quadrature<1> QProjector<1>::project_to_all_subfaces (const Quadrature<0> &quadrature);
+Quadrature<1>
+QProjector<1>::project_to_all_subfaces (const Quadrature<0> &quadrature);
 
 
 template <>
 bool
 QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature);
+
 template <>
 QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 			 const unsigned int   n_copies);

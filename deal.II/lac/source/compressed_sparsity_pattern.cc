@@ -21,14 +21,17 @@
 #include <numeric>
 #include <functional>
 
-CompressedSparsityPattern::CompressedSparsityPattern () :
+CompressedSparsityPattern::CompressedSparsityPattern ()
+                :
 		rows(0),
 		cols(0)
 {}
 
 
 
-CompressedSparsityPattern::CompressedSparsityPattern (const CompressedSparsityPattern &s) :
+CompressedSparsityPattern::
+CompressedSparsityPattern (const CompressedSparsityPattern &s)
+                :
 		Subscriptor(),
 		rows(0),
 		cols(0)
@@ -41,8 +44,9 @@ CompressedSparsityPattern::CompressedSparsityPattern (const CompressedSparsityPa
 
 CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int m,
 						      const unsigned int n) 
-		: rows(0),
-		  cols(0)
+		:
+                rows(0),
+                cols(0)
 {
   reinit (m,n);
 }
@@ -50,8 +54,9 @@ CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int m,
 
 
 CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int n)
-		: rows(0),
-		  cols(0)
+		:
+                rows(0),
+                cols(0)
 {
   reinit (n,n);
 }
@@ -100,7 +105,7 @@ CompressedSparsityPattern::empty () const
 
 
 unsigned int
-CompressedSparsityPattern::max_entries_per_row () const 
+CompressedSparsityPattern::max_entries_per_row () const
 {
   unsigned int m = 0;
   for (unsigned int i=1; i<rows; ++i)
@@ -137,7 +142,7 @@ CompressedSparsityPattern::exists (const unsigned int i,
 
 
 void
-CompressedSparsityPattern::symmetrize () 
+CompressedSparsityPattern::symmetrize ()
 {
   Assert (rows==cols, ExcNotSquare());
 

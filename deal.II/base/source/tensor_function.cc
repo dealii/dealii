@@ -30,6 +30,7 @@ TensorFunction<rank, dim>::TensorFunction (const double initial_time)
 {}
 
 
+
 template <int rank, int dim>
 TensorFunction<rank, dim>::~TensorFunction ()
 {}

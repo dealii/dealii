@@ -37,12 +37,18 @@ TableEntryBase::~TableEntryBase ()
 /*---------------------------------------------------------------------*/
 
 template <typename number>
-TableEntry<number>::TableEntry(const number value):
-		val(value)  {}
+TableEntry<number>::TableEntry(const number value)
+                :
+		val(value)
+{}
+
+
 
 template <typename number>
 TableEntry<number>::~TableEntry()
 {}
+
+
 
 template <typename number>
 number TableEntry<number>::value() const
@@ -51,11 +57,14 @@ number TableEntry<number>::value() const
 }
 
 
+
 template <typename number>
 void TableEntry<number>::write_tex (std::ostream &out) const
 {
   out << val;
 }
+
+
 
 template <typename number>
 void TableEntry<number>::write_text (std::ostream &out) const
@@ -66,7 +75,8 @@ void TableEntry<number>::write_text (std::ostream &out) const
 
 /*---------------------------------------------------------------------*/
 
-TableHandler::Column::Column(const std::string &tex_caption):
+TableHandler::Column::Column(const std::string &tex_caption)
+                :
 		tex_caption(tex_caption),
 		tex_format("c"),
 		precision(4),
@@ -75,13 +85,16 @@ TableHandler::Column::Column(const std::string &tex_caption):
 {}
 
 
-TableHandler::Column::Column():
+
+TableHandler::Column::Column()
+                :
 		tex_caption(),
 		tex_format("c"),
 		precision(4),
 		scientific(0),
 		flag(0)  
 {}
+
 
 
 TableHandler::Column::~Column()
@@ -331,7 +344,7 @@ void TableHandler::write_text(std::ostream &out) const
 }
 
 
-void TableHandler::write_tex(std::ofstream &out) const
+void TableHandler::write_tex (std::ofstream &out) const
 {
   AssertThrow (out, ExcIO());
   
@@ -451,7 +464,7 @@ void TableHandler::write_tex(std::ofstream &out) const
 unsigned int TableHandler::n_rows() const
 {
   std::map<std::string, Column>::const_iterator col_iter=columns.begin();
-  unsigned int n=col_iter->second.entries.size();
+  unsigned int n = col_iter->second.entries.size();
   std::string first_name=col_iter->first;
 
   for (++col_iter; col_iter!=columns.end(); ++col_iter)

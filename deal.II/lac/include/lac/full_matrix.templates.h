@@ -51,7 +51,8 @@ FullMatrix<number>::FullMatrix (const unsigned int m,
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix (const FullMatrix &m) :
+FullMatrix<number>::FullMatrix (const FullMatrix &m)
+                :
 		Table<2,number> (m)
 {}
 
@@ -480,7 +481,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
 
 template <typename number>
 void FullMatrix<number>::add_col (const unsigned int i, const number s,
-			const unsigned int j)
+                                  const unsigned int j)
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   
@@ -491,14 +492,15 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
 
 template <typename number>
 void FullMatrix<number>::add_col (const unsigned int i, const number s,
-		        const unsigned int j, const number t,
-			const unsigned int k)
+                                  const unsigned int j, const number t,
+                                  const unsigned int k)
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   
   for (unsigned int l=0; l<n(); ++l)
     this->el(l,i) += s*this->el(l,j) + t*this->el(l,k);
 }
+
 
 
 template <typename number>
@@ -1143,8 +1145,6 @@ FullMatrix<number>::determinant () const
   
   Assert (this->n_cols() == this->n_rows(),
 	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
-  Assert ((this->n_cols()>=1) && (this->n_cols()<=3),
-	  ExcNotImplemented(this->n_cols()));
   
   switch (this->n_cols()) 
     {
@@ -1160,6 +1160,8 @@ FullMatrix<number>::determinant () const
                      +this->el(2,0)*this->el(0,1)*this->el(1,2)
                      -this->el(2,0)*this->el(0,2)*this->el(1,1));
       default:
+            Assert (false,
+                    ExcNotImplemented(this->n_cols()));
             return 0;
     };
 }
@@ -1176,6 +1178,7 @@ FullMatrix<number>::norm2 () const
     s += this->data()[i]*this->data()[i];
   return std::sqrt(s);
 }
+
 
 
 template <typename number>
@@ -1196,6 +1199,7 @@ FullMatrix<number>::relative_symmetry_norm2 () const
     return std::sqrt(a)/std::sqrt(s);
   return 0;
 }
+
 
 
 template <typename number>
@@ -1435,7 +1439,7 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 
 template <typename number>
 void
-FullMatrix<number>::gauss_jordan()
+FullMatrix<number>::gauss_jordan ()
 {
   Assert (this->data() != 0, ExcEmptyMatrix());  
   Assert (this->n_cols() == this->n_rows(), ExcNotQuadratic());
@@ -1570,7 +1574,8 @@ FullMatrix<number>::householder(Vector<number2>& src)
 template <typename number>
 template <typename number2>
 double
-FullMatrix<number>::least_squares(Vector<number2>& dst, Vector<number2>& src)
+FullMatrix<number>::least_squares (Vector<number2>& dst,
+                                   Vector<number2>& src)
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   

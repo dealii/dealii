@@ -23,7 +23,7 @@
 template <int dim> class Point;
 template <int rank_, int dim> class Tensor;
 template <int dim> class Tensor<1,dim>;
-template<typename number> class Vector;
+template <typename number> class Vector;
 
 /**
  * This class is a model for a general function. It serves the purpose
@@ -202,8 +202,8 @@ class Function : public FunctionTime,
 				      * size beforehand,
 				      * i.e. @p{n_components}.
 				      */
-    virtual void   vector_value (const Point<dim>   &p,
-				 Vector<double>     &values) const;
+    virtual void vector_value (const Point<dim>   &p,
+                               Vector<double>     &values) const;
     
 				     /**
 				      * Set @p{values} to the point
@@ -245,8 +245,8 @@ class Function : public FunctionTime,
 				      * components of the
 				      * function at the given point.
 				      */
-    virtual void          vector_gradient (const Point<dim>            &p,
-					   std::vector<Tensor<1,dim> > &gradients) const;
+    virtual void vector_gradient (const Point<dim>            &p,
+                                  std::vector<Tensor<1,dim> > &gradients) const;
     
 				     /**
 				      * Set @p{gradients} to the
@@ -379,8 +379,8 @@ class ZeroFunction : public Function<dim>
 				      * at the given point for all
 				      * components.
 				      */
-    virtual void   vector_value (const Point<dim> &p,
-				 Vector<double>   &return_value) const;
+    virtual void vector_value (const Point<dim> &p,
+                               Vector<double>   &return_value) const;
 
 				     /**
 				      * Set @p{values} to the point values
@@ -421,8 +421,8 @@ class ZeroFunction : public Function<dim>
 				      * function at the given point,
 				      * for all components.
 				      */
-    virtual void          vector_gradient (const Point<dim>            &p,
-					   std::vector<Tensor<1,dim> > &gradients) const;
+    virtual void vector_gradient (const Point<dim>            &p,
+                                  std::vector<Tensor<1,dim> > &gradients) const;
     
 				     /**
 				      * Set @p{gradients} to the gradients of
@@ -561,6 +561,8 @@ class ConstantFunction : public ZeroFunction<dim>
 				      */
     const double function_value;
 };
+
+
 
 /**
  * This is a constant vector-valued function, that is different from

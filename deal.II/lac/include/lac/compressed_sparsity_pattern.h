@@ -220,9 +220,10 @@ class CompressedSparsityPattern : public Subscriptor
 				      * Check if a value at a certain
 				      * position may be non-zero.
 				      */
-    bool exists (const unsigned int i, const unsigned int j) const;
+    bool exists (const unsigned int i,
+                 const unsigned int j) const;
     
-			     /**
+                                     /**
 				      * Make the sparsity pattern
 				      * symmetric by adding the
 				      * sparsity pattern of the

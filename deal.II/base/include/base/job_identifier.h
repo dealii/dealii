@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,7 +55,7 @@ class JobIdentifier
 				     /**
 				      * Return the value of @p{id}.
 				      */
-    const std::string operator () ()const;
+    const std::string operator () () const;
     
   private:
 				     /**

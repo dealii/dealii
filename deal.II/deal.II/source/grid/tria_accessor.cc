@@ -181,7 +181,7 @@ unsigned char TriaObjectAccessor<1, dim>::boundary_indicator () const
 
 
 template <int dim>
-void TriaObjectAccessor<1, dim>::set_boundary_indicator (unsigned char boundary_ind) const
+void TriaObjectAccessor<1, dim>::set_boundary_indicator (const unsigned char boundary_ind) const
 {
   Assert (dim>=2, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
@@ -410,7 +410,7 @@ unsigned char TriaObjectAccessor<2, dim>::boundary_indicator () const
 
 
 template <int dim>
-void TriaObjectAccessor<2, dim>::set_boundary_indicator (unsigned char boundary_ind) const
+void TriaObjectAccessor<2, dim>::set_boundary_indicator (const unsigned char boundary_ind) const
 {
   Assert (dim>=3, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
@@ -830,7 +830,7 @@ unsigned char TriaObjectAccessor<3, dim>::boundary_indicator () const
 
 
 template <int dim>
-void TriaObjectAccessor<3, dim>::set_boundary_indicator (unsigned char boundary_ind) const
+void TriaObjectAccessor<3, dim>::set_boundary_indicator (const unsigned char boundary_ind) const
 {
   Assert (dim<4, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());

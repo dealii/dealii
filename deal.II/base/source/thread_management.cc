@@ -37,7 +37,7 @@ namespace Threads
     ThreadMutex  n_existing_threads_mutex;
 
   
-    void register_thread () 
+    void register_thread ()
     {
       ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
       ++n_existing_threads_counter;
@@ -102,8 +102,7 @@ namespace Threads
   unsigned int n_existing_threads () 
   {
     ThreadMutex::ScopedLock lock (internal::n_existing_threads_mutex);
-    const unsigned int n = internal::n_existing_threads_counter;
-    return n;
+    return internal::n_existing_threads_counter;
   }
   
   

@@ -84,7 +84,8 @@ class TriaAccessor
     TriaAccessor (const Triangulation<dim> *parent =  0,
 		  const int                 level  = -1,
 		  const int                 index  = -1,
-		  const AccessorData       *       =  0) :
+		  const AccessorData       *       =  0)
+                    :
 		    present_level (level),
 		    present_index (index),
 		    tria (parent) {};
@@ -124,7 +125,7 @@ class TriaAccessor
 				     /**
 				      *  Same as above.
 				      */
-    TriaAccessor &operator = (const TriaAccessor &);
+    TriaAccessor & operator = (const TriaAccessor &);
 
   protected:
     
@@ -296,8 +297,10 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0) :
-		    TriaAccessor<dim> (parent, level, index, local_data) {};
+			const AccessorData       *local_data =  0)
+                    :
+		    TriaAccessor<dim> (parent, level, index, local_data)
+      {};
 
 				     /**
 				      * Copy the data of a line. Only
@@ -343,7 +346,8 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *
 				      * Implemented only for @p{celldim>1}.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<1, dim> > line (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<1, dim> >
+    line (const unsigned int i) const;
 
 				     /**
 				      * Line index of the @p{i}th
@@ -361,7 +365,8 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *
 				      * Implemented only for @p{celldim>2}.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<2, dim> > quad (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<2, dim> >
+    quad (const unsigned int i) const;
 
 				     /**
 				      * Quad index of the @p{i}th
@@ -583,12 +588,12 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * you are doing!  This value is
 				      * reserved for another purpose
 				      * and algorithms may not work if
-				      * boundary cells have have this
+				      * boundary cells have this
 				      * boundary indicator or if
 				      * interior cells have boundary
 				      * indicators other than 255.
 				      */
-    void set_boundary_indicator (unsigned char) const;
+    void set_boundary_indicator (const unsigned char) const;
 
 				     /**
 				      * Return whether this object is
@@ -751,7 +756,8 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0) :
+			const AccessorData       *local_data =  0)
+                    :
 		    TriaAccessor<dim> (parent, level, index, local_data)
       {
 	Assert (false, ExcInternalError());
@@ -785,8 +791,10 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0) :
-		    TriaAccessor<dim> (parent, level, index, local_data) {};
+			const AccessorData       *local_data =  0)
+                    :
+		    TriaAccessor<dim> (parent, level, index, local_data)
+      {};
 
 				     /**
 				      *  Copy the data of the given
@@ -1024,7 +1032,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * interior cells have boundary
 				      * indicators other than 255.
 				      */
-    void set_boundary_indicator (unsigned char) const;
+    void set_boundary_indicator (const unsigned char) const;
 
 				     /**
 				      * Return whether this line is at
@@ -1196,8 +1204,10 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0) :
-		    TriaAccessor<dim> (parent, level, index, local_data) {};
+			const AccessorData       *local_data =  0)
+                    :
+		    TriaAccessor<dim> (parent, level, index, local_data)
+      {};
 
 				     /**
 				      *  Copy the data of the given quad.
@@ -1456,12 +1466,12 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * doing, since this value is
 				      * reserved for another purpose
 				      * and algorithms may not work if
-				      * boundary cells have have this
+				      * boundary cells have this
 				      * boundary indicator or if
 				      * interior cells have boundary
 				      * indicators other than 255.
 				      */
-    void set_boundary_indicator (unsigned char) const;
+    void set_boundary_indicator (const unsigned char) const;
 
 				     /**
 				      * Return whether this quad is at
@@ -1660,8 +1670,10 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0) :
-		    TriaAccessor<dim> (parent, level, index, local_data) {};
+			const AccessorData       *local_data =  0)
+                    :
+		    TriaAccessor<dim> (parent, level, index, local_data)
+      {};
 
 				     /**
 				      *  Copy the data of the given
@@ -1938,12 +1950,12 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * doing, since this value is
 				      * reserved for another purpose
 				      * and algorithms may not work if
-				      * boundary cells have have this
+				      * boundary cells have this
 				      * boundary indicator or if
 				      * interior cells have boundary
 				      * indicators other than 255.
 				      */
-    void set_boundary_indicator (unsigned char) const;
+    void set_boundary_indicator (const unsigned char) const;
 
 				     /**
 				      * Return whether this hex is at
@@ -2128,8 +2140,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     CellAccessor (const Triangulation<dim> *parent     =  0,
 		  const int                 level      = -1,
 		  const int                 index      = -1,
-		  const AccessorData       *local_data =  0) :
-		    TriaObjectAccessor<dim,dim> (parent, level, index, local_data) {};
+		  const AccessorData       *local_data =  0)
+                    :
+		    TriaObjectAccessor<dim,dim> (parent, level, index, local_data)
+      {};
 
 				     /**
 				      *  Return a pointer to the

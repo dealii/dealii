@@ -34,8 +34,8 @@ PolynomialSpace<dim>::compute_n_pols (const unsigned int n)
 template <>
 void
 PolynomialSpace<1>::
-compute_index(const unsigned int n,
-              unsigned int      (&index)[1]) const
+compute_index (const unsigned int n,
+               unsigned int      (&index)[1]) const
 {
   index[0] = n;
 }

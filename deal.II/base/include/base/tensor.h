@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -209,7 +209,7 @@ class Tensor
 				     // also, it would be sufficient to make
 				     // the function unroll_loops a friend,
 				     // but that seems to be impossible as well.
-    template<int otherrank, int otherdim> friend class Tensor;
+    template <int otherrank, int otherdim> friend class Tensor;
 };
 
 
@@ -706,7 +706,7 @@ void contract (Tensor<4,dim>       &dest,
 template <int dim>
 void outer_product (Tensor<2,dim>       &dst,
 		    const Tensor<1,dim> &src1,
-		    const Tensor<1,dim> &src2) 
+		    const Tensor<1,dim> &src2)
 {
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -724,7 +724,7 @@ void outer_product (Tensor<2,dim>       &dst,
 template <int dim>
 void outer_product (Tensor<3,dim>       &dst,
 		    const Tensor<1,dim> &src1,
-		    const Tensor<2,dim> &src2) 
+		    const Tensor<2,dim> &src2)
 {
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -743,7 +743,7 @@ void outer_product (Tensor<3,dim>       &dst,
 template <int dim>
 void outer_product (Tensor<3,dim>       &dst,
 		    const Tensor<2,dim> &src1,
-		    const Tensor<1,dim> &src2) 
+		    const Tensor<1,dim> &src2)
 {
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
@@ -766,7 +766,7 @@ void outer_product (Tensor<3,dim>       &dst,
 template <int dim>
 void outer_product (Tensor<1,dim>       &dst,
 		    const double         src1,
-		    const Tensor<1,dim> &src2) 
+		    const Tensor<1,dim> &src2)
 {
   for (unsigned int i=0; i<dim; ++i)
     dst[i] = src1 * src2[i];
@@ -787,7 +787,7 @@ void outer_product (Tensor<1,dim>       &dst,
 template <int dim>
 void outer_product (Tensor<1,dim>       &dst,
 		    const Tensor<1,dim>  src1,
-		    const double         src2) 
+		    const double         src2)
 {
   for (unsigned int i=0; i<dim; ++i)
     dst[i] = src1[i] * src2;
@@ -1018,7 +1018,7 @@ invert (const Tensor<2,dim> &t)
 template <int dim>
 inline
 Tensor<2,dim>
-transpose (const Tensor<2,dim> &t) 
+transpose (const Tensor<2,dim> &t)
 {
   Tensor<2,dim> tt = t;
   for (unsigned int i=0; i<dim; ++i)
@@ -1041,7 +1041,7 @@ transpose (const Tensor<2,dim> &t)
  */
 inline
 Tensor<2,1>
-transpose (const Tensor<2,1> &t) 
+transpose (const Tensor<2,1> &t)
 {
   return t;
 }
@@ -1057,7 +1057,7 @@ transpose (const Tensor<2,1> &t)
  */
 inline
 Tensor<2,2>
-transpose (const Tensor<2,2> &t) 
+transpose (const Tensor<2,2> &t)
 {
   const double x[2][2] = {{t[0][0], t[1][0]}, {t[0][1], t[1][1]}};
   return Tensor<2,2>(x);
@@ -1074,7 +1074,7 @@ transpose (const Tensor<2,2> &t)
  */
 inline
 Tensor<2,3>
-transpose (const Tensor<2,3> &t) 
+transpose (const Tensor<2,3> &t)
 {
   const double x[3][3] = {{t[0][0], t[1][0], t[2][0]},
                           {t[0][1], t[1][1], t[2][1]},

@@ -147,12 +147,14 @@ class Tensor<1,dim>
     Tensor<1,dim> & operator = (const Tensor<1,dim> &);
 
 				     /**
-				      * Test for equality of two points.
+				      * Test for equality of two
+				      * tensors.
 				      */
     bool operator == (const Tensor<1,dim> &) const;
 
     				     /**
-				      * Test for inequality of two points.
+				      * Test for inequality of two
+				      * tensors.
 				      */
     bool operator != (const Tensor<1,dim> &) const;
 
@@ -162,6 +164,7 @@ class Tensor<1,dim>
 				      * offset.
 				      */
     Tensor<1,dim> & operator += (const Tensor<1,dim> &);
+    
 				     /**
 				      * Subtract another vector.
 				      */
@@ -281,7 +284,7 @@ class Tensor<1,dim>
 				      * that seems to be impossible as
 				      * well.
 				      */
-    template<int otherrank, int otherdim>  friend class Tensor;
+    template <int otherrank, int otherdim>  friend class Tensor;
 
 				     /**
 				      * Point is allowed access to

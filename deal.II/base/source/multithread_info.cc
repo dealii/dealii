@@ -101,7 +101,8 @@ unsigned int MultithreadInfo::get_n_cpus()
 #endif
 
 
-MultithreadInfo::MultithreadInfo () :
+MultithreadInfo::MultithreadInfo ()
+                :
                 n_cpus (get_n_cpus()),
                 n_default_threads (n_cpus)
 {}

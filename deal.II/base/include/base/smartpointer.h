@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,29 +57,33 @@ class SmartPointer
 				     /**
 				      * Standard constructor for null pointer.
 				      */
-    SmartPointer();
+    SmartPointer ();
 
 				     /*
 				      * Copy constructor for
-				      * @p{SmartPointer}. We copy the object
-				      * subscribed to from @p{tt}, but subscribe
+				      * @p{SmartPointer}. We do now
+				      * copy the object subscribed to
+				      * from @p{tt}, but subscribe
 				      * ourselves to it again.
 				      */
     SmartPointer (const SmartPointer<T> &tt);
 
 				     /**
-				      * Constructor taking a normal pointer.
-				      * If possible, i.e. if the pointer
-				      * is not a null pointer, the constructor
-				      * subscribes to the given object to
-				      * lock it, i.e. to prevent its
-				      * destruction before the end of its use.
+				      * Constructor taking a normal
+				      * pointer.  If possible, i.e. if
+				      * the pointer is not a null
+				      * pointer, the constructor
+				      * subscribes to the given object
+				      * to lock it, i.e. to prevent
+				      * its destruction before the end
+				      * of its use.
 				      */
     SmartPointer (T *t);
 
 
 				     /**
-				      * Destructor, removing the subscription.
+				      * Destructor, removing the
+				      * subscription.
 				      */
     ~SmartPointer();
     
@@ -183,14 +187,16 @@ class SmartPointer
 
 
 template <typename T>
-SmartPointer<T>::SmartPointer () :
+SmartPointer<T>::SmartPointer ()
+                :
 		t (0)
 {}
 
 
 
 template <typename T>
-SmartPointer<T>::SmartPointer (T *t) :
+SmartPointer<T>::SmartPointer (T *t)
+                :
 		t (t)
 {
   if (t != 0)
@@ -200,7 +206,8 @@ SmartPointer<T>::SmartPointer (T *t) :
 
 
 template <typename T>
-SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt) :
+SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt)
+                :
 		t (tt.t)
 {
   if (t != 0)
@@ -237,7 +244,8 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
 
 
 template <typename T>
-SmartPointer<T> & SmartPointer<T>::operator = (const SmartPointer<T>& tt)
+SmartPointer<T> &
+SmartPointer<T>::operator = (const SmartPointer<T>& tt)
 {
 				   // if objects on the left and right
 				   // hand side of the operator= are

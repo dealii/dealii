@@ -103,8 +103,9 @@ class Vector
 //     Vector (const Vector<OtherNumber> &v);
     
 				     /**
-				      * Constructor. Set dimension to @p{n} and
-				      * initialize all elements with zero.
+				      * Constructor. Set dimension to
+				      * @p{n} and initialize all
+				      * elements with zero.
 				      */
     explicit Vector (const unsigned int n);
 
@@ -456,12 +457,13 @@ class Vector
 				      * the cellwise ratio of true to estimated
 				      * error.
 				      *
-				      * This vector is appropriately scaled to
-				      * hold the result.
+				      * This vector is appropriately
+				      * scaled to hold the result.
 				      *
-				      * If any of the @p{b[i]} is zero, the result
-				      * is undefined. No attempt is made to
-				      * catch such situations.
+				      * If any of the @p{b[i]} is
+				      * zero, the result is
+				      * undefined. No attempt is made
+				      * to catch such situations.
 				      */
     void ratio (const Vector<Number> &a,
 		const Vector<Number> &b);
@@ -585,7 +587,8 @@ class Vector
 
 template <typename Number>
 inline
-Vector<Number>::Vector () :
+Vector<Number>::Vector ()
+                :
 		dim(0),
 		maxdim(0),
 		val(0)
@@ -612,7 +615,8 @@ Vector<Number>::Vector (const InputIterator first, const InputIterator last)
 
 template <typename Number>
 inline
-Vector<Number>::Vector (const unsigned int n) :
+Vector<Number>::Vector (const unsigned int n)
+                :
 		dim(0),
 		maxdim(0),
 		val(0)
@@ -713,7 +717,7 @@ Vector<Number>::end ()
 template <typename Number>
 inline
 typename Vector<Number>::const_iterator
-Vector<Number>::end () const 
+Vector<Number>::end () const
 {
   return &val[dim];
 }
@@ -742,7 +746,7 @@ Number& Vector<Number>::operator() (const unsigned int i)
 
 template <typename Number>
 inline
-Vector<Number> & Vector<Number>::operator *= (const Number factor) 
+Vector<Number> & Vector<Number>::operator *= (const Number factor)
 {
   scale (factor);
   return *this;
@@ -752,7 +756,7 @@ Vector<Number> & Vector<Number>::operator *= (const Number factor)
 
 template <typename Number>
 inline
-Vector<Number> & Vector<Number>::operator /= (const Number factor) 
+Vector<Number> & Vector<Number>::operator /= (const Number factor)
 {
   scale (1./factor);
   return *this;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,7 +16,7 @@
 #include <cmath>
 
 
-ConvergenceTable::ConvergenceTable()  
+ConvergenceTable::ConvergenceTable()
 {}
 
 
@@ -77,8 +77,10 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 }
 
 
-void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
-						  const RateMode     rate_mode)
+
+void
+ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
+                                             const RateMode     rate_mode)
 {
   Assert(columns.count(data_column_key), ExcColumnNotExistent(data_column_key));
   
@@ -106,6 +108,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
     {
       case none:
 	    break;
+
       case reduction_rate:
 	    rate_key+="red.rate";
 	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
@@ -115,6 +118,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 	    for (unsigned int i=1; i<n; ++i)
 	      add_value(rate_key, values[i-1]/values[i]);
 	    break;
+
       case reduction_rate_log2:
 	    rate_key+="red.rate.log2";
 	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
@@ -124,6 +128,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 	    for (unsigned int i=1; i<n; ++i)
 	      add_value(rate_key, std::log(values[i-1]/values[i])/std::log(2.0));
 	    break;
+
       default:
 	    ExcNotImplemented();  
     }
@@ -145,7 +150,10 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
   add_column_to_supercolumn(rate_key, superkey);
 }
 
-void ConvergenceTable::omit_column_from_convergence_rate_evaluation(const std::string &key)
+
+
+void
+ConvergenceTable::omit_column_from_convergence_rate_evaluation(const std::string &key)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   
@@ -154,8 +162,10 @@ void ConvergenceTable::omit_column_from_convergence_rate_evaluation(const std::s
 }
 
 
-void ConvergenceTable::evaluate_all_convergence_rates(const std::string &reference_column_key,
-						      const RateMode rate_mode)
+
+void
+ConvergenceTable::evaluate_all_convergence_rates(const std::string &reference_column_key,
+                                                 const RateMode rate_mode)
 {
   for (std::map<std::string, Column>::const_iterator col_iter=columns.begin();
        col_iter!=columns.end(); ++col_iter)
@@ -164,7 +174,9 @@ void ConvergenceTable::evaluate_all_convergence_rates(const std::string &referen
 }
 
 
-void ConvergenceTable::evaluate_all_convergence_rates(const RateMode rate_mode)
+
+void
+ConvergenceTable::evaluate_all_convergence_rates(const RateMode rate_mode)
 {
   for (std::map<std::string, Column>::const_iterator col_iter=columns.begin();
        col_iter!=columns.end(); ++col_iter)

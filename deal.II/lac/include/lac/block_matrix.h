@@ -35,37 +35,38 @@
 template <class MATRIX>
 class BlockDiagonalMatrix : public Subscriptor
 {
-public:
-				   /**
-				    * Constructor for an @p{n_blocks}
-				    * by @p{n_blocks} matrix with
-				    * diagonal blocks @p{M}.
-				    */
-  BlockDiagonalMatrix (const MATRIX& M,
-		       unsigned int n_blocks);
+  public:
+                                     /**
+                                      * Constructor for an @p{n_blocks}
+                                      * by @p{n_blocks} matrix with
+                                      * diagonal blocks @p{M}.
+                                      */
+    BlockDiagonalMatrix (const MATRIX       &M,
+                         const unsigned int  n_blocks);
 
-				   /**
-				    * Matrix-vector-multiplication.
-				    */
-  template <typename number1, typename number2>
-  void vmult (BlockVector<number1>& dst,
-	      const BlockVector<number2>& src) const;
+                                     /**
+                                      * Matrix-vector-multiplication.
+                                      */
+    template <typename number1, typename number2>
+    void vmult (BlockVector<number1>& dst,
+                const BlockVector<number2>& src) const;
   
-				   /**
-				    * Transposed matrix-vector-multiplication.
-				    */
-  template <typename number1, typename number2>
-  void Tvmult (BlockVector<number1>& dst,
-	       const BlockVector<number2>& src) const;
-private:
-				   /**
-				    * Number of blocks.
-				    */
-  unsigned int num_blocks;
-				   /**
-				    * Diagonal entry.
-				    */
-  SmartPointer<const MATRIX> matrix;
+                                     /**
+                                      * Transposed matrix-vector-multiplication.
+                                      */
+    template <typename number1, typename number2>
+    void Tvmult (BlockVector<number1>& dst,
+                 const BlockVector<number2>& src) const;
+  private:
+                                     /**
+                                      * Number of blocks.
+                                      */
+    unsigned int num_blocks;
+
+                                     /**
+                                      * Diagonal entry.
+                                      */
+    SmartPointer<const MATRIX> matrix;
 };
 
 
@@ -73,9 +74,10 @@ private:
 
 template <class MATRIX>
 BlockDiagonalMatrix<MATRIX>::BlockDiagonalMatrix (const MATRIX& M,
-						  unsigned int num_blocks)
-  : num_blocks (num_blocks),
-    matrix(&M)
+						  const unsigned int num_blocks)
+                :
+                num_blocks (num_blocks),
+                matrix(&M)
 {}
 
 
@@ -83,7 +85,7 @@ template <class MATRIX>
 template <typename number1, typename number2>
 void
 BlockDiagonalMatrix<MATRIX>::vmult (BlockVector<number1>& dst,
-				     const BlockVector<number2>& src) const
+                                    const BlockVector<number2>& src) const
 {
   Assert (dst.n_blocks()==num_blocks,
 	  ExcDimensionMismatch(dst.n_blocks(),num_blocks));

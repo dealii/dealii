@@ -62,7 +62,8 @@ class EigenPower : private Solver<VECTOR>
 					 /**
 					  * Constructor. Set the shift parameter.
 					  */
-	AdditionalData (const double shift = 0.):
+	AdditionalData (const double shift = 0.)
+                        :
 			shift(shift)
 	  {}
 	
@@ -160,11 +161,12 @@ class EigenInverse : private Solver<VECTOR>
 					  */
 	AdditionalData (double relaxation = 1.,
 			unsigned int start_adaption = 6,
-			bool use_residual = true):
-	  relaxation(relaxation),
-	  start_adaption(start_adaption),
-	  use_residual(use_residual)
-      {}
+			bool use_residual = true)
+                        :
+                        relaxation(relaxation),
+                        start_adaption(start_adaption),
+                        use_residual(use_residual)
+          {}
 	
     };
     
@@ -213,15 +215,18 @@ class EigenInverse : private Solver<VECTOR>
 template <class VECTOR>
 EigenPower<VECTOR>::EigenPower (SolverControl &cn,
 				VectorMemory<VECTOR> &mem,
-				const AdditionalData &data):
+				const AdditionalData &data)
+                :
 		Solver<VECTOR>(cn, mem),
 		additional_data(data)
 {}
 
 
+
 template <class VECTOR>
 EigenPower<VECTOR>::~EigenPower ()
 {}
+
 
 
 template <class VECTOR>
@@ -300,15 +305,18 @@ EigenPower<VECTOR>::solve (double       &value,
 template <class VECTOR>
 EigenInverse<VECTOR>::EigenInverse (SolverControl &cn,
 				    VectorMemory<VECTOR> &mem,
-				    const AdditionalData &data):
+				    const AdditionalData &data)
+                :
 		Solver<VECTOR>(cn, mem),
 		additional_data(data)
 {}
 
 
+
 template <class VECTOR>
 EigenInverse<VECTOR>::~EigenInverse ()
 {}
+
 
 
 template <class VECTOR>

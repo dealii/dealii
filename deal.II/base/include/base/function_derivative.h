@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,9 +56,9 @@ class FunctionDerivative : public Function<dim>
 				      * and the step size @p{h} of the
 				      * difference formula.
 				      */
-    FunctionDerivative (const Function<dim>& f,
-			const Point<dim>& direction,
-			const double h = 1.e-6);
+    FunctionDerivative (const Function<dim> &f,
+			const Point<dim>    &direction,
+			const double         h = 1.e-6);
     
 				     /**
 				      * Constructor. Provided are the
@@ -110,8 +110,8 @@ class FunctionDerivative : public Function<dim>
 				      * points.
 				      */
     virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<double>                     &values,
-			     const unsigned int                       component = 0) const;    
+			     std::vector<double>            &values,
+			     const unsigned int              component = 0) const;    
 
 				     /**
 				      * Determine an estimate for
@@ -147,10 +147,12 @@ class FunctionDerivative : public Function<dim>
 				      * formula.
 				      */
     double h;
+    
 				     /**
 				      * Difference formula.
 				      */
     DifferenceFormula formula;
+    
 				     /**
 				      * Helper object. Contains the
 				      * increment vector for the

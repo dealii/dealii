@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002 by the deal authors
+//    Copyright (C) 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -223,7 +223,9 @@ class AutoDerivativeFunction : public Function<dim>
 				      * @p{DifferenceFormula} of the
 				      * order @p{ord} at minimum.
 				      */
-    static DifferenceFormula get_formula_of_order(const unsigned int ord);
+    static
+    DifferenceFormula
+    get_formula_of_order (const unsigned int ord);
 
 				     /**
 				      * Exception.

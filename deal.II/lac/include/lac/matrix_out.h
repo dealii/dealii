@@ -94,9 +94,8 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * modify the output of the
 				      * @ref{MatrixOut} class.
 				      */
-    class Options 
+    struct Options 
     {
-      public:
 					 /**
 					  * If @p{true}, only show the
 					  * absolute values of the
@@ -298,7 +297,7 @@ class MatrixOut : public DataOutInterface<2,2>
     static double get_gridpoint_value (const Matrix       &matrix,
 				       const unsigned int  i,
 				       const unsigned int  j,
-				       const Options      &options);    
+				       const Options      &options);
 };
 
 

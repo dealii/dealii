@@ -20,7 +20,8 @@
 
 template <int dim>
 Function<dim>::Function (const unsigned int n_components,
-			 const double       initial_time) :
+			 const double       initial_time)
+                :
 		FunctionTime(initial_time),
 		n_components(n_components)
 {}
@@ -200,7 +201,8 @@ Function<dim>::memory_consumption () const
 //------------------------------------------------------------//
 
 template <int dim>
-ZeroFunction<dim>::ZeroFunction (const unsigned int n_components) :
+ZeroFunction<dim>::ZeroFunction (const unsigned int n_components)
+                :
 		Function<dim> (n_components)
 {}
 
@@ -309,14 +311,17 @@ void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >    
 
 template <int dim>
 ConstantFunction<dim>::ConstantFunction (const double value,
-					 const unsigned int n_components) :
+					 const unsigned int n_components)
+                :
 		ZeroFunction<dim> (n_components),
   function_value    (value)
 {}
 
 
+
 template <int dim>
 ConstantFunction<dim>::~ConstantFunction () {}
+
 
 
 template <int dim>
@@ -325,6 +330,7 @@ double ConstantFunction<dim>::value (const Point<dim> &,
 {
   return function_value;
 }
+
 
 
 template <int dim>
@@ -338,6 +344,7 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
 }
 
 
+
 template <int dim>
 void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 					std::vector<double>            &values,
@@ -348,6 +355,7 @@ void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 
   std::fill (values.begin(), values.end(), function_value);
 }
+
 
 
 template <int dim>
@@ -379,13 +387,15 @@ ConstantFunction<dim>::memory_consumption () const
 //------------------------------------------------------------//
 
 template <int dim>
-ComponentSelectFunction<dim>::ComponentSelectFunction (const unsigned int selected,
-						       const double value,
-						       const unsigned int n_components)
+ComponentSelectFunction<dim>::
+ComponentSelectFunction (const unsigned int selected,
+                         const double value,
+                         const unsigned int n_components)
 		:
 		ConstantFunction<dim> (value, n_components),
-  selected(selected)
+                selected(selected)
 {}
+
 
 
 template <int dim>

@@ -41,7 +41,8 @@
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix () :
+SparseMatrix<number>::SparseMatrix ()
+                :
 		cols(0),
 		val(0),
 		max_len(0)
@@ -50,7 +51,8 @@ SparseMatrix<number>::SparseMatrix () :
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
+SparseMatrix<number>::SparseMatrix (const SparseMatrix &m)
+                :
 		Subscriptor (m),
 		cols(0),
 		val(0),
@@ -372,7 +374,8 @@ SparseMatrix<number>::threaded_vmult (Vector<somenumber>       &dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::Tvmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const
+SparseMatrix<number>::Tvmult (Vector<somenumber>& dst,
+                              const Vector<somenumber>& src) const
 {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -395,7 +398,8 @@ SparseMatrix<number>::Tvmult (Vector<somenumber>& dst, const Vector<somenumber>&
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::vmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const
+SparseMatrix<number>::vmult_add (Vector<somenumber>& dst,
+                                 const Vector<somenumber>& src) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -420,7 +424,8 @@ SparseMatrix<number>::vmult_add (Vector<somenumber>& dst, const Vector<somenumbe
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const
+SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst,
+                                  const Vector<somenumber>& src) const
 {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -522,10 +527,11 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::threaded_matrix_norm_square (const Vector<somenumber> &v,
-						   const unsigned int        begin_row,
-						   const unsigned int        end_row,
-						   somenumber               *partial_sum) const
+SparseMatrix<number>::
+threaded_matrix_norm_square (const Vector<somenumber> &v,
+                             const unsigned int        begin_row,
+                             const unsigned int        end_row,
+                             somenumber               *partial_sum) const
 {
 				   // this function should not be called
 				   // when not in parallel mode.
@@ -634,11 +640,12 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::threaded_matrix_scalar_product (const Vector<somenumber> &u,
-						      const Vector<somenumber> &v,
-						      const unsigned int        begin_row,
-						      const unsigned int        end_row,
-						      somenumber               *partial_sum) const
+SparseMatrix<number>::
+threaded_matrix_scalar_product (const Vector<somenumber> &u,
+                                const Vector<somenumber> &v,
+                                const unsigned int        begin_row,
+                                const unsigned int        end_row,
+                                somenumber               *partial_sum) const
 {
 				   // this function should not be called
 				   // when not in parallel mode.
@@ -921,8 +928,9 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst, const Vector<somenumber>& src,
-			    const number om) const
+SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst,
+                                        const Vector<somenumber>& src,
+                                        const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -936,8 +944,9 @@ SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst, const Vector<so
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_TSOR (Vector<somenumber>& dst, const Vector<somenumber>& src,
-			    const number om) const
+SparseMatrix<number>::precondition_TSOR (Vector<somenumber>& dst,
+                                         const Vector<somenumber>& src,
+                                         const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -951,7 +960,8 @@ SparseMatrix<number>::precondition_TSOR (Vector<somenumber>& dst, const Vector<s
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
+SparseMatrix<number>::SOR (Vector<somenumber>& dst,
+                           const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -976,7 +986,8 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::TSOR (Vector<somenumber>& dst, const number om) const
+SparseMatrix<number>::TSOR (Vector<somenumber>& dst,
+                            const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -999,11 +1010,10 @@ SparseMatrix<number>::TSOR (Vector<somenumber>& dst, const number om) const
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::PSOR (
-  Vector<somenumber>& dst,
-  const std::vector<unsigned int>& permutation,
-  const std::vector<unsigned int>& inverse_permutation,
-  const number om) const
+SparseMatrix<number>::PSOR (Vector<somenumber>& dst,
+                            const std::vector<unsigned int>& permutation,
+                            const std::vector<unsigned int>& inverse_permutation,
+                            const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -1039,11 +1049,10 @@ SparseMatrix<number>::PSOR (
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::TPSOR (
-  Vector<somenumber>& dst,
-  const std::vector<unsigned int>& permutation,
-  const std::vector<unsigned int>& inverse_permutation,
-  const number om) const
+SparseMatrix<number>::TPSOR (Vector<somenumber>& dst,
+                             const std::vector<unsigned int>& permutation,
+                             const std::vector<unsigned int>& inverse_permutation,
+                             const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -1071,12 +1080,13 @@ SparseMatrix<number>::TPSOR (
 }
 
 
+
 template <typename number>
 template <typename somenumber>
 void
 SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
-	       const Vector<somenumber> &b,
-	       const number        om) const
+                                const Vector<somenumber> &b,
+                                const number        om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -1095,12 +1105,14 @@ SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
     }
 }
 
+
+
 template <typename number>
 template <typename somenumber>
 void
 SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
-	       const Vector<somenumber> &b,
-	       const number        om) const
+                                 const Vector<somenumber> &b,
+                                 const number        om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -1119,22 +1131,26 @@ SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
     }
 }
 
+
+
 template <typename number>
 template <typename somenumber>
 void
 SparseMatrix<number>::SSOR_step (Vector<somenumber> &v,
-	       const Vector<somenumber> &b,
-	       const number        om) const
+                                 const Vector<somenumber> &b,
+                                 const number        om) const
 {
   SOR_step(v,b,om);
   TSOR_step(v,b,om);
 }
 
 
+
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
+SparseMatrix<number>::SSOR (Vector<somenumber>& dst,
+                            const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());

@@ -656,7 +656,7 @@ class Exception1 : public ExceptionBase {                             \
 #define DeclException2(Exception2, type1, type2, outsequence)         \
 class Exception2 : public ExceptionBase {                             \
   public:                                                             \
-      Exception2 (const type1 a1, const type2 a2) :                   \
+      Exception2 (const type1 a1, const type2 a2) :          \
 	      arg1 (a1), arg2(a2) {};                                 \
       virtual ~Exception2 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
@@ -678,7 +678,7 @@ class Exception2 : public ExceptionBase {                             \
 #define DeclException3(Exception3, type1, type2, type3, outsequence)  \
 class Exception3 : public ExceptionBase {                             \
   public:                                                             \
-      Exception3 (const type1 a1, const type2 a2, const type3 a3) :   \
+      Exception3 (const type1 a1, const type2 a2, const type3 a3) : \
 	      arg1 (a1), arg2(a2), arg3(a3) {};                       \
       virtual ~Exception3 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
@@ -702,7 +702,7 @@ class Exception3 : public ExceptionBase {                             \
 class Exception4 : public ExceptionBase {                             \
   public:                                                             \
       Exception4 (const type1 a1, const type2 a2,                     \
-	    const type3 a3, const type4 a4) :                         \
+	    const type3 a3, const type4 a4) :                \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {};             \
       virtual ~Exception4 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \
@@ -727,7 +727,7 @@ class Exception4 : public ExceptionBase {                             \
 class Exception5 : public ExceptionBase {                             \
   public:                                                             \
       Exception5 (const type1 a1, const type2 a2, const type3 a3,     \
-	    const type4 a4, const type5 a5) :                         \
+	    const type4 a4, const type5 a5) :                \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {};   \
       virtual ~Exception5 () throw () {};                             \
       virtual void PrintInfo (std::ostream &out) const {              \

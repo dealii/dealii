@@ -704,7 +704,7 @@ namespace Threads
                                       * for use in the template
                                       * functions below.
                                       */
-    void deregister_thread ();  
+    void deregister_thread ();
   }
   
 }   // end declarations of namespace Threads

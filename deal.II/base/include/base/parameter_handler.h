@@ -1184,13 +1184,13 @@ class ParameterHandler
 				      * Inhibit automatic
 				      * CopyConstructor.
 				      */
-    ParameterHandler(const ParameterHandler&);
+    ParameterHandler (const ParameterHandler&);
 
 				     /**
 				      * Inhibit automatic
 				      * assignment operator.
 				      */
-    ParameterHandler& operator=(const ParameterHandler&);
+    ParameterHandler& operator= (const ParameterHandler&);
     
   public:
 				     /**

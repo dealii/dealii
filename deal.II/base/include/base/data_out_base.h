@@ -554,8 +554,7 @@ class DataOutBase
 					  */
 	DXFlags (const bool write_multigrid = false,
 		 const bool write_neighbors = false);
-
-      public:
+        
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -1011,9 +1010,10 @@ class DataOutBase
 					  * This function was originally written
 					  * by Stefan Nauber.
 					  */
-	static RgbValues default_color_function (const double value,
-						 const double min_value,
-						 const double max_value);
+	static RgbValues
+        default_color_function (const double value,
+                                const double min_value,
+                                const double max_value);
 
 					 /**
 					  * This is an alternative color
@@ -1024,9 +1024,10 @@ class DataOutBase
 					  * @p{color_function} variable to the
 					  * address of this function.
 					  */
-	static RgbValues grey_scale_color_function (const double value,
-						    const double min_value,
-						    const double max_value);
+	static RgbValues
+        grey_scale_color_function (const double value,
+                                   const double min_value,
+                                   const double max_value);
 	
 					 /**
 					  * This is one more
@@ -1042,9 +1043,10 @@ class DataOutBase
 					  * variable to the address of
 					  * this function.
 					  */
-	static RgbValues reverse_grey_scale_color_function (const double value,
-							    const double min_value,
-							    const double max_value);
+	static RgbValues
+        reverse_grey_scale_color_function (const double value,
+                                           const double min_value,
+                                           const double max_value);
 	
 					 /**
 					  * Constructor.
@@ -2059,7 +2061,7 @@ class DataOutInterface : private DataOutBase
 
 inline
 bool
-DataOutBase::EpsFlags::RgbValues::is_grey () const 
+DataOutBase::EpsFlags::RgbValues::is_grey () const
 {
   return (red == green) && (red == blue);
 }

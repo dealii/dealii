@@ -20,9 +20,11 @@
 
 
 template <int dim>
-AutoDerivativeFunction<dim>::AutoDerivativeFunction (const double hh,
-						     const unsigned int n_components,
-						     const double       initial_time):
+AutoDerivativeFunction<dim>::
+AutoDerivativeFunction (const double hh,
+                        const unsigned int n_components,
+                        const double       initial_time)
+                :
 		Function<dim>(n_components, initial_time),
 		h(1),
 		ht(dim),
@@ -111,8 +113,10 @@ AutoDerivativeFunction<dim>::gradient (const Point<dim>   &p,
 
 
 template <int dim>
-void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
-						   std::vector<Tensor<1,dim> > &gradients) const
+void
+AutoDerivativeFunction<dim>::
+vector_gradient (const Point<dim>            &p,
+                 std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (gradients.size() == this->n_components,
 	  ExcDimensionMismatch(gradients.size(), this->n_components));
@@ -135,6 +139,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 	  }
 	break;
       }
+
       case Euler:
       {
 	Point<dim> q1, q2;
@@ -152,6 +157,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 	  }
 	break;
       }
+
       case FourthOrder:
       {
 	Point<dim> q1, q2, q3, q4;
@@ -175,6 +181,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 	  }
 	break;
       }
+
       default:
 	    Assert(false, ExcInvalidFormula());
     }
@@ -182,9 +189,11 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 
 
 template <int dim>
-void AutoDerivativeFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
-						 std::vector<Tensor<1,dim> >    &gradients,
-						 const unsigned int              comp) const
+void
+AutoDerivativeFunction<dim>::
+gradient_list (const std::vector<Point<dim> > &points,
+               std::vector<Tensor<1,dim> >    &gradients,
+               const unsigned int              comp) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -202,6 +211,7 @@ void AutoDerivativeFunction<dim>::gradient_list (const std::vector<Point<dim> > 
 	    }
 	break;
       }
+
       case Euler:
       {
 	Point<dim> q1, q2;
@@ -214,6 +224,7 @@ void AutoDerivativeFunction<dim>::gradient_list (const std::vector<Point<dim> > 
 	    }
 	break;
       }
+
       case FourthOrder:
       {
 	Point<dim> q1, q2, q3, q4;
@@ -231,6 +242,7 @@ void AutoDerivativeFunction<dim>::gradient_list (const std::vector<Point<dim> > 
 	    }
 	break;
       }
+
       default:
 	    Assert(false, ExcInvalidFormula());
     }
@@ -264,6 +276,7 @@ vector_gradient_list (const std::vector<Point<dim> >            &points,
 	  }
 	break;
       }
+
       case Euler:
       {
 	Point<dim> q1, q2;
@@ -273,10 +286,12 @@ vector_gradient_list (const std::vector<Point<dim> >            &points,
 	      q1=points[p]+ht[i];
 	      q2=points[p]-ht[i];
 	      for (unsigned int comp=0; comp<this->n_components; ++comp)
-		gradients[p][comp][i]=(this->value(q1, comp)-this->value(q2, comp))/(2*h);
+		gradients[p][comp][i]=(this->value(q1, comp) -
+                                       this->value(q2, comp))/(2*h);
 	    }
 	break;
       }
+
       case FourthOrder:
       {
 	Point<dim> q1, q2, q3, q4;
@@ -295,6 +310,7 @@ vector_gradient_list (const std::vector<Point<dim> >            &points,
 	    }
 	break;
       }
+      
       default:
 	    Assert(false, ExcInvalidFormula());
     }

@@ -24,8 +24,7 @@
 
 
 template <class MATRIX, class VECTOR>
-FilteredMatrix<MATRIX,VECTOR>::
-FilteredMatrix () 
+FilteredMatrix<MATRIX,VECTOR>::FilteredMatrix ()
 {}
 
 
@@ -75,7 +74,7 @@ set_referenced_matrix (const MATRIX &m)
 
 template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<MATRIX,VECTOR>::clear_constraints () 
+FilteredMatrix<MATRIX,VECTOR>::clear_constraints ()
 {
 				   // swap vectors to release memory
   std::vector<IndexValuePair> empty;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -256,13 +256,15 @@ namespace Functions
 				   const unsigned int              component = 0) const;
       
 				       /**
-					* Gradient at a single point.
+					* Second derivatives at a
+					* single point.
 					*/
       virtual Tensor<2,dim> hessian (const Point<dim>   &p,
 				     const unsigned int  component = 0) const;
       
 				       /**
-					* Gradients at multiple points.
+					* Second derivatives at
+					* multiple points.
 					*/
       virtual void hessian_list (const std::vector<Point<dim> > &points,
 				 std::vector<Tensor<2,dim> >    &hessians,
@@ -502,7 +504,8 @@ namespace Functions
 			    const unsigned int  component = 0) const;
       
 				       /**
-					* Function values at multiple points.
+					* Function values at multiple
+					* points.
 					*/
       virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,12 +47,15 @@ class Point : public Tensor<1,dim>
 {
   public:
 				     /**
-				      * Standard constructor. Creates an origin.
+				      * Standard constructor. Creates
+				      * an origin.
 				      */
     Point ();
+    
 				     /**
-				      * Constructor. Initialize all entries
-				      * to zero if @p{initialize==true}.
+				      * Constructor. Initialize all
+				      * entries to zero if
+				      * @p{initialize==true}.
 				      */
     explicit Point (const bool initialize);
 
@@ -182,7 +185,8 @@ Point<dim>::Point ()
 
 template <int dim>
 inline
-Point<dim>::Point (const bool initialize) :
+Point<dim>::Point (const bool initialize)
+                :
 		Tensor<1,dim>(initialize) 
 {}
 
@@ -190,7 +194,8 @@ Point<dim>::Point (const bool initialize) :
 
 template <int dim>
 inline
-Point<dim>::Point (const Tensor<1,dim> &t) :
+Point<dim>::Point (const Tensor<1,dim> &t)
+                :
 		Tensor<1,dim>(t) 
 {}
 
@@ -241,7 +246,7 @@ double Point<dim>::operator () (const unsigned int index) const
 
 template <int dim>
 inline
-double & Point<dim>::operator () (const unsigned int index) 
+double & Point<dim>::operator () (const unsigned int index)
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return this->values[index];
@@ -251,7 +256,7 @@ double & Point<dim>::operator () (const unsigned int index)
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator + (const Tensor<1,dim> &p) const 
+Point<dim> Point<dim>::operator + (const Tensor<1,dim> &p) const
 {
   return (Point<dim>(*this) += p);
 }
@@ -260,7 +265,7 @@ Point<dim> Point<dim>::operator + (const Tensor<1,dim> &p) const
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator - (const Tensor<1,dim> &p) const 
+Point<dim> Point<dim>::operator - (const Tensor<1,dim> &p) const
 {
   return (Point<dim>(*this) -= p);
 }
@@ -269,7 +274,7 @@ Point<dim> Point<dim>::operator - (const Tensor<1,dim> &p) const
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator - () const 
+Point<dim> Point<dim>::operator - () const
 {
   Point<dim> result;
   for (unsigned int i=0; i<dim; ++i)
@@ -281,7 +286,7 @@ Point<dim> Point<dim>::operator - () const
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator * (const double factor) const 
+Point<dim> Point<dim>::operator * (const double factor) const
 {
   return (Point<dim>(*this) *= factor);
 }
@@ -290,7 +295,7 @@ Point<dim> Point<dim>::operator * (const double factor) const
 
 template <int dim>
 inline
-double Point<dim>::operator * (const Tensor<1,dim> &p) const 
+double Point<dim>::operator * (const Tensor<1,dim> &p) const
 {
 				   // simply pass down
   return Tensor<1,dim>::operator * (p);
@@ -299,7 +304,7 @@ double Point<dim>::operator * (const Tensor<1,dim> &p) const
 
 template <int dim>
 inline
-double Point<dim>::square () const 
+double Point<dim>::square () const
 {
   double q=0;
   for (unsigned int i=0; i<dim; ++i)
@@ -325,7 +330,7 @@ double Point<dim>::distance (const Point<dim> &p) const
 
 template <int dim>
 inline
-Point<dim> Point<dim>::operator / (const double factor) const 
+Point<dim> Point<dim>::operator / (const double factor) const
 {
   return (Point<dim>(*this) /= factor);
 }
@@ -340,7 +345,7 @@ Point<dim> Point<dim>::operator / (const double factor) const
  */
 template <int dim>
 inline
-Point<dim> operator * (const double factor, const Point<dim> &p) 
+Point<dim> operator * (const double factor, const Point<dim> &p)
 {
   return p*factor;
 }
