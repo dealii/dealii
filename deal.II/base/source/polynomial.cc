@@ -467,9 +467,9 @@ template void Polynomial<float>::shift(const double offset);
 template void Polynomial<double>::shift(const double offset);
 template void Polynomial<long double>::shift(const long double offset);
 
-// gcc 3.1 crashes withan internal error when trying to instantiate
+// gcc 3.1 crashes with an internal error when trying to instantiate
 // these functions.
-
+// TODO[WB]: check this with an autoconf macro. also fix the #ifdef so that it only works when GCC is actually used!
 #if ((__GNUC__ == 3) && (__GNUC_MINOR__ == 1))
 #warning Polynomial::shift with long double has been disabled in gcc 3.1
 #else
