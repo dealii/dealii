@@ -5,6 +5,7 @@
 #include <fe/fe_values.h>
 #include <fe/fe_update_flags.h>
 #include <base/quadrature.h>
+#include <base/quadrature_lib.h>
 #include <numerics/error_estimator.h>
 #include <grid/dof.h>
 #include <grid/tria_iterator.h>
@@ -28,16 +29,74 @@ inline static double sqr (const double x) {
 #if deal_II_dimension == 1
 
 template <>
-void KellyErrorEstimator<1>::estimate (const DoFHandler<1> &,
-				       const Quadrature<0> &,
-				       const FunctionMap &,
-				       const Vector<double> &,
-				       Vector<float> &,
-				       const Function<1> *,
-				       const unsigned int) {
-  Assert(false, ExcNotImplemented());
-};
+void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
+				       const Quadrature<0>  &,
+				       const FunctionMap    &neumann_bc,
+				       const Vector<double> &solution,
+				       Vector<float>        &error,
+				       const Function<1>    *coefficient,
+				       const unsigned int    selected_component)
+{
+  Assert (selected_component < dof.get_fe().n_components,
+	  ExcInvalidComponent (selected_component, dof.get_fe().n_components));
 
+  const unsigned int dim=1;
+
+				   // reserve one slot for each cell and set
+				   // it to zero
+  error.reinit (dof.get_tria().n_active_cells());
+
+				   // loop over all cells. note that the
+				   // error indicator is only a sum over
+				   // the two contributions from the two
+				   // vertices of each cell.
+  QTrapez<1> quadrature;
+  FEValues<dim> fe_values (dof.get_fe(), quadrature, update_gradients);
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+  for (unsigned int cell_index=0; cell != dof.end(); ++cell, ++cell_index)
+    {
+				       // loop over te two points bounding
+				       // this line. n==0 is left point,
+				       // n==1 is right point
+      for (unsigned int n=0; n<2; ++n)
+	{
+					   // find right active neighbor
+	  DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
+	  if (neighbor.state() == valid)
+	    while (neighbor->has_children())
+	      neighbor = neighbor->child(n==0 ? 1 : 0);
+      
+					   // now get the gradients on the
+					   // both sides of the point
+	  vector<vector<Tensor<1,dim> > > gradients (2, vector<Tensor<1,1> >(dof.get_fe().n_components));
+	  
+	  fe_values.reinit (cell);
+	  fe_values.get_function_grads (solution, gradients);
+	  const double grad_here = gradients[n][selected_component][0];
+
+	  double grad_neighbor;
+	  if (neighbor.state() == valid)
+	    {
+	      fe_values.reinit (neighbor);
+	      fe_values.get_function_grads (solution, gradients);
+	      grad_neighbor = gradients[n==0 ? 1 : 0][selected_component][0];
+	    }
+	  else
+	    if (neumann_bc.find(n) != neumann_bc.end())
+	      grad_neighbor = neumann_bc.find(n)->second->operator()(cell->vertex(0));
+	    else
+	      grad_neighbor = 0;
+	    
+	  const double jump = (grad_here - grad_neighbor) *
+			      (coefficient != 0 ?
+			       (*coefficient)(cell->vertex(n)) :
+			       1);
+	  error(cell_index) += jump*jump * cell->diameter();
+	};
+      error(cell_index) = sqrt(error(cell_index));
+    };
+};
+	
 #endif
 
 
