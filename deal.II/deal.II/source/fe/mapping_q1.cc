@@ -26,7 +26,6 @@
 
 
 
-
 template <int dim>
 const unsigned int MappingQ1<dim>::n_shape_functions;
 
@@ -328,6 +327,19 @@ MappingQ1<dim>::get_data (const UpdateFlags update_flags,
 }
 
 
+#if deal_II_dimension == 1
+
+template <>
+void
+MappingQ1<1>::compute_face_data (const UpdateFlags update_flags,
+                                 const Quadrature<1>& q,
+                                 const unsigned int n_original_q_points,
+                                 InternalData& data) const
+{
+  compute_data (update_flags, q, n_original_q_points, data);
+}
+
+#else
 
 template <int dim>
 void
@@ -338,7 +350,6 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 {
   compute_data (update_flags, q, n_original_q_points, data);
 
-#if (deal_II_dimension>1)
   if (data.update_flags & update_boundary_forms)
     {
       data.aux.reinit(dim-1, n_original_q_points);      
@@ -385,8 +396,9 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 	    }
 	}
     }
-#endif
 }
+
+#endif
 
   
 
