@@ -153,7 +153,7 @@ template <int dim>
 unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
 {
   typename Triangulation<dim>::active_face_iterator face, endf;
-  unsigned long int n_faces = 0;
+  unsigned int n_faces = 0;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
