@@ -1134,6 +1134,8 @@ namespace internal
 	= c.local_orientation_flags[edge];
       mesh.edge_list[c.edges[edge]].group = cur_edge_group;
 
+                                       // Remember that we have oriented 
+                                       // this edge in the current cell.
       edge_orient_array[edge] = true;
 
       return true;
@@ -1196,6 +1198,8 @@ namespace internal
 	    mesh.edge_list[c.edges[i]].orientation_flag 
 	      = c.local_orientation_flags[i]*glorient;
 	    mesh.edge_list[c.edges[i]].group = cur_edge_group;
+                                       // Remember that we have oriented 
+                                       // this edge in the current cell.
 	    edge_orient_array[i] = true;
 	  }
 	
@@ -1208,10 +1212,11 @@ namespace internal
     {
       const Cell &c = mesh.cell_list[cur_posn];
       for (unsigned int e=0; e<12; ++e)
+                               	       // Only need to add the adjacent 
+	                               // cubes for edges we recently 
+	                               // oriented
 	if (edge_orient_array[e] == true)
 	  {
-	    edge_orient_array[e] = false;
-	    
 	    const Edge & the_edge = mesh.edge_list[c.edges[e]];
 	    for (unsigned int local_cube_num = 0; 
 		 local_cube_num < the_edge.neighboring_cubes.size();
@@ -1220,7 +1225,10 @@ namespace internal
 		const unsigned int
 		  global_cell_num = the_edge.neighboring_cubes[local_cube_num];
 		Cell &ncell = mesh.cell_list[global_cell_num];
-		
+	
+ 	                               // If the cell is waiting to be 
+		                       // processed we dont want to add 
+		                       // it to the list a second time.	
 		if (!ncell.waiting_to_be_processed)
 		  {
 		    sheet_to_process.push_back(global_cell_num);
@@ -1228,6 +1236,11 @@ namespace internal
 		  }
 	      }
 	  }
+                                       // we're done with this cube so 
+                                       // clear its processing flags.
+      for (unsigned int e=0; e<12; ++e)
+	edge_orient_array[e] = false;
+	    
     }
 
 
