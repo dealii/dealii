@@ -557,6 +557,25 @@ class BlockSparseMatrix : public Subscriptor
 
 template <typename number>
 inline
+unsigned int
+BlockSparseMatrix<number>::n_block_cols () const
+{
+  return columns;
+};
+
+
+
+template <typename number>
+inline
+unsigned int
+BlockSparseMatrix<number>::n_block_rows () const
+{
+  return rows;
+};
+
+
+template <typename number>
+inline
 SparseMatrix<number> &
 BlockSparseMatrix<number>::block (const unsigned int row,
 				  const unsigned int column)
@@ -748,14 +767,22 @@ BlockSparseMatrix<number>::vmult_add (BlockVector<somenumber>       &dst,
 template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>   &/*dst*/,
-				   const BlockVector<somenumber> &/*src*/) const
+BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>& dst,
+				   const BlockVector<somenumber>& src) const
 {
-				   // presently not
-				   // implemented. should be simple,
-				   // but don't have the time right
-				   // now.
-  Assert (false, ExcNotImplemented());
+  Assert (dst.n_blocks() == n_block_cols(),
+	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
+  Assert (src.n_blocks() == n_block_rows(),
+	  ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
+
+  dst = 0.;
+  
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    {
+      for (unsigned int col=0; col<n_block_cols(); ++col)
+	block(row,col).Tvmult_add (dst.block(col),
+				   src.block(row));
+    };
 };
 
 
@@ -763,14 +790,20 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>   &/*dst*/,
 template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number>::Tvmult_add (BlockVector<somenumber>    &/*dst*/,
-				       const BlockVector<somenumber> &/*src*/) const
+BlockSparseMatrix<number>::Tvmult_add (BlockVector<somenumber>& dst,
+				       const BlockVector<somenumber>& src) const
 {
-				   // presently not
-				   // implemented. should be simple,
-				   // but don't have the time right
-				   // now.
-  Assert (false, ExcNotImplemented());
+  Assert (dst.n_blocks() == n_block_cols(),
+	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
+  Assert (src.n_blocks() == n_block_rows(),
+	  ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
+
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    {
+      for (unsigned int col=0; col<n_block_cols(); ++col)
+	block(row,col).Tvmult_add (dst.block(col),
+				   src.block(row));
+    };
 };
 
 
@@ -890,25 +923,6 @@ precondition_Jacobi (BlockVector<somenumber>          &dst,
     block(i,i).precondition_Jacobi (dst.block(i),
 				    src.block(i),
 				    omega);
-};
-
-
-template <typename number>
-inline
-unsigned int
-BlockSparseMatrix<number>::n_block_cols () const
-{
-  return columns;
-};
-
-
-
-template <typename number>
-inline
-unsigned int
-BlockSparseMatrix<number>::n_block_rows () const
-{
-  return rows;
 };
 
 
