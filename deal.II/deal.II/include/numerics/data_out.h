@@ -133,8 +133,8 @@ template <int dim> class DoFHandler;
  *
  * @author Wolfgang Bangerth, 1999
  */
-template <int dof_handler_dim, int patch_dim>
-class DataOut_DoFData : public DataOutInterface<patch_dim>
+template <int dof_handler_dim, int patch_dim, int patch_space_dim=patch_dim>
+class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 {
   public:
 				     /**
@@ -377,7 +377,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim>
 				      * in the output routines of the base
 				      * classes.
 				      */
-    vector<DataOutBase::Patch<patch_dim> > patches;
+    vector<DataOutBase::Patch<patch_dim,patch_space_dim> > patches;
 
 				     /**
 				      * Function by which the base
@@ -385,7 +385,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim>
 				      * what patches they shall write
 				      * to a file.
 				      */
-    virtual const vector<DataOutBase::Patch<patch_dim> > & get_patches () const;
+    virtual const vector<DataOutBase::Patch<patch_dim,patch_space_dim> > &
+    get_patches () const;
 
 				     /**
 				      * Virtual function through
@@ -395,6 +396,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim>
 				      */
     virtual vector<string> get_dataset_names () const;
 };
+
 
 
 /**

@@ -28,8 +28,8 @@
 
 #include <strstream>
 
-template <int dof_handler_dim, int patch_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim>::DataEntry::
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntry::
 DataEntry (const Vector<double> *data,
 	   const vector<string> &names) :
 		data(data),
@@ -38,24 +38,24 @@ DataEntry (const Vector<double> *data,
 
 
 
-template <int dof_handler_dim, int patch_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim>::DataOut_DoFData () :
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataOut_DoFData () :
 		dofs(0)
 {};
 
 
 
-template <int dof_handler_dim, int patch_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim>::~DataOut_DoFData ()
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::~DataOut_DoFData ()
 {
   clear ();
 };
 
 
 
-template <int dof_handler_dim, int patch_dim>
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim>::
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
 attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
 {
   Assert (dof_data.size() == 0, ExcOldDataStillPresent());
@@ -71,9 +71,9 @@ attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
 
 
 
-template <int dof_handler_dim, int patch_dim>
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim>::add_data_vector (const Vector<double> &vec,
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (const Vector<double> &vec,
 							     const vector<string> &names)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
@@ -112,9 +112,9 @@ DataOut_DoFData<dof_handler_dim,patch_dim>::add_data_vector (const Vector<double
 };
 
 
-template <int dof_handler_dim, int patch_dim>
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim>::add_data_vector (const Vector<double> &vec,
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (const Vector<double> &vec,
 							     const string         &name)
 {
   unsigned int n_components = dofs->get_fe().n_components ();
@@ -146,22 +146,22 @@ DataOut_DoFData<dof_handler_dim,patch_dim>::add_data_vector (const Vector<double
 
 
 
-template <int dof_handler_dim, int patch_dim>
-void DataOut_DoFData<dof_handler_dim,patch_dim>::clear_data_vectors ()
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+void DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_data_vectors ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
 
 				   // delete patches
-  vector<DataOutBase::Patch<patch_dim> > dummy;
+  vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
   patches.swap (dummy);
 }
 
 
 
-template <int dof_handler_dim, int patch_dim>
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim>::clear_input_data_references ()
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_input_data_references ()
 {
   for (unsigned int i=0; i<dof_data.size(); ++i)
     dof_data[i].data = 0;
@@ -178,9 +178,9 @@ DataOut_DoFData<dof_handler_dim,patch_dim>::clear_input_data_references ()
 
 
 
-template <int dof_handler_dim, int patch_dim>
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim>::clear ()
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
@@ -192,14 +192,14 @@ DataOut_DoFData<dof_handler_dim,patch_dim>::clear ()
     };
 
 				   // delete patches
-  vector<DataOutBase::Patch<patch_dim> > dummy;
+  vector<DataOutBase::Patch<patch_dim,patch_space_dim> > dummy;
   patches.swap (dummy);
 }
 
 
-template <int dof_handler_dim, int patch_dim>
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 vector<string>
-DataOut_DoFData<dof_handler_dim,patch_dim>::get_dataset_names () const 
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_dataset_names () const 
 {
   vector<string> names;
 				   // collect the names of dof
@@ -220,9 +220,9 @@ DataOut_DoFData<dof_handler_dim,patch_dim>::get_dataset_names () const
 
 
 
-template <int dof_handler_dim, int patch_dim>
-const vector<typename DataOutBase::Patch<patch_dim> > &
-DataOut_DoFData<dof_handler_dim,patch_dim>::get_patches () const
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+const vector<typename DataOutBase::Patch<patch_dim, patch_space_dim> > &
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
 };
@@ -430,3 +430,7 @@ template class DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>;
 template class DataOut<deal_II_dimension>;
 
 
+// for 3d, also generate an extra class
+#if deal_II_dimension >= 3
+template class DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>;
+#endif
