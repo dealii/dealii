@@ -1266,7 +1266,16 @@ Point<dim> MappingQ<dim>::transform_real_to_unit_cell (
   delete mdata;
   return p_unit;
 }
-  
+
+
+
+template <int dim>
+unsigned int
+MappingQ<dim>::get_degree() const
+{
+  return degree;
+};
+
   
 // explicit instantiation
 template class MappingQ<deal_II_dimension>;

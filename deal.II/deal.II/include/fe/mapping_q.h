@@ -117,6 +117,13 @@ class MappingQ : public MappingQ1<dim>
 			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
 
+				     /**
+				      * Return the degree of the
+				      * mapping, i.e. the value which
+				      * was passed to the constructor.
+				      */
+    unsigned int get_degree () const;
+    
   protected:
 				     /**
 				      * Implementation of the interface in
@@ -540,6 +547,7 @@ template<> void MappingQ<3>::add_quad_support_points(
 template <> void MappingQ<3>::fill_quad_support_points_simple (
   const Triangulation<3>::cell_iterator &cell,
   std::vector<Point<3> > &a) const;
+
 
 
 #endif
