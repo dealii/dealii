@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <grid/point.h>
+#include <grid/geometry_info.h>
 
 
 

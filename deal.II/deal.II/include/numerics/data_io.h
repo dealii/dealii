@@ -6,7 +6,6 @@
 /*----------------------------   data_io.h     ---------------------------*/
 
 #include <base/exceptions.h>
-#include <grid/geometry_info.h>
 #include <vector>
 #include <string>
 
