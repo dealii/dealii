@@ -138,7 +138,7 @@ class FullMatrix : public Table<2,number>
 				      * matrices are possible sources.
 				      */
     template <class MATRIX>
-    FullMatrix<number>& copy_from (const MATRIX&);
+    void copy_from (const MATRIX&);
     
 				     /**
 				      * Comparison operator. Be
