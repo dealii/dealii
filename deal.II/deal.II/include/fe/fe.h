@@ -158,10 +158,10 @@ struct FiniteElementData<2> {
 				      */
     const unsigned int n_transform_functions;
 
-				   /**
-				    * Number of components.
-				    */
-  const unsigned int n_components;
+				     /**
+				      * Number of components.
+				      */
+    const unsigned int n_components;
 
     				     /**
 				      * Default constructor. Constructs an element
@@ -284,6 +284,18 @@ struct FiniteElementBase :
 				      * #prolongation#.
 				      */
     bool operator == (const FiniteElementBase<dim> &) const;
+
+				     /**
+				      * Compute system index from components.
+				      */
+    unsigned component_to_system_index (unsigned component,
+					unsigned component_index) const;
+  
+				     /**
+				      * Compute component and index from system index.
+				      */
+    pair<unsigned,unsigned> system_to_component_index (unsigned index) const; 
+    
 
 				     /**
 				      * Exception
@@ -1134,17 +1146,6 @@ class FiniteElement : public FiniteElementBase<dim> {
 					const Boundary<dim> &boundary, 
 					dFMatrix            &local_mass_matrix) const =0;
 
-				   /**
-				    * Compute system index from components.
-				    */
-  virtual unsigned component_to_system_index (unsigned component,
-					      unsigned component_index) const;
-  
-				   /**
-				    * Compute component and index from system index.
-				    */
-  virtual pair<unsigned,unsigned> system_to_component_index (unsigned index) const; 
-    
 				     /**
 				      * Exception
 				      */
@@ -1163,10 +1164,26 @@ class FiniteElement : public FiniteElementBase<dim> {
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
 };
 
+template <int dim>
+inline unsigned
+FiniteElementBase<dim>::component_to_system_index (unsigned component,
+						   unsigned component_index) const
+{
+  Assert(false, ExcInvalidIndex(component));
+  return component_index;
+}
 
 
+template <int dim>  
+inline pair<unsigned,unsigned>
+FiniteElementBase<dim>::system_to_component_index (unsigned index) const
+{
+  Assert(false, ExcInvalidIndex(index));
+  return pair<unsigned,unsigned>(0,0);
+}
 
-  
+    
+
 /*----------------------------   fe.h     ---------------------------*/
 /* end of #ifndef __fe_H */
 #endif
