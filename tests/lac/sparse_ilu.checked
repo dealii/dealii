@@ -1,28 +1,28 @@
 
 DEAL::Size 4 Unknowns 9
 DEAL::Test 0
-DEAL::Residual with test vector 0:   left=0.000, right=0.000
-DEAL::Residual with test vector 1:   left=0.000, right=0.000
-DEAL::Residual with test vector 2:   left=0.000, right=0.000
+DEAL::Residual with test vector 0:   left=0.00, right=0.00
+DEAL::Residual with test vector 1:   left=0.00, right=0.00
+DEAL::Residual with test vector 2:   left=0.00, right=0.00
 DEAL::Test 1
-DEAL::Residual with test vector 0:   left=0.425, right=0.447
-DEAL::Residual with test vector 1:   left=0.266, right=0.267
-DEAL::Residual with test vector 2:   left=0.297, right=0.377
+DEAL::Residual with test vector 0:   left=0.42, right=0.44
+DEAL::Residual with test vector 1:   left=0.26, right=0.26
+DEAL::Residual with test vector 2:   left=0.29, right=0.37
 DEAL::Size 8 Unknowns 49
 DEAL::Test 0
-DEAL::Residual with test vector 0:   left=0.000, right=0.000
-DEAL::Residual with test vector 1:   left=0.000, right=0.000
-DEAL::Residual with test vector 2:   left=0.000, right=0.000
+DEAL::Residual with test vector 0:   left=0.00, right=0.00
+DEAL::Residual with test vector 1:   left=0.00, right=0.00
+DEAL::Residual with test vector 2:   left=0.00, right=0.00
 DEAL::Test 1
-DEAL::Residual with test vector 0:   left=1.895, right=1.900
-DEAL::Residual with test vector 1:   left=1.705, right=1.711
-DEAL::Residual with test vector 2:   left=2.061, right=2.057
+DEAL::Residual with test vector 0:   left=1.89, right=1.90
+DEAL::Residual with test vector 1:   left=1.70, right=1.71
+DEAL::Residual with test vector 2:   left=2.06, right=2.05
 DEAL::Size 16 Unknowns 225
 DEAL::Test 0
-DEAL::Residual with test vector 0:   left=0.000, right=0.000
-DEAL::Residual with test vector 1:   left=0.000, right=0.000
-DEAL::Residual with test vector 2:   left=0.000, right=0.000
+DEAL::Residual with test vector 0:   left=0.00, right=0.00
+DEAL::Residual with test vector 1:   left=0.00, right=0.00
+DEAL::Residual with test vector 2:   left=0.00, right=0.00
 DEAL::Test 1
-DEAL::Residual with test vector 0:   left=5.900, right=5.911
-DEAL::Residual with test vector 1:   left=5.659, right=5.662
-DEAL::Residual with test vector 2:   left=5.914, right=5.921
+DEAL::Residual with test vector 0:   left=5.90, right=5.91
+DEAL::Residual with test vector 1:   left=5.65, right=5.66
+DEAL::Residual with test vector 2:   left=5.91, right=5.92
