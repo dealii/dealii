@@ -333,14 +333,27 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 
   DoFHandler<dim>::active_cell_iterator cell=data.dof.begin_active();
 
-				   // calculate the start cell for this
-				   // thread. the enumeration is choosen
-				   // in this strange way to generate a
-				   // "random" distribution of the cells.
-				   // if the sequence of the iterator would
-				   // be used, the threads would take widely
-				   // spread times to calculate their cells.
-  for (unsigned int t=0;t<this_thread;++t,++cell);
+				   // calculate the start cell for
+				   // this thread. note that this way
+				   // the threads work interleaved on
+				   // successive cells, rather than on
+				   // blocks of cells. the reason is
+				   // that it takes vastly more time
+				   // to work on cells with hanging
+				   // nodes than on regular cells, but
+				   // such cells are not evenly
+				   // distributed across the range of
+				   // cell iterators, so in order to
+				   // have the different threads do
+				   // approximately the same amount of
+				   // work, we have to let them work
+				   // interleaved to the effect of a
+				   // pseudorandom distribution of the
+				   // `hard' cells to the different
+				   // threads.
+  for (unsigned int t=0; (t<this_thread) && (cell!=data.endc); ++t, ++cell);
+
+  
 				   // loop over all cells for this thread
 				   // the iteration of cell is done at the end
   for (; cell!=data.endc; )
