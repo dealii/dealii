@@ -1596,7 +1596,15 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 //    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
 //    Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
 //    Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
-  
+
+				   // Somehow, we have to avoid making
+				   // this an operation of complexity
+				   // n^2. For the transpose case, we
+				   // can go through the non-zero
+				   // elements of A^-1 and use the
+				   // corresponding rows of B only.
+				   // For the non-transpose case, we
+				   // must find a trick.
   typename MATRIXB::const_iterator b1 = B.begin();
   const typename MATRIXB::const_iterator b_final = B.end();
   if (transpose)
@@ -1619,26 +1627,45 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 	++b1;
       }
   else
-    while (b1 != b_final)
-      {
-	const unsigned int i = b1->row();
-	const unsigned int k = b1->column();
-	typename MATRIXB::const_iterator b2 = B.begin();
-	while (b2 != b_final)
-	  {
-	    const unsigned int j = b2->row();
-	    const unsigned int l = b2->column();
-	    
-	    const typename MATRIXA::value_type a = A.el(k,l);
-	    
-	    if (a != 0.)
-	      {
-		add (i, j, a * b1->value() * b2->value());
-	      }
-	    ++b2;
-	  }
-	++b1;
+    {
+				       // Determine minimal and
+				       // maximal row for a column in
+				       // advance.
+      if(false){
+      std::vector<unsigned int>::minrow(B.n(), B.m());
+      std::vector<unsigned int>::maxrow(B.n(), 0);
+      while (b1 != b_final)
+	{
+	  const unsigned int r = b1->row();
+	  if (r < minrow[b1->column()])
+	    minrow[b1->column()] = r;
+	  if (r > maxrow[b1->column()])
+	    maxrow[b1->column()] = r;
+	}
       }
+      
+      b1 = B.begin();
+      while (b1 != b_final)
+	{
+	  const unsigned int i = b1->row();
+	  const unsigned int k = b1->column();
+	  typename MATRIXB::const_iterator b2 = B.begin();
+	  while (b2 != b_final)
+	    {
+	      const unsigned int j = b2->row();
+	      const unsigned int l = b2->column();
+	      
+	      const typename MATRIXA::value_type a = A.el(k,l);
+	      
+	      if (a != 0.)
+		{
+		  add (i, j, a * b1->value() * b2->value());
+		}
+	      ++b2;
+	    }
+	  ++b1;
+	}
+    }
 }
 
 
