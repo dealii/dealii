@@ -33,7 +33,7 @@ compiler=gcc295
 
 # Options for configure
 
-options='-'
+options=''
 
 # Name of the target directory (must be unique if you run several
 # tests on the same computer). Change the value below if you use the
@@ -48,11 +48,11 @@ target="${sysname}+${compiler}"
 
 # Name of the C++ compiler
 
-export CXX=CC
+export CXX=g++
 
 # Name of the C compiler
 
-export CC=cc
+export CC=gcc
 
 # Additional command names
 
@@ -61,8 +61,8 @@ MAKE=make
 
 # Make sure the right compiler, linker and libraries are found first
 
-#export PATH=/mypath/bin:$PATH
-#export LD_LIBRARY_PATH=/mypath/lib:$LD_LIBRARY_PATH
+#export PATH:$PATH
+#export LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
 ######################################################################
 # Mail program setup:
@@ -82,6 +82,7 @@ MAIL='mail'
 ######################################################################
 ######################################################################
 
+if test -d $target ; then rm -rf $target ; fi
 mkdir $target
 cd $target
 $CVS co deal.II
@@ -91,16 +92,18 @@ cd deal.II
 
 echo "CONFIG " $sysname $compiler $options > log
 
-echo "RUNNING CONFIGURE AT " `date` | tee -a log
+echo "RUNNING CONFIGURE AT " `date '+%Y-%m-%d %T'` | tee -a log
 (./configure $options 2>&1) | tee -a log
 
-echo "BUILDING LIBRARY AT " `date` | tee -a log
+echo "BUILDING LIBRARY AT " `date '+%Y-%m-%d %T'` | tee -a log
 
 # now build the library. either write "succeeded" or "failed"
 # into the file "result", and append all the output into "log"
 
-(if ($MAKE all -k 2>&1) ; then 
-	echo "BUILDING EXAMPLES AT " `date` | tee -a log
+(if ($MAKE all -k 2>&1) ; then
+	echo "CLEANING OBJECT FILES AT " `date '+%Y-%m-%d %T'` | tee -a log
+	$MAKE clean
+	echo "BUILDING EXAMPLES AT " `date '+%Y-%m-%d %T'` | tee -a log
         if (cd examples ; $MAKE -k 2>&1) ; then
 		result=succeeded ;
 	else
@@ -110,7 +113,7 @@ else
 	result=failed ;
 fi ; echo $result > result ) | tee -a log 
 
-echo "CHECKING RESULTS AT " `date` | tee -a log
+echo "CHECKING RESULTS AT " `date '+%Y-%m-%d %T'` | tee -a log
 
 # now decide what to do with the output. if the build succeeded then
 # simply delete it and replace it by a success message for mailing to
@@ -120,13 +123,10 @@ echo "CHECKING RESULTS AT " `date` | tee -a log
 if test "`cat result`" = "failed" ; then
 	$MAIL build-failure@dealii.org < log
 else
-	rm -f log
-	echo "CONFIG " $sysname $compiler $options > log
-	echo "OK AT " `date` >> log
 	$MAIL build-success@dealii.org < log
 fi
 
-echo "CLEANING UP AT " `date` | tee -a log
+echo "CLEANING UP AT " `date '+%Y-%m-%d %T'` | tee -a log
 
 # finally clean up
 cd ../../
