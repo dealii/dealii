@@ -15,7 +15,6 @@
 #include <base/function.h>
 #include <numerics/data_out.h>
 #include <fe/fe_lib.lagrange.h>
-#include <fe/fe_lib.criss_cross.h>
 #include <base/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
@@ -182,7 +181,7 @@ template <int dim>
 void PoissonEquation<dim>::assemble (FullMatrix<double>  &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
-  Assert (false, typename Equation<dim>::ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 };
 
 
@@ -191,7 +190,7 @@ template <int dim>
 void PoissonEquation<dim>::assemble (Vector<double>      &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
-  Assert (false, typename Equation<dim>::ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 };
 
 
@@ -272,9 +271,6 @@ int PoissonProblem<dim>::run (const unsigned int level) {
        << ", using elements of type <";
   switch (order)
     {
-      case 0:
-	    cout << "criss-cross";
-	    break;
       default:
 	    cout << "Lagrange-" << order;
 	    break;
@@ -300,11 +296,6 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   Quadrature<dim>      *quadrature;
   Quadrature<dim-1>    *boundary_quadrature;
   switch (order) {
-    case 0:
-	  fe         = new FECrissCross<dim>();
-	  quadrature = new QCrissCross1<dim>();
-	  boundary_quadrature = new QGauss2<dim-1>();
-	  break;
     case 1:
 	  fe         = new FEQ1<dim>();
 	  quadrature = new QGauss3<dim>();
