@@ -64,13 +64,13 @@ class MGDoFDimensionInfo<1> {
  */
 class MGDoFDimensionInfo<2> {
   public:
-    typedef TriaRawIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >    raw_line_iterator;
-    typedef TriaIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >       line_iterator;
-    typedef TriaActiveIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > > active_line_iterator;
+    typedef TriaRawIterator<2,MGDoFObjectAccessor<1, 2> >    raw_line_iterator;
+    typedef TriaIterator<2,MGDoFObjectAccessor<1, 2> >       line_iterator;
+    typedef TriaActiveIterator<2,MGDoFObjectAccessor<1, 2> > active_line_iterator;
     
-    typedef TriaRawIterator<2,MGDoFCellAccessor<2> >               raw_quad_iterator;
-    typedef TriaIterator<2,MGDoFCellAccessor<2> >                  quad_iterator;
-    typedef TriaActiveIterator<2,MGDoFCellAccessor<2> >            active_quad_iterator;
+    typedef TriaRawIterator<2,MGDoFCellAccessor<2> >         raw_quad_iterator;
+    typedef TriaIterator<2,MGDoFCellAccessor<2> >            quad_iterator;
+    typedef TriaActiveIterator<2,MGDoFCellAccessor<2> >      active_quad_iterator;
 
     typedef void * raw_hex_iterator;
     typedef void * hex_iterator;
@@ -95,13 +95,13 @@ class MGDoFDimensionInfo<2> {
  */
 class MGDoFDimensionInfo<3> {
   public:
-    typedef TriaRawIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >    raw_line_iterator;
-    typedef TriaIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >       line_iterator;
-    typedef TriaActiveIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > > active_line_iterator;
+    typedef TriaRawIterator<3,MGDoFObjectAccessor<1, 3> >    raw_line_iterator;
+    typedef TriaIterator<3,MGDoFObjectAccessor<1, 3> >       line_iterator;
+    typedef TriaActiveIterator<3,MGDoFObjectAccessor<1, 3> > active_line_iterator;
 
-    typedef TriaRawIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >    raw_quad_iterator;
-    typedef TriaIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >       quad_iterator;
-    typedef TriaActiveIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > > active_quad_iterator;
+    typedef TriaRawIterator<3,MGDoFObjectAccessor<2, 3> >    raw_quad_iterator;
+    typedef TriaIterator<3,MGDoFObjectAccessor<2, 3> >       quad_iterator;
+    typedef TriaActiveIterator<3,MGDoFObjectAccessor<2, 3> > active_quad_iterator;
 
     typedef TriaRawIterator<3,MGDoFCellAccessor<3> >               raw_hex_iterator;
     typedef TriaIterator<3,MGDoFCellAccessor<3> >                  hex_iterator;
@@ -958,12 +958,9 @@ class MGDoFHandler
 				      */
     vector<unsigned int>      mg_used_dofs;
 
-    friend class MGDoFObjectAccessor<1, dim, TriaObjectAccessor<1, dim> >;
-    friend class MGDoFObjectAccessor<1, dim, CellAccessor<dim> >;
-    friend class MGDoFObjectAccessor<2, dim, TriaObjectAccessor<2, dim> >;
-    friend class MGDoFObjectAccessor<2, dim, CellAccessor<dim> >;
-    friend class MGDoFObjectAccessor<3, dim, TriaObjectAccessor<3, dim> >;
-    friend class MGDoFObjectAccessor<3, dim, CellAccessor<dim> >;
+    friend class MGDoFObjectAccessor<1, dim>;
+    friend class MGDoFObjectAccessor<2, dim>;
+    friend class MGDoFObjectAccessor<3, dim>;
 };
 
     
