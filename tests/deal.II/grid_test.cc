@@ -14,6 +14,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
+#include <basic/grid_io.h>
 #include <cmath>
 #include <cstdlib>
 
@@ -246,7 +247,7 @@ void test (const int test_case) {
     };
   
   
-  tria.print_gnuplot (cout);
+  GridOut::write_gnuplot (tria, cout);
     
   cout << "     Total number of cells        = " << tria.n_cells() << endl
        << "     Total number of active cells = " << tria.n_active_cells() << endl;

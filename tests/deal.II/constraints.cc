@@ -26,7 +26,7 @@
 #include <lac/sparsematrix.h>
 #include <base/parameter_handler.h>
 #include <grid/dof_constraints.h>
-
+#include <basic/grid_io.h>
 
 #include <fstream>
 #include <cmath>
@@ -255,7 +255,7 @@ int main () {
 	  
 	  Triangulation<3> tria;
 	  make_tria (tria, step);
-	  tria.print_gnuplot (cout);
+	  GridOut::write_gnuplot (tria, cout);
 	  
 	  DoFHandler<3> dof (&tria);
 	  dof.distribute_dofs (*fe);
