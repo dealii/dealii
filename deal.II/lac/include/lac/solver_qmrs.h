@@ -20,6 +20,9 @@
 #include <cmath>
 #include <base/subscriptor.h>
 
+#include <cmath>
+
+
 /**
  * QMRS method.
  *
@@ -205,7 +208,7 @@ template<class VECTOR>
 double
 SolverQMRS<VECTOR>::criterion()
 {
-  return sqrt(res2);
+  return std::sqrt(res2);
 }
 
 
@@ -335,7 +338,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
       sigma = q*t;
       
 //TODO:[?] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
-      if (fabs(sigma/rho) < additional_data.breakdown)
+      if (std::fabs(sigma/rho) < additional_data.breakdown)
 	return true;
 				       // Step 3
       alpha = rho/sigma;
@@ -359,13 +362,13 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
 	  res = q.l2_norm();
 	}
       else
-	res = sqrt((it+1)*tau);
+	res = std::sqrt((it+1)*tau);
       state = this->control().check(step,res);
       if ((state == SolverControl::success)
       || (state == SolverControl::failure))
 	return false;
 				       // Step 6
-      if (fabs(rho) < additional_data.breakdown)
+      if (std::fabs(rho) < additional_data.breakdown)
 	return true;
 				       // Step 7
       rho_old = rho;
