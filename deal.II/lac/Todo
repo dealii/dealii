@@ -26,11 +26,6 @@ Use the commented-out version in PreconditionBlock::invert_diagblocks
   using the try-catch clauses
 
 
-Comment on the modification of the right hand side in the Vanka
-  smoother (which is done to yield a homogeneous boundary value
-  problem on each patch) GK?
-  
-
 Someone should take a look at the handling of the sparsity variable
   in the sparse matrix: it is subscribed to twice (explicitely and 
   through the subscriptor); the explicit subscription is redundant,
