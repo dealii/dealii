@@ -16,13 +16,14 @@
   -- You should only have to change the very first lines for polynomials
   -- of higher order.
   --------------------------------------------------------------------------
-  n_functions := 4;
+  n_functions := 5;
   
   ansatz_points := array(0..n_functions-1);
   ansatz_points[0] := 0;
   ansatz_points[1] := 1;
-  ansatz_points[2] := 1/3;
-  ansatz_points[3] := 2/3;
+  ansatz_points[2] := 1/4;
+  ansatz_points[3] := 2/4;
+  ansatz_points[4] := 3/4;
 
   phi_polynom := array(0..n_functions-1);
   grad_phi_polynom := array(0..n_functions-1);
@@ -83,10 +84,13 @@
   Use the following perl scripts to convert the output into a
   suitable format:
   
+  perl -pi -e 's/([^;])\n/$1/g;' shape_value_1d
+  perl -pi -e 's/([^;])\n/$1/g;' shape_grad_1d
   perl -pi -e 's/phi_polynom\[(\d)\] =/case $1: return/g;' shape_value_1d
   perl -pi -e 's/grad_phi_polynom\[(\d)\] = (.*);/case $1: return Point<1>($2);/g;' shape_grad_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]/($1,$2)/g;' massmatrix_1d
   perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' prolongation_1d
+  perl -pi -e 's/.*= 0.0;\n//g;' prolongation_1d
   perl -pi -e 's/(t\d+) =/const double $1/g;' massmatrix_1d
 */
 
@@ -318,37 +322,31 @@ template <>
 FEQuarticSub<1>::FEQuarticSub () :
 		FiniteElement<1> (1, 3) {
   prolongation[0](0,0) = 1.0;
-  prolongation[0](0,1) = 0.0;
-  prolongation[0](0,2) = 0.0;
-  prolongation[0](0,3) = 0.0;
-  prolongation[0](1,0) = -1.0/16.0;
-  prolongation[0](1,1) = -1.0/16.0;
-  prolongation[0](1,2) = 9.0/16.0;
-  prolongation[0](1,3) = 9.0/16.0;
-  prolongation[0](2,0) = 5.0/16.0;
-  prolongation[0](2,1) = 1.0/16.0;
-  prolongation[0](2,2) = 15.0/16.0;
-  prolongation[0](2,3) = -5.0/16.0;
-  prolongation[0](3,0) = 0.0;
-  prolongation[0](3,1) = 0.0;
+  prolongation[0](1,3) = 1.0;
+  prolongation[0](2,0) = 35.0/128.0;
+  prolongation[0](2,1) = -5.0/128.0;
+  prolongation[0](2,2) = 35.0/32.0;
+  prolongation[0](2,3) = -35.0/64.0;
+  prolongation[0](2,4) = 7.0/32.0;
   prolongation[0](3,2) = 1.0;
-  prolongation[0](3,3) = 0.0;
-  prolongation[1](0,0) = -1.0/16.0;
-  prolongation[1](0,1) = -1.0/16.0;
-  prolongation[1](0,2) = 9.0/16.0;
-  prolongation[1](0,3) = 9.0/16.0;
-  prolongation[1](1,0) = 0.0;
+  prolongation[0](4,0) = -5.0/128.0;
+  prolongation[0](4,1) = 3.0/128.0;
+  prolongation[0](4,2) = 15.0/32.0;
+  prolongation[0](4,3) = 45.0/64.0;
+  prolongation[0](4,4) = -5.0/32.0;
+  prolongation[1](0,3) = 1.0;
   prolongation[1](1,1) = 1.0;
-  prolongation[1](1,2) = 0.0;
-  prolongation[1](1,3) = 0.0;
-  prolongation[1](2,0) = 0.0;
-  prolongation[1](2,1) = 0.0;
-  prolongation[1](2,2) = 0.0;
-  prolongation[1](2,3) = 1.0;
-  prolongation[1](3,0) = 1.0/16.0;
-  prolongation[1](3,1) = 5.0/16.0;
-  prolongation[1](3,2) = -5.0/16.0;
-  prolongation[1](3,3) = 15.0/16.0;
+  prolongation[1](2,0) = 3.0/128.0;
+  prolongation[1](2,1) = -5.0/128.0;
+  prolongation[1](2,2) = -5.0/32.0;
+  prolongation[1](2,3) = 45.0/64.0;
+  prolongation[1](2,4) = 15.0/32.0;
+  prolongation[1](3,4) = 1.0;
+  prolongation[1](4,0) = -5.0/128.0;
+  prolongation[1](4,1) = 35.0/128.0;
+  prolongation[1](4,2) = 7.0/32.0;
+  prolongation[1](4,3) = -35.0/64.0;
+  prolongation[1](4,4) = 35.0/32.0;
 };
 
 
@@ -381,11 +379,12 @@ FEQuarticSub<1>::shape_value(const unsigned int i,
   const double xi = p(0);
   switch (i)
     {
-      case 0: return -9.0/2.0*xi*xi*xi+9.0*xi*xi-11.0/2.0*xi+1.0;
-      case 1: return 9.0/2.0*xi*xi*xi-9.0/2.0*xi*xi+xi;
-      case 2: return 27.0/2.0*xi*xi*xi-45.0/2.0*xi*xi+9.0*xi;
-      case 3: return -27.0/2.0*xi*xi*xi+18.0*xi*xi-9.0/2.0*xi;
-    }
+      case 0: return 32.0/3.0*xi*xi*xi*xi-80.0/3.0*xi*xi*xi+70.0/3.0*xi*xi-25.0/3.0*xi+1.0;
+      case 1: return 32.0/3.0*xi*xi*xi*xi-16.0*xi*xi*xi+22.0/3.0*xi*xi-xi;
+      case 2: return -128.0/3.0*xi*xi*xi*xi+96.0*xi*xi*xi-208.0/3.0*xi*xi+16.0*xi;
+      case 3: return 64.0*xi*xi*xi*xi-128.0*xi*xi*xi+76.0*xi*xi-12.0*xi;
+      case 4: return -128.0/3.0*xi*xi*xi*xi+224.0/3.0*xi*xi*xi-112.0/3.0*xi*xi+16.0/3.0*xi;
+    };
   return 0.;
 };
 
@@ -418,11 +417,12 @@ FEQuarticSub<1>::shape_grad(const unsigned int i,
   const double xi = p(0);
   switch (i)
     {
-      case 0: return Point<1>(-27.0/2.0*xi*xi+18.0*xi-11.0/2.0);
-      case 1: return Point<1>(27.0/2.0*xi*xi-9.0*xi+1.0);
-      case 2: return Point<1>(81.0/2.0*xi*xi-45.0*xi+9.0);
-      case 3: return Point<1>(-81.0/2.0*xi*xi+36.0*xi-9.0/2.0);
-    }
+      case 0: return Point<1>(128.0/3.0*xi*xi*xi-80.0*xi*xi+140.0/3.0*xi-25.0/3.0);
+      case 1: return Point<1>(128.0/3.0*xi*xi*xi-48.0*xi*xi+44.0/3.0*xi-1.0);
+      case 2: return Point<1>(-512.0/3.0*xi*xi*xi+288.0*xi*xi-416.0/3.0*xi+16.0);
+      case 3: return Point<1>(256.0*xi*xi*xi-384.0*xi*xi+152.0*xi-12.0);
+      case 4: return Point<1>(-512.0/3.0*xi*xi*xi+224.0*xi*xi-224.0/3.0*xi+16.0/3.0);
+    };
   return Point<1>();
 };
 
@@ -517,28 +517,39 @@ void FEQuarticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator 
   const double h = cell->vertex(1)(0) - cell->vertex(0)(0);
   Assert (h>0, ExcJacobiDeterminantHasWrongSign());
 
-  const double t1 8.0/105.0*h;
-  const double t2 19.0/1680.0*h;
-  const double t3 33.0/560.0*h;
-  const double t4 3.0/140.0*h;
-  const double t5 27.0/70.0*h;
-  const double t6 27.0/560.0*h;
+  const double t1 146.0/2835.0*h;
+  const double t2 29.0/5670.0*h;
+  const double t3 148.0/2835.0*h;
+  const double t4 29.0/945.0*h;
+  const double t5 4.0/405.0*h;
+  const double t6 128.0/405.0*h;
+  const double t7 64.0/945.0*h;
+  const double t8 128.0/2835.0*h;
   local_mass_matrix(0,0) = t1;
-  local_mass_matrix(0,1) = t2;
+  local_mass_matrix(0,1) = -t2;
   local_mass_matrix(0,2) = t3;
   local_mass_matrix(0,3) = -t4;
-  local_mass_matrix(1,0) = t2;
+  local_mass_matrix(0,4) = t5;
+  local_mass_matrix(1,0) = -t2;
   local_mass_matrix(1,1) = t1;
-  local_mass_matrix(1,2) = -t4;
-  local_mass_matrix(1,3) = t3;
+  local_mass_matrix(1,2) = t5;
+  local_mass_matrix(1,3) = -t4;
+  local_mass_matrix(1,4) = t3;
   local_mass_matrix(2,0) = t3;
-  local_mass_matrix(2,1) = -t4;
-  local_mass_matrix(2,2) = t5;
-  local_mass_matrix(2,3) = -t6;
+  local_mass_matrix(2,1) = t5;
+  local_mass_matrix(2,2) = t6;
+  local_mass_matrix(2,3) = -t7;
+  local_mass_matrix(2,4) = t8;
   local_mass_matrix(3,0) = -t4;
-  local_mass_matrix(3,1) = t3;
-  local_mass_matrix(3,2) = -t6;
-  local_mass_matrix(3,3) = t5;
+  local_mass_matrix(3,1) = -t4;
+  local_mass_matrix(3,2) = -t7;
+  local_mass_matrix(3,3) = 104.0/315.0*h;
+  local_mass_matrix(3,4) = -t7;
+  local_mass_matrix(4,0) = t5;
+  local_mass_matrix(4,1) = t3;
+  local_mass_matrix(4,2) = t8;
+  local_mass_matrix(4,3) = -t7;
+  local_mass_matrix(4,4) = t6;
 };
 
 #endif
