@@ -78,8 +78,8 @@ void check_poly(const Point<dim>& x,
                                        // somewhat to make them
                                        // significant despite our
                                        // two-post-dot-digits limit
-      values[k] *= std::pow(10, dim);
-      gradients[k] *= std::pow(10, dim);
+      values[k] *= std::pow(10., dim);
+      gradients[k] *= std::pow(10., dim);
       
       deallog << 'P' << k << "\t= " << values[k]
 	      << "\tgradient\t";
