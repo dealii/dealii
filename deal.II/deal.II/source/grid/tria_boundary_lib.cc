@@ -511,6 +511,59 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 
 
 
+template <int dim>
+void
+HalfHyperShellBoundary<dim>::
+get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				 typename std::vector<Point<dim> > &points) const
+{
+				   // check whether center of object is
+				   // at x==0, since then it belongs
+				   // to the plane part of the
+				   // boundary
+  const Point<dim> line_center = line->center();
+  if (line_center(0) == center(0))
+    return StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
+  else
+    return HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
+};
+
+
+
+template <int dim>
+void
+HalfHyperShellBoundary<dim>::
+get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				 typename std::vector<Point<dim> > &points) const
+{
+				   // check whether center of object is
+				   // at x==0, since then it belongs
+				   // to the plane part of the
+				   // boundary
+  const Point<dim> quad_center = quad->center();
+  if (quad_center(0) == center(0))
+    StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
+  else
+    HyperShellBoundary<dim>::get_intermediate_points_on_quad (quad, points);
+};
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+HalfHyperShellBoundary<1>::
+get_intermediate_points_on_quad (const Triangulation<1>::quad_iterator &,
+				 std::vector<Point<1> > &) const
+{
+  Assert (false, ExcInternalError());
+};
+
+#endif
+
+
+
 #if deal_II_dimension == 1
 
 template <>
