@@ -23,7 +23,7 @@
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
-#include <lac/dsmatrix.h>
+#include <lac/sparsematrix.h>
 #include <base/parameter_handler.h>
 #include <grid/dof_constraints.h>
 
@@ -74,7 +74,7 @@ void make_tria (Triangulation<3> &tria, int step)
 	  tria.last_active()->set_refine_flag();
 	else
 	  tria.begin_active()->set_refine_flag();
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 
 	break;
       };
@@ -115,7 +115,7 @@ void make_tria (Triangulation<3> &tria, int step)
 	  tria.last_active()->set_refine_flag();
 	else
 	  tria.begin_active()->set_refine_flag();
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 
 	break;
       };
@@ -156,7 +156,7 @@ void make_tria (Triangulation<3> &tria, int step)
 	  tria.last_active()->set_refine_flag();
 	else
 	  tria.begin_active()->set_refine_flag();
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 	
 	break;
       };
@@ -224,7 +224,7 @@ void make_tria (Triangulation<3> &tria, int step)
 		  break;
 	  };
 		  
-	tria.execute_refinement ();
+	tria.execute_coarsening_and_refinement ();
 	
 	break;
       };

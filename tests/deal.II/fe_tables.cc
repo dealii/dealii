@@ -1,18 +1,52 @@
 // $Id$
 
-// deal_II_libraries.g=-ldeal_II_2d.g
+// deal_II_libraries.g=-ldeal_II_2d.g -ldeal_II_1d.g
 // deal_II_libraries=-ldeal_II_2d
 
+#include <base/exceptions.h>
+#include <base/point.h>
+#include <lac/vector.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.dg.h>
 #include <fe/fe_system.h>
+#include <grid/tria.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_boundary.h>
+#include <grid/dof.h>
+#include <grid/dof_accessor.h>
 #include <iomanip>
 #include <base/logstream.h>
+
+#define TEST_ELEMENT(e) { deallog.push(#e); e el;\
+  print_fe_statistics(el); deallog.pop(); deallog << endl; }
+#define TEST_MULTIPLE(e,n,d) { deallog.push(#e "x" #n); e eb; FESystem<d> el(eb,n); \
+  print_fe_statistics(el); deallog.pop(); deallog << endl; }
+#define TEST_MIXED2(e1,n1,e2,n2,d) { deallog.push(#e1 "x" #n1 "-" #e2 "x" #n2);\
+  e1 eb1; e2 eb2; FESystem<d> el(eb1,n1,eb2,n2);\
+  print_fe_statistics(el); deallog.pop(); deallog << endl; }
+
 
 template<int dim>
 inline void
 print_fe_statistics(const FiniteElement<dim>& fe)
 {
+  Triangulation<dim> tr;
+  tr.create_hypercube(-1,1);
+  DoFHandler<dim> dof(&tr);
+  dof.distribute_dofs(fe);
+  StraightBoundary<dim> boundary;
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face();
+
+  vector<Point<dim> > unit_points(fe.total_dofs);
+  vector<Point<dim> > support_points(fe.total_dofs);
+  vector<Point<dim> > face_support_points(fe.dofs_per_face);
+
+//  fe.get_unit_support_points(unit_points);
+//  fe.get_support_points(cell, boundary, support_points);
+  fe.get_face_support_points(face, boundary, face_support_points);
+  
   deallog << "total_dofs" << " " << fe.total_dofs;
   deallog << ": vertex" << " " << fe.dofs_per_vertex;
   deallog << "  line" << " " << fe.dofs_per_line;
@@ -24,13 +58,26 @@ print_fe_statistics(const FiniteElement<dim>& fe)
     {
       pair<unsigned,unsigned> p = fe.system_to_component_index(i);
       deallog << "Index " << i << " ("
-	      << p.first << "," << p.second << ")" << endl;
+	      << p.first << "," << p.second << ") -> "
+	      << fe.component_to_system_index(p.first, p.second)
+	      << " support " << support_points[i] << " unit: " << unit_points[i]
+	      << endl;
+    }
+  for (unsigned i=0;i<fe.dofs_per_face;++i)
+    {
+      pair<unsigned,unsigned> p = fe.face_system_to_component_index(i);
+      deallog << "FaceIndex " << i << " ("
+	      << p.first << "," << p.second << ") -> " 
+	      << fe.face_component_to_system_index(p.first, p.second)
+	      << " support " << face_support_points[i]
+	      << endl;
     }
   deallog.pop();
 }
 
 main()
 {
+
   deallog.push("GeometryInfo");
 
   deallog.push("1D");
@@ -67,80 +114,24 @@ main()
   
   deallog.pop();
   
-  FEDGConstant<2>   dg0;
-  FEDGLinear<2>   dg1;
-  FELinear<2>       q1;
-  FEQuadraticSub<2> q2;
-  FECubicSub<2>     q3;
-
-  FESystem<2> q2_3(q2,3);
-  FESystem<2> q3_3(q3,3);
+  TEST_ELEMENT(FEDGConstant<2>);
+  TEST_ELEMENT(FEDGLinear<2>);
   
+  TEST_ELEMENT(FELinear<2>);
+  TEST_ELEMENT(FEQuadraticSub<2>);
+  TEST_ELEMENT(FECubicSub<2>);
+  TEST_ELEMENT(FEQuarticSub<2>);
+/*
+  TEST_ELEMENT(FELinear<1>);
+  TEST_ELEMENT(FEQuadraticSub<1>);
+  TEST_ELEMENT(FECubicSub<1>);
+  TEST_ELEMENT(FEQuarticSub<1>);
+*/
+  TEST_MULTIPLE(FELinear<2>,3,2);
+  TEST_MULTIPLE(FEQuadraticSub<2>,3,2);
+  TEST_MULTIPLE(FECubicSub<2>,3,2);
   
-  deallog.push("Q0  ");
-  print_fe_statistics(dg0);
-  deallog.pop();
-  deallog << endl;
-  
-  deallog.push("Q1  ");
-  print_fe_statistics(q1);
-  deallog.pop();
-  deallog << endl;
-  
-  deallog.push("Q2  ");
-  print_fe_statistics(q2);
-  deallog.pop();
-  deallog << endl;
-
-  deallog.push("Q3  ");
-  print_fe_statistics(q3);
-  deallog.pop();
-  deallog << endl;
-
-  deallog.push("DG1 ");
-  print_fe_statistics(dg1);
-  deallog.pop();
-  deallog << endl;
-
-  {
-    FESystem<2> q1_3(q1,3);
-    deallog.push("Q1^3");
-    print_fe_statistics(q1_3);
-    deallog.pop();
-  }
-  deallog << endl;
-
-  deallog.push("Q2^3");
-  print_fe_statistics(q2_3);
-  deallog.pop();
-  deallog << endl;
-
-  deallog.push("Q3^3");
-  print_fe_statistics(q3_3);
-  deallog.pop();
-  deallog << endl;
-  
-  {
-    FESystem<2> q1_2q0(q1,2,dg0,1);
-    deallog.push("Q1^2 Q0");
-    print_fe_statistics(q1_2q0);
-    deallog.pop();
-  }
-  deallog << endl;
-  
-  {
-    FESystem<2> q2_2q1(q2,2,q1,1);
-    deallog.push("Q2^2 Q1");
-    print_fe_statistics(q2_2q1);
-    deallog.pop();
-  }
-  deallog << endl;
-
-  {
-    FESystem<2> q2_2dg1(q2,2,dg1,1);
-    deallog.push("Q2^2 DG1");
-    print_fe_statistics(q2_2dg1);
-    deallog.pop();
-  }
-  deallog << endl;
+  TEST_MIXED2(FELinear<2>,1,FEDGConstant<2>,1,2);
+  TEST_MIXED2(FEQuadraticSub<2>,3,FELinear<2>,1,2);
+  TEST_MIXED2(FECubicSub<2>,3,FEQuadraticSub<2>,2,2);
 }
