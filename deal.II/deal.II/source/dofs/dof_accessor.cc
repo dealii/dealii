@@ -323,8 +323,8 @@ DoFCellAccessor<2>::face (const unsigned int i) const {
 
 template <>
 void
-DoFCellAccessor<1>::get_dof_values (const dVector  &values,
-				    vector<double> &dof_values) const {
+DoFCellAccessor<1>::get_dof_values (const dVector &values,
+				    dVector       &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,
@@ -347,8 +347,8 @@ DoFCellAccessor<1>::get_dof_values (const dVector  &values,
 
 template <>
 void
-DoFCellAccessor<2>::get_dof_values (const dVector  &values,
-				    vector<double> &dof_values) const {
+DoFCellAccessor<2>::get_dof_values (const dVector &values,
+				    dVector       &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,

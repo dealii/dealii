@@ -490,8 +490,9 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
 				      */
-    void get_dof_values (const dVector  &values,
-			 vector<double> &dof_values) const;
+    void get_dof_values (const dVector &values,
+			 dVector       &dof_values) const;
+
 
     				     /**
 				      *  Exception

@@ -59,7 +59,7 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  vector<double> dof_values (total_dofs, 0);
+  dVector dof_values (total_dofs);
   present_cell->get_dof_values (fe_function, dof_values);
 
 				   // initialize with zero
@@ -69,7 +69,7 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
-      values[point] += (dof_values[shape_func] *
+      values[point] += (dof_values(shape_func) *
 			shape_values[selected_dataset](shape_func, point));
 };
 
@@ -98,7 +98,7 @@ void FEValuesBase<dim>::get_function_grads (const dVector       &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  vector<double> dof_values (total_dofs, 0);
+  dVector dof_values (total_dofs);
   present_cell->get_dof_values (fe_function, dof_values);
 
 				   // initialize with zero
@@ -108,7 +108,7 @@ void FEValuesBase<dim>::get_function_grads (const dVector       &fe_function,
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
-      gradients[point] += (dof_values[shape_func] *
+      gradients[point] += (dof_values(shape_func) *
 			   shape_gradients[shape_func][point]);
 };
 
