@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,7 +45,7 @@ namespace Patterns
 				    * class is mostly to define the
 				    * interface of patterns, and to
 				    * force derived classes to have a
-				    * @p{clone} function. It is thus,
+				    * <tt>clone</tt> function. It is thus,
 				    * in the languages of the "Design
 				    * Patterns" book (Gamma et al.), a
 				    * "prototype".
@@ -60,7 +60,7 @@ namespace Patterns
       virtual ~PatternBase ();
 	
 				       /**
-					* Return true if the given string
+					* Return <tt>true</tt> if the given string
 					* matches the pattern.
 					*/
       virtual bool match (const std::string &test_string) const = 0;
@@ -114,7 +114,7 @@ namespace Patterns
 					* usually not many thousands
 					* of objects of this type
 					* around, and since the
-					* @p{memory_consumption}
+					* memory_consumption
 					* mechanism is used to find
 					* out where memory in the
 					* range of many megabytes
@@ -170,7 +170,7 @@ namespace Patterns
     public:
 				       /**
 					* Minimal integer value. If
-					* the @p{numeric_limits} class
+					* the numeric_limits class
 					* is available use this
 					* information to obtain the
 					* extremal values, otherwise
@@ -182,7 +182,7 @@ namespace Patterns
 
 				       /**
 					* Maximal integer value. If
-					* the @p{numeric_limits} class
+					* the numeric_limits class
 					* is available use this
 					* information to obtain the
 					* extremal values, otherwise
@@ -208,7 +208,7 @@ namespace Patterns
 	       const int upper_bound = max_int_value);
 	
 				       /**
-					* Return @p{true} if the
+					* Return <tt>true</tt> if the
 					* string is an integer and
 					* its value is within the
 					* specified range.
@@ -242,7 +242,7 @@ namespace Patterns
 				       /**
 					* Value of the lower
 					* bound. A number that
-					* satisfies the @p{match}
+					* satisfies the @ref match
 					* operation of this class
 					* must be equal to this
 					* value or larger, if the
@@ -254,7 +254,7 @@ namespace Patterns
 				       /**
 					* Value of the upper
 					* bound. A number that
-					* satisfies the @p{match}
+					* satisfies the @ref match
 					* operation of this class
 					* must be equal to this
 					* value or less, if the
@@ -266,7 +266,7 @@ namespace Patterns
     
 				   /**
                                     * Test for the string being a
-                                    * @p{double}. If bounds are
+                                    * <tt>double</tt>. If bounds are
                                     * given to the constructor, then
                                     * the integer given also needs
                                     * to be withing the interval
@@ -304,7 +304,7 @@ namespace Patterns
     public:
 				       /**
 					* Minimal double value. If the
-					* @p{numeric_limits} class is
+					* @ref numeric_limits class is
 					* available use this
 					* information to obtain the
 					* extremal values, otherwise
@@ -316,7 +316,7 @@ namespace Patterns
       
 				       /**
 					* Maximal double value. If the
-					* @p{numeric_limits} class is
+					* numeric_limits class is
 					* available use this
 					* information to obtain the
 					* extremal values, otherwise
@@ -342,7 +342,7 @@ namespace Patterns
 	      const double upper_bound = max_double_value);
 	
 				       /**
-					* Return @p{true} if the
+					* Return <tt>true</tt> if the
 					* string is a number and its
 					* value is within the
 					* specified range.
@@ -376,7 +376,7 @@ namespace Patterns
 				       /**
 					* Value of the lower
 					* bound. A number that
-					* satisfies the @p{match}
+					* satisfies the @ref match
 					* operation of this class
 					* must be equal to this
 					* value or larger, if the
@@ -388,7 +388,7 @@ namespace Patterns
 				       /**
 					* Value of the upper
 					* bound. A number that
-					* satisfies the @p{match}
+					* satisfies the @ref match
 					* operation of this class
 					* must be equal to this
 					* value or less, if the
@@ -404,9 +404,9 @@ namespace Patterns
                                     * like a regular expression. For
                                     * example, if the string given
                                     * to the constructor is
-                                    * @p{"red|blue|black"}, then the
-                                    * @p{match} function returns
-                                    * @p{true} exactly if the string
+                                    * <tt>"red|blue|black"</tt>, then the
+                                    * @ref match function returns
+                                    * <tt>true</tt> exactly if the string
                                     * is either "red" or "blue" or
                                     * "black". Spaces around the
                                     * pipe signs do not matter and
@@ -424,7 +424,7 @@ namespace Patterns
       Selection (const std::string &seq);
 
 				       /**
-					* Return @p{true} if the
+					* Return <tt>true</tt> if the
 					* string is an element of
 					* the description list
 					* passed to the constructor.
@@ -486,7 +486,7 @@ namespace Patterns
     public:
 				       /**
 					* Maximal integer value. If
-					* the @p{numeric_limits} class
+					* the numeric_limits class
 					* is available use this
 					* information to obtain the
 					* extremal values, otherwise
@@ -517,7 +517,7 @@ namespace Patterns
       virtual ~List ();
       
 				       /**
-					* Return @p{true} if the
+					* Return <tt>true</tt> if the
 					* string is a comma-separated
 					* list of strings each of
 					* which match the pattern
@@ -582,19 +582,19 @@ namespace Patterns
 
 				   /**
                                     * This class is much like the
-                                    * @p{Selection} class, but it
+                                    * Selection class, but it
                                     * allows the input to be a
                                     * comma-separated list of values
                                     * which each have to be given in
                                     * the constructor
                                     * argument. Alternatively, it
                                     * could be viewed as a
-                                    * specialization of the @p{List}
+                                    * specialization of the List
                                     * class. For example, if the
                                     * string to the constructor was
-                                    * @p{"ucd|gmv|eps"}, then the
+                                    * <tt>"ucd|gmv|eps"</tt>, then the
                                     * following would be legal input:
-                                    * @p{eps, gmv}. You may give an
+                                    * <tt>eps</tt>, <tt>gmv</tt>. You may give an
                                     * arbitrarily long list of values,
                                     * where there may be as many
                                     * spaces around commas as you
@@ -614,7 +614,7 @@ namespace Patterns
       MultipleSelection (const std::string &seq);
 
 				       /**
-					* Return @p{true} if the
+					* Return <tt>true</tt> if the
 					* string is an element of
 					* the description list
 					* passed to the constructor.
@@ -672,7 +672,7 @@ namespace Patterns
 				   /**
                                     * Test for the string being
                                     * either "true" or "false". This
-                                    * is mapped to the @p{Selection}
+                                    * is mapped to the Selection
                                     * class.
                                     */
   class Bool : public Selection
@@ -696,7 +696,7 @@ namespace Patterns
   };
         
 				   /**
-                                    * Always returns true when testing a
+                                    * Always returns <tt>true</tt> when testing a
                                     * string.
                                     */
   class Anything : public PatternBase
@@ -712,7 +712,7 @@ namespace Patterns
       Anything ();
 
 				       /**
-					* Return @p{true} if the
+					* Return <tt>true</tt> if the
 					* string matches its
 					* constraints, i.e. always.
 					*/
@@ -723,7 +723,7 @@ namespace Patterns
 					* the pattern that valid
 					* strings are expected to
 					* match. Here, this is the
-					* string @p{"[Anything]"}.
+					* string <tt>"[Anything]"</tt>.
 					*/
       virtual std::string description () const;
 
@@ -742,24 +742,24 @@ namespace Patterns
 
 
 /**
- *   The @p{ParameterHandler} class provides a standard interface to an input file
+ *   The ParameterHandler class provides a standard interface to an input file
  *   which provides at run-time for program parameters such as time step sizes,
  *   geometries, right hand sides etc. The input for the program is given in files,
  *   streams or strings in memory using text like
- *   @begin{verbatim}
+ *   @verbatim
  *     set Time step size = 0.3
  *     set Geometry       = [0,1]x[0,3]
- *   @end{verbatim}
+ *   @endverbatim
  *   Input may be sorted into subsection trees in order to give the input a logical
  *   structure.
  *
  *   
- *   @sect3{Declaration of entries}
+ *   @section Declaration Declaration of entries
  *   
- *   In order to use the facilities of a @p{ParameterHandler} object, one first has
+ *   In order to use the facilities of a ParameterHandler object, one first has
  *   to make known the different entries the input file may or may not contain. This
  *   is done in the following way:
- *   @begin{verbatim}
+ *   @code
  *     ...
  *     ParameterHandler prm;
  *     prm.declare_entry ("Time step size",
@@ -770,28 +770,28 @@ namespace Patterns
  *                       "[0,1]x[0,1]",
  *                       Patterns::Anything());
  *     ...
- *   @end{verbatim}
- *   Each entry is declared using the function @p{declare_entry}. The
+ *   @endcode
+ *   Each entry is declared using the function declare_entry(). The
  *   first parameter is the name of the entry (in short: the
  *   entry). The second is the default answer to be taken in case the
  *   entry is not specified in the input file. The third parameter is
  *   a regular expression which the input (and the default answer) has
  *   to match.  Several such regular expressions are defined in
- *   @p{Patterns}. This parameter can be omitted, in which case it
- *   will default to @p{Patterns::Anything}, i.e. a pattern that
+ *   Patterns. This parameter can be omitted, in which case it
+ *   will default to Patterns::Anything, i.e. a pattern that
  *   matches every input string. The fourth parameter can be used to
  *   document the intent or expected format of an entry; its value is
  *   printed as a comment when writing all entries of a
- *   @p{ParameterHandler} object using the @p{print_parameters}
+ *   ParameterHandler object using the print_parameters()
  *   function to allow for easier understanding of a parameter
  *   file. It can be omitted as well, in which case no such
  *   documentation will be printed.
  *
  *   Entries may be located in subsections which form a kind of input tree. For example
  *   input parameters for linear solver routines should be classified in a subsection
- *   named @p{Linear solver} or any other suitable name. This is accomplished in the
+ *   named <tt>Linear solver</tt> or any other suitable name. This is accomplished in the
  *   following way:
- *   @begin{verbatim}
+ *   @code
  *     ...
  *       LinEq eq;
  *       eq.declare_parameters (prm);
@@ -809,12 +809,12 @@ namespace Patterns
  *       ...
  *       prm.leave_subsection ();
  *     };
- *   @end{verbatim}
+ *   @endcode
  *
  *   Subsections may be nested. For example a nonlinear solver may have a linear solver
  *   as member object. Then the function call tree would be something like (if the class
- *   @p{NonLinEq} has a member variables @p{eq} of type @p{LinEq}):
- *   @begin{verbatim}
+ *   <tt>NonLinEq</tt> has a member variables <tt>eq</tt> of type <tt>LinEq</tt>):
+ *   @code
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       prm.declare_entry ("Nonlinear method",
@@ -823,16 +823,16 @@ namespace Patterns
  *       eq.declare_parameters (prm);
  *       prm.leave_subsection ();
  *     };
- *   @end{verbatim}
+ *   @endcode
  *
  *   For class member functions which declare the different entries we propose to use the
- *   common name @p{declare_parameters}. In normal cases this method can be @p{static} since the
+ *   common name <tt>declare_parameters</tt>. In normal cases this method can be @p{static} since the
  *   entries will not depend on any previous knowledge. Classes for which entries should
  *   logically be grouped into subsections should declare these subsections themselves. If
  *   a class has two or more member variables of the same type both of which should have
- *   their own parameters, this parent class' method @p{declare_parameters} is responsible to
+ *   their own parameters, this parent class' method <tt>declare_parameters</tt> is responsible to
  *   group them into different subsections:
- *   @begin{verbatim}
+ *   @code
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       prm.enter_subsection ("Linear solver 1");
@@ -844,13 +844,13 @@ namespace Patterns
  *       prm.leave_subsection ();
  *       prm.leave_subsection ();
  *     };	
- *   @end{verbatim}
+ *   @endcode
  *
  *
- *   @sect3{Input files and special characters}
+ *   @section Input Input files and special characters
  *
  *   For the first example above the input file would look like the following:
- *   @begin{verbatim}
+ *   @verbatim
  *     ...
  *     subsection Nonlinear solver
  *       set Nonlinear method = Gradient
@@ -860,14 +860,14 @@ namespace Patterns
  *       end
  *     end
  *     ...                       # other stuff
- *   @end{verbatim}
+ *   @endverbatim
  *   The words @p{subsection}, @p{set} and @p{end} may be either written in lowercase or uppercase
  *   letters. Leading and trailing whitespace is removed, multiple whitespace is condensed into
  *   only one. Since the latter applies also to the name of an entry, an entry name will not
  *   be recognised if in the declaration multiple whitespace is used.
  *
- *   In entry names and values the following characters are not allowed: @p{#}, @p{\{}, 
- *   @p{\}}, @p{|}. Their use is reserved for the @ref{MultipleParameterLoop} class.
+ *   In entry names and values the following characters are not allowed: <tt>\#</tt>, <tt>{</tt>, 
+ *   <tt>}</tt>, <tt>|</tt>. Their use is reserved for the @ref{MultipleParameterLoop} class.
  *   
  *   Comments starting with \# are skipped.
  *   
@@ -877,12 +877,12 @@ namespace Patterns
  *   @p{=} sign.
  *
  *   
- *   @sect3{Reading data from input sources}
+ *   @section Reading Reading data from input sources
  *   
- *   In order to read input you can use three possibilities: reading from an @p{std::istream} object,
+ *   In order to read input you can use three possibilities: reading from an <tt>std::istream</tt> object,
  *   reading from a file of which the name is given and reading from a string in memory in
- *   which the lines are separated by @p{\n} characters. These possibilites are used as follows:
- *   @begin{verbatim}
+ *   which the lines are separated by <tt>@\n</tt> characters. These possibilites are used as follows:
+ *   @code
  *     ParameterHandler prm;
  *     ...
  *     // declaration of entries
@@ -894,32 +894,32 @@ namespace Patterns
  *     char *in = "set Time step size = 0.3 \n ...";
  *     prm.read_input_from_string (in);
  *     ...
- *   @end{verbatim}
+ *   @endcode
  *   You can use several sources of input successively. Entries which are changed more than
  *   once will be overwritten everytime they are used. It is suggested to let the name of
- *   parameter input end in @p{.prm}.
+ *   parameter input end in <tt>.prm</tt>.
  *
- *   You should not try to declare entries using @p{declare_entry} and
- *   @p{enter_subsection} with as yet unknown subsection names after
- *   using @p{read_input}. The results in this case are unspecified.
+ *   You should not try to declare entries using declare_entry() and
+ *   enter_subsection() with as yet unknown subsection names after
+ *   using read_input(). The results in this case are unspecified.
  *
  *   If an error occurs upon reading the input, error messages are
- *   written to @p{std::cerr}.
+ *   written to <tt>std::cerr</tt>.
  *
  *   
- *   @sect3{Getting entry values out of a @p{ParameterHandler} object}
+ *   @section Access Getting entry values out of a ParameterHandler object
  *   
- *   Each class gets its data out of a @p{ParameterHandler} object by
- *   calling the @p{get (...)}  member functions like this:
- *   @begin{verbatim}
+ *   Each class gets its data out of a ParameterHandler object by
+ *   calling the get()  member functions like this:
+ *   @code
  *      void NonLinEq::get_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       std::string method = prm.get ("Nonlinear method");
  *       eq.get_parameters (prm);
  *       prm.leave_subsection ();
  *     };
- *   @end{verbatim}
- *   @p{get()} returns the value of the given entry. If the entry was not specified in the input
+ *   @endcode
+ *   get() returns the value of the given entry. If the entry was not specified in the input
  *   source(s), the default value is returned. You have to enter and leave subsections
  *   exactly as you did when declaring subsection. You may chose the order in which to
  *   transverse the subsection tree.
@@ -927,17 +927,17 @@ namespace Patterns
  *   It is guaranteed that only entries matching the given regular expression are returned,
  *   i.e. an input entry value which does not match the regular expression is not stored.
  *
- *   You can use @p{get} to retrieve the parameter in text form, @p{get_integer} to get an integer
- *   or @p{get_double} to get a double. You can also use @p{get_bool}.
+ *   You can use get() to retrieve the parameter in text form, get_integer() to get an integer
+ *   or get_double() to get a double. You can also use get_bool().
  *   It will cause an internal error if the string could not be 
  *   converted to an integer, double or a bool. This should, though, not
  *   happen if you correctly specified the regular expression for this entry; you should not
  *   try to get out an integer or a double from an entry for which no according regular
- *   expression was set. The internal error is raised through the @p{Assert()} macro family
+ *   expression was set. The internal error is raised through the Assert() macro family
  *   which only works in debug mode.
  *
  *   If you want to print out all user selectable features, use the
- *   @p{print_parameters} function. It is generally a good idea to print all parameters
+ *   print_parameters() function. It is generally a good idea to print all parameters
  *   at the beginning of a log file, since this way input and output are together in
  *   one file which makes matching at a later time easier. Additionally, the function
  *   also print those entries which have not been modified in the input file und are
@@ -946,14 +946,16 @@ namespace Patterns
  *   input file.
  *   
  *   
- *   @sect3{Style guide for data retrieval}
+ *   @section Style Style guide for data retrieval
  *   
- *   We propose that every class which gets data out of a @p{ParameterHandler} object provides
- *   a function named @p{get_parameters}. This should be declared @p{virtual}. @p{get_parameters}
- *   functions in derived classes should call the @p{BaseClass::get_parameters} function.
+ *   We propose that every class which gets data out of a
+ *   ParameterHandler object provides a function named
+ *   <tt>get_parameters</tt>. This should be declared
+ *   @p{virtual}. @p{get_parameters} functions in derived classes
+ *   should call the @p{BaseClass::get_parameters} function.
  *
  *
- *   @sect3{Experience with large parameter lists}
+ *   @section Large Experience with large parameter lists
  *  
  *   Experience has shown that in programs defining larger numbers of parameters (more than,
  *   say, fifty) it is advantageous to define an additional class holding these parameters.
@@ -967,21 +969,21 @@ namespace Patterns
  *   up your main class with dozens or more variables denoting the parameters.
  *
  *
- *   @sect3{Possible future extensions}
+ *   @section Future Possible future extensions
  *   
- *   @begin{itemize}
- *   @item Allow long input lines to be broken by appending a backslash character
+ *   <ul>
+ *   <li> Allow long input lines to be broken by appending a backslash character
  *     (just like C macros and shell input).
- *   @item Provide an @p{input filename} command for the input file to enable users to put the
+ *   <li> Provide an @p{input filename} command for the input file to enable users to put the
  *     most common parameters into separate files.
- *   @end{itemize}  
+ *   </ul>
  *
  *
  *   
- *   @sect3{Worked Example}
+ *   @section Example Worked Example
  *
  *   This is the code:
- *   @begin{verbatim}
+ *   @code
  *     #include <iostream>
  *     #include "../include/parameter_handler.h"
  *     
@@ -1122,11 +1124,11 @@ namespace Patterns
  *                                        // input parameters
  *       p.do_something ();
  *     };
- *   @end{verbatim}
+ *   @endcode
  *
  *   
  *   This is the input file (named "prmtest.prm"):
- *   @begin{verbatim}
+ *   @verbatim
  *                                 # first declare the types of equations
  *     set Equation 1 = Poisson
  *     set Equation 2 = Navier-Stokes
@@ -1186,16 +1188,15 @@ namespace Patterns
  *       Problem: outfile=out
  *                eq1=Poisson, eq2=Navier-Stokes
  *                Matrix1=Sparse, Matrix2=Full
- *   @end{verbatim}
+ *   @endverbatim
  *
  *   
- *   @sect3{References}
+ *   @section References References
  *
  *   This class is inspired by the @p{MenuSystem} class of @p{DiffPack}.
  *
  *   @author Wolfgang Bangerth, October 1997, revised February 1998
- *   @ref MultipleParameterLoop
- */
+  */
 class ParameterHandler
 {
   private:
@@ -1278,7 +1279,7 @@ class ParameterHandler
     				     /**
 				      * Read input from a string in
 				      * memory. The lines in memory
-				      * have to be separated by @p{\n}
+				      * have to be separated by <tt>@\n</tt>
 				      * characters.
 				      *
 				      * Return whether the read was
@@ -1288,8 +1289,8 @@ class ParameterHandler
 
 				     /**
 				      * Return status of this object:
-				      * @p{true}=clean or
-				      * @p{false}=error occured.
+				      * <tt>true</tt>=clean or
+				      * <tt>false</tt>=error occured.
 				      */
     bool ok () const;
 
@@ -1338,8 +1339,8 @@ class ParameterHandler
     
 				     /**
 				      * Leave present subsection.
-				      * Return @p{false} if there is
-				      * no subsection to leave; true
+				      * Return <tt>false</tt> if there is
+				      * no subsection to leave; <tt>true</tt>
 				      * otherwise.
 				      */
     bool leave_subsection ();
@@ -1362,15 +1363,14 @@ class ParameterHandler
     
 				     /**
 				      * Return value of entry
-				      * @p{entry_string} as @p{long
-				      * int}.
+				      * @p{entry_string} as @p{long int}.
 				      */
     long int       get_integer (const std::string &entry_string) const;
     
 				     /**
 				      * Return value of entry
 				      * @p{entry_string} as
-				      * @p{double}.
+				      * <tt>double</tt>.
 				      */
     double         get_double (const std::string &entry_string) const;
 
@@ -1603,7 +1603,7 @@ class ParameterHandler
 				      * @p{lineno} is the number of
 				      * the line presently scanned
 				      * (for the logs if there are
-				      * messages). Return @p{false} if
+				      * messages). Return <tt>false</tt> if
 				      * line contained stuff that
 				      * could not be understood, the
 				      * uppermost subsection was to be
@@ -1612,7 +1612,7 @@ class ParameterHandler
 				      * non-declared entry was given
 				      * or teh entry value did not
 				      * match the regular
-				      * expression. @p{true} otherwise.
+				      * expression. <tt>true</tt> otherwise.
 				      *
 				      * The function modifies its
 				      * argument, but also takes it by
@@ -1790,20 +1790,20 @@ class ParameterHandler
  *   
  *   @sect3{Syntax for variant and array entry values}
  *   
- *   Variant values are specified like @p{prefix{ v1 | v2 | v3 | ... }postfix}. Whitespace
- *   to the right of the opening brace @p{{} is ignored as well as to the left of the
- *   closing brace @p{}} while whitespace on the respectively other side is not ignored.
+ *   Variant values are specified like <tt>prefix{ v1 | v2 | v3 | ... }postfix</tt>. Whitespace
+ *   to the right of the opening brace <tt>{</tt> is ignored as well as to the left of the
+ *   closing brace <tt>}</tt> while whitespace on the respectively other side is not ignored.
  *   Whitespace around the mid symbols @p{|} is also ignored. The empty selection
- *   @p{prefix{ v1 | }postfix} is also allowed and produces the strings @p{prefixv1postfix} and
- *   @p{prefixpostfix}.
+ *   <tt>prefix{ v1 | }postfix</tt> is also allowed and produces the strings <tt>prefixv1postfix</tt> and
+ *   <tt>prefixpostfix</tt>.
  *
  *   The syntax for array values is equal, apart from the double braces:
- *   @p{prefix{{ v1 | v2 | v3 }}postfix}.
+ *   <tt>prefix{{ v1 | v2 | v3 }}postfix</tt>.
  *   
  *
  *   @sect3{Worked example}
  *   
- *   Given the above extensions to the example program for the @p{ParameterHandler} and the
+ *   Given the above extensions to the example program for the ParameterHandler and the
  *   following input file
  *   @begin{verbatim}
  *     set Equation 1 = Poisson
