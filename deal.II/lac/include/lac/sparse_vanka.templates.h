@@ -79,14 +79,19 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 	    }
 	}
 
-				       // alias to the matrix which is
+				       // if we don't store the
+				       // inverse matrices, then alias
+				       // the entry in the global
+				       // vector to the local matrix
 				       // to be used
-      FullMatrix<float> &A = (conserve_mem ?
-			      local_matrix :
-			      (*inverses[row]));
-
-      if (build_matrix)
-	A.reinit(row_length);
+      if (conserve_mem == true)
+	{
+	  inverses[row] = &local_matrix;
+	  inverses[row]->reinit (row_length, row_length);
+	}
+      else
+	if (build_matrix)
+	  inverses[row]->reinit (row_length, row_length);
       
       Vector<float> b(row_length);
       Vector<float> x(row_length);
@@ -153,14 +158,14 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 						   // if so, then build the
 						   // matrix out of it
 		  if (build_matrix)
-		    A(i,js->second) = matrix->raw_entry(irow,j);
+		    (*inverses[row])(i,js->second) = matrix->raw_entry(irow,j);
 		}
 	    }
 	}
 				       // Compute new values
       if (build_matrix)
-	A.gauss_jordan();
-      A.vmult(x,b);
+	inverses[row]->gauss_jordan();
+      inverses[row]->vmult(x,b);
       
 				       // Distribute new values
       for (map<unsigned int, unsigned int>::const_iterator is=local_index.begin();
@@ -169,7 +174,13 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 	  const unsigned int irow = is->first;
 	  const unsigned int i = is->second;
 	  dst(irow) = x(i);
-	}
+	};
+
+				       // if we don't store the
+				       // inverses, then unalias the
+				       // local matrix
+      if (conserve_mem == true)
+	inverses[row] = 0;
     }
 }
 
