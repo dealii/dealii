@@ -274,10 +274,13 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       tria=new Triangulation<2>();
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
-      Point<2> &v=tria->begin_quad()->vertex(2);
-      v(0) = 5.;
-      v(1) = 4.;
+      Point<2> &v0=tria->begin_quad()->vertex(0);
+      v0(0) = 0.;
+      Point<2> &v2=tria->begin_quad()->vertex(2);
+      v2(0) = 5.;
+      v2(1) = 4.;
       exact_areas.push_back(7.);
+      show[1][0] = 1;
     }
   
 				   // tria2: crazy cell
