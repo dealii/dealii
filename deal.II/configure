@@ -2841,10 +2841,10 @@ rm -f conftest.$ac_objext conftest.$ac_ext
           ;;
 
       intel_icc)
-                                                                                                              CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -unroll -w0"
+                                                                                                              	            	                                          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424"
           CXXFLAGSPIC="-KPIC"
-          LDFLAGSPIC="-KPIC"
+          LDFLAGSPIC="-KPIC -shared"
           ;;
 
       compaq_cxx)
@@ -3120,22 +3120,31 @@ rm -f conftest.$ac_objext conftest.$ac_ext
         CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
       fi
     else
-      if test "x$GXX_VERSION" = "xibm_xlc" ; then
-        CXXFLAGSG="$CXXFLAGSG -threaded"
-        CXXFLAGSO="$CXXFLAGSO -threaded"
-      else
-        if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
-          CXXFLAGSG="$CXXFLAGSG -pthread"
-          CXXFLAGSO="$CXXFLAGSO -pthread"
-        else
-                    { { echo "$as_me:$LINENO: error: No threading compiler options for this C++ compiler
-                       specified at present" >&5
+      case "$GXX_VERSION" in
+	ibm_xlc)
+            CXXFLAGSG="$CXXFLAGSG -threaded"
+            CXXFLAGSO="$CXXFLAGSO -threaded"
+            ;;
+
+	compaq_cxx)
+            CXXFLAGSG="$CXXFLAGSG -pthread"
+            CXXFLAGSO="$CXXFLAGSO -pthread"
+	    ;;
+
+        intel_icc)
+            CXXFLAGSG="$CXXFLAGSG"
+            CXXFLAGSO="$CXXFLAGSO -parallel"
+	    ;;
+
+	*)
+            { { echo "$as_me:$LINENO: error: No threading compiler options for this C++ compiler
+                         specified at present" >&5
 echo "$as_me: error: No threading compiler options for this C++ compiler
-                       specified at present" >&2;}
+                         specified at present" >&2;}
    { (exit 1); exit 1; }; }
-          exit 1
-        fi
-      fi
+            exit 1
+	    ;;
+      esac
     fi
   fi
 
@@ -4052,7 +4061,6 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
 
       echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-      x=""
 
 else
   echo "$as_me: failed program was:" >&5
@@ -4060,15 +4068,14 @@ cat conftest.$ac_ext >&5
 
       echo "$as_me:$LINENO: result: yes. using workaround" >&5
 echo "${ECHO_T}yes. using workaround" >&6
-      x="template"
+
+cat >>confdefs.h <<_ACEOF
+#define DEAL_II_NAMESP_TEMPL_FRIEND_BUG 1
+_ACEOF
+
 
 fi
 rm -f conftest.$ac_objext conftest.$ac_ext
-
-cat >>confdefs.h <<_ACEOF
-#define DEAL_II_NAMESP_TEMPL_FRIEND_BUG $x
-_ACEOF
-
 
 
   echo "$as_me:$LINENO: checking for templates and pointers to const member functions bug" >&5

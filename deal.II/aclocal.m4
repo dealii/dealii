@@ -263,13 +263,20 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl #327: `NULL reference is not allowed' (this happens when we
           dnl       write "*static_cast<double*>(0)" or some such thing,
           dnl       which we do to create invalid references)
+          dnl #424: `extra ";" ignored'
           dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
           dnl       (allowed for compatibility)' (I don't understand what the
           dnl       compiler means)
-          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -unroll -w0"
+	  dnl
+          dnl Note: we would really like to use  -ansi -Xc, since that
+	  dnl is _very_ picky about standard C++, and is thus very efficient
+          dnl in detecting slight standard violations, but these flags are
+          dnl also very efficient in crashing the compiler (it generates a
+          dnl segfault)
+          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424"
           CXXFLAGSPIC="-KPIC"
-          LDFLAGSPIC="-KPIC"
+          LDFLAGSPIC="-KPIC -shared"
           ;;
   
       compaq_cxx)
@@ -737,20 +744,28 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
         CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
       fi
     else
-      if test "x$GXX_VERSION" = "xibm_xlc" ; then
-        CXXFLAGSG="$CXXFLAGSG -threaded"  
-        CXXFLAGSO="$CXXFLAGSO -threaded"
-      else
-        if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
-          CXXFLAGSG="$CXXFLAGSG -pthread"  
-          CXXFLAGSO="$CXXFLAGSO -pthread"
-        else
-          dnl Other compiler
-          AC_MSG_ERROR(No threading compiler options for this C++ compiler
-                       specified at present)
-          exit 1
-        fi
-      fi
+      case "$GXX_VERSION" in
+	ibm_xlc)
+            CXXFLAGSG="$CXXFLAGSG -threaded"  
+            CXXFLAGSO="$CXXFLAGSO -threaded"
+            ;;
+
+	compaq_cxx)
+            CXXFLAGSG="$CXXFLAGSG -pthread"  
+            CXXFLAGSO="$CXXFLAGSO -pthread"
+	    ;;
+
+        intel_icc)
+            CXXFLAGSG="$CXXFLAGSG"  
+            CXXFLAGSO="$CXXFLAGSO -parallel"
+	    ;;
+
+	*)
+            AC_MSG_ERROR(No threading compiler options for this C++ compiler
+                         specified at present)
+            exit 1
+	    ;;
+      esac
     fi
   fi
 ])
@@ -1658,18 +1673,16 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
     [],
     [
       AC_MSG_RESULT(no)
-      x=""
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      x="template"
+      AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG, 1, 
+                         [Define if we have to work around a bug in gcc with
+                          marking all instances of a template class as friends
+		          to this class if the class is inside a namespace.
+                          See the aclocal.m4 file in the top-level directory
+                          for a description of this bug.])
     ])
-  AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG, $x, 
-                     [Define if we have to work around a bug in gcc with
-                      marking all instances of a template class as friends
-		      to this class if the class is inside a namespace.
-                      See the aclocal.m4 file in the top-level directory
-                      for a description of this bug.])
 ])
 
 
