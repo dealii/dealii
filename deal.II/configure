@@ -7671,7 +7671,7 @@ _ACEOF
   fi
 
 
-        if test "x$USE_CONTRIB_PETSC" != "x" ; then
+        if test "$USE_CONTRIB_PETSC" = "yes" ; then
     echo "$as_me:$LINENO: checking for PETSc library architecture" >&5
 echo $ECHO_N "checking for PETSc library architecture... $ECHO_C" >&6
 

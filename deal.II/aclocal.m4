@@ -3621,7 +3621,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   dnl Secondly, check for the PETSc architecture, since that determines
   dnl where object and configuration files will be found. Do so only
   dnl if we are interested in this information at all.
-  if test "x$USE_CONTRIB_PETSC" != "x" ; then
+  if test "$USE_CONTRIB_PETSC" = "yes" ; then
     AC_MSG_CHECKING(for PETSc library architecture)
 
     AC_ARG_WITH(petsc-arch,
