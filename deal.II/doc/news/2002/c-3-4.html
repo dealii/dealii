@@ -300,6 +300,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: Some of the various instances of the <code
+       class="member">VectorTools::interpolate_boundary_values</code> functions
+       were not explicitly instantiated, leading to linker errors. This is now
+       fixed. 
+       <br>
+       (WB 2002/09/19)
+       </p>
+
+  <li> <p> 
        Removed: The <code
        class="member">FiniteElement::component_to_system_index</code> function
        and its counterpart for faces is gone. This data did not make much sense
@@ -309,6 +318,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        classes, if so necessary.
        <br>
        (WB 2002/09/16)
+       </p>
 
   <li> <p> 
        Changed: The <code
@@ -322,12 +332,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        this will most probably not lead to more serious problems.
        <br>
        (WB 2002/09/16)
+       </p>
 
   <li> <p> 
        New: The mapping classes now also know how to transform tensors of rank
        2, not only vectors (tensors of rank 1) in a co- and contravariant way.
        <br>
        (WB 2002/09/03)
+       </p>
 
   <li> <p> 
        Fixed: the <code class="class">GridIn</code> class had problems
@@ -335,7 +347,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        only the comment sign, but nothing else. This is now fixed.
        <br>
        (WB 2002/08/30)
-  </p>
+       </p>
 
   <li> <p> 
        Improved: <code class="class">VectorTools</code>::<code
@@ -345,7 +357,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        fuctionality remains unchanged, although the code has been cleaned up a bit.
        <br>
        (GK 2002/08/01)
-  </p>
+       </p>
 
   <li> <p> New: The <code class="class">GridTools</code> class now
        offers functions to apply general transformations to all

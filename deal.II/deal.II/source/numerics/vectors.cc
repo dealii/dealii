@@ -770,8 +770,9 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask_)
 {
-				   // if for whatever we were passed
-				   // an empty map, return immediately
+				   // if for whatever reason we were
+				   // passed an empty map, return
+				   // immediately
   if (function_map.size() == 0)
     return;
   
@@ -1774,6 +1775,7 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension>
  const Function<deal_II_dimension>   &,
  std::map<unsigned int,double>       &,
  const std::vector<bool>    &);
+
 template
 void VectorTools::project<deal_II_dimension>
 (const Mapping<deal_II_dimension>      &,
@@ -1786,3 +1788,13 @@ void VectorTools::project<deal_II_dimension>
  const Quadrature<deal_II_dimension-1> &,
  const bool);
 #endif
+
+
+template
+void
+VectorTools::interpolate_boundary_values<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>         &,
+ const FunctionMap<deal_II_dimension>::type &,
+ std::map<unsigned int,double> &,
+ const std::vector<bool>       &);
+
