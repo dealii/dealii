@@ -126,9 +126,9 @@ dnl Usage: DEAL_II_CHECK_ISNAN
 dnl
 AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
   DEAL_II_CHECK_ISNAN_FLAG(debug, $CXXFLAGSG,
-			   CXXFLAGSG="$CXXFLAGSG $deal_II_isnan_flag")
+			   CXXFLAGSG="$deal_II_isnan_flag $CXXFLAGSG")
   DEAL_II_CHECK_ISNAN_FLAG(optimized, $CXXFLAGSO,
-		 	   CXXFLAGSO="$CXXFLAGSO $deal_II_isnan_flag")
+		 	   CXXFLAGSO="$deal_II_isnan_flag $CXXFLAGSO")
 )
 
 
@@ -154,6 +154,8 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
     ],
     [
 	AC_MSG_RESULT("yes")
+	deal_II_isnan_flag="-DHAVE_ISNAN"
+	$3
     ],
     [
 	dnl We need to define something. Unfortunately, this is system 
@@ -170,7 +172,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 		isnan (d);
 	    ],
 	    [
-		deal_II_isnan_flag=$testflag
+		deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
 		break;
 	    ],
 	    [
@@ -181,12 +183,12 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 	dnl the library will not be compilable on this platform
 	dnl without knowledge of the right flag
 	if test "$deal_II_isnan_flag" = "" ; then
-	  AC_MSG_RESULT(no. no such flag found. aborting)
-	  exit 1
-	fi
+	  AC_MSG_RESULT(no.)
+	else
 
-	dnl we found something, lets us it
-	AC_MSG_RESULT(using $testflag)
-	$3
+  	  dnl we found something, lets us it
+	  AC_MSG_RESULT(using $testflag)
+	  $3
+	fi
     ])
 )      

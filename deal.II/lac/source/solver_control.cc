@@ -66,8 +66,11 @@ SolverControl::check (const unsigned int step,
 
   
   if ((step >= maxsteps) ||
-      (check_failure && ((check_value > failure_residual) ||
-			 isnan(check_value))))
+      (check_failure && ((check_value > failure_residual)
+#ifdef HAVE_ISNAN
+			 || isnan(check_value)
+#endif
+      )))
     {
       if (_log_result)
 	deallog << "Failure step " << step

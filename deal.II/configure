@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.28 
+# From configure.in Revision: 1.29 
 
 
 
@@ -1689,6 +1689,8 @@ if { (eval echo configure:1689: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; 
   rm -rf conftest*
   
 	echo "$ac_t"""yes"" 1>&6
+	deal_II_isnan_flag="-DHAVE_ISNAN"
+	CXXFLAGSG="$deal_II_isnan_flag $CXXFLAGSG"
     
 else
   echo "configure: failed program was:" >&5
@@ -1699,7 +1701,7 @@ else
 	for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
 	  CXXFLAGS="$CXXFLAGSG $testflag"
           cat > conftest.$ac_ext <<EOF
-#line 1703 "configure"
+#line 1705 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -1711,10 +1713,10 @@ int main() {
 	    
 ; return 0; }
 EOF
-if { (eval echo configure:1715: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1717: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-		deal_II_isnan_flag=$testflag
+		deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
 		break;
 	    
 else
@@ -1728,22 +1730,22 @@ rm -f conftest*
 	done
 
 				if test "$deal_II_isnan_flag" = "" ; then
-	  echo "$ac_t""no. no such flag found. aborting" 1>&6
-	  exit 1
-	fi
+	  echo "$ac_t""no." 1>&6
+	else
 
-		echo "$ac_t""using $testflag" 1>&6
-	CXXFLAGSG="$CXXFLAGSG $deal_II_isnan_flag"
+  	  	  echo "$ac_t""using $testflag" 1>&6
+	  CXXFLAGSG="$deal_II_isnan_flag $CXXFLAGSG"
+	fi
     
 fi
 rm -f conftest*
 
     echo $ac_n "checking whether isnan is declared with optimized flags""... $ac_c" 1>&6
-echo "configure:1743: checking whether isnan is declared with optimized flags" >&5
+echo "configure:1745: checking whether isnan is declared with optimized flags" >&5
   
   CXXFLAGS=$CXXFLAGSO
   cat > conftest.$ac_ext <<EOF
-#line 1747 "configure"
+#line 1749 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -1755,10 +1757,12 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:1759: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1761: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	echo "$ac_t"""yes"" 1>&6
+	deal_II_isnan_flag="-DHAVE_ISNAN"
+	CXXFLAGSO="$deal_II_isnan_flag $CXXFLAGSO"
     
 else
   echo "configure: failed program was:" >&5
@@ -1769,7 +1773,7 @@ else
 	for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
 	  CXXFLAGS="$CXXFLAGSO $testflag"
           cat > conftest.$ac_ext <<EOF
-#line 1773 "configure"
+#line 1777 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -1781,10 +1785,10 @@ int main() {
 	    
 ; return 0; }
 EOF
-if { (eval echo configure:1785: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1789: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-		deal_II_isnan_flag=$testflag
+		deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
 		break;
 	    
 else
@@ -1798,12 +1802,12 @@ rm -f conftest*
 	done
 
 				if test "$deal_II_isnan_flag" = "" ; then
-	  echo "$ac_t""no. no such flag found. aborting" 1>&6
-	  exit 1
-	fi
+	  echo "$ac_t""no." 1>&6
+	else
 
-		echo "$ac_t""using $testflag" 1>&6
-	CXXFLAGSO="$CXXFLAGSO $deal_II_isnan_flag"
+  	  	  echo "$ac_t""using $testflag" 1>&6
+	  CXXFLAGSO="$deal_II_isnan_flag $CXXFLAGSO"
+	fi
     
 fi
 rm -f conftest*
@@ -1827,16 +1831,16 @@ esac
 
 CXXFLAGS="$CXXFLAGSG"
 echo $ac_n "checking for consistency of CXXFLAGSG flags""... $ac_c" 1>&6
-echo "configure:1831: checking for consistency of CXXFLAGSG flags" >&5
+echo "configure:1835: checking for consistency of CXXFLAGSG flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1833 "configure"
+#line 1837 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:1840: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1844: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6
@@ -1854,16 +1858,16 @@ rm -f conftest*
 
 CXXFLAGS="$CXXFLAGSO"
 echo $ac_n "checking for consistency of CXXFLAGSO flags""... $ac_c" 1>&6
-echo "configure:1858: checking for consistency of CXXFLAGSO flags" >&5
+echo "configure:1862: checking for consistency of CXXFLAGSO flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1860 "configure"
+#line 1864 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:1867: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1871: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6
