@@ -1,0 +1,159 @@
+#!/bin/sh
+# $Id$
+# author: Ralf Hartmann, 2004
+
+
+echo "Running $(pwd)/minimize_boost"
+
+# path of the (original) boost library, e.g.
+O="/home/rhartman/tmp/boost-1.30.2"
+# directory of the deal.II library
+Dtmp="$(pwd)/../.."
+cd $Dtmp && \
+D="$(pwd)"
+# minimized boost library in deal.II
+B="$D/contrib/boost/include"
+
+# when following files compile we assume that the whole library compiles
+F="$D/lib/base/data_out_base.g.o $D/lib/base/polynomial.g.o $D/lib/base/subscriptor.g.o $D/lib/base/thread_management.g.o"
+
+######################################################################
+# Based on a full (original) boost distribution at $O this script
+# creates a boost directory at $B which includes the minimal but
+# complete set of boost files needed for the deal.II library to be
+# compiled on the current platform and compiler.
+#
+# For the case, that the $B/boost directory already exists all needed
+# boost files are updated in $B. No files in $B are removed!
+#
+# Output of this script:
+#   $B/dirs_new.txt:        all directories which were newly created
+#   $B/files_new.txt:       all files which were added to $B
+#   $B/dirs_notneeded.txt:  all directories which (on this platform
+#                           and compiler) weren't needed
+#   $B/files_notneeded.txt: all files which (on this platform
+#                           and compiler) weren't needed
+#
+# Not yet implemented: version update of boost
+######################################################################
+
+
+# get versions:
+Bversion=`grep "define BOOST_VERSION " $B/boost/version.hpp | perl -p -e 's/.define BOOST_VERSION //g;'`
+Oversion=`grep "define BOOST_VERSION " $O/boost/version.hpp | perl -p -e 's/.define BOOST_VERSION //g;'`
+
+# output paths and versions
+if test -d $O; then
+  echo "boost (version $Oversion) library path:"
+  echo "  $O"
+else
+  echo "Error (Line 6)"
+  echo "Path of original boost library not set!"
+  exit
+fi
+echo "deal.II library path:"
+echo "  $D"
+echo "path of boost (version $Bversion) in deal.II:"
+echo "  $B"
+echo 
+
+# version controls:
+if [ $Oversion = $Bversion ]; then
+  echo "version numbers match"
+elif test $Oversion -lt $Bversion; then
+  echo "Error: deal.II already uses a higher version of boost"
+  exit
+elif test $Oversion -gt $Bversion; then
+  echo "Updating $B/boost from boost version $Bversion to $Oversion ..."
+  echo "Error: Not Implemented"
+  exit
+fi
+
+
+# If there is already a boost directory:
+# 1. take inventory, which will be compared with the inventory at the end
+# 2. move the boost directory out of the way
+cd $B && find boost -type d > $B/dirs_start.txt
+cd $B && find boost -type f > $B/files_start.txt
+if test -d $B/boost; then
+  mv boost boost._bak
+fi
+
+# Create all directories and subdirectories
+echo Creating subdirectories
+cd $O && find boost -type d > $B/dirs.txt
+cd $B && mkdir `cat dirs.txt`
+rm $B/dirs.txt
+
+# make sure that while loop below starts
+echo irgendwas > $B/files.txt
+
+# make the base library and cp all needed boost files from $O to $B
+# redo this until no boost file is missing
+while test -s $B/files.txt; do
+  # remove the object files in order to force recompilation
+  cd $D/lib && rm -f libbase.g.so
+  cd $D/lib && rm -f $F
+  echo "Recompile..."
+  # recompile and keep track of missing boost files
+  # create files.txt which includes a list of all missing boost files
+# CHANGE FOLLOWING TWO LINES ACCORDING TO THE OUTPUT OF YOUR SPECIFIC COMPILER
+  cd $D/base && make $F | grep "No such file" > $B/files.txt
+  perl -pi -e 's&^[^ ]* ([^:]*): .*&$1&g;' $B/files.txt
+  # if there are some boost files missing
+  if test -s $B/files.txt; then
+    # collect them from the original boost directory
+    cd $O && tar cvf $B/files.tar `cat $B/files.txt`
+    # and write them into the minimized boost directory
+    cd $B && tar xf files.tar
+  fi
+done
+rm $B/files.tar $B/files.txt
+echo "Success: The files $F are now compiled"
+
+# remove empty directories
+echo Remove empty directories
+cd $B && find boost -type d > dirs.txt
+cp $B/dirs.txt $B/diff.txt
+while test -s $B/diff.txt; do
+  cd $B && rmdir --ignore-fail-on-non-empty `cat dirs.txt`
+  cp $B/dirs.txt $B/dirs.old.txt
+  cd $B && find boost -type d > dirs.txt
+  rm $B/diff.txt
+  diff $B/dirs.old.txt $B/dirs.txt > $B/diff.txt
+done
+rm $B/dirs.old.txt $B/dirs.txt $B/diff.txt
+
+echo "The $B/boost directory is now complete"
+
+# Take inventory of new boost directory
+cd $B && find boost -type d > $B/dirs_end.txt
+cd $B && find boost -type f > $B/files_end.txt
+
+# cp new boost files to old boost directory
+if test -d boost._bak; then
+  cd $B && tar cf boost._tar boost
+  cd $B && rm -rf boost; mv boost._bak boost
+  cd $B && tar xf boost._tar
+  rm boost._tar
+fi
+
+# output of diffs
+echo "Output of log files in $B ..."
+echo "  dirs_new.txt"
+cd $B && diff dirs_start.txt dirs_end.txt | \
+  perl -p -e 's/^[^>].*$/LineToBeRemoved/g; s/^> //g;' | grep -v "LineToBeRemoved"  > dirs_new.txt
+echo "  dirs_notneeded.txt"
+cd $B && diff dirs_start.txt dirs_end.txt | \
+  perl -p -e 's/^[^<].*$/LineToBeRemoved/g; s/^< //g;' | \
+  grep -v "LineToBeRemoved" | grep -v CVS > dirs_notneeded.txt
+echo "  files_new.txt"
+cd $B && diff files_start.txt files_end.txt | \
+  perl -p -e 's/^[^>].*$/LineToBeRemoved/g; s/^> //g;' | grep -v "LineToBeRemoved"  > files_new.txt
+echo "  files_notneeded.txt"
+cd $B && diff files_start.txt files_end.txt | \
+  perl -p -e 's/^[^<].*$/LineToBeRemoved/g; s/^< //g;' | \
+  grep -v "LineToBeRemoved" | grep -v CVS > files_notneeded.txt
+rm dirs_start.txt dirs_end.txt files_start.txt files_end.txt
+
+echo done
