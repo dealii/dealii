@@ -23,8 +23,12 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs   = -ldeal_II_2d -llac -lbase
-libs.g = -ldeal_II_2d.g -llac.g -lbase.g
+libs.g   = $(lib-deal2-2d.g) \
+           $(lib-lac.g)      \
+           $(lib-base.g)
+libs     = $(lib-deal2-2d.o) \
+           $(lib-lac.o)      \
+           $(lib-base.o)
 
 
 ############################################################
@@ -40,6 +44,14 @@ ifeq ($(debug-mode),off)
 libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
+
+# If in multithread mode, add the ACE library to the libraries which
+# we need to link with:
+ifneq ($(with-multithreading),no)
+  libraries += $(lib-ACE)
+endif
+
+
 
 %.go : %.cc Makefile
 	@echo =====debug========= $<
