@@ -151,6 +151,27 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The <code class="class">Legendre</code> and
+       <code class="class">LagrangeEquidistant</code> classes now have
+       static member functions <code
+       class="member">generate_complete_basis<code> which returns an
+       array of polynomial objects spanning the complete space up to a
+       specified order in 1d. This may be used to generate the
+       respective polynomial spaces in higher space dimensions.
+       <br>
+       (WB 2002/05/27)
+       </p>
+
+  <li> <p> 
+       Changed: The <code class="class">Polynomial</code> and
+       <code class="class">LagrangeEquidistant</code> classes have lost
+       their default constructor, as that did not make much sense
+       anyway.
+       <br>
+       (WB 2002/05/27)
+       </p>
+
+  <li> <p> 
        Fixed: When forward declaring the <code
        class="class">Tensor</code> class, we now also forward declare
        its partial specialization for a rank one tensor. Not doing so

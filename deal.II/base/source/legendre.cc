@@ -165,5 +165,18 @@ Legendre<number>::Legendre (const unsigned int k)
 
 
 
+template <typename number>
+std::vector<Polynomial<number> >
+Legendre<number>::generate_complete_basis (const unsigned int degree)
+{
+  std::vector<Polynomial<double> > v;
+  v.reserve(degree+1);
+  for (unsigned int i=0; i<=degree; ++i)
+    v.push_back (Legendre<double>(i));
+  return v;
+};
+
+
+
 // explicit instantiations
 template class Legendre<double>;

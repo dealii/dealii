@@ -16,16 +16,18 @@
 #include <base/polynomial_space.h>
 
 
-
 template <int dim>
-unsigned int PolynomialSpace<dim>::power(const unsigned int x,
-				     const unsigned int y)
+unsigned int
+PolynomialSpace<dim>::compute_n_pols (const unsigned int n)
 {
-  unsigned int value=1;
-  for (unsigned int i=0; i<y; ++i)
-    value*=x;
-  return value;
-}
+  unsigned int n_pols = n;
+  for (unsigned int i=1;i<dim;++i)
+    {
+      n_pols *= (n+i);
+      n_pols /= (i+1);
+    }
+  return n_pols;
+};
 
 
 

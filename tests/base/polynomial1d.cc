@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,12 +44,12 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  std::vector<Polynomial<double> > p (15);
+  std::vector<Polynomial<double> > p;
 
   deallog << "Legendre" << endl;
   
-  for (unsigned int i=0;i<p.size();++i)
-    p[i] = Legendre<double>(i);
+  for (unsigned int i=0;i<15;++i)
+    p.push_back (Legendre<double>(i));
   
   for (unsigned int i=0;i<p.size();++i)
     for (unsigned int j=0;j<=i;++j)
@@ -59,9 +59,9 @@ int main ()
 
   deallog << "LagrangeEquidistant" << endl;
   
-  p.resize(6);
-  for (unsigned int i=0;i<p.size();++i)
-    p[i] = LagrangeEquidistant(p.size(), i);
+  p.clear();
+  for (unsigned int i=0;i<6;++i)
+    p.push_back(LagrangeEquidistant(6, i));
 
 				   // We add 1.0001 bacuse of bugs in
 				   // the ostream classes

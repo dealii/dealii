@@ -25,12 +25,13 @@
 
 
 /**
- * Polynomial space of degree at most n in higher dimensions.
+ * Representation of the space of polynomials of degree at most n in
+ * higher dimensions.
  *
  * Given a vector of @{n} one-dimensional polynomials @{P0} to @{Pn},
  * where @{Pi} has degree @p{i}, this class generates all polynomials
- * the form @p{ Pijk(x,y,z) = Pi(x)Pj(y)Pk(z)}, where the sum of
- * @p{i}, @p{j} and @p{k} is below/equal @p{n}.
+ * of the form @p{ Pijk(x,y,z) = Pi(x)Pj(y)Pk(z)}, where the sum of
+ * @p{i}, @p{j} and @p{k} is less than or equal @p{n}.
  *
  * @author Guido Kanschat, 2002
  */
@@ -43,7 +44,15 @@ class PolynomialSpace
 				      * vector of pointers to
 				      * one-dimensional polynomials
 				      * and will be copied into the
-				      * member variable @p{polynomials}.
+				      * member variable
+				      * @p{polynomials}.  The static
+				      * type of the template argument
+				      * @p{pols} needs to be
+				      * convertible to
+				      * @p{Polynomial<double>},
+				      * i.e. should usually be a
+				      * derived class of
+				      * @p{Polynomial<double>}.
 				      */
     template <class Pol>
     PolynomialSpace(const typename std::vector<Pol> &pols);
@@ -70,10 +79,10 @@ class PolynomialSpace
 				      * functions, see below, in a
 				      * loop over all polynomials.
 				      */
-    void compute(const Point<dim>                     &unit_point,
-		 std::vector<double>                  &values,
-		 typename std::vector<Tensor<1,dim> > &grads,
-		 typename std::vector<Tensor<2,dim> > &grad_grads) const;
+    void compute (const Point<dim>                     &unit_point,
+		  std::vector<double>                  &values,
+		  typename std::vector<Tensor<1,dim> > &grads,
+		  typename std::vector<Tensor<2,dim> > &grad_grads) const;
     
 				     /**
 				      * Computes the value of the
@@ -107,9 +116,16 @@ class PolynomialSpace
 				    const Point<dim> &p) const;
 
 				     /**
-				      * Returns the number of tensor
-				      * product polynomials. For $n$
-				      * 1d polynomials this is $n^dim$.
+				      * Return the number of
+				      * polynomials spanning the space
+				      * represented by this
+				      * class. Here, if @p{N} is the
+				      * number of one-dimensional
+				      * polynomials given, then the
+				      * result of this function is
+				      * @p{N} in 1d, @p{N(N+1)/2} in
+				      * 2d, and @p{N(N+1)(N+2)/6 in
+				      * 3d.
 				      */
     unsigned int n() const;
 
@@ -127,42 +143,33 @@ class PolynomialSpace
 				      * polynomials given to the
 				      * constructor.
 				      */
-    std::vector<Polynomial<double> > polynomials;
+    const std::vector<Polynomial<double> > polynomials;
 
 				     /**
-				      * Number of tensor product
-				      * polynomials. For $n$ 1d
-				      * polynomials this is $n^dim$.
+				      * Store the precomputed value
+				      * which the @p{n()} function
+				      * returns.
 				      */
-    unsigned int n_pols;
-    
+    const unsigned int n_pols;
+
 				     /**
-				      * Computes @p{x} to the power of
-				      * @p{y} for unsigned int @p{x}
-				      * and @p{y}. It is a private
-				      * function as it is only used in
-				      * this class.
+				      * Static function used in the
+				      * constructor to compute the
+				      * number of polynomials.
 				      */
-    static unsigned int power(const unsigned int x, const unsigned int y);
+    static unsigned int compute_n_pols (const unsigned int n);
 };
 
 
 
 template <int dim>
 template <class Pol>
-PolynomialSpace<dim>::PolynomialSpace(
-  const typename std::vector<Pol> &pols):
-		polynomials (pols.begin(), pols.end())
-{
-  const unsigned int n=polynomials.size();
-
-  n_pols = n;
-  for (unsigned int i=1;i<dim;++i)
-    {
-      n_pols *= (n+i);
-      n_pols /= (i+1);
-    }
-}
+PolynomialSpace<dim>::
+PolynomialSpace (const typename std::vector<Pol> &pols)
+		:
+		polynomials (pols.begin(), pols.end()),
+		n_pols (compute_n_pols(polynomials.size()))
+{}
 
 
 

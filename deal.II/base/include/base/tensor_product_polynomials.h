@@ -182,7 +182,7 @@ class TensorProductPolynomials
 				      * polynomials given to the
 				      * constructor.
 				      */
-    std::vector<Polynomial<double> > polynomials;
+    const std::vector<Polynomial<double> > polynomials;
 
 				     /**
 				      * Number of tensor product
@@ -213,11 +213,12 @@ class TensorProductPolynomials
 
 template <int dim>
 template <class Pol>
-TensorProductPolynomials<dim>::TensorProductPolynomials(
-  const typename std::vector<Pol> &pols):
+TensorProductPolynomials<dim>::
+TensorProductPolynomials(const typename std::vector<Pol> &pols)
+		:
 		polynomials (pols.begin(), pols.end()),
 		n_tensor_pols(power(pols.size(), dim)),
-		n_pols_to(dim+1)
+		n_pols_to(dim+1, 0)
 {
   const unsigned int n_pols=polynomials.size();
 

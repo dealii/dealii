@@ -22,14 +22,6 @@ Polynomial<number>::Polynomial (const typename std::vector<number> &a):
 
 
 template <typename number>
-Polynomial<number>::Polynomial ()
-  :
-  coefficients(0)
-{}
-
-
-
-template <typename number>
 number
 Polynomial<number>::value (const number x) const
 {
@@ -106,11 +98,6 @@ Polynomial<number>::value (const number         x,
 LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
 					  const unsigned int support_point):
 		Polynomial<double>(compute_coefficients(n,support_point))
-{}
-
-
-
-LagrangeEquidistant::LagrangeEquidistant ()
 {}
 
 
@@ -335,6 +322,28 @@ LagrangeEquidistant::compute_coefficients (const unsigned int n,
   
   return a;
 }
+
+
+std::vector<Polynomial<double> >
+LagrangeEquidistant::
+generate_complete_basis (const unsigned int degree)
+{
+  if (degree==0)
+				     // create constant polynomial
+    return std::vector<Polynomial<double> >
+      (1, Polynomial<double> (std::vector<double> (1,1.)));
+  else
+    {
+				       // create array of Lagrange
+				       // polynomials
+      std::vector<Polynomial<double> > v;
+      for (unsigned int i=0; i<=degree; ++i)
+	v.push_back(LagrangeEquidistant(degree,i));
+      return v;
+    };
+};
+
+
 
 template class Polynomial<float>;
 template class Polynomial<double>;

@@ -104,14 +104,15 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  vector<Polynomial<double> > p(3);
-  for (unsigned int i=0;i<p.size();++i)
-    p[i] = LagrangeEquidistant(p.size(), i);
+  vector<Polynomial<double> > p;
+  for (unsigned int i=0;i<3;++i)
+    p.push_back (LagrangeEquidistant(3, i));
 
   check_dimensions(p);
 
-  for (unsigned int i=0;i<p.size();++i)
-    p[i] = Legendre<double>(i);
+  p.clear ();
+  for (unsigned int i=0;i<3;++i)
+    p.push_back (Legendre<double>(i));
 
   check_dimensions(p);
 }
