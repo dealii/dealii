@@ -27,7 +27,7 @@ template <int dim>
 ProblemBase<dim>::ProblemBase () :
 		tria(0),
 		dof_handler(0),
-		system_sparsity(1,1,1),   // dummy initialisation, is later reinit'd
+		system_sparsity(),        // dummy initialisation, is later reinit'd
 		system_matrix()           // dummy initialisation, is later reinit'd
 {};
 
@@ -49,7 +49,7 @@ template <int dim>
 void ProblemBase<dim>::clear () {
   tria        = 0;
   dof_handler = 0;
-  system_sparsity.reinit (1,1,1);
+  system_sparsity.reinit (0,0,1);
   system_matrix.clear ();
   right_hand_side.reinit (1);
   solution.reinit (1);
