@@ -49,7 +49,7 @@ foreach $name (sort keys %testcase) {
 
 for ($i=1;$i<$next_index;$i++)
 {
-    printf "<th>%02d", $i;
+    printf "<th><small>%02d</small>", $i;
 }
 
 # finally output a table of results
