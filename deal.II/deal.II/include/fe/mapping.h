@@ -227,11 +227,20 @@ class Mapping : public Subscriptor
 			     const InternalDataBase& internal) const = 0;
 
 				     /**
-				      * Indicate fields to be updated in the
-				      * constructor of @ref{FEValues}. Especially,
-				      * fields not asked for by @ref{FEValues}, but
-				      * computed for efficiency reasons will be
+				      * Indicate fields to be updated
+				      * in the constructor of
+				      * @ref{FEValues}. Especially,
+				      * fields not asked for by
+				      * @ref{FEValues}, but computed
+				      * for efficiency reasons will be
 				      * notified here.
+				      *
+				      * Refer to the same function in
+				      * @ref{FiniteElement} for
+				      * further information.
+				      *
+				      * Example: refer to the same
+				      * function in @ref{MappingQ1}.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags) const = 0;
     

@@ -649,41 +649,71 @@ class FE_Q : public FiniteElement<dim>
     void initialize_unit_face_support_points ();
     
 				     /**
-				      * Given a set of flags indicating
-				      * what quantities are requested
-				      * from a @p{FEValues} object,
-				      * return which of these can be
-				      * precomputed once and for
-				      * all. Often, the values of
-				      * shape function at quadrature
-				      * points can be precomputed, for
-				      * example, in which case the
-				      * return value of this function
-				      * would be the logical and of
-				      * the input @p{flags} and
-				      * @p{update_values}.
+				      * Determine the values that need
+				      * to be computed on the unit
+				      * cell to be able to compute all
+				      * values required by @p{flags}.
 				      *
-				      * For the present kind of finite
-				      * element, this is exactly the
-				      * case.
+				      * For the purpuse of this
+				      * function, refer to the
+				      * documentation in
+				      * @p{FiniteElement}.
+				      *
+				      * The effect in this element is
+				      * as follows: if
+				      * @p{update_values} is set in
+				      * @p{flags}, copy it to the
+				      * result. All other flags of the
+				      * result are cleared, since
+				      * everything else must be
+				      * computed for each cell.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
   
 				     /**
-				      * This is the opposite to the
-				      * above function: given a set of
-				      * flags indicating what we want
-				      * to know, return which of these
-				      * need to be computed each time
-				      * we visit a new cell.
+				      * Determine the values that need
+				      * to be computed on every
+				      * cell to be able to compute all
+				      * values required by @p{flags}.
 				      *
-				      * If for the computation of one
-				      * quantity something else is
-				      * also required (for example, we
-				      * often need the covariant
-				      * transformation when gradients
-				      * need to be computed), include
-				      * this in the result as well.
+				      * For the purpuse of this
+				      * function, refer to the
+				      * documentation in
+				      * @p{FiniteElement}.
+				      *
+				      * The effect in this element is
+				      * as follows:
+				      * @begin{itemize}
+				      * @item if @p{update_gradients}
+				      * is set, the result will
+				      * contain @p{update_gradients}
+				      * and
+				      * @p{update_covariant_transformation}.
+				      * The latter is required to
+				      * transform the gradient on the
+				      * unit cell to the real
+				      * cell. Remark, that the action
+				      * required by
+				      * @p{update_covariant_transformation}
+				      * is actually performed by the
+				      * @p{Mapping} object used in
+				      * conjunction with this finite
+				      * element.
+				      * @item if
+				      * @p{update_second_derivatives}
+				      * is set, the result will
+				      * contain
+				      * @p{update_second_derivatives}
+				      * and
+				      * @p{update_covariant_transformation}.
+				      * The rationale is the same as
+				      * above and no higher
+				      * derivatives of the
+				      * transformation are required,
+				      * since we use difference
+				      * quotients for the actual
+				      * computation.
+				      * @end{itemize}
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
     
