@@ -58,10 +58,10 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 				   // eliminates the need to
 				   // re-allocate memory inside the
 				   // loop.
-  FullMatrix<float> local_matrix (structure.max_row_length(),
-				  structure.max_row_length());
-  Vector<float> b (structure.max_row_length());
-  Vector<float> x (structure.max_row_length());
+  FullMatrix<float> local_matrix (structure.max_entries_per_row(),
+				  structure.max_entries_per_row());
+  Vector<float> b (structure.max_entries_per_row());
+  Vector<float> x (structure.max_entries_per_row());
   
 				   // traverse all rows of the matrix
 				   // which are selected
