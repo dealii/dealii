@@ -17,7 +17,9 @@
 
 
 template <int dim>
-Triangulation<dim>::Triangulation () {
+Triangulation<dim>::Triangulation (const bool smooth_grid) :
+		smooth_grid(smooth_grid)
+{
   static StraightBoundary<dim> default_boundary;
   boundary = &default_boundary;
   
@@ -2592,18 +2594,72 @@ void Triangulation<dim>::prepare_refinement () {
 				   // there are no such cells.
   if (dim>=2) 
     {
+				       // store highest level one of the cells
+				       // adjacent to a vertex belongs to; do
+				       // so only if mesh smoothing is
+				       // required
+      vector<int> vertex_level;
+      if (smooth_grid) 
+	{
+	  vertex_level.resize (vertices.size(), 0);
+	  active_cell_iterator cell = begin_active(),
+			       endc = end();
+	  for (; cell!=endc; ++cell)
+	    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		 ++vertex)
+	      if (cell->refine_flag_set())
+		vertex_level[cell->vertex_index(vertex)]
+		  = max (vertex_level[cell->vertex_index(vertex)],
+			 cell->level()+1);
+	      else
+		vertex_level[cell->vertex_index(vertex)]
+		  = max (vertex_level[cell->vertex_index(vertex)],
+			 cell->level());
+	};
+      
       active_cell_iterator cell = last_active(),
 			   endc = end();
+
 				       // loop over active cells
       for (; cell != endc; --cell)
-	if (cell->refine_flag_set() == true)
-					   // loop over neighbors of cell
-	  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-	    if (cell->neighbor(i).state() == valid)
-	      if ((cell->neighbor_level(i) == cell->level()-1)
-		  &&
-		  (cell->neighbor(i)->refine_flag_set() == false))
-		cell->neighbor(i)->set_refine_flag();
+	if (cell->refine_flag_set() == true) 
+	  {
+					     // loop over neighbors of cell
+	    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+	      if (cell->neighbor(i).state() == valid)
+		{
+						   // regularisation?
+		  if ((cell->neighbor_level(i) == cell->level()-1)
+		      &&
+		      (cell->neighbor(i)->refine_flag_set() == false))
+		    cell->neighbor(i)->set_refine_flag();
+		};
+	  }
+	else
+					   // smoothing?
+	  if (smooth_grid) 
+	    for (unsigned int vertex=0;
+		 vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+	      if (vertex_level[cell->vertex_index(vertex)] >
+		  cell->level()+1)
+		{
+						   // if we did not make an
+						   // error, the level diff
+						   // should not be more than
+						   // two
+		  Assert (vertex_level[cell->vertex_index(vertex)] ==
+			  cell->level()+2,
+			  ExcInternalError());
+
+						   // refine cell and
+						   // update vertex levels
+		  cell->set_refine_flag();
+		  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
+		       ++v)
+		    vertex_level[cell->vertex_index(v)]
+		      = max (vertex_level[cell->vertex_index(v)],
+			     cell->level()+1);
+		};
     };
 
 
