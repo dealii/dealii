@@ -19,6 +19,10 @@
 
 
 template <int dim>
+const unsigned int Function<dim>::dimension;
+
+
+template <int dim>
 Function<dim>::Function (const unsigned int n_components,
 			 const double       initial_time)
                 :

@@ -100,6 +100,15 @@ class Function : public FunctionTime,
 		 public Subscriptor
 {
   public:
+				     /**
+				      * Export the value of the
+				      * template parameter as a static
+				      * member constant. Sometimes
+				      * useful for some expression
+				      * template programming.
+				      */
+    static const unsigned int dimension = dim;
+    
     				     /**
 				      * Number of vector components.
 				      */
