@@ -17,7 +17,7 @@ plane { y,0
   }
 }
 
-text { ttf "timrom.ttf" "deal.II 4.0" .25, 0
+text { ttf "timrom.ttf" "deal.II" .25, 0
   pigment { BrightGold }
   finish { specular 1 }
   translate -3*x
