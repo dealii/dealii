@@ -30,7 +30,7 @@
 #include <lac/vector.h>
 
 #include <algorithm>
-
+#include <numeric>
 
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
@@ -1039,6 +1039,59 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
 
 template <int dim>
 void
+DoFTools::count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
+				    std::vector<unsigned int> &dofs_per_component)
+{
+  const unsigned int n_components = dof_handler.get_fe().n_components();
+  dofs_per_component.resize (n_components);
+
+				   // special case for only one
+				   // component. treat this first
+				   // since it does not require any
+				   // computations
+  if (n_components == 1)
+    {
+      dofs_per_component[0] = dof_handler.n_dofs();
+      return;
+    };
+  
+				   // otherwise determine the number
+				   // of dofs in each component
+				   // separately. do so in parallel
+  std::vector<std::vector<bool> > dofs_in_component (n_components,
+						     std::vector<bool>(dof_handler.n_dofs(),
+								       false));
+  std::vector<std::vector<bool> > component_select (n_components,
+						    std::vector<bool>(n_components, false));
+  Threads::ThreadManager thread_manager;
+  for (unsigned int i=0; i<n_components; ++i)
+    {
+      component_select[i][i] = true;
+      Threads::spawn (thread_manager,
+		      Threads::encapsulate (&DoFTools::template extract_dofs<dim>)
+		      .collect_args (dof_handler, component_select[i],
+				     dofs_in_component[i]));
+    };
+  thread_manager.wait();
+
+				   // next count what we got
+  for (unsigned int i=0; i<n_components; ++i)
+    dofs_per_component[i] = std::count(dofs_in_component[i].begin(),
+				       dofs_in_component[i].end(),
+				       true);
+
+				   // finally sanity check
+  Assert (std::accumulate (dofs_per_component.begin(), dofs_per_component.end(), 0U)
+	  ==
+	  dof_handler.n_dofs(),
+	  ExcInternalError());
+	  
+};
+
+
+
+template <int dim>
+void
 DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coarse_grid,
 					 const unsigned int                  coarse_component,
 					 const DoFHandler<dim>              &fine_grid,
@@ -1779,6 +1832,13 @@ DoFTools::extract_boundary_dofs (const DoFHandler<deal_II_dimension> &,
 				 const std::vector<bool>                  &,
 				 std::vector<bool>                        &);
 #endif 
+
+
+template
+void
+DoFTools::count_dofs_per_component (const DoFHandler<deal_II_dimension> &dof_handler,
+				    std::vector<unsigned int>           &dofs_per_component);
+
 
 template
 void

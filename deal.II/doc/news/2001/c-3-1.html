@@ -111,8 +111,18 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       New: The <code class="class">DoFTools</code> class now has
+       a function <code class="member">count_dofs_per_component</code>
+       that counts the number of degrees of freedom in each of the
+       components of the finite element, i.e. how many degrees of
+       freedom there are on the global mesh for each variable (field).
+       <br>
+       (WB 2001/02/22)
+       </p>
+
   <li> <p>
-       New: The <code class="class">CellAccessor</code> now has a function
+       New: The <code class="class">CellAccessor</code> class now has a function
        <code class="member">has_boundary_lines</code> that mostly has
        the same semantics that <code class="member">at_boundary</code>
        has, but also covers the case that a hexahedron in 3d may be at
