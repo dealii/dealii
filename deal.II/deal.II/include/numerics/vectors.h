@@ -275,21 +275,29 @@ class VectorTools
 				     /**
 				      * Interpolate different finite
 				      * element spaces. The
-				      * interpolation is executed from
-				      * the higher order space
-				      * represented by #high# to the
-				      * lower order space #low#. The
+				      * interpolation of vector
+				      * #data_1# is executed from the
+				      * FE space represented by
+				      * #dof_1# to the vector #data_2#
+				      * on FE space #dof_2#. The
 				      * interpolation on each cell is
 				      * represented by the matrix
 				      * #transfer#. Curved boundaries
 				      * are neglected so far.
+				      *
+				      * Note that you may have to call
+				      * #hanging_nodes.distribute(data_2)#
+				      * with the hanging nodes from
+				      * space #dof_2# afterwards, to
+				      * make the result continuous
+				      * again.
 				      */
     template <int dim>
-    static void interpolate (const DoFHandler<dim>    &high_dof,
-			     const DoFHandler<dim>    &low_dof,
+    static void interpolate (const DoFHandler<dim>    &dof_1,
+			     const DoFHandler<dim>    &dof_2,
 			     const FullMatrix<double> &transfer,
-			     const Vector<double>     &high,
-			     Vector<double>           &low);
+			     const Vector<double>     &data_1,
+			     Vector<double>           &data_2);
 			  
 				     /**
 				      * Compute the projection of
