@@ -490,8 +490,15 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * according to the given distribution
 				      * method.
 				      *
-				      * A copy of the transferred finite
-				      * element is stored.
+				      * A pointer of the transferred finite
+				      * element is stored. Therefore, the
+				      * lifetime of the finite element object
+				      * shall be longer than that of this
+				      * object. If you don't want this
+				      * behaviour, you may want to call
+				      * the #clear# member function which also
+				      * releases the lock of this object to the
+				      * finite element.
 				      *
 				      * This function uses the user flags of the
 				      * triangulation object, so make sure you
@@ -500,6 +507,14 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     virtual void distribute_dofs (const FiniteElement<dim> &);
 
+				     /**
+				      * Clear all data of this object and
+				      * especially delete the lock this object
+				      * has to the finite element used the last
+				      * time when #distribute_dofs# was called.
+				      */
+    virtual void clear ();
+    
 				     /**
 				      * Renumber the degrees of freedom according
 				      * to the given scheme, eventually using
@@ -1338,6 +1353,11 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     void reserve_space ();
 
+				     /**
+				      * Free all used memory.
+				      */
+    void clear_space ();
+    
 				     /**
 				      * Distribute dofs on the given cell,
 				      * with new dofs starting with index

@@ -909,6 +909,18 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff) {
 
 
 
+template <int dim>
+void DoFHandler<dim>::clear () {
+				   // release lock to old fe
+  selected_fe = 0;
+
+				   // release memory
+  clear_space ();
+};
+
+
+
+
 #if deal_II_dimension == 1
 
 template <>
@@ -1966,10 +1978,8 @@ void DoFHandler<1>::reserve_space () {
                                    // newly, since vectors are
                                    // troublesome if you want to change
                                    // their size
-  for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
-  levels.resize (0);
-
+  clear_space ();
+  
   vertex_dofs = vector<int>(tria->vertices.size()*
 			    selected_fe->dofs_per_vertex,
 			    -1);
@@ -1983,6 +1993,7 @@ void DoFHandler<1>::reserve_space () {
 					     -1);
     };
 };
+
 
 #endif
 
@@ -1998,10 +2009,8 @@ void DoFHandler<2>::reserve_space () {
                                    // newly, since vectors are
                                    // troublesome if you want to change
                                    // their size
-  for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
-  levels.resize (0);
-
+  clear_space ();
+  
   vertex_dofs = vector<int>(tria->vertices.size()*
 			    selected_fe->dofs_per_vertex,
 			    -1);
@@ -2019,6 +2028,14 @@ void DoFHandler<2>::reserve_space () {
 };
 
 #endif
+
+
+template <int dim>
+void DoFHandler<dim>::clear_space () {  
+  for (unsigned int i=0; i<levels.size(); ++i)
+    delete levels[i];
+  levels.resize (0);
+};
 
 
 
