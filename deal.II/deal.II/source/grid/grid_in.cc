@@ -363,7 +363,18 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 
 
 template <int dim>
-void GridIn<dim>::read_xda (std::istream &in)
+void GridIn<dim>::read_xda (std::istream &)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+// 2D XDA meshes
+#if deal_II_dimension == 2
+
+template <>
+void GridIn<2>::read_xda (std::istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
@@ -388,7 +399,7 @@ void GridIn<dim>::read_xda (std::istream &in)
     getline (in, line);
 
 				   // set up array of cells
-  std::vector<CellData<dim> > cells (n_cells);
+  std::vector<CellData<2> > cells (n_cells);
   SubCellData subcelldata;
 
   for (unsigned int cell=0; cell<n_cells; ++cell) 
@@ -399,15 +410,17 @@ void GridIn<dim>::read_xda (std::istream &in)
 				       // should still be input here,
 				       // so check this:
       AssertThrow (in, ExcIO());
+      Assert (GeometryInfo<2>::vertices_per_cell == 4,
+	      ExcInternalError());
       
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (unsigned int i=0; i<4; ++i)
 	in >> cells[cell].vertices[i];
     };
 
 
-  
+   
 				   // set up array of vertices
-  std::vector<Point<dim> > vertices (n_vertices);
+  std::vector<Point<2> > vertices (n_vertices);
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
     {
       double x[3];
@@ -416,7 +429,7 @@ void GridIn<dim>::read_xda (std::istream &in)
       in >> x[0] >> x[1] >> x[2];
 
 				       // store vertex
-      for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int d=0; d<2; ++d)
 	vertices[vertex](d) = x[d];
     };
   AssertThrow (in, ExcIO());
@@ -424,9 +437,93 @@ void GridIn<dim>::read_xda (std::istream &in)
 				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
-  GridReordering<dim>::reorder_cells (cells);
+  GridReordering<2>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
 }
+
+#endif // #if deal_II_dimension == 2
+
+
+
+// 3-D XDA meshes
+#if deal_II_dimension == 3
+
+template <>
+void GridIn<3>::read_xda (std::istream &in)
+{
+  Assert (tria != 0, ExcNoTriangulationSelected());
+  AssertThrow (in, ExcIO());
+
+  static const unsigned int xda_to_dealII_map[] = {0,1,5,4,3,2,6,7};
+  
+  std::string line;
+				   // skip comments at start of file
+  getline (in, line);
+
+
+  unsigned int n_vertices;
+  unsigned int n_cells;
+
+				   // read cells, throw away rest of line
+  in >> n_cells;
+  getline (in, line);
+
+  in >> n_vertices;
+  getline (in, line);
+
+				   // ignore following 8 lines
+  for (unsigned int i=0; i<8; ++i)
+    getline (in, line);
+
+				   // set up array of cells
+  std::vector<CellData<3> > cells (n_cells);
+  SubCellData subcelldata;
+
+  for (unsigned int cell=0; cell<n_cells; ++cell) 
+    {
+				       // note that since in the input
+				       // file we found the number of
+				       // cells at the top, there
+				       // should still be input here,
+				       // so check this:
+      AssertThrow (in, ExcIO());
+      Assert(GeometryInfo<3>::vertices_per_cell == 8,
+	     ExcInternalError());
+      
+      unsigned int xda_ordered_nodes[8];
+      
+      for (unsigned int i=0; i<8; ++i)
+	in >> xda_ordered_nodes[i];
+
+      for (unsigned int i=0; i<8; i++)
+	cells[cell].vertices[i] = xda_ordered_nodes[xda_to_dealII_map[i]];
+    };
+
+
+  
+				   // set up array of vertices
+  std::vector<Point<3> > vertices (n_vertices);
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+    {
+      double x[3];
+
+				       // read vertex
+      in >> x[0] >> x[1] >> x[2];
+
+				       // store vertex
+      for (unsigned int d=0; d<3; ++d)
+	vertices[vertex](d) = x[d];
+    };
+  AssertThrow (in, ExcIO());
+
+				   // do some clean-up on vertices...
+  delete_unused_vertices (vertices, cells, subcelldata);
+				   // ... and cells
+  GridReordering<3>::reorder_cells (cells);
+  tria->create_triangulation (vertices, cells, subcelldata);
+}
+
+#endif // #if deal_II_dimension == 3
 
 
 
