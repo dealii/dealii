@@ -392,6 +392,26 @@
 
 <ol>
   <li> <p>
+       New: there is now a class <code class="class">DataOutRotation</code>
+       that can be used to output data which has been computed
+       exploiting rotational symmetry, on the original domain. Thus,
+       the output is of one dimension higher than the computation was,
+       where the computed solution is rotated around the axis of
+       symmetry.
+       <br>
+       (WB 2000/08/14)
+       </p>
+
+  <li> <p>
+       New: class <code class="class">HalfHyperShellBoundary</code>
+       and <code class="member">GridGenerator::half_hyper_shell</code>
+       generate a half shell, useful for computations with a shell
+       domain and rotational symmetry.
+       <br>
+       (WB 2000/08/08)
+       </p>
+
+  <li> <p>
        Changed: The functions
        <code class="member">Triangulation::refine</code>,
        <code class="member">Triangulation::coarsen</code>,

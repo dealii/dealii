@@ -118,10 +118,23 @@ template <int dim> class DoFHandler;
  * usually @p{build_patches} or the like, which fills the @p{patches} array of
  * this class.
  *
+ * Regarding the templates of this class, it needs two values: first
+ * the space dimension in which the triangulation and the DoF handler
+ * operate, second the space dimension of the output to be
+ * generated. Although in most cases they are equal, there are also
+ * classes for which this does not hold, for example if one outputs
+ * the result of a computation exploiting rotational symmetry in the
+ * original domain (in which the space dimension of the output would
+ * be one higher than that of the DoF handler, see the
+ * @ref{DataOut_Rotation} class), or one might conceive that one could
+ * write a class that only outputs the solution on a cut through the
+ * domain, in which case the space dimension of the output is less
+ * than that of the DoF handler.
+ *
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim>
-class DataOut_DoFData : public DataOutInterface<dim>
+template <int dof_handler_dim, int patch_dim>
+class DataOut_DoFData : public DataOutInterface<patch_dim>
 {
   public:
 				     /**
@@ -140,7 +153,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
 				      * and the mapping between nodes
 				      * and node values.
 				      */
-    void attach_dof_handler (const DoFHandler<dim> &);
+    void attach_dof_handler (const DoFHandler<dof_handler_dim> &);
 
 				     /**
 				      * Add a data vector together
@@ -343,7 +356,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
 				     /**
 				      * Pointer to the dof handler object.
 				      */
-    const DoFHandler<dim>   *dofs;
+    const DoFHandler<dof_handler_dim> *dofs;
 
 				     /**
 				      * List of data elements with vectors of
@@ -364,7 +377,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
 				      * in the output routines of the base
 				      * classes.
 				      */
-    vector<DataOutBase::Patch<dim> > patches;
+    vector<DataOutBase::Patch<patch_dim> > patches;
 
 				     /**
 				      * Function by which the base
@@ -372,7 +385,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
 				      * what patches they shall write
 				      * to a file.
 				      */
-    virtual const vector<DataOutBase::Patch<dim> > & get_patches () const;
+    virtual const vector<DataOutBase::Patch<patch_dim> > & get_patches () const;
 
 				     /**
 				      * Virtual function through
@@ -443,7 +456,7 @@ class DataOut_DoFData : public DataOutInterface<dim>
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
-class DataOut : public DataOut_DoFData<dim> 
+class DataOut : public DataOut_DoFData<dim,dim> 
 {
   public:
     				     /**
