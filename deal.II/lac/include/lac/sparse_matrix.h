@@ -763,7 +763,7 @@ class SparseMatrix : public Subscriptor
 				      * for this operation.
 				      */
     template <typename somenumber>
-    double matrix_norm (const Vector<somenumber> &v) const;
+    somenumber matrix_norm (const Vector<somenumber> &v) const;
 
     				     /**
 				      * Return the l1-norm of the matrix, i.e.
@@ -801,7 +801,7 @@ class SparseMatrix : public Subscriptor
 				      * #dst#.
 				      */
     template <typename somenumber>
-    double residual (Vector<somenumber>& dst, const Vector<somenumber>& x,
+    somenumber residual (Vector<somenumber>& dst, const Vector<somenumber>& x,
 		     const Vector<somenumber>& b) const;
 				     //
     template <typename somenumber>

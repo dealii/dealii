@@ -29,12 +29,12 @@ template void SparseMatrix<TYPEMAT>::vmult (Vector<TYPE2> &,
 template void SparseMatrix<TYPEMAT>::Tvmult (Vector<TYPE2> &,
 					     const Vector<TYPE2> &) const;
 
-template double
+template TYPE2
 SparseMatrix<TYPEMAT>::matrix_norm (const Vector<TYPE2> &) const;
 
-template double SparseMatrix<TYPEMAT>::residual (Vector<TYPE2> &,
-					       const Vector<TYPE2> &,
-					       const Vector<TYPE2> &) const;
+template TYPE2 SparseMatrix<TYPEMAT>::residual (Vector<TYPE2> &,
+						const Vector<TYPE2> &,
+						const Vector<TYPE2> &) const;
 
 template void SparseMatrix<TYPEMAT>::precondition_SSOR (Vector<TYPE2> &,
 						      const Vector<TYPE2> &,

@@ -52,7 +52,7 @@ class SolverCG : public Solver<Matrix,Vector>
 				      * Implementation of the computation of
 				      * the norm of the residual.
 				      */
-    virtual double criterion();
+    virtual long double criterion();
     
 				     /**
 				      * Temporary vectors, allocated through
@@ -72,7 +72,7 @@ class SolverCG : public Solver<Matrix,Vector>
 				      * norm of the residual vector and thus
 				      * the square root of the #res2# value.
 				      */
-    double res2;
+    long double res2;
 };
 
 
@@ -89,7 +89,8 @@ SolverCG<Matrix,Vector>::SolverCG(SolverControl &cn,
 
 
 template<class Matrix, class Vector>
-double SolverCG<Matrix,Vector>::criterion()
+long double
+SolverCG<Matrix,Vector>::criterion()
 {
   return sqrt(res2);
 };
@@ -128,7 +129,7 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
 				   // Implementation taken from the DEAL
 				   // library
   int  it=0;
-  double res,gh,alpha,beta;
+  long double res,gh,alpha,beta;
  
   res = A.residual(g,x,b);
   conv = control().check(0,res);

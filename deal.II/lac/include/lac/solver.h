@@ -144,46 +144,11 @@ class Solver
     Solver (SolverControl &, VectorMemory<Vector> &);
 
 				     /**
-				      * Solver procedure.  This is in
-				      * fact only a template for the
-				      * solve-function to be
-				      * implemented in derived classes
-				      */
-    template<class Preconditioner>
-    ReturnState solve (const Matrix &A,
-		       Vector &x,
-		       const Vector &b,
-		       const Preconditioner& precondition) const;
-    
-				     /**
 				      * Access to control object.
 				      */
     SolverControl& control() const;
     
   protected:
-				     /**
-				      * Calculation of convergence
-				      * criterion. To allow further
-				      * flexibility in solvers, the
-				      * convergence criterion can be
-				      * implemented by the user. Each
-				      * method has it's standard
-				      * criterion (usually some kind of
-				      * residual) already implemented.
-				      */
-    virtual double criterion() = 0;
-    
-				     /**
-				      * Additional entry point for
-				      * examination.  Allows access to
-				      * internal variables of a solver
-				      * at a given point dependent of
-				      * the actual solver method. Does
-				      * nothing by default and should
-				      * only be implemented to test
-				      * iterative methods.
-				      */
-    virtual void expert() {};
 
 				     /**
 				      * Control structure.
@@ -217,7 +182,7 @@ class SolverDual : public Solver<Matrix, Vector>
 				      * Solve the original problem
 				      * $Ax=b$.
 				      */
-    virtual ReturnState solve (const Matrix &A,
+    ReturnState solve (const Matrix &A,
 			       Vector       &x,
 			       const Vector &b) = 0;
 
@@ -225,7 +190,7 @@ class SolverDual : public Solver<Matrix, Vector>
 				      * Solve the two problems
 				      * $Ax=b1$ and $A^Tz=b2$ simultanously.
 				      */
-    virtual ReturnState solve (const Matrix &A,
+    ReturnState solve (const Matrix &A,
 			       Vector       &x,
 			       const Vector &b1,
 			       Vector       &z,
@@ -241,7 +206,8 @@ class SolverDual : public Solver<Matrix, Vector>
 
 template <class Matrix, class Vector>
 inline
-SolverControl & Solver<Matrix,Vector>::control() const {
+SolverControl & Solver<Matrix,Vector>::control() const
+{
   return cntrl;
 };
 
@@ -253,9 +219,6 @@ Solver<Matrix, Vector>::Solver(SolverControl &cn, VectorMemory<Vector> &mem)
 		: cntrl(cn),
 		  memory(mem)
 {};
-
-
-
 
 
 /*----------------------------   solver.h     ---------------------------*/

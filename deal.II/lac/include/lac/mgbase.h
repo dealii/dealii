@@ -12,9 +12,6 @@
 #include <vector>
 #include <base/smartpointer.h>
 
-#define FLOAT float
-
-
 /**
  * Abstract base class for coarse grid solvers.
  * The interface of a function call operator is defined to execute coarse
@@ -41,8 +38,8 @@ class MGCoarseGridSolver
 				      * about the matrix is removed to
 				      * that class.
 				      */
-    virtual void operator() (unsigned int level, Vector<FLOAT>& dst,
-			     const Vector<FLOAT>& src) const = 0;
+    virtual void operator() (unsigned int level, Vector<float>& dst,
+			     const Vector<float>& src) const = 0;
 };
 
 
@@ -75,8 +72,8 @@ class MGSmootherBase
 				      * things.
 				      */
     virtual void smooth (const unsigned int   level,
-			 Vector<FLOAT>       &u,
-			 const Vector<FLOAT> &rhs) const = 0;
+			 Vector<float>       &u,
+			 const Vector<float> &rhs) const = 0;
 
 };
 
@@ -94,8 +91,8 @@ class MGSmootherIdentity
 				      * This function does nothing.
 				      */
     virtual void smooth (const unsigned int   level,
-			 Vector<FLOAT>       &u,
-			 const Vector<FLOAT> &rhs) const;
+			 Vector<float>       &u,
+			 const Vector<float> &rhs) const;
 };
 
 /**
@@ -130,8 +127,8 @@ class MGTransferBase
 				      * level.
 				      */
     virtual void prolongate (const unsigned int   to_level,
-			     Vector<FLOAT>       &dst,
-			     const Vector<FLOAT> &src) const = 0;
+			     Vector<float>       &dst,
+			     const Vector<float> &src) const = 0;
 
 				     /**
 				      * Restrict a vector from level
@@ -147,8 +144,8 @@ class MGTransferBase
 				      * level.
 				      */
     virtual void restrict (const unsigned int   from_level,
-			   Vector<FLOAT>       &dst,
-			   const Vector<FLOAT> &src) const = 0;
+			   Vector<float>       &dst,
+			   const Vector<float> &src) const = 0;
 };
 
 /**
@@ -246,8 +243,8 @@ class MGCoarseGridLACIteration
 				      * matrix, vectors and
 				      * preconditioner.
 				      */
-    virtual void operator() (unsigned int level, Vector<FLOAT>& dst,
-			     const Vector<FLOAT>& src) const;
+    virtual void operator() (unsigned int level, Vector<float>& dst,
+			     const Vector<float>& src) const;
   private:
 				     /**
 				      * Reference to the solver.
@@ -304,18 +301,18 @@ class MGBase
 				     /**
 				      * Auxiliary vector, defect.
 				      */
-    MGVector<Vector<FLOAT> > d;
+    MGVector<Vector<float> > d;
 
 				     /**
 				      * Auxiliary vector, solution.
 				      */
-    MGVector<Vector<FLOAT> > s;
+    MGVector<Vector<float> > s;
 
   private:
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector<FLOAT> t;
+    Vector<float> t;
     
 				     /**
 				      * Prolongation and restriction object.
@@ -345,9 +342,9 @@ class MGBase
 				      * derived class.
 				      */
     virtual void level_residual(unsigned int level,
-			     Vector<FLOAT>& dst,
-			     const Vector<FLOAT>& src,
-			     const Vector<FLOAT>& rhs) = 0;  
+			     Vector<float>& dst,
+			     const Vector<float>& src,
+			     const Vector<float>& rhs) = 0;  
 
   
   public:
@@ -443,7 +440,7 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>
 template<class SOLVER, class MATRIX, class PRECOND>
 void
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>::operator()
-(unsigned int, Vector<FLOAT>& dst, const Vector<FLOAT>& src) const
+(unsigned int, Vector<float>& dst, const Vector<float>& src) const
 {
   solver.solve(matrix, dst, src, precondition);
 }

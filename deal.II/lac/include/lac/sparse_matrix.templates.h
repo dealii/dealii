@@ -225,7 +225,7 @@ SparseMatrix<number>::Tvmult (Vector<somenumber>& dst, const Vector<somenumber>&
 
 template <typename number>
 template <typename somenumber>
-double
+somenumber
 SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -292,7 +292,7 @@ number SparseMatrix<number>::linfty_norm () const
 
 template <typename number>
 template <typename somenumber>
-double
+somenumber
 SparseMatrix<number>::residual (Vector<somenumber>& dst,
 				const Vector<somenumber>& u,
 				const Vector<somenumber>& b) const

@@ -13,7 +13,7 @@ void print_vector(ostream& s, const VECTOR& v)
   for (unsigned int i=0;i<n;++i)
     {
       for (unsigned int j=0;j<n;++j)
-//	s << ((FLOAT)i)/n << '\t' << ((FLOAT)j)/n << '\t' << v(k++) << endl;
+//	s << ((float)i)/n << '\t' << ((float)j)/n << '\t' << v(k++) << endl;
 	s << '\t' << v(k++);
       s << endl;
     }
@@ -99,8 +99,8 @@ MGSmootherBase::~MGSmootherBase()
 
 void
 MGSmootherIdentity::smooth (const unsigned int,
-			    Vector<FLOAT>       &,
-			    const Vector<FLOAT> &) const
+			    Vector<float>       &,
+			    const Vector<float> &) const
 {}
 
 
