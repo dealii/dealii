@@ -33,7 +33,9 @@ report: compare
 	 fi
 
 report+mail:
-	$(MAKE) report | mail regression-tests@dealii.org
+	@$(MAKE) report | tee testresults
+	@cat testresults | mail regression-tests@dealii.org
+	@rm testresults
 
 
 # collect all header files, and for each try to do the following:
