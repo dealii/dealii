@@ -22,34 +22,31 @@ threads.cc : threads.pl
 	@echo =====regenerating== $@
 	@$(PERL) $^ > $@
 
-data_out_base.exe  : data_out_base.g.$(OBJEXT)                      $(lib-base.g)
-logtest.exe        : logtest.g.$(OBJEXT)                            $(lib-base.g)
-path_search.exe    : path_search.g.$(OBJEXT)                        $(lib-base.g)
-polynomial_test.exe: polynomial_test.g.$(OBJEXT)                    $(lib-base.g)
-polynomial1d.exe   : polynomial1d.g.$(OBJEXT)                       $(lib-base.g)
-quadrature_test.exe: quadrature_test.g.$(OBJEXT)                    $(lib-base.g)
-quadrature_selector.exe: quadrature_selector.g.$(OBJEXT)            $(lib-base.g)
-reference.exe      : reference.g.$(OBJEXT)                          $(lib-base.g)
-slice_vector.exe   : slice_vector.g.$(OBJEXT)                       $(lib-base.g)
-table.exe          : table.g.$(OBJEXT)                              $(lib-base.g)
-tensor.exe         : tensor.g.$(OBJEXT)                             $(lib-base.g)
-timer.exe          : timer.g.$(OBJEXT)                              $(lib-base.g)
-threads.exe        : threads.g.$(OBJEXT)                            $(lib-base.g)
-anisotropic_1.exe  : anisotropic_1.g.$(OBJEXT)                      $(lib-base.g)
-anisotropic_2.exe  : anisotropic_2.g.$(OBJEXT)                      $(lib-base.g)
-hierarchical.exe   : hierarchical.g.$(OBJEXT)                       $(lib-base.g)
-bdm.exe            : bdm.g.$(OBJEXT)                                $(lib-base.g)
-auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries) $(lib-base.g)
+tests_x =  logtest \
+	   reference \
+	   quadrature_* \
+	   path_search \
+	   slice_vector \
+	   table \
+	   tensor \
+           timer \
+	   threads \
+	   polynomial* \
+	   auto_derivative_function \
+	   anisotropic_* \
+           hierarchical \
+	   data_out_base
 
-tests =  logtest reference quadrature_test quadrature_selector \
-	 path_search \
-	  slice_vector table tensor \
-          timer threads polynomial1d polynomial_test \
-	  auto_derivative_function anisotropic_1 anisotropic_2 \
-          hierarchical data_out_base
+# from above list of regular expressions, generate the real set of
+# tests
+expand = $(shell echo $(addsuffix .cc,$(1)) \
+           | $(PERL) -pi -e 's/\.cc//g;')
+tests = $(call expand,$(tests_x))
+
 
 ############################################################
 
 
 include ../Makefile.rules
 include Makefile.depend
+include Makefile.tests
