@@ -38,6 +38,27 @@ class ostream;
 
 
 /**
+ * Declare some symbolic names for mesh smoothing algorithms. The meaning of
+ * these flags is documented in the #Triangulation# class.
+ */
+enum MeshSmoothing {
+      none                               = 0x0,
+      limit_level_difference_at_vertices = 0x1,     
+      eliminate_unrefined_islands        = 0x2,
+
+      eliminate_refined_islands          = 0x4,
+      
+      smoothing_on_refinement            = (limit_level_difference_at_vertices |
+					    eliminate_unrefined_islands),
+      smoothing_on_coarsening            = (eliminate_refined_islands),
+      maximum_smoothing                  = 0xffff
+};
+
+				       
+
+
+
+/**
  *  General template for information belonging to one level of a multilevel
  *  hierarchy of a triangulation. This template is only declared to allow
  *  specializations for different dimensions.
@@ -539,29 +560,10 @@ class TriaDimensionInfo<2> {
 
 
 
-/**
- * Declare some symbolic names for mesh smoothing algorithms. The meaning of
- * these flags is documented in the #Triangulation# class.
- */
-enum MeshSmoothing {
-      none                               = 0x0,
-      limit_level_difference_at_vertices = 0x1,     
-      eliminate_unrefined_islands        = 0x2,
-
-      eliminate_refined_islands          = 0x4,
-      
-      smoothing_on_refinement            = (limit_level_difference_at_vertices |
-					    eliminate_unrefined_islands),
-      smoothing_on_coarsening            = (eliminate_refined_islands),
-      maximum_smoothing                  = 0xffff
-};
-
-				       
 
 
 
 /*------------------------------------------------------------------------*/
-
 
 
 /**
