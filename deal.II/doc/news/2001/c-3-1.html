@@ -239,7 +239,6 @@ documentation, etc</a>.
        (GK 2001/03/05)
        </p>
 
-
   <li> <p> Fix: <code class="class">Logstream</code>::<code
        class="member">pop()</code> does not perform anything on empty
        stacks.
@@ -408,6 +407,16 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Fixed: due to a bug in gcc, the compiler did not check that we
+       did not use the set of given boundary indicators to the
+       <code class="member">DoFTools::extract_boundary_dofs</code>
+       function in 1d. That set was therefore ignored. This is now
+       fixed.
+       <br>
+       (WB 2001/05/18)
+       </p>
+
   <li> <p>
        Changed: the flags which are given to the <code
        class="class">GridOut</code> class to modify the appearance of

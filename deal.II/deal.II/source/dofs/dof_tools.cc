@@ -946,7 +946,8 @@ template <>
 void
 DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
 				 const std::vector<bool>  &component_select,
-				 std::vector<bool>        &selected_dofs)
+				 std::vector<bool>        &selected_dofs,
+				 const std::set<unsigned char> &boundary_indicators)
 {
   Assert (component_select.size() == dof_handler.get_fe().n_components(),
 	  ExcWrongSize (component_select.size(),
@@ -959,23 +960,36 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1>      &dof_handler,
 
   Assert (dof_handler.get_fe().dofs_per_face == dof_handler.get_fe().dofs_per_vertex,
 	  ExcInternalError());
+
+				   // let's see whether we have to
+				   // check for certain boundary
+				   // indicators or whether we can
+				   // accept all
+  const bool check_left_vertex  = ((boundary_indicators.size() == 0) ||
+				   (boundary_indicators.find(0) !=
+				    boundary_indicators.end()));
+  const bool check_right_vertex = ((boundary_indicators.size() == 0) ||
+				   (boundary_indicators.find(1) !=
+				    boundary_indicators.end()));
   
 				   // loop over coarse grid cells
   for (DoFHandler<1>::cell_iterator cell=dof_handler.begin(0);
        cell!=dof_handler.end(0); ++cell)
     {
 				       // check left-most vertex
-      if (cell->neighbor(0) == dof_handler.end())
-	for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
-	  if (component_select[dof_handler.get_fe().
-			      face_system_to_component_index(i).first] == true)
-	    selected_dofs[cell->vertex_dof_index(0,i)] = true;
+      if (check_left_vertex)
+	if (cell->neighbor(0) == dof_handler.end())
+	  for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
+	    if (component_select[dof_handler.get_fe().
+				face_system_to_component_index(i).first] == true)
+	      selected_dofs[cell->vertex_dof_index(0,i)] = true;
 				       // check right-most vertex
-      if (cell->neighbor(1) == dof_handler.end())
-	for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
-	  if (component_select[dof_handler.get_fe().
-			      face_system_to_component_index(i).first] == true)
-	    selected_dofs[cell->vertex_dof_index(1,i)] = true;
+      if (check_right_vertex)
+	if (cell->neighbor(1) == dof_handler.end())
+	  for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
+	    if (component_select[dof_handler.get_fe().
+				face_system_to_component_index(i).first] == true)
+	      selected_dofs[cell->vertex_dof_index(1,i)] = true;
     };
 };
 
