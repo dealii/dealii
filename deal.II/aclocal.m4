@@ -2103,6 +2103,56 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_BUG, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl gcc3.1 (and maybe later compilers) has a bug with long double
+dnl and optimization (see code below), when compiling on Sparc
+dnl machines
+dnl
+dnl Usage: DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG, dnl
+[
+  AC_MSG_CHECKING(for long double optimization bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSO"
+  AC_TRY_COMPILE(
+    [
+	double* copy(long double* first, long double* last, double* result)
+	{
+	  int n;
+	  for (n = last - first; n > 0; --n) {
+	    *result = *first;
+	    ++first;
+	    ++result;
+	  }
+	  return result;
+	}
+
+	void f()
+	{
+	  long double *p1, *p2;
+	  double *p3;
+	  copy (p1, p2, p3);
+	  p3 = copy (p1, p2, p3);
+	};
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. disabling respective functions)
+      AC_DEFINE(DEAL_II_LONG_DOUBLE_LOOP_BUG, 1, 
+                     [Defined if the compiler gets an internal compiler
+                      upon some code involving long doubles, and with
+                      optimization. For the details, look at
+                      aclocal.m4 in the top-level directory.])
+    ])
+])
+
+
+
 
 dnl -------------------------------------------------------------
 dnl gcc2.95 doesn't have the std::iterator class, but the standard
