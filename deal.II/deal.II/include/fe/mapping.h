@@ -24,6 +24,8 @@
 template <int dim> class Quadrature;
 template <int dim> class FEValuesData;
 template <int dim> class FEValues;
+template <int dim> class FEFaceValues;
+template <int dim> class FESubfaceValues;
 
 /**
  * Abstract basis class for mapping classes.
@@ -41,28 +43,59 @@ template <int dim> class FEValues;
  * @p{fill_fe_*_values} with the result of @p{update_each} to compute
  * values for a special cell.
  * 
- * @author Guido Kanschat, 2000
+ * @author Guido Kanschat, Ralf Hartmann 2000
  */
 template <int dim>
 class Mapping : public Subscriptor
 {
   public:
-				   /**
-				    * Class for internal data of finite
-				    * element and mapping objects.
-				    */
-//TODO: can we make the following class protected?    
+    
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~Mapping ();
+    
+				     /**
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns @p{p_real}.
+				      */
+    virtual Point<dim> transform_unit_to_real_cell (
+      const typename Triangulation<dim>::cell_iterator cell,
+      const Point<dim> &p) const=0;
+    
+				     /**
+				      * Transforms the point @p{p} on
+				      * the real cell to the point
+				      * @p{p_unit} on the unit cell
+				      * @p{cell} and returns @p{p_unit}.
+				      */
+    virtual Point<dim> transform_real_to_unit_cell (
+      const typename Triangulation<dim>::cell_iterator cell,
+      const Point<dim> &p) const=0;
+    
+				     /**
+				      * Class for internal data of finite
+				      * element and mapping objects.
+				      */
     class InternalDataBase: public Subscriptor
     {
+      private:
+					 /**
+					  * Copy constructor forbidden.
+					  */
+        InternalDataBase (const InternalDataBase&);
+
       public:
-				       /**
-					* Constructor. Sets
-					* @p{UpdateFlags} to
-					* @p{update_default} and
-					* @p{first_cell} to @p{true}.
-					*/
+					 /**
+					  * Constructor. Sets
+					  * @p{UpdateFlags} to
+					  * @p{update_default} and
+					  * @p{first_cell} to @p{true}.
+					  */
         InternalDataBase ();
-      
+	
 					 /**
 					  * Virtual destructor for
 					  * derived classes
@@ -107,13 +140,101 @@ class Mapping : public Subscriptor
 	bool first_cell;
     };
     
+				     /**
+				      * Tranform a field of covariant vectors.
+				      * There must be one vector for each quadrature
+				      * point. Alternatively, for faces and subfaces,
+				      * the first quadrature point can be
+				      * given as additional argument.
+				      */
+    virtual void transform_covariant (std::vector<Tensor<1,dim> >       &dst,
+				      const std::vector<Tensor<1,dim> > &src,
+				      const InternalDataBase& internal,
+				      const unsigned int src_offset) const = 0;
     
 				     /**
-				      * Virtual destructor.
+				      * Tranform a field of contravariant vectors.
+				      * There must be one vector for each quadrature
+				      * point. Alternatively, for faces and subfaces,
+				      * the first quadrature point can be
+				      * given as additional argument.
 				      */
-    virtual ~Mapping ();
+    virtual void transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
+					  const std::vector<Tensor<1,dim> > &src,
+					  const InternalDataBase& internal,
+					  const unsigned int src_offset) const = 0;
+    
+				     /**
+				      * Tranform a field of covariant vectors.
+				      * There must be one vector for each quadrature
+				      * point. Alternatively, for faces and subfaces,
+				      * the first quadrature point can be
+				      * given as additional argument.
+				      */
+    virtual void transform_covariant (std::vector<Point<dim> >       &dst,
+				      const std::vector<Point<dim> > &src,
+				      const InternalDataBase& internal,
+				      const unsigned int src_offset) const = 0;
+    
+				     /**
+				      * Tranform a field of contravariant vectors.
+				      * There must be one vector for each quadrature
+				      * point. Alternatively, for faces and subfaces,
+				      * the first quadrature point can be
+				      * given as additional argument.
+				      */
+    virtual void transform_contravariant (std::vector<Point<dim> >       &dst,
+					  const std::vector<Point<dim> > &src,
+					  const InternalDataBase& internal,
+					  const unsigned int src_offset) const = 0;
 
-//TODO: why make the following functions public? they are only helpful for fevalues and maybe the finite elements?
+				     /**
+				      * Indicate fields to be updated in the
+				      * constructor of @ref{FEValues}. Especially,
+				      * fields not asked for by @ref{FEValues}, but
+				      * computed for efficiency reasons will be
+				      * notified here.
+				      */
+    virtual UpdateFlags update_once (const UpdateFlags) const = 0;
+    
+				     /**
+				      * The same as @p{update_once},
+				      * but for the flags to be updated for
+				      * each grid cell.
+				      */
+    virtual UpdateFlags update_each (const UpdateFlags) const = 0;
+    
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidData);
+
+
+    
+  protected:
+
+				     /**
+				      * Vector of unit normal
+				      * directions. The entry divided by
+				      * 2 determines the non-zero
+				      * component of the normal vector:
+				      * 0 means x, 1 means y and 2 means
+				      * z. The entry modulo 2 determines
+				      * the orientation of the first
+				      * tangential vector in the
+				      * cross-product. This has to be
+				      * chosen such that the normal
+				      * vector points outwards.
+				      *
+				      * This variable is purely for
+				      * internal use and its values are
+				      * determined by its usage in the
+				      * source code.
+				      */
+    static const unsigned int normal_directions[2*dim];
+
+  private:
+    
 				     /**
 				      * Prepare internal data
 				      * structures and fill in values
@@ -225,131 +346,15 @@ class Mapping : public Subscriptor
 			    std::vector<Tensor<1,dim> >        &boundary_form,
 			    std::vector<Point<dim> >        &normal_vectors) const = 0;
 
-
 				     /**
-				      * Tranform a field of covariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
+				      * Give class @p{FEValues} access
+				      * to the private @p{get_...data}
+				      * and @p{fill_fe_...values}
+				      * functions.
 				      */
-    virtual void transform_covariant (std::vector<Tensor<1,dim> >       &dst,
-				      const std::vector<Tensor<1,dim> > &src,
-				      const InternalDataBase& internal,
-				      const unsigned int src_offset) const = 0;
-    
-				     /**
-				      * Tranform a field of contravariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
-				      */
-    virtual void transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
-					  const std::vector<Tensor<1,dim> > &src,
-					  const InternalDataBase& internal,
-					  const unsigned int src_offset) const = 0;
-    
-				     /**
-				      * Tranform a field of covariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
-				      */
-    virtual void transform_covariant (std::vector<Point<dim> >       &dst,
-				      const std::vector<Point<dim> > &src,
-				      const InternalDataBase& internal,
-				      const unsigned int src_offset) const = 0;
-    
-				     /**
-				      * Tranform a field of contravariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
-				      */
-    virtual void transform_contravariant (std::vector<Point<dim> >       &dst,
-					  const std::vector<Point<dim> > &src,
-					  const InternalDataBase& internal,
-					  const unsigned int src_offset) const = 0;
-
-				     /**
-				      * Transforms the point @p{p} on
-				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns @p{p_real}.
-				      *
-				      * Give pointer @p{m_data} if the
-				      * shape values at point @p{p}
-				      * and the mapping support points
-				      * of the cell are computed
-				      * earlier. This pointer is
-				      * mainly for internal use (used
-				      * by the
-				      * @p{transform_real_to_unit_cell}
-				      * function). As default this
-				      * pointer is set to 0 and the
-				      * shape values and the mapping
-				      * support points are compute
-				      * within this function.
-				      */
-    virtual Point<dim> transform_unit_to_real_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p,
-      const InternalDataBase *const m_data=0) const=0;
-    
-				     /**
-				      * Transforms the point @p{p} on
-				      * the real cell to the point
-				      * @p{p_unit} on the unit cell
-				      * @p{cell} and returns @p{p_unit}.
-				      */
-    virtual Point<dim> transform_real_to_unit_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p) const=0;
-
-				     /**
-				      * Indicate fields to be updated in the
-				      * constructor of @ref{FEValues}. Especially,
-				      * fields not asked for by @ref{FEValues}, but
-				      * computed for efficiency reasons will be
-				      * notified here.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags) const = 0;
-    
-				     /**
-				      * The same as @p{update_once},
-				      * but for the flags to be updated for
-				      * each grid cell.
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags) const = 0;
-    
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidData);
-
-  protected:
-				     /**
-				      * Vector of unit normal
-				      * directions. The entry divided by
-				      * 2 determines the non-zero
-				      * component of the normal vector:
-				      * 0 means x, 1 means y and 2 means
-				      * z. The entry modulo 2 determines
-				      * the orientation of the first
-				      * tangential vector in the
-				      * corss-product. This has to be
-				      * chosen such that the normal
-				      * vector points outwards.
-				      *
-				      * This variable is purely for
-				      * internal use and its values are
-				      * determined by its usage in the
-				      * source code.
-				      */
-    static const unsigned int normal_directions[2*dim];    
+  friend class FEValues<dim>;
+  friend class FEFaceValues<dim>;
+  friend class FESubfaceValues<dim>;
 };
 
 
