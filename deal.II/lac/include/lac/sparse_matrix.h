@@ -311,6 +311,10 @@ namespace internals
                                           * the row numbers are
                                           * equal and the first
                                           * index is smaller.
+                                          *
+                                          * This function is only valid if
+                                          * both iterators point into the same
+                                          * matrix.
                                           */
 	bool operator < (const Iterator&) const;
 
