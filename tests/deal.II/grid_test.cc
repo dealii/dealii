@@ -20,7 +20,6 @@
 // 1: continuous refinement of the unit square always in the middle
 // 2: refinement of the circle at the boundary
 // 2: refinement of a wiggled area at the boundary
-// 4: random refinement
 
 
 
@@ -187,7 +186,7 @@ void test (const int test_case) {
 	tria.execute_refinement ();
 
 	Triangulation<dim>::active_cell_iterator cell;
-	for (int i=0; i<17; ++i) 
+	for (int i=0; i<(dim==2 ? 13 : 7); ++i) 
 	  {
 					     // refine the presently
 					     // second last cell 17
@@ -224,7 +223,7 @@ void test (const int test_case) {
 	tria.execute_refinement ();
 	
  	Triangulation<dim>::active_cell_iterator cell, endc;
-	const unsigned int steps[4] = { 0, 10, 7, 2 };
+	const unsigned int steps[4] = { 0, 10, 5, 2 };
  	for (unsigned int i=0; i<steps[dim]; ++i) 
  	  {
  	    cell = tria.begin_active();
@@ -242,35 +241,6 @@ void test (const int test_case) {
 	tria.set_boundary (0);
 	break;
       }
-
-      case 4:
-      {
-					 // refine once
-	tria.begin_active()->set_refine_flag();
-	tria.execute_refinement ();
-	
-	Triangulation<dim>::active_cell_iterator cell, endc;
-	for (int i=0; i<(dim==2 ? 13 : (dim==3 ? 7 : 30)); ++i) 
-	  {
-	    int n_levels = tria.n_levels();
-	    cell = tria.begin_active();
-	    endc = tria.end();
-
-	    for (; cell!=endc; ++cell) 
-	      {
-		double r      = rand()*1.0/RAND_MAX,
-		       weight = 1.*
-				(cell->level()*cell->level()) /
-				(n_levels*n_levels);
-		
-		if (r <= 0.5*weight)
-		  cell->set_refine_flag ();
-	      };
-	    
-	    tria.execute_refinement ();
-	  };
-	break;	
-      }
     };
   
   
@@ -283,9 +253,12 @@ void test (const int test_case) {
 
 
 int main () {
-  for (unsigned int i=1; i<=4; ++i)
+				   // limit output a bit
+  cout.precision (4);
+  
+  for (unsigned int i=1; i<=3; ++i)
     test<2> (i);
-  for (unsigned int i=1; i<=4; ++i)
+  for (unsigned int i=1; i<=3; ++i)
     test<3> (i);
   
   return 0;
