@@ -42,11 +42,11 @@ D = ../../..
 include $D/common/Make.global_options
 
 # get lists of files we need
-cc-files    = $(wildcard *.cc)
+cc-files    = $(filter-out *%, $(shell echo *.cc))
 o-files     = $(cc-files:.cc=.o)
 go-files    = $(cc-files:.cc=.go)
-h-files     = $(wildcard *.h)
-lib-h-files = $(wildcard ../../include/*/*.h)
+h-files     = $(filter-out *%, $(shell echo *.h))
+lib-h-files = $(filter-out *%, $(shell echo ../../include/*/*.h))
 
 # list of libraries needed to link with
 libs     = ./Obj.a   -ldeal_II_2d  -llac -lbase
