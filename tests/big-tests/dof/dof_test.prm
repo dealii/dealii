@@ -1,4 +1,0 @@
-set Test run      = { zoom in | ball | curved line | random }
-set Grid file     = {{ zoom_in | ball | curved_line | random }}.grid
-set Sparsity file = {{ zoom_in | ball | curved_line | random }}.sparsity
-set Condensed sparsity file = {{ zoom_in | ball | curved_line | random }}.sparsity.c

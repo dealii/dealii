@@ -1,1 +1,0 @@
-perl -pi -e 's/^#.*$\\n//g' data-*/*.inp
