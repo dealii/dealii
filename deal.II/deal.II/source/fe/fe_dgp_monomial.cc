@@ -79,10 +79,13 @@ namespace
 			     std::vector<Point<dim> > &);
 
   template <>
-  void generate_unit_points (const unsigned int,
-			     std::vector<Point<1> > &)
+  void generate_unit_points (const unsigned int k,
+			     std::vector<Point<1> > &p)
   {
-    Assert(false, ExcNotImplemented());
+    Assert(p.size()==k+1, ExcDimensionMismatch(p.size(), k+1));
+    const double h = 1./k;
+    for (unsigned int i=0; i<p.size(); ++i)
+      p[i](0)=i*h;
   }
   
   
