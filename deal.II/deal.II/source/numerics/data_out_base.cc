@@ -23,18 +23,22 @@ DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 {};
 
 
-DataOutBase::EpsFlags::EpsFlags (const SizeType     size_type,
+DataOutBase::EpsFlags::EpsFlags (const unsigned int height_vector,
+				 const SizeType     size_type,
 				 const unsigned int size,
 				 const double       line_width,
 				 const double       azimut_angle,
 				 const double       turn_angle,
-				 const double       z_scaling) :
+				 const double       z_scaling,
+				 const bool         draw_mesh) :
+		height_vector(height_vector),
 		size_type(size_type),
 		size(size),
 		line_width(line_width),
 		azimut_angle(azimut_angle),
 		turn_angle(turn_angle),
-		z_scaling(z_scaling)
+		z_scaling(z_scaling),
+		draw_mesh(draw_mesh)
 {};
 
 
@@ -784,12 +788,23 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 			 ((patch->vertices[2] * x_frac) +
 			  (patch->vertices[3] * (1-x_frac))) * y_frac1) 
 		    };
-		  
+
+		  Assert ((flags.height_vector < patch->data.m()) ||
+			  patch->data.m() == 0,
+			  ExcInvalidHeightVectorNumber (flags.height_vector,
+							patch->data.m()));
 		  const double heights[4]
-		    = { patch->data(0,i*(n_subdivisions+1) + j)       * flags.z_scaling,
-			patch->data(0,(i+1)*(n_subdivisions+1) + j)   * flags.z_scaling,
-			patch->data(0,(i+1)*(n_subdivisions+1) + j+1) * flags.z_scaling,
-			patch->data(0,i*(n_subdivisions+1) + j+1)     * flags.z_scaling};
+		    = { patch->data.m() != 0 ?
+			patch->data(flags.height_vector,i*(n_subdivisions+1) + j)       * flags.z_scaling : 0,
+			
+			patch->data.m() != 0 ?
+			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j)   * flags.z_scaling : 0,
+			
+			patch->data.m() != 0 ?
+			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j+1) * flags.z_scaling : 0,
+			
+			patch->data.m() != 0 ?
+			patch->data(flags.height_vector,i*(n_subdivisions+1) + j+1)     * flags.z_scaling : 0};
 		  
 
 						   // now compute the projection of
@@ -961,13 +976,14 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 		<< (cell->vertices[2]-offset) * scale << " l "
 		<< (cell->vertices[3]-offset) * scale << " lf"
 		<< endl;
-	
-	    out << "0 sg " 
-		<< (cell->vertices[0]-offset) * scale << " m "
-		<< (cell->vertices[1]-offset) * scale << " l "
-		<< (cell->vertices[2]-offset) * scale << " l "
-		<< (cell->vertices[3]-offset) * scale << " lx"
-		<< endl;
+
+	    if (flags.draw_mesh)
+	      out << "0 sg " 
+		  << (cell->vertices[0]-offset) * scale << " m "
+		  << (cell->vertices[1]-offset) * scale << " l "
+		  << (cell->vertices[2]-offset) * scale << " l "
+		  << (cell->vertices[3]-offset) * scale << " lx"
+		  << endl;
 	  };
 	out << "showpage" << endl;
 	

@@ -149,7 +149,7 @@
  *
  * To be filled in.
  * precision=5; viewpoint=gnuplot default; no border
- *
+ * shade or not; grid or not; grid shaded; data vector
  *
  * \subsection{GMV format}
  *
@@ -340,6 +340,19 @@ class DataOutBase
     struct EpsFlags 
     {
 					 /**
+					  * This denotes the number of the
+					  * data vector which shall be used
+					  * for generating the height
+					  * information. By default, the
+					  * first data vector is taken,
+					  * i.e. #height_value==0#, if
+					  * there is any data vector. If there
+					  * is no data vector, no height
+					  * information is generated.
+					  */
+	unsigned int height_vector;
+	
+					 /**
 					  * Enum denoting the possibilities
 					  * whether the scaling should be done
 					  * such that the given #size# equals
@@ -415,16 +428,27 @@ class DataOutBase
 					  * Default is #1.0#.
 					  */
 	double z_scaling;
-	
+
+					 /**
+					  * Flag the determines whether the
+					  * lines bounding the cells (or the
+					  * parts of each patch) are to be
+					  * plotted.
+					  *
+					  * Default: #true#.
+	bool   draw_mesh;
+
 					 /**
 					  * Constructor.
 					  */
-	EpsFlags (const SizeType     size_type    = width,
+	EpsFlags (const unsigned int height_vector = 0,
+		  const SizeType     size_type    = width,
 		  const unsigned int size         = 300,
 		  const double       line_width   = 0.5,
 		  const double       azimut_angle = 60,
 		  const double       turn_angle   = 30,
-		  const double       z_scaling    = 1.0);
+		  const double       z_scaling    = 1.0,
+		  const bool         draw_mesh    = true);
     };
 
     				     /**
@@ -527,7 +551,14 @@ class DataOutBase
 		    int, int,
 		    << "The number of points in this data set is " << arg1
 		    << ", but we expected " << arg2 << " in each space direction.");
-
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidHeightVectorNumber,
+		    int, int,
+		    << "The number " << arg1 << " of the vector to be used for "
+		    << "height information is invalid, since there are only "
+		    << arg2 << " data sets.");
 				     /**
 				      * Exception
 				      */
