@@ -23,12 +23,10 @@
 template <int dim> class Triangulation;
 
 /**
- * This class implements an input mechanism for grid data. It allows to
- * read a grid structure into a triangulation object. Future versions
- * will also allow to read data on this grid into vectors.
- *
- * At present, only UCD (unstructured cell data) is supported as input
- * format for grid data. Any numerical data after the block of topological
+ * This class implements an input mechanism for grid data. It allows
+ * to read a grid structure into a triangulation object. At present,
+ * only UCD (unstructured cell data) is supported as input format for
+ * grid data. Any numerical data after the block of topological
  * information is ignored.
  *
  * To read grid data, the triangulation to be fed with has to be empty.
