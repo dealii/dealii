@@ -155,7 +155,6 @@ check_iterator (const MATRIX& A)
 	else
 	  deallog << r
 		  << '\t' << b->row()
-		  << '\t' << b->index()
 		  << '\t' << b->column()
 		  << '\t' << b->value()
 		  << std::endl;
@@ -164,24 +163,21 @@ check_iterator (const MATRIX& A)
 	  deallog << "Final" << std::endl;
 	else
 	  deallog << '\t' << e->row()
-		  << '\t' << e->index()
 		  << std::endl;
 	deallog << "cols:";
 	
 	for (typename MATRIX::const_iterator i=b;i!=e;++i)
-	  deallog << '\t' << i->index() << ',' << i->column();
+	  deallog << '\t' << ',' << i->column();
 	deallog << std::endl;
       }
   for (typename MATRIX::const_iterator i = A.begin(); i!= A.end(); ++i)
     deallog << '\t' << i->row()
-      	    << '\t' << i->index()
 	    << '\t' << i->column()
       	    << '\t' << i->value()
 	    << std::endl;
   deallog << "Repeat row 2" << std::endl;
   for (typename MATRIX::const_iterator i = A.begin(2); i!= A.end(2); ++i)
     deallog << '\t' << i->row()
-      	    << '\t' << i->index()
 	    << '\t' << i->column()
       	    << '\t' << i->value()
 	    << std::endl;
