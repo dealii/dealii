@@ -6,7 +6,7 @@
 #include <fe/fe_lib.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
-#include "../../deal/dsmatrix.h"
+#include <lac/dsmatrix.h>
 #include <basic/parameter_handler.h>
 #include <grid/dof_constraints.h>
 
