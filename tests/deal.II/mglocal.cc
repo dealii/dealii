@@ -47,11 +47,13 @@ class RHSFunction
   public Function<dim>
 {
   public:
-    virtual double operator() (const Point<dim>&) const;
-//    virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
+    virtual double value (const Point<dim>&,
+			  const unsigned int ) const;
 };
 
-extern void write_gnuplot (const MGDoFHandler<2>& dofs, const Vector<double>& v, unsigned int level,
+extern void write_gnuplot (const MGDoFHandler<2>& dofs,
+			   const Vector<double>& v,
+			   unsigned int level,
 			   ostream &out);
 
 main()
@@ -163,7 +165,8 @@ main()
 
 template<int dim>
 double
-RHSFunction<dim>::operator() (const Point<dim>&p) const
+RHSFunction<dim>::value (const Point<dim>&p,
+			 const unsigned int) const
 {
 //  return 1.;
   

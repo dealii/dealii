@@ -3747,7 +3747,8 @@ class InitialValues {
   public:
     class EigenMode : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926539;
 	  return sin(2*pi*p(0))*sin(2*pi*p(1));
 	};
@@ -3755,7 +3756,8 @@ class InitialValues {
 
     class Bump : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double width = 0.1;
 	  const double r2 = p.square();
 	  return exp(-r2/width/width) * (r2<width*width ?
@@ -3767,7 +3769,8 @@ class InitialValues {
 
     class SmallBump : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double width = 0.02;
 	  const double r2 = p.square();
 	  return exp(-r2/width/width) * (r2<width*width ?
@@ -3779,7 +3782,8 @@ class InitialValues {
 
     class ShiftedBump : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double width = 0.1;
 	  Point<dim> shift;
 	  shift(0) = 0.5;
@@ -3792,7 +3796,8 @@ class InitialValues {
 
     class CenterKink : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double width = 0.1;
 	  const double r     = sqrt(p.square());
 	  return (r<width ? r/width : (r<2*width ? 2-r/width : 0));
@@ -3801,7 +3806,8 @@ class InitialValues {
 
     class Plateau : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double width = 0.1;
 	  const double r     = sqrt(p.square());
 	  return (r<width ? 1 : 0);
@@ -3811,7 +3817,8 @@ class InitialValues {
 
     class Earthquake : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  Point<dim> earthquake_center = p;
 	  earthquake_center(1) -= 5500;
 	  const double r2 = earthquake_center.square();
@@ -3828,7 +3835,8 @@ class Coefficients {
   public:
     class Kink : public Function<dim> {
       public:
-	inline virtual double operator () (const Point<dim> &p) const {
+	inline virtual double value (const Point<dim> &p,
+				     const unsigned int) const {
 					   // always let the kink be
 					   // in direction of the last
 					   // variable
@@ -3836,14 +3844,16 @@ class Coefficients {
 	};
 	
 	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values) const {
+				 vector<double>            &values,
+				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcVectorHasWrongSize(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    values[i]  = this->Kink::operator()(points[i]);
+	    values[i]  = this->Kink::value(points[i], 0);
 	};
 
-	virtual Tensor<1,dim> gradient (const Point<dim> &p) const {
+	virtual Tensor<1,dim> gradient (const Point<dim> &p,
+					const unsigned int) const {
 	  Tensor<1,dim> tmp;
 	  if (fabs(p(1)-1./5.) < 1./400.)
 	    tmp[1] = 100;
@@ -3851,37 +3861,42 @@ class Coefficients {
 	};
 	
 	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients) const {
+				    vector<Tensor<1,dim> >    &gradients,
+				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    gradients[i] = Kink::gradient (points[i]);
+	    gradients[i] = Kink::gradient (points[i], 0);
 	};
     };
 
 
     class Gradient : public Function<dim> {
       public:
-	inline virtual double operator () (const Point<dim> &p) const {
+	inline virtual double value (const Point<dim> &p,
+				     const unsigned int) const {
 	  return 1+8*p(1)*p(1);
 	};
 	
 	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values) const {
+				 vector<double>            &values,
+				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcVectorHasWrongSize(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    values[i]  = this->Gradient::operator()(points[i]);
+	    values[i]  = this->Gradient::value(points[i], 0);
 	};
 
-	virtual Tensor<1,dim> gradient (const Point<dim> &p) const {
+	virtual Tensor<1,dim> gradient (const Point<dim> &p,
+					const unsigned int) const {
 	  Tensor<1,dim> tmp;
 	  tmp[1] = 16*p(1);
 	  return tmp;
 	};
 	
 	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients) const {
+				    vector<Tensor<1,dim> >    &gradients,
+				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    gradients[i] = Gradient::gradient (points[i]);
+	    gradients[i] = Gradient::gradient (points[i], 0);
 	};
     };
 
@@ -3889,7 +3904,8 @@ class Coefficients {
 
     class PreliminaryEarthModel : public Function<dim> {
       public:
-	inline virtual double operator () (const Point<dim> &p) const {
+	inline virtual double value (const Point<dim> &p,
+				     const unsigned int) const {
 	  const double r=sqrt(p.square());
 					   // this data just ad hoc, not taken
 					   // from the PREM
@@ -3897,14 +3913,16 @@ class Coefficients {
 	};
 	
 	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values) const {
+				 vector<double>            &values,
+				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcVectorHasWrongSize(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    values[i]  = this->PreliminaryEarthModel::operator()(points[i]);
+	    values[i]  = this->PreliminaryEarthModel::value(points[i], 0);
 	};
 
-	virtual Tensor<1,dim> gradient (const Point<dim> &p) const {
+	virtual Tensor<1,dim> gradient (const Point<dim> &p,
+					const unsigned int) const {
 					   // gradient is derivative with
 					   // respect to r times a unit vector
 					   // in direction of p
@@ -3915,9 +3933,10 @@ class Coefficients {
 	};
 	
 	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients) const {
+				    vector<Tensor<1,dim> >    &gradients,
+				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    gradients[i] = PreliminaryEarthModel::gradient (points[i]);
+	    gradients[i] = PreliminaryEarthModel::gradient (points[i], 0);
 	};
     };
 
@@ -3925,7 +3944,8 @@ class Coefficients {
     
     class Distorted : public Function<dim> {
       public:
-	inline virtual double operator () (const Point<dim> &p) const {
+	inline virtual double value (const Point<dim> &p,
+				     const unsigned int) const {
 	  const double x=p(0),
 		       y=p(1);
 	  const double pi = 3.1415926539;
@@ -3935,23 +3955,26 @@ class Coefficients {
 	};
 	
 	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values) const {
+				 vector<double>            &values,
+				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcVectorHasWrongSize(values.size(), points.size()));
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    values[i]  = this->Distorted::operator()(points[i]);
+	    values[i]  = this->Distorted::value(points[i], 0);
 	};
 
-	virtual Tensor<1,dim> gradient (const Point<dim> &) const {
+	virtual Tensor<1,dim> gradient (const Point<dim> &,
+					const unsigned int) const {
 					   // return zero, since we don't know
 					   // how to do better (regularize?)
 	  return Tensor<1,dim>();
 	};
 	
 	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients) const {
+				    vector<Tensor<1,dim> >    &gradients,
+				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
-	    gradients[i] = Distorted::gradient (points[i]);
+	    gradients[i] = Distorted::gradient (points[i], 0);
 	};
     };
 };
@@ -3965,7 +3988,8 @@ class BoundaryValues {
 
     class WaveFromLeft_u : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 //	  if ((get_time()<0.4) && (p(0)==0))
 	  if (p(0)==0)
@@ -3977,7 +4001,8 @@ class BoundaryValues {
 
     class WaveFromLeft_v : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 //	  if ((get_time()<0.4) && (p(0)==0))
 	  if (p(0)==0)
@@ -3990,7 +4015,8 @@ class BoundaryValues {
 
     class FastWaveFromLeft_u : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if ((get_time()<0.2) && (p(0)==0))
 	    return sin(pi*get_time()/0.2)*sin(pi*get_time()/0.2);
@@ -4001,7 +4027,8 @@ class BoundaryValues {
 
     class FastWaveFromLeft_v : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if ((get_time()<0.2) && (p(0)==0))
 	    return 2*pi/0.2*sin(pi*get_time()/0.2)*cos(pi*get_time()/0.2);
@@ -4013,7 +4040,8 @@ class BoundaryValues {
     
     class WaveFromLeftCenter_u : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if ((0.4 <= p(1)) && (p(1) <= 0.6) && (p(0) <= 0.5))
 	    return (p(1)-0.4)*(0.6-p(1)) * sin(pi*get_time()/0.2);
@@ -4024,7 +4052,8 @@ class BoundaryValues {
 
     class WaveFromLeftCenter_v : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  if ((0.4 <= p(1)) && (p(1) <= 0.6) && (p(0) <= 0.5))
 	    return pi/0.2*(p(1)-0.4)*(0.6-p(1)) * cos(pi*get_time()/0.2);
@@ -4036,7 +4065,8 @@ class BoundaryValues {
 
     class WaveFromLeftBottom_u : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  const double r  = sqrt(p.square());
 					   // let the radius of
@@ -4058,7 +4088,8 @@ class BoundaryValues {
 
     class WaveFromLeftBottom_v : public Function<dim> {
       public:
-	virtual double operator () (const Point<dim> &p) const {
+	virtual double value (const Point<dim> &p,
+			      const unsigned int) const {
 	  const double pi = 3.1415926536;
 	  const double r  = sqrt(p.square());
 					   // let the radius of
@@ -5493,9 +5524,11 @@ void TimeStep_Wave<dim>::create_matrices ()
 				   // if a coefficient is constant, get
 				   // its value
   if (density_constant)
-    fill_n (density_values.begin(), n_q_points, (*parameters.density)(Point<dim>()));
+    fill_n (density_values.begin(), n_q_points,
+	    parameters.density->value(Point<dim>()));
   if (stiffness_constant)
-    fill_n (stiffness_values.begin(), n_q_points, (*parameters.stiffness)(Point<dim>()));
+    fill_n (stiffness_values.begin(), n_q_points,
+	    parameters.stiffness->value(Point<dim>()));
   
   
   FEValues<dim>  fe_values (fe, quadrature,

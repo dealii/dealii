@@ -28,18 +28,15 @@
 #include "helmholtz.h"
 
 template<int dim>
-class RHSFunction
-  :
-  public Function<dim>
+class RHSFunction : public Function<dim>
 {
   public:
-    virtual double operator() (const Point<dim>&) const;
-//    virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
+    virtual double value (const Point<dim>&,
+			  const unsigned int) const;
 };
 
-class MGSmootherLAC
-  :
-  public MGSmootherBase
+
+class MGSmootherLAC : public MGSmootherBase
 {
   private:
     SmartPointer<MGMatrix<SparseMatrix<double> > >matrices;
@@ -149,7 +146,8 @@ main()
 
 template<int dim>
 double
-RHSFunction<dim>::operator() (const Point<dim>&) const
+RHSFunction<dim>::value (const Point<dim>&,
+			 const unsigned int) const
 {
   return 1.;
 }

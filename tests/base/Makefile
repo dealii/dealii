@@ -74,7 +74,7 @@ logtest-o-files = $(logtest-cc-files:.cc=.o)
 endif
 
 logtest.testcase: $(logtest-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(flags) -o $@ $^
 
 
 ############################################################
@@ -89,7 +89,7 @@ tensor-o-files = $(tensor-cc-files:.cc=.o)
 endif
 
 tensor.testcase: $(tensor-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(flags) -o $@ $^
 
 
 
@@ -105,7 +105,7 @@ reference-o-files = $(reference-cc-files:.cc=.o)
 endif
 
 reference.testcase: $(reference-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(flags) -o $@ $^
 
 
 
@@ -128,7 +128,7 @@ target1-o-files = $(target1-cc-files:.cc=.o)
 endif
 
 target1: $(target1-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(flags) -o $@ $^
 
 
 ############################################################

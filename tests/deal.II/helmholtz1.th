@@ -41,7 +41,7 @@ Helmholtz::build_all(MATRIX& A,
 	      double v = fe.shape_value(i,k);
 	      
 	      elvec(i) += fe.JxW(k) *
-			rhs(loc) * v;
+			rhs.value(loc) * v;
 	      
 					       //Trial function loop
 	      for (unsigned j=0;j<fe_dofs;++j)
