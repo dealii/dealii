@@ -60,8 +60,7 @@ namespace PETScWrappers
                                            // available
           int ierr;
           int begin, end;
-          ierr = MatGetOwnershipRange (static_cast<const Mat &>(*matrix),
-                                       &begin, &end);
+          ierr = MatGetOwnershipRange (*matrix, &begin, &end);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           AssertThrow ((this->a_row >= static_cast<unsigned int>(begin)) &&
