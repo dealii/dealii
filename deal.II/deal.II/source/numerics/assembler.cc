@@ -3,8 +3,8 @@
 #include <numerics/assembler.h>
 #include <numerics/base.h>
 #include <grid/tria_iterator.h>
-#include <deal/dfmatrix.h>
-#include <deal/dvector.h>
+#include <lac/dfmatrix.h>
+#include <lac/dvector.h>
 
 
 extern TriaIterator<1,CellAccessor<1> > __dummy127; // do this to calm down gcc2.7,
