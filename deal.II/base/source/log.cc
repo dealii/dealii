@@ -136,6 +136,22 @@ LogStream::print_line_head()
 	}
     }
 
+/*
+ * The following lines were used for debugging a memory leak.
+ * They work on Linux, not on Solaris, since the /proc filesystem
+ * on Solaris is quite cryptic.
+ *
+ * Unfortunately, the information in /proc/pid/stat is updated slowly,
+ * therefore, the information is quite unreliable.
+ *
+ * Furthermore, the cunstructor of ifstream caused another memory leak.
+ *
+ * Still, this code might be usefull sometimes, so I kept it here.
+ * When we have more information about the kernel, this should be
+ * incorporated properly. Suggestions are welcome!
+ */
+  
+#ifdef DEALII_MEMORY_DEBUG
   static const pid_t id = getpid();
   std::ostrstream statname;
   statname << "/proc/" << id << "/stat" << std::ends;
@@ -147,6 +163,7 @@ LogStream::print_line_head()
     dummy >> dummy >> dummy >> dummy >> dummy >>
     dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
     dummy >> dummy >> dummy >> dummy >> dummy >> size;
+#endif
   
   const std::string& head = get_prefix();
 
@@ -156,9 +173,9 @@ LogStream::print_line_head()
 	{
 	  int p = std_out->width(5);
 	  *std_out << utime << ':';
-	  std_out->width(16);
+#ifdef DEALII_MEMORY_DEBUG
 	  *std_out << size << ':';
-	  
+#endif
 	  std_out->width(p);
 	}
       *std_out <<  head << ':';
@@ -170,8 +187,9 @@ LogStream::print_line_head()
 	{
 	  int p = file->width(6);
 	  *file << utime << ':';
-	  file->width(16);
+#ifdef DEALII_MEMORY_DEBUG
 	  *file << size << ':';
+#endif
 	  file->width(p);
 	}  
       *file << head << ':';
