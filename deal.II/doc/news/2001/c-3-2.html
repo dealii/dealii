@@ -95,6 +95,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: Allocation of temporary vectors in <code
+       class="member">FilteredMatrix::allocate_tmp_vector</code>
+       is now faster since it does no more copy the value of the
+       template vector.
+       <br>
+       (WB 2001/11/22)
+       </p>
+
+  <li> <p>
        Fixed: The <code
        class="member">FilteredMatrix::allocate_tmp_vector</code>
        function had a bug with block vectors.

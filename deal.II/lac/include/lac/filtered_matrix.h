@@ -539,7 +539,11 @@ class FilteredMatrix : public Subscriptor
 				      * temporary vector. This
 				      * function has to be overloaded
 				      * for the various template
-				      * parameter choices.
+				      * parameter choices. Since the
+				      * allocated vector will be
+				      * filled by the site that calls
+				      * this function, no
+				      * initialization is necessary.
 				      */
     void allocate_tmp_vector ();
 
