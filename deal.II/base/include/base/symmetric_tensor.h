@@ -1834,6 +1834,32 @@ transpose (const SymmetricTensor<rank,dim> &t)
 }
 
 
+
+/**
+ * Return the symmetrized version of the full rank-2 tensor,
+ * i.e. (t+transpose(t))/2, as a symmetric rank-2 tensor.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+SymmetricTensor<2,dim>
+symmetrize (const Tensor<2,dim> &t)
+{
+  SymmetricTensor<2,dim> s;
+  for (unsigned int i=0; i<dim; ++i)
+    {
+      s(TableIndices<2>(i,i)) = t[i][i];
+  
+      for (unsigned int j=i+1; j<dim; ++j)
+	s(TableIndices<2>(i,j))
+	  = (t[i][j] + t[j][i])/2;
+    }
+  return s;
+}
+
+
 /**
  * Multiplication of a symmetric tensor of general rank with a scalar double
  * from the right.
