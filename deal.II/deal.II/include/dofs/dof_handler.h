@@ -145,10 +145,6 @@ class DoFDimensionInfo<3> {
  * degrees of freedom only. The actual layout of storage of the indices
  * is described in the \Ref{DoFLevel} class documentation.
  *
- * Additionally, the DoFHandler is able to generate the condensation
- * matrix which connects constrained and unconstrained matrices and
- * vectors.
- *
  * Finally it offers a starting point for the assemblage of the matrices
  * by offering #begin()# and #end()# functions which return iterators
  * to walk on the DoF structures as well as the triangulation data.
@@ -334,28 +330,38 @@ class DoFHandler  :  public Subscriptor,
 				      * according to the given distribution
 				      * method.
 				      *
-				      * The additional optional parameter #offset#
-				      * allows you to reserve space for a finite number
-				      * of additional vector entries in the beginning
-				      * of all discretization vectors.
+				      * The additional optional
+				      * parameter #offset# allows you
+				      * to reserve space for a finite
+				      * number of additional vector
+				      * entries in the beginning of
+				      * all discretization vectors, by
+				      * starting the enumeration of
+				      * degrees of freedom on the grid
+				      * at a nonzero value. By
+				      * default, this value is of
+				      * course zero.
 				      *
-				      * A pointer of the transferred finite
-				      * element is stored. Therefore, the
-				      * lifetime of the finite element object
-				      * shall be longer than that of this
-				      * object. If you don't want this
-				      * behaviour, you may want to call
-				      * the #clear# member function which also
-				      * releases the lock of this object to the
-				      * finite element.
+				      * A pointer of the transferred
+				      * finite element is
+				      * stored. Therefore, the
+				      * lifetime of the finite element
+				      * object shall be longer than
+				      * that of this object. If you
+				      * don't want this behaviour, you
+				      * may want to call the #clear#
+				      * member function which also
+				      * releases the lock of this
+				      * object to the finite element.
 				      *
-				      * This function uses the user flags of the
-				      * triangulation object, so make sure you
-				      * don't need them after calling this
+				      * This function uses the user
+				      * flags of the triangulation
+				      * object, so make sure you don't
+				      * need them after calling this
 				      * function, or if so store them.
 				      */
-    virtual void distribute_dofs (const FiniteElement<dim> &,
-				  unsigned int offset = 0);
+    virtual void distribute_dofs (const FiniteElement<dim> &fe,
+				  const unsigned int        offset = 0);
 
 				     /**
 				      * Clear all data of this object and
@@ -386,43 +392,6 @@ class DoFHandler  :  public Subscriptor,
 				      */
     void renumber_dofs (const vector<int> &new_numbers);
 
-				     /**
-				      * Make up the constraints which
-				      * is result from the use of hanging
-				      * nodes. The object into which these
-				      * are inserted is later
-				      * used to condensate the global
-				      * system matrices and to prolong
-				      * the solution vectors from the true
-				      * degrees of freedom also to the
-				      * constraint nodes.
-				      *
-				      * Since this method does not make sense in
-				      * one dimension, the function returns
-				      * immediately. The object is not cleared
-				      * before use, so you should make sure
-				      * it containts only constraints you still
-				      * want; otherwise call the #clear#
-				      * function.
-				      *
-				      * To condense a given sparsity pattern,
-				      * use #ConstraintMatrix::condense#.
-				      * Before doing so, you need to close
-				      * the constraint object, which must be
-				      * done after all constraints are entered.
-				      * This function does not close the object
-				      * since you may want to enter other
-				      * constraints later on yourself.
-				      *
-				      * This function uses the user flags for
-				      * the faces. If you need the user flags,
-				      * store them beforehand.
-				      */
-    void make_hanging_node_constraints (ConstraintMatrix &) const;
-
-
-
-    
 				     /**
 				      * Return the maximum number of
 				      * degrees of freedom a degree of freedom
@@ -459,54 +428,6 @@ class DoFHandler  :  public Subscriptor,
 				      * dimension less.
 				      */
     unsigned int max_couplings_between_boundary_dofs () const;
-    
-				     /**
-				      * Take a vector of values which live on
-				      * cells (e.g. an error per cell) and
-				      * distribute it to the dofs in such a
-				      * way that a finite element field results,
-				      * which can then be further processed,
-				      * e.g. for output. You should note that
-				      * the resulting field will not be
-				      * continuous at hanging nodes. This can,
-				      * however, easily be arranged by calling
-				      * the appropraite #distribute# function
-				      * of a #ConstraintMatrix# object created
-				      * for this #DoFHandler# object.
-				      *
-				      * It is assumed that the number of
-				      * elements in #cell_data# equals the
-				      * number of active cells. The size of
-				      * #dof_data# is adjusted to the right
-				      * size.
-				      *
-				      * Note that the input vector may be
-				      * a vector of any data type as long
-				      * as it is convertible to #double#.
-				      * The output vector, being a data
-				      * vector on the grid, always consists
-				      * of elements of type #double#.
-				      *
-				      * In case the finite element used by
-				      * this DoFHandler consists of more than
-				      * one component, you should give which
-				      * component in the output vector should
-				      * be used to store the finite element
-				      * field in; the default is zero (no other
-				      * value is allowed if the finite element
-				      * consists only of one component). All
-				      * other components of the vector remain
-				      * untouched, i.e. their contents are
-				      * not changed.
-				      *
-				      * It is assumed that the output vector
-				      * #dof_data# already has the right size,
-				      * i.e. #n_dofs()# elements.
-				      */
-    template <typename Number>
-    void distribute_cell_to_dof_vector (const Vector<Number> &cell_data,
-					Vector<double>       &dof_data,
-					const unsigned int    component = 0) const;
 
 				     /**
 				      * Create a mapping from degree of freedom
@@ -1160,10 +1081,6 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcInternalError);
-				     /**
-				      * Exception
-				      */
     DeclException1 (ExcMatrixHasWrongSize,
 		    int,
 		    << "The matrix has the wrong dimension " << arg1);
@@ -1174,26 +1091,10 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcWrongSize,
-		    int, int,
-		    << "The dimension " << arg1 << " of the vector is wrong. "
-		    << "It should be " << arg2);
-				     /**
-				      * Exception
-				      */
     DeclException1 (ExcNewNumbersNotConsecutive,
 		    int,
 		    << "The given list of new dof indices is not consecutive: "
 		    << "the index " << arg1 << " does not exist.");
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidComponent,
-		    int, int,
-		    << "The component you gave (" << arg1 << ") "
-		    << "is invalid with respect to the number "
-		    << "of components in the finite element "
-		    << "(" << arg2 << ")");
 
   protected:
     
@@ -1320,7 +1221,17 @@ class DoFHandler  :  public Subscriptor,
 
 template <int dim>
 inline
-const FiniteElement<dim> & DoFHandler<dim>::get_fe () const {
+unsigned int DoFHandler<dim>::n_dofs () const
+{
+  return used_dofs;
+};
+
+
+
+template <int dim>
+inline
+const FiniteElement<dim> & DoFHandler<dim>::get_fe () const
+{
   return *selected_fe;
 };
 

@@ -1,24 +1,19 @@
 /* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+/* Copyright W. Bangerth, University of Heidelberg, 1998, 1999 */
 
 
 #include <dofs/dof_handler.h>
 #include <dofs/dof_levels.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/dof_constraints.h>
-#include <grid/tria_levels.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/tria_levels.h>
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
-#include <lac/vector.h>
 
 #include <set>
 #include <algorithm>
-
 
 
 
@@ -1287,13 +1282,6 @@ DoFHandler<dim>::last_active_hex () const {
 
 
 
-template <int dim>
-unsigned int DoFHandler<dim>::n_dofs () const {
-  return used_dofs;
-};
-
-
-
 #if deal_II_dimension == 1
 
 template <>
@@ -1374,7 +1362,7 @@ const Triangulation<dim> & DoFHandler<dim>::get_tria () const {
 
 template <int dim>
 void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff,
-				       unsigned int offset)
+				       const unsigned int        offset)
 {
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
@@ -1731,254 +1719,6 @@ void DoFHandler<3>::renumber_dofs (const vector<int> &new_numbers) {
 
 
 
-#if deal_II_dimension == 1
-
-template <>
-void DoFHandler<1>::make_hanging_node_constraints (ConstraintMatrix &) const {};
-
-#endif
-
-
-
-#if deal_II_dimension == 2
-
-template <>
-void DoFHandler<2>::make_hanging_node_constraints (ConstraintMatrix &constraints) const {
-  const unsigned int dim = 2;
-  
-				   // first mark all faces which are subject
-				   // to constraints. We do so by looping
-				   // over all active cells and checking
-				   // whether any of the faces are refined
-				   // which can only be from the neighboring
-				   // cell because this one is active. In that
-				   // case, the face is subject to constraints
-  tria->clear_user_flags ();
-  Triangulation<dim>::active_cell_iterator cell = tria->begin_active(),
-					   endc = tria->end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->face(face)->has_children()) 
-	cell->face(face)->set_user_flag();
-	  
-  
-
-  
-  line_iterator line = begin_line(),
-		endl = end_line();
-				   // loop over all lines; only on lines
-				   // there can be constraints.
-  for (; line != endl; ++line)
-				     // if dofs on this line are subject
-				     // to constraints
-    if (line->user_flag_set() == true)
-      {
-					 // reserve space to gather
-					 // the dof numbers. We could
-					 // get them when we need them,
-					 // but it seems easier to gather
-					 // them only once.
-	vector<int> dofs_on_mother;
-	vector<int> dofs_on_children;
-	dofs_on_mother.reserve (2*selected_fe->dofs_per_vertex+
-				selected_fe->dofs_per_line);
-	dofs_on_children.reserve (selected_fe->dofs_per_vertex+
-				  2*selected_fe->dofs_per_line);
-
-	Assert(2*selected_fe->dofs_per_vertex+selected_fe->dofs_per_line ==
-	       selected_fe->constraints().n(),
-	       ExcDimensionMismatch(2*selected_fe->dofs_per_vertex+
-				      selected_fe->dofs_per_line,
-				      selected_fe->constraints().n()));
-	Assert(selected_fe->dofs_per_vertex+2*selected_fe->dofs_per_line ==
-	       selected_fe->constraints().m(),
-	       ExcDimensionMismatch(3*selected_fe->dofs_per_vertex+
-				      2*selected_fe->dofs_per_line,
-				      selected_fe->constraints().m()));
-	
-					 // fill the dofs indices. Use same
-					 // enumeration scheme as in
-					 // #FiniteElement::constraints()#
-	for (unsigned int vertex=0; vertex<2; ++vertex)
-	  for (unsigned int dof=0; dof!=selected_fe->dofs_per_vertex; ++dof)
-	    dofs_on_mother.push_back (line->vertex_dof_index(vertex,dof));
-	for (unsigned int dof=0; dof!=selected_fe->dofs_per_line; ++dof)
-	  dofs_on_mother.push_back (line->dof_index(dof));
-
-	for (unsigned int dof=0; dof!=selected_fe->dofs_per_vertex; ++dof)
-	  dofs_on_children.push_back (line->child(0)->vertex_dof_index(1,dof));
-	for (unsigned int child=0; child<2; ++child)
-	  for (unsigned int dof=0; dof!=selected_fe->dofs_per_line; ++dof)
-	    dofs_on_children.push_back (line->child(child)->dof_index(dof));
-
-					 // for each row in the constraint
-					 // matrix for this line:
-	for (unsigned int row=0; row!=dofs_on_children.size(); ++row) 
-	  {
-	    constraints.add_line (dofs_on_children[row]);
-	    for (unsigned int i=0; i!=dofs_on_mother.size(); ++i)
-	      constraints.add_entry (dofs_on_children[row],
-				     dofs_on_mother[i],
-				     selected_fe->constraints()(row,i));
-	  };
-      };
-};
-
-#endif
-
-
-
-#if deal_II_dimension == 3
-
-template <>
-void DoFHandler<3>::make_hanging_node_constraints (ConstraintMatrix &constraints) const {
-  const unsigned int dim = 3;
-  
-				   // first mark all faces which are subject
-				   // to constraints. We do so by looping
-				   // over all active cells and checking
-				   // whether any of the faces are refined
-				   // which can only be from the neighboring
-				   // cell because this one is active. In that
-				   // case, the face is subject to constraints
-  tria->clear_user_flags ();
-  Triangulation<dim>::active_cell_iterator cell = tria->begin_active(),
-					   endc = tria->end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->face(face)->has_children()) 
-	cell->face(face)->set_user_flag();
-	  
-  
-
-  
-  face_iterator face = begin_face(),
-		endf = end_face();
-				   // loop over all faces; only on faces
-				   // there can be constraints.
-  for (; face != endf; ++face)
-				     // if dofs on this line are subject
-				     // to constraints
-    if (face->user_flag_set() == true)
-      {
-					 // reserve space to gather
-					 // the dof numbers. We could
-					 // get them when we need them,
-					 // but it seems easier to gather
-					 // them only once.
-	vector<int> dofs_on_mother;
-	vector<int> dofs_on_children;
-	dofs_on_mother.reserve (4*selected_fe->dofs_per_vertex+
-				4*selected_fe->dofs_per_line+
-				selected_fe->dofs_per_quad);
-	dofs_on_children.reserve (5*selected_fe->dofs_per_vertex+
-				  12*selected_fe->dofs_per_line+
-				  4*selected_fe->dofs_per_quad);
-
-	Assert(4*selected_fe->dofs_per_vertex+
-	       4*selected_fe->dofs_per_line+
-	       selected_fe->dofs_per_quad
-	       ==
-	       selected_fe->constraints().n(),
-	       ExcDimensionMismatch(4*selected_fe->dofs_per_vertex+
-				      4*selected_fe->dofs_per_line+
-				      selected_fe->dofs_per_quad,
-				      selected_fe->constraints().n()));
-	Assert(5*selected_fe->dofs_per_vertex+
-	       12*selected_fe->dofs_per_line+
-	       4*selected_fe->dofs_per_quad
-	       ==
-	       selected_fe->constraints().m(),
-	       ExcDimensionMismatch(5*selected_fe->dofs_per_vertex+
-				      12*selected_fe->dofs_per_line+
-				      4*selected_fe->dofs_per_quad,
-				      selected_fe->constraints().m()));
-	
-					 // fill the dofs indices. Use same
-					 // enumeration scheme as in
-					 // #FiniteElement::constraints()#
-	for (unsigned int vertex=0; vertex<4; ++vertex)
-	  for (unsigned int dof=0; dof!=selected_fe->dofs_per_vertex; ++dof)
-	    dofs_on_mother.push_back (face->vertex_dof_index(vertex,dof));
-	for (unsigned int line=0; line<4; ++line)
-	  for (unsigned int dof=0; dof!=selected_fe->dofs_per_line; ++dof)
-	    dofs_on_mother.push_back (face->line(line)->dof_index(dof));
-	for (unsigned int dof=0; dof!=selected_fe->dofs_per_quad; ++dof)
-	  dofs_on_mother.push_back (face->dof_index(dof));
-
-					 // dof numbers on vertex at the center
-					 // of the face, which is vertex 2 of
-					 // child zero, or vertex 3 of child 1
-					 // or vertex 0 of child 2 or vertex 1
-					 // of child 3. We're a bit cautious and
-					 // check this (also an additional safety
-					 // check for the internal states of the
-					 // library)
-	Assert ((face->child(0)->vertex_dof_index(2,0) ==
-		 face->child(1)->vertex_dof_index(3,0)) &&
-		(face->child(0)->vertex_dof_index(2,0) ==
-		 face->child(2)->vertex_dof_index(0,0)) &&
-		(face->child(0)->vertex_dof_index(2,0) ==
-		 face->child(3)->vertex_dof_index(1,0)),
-		ExcInternalError());
-	for (unsigned int dof=0; dof!=selected_fe->dofs_per_vertex; ++dof)
-	  dofs_on_children.push_back (face->child(0)->vertex_dof_index(2,dof));
-	
-					 // dof numbers on the centers of
-					 // the lines bounding this face
-	for (unsigned int line=0; line<4; ++line)
-	  for (unsigned int dof=0; dof!=selected_fe->dofs_per_vertex; ++dof)
-	    dofs_on_children.push_back (face->line(line)->child(0)->vertex_dof_index(1,dof));
-
-					 // next the dofs on the lines interior
-					 // to the face; the order of these
-					 // lines is laid down in the
-					 // FiniteElement class documentation
-	for (unsigned int dof=0; dof<selected_fe->dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(0)->line(1)->dof_index(dof));
-	for (unsigned int dof=0; dof<selected_fe->dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(1)->line(2)->dof_index(dof));
-	for (unsigned int dof=0; dof<selected_fe->dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(2)->line(3)->dof_index(dof));
-	for (unsigned int dof=0; dof<selected_fe->dofs_per_line; ++dof)
-	  dofs_on_children.push_back (face->child(3)->line(0)->dof_index(dof));
-
-					 // dofs on the bordering lines
-	for (unsigned int line=0; line<4; ++line)
-	  for (unsigned int child=0; child<2; ++child)
-	    for (unsigned int dof=0; dof!=selected_fe->dofs_per_line; ++dof)
-	      dofs_on_children.push_back (face->line(line)->child(child)->dof_index(dof));
-	
-					 // finally, for the dofs interior
-					 // to the four child faces
-	for (unsigned int child=0; child<4; ++child)
-	  for (unsigned int dof=0; dof!=selected_fe->dofs_per_quad; ++dof)
-	    dofs_on_children.push_back (face->child(child)->dof_index(dof));
-
-	Assert (dofs_on_children.size() ==
-	       selected_fe->constraints().m(),
-	       ExcDimensionMismatch(dofs_on_children.size(),
-				      selected_fe->constraints().m()));
-	Assert (dofs_on_mother.size() ==
-	       selected_fe->constraints().n(),
-	       ExcDimensionMismatch(dofs_on_mother.size(),
-				      selected_fe->constraints().n()));
-
-					 // for each row in the constraint
-					 // matrix for this line:
-	for (unsigned int row=0; row!=dofs_on_children.size(); ++row) 
-	  {
-	    constraints.add_line (dofs_on_children[row]);
-	    for (unsigned int i=0; i!=dofs_on_mother.size(); ++i)
-	      constraints.add_entry (dofs_on_children[row],
-				     dofs_on_mother[i],
-				     selected_fe->constraints()(row,i));
-	  };
-      };
-};
-
-#endif
-
 
 #if deal_II_dimension == 1
 
@@ -2123,71 +1863,6 @@ unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const {
 #endif
 
 
-
-
-template <int dim>
-template <typename Number>
-void DoFHandler<dim>::distribute_cell_to_dof_vector (const Vector<Number> &cell_data,
-						     Vector<double>       &dof_data,
-						     const unsigned int    component) const {
-  Assert (cell_data.size()==tria->n_active_cells(),
-	  ExcWrongSize (cell_data.size(), tria->n_active_cells()));
-  Assert (dof_data.size()==n_dofs(), ExcWrongSize (dof_data.size(), n_dofs()));
-  Assert (component < selected_fe->n_components(),
-	  ExcInvalidComponent(component, selected_fe->n_components()));
-
-				   // store a flag whether we should care
-				   // about different components. this is
-				   // just a simplification, we could ask
-				   // for this at every single place
-				   // equally well
-  const bool consider_components = (selected_fe->n_components() != 1);
-  
-				   // count how often we have added a value
-				   // in the sum for each dof
-  vector<unsigned char> touch_count (n_dofs(), 0);
-
-  active_cell_iterator cell = begin_active(),
-		       endc = end();
-  unsigned int present_cell = 0;
-  const unsigned int dofs_per_cell = selected_fe->dofs_per_cell;
-  vector<int> dof_indices (dofs_per_cell);
-
-  for (; cell!=endc; ++cell, ++present_cell) 
-    {
-      cell->get_dof_indices (dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-					 // consider this dof only if it
-					 // is the right component. if there
-					 // is only one component, short cut
-					 // the test
-	if (!consider_components ||
-	    (selected_fe->system_to_component_index(i).first == component))
-	  {
-					     // sum up contribution of the
-					     // present_cell to this dof
-	    dof_data(dof_indices[i]) += cell_data(present_cell);
-					     // note that we added another
-					     // summand
-	    ++touch_count[dof_indices[i]];
-	  };
-    };
-  
-				   // compute the mean value on all the
-				   // dofs by dividing with the number
-				   // of summands.
-  for (unsigned int i=0; i<n_dofs(); ++i)
-    {
-				       // assert that each dof was used
-				       // at least once. this needs not be
-				       // the case if the vector has more than
-				       // one component
-      Assert (consider_components || (touch_count[i]!=0),
-	      ExcInternalError());
-      if (touch_count[i] != 0)
-	dof_data(i) /=  touch_count[i];
-    };
-};
 
 
 
@@ -2385,16 +2060,4 @@ void DoFHandler<dim>::clear_space () {
 
 /*-------------- Explicit Instantiations -------------------------------*/
 template class DoFHandler<deal_II_dimension>;
-
-template
-void
-DoFHandler<deal_II_dimension>::distribute_cell_to_dof_vector (const Vector<float>  &cell_data,
-							      Vector<double>       &dof_data) const;
-
-template
-void
-DoFHandler<deal_II_dimension>::distribute_cell_to_dof_vector (const Vector<double> &cell_data,
-							      Vector<double>       &dof_data) const;
-
-
 

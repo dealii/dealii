@@ -313,7 +313,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 				   // computing constraints
   deallog << "    Computing constraints..." << endl;
   ConstraintMatrix constraints;
-  dof->make_hanging_node_constraints (constraints);
+  DoFTools::make_hanging_node_constraints (*dof, constraints);
   constraints.close ();
   constraints.condense (sparsity);
   

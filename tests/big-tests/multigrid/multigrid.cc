@@ -353,7 +353,7 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
 				   // make up sparsity pattern and
 				   // compress with constraints
   constraints.clear ();
-  dof->DoFHandler<dim>::make_hanging_node_constraints (constraints);
+  DoFTools::make_hanging_node_constraints (*dof, constraints);
   constraints.close ();
   DoFTools::make_sparsity_pattern (*dof, system_sparsity);
   constraints.condense (system_sparsity);
@@ -557,13 +557,13 @@ int PoissonProblem<dim>::run (const unsigned int level) {
       Vector<double> linfty_error_per_dof (dof->DoFHandler<dim>::n_dofs());
       Vector<double> h1_seminorm_error_per_dof (dof->DoFHandler<dim>::n_dofs());
       Vector<double> h1_error_per_dof (dof->DoFHandler<dim>::n_dofs());
-      dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
-      dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-      dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
+      DoFTools::distribute_cell_to_dof_vector (*dof, l1_error_per_cell, l1_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, l2_error_per_cell, l2_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, linfty_error_per_cell,
 					  linfty_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell,
+      DoFTools::distribute_cell_to_dof_vector (*dof, h1_seminorm_error_per_cell,
 					  h1_seminorm_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, h1_error_per_cell, h1_error_per_dof);
 
 //       Vector<double> projected_solution;
 //       ConstraintMatrix constraints;

@@ -220,6 +220,93 @@ class DoFTools
 					    SparseMatrixStruct    &sparsity_pattern);
     
 				     /**
+				      * Make up the constraints which
+				      * is result from the use of hanging
+				      * nodes. The object into which these
+				      * are inserted is later
+				      * used to condensate the global
+				      * system matrices and to prolong
+				      * the solution vectors from the true
+				      * degrees of freedom also to the
+				      * constraint nodes.
+				      *
+				      * Since this method does not make sense in
+				      * one dimension, the function returns
+				      * immediately. The object is not cleared
+				      * before use, so you should make sure
+				      * it containts only constraints you still
+				      * want; otherwise call the #clear#
+				      * function.
+				      *
+				      * To condense a given sparsity pattern,
+				      * use #ConstraintMatrix::condense#.
+				      * Before doing so, you need to close
+				      * the constraint object, which must be
+				      * done after all constraints are entered.
+				      * This function does not close the object
+				      * since you may want to enter other
+				      * constraints later on yourself.
+				      *
+				      * This function uses the user flags for
+				      * the faces. If you need the user flags,
+				      * store them beforehand.
+				      */
+    template <int dim>
+    static void
+    make_hanging_node_constraints (const DoFHandler<dim> &dof_handler,
+				   ConstraintMatrix      &constraints);
+
+				     /**
+				      * Take a vector of values which live on
+				      * cells (e.g. an error per cell) and
+				      * distribute it to the dofs in such a
+				      * way that a finite element field results,
+				      * which can then be further processed,
+				      * e.g. for output. You should note that
+				      * the resulting field will not be
+				      * continuous at hanging nodes. This can,
+				      * however, easily be arranged by calling
+				      * the appropraite #distribute# function
+				      * of a #ConstraintMatrix# object created
+				      * for this #DoFHandler# object.
+				      *
+				      * It is assumed that the number of
+				      * elements in #cell_data# equals the
+				      * number of active cells. The size of
+				      * #dof_data# is adjusted to the right
+				      * size.
+				      *
+				      * Note that the input vector may be
+				      * a vector of any data type as long
+				      * as it is convertible to #double#.
+				      * The output vector, being a data
+				      * vector on the grid, always consists
+				      * of elements of type #double#.
+				      *
+				      * In case the finite element used by
+				      * this DoFHandler consists of more than
+				      * one component, you should give which
+				      * component in the output vector should
+				      * be used to store the finite element
+				      * field in; the default is zero (no other
+				      * value is allowed if the finite element
+				      * consists only of one component). All
+				      * other components of the vector remain
+				      * untouched, i.e. their contents are
+				      * not changed.
+				      *
+				      * It is assumed that the output vector
+				      * #dof_data# already has the right size,
+				      * i.e. #n_dofs()# elements.
+				      */
+    template <int dim, typename Number>
+    static void
+    distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler,
+				   const Vector<Number>  &cell_data,
+				   Vector<double>        &dof_data,
+				   const unsigned int     component = 0);
+
+				     /**
 				      * Extract the indices of the degrees
 				      * of freedom belonging to certain
 				      * components. The bit vector #select#
@@ -249,6 +336,23 @@ class DoFTools
 				   const MGDoFHandler<dim> &dof,
 				   const vector<bool>      &select,
 				   vector<bool>            &selected_dofs);
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongSize,
+		    int, int,
+		    << "The dimension " << arg1 << " of the vector is wrong. "
+		    << "It should be " << arg2);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidComponent,
+		    int, int,
+		    << "The component you gave (" << arg1 << ") "
+		    << "is invalid with respect to the number "
+		    << "of components in the finite element "
+		    << "(" << arg2 << ")");
 };
 
 

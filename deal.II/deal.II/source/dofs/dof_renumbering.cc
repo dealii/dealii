@@ -29,7 +29,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>   &dof_handler,
   if (use_constraints) 
     {
       ConstraintMatrix constraints;
-      dof_handler.make_hanging_node_constraints (constraints);
+      DoFTools::make_hanging_node_constraints (dof_handler, constraints);
       constraints.close ();
       constraints.condense (sparsity);
     };

@@ -44,6 +44,15 @@ libdeal1d = -ldeal_II_1d
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
+
+%.go : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
+
+
 all: grid_test.check dof_test.check fe_tables.check gradients.check \
      constraints.check mg.check mglocal.check wave-test-3.check second_derivatives.check
 

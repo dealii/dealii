@@ -376,7 +376,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 				   // computing constraints
   cout << "    Computing constraints..." << endl;
   ConstraintMatrix constraints;
-  dof->make_hanging_node_constraints (constraints);
+  DoFTools::make_hanging_node_constraints (*dof, constraints);
   constraints.close ();
   constraints.condense (sparsity);
   

@@ -2,20 +2,21 @@
 /* Copyright W. Bangerth, University of Heidelberg, 1998 */
 
 
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <grid/tria_accessor.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <dofs/dof_constraints.h>
-#include <grid/grid_generator.h>
 #include <base/function.h>
-#include <numerics/data_out.h>
-#include <grid/grid_out.h>
 #include <base/parameter_handler.h>
-#include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>
+#include <grid/grid_generator.h>
+#include <grid/grid_out.h>
+#include <grid/tria.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_boundary_lib.h>
+#include <grid/tria_iterator.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_tools.h>
+#include <fe/fe_lib.lagrange.h>
+#include <numerics/data_out.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
@@ -559,11 +560,11 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       Vector<double> l2_error_per_dof(dof->n_dofs()), linfty_error_per_dof(dof->n_dofs());
       Vector<double> h1_error_per_dof(dof->n_dofs()), estimated_error_per_dof(dof->n_dofs());
       Vector<double> error_ratio (dof->n_dofs());
-      dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-      dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
+      DoFTools::distribute_cell_to_dof_vector (*dof, l2_error_per_cell, l2_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, linfty_error_per_cell,
 					  linfty_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
-      dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
+      DoFTools::distribute_cell_to_dof_vector (*dof, h1_error_per_cell, h1_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, estimated_error_per_cell,
 					  estimated_error_per_dof);
       error_ratio.ratio (h1_error_per_dof, estimated_error_per_dof);
   

@@ -88,7 +88,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // make up sparsity pattern and
 				   // compress with constraints
   constraints.clear ();
-  dof_handler->make_hanging_node_constraints (constraints);
+  DoFTools::make_hanging_node_constraints (*dof_handler, constraints);
   constraints.close ();
   DoFTools::make_sparsity_pattern (*dof_handler, system_sparsity);
   constraints.condense (system_sparsity);

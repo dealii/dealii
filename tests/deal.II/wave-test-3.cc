@@ -5338,7 +5338,7 @@ void TimeStep_Wave<dim>::wake_up (const unsigned int wakeup_level)
       
 
       constraints.clear ();
-      dof_handler->make_hanging_node_constraints (constraints);
+      DoFTools::make_hanging_node_constraints (*dof_handler, constraints);
       constraints.close ();
 
       sweep_info->get_timers().grid_generation.stop();
@@ -7944,9 +7944,9 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	  else
 	    {
 	      estimated_error.reinit (get_timestep_primal().dof_handler->n_dofs());
-	      get_timestep_primal().dof_handler
-		->distribute_cell_to_dof_vector (estimated_error_per_cell,
-						 estimated_error);
+	      DoFTools::distribute_cell_to_dof_vector (*get_timestep_primal().dof_handler,
+						       estimated_error_per_cell,
+						       estimated_error);
 	    };
       
 	  out.add_data_vector (estimated_error, "est_error");

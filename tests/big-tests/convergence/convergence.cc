@@ -3,12 +3,13 @@
 
 
 #include <grid/tria.h>
-#include <dofs/dof_handler.h>
 #include <grid/tria_accessor.h>
-#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
 #include <dofs/dof_constraints.h>
+#include <dofs/dof_tools.h>
 #include <grid/grid_generator.h>
 #include <base/function.h>
 #include <numerics/data_out.h>
@@ -387,13 +388,13 @@ int PoissonProblem<dim>::run (const unsigned int level) {
       Vector<double> linfty_error_per_dof(dof->n_dofs());
       Vector<double> h1_seminorm_error_per_dof(dof->n_dofs());
       Vector<double> h1_error_per_dof(dof->n_dofs());
-      dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
-      dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-      dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
-					  linfty_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell,
-					  h1_seminorm_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, l1_error_per_cell, l1_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, l2_error_per_cell, l2_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, linfty_error_per_cell,
+					       linfty_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, h1_seminorm_error_per_cell,
+					       h1_seminorm_error_per_dof);
+      DoFTools::distribute_cell_to_dof_vector (*dof, h1_error_per_cell, h1_error_per_dof);
 
 //       Vector<double> projected_solution;
 //       ConstraintMatrix constraints;
