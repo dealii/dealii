@@ -298,10 +298,11 @@ class DataOutBase
 	FullMatrix<double> data;
 	
 					 /**
-					  * Default constructor.
+					  * Default constructor. Sets
+					  * #n_subdivisions# to one.
 					  */
 	Patch () :
-			n_subdivisions(0) {};
+			n_subdivisions(1) {};
     };
 
 

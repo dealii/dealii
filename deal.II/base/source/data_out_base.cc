@@ -12,7 +12,7 @@
 //
 // template <int dim>
 // DataOut::Patch<dim>::Patch () :
-// 		n_subdivisions (0)
+// 		n_subdivisions (1)
 // 				 // all the rest has a constructor of its own
 // {};
 
