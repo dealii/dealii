@@ -15,7 +15,8 @@ help:
 	@echo "=  base lac: debug and optimized libraries base and lac              ="
 	@echo "=  1dg 2dg 3dg: (1) and deal.II debug version for specified dimension="
 	@echo "=  1d 2d 3d: (2) and deal.II for specified dimension                 ="
-	@echo "=  all: base, lac 1d, 2d and 3d                                      ="
+	@echo "=  all: base, lac, 1d, 2d and 3d                                     ="
+	@echo "=  debug: baseg, lacg, 1dg, 2dg and 3dg                              ="
 	@echo "=  online-doc: generate the documentation in HTML format             ="
 	@echo "=  printable-doc: generate the documentation in Postscript format.   ="
 	@echo "=      You need to have Doc++ and LaTeX installed for that.          ="
@@ -81,6 +82,13 @@ all:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1d
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
+
+debug:
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 
 
 online-doc:
