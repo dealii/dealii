@@ -1875,7 +1875,7 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
 				      Vector<double> &final_u_bar,
 				      Vector<double> &final_v_bar) const {
   const double y_offset = 300000000;
-  const double n_q_points = quadrature->n_quadrature_points;
+  const unsigned int n_q_points = quadrature->n_quadrature_points;
   const unsigned int dofs_per_cell = fe->dofs_per_cell;
   
   final_u_bar.reinit (dof->n_dofs());
@@ -3547,7 +3547,7 @@ class Distorted : public Function<dim> {
 	  const double pi = 3.1415926539;
 	  
 	  return (1+0.5*((sin(3*pi*x)>0 ? 1 : 0)+
-			 (sin(3*pi*(2*x+y)/sqrt(3)))>0 ? 1 : 0));
+			 (sin(3*pi*(2*x+y)/sqrt(3.0)))>0 ? 1 : 0));
 	};
 	
 	virtual void value_list (const std::vector<Point<dim> > &points,
@@ -4237,14 +4237,14 @@ case square:
       {
 	const double radius = 1.;
 	const double a = radius/2;
-	const Point<2> vertices[8] = { Point<2>(-1,-1)*(radius/sqrt(2)),
-				       Point<2>(+1,-1)*(radius/sqrt(2)),
-				       Point<2>(-1,-1)*(radius/sqrt(2)*a),
-				       Point<2>(+1,-1)*(radius/sqrt(2)*a),
-				       Point<2>(-1,+1)*(radius/sqrt(2)*a),
-				       Point<2>(+1,+1)*(radius/sqrt(2)*a),
-				       Point<2>(-1,+1)*(radius/sqrt(2)),
-				       Point<2>(+1,+1)*(radius/sqrt(2)) };
+	const Point<2> vertices[8] = { Point<2>(-1,-1)*(radius/sqrt(2.0)),
+				       Point<2>(+1,-1)*(radius/sqrt(2.0)),
+				       Point<2>(-1,-1)*(radius/sqrt(2.0)*a),
+				       Point<2>(+1,-1)*(radius/sqrt(2.0)*a),
+				       Point<2>(-1,+1)*(radius/sqrt(2.0)*a),
+				       Point<2>(+1,+1)*(radius/sqrt(2.0)*a),
+				       Point<2>(-1,+1)*(radius/sqrt(2.0)),
+				       Point<2>(+1,+1)*(radius/sqrt(2.0)) };
 	
 	const int cell_vertices[4][4] = {{0, 1, 3, 2},
 					 {0, 2, 4, 6},
