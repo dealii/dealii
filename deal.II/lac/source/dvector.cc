@@ -252,8 +252,8 @@ double dVector::linfty_norm () const {
     };
 				   // add up remaining elements
   for (unsigned int i=(dim/4)*4; i<dim; ++i)
-    if (max0<val[i])
-      max0 = val[i];
+    if (max0<fabs(val[i]))
+      max0 = fabs(val[i]);
 
   return max (max(max0, max1),
 	      max(max2, max3));
