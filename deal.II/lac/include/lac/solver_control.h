@@ -264,7 +264,7 @@ class SolverControl : public Subscriptor
     void log_history (const bool);
 
 				     /**
-				      * Returns the log_history flag.
+				      * Returns the @p{log_history} flag.
 				      */
     bool log_history () const;
     
@@ -277,6 +277,11 @@ class SolverControl : public Subscriptor
 				      * Log start and end step.
 				      */
     void log_result (const bool);
+    
+				     /**
+				      * Returns the @p{log_result} flag.
+				      */
+    bool log_result () const;
     
   protected:
 				     /**
@@ -520,6 +525,14 @@ inline void
 SolverControl::log_result (const bool newval)
 {
   m_log_result = newval;
+}
+
+
+
+inline bool
+SolverControl::log_result () const
+{
+  return m_log_result;
 }
 
 
