@@ -1562,7 +1562,7 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
 {
   Assert (used(), TriaAccessor<1>::ExcCellNotUsed());
   tria->levels[present_level]->lines.material_id[present_index]
-    = mat_id;						 
+    = mat_id;
 };
 
 
@@ -1703,6 +1703,26 @@ bool CellAccessor<3>::point_inside (const Point<3> &) const
 
 
 /*------------------------ Functions: CellAccessor<dim> -----------------------*/
+
+
+template <int dim>
+unsigned int CellAccessor<dim>::subdomain_id () const
+{
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  return tria->levels[present_level]->subdomain_ids[present_index];
+};
+
+
+
+template <int dim>
+void
+CellAccessor<dim>::set_subdomain_id (const unsigned int new_subdomain_id) const
+{
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  tria->levels[present_level]->subdomain_ids[present_index]
+    = new_subdomain_id;
+};
+
 
 
 template <int dim>

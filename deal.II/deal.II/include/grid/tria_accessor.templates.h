@@ -10,6 +10,7 @@
 #define __deal2__tria_accessor_templates_h
 
 
+#include <base/config.h>
 #include <grid/tria.h>
 #include <grid/tria_levels.h>
 #include <grid/tria_iterator.h>

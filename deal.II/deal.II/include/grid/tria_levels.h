@@ -14,6 +14,7 @@
 #define __deal2__tria_levels_h
 
 
+#include <base/config.h>
 #include <vector>
 #include <grid/tria_line.h>
 #include <grid/tria_quad.h>
@@ -127,6 +128,18 @@ class TriangulationLevel<0>
 				      *  to the mother cell of this cell).
 				      */
     std::vector<std::pair<int,int> > neighbors;
+
+				     /**
+				      * One integer per cell to store
+				      * which subdomain it belongs
+				      * to. This field is most often
+				      * used in parallel computations,
+				      * where it denotes which
+				      * processor shall work on the
+				      * cells with a given subdomain
+				      * number.
+				      */
+    std::vector<unsigned int> subdomain_ids;
     
 				     /**
 				      *  Reserve enough space to accomodate

@@ -14,6 +14,7 @@
 #define __deal2__tria_accessor_h
 
 
+#include <base/config.h>
 #include <base/exceptions.h>
 #include <grid/tria_iterator_base.h>
 
@@ -1966,14 +1967,28 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     face (const unsigned int i) const;
     
 				     /**
-				      * Return the material id of this cell.
+				      * Return the material id of this
+				      * cell.
 				      */
     unsigned char material_id () const;
 
 				     /**
-				      * Set the material id of this cell.
+				      * Set the material id of this
+				      * cell.
 				      */
-    void set_material_id (const unsigned char) const;
+    void set_material_id (const unsigned char new_material_id) const;
+
+				     /**
+				      * Return the subdomain id of
+				      * this cell.
+				      */
+    unsigned int subdomain_id () const;
+
+				     /**
+				      * Set the subdomain id of this
+				      * cell.
+				      */
+    void set_subdomain_id (const unsigned int new_subdomain_id) const;
 
 				     /**
 				      * Test whether the cell has children
@@ -2056,6 +2071,7 @@ template <> bool CellAccessor<3>::at_boundary () const;
 template <> unsigned char CellAccessor<3>::material_id () const;
 template <> void CellAccessor<3>::set_material_id (const unsigned char mat_id) const;
 template <> bool CellAccessor<3>::point_inside (const Point<3> &) const;
+
 template <> bool CellAccessor<1>::has_boundary_lines () const;
 
 template <> double TriaObjectAccessor<2, 2>::measure () const;
