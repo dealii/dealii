@@ -31,11 +31,11 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
                                                        false),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
-								      degree(degree),
-								      renumber(this->dofs_per_cell, 0),
-								      renumber_inverse(this->dofs_per_cell, 0),
-								      face_renumber(this->dofs_per_face, 0),
-								      polynomial_space(LagrangeEquidistant::generate_complete_basis(degree))
+                degree(degree),
+                renumber(this->dofs_per_cell, 0),
+		renumber_inverse(this->dofs_per_cell, 0),
+		face_renumber(this->dofs_per_face, 0),
+		polynomial_space(Polynomials::LagrangeEquidistant::generate_complete_basis(degree))
 {
 				   // do some internal book-keeping on
 				   // cells and faces. if in 1d, the

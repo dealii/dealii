@@ -20,6 +20,9 @@
 #include <base/quadrature_lib.h>
 
 
+using namespace Polynomials;
+
+
 double scalar_product (const Polynomial<double>& p1,
 		       const Polynomial<double>& p2)
 {

@@ -20,6 +20,9 @@
 #include <base/polynomial_space.h>
 
 
+using namespace Polynomials;
+
+
 template<int dim, class POLY>
 void check_poly(const Point<dim>& x,
 		const POLY& p)

@@ -30,7 +30,7 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
                 degree(degree),
-                polynomial_space (Legendre<double>::generate_complete_basis(degree))
+                polynomial_space (Polynomials::Legendre<double>::generate_complete_basis(degree))
 {
 				   // if defined, copy over matrices
 				   // from precomputed arrays

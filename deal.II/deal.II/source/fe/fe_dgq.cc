@@ -32,8 +32,8 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
                                                       true),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
-								      degree(degree),
-								      polynomial_space (LagrangeEquidistant::generate_complete_basis(degree))
+                degree(degree),
+                polynomial_space (Polynomials::LagrangeEquidistant::generate_complete_basis(degree))
 {
 				   // generate permutation/rotation
 				   // index sets to generate some

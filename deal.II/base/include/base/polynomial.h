@@ -23,6 +23,13 @@
 
 
 /**
+ * A namespace in which classes relating to the description of
+ * 1d polynomial spaces are declared.
+ */
+namespace Polynomials
+{
+
+/**
  * Base class for all 1D polynomials. A polynomial is represented in
  * this class by its coefficients, which are set through the
  * constructor or by derived classes. Evaluation of a polynomial
@@ -31,164 +38,164 @@
  *
  * @author Ralf Hartmann, Guido Kanschat, 2000
  */
-template <typename number>
-class Polynomial : public Subscriptor
-{
-  public:
-				     /**
-				      * Constructor. The coefficients
-				      * of the polynomial are passed
-				      * as arguments, and denote the
-				      * polynomial @p{\sum_i a[i]
-				      * x^i}, i.e. the first element
-				      * of the array denotes the
-				      * constant term, the second the
-				      * linear one, and so on. The
-				      * degree of the polynomial
-				      * represented by this object is
-				      * thus the number of elements in
-				      * the @p{coefficient} array
-				      * minus one.
-				      */
-    Polynomial (const std::vector<number> &coefficients);
+  template <typename number>
+  class Polynomial : public Subscriptor
+  {
+    public:
+                                       /**
+                                        * Constructor. The coefficients
+                                        * of the polynomial are passed
+                                        * as arguments, and denote the
+                                        * polynomial @p{\sum_i a[i]
+                                        * x^i}, i.e. the first element
+                                        * of the array denotes the
+                                        * constant term, the second the
+                                        * linear one, and so on. The
+                                        * degree of the polynomial
+                                        * represented by this object is
+                                        * thus the number of elements in
+                                        * the @p{coefficient} array
+                                        * minus one.
+                                        */
+      Polynomial (const std::vector<number> &coefficients);
     
-				     /**
-				      * Return the value of this
-				      * polynomial at the given point.
-				      *
-				      * This function uses the Horner
-				      * scheme for numerical stability
-				      * of the evaluation.
-				      */
-    number value (const number x) const;
+                                       /**
+                                        * Return the value of this
+                                        * polynomial at the given point.
+                                        *
+                                        * This function uses the Horner
+                                        * scheme for numerical stability
+                                        * of the evaluation.
+                                        */
+      number value (const number x) const;
     
-				     /**
-				      * Return the values and the
-				      * derivatives of the
-				      * @p{Polynomial} at point @p{x}.
-				      * @p{values[i],
-				      * i=0,...,values.size()-1}
-				      * includes the @p{i}th
-				      * derivative. The number of
-				      * derivatives to be computed is
-				      * thus determined by the size of
-				      * the array passed.
-				      *
-				      * This function uses the Horner
-				      * scheme for numerical stability
-				      * of the evaluation.
-				      */
-    void value (const number         x,
-		std::vector<number> &values) const;
+                                       /**
+                                        * Return the values and the
+                                        * derivatives of the
+                                        * @p{Polynomial} at point @p{x}.
+                                        * @p{values[i],
+                                        * i=0,...,values.size()-1}
+                                        * includes the @p{i}th
+                                        * derivative. The number of
+                                        * derivatives to be computed is
+                                        * thus determined by the size of
+                                        * the array passed.
+                                        *
+                                        * This function uses the Horner
+                                        * scheme for numerical stability
+                                        * of the evaluation.
+                                        */
+      void value (const number         x,
+                  std::vector<number> &values) const;
 
-				     /**
-				      * Degree of the polynomial. This
-				      * is the degree reflected by the
-				      * number of coefficients
-				      * provided by the
-				      * constructor. Leading non-zero
-				      * coefficients are not treated
-				      * separately.
-				      */
-    unsigned int degree () const;
+                                       /**
+                                        * Degree of the polynomial. This
+                                        * is the degree reflected by the
+                                        * number of coefficients
+                                        * provided by the
+                                        * constructor. Leading non-zero
+                                        * coefficients are not treated
+                                        * separately.
+                                        */
+      unsigned int degree () const;
 
-				     /**
-				      * Scale the abscissa of the
-				      * polynomial.  Given the
-				      * polynomial $p(t)$ and the
-				      * scaling $t = ax$, then the
-				      * result of this operation is
-				      * the polynomial $q$, such that
-				      * $q(x) = p(t)$.
-				      *
-				      * The operation is performed in
-				      * place.
-				      */
-    void scale (const number factor);
+                                       /**
+                                        * Scale the abscissa of the
+                                        * polynomial.  Given the
+                                        * polynomial $p(t)$ and the
+                                        * scaling $t = ax$, then the
+                                        * result of this operation is
+                                        * the polynomial $q$, such that
+                                        * $q(x) = p(t)$.
+                                        *
+                                        * The operation is performed in
+                                        * place.
+                                        */
+      void scale (const number factor);
 
-				     /**
-				      * Shift the abscissa oft the
-				      * polynomial.  Given the
-				      * polynomial $p(t)$ and the
-				      * shift $t = x + a$, then the
-				      * result of this operation is
-				      * the polynomial $q$, such that
-				      * $q(x) = p(t)$.
-				      *
-				      * The template parameter allows
-				      * to compute the new
-				      * coefficients with higher
-				      * accuracy, since all
-				      * computations are performed
-				      * with type @p{number2}. This
-				      * may be necessary, since this
-				      * operation involves a big
-				      * number of additions. On a Sun
-				      * Sparc Ultra with Solaris 2.8,
-				      * the difference between
-				      * @p{double} and @p{long double}
-				      * was not significant, though.
-				      *
-				      * The operation is performed in
-				      * place, i.e. the coefficients
-				      * of the present object are
-				      * changed.
-				      */
-    template <typename number2>
-    void shift (const number2 offset);
+                                       /**
+                                        * Shift the abscissa oft the
+                                        * polynomial.  Given the
+                                        * polynomial $p(t)$ and the
+                                        * shift $t = x + a$, then the
+                                        * result of this operation is
+                                        * the polynomial $q$, such that
+                                        * $q(x) = p(t)$.
+                                        *
+                                        * The template parameter allows
+                                        * to compute the new
+                                        * coefficients with higher
+                                        * accuracy, since all
+                                        * computations are performed
+                                        * with type @p{number2}. This
+                                        * may be necessary, since this
+                                        * operation involves a big
+                                        * number of additions. On a Sun
+                                        * Sparc Ultra with Solaris 2.8,
+                                        * the difference between
+                                        * @p{double} and @p{long double}
+                                        * was not significant, though.
+                                        *
+                                        * The operation is performed in
+                                        * place, i.e. the coefficients
+                                        * of the present object are
+                                        * changed.
+                                        */
+      template <typename number2>
+      void shift (const number2 offset);
 
-				     /**
-				      * Print coefficients.
-				      */
-    void print(std::ostream& out) const;
+                                       /**
+                                        * Print coefficients.
+                                        */
+      void print(std::ostream& out) const;
 				      
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcEmptyArray);
+                                       /**
+                                        * Exception
+                                        */
+      DeclException0 (ExcEmptyArray);
     
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcVoidPolynomial);
+                                       /**
+                                        * Exception
+                                        */
+      DeclException0 (ExcVoidPolynomial);
     
-  protected:
+    protected:
 
-				     /**
-				      * This function performs the
-				      * actual scaling.
-				      */
-    static void scale (std::vector<number> &coefficients,
-		       const number         factor);
+                                       /**
+                                        * This function performs the
+                                        * actual scaling.
+                                        */
+      static void scale (std::vector<number> &coefficients,
+                         const number         factor);
 
-				     /**
-				      * This function performs the
-				      * actual shift
-				      */
-    template <typename number2>
-    static void shift (std::vector<number> &coefficients,
-		       const number2        shift);
+                                       /**
+                                        * This function performs the
+                                        * actual shift
+                                        */
+      template <typename number2>
+      static void shift (std::vector<number> &coefficients,
+                         const number2        shift);
 
-				     /**
-				      * Multiply polynomial by a factor.
-				      */
-    static void multiply (std::vector<number>& coefficients,
-			  const number factor);
+                                       /**
+                                        * Multiply polynomial by a factor.
+                                        */
+      static void multiply (std::vector<number>& coefficients,
+                            const number factor);
     
-				     /**
-				      * Coefficients of the polynomial
-				      * $\sum_i a_i x^i$. This vector
-				      * is filled by the constructor
-				      * of this class and may be
-				      * passed down by derived
-				      * classes.
-				      *
-				      * This vector cannot be constant
-				      * since we want to allow copying
-				      * of polynomials.
-				      */
-    std::vector<number> coefficients;
-};
+                                       /**
+                                        * Coefficients of the polynomial
+                                        * $\sum_i a_i x^i$. This vector
+                                        * is filled by the constructor
+                                        * of this class and may be
+                                        * passed down by derived
+                                        * classes.
+                                        *
+                                        * This vector cannot be constant
+                                        * since we want to allow copying
+                                        * of polynomials.
+                                        */
+      std::vector<number> coefficients;
+  };
 
 
 
@@ -210,56 +217,56 @@ class Polynomial : public Subscriptor
  *
  * @author Ralf Hartmann, 2000
  */
-class LagrangeEquidistant: public Polynomial<double>
-{
-  public:
-				     /**
-				      * Constructor. Takes the order
-				      * @p{n} of the Lagrangian
-				      * polynom and the index
-				      * @p{support_point} of the
-				      * support point. Fills the
-				      * @p{coefficients} of the base
-				      * class @p{Polynomial}.
-				      */
-    LagrangeEquidistant (const unsigned int n,
-			 const unsigned int support_point);
+  class LagrangeEquidistant: public Polynomial<double>
+  {
+    public:
+                                       /**
+                                        * Constructor. Takes the order
+                                        * @p{n} of the Lagrangian
+                                        * polynom and the index
+                                        * @p{support_point} of the
+                                        * support point. Fills the
+                                        * @p{coefficients} of the base
+                                        * class @p{Polynomial}.
+                                        */
+      LagrangeEquidistant (const unsigned int n,
+                           const unsigned int support_point);
 
-				     /**
-				      * Return a vector of polynomial
-				      * objects of order @p{degree},
-				      * which then spans the full
-				      * space of polynomials up to the
-				      * given degree. The polynomials
-				      * are generated by calling the
-				      * destructor of this class with
-				      * the same degree but support
-				      * point running from zero to
-				      * @p{degree}. This function may
-				      * be used to initialize the
-				      * @ref{TensorProductPolynomials}
-				      * and @ref{PolynomialSpace}
-				      * classes.
-				      */
-    static
-    std::vector<Polynomial<double> >
-    generate_complete_basis (const unsigned int degree);
+                                       /**
+                                        * Return a vector of polynomial
+                                        * objects of order @p{degree},
+                                        * which then spans the full
+                                        * space of polynomials up to the
+                                        * given degree. The polynomials
+                                        * are generated by calling the
+                                        * destructor of this class with
+                                        * the same degree but support
+                                        * point running from zero to
+                                        * @p{degree}. This function may
+                                        * be used to initialize the
+                                        * @ref{TensorProductPolynomials}
+                                        * and @ref{PolynomialSpace}
+                                        * classes.
+                                        */
+      static
+      std::vector<Polynomial<double> >
+      generate_complete_basis (const unsigned int degree);
     
-  private:
+    private:
 
-				     /**
-				      * Computes the @p{coefficients}
-				      * of the base class
-				      * @p{Polynomial}. This function
-				      * is @p{static} to allow to be
-				      * called in the
-				      * constructor.
-				      */
-    static 
-    std::vector<double> 
-    compute_coefficients (const unsigned int n,
-			  const unsigned int support_point);
-};
+                                       /**
+                                        * Computes the @p{coefficients}
+                                        * of the base class
+                                        * @p{Polynomial}. This function
+                                        * is @p{static} to allow to be
+                                        * called in the
+                                        * constructor.
+                                        */
+      static 
+      std::vector<double> 
+      compute_coefficients (const unsigned int n,
+                            const unsigned int support_point);
+  };
 
 
 /**
@@ -274,76 +281,81 @@ class LagrangeEquidistant: public Polynomial<double>
  *
  * @author Guido Kanschat, 2000
  */
-template <typename number>
-class Legendre : public Polynomial<number>
-{
-  public:
-				     /**
-				      * Constructor for polynomial of
-				      * order @p{k}.
-				      */
-    Legendre (const unsigned int k);
+  template <typename number>
+  class Legendre : public Polynomial<number>
+  {
+    public:
+                                       /**
+                                        * Constructor for polynomial of
+                                        * order @p{k}.
+                                        */
+      Legendre (const unsigned int k);
 
-				     /**
-				      * Return a vector of Legendre
-				      * polynomial objects of orders
-				      * zero through @p{degree}, which
-				      * then spans the full space of
-				      * polynomials up to the given
-				      * degree. This function may be
-				      * used to initialize the
-				      * @ref{TensorProductPolynomials}
-				      * and @ref{PolynomialSpace}
-				      * classes.
-				      */
-    static
-    std::vector<Polynomial<number> >
-    generate_complete_basis (const unsigned int degree);
+                                       /**
+                                        * Return a vector of Legendre
+                                        * polynomial objects of orders
+                                        * zero through @p{degree}, which
+                                        * then spans the full space of
+                                        * polynomials up to the given
+                                        * degree. This function may be
+                                        * used to initialize the
+                                        * @ref{TensorProductPolynomials}
+                                        * and @ref{PolynomialSpace}
+                                        * classes.
+                                        */
+      static
+      std::vector<Polynomial<number> >
+      generate_complete_basis (const unsigned int degree);
     
-  private:
-				     /**
-				      * Coefficients for the interval $[0,1]$.
-				      */
-    static std::vector<const std::vector<number> *> shifted_coefficients;
+    private:
+                                       /**
+                                        * Coefficients for the interval $[0,1]$.
+                                        */
+      static std::vector<const std::vector<number> *> shifted_coefficients;
     
-				     /**
-				      * Vector with already computed
-				      * coefficients. For each degree
-				      * of the polynomial, we keep one
-				      * pointer to the list of
-				      * coefficients; we do so rather
-				      * than keeping a vector of
-				      * vectors in order to simplify
-				      * programming multithread-safe.
-				      */
-    static std::vector<const std::vector<number> *> recursive_coefficients;
+                                       /**
+                                        * Vector with already computed
+                                        * coefficients. For each degree
+                                        * of the polynomial, we keep one
+                                        * pointer to the list of
+                                        * coefficients; we do so rather
+                                        * than keeping a vector of
+                                        * vectors in order to simplify
+                                        * programming multithread-safe.
+                                        */
+      static std::vector<const std::vector<number> *> recursive_coefficients;
     
-				     /**
-				      * Compute coefficients recursively.
-				      */
-    static void compute_coefficients (const unsigned int k);
+                                       /**
+                                        * Compute coefficients recursively.
+                                        */
+      static void compute_coefficients (const unsigned int k);
     
-				     /**
-				      * Get coefficients for
-				      * constructor.  This way, it can
-				      * use the non-standard
-				      * constructor of
-				      * @ref{Polynomial}.
-				      */
-    static const std::vector<number> &
-    get_coefficients (const unsigned int k);
-};
+                                       /**
+                                        * Get coefficients for
+                                        * constructor.  This way, it can
+                                        * use the non-standard
+                                        * constructor of
+                                        * @ref{Polynomial}.
+                                        */
+      static const std::vector<number> &
+      get_coefficients (const unsigned int k);
+  };
+  
+}
 
 
 /* -------------------------- inline functions --------------------- */
 
-template <typename number>
-inline
-unsigned int
-Polynomial<number>::degree () const
+namespace Polynomials 
 {
-  Assert (coefficients.size()>0, ExcVoidPolynomial());
-  return coefficients.size() - 1;
+  template <typename number>
+  inline
+  unsigned int
+  Polynomial<number>::degree () const
+  {
+    Assert (coefficients.size()>0, ExcVoidPolynomial());
+    return coefficients.size() - 1;
+  }
 }
 
 #endif

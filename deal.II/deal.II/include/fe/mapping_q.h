@@ -19,7 +19,6 @@
 #include <fe/mapping_q1.h>
 
 template <int dim> class TensorProductPolynomials;
-class LagrangeEquidistant;
 
 
 

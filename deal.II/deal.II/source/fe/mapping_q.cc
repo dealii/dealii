@@ -13,6 +13,7 @@
 
 #include <fe/mapping_q.h>
 #include <fe/fe_q.h>
+#include <base/polynomial.h>
 #include <base/quadrature.h>
 #include <base/quadrature_lib.h>
 #include <base/memory_consumption.h>
@@ -112,9 +113,9 @@ MappingQ<dim>::MappingQ (const unsigned int p)
 				   // polynomials used as shape
 				   // functions for the Qp mapping of
 				   // cells at the boundary.
-  std::vector<LagrangeEquidistant> v;
+  std::vector<Polynomials::LagrangeEquidistant> v;
   for (unsigned int i=0; i<=degree; ++i)
-    v.push_back(LagrangeEquidistant(degree,i));
+    v.push_back(Polynomials::LagrangeEquidistant(degree,i));
 
   tensor_pols = new TensorProductPolynomials<dim> (v);
   Assert (n_shape_functions==tensor_pols->n(),

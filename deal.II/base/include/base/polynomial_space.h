@@ -143,7 +143,7 @@ class PolynomialSpace
 				      * polynomials given to the
 				      * constructor.
 				      */
-    const std::vector<Polynomial<double> > polynomials;
+    const std::vector<Polynomials::Polynomial<double> > polynomials;
 
 				     /**
 				      * Store the precomputed value
