@@ -18,11 +18,14 @@ help:
 	@echo "=      You need to have Doc++ and LaTeX installed for that.          ="
 	@echo "=  tex-doc: same, but only generate the LaTeX file, don't compile it ="
 	@echo "=  TODO: create a TODO file from TODO lines in the source files      ="
+	@echo "=  TAGS: create a TAGS file from include and source files            ="
 	@echo "=  clean: removes all object files, libraries, etc in all subdirs    ="
 	@echo "=                                                                    ="
 	@echo "=The following additional parameters may be specified to make:       ="
 	@echo "=  PAR=-jn where n is the number of parallel processes for parallel  ="
-	@echo "=          builds.                                                   ="
+	@echo "=          builds. If you use GNU make 3.78 or higher, you can       ="
+	@echo "=          call 'make -jn' directly. This parameter is no more       ="
+	@echo "=          necessary then.                                           ="
 	@echo "======================================================================"
 
 
