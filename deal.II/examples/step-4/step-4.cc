@@ -252,7 +252,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
   cout << "   Number of active cells: "
        << triangulation.n_active_cells()
        << endl
-       << "  Total number of cells: "
+       << "   Total number of cells: "
        << triangulation.n_cells()
        << endl;
 
