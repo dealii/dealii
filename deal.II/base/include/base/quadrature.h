@@ -133,7 +133,7 @@ class Quadrature : public Subscriptor
 				      * less. For cells, this would
 				      * then be a face quadrature.
 				      */
-    typedef Quadrature<dim2-1> SubQuadrature;
+    typedef Quadrature<dim-1> SubQuadrature;
 #endif    
     
 				     /**
@@ -407,7 +407,7 @@ class QProjector
 				      * less. For cells, this would
 				      * then be a face quadrature.
 				      */
-    typedef Quadrature<dim2-1> SubQuadrature;
+    typedef Quadrature<dim-1> SubQuadrature;
 #endif    
     
 				     /**
