@@ -36,8 +36,8 @@ template void FullMatrix<TYPEMAT>::add_diag (const TYPEMAT, const FullMatrix<TYP
 template void FullMatrix<TYPEMAT>::vmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template void FullMatrix<TYPEMAT>::Tvmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template double FullMatrix<TYPEMAT>::residual(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
-template double FullMatrix<TYPEMAT>::matrix_norm (const Vector<TYPEVEC> &) const;
-template double FullMatrix<TYPEMAT>::matrix_scalar_product(const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square (const Vector<TYPEVEC> &) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_scalar_product(const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::forward(Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::backward(Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::householder(Vector<TYPEVEC>&);
@@ -49,8 +49,8 @@ template double FullMatrix<TYPEMAT>::least_squares(Vector<TYPEVEC>&, Vector<TYPE
 template void FullMatrix<TYPEMAT>::vmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template void FullMatrix<TYPEMAT>::Tvmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template double FullMatrix<TYPEMAT>::residual(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
-template double FullMatrix<TYPEMAT>::matrix_norm (const Vector<TYPEVEC> &) const;
-template double FullMatrix<TYPEMAT>::matrix_scalar_product(const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square (const Vector<TYPEVEC> &) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_scalar_product(const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::forward(Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::backward(Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::householder(Vector<TYPEVEC>&);

@@ -588,7 +588,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>& dst, const FullMatrix<numb
 
 template <typename number>
 template <typename number2>
-double FullMatrix<number>::matrix_norm (const Vector<number2> &v) const
+number2 FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
 {
   Assert (val != 0, ExcEmptyMatrix());
   
@@ -617,8 +617,8 @@ double FullMatrix<number>::matrix_norm (const Vector<number2> &v) const
 
 template <typename number>
 template <typename number2>
-double FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
-						  const Vector<number2> &v) const
+number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
+						   const Vector<number2> &v) const
 {
   Assert (val != 0, ExcEmptyMatrix());
   

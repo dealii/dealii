@@ -275,28 +275,25 @@ class FullMatrix : public Subscriptor
 		 const bool             adding=false) const;
 
 				     /**
-				      * Return the norm of the vector #v# with
-				      * respect to the norm induced by this
-				      * matrix, i.e. $\left(v,Mv\right)$. This
-				      * is useful, e.g. in the finite element
-				      * context, where the $L_2$ norm of a
-				      * function equals the matrix norm with
-				      * respect to the mass matrix of the vector
-				      * representing the nodal values of the
-				      * finite element function.
+				      * Return the square of the norm
+				      * of the vector #v# with respect
+				      * to the norm induced by this
+				      * matrix,
+				      * i.e. $\left(v,Mv\right)$. This
+				      * is useful, e.g. in the finite
+				      * element context, where the
+				      * $L_2$ norm of a function
+				      * equals the matrix norm with
+				      * respect to the mass matrix of
+				      * the vector representing the
+				      * nodal values of the finite
+				      * element function.
 				      *
-				      * Note the order in which the matrix
-				      * appears. For non-symmetric matrices
-				      * there is a difference whether the
-				      * matrix operates on the first
-				      * or on the second operand of the
-				      * scalar product.
-				      *
-				      * Obviously, the matrix needs to be square
-				      * for this operation.
+				      * Obviously, the matrix needs to
+				      * be square for this operation.
 				      */
     template<typename number2>
-    double matrix_norm (const Vector<number2> &v) const;
+    number2 matrix_norm_square (const Vector<number2> &v) const;
 
 				     /**
 				      * Build the matrix scalar product
@@ -306,8 +303,8 @@ class FullMatrix : public Subscriptor
 				      * the finite element context.
 				      */
     template<typename number2>
-    double matrix_scalar_product (const Vector<number2> &u,
-				  const Vector<number2> &v) const;
+    number2 matrix_scalar_product (const Vector<number2> &u,
+				   const Vector<number2> &v) const;
 
     				     /**
 				      * Return the $l_1$-norm of the matrix, i.e.
