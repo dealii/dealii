@@ -26,9 +26,10 @@ class ostream;
 
 
 /*
-
-   @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth
-   */
+ * Structure representing the sparsity pattern of a sparse matrix.
+ *
+ * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth
+ */
 class SparseMatrixStruct : public Subscriptor
 {
   public:
@@ -337,7 +338,7 @@ class SparseMatrixStruct : public Subscriptor
 				      * readonly.
 				      *
 				      * Though the return value is declared
-				      * #const#, you shoudl be aware that it
+				      * #const#, you should be aware that it
 				      * may change if you call any nonconstant
 				      * function of objects which operate on
 				      * it.
@@ -407,12 +408,126 @@ class SparseMatrixStruct : public Subscriptor
     DeclException0 (ExcNotSquare);
     
   private:
+				     /**
+				      * Maximum number of rows that can
+				      * be stored in the #row_start# array.
+				      * Since reallocation of that array
+				      * only happens if the present one is
+				      * too small, but never when the size
+				      * of this matrix structure shrinks,
+				      * #max_dim# might be larger than
+				      * #rows# and in this case #row_start#
+				      * has more elements than are used.
+				      */
     unsigned int max_dim;
-    unsigned int rows, cols;
-    unsigned int vec_len, max_vec_len;
+
+				     /**
+				      * Number of rows that this sparsity
+				      * structure shall represent.
+				      */
+    unsigned int rows;
+
+				     /**
+				      * Number of columns that this sparsity
+				      * structure shall represent.
+				      */
+    unsigned int cols;
+
+				     /**
+				      * Size of the used part of the
+				      * #colnums# array. Might be lower than
+				      * #max_vec_len# if the size was reduced
+				      * somewhen in the past.
+				      */
+    unsigned int vec_len;
+
+				     /**
+				      * Size of the actually allocated array
+				      * #colnums#. Here, the same applies as
+				      * for the #rowstart# array, i.e. it
+				      * may be larger than the actually used
+				      * part of the array.
+				      */
+    unsigned int max_vec_len;
+
+				     /**
+				      * Maximum number of elements per
+				      * row. This is set to the value given
+				      * to the #reinit# function (or to the
+				      * constructor). Its value is more
+				      * or less meaningsless after #compress()#
+				      * has been called.
+				      */
     unsigned int max_row_len;
-    unsigned int* rowstart;
-    int* colnums;
+
+				     /**
+				      * Array which hold for each row which
+				      * is the first element in #colnums#
+				      * belonging to that row. Note that
+				      * the size of the array is one larger
+				      * than the number of rows, because
+				      * the last element is used for
+				      * #row=rows#, i.e. the row past the
+				      * last used one. The value of
+				      * #rowstart[rows]# equals the index
+				      * of the element past the end in
+				      * #colnums#; this way, we are able to
+				      * write loops like
+				      * #for (i=rowstart[k]; i<rowstart[k+1]; ++i)#
+				      * also for the last row.
+				      *
+				      * Note that the actual size of the
+				      * allocated memory may be larger than
+				      * the region that is used. The actual
+				      * number of elements that was allocated
+				      * is stored in #max_dim#.
+				      */
+    unsigned int *rowstart;
+
+				     /**
+				      * Array of column numbers. In this array,
+				      * we store for each non-zero element its
+				      * column number. The column numbers for
+				      * the elements in row #r# are stored
+				      * within the index range
+				      * #rowstart[r]...rowstart[r+1]#. Therefore
+				      * to find out whether a given element
+				      * #(r,c)# exists, we have to check
+				      * whether the column number #c# exists in
+				      * the abovementioned range within this
+				      * array. If it exists, say at position
+				      * #p# within this array, the value of
+				      * the respective element in the sparse
+				      * matrix will also be at position #p#
+				      * of the values array of that class.
+				      *
+				      * At the beginning, all elements of
+				      * this array are set to #-1# indicating
+				      * invalid (unused) column numbers
+				      * (however, note that if this object
+				      * refers to a square matrix, the diagonal
+				      * elements are preset, see below). Now, if
+				      * nonzero elements are added, one column
+				      * number in the row's respective range
+				      * after the other is set to the column
+				      * number of the added element. When
+				      * compress is called, unused elements
+				      * (indicated by column numbers #-1#)
+				      * are eliminated by copying the column
+				      * number of subsequent rows and the
+				      * column numbers within each row (with
+				      * the exception of the diagonal element)
+				      * are sorted, such that finding whether
+				      * an element exists and determining its
+				      * position can be done by a binary search.
+				      *
+				      * If this object represents a square
+				      * matrix, the first element in each
+				      * row always denotes the diagonal
+				      * element, i.e.
+				      * #colnums[rowstart[r]]==r#.
+				      */
+    int *colnums;
 
 				     /**
 				      * Store whether the #compress# function
@@ -427,17 +542,17 @@ class SparseMatrixStruct : public Subscriptor
 
 
 /*
-CLASS
-   SparseMatrix
-
-   @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth 1998
-   */
+ * Sparse matrix.
+ *
+ * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth 1998
+ */
 template <typename number>
 class SparseMatrix : public Subscriptor
 {
   public:
 				     /**
-				      * Type of matrix entries.
+				      * Type of matrix entries. In analogy to
+				      * the STL container classes.
 				      */
     typedef number value_type;
     
@@ -765,26 +880,42 @@ class SparseMatrix : public Subscriptor
 				      * #dst#.
 				      */
     template <typename somenumber>
-    somenumber residual (Vector<somenumber>& dst, const Vector<somenumber>& x,
-		     const Vector<somenumber>& b) const;
+    somenumber residual (Vector<somenumber>       &dst,
+			 const Vector<somenumber> &x,
+			 const Vector<somenumber> &b) const;
 				     //
     template <typename somenumber>
-    void precondition_Jacobi (Vector<somenumber>& dst, const Vector<somenumber>& src,
-			      const number om = 1.) const;
+    void precondition_Jacobi (Vector<somenumber>       &dst,
+			      const Vector<somenumber> &src,
+			      const number              om = 1.) const;
 				     //
     template <typename somenumber>
-    void precondition_SSOR (Vector<somenumber>& dst, const Vector<somenumber>& src,
-			    const number om = 1.) const;
+    void precondition_SSOR (Vector<somenumber>       &dst,
+			    const Vector<somenumber> &src,
+			    const number              om = 1.) const;
 				     //
     template <typename somenumber>
-    void precondition_SOR (Vector<somenumber>& dst, const Vector<somenumber>& src,
-			   const number om = 1.) const;
-				     //
+    void precondition_SOR (Vector<somenumber>       &dst,
+			   const Vector<somenumber> &src,
+			   const number              om = 1.) const;
+    
+				     /**
+				      * Perform an SSOR step in-place, i.e.
+				      * without copying to a second vector.
+				      * #omega# is the damping parameter.
+				      */
     template <typename somenumber>
-    void SSOR (Vector<somenumber>& dst, const number om = 1.) const;
-				     //
+    void SSOR (Vector<somenumber> &dst,
+	       const number        omega = 1.) const;
+
+				     /**
+				      * Perform an SOR step in-place, i.e.
+				      * without copying to a second vector.
+				      * #omega# is the damping parameter.
+				      */
     template <typename somenumber>
-    void SOR (Vector<somenumber>& dst, const number om = 1.) const;
+    void SOR (Vector<somenumber> &dst,
+	      const number        om = 1.) const;
 
 				     /**
 				      * Return a (constant) reference to the
@@ -792,7 +923,7 @@ class SparseMatrix : public Subscriptor
 				      * matrix.
 				      *
 				      * Though the return value is declared
-				      * #const#, you shoudl be aware that it
+				      * #const#, you should be aware that it
 				      * may change if you call any nonconstant
 				      * function of objects which operate on
 				      * it.
@@ -881,8 +1012,36 @@ class SparseMatrix : public Subscriptor
     DeclException0 (ExcInvalidConstructorCall);
     
   private:
+				     /**
+				      * Pointer to the sparsity pattern used
+				      * for this matrix. In order to guarantee
+				      * that it is not deleted while still in
+				      * use, we subscribe to it using the
+				      * #SmartPointer# class.
+				      */
     SmartPointer<const SparseMatrixStruct> cols;
-    number* val;
+
+				     /**
+				      * Array of values for all the nonzero
+				      * entries. The position within the matrix,
+				      * i.e. the row and column number for a
+				      * given entry can only be deduced using
+				      * the sparsity pattern. The same holds
+				      * for the more common operation of
+				      * finding an entry by its coordinates.
+				      */
+    number *val;
+
+				     /**
+				      * Allocated size of #val#. This can
+				      * be larger than the actually used part
+				      * if the size of the matrix was
+				      * reduced somewhen in the past by
+				      * associating a sparsity pattern
+				      * with a smaller size to this object
+				      * somewhen, using the #reinit#
+				      * function.
+				      */
     unsigned int max_len;
     
 

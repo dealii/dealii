@@ -226,7 +226,7 @@ SparseMatrixStruct::compress ()
 		    row_length = 0;
 
 				   // reserve temporary storage to
-				   // store the entries of one wor
+				   // store the entries of one row
   int *tmp_entries = new int[max_row_len];
 
 				   // Traverse all rows
@@ -324,6 +324,16 @@ SparseMatrixStruct::empty () const {
 unsigned int
 SparseMatrixStruct::max_entries_per_row () const 
 {
+				   // if compress() has not yet been
+				   // called, we can get the maximum
+				   // number of elements per row using
+				   // the stored value
+  if (!compressed)
+    return max_row_len;
+
+				   // if compress() was called, we
+				   // use a better algorithm which
+				   // gives us a sharp bound
   unsigned int m = 0;
   for (unsigned int i=1; i<rows; ++i)
     m = max (m, rowstart[i]-rowstart[i-1]);

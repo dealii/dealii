@@ -26,7 +26,7 @@ class iVector
 {
   friend class dFMatrix;
 
-protected:
+  protected:
 
 				     /// Dimension. Actual number of components
     unsigned int dim;

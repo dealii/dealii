@@ -14,7 +14,7 @@ include $D/deal.II/Make.global_options
 
 ../lib/o/%.go :
 	@echo ============================ Compiling with debugging information:   $<
-	$(CXX) $(CXXFLAGS.g) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 ../lib/o/%.o :
 	@echo ============================ Compiling with optimization:   $<
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -24,9 +24,11 @@ lib: ../lib/liblac.g.a ../lib/liblac.a
 
 
 ../lib/liblac.a: $(forward-declarations) $(o-files)
+	@echo ======================================== Updating library:   $@
 	@ar ruv $@ $(o-files)
 
 ../lib/liblac.g.a: $(forward-declarations) $(go-files)
+	@echo ======================================== Updating library:   $@
 	@ar ruv $@ $(go-files)
 
 clean:

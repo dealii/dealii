@@ -28,44 +28,14 @@
  */
 template <typename Number>
 class Vector {
-  protected:
-
-				     /**
-				      * Dimension. Actual number of components
-				      * contained in the vector.
-				      * Get this number by calling #size()#.
-				      */
-    unsigned int dim;
-
-				     /**
-				      * Amount of memory actually reserved for
-				      * this vector. This number may be greater
-				      * than #dim# if a #reinit# was called with
-				      * less memory requirements than the vector
-				      * needed last time. At present #reinit#
-				      * does not free memory when the number of
-				      * needed elements is reduced.
-				      */
-    unsigned int maxdim;
-
-				     /**
-				      * Pointer to the array of components.
-				      */
-    Number *val;
-
   public:
-
-				     /**
-				      * Declare iterator types just like those
-				      * for the C++ standard library:
-				      * Data type stored by this container.
-				      */
-    typedef Number value_type;
-
 				     /**
 				      * Declare standard types used in all
-				      * containers.
+				      * containers. These types parallel
+				      * those in the #C++# standard libraries
+				      * #vector<...># class.
 				      */
+    typedef Number value_type;
     typedef value_type* pointer;
     typedef const value_type* const_pointer;
     typedef value_type* iterator;
@@ -85,8 +55,9 @@ class Vector {
     Vector ();
     
 				     /**
-				      *   Copy-Constructor. Dimension set to that of V , <p>
-				      *                     all components are copied from V
+				      * Copy-Constructor. Dimension set to
+				      * that of V, all components are copied
+				      * from V
 				      */
     Vector (const Vector<Number>& V);
 
@@ -94,7 +65,7 @@ class Vector {
 // note: I disabled this function for the time being, since egcs1.1.2
 // does not respect the "explicit" keyword for template constructors.
 // this leads to unwanted conversions and in some places to automatically
-// generated temporaries, where this is not a good idea    
+// generated temporaries, where this is not a good idea. [WB]
 // 				     /**
 // 				      * Copy constructor taking a vector of
 // 				      * another data type. This will fail if
@@ -115,7 +86,7 @@ class Vector {
     Vector (const unsigned int n);
     
 				     /**
-				      *         Destructor. Clears memory
+				      * Destructor. Clears memory
 				      */
     ~Vector ();
 
@@ -129,28 +100,28 @@ class Vector {
     void clear ();
     
 				     /**
-				      *  U(0-N) = s       . Fill all components
+				      * $U(0-N) = s$: fill all components.
 				      */
-    Vector<Number>& operator= (const Number s);
+    Vector<Number> & operator= (const Number s);
     
 				     /**
-				      *  U = V            . Copy all components
+				      *  $U = V$: copy all components.
 				      */
-    Vector<Number>& operator= (const Vector<Number>& V);
+    Vector<Number> & operator= (const Vector<Number>& V);
 
 				     /**
-				      * U = V for different types.
+				      * $U = V$ for different types.
 				      */
     template<typename Number2>
-    Vector<Number>& operator= (const Vector<Number2>& V);
+    Vector<Number> & operator= (const Vector<Number2>& V);
     
 				     /**
-				      *  U = U * V        . Scalar Produkt
+				      * $U = U * V$: scalar product.
 				      */
     Number operator* (const Vector<Number>& V) const;
 
 				     /**
-				      * Return square of the l2-norm.
+				      * Return square of the $l_2$-norm.
 				      */
     Number norm_sqr () const;
 
@@ -161,13 +132,13 @@ class Vector {
     Number mean_value () const;
 
 				     /**
-				      * Return the l1-norm of the vector, i.e.
+				      * Return the $l_1$-norm of the vector, i.e.
 				      * the sum of the absolute values.
 				      */
     Number l1_norm () const;
 
 				     /**
-				      * Return the l2-norm of the vector, i.e.
+				      * Return the $l_2$-norm of the vector, i.e.
 				      * the square root of the sum of the
 				      * squares of the elements.
 				      */
@@ -175,7 +146,8 @@ class Vector {
 
 				     /**
 				      * Return the maximum absolute value of the
-				      * elements of this vector.
+				      * elements of this vector, which is the
+				      * $l_\infty$-norm of a vector.
 				      */
     Number linfty_norm () const;
     
@@ -197,7 +169,8 @@ class Vector {
 				      * On #fast==false#, the vector is filled by
 				      * zeros.
 				      */ 
-    void reinit (const unsigned int N, const bool fast=false);
+    void reinit (const unsigned int N,
+		 const bool         fast=false);
     
 				     /**
 				      * Change the dimension to that of the
@@ -208,7 +181,8 @@ class Vector {
 				      * this function is the same as calling
 				      * #reinit (V.size(), fast)#.
 				      */
-    void reinit (const Vector<Number>& V, const bool fast=false);
+    void reinit (const Vector<Number> &V,
+		 const bool            fast=false);
     
 				     /**
 				      * Return dimension of the vector. This
@@ -263,14 +237,13 @@ class Vector {
 				      */
 				     //@{
 				     /**
-				      *  Access Components. returns U(i) , 
-				      *             INLINE
+				      * Access components, returns U(i).
 				      */
     Number operator() (const unsigned int i) const;
     
 				     /**
-				      *  Access Components. returns U(i) , 
-				      *             INLINE
+				      * Access components, returns U(i)
+				      * as a writeable reference.
 				      */
     Number& operator() (const unsigned int i);
 				     //@}
@@ -356,7 +329,7 @@ class Vector {
     void scale (const Number factor);
     
 				     /**
-				      *  U=a*V. Replacing
+				      *  U=a*V. Replacing.
 				      */
     void equ (const Number a, const Vector<Number>& V);
     
@@ -382,7 +355,8 @@ class Vector {
 				      * is undefined. No attempt is made to
 				      * catch such situations.
 				      */
-    void ratio (const Vector<Number> &a, const Vector<Number> &b);
+    void ratio (const Vector<Number> &a,
+		const Vector<Number> &b);
 				     //@}
     
     
@@ -465,6 +439,31 @@ class Vector {
 				      * Exception
 				      */
     DeclException0 (ExcIO);
+
+  protected:
+
+				     /**
+				      * Dimension. Actual number of components
+				      * contained in the vector.
+				      * Get this number by calling #size()#.
+				      */
+    unsigned int dim;
+
+				     /**
+				      * Amount of memory actually reserved for
+				      * this vector. This number may be greater
+				      * than #dim# if a #reinit# was called with
+				      * less memory requirements than the vector
+				      * needed last time. At present #reinit#
+				      * does not free memory when the number of
+				      * needed elements is reduced.
+				      */
+    unsigned int maxdim;
+
+				     /**
+				      * Pointer to the array of components.
+				      */
+    Number *val;
 };
 
 

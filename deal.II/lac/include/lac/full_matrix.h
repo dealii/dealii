@@ -26,18 +26,20 @@ class iVector;
  * Rectangular/quadratic full matrix.
  *
  * Implementation of a classical rectangular scheme of numbers. The
- * data type of the entries is provided in the template argument #number#.
- * The interface is quite fat and in fact has grown every time a new
- * feature was needed. So, a lot of functions are provided.
+ * data type of the entries is provided in the template argument
+ * #number#.  The interface is quite fat and in fact has grown every
+ * time a new feature was needed. So, a lot of functions are provided.
  *
  * Since the instantiation of this template is quite an effort,
- * standard versions are precompiled into the library. These include all
- * combinations of 'float' and 'double' for matrices and vectors. If you need more
- * data types, the implementation of non-inline functions is in
- * "fullmatrix.templates.h". Driver files are in the source tree.
+ * standard versions are precompiled into the library. These include
+ * all combinations of #float# and #double# for matrices and
+ * vectors. If you need more data types, the implementation of
+ * non-inline functions is in #fullmatrix.templates.h#. Driver files
+ * are in the source tree.
  *
- * Internal calculations are usually done with the accuracy of the vector argument to
- * functions. If there is no argument with a number type, the matrix number type is used.
+ * Internal calculations are usually done with the accuracy of the
+ * vector argument to functions. If there is no argument with a number
+ * type, the matrix number type is used.
  *
  * <TABLE BORDER=1>
  * <TR><TH ALIGN=CENTER><B>this</B><TH ALIGN=CENTER><B>other
@@ -52,67 +54,27 @@ class iVector;
  * <CAPTION>Instantiations provided in the library</CAPTION>
  * </TABLE>
  *
- *  CONVENTIONS for used 'equations' : <p>
- *  - THIS matrix is always named 'A' <p>
- *  - matrices are always uppercase , vectors and scalars are lowercase <p>
- *  - Transp(A) used for transpose of matrix A
+ * In the documentation of member functions, the following conventions are adopted:
+ * \begin{itemize}
+ *  \item THIS matrix is always named #A#.
+ *  \item Matrices are always uppercase, vectors and scalars are lowercase.
+ *  \item #Transp(A)# denotes the transpose of matrix A.
+ * \end{itemize}
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template<typename number>
 class FullMatrix : public Subscriptor
 {
-  private:
-				     /**
-				      * Component-array.
-				      */
-    number* val;
-				     /** 
-				      * Dimension of range. Actual number of Columns
-				      */
-    unsigned int dim_range;
-				     /**
-				      * Dimension of image. Actual number of Rows
-				      */
-    unsigned int dim_image;
-				     /**
-				      * Dimension. Determines amount of reserved memory
-				      */
-    unsigned int val_size;
-    
-				     /**
-				      * Initialization. Initialize
-				      * memory for a #FullMatrix#
-				      * of #m# rows and #n#
-				      * columns to zero.
-				      */
-    void init (const unsigned int m, const unsigned int n);
-    
-				     /**
-				      * Return a read-write reference to the
-				      * element #(i,j)#.
-				      *
-				      * This function does no bounds
-				      * checking and is only to be used
-				      * internally and in functions
-				      * already checked.
-				      */
-    number& el (const unsigned int i, const unsigned int j);
-    
-				     /**
-				      * Return the value of the element #(i,j)#.
-				      *
-				      * This function does no bounds checking and is only to be used
-				      * internally and in functions
-				      * already checked.
-				      */
-    number el (const unsigned int i, const unsigned int j) const;
-    
-    
   public:
 				     /**
 				      * Constructor. Initialize the matrix as
 				      * a square matrix with dimension #n#.
+				      *
+				      * In order to avoid the implicit
+				      * conversion of integers and other types
+				      * to a matrix, this constructor is
+				      * declared #explicit#.
 				      */
     explicit FullMatrix (const unsigned int n = 1);
     
@@ -172,38 +134,40 @@ class FullMatrix : public Subscriptor
 				      * Fill rectangular block.
 				      *
 				      * The matrix #src# is copied
-				      into the target. The optional
-				      values #i# and #j# determine the
-				      upper left corner of the image
-				      of #src#.
+				      * into the target. The optional
+				      * values #i# and #j# determine the
+				      * upper left corner of the image
+				      * of #src#.
 				      *
 				      * This function requires that
-				      #i+src.m()<=m()# and
-				      #j+src.n()<=n()#, that is, the
-				      image fits into the space of #this#.
+				      * #i+src.m()<=m()# and
+				      * #j+src.n()<=n()#, that is, the
+				      * image fits into the space of #this#.
 				      */
     template<typename number2>
-    void fill (const FullMatrix<number2>& src,
-	       const unsigned int i=0, const unsigned int j=0);
+    void fill (const FullMatrix<number2> &src,
+	       const unsigned int         i=0,
+	       const unsigned int         j=0);
     
 				     /**
-				      * Change  Dimensions.
-				      * Set dimension to (m,n) <p>
-				      * ( reinit rectangular matrix )
+				      * Set dimension to $m\times n$ and
+				      * allocate memory if necessary. Forget
+				      * the previous content of the matrix.
 				      */
-    void reinit (const unsigned int m, const unsigned int n);
+    void reinit (const unsigned int m,
+		 const unsigned int n);
     
 				     /**
-				      * Change  Dimensions.
-				      * Set dimension to (n,n) <p>
-				      * ( reinit quadratic matrix )
+				      * Set dimension to $n\times n$ and
+				      * allocate memory if necessary. Forget
+				      * the previous content of the matrix.
 				      */
     void reinit (const unsigned int n);
     
 				     /**
-				      * Adjust  Dimension.
-				      * Set dimension to ( m(B),n(B) ) <p>
-				      * ( adjust to dimensions of another matrix B )
+				      * Set dimension to $m(B)\times n(B)$ and
+				      * allocate memory if necessary. Forget
+				      * the previous content of the matrix.
 				      */
     template<typename number2>
     void reinit (const FullMatrix<number2> &B);
@@ -226,66 +190,64 @@ class FullMatrix : public Subscriptor
 				      * Return whether the matrix contains only
 				      * elements with value zero. This function
 				      * is mainly for internal consistency
-				      * check and should seldomly be used when
+				      * checks and should seldomly be used when
 				      * not in debug mode since it uses quite
 				      * some time.
 				      */
     bool all_zero () const;
 
-				     /*
-				      *   Access Elements. returns element at relative 'address' i <p>
-				      *   ( -> access to A(i/n , i mod n) )
-				      */
-//    number el (const unsigned int i) const;
-    
 				     /**
 				      * Return the value of the element #(i,j)#.
-				      * Does the same as the private #el(i,j)# function
-				      * but does bounds checking in
+				      * Does the same as the private #el(i,j)#
+				      * function but does bounds checking in
 				      * debug mode.
 				      */
-    number operator() (const unsigned int i, const unsigned int j) const;
+    number operator() (const unsigned int i,
+		       const unsigned int j) const;
     
 				     /**
 				      * Return a read-write reference to
 				      * the element #(i,j)#.
-				      * Does the same as the private #el(i,j)# function
-				      * but does bounds checking in
+				      * Does the same as the private #el(i,j)#
+				      * function but does bounds checking in
 				      * debug mode.
 				      */
-    number& operator() (const unsigned int i, const unsigned int j);
+    number& operator() (const unsigned int i,
+			const unsigned int j);
     
 				     /**
 				      * Set all entries in the matrix to
-				      * zero.
+				      * zero. Do not resize the matrix.
 				      */
     void clear ();
 
 				     /**
-				      *  Weighted addition. The matrix
-				      #s*B# is added to #this#.
+				      * Weighted addition. The matrix
+				      * #s*B# is added to #this#.
 				      *
 				      * $A += sB$
 				      */
     template<typename number2>
-    void add (const number s, const FullMatrix<number2>& B);
+    void add (const number               s,
+	      const FullMatrix<number2> &B);
 
 				     /**
 				      * Weighted addition of the
-				      transpose of #B# to #this#.
+				      * transpose of #B# to #this#.
 				      *
 				      * $A += s B^T$
 				      */
     template<typename number2>
-    void Tadd (const number s, const FullMatrix<number2>& B);
+    void Tadd (const number               s,
+	       const FullMatrix<number2> &B);
     
 				     /**
 				      * Matrix-matrix-multiplication.
 				      * $C=A*B$.
 				      */
- 
     template<typename number2>
-    void mmult (FullMatrix<number2>& C, const FullMatrix<number2>& B) const;
+    void mmult (FullMatrix<number2>       &C,
+		const FullMatrix<number2> &B) const;
     
 				     /**
 				      * Matrix-matrix-multiplication using
@@ -293,30 +255,36 @@ class FullMatrix : public Subscriptor
 				      * $C=A^T*B$.
 				      */
     template<typename number2>
-    void Tmmult (FullMatrix<number2>& C, const FullMatrix<number2>& B) const;
+    void Tmmult (FullMatrix<number2>       &C,
+		 const FullMatrix<number2> &B) const;
     
 				     /**
 				      * Matrix-vector-multiplication.
 				      *
 				      * The optional parameter
 				      * #adding# determines, whether the
-				      * result is stored in #w# or addet
+				      * result is stored in #w# or added
 				      * to #w#.
 				      *
 				      * if (adding)
-				      *  w += A*v
+				      *  $w += A*v$
 				      *
 				      * if (!adding)
-				      *  w = A*v
+				      *  $w = A*v$
 				      */
     template<typename number2>
-    void vmult (Vector<number2>& w, const Vector<number2>& v, const bool adding=false) const;
+    void vmult (Vector<number2>       &w,
+		const Vector<number2> &v,
+		const bool             adding=false) const;
     
 				     /**
-				      * Transpose matrix-vector-multiplication. See #vmult# above.
+				      * Transpose matrix-vector-multiplication.
+				      * See #vmult# above.
 				      */
     template<typename number2>
-    void Tvmult (Vector<number2>& w, const Vector<number2>& v, const bool adding=false) const;
+    void Tvmult (Vector<number2>       &w,
+		 const Vector<number2> &v,
+		 const bool             adding=false) const;
 
 				     /**
 				      * Return the norm of the vector #v# with
@@ -350,38 +318,48 @@ class FullMatrix : public Subscriptor
 				      * the finite element context.
 				      */
     template<typename number2>
-    double matrix_scalar_product (const Vector<number2> &u, const Vector<number2> &v) const;
+    double matrix_scalar_product (const Vector<number2> &u,
+				  const Vector<number2> &v) const;
 
     				     /**
-				      * Return the l1-norm of the matrix, i.e.
+				      * Return the $l_1$-norm of the matrix, i.e.
 				      * $|M|_1=max_{all columns j}\sum_{all 
 				      * rows i} |M_ij|$,
-				      * (max. sum of columns).
-				      * This is the
+				      * (max. sum of columns). This is the
 				      * natural matrix norm that is compatible
-				      * to the l1-norm for vectors, i.e.
+				      * to the $l_1$-norm for vectors, i.e.
 				      * $|Mv|_1\leq |M|_1 |v|_1$.
 				      * (cf. Rannacher Numerik0)
 				      */
     number l1_norm () const;
 
     				     /**
-				      * Return the linfty-norm of the
+				      * Return the $l_\infty$-norm of the
 				      * matrix, i.e.
-				      * $|M|_infty=max_{all rows i}\sum_{all 
-				      * columns j} |M_ij|$,
+				      * $|M|_\infty=\max_{all rows i}\sum_{all 
+				      * columns j} |M_{ij}|$,
 				      * (max. sum of rows).
 				      * This is the
 				      * natural matrix norm that is compatible
-				      * to the linfty-norm of vectors, i.e.
-				      * $|Mv|_infty \leq |M|_infty |v|_infty$.
+				      * to the $l_\infty$-norm of vectors, i.e.
+				      * $|Mv|_\infty \leq |M|_\infty |v|_\infty$.
 				      * (cf. Rannacher Numerik0)
 				      */
     number linfty_norm () const;
     
 				     /**
+				      * Compute the quadratic matrix norm.
+				      * Return value is the root of the square
+				      * sum of all matrix entries.
+				      */
+    number norm2 () const;
+    
+				     /**
 				      * A=Inverse(A). Inversion of this by
-				      * Gauss-Jordan-algorithm
+				      * Gauss-Jordan-algorithm. Note that this
+				      * is a rather expensive operation, so
+				      * you may not want to use it for
+				      * larger matrices if not necessary.
 				      */
     void gauss_jordan ();
 
@@ -396,44 +374,58 @@ class FullMatrix : public Subscriptor
     double determinant () const;
 
 				     /**
-				      * Compute the quadratic matrix norm.
-				      * Return value is the root of the square
-				      * sum of all matrix entries.
-				      */
-    double norm2 () const;
-
-				     /**
 				      * Assign the inverse of the given
 				      * matrix to #*this#. This function is
 				      * only implemented (hardcoded) for
 				      * square matrices of dimension one,
-				      * two and three.
+				      * two, three and four, since the
+				      * amount of code needed grows quickly.
+				      * The implementation does not use
+				      * an elimination method like the
+				      * Gauss-Jordan one, but rather sets
+				      * the element directly; their values
+				      * are precomputed symbolically using
+				      * Maple. This way, we can avoid the
+				      * overhead of loops and local variables
+				      * but the number of lines of code
+				      * grows rapidly.
+				      *
+				      * For all other sizes than the ones given
+				      * above, an exception of type
+				      * #ExcNotImplemented(dim_range)# is
+				      * thrown, which you can catch and use
+				      * some other method to invert the matrix,
+				      * e.g. the #gauss_jordan# function.
 				      */
     void invert (const FullMatrix<number> &M);
 
 				     /**
-				      *  A(i,1-n)+=s*A(j,1-n).
+				      * $A(i,1-n)+=s*A(j,1-n)$.
 				      * Simple addition of rows of this
 				      */
-    void add_row (const unsigned int i, const number s, const unsigned int j);
+    void add_row (const unsigned int i,
+		  const number       s,
+		  const unsigned int j);
 
 				     /**
-				      *  A(i,1-n)+=s*A(j,1-n)+t*A(k,1-n).
-				      *  Multiple addition of rows of this
+				      * $A(i,1-n)+=s*A(j,1-n)+t*A(k,1-n)$.
+				      * Multiple addition of rows of this.
 				      */
     void add_row (const unsigned int i,
 		  const number s, const unsigned int j,
 		  const number t, const unsigned int k);
 
 				     /**
-				      *  A(1-n,i)+=s*A(1-n,j).
-				      *  Simple addition of columns of this
+				      * $A(1-n,i)+=s*A(1-n,j)$.
+				      *  Simple addition of columns of this.
 				      */
-    void add_col (const unsigned int i, const number s, const unsigned int j);
+    void add_col (const unsigned int i,
+		  const number       s,
+		  const unsigned int j);
 
 				     /**
-				      *  A(1-n,i)+=s*A(1-n,j)+t*A(1-n,k).
-				      *  Multiple addition of columns of this
+				      * $A(1-n,i)+=s*A(1-n,j)+t*A(1-n,k)$.
+				      *  Multiple addition of columns of this.
 				      */
     void add_col (const unsigned int i,
 		  const number s, const unsigned int j,
@@ -452,11 +444,14 @@ class FullMatrix : public Subscriptor
     void swap_col (const unsigned int i, const unsigned int j);
 
 				     /**
-				      *  w=b-A*v.
-				      *  Residual calculation , returns |w|
+				      * $w=b-A*v$.
+				      * Residual calculation , returns
+				      * the $l_2$-norm $|w|$
 				      */
     template<typename number2, typename number3>
-    double residual (Vector<number2>& w, const Vector<number2>& v, const Vector<number3>& b) const;
+    double residual (Vector<number2>      & w,
+		     const Vector<number2>& v,
+		     const Vector<number3>& b) const;
 
 				     /**
 				      * Forward elimination of lower triangle.
@@ -470,31 +465,37 @@ class FullMatrix : public Subscriptor
 				      * is considered
 				      */
     template<typename number2>
-    void forward (Vector<number2>& dst, const Vector<number2>& src) const;
+    void forward (Vector<number2>       &dst,
+		  const Vector<number2> &src) const;
 
 				     /**
 				      * Backward elimination of upper triangle.
 				      * @see forward
 				      */
     template<typename number2>
-    void backward (Vector<number2>& dst, const Vector<number2>& src) const;
+    void backward (Vector<number2>       &dst,
+		   const Vector<number2> &src) const;
 
 				     /**
-				      * QR - factorization of a matrix.
+				      * QR-factorization of a matrix.
 				      * The orthogonal transformation Q is
-				      * applied to the vector y and this matrix. <p>
+				      * applied to the vector y and this matrix.
+				      *
 				      * After execution of householder, the upper
-				      *  triangle contains the resulting matrix R, <p>
-				      * the lower the incomplete factorization matrices.
+				      * triangle contains the resulting matrix R,
+				      * the lower the incomplete factorization
+				      * matrices.
 				      */
     template<typename number2>
-    void householder (Vector<number2>& y);
+    void householder (Vector<number2> &y);
 
 				     /**
-				      * Least - Squares - Approximation by QR-factorization.
+				      * Least-Squares-Approximation by
+				      * QR-factorization.
 				      */
     template<typename number2>
-    double least_squares (Vector<number2>& dst, Vector<number2>& src);
+    double least_squares (Vector<number2> &dst,
+			  Vector<number2> &src);
 
 				     /**
 				      *  A(i,i)+=B(i,1-n). Addition of complete
@@ -502,7 +503,8 @@ class FullMatrix : public Subscriptor
 				      *  ( i = 1 ... m )
 				      */
     template<typename number2>
-    void add_diag (const number s, const FullMatrix<number2>& B);
+    void add_diag (const number               s,
+		   const FullMatrix<number2> &B);
 
 				     /**
 				      *  A(i,i)+=s  i=1-m.
@@ -592,6 +594,70 @@ class FullMatrix : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcIO);
+
+  private:
+				     /**
+				      * Component-array.
+				      */
+    number *val;
+    
+				     /** 
+				      * Dimension of range.
+				      * Actual number of Columns
+				      */
+    unsigned int dim_range;
+    
+				     /**
+				      * Dimension of image. Actual number of Rows
+				      */
+    unsigned int dim_image;
+    
+				     /**
+				      * Dimension of the array
+				      * holding the values of the
+				      * matrix elements. Determines
+				      * amount of reserved memory.
+				      *
+				      * Actually, the allocated array may
+				      * not have a size equal to the number
+				      * of elements of this matrix, since
+				      * reallocation only happens when the
+				      * size of the matrix is increased.
+				      * Therefore, if the matrix size was
+				      * decreased somewhen in the past,
+				      * #val_size# will be larger than
+				      * #dim_range * dim_image#.
+				      */
+    unsigned int val_size;
+    
+				     /**
+				      * Initialization. Initialize
+				      * memory for a #FullMatrix#
+				      * of #m# rows and #n#
+				      * columns to zero.
+				      */
+    void init (const unsigned int m, const unsigned int n);
+    
+				     /**
+				      * Return a read-write reference to the
+				      * element #(i,j)#.
+				      *
+				      * This function does no bounds
+				      * checking and is only to be used
+				      * internally and in functions
+				      * already checked.
+				      */
+    number & el (const unsigned int i, const unsigned int j);
+    
+				     /**
+				      * Return the value of the element #(i,j)#.
+				      *
+				      * This function does no bounds checking
+				      * and is only to be used
+				      * internally and in functions
+				      * already checked.
+				      */
+    number el (const unsigned int i, const unsigned int j) const;    
 };
 
 

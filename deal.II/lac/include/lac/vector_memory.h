@@ -7,6 +7,8 @@
 
 #include <base/subscriptor.h>
 
+
+
 /**
  * Memory management for vectors. This class is used by all
  * iterative methods to allocate space for auxilliary

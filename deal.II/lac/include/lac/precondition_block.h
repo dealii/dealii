@@ -16,29 +16,32 @@
  * Base class for #PreconditionBlockJacobi#, #PreconditionBlockSOR#, ...
  * This class assumes the #SparseMatrix<number># consisting of invertible blocks 
  * of #blocksize# on the diagonal and provides the inversion of the diagonal blocks
- * of the matrix. NOT only diagonal block matrices are allowed but all
- * matrices of arbitrary structure with the minimal property of having got
+ * of the matrix. NOT only block diagonal matrices are allowed but all
+ * matrices of arbitrary structure with the minimal property of having
  * invertible blocks on the diagonal!
  *
  * This block matrix structure is given e.g. for the DG method
  * for the transport equation. For a downstream numbering the matrices
- * even have got a lower block diagonal matrix structure, i.e. the matrices
+ * even have got a block lower left matrix structure, i.e. the matrices
  * are empty above the diagonal blocks.
  *
  * For all matrices that are empty above and below the diagonal
  * blocks (i.e. for all block diagonal matrices) the #BlockJacobi# preconditioner
  * is a direct solver. For all matrices that are empty only above the diagonal blocks
- * (e.g. the matrices one get by the DG method with downstream numbering) the
+ * (e.g. the matrices one gets by the DG method with downstream numbering) the
  * #BlockSOR# is a direct solver.
  * 
  * This first implementation of the #PreconditionBlock# assumes the
- * matrix having blocks each of the same block size. Varying
+ * matrix has blocks each of the same block size. Varying
  * block sizes within the matrix must still be implemented if needed.
  *
  * The first template parameter denotes the type of number representation in
  * the sparse matrix, the second denotes the type of number representation in
- * which the inverse diagonal block
- * matrices are stored by #invert_diagblocks()#.
+ * which the inverted diagonal block matrices are stored within this class
+ * by #invert_diagblocks()#. If you don't want to use the block inversion as
+ * an exact solver, but rather as a preconditioner, you may probably want to
+ * store the inverted blocks with less accuracy than the original matrix;
+ * for example, #number==double, inverse_type=float# might be a viable choice.
  */
 template<typename number, typename inverse_type>
 class PreconditionBlock: public Subscriptor
@@ -66,7 +69,10 @@ class PreconditionBlock: public Subscriptor
 
 				     /**
 				      * Takes the matrix that should be used
-				      * for the preconditioning.
+				      * for the preconditioning. A reference
+				      * to it is stored within this class,
+				      * but ownership of the matrix remains
+				      * with the caller of this function.
 				      */
     void use_matrix(const SparseMatrix<number> &M);
     
@@ -85,7 +91,7 @@ class PreconditionBlock: public Subscriptor
 
     				     /**
 				      * Stores the inverse of
-				      * the diagonal blocks matrices
+				      * the diagonal blocks
 				      * in #inverse#. This costs some 
 				      * additional memory - for DG
 				      * methods about 1/3 (for double inverses) 
@@ -95,14 +101,22 @@ class PreconditionBlock: public Subscriptor
 				      *
 				      * It is not allowed to call this function
 				      * twice (will produce an error) before
-				      * a call of #reinit(..)#
+				      * a call of #clear(..)#
 				      * because at the second time there already
 				      * exist the inverse matrices.
+				      *
+				      * After this function is called, the
+				      * lock on the matrix given through the
+				      * #use_matrix# function is released,
+				      * i.e. you may overwrite of delete it.
+				      * You may want to do this in case
+				      * you use this matrix to precondition
+				      * another matrix.
 				      */
     void invert_diagblocks();
 
 				     /**
-				      * Gives back the size of the blocks.
+				      * Return the size of the blocks.
 				      */
     unsigned int block_size () const;
 
@@ -191,7 +205,7 @@ class PreconditionBlockSOR : public PreconditionBlock<number, inverse_type>
 				      * Constructor. Takes the damping
 				      * Parameter as 
 				      */
-    PreconditionBlockSOR(number omega=1.);
+    PreconditionBlockSOR (const number omega=1.);
     
 				     /**
 				      * Destructor.
@@ -220,7 +234,10 @@ class PreconditionBlockSOR : public PreconditionBlock<number, inverse_type>
     void operator() (Vector<number2>&, const Vector<number2>&) const;
 
   private:
-    number omega;
+				     /**
+				      * Damping parameter.
+				      */
+    const number omega;
 };
 
 
@@ -229,3 +246,4 @@ class PreconditionBlockSOR : public PreconditionBlock<number, inverse_type>
 /* end of #ifndef __precondition_block_H */
 #endif
 /*------------------------   precondition_block.h     ---------------------------*/
+

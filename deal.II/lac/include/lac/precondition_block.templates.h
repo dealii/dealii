@@ -34,8 +34,7 @@ template <typename number, typename inverse_type>
 void PreconditionBlock<number, inverse_type>::use_matrix(
   const SparseMatrix<number> &M)
 {
-  A=0;
-  A=&M;
+  A = &M;
 }
 
 
@@ -62,7 +61,7 @@ void PreconditionBlock<number, inverse_type>::invert_diagblocks()
   Assert (blocksize!=0, ExcBlockSizeNotSet());
   Assert (M.m()%blocksize==0, ExcWrongBlockSize(blocksize, M.m()));
 
-  unsigned int n_cells=M.m()/blocksize;
+  const unsigned int n_cells = M.m()/blocksize;
 
 				   // cell_row, cell_column are the
 				   // numbering of the blocks (cells).
@@ -72,8 +71,21 @@ void PreconditionBlock<number, inverse_type>::invert_diagblocks()
 				   // row, column are the global numbering
 				   // of the unkowns.
 
-  inverse = vector<FullMatrix<inverse_type> > (
-    n_cells, FullMatrix<inverse_type>(blocksize));
+				   // set the #inverse# array to the right
+				   // size. we could do it like this:
+				   // inverse = vector<>(n_cells,FullMatrix<>())
+				   // but this would involve copying many
+				   // FullMatrix objects.
+				   //
+				   // the following is a neat trick which
+				   // avoids copying
+  if (true)
+    {
+      vector<FullMatrix<inverse_type> > tmp(n_cells,
+					    FullMatrix<inverse_type>(blocksize));
+      inverse.swap (tmp);
+    };
+  
   FullMatrix<inverse_type> M_cell(blocksize);
   
   for (unsigned int cell=0, row=0; cell<n_cells; ++cell)
@@ -114,14 +126,15 @@ PreconditionBlockSOR<number, inverse_type>::~PreconditionBlockSOR(){}
 
 template <typename number, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<number, inverse_type>::operator() (Vector<number2> &dst, const Vector<number2> &src) const
+void PreconditionBlockSOR<number, inverse_type>::operator() (Vector<number2> &dst,
+							     const Vector<number2> &src) const
 {
   Assert(A!=0, ExcNoMatrixGivenToUse());
   const SparseMatrix<number> &M=*A;
   Assert (M.m() == M.n(), ExcMatrixNotSquare());
   Assert (blocksize!=0, ExcBlockSizeNotSet());
   Assert (M.m()%blocksize==0, ExcWrongBlockSize(blocksize, M.m()));
-  unsigned int n_cells=M.m()/blocksize;
+  const unsigned int n_cells=M.m()/blocksize;
   Assert (inverse.size()==0 || inverse.size()==n_cells,
 	  ExcWrongNumberOfInverses(inverse.size(), n_cells));
 

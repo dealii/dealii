@@ -71,7 +71,8 @@ FullMatrix<number>::all_zero () const
 
 template <typename number>
 void
-FullMatrix<number>::reinit (const unsigned int mm, const unsigned int nn)
+FullMatrix<number>::reinit (const unsigned int mm,
+			    const unsigned int nn)
 {
   if (val_size<nn*mm)
     {
@@ -405,14 +406,13 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
   Assert(right.size() == m(), ExcDimensionMismatch(right.size(), m()));
 
-  unsigned int i,j;
   number2 s, res = 0.;
   const unsigned int size_m = m(),
 		     size_n = n();
-  for (i=0; i<size_n; ++i)
+  for (unsigned int i=0; i<size_n; ++i)
     {
       s = right(i);
-      for (j=0; j<size_m; ++j)
+      for (unsigned int j=0; j<size_m; ++j)
 	s -= src(j) * el(i,j);
       dst(i) = s;
       res += s*s;
@@ -1185,7 +1185,7 @@ FullMatrix<number>::determinant () const
 
 
 template <typename number>
-double
+number
 FullMatrix<number>::norm2 () const
 {
   number s = 0.;
