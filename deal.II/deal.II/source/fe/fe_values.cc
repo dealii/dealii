@@ -35,7 +35,6 @@
 /* ---------------- FEValuesBase<dim>::CellIteratorBase --------- */
 
 template <int dim>
-inline
 FEValuesBase<dim>::CellIteratorBase::~CellIteratorBase ()
 {}
 
@@ -46,7 +45,6 @@ FEValuesBase<dim>::CellIteratorBase::~CellIteratorBase ()
 
 template <int dim>
 template <typename CI>
-inline
 FEValuesBase<dim>::CellIterator<CI>::CellIterator (const CI &cell)
                 :
                 cell(cell)
