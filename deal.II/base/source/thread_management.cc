@@ -13,6 +13,7 @@
 
 
 #include <base/thread_management.h>
+#include <iostream>
 #ifdef DEAL_II_USE_MT_POSIX
 #  include <list>
 #endif
