@@ -104,7 +104,7 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
  * <i>M<sub>1</sub>M<sub>2</sub></i> by performing multiplication with
  * both factors consecutively.
  *
- * The documentation of @ProductMatrix applies with exception that
+ * The documentation of ProductMatrix applies with exception that
  * these matrices here may be rectangular.
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
