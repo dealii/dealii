@@ -809,12 +809,12 @@ void ElasticProblem<dim>::refine_grid ()
 				 // The output happens mostly as has
 				 // been shown in previous examples
 				 // already. The only difference is
-				 // not that the solution function is
-				 // std::vector values. The ``DataOut''
+				 // that the solution function is
+				 // vector valued. The ``DataOut''
 				 // class takes care of this
 				 // automatically, but we have to give
 				 // each component of the solution
-				 // std::vector a different name.
+				 // vector a different name.
 template <int dim>
 void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 {
