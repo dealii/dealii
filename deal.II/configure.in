@@ -281,8 +281,8 @@ else
       else
 
 	if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
-	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi_errors -w0 -DDEBUG"
-	  CXXFLAGSO="$CXXFLAGS -model ansi -accept restrict_keyword -fast"
+	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w0 -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -accept restrict_keyword -fast"
           dnl if necessary: -shared, -pthread 
           dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
           dnl                -pch? -noimplicit_include?

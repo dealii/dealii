@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.73 
+# From configure.in Revision: 1.74 
 
 
 
@@ -1315,8 +1315,8 @@ else
       else
 
 	if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
-	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi_errors -w0 -DDEBUG"
-	  CXXFLAGSO="$CXXFLAGS -model ansi -accept restrict_keyword -fast"
+	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w0 -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -accept restrict_keyword -fast"
                                       else
 
                     { echo "configure: error: No compiler options for this C++ compiler
