@@ -628,32 +628,44 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
 
 
 template <int dim>
-void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &/*cell*/,
-					   FullMatrix<double>  &/*local_mass_matrix*/) const
+void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+					   FullMatrix<double>  &local_mass_matrix) const
 {
-  Assert(false, ExcNotImplemented());
-/*
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
 
-				   // first get the local mass matrix for
-				   // the base object
-  FullMatrix<double> base_mass_matrix (base_element.total_dofs,
-			     base_element.total_dofs);
-  base_element.get_local_mass_matrix (cell, base_mass_matrix);
-
-
-				   // now distribute it to the mass matrix
-				   // of this object
-  for (unsigned int i=0; i<base_element.total_dofs; ++i)
-    for (unsigned int j=0; j<base_element.total_dofs; ++j)
-      for (unsigned int n=0; n<n_sub_elements; ++n)
-					 // only fill diagonals of the blocks
-	local_mass_matrix (i*n_sub_elements + n,
-			   j*n_sub_elements + n) = base_mass_matrix (i,j);
-*/
+				   // track which component we are
+				   // presently working with, since we
+				   // only have the number of the base
+				   // element and the number within
+				   // its multiplicity
+  unsigned int component = 0;  
+  for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
+    {
+				       // first get the local mass matrix for
+				       // the base object
+      const unsigned int base_element_total_dofs=base_element(base_el).total_dofs;
+      FullMatrix<double> base_mass_matrix (base_element_total_dofs,
+					   base_element_total_dofs);
+      base_element(base_el).get_local_mass_matrix (cell, base_mass_matrix);
+      
+				       // now distribute it to the mass matrix
+				       // of this object
+      const unsigned int el_multiplicity=element_multiplicity(base_el);
+      for (unsigned int n=0; n<el_multiplicity; ++n)
+	{
+	  for (unsigned int i=0; i<base_element_total_dofs; ++i)
+	    for (unsigned int j=0; j<base_element_total_dofs; ++j)
+					     // only fill diagonals of the blocks
+	      local_mass_matrix (component_to_system_index(component,i),
+				 component_to_system_index(component,j))
+		= base_mass_matrix (i,j);
+	  ++component;
+	};
+    };
+  Assert (component == n_components, ExcInternalError());
 };
 
 
