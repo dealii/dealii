@@ -288,7 +288,7 @@ template <>
 inline
 Tensor<1,3>
 FEDG_P1<3>::shape_grad (const unsigned int i,
-			 const Point<3>& p) const
+			 const Point<3>&) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 				   // originally, the return type of the
@@ -311,7 +311,7 @@ template <>
 inline
 Tensor<2,3>
 FEDG_P1<3>::shape_grad_grad (const unsigned int i,
-			      const Point<3> &p) const
+			      const Point<3> &) const
 {
   Assert((i<dofs_per_cell), ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -334,7 +334,8 @@ void FEDG_P1<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 
 template <>
-void FEDG_P1<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+void FEDG_P1<3>::get_unit_support_points (vector<Point<3> > &unit_points) const
+{
   Assert (unit_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
 
