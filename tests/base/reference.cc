@@ -12,6 +12,11 @@
 //----------------------------  reference.cc  ---------------------------
 
 
+// check that SmartPointers preserve constness etc of the objects they
+// point to, through assignment of SmartPointers to each other and
+// other tests.
+
+
 #include <fstream>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
@@ -21,25 +26,25 @@
 
 class Test : public Subscriptor
 {
-  const char* name;
-public:
-  Test(const char* n) :
-		  name(n)
+    const char* name;
+  public:
+    Test(const char* n) :
+                    name(n)
       {
 	deallog << "Construct " << name << std::endl;
       }
-  ~Test()
+    ~Test()
       {
 	deallog << "Destruct " << name << std::endl;
       }	  
-  void f()
-  {
-    deallog << "mutable" << std::endl;
-  }
-  void f() const
-  {
-    deallog << "const" << std::endl;
-  }
+    void f()
+      {
+        deallog << "mutable" << std::endl;
+      }
+    void f() const
+      {
+        deallog << "const" << std::endl;
+      }
 };
 
 
@@ -58,7 +63,7 @@ int main()
   SmartPointer<const Test> u=&b;
 
 
-deallog << "a ";
+  deallog << "a ";
   a.f();            // should print "mutable", since #a# is not const
   deallog << "b ";
   b.f();            // should print "const", since #b# is const
