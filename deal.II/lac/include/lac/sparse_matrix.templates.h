@@ -27,8 +27,7 @@
 #  include <numeric>
 
 #  include <base/thread_manager.h>
-
-#  define NTHREADS 4
+#  include <base/multithread_info.h>
 #endif
 
 
@@ -214,9 +213,9 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
 				   // in MT mode: start new threads only
 				   // if the matrix is sufficiently large.
 				   // the limit is mostly artificial
-  if (n_rows/NTHREADS > 2000)
+  if (n_rows/multithread_info.n_default_threads > 2000)
     {
-      const unsigned int n_threads = NTHREADS;
+      const unsigned int n_threads = multithread_info.n_default_threads;
 
       ThreadManager thread_manager;
       
@@ -380,9 +379,9 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 				   // if in MT mode and size sufficiently
 				   // large: do it in parallel; the limit
 				   // is mostly artificial
-  if (n_rows/NTHREADS > 2000)
+  if (n_rows/multithread_info.n_default_threads > 2000)
     {
-      const unsigned int n_threads = NTHREADS;
+      const unsigned int n_threads = multithread_info.n_default_threads;
 
       ThreadManager thread_manager;
       
@@ -530,9 +529,9 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 				   // if in MT mode and size sufficiently
 				   // large: do it in parallel; the limit
 				   // is mostly artificial
-  if (n_rows/NTHREADS > 2000)
+  if (n_rows/multithread_info.n_default_threads > 2000)
     {
-      const unsigned int n_threads = NTHREADS;
+      const unsigned int n_threads = multithread_info.n_default_threads;
 
       ThreadManager thread_manager;
       

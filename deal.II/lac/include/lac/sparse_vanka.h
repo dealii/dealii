@@ -18,6 +18,7 @@
 
 
 #include <base/smartpointer.h>
+#include <base/multithread_info.h>
 #include <lac/forward_declarations.h>
 
 #include <vector>
@@ -165,12 +166,15 @@ class SparseVanka
 				      * building the inverses of the
 				      * diagonal blocks. This
 				      * parameter is ignored if not in
-				      * multithreaded mode.
+				      * multithreaded mode. By
+				      * default, this variable is set
+				      * to the value of
+				      * #multithread_info.n_default_threads#.
 				      */
     SparseVanka(const SparseMatrix<number> &M,
 		const vector<bool>         &selected,
 		const bool                  conserve_memory = false,
-		const unsigned int          n_threads       = 1);
+		const unsigned int          n_threads       = multithread_info.n_default_threads);
     
 				     /**
 				      * Destructor.
@@ -268,7 +272,7 @@ class SparseVanka
 				      * Number of threads to be used
 				      * when building the
 				      * inverses. Only relevant in
-				      * multithread mode.
+				      * multithreaded mode.
 				      */
     const unsigned int n_threads;
     
@@ -491,7 +495,7 @@ class SparseBlockVanka : public SparseVanka<number>
 		      const unsigned int          n_blocks,
 		      const BlockingStrategy      blocking_strategy,
 		      const bool                  conserve_memory = false,
-		      const unsigned int          n_threads       = 1);
+		      const unsigned int          n_threads       = multithread_info.n_default_threads);
 
 				     /**
 				      * Apply the preconditioner.
