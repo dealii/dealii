@@ -196,8 +196,9 @@ class ConstraintMatrix {
 				      * The constraint matrix object must be
 				      * closed to call this function.
 				      */
-    void condense (const SparseMatrix<double> &uncondensed,
-		   SparseMatrix<double>       &condensed) const;
+    template<typename number>
+    void condense (const SparseMatrix<number> &uncondensed,
+		   SparseMatrix<number>       &condensed) const;
 
 				     /**
 				      * This function does much the same as
@@ -206,7 +207,8 @@ class ConstraintMatrix {
 				      * documentation of this class for more
 				      * detailed information.
 				      */
-    void condense (SparseMatrix<double> &matrix) const;
+    template<typename number>
+    void condense (SparseMatrix<number> &matrix) const;
 
 				     /**
 				      * Condense the given vector #uncondensed#
@@ -214,13 +216,15 @@ class ConstraintMatrix {
 				      * responsibility to guarantee that all
 				      * entries of #condensed# be zero!
 				      */
-    void condense (const Vector<double> &uncondensed,
-		   Vector<double>       &condensed) const;
+    template<typename number>
+    void condense (const Vector<number> &uncondensed,
+		   Vector<number>       &condensed) const;
 
 				     /**
 				      * Condense the given vector in-place.
 				      */
-    void condense (Vector<double> &vec) const;
+    template<typename number>
+    void condense (Vector<number> &vec) const;
 
 				     /**
 				      * Re-distribute the elements of the vector
@@ -232,14 +236,16 @@ class ConstraintMatrix {
 				      * #condense# somehow, but it should be noted
 				      * that it is not the inverse of #condense#-
 				      */
-    void distribute (const Vector<double> &condensed,
-		     Vector<double>       &uncondensed) const;
+    template<typename number>
+    void distribute (const Vector<number> &condensed,
+		     Vector<number>       &uncondensed) const;
 
 				     /**
 				      * Re-distribute the elements of the vector
 				      * in-place.
 				      */
-    void distribute (Vector<double> &vec) const;
+    template<typename number>
+    void distribute (Vector<number> &vec) const;
     
     
 				     /**
