@@ -10,8 +10,6 @@ print <<'EOT'
 <body>
 <h1>Regression tests</h1>
 <h2>Results</h2>
-<table>
-<tr><th>Date
 EOT
     ;
 
@@ -27,9 +25,9 @@ while (<>)
 	$result = $3;
 	$name   = $4;
 
-	$results{$date}{$dir.':'.$name} = '<img src="pictures/ok.gif">'
+	$results{$date}{$dir.':'.$name} = '<img src="pictures/ok.gif" size="1">'
 	    if ($result eq '+');
-	$results{$date}{$dir.':'.$name} = '<img src="pictures/fail.gif">'
+	$results{$date}{$dir.':'.$name} = '<img src="pictures/fail.gif" size="1">'
 	    if ($result eq '-');
     }
 }
@@ -47,10 +45,19 @@ foreach $name (sort keys %testcase) {
     $testcase{$name} = $next_index++;
 }
 
+
+print <<'EOT'
+<table>
+<tr><th>Date
+EOT
+    ;
+
 for ($i=1;$i<$next_index;$i++)
 {
     printf "<th><small>%02d</small>", $i;
 }
+print "\n";
+
 
 # finally output a table of results
 foreach $date (sort {$b cmp $a} keys %results)
@@ -58,17 +65,32 @@ foreach $date (sort {$b cmp $a} keys %results)
     # if this is not the first iteration, and if the month has changed,
     # then put in a break into the table to avoid overly long tables
     # which browsers take infinitely long to render
-    $date ~ /\d+-(\d+)-\d+/;
+    $date =~ /(\d+)-(\d+)-\d+/;
+    $this_year  = $1;
     $this_month = $2;
-    if ((defined $oldmonth) && ($this_month != $old_month)) {
-	print "</table>\n\n<table>\n"
+    if ($this_month != $old_month) {
+	if (defined $old_month) {
+	    print "</table>\n";
+
+	    print <<'EOT'
+		<table>
+   	        <tr><th>Date
+EOT
+			    ;
+
+	    for ($i=1;$i<$next_index;$i++)
+	    {
+		printf "<th><small>%02d</small>", $i;
+	    }
+	    print "\n";
+	}
     }
 
     print "<tr><td>$date  ";
     foreach $name (sort keys %testcase)
     {
 	$_ = $results{$date}{$name};
-	print '<th> ', $_;
+	print '<td> ', $_, '</td>';
     }
     print "</tr></td>\n";
 
@@ -96,3 +118,5 @@ print <<'EOT'
 </html>
 EOT
     ;
+
+
