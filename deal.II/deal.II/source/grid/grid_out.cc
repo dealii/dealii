@@ -417,7 +417,6 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 	out << cell->level() + 8;
       else
 	out << cell->material_id() + 1;
-      out << " 6 ";
 				       // Depth, unused, solid fill
       out << ' '
 	  << (xfig_flags.level_depth
