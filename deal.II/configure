@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.89 
+# From configure.in Revision: 1.90 
 
 
 
@@ -2171,7 +2171,7 @@ cross_compiling=$ac_cv_prog_cxx_cross
     
 int main() {
 
-	unsigned int i = std::numeric_limits<unsigned int>::eps;
+	unsigned int i = std::numeric_limits<unsigned int>::min();
     
 ; return 0; }
 EOF

@@ -637,7 +637,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_NUMERIC_LIMITS, dnl
 #include <limits>
     ],
     [
-	unsigned int i = std::numeric_limits<unsigned int>::eps;
+	unsigned int i = std::numeric_limits<unsigned int>::min();
     ],
     [
       AC_MSG_RESULT(yes)
