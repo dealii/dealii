@@ -20,6 +20,7 @@ template <int dim> class QGauss2;
 
 template <typename number> class Vector;
 template <typename number> class FullMatrix;
+template <int dim> class Mapping;
 template <int dim> class DoFHandler;
 class ConstraintMatrix;
 
@@ -278,6 +279,17 @@ class VectorTools
 				      * class for further information.
 				      */
     template <int dim>
+    static void interpolate (const Mapping<dim>    &mapping,
+			     const DoFHandler<dim> &dof,
+			     const Function<dim>   &function,
+			     Vector<double>        &vec);
+    
+				     /**
+				      * Calls the @p{interpolate}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    template <int dim>
     static void interpolate (const DoFHandler<dim>    &dof,
 			     const Function<dim>      &function,
 			     Vector<double>           &vec);
@@ -358,11 +370,23 @@ class VectorTools
 				      * class for further information.
 				      */				      
     template <int dim>
-    static void create_right_hand_side (const DoFHandler<dim>    &dof,
-					const Quadrature<dim>    &q,
-					const Function<dim>      &rhs,
-					Vector<double>           &rhs_vector);
+    static void create_right_hand_side (const Mapping<dim>    &mapping,
+					const DoFHandler<dim> &dof,
+					const Quadrature<dim> &q,
+					const Function<dim>   &rhs,
+					Vector<double>        &rhs_vector);
     
+				     /**
+				      * Calls the @p{create_right_hand_side}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    template <int dim>
+    static void create_right_hand_side (const DoFHandler<dim> &dof,
+					const Quadrature<dim> &q,
+					const Function<dim>   &rhs,
+					Vector<double>        &rhs_vector);
+
 				     /**
 				      * Prepare Dirichlet boundary conditions.
 				      * Make up the list of nodes subject
@@ -407,9 +431,22 @@ class VectorTools
 				      * information.
 				      */
     template <int dim>
-    static void interpolate_boundary_values (const DoFHandler<dim>    &dof,
-					     const unsigned char       boundary_component,
-					     const Function<dim>      &boundary_function,
+    static void interpolate_boundary_values (const Mapping<dim>            &mapping,
+					     const DoFHandler<dim>         &dof,
+					     const unsigned char            boundary_component,
+					     const Function<dim>           &boundary_function,
+					     std::map<unsigned int,double> &boundary_values,
+					     const std::vector<bool>       &component_mask = std::vector<bool>());
+
+				     /**
+				      * Calls the @p{interpolate_boundary_values}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    template <int dim>
+    static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
+					     const unsigned char            boundary_component,
+					     const Function<dim>           &boundary_function,
 					     std::map<unsigned int,double> &boundary_values,
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
@@ -491,13 +528,28 @@ class VectorTools
 				      * class for more information.
 				      */
     template <int dim>
-    static void integrate_difference (const DoFHandler<dim>    &dof,
-				      const Vector<double>     &fe_function,
-				      const Function<dim>      &exact_solution,
-				      Vector<float>            &difference,
-				      const Quadrature<dim>    &q,
-				      const NormType           &norm,
-				      const Function<dim>      *weight=0);
+    static void integrate_difference (const Mapping<dim>    &mapping,
+				      const DoFHandler<dim> &dof,
+				      const Vector<double>  &fe_function,
+				      const Function<dim>   &exact_solution,
+				      Vector<float>         &difference,
+				      const Quadrature<dim> &q,
+				      const NormType        &norm,
+				      const Function<dim>   *weight=0);
+
+				     /**
+				      * Calls the @p{integrate_difference}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    template <int dim>
+    static void integrate_difference (const DoFHandler<dim> &dof,
+				      const Vector<double>  &fe_function,
+				      const Function<dim>   &exact_solution,
+				      Vector<float>         &difference,
+				      const Quadrature<dim> &q,
+				      const NormType        &norm,
+				      const Function<dim>   *weight=0);
 
 				     /**
 				      * Mean-value filter for Stokes.
@@ -521,6 +573,7 @@ class VectorTools
 				      * be computed and later
 				      * subtracted.
 				      */
+// TODO: Implementation of subtract_mean_value is missing.    
     static void subtract_mean_value(Vector<double>          &v,
 				    const std::vector<bool> &p_select);
     
@@ -551,11 +604,23 @@ class VectorTools
 				      * boundaries for the velocities.
 				      */
     template <int dim>
+    static double compute_mean_value (const Mapping<dim>    &mapping,
+				      const DoFHandler<dim> &dof,
+				      const Quadrature<dim> &quadrature,
+				      Vector<double>        &v,
+				      const unsigned int     component);
+    
+				     /**
+				      * Calls the @p{integrate_difference}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    template <int dim>
     static double compute_mean_value (const DoFHandler<dim> &dof,
 				      const Quadrature<dim> &quadrature,
 				      Vector<double>        &v,
-				      const unsigned int component);
-    
+				      const unsigned int     component);
+
 				     /**
 				      * Exception
 				      */

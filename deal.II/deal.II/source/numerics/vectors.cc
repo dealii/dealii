@@ -66,7 +66,8 @@ inline double sqr_point (const Tensor<1,dim> &p)
 
 
 template <int dim>
-void VectorTools::interpolate (const DoFHandler<dim> &dof,
+void VectorTools::interpolate (const Mapping<dim>    &mapping,
+			       const DoFHandler<dim> &dof,
 			       const Function<dim>   &function,
 			       Vector<double>        &vec)
 {
@@ -169,10 +170,9 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 				   // to feed it into FEValues
   Quadrature<dim> support_quadrature(unit_support_points, dummy_weights);
 
-//TODO: Higher order mapping?  
 				   // Transformed support points are computed by
 				   // FEValues
-  FEValues<dim> fe_values (mapping_q1, fe, support_quadrature, update_q_points);
+  FEValues<dim> fe_values (mapping, fe, support_quadrature, update_q_points);
   
   for (; cell!=endc; ++cell)
     {
@@ -225,6 +225,16 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 	      = function_values_scalar[dof_to_rep_index_table[i]];
 	};
     }
+}
+
+
+template <int dim>
+void VectorTools::interpolate (const DoFHandler<dim> &dof,
+			       const Function<dim>   &function,
+			       Vector<double>        &vec)
+{
+  static const MappingQ1<dim> mapping;
+  interpolate(mapping, dof, function, vec);
 }
 
 
@@ -395,7 +405,7 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 
   MatrixCreator<dim>::create_mass_matrix (dof, quadrature, mass_matrix);
   
-  VectorTools::create_right_hand_side (dof, quadrature, function, tmp);
+  VectorTools::create_right_hand_side (mapping_q1, dof, quadrature, function, tmp);
 
   constraints.condense (mass_matrix);
   constraints.condense (tmp);
@@ -420,10 +430,11 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 
 
 template <int dim>
-void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
-					  const Quadrature<dim>    &quadrature,
-					  const Function<dim>      &rhs_function,
-					  Vector<double>           &rhs_vector)
+void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
+					  const DoFHandler<dim> &dof_handler,
+					  const Quadrature<dim> &quadrature,
+					  const Function<dim>   &rhs_function,
+					  Vector<double>        &rhs_vector)
 {
   const FiniteElement<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
@@ -435,7 +446,7 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_q_points |
 					 update_JxW_values);
-  FEValues<dim> fe_values (mapping_q1, fe, quadrature, update_flags);
+  FEValues<dim> fe_values (mapping, fe, quadrature, update_flags);
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points,
@@ -505,6 +516,17 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
     }
 };
 
+
+template <int dim>
+void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
+					  const Quadrature<dim>    &quadrature,
+					  const Function<dim>      &rhs_function,
+					  Vector<double>           &rhs_vector)
+{
+  static const MappingQ1<dim> mapping;
+  create_right_hand_side(mapping, dof_handler, quadrature,
+			 rhs_function, rhs_vector);
+}
 
 
 #if deal_II_dimension == 1
@@ -586,9 +608,10 @@ VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
 
 template <int dim>
 void
-VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
-					  const unsigned char       boundary_component,
-					  const Function<dim>      &boundary_function,
+VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping,
+					  const DoFHandler<dim>         &dof,
+					  const unsigned char            boundary_component,
+					  const Function<dim>           &boundary_function,
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask_)
 {
@@ -641,7 +664,7 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 
   std::vector<double> dummy_weights (unit_support_points.size());
   Quadrature<dim-1> aux_quad (unit_support_points, dummy_weights);
-  FEFaceValues<dim> fe_values (mapping_q1, fe, aux_quad, update_q_points);
+  FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
 
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
@@ -691,7 +714,21 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 }
 
   
-  
+template <int dim>
+void
+VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
+					  const unsigned char            boundary_component,
+					  const Function<dim>           &boundary_function,
+					  std::map<unsigned int,double> &boundary_values,
+					  const std::vector<bool>       &component_mask)
+{
+  static const MappingQ1<dim> mapping;
+  interpolate_boundary_values(mapping, dof, boundary_component,
+			      boundary_function, boundary_values, component_mask);
+}
+
+
+
 template <int dim>
 void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
@@ -782,13 +819,14 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void
-VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
-				   const Vector<double>     &fe_function,
-				   const Function<dim>      &exact_solution,
-				   Vector<float>            &difference,
-				   const Quadrature<dim>    &q,
-				   const NormType           &norm,
-				   const Function<dim>      *weight)
+VectorTools::integrate_difference (const Mapping<dim>    &mapping,
+				   const DoFHandler<dim> &dof,
+				   const Vector<double>  &fe_function,
+				   const Function<dim>   &exact_solution,
+				   Vector<float>         &difference,
+				   const Quadrature<dim> &q,
+				   const NormType        &norm,
+				   const Function<dim>   *weight)
 {
   const unsigned int        n_q_points   = q.n_quadrature_points;
   const FiniteElement<dim> &fe           = dof.get_fe();
@@ -814,7 +852,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
   
-  FEValues<dim> fe_values(mapping_q1, fe, q, update_flags);
+  FEValues<dim> fe_values(mapping, fe, q, update_flags);
 
   std::vector< Vector<double> >        function_values (n_q_points,
 							Vector<double>(n_components));
@@ -1110,18 +1148,36 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 };
 
 
+template <int dim>
+void
+VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
+				   const Vector<double>     &fe_function,
+				   const Function<dim>      &exact_solution,
+				   Vector<float>            &difference,
+				   const Quadrature<dim>    &q,
+				   const NormType           &norm,
+				   const Function<dim>      *weight)
+{
+  static const MappingQ1<dim> mapping;
+  integrate_difference(mapping, dof, fe_function, exact_solution,
+		       difference, q, norm, weight);
+}
+
+
+
 
 template <int dim>
 double
-VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
+VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
+				 const DoFHandler<dim> &dof,
 				 const Quadrature<dim> &quadrature,
 				 Vector<double>        &v,
-				 const unsigned int component)
+				 const unsigned int     component)
 {
   Assert (component < dof.get_fe().n_components(),
 	  ExcIndexRange(component, 0, dof.get_fe().n_components()));
   
-  FEValues<dim> fe(mapping_q1, dof.get_fe(), quadrature,
+  FEValues<dim> fe(mapping, dof.get_fe(), quadrature,
 		   UpdateFlags(update_JxW_values
 			       | update_values));
 
@@ -1147,10 +1203,54 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 };
 
 
-
+template <int dim>
+double
+VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
+				 const Quadrature<dim> &quadrature,
+				 Vector<double>        &v,
+				 const unsigned int     component)
+{
+  static const MappingQ1<dim> mapping;
+  return compute_mean_value(mapping, dof, quadrature, v, component);
+}
 
 
 // explicit instantiations
+template
+void VectorTools::interpolate (const Mapping<deal_II_dimension>    &,
+			       const DoFHandler<deal_II_dimension> &,
+			       const Function<deal_II_dimension>   &,
+			       Vector<double>                      &);
+template
+void VectorTools::interpolate (const DoFHandler<deal_II_dimension> &,
+			       const Function<deal_II_dimension>   &,
+			       Vector<double>                      &);
+template
+void VectorTools::interpolate(const DoFHandler<deal_II_dimension> &,
+			      const DoFHandler<deal_II_dimension> &,
+			      const FullMatrix<double> &,
+			      const Vector<double>     &,
+			      Vector<double>           &);
+template
+void VectorTools::create_right_hand_side (const Mapping<deal_II_dimension>    &,
+					  const DoFHandler<deal_II_dimension> &,
+					  const Quadrature<deal_II_dimension> &,
+					  const Function<deal_II_dimension>   &,
+					  Vector<double>                      &);
+template
+void VectorTools::create_right_hand_side (const DoFHandler<deal_II_dimension> &,
+					  const Quadrature<deal_II_dimension> &,
+					  const Function<deal_II_dimension>   &,
+					  Vector<double>                      &);
+template
+void VectorTools::integrate_difference (const Mapping<deal_II_dimension>    &,
+					const DoFHandler<deal_II_dimension> &,
+					const Vector<double>                &,
+					const Function<deal_II_dimension>   &,
+					Vector<float>                       &,
+					const Quadrature<deal_II_dimension> &,
+					const NormType                      &,
+					const Function<deal_II_dimension>   *);
 template
 void VectorTools::integrate_difference (const DoFHandler<deal_II_dimension> &,
 					const Vector<double>                &,
@@ -1164,33 +1264,29 @@ void VectorTools::project_boundary_values (const DoFHandler<deal_II_dimension>  
 					   const std::map<unsigned char,const Function<deal_II_dimension>*>&,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
-
 template
-void VectorTools::create_right_hand_side (const DoFHandler<deal_II_dimension> &,
-					const Quadrature<deal_II_dimension>   &,
-					const Function<deal_II_dimension>     &,
-					Vector<double>                        &);
+double VectorTools::compute_mean_value (const Mapping<deal_II_dimension>    &,
+					const DoFHandler<deal_II_dimension> &,
+					const Quadrature<deal_II_dimension> &,
+					Vector<double>                      &,
+					const unsigned int);
 template
-void VectorTools::interpolate(const DoFHandler<deal_II_dimension> &,
-			      const DoFHandler<deal_II_dimension> &,
-			      const FullMatrix<double> &,
-			      const Vector<double>     &,
-			      Vector<double>           &);
-template
-void VectorTools::interpolate (const DoFHandler<deal_II_dimension> &,
-			       const Function<deal_II_dimension>   &,
-			       Vector<double>                      &);
-
-template
-double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension> &dof,
-					const Quadrature<deal_II_dimension> &quadrature,
-					Vector<double>        &v,
-					const unsigned int component);
+double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension> &,
+					const Quadrature<deal_II_dimension> &,
+					Vector<double>                      &,
+					const unsigned int);
 
 
 // the following two functions are not derived from a template in 1d
 // and thus need no explicit instantiation
 #if deal_II_dimension > 1
+template
+void VectorTools::interpolate_boundary_values (const Mapping<deal_II_dimension>    &,
+					       const DoFHandler<deal_II_dimension> &,
+					       const unsigned char,
+					       const Function<deal_II_dimension>   &,
+					       std::map<unsigned int,double>       &,
+					       const std::vector<bool>    &);
 template
 void VectorTools::interpolate_boundary_values (const DoFHandler<deal_II_dimension> &,
 					       const unsigned char,
