@@ -83,7 +83,7 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 				     /**
 				      * Reference to the solver.
 				      */
-    SmartPointer<const SOLVER> solver;
+    SmartPointer<SOLVER> solver;
     
 				     /**
 				      * Reference to the matrix.
