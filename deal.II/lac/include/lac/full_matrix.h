@@ -11,6 +11,7 @@
 
 
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 
 
 // forward declarations
@@ -56,7 +57,7 @@ class iVector;
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template<typename number>
-class FullMatrix
+class FullMatrix : public Subscriptor
 {
   private:
 				     /**
