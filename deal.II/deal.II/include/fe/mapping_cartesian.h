@@ -142,11 +142,9 @@ class MappingCartesian : public Mapping<dim>
 				      * @p{p_real} on the real cell
 				      * @p{cell} and returns @p{p_real}.
 				      */
-//TODO: document meaning of mdata argument    
     virtual Point<dim> transform_unit_to_real_cell (
       const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p,
-      const typename Mapping<dim>::InternalDataBase *const mdata=0) const;
+      const Point<dim> &p) const;
 
 				     /**
 				      * Transforms the point @p{p} on
@@ -215,7 +213,8 @@ class MappingCartesian : public Mapping<dim>
 					 /**
 					  * Length of the cell in
 					  * different coordinate
-					  * directions.
+					  * directions, @p{h_x},
+					  * @p{h_y}, @p{h_z}.
 					  */
 	Tensor<1,dim> length;
 
