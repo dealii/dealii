@@ -152,12 +152,16 @@ dnl Adjust compiler parameters if multithreading is desired:
 dnl - Use the right -threads/-pthread/-mthread option
 dnl - Set preprocessor directives if necessary
 dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
+dnl - remove -ansi from compiler flags again, since ACE yields hundreds of
+dnl   error messages with this flag
 if test $enablemultithreading = yes ; then
   DEAL_II_GET_THREAD_FLAGS
   DEAL_II_THREAD_CPPFLAGS
 
   CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
   CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
+
+  CXXFLAGSG="`echo $CXXFLAGS | perl -pi -e 's/-ansi//g;'"
 fi
 
 

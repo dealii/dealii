@@ -17,7 +17,9 @@
        New: the <code class="program">configure</code> script now
        enforces the compiler flags <code>-ansi -pedantic</code> when
        compiling in debug mode. This should force us to write more
-       standard compliant code.
+       standard compliant code. (Since the ACE library is not
+       standards conforming, the <code>-ansi</code> flag is not used
+       when multithreadinf is required.)
        <br>
        (WB 2000/06/14)
        </p>
