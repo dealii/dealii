@@ -59,7 +59,7 @@ foreach $filename (@ARGV) {
 		open IN2, $external_file;
 		$found = 0;
 		while ( <IN2> ) {
-		    if ( /<a name=\"?(.*?)[\s\"]/i ) {
+		    while ( /<a name=\"?(.*?)[\s\"]/gi ) {
 			if ( $1 eq $external_ref) {
 			    print "                    found.\n" if $debug;
 			    $found = 1;
