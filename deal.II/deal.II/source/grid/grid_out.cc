@@ -522,11 +522,12 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				   // in order to avoid the recurring
 				   // distinctions between
 				   // eps_flags_1, eps_flags_2, ...
-  const EpsFlagsBase &eps_flags_base = (dim==2 ?
-					static_cast<EpsFlagsBase&>(eps_flags_2) :
-					(dim==3 ?
-					 static_cast<EpsFlagsBase&>(eps_flags_3) :
-					 *static_cast<EpsFlagsBase*>(0)));
+  const GridOutFlags::EpsFlagsBase
+    &eps_flags_base = (dim==2 ?
+		       static_cast<GridOutFlags::EpsFlagsBase&>(eps_flags_2) :
+		       (dim==3 ?
+			static_cast<GridOutFlags::EpsFlagsBase&>(eps_flags_3) :
+			*static_cast<GridOutFlags::EpsFlagsBase*>(0)));
   
   AssertThrow (out, ExcIO());
   const unsigned int n_points = eps_flags_base.n_boundary_face_points;
@@ -753,7 +754,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				   // preserve the shape of the
 				   // triangulation
   const double scale = (eps_flags_base.size /
-			(eps_flags_base.size_type==EpsFlagsBase::width ?
+			(eps_flags_base.size_type==GridOutFlags::EpsFlagsBase::width ?
 			 x_max - x_min :
 			 y_min - y_max));
 
@@ -860,4 +861,4 @@ template void GridOut::write_eps (const Triangulation<deal_II_dimension> &,
 template void GridOut::write (const Triangulation<deal_II_dimension> &,
 			      std::ostream &,
 			      const OutputFormat,
-			      const Mapping<dim> *);
+			      const Mapping<deal_II_dimension> *);

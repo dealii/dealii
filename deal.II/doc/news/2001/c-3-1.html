@@ -409,6 +409,20 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: the flags which are given to the <code
+       class="class">GridOut</code> class to modify the appearance of
+       the output have been moved from local classes of the <code
+       class="class">GridOut</code> class to a namespace names
+       <code class="class">GridOutFlags</code> and have lost the
+       trailing <code class="class">Flags</code> part in their name.
+       This change was necessary as C++ does not allow explicit
+       specialization of member classes; the previous use in the
+       library was only accepted by GCC as an extension.
+       <br>
+       (WB 2001/05/17)
+       </p>
+
+  <li> <p>
        New: The functions <code
        class="member">DoFTools::map_dof_to_boundary_indices</code>,
        <code class="member">DoFTools::make_boundary_sparsity_pattern</code>,
