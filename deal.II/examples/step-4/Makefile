@@ -77,7 +77,7 @@ ifeq ($(debug-mode),on)
   libraries = $(target).go $(libs.g)
   flags     = $(CXXFLAGS.g)
 else
-  libraries = $(target).go $(libs.o)
+  libraries = $(target).o $(libs.o)
   flags     = $(CXXFLAGS.o)
 endif
 
@@ -129,7 +129,7 @@ clean:
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 %.o : %.cc
 	@echo ==============optimized===== $(<F)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
 # The following statement tells make that the rules `run' and `clean'
