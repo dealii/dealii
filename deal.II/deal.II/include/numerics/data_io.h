@@ -304,11 +304,11 @@ class DataIn {
  * There are two functions for generating encapsulated Postscript
  * (EPS) without the need for another graphics tool.
  * #write_epsgrid# writes just the 2d grid - This is obsolete and
- * should be removed. The functionality is provided through write_eps
- * and eps_output_data now. 
+ * should be removed. The functionality is provided through #write_eps#
+ * and #eps_output_data# now. 
  * #write_eps# can use one data vector for height information and one
  * cell vector for shading information. Control is done through an
- * object of class eps_output_data as follows.
+ * object of class #eps_output_data# as follows.
  *
  * Vectors are added as usual by #add_data_vector#. Then one has to
  * decide, wether to produce a 2D or 3D plot. This is done by setting
@@ -319,11 +319,11 @@ class DataIn {
  *   \item[Vector] for 3D-Output.
  * \end{description}
  * For 3D-Output one has to set #azimuth# and #elevation# for the
- * angle of view and #height_vector# to the number of the dof_data
+ * angle of view and #height_vector# to the number of the #dof_data#
  * vector that provides the height information to be used.
  *
  * The cells can be shaded in three different modes, controlled by the
- * attribute cell_type:
+ * attribute #cell_type#:
  * \begin{description}
  *   \item[None] provides transparent shading.
  *   \item[Vector] uses a cell vector to do shading. The number of the
@@ -726,7 +726,7 @@ class DataOut {
 };
 
 				 /** 
-				  * Structure for the controll of
+				  * Structure for the control of
 				  * eps_output. See general
 				  * documentation of class DataOut for
 				  * description.
