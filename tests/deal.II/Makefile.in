@@ -334,7 +334,12 @@ wave-test-3.output: wave-test-3.testcase
 %.output:%.testcase
 	@echo =====Running======= $<
 	@./$<
-	@perl -pi -e 's/JobId.*//;s/value.*//;' $@
+	@perl -pi -e 's/JobId.*//;\
+		s/value.*//;\
+		s/%%Creation Date:.*//;\
+		s/# Time =.*//; \
+		s/^\s+Time =.*//;\
+		s/^\s+Date =.*//;'  $@
 
 %.check:%.output
 	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============' $<
