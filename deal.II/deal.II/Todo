@@ -137,28 +137,11 @@ I suppose the [mg_]get_dof_values really belongs to the
   [MG]Line/QuadAccessor classes, but now it is in the
   [MG]CellAccessor. Correct this some time.
 
-
-
-
-
-
-DEAL:
-Is dvector::operator= (double) really useful or does it make more
-  confusion than it helps?
-
-
-Give mia::State a much better name, same for Control ! :-]]]
-
-
 Let all the reinit functions in /lac free their memory, if reinit
-  is called with less requirements. Maybe give free all memory
-  if the given dimension is zero. If so, check all deal.II files
+  is called with the given dimension is zero. If so, check all deal.II files
   for use of reinit. (At present, new dimension==0 is not allowed.)
   [Done for dFMatrix and dVector; still to be done for the other
   classes.]
-
-Why are there all these unsafe casts from VectorBase to dVector
-  in dvector.cc? What is VectorBase there for anyway
 
 Use unsigned integers for the colnums array in dSMatrixStruct. This
   would enhance safety since colnum=-1 would no longer point to a
@@ -171,4 +154,5 @@ FeValues: add flexibility for update flags
 
 Remove all fe& in vectors.h
 
-Collection of transfer matrices: how to design?
+No support points for non-Lagrangian elements? Check for Langrange in
+interpolation?

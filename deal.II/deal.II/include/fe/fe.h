@@ -445,7 +445,7 @@ struct FiniteElementBase :
  *   function value (as opposed to derivatives or the like, as used in the
  *   Hermitean finite element class or in the quintic Argyris element). It is
  *   further assumed that a basis function takes its nominal value at a
- *   certain point (e.g. linear ansatz functions take their value in the
+ *   certain point (e.g. linear trial functions take their value in the
  *   corners of the element; this restriction rules out spectral elements for
  *   the present library).
  *
@@ -454,9 +454,9 @@ struct FiniteElementBase :
  *   places where this is used in the library come to mind to the author,
  *   namely the treating of boundary values in the #ProblemBase# class and
  *   the interpolation in the #VectorTools# collection. You should also
- *   look out for other places where explicit use of the ansatz points is
+ *   look out for other places where explicit use of the support points is
  *   made if you want to use elements of other classes. A hint may be the
- *   use of the #get_ansatz_points# and #get_face_ansatz_points# functions
+ *   use of the #get_support_points# and #get_face_support_points# functions
  *   of this class.
  *
  *   This also is used in some sense in the
@@ -533,7 +533,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * function of the transformation mapping
 				      * from unit cell to real cell. For
 				      * isoparametric elements, this function
-				      * is the same as the ansatz functions,
+				      * is the same as the trial functions,
 				      * but for sublinear or other mappings,
 				      * they differ.
 				      */
@@ -550,7 +550,7 @@ class FiniteElement : public FiniteElementBase<dim> {
     
 				     /**
 				      * Compute the Jacobian matrix and the
-				      * quadrature points as well as the ansatz
+				      * quadrature points as well as the trial
 				      * function locations on the real cell in
 				      * real space from the given cell
 				      * and the given quadrature points on the
@@ -608,8 +608,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				 const vector<Point<dim> >            &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
-				 vector<Point<dim> > &ansatz_points,
-				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &support_points,
+				 const bool           compute_support_points,
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const dFMatrix      &shape_values_transform,
@@ -658,13 +658,13 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * jacobi matrices as explained in the
 				      * documentation of the #FEValues# class.
 				      * 
-				      * The ansatz points are the
-				      * off-points of those ansatz functions
+				      * The support points are the
+				      * off-points of those trial functions
 				      * located on the given face; this
 				      * information is taken over from the
-				      * #get_face_ansatz_points# function.
+				      * #get_face_support_points# function.
 				      *
-				      * The order of ansatz functions is the
+				      * The order of trial functions is the
 				      * same as if it were a cell of dimension
 				      * one less than the present. E.g. in
 				      * two dimensions, the order is first
@@ -694,11 +694,11 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * specific in this standard implementation:
 				      * The jacobi determinants of the
 				      * transformation from the unit face to the
-				      * real face, the ansatz points
+				      * real face, the support points
 				      * and the outward normal vectors. For
 				      * these fields, there exist pure
 				      * virtual functions, #get_face_jacobians#,
-				      * #get_face_ansatz_points# and
+				      * #get_face_support_points# and
 				      * #get_normal_vectors#.
 				      *
 				      * Though there is a standard
@@ -726,8 +726,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      const vector<Point<dim> >   &global_unit_points,
 				      vector<dFMatrix>    &jacobians,
 				      const bool           compute_jacobians,
-				      vector<Point<dim> > &ansatz_points,
-				      const bool           compute_ansatz_points,
+				      vector<Point<dim> > &support_points,
+				      const bool           compute_support_points,
 				      vector<Point<dim> > &q_points,
 				      const bool           compute_q_points,
 				      vector<double>      &face_jacobi_determinants,
@@ -749,7 +749,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * of the other parameters is the same as
 				      * for the #fill_fe_face_values# function.
 				      *
-				      * Since the usage of ansatz points on
+				      * Since the usage of support points on
 				      * subfaces is not useful, it is excluded
 				      * from the interface to this function.
 				      *
@@ -784,8 +784,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 const Boundary<dim> &boundary) const;
 
 				     /**
-				      * Return the ansatz points of the
-				      * ansatz functions on the unit cell.
+				      * Return the support points of the
+				      * trial functions on the unit cell.
 				      *
 				      * The function assumes that the
 				      * #unit_points# array already has the
@@ -799,7 +799,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * line. For all other dimensions, an
 				      * overwritten function has to be provided.
 				      */
-    virtual void get_unit_ansatz_points (vector<Point<dim> > &unit_points) const;
+    virtual void get_unit_support_points (vector<Point<dim> > &unit_points) const;
     
 				     /**
 				      * Compute the off-points of the finite
@@ -818,7 +818,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * abovementioned one.
 				      *
 				      * The function assumes that the
-				      * #ansatz_points# array already has the
+				      * #support_points# array already has the
 				      * right size. The order of points in
 				      * the array matches that returned by
 				      * the #cell->get_dof_indices# function.
@@ -829,18 +829,18 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * line. For all other dimensions, an
 				      * overwritten function has to be provided.
 				      */
-    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &ansatz_points) const;
+				    vector<Point<dim> > &support_points) const;
     
 				     /**
 				      * Compute the off-points of the finite
 				      * element basis functions located on the
 				      * face. It only returns the off-points
-				      * of the ansatz functions which are
+				      * of the trial functions which are
 				      * located on the face, rather than of
 				      * all basis functions, which is done by
-				      * the #get_ansatz_points# function.
+				      * the #get_support_points# function.
 				      *
 				      * This function produces a subset of
 				      * the information provided by the
@@ -863,7 +863,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * the #fill_fe_face_values# function.
 				      *
 				      * The function assumes that the
-				      * #ansatz_points# array already has the
+				      * #support_points# array already has the
 				      * right size. The order of points in
 				      * the array matches that returned by
 				      * the #face->get_dof_indices# function.
@@ -873,9 +873,9 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * derived classes should throw an error
 				      * when called with #dim==1#.
 				      */
-    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &ansatz_points) const =0;
+					 vector<Point<dim> > &support_points) const =0;
 
 				     /**
 				      * This is the second separated function
@@ -980,7 +980,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * the computation of the local mass matrix
 				      * is reduced to the computation of a
 				      * weighted evaluation of a polynom in
-				      * the coordinates of the ansatz points
+				      * the coordinates of the support points
 				      * in real space (for linear mappings,
 				      * these are the corner points, for
 				      * quadratic mappings also the center of

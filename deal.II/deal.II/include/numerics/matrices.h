@@ -286,6 +286,16 @@ class MatrixCreator {
 				       dVector                  &rhs_vector,
 				       const Function<dim>      *a = 0);
 
+				   /**
+				    * Build Lagrange interpolation
+				    matrix of different finite
+				    elements.
+				   */
+  static void create_interpolation_matrix(const FiniteElement<dim> &high,
+					  const FiniteElement<dim> &low,
+					  dFMatrix& result);
+
+
 				     /**
 				      * Exception
 				      */

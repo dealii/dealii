@@ -97,8 +97,8 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 					 const vector<Point<1> >            &unit_points,
 					 vector<dFMatrix>  &jacobians,
 					 const bool         compute_jacobians,
-					 vector<Point<1> > &ansatz_points,
-					 const bool         compute_ansatz_points,
+					 vector<Point<1> > &support_points,
+					 const bool         compute_support_points,
 					 vector<Point<1> > &q_points,
 					 const bool         compute_q_points,
 					 const dFMatrix      &shape_values_transform,
@@ -107,7 +107,7 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
-				    ansatz_points, compute_ansatz_points,
+				    support_points, compute_support_points,
 				    q_points, compute_q_points,
 				    shape_values_transform, shape_gradients_transform,
 				    boundary);
@@ -281,8 +281,8 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					   const vector<Point<dim> >            &unit_points,
 					   vector<dFMatrix>    &jacobians,
 					   const bool           compute_jacobians,
-					   vector<Point<dim> > &ansatz_points,
-					   const bool           compute_ansatz_points,
+					   vector<Point<dim> > &support_points,
+					   const bool           compute_support_points,
 					   vector<Point<dim> > &q_points,
 					   const bool           compute_q_points,
 					   const dFMatrix      &shape_values_transform,
@@ -292,8 +292,8 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension(support_points.size(), total_dofs));
 
   
   unsigned int n_points=unit_points.size();
@@ -364,8 +364,8 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 	};
     };
 
-  if (compute_ansatz_points)
-    get_ansatz_points (cell, boundary, ansatz_points);
+  if (compute_support_points)
+    get_support_points (cell, boundary, support_points);
 };
 
 

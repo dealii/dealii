@@ -51,15 +51,15 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 					endc = dof.end();
   vector<int>         dofs_on_cell (fe.total_dofs);
   vector<double>      dof_values_on_cell (fe.total_dofs);
-  vector<Point<dim> > ansatz_points (fe.total_dofs);
+  vector<Point<dim> > support_points (fe.total_dofs);
   for (; cell!=endc; ++cell) 
     {
 				       // for each cell:
 				       // get location of finite element
 				       // off-points
-      fe.get_ansatz_points (cell, boundary, ansatz_points);
+      fe.get_support_points (cell, boundary, support_points);
 				       // get function values at these points
-      function.value_list (ansatz_points, dof_values_on_cell);
+      function.value_list (support_points, dof_values_on_cell);
 				       // get indices of the dofs on this cell
       cell->get_dof_indices (dofs_on_cell);
 				       // distribute function values to the
@@ -266,7 +266,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					 // boundary values of dofs on this
 					 // face
 	face->get_dof_indices (face_dofs);
-	fe.get_face_ansatz_points (face, boundary, dof_locations);
+	fe.get_face_support_points (face, boundary, dof_locations);
 	function_ptr->second->value_list (dof_locations, dof_values);
 
 					 // enter into list
@@ -396,7 +396,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     // \psi(x_j)=\sum_i v_i \phi_i(x_j)
 					     // with v_i the nodal values of the
 					     // fe_function and \phi_i(x_j) the
-					     // matrix of the ansatz function
+					     // matrix of the trial function
 					     // values at the integration point
 					     // x_j. Then the vector
 					     // of the \psi(x_j) is v*Phi with

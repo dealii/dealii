@@ -169,9 +169,9 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 #if deal_II_dimension == 1
 
 //template <>
-//void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
+//void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 //					  const Boundary<1> &,
-//					  vector<Point<1> > &ansatz_points) const;
+//					  vector<Point<1> > &support_points) const;
 
 
 template <>
@@ -179,8 +179,8 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const vector<Point<1> > &unit_points,
 				       vector<dFMatrix>  &jacobians,
 				       const bool         compute_jacobians,
-				       vector<Point<1> > &ansatz_points,
-				       const bool         compute_ansatz_points,
+				       vector<Point<1> > &support_points,
+				       const bool         compute_support_points,
 				       vector<Point<1> > &q_points,
 				       const bool         compute_q_points,
 				       const dFMatrix      &,
@@ -190,8 +190,8 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension(support_points.size(), total_dofs));
 
 
 				   // local mesh width
@@ -208,12 +208,12 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 	q_points[i] = cell->vertex(0) + h*unit_points[i];
     };
 
-				   // compute ansatz points. The first ones
+				   // compute support points. The first ones
 				   // belong to vertex one, the second ones
 				   // to vertex two, all following are
 				   // equally spaced along the line
-  if (compute_ansatz_points)
-    get_ansatz_points (cell, boundary, ansatz_points);
+  if (compute_support_points)
+    get_support_points (cell, boundary, support_points);
 };
 
 
@@ -263,34 +263,34 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 
 
 template <>
-void FiniteElement<1>::get_unit_ansatz_points (vector<Point<1> > &ansatz_points) const {
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
-				   // compute ansatz points. The first ones
+void FiniteElement<1>::get_unit_support_points (vector<Point<1> > &support_points) const {
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension(support_points.size(), total_dofs));
+				   // compute support points. The first ones
 				   // belong to vertex one, the second ones
 				   // to vertex two, all following are
 				   // equally spaced along the line
   unsigned int next = 0;
 				   // first the dofs in the vertices
   for (unsigned int i=0; i<dofs_per_vertex; ++i)
-    ansatz_points[next++] = Point<1>(0);
+    support_points[next++] = Point<1>(0);
   for (unsigned int i=0; i<dofs_per_vertex; ++i)
-    ansatz_points[next++] = Point<1>(1);
+    support_points[next++] = Point<1>(1);
   
 				   // now dofs on line
   for (unsigned int i=0; i<dofs_per_line; ++i) 
-    ansatz_points[next++] = Point<1>((i+1.0)/(dofs_per_line+1.0));
+    support_points[next++] = Point<1>((i+1.0)/(dofs_per_line+1.0));
 };
 
 
 
 template <>
-void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &cell,
+void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
 					  const Boundary<1> &,
-					  vector<Point<1> > &ansatz_points) const {
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
-				   // compute ansatz points. The first ones
+					  vector<Point<1> > &support_points) const {
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension(support_points.size(), total_dofs));
+				   // compute support points. The first ones
 				   // belong to vertex one, the second ones
 				   // to vertex two, all following are
 				   // equally spaced along the line
@@ -300,11 +300,11 @@ void FiniteElement<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &ce
 				   // first the dofs in the vertices
   for (unsigned int vertex=0; vertex<2; vertex++) 
     for (unsigned int i=0; i<dofs_per_vertex; ++i)
-      ansatz_points[next++] = cell->vertex(vertex);
+      support_points[next++] = cell->vertex(vertex);
   
 				   // now dofs on line
   for (unsigned int i=0; i<dofs_per_line; ++i) 
-    ansatz_points[next++] = cell->vertex(0) +
+    support_points[next++] = cell->vertex(0) +
 			    Point<1>((i+1.0)/(dofs_per_line+1.0)*h);
 };
 
@@ -336,8 +336,8 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 					      const vector<Point<dim> > &global_unit_points,
 					      vector<dFMatrix>    &jacobians,
 					      const bool           compute_jacobians,
-					      vector<Point<dim> > &ansatz_points,
-					      const bool           compute_ansatz_points,
+					      vector<Point<dim> > &support_points,
+					      const bool           compute_support_points,
 					      vector<Point<dim> > &q_points,
 					      const bool           compute_q_points,
 					      vector<double>      &face_jacobi_determinants,
@@ -353,8 +353,8 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
   Assert (global_unit_points.size() == unit_points.size(),
 	  ExcWrongFieldDimension(global_unit_points.size(), unit_points.size()));
-  Assert (ansatz_points.size() == dofs_per_face,
-	  ExcWrongFieldDimension(ansatz_points.size(), dofs_per_face));
+  Assert (support_points.size() == dofs_per_face,
+	  ExcWrongFieldDimension(support_points.size(), dofs_per_face));
   
   vector<Point<dim> > dummy(total_dofs);
   fill_fe_values (cell, global_unit_points,
@@ -364,8 +364,8 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 		  shape_values_transform, shape_gradients_transform,
 		  boundary);
   
-  if (compute_ansatz_points)
-    get_face_ansatz_points (cell->face(face_no), boundary, ansatz_points);
+  if (compute_support_points)
+    get_face_support_points (cell->face(face_no), boundary, support_points);
 
   if (compute_face_jacobians)
     get_face_jacobians (cell->face(face_no), boundary,
@@ -423,14 +423,14 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 
 
 template <int dim>
-void FiniteElement<dim>::get_unit_ansatz_points (vector<Point<dim> > &) const {
+void FiniteElement<dim>::get_unit_support_points (vector<Point<dim> > &) const {
   Assert (false, ExcPureFunctionCalled());
 };
 
 
 
 template <int dim>
-void FiniteElement<dim>::get_ansatz_points (const DoFHandler<dim>::cell_iterator &,
+void FiniteElement<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &,
 					    const Boundary<dim> &,
 					    vector<Point<dim> > &) const {
   Assert (false, ExcPureFunctionCalled());

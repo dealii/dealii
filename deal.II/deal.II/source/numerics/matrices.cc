@@ -797,11 +797,22 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
       rhs(i) += values(i,point) *
 		rhs_values[point] *
 		weights[point];
-};
+}
 
+template<int dim> void
+MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
+						const FiniteElement<dim> &low,
+						dFMatrix& result)
+{
+  result.reinit (high.total_dofs, low.total_dofs);
 
-
-
+  vector<Point<dim> > unit_support_points (high.total_dofs);
+  high.get_unit_support_points (unit_support_points);
+  
+  for (unsigned int i=0; i<high.total_dofs; ++i)
+    for (unsigned int j=0; j<low.total_dofs; ++j)
+      result(i,j) = low.shape_value (j, unit_support_points[i]);
+}
 
 
 
