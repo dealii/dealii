@@ -308,7 +308,7 @@ class ParameterHandler;
  * details of the viewpoint, light source, etc.
  *
  *
- * @author Wolfgang Bangerth 1999, 2000, 2001; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999
+ * @author Wolfgang Bangerth 1999, 2000, 2001; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999; OpenDX output by Guido Kanschat, 2001; Tecplot output by Benjamin Shelton Kirk, 2002.
  */
 class DataOutBase 
 {
@@ -1121,6 +1121,62 @@ class DataOutBase
     };
 
     				     /**
+				      * Flags describing the details of
+				      * output in Tecplot format. At
+				      * present no flags are implemented.
+				      */
+    struct TecplotFlags 
+    {
+      private:
+					 /**
+					  * Dummy entry to suppress compiler
+					  * warnings when copying an empty
+					  * structure. Remove this member
+					  * when adding the first flag to
+					  * this structure (and remove the
+					  * @p{private} as well).
+					  */
+	int dummy;
+
+      public:
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * @p{declare_parameters} and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object. Since sometimes
+					  * the size of objects can
+					  * not be determined exactly
+					  * (for example: what is the
+					  * memory consumption of an
+					  * STL @p{std::map} type with a
+					  * certain number of
+					  * elements?), this is only
+					  * an estimate. however often
+					  * quite close to the true
+					  * value.
+					  */
+	unsigned int memory_consumption () const;
+    };
+
+    				     /**
 				      * Flags describing the details
 				      * of output in VTK format. At
 				      * present no flags are
@@ -1254,6 +1310,19 @@ class DataOutBase
 			   const std::vector<std::string>          &data_names,
 			   const GmvFlags                          &flags,
 			   std::ostream                            &out);
+
+    				     /**
+				      * Write the given list of patches
+				      * to the output stream in Tecplot
+				      * format. See the general
+				      * documentation for more information
+				      * on the parameters.
+				      */
+    template <int dim, int spacedim>
+    static void write_tecplot (const typename std::vector<Patch<dim,spacedim> > &patches,
+			       const std::vector<std::string>          &data_names,
+			       const TecplotFlags                      &flags,
+			       std::ostream                            &out);
 
     				     /**
 				      * Write the given list of
@@ -1518,7 +1587,7 @@ class DataOutInterface : private DataOutBase
 				      * the presently supported output
 				      * formats.
 				      */
-    enum OutputFormat { default_format, dx, ucd, gnuplot, povray, eps, gmv, vtk };
+    enum OutputFormat { default_format, dx, ucd, gnuplot, povray, eps, gmv, tecplot, vtk };
 
 				     /**
 				      * Obtain data through the
@@ -1567,6 +1636,15 @@ class DataOutInterface : private DataOutBase
 				      * format.
 				      */
     void write_gmv (std::ostream &out) const;
+
+
+    				     /**
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in Tecplot
+				      * format.
+				      */
+    void write_tecplot (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through the
@@ -1637,6 +1715,12 @@ class DataOutInterface : private DataOutBase
 				      * output in GMV format.
 				      */
     void set_flags (const GmvFlags &gmv_flags);
+
+    				     /**
+				      * Set the flags to be used for
+				      * output in Tecplot format.
+				      */
+    void set_flags (const TecplotFlags &tecplot_flags);
 
     				     /**
 				      * Set the flags to be used for
@@ -1859,6 +1943,15 @@ class DataOutInterface : private DataOutBase
 				      * function.
 				      */
     GmvFlags     gmv_flags;
+
+				     /**
+				      * Flags to be used upon output
+				      * of Tecplot data in one space
+				      * dimension. Can be changed by
+				      * using the @p{set_flags}
+				      * function.
+				      */
+    TecplotFlags tecplot_flags;
 
 				     /**
 				      * Flags to be used upon output

@@ -382,6 +382,25 @@ DataOutBase::GmvFlags::memory_consumption () const
 
 
 
+void DataOutBase::TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
+{};
+
+
+
+void DataOutBase::TecplotFlags::parse_parameters (ParameterHandler &/*prm*/)
+{};
+
+
+unsigned int
+DataOutBase::TecplotFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
+
 void DataOutBase::VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
 {};
 
