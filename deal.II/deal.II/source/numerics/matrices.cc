@@ -1004,7 +1004,11 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
   Assert (high.n_components() == low.n_components(),
 	  ExcInvalidFE());
   
-  result.reinit (low.dofs_per_cell, high.dofs_per_cell);
+  Assert (result.m() == low.dofs_per_cell,
+	  ExcDimensionMismatch(result.m(), low.dofs_per_cell));
+  Assert (result.n() == high.dofs_per_cell,
+	  ExcDimensionMismatch(result.n(), high.dofs_per_cell));
+
 
 				   // Initialize FEValues at the support points
 				   // of the low element.
