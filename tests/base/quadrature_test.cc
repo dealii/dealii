@@ -135,7 +135,8 @@ check_faces (vector<Quadrature<dim-1>*>& quadratures, bool sub)
 	  ++i;
 
 	  quadrature_int=0;
-					   // Check the polynomial x^i*y^i
+					   // Check the polynomial
+	                                   // x^i*y^i*z^i
 
 	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
 	    {
@@ -152,22 +153,23 @@ check_faces (vector<Quadrature<dim-1>*>& quadratures, bool sub)
 	      quadrature_int+=f*weights[x];
 	    }
 	  
-					   // the exact integral is 1/(i+1)
-      switch (dim)
-	{
-	case 2:
-	  exact_int = 2 * (sub ? 2:1) / pow(i+1,dim-1);
-	  break;
-	case 3:
-	  exact_int = 3 * (sub ? 4:1) / pow(i+1,dim-1);
-	  break;
-	}
+					   // the exact integral is
+	                                   // 1/(i+1)^(dim-1)
+	  switch (dim)
+	    {
+	    case 2:
+	      exact_int = 2 * (sub ? 2:1) / (double) (i+1);
+	      break;
+	    case 3:
+	      exact_int = 3 * (sub ? 4:1) / (double) (i+1)/(i+1);
+	      break;
+	    }
       
 	  err = fabs(quadrature_int-exact_int);
 	}
-      while (err<1e-16);
+      while (err<5e-15);
 				       // Uncomment here for testing
-//      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
+      //      deallog << " (Int " << quadrature_int << '-' << exact_int << '=' << err << ")";
       deallog << " is exact for polynomials of degree " << i-1 << endl;
     }
   deallog.pop();
