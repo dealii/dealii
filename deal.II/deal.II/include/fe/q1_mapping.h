@@ -32,10 +32,10 @@ class FEQ1Mapping : public FiniteElement<dim>
 				      */
     FEQ1Mapping (const unsigned int dofs_per_vertex,
 		 const unsigned int dofs_per_line,
-		 const unsigned int dofs_per_quad  =0,
-		 const unsigned int dofs_per_hex   =0,
-		 const unsigned int n_components   =1,
-		 const bool restriction_is_additive=false);
+		 const unsigned int dofs_per_quad,
+		 const unsigned int dofs_per_hex,
+		 const unsigned int n_components,
+		 const vector<bool> restriction_is_additive_flags);
 
     				     /**
 				      * Return the value of the #i#th shape

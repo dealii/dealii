@@ -515,6 +515,62 @@ FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe1,
 
 
 template <int dim>
+vector<bool>
+FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
+						      const unsigned int n_elements) 
+{
+  vector<bool> tmp;
+  for (unsigned int i=0; i<n_elements; ++i)
+    for (unsigned int component=0; component<fe.n_components; ++component)
+      tmp.push_back (fe.restriction_is_additive (component));
+  return tmp;
+};
+
+
+template <int dim>
+vector<bool>
+FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+						      const unsigned int        N1,
+						      const FiniteElement<dim> &fe2,
+						      const unsigned int        N2) 
+{
+  vector<bool> tmp;
+  for (unsigned int i=0; i<N1; ++i)
+    for (unsigned int component=0; component<fe1.n_components; ++component)
+      tmp.push_back (fe1.restriction_is_additive (component));
+  for (unsigned int i=0; i<N2; ++i)
+    for (unsigned int component=0; component<fe2.n_components; ++component)
+      tmp.push_back (fe2.restriction_is_additive (component));
+  return tmp;
+};
+
+
+template <int dim>
+vector<bool>
+FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+						      const unsigned int        N1,
+						      const FiniteElement<dim> &fe2,
+						      const unsigned int        N2,
+						      const FiniteElement<dim> &fe3,
+						      const unsigned int        N3) 
+{
+  vector<bool> tmp;
+  for (unsigned int i=0; i<N1; ++i)
+    for (unsigned int component=0; component<fe1.n_components; ++component)
+      tmp.push_back (fe1.restriction_is_additive (component));
+  for (unsigned int i=0; i<N2; ++i)
+    for (unsigned int component=0; component<fe2.n_components; ++component)
+      tmp.push_back (fe2.restriction_is_additive (component));
+  for (unsigned int i=0; i<N3; ++i)
+    for (unsigned int component=0; component<fe3.n_components; ++component)
+      tmp.push_back (fe3.restriction_is_additive (component));
+  return tmp;
+};
+
+		
+
+
+template <int dim>
 double
 FESystem<dim>::shape_value (const unsigned int i,
 			    const Point<dim>  &p) const

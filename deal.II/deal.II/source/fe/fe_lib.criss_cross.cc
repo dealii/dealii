@@ -310,7 +310,8 @@
 template <>
 FECrissCross<1>::FECrissCross () :
 				   // set more or less invalid data
-		FiniteElement<1> (FiniteElementData<1> (0,0,0,0))
+		FiniteElement<1> (FiniteElementData<1> (0,0,0,0),
+				  vector<bool>())
 {
   Assert (false, ExcNotUseful());
 };
@@ -458,7 +459,8 @@ void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
 
 template <>
 FECrissCross<2>::FECrissCross () :
-		FiniteElement<2> (FiniteElementData<2> (1,0,1,5,1))
+		FiniteElement<2> (FiniteElementData<2> (1,0,1,5,1),
+				  vector<bool> (1, false))
 {
   interface_constraints(0,0) = 1./2.;
   interface_constraints(0,1) = 1./2.;

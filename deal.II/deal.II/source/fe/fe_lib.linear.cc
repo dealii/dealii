@@ -22,7 +22,8 @@ template <> void FEQ1<deal_II_dimension>::initialize_matrices ();
 
 template <>
 FEQ1<1>::FEQ1 () :
-		FEQ1Mapping<1> (1, 0)
+		FEQ1Mapping<1> (1, 0, 0, 0, 1,
+				vector<bool> (1, false))
 {
   initialize_matrices ();
 };
@@ -30,7 +31,8 @@ FEQ1<1>::FEQ1 () :
 
 template <>
 FEQ1<1>::FEQ1 (const int) :
-		FEQ1Mapping<1> (0, 2)
+		FEQ1Mapping<1> (0, 2, 0, 0, 1,
+				vector<bool> (1, false))
 {
   initialize_matrices ();
 };
@@ -165,7 +167,8 @@ void FEQ1<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 
 template <>
 FEQ1<2>::FEQ1 () :
-		FEQ1Mapping<2> (1, 0, 0)
+		FEQ1Mapping<2> (1, 0, 0, 0, 1,
+				vector<bool> (1, false))
 {
   interface_constraints(0,0) = 1./2.;
   interface_constraints(0,1) = 1./2.;
@@ -177,7 +180,8 @@ FEQ1<2>::FEQ1 () :
 
 template <>
 FEQ1<2>::FEQ1 (const int) :
-		FEQ1Mapping<2> (0, 0, 4)
+		FEQ1Mapping<2> (0, 0, 4, 0, 1,
+				vector<bool> (1, false))
 {
   initialize_matrices ();
 };
@@ -433,7 +437,8 @@ void FEQ1<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
 
 template <>
 FEQ1<3>::FEQ1 () :
-		FEQ1Mapping<3> (1, 0, 0, 0)
+		FEQ1Mapping<3> (1, 0, 0, 0, 1,
+				vector<bool> (1, false))
 {
   interface_constraints(0,0) = 1.0/4.0;
   interface_constraints(0,1) = 1.0/4.0;
@@ -455,7 +460,8 @@ FEQ1<3>::FEQ1 () :
 
 template <>
 FEQ1<3>::FEQ1 (const int) :
-		FEQ1Mapping<3> (0, 0, 0, 8)
+		FEQ1Mapping<3> (0, 0, 0, 8, 1,
+				vector<bool> (1, false))
 {
   initialize_matrices ();
 };

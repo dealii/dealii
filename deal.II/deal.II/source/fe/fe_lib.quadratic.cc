@@ -19,7 +19,8 @@ template <> void FEQ2<deal_II_dimension>::initialize_matrices ();
 
 template <>
 FEQ2<1>::FEQ2 () :
-		FEQ1Mapping<1> (1, 1) {
+		FEQ1Mapping<1> (1, 1, 0, 0, 1,
+				vector<bool> (1, false)) {
   initialize_matrices ();
 };
 
@@ -27,7 +28,8 @@ FEQ2<1>::FEQ2 () :
 
 template <>
 FEQ2<1>::FEQ2 (const int) :
-		FEQ1Mapping<1> (0, 3) {
+		FEQ1Mapping<1> (0, 3, 0, 0, 1,
+				vector<bool> (1, false)) {
   initialize_matrices ();
 };
 
@@ -121,7 +123,7 @@ void FEQ2<1>::initialize_matrices () {
 template <>
 double
 FEQ2<1>::shape_value(const unsigned int i,
-			       const Point<1>     &p) const
+		     const Point<1>     &p) const
 {
   Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   const double xi = p(0);
@@ -139,7 +141,7 @@ FEQ2<1>::shape_value(const unsigned int i,
 template <>
 Tensor<1,1>
 FEQ2<1>::shape_grad(const unsigned int i,
-			      const Point<1>    &p) const
+		    const Point<1>    &p) const
 {
   Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   const double xi = p(0);
@@ -162,7 +164,7 @@ FEQ2<1>::shape_grad(const unsigned int i,
 template <>
 Tensor<2,1>
 FEQ2<1>::shape_grad_grad (const unsigned int i,
-				    const Point<1>    &) const
+			  const Point<1>    &) const
 {
   Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
@@ -209,7 +211,7 @@ void FEQ2<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 
 template <>
 void FEQ2<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
-					       FullMatrix<double> &local_mass_matrix) const {
+				     FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
@@ -232,7 +234,8 @@ void FEQ2<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 
 template <>
 FEQ2<2>::FEQ2 () :
-		FEQ1Mapping<2> (1, 1, 1)
+		FEQ1Mapping<2> (1, 1, 1, 0, 1,
+				vector<bool> (1, false))
 {
   interface_constraints(0,2) = 1.0;
   interface_constraints(1,0) = 3./8.;
@@ -249,7 +252,8 @@ FEQ2<2>::FEQ2 () :
 
 template <>
 FEQ2<2>::FEQ2 (const int) :
-		FEQ1Mapping<2> (0, 0, 9)
+		FEQ1Mapping<2> (0, 0, 9, 0, 1,
+				vector<bool> (1, false))
 {
   initialize_matrices ();
 };
@@ -1121,7 +1125,8 @@ void FEQ2<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 
 template <>
 FEQ2<3>::FEQ2 () :
-		FEQ1Mapping<3> (1, 1, 1, 1)
+		FEQ1Mapping<3> (1, 1, 1, 1, 1,
+				vector<bool> (1, false))
 {
   interface_constraints(0,8) = 1.0;
   interface_constraints(1,4) = 1.0;
@@ -1208,7 +1213,8 @@ FEQ2<3>::FEQ2 () :
 
 template <>
 FEQ2<3>::FEQ2 (const int) :
-		FEQ1Mapping<3> (0, 0, 0, 27)
+		FEQ1Mapping<3> (0, 0, 0, 27, 1,
+				vector<bool> (1, false))
 {
   initialize_matrices ();
 };

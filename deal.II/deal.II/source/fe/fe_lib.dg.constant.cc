@@ -18,7 +18,7 @@ FEDG_Q0<dim>::FEDG_Q0 () :
 				  (dim==2 ? 1 : 0),
 				  (dim==3 ? 1 : 0),
 				  1,
-				  true)
+				  vector<bool> (1, true))
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     { 

@@ -28,8 +28,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_quad,
 					   const unsigned int dofs_per_hex,
 					   const unsigned int n_transform_functions,
-					   const unsigned int n_components,
-					   const bool restriction_is_additive) :
+					   const unsigned int n_components) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(dofs_per_quad),
@@ -52,8 +51,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				      * dofs_per_line),
 		total_dofs (first_hex_index+dofs_per_hex),
 		n_transform_functions (n_transform_functions),
-		n_components(n_components),
-		restriction_is_additive(restriction_is_additive)
+		n_components(n_components)
 {
   Assert(dim==3, ExcDimensionMismatch(3,dim));
 };
@@ -65,8 +63,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
 					   const unsigned int dofs_per_quad,
 					   const unsigned int n_transform_functions,
-					   const unsigned int n_components,
-					   const bool restriction_is_additive) :
+					   const unsigned int n_components) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(dofs_per_quad),
@@ -85,8 +82,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				      * dofs_per_line),
 		total_dofs (first_quad_index+dofs_per_quad),
 		n_transform_functions (n_transform_functions),
-		n_components(n_components),
-		restriction_is_additive(restriction_is_additive)
+		n_components(n_components)
 {
   Assert(dim==2, ExcDimensionMismatch(2,dim));
 };
@@ -97,8 +93,7 @@ template <int dim>
 FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
 					   const unsigned int n_transform_functions,
-					   const unsigned int n_components,
-					   const bool restriction_is_additive) :
+					   const unsigned int n_components) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(0),
@@ -116,8 +111,7 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				      * dofs_per_line),
 		total_dofs (first_line_index+dofs_per_line),
 		n_transform_functions (n_transform_functions),
-		n_components(n_components),
-		restriction_is_additive(restriction_is_additive)
+		n_components(n_components)
 {
   Assert(dim==1, ExcDimensionMismatch(1,dim));
 };
@@ -139,8 +133,7 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 	  (dofs_per_quad == f.dofs_per_quad) &&
 	  (dofs_per_hex == f.dofs_per_hex) &&
 	  (n_transform_functions == f.n_transform_functions) &&
-	  (n_components == f.n_components) &&
-	  (restriction_is_additive == f.restriction_is_additive));
+	  (n_components == f.n_components));
 };
 
 
@@ -150,14 +143,19 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 
 
 template <int dim>
-FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data) :
+FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data,
+					   const vector<bool> &restriction_is_additive_flags) :
 		FiniteElementData<dim> (fe_data),
 		system_to_component_table(total_dofs),
 		face_system_to_component_table(dofs_per_face),
 		component_to_system_table(n_components, vector<unsigned>(total_dofs)),
 		face_component_to_system_table(n_components, vector<unsigned>(dofs_per_face)),
-		component_to_base_table(n_components)
+		component_to_base_table(n_components),
+		restriction_is_additive_flags(restriction_is_additive_flags)
 {
+  Assert(restriction_is_additive_flags.size()==fe_data.n_components,
+	 ExcWrongFieldDimension(restriction_is_additive_flags.size(),fe_data.n_components));
+
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
       restriction[i].reinit (total_dofs, total_dofs);
@@ -250,14 +248,14 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 
 
 
-
-
 /*------------------------------- FiniteElement ----------------------*/
 
 
 template <int dim>
-FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data) :
-		FiniteElementBase<dim> (fe_data) {};
+FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data,
+				   const vector<bool> restriction_is_additive_flags) :
+		FiniteElementBase<dim> (fe_data,
+					restriction_is_additive_flags) {};
 
 #if deal_II_dimension == 1
 

@@ -443,6 +443,40 @@ class FESystem : public FiniteElement<dim>
 			  const FiniteElementData<dim> &fe3,
 			  const unsigned int            N3);
 
+   
+				     /**
+				      * Helper function used in the constructor:
+				      * takes a #FiniteElement# object
+				      * and returns an boolean vector including
+				      * the #restriction_is_additive_flags# of
+				      * the mixed element consisting of #N#
+				      * elements of the sub-element #fe#.
+				      */
+    static vector<bool>
+    compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
+					   const unsigned int        N);
+    				     /**
+				      * Same as above for mixed elements
+				      * with two different sub-elements.
+				      */
+    static vector<bool>
+    compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+					   const unsigned int        N1,
+					   const FiniteElement<dim> &fe2,
+					   const unsigned int        N2);
+
+    				     /**
+				      * Same as above for mixed elements
+				      * with three different sub-elements.
+				      */
+    static vector<bool>
+    compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+					   const unsigned int        N1,
+					   const FiniteElement<dim> &fe2,
+					   const unsigned int        N2,
+					   const FiniteElement<dim> &fe3,
+					   const unsigned int        N3);
+    
 				     /**
 				      * This function is simply singled out of
 				      * the constructor. It sets up the
@@ -494,32 +528,11 @@ FESystem<dim>::n_base_elements() const
 
 
 
-template<int dim>
-inline unsigned int
-FESystem<dim>::element_multiplicity(unsigned int index) const
-{
-  Assert (index < base_elements.size(), 
-	  ExcIndexRange(index, 0, base_elements.size()));
-  return base_elements[index].second;
-}
-
-
-
-template <int dim>
-inline const FiniteElement<dim>&
-FESystem<dim>::base_element(unsigned int index) const
-{
-  Assert (index < base_elements.size(), 
-	  ExcIndexRange(index, 0, base_elements.size()));
-  return *base_elements[index].first;
-}
-
-
-
 template <int dim>
 template <class FE>
 FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
-		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements)),
+		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements),
+				    compute_restriction_is_additive_flags (fe, n_elements)),
 		base_elements(1)
 {
   base_elements[0] = ElementPair(new FE, n_elements);
@@ -534,7 +547,9 @@ template <class FE1, class FE2>
 FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 			 const FE2 &fe2, const unsigned int n2)
 		:
-		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2)),
+		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2),
+				    compute_restriction_is_additive_flags (fe1, n1,
+									   fe2, n2)),
 		base_elements(2)
 {
   Assert(fe1.n_transform_functions == fe2.n_transform_functions,
@@ -557,7 +572,10 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 		:
 		FiniteElement<dim> (multiply_dof_numbers(fe1, n1,
 							 fe2, n2,
-							 fe3, n3)),
+							 fe3, n3),
+				    compute_restriction_is_additive_flags (fe1, n1,
+									   fe2, n2,
+									   fe3, n3)),
 		base_elements(3)
 {
   Assert(fe1.n_transform_functions == fe2.n_transform_functions,
@@ -573,6 +591,31 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
   base_elements[2].first -> subscribe ();
   initialize ();
 };
+
+
+
+template<int dim>
+inline unsigned int
+FESystem<dim>::element_multiplicity(unsigned int index) const
+{
+  Assert (index < base_elements.size(), 
+	  ExcIndexRange(index, 0, base_elements.size()));
+  return base_elements[index].second;
+}
+
+
+
+template <int dim>
+inline const FiniteElement<dim>&
+FESystem<dim>::base_element(unsigned int index) const
+{
+  Assert (index < base_elements.size(), 
+	  ExcIndexRange(index, 0, base_elements.size()));
+  return *base_elements[index].first;
+}
+
+
+
 
 
 

@@ -24,12 +24,12 @@ FEQ1Mapping<1>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const bool restriction_is_additive) :
+			     const vector<bool> restriction_is_additive_flags) :
 		FiniteElement<1> (FiniteElementData<1> (dofs_per_vertex,
 							dofs_per_line,
 							GeometryInfo<1>::vertices_per_cell,
-							n_components,
-							restriction_is_additive))
+							n_components),
+				  restriction_is_additive_flags)
 {
   Assert (dofs_per_quad==0, ExcInvalidData());
   Assert (dofs_per_hex==0,  ExcInvalidData());
@@ -147,13 +147,13 @@ FEQ1Mapping<2>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const bool restriction_is_additive) :
+			     const vector<bool> restriction_is_additive_flags) :
 		FiniteElement<2> (FiniteElementData<2> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
 							GeometryInfo<2>::vertices_per_cell,
-							n_components,
-							restriction_is_additive))
+							n_components),
+				  restriction_is_additive_flags)
 {
   Assert (dofs_per_hex == 0, ExcInvalidData());
 };
@@ -321,14 +321,14 @@ FEQ1Mapping<3>::FEQ1Mapping (const unsigned int dofs_per_vertex,
 			     const unsigned int dofs_per_quad,
 			     const unsigned int dofs_per_hex,
 			     const unsigned int n_components,
-			     const bool restriction_is_additive) :
+			     const vector<bool> restriction_is_additive_flags) :
 		FiniteElement<3> (FiniteElementData<3> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
 							dofs_per_hex,
 							GeometryInfo<3>::vertices_per_cell,
-							n_components,
-							restriction_is_additive))
+							n_components),
+				  restriction_is_additive_flags)
 {};
 
 

@@ -680,9 +680,6 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
       
       interpolated_values.clear ();
 
-      const bool restriction_is_additive 
-	= dof_handler->get_fe().restriction_is_additive;
-
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
 	   ++child)
 	{
@@ -702,18 +699,18 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
 					   // end in adding up the contribution
 					   // from nodes on boundaries of
 					   // children more than once.
-	  if (restriction_is_additive) 
+	  for (unsigned int i=0; i<total_dofs; ++i)
 	    {
-	      for (unsigned int i=0; i<total_dofs; ++i)
+	      const unsigned int component
+		= dof_handler->get_fe().system_to_component_index(i).first;
+	  
+	      if (dof_handler->get_fe().restriction_is_additive(component)) 
 		interpolated_values(i) += tmp2(i);
-	    } 
-	  else
-	    {  
-	      for (unsigned int i=0; i<total_dofs; ++i)
+	      else
 		if (tmp2(i) != 0)
 		  interpolated_values(i) = tmp2(i);
-	    };
-	};
+	    } 
+	}
     };
 };
 
