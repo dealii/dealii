@@ -233,7 +233,7 @@ namespace PETScWrappers
                                         * vectors.
                                         */ 
       void reinit (const unsigned int N,
-                   const bool         fast=false,
+                   const bool         fast = false,
                    const unsigned int local_size = 0);
     
                                        /**
@@ -247,7 +247,7 @@ namespace PETScWrappers
                                         * fast)}.
                                         */
       void reinit (const VectorBase &V,
-                   const bool    fast=false);
+                   const bool        fast = false);
 
                                        /**
                                         * Set all entries to zero. Equivalent
