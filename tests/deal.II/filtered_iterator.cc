@@ -110,11 +110,11 @@ void test ()
 				   // on some level in a different way
   if (true)
     {
+      bool (*predicate) (const active_cell_iterator)
+	= &level_equal_to_3<active_cell_iterator>;
       FilteredIterator<active_cell_iterator>
-	begin (&level_equal_to_3<active_cell_iterator>,
-	       tria.begin_active (3)),
-	end   (&level_equal_to_3<active_cell_iterator>,
-	       tria.end());
+	begin (predicate, tria.begin_active (3)),
+	end   (predicate, tria.end());
       
       Assert (std::distance (begin, end) ==
 	      static_cast<signed int>(tria.n_active_cells (3)),
@@ -133,10 +133,12 @@ void test ()
 				   // way
   if (true)
     {
+      bool (*predicate) (const active_cell_iterator, const unsigned int)
+	= &level_equal_to<active_cell_iterator>;
       FilteredIterator<active_cell_iterator>
-	begin (std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3),
+	begin (std::bind2nd (std::ptr_fun(predicate), 3),
 	       tria.begin_active (3)),
-	end   (std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3),
+	end   (std::bind2nd (std::ptr_fun(predicate), 3),
 	       tria.end());
       
       Assert (std::distance (begin, end) ==
@@ -156,13 +158,17 @@ void test ()
     {
       typedef FilteredIterator<active_cell_iterator> FI;
             
-      Assert (std::distance (FI(std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3)).set_to_next_positive(tria.begin_active()),
-			     FI(std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3), tria.end())) ==
+      bool (*predicate) (const active_cell_iterator, const unsigned int)
+	= &level_equal_to<active_cell_iterator>;
+      Assert (std::distance (FI(std::bind2nd (std::ptr_fun(predicate), 3))
+			     .set_to_next_positive(tria.begin_active()),
+			     FI(std::bind2nd (std::ptr_fun(predicate), 3), tria.end())) ==
 	      static_cast<signed int>(tria.n_active_cells (3)),
 	      ExcInternalError());
       logfile << "Check 4: "
-	      << (std::distance (FI(std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3)).set_to_next_positive(tria.begin_active()),
-				 FI(std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3), tria.end())) ==
+	      << (std::distance (FI(std::bind2nd (std::ptr_fun(predicate), 3))
+				 .set_to_next_positive(tria.begin_active()),
+				 FI(std::bind2nd (std::ptr_fun(predicate), 3), tria.end())) ==
 		  static_cast<signed int>(tria.n_active_cells (3))
 		  ?
 		  "OK" : "Failed")
