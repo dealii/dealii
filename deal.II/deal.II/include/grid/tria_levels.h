@@ -10,6 +10,7 @@
 #include <vector>
 #include <grid/tria_line.h>
 #include <grid/tria_quad.h>
+#include <grid/tria_hex.h>
 #include <base/point.h>
 
 
@@ -173,6 +174,7 @@ class TriangulationLevel<0> {
  *  this one.
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
+ *  @author Wolfgang Bangerth, 1998
  */
 template <>
 class TriangulationLevel<1> : public TriangulationLevel<0> {
@@ -243,7 +245,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 					 /**
 					  * Store boundary and material data. In
 					  * one dimension, this field stores
-					  * the material id of a line, which is
+					  * the material id of a line, which is a
 					  * number between 0 and 254. In more
 					  * than one dimension, lines have no
 					  * material id, but they may be at the
@@ -321,6 +323,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
  *  #TriangulationLevel<1>#.
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
+ *  @author Wolfgang Bangerth, 1998
  */
 template <>
 class TriangulationLevel<2> :  public TriangulationLevel<1>
@@ -361,7 +364,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					 /**
 					  * Store boundary and material data. In
 					  * two dimension, this field stores
-					  * the material id of a quad, which is
+					  * the material id of a quad, which is a
 					  * number between 0 and 254. In more
 					  * than two dimensions, quads have no
 					  * material id, but they may be at the
@@ -396,6 +399,114 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *  Data about the quads.
 				      */
     QuadsData quads;
+
+    				     /**
+				      *  Assert that enough space is allocated
+				      *  to accomodate #new_quads# new quads.
+				      */
+    void reserve_space (const unsigned int new_quads);
+
+				     /**
+				      *  Check the memory consistency of the
+				      *  different containers. Should only be
+				      *  called with the prepro flag #DEBUG#
+				      *  set. The function should be called from
+				      *  the functions of the higher
+				      *  #TriangulationLevel# classes.
+				      */
+    void monitor_memory (const unsigned int true_dimension) const;
+};
+
+
+
+
+/**
+ *  Store all information which belongs to one level of the multilevel hierarchy.
+ *
+ *  In 3D this is a vector of the lines, one of quads and one of the
+ *  hexaeders on this levels, as well as a the associated vectors holding
+ *  information about the children of these lines, quads and hexs.
+ *
+ *  The vectors of lines and quads and their children are derived from
+ *  #TriangulationLevel<2>#.
+ *
+ *  @memo Information belonging to one level of the multilevel hierarchy.
+ *  @author Wolfgang Bangerth, 1998
+ */
+template <>
+class TriangulationLevel<3> :  public TriangulationLevel<2>
+{
+				     /**
+				      *  This subclass groups together all that
+				      *  is needed to describe the hexs on one
+				      *  level.
+				      *
+				      *  It is fully analogous to the
+				      *  #LinesData# structure inherited from
+				      *  #Triangulation<1>#.
+				      */
+    struct HexesData {
+					 /**
+					  *  Same as for the #lines# array.
+					  */
+	vector<Hexahedron> hexes;
+					 /**
+					  *  Same as for the #LineData::chilren#
+					  *  array, but since there are four
+					  *  children, the index points to the
+					  *  first while the other three are
+					  *  following immediately afterwards.
+					  */
+	vector<int>  children;
+
+					 /**
+					  *  Same as for #LineData::used#.
+					  */
+	vector<bool> used;
+
+					 /**
+					  *  Same as for #LineData::used#.
+					  */
+	vector<bool> user_flags;
+
+					 /**
+					  * Store boundary and material data. In
+					  * two dimension, this field stores
+					  * the material id of a hex, which is a
+					  * number between 0 and 254. In more
+					  * than three dimensions, hexes have no
+					  * material id, but they may be at the
+					  * boundary; then, we store the
+					  * boundary indicator in this field,
+					  * which denotes to which part of the
+					  * boundary this line belongs and which
+					  * boundary conditions hold on this
+					  * part. The boundary indicator also
+					  * is a number between zero and 254;
+					  * the id 255 is reserved for hexes
+					  * in the interior and may be used
+					  * to check whether a hex is at the
+					  * boundary or not, which otherwise
+					  * is not possible if you don't know
+					  * which cell it belongs to.
+					  */
+	vector<unsigned char> material_id;
+
+    
+					 /**
+					  * Pointer which is not used by the
+					  * library but may be accessed an set
+					  * by the user to handle data local to
+					  * a line/quad/etc.
+					  */
+	vector<void*> user_pointers;
+    };
+    
+  public:
+				     /**
+				      *  Data about the hexes.
+				      */
+    HexesData hexes;
 
     				     /**
 				      *  Assert that enough space is allocated

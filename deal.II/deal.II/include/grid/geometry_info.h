@@ -14,7 +14,7 @@ template <int dim> struct GeometryInfo;
 
 /**
  *  Publish some information about geometrical interconnections to the
- *  outside world, for one spacial dimension in this case. These are,
+ *  outside world, for one spatial dimension in this case. These are,
  *  for example the numbers of children per cell, faces per cell, etc,
  *  but also neighborship information, It is especially useful if you
  *  want to loop over all faces in any space dimension, but don't want
@@ -61,7 +61,7 @@ struct GeometryInfo<1> {
 
 /**
  *  Publish some information about geometrical interconnections to the
- *  outside world, for two spacial dimensions in this case. These are,
+ *  outside world, for two spatial dimensions in this case. These are,
  *  for example the numbers of children per cell, faces per cell, etc,
  *  but also neighborship information, It is especially useful if you
  *  want to loop over all faces in any space dimension, but don't want
@@ -139,6 +139,61 @@ struct GeometryInfo<2> {
 				      */
     static unsigned int child_cell_on_face (unsigned int face,
 					    unsigned int subface);
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int,
+		    int,
+		    << "Invalid index " << arg1
+		    << ", index must be between 0 and " << arg2 << ".");
+};
+
+
+
+/**
+ *  Publish some information about geometrical interconnections to the
+ *  outside world, for three spatial dimensions in this case. These are,
+ *  for example the numbers of children per cell, faces per cell, etc,
+ *  but also neighborship information, It is especially useful if you
+ *  want to loop over all faces in any space dimension, but don't want
+ *  to think about their number in a dimension independent expression.
+ *  This not only reduces thinking effort but also error possibilities.
+ */
+template <>
+struct GeometryInfo<3> {
+  public:
+				     /**
+				      * Present dimension
+				      */
+    static const unsigned int dim               = 3;
+
+				     /**
+				      * Number of children a cell has.
+				      */
+    static const unsigned int children_per_cell = (1<<dim);
+
+				     /**
+				      * Number of faces a cell has.
+				      */
+    static const unsigned int faces_per_cell    = 2*dim;
+
+				     /**
+				      * Number of children each face has
+				      * when the adjacent cell is refined.
+				      */
+    static const unsigned int subfaces_per_face = (1<<(dim-1));
+
+				     /**
+				      * Number of vertices a cell has.
+				      */
+    static const unsigned int vertices_per_cell = (1<<dim);
+
+				     /**
+				      * Number of vertices each face has.
+				      */
+    static const unsigned int vertices_per_face = (1<<(dim-1));
 
 				     /**
 				      * Exception
