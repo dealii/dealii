@@ -73,14 +73,21 @@ void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 					    const vector<string> &names)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
+
+				   // check for allowed sizes of
+				   // vectors
+  Assert ((vec.size() == dofs->get_tria().n_active_cells()) ||
+	  (vec.size() == dofs->n_dofs()),
+	  ExcInvalidVectorSize(vec.size(), dofs->get_tria().n_active_cells(), dofs->n_dofs()));
+  
 				   // either cell data and one name,
 				   // or dof data and n_components names
-  Assert (((vec.size() == dofs->get_tria().n_active_cells()) &&
-	   (names.size() == 1))
-	  ||
-	  ((vec.size() == dofs->n_dofs()) &&
-	   (names.size() == dofs->get_fe().n_components())),
-	  ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
+  if (vec.size() == dofs->get_tria().n_active_cells())
+    Assert (names.size() == 1,
+	    ExcInvalidNumberOfNames (names.size(), 1));
+  if (vec.size() == dofs->n_dofs())
+    Assert (names.size() == dofs->get_fe().n_components(),
+	    ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
