@@ -634,6 +634,15 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * argument.
 				      */
     UpdateFlags compute_update_flags (const UpdateFlags update_flags) const;
+
+				     /**
+				      * Returns reference to default
+				      * @p{MappingQ1} object. Needed
+				      * by constructors of derived
+				      * classes that uses
+				      * @p{MappingQ1} implicitely.
+				      */
+    static const Mapping<dim> &get_default_mapping();
 };
 
 
@@ -1032,7 +1041,7 @@ FEValuesBase<dim>::get_mapping () const
 }
 
 
-/*------------------------ Inline functions: FEFaceValuesBase --------------------*/
+/*------------------------ Inline functions: FEValues ----------------------------*/
 
 
 template <int dim>
@@ -1041,7 +1050,6 @@ FEValues<dim>::get_quadrature () const
 {
   return quadrature;
 };
-
 
 
 /*------------------------ Inline functions: FEFaceValuesBase --------------------*/
