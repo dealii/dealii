@@ -433,7 +433,7 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				   // quotients of gradients in each
 				   // direction (first index) and at
 				   // all q-points (second index)
-  vector2d<Tensor<1,dim> >    diff_quot (dim, n_q_points);
+  Table<2,Tensor<1,dim> >    diff_quot (dim, n_q_points);
   std::vector<Tensor<1,dim> > diff_quot2 (n_q_points);
 
 				   // for all shape functions at all

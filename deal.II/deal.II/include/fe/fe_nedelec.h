@@ -437,7 +437,7 @@ class FE_Nedelec : public FiniteElement<dim>
 					  * multiplication with the
 					  * Jacobian of the mapping.
 					  */
-	vector2d<Tensor<1,dim> > shape_values;
+	Table<2,Tensor<1,dim> > shape_values;
 
 					 /**
 					  * Array with shape function
@@ -457,7 +457,7 @@ class FE_Nedelec : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */
-	vector2d<Tensor<2,dim> > shape_gradients;
+	Table<2,Tensor<2,dim> > shape_gradients;
     };
     
 				     /**

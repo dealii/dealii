@@ -176,7 +176,7 @@ MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 
 
 
-//TODO: Replace FullMatrix by vector2d<bool>
+//TODO: Replace FullMatrix by Table<2,bool>
 template<int dim, class SparsityPattern>
 void
 MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,

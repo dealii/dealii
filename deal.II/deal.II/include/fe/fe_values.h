@@ -20,7 +20,7 @@
 #include <base/point.h>
 #include <base/tensor.h>
 #include <base/quadrature.h>
-#include <base/vector2d.h>
+#include <base/table.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
@@ -94,7 +94,7 @@ class FEValuesData
 				      * thus have a row in the array
 				      * presently under discussion.
 				      */
-    typedef vector2d<double> ShapeVector;
+    typedef Table<2,double> ShapeVector;
 
 				     /**
 				      * Storage type for
@@ -102,13 +102,13 @@ class FEValuesData
 				      * is the same as for the
 				      * @ref{ShapeVector} data type.
 				      */
-    typedef vector2d<Tensor<1,dim> > GradientVector;
+    typedef Table<2,Tensor<1,dim> > GradientVector;
 
 				     /**
 				      * Likewise for second order
 				      * derivatives.
 				      */
-    typedef vector2d<Tensor<2,dim> > GradGradVector;
+    typedef Table<2,Tensor<2,dim> > GradGradVector;
     
 				     /**
 				      * Store the values of the shape

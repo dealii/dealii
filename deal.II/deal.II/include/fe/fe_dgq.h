@@ -434,7 +434,7 @@ class FE_DGQ : public FiniteElement<dim>
 					  * them over when visiting a
 					  * concrete cell.
 					  */
-	vector2d<double> shape_values;
+	Table<2,double> shape_values;
 	
 					 /**
 					  * Array with shape function
@@ -454,7 +454,7 @@ class FE_DGQ : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */				      
-	vector2d<Tensor<1,dim> > shape_gradients;
+	Table<2,Tensor<1,dim> > shape_gradients;
     };
     
 				     /**

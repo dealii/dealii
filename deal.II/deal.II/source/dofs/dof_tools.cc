@@ -475,14 +475,14 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
   const unsigned int total_dofs = fe.dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(total_dofs);
   std::vector<unsigned int> dofs_on_other_cell(total_dofs);
-  vector2d<bool> support_on_face(total_dofs, GeometryInfo<dim>::faces_per_cell);
+  Table<2,bool> support_on_face(total_dofs, GeometryInfo<dim>::faces_per_cell);
   
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 						 endc = dof.end();
 
 
-  vector2d<char> int_dof_mask(total_dofs, total_dofs);
-  vector2d<char> flux_dof_mask(total_dofs, total_dofs);
+  Table<2,char> int_dof_mask(total_dofs, total_dofs);
+  Table<2,char> flux_dof_mask(total_dofs, total_dofs);
 
   for (unsigned int i=0; i<total_dofs; ++i)
     {

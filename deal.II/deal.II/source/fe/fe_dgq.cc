@@ -88,7 +88,7 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
   else
 				     // matrix undefined, set size to zero
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->prolongation[i].reinit(0);
+      this->prolongation[i].reinit(0, 0);
 
 				   // same as above: copy over matrix
 				   // from predefined values and
@@ -134,7 +134,7 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
   else
 				     // matrix undefined, set size to zero
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->restriction[i].reinit(0);
+      this->restriction[i].reinit(0, 0);
 
   
 				   // finally fill in support points
