@@ -3,7 +3,8 @@
 #include <base/logstream.h>
 #include <base/job_identifier.h>
 
-//#include <sys/rusage.h>
+#include <sys/resource.h>
+#include <iomanip>
 
 LogStream deallog;
 
@@ -15,6 +16,7 @@ LogStream::LogStream()
 		  print_utime(false)
 {
   prefixes.push("DEAL:");
+  std_out->setf(ios::showpoint | ios::left);
 }
 
 
@@ -24,6 +26,7 @@ void
 LogStream::attach(ostream& o)
 {
   file = &o;
+  o.setf(ios::showpoint | ios::left);
   o << dealjobid();
 }
 
@@ -62,11 +65,31 @@ LogStream::depth_file(unsigned n)
 void
 LogStream::print_line_head()
 {
+  rusage usage;
+  float utime = 0.;
+  if (print_utime)
+    {
+      getrusage(RUSAGE_SELF, &usage);
+      utime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+    }
+  
   if (prefixes.size() <= std_depth)
+    {
+      if (print_utime)
+	{
+	  *std_out << utime << ':';
+	}
     *std_out << prefixes.top() << ':';
-
+    }
+  
   if (file && (prefixes.size() <= file_depth))
+    {
+      if (print_utime)
+	{
+	  *file << utime << ':';
+	}  
     *file << prefixes.top() << ':';
+    }
 }
 
 
