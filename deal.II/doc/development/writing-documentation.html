@@ -118,6 +118,18 @@
     included into the online documentation of the class.
     </p>
 
+    <p>
+    There is one exception to the rule that every member can be
+    documented separately: due to internal restrictions of the
+    <code>kdoc2</code> tool by which the documentation is generated,
+    elements of en enumeration type (i.e. an <code>enum</code> object
+    in technical terminus) may not be documented right above their
+    declaration, but must be documented atop of the <code>enum</code>
+    declaration. (This is due to the fact that inside enums,
+    <code>kdoc2</code> does not parse the elements separately at
+    present, but rather the whole enum as one.)
+    </p>
+
     
     <h4>Extended Layout</h4>
 
