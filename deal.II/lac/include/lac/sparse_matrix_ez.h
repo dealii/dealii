@@ -801,12 +801,12 @@ class SparseMatrixEZ : public Subscriptor
 				      * STL-like iterator with the
 				      * first entry of row @p{r}.
 				      */
-    const_iterator begin (unsigned int r) const;
+    const_iterator begin (const unsigned int r) const;
 
 				     /**
 				      * Final iterator of row @p{r}.
 				      */
-    const_iterator end (unsigned int r) const;
+    const_iterator end (const unsigned int r) const;
     
 				     /**
 				      * Return the number of nonzero
@@ -1393,7 +1393,7 @@ SparseMatrixEZ<number>::end () const
 template <typename number>
 inline
 typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::begin (unsigned int r) const
+SparseMatrixEZ<number>::begin (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r, 0);
@@ -1402,7 +1402,7 @@ SparseMatrixEZ<number>::begin (unsigned int r) const
 template <typename number>
 inline
 typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::end (unsigned int r) const
+SparseMatrixEZ<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r+1, 0);

@@ -864,12 +864,12 @@ class SparseMatrix : public Subscriptor
 				      * STL-like iterator with the
 				      * first entry of row @p{r}.
 				      */
-    const_iterator begin (unsigned int r) const;
+    const_iterator begin (const unsigned int r) const;
 
 				     /**
 				      * Final iterator of row @p{r}.
 				      */
-    const_iterator end (unsigned int r) const;
+    const_iterator end (const unsigned int r) const;
     
 				     /**
 				      * Print the matrix to the given
@@ -1486,7 +1486,7 @@ SparseMatrix<number>::end () const
 template <typename number>
 inline
 typename SparseMatrix<number>::const_iterator
-SparseMatrix<number>::begin (unsigned int r) const
+SparseMatrix<number>::begin (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r, 0);
@@ -1495,7 +1495,7 @@ SparseMatrix<number>::begin (unsigned int r) const
 template <typename number>
 inline
 typename SparseMatrix<number>::const_iterator
-SparseMatrix<number>::end (unsigned int r) const
+SparseMatrix<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r+1, 0);
