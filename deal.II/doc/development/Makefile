@@ -54,7 +54,6 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>include-path-contrib-hsl=$(include-path-contrib-hsl)</code>' >> $@
 	@echo '<li><code>include-path-contrib-petsc=$(include-path-contrib-petsc)</code>' >> $@
 	@echo '<li><code>include-path-contrib-petsc-bmake=$(include-path-contrib-petsc-bmake)</code>' >> $@
-	@echo '<li><code>include-path-contrib-petsc-mpi=$(include-path-contrib-petsc-mpi)</code>' >> $@
 	@echo '<li><code>include-path-contrib-metis=$(include-path-contrib-metis)</code>' >> $@
 	@echo '<li><code>INCLUDE=$(INCLUDE)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.g=$(CXXFLAGS.g)</code>' >> $@
