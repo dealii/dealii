@@ -5,37 +5,13 @@
 #include <lac/vector.h>
 
 void
-MultiGrid::vmult(Vector<double>& dst, const Vector<double>& src) const
-{
-  dst = 0.;
-  
-  copy_to_mg(s,src);
-  
-  for (unsigned l=0;l<maxlevel;++l)
-  {
-    level_active_vmult(l,d[l],s[l]);
-  }
-  copy_from_mg(dst,d);
-}
-
-
-void
-MultiGrid::precondition(Vector<double>& dst, const Vector<double>& src) const
-{
-  copy_to_mg(s,src);
-  copy_to_mg(d,dst);
-  level_mgstep(maxlevel);
-}
-
-
-void
-MultiGrid::level_mgstep(unsigned level) const
+MultiGridBase::level_mgstep(unsigned level)
 {
   if (level == minlevel)
-  {
-    coarse_grid_solution(level, d[level], s[level]);
-    return;
-  }
+    {
+      coarse_grid_solution(level, d[level], s[level]);
+      return;
+    }
   
   smooth(level, d[level], s[level], n_pre_smooth);
 
@@ -43,9 +19,12 @@ MultiGrid::level_mgstep(unsigned level) const
 }
 
 
-void MultiGrid::post_smooth(unsigned level,
-			    Vector<double>& dst, const Vector<double>& src,
-			    unsigned steps) const
+void MultiGridBase::post_smooth(unsigned level,
+				Vector<float>& dst, const Vector<float>& src,
+				unsigned steps)
 {
   smooth(level, dst, src, steps);
 }
+
+// ab hier Wolfgang
+
