@@ -95,9 +95,10 @@ class dVector : public VectorBase
     dVector (const dVector& V);
     
 				     /**
-				      *        Constructor. Dimension = N (>0)
+				      * Constructor. Set dimension to #n# and
+				      * initialize all elements with zero.
 				      */
-    dVector (const unsigned int N);
+    dVector (const unsigned int n);
     
 				     /**
 				      *         Destructor. Clears memory
