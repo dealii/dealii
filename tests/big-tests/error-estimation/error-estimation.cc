@@ -72,8 +72,8 @@ class PoissonProblem : public ProblemBase<dim> {
 
     HyperBallBoundary<dim> boundary;
     
-    vector<double> l1_error, l2_error, linfty_error;
-    vector<double> h1_seminorm_error, h1_error, estimated_error;
+    vector<double> l2_error, linfty_error;
+    vector<double> h1_error, estimated_error;
     vector<int>    n_dofs;
 };
 
@@ -269,16 +269,10 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   solve ();
 
   Solution<dim> sol;
-  dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
-  dVector       h1_seminorm_error_per_cell, h1_error_per_cell;
+  dVector       l2_error_per_cell, linfty_error_per_cell, h1_error_per_cell;
   dVector       estimated_error_per_cell;
   QGauss3<dim>  q;
   
-  cout << "    Calculating L1 error... ";
-  integrate_difference (sol, l1_error_per_cell, q, fe, L1_norm);
-  cout << l1_error_per_cell.l1_norm() << endl;
-  l1_error.push_back (l1_error_per_cell.l1_norm());
-
   cout << "    Calculating L2 error... ";
   integrate_difference (sol, l2_error_per_cell, q, fe, L2_norm);
   cout << l2_error_per_cell.l2_norm() << endl;
@@ -288,11 +282,6 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   integrate_difference (sol, linfty_error_per_cell, q, fe, Linfty_norm);
   cout << linfty_error_per_cell.linfty_norm() << endl;
   linfty_error.push_back (linfty_error_per_cell.linfty_norm());
-  
-  cout << "    Calculating H1-seminorm error... ";
-  integrate_difference (sol, h1_seminorm_error_per_cell, q, fe, H1_seminorm);
-  cout << h1_seminorm_error_per_cell.l2_norm() << endl;
-  h1_seminorm_error.push_back (h1_seminorm_error_per_cell.l2_norm());
 
   cout << "    Calculating H1 error... ";
   integrate_difference (sol, h1_error_per_cell, q, fe, H1_norm);
@@ -306,17 +295,14 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
 		     KellyErrorEstimator<dim>::FunctionMap(),
 		     solution,
 		     estimated_error_per_cell);
-  cout << estimated_error_per_cell.l2_norm();
+  cout << estimated_error_per_cell.l2_norm() << endl;
   estimated_error.push_back (estimated_error_per_cell.l2_norm());
-  
-  cout << "    Writing to file..." << endl;
-  dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
-  dVector h1_seminorm_error_per_dof, h1_error_per_dof, estimated_error_per_dof;
-  dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
+
+  dVector l2_error_per_dof, linfty_error_per_dof;
+  dVector h1_error_per_dof, estimated_error_per_dof;
   dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-  dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
-  dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell,
-				      h1_seminorm_error_per_dof);
+  dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
+				      linfty_error_per_dof);
   dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
   dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
 				      estimated_error_per_dof);
@@ -324,24 +310,29 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   
   DataOut<dim> out;
   fill_data (out);
-  out.add_data_vector (l1_error_per_dof, "L1-Error");
   out.add_data_vector (l2_error_per_dof, "L2-Error");
   out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
-  out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
   out.add_data_vector (h1_error_per_dof, "H1-Error");
   out.add_data_vector (estimated_error_per_dof, "Estimated Error");
-//  string filename = "gnuplot.";
-  string filename = "ee.";
+  string filename = "gnuplot.";
+//  string filename = "ee.";
   filename += ('0'+start_level);
-  filename += ".inp";
+//  filename += ".inp";
   cout << "    Writing error plots to <" << filename << ">..." << endl;
   
-//  ofstream gnuplot(filename.c_str());
-//  out.write_gnuplot (gnuplot);
-//  gnuplot.close ();
-  ofstream ucd(filename.c_str());
-  out.write_ucd (ucd);
-  ucd.close();
+  ofstream gnuplot(filename.c_str());
+  out.write_gnuplot (gnuplot);
+  gnuplot.close ();
+//  ofstream ucd(filename.c_str());
+//  out.write_ucd (ucd);
+//  ucd.close();
+  
+  tria->refine_fixed_number (estimated_error_per_cell, 0.3);
+  tria->execute_refinement ();
+  string ref_filename = "gnuplot.ref.";
+  ref_filename += ('0'+start_level);
+  ofstream oxx(ref_filename.c_str());
+  tria->print_gnuplot (oxx);
   
   cout << endl;
 };
@@ -350,49 +341,39 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
 template <int dim>
 void PoissonProblem<dim>::print_history () const {
   ofstream out("gnuplot.history");
-  out << "# n_dofs    l1_error l2_error linfty_error "
-      << "h1_seminorm_error h1_error estimated_error"
+  out << "# n_dofs    l2_error linfty_error "
+      << "h1_error estimated_error"
       << endl;
   for (unsigned int i=0; i<n_dofs.size(); ++i)
     out << n_dofs[i]
 	<< "    "
-	<< l1_error[i] << "  "
 	<< l2_error[i] << "  "
 	<< linfty_error[i] << "  "
-	<< h1_seminorm_error[i] << "  "
 	<< h1_error[i] << "  "
 	<< estimated_error[i]
 	<< endl;
 
-  double average_l1=0,
-	 average_l2=0,
+  double average_l2=0,
      average_linfty=0,
-    average_h1_semi=0,
 	 average_h1=0,
 	average_est=0;
   
   for (unsigned int i=1; i<n_dofs.size(); ++i) 
     {
-      average_l1 += l1_error[i]/l1_error[i-1];
       average_l2 += l2_error[i]/l2_error[i-1];
       average_linfty += linfty_error[i]/linfty_error[i-1];
-      average_h1_semi += h1_seminorm_error[i]/h1_seminorm_error[i-1];
       average_h1 += h1_error[i]/h1_error[i-1];
       average_est += estimated_error[i]/estimated_error[i-1];
     };
 
-  average_l1 /= (l1_error.size()-1);
-  average_l2 /= (l1_error.size()-1);
-  average_linfty /= (l1_error.size()-1);
-  average_h1_semi /= (l1_error.size()-1);
-  average_h1 /= (l1_error.size()-1);
-  average_est /= (l1_error.size()-1);
+  average_l2 /= (l2_error.size()-1);
+  average_linfty /= (l2_error.size()-1);
+  average_h1 /= (l2_error.size()-1);
+  average_est /= (l2_error.size()-1);
 
   cout << "Average error reduction rates for h->h/2:" << endl;
-  cout << "    L1 error         : " << 1./average_l1 << endl
-       << "    L2 error         : " << 1./average_l2 << endl
+  cout << "    L2 error         : " << 1./average_l2 << endl
        << "    Linfty error     : " << 1./average_linfty << endl
-       << "    H1 seminorm error: " << 1./average_h1_semi << endl
        << "    H1 error         : " << 1./average_h1 << endl
        << "    Estimated error  : " << 1./average_est << endl;
 };
@@ -411,3 +392,6 @@ int main () {
 
   return 0;
 };
+
+
+
