@@ -762,7 +762,7 @@ class SparsityPattern : public Subscriptor
 				      * across different runs of the
 				      * program.
 				      */
-    void block_write (ostream &out) const;
+    void block_write (std::ostream &out) const;
 
 				     /**
 				      * Read data that has previously

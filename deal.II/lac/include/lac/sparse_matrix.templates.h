@@ -1174,7 +1174,7 @@ void SparseMatrix<number>::print_formatted (std::ostream &out,
 
 template <typename number>
 void
-SparseMatrix<number>::block_write (ostream &out) const 
+SparseMatrix<number>::block_write (std::ostream &out) const 
 {
   AssertThrow (out, ExcIO());
 
@@ -1194,7 +1194,7 @@ SparseMatrix<number>::block_write (ostream &out) const
 
 template <typename number>
 void
-SparseMatrix<number>::block_read (istream &in)
+SparseMatrix<number>::block_read (std::istream &in)
 {
   AssertThrow (in, ExcIO());
 

@@ -776,7 +776,7 @@ SparsityPattern::bandwidth () const
 
 
 void
-SparsityPattern::block_write (ostream &out) const 
+SparsityPattern::block_write (std::ostream &out) const 
 {
   AssertThrow (out, ExcIO());
 
@@ -803,7 +803,7 @@ SparsityPattern::block_write (ostream &out) const
 
 
 void
-SparsityPattern::block_read (istream &in)
+SparsityPattern::block_read (std::istream &in)
 {
   AssertThrow (in, ExcIO());
 
