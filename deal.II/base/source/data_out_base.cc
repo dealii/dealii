@@ -17,6 +17,7 @@
 #include <base/thread_management.h>
 #include <base/memory_consumption.h>
 
+#include <algorithm>
 #include <iomanip>
 #include <ctime>
 #include <cmath>
