@@ -222,6 +222,22 @@ Point<3>::Point (const double x, const double y, const double z) {
 
 
 
+template <>
+inline
+Point<4>::Point (const double, const double) {
+  Assert (false, ExcInvalidConstructorCalled());
+};
+
+
+
+template <>
+inline
+Point<4>::Point (const double x, const double y, const double z) {
+  Assert (false, ExcInvalidConstructorCalled());
+};
+
+
+
 template <int dim>
 inline
 double Point<dim>::operator () (const unsigned int index) const {
