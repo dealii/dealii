@@ -8,8 +8,8 @@
 //    further information on this license.
 //
 //----------------------------  sparse_ilu.templates.h  ---------------------------
-#ifndef _sparse_ilu_templates_h
-#define _sparse_ilu_templates_h
+#ifndef __deal2__sparse_ilu_templates_h
+#define __deal2__sparse_ilu_templates_h
 
 
 
