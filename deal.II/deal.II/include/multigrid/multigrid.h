@@ -5,8 +5,12 @@
 /*----------------------------   multigrid.h     ---------------------------*/
 
 #include <vector>
-#include <base/subscriptor.h>
+#include <base/smartpointer.h>
 #include <lac/forward-declarations.h>
+#include <lac/vector.h>
+
+class MGTransferBase;
+
 
 /**
  * Basic matrix class for multigrid preconditioning.
@@ -36,10 +40,20 @@ class MultiGridBase
     MultiGridBase(const MultiGridBase&);
     const MultiGridBase& operator=(const MultiGridBase&);
     
-				     /** Auxiliary vectors.
+				     /**
+				      * Auxiliary vector.
 				      */
     vector<Vector<float> > d;
+
+				     /**
+				      * Auxiliary vector.
+				      */
     vector<Vector<float> > s;
+
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector<float> t;
     
 				     /**
 				      * Highest level of cells.
@@ -50,7 +64,12 @@ class MultiGridBase
 				      * Level for coarse grid solution.
 				      */
     unsigned minlevel;
-  
+
+				     /**
+				      * Prolongation and restriction object.
+				      */
+    SmartPointer<MGTransferBase> transfer;
+
 				     /** Tranfer from dVector to
 				      * MGVector.
 				      *
@@ -111,7 +130,7 @@ class MultiGridBase
     virtual void smooth(unsigned level,
 			Vector<float>& x,
 			const Vector<float>& b,
-			unsigned steps);
+			unsigned steps) = 0;
 
 				     /**
 				      * The post-smoothing algorithm.
@@ -123,16 +142,26 @@ class MultiGridBase
 			     unsigned steps);
 
 				     /**
-				      * Apply operator on all
+				      * Apply residual operator on all
 				      * cells of a level.
-				      *
+				      * This is implemented in a
+				      * derived class.
 				      */
-    virtual void level_vmult(unsigned level,
+    virtual void level_residual(unsigned level,
 			     Vector<float>& dst,
-			     const Vector<float>& src);
+			     const Vector<float>& src,
+			     const Vector<float>& rhs) = 0;
 
 				     /**
 				      * Solve exactly on coarsest grid.
+				      * Usually, this function should
+				      * be overloaded by a more
+				      * sophisticated derived
+				      * class. Still, there is a
+				      * standard implementation doing
+				      * #10 * (n_pre_smooth +
+				      * n_post_smooth)#
+				      * smoothing steps.
 				      */
     virtual void coarse_grid_solution(unsigned l,
 				      Vector<float>& dst,
@@ -146,7 +175,9 @@ class MultiGridBase
 				     /**
 				      * Constructor, subject to change.
 				      */
-    MultiGridBase();
+    MultiGridBase(MGTransferBase& transfer,
+		  unsigned maxlevel, unsigned minlevel,
+		  unsigned pre_smooth, unsigned post_smooth);
     virtual ~MultiGridBase();
     
 };
