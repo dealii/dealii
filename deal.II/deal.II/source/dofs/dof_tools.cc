@@ -2993,7 +2993,8 @@ template
 void
 DoFTools::count_dofs_per_component<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &dof_handler,
- std::vector<unsigned int>           &dofs_per_component);
+ std::vector<unsigned int>           &dofs_per_component,
+ std::vector<unsigned int>            guidos_special_arg);
 
 
 template
