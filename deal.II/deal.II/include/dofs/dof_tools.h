@@ -15,6 +15,8 @@
 
 
 #include <base/exceptions.h>
+#include <dofs/function_map.h>
+
 #include <vector>
 #include <set>
 #include <map>
