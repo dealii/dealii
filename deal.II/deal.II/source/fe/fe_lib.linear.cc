@@ -78,6 +78,20 @@ FELinear<1>::shape_grad(const unsigned int i,
 
 
 template <>
+inline
+Tensor<2,1>
+FELinear<1>::shape_grad_grad (const unsigned int i,
+			      const Point<1> &) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+				   // second derivatives on the unit cell
+				   // are always zero
+  return Tensor<2,1>();
+};
+
+
+
+template <>
 void FELinear<1>::get_unit_support_points (vector<Point<1> >  &support_points) const {
   FiniteElement<1>::get_unit_support_points (support_points);
 };
@@ -214,6 +228,19 @@ FELinear<2>::shape_grad (const unsigned int i,
       case 3: return Point<2> (-p(1), 1.-p(0));
     }
   return Point<2> ();
+};
+
+
+
+template <>
+inline
+Tensor<2,2>
+FELinear<2>::shape_grad_grad (const unsigned int i,
+			      const Point<2> &) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+
+  return Tensor<2,2>();
 };
 
 

@@ -185,6 +185,21 @@ class FECrissCross : public FiniteElement<dim> {
 				  const Point<dim>& p) const;
 
 				     /**
+				      * Return the tensor of second derivatives
+				      * of the #i#th shape function at
+				      * point #p# on the unit cell.
+				      *
+				      * The second derivatives are zero almost
+				      * everywhere for this element; however,
+				      * they are singular at the diagonals, so
+				      * when trying to use this tensor, you
+				      * should take special care and you may
+				      * need to do some evaluation by hand.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim>   &p) const = 0;
+
+				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */

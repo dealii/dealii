@@ -331,6 +331,14 @@ Point<1> FECrissCross<1>::shape_grad (const unsigned int, const Point<1> &) cons
 
 
 template <>
+Tensor<2,1> FECrissCross<1>::shape_grad_grad (const unsigned int, const Point<1> &) const {
+  Assert (false, ExcNotUseful());
+  return Tensor<2,1>();
+};
+
+
+
+template <>
 void FECrissCross<1>::get_unit_support_points (vector<Point<1> >&) const {
   Assert (false, ExcNotUseful());
 };
@@ -551,6 +559,21 @@ Point<2> FECrissCross<2>::shape_grad (const unsigned int i, const Point<2> &p) c
 			  ((y>x)   ? Point<2>(-1,1)  : Point<2>(0,0)));
     }
   return Point<2>();
+};
+
+
+template <>
+inline
+Tensor<2,2>
+FECrissCross<2>::shape_grad_grad (const unsigned int i,
+				  const Point<2> &) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+				   // second derivatives on the unit cell
+				   // are always zero, at least almost
+				   // everywhere. see the doc for more
+				   // info
+  return Tensor<2,2>();
 };
 
 

@@ -642,6 +642,79 @@ FEQuadraticSub<2>::shape_grad (const unsigned int i,
 
 
 template <>
+Tensor<2,2>
+FEQuadraticSub<2>::shape_grad_grad (const unsigned int i,
+				    const Point<2>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi = p(0),
+	       eta= p(1);
+  Tensor<2,2> return_value;
+  
+  switch (i)
+    {
+      case 0:
+	    return_value[0][0] = 4.0-12.0*eta+8.0*eta*eta;
+	    return_value[0][1] = 9.0-12.0*xi+2.0*(-6.0+8.0*xi)*eta;
+	    return_value[1][0] = 9.0-12.0*xi+2.0*(-6.0+8.0*xi)*eta;
+	    return_value[1][1] = 4.0-12.0*xi+8.0*xi*xi;
+	    break;
+      case 1:
+	    return_value[0][0] = 4.0-12.0*eta+8.0*eta*eta;
+	    return_value[0][1] = 3.0-12.0*xi+2.0*(-2.0+8.0*xi)*eta;
+	    return_value[1][0] = 3.0-12.0*xi+2.0*(-2.0+8.0*xi)*eta;
+	    return_value[1][1] = -4.0*xi+8.0*xi*xi;
+	    break;
+      case 2:
+	    return_value[0][0] = -4.0*eta+8.0*eta*eta;
+	    return_value[0][1] = 1.0-4.0*xi+2.0*(-2.0+8.0*xi)*eta;
+	    return_value[1][0] = 1.0-4.0*xi+2.0*(-2.0+8.0*xi)*eta;
+	    return_value[1][1] = -4.0*xi+8.0*xi*xi;
+	    break;
+      case 3:
+	    return_value[0][0] = -4.0*eta+8.0*eta*eta;
+	    return_value[0][1] = 3.0-4.0*xi+2.0*(-6.0+8.0*xi)*eta;
+	    return_value[1][0] = 3.0-4.0*xi+2.0*(-6.0+8.0*xi)*eta;
+	    return_value[1][1] = 4.0-12.0*xi+8.0*xi*xi;
+	    break;
+      case 4:
+	    return_value[0][0] = -8.0+24.0*eta-16.0*eta*eta;
+	    return_value[0][1] = -12.0+24.0*xi+2.0*(8.0-16.0*xi)*eta;
+	    return_value[1][0] = -12.0+24.0*xi+2.0*(8.0-16.0*xi)*eta;
+	    return_value[1][1] = 16.0*xi-16.0*xi*xi;
+	    break;
+      case 5:
+	    return_value[0][0] = 16.0*eta-16.0*eta*eta;
+	    return_value[0][1] = -4.0+16.0*xi+2.0*(4.0-16.0*xi)*eta;
+	    return_value[1][0] = -4.0+16.0*xi+2.0*(4.0-16.0*xi)*eta;
+	    return_value[1][1] = 8.0*xi-16.0*xi*xi;
+	    break;
+      case 6:
+	    return_value[0][0] = 8.0*eta-16.0*eta*eta;
+	    return_value[0][1] = -4.0+8.0*xi+2.0*(8.0-16.0*xi)*eta;
+	    return_value[1][0] = -4.0+8.0*xi+2.0*(8.0-16.0*xi)*eta;
+	    return_value[1][1] = 16.0*xi-16.0*xi*xi;
+	    break;
+      case 7:
+	    return_value[0][0] = 16.0*eta-16.0*eta*eta;
+	    return_value[0][1] = -12.0+16.0*xi+2.0*(12.0-16.0*xi)*eta;
+	    return_value[1][0] = -12.0+16.0*xi+2.0*(12.0-16.0*xi)*eta;
+	    return_value[1][1] = -8.0+24.0*xi-16.0*xi*xi;
+	    break;
+      case 8:
+	    return_value[0][0] = -32.0*eta+32.0*eta*eta;
+	    return_value[0][1] = 16.0-32.0*xi+2.0*(-16.0+32.0*xi)*eta;
+	    return_value[1][0] = 16.0-32.0*xi+2.0*(-16.0+32.0*xi)*eta;
+	    return_value[1][1] = -32.0*xi+32.0*xi*xi;
+      break;
+    };
+  return return_value;
+};
+
+
+
+template <>
 void FEQuadraticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					       const Boundary<2> &,
 					       dFMatrix &local_mass_matrix) const {

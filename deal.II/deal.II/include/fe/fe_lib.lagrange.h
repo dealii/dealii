@@ -48,6 +48,17 @@ class FELinear : public FELinearMapping<dim> {
 				  const Point<dim>& p) const;
 
 				     /**
+				      * Return the tensor of second derivatives
+				      * of the #i#th shape function at
+				      * point #p# on the unit cell.
+				      *
+				      * For linear elements, all second
+				      * derivatives on the unit cell are zero.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim>   &p) const = 0;
+
+				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
@@ -109,6 +120,14 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      */
     virtual Point<dim> shape_grad(const unsigned int i,
 				  const Point<dim>& p) const;
+
+				     /**
+				      * Return the tensor of second derivatives
+				      * of the #i#th shape function at
+				      * point #p# on the unit cell.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim>   &p) const = 0;
 
 				     /**
 				      * Refer to the base class for detailed
@@ -193,6 +212,14 @@ class FECubicSub : public FELinearMapping<dim> {
 				  const Point<dim>& p) const;
 
 				     /**
+				      * Return the tensor of second derivatives
+				      * of the #i#th shape function at
+				      * point #p# on the unit cell.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim>   &p) const = 0;
+
+				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
@@ -274,6 +301,14 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      */
     virtual Point<dim> shape_grad(const unsigned int i,
 				  const Point<dim>& p) const;
+
+				     /**
+				      * Return the tensor of second derivatives
+				      * of the #i#th shape function at
+				      * point #p# on the unit cell.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim>   &p) const = 0;
 
 				     /**
 				      * Refer to the base class for detailed

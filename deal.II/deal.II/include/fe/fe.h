@@ -8,6 +8,7 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/point.h>
+#include <base/tensor.h>
 #include <grid/dof.h>
 #include <grid/geometry_info.h>
 #include <lac/dfmatrix.h>
@@ -549,8 +550,16 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * function at the point #p#.
 				      * #p# is a point on the reference element,
 				      */
-    virtual Point<dim> shape_grad (const unsigned int i,
-				   const Point<dim> &p) const = 0;
+    virtual Point<dim> shape_grad (const unsigned int  i,
+				   const Point<dim>   &p) const = 0;
+
+				     /**
+				      * Return the tensor of second derivatives
+				      * of the #i#th shape function at
+				      * point #p# on the unit cell.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+					   const Point<dim>   &p) const = 0;
 
 				     /**
 				      * Return the value of the #i#th shape

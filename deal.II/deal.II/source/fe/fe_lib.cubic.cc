@@ -862,6 +862,109 @@ FECubicSub<2>::shape_grad (const unsigned int i,
 
 
 template <>
+Tensor<2,2>
+FECubicSub<2>::shape_grad_grad (const unsigned int i,
+				const Point<2>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi = p(0),
+	       eta= p(1);
+  Tensor<2,2> return_value;
+  
+  switch (i)
+    {
+      case 0:
+	    return_value[0][0] = 18.0-27.0*xi+(-99.0+297.0/2.0*xi)*eta+(162.0-243.0*xi)*eta*eta+(-81.0+243.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 121.0/4.0-99.0*xi+297.0/4.0*xi*xi+2.0*(-99.0/2.0+162.0*xi-243.0/2.0*xi*xi)*eta+3.0*(99.0/4.0-81.0*xi+243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 121.0/4.0-99.0*xi+297.0/4.0*xi*xi+2.0*(-99.0/2.0+162.0*xi-243.0/2.0*xi*xi)*eta+3.0*(99.0/4.0-81.0*xi+243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 18.0-99.0*xi+162.0*xi*xi-81.0*xi*xi*xi+6.0*(-9.0/2.0+99.0/4.0*xi-81.0/2.0*xi*xi+81.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 1:
+	    return_value[0][0] = -9.0+27.0*xi+(99.0/2.0-297.0/2.0*xi)*eta+(-81.0+243.0*xi)*eta*eta+(81.0/2.0-243.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -11.0/2.0+99.0/2.0*xi-297.0/4.0*xi*xi+2.0*(9.0-81.0*xi+243.0/2.0*xi*xi)*eta+3.0*(-9.0/2.0+81.0/2.0*xi-243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -11.0/2.0+99.0/2.0*xi-297.0/4.0*xi*xi+2.0*(9.0-81.0*xi+243.0/2.0*xi*xi)*eta+3.0*(-9.0/2.0+81.0/2.0*xi-243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 18.0*xi-81.0*xi*xi+81.0*xi*xi*xi+6.0*(-9.0/2.0*xi+81.0/4.0*xi*xi-81.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 2:
+	    return_value[0][0] = (-9.0+27.0*xi)*eta+(81.0/2.0-243.0/2.0*xi)*eta*eta+(-81.0/2.0+243.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 1.0-9.0*xi+27.0/2.0*xi*xi+2.0*(-9.0/2.0+81.0/2.0*xi-243.0/4.0*xi*xi)*eta+3.0*(9.0/2.0-81.0/2.0*xi+243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 1.0-9.0*xi+27.0/2.0*xi*xi+2.0*(-9.0/2.0+81.0/2.0*xi-243.0/4.0*xi*xi)*eta+3.0*(9.0/2.0-81.0/2.0*xi+243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -9.0*xi+81.0/2.0*xi*xi-81.0/2.0*xi*xi*xi+6.0*(9.0/2.0*xi-81.0/4.0*xi*xi+81.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 3:
+	    return_value[0][0] = (18.0-27.0*xi)*eta+(-81.0+243.0/2.0*xi)*eta*eta+(81.0-243.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -11.0/2.0+18.0*xi-27.0/2.0*xi*xi+2.0*(99.0/4.0-81.0*xi+243.0/4.0*xi*xi)*eta+3.0*(-99.0/4.0+81.0*xi-243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -11.0/2.0+18.0*xi-27.0/2.0*xi*xi+2.0*(99.0/4.0-81.0*xi+243.0/4.0*xi*xi)*eta+3.0*(-99.0/4.0+81.0*xi-243.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -9.0+99.0/2.0*xi-81.0*xi*xi+81.0/2.0*xi*xi*xi+6.0*(9.0/2.0-99.0/4.0*xi+81.0/2.0*xi*xi-81.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 4:
+	    return_value[0][0] = -45.0+81.0*xi+(495.0/2.0-891.0/2.0*xi)*eta+(-405.0+729.0*xi)*eta*eta+(405.0/2.0-729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi+2.0*(81.0-405.0*xi+729.0/2.0*xi*xi)*eta+3.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi+2.0*(81.0-405.0*xi+729.0/2.0*xi*xi)*eta+3.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 162.0*xi-405.0*xi*xi+243.0*xi*xi*xi+6.0*(-81.0/2.0*xi+405.0/4.0*xi*xi-243.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 5:
+	    return_value[0][0] = 36.0-81.0*xi+(-198.0+891.0/2.0*xi)*eta+(324.0-729.0*xi)*eta*eta+(-162.0+729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 99.0/4.0-198.0*xi+891.0/4.0*xi*xi+2.0*(-81.0/2.0+324.0*xi-729.0/2.0*xi*xi)*eta+3.0*(81.0/4.0-162.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 99.0/4.0-198.0*xi+891.0/4.0*xi*xi+2.0*(-81.0/2.0+324.0*xi-729.0/2.0*xi*xi)*eta+3.0*(81.0/4.0-162.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -81.0*xi+324.0*xi*xi-243.0*xi*xi*xi+6.0*(81.0/4.0*xi-81.0*xi*xi+243.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 6:
+	    return_value[0][0] = (-81.0+243.0*xi)*eta+(405.0/2.0-1215.0/2.0*xi)*eta*eta+(-243.0/2.0+729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 9.0-81.0*xi+243.0/2.0*xi*xi+2.0*(-45.0/2.0+405.0/2.0*xi-1215.0/4.0*xi*xi)*eta+3.0*(27.0/2.0-243.0/2.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 9.0-81.0*xi+243.0/2.0*xi*xi+2.0*(-45.0/2.0+405.0/2.0*xi-1215.0/4.0*xi*xi)*eta+3.0*(27.0/2.0-243.0/2.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -45.0*xi+405.0/2.0*xi*xi-405.0/2.0*xi*xi*xi+6.0*(27.0/2.0*xi-243.0/4.0*xi*xi+243.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 7:
+	    return_value[0][0] = (81.0/2.0-243.0/2.0*xi)*eta+(-162.0+486.0*xi)*eta*eta+(243.0/2.0-729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -9.0/2.0+81.0/2.0*xi-243.0/4.0*xi*xi+2.0*(18.0-162.0*xi+243.0*xi*xi)*eta+3.0*(-27.0/2.0+243.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -9.0/2.0+81.0/2.0*xi-243.0/4.0*xi*xi+2.0*(18.0-162.0*xi+243.0*xi*xi)*eta+3.0*(-27.0/2.0+243.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 36.0*xi-162.0*xi*xi+162.0*xi*xi*xi+6.0*(-27.0/2.0*xi+243.0/4.0*xi*xi-243.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 8:
+	    return_value[0][0] = (-45.0+81.0*xi)*eta+(405.0/2.0-729.0/2.0*xi)*eta*eta+(-405.0/2.0+729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 9.0-45.0*xi+81.0/2.0*xi*xi+2.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta+3.0*(81.0/2.0-405.0/2.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 9.0-45.0*xi+81.0/2.0*xi*xi+2.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta+3.0*(81.0/2.0-405.0/2.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -81.0*xi+405.0/2.0*xi*xi-243.0/2.0*xi*xi*xi+6.0*(81.0/2.0*xi-405.0/4.0*xi*xi+243.0/4.0*xi*xi*xi)*eta;
+	    break;
+      case 9:
+	    return_value[0][0] = (36.0-81.0*xi)*eta+(-162.0+729.0/2.0*xi)*eta*eta+(162.0-729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -9.0/2.0+36.0*xi-81.0/2.0*xi*xi+2.0*(81.0/4.0-162.0*xi+729.0/4.0*xi*xi)*eta+3.0*(-81.0/4.0+162.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -9.0/2.0+36.0*xi-81.0/2.0*xi*xi+2.0*(81.0/4.0-162.0*xi+729.0/4.0*xi*xi)*eta+3.0*(-81.0/4.0+162.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 81.0/2.0*xi-162.0*xi*xi+243.0/2.0*xi*xi*xi+6.0*(-81.0/4.0*xi+81.0*xi*xi-243.0/4.0*xi*xi*xi)*eta;
+	    return_value[0][0] = (162.0-243.0*xi)*eta+(-405.0+1215.0/2.0*xi)*eta*eta+(243.0-729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -99.0/2.0+162.0*xi-243.0/2.0*xi*xi+2.0*(495.0/4.0-405.0*xi+1215.0/4.0*xi*xi)*eta+3.0*(-297.0/4.0+243.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -99.0/2.0+162.0*xi-243.0/2.0*xi*xi+2.0*(495.0/4.0-405.0*xi+1215.0/4.0*xi*xi)*eta+3.0*(-297.0/4.0+243.0*xi-729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -45.0+495.0/2.0*xi-405.0*xi*xi+405.0/2.0*xi*xi*xi+6.0*(27.0/2.0-297.0/4.0*xi+243.0/2.0*xi*xi-243.0/4.0*xi*xi*xi)*eta;
+	    return_value[0][0] = (-81.0+243.0/2.0*xi)*eta+(324.0-486.0*xi)*eta*eta+(-243.0+729.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 99.0/4.0-81.0*xi+243.0/4.0*xi*xi+2.0*(-99.0+324.0*xi-243.0*xi*xi)*eta+3.0*(297.0/4.0-243.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 99.0/4.0-81.0*xi+243.0/4.0*xi*xi+2.0*(-99.0+324.0*xi-243.0*xi*xi)*eta+3.0*(297.0/4.0-243.0*xi+729.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 36.0-198.0*xi+324.0*xi*xi-162.0*xi*xi*xi+6.0*(-27.0/2.0+297.0/4.0*xi-243.0/2.0*xi*xi+243.0/4.0*xi*xi*xi)*eta;
+	    return_value[0][0] = (-405.0+729.0*xi)*eta+(2025.0/2.0-3645.0/2.0*xi)*eta*eta+(-1215.0/2.0+2187.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 81.0-405.0*xi+729.0/2.0*xi*xi+2.0*(-405.0/2.0+2025.0/2.0*xi-3645.0/4.0*xi*xi)*eta+3.0*(243.0/2.0-1215.0/2.0*xi+2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 81.0-405.0*xi+729.0/2.0*xi*xi+2.0*(-405.0/2.0+2025.0/2.0*xi-3645.0/4.0*xi*xi)*eta+3.0*(243.0/2.0-1215.0/2.0*xi+2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -405.0*xi+2025.0/2.0*xi*xi-1215.0/2.0*xi*xi*xi+6.0*(243.0/2.0*xi-1215.0/4.0*xi*xi+729.0/4.0*xi*xi*xi)*eta;
+	    return_value[0][0] = (324.0-729.0*xi)*eta+(-810.0+3645.0/2.0*xi)*eta*eta+(486.0-2187.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -81.0/2.0+324.0*xi-729.0/2.0*xi*xi+2.0*(405.0/4.0-810.0*xi+3645.0/4.0*xi*xi)*eta+3.0*(-243.0/4.0+486.0*xi-2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -81.0/2.0+324.0*xi-729.0/2.0*xi*xi+2.0*(405.0/4.0-810.0*xi+3645.0/4.0*xi*xi)*eta+3.0*(-243.0/4.0+486.0*xi-2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 405.0/2.0*xi-810.0*xi*xi+1215.0/2.0*xi*xi*xi+6.0*(-243.0/4.0*xi+243.0*xi*xi-729.0/4.0*xi*xi*xi)*eta;
+	    return_value[0][0] = (-162.0+729.0/2.0*xi)*eta+(648.0-1458.0*xi)*eta*eta+(-486.0+2187.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = 81.0/4.0-162.0*xi+729.0/4.0*xi*xi+2.0*(-81.0+648.0*xi-729.0*xi*xi)*eta+3.0*(243.0/4.0-486.0*xi+2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = 81.0/4.0-162.0*xi+729.0/4.0*xi*xi+2.0*(-81.0+648.0*xi-729.0*xi*xi)*eta+3.0*(243.0/4.0-486.0*xi+2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = -162.0*xi+648.0*xi*xi-486.0*xi*xi*xi+6.0*(243.0/4.0*xi-243.0*xi*xi+729.0/4.0*xi*xi*xi)*eta;
+	    return_value[0][0] = (405.0/2.0-729.0/2.0*xi)*eta+(-810.0+1458.0*xi)*eta*eta+(1215.0/2.0-2187.0/2.0*xi)*eta*eta*eta;
+	    return_value[0][1] = -81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi+2.0*(162.0-810.0*xi+729.0*xi*xi)*eta+3.0*(-243.0/2.0+1215.0/2.0*xi-2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][0] = -81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi+2.0*(162.0-810.0*xi+729.0*xi*xi)*eta+3.0*(-243.0/2.0+1215.0/2.0*xi-2187.0/4.0*xi*xi)*eta*eta;
+	    return_value[1][1] = 324.0*xi-810.0*xi*xi+486.0*xi*xi*xi+6.0*(-243.0/2.0*xi+1215.0/4.0*xi*xi-729.0/4.0*xi*xi*xi)*eta;
+      break;
+    };
+  return return_value;
+};
+
+
+
+template <>
 void FECubicSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					       const Boundary<2> &,
 					       dFMatrix &local_mass_matrix) const {
