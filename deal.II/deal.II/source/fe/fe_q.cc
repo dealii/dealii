@@ -1306,7 +1306,7 @@ FE_Q<3>::initialize_constraints ()
 
     // Generate destination points.
     std::vector<Point<dim-1> > constraint_points;
-    const std::vector<Point<dim-1> > &un_supp = get_unit_face_support_points ();
+    const std::vector<Point<dim-1> > &un_supp = this->get_unit_face_support_points ();
     const unsigned int pnts = un_supp.size ();
 
     // Add midpoint
@@ -1326,8 +1326,8 @@ FE_Q<3>::initialize_constraints ()
     for (unsigned int face = 0; 
 	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
     {
-	unsigned int line_offset = 4 + ((face + 1) % 4) * (degree-1);
-	for (unsigned int line_dof = 0; line_dof < degree-1; ++line_dof)
+	unsigned int line_offset = 4 + ((face + 1) % 4) * (this->degree-1);
+	for (unsigned int line_dof = 0; line_dof < this->degree-1; ++line_dof)
 	{
 	    Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
 	    pnt_temp *= 0.5;
@@ -1345,7 +1345,7 @@ FE_Q<3>::initialize_constraints ()
 	for (unsigned int face = 0; face < 2; ++face)
 	{
 	    unsigned int offset;
-	    unsigned int line_offset = 4 + (line * (degree-1));
+	    unsigned int line_offset = 4 + (line * (this->degree-1));
 
 	    // Line 2 and 3 have a different ordering
 	    if (line < 2)
@@ -1353,7 +1353,7 @@ FE_Q<3>::initialize_constraints ()
 	    else
 		offset = ((line + 1 - face) % 4);
 
-	    for (unsigned int line_dof = 0; line_dof < degree-1; ++line_dof)
+	    for (unsigned int line_dof = 0; line_dof < this->degree-1; ++line_dof)
 	    {
 		Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
 		pnt_temp *= 0.5;
@@ -1364,11 +1364,11 @@ FE_Q<3>::initialize_constraints ()
     }
 
     // Create constraints for interior nodes
-    unsigned int dofs_per_face = (degree-1) * (degree-1);
+    unsigned int dofs_per_face = (this->degree-1) * (this->degree-1);
     for (unsigned int face = 0; 
 	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
     {
-	unsigned int face_offset = 4 + (4 * (degree-1));
+	unsigned int face_offset = 4 + (4 * (this->degree-1));
 	for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
 	{
 	    Point<dim-1> pnt_temp = un_supp[face_offset + face_dof];
@@ -1381,8 +1381,8 @@ FE_Q<3>::initialize_constraints ()
     // Now construct relation between destination (child)
     // and source (mother) dofs.
     std::vector<Polynomials::LagrangeEquidistant> v;
-    for (unsigned int i=0;i<=degree;++i)
-	v.push_back(Polynomials::LagrangeEquidistant(degree,i));
+    for (unsigned int i=0;i<=this->degree;++i)
+	v.push_back(Polynomials::LagrangeEquidistant(this->degree,i));
     TensorProductPolynomials<dim-1>* poly_f;
 
     poly_f = new TensorProductPolynomials<dim-1> (v);
@@ -1393,7 +1393,7 @@ FE_Q<3>::initialize_constraints ()
 
     for (unsigned int j = 0; j < constraint_no; ++j)
     {
-	double interval = (double) (degree * 2);
+	double interval = (double) (this->degree * 2);
 	bool mirror[dim - 1];
 	Point<dim-1> constraint_point;
 
@@ -1471,14 +1471,14 @@ FE_Q<3>::initialize_constraints ()
 		new_index;
 
 	    // poly_f->compute_index (face_index_map [i], indices);
-	    indices[0] = face_index_map[i] % (degree + 1);
-	    indices[1] = face_index_map[i] / (degree + 1);
+	    indices[0] = face_index_map[i] % (this->degree + 1);
+	    indices[1] = face_index_map[i] / (this->degree + 1);
 	    for (unsigned int k = 0; k < dim - 1; ++k)
 		if (mirror[k])
-		    indices[k] = degree - indices[k];
-	    new_index = indices[1] * (degree + 1) + indices[0];
+		    indices[k] = this->degree - indices[k];
+	    new_index = indices[1] * (this->degree + 1) + indices[0];
 
-	    interface_constraints(j,i) = 
+	    this->interface_constraints(j,i) = 
 		poly_f->compute_value(new_index, 
 				      constraint_point);
 	    
@@ -1492,8 +1492,8 @@ FE_Q<3>::initialize_constraints ()
 				   // of other DoFs a
 				   // constrained DoF would
 				   // couple to)
-	    if (std::fabs(interface_constraints(j,i)) < 1e-14)
-		interface_constraints(j,i) = 0;
+	    if (std::fabs(this->interface_constraints(j,i)) < 1e-14)
+		this->interface_constraints(j,i) = 0;
 	}
     }
     delete poly_f;
