@@ -1,0 +1,19 @@
+
+
+############################################################
+# Include general settings for including DEAL libraries
+############################################################
+
+include $D/common/Make.global_options
+
+
+############################################################
+# Targets for compilation
+############################################################
+
+%.g.o : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
