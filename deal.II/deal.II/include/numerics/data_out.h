@@ -19,7 +19,7 @@
 
 /**
  * This is an abstract class which provides the functionality to generate
- * patches for output by base classes from data vectors on a grid. It alloes
+ * patches for output by base classes from data vectors on a grid. It allows
  * to store a pointer to a @ref{DoFHandler} object and one or more pointers to
  * node and cell data denoting functions on the grid which shall later
  * be written in any of the implemented data formats.
