@@ -33,6 +33,7 @@
 //TODO:[GK] Obtain aux vector from VectorMemory
 
 template <typename> class BlockVector;
+template <typename> class Vector;
 
 
 /**
