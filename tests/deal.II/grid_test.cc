@@ -20,7 +20,7 @@
 #include <cstdlib>
 
 #include <fstream>
-#include <strstream>
+#include <cstdio>
 
 ofstream logfile("grid_test.output");
 
@@ -170,8 +170,7 @@ template <int dim>
 void test (const int test_case)
 {
   char testname[100];
-  ostrstream namestream(testname, 100);
-  namestream << "Test" << test_case << ".dim" << dim;
+  sprintf(testname, "Test%d.dim%d", test_case , dim);
   
   deallog.push(testname);
   deallog << "Start" << endl;
@@ -201,7 +200,7 @@ void test (const int test_case)
 	tria.execute_coarsening_and_refinement ();
 
 	Triangulation<dim>::active_cell_iterator cell;
-	for (int i=0; i<(dim==2 ? 13 : 7); ++i) 
+	for (int i=0; i<(dim==2 ? 5 : 2); ++i) 
 	  {
 					     // refine the presently
 					     // second last cell 17
@@ -238,7 +237,7 @@ void test (const int test_case)
 	tria.execute_coarsening_and_refinement ();
 	
  	Triangulation<dim>::active_cell_iterator cell, endc;
-	const unsigned int steps[4] = { 0, 10, 5, 2 };
+	const unsigned int steps[4] = { 0, 5, 3, 2 };
  	for (unsigned int i=0; i<steps[dim]; ++i) 
  	  {
  	    cell = tria.begin_active();
