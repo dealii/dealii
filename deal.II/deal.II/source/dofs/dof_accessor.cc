@@ -842,6 +842,19 @@ template
 void
 DoFCellAccessor<deal_II_dimension>::
 set_dof_values_by_interpolation(const Vector<double> &,
+				BlockVector<2,double> &) const;
+
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values (const BlockVector<3,double> &,
+			     Vector<double>       &) const;
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation(const Vector<double> &,
 				BlockVector<3,double> &) const;
 
 
