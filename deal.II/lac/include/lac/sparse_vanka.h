@@ -98,7 +98,7 @@
  * whether this might pose some problems in the inversion of the local matrices.
  * Maybe someone would like to check this.
  *
- * @author Guido Kanschat, documentation mostly by Wolfgang Bangerth; 1999
+ * @author Guido Kanschat, documentation and extensions by Wolfgang Bangerth; 1999, 2000
  */
 template<typename number>
 class SparseVanka
@@ -114,16 +114,50 @@ class SparseVanka
 				      * longer than the Vanka
 				      * object. The same is true for
 				      * the matrix.
+				      *
+				      * The matrix #M# which is passed
+				      * here may or may not be the
+				      * same matrix for which this
+				      * object shall act as
+				      * preconditioner. In particular,
+				      * it is conceivable that the
+				      * preconditioner is build up for
+				      * one matrix once, but is used
+				      * for subsequent steps in a
+				      * nonlinear process as well,
+				      * where the matrix changes in
+				      * each step slightly.
+				      *
+				      * If #conserve_mem# is #false#,
+				      * then the inverses of the local
+				      * systems are computed now, if
+				      * the flag is #true#, then they
+				      * are computed every time the
+				      * preconditioner is
+				      * applied. This saves some
+				      * memory, but makes
+				      * preconditioning very
+				      * slow. Note also, that if the
+				      * flag is #false#, the the
+				      * contents of the matrix #M# at
+				      * the time of calling this
+				      * constructor are used, while if
+				      * the flag is #true#, then the
+				      * values in #M# at the time of
+				      * preconditioning are used. This
+				      * may lead to different results,
+				      * obviously, of #M# changes.
 				      */
     SparseVanka(const SparseMatrix<number> &M,
-		const vector<bool>         &selected);
+		const vector<bool>         &selected,
+		const bool                  conserve_memory = false);
     
 				     /**
 				      * Destructor.
 				      * Delete all allocated matrices.
 				      */
     ~SparseVanka();
-    
+
 				     /**
 				      * Do the preconditioning.
 				      * This function takes the residual
@@ -133,18 +167,6 @@ class SparseVanka
     template<typename number2>
     void operator() (Vector<number2>       &dst,
 		     const Vector<number2> &src) const;
-
-				     /**
-				      * Minimize memory consumption.
-				      * Activating this option reduces
-				      * memory needs of the Vanka object
-				      * to nearly zero. You pay for this
-				      * by a high increase of computing
-				      * time, since all local matrices
-				      * are built up and inverted every
-				      * time the Vanka operator is applied.
-				      */
-    void conserve_memory();
 
 				     /**
 				      * Exception
@@ -175,6 +197,12 @@ class SparseVanka
 				      * that are tagged in #selected#.
 				      */
     mutable vector<SmartPointer<FullMatrix<float> > > inverses;
+
+				     /**
+				      * Compute the inverses of all
+				      * selected diagonal elements.
+				      */
+    void compute_inverses ();
 };
 
 
