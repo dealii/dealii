@@ -1041,17 +1041,26 @@ class FiniteElement : public FiniteElementBase<dim>
 			        const Point<dim> &p) const = 0;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at the point #p#.
-				      * #p# is a point on the reference element,
+				      * Return the gradient of the
+				      * #i#th shape function at the
+				      * point #p#.  #p# is a point on
+				      * the reference element, and
+				      * likewise the gradient is the
+				      * gradient on the unit cell with
+				      * respect to unit cell
+				      * coordinates.
 				      */
     virtual Tensor<1,dim> shape_grad (const unsigned int  i,
 				      const Point<dim>   &p) const = 0;
 
 				     /**
-				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * Return the tensor of second
+				      * derivatives of the #i#th shape
+				      * function at point #p# on the
+				      * unit cell. The derivatives are
+				      * derivatives on the unit cell
+				      * with respect to unit cell
+				      * coordinates.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const = 0;
