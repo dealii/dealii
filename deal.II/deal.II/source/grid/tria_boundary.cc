@@ -3,6 +3,9 @@
 
 
 #include <grid/tria_boundary.h>
+#include <grid/tria.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_accessor.h>
 #include <cmath>
 
 
@@ -12,22 +15,74 @@ Boundary<dim>::~Boundary ()
 {};
 
 
+
+
 template <int dim>
-Point<dim> StraightBoundary<dim>::in_between (const PointArray &neighbors) const 
+Point<dim>
+Boundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
 {
-  Point<dim> p;
-  for (int i=0; i<(1<<(dim-1)); ++i)
-    p += *neighbors[i];
-  p /= (1<<(dim-1))*1.0;
-  return p;
+  Assert (false, ExcPureVirtualFunctionCalled());
+  return Point<dim>();
 };
 
 
 
 template <int dim>
-Point<dim> HyperBallBoundary<dim>::in_between (const PointArray &neighbors) const
+Point<dim>
+StraightBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
 {
-  Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
+  return (line->vertex(0) + line->vertex(1)) / 2;
+};
+
+
+
+#if deal_II_dimension < 3
+
+template <int dim>
+Point<dim>
+StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+  return Point<dim>();
+};
+
+
+#else
+
+
+template <int dim>
+Point<dim>
+StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const 
+{
+  return (quad->vertex(0) + quad->vertex(1) +
+	  quad->vertex(1) + quad->vertex(2)) / 2;
+};
+
+#endif
+
+
+
+template <int dim>
+Point<dim>
+HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+  
+  middle -= center;
+				   // project to boundary
+  middle *= radius / sqrt(middle.square());
+  
+  middle += center;
+  return middle;
+};
+
+
+
+template <int dim>
+Point<dim>
+HyperBallBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
   
   middle -= center;
 				   // project to boundary

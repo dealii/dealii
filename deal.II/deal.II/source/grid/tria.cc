@@ -4494,13 +4494,9 @@ void Triangulation<2>::execute_refinement () {
 						     // vertex?
 		    Point<2> new_point;
 		    if (cell->at_boundary(nb)) 
-		      {
-							 // boundary vertex
-			const Point<2> *neighbors[2] =
-			{&vertices[new_vertices[2*nb]],
-			 &vertices[new_vertices[(2*nb+2)%8]]};
-			new_point = boundary->in_between (neighbors);
-		      } else {
+						       // boundary vertex
+		      new_point = boundary->get_new_point_on_line (cell->line(nb));
+		    else {
 							 // vertex between two
 							 // normal cells
 			new_point = vertices[new_vertices[2*nb]];
@@ -4945,17 +4941,9 @@ void Triangulation<3>::execute_refinement () {
 		    ExcTooFewVerticesAllocated());
 	    vertices_used[next_unused_vertex] = true;
 
-	    if (line->at_boundary()) 
-	      {
-		const Boundary<dim>::PointArray surrounding_points
-		  = { &line->vertex(0),
-		      &line->vertex(0),
-		      &line->vertex(1),
-		      &line->vertex(1) 
-		  };
-		vertices[next_unused_vertex]
-		  = boundary->in_between (surrounding_points);
-	      }
+	    if (line->at_boundary())
+	      vertices[next_unused_vertex]
+		= boundary->get_new_point_on_line (line);
 	    else
 	      vertices[next_unused_vertex]
 		= (line->vertex(0) + line->vertex(1)) / 2;
@@ -5036,16 +5024,8 @@ void Triangulation<3>::execute_refinement () {
 	    vertices_used[next_unused_vertex] = true;
 	    
 	    if (quad->at_boundary()) 
-	      {
-		const Boundary<dim>::PointArray surrounding_points
-		  = { &quad->vertex(0),
-		      &quad->vertex(1),
-		      &quad->vertex(2),
-		      &quad->vertex(3) 
-		  };
-		vertices[next_unused_vertex]
-		  = boundary->in_between (surrounding_points);
-	      }
+	      vertices[next_unused_vertex]
+		= boundary->get_new_point_on_quad (quad);
 	    else
 	      vertices[next_unused_vertex]
 		= (quad->vertex(0) + quad->vertex(1) +

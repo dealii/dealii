@@ -10,52 +10,8 @@
 #include <grid/geometry_info.h>
 
 
+template <int dim> class Triangulation;
 
-/**
- * Workaround for a bug in egcs snapshot 1998/08/03.
- */
-template <int dim>
-struct BoundaryHelper;
-
-/**
- * Workaround for a bug in egcs snapshot 1998/08/03.
- */
-template <>
-struct BoundaryHelper<1> {
-				     /**
-				      * Declare a data type for the derived
-				      * classes.
-				      *
-				      * actually, this does not make much
-				      * sense, but declaring a zero-sized
-				      * array is forbidden nowadays.
-				      */
-    typedef const Point<1> *PointArray[1];
-};
-
-/**
- * Workaround for a bug in egcs snapshot 1998/08/03.
- */
-template <>
-struct BoundaryHelper<2> {
-				     /**
-				      * Declare a data type for the derived
-				      * classes.
-				      */
-    typedef const Point<2> *PointArray[GeometryInfo<2>::vertices_per_face];
-};
-
-/**
- * Workaround for a bug in egcs snapshot 1998/08/03.
- */
-template <>
-struct BoundaryHelper<3> {
-				     /**
-				      * Declare a data type for the derived
-				      * classes.
-				      */
-    typedef const Point<3> *PointArray[GeometryInfo<3>::vertices_per_face];
-};
 
 
 /**
@@ -65,56 +21,97 @@ struct BoundaryHelper<3> {
  *   following code (here in two dimensions):
  *   \begin{verbatim}
  *     ...
- *     const Point<2> *neighbors[2] = {&neighbor1, &neighbor2};
- *     Point<2> new_vertex = boundary.in_between (neighbors);
+ *     Point<2> new_vertex = boundary.get_new_point_on_line (line);
  *     ...
  *   \end{verbatim}
- *   #neighbor1# and #neighbor2# are the two vertices bounding the old
- *   line on the boundary, which is to be subdivided. #boundary# is an
- *   object of type #Boundary<dim>#.
+ *   #line# denotes the line at the boundary that shall be refined
+ *   and for which we seek the common point of the two child lines.
  *
  *   In 3D, a new vertex may be placed on the middle of a line or on
- *   the middle of a side. In the both cases, an array with four points
- *   has to be passed to #in_between#; in the latter case the two end
- *   points of the line have to be given consecutively twice, as
- *   elements 0 and 1, and 2 and 3, respectively.
+ *   the middle of a side. Respectively, the library calls
+ *   \begin{verbatim}
+ *     ...
+ *     Point<3> new_line_vertices[4]
+ *       = { boundary.get_new_point_on_line (face->line(0)),
+ *           boundary.get_new_point_on_line (face->line(1)),
+ *           boundary.get_new_point_on_line (face->line(2)),
+ *           boundary.get_new_point_on_line (face->line(3))  };
+ *     ...
+ *   \end{verbatim}
+ *   to get the four midpoints of the lines bounding the quad at the
+ *   boundary, and after that
+ *   \begin{verbatim}
+ *     ...
+ *     Point<3> new_quad_vertex = boundary.get_new_point_on_quad (face);
+ *     ...
+ *   \end{verbatim}
+ *   to get the midpoint of the face. It is guaranteed that this order
+ *   (first lines, then faces) holds, so you can use information from
+ *   the children of the four lines of a face, since these already exist
+ *   at the time the midpoint of the face is to be computed.
  *   
+ *   Since iterators are passed to the functions, you may use information
+ *   about boundary indicators and the like, as well as all other information
+ *   provided by these objects.
+ *
  *   There are specialisations, #StraightBoundary<dim>#, which places
  *   the new point right into the middle of the given points, and
  *   #HyperBallBoundary<dim># creating a hyperball with given radius
  *   around a given center point.
  *
- *   @author Wolfgang Bangerth, 1998
+ *   @author Wolfgang Bangerth, 1999
  */
 template <int dim>
 class Boundary : public Subscriptor {
   public:
-				     /**
-				      *  Typedef an array of the needed number
-				      *  of old points to compute the new
-				      *  middle point of a face. This does not
-				      *  make much sense in 1D, so we set the
-				      *  array size to a dummy value.
-				      */
-    typedef typename BoundaryHelper<dim>::PointArray PointArray;
-// this is the way it should be, but egcs throws an internal compiler error
-// on this, so we invented the above workaround    
-//    typedef const Point<dim>* PointArray[((dim==1) ?
-//					  1 :
-//					  GeometryInfo<dim>::vertices_per_face)];
-
 				     /**
 				      * Destructor. Does nothing here, but
 				      * needs to be declared to make it
 				      * virtual.
 				      */
     virtual ~Boundary ();
-        
+
 				     /**
-				      *  This function calculates the position
-				      *  of the new vertex.
+				      * Return the point which shall become
+				      * the new middle vertex of the two
+				      * children of a regular line. In 2D,
+				      * this line is a line at the boundary,
+				      * while in 3d, it is bounding a face
+				      * at the boundary (the lines therefore
+				      * is also on the boundary).
 				      */
-    virtual Point<dim> in_between (const PointArray &neighbors) const = 0;
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const = 0;
+
+				     /**
+				      * Return the point which shall become
+				      * the common point of the four children
+				      * of a quad at the boundary in three
+				      * or more spatial dimensions. This
+				      * function therefore is only useful in
+				      * at least three dimensions and should
+				      * not be called for lower dimensions.
+				      *
+				      * This function is called after the
+				      * four lines bounding the given #quad#
+				      * are refined, so you may want to use
+				      * the information provided by
+				      * #quad->line(i)->child(j)#, #i=0...3#,
+				      * #j=0,1#.
+				      *
+				      * Because in 2D, this function is not
+				      * needed, it is not made pure virtual,
+				      * to avoid the need to overload it.
+				      * The default implementation throws
+				      * an error in any case, however.
+				      */
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcPureVirtualFunctionCalled);
 };
 
 
@@ -135,10 +132,20 @@ template <int dim>
 class StraightBoundary : public Boundary<dim> {
   public:
 				     /**
-				      *  This function calculates the position
-				      *  of the new vertex.
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
 				      */
-    virtual Point<dim> in_between (const PointArray &neighbors) const;
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+
+				     /**
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      */
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
 
 
@@ -167,10 +174,20 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 		    center(p), radius(radius) {};
 
 				     /**
-				      *  This function calculates the position
-				      *  of the new vertex.
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
 				      */
-    virtual Point<dim> in_between (const PointArray &neighbors) const;
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+
+				     /**
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      */
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
 
   private:
