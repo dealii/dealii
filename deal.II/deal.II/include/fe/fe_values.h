@@ -515,6 +515,11 @@ class FEValuesBase
     const FiniteElement<dim> & get_fe () const;
 
 				     /**
+				      * Return the present cell.
+				      */
+    const DoFHandler<dim>::cell_iterator & get_cell() const;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcAccessToUninitializedField);
@@ -1280,6 +1285,13 @@ FEValuesBase<dim>::get_fe () const {
   return *fe;
 };
 
+
+template <int dim>
+inline
+const DoFHandler<dim>::cell_iterator &
+FEValuesBase<dim>::get_cell() const {
+  return present_cell;
+};
 
 /*------------------------ Inline functions: FEFaceValuesBase --------------------*/
 
