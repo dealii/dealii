@@ -1733,6 +1733,9 @@ class FiniteElementBase : public Subscriptor,
 };
 /*@}*/
 
+
+// --------- inline and template functions ---------------
+
 template <int dim>
 inline
 unsigned int 
