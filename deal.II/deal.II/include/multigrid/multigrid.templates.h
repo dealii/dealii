@@ -16,33 +16,16 @@
 
 #include <multigrid/multigrid.h>
 
-/* --------------------------- inline functions --------------------- */
-
-
 template <class VECTOR>
-template <int dim>
-Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
-			      const MGMatrixBase<VECTOR>& matrix,
-			      const MGCoarseGrid<VECTOR>& coarse,
-			      const MGTransfer<VECTOR>& transfer,
-			      const MGSmoother<VECTOR>& pre_smooth,
-			      const MGSmoother<VECTOR>& post_smooth,
-			      const unsigned int min_level,
-			      const unsigned int max_level)
-		:
-		minlevel(min_level),
-		maxlevel(std::min(mg_dof_handler.get_tria().n_levels()-1,
-				  max_level)),
-		defect(minlevel,maxlevel),
-		solution(minlevel,maxlevel),
-		t(minlevel,maxlevel),
-		matrix(&matrix),
-		coarse(&coarse),
-		transfer(&transfer),
-		pre_smooth(&pre_smooth),
-		post_smooth(&post_smooth)
+void
+Multigrid<VECTOR>::set_edge_matrices (const MGMatrixBase<VECTOR>& down,
+				      const MGMatrixBase<VECTOR>& up)
 {
-};
+  edge_down = &down;
+  edge_up = &up;
+}
+
+
 
 
 template <class VECTOR>
@@ -75,9 +58,8 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
   print_vector(level, solution[level], name);
 #endif
   
-				   // t = -A*solution[level]
+				   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
-  t[level].scale(-1);
   
 				   // make t rhs of lower level
 				   // The non-refined parts of the
@@ -87,13 +69,14 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
   for (unsigned int l = level;l>minlevel;--l)
     {
       t[l-1] = 0.;
+      if (l==level && edge_down != 0)
+	{
+	  edge_down->vmult(level, t[level-1], solution[level]);
+	}
       transfer->restrict_and_add (l, t[l-1], t[l]);
-      defect[l-1] += t[l-1];
+      defect[l-1] -= t[l-1];
     }
 
-				   // add additional DG contribution
-//  edge_vmult(level, defect[level-1], defect[level]);
-  
 				   // do recursion
   level_mgstep(level-1);
 
@@ -113,6 +96,12 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
 #endif
 
   solution[level] += t[level];
+
+  if (edge_up != 0)
+    {
+      edge_up->Tvmult(level, t[level], solution[level-1]);
+      defect[level] -= t[level];
+    }
   
 				   // post-smoothing
   post_smooth->smooth(level, solution[level], defect[level]);

@@ -23,7 +23,7 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_dof_tools.h>
-
+#include <multigrid/multigrid.templates.h>
 
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
 

@@ -122,6 +122,13 @@ class Multigrid : public Subscriptor
 				      */
     void vcycle();
 
+				     /**
+				      * Set additional matrices to
+				      * correct residual computation
+				      * at refinement edges.
+				      */
+    void set_edge_matrices (const MGMatrixBase<VECTOR>& edge_down,
+			    const MGMatrixBase<VECTOR>& edge_up);
   private:
     
 				     /**
@@ -295,6 +302,37 @@ class PreconditionMG : public Subscriptor
 				    * Object for grid tranfer.
 				    */
     SmartPointer<const TRANSFER> transfer;  
+};
+
+
+/* --------------------------- inline functions --------------------- */
+
+
+template <class VECTOR>
+template <int dim>
+Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
+			      const MGMatrixBase<VECTOR>& matrix,
+			      const MGCoarseGrid<VECTOR>& coarse,
+			      const MGTransfer<VECTOR>& transfer,
+			      const MGSmoother<VECTOR>& pre_smooth,
+			      const MGSmoother<VECTOR>& post_smooth,
+			      const unsigned int min_level,
+			      const unsigned int max_level)
+		:
+		minlevel(min_level),
+		maxlevel(std::min(mg_dof_handler.get_tria().n_levels()-1,
+				  max_level)),
+		defect(minlevel,maxlevel),
+		solution(minlevel,maxlevel),
+		t(minlevel,maxlevel),
+		matrix(&matrix),
+		coarse(&coarse),
+		transfer(&transfer),
+		pre_smooth(&pre_smooth),
+		post_smooth(&post_smooth),
+		edge_down(0),
+		edge_up(0)
+{
 };
 
 
