@@ -782,6 +782,142 @@ namespace Functions
       const typename std::vector<Point<dim> > fourier_coefficients;
       const std::vector<double>      weights;
   };
+
+
+/**
+ * Cut-off function in L-infinity for an arbitrary ball.  This
+ * function is the characteristic function of a ball around @p{center}
+ * with a specified @p{radius}.
+ *
+ * @author Guido Kanschat, 2001
+ */
+  template<int dim>
+  class CutOffFunctionLinfty : public Function<dim>
+  {
+    public:
+				     /**
+				      * Constructor. Arguments are the
+				      * center of the ball and its
+				      * radius.
+				      */
+    CutOffFunctionLinfty (const double radius = 1.,
+		      Point<dim> = Point<dim>());
+    
+				       /**
+					* Function value at one point.
+					*/
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+      
+				       /**
+					* Function values at multiple points.
+					*/
+      virtual void value_list (const typename std::vector<Point<dim> > &points,
+			       std::vector<double>            &values,
+			       const unsigned int              component = 0) const;
+
+  private:
+				     /**
+				      * Center of the integration ball.
+				      */
+    const Point<dim> center;
+
+				     /**
+				      * Radius of the ball.
+				      */
+    const double radius;
+  };
+  
+  
+/**
+ * Cut-off function for an arbitrary ball. This function is a cone
+ * with support in a ball of certain @p{radius} around @p{center}. The
+ * maximum value is 1.
+ *
+ * @author Guido Kanschat, 2001
+ */
+  template<int dim>
+  class CutOffFunctionW1 : public Function<dim>
+  {
+    public:
+				     /**
+				      * Constructor. Arguments are the
+				      * center of the ball and its
+				      * radius.
+				      */
+    CutOffFunctionW1 (const double radius = 1.,
+		      Point<dim> = Point<dim>());
+    
+				       /**
+					* Function value at one point.
+					*/
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+      
+				       /**
+					* Function values at multiple points.
+					*/
+      virtual void value_list (const typename std::vector<Point<dim> > &points,
+			       std::vector<double>            &values,
+			       const unsigned int              component = 0) const;
+
+  private:
+				     /**
+				      * Center of the integration ball.
+				      */
+    const Point<dim> center;
+
+				     /**
+				      * Radius of the ball.
+				      */
+    const double radius;
+  };
+  
+  
+/**
+ * Cut-off function for an arbitrary ball. This is the traditional
+ * cut-off function in C-infinity for a ball of certain @p{radius}
+ * around @p{center}.
+ *
+ * @author Guido Kanschat, 2001
+ */
+  template<int dim>
+  class CutOffFunctionCinfty : public Function<dim>
+  {
+    public:
+				     /**
+				      * Constructor. Arguments are the
+				      * center of the ball and its
+				      * radius.
+				      */
+    CutOffFunctionCinfty (const double radius = 1.,
+			  Point<dim> = Point<dim>());
+    
+				       /**
+					* Function value at one point.
+					*/
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+      
+				       /**
+					* Function values at multiple points.
+					*/
+      virtual void value_list (const typename std::vector<Point<dim> > &points,
+			       std::vector<double>            &values,
+			       const unsigned int              component = 0) const;
+
+  private:
+				     /**
+				      * Center of the integration ball.
+				      */
+    const Point<dim> center;
+
+				     /**
+				      * Radius of the ball.
+				      */
+    const double radius;
+  };
+  
   
   
 };
