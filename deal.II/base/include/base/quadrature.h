@@ -42,6 +42,27 @@
  * exact on tensor product polynomials of degree #m# in each space
  * direction, but they are still only of #m+1#st order.
  *
+ * Most integration formulae in more than one space dimension are
+ * tensor products of quadrature formulae in one space dimension, or
+ * more generally the tensor product of a formula in #(dim-1)#
+ * dimensions and one in one dimension. There is a special constructor
+ * to generate a quadrature formula from two others.  For example, the
+ * #QGauss2<dim># formulae includes $2^dim$ quadrature points in #dim#
+ * dimensions but is still exact for polynomials of degree 3 and its
+ * order of integration is 4.
+ *
+ * For some programs it is necessary to have a quadrature object for
+ * faces.  These programs fail to link if compiled for only one space
+ * dimension, since there quadrature rules for faces just don't make
+ * no sense. In order to allow these programs to be linked anyway, for
+ * class #Quadrature<0># all functions are provided in the
+ * #quadrature.cc# file, but they will throw exceptions if actually
+ * called. The only function which is allowed to be called is the
+ * constructor taking one integer, which in this case ignores its
+ * parameter, and of course the destructor. Besides this, it is
+ * necessary to provide a class #Point<0># to make the compiler
+ * happy. This class also does nothing.
+ *
  * @author Wolfgang Bangerth, 1998, 1999, 2000
  */
 template <int dim>
