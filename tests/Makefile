@@ -20,7 +20,44 @@ report:
 	@for i in base lac fe deal.II ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
-	done
+	 done
+	echo =======Report: all-headers =======
+	@today=`date -u +"%Y-%m-%d %H:%M"` ; \
+	 if $(MAKE) all-headers ; then \
+		echo $$today + all-headers ; \
+	 else \
+		echo $$today - all-headers ; \
+	 fi
+
+# collect all header files, and for each try to do the following:
+# generate a file tmp.cc that contains nothing but "#include <xxx>"
+# with this particular header file. then try to compile it. this 
+# sometimes fails since this header does not include all other headers
+# it actually needs. we don't usually see this since we may be 
+# including these missing headers into our files before, so that nobody
+# notices the problem. expose it this way.
+#
+# this all happens in a subdir tmp-all-headers, which is removed
+# afterwards again.
+all-headers:
+	@rm -rf tmp-all-headers
+	@mkdir tmp-all-headers 
+	@for i in base lac deal.II ; do \
+		pushd . > /dev/null ; \
+		headers=`cd $D/$$i/include ; \
+			 for j in */*.h ; do echo $$j ; done` ; \
+		popd > /dev/null ; \
+		cd tmp-all-headers ; \
+		cp ../base/Makefile . ; \
+		for j in $$headers ; do \
+			echo "#include <$$j>" > tmp.cc ; \
+			echo "********** Checking for $$j ************" ; \
+			if $(MAKE) tmp.go ; then : ; else exit 1 ; fi ; \
+			rm -f tmp.* ; \
+		done ; \
+		cd .. ; \
+	 done
+	@rm -rf tmp-all-headers
 
 
 clean: clean-base clean-lac clean-deal.II clean-fe
@@ -59,3 +96,5 @@ veryclean-big:
 .PHONY : all base lac fe deal.II big-tests \
 	clean clean-base clean-lac clean-fe clean-deal.II clean-big \
 	veryclean veryclean-base veryclean-lac veryclean-fe veryclean-deal.II veryclean-big
+
+include Makefile.paths
