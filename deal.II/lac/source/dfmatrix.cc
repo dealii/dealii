@@ -927,7 +927,7 @@ double dFMatrix::determinant () const {
 void dFMatrix::clear () {
   double       *val_ptr = &val[0];
   const double *end_ptr = &val[n()*m()];
-  while (val_prt != end_ptr)
+  while (val_ptr != end_ptr)
     *val_ptr++ = 0.;
 };
 
