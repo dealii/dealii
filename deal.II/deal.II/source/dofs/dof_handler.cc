@@ -1,6 +1,7 @@
 /* $Id$ */
 
 #include <grid/dof.h>
+#include <grid/dof_levels.h>
 #include <grid/dof_accessor.h>
 #include <grid/dof_constraints.h>
 #include <grid/tria_levels.h>

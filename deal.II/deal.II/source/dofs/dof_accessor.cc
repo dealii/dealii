@@ -3,6 +3,7 @@
 
 #include <grid/dof_accessor.h>
 #include <grid/dof.h>
+#include <grid/dof_levels.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
