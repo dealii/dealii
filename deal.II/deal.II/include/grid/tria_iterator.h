@@ -286,8 +286,8 @@ class TriaRawIterator :
 				      *  class.
 				      */
     TriaRawIterator (const Triangulation<dim> *parent,
-		     const int           level,
-		     const int           index,
+		     const int                 level,
+		     const int                 index,
 		     const typename AccessorType::AccessorData *local_data = 0);
 
 				     /**
@@ -569,8 +569,8 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  an error!
 				      */
     TriaIterator (const Triangulation<dim> *parent,
-		  const int           level,
-		  const int           index,
+		  const int                 level,
+		  const int                 index,
 		  const typename Accessor::AccessorData *local_data = 0);
     
 				     /**
@@ -728,8 +728,8 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  an error!
 				      */
     TriaActiveIterator (const Triangulation<dim> *parent,
-			const int           level,
-			const int           index,
+			const int                 level,
+			const int                 index,
 			const typename Accessor::AccessorData *local_data = 0);
 
 				     /**

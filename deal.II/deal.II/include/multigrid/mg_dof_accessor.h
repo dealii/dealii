@@ -251,9 +251,9 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 				      * to a @p{MGDoFHandler<dim>} object.
 				      */
     MGDoFObjectAccessor (const Triangulation<dim> *tria,
-			 const int           level,
-			 const int           index,
-			 const AccessorData *local_data);
+			 const int                 level,
+			 const int                 index,
+			 const AccessorData       *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -367,9 +367,9 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     MGDoFObjectAccessor (const Triangulation<dim> *tria,
-			 const int           level,
-			 const int           index,
-			 const AccessorData *local_data);
+			 const int                 level,
+			 const int                 index,
+			 const AccessorData       *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -492,9 +492,9 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     MGDoFObjectAccessor (const Triangulation<dim> *tria,
-			 const int           level,
-			 const int           index,
-			 const AccessorData *local_data);
+			 const int                 level,
+			 const int                 index,
+			 const AccessorData       *local_data);
     
 				     /**
 				      * Return the index of the @p{i}th degree
@@ -627,9 +627,9 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
 				      * Constructor
 				      */
     MGDoFCellAccessor (const Triangulation<dim> *tria,
-		       const int           level,
-		       const int           index,
-		       const AccessorData *local_data) :
+		       const int                 level,
+		       const int                 index,
+		       const AccessorData       *local_data) :
 		    MGDoFObjectAccessor<dim, dim> (tria,level,index,local_data) {};
 
 				     /**

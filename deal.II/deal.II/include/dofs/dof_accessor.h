@@ -258,9 +258,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (const Triangulation<dim> *tria,
-		       const int           level,
-		       const int           index,
-		       const AccessorData *local_data) :
+		       const int                 level,
+		       const int                 index,
+		       const AccessorData       *local_data) :
 		    DoFAccessor<dim> (local_data),
       DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass (tria,level,index) {};
     
@@ -512,9 +512,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (const Triangulation<dim> *tria,
-		       const int           level,
-		       const int           index,
-		       const AccessorData *local_data) :
+		       const int                 level,
+		       const int                 index,
+		       const AccessorData       *local_data) :
 		    DoFAccessor<dim> (local_data),
       DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,level,index) {};
     
@@ -700,9 +700,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (const Triangulation<dim> *tria,
-		       const int           level,
-		       const int           index,
-		       const AccessorData *local_data) :
+		       const int                 level,
+		       const int                 index,
+		       const AccessorData       *local_data) :
 		    DoFAccessor<dim> (local_data),
       DoFObjectAccessor_Inheritance<2,dim>::BaseClass (tria,level,index) {};
     
@@ -897,9 +897,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * to a @ref{DoFHandler} object.
 				      */
     DoFObjectAccessor (const Triangulation<dim> *tria,
-		       const int           level,
-		       const int           index,
-		       const AccessorData *local_data) :
+		       const int                 level,
+		       const int                 index,
+		       const AccessorData       *local_data) :
 		    DoFAccessor<dim> (local_data),
       DoFObjectAccessor_Inheritance<3,dim>::BaseClass (tria,level,index) {};
     
@@ -1099,9 +1099,9 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * Constructor
 				      */
     DoFCellAccessor (const Triangulation<dim> *tria,
-		     const int           level,
-		     const int           index,
-		     const AccessorData *local_data) :
+		     const int                 level,
+		     const int                 index,
+		     const AccessorData       *local_data) :
 		    DoFObjectAccessor<dim, dim> (tria,level,index,local_data) {};
 
 				     /**

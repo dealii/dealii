@@ -80,10 +80,10 @@ class TriaAccessor
 				      *  only callable from friend
 				      *  classes.
 				      */
-    TriaAccessor (const Triangulation<dim> *parent     = 0,
-		  const int           level      = -1,
-		  const int           index      = -1,
-		  const AccessorData * = 0) :
+    TriaAccessor (const Triangulation<dim> *parent =  0,
+		  const int                 level  = -1,
+		  const int                 index  = -1,
+		  const AccessorData       *       =  0) :
 		    present_level (level),
 		    present_index (index),
 		    tria (parent) {};
@@ -295,10 +295,10 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * By default, an illegal
 				      * accessor is constructed.
 				      */
-    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
-			const int           level      = -1,
-			const int           index      = -1,
-			const AccessorData *local_data = 0) :
+    TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
+			const int                 level      = -1,
+			const int                 index      = -1,
+			const AccessorData       *local_data =  0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -683,10 +683,10 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 				      * Constructor. Should never be called and
 				      * thus produces an error.
 				      */
-    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
-			const int           level      = -1,
-			const int           index      = -1,
-			const AccessorData *local_data = 0) :
+    TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
+			const int                 level      = -1,
+			const int                 index      = -1,
+			const AccessorData       *local_data =  0) :
 		    TriaAccessor<dim> (parent, level, index, local_data)
       {
 	Assert (false, ExcInternalError());
@@ -716,10 +716,10 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Constructor.
 				      */
-    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
-			const int           level      = -1,
-			const int           index      = -1,
-			const AccessorData *local_data = 0) :
+    TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
+			const int                 level      = -1,
+			const int                 index      = -1,
+			const AccessorData       *local_data =  0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1059,10 +1059,10 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Constructor.
 				      */
-    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
-			const int           level      = -1,
-			const int           index      = -1,
-			const AccessorData *local_data = 0) :
+    TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
+			const int                 level      = -1,
+			const int                 index      = -1,
+			const AccessorData       *local_data =  0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1436,10 +1436,10 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Constructor.
 				      */
-    TriaObjectAccessor (const Triangulation<dim> *parent     = 0,
-			const int           level      = -1,
-			const int           index      = -1,
-			const AccessorData *local_data = 0) :
+    TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
+			const int                 level      = -1,
+			const int                 index      = -1,
+			const AccessorData       *local_data =  0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1822,10 +1822,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				     /**
 				      *  Constructor.
 				      */
-    CellAccessor (const Triangulation<dim> *parent     = 0,
-		  const int           level      = -1,
-		  const int           index      = -1,
-		  const AccessorData *local_data = 0) :
+    CellAccessor (const Triangulation<dim> *parent     =  0,
+		  const int                 level      = -1,
+		  const int                 index      = -1,
+		  const AccessorData       *local_data =  0) :
 		    TriaObjectAccessor<dim,dim> (parent, level, index, local_data) {};
 
 				     /**

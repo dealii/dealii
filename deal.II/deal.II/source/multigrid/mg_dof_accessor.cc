@@ -35,9 +35,9 @@ using namespace std;
 
 template <int dim>
 MGDoFObjectAccessor<1, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria,
-						  const int           level,
-						  const int           index,
-						  const AccessorData *local_data) :
+						  const int                 level,
+						  const int                 index,
+						  const AccessorData       *local_data) :
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass(tria,level,index,local_data)
 {};
@@ -192,9 +192,9 @@ MGDoFObjectAccessor<1, dim>::copy_from (const MGDoFObjectAccessor<1, dim> &a)
 
 template <int dim>
 MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria,
-						  const int           level,
-						  const int           index,
-						  const AccessorData *local_data) :
+						  const int                 level,
+						  const int                 index,
+						  const AccessorData       *local_data) :
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<2,dim>::BaseClass(tria,level,index,local_data)
 {};
@@ -374,9 +374,9 @@ MGDoFObjectAccessor<2, dim>::copy_from (const MGDoFObjectAccessor<2, dim> &a)
 
 template <int dim>
 MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria,
-						  const int           level,
-						  const int           index,
-						  const AccessorData *local_data) :
+						  const int                 level,
+						  const int                 index,
+						  const AccessorData       *local_data) :
 		MGDoFAccessor<dim> (local_data),
 		MGDoFObjectAccessor_Inheritance<3,dim>::BaseClass(tria,level,index,local_data)
 {};
