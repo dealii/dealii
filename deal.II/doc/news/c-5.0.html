@@ -99,6 +99,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: <code
+       class="member">CompressedSparsityPattern::max_entries_per_row()</code>
+       ignored the first row and thus sometimes returned a value that was too
+       low. This is now fixed.
+       <br> 
+       (WB 2004/06/21)
+       </p>
+
+  <li> <p>
        Fixed: <code class="member">BlockSparseMatrix::clear()</code> did not
        do what it was supposed to do: it emptied the individual blocks and
        removed them, but it still kept the number of blocks
