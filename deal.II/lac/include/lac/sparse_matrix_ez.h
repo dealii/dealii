@@ -72,8 +72,12 @@ template<typename number> class FullMatrix;
  * be achieved. @p{default_reserve} should then be an estimate for the
  * number of hanging nodes times @p{default_increment}.
  *
+ * Letting @p{default_increment} zero causes an exception whenever a
+ * row overflows.
+ *
  * If the rows are expected to be filled more or less from first to
- * last, using a @p{default_row_length} may not be such a bad idea.
+ * last, using a @p{default_row_length} of zero may not be such a bad
+ * idea.
  *
  * The name of this matrix is in reverence to a publication of the
  * Internal Revenue Service of the United States of America. I hope
@@ -839,6 +843,18 @@ class SparseMatrixEZ : public Subscriptor
     unsigned int memory_consumption () const;
 
 				     /**
+				      * Print statistics. If @p{full}
+				      * is @p{true}, prints a
+				      * histogram of all existing row
+				      * lengths and allocated row
+				      * lengths. Otherwise, just the
+				      * relation of allocated and used
+				      * entries is shown.
+				      */
+    template <class STREAM>
+    void print_statistics (STREAM& s, bool full = false);
+    
+				     /**
 				      * Exception for applying
 				      * inverse-type operators to
 				      * rectangular matrices.
@@ -1269,7 +1285,7 @@ inline
 number SparseMatrixEZ<number>::el (const unsigned int i,
 				   const unsigned int j) const
 {
-  Entry* entry = locate(i,j);
+  const Entry* entry = locate(i,j);
   if (entry)
     return entry->value;
   return 0.;
@@ -1397,6 +1413,50 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 	  ++b2;
 	}
       ++b1;
+    }
+}
+
+
+template <typename number>
+template <class STREAM>
+void
+SparseMatrixEZ<number>::print_statistics(STREAM& out, bool full)
+{
+  typename std::vector<RowInfo>::const_iterator row = row_info.begin();
+  const typename std::vector<RowInfo>::const_iterator endrow = row_info.end();
+
+				   // Add up entries actually used
+  unsigned int entries_used = 0;
+  unsigned int max_length = 0;
+  for (; row != endrow ; ++ row)
+    {
+      entries_used += row->length;
+      if (max_length < row->length)
+	max_length = row->length;
+    }
+  
+				   // Number of entries allocated is
+				   // position of last entry used
+  --row;
+  unsigned int entries_alloc = row->start + row->length;
+
+  out << "SparseMatrixEZ:used     entries:" << entries_used << std::endl
+      << "SparseMatrixEZ:alloc    entries:" << entries_alloc << std::endl
+      << "SparseMatrixEZ:reserved entries:" << data.capacity() << std::endl;
+  
+  if (full)
+    {
+      std::vector<unsigned int> length_used (max_length+1);
+      
+      for (row = row_info.begin() ; row != endrow; ++row)
+	{
+	  ++length_used[row->length];
+	}
+      for (unsigned int i=0; i< length_used.size();++i)
+	if (length_used[i] != 0)
+	  out << "SparseMatrixEZ:entries\t" << i
+	      << "\trows\t" << length_used[i]
+	      << std::endl;
     }
 }
 

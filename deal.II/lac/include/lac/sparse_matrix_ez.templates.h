@@ -1,4 +1,5 @@
 #include <lac/sparse_matrix_ez.h>
+#include <lac/vector.h>
 
 #include <algorithm>
 
@@ -82,7 +83,7 @@ template <typename number>
 bool
 SparseMatrixEZ<number>::empty() const
 {
-  return ((n_columns == 0) && (row_start.size()==0));
+  return ((n_columns == 0) && (row_info.size()==0));
 }
 
 
@@ -155,7 +156,7 @@ SparseMatrixEZ<number>::vmult_add (Vector<somenumber>& dst,
   const unsigned int end_row = row_info.size();
   for (unsigned int row = 0; row < end_row; ++row)
     {
-      const RowInfo& ri = row_info[i];
+      const RowInfo& ri = row_info[row];
       typename std::vector<Entry>::const_iterator
 	entry = data.begin() + ri.start;
       double s = 0.;
@@ -333,9 +334,8 @@ template <typename number>
 unsigned int
 SparseMatrixEZ<number>::memory_consumption() const
 {
-  unsigned int result =
+  return
     sizeof (*this)
-    + sizeof(unsigned int) * row_start.capacity();
-    + sizeof(SparseMatrixEZ<number>::Entry) * data.capacity();
-  return result;
+    + sizeof(unsigned int) * row_info.capacity()
+    + sizeof(typename SparseMatrixEZ<number>::Entry) * data.capacity();
 }

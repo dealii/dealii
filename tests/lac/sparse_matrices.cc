@@ -159,6 +159,7 @@ int main()
 #ifdef DEBUG
   check_iterator(E);
 #endif
+  E.print_statistics(deallog, true);
   E.add_scaled(-1., A);
   if (E.l2_norm() < 1.e-14)
     deallog << "Matrices are equal" << std::endl;
@@ -180,6 +181,7 @@ int main()
   deallog << "Assemble" << std::endl;
   testproblem.nine_point(E);
   check_vmult_quadratic(E_res, E, "9-SparseMatrixEZ<double>");
+  E.print_statistics(deallog, true);
 
   for (unsigned int i=0;i<E_res.size();++i)
     if (std::fabs(A_res[i] - E_res[i]) > 1.e-14)

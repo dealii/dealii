@@ -17,8 +17,6 @@
 #include <lac/sparse_matrix_ez.h>
 #include <lac/vector.h>
 
-#include <lac/sparse_matrix_ez.templates.h>
-
 FDMatrix::FDMatrix(unsigned int nx, unsigned int ny)
 		:
 		nx(nx), ny(ny)
