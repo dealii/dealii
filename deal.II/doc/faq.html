@@ -34,6 +34,9 @@
   <li> <a href="#parallel">Does <acronym>deal.II</acronym> support parallel
        computing?</a>
   <li> <a href="#perl-bug">I can't build the online documentation under Cygwin!</a>
+  <li> <a href="#cygwin-shared">My program compiles and links under Cygwin, but
+       it issues a run-time error saying that <code>libXXX.DLL</code> cannot 
+       be found!</a>
   <li> <a href="#triangles">Can I use/implement triangles/tetrahedra
        in <acronym>deal.II</acronym>?</a> 
   <li> <a href="#problem-types">Can I solve problem XXX with
@@ -233,6 +236,30 @@
   patch to the source code of the perl utility and recompile.
   </p>
 
+  <a name="cygwin-shared">
+  <h3>My program compiles and links under Cygwin, but it issues a 
+  run-time error saying that <code>libXXX.DLL</code> cannot 
+  be found!</a></h3>
+
+  <p>
+  With Version 5.1.0, <acronym>deal.II</acronym> creates and uses shared 
+  libraries (DLLs) under cygwin. These DLLs will be linked to your program
+  at run-time, which requires Windows to know where the DLLs are stored.
+  Windows looks for DLLs in the execution path of your program, in the
+  Windows system directories, and in every directory specified in the
+  <code>PATH</code> environment variable. To do this, type
+  </p>
+  
+  <p> 
+  <code>export PATH=$PATH:/usr/local/lib/deal.II/lib</code>
+  </p>
+
+  <p>
+  in the shell prior to execution, or add this line to <code>.bashrc</code>.
+  To disable shared libraries, change <code>enable-shared</code> in 
+  <code>common/Make.global_options</code> to <code>no</code> and link
+  <acronym>deal.II</acronym> again (with <code>make all</code>).
+  </p>
 
 
   <a name="parallel">
