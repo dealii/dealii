@@ -103,6 +103,7 @@ block_sparse_matrix_1.exe:block_sparse_matrix_1.g.$(OBJEXT) $(libraries)
 hyper_ball_3d.exe       : hyper_ball_3d.g.$(OBJEXT)        $(libraries)
 cylinder.exe            : cylinder.g.$(OBJEXT)             $(libraries)
 coarsening_3d.exe       : coarsening_3d.g.$(OBJEXT)        $(libraries)
+mesh_3d_1.exe           : mesh_3d_1.g.$(OBJEXT)            $(libraries)
 
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
@@ -131,7 +132,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	parameter_handler_3 parameter_handler_4 \
 	parameter_handler_5 \
 	sparse_lu_decomposition_1 block_sparse_matrix_1 \
-	hyper_ball_3d cylinder coarsening_3d
+	hyper_ball_3d cylinder coarsening_3d mesh_3d_1
 
 ############################################################
 
