@@ -37,10 +37,14 @@ class dVector;
 
    In principle, the implementation of the error estimation is simple: let
    $$ \eta_K^2 =
-   \frac{h}{24} \int_{\partial K} \left[\frac{\partial u_h}{\partial n}\right]^2 do
+   h \int_{\partial K} \left[\frac{\partial u_h}{\partial n}\right]^2 do
    $$
    be the error estimator for cell $K$. $[\cdot]$ denotes the jump of the
-   argument at the face.
+   argument at the face. In the paper of Ainsworth, $h$ is divided by $24$,
+   but this factor is a bit esoteric, stemming from interpolation estimates
+   and stability constants which may hold for the Poisson problem, but may
+   not hold for more general situations. In the implementation, this factor
+   is dropped for these reasons.
 
    To perform the integration, use is made of the #FEFaceValues# class and the
    integration is performed for each cell, i.e. no use is made of the fact, that
