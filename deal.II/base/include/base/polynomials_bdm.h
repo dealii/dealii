@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -186,15 +186,14 @@ class PolynomialsBDM
 				      * Returns the number of BDM polynomials.
 				      */
     unsigned int n () const;
-
+    
 				     /**
-				      * Exception.
+				      * Returns the degree of the BDM
+				      * space, which is one less than
+				      * the highest polynomial degree.
 				      */
-    DeclException3 (ExcDimensionMismatch2,
-		    int, int, int,
-		    << "Dimension " << arg1 << " not equal to " << arg2 << " nor to " << arg3);
-
-	    
+    unsigned int degree () const;
+    
   private:
 				     /**
 				      * An object representing the
@@ -219,7 +218,7 @@ class PolynomialsBDM
 				      * polynomials.
 				      */
     unsigned int n_pols;
-
+    
 				     /**
 				      * Auxiliary memory.
 				      */
@@ -241,6 +240,13 @@ inline unsigned int
 PolynomialsBDM<dim>::n() const
 {
   return n_pols;
+}
+
+template <int dim>
+inline unsigned int
+PolynomialsBDM<dim>::degree() const
+{
+  return polynomial_space.degree() - 1;
 }
 
 #endif

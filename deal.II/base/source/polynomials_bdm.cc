@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,11 +45,11 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
 			      std::vector<Tensor<3,dim> > &grad_grads) const
 {
   Assert(values.size()==n_pols || values.size()==0,
-	 ExcDimensionMismatch2(values.size(), n_pols, 0));
+	 ExcDimensionMismatch(values.size(), n_pols));
   Assert(grads.size()==n_pols|| grads.size()==0,
-	 ExcDimensionMismatch2(grads.size(), n_pols, 0));
+	 ExcDimensionMismatch(grads.size(), n_pols));
   Assert(grad_grads.size()==n_pols|| grad_grads.size()==0,
-	 ExcDimensionMismatch2(grad_grads.size(), n_pols, 0));
+	 ExcDimensionMismatch(grad_grads.size(), n_pols));
 
   const unsigned int n_sub = polynomial_space.n();
   p_values.resize((values.size() == 0) ? 0 : n_sub);
@@ -69,7 +69,6 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
       for (unsigned int j=0;j<dim;++j)
 	{
 	  values[i+j*n_sub][j] = p_values[i];
-//	  std::cerr << i+j*n_sub << ' ' << j << ' ' << p_values[i] << std::endl;
 	}
       
     }
@@ -119,7 +118,7 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
   for (unsigned int i=0;i<legendre.size();++i)
     legendre[i] = Legendre(i);
 
-  QGauss<1> qface(polynomial_space.degree());
+  QGauss<1> qface(polynomial_space.degree()+1);
 
   Table<2,double> integrals (n(), n());
 
@@ -147,8 +146,6 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 	      p(1) = x;
 	      break;	      
 	  }
-//	std::cerr << p << std::endl;
-	
 	compute (p, values, grads, grad_grads);
 	for (unsigned int i=0;i<n();++i)
 	  {
