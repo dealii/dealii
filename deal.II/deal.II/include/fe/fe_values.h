@@ -311,9 +311,9 @@ class FEValuesBase
 				      * #Vector<float>#, or
 				      * #BlockVector<double,...>#.
 				      */
-    template <class InputVector>
+    template <class InputVector, typename number>
     void get_function_values (const InputVector &fe_function,
-			      vector<double>    &values) const;
+			      vector<number>    &values) const;
 
 				     /**
 				      * Access to vector valued finite
@@ -330,9 +330,9 @@ class FEValuesBase
 				      * #Vector<float>#, or
 				      * #BlockVector<double,...>#.
 				      */
-    template <class InputVector>
+    template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
-			      vector<Vector<double> > &values) const;
+			      vector<Vector<number> > &values) const;
 
     				     /**
 				      * Return the gradient of the #i#th shape
