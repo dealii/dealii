@@ -236,7 +236,6 @@ namespace Threads
     list_mutex.acquire ();
     if (thread_id_list != 0)
       delete reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
-    thread_id_list = 0;
     list_mutex.release ();
   }
 
