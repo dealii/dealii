@@ -1553,7 +1553,7 @@ void DoFHandler<3>::renumber_dofs (const vector<unsigned int> &new_numbers) {
 template <>
 unsigned int DoFHandler<1>::max_couplings_between_dofs () const {
   Assert (selected_fe != 0, ExcNoFESelected());
-  return 3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line;
+  return min(3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line, n_dofs());
 };
 
 
@@ -1594,32 +1594,34 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 				   // nodes)
 				   // count lines -> 28 (don't forget to count
 				   // mother and children separately!)
+  unsigned int max_couplings;
   switch (tria->max_adjacent_cells())
     {
       case 4:
-	    return (19*selected_fe->dofs_per_vertex +
-		    28*selected_fe->dofs_per_line +
-		    8*selected_fe->dofs_per_quad);
+	    max_couplings=19*selected_fe->dofs_per_vertex +
+			  28*selected_fe->dofs_per_line +
+			  8*selected_fe->dofs_per_quad;
       case 5:
-	    return (21*selected_fe->dofs_per_vertex +
-		    31*selected_fe->dofs_per_line +
-		    9*selected_fe->dofs_per_quad);
+	    max_couplings=21*selected_fe->dofs_per_vertex +
+			  31*selected_fe->dofs_per_line +
+			  9*selected_fe->dofs_per_quad;
       case 6:
-	    return (28*selected_fe->dofs_per_vertex +
-		    42*selected_fe->dofs_per_line +
-		    12*selected_fe->dofs_per_quad);
+	    max_couplings=28*selected_fe->dofs_per_vertex +
+			  42*selected_fe->dofs_per_line +
+			  12*selected_fe->dofs_per_quad;
       case 7:
-	    return (30*selected_fe->dofs_per_vertex +
-		    45*selected_fe->dofs_per_line +
-		    13*selected_fe->dofs_per_quad);
+	    max_couplings=30*selected_fe->dofs_per_vertex +
+			  45*selected_fe->dofs_per_line +
+			  13*selected_fe->dofs_per_quad;
       case 8:
-	    return (37*selected_fe->dofs_per_vertex +
-		    56*selected_fe->dofs_per_line +
-		    16*selected_fe->dofs_per_quad);
+	    max_couplings=37*selected_fe->dofs_per_vertex +
+			  56*selected_fe->dofs_per_line +
+			  16*selected_fe->dofs_per_quad;
       default:
 	    Assert (false, ExcNotImplemented());
-	    return 0;
+	    max_couplings=0;
     };
+  return(min(max_couplings,n_dofs()));
 };
 
 
@@ -1649,15 +1651,19 @@ unsigned int DoFHandler<3>::max_couplings_between_dofs () const {
 				   // can anyone give better estimate here?
   const unsigned int max_adjacent_cells = tria->max_adjacent_cells();
 
+  unsigned int max_couplings;
   if (max_adjacent_cells <= 8)
-    return (7*7*7*selected_fe->dofs_per_vertex +
-	    7*6*7*3*selected_fe->dofs_per_line +
-	    9*4*7*3*selected_fe->dofs_per_quad +
-	    27*selected_fe->dofs_per_hex);
-
-
-  Assert (false, ExcNotImplemented());
-  return 0;
+    max_couplings=7*7*7*selected_fe->dofs_per_vertex +
+		  7*6*7*3*selected_fe->dofs_per_line +
+		  9*4*7*3*selected_fe->dofs_per_quad +
+		  27*selected_fe->dofs_per_hex;
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      max_couplings=0;
+    }
+  
+  return min(max_couplings,n_dofs());
 };
 
 
