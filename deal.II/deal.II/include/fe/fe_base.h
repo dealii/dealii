@@ -960,6 +960,21 @@ class FiniteElementBase : public Subscriptor,
 		      typename Mapping<dim>::InternalDataBase &mapping_internal,
 		      InternalDataBase                        &fe_internal,
 		      FEValuesData<dim>                       &data) const;
+
+  private:
+				     /**
+				      * Second derivatives of shapes
+				      * functions are not computed
+				      * analytically, but by finite
+				      * differences of the
+				      * gradients. This static
+				      * variable denotes the step
+				      * length to be used for
+				      * that. It's value is set to
+				      * 1e-6.
+				      */
+    static const double fd_step_length;
+    
     
 				     /**
 				      * Allow the FESystem class to

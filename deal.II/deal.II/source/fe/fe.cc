@@ -32,6 +32,10 @@ using namespace std;
 
 
 template <int dim>
+const double FiniteElementBase<dim>::fd_step_length = 1.0e-6;
+
+
+template <int dim>
 void
 FiniteElementBase<dim>::
 InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
@@ -58,8 +62,7 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
   for (unsigned int d=0; d<dim; ++d)
     {
       Point<dim> shift;
-//TODO:[GK] unify the places where the finite differencing step length is used      
-      shift (d) = 1.e-6;
+      shift (d) = fd_step_length;
 
 				       // generate points and FEValues
 				       // objects shifted in
@@ -374,13 +377,12 @@ compute_2nd (const Mapping<dim>                   &mapping,
 	    const Tensor<1,dim>& left
 	      = fe_internal.differences[d1+dim]->shape_grad(shape, q);
 
-//TODO:[GK] unify the places where the finite differencing step length is used      
 					     // compute the second
 					     // derivative from a
 					     // symmetric difference
 					     // approximation
 	    for (unsigned int d=0; d<dim; ++d)
-	      diff_quot[d][q][d1] = 1./(2*1.e-6) * (right[d]-left[d]);
+	      diff_quot[d][q][d1] = 1./(2*fd_step_length) * (right[d]-left[d]);
 	  }
 
 				       // up to now we still have
