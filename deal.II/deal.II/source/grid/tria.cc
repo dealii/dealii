@@ -212,7 +212,8 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 template <>
 void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 					     const vector<CellData<1> > &cells,
-					     const SubCellData &subcelldata) {
+					     const SubCellData &subcelldata)
+{
 				   // note: since no boundary information
 				   // can be given in one dimension, the
 				   // @p{subcelldata} field is ignored. (only
@@ -263,18 +264,29 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
   for (unsigned int i=0; i<lines_at_vertex.size(); ++i)
     switch (lines_at_vertex[i].size()) 
       {
-	case 1:      // this vertex has only one adjacent line
+	case 1:
+					       // this vertex has only
+					       // one adjacent line
 	      ++boundary_nodes;
 	      break;
 	case 2:
 	      break;
-	default:     // a node must have one or two adjacent lines
+	default:
+					       // a node must have one
+					       // or two adjacent
+					       // lines
+	      clear ();
 	      AssertThrow (false, ExcInternalError());
       };
 
 				   // assert there are no more than two boundary
 				   // nodes
-  AssertThrow (boundary_nodes == 2, ExcInternalError());
+  if (boundary_nodes != 2)
+    {
+      clear ();
+      AssertThrow (false, ExcInternalError());
+    };
+  
 
 
 				   // update neighborship info
@@ -354,9 +366,14 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
       for (unsigned int vertex=0; vertex<4; ++vertex)
-	AssertThrow ((0<=cells[cell].vertices[vertex]) &&
-		     (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size())),
-		     ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
+	if ( ! ((0<=cells[cell].vertices[vertex]) &&
+		(cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
+	  {
+	    clear ();
+	    Assert (false,
+		    ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
+	  };
+      
       
       pair<int,int> line_vertices[4] = {   // note the order of the vertices
 	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
@@ -426,11 +443,15 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 					   // direction 1->4, while in
 					   // the second it would be 4->1.
 					   // This will cause the exception.
-	  AssertThrow (needed_lines.find(make_pair(line_vertices[line].second,
-						   line_vertices[line].first))
-		       ==
-		       needed_lines.end(),
-		       ExcGridHasInvalidCell(cell));
+	  if (! (needed_lines.find(make_pair(line_vertices[line].second,
+					     line_vertices[line].first))
+		 ==
+		 needed_lines.end()))
+	    {
+	      clear ();
+	      AssertThrow (false,
+			   ExcGridHasInvalidCell(cell));
+	    };
 		  
 					   // insert line, with invalid iterator
 					   // if line already exists, then
@@ -440,7 +461,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
     };
 
 
-				   // check the every vertex has
+				   // check that every vertex has
 				   // at least two adjacent lines
   if (true) 
     {
@@ -453,11 +474,16 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	  ++vertex_touch_count[i->first.second];
 	};
 
-				       // assert minimum touch count is at
-				       // least two
-      AssertThrow (* (min_element(vertex_touch_count.begin(),
-				  vertex_touch_count.end())) >= 2,
-		   ExcGridHasInvalidVertices());
+				       // assert minimum touch count
+				       // is at least two. if not so,
+				       // then clean triangulation and
+				       // exit with an exception
+      if ( ! (* (min_element(vertex_touch_count.begin(),
+			     vertex_touch_count.end())) >= 2))
+	{
+	  clear ();
+	  AssertThrow (false, ExcGridHasInvalidVertices());
+	};
     };
 	
   				   // reserve enough space
@@ -531,9 +557,12 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       const unsigned int n_adj_cells = adjacent_cells[line->index()].size();
 				       // assert that every line has one or
 				       // two adjacent cells
-      AssertThrow ((n_adj_cells >= 1) &&
-		   (n_adj_cells <= 2),
-		   ExcInternalError());
+      if (! ((n_adj_cells >= 1) &&
+	     (n_adj_cells <= 2)))
+	{
+	  clear ();
+	  AssertThrow (false, ExcInternalError());
+	};
 
 				       // if only one cell: line is at
 				       // boundary -> give it the boundary
@@ -568,16 +597,19 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	  else 
 	    {
 					       // line does not exist
+	      clear ();
 	      AssertThrow (false, ExcLineInexistant(line_vertices.first,
 						    line_vertices.second));
-	      line = end_line();
 	    };
 	};
 
 				       // Assert that only exterior lines
 				       // are given a boundary indicator
-      AssertThrow (line->boundary_indicator() == 0,
-		   ExcInteriorLineCantBeBoundary());
+      if (! (line->boundary_indicator() == 0))
+	{
+	  clear ();
+	  AssertThrow (false, ExcInteriorLineCantBeBoundary());
+	};
 
       line->set_boundary_indicator (boundary_line->material_id);
     };
@@ -683,9 +715,15 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				       // check whether vertex
 				       // indices are valid ones
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-	AssertThrow ((0<=cells[cell].vertices[vertex]) &&
-		     (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size())),
-		     ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
+	if (! ((0<=cells[cell].vertices[vertex]) &&
+	       (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
+	  {
+	    clear ();
+	    AssertThrow (false,
+			 ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex],
+						vertices.size()));
+	  };
+      
       
       pair<int,int> line_vertices[12] = {   // note the order of the vertices
 					     // front face
@@ -719,11 +757,14 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 					   // assert that the line was not
 					   // already inserted in reverse
 					   // order.
-	  AssertThrow (needed_lines.find(make_pair(line_vertices[line].second,
-						   line_vertices[line].first))
-		       ==
-		       needed_lines.end(),
-		       ExcGridHasInvalidCell(cell));
+	  if (! (needed_lines.find(make_pair(line_vertices[line].second,
+					     line_vertices[line].first))
+		 ==
+		 needed_lines.end()))
+	    {
+	      clear ();
+	      AssertThrow (false, ExcGridHasInvalidCell(cell));
+	    };
 		  
 					   // insert line, with invalid iterator
 					   // if line already exists, then
@@ -751,9 +792,12 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 
 				       // assert minimum touch count is at
 				       // least two
-      AssertThrow (* (min_element(vertex_touch_count.begin(),
-			     vertex_touch_count.end())) >= 2,
-	      ExcGridHasInvalidVertices());
+      if (! (* (min_element(vertex_touch_count.begin(),
+			    vertex_touch_count.end())) >= 2))
+	{
+	  clear ();
+	  AssertThrow (false, ExcGridHasInvalidVertices());
+	};
     };
 
 
@@ -1046,9 +1090,12 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
       const unsigned int n_adj_cells = adjacent_cells[quad->index()].size();
 				       // assert that every quad has one or
 				       // two adjacent cells
-      AssertThrow ((n_adj_cells >= 1) &&
-		   (n_adj_cells <= 2),
-		   ExcInternalError());
+      if (! ((n_adj_cells >= 1) &&
+	     (n_adj_cells <= 2)))
+	{
+	  clear ();
+	  AssertThrow (false, ExcInternalError());
+	};
 
 				       // if only one cell: quad is at
 				       // boundary -> give it the boundary
@@ -1084,7 +1131,7 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				   // not yet implemented
   AssertThrow ((subcelldata.boundary_lines.size() == 0) &&
 	       (subcelldata.boundary_quads.size() == 0),
-	       ExcInternalError());
+	       ExcNotImplemented());
 
 
 				   /////////////////////////////////////////
@@ -1118,7 +1165,8 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 
 template <>
 void Triangulation<1>::distort_random (const double factor,
-				       const bool   keep_boundary) {
+				       const bool   keep_boundary)
+{
 				   // this function is mostly equivalent to
 				   // that for the general dimensional case
 				   // the only difference being the correction
