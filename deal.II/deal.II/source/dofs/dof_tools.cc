@@ -1488,7 +1488,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				       // all other dofs are constrained
       {
 	const unsigned int col = weight_mapping[global_dof];
-	Assert (col < n_coarse_dofs, ExcInternalError());
+	Assert (col < n_parameters_on_fine_grid, ExcInternalError());
 	
 	unsigned int first_used_row=0;
 	if (true)
