@@ -1886,6 +1886,55 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl Many compilers get this wrong (see Section 14.7.3.1, number (4)):
+dnl ---------------------------------
+dnl   template <int dim> struct T {
+dnl     static const int i;
+dnl   };
+dnl
+dnl   template <> const int T<1>::i;
+dnl   template <> const int T<1>::i = 1;
+dnl ---------------------------------
+dnl First, by Section 14.7.3.14 of the standard, the first template<>
+dnl line must necessarily be the _declaration_ of a specialization,
+dnl and the second is then its definition. There is therefore no
+dnl reason to report a doubly defined variable (Intel ICC 6.0), or
+dnl to choke on these lines at all (Sun Forte)
+dnl
+dnl Usage: DEAL_II_CHECK_MEMBER_VARIALIZATION_SPEC_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_BUG, dnl
+[
+  AC_MSG_CHECKING(for member variable specialization bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	template <int dim> struct T {
+	    static const int i;
+	};
+
+	template <> const int T<1>::i;
+	template <> const int T<1>::i = 1;
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG, 1, 
+                     [Defined if the compiler refuses to allow the
+                      explicit specialization of static member 
+                      variables. For the exact failure mode, look at
+                      aclocal.m4 in the top-level directory.])
+    ])
+])
+
+
+
 
 dnl -------------------------------------------------------------
 dnl gcc2.95 doesn't have the std::iterator class, but the standard
