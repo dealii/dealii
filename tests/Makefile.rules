@@ -44,8 +44,8 @@ verbose = off
 
 
 %.check : %.output
-	@echo '=====Checking======' $< ;
-	@if test "x$verbose" = "xon" ; then \
+	@echo '=====Checking======' $<
+	@if test "x$(verbose)" = "xon" ; then \
 		cmd="diff $< $(patsubst %.output,%.checked, $<)" ; \
 	 else \
 		cmd="diff $< $(patsubst %.output,%.checked, $<) > /dev/null" ; \
@@ -55,7 +55,7 @@ verbose = off
 		touch $@ ; \
 	 else \
 		echo '+++++Error+++++++++' $@ ; \
-		if test "x$stop_on_error" = "xon" ; then \
+		if test "x$(stop_on_error)" = "xon" ; then \
 			false ; \
 		fi ; \
 	 fi
