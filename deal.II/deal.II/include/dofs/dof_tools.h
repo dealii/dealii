@@ -566,6 +566,30 @@ class DoFTools
     static void
     extract_hanging_node_dofs (const DoFHandler<dim> &dof_handler,
 			       std::vector<bool>     &selected_dofs);
+
+				     /**
+				      * Count how many degrees of
+				      * freedom out of the total
+				      * number belong to each
+				      * components. If the number of
+				      * components the finite element
+				      * has (i.e. you only have one
+				      * scalar variable), then the
+				      * number in this component
+				      * obviously equals the total
+				      * number of degrees of
+				      * freedom. Otherwise, the sum of
+				      * the DoFs in all the components
+				      * needs to equal the total
+				      * number.
+				      *
+				      * The result is returned in the
+				      * last argument.
+				      */
+    template <int dim>
+    static void
+    count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
+			      std::vector<unsigned int> &dofs_per_component);
     
 				     /**
 				      * This function can be used when
