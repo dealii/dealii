@@ -21,7 +21,7 @@
 
 
 
-/* -------------------------- StraightBoundary --------------------- */
+/* -------------------------- Boundary --------------------- */
 
 
 template <int dim>
@@ -74,6 +74,12 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &,
 
 
 /* -------------------------- StraightBoundary --------------------- */
+
+
+template <int dim>
+StraightBoundary<dim>::StraightBoundary ()
+{};
+
 
 
 template <int dim>
