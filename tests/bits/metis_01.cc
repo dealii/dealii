@@ -44,7 +44,7 @@ void test ()
                                    // more than 8 subdomains) rather than the
                                    // recursive one
   deallog << "K-WAY" << std::endl;
-  GridTools::partition_triangulation (triangulation, 9);
+  GridTools::partition_triangulation (9, triangulation);
   for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
