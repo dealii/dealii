@@ -597,10 +597,10 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   
   FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
   const StraightBoundary<dim> boundary;
-  vector< vector <Vector<double> > >
+  vector< vector <vector<double> > >
     values (dof_data.size(),
-	    vector< Vector<double> >(points.n_quadrature_points,
-				     Vector<double>(dofs->get_fe().n_components
+	    vector< vector<double> >(points.n_quadrature_points,
+				     vector<double>(dofs->get_fe().n_components
 				     )));
 
   unsigned int cell_index=0;
@@ -625,7 +625,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    out << pt << "  ";
 		    for (unsigned int i=0; i!=dof_data.size(); ++i)
 		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
-			out << values[i][supp_pt](j)
+			out << values[i][supp_pt][j]
 			    << ' ';
 		    for (unsigned int i=0; i<cell_data.size(); ++i)
 		      out << (*cell_data[i].data)(cell_index)
@@ -651,7 +651,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		    
 		    for (unsigned int i=0; i!=dof_data.size(); ++i)
 		      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
-			out << values[i][supp_pt](j)
+			out << values[i][supp_pt][j]
 			    << ' ';
 		    for (unsigned int i=0; i<cell_data.size(); ++i)
 		      out << (*cell_data[i].data)(cell_index)
@@ -687,7 +687,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 			    
 			    for (unsigned int i=0; i!=dof_data.size(); ++i)
 			      for (unsigned int j=0; j < dofs->get_fe().n_components; ++j)
-				out << values[i][supp_pt](j)
+				out << values[i][supp_pt][j]
 				    << ' ';
 			    for (unsigned int i=0; i<cell_data.size(); ++i)
 			      out << (*cell_data[i].data)(cell_index)
