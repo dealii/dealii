@@ -25,6 +25,8 @@
 
 template<int dim> class FESystem;
 
+
+
 /**
  * Dimension independent data for finite elements. See the derived
  * class @ref{FiniteElementBase} class for information on its use. All
@@ -117,11 +119,13 @@ class FiniteElementData
     const unsigned int components;
 
     				     /**
-				      * Default constructor. Constructs
-				      * an element
-				      * which is not so useful. Checking
-				      * @p{dofs_per_cell} is therefore a good way to
-				      * check if something went wrong. 
+				      * Default
+				      * constructor. Constructs an
+				      * element which is not so
+				      * useful. Checking
+				      * @p{dofs_per_cell} is therefore
+				      * a good way to check if
+				      * something went wrong.
 				      */
     FiniteElementData ();
 
@@ -179,11 +183,8 @@ class FiniteElementData
     unsigned int n_components () const;
 
 				     /**
-				      * Comparison operator. It is not clear to
-				      * me (WB) why we have to declare and implement
-				      * this one explicitly.
+				      * Comparison operator.
 				      */
-//TODO:[WB] (compiler) remove operator and let the compiler generate it as soon as it is willing to do so    
     bool operator == (const FiniteElementData<dim> &) const;
 
 				     /**
@@ -350,7 +351,7 @@ class FiniteElementData
  * introduced from the two sides are unique; it is able to handle the fact
  * that the constraints for some of the dofs are entered more than once.
  *
- * @author Wolfgang Bangerth, 1998, Ralf Hartmann, Guido Kanschat, 2001
+ * @author Wolfgang Bangerth, 1998, 2002, Ralf Hartmann, Guido Kanschat, 2001
  */
 template <int dim>
 class FiniteElementBase : public Subscriptor,
@@ -358,9 +359,14 @@ class FiniteElementBase : public Subscriptor,
 {
   public:
 				   /**
-				    * Basis class for internal data.
+				    * Base class for internal data.
 				    * Adds data for second derivatives to
 				    * @ref{Mapping::InternalDataBase}
+				    *
+				    * For information about the
+				    * general purpose of this class,
+				    * see the documentation of the
+				    * base class.
 				    *
 				    * @author Guido Kanschat, 2001
 				    */
@@ -402,30 +408,65 @@ class FiniteElementBase : public Subscriptor,
     };
   
 				     /**
-				      * Construct an object of this type.
-				      * You have to set the
-				      * matrices explicitly after calling
-				      * this base class' constructor.
+				      * Construct an object of this
+				      * type.  You have to set some
+				      * member variables, for example
+				      * some matrices, explicitly
+				      * after calling this base class'
+				      * constructor.
 				      */
     FiniteElementBase (const FiniteElementData<dim> &fe_data,
-		       const std::vector<bool> &restriction_is_additive_flags);
+		       const std::vector<bool> &restriction_is_additive_flags,
+		       const std::vector<std::vector<bool> > &nonzero_components);
 
 				     /**
 				      * Return the value of the
 				      * @p{i}th shape function at the
-				      * point @p{p}.  @p{p} is a point
-				      * on the reference element.
+				      * point @p{p}. @p{p} is a point
+				      * on the reference element. If
+				      * the finite element is
+				      * vector-valued, then return the
+				      * value of the only non-zero
+				      * component of the vector value
+				      * of this shape function. If the
+				      * shape function has more than
+				      * one non-zero component (which
+				      * we refer to with the term
+				      * non-primitive), then derived
+				      * classes implementing this
+				      * function should throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * that case, use the
+				      * @ref{shape_value_component}
+				      * function.
 				      *
 				      * An
 				      * @p{ExcUnitShapeValuesDoNotExist}
 				      * is thrown if the shape values
 				      * of the @p{FiniteElement} under
-				      * consideration depend on the
+				      * consideration depends on the
 				      * shape of the cell in real
 				      * space.
 				      */
-    virtual double shape_value (const unsigned int i,
-			        const Point<dim> &p) const;
+    virtual double shape_value (const unsigned int  i,
+			        const Point<dim>   &p) const;
+
+				     /**
+				      * Just like for @p{shape_value},
+				      * but this function will be
+				      * called when the shape function
+				      * has more than one non-zero
+				      * vector component. In that
+				      * case, this function should
+				      * return the value of the
+				      * @p{component}-th vector
+				      * component of the @p{i}th shape
+				      * function at point @p{p}.
+				      */
+    virtual double shape_value_component (const unsigned int i,
+					  const Point<dim>   &p,
+					  const unsigned int component) const;
     
 				     /**
 				      * Return the gradient of the
@@ -435,18 +476,50 @@ class FiniteElementBase : public Subscriptor,
 				      * likewise the gradient is the
 				      * gradient on the unit cell with
 				      * respect to unit cell
-				      * coordinates.
+				      * coordinates. If
+				      * the finite element is
+				      * vector-valued, then return the
+				      * value of the only non-zero
+				      * component of the vector value
+				      * of this shape function. If the
+				      * shape function has more than
+				      * one non-zero component (which
+				      * we refer to with the term
+				      * non-primitive), then derived
+				      * classes implementing this
+				      * function should throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * that case, use the
+				      * @ref{shape_grad_component}
+				      * function.
 				      *
 				      * An
 				      * @p{ExcUnitShapeValuesDoNotExist}
 				      * is thrown if the shape values
 				      * of the @p{FiniteElement} under
-				      * consideration depend on the
+				      * consideration depends on the
 				      * shape of the cell in real
 				      * space.
 				      */
     virtual Tensor<1,dim> shape_grad (const unsigned int  i,
 				      const Point<dim>   &p) const;
+
+				     /**
+				      * Just like for @p{shape_grad},
+				      * but this function will be
+				      * called when the shape function
+				      * has more than one non-zero
+				      * vector component. In that
+				      * case, this function should
+				      * return the gradient of the
+				      * @p{component}-th vector
+				      * component of the @p{i}th shape
+				      * function at point @p{p}.
+				      */
+    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
+						const Point<dim>   &p,
+						const unsigned int component) const;
 
 				     /**
 				      * Return the tensor of second
@@ -455,18 +528,50 @@ class FiniteElementBase : public Subscriptor,
 				      * on the unit cell. The
 				      * derivatives are derivatives on
 				      * the unit cell with respect to
-				      * unit cell coordinates.
+				      * unit cell coordinates. If
+				      * the finite element is
+				      * vector-valued, then return the
+				      * value of the only non-zero
+				      * component of the vector value
+				      * of this shape function. If the
+				      * shape function has more than
+				      * one non-zero component (which
+				      * we refer to with the term
+				      * non-primitive), then derived
+				      * classes implementing this
+				      * function should throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * that case, use the
+				      * @ref{shape_grad_grad_component}
+				      * function.
 				      *
 				      * An
 				      * @p{ExcUnitShapeValuesDoNotExist}
 				      * is thrown if the shape values
 				      * of the @p{FiniteElement} under
-				      * consideration depend on the
+				      * consideration depends on the
 				      * shape of the cell in real
 				      * space.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim> &p) const;
+					   const Point<dim>   &p) const;
+
+				     /**
+				      * Just like for @p{shape_grad_grad},
+				      * but this function will be
+				      * called when the shape function
+				      * has more than one non-zero
+				      * vector component. In that
+				      * case, this function should
+				      * return the gradient of the
+				      * @p{component}-th vector
+				      * component of the @p{i}th shape
+				      * function at point @p{p}.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
+						     const Point<dim>   &p,
+						     const unsigned int component) const;
 
 				     /**
 				      * Projection from a fine grid
@@ -553,81 +658,162 @@ class FiniteElementBase : public Subscriptor,
     const FullMatrix<double> & prolongate (const unsigned int child) const;
 
 				     /**
-				      * Return a readonly reference to the
-				      * matrix which describes the constraints
-				      * at the interface between a refined and
-				      * an unrefined cell.
+				      * Return a readonly reference to
+				      * the matrix which describes the
+				      * constraints at the interface
+				      * between a refined and an
+				      * unrefined cell.
 				      *
-				      * The matrix is obviously empty in only
-				      * one space dimension, since there are no
-				      * constraints then.
+				      * The matrix is obviously empty
+				      * in only one space dimension,
+				      * since there are no constraints
+				      * then.
 				      */
     const FullMatrix<double> & constraints () const;
 
 				     /**
-				      * Comparison operator. We also check for
-				      * equality of the constraint matrix,
-				      * which is quite an expensive operation.
-				      * Do therefore
-				      * use this function with care, if possible
-				      * only for debugging purposes.
+				      * Comparison operator. We also
+				      * check for equality of the
+				      * constraint matrix, which is
+				      * quite an expensive operation.
+				      * Do therefore use this function
+				      * with care, if possible only
+				      * for debugging purposes.
 				      *
-				      * Since this function is not that important,
-				      * we avoid an implementational question
-				      * about comparing arrays and do not compare
-				      * the matrix arrays @p{restriction} and
+				      * Since this function is not
+				      * that important, we avoid an
+				      * implementational question
+				      * about comparing arrays and do
+				      * not compare the matrix arrays
+				      * @p{restriction} and
 				      * @p{prolongation}.
 				      */
     bool operator == (const FiniteElementBase<dim> &) const;
 
 				     /**
-				      * Compute system index from components.
+				      * Given a vector component and
+				      * an index of a shape function
+				      * within the shape functions
+				      * corresponding to this vector
+				      * component, return the index of
+				      * this shape function within the
+				      * shape functions of this
+				      * element. If this is a scalar
+				      * element, then the given
+				      * component may only be zero,
+				      * and the given component index
+				      * is also the return value.
+				      *
+				      * If the finite element is
+				      * vector-valued and has
+				      * non-primitive shape functions,
+				      * i.e. some of its shape
+				      * functions are non-zero in more
+				      * than just one vector
+				      * component, then this function
+				      * cannot be used since shape
+				      * functions are no more
+				      * associated with individual
+				      * vector components, and an
+				      * exception of type
+				      * @p{ExcFENotPrimitive} is
+				      * thrown.
 				      */
     unsigned int component_to_system_index (const unsigned int component,
 					    const unsigned int component_index) const;
   
 				     /**
-				      * Compute component and index from
-				      * system index.
-				      *
-				      * Return value contains first
-				      * component and second index in
-				      * component.
-				      */
-    std::pair<unsigned int,unsigned int>
-    system_to_component_index (const unsigned int index) const; 
-    
-				     /**
-				      * Compute system index from components on a face.
+				      * Same as above, but compute the
+				      * data from the index of a shape
+				      * function on a face.
 				      */
     unsigned int face_component_to_system_index (const unsigned int component,
 						 const unsigned int component_index) const;
+
+				     /**
+				      * Compute vector component and
+				      * index of this shape function
+				      * within the shape functions
+				      * corresponding to this
+				      * component from the index of a
+				      * shape function within this
+				      * finite element.
+				      *
+				      * If the element is scalar, then
+				      * the component is always zero,
+				      * and the index within this
+				      * component is equal to the
+				      * overall index.
+				      *
+				      * If the shape function
+				      * referenced has more than one
+				      * non-zero component, then it
+				      * cannot be associated with one
+				      * vector component, and an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}
+				      * will be raised.
+				      *
+				      * Note that if the element is
+				      * composed of other (base)
+				      * elements, and a base element
+				      * has more than one component
+				      * but all its shape functions
+				      * are primitive (i.e. are
+				      * non-zero in only one
+				      * component), then this mapping
+				      * contains valid
+				      * information. However, the
+				      * index of a shape function of
+				      * this element within one
+				      * component (i.e. the second
+				      * number of the respective entry
+				      * of this array) does not
+				      * indicate the index of the
+				      * respective shape function
+				      * within the base element (since
+				      * that has more than one
+				      * vector-component). For this
+				      * information, refer to the
+				      * @p{system_to_base_table}
+				      * field.
+				      */
+    std::pair<unsigned int,unsigned int>
+    system_to_component_index (const unsigned int index) const;    
   
 				     /**
-				      * Compute component and index from system
-				      * index for a face.
-				      *
-				      * Return value contains first
-				      * component and second index in
-				      * component.
+				      * Same as above, but do it for
+				      * shape functions and their
+				      * indices on a face.
 				      */
     std::pair<unsigned int,unsigned int>
     face_system_to_component_index (const unsigned int index) const;
     
  				     /**
-				      * The base element establishing a
-				      * component.
+				      * Given a vector component,
+				      * return an index which base
+				      * element implements this
+				      * component, and which vector
+				      * component is this base element
+				      * this is. This information is
+				      * only of interest for
+				      * vector-valued finite elements
+				      * which are composed of several
+				      * sub-elements. In that case,
+				      * one may want to obtain
+				      * information about the element
+				      * implementing a certain vector
+				      * component, which can be done
+				      * using this function and the
+				      * @ref{FESystem}::@p{base_element}
+				      * function.
 				      *
-				      * This table converts a
-				      * component number to the
-				      * @p{base_element} number. While
-				      * component information contains
-				      * multiplicity of base elements,
-				      * the result allows access to
-				      * shape functions of the base
-				      * element.
+				      * If this is a scalar finite
+				      * element, then the return value
+				      * is always equalt to zero.
 				      */
-    unsigned int component_to_base (unsigned int index) const;
+    std::pair<unsigned int,unsigned int>
+    component_to_base (unsigned int component) const;
 
 				     /**
 				      * Access the @p{restriction_is_additive_flag}
@@ -746,6 +932,97 @@ class FiniteElementBase : public Subscriptor,
 				      * yields a non-empty array.
 				      */
     bool has_face_support_points () const;
+
+				     /**
+				      * Return in which of the vector
+				      * components of this finite
+				      * element the @p{i}the shape
+				      * function is non-zero. The
+				      * length of the returned array
+				      * is equal to the number of
+				      * vector components of this
+				      * element.
+				      *
+				      * For most finite element
+				      * spaces, the result of this
+				      * function will be a vector with
+				      * exactly one element being
+				      * @p{true}, since for most
+				      * spaces the individual vector
+				      * components are
+				      * independent. Only for those
+				      * spaces that couple the
+				      * components, for example to
+				      * make a shape function
+				      * divergence free, will there be
+				      * more than one @p{true} entry.
+				      */
+    const std::vector<bool> &
+    get_nonzero_components (const unsigned int i) const;
+
+				     /**
+				      * Return in how many vector
+				      * components the @p{i}th shape
+				      * function is non-zero. This
+				      * value equals the number of
+				      * entries equal to @p{true} in
+				      * the result of the
+				      * @p{get_nonzero_components}
+				      * function.
+				      *
+				      * For most finite element
+				      * spaces, the result will be
+				      * equal to one. It is not equal
+				      * to one only for those ansatz
+				      * spaces for which vector-valued
+				      * shape functions couple the
+				      * individual components, for
+				      * example in order to make them
+				      * divergence-free.
+				      */
+    unsigned int
+    n_nonzero_components (const unsigned int i) const;
+
+				     /**
+				      * Return whether the @p{i}th
+				      * shape function is primitive in
+				      * the sense that the shape
+				      * function is non-zero in only
+				      * one vector
+				      * component. Non-primitive shape
+				      * functions would then, for
+				      * example, be those of
+				      * divergence free ansatz spaces,
+				      * in which the individual vector
+				      * components are coupled.
+				      *
+				      * The result of the function is
+				      * @p{true} if and only if the
+				      * result of
+				      * @p{n_nonzero_components(i)} is
+				      * equal to one.
+				      */
+    bool
+    is_primitive (const unsigned int i) const;
+
+				     /**
+				      * Return whether the entire
+				      * finite element is primitive,
+				      * in the sense that all its
+				      * shape functions are
+				      * primitive. If the finite
+				      * element is scalar, then this
+				      * is always the case.
+				      *
+				      * Since this is an extremely
+				      * common operations, the result
+				      * is cached in the
+				      * @p{cached_primitivity}
+				      * variable which is computed in
+				      * the constructor.
+				      */
+    bool
+    is_primitive () const;
     
 				     /**
 				      * Determine an estimate for the
@@ -760,6 +1037,21 @@ class FiniteElementBase : public Subscriptor,
 				      */
     unsigned int memory_consumption () const;
 
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcShapeFunctionNotPrimitive,
+		    int,
+		    << "The shape function with index " << arg1
+		    << " is not primitive, i.e. it is vector-valued and "
+		    << "has more than one non-zero vector component. This "
+		    << "function cannot be called for these shape functions. "
+		    << "Maybe you want to use the same function with the "
+		    << "_component suffix?");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFENotPrimitive);
 				     /**
 				      * Exception
 				      */
@@ -843,20 +1135,83 @@ class FiniteElementBase : public Subscriptor,
     FullMatrix<double> interface_constraints;
 
 				     /**
-				      * Map between linear dofs and
-				      * component dofs.
+				      * Store what
+				      * @p{system_to_component_index}
+				      * will return.
 				      */
     std::vector< std::pair<unsigned int, unsigned int> > system_to_component_table;
 
 				     /**
-				      * Map between linear dofs and
-				      * component dofs on face.
+  				      * Map between linear dofs and
+ 				      * component dofs on face. This
+ 				      * is filled with default values
+ 				      * in the constructor, but
+ 				      * derived classes will have to
+ 				      * overwrite the information if
+ 				      * necessary.
+ 				      *
+ 				      * By component, we mean the
+ 				      * vector component, not the base
+ 				      * element. The information thus
+ 				      * makes only sense if a shape
+ 				      * function is non-zero in only
+ 				      * one component.
 				      */
     std::vector< std::pair<unsigned int, unsigned int> > face_system_to_component_table;
 
 				     /**
+				      * For each shape function, store
+				      * to which base element and
+				      * which instance of this base
+				      * element (in case its
+				      * multiplicity is greater than
+				      * one) it belongs, and its index
+				      * within this base element. If
+				      * the element is not composed of
+				      * others, then base and instance
+				      * are always zero, and the index
+				      * is equal to the number of the
+				      * shape function. If the element
+				      * is composed of single
+				      * instances of other elements
+				      * (i.e. all with multiplicity
+				      * one) all of which are scalar,
+				      * then base values and dof
+				      * indices within this element
+				      * are equal to the
+				      * @p{system_to_component_table}. It
+				      * differs only in case the
+				      * element is composed of other
+				      * elements and at least one of
+				      * them is vector-valued itself.
+				      *
+				      * This array has valid values
+				      * also in the case of
+				      * vector-value
+				      * (i.e. non-primitive) shape
+				      * functions, in contrast to the
+				      * @p{system_to_component_table}.
+				      */
+    std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> > system_to_base_table;
+
+				     /**
+				      * Likewise for the indices on
+				      * faces.
+				      */
+    std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> > face_system_to_base_table;
+    
+				     /**
 				      * Map between component and
-				      * linear dofs.
+				      * linear dofs: For each pair of
+				      * vector component and index
+				      * within this component, store
+				      * the global dof number in the
+				      * composed element. If the
+				      * element is scalar, then the
+				      * outer (component) index can
+				      * only be zero, and the inner
+				      * index is equal to the stored
+				      * value.
 				      */
     std::vector< std::vector<unsigned int> > component_to_system_table;
 
@@ -871,9 +1226,12 @@ class FiniteElementBase : public Subscriptor,
 				      * a component.
 				      *
 				      * This table converts a
-				      * component number to the
-				      * @p{base_element} number. While
-				      * component information contains
+				      * component number to a pair
+				      * consisting of the
+				      * @p{base_element} number, and
+				      * the component within this base
+				      * element. While component
+				      * information contains
 				      * multiplicity of base elements,
 				      * the result allows access to
 				      * shape functions of the base
@@ -890,8 +1248,8 @@ class FiniteElementBase : public Subscriptor,
 				      * case, the initialization by
 				      * the base class is sufficient.
 				      */
-    std::vector<unsigned int> component_to_base_table;
-
+    std::vector<std::pair<unsigned int, unsigned int> > component_to_base_table;
+    
 				     /**
 				      * Projection matrices are
 				      * concatenated or summed up.
@@ -957,6 +1315,48 @@ class FiniteElementBase : public Subscriptor,
 				      */
     typename std::vector<Point<dim-1> > unit_face_support_points;
 
+				     /**
+				      * For each shape function, give
+				      * a vector of bools (with size
+				      * equal to the number of vector
+				      * components which this finite
+				      * element has) indicating in
+				      * which component each of these
+				      * shape functions is non-zero.
+				      *
+				      * For primitive elements, there
+				      * is only one non-zero
+				      * component.
+				      */
+    const std::vector<std::vector<bool> > nonzero_components;
+
+				     /**
+				      * This array holds how many
+				      * values in the respective entry
+				      * of the @p{nonzero_components}
+				      * element are non-zero. The
+				      * array is thus a short-cut to
+				      * allow faster access to this
+				      * information than if we had to
+				      * count the non-zero entries
+				      * upon each request for this
+				      * information. The field is
+				      * initialized in the constructor
+				      * of this class.
+				      */
+    const std::vector<unsigned int> n_nonzero_components_table;
+
+				     /**
+				      * Store whether all shape
+				      * functions are primitive. Since
+				      * finding this out is a very
+				      * common operation, we cache the
+				      * result, i.e. compute the value
+				      * in the constructor for simpler
+				      * access.
+				      */
+    const bool cached_primitivity;
+
                                      /**
 				      * Compute second derivatives by
 				      * finite differences of
@@ -982,7 +1382,20 @@ class FiniteElementBase : public Subscriptor,
 				      * 1e-6.
 				      */
     static const double fd_step_length;
-    
+
+				     /**
+				      * Given the pattern of nonzero
+				      * components for each shape
+				      * function, compute for each
+				      * entry how many components are
+				      * non-zero for each shape
+				      * function. This function is
+				      * used in the constructor of
+				      * this class.
+				      */
+    static
+    std::vector<unsigned int>
+    compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components);
     
 				     /**
 				      * Allow the FESystem class to
@@ -1000,7 +1413,7 @@ class FiniteElementBase : public Subscriptor,
 				      * that throw if the matrices are
 				      * not already initialized.
 				      */
-    friend class FESystem<dim>;
+    template <int dim_> friend class FESystem;
 };
 
 
@@ -1078,6 +1491,9 @@ FiniteElementBase<dim>::component_to_system_index (const unsigned int component,
   Assert(component_index<component_to_system_table[component].size(),
 	 ExcIndexRange(component_index, 0,
 		       component_to_system_table[component].size()));
+  Assert (is_primitive(),
+	  typename FiniteElementBase<dim>::ExcFENotPrimitive());
+  
   return component_to_system_table[component][component_index];
 }
 
@@ -1087,8 +1503,10 @@ inline
 std::pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::system_to_component_index (const unsigned int index) const
 {
-  Assert(index < system_to_component_table.size(),
+  Assert (index < system_to_component_table.size(),
 	 ExcIndexRange(index, 0, system_to_component_table.size()));
+  Assert (is_primitive (index),
+	  typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(index));
   return system_to_component_table[index];
 }
 
@@ -1104,6 +1522,9 @@ FiniteElementBase<dim>::face_component_to_system_index (const unsigned int compo
   Assert(component_index<face_component_to_system_table[component].size(),
 	 ExcIndexRange(component_index, 0,
 		       face_component_to_system_table[component].size()));
+  Assert (is_primitive(),
+	  typename FiniteElementBase<dim>::ExcFENotPrimitive());
+
   return face_component_to_system_table[component][component_index];
 }
 
@@ -1115,19 +1536,21 @@ FiniteElementBase<dim>::face_system_to_component_index (const unsigned int index
 {
   Assert(index < face_system_to_component_table.size(),
 	 ExcIndexRange(index, 0, face_system_to_component_table.size()));
+//TODO: check for primitivity of this shape function. this needs the global dof index
+//    Assert (is_primitive (face_to_cell_index(index)),
+//  	  typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(index));
   return face_system_to_component_table[index];
 }
 
 
 template <int dim>  
 inline
-unsigned int
+std::pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::component_to_base (unsigned int index) const
 {
-  if (n_components() == 1)
-    return 0;
   Assert(index < component_to_base_table.size(),
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
+
   return component_to_base_table[index];
 }
 
@@ -1141,6 +1564,59 @@ FiniteElementBase<dim>::restriction_is_additive (const unsigned int component) c
 	 ExcIndexRange(component, 0, n_components()));
   return restriction_is_additive_flags[component];
 }
+
+
+template <int dim>
+inline
+const std::vector<bool> &
+FiniteElementBase<dim>::get_nonzero_components (const unsigned int i) const
+{
+  Assert (i < dofs_per_cell, ExcIndexRange (i, 0, dofs_per_cell));
+  return nonzero_components[i];
+};
+
+
+
+template <int dim>
+inline
+unsigned int
+FiniteElementBase<dim>::n_nonzero_components (const unsigned int i) const
+{
+  Assert (i < dofs_per_cell, ExcIndexRange (i, 0, dofs_per_cell));
+  return n_nonzero_components_table[i];
+};
+
+
+
+template <int dim>
+inline
+bool
+FiniteElementBase<dim>::is_primitive (const unsigned int i) const
+{
+  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, dofs_per_cell));
+
+				   // return primitivity of a shape
+				   // function by checking whether it
+				   // has more than one non-zero
+				   // component or not. we could cache
+				   // this value in an array of bools,
+				   // but accessing a bit-vector (as
+				   // std::vector<bool> is) is
+				   // probably more expensive than
+				   // just comparing against 1
+  return (n_nonzero_components_table[i] == 1);
+};
+
+
+template <int dim>
+inline
+bool
+FiniteElementBase<dim>::is_primitive () const
+{
+  return cached_primitivity;
+};
+
+
 
 
 #endif

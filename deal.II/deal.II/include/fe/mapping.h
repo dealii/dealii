@@ -28,15 +28,16 @@ template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 
+
 /**
- * Abstract basis class for mapping classes.
+ * Abstract base class for mapping classes.
  *
  * The interface for filling the tables of @ref{FEValues} is provided.
  * Everything else has to happen in derived classes.
  *
  * The following paragraph applies to the implementation of
  * @ref{FEValues}. Usage of the class is as follows: first, call the
- * functionss @p{update_once} and @p{update_each} with the update
+ * functions @p{update_once} and @p{update_each} with the update
  * flags you need. This includes the flags needed by the
  * @ref{FiniteElement}. Then call @p{get_*_data} and with the or'd
  * results.  This will initialize and return some internal data
@@ -81,8 +82,41 @@ class Mapping : public Subscriptor
       const Point<dim> &p) const=0;
     
 				     /**
-				      * Class for internal data of finite
-				      * element and mapping objects.
+				      * Base class for internal data
+				      * of finite element and mapping
+				      * objects. The internal
+				      * mechanism is that upon
+				      * construction of a @p{FEValues}
+				      * objects, it asks the mapping
+				      * and finite element classes
+				      * that are to be used to
+				      * allocate memory for their own
+				      * purpose in which they may
+				      * store data that only needs to
+				      * be computed once. For example,
+				      * most finite elements will
+				      * store the values of the shape
+				      * functions at the quadrature
+				      * points in this object, since
+				      * they do not change from cell
+				      * to cell and only need to be
+				      * computed once. Since different
+				      * @p{FEValues} objects using
+				      * different quadrature rules
+				      * might access the same finite
+				      * element object at the same
+				      * time, it is necessary to
+				      * create one such object per
+				      * @p{FEValues} object. Ownership
+				      * of this object is then
+				      * transferred to the
+				      * @p{FEValues} object, but a
+				      * pointer to this object is
+				      * passed to the finite element
+				      * object every time it shall
+				      * compute some data so that it
+				      * has access to the precomputed
+				      * values stored there.
 				      */
     class InternalDataBase: public Subscriptor
     {

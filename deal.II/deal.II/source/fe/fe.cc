@@ -22,6 +22,10 @@
 #include <dofs/dof_accessor.h>
 #include <grid/tria_boundary.h>
 
+#include <algorithm>
+#include <functional>
+
+
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
 using namespace std;
@@ -105,19 +109,47 @@ FiniteElementBase<dim>::InternalDataBase::~InternalDataBase ()
 
 template <int dim>
 FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data,
-					   const std::vector<bool> &restriction_is_additive_flags)
+					   const std::vector<bool> &restriction_is_additive_flags,
+					   const std::vector<std::vector<bool> > &nonzero_components)
 		:
 		FiniteElementData<dim> (fe_data),
                 system_to_component_table(dofs_per_cell),
                 face_system_to_component_table(dofs_per_face),
+		system_to_base_table(dofs_per_cell),
+		face_system_to_base_table(dofs_per_face),		
                 component_to_system_table(components, std::vector<unsigned>(dofs_per_cell)),
-		face_component_to_system_table(components, std::vector<unsigned>(dofs_per_face)),
-		component_to_base_table (components, 0),
-		restriction_is_additive_flags(restriction_is_additive_flags)
+	        face_component_to_system_table(components, std::vector<unsigned>(dofs_per_face)),
+		component_to_base_table (components, std::make_pair(0U, 0U)),
+		restriction_is_additive_flags(restriction_is_additive_flags),
+		nonzero_components (nonzero_components),
+		n_nonzero_components_table (compute_n_nonzero_components(nonzero_components)),
+		cached_primitivity (std::find_if (n_nonzero_components_table.begin(),
+						  n_nonzero_components_table.end(),
+						  std::bind2nd(std::not_equal_to<unsigned int>(),
+							       1U))
+				    ==
+				    n_nonzero_components_table.end())
 {
-  Assert(restriction_is_additive_flags.size()==fe_data.components,
-	 ExcDimensionMismatch(restriction_is_additive_flags.size(),fe_data.components));
-
+  Assert (restriction_is_additive_flags.size()==fe_data.components,
+	  ExcDimensionMismatch(restriction_is_additive_flags.size(),
+			       fe_data.components));
+  Assert (nonzero_components.size() == dofs_per_cell,
+	  ExcInternalError());
+  for (unsigned int i=0; i<nonzero_components.size(); ++i)
+    {
+      Assert (nonzero_components[i].size() == n_components(),
+	      ExcInternalError());
+      Assert (std::count (nonzero_components[i].begin(),
+			  nonzero_components[i].end(),
+			  true)
+	      >= 1,
+	      ExcInternalError());
+      Assert (n_nonzero_components_table[i] >= 1,
+	      ExcInternalError());
+      Assert (n_nonzero_components_table[i] <= n_components(),
+	      ExcInternalError());      
+    };
+  
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
       restriction[i].reinit (dofs_per_cell, dofs_per_cell);
@@ -159,11 +191,13 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
   for (unsigned int j=0 ; j<dofs_per_cell ; ++j)
     {
       system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
+      system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
       component_to_system_table[0][j] = j;
     }
   for (unsigned int j=0 ; j<dofs_per_face ; ++j)
     {
       face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
+      face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
       face_component_to_system_table[0][j] = j;
     }
 };
@@ -173,6 +207,18 @@ template <int dim>
 double
 FiniteElementBase<dim>::shape_value (const unsigned int,
 				     const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return 0.;
+}
+
+
+
+template <int dim>
+double
+FiniteElementBase<dim>::shape_value_component (const unsigned int,
+					       const Point<dim> &,
+					       const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return 0.;
@@ -192,9 +238,33 @@ FiniteElementBase<dim>::shape_grad (const unsigned int,
 
 
 template <int dim>
+Tensor<1,dim>
+FiniteElementBase<dim>::shape_grad_component (const unsigned int,
+					      const Point<dim> &,
+					      const unsigned int) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<1,dim> ();
+}
+
+
+
+template <int dim>
 Tensor<2,dim>
 FiniteElementBase<dim>::shape_grad_grad (const unsigned int,
 					 const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<2,dim> ();
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FiniteElementBase<dim>::shape_grad_grad_component (const unsigned int,
+						   const Point<dim> &,
+						   const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<2,dim> ();
@@ -316,10 +386,14 @@ FiniteElementBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (interface_constraints) +
 	  MemoryConsumption::memory_consumption (system_to_component_table) +
 	  MemoryConsumption::memory_consumption (face_system_to_component_table) +
+	  MemoryConsumption::memory_consumption (system_to_base_table) +
+	  MemoryConsumption::memory_consumption (face_system_to_base_table) +	  
 	  MemoryConsumption::memory_consumption (component_to_system_table) +
 	  MemoryConsumption::memory_consumption (face_component_to_system_table) +
 	  MemoryConsumption::memory_consumption (component_to_base_table) +
-	  MemoryConsumption::memory_consumption (restriction_is_additive_flags));
+	  MemoryConsumption::memory_consumption (restriction_is_additive_flags) +
+	  MemoryConsumption::memory_consumption (nonzero_components) +
+	  MemoryConsumption::memory_consumption (n_nonzero_components_table));
 };
 
 
@@ -402,13 +476,31 @@ compute_2nd (const Mapping<dim>                   &mapping,
 }
 
 
+
+template <int dim>
+std::vector<unsigned int>
+FiniteElementBase<dim>::
+compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components)
+{
+  std::vector<unsigned int> retval (nonzero_components.size());
+  for (unsigned int i=0; i<nonzero_components.size(); ++i)
+    retval[i] = std::count (nonzero_components[i].begin(),
+			    nonzero_components[i].end(),
+			    true);
+  return retval;
+};
+
+
+
 /*------------------------------- FiniteElement ----------------------*/
 
 template <int dim>
 FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data,
-				   const std::vector<bool> &restriction_is_additive_flags) :
+				   const std::vector<bool> &restriction_is_additive_flags,
+				   const std::vector<std::vector<bool> > &nonzero_components) :
 		FiniteElementBase<dim> (fe_data,
-					restriction_is_additive_flags)
+					restriction_is_additive_flags,
+					nonzero_components)
 {}
 
 

@@ -12,8 +12,6 @@
 //----------------------------------------------------------------
 
 #include <base/quadrature.h>
-#include <base/polynomial.h>
-#include <base/polynomial_space.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
@@ -28,16 +26,12 @@ template <int dim>
 FE_DGP<dim>::FE_DGP (unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool>(1,true)),
+				    std::vector<bool>(1,true),
+				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+								    std::vector<bool>(1,true))),
 		degree(degree),
-		poly(0)
+		polynomial_space (Legendre<double>::generate_complete_basis(degree))
 {
-				   // create array of Legendre polynomials
-  std::vector<Legendre<double> > v;
-  for (unsigned int i=0;i<=degree;++i)
-    v.push_back(Legendre<double>(i));
-  poly = new PolynomialSpace<dim> (v);
-
 				   // if defined, copy over matrices
 				   // from precomputed arrays
   if ((degree < Matrices::n_embedding_matrices) &&
@@ -47,6 +41,7 @@ FE_DGP<dim>::FE_DGP (unsigned int degree)
   else
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
       prolongation[i].reinit(0,0);
+  
 //  				   // same as above: copy over matrix
 //  				   // from predefined values and
 //  				   // generate all others by rotation
@@ -64,17 +59,6 @@ FE_DGP<dim>::FE_DGP (unsigned int degree)
 
 
 template <int dim>
-FE_DGP<dim>::~FE_DGP ()
-{
-				   // delete poly member and set it to
-				   // zero to prevent accidental use
-  delete poly;
-  poly = 0;
-}
-
-
-
-template <int dim>
 FiniteElement<dim> *
 FE_DGP<dim>::clone() const
 {
@@ -88,7 +72,21 @@ double
 FE_DGP<dim>::shape_value (const unsigned int i,
 			  const Point<dim> &p) const
 {
-  return poly->compute_value(i, p);
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  return polynomial_space.compute_value(i, p);
+}
+
+
+
+template <int dim>
+double
+FE_DGP<dim>::shape_value_component (const unsigned int i,
+				    const Point<dim> &p,
+				    const unsigned int component) const
+{
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_value(i, p);
 }
 
 
@@ -98,7 +96,20 @@ Tensor<1,dim>
 FE_DGP<dim>::shape_grad (const unsigned int i,
 			 const Point<dim> &p) const
 {
-  return poly->compute_grad(i, p);
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  return polynomial_space.compute_grad(i, p);
+}
+
+
+template <int dim>
+Tensor<1,dim>
+FE_DGP<dim>::shape_grad_component (const unsigned int i,
+				   const Point<dim> &p,
+				   const unsigned int component) const
+{
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_grad(i, p);
 }
 
 
@@ -108,7 +119,21 @@ Tensor<2,dim>
 FE_DGP<dim>::shape_grad_grad (const unsigned int i,
 			      const Point<dim> &p) const
 {
-  return poly->compute_grad_grad(i, p);
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  return polynomial_space.compute_grad_grad(i, p);
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FE_DGP<dim>::shape_grad_grad_component (const unsigned int i,
+					const Point<dim> &p,
+					const unsigned int component) const
+{
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_grad_grad(i, p);
 }
 
 
@@ -136,12 +161,12 @@ template <int dim>
 UpdateFlags
 FE_DGP<dim>::update_once (const UpdateFlags flags) const
 {
-  UpdateFlags out = update_default;
-
-  if (flags & update_values)
-    out |= update_values;
-
-  return out;
+				   // for this kind of elements, only
+				   // the values can be precomputed
+				   // once and for all. set this flag
+				   // if the values are requested at
+				   // all
+  return (update_default | (flags & update_values));
 }
 
 
@@ -171,11 +196,8 @@ FE_DGP<dim>::get_data (const UpdateFlags      update_flags,
 		       const Mapping<dim>    &mapping,
 		       const Quadrature<dim> &quadrature) const
 {
+				   // generate a new data object
   InternalData* data = new InternalData;
-  std::vector<double> values(0);
-  std::vector<Tensor<1,dim> > grads(0);
-  std::vector<Tensor<2,dim> > grad_grads(0);
-  
 				   // check what needs to be
 				   // initialized only once and what
 				   // on every cell/face/subface we
@@ -186,7 +208,15 @@ FE_DGP<dim>::get_data (const UpdateFlags      update_flags,
 
   const UpdateFlags flags(data->update_flags);
   const unsigned int n_q_points = quadrature.n_quadrature_points;
+
+				   // have some scratch arrays
+  std::vector<double> values(0);
+  std::vector<Tensor<1,dim> > grads(0);
+  std::vector<Tensor<2,dim> > grad_grads(0);
   
+				   // initialize fields only if really
+				   // necessary. otherwise, don't
+				   // allocate memory
   if (flags & update_values)
     {
       values.resize (dofs_per_cell);
@@ -208,11 +238,18 @@ FE_DGP<dim>::get_data (const UpdateFlags      update_flags,
   if (flags & update_second_derivatives)
     data->initialize_2nd (this, mapping, quadrature);
   
-  
+				   // next already fill those fields
+				   // of which we have information by
+				   // now. note that the shape
+				   // gradients are only those on the
+				   // unit cell, and need to be
+				   // transformed when visiting an
+				   // actual cell  
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-	poly->compute(quadrature.point(i), values, grads, grad_grads);
+	polynomial_space.compute(quadrature.point(i),
+				 values, grads, grad_grads);
 	for (unsigned int k=0; k<dofs_per_cell; ++k)
 	  {
 	    if (flags & update_values)
@@ -249,8 +286,8 @@ FE_DGP<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 
   for (unsigned int k=0; k<dofs_per_cell; ++k)
     {
-      for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-	if (flags & update_values)
+      if (flags & update_values)
+	for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
       if (flags & update_gradients)

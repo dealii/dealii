@@ -34,26 +34,50 @@ using namespace std;
 
 template <int dim>
 void
-FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
-			       const unsigned int n_shapes,
-			       const UpdateFlags  flags)
+FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
+			       const FiniteElement<dim> &fe,
+			       const UpdateFlags         flags)
 {
   update_flags = flags;
-  
+
+				   // initialize the table mapping
+				   // from shape function number to
+				   // the rows in the tables denoting
+				   // its first non-zero
+				   // component. with this also count
+				   // the total number of non-zero
+				   // components accumulated over all
+				   // shape functions
+  shape_function_to_row_table.resize (fe.dofs_per_cell);
+  unsigned int row = 0;
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    {
+      shape_function_to_row_table[i] = row;
+      row += fe.n_nonzero_components (i);
+    };
+	 
+  const unsigned int n_nonzero_shape_components = row;
+  Assert (n_nonzero_shape_components >= fe.dofs_per_cell,
+	  ExcInternalError());
+
+				   // with the number of rows now
+				   // known, initialize those fields
+				   // that we will need to their
+				   // correct size
   if (flags & update_values)
-    shape_values.reinit(n_shapes, n_quadrature_points);
+    shape_values.reinit(n_nonzero_shape_components, n_quadrature_points);
 
   if (flags & update_gradients)
     {
-      shape_gradients.resize(n_shapes);
-      for (unsigned int i=0;i<n_shapes;++i)
+      shape_gradients.resize(n_nonzero_shape_components);
+      for (unsigned int i=0; i<n_nonzero_shape_components; ++i)
 	shape_gradients[i].resize(n_quadrature_points);
     }
 
   if (flags & update_second_derivatives)
     {      
-      shape_2nd_derivatives.resize(n_shapes);
-      for (unsigned int i=0;i<n_shapes;++i)
+      shape_2nd_derivatives.resize(n_nonzero_shape_components);
+      for (unsigned int i=0; i<n_nonzero_shape_components; ++i)
 	shape_2nd_derivatives[i].resize(n_quadrature_points);
     }
   
@@ -96,14 +120,19 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 template <int dim>
 FEValuesBase<dim>::~FEValuesBase ()
 {
-  if (fe_data)
+				   // delete those fields that were
+				   // created by the mapping and
+				   // finite element objects,
+				   // respectively, but of which we
+				   // have assumed ownership
+  if (fe_data != 0)
     {
       typename Mapping<dim>::InternalDataBase *tmp1=fe_data;
       fe_data=0;
       delete tmp1;
     }
 
-  if (mapping_data)
+  if (mapping_data != 0)
     {
       typename Mapping<dim>::InternalDataBase *tmp1=mapping_data;
       mapping_data=0;
@@ -138,11 +167,15 @@ void FEValuesBase<dim>::get_function_values (const InputVector            &fe_fu
   std::fill_n (values.begin(), n_quadrature_points, 0);
 
 				   // add up contributions of trial
+				   // functions. note that here we
+				   // deal with scalar finite
+				   // elements, so no need to check
+				   // for non-primitivity of shape
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       values[point] += (dof_values(shape_func) *
-			shape_values(shape_func, point));
+			shape_value(shape_func, point));
 };
 
 
@@ -154,9 +187,11 @@ void FEValuesBase<dim>::get_function_values (const InputVector                  
 {
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+
+  const unsigned int n_components = fe->n_components();
   for (unsigned i=0;i<values.size();++i)
-    Assert (values[i].size() == fe->n_components(),
-	    ExcWrongNoOfComponents());
+    Assert (values[i].size() == n_components, ExcWrongNoOfComponents());
+
   Assert (update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
@@ -174,42 +209,20 @@ void FEValuesBase<dim>::get_function_values (const InputVector                  
     std::fill_n (values[i].begin(), values[i].size(), 0);
 
 				   // add up contributions of trial
-				   // functions
+				   // functions. now check whether the
+				   // shape function is primitive or
+				   // not. if it is, then set its only
+				   // non-zero component, otherwise
+				   // loop over components
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
-      values[point](fe->system_to_component_index(shape_func).first)
-	+= (dof_values(shape_func) * shape_values(shape_func, point));
-};
-
-
-
-template <int dim>
-const typename FEValuesData<dim>::ShapeVector &
-FEValuesBase<dim>::get_shape_values () const
-{
-  Assert (update_flags & update_values, ExcAccessToUninitializedField());
-  return shape_values;
-};
-
-
-
-template <int dim>
-const typename FEValuesData<dim>::GradientVector &
-FEValuesBase<dim>::get_shape_grads () const
-{
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
-  return shape_gradients;
-};
-
-
-
-
-template <int dim>
-const typename std::vector<typename std::vector<Tensor<2,dim> > > &
-FEValuesBase<dim>::get_shape_2nd_derivatives () const
-{
-  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
-  return shape_2nd_derivatives;
+      if (fe->is_primitive(shape_func))
+	values[point](fe->system_to_component_index(shape_func).first)
+	  += (dof_values(shape_func) * shape_value(shape_func, point));
+      else
+	for (unsigned int c=0; c<n_components; ++c)
+	  values[point](c) += (dof_values(shape_func) *
+			       shape_value_component(shape_func, point, c));
 };
 
 
@@ -262,11 +275,15 @@ get_function_grads (const InputVector                    &fe_function,
   std::fill_n (gradients.begin(), n_quadrature_points, Tensor<1,dim>());
 
 				   // add up contributions of trial
+				   // functions. note that here we
+				   // deal with scalar finite
+				   // elements, so no need to check
+				   // for non-primitivity of shape
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	Tensor<1,dim> tmp(shape_gradients[shape_func][point]);
+	Tensor<1,dim> tmp = shape_grad(shape_func,point);
 	tmp *= dof_values(shape_func);
 	gradients[point] += tmp;
       };
@@ -283,9 +300,11 @@ get_function_grads (const InputVector                                           
 {
   Assert (n_quadrature_points == gradients.size(),
 	  ExcWrongNoOfComponents());
-  for (unsigned i=0;i<gradients.size();++i)
-    Assert (gradients[i].size() == fe->n_components(),
-	    ExcWrongVectorSize(gradients[i].size(), fe->n_components()));
+
+  const unsigned int n_components = fe->n_components();
+  for (unsigned i=0; i<gradients.size(); ++i)
+    Assert (gradients[i].size() == n_components, ExcWrongNoOfComponents());
+
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
@@ -303,15 +322,27 @@ get_function_grads (const InputVector                                           
     std::fill_n (gradients[i].begin(), gradients[i].size(), Tensor<1,dim>());
 
 				   // add up contributions of trial
-				   // functions
+				   // functions. now check whether the
+				   // shape function is primitive or
+				   // not. if it is, then set its only
+				   // non-zero component, otherwise
+				   // loop over components
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
-      {
-	Tensor<1,dim> tmp(shape_gradients[shape_func][point]);
-	tmp *= dof_values(shape_func);
-	gradients[point][fe->system_to_component_index(shape_func).first]
-	  += tmp;
-      };
+      if (fe->is_primitive (shape_func))
+	{
+	  Tensor<1,dim> tmp = shape_grad(shape_func,point);
+	  tmp *= dof_values(shape_func);
+	  gradients[point][fe->system_to_component_index(shape_func).first]
+	    += tmp;
+	}
+      else
+	for (unsigned int c=0; c<n_components; ++c)
+	  {
+	    Tensor<1,dim> tmp = shape_grad_component(shape_func,point,c);
+	    tmp *= dof_values(shape_func);
+	    gradients[point][c] += tmp;
+	  };
 };
 
 
@@ -343,11 +374,15 @@ get_function_2nd_derivatives (const InputVector                    &fe_function,
   std::fill_n (second_derivatives.begin(), n_quadrature_points, Tensor<2,dim>());
 
 				   // add up contributions of trial
+				   // functions. note that here we
+				   // deal with scalar finite
+				   // elements, so no need to check
+				   // for non-primitivity of shape
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	Tensor<2,dim> tmp(shape_2nd_derivatives[shape_func][point]);
+	Tensor<2,dim> tmp = shape_2nd_derivative(shape_func,point);
 	tmp *= dof_values(shape_func);
 	second_derivatives[point] += tmp;
       };
@@ -364,9 +399,11 @@ get_function_2nd_derivatives (const InputVector                                 
 {
   Assert (n_quadrature_points == second_derivs.size(),
 	  ExcWrongNoOfComponents());
+
+  const unsigned int n_components = fe->n_components();
   for (unsigned i=0;i<second_derivs.size();++i)
-    Assert (second_derivs[i].size() == fe->n_components(),
-	    ExcWrongVectorSize(second_derivs[i].size(), fe->n_components()));
+    Assert (second_derivs[i].size() == n_components, ExcWrongNoOfComponents());
+
   Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
@@ -387,12 +424,20 @@ get_function_2nd_derivatives (const InputVector                                 
 				   // functions
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
-      {
-	Tensor<2,dim> tmp(shape_2nd_derivatives[shape_func][point]);
-	tmp *= dof_values(shape_func);
-	second_derivs[point][fe->system_to_component_index(shape_func).first]
-	  += tmp;
-      };
+      if (fe->is_primitive(shape_func))
+	{
+	  Tensor<2,dim> tmp(shape_2nd_derivative(shape_func,point));
+	  tmp *= dof_values(shape_func);
+	  second_derivs[point][fe->system_to_component_index(shape_func).first]
+	    += tmp;
+	}
+      else
+	for (unsigned int c=0; c<n_components; ++c)
+	  {
+	    Tensor<2,dim> tmp = shape_2nd_derivative_component(shape_func,point,c);
+	    tmp *= dof_values(shape_func);
+	    second_derivs[point][c] += tmp;
+	  };
 };
 
 
@@ -441,7 +486,8 @@ FEValuesBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (mapping_data) +
 	  MemoryConsumption::memory_consumption (*mapping_data) +
 	  MemoryConsumption::memory_consumption (fe_data) +
-	  MemoryConsumption::memory_consumption (*fe_data));
+	  MemoryConsumption::memory_consumption (*fe_data) +
+	  MemoryConsumption::memory_consumption (shape_function_to_row_table));
 };
 
 
@@ -536,9 +582,7 @@ FEValues<dim>::initialize (const UpdateFlags update_flags)
   fe_data      = fe->get_data(flags, *mapping, quadrature);
 
 				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points,
-				dofs_per_cell,
-				flags);
+  FEValuesData<dim>::initialize (n_quadrature_points, *fe, flags);
 };
 
 
@@ -685,9 +729,7 @@ FEFaceValues<dim>::initialize (const UpdateFlags update_flags)
   fe_data      = fe->get_face_data(flags, *mapping, quadrature);
 
 				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points,
-				dofs_per_cell,
-				flags);
+  FEValuesData<dim>::initialize(n_quadrature_points, *fe, flags);
 };
 
 
@@ -775,9 +817,7 @@ FESubfaceValues<dim>::initialize (const UpdateFlags update_flags)
   fe_data      = fe->get_subface_data(flags, *mapping, quadrature);
 
 				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points,
-				dofs_per_cell,
-				flags);
+  FEValuesData<dim>::initialize(n_quadrature_points, *fe, flags);
 };
 
 

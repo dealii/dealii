@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------
-#ifndef __deal2__fe_dgq_h
-#define __deal2__fe_dgq_h
+#ifndef __deal2__fe_nedelec_h
+#define __deal2__fe_nedelec_h
 
 #include <base/config.h>
 #include <base/polynomial.h>
@@ -22,37 +22,75 @@ template <int dim> class TensorProductPolynomials;
 template <int dim> class MappingQ;
 
 
+
 /**
- * Discontinuous tensor product elements based on equidistant support points.
+ * Implementation of continuous Nedelec elements for the space H_curl.
  *
- * This is a discontinuous finite element using interpolating tensor
- * product polynomials. The shape functions are Lagrangian
- * interpolants of an equidistant grid of points on the unit cell. The
- * points are numbered in lexicographical order, @p{x} running fastest.
+ * The constructor of this class takes the degree @p{p} of this finite
+ * element.
  *
- * @author Guido Kanschat, Ralf Hartmann, 2001
+ *
+ * @sect3{Numbering of the degrees of freedom (DoFs)}
+ *
+ * Nedelec elements have their degrees of freedom on edges, with shape
+ * functions being vector valued and pointing in tangential
+ * direction. We use the standard enumeration and direction of edges
+ * in deal.II, yielding the following shape functions in 2d:
+ *
+ *   @begin{verbatim}
+ *          2
+ *      *--->---*
+ *      |       |
+ *     3^       ^1
+ *      |       |
+ *      *--->---*
+ *          0
+ *   @end{verbatim}
+ *
+ * For the 3d case, the ordering follows the same scheme: the lines
+ * are numbered as described in the documentation of the
+ * @ref{Triangulation} class, i.e.
+ *   @begin{verbatim}
+ *         *---6---*        *---6---*
+ *        /|       |       /       /|
+ *      11 |       5      11     10 5
+ *      /  7       |     /       /  |
+ *     *   |       |    *---2---*   |
+ *     |   *---4---*    |       |   *
+ *     |  /       /     |       1  /
+ *     3 8       9      3       | 9
+ *     |/       /       |       |/
+ *     *---0---*        *---0---*
+ *   @end{verbatim}
+ * and their directions are as follows:
+ *   @begin{verbatim}
+ *         *--->---*        *--->---*
+ *        /|       |       /       /|
+ *       ^ |       ^      ^       ^ ^
+ *      /  ^       |     /       /  |
+ *     *   |       |    *--->---*   |
+ *     |   *--->---*    |       |   *
+ *     |  /       /     |       ^  /
+ *     ^ ^       ^      ^       | ^
+ *     |/       /       |       |/
+ *     *--->---*        *--->---*
+ *   @end{verbatim}
+ *
+ * The element does not make much sense in 1d, so it is not
+ * implemented there.
+ *
+ *
+ * @author Anna Schneebeli, Wolfgang Bangerth, 2002
  */
 template <int dim>
-class FE_DGQ : public FiniteElement<dim>
+class FE_Nedelec : public FiniteElement<dim>
 {
   public:
 				     /**
-				      * Constructor for tensor product
-				      * polynomials of degree @p{k}.
+				      * Constructor for the Nedelec
+				      * element of degree @p{p}.
 				      */
-    FE_DGQ (const unsigned int k);
-    
-				     /**
-				      * Return the value of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual double shape_value (const unsigned int i,
-			        const Point<dim> &p) const;
+    FE_Nedelec (const unsigned int p);
     
 				     /**
 				      * Return the value of the
@@ -64,13 +102,6 @@ class FE_DGQ : public FiniteElement<dim>
 				      * class for more information
 				      * about the semantics of this
 				      * function.
-				      *
-				      * Since this element is scalar,
-				      * the returned value is the same
-				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
-				      * specified component is zero.
 				      */
     virtual double shape_value_component (const unsigned int i,
 					  const Point<dim> &p,
@@ -78,18 +109,6 @@ class FE_DGQ : public FiniteElement<dim>
 
 				     /**
 				      * Return the gradient of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-				      const Point<dim>   &p) const;
-
-				     /**
-				      * Return the gradient of the
 				      * @p{component}th vector
 				      * component of the @p{i}th shape
 				      * function at the point
@@ -98,31 +117,11 @@ class FE_DGQ : public FiniteElement<dim>
 				      * class for more information
 				      * about the semantics of this
 				      * function.
-				      *
-				      * Since this element is scalar,
-				      * the returned value is the same
-				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
-				      * specified component is zero.
 				      */
     virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
 						const Point<dim> &p,
 						const unsigned int component) const;
 
-				     /**
-				      * Return the tensor of second
-				      * derivatives of the @p{i}th
-				      * shape function at point @p{p}
-				      * on the unit cell. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim> &p) const;
-    
 				     /**
 				      * Return the second derivative
 				      * of the @p{component}th vector
@@ -133,13 +132,6 @@ class FE_DGQ : public FiniteElement<dim>
 				      * class for more information
 				      * about the semantics of this
 				      * function.
-				      *
-				      * Since this element is scalar,
-				      * the returned value is the same
-				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
-				      * specified component is zero.
 				      */
     virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
 						     const Point<dim> &p,
@@ -152,19 +144,19 @@ class FE_DGQ : public FiniteElement<dim>
 				      * constructor.
 				      */
     unsigned int get_degree () const;
-
+    
 				     /**
 				      * Number of base elements in a
-				      * mixed discretization. Since
-				      * this is a scalar element,
-				      * return one.
+				      * mixed discretization. Here,
+				      * this is of course equal to
+				      * one.
 				      */
     virtual unsigned int n_base_elements () const;
     
 				     /**
 				      * Access to base element
 				      * objects. Since this element is
-				      * scalar, @p{base_element(0)} is
+				      * atomic, @p{base_element(0)} is
 				      * @p{this}, and all other
 				      * indices throw an error.
 				      */
@@ -199,8 +191,12 @@ class FE_DGQ : public FiniteElement<dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
-  protected:
-
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotUsefulInThisDimension);
+    
+  protected:    
 				     /**
 				      * @p{clone} function instead of
 				      * a copy constructor.
@@ -208,7 +204,7 @@ class FE_DGQ : public FiniteElement<dim>
 				      * This function is needed by the
 				      * constructors of @p{FESystem}.
 				      */
-    virtual FiniteElement<dim> *clone() const;
+    virtual FiniteElement<dim> * clone() const;
   
 				     /**
 				      * Prepare internal data
@@ -272,45 +268,66 @@ class FE_DGQ : public FiniteElement<dim>
 				      * constraint and embedding
 				      * matrices. The definition of
 				      * the various static fields are
-				      * in the files @p{fe_dgq_[123]d.cc}
+				      * in the files @p{fe_nedelec_[23]d.cc}
 				      * in the source directory.
 				      */
     struct Matrices
     {
 					 /**
-					  * Pointers to the embedding
-					  * matrices, one for each
-					  * polynomial degree starting
-					  * from constant elements
+					  * Embedding matrices. For
+					  * each element type (the
+					  * first index) there are as
+					  * many embedding matrices as
+					  * there are children per
+					  * cell. The first index
+					  * starts with linear
+					  * elements and goes up in
+					  * polynomial degree. The
+					  * array may grow in the
+					  * future with the number of
+					  * elements for which these
+					  * matrices have been
+					  * computed. If for some
+					  * element, the matrices have
+					  * not been computed then you
+					  * may use the element
+					  * nevertheless but can not
+					  * access the respective
+					  * fields.
 					  */
-	static const double * const embedding[];
+	static const double * const
+	embedding[][GeometryInfo<dim>::children_per_cell];
 
 					 /**
 					  * Number of elements (first
 					  * index) the above field
 					  * has. Equals the highest
-					  * polynomial degree plus one
-					  * for which the embedding
+					  * polynomial degree for
+					  * which the embedding
 					  * matrices have been
 					  * computed.
 					  */
 	static const unsigned int n_embedding_matrices;
 
 					 /**
-					  * As @p{embedding} but for
-					  * projection matrices.
+					  * As the
+					  * @p{embedding_matrices}
+					  * field, but for the
+					  * interface constraints. One
+					  * for each element for which
+					  * it has been computed.
 					  */
-	static const double * const projection_matrices[];
+	static const double * const constraint_matrices[];
 
 					 /**
-					  * As
-					  * @p{n_embedding_matrices}
-					  * but for projection
+					  * Like
+					  * @p{n_embedding_matrices},
+					  * but for the number of
+					  * interface constraint
 					  * matrices.
 					  */
-	static const unsigned int n_projection_matrices;
+	static const unsigned int n_constraint_matrices;
     };
-
     
 				     /**
 				      * Only for internal use. Its
@@ -322,7 +339,25 @@ class FE_DGQ : public FiniteElement<dim>
 				      * be passed to the constructor of
 				      * @p{FiniteElementData}.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
+    static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+
+				     /**
+				      * Initialize the
+				      * @p{unit_support_points} field
+				      * of the @ref{FiniteElementBase}
+				      * class. Called from the
+				      * constructor.
+				      */
+    void initialize_unit_support_points ();
+
+				     /**
+				      * Initialize the
+				      * @p{unit_face_support_points} field
+				      * of the @ref{FiniteElementBase}
+				      * class. Called from the
+				      * constructor.
+				      */
+    void initialize_unit_face_support_points ();
     
 				     /**
 				      * Given a set of flags indicating
@@ -362,46 +397,11 @@ class FE_DGQ : public FiniteElement<dim>
 				      * this in the result as well.
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
-  
-				     /**
-				      * Compute renumbering for rotation
-				      * of degrees of freedom.
-				      *
-				      * Rotates a tensor product
-				      * numbering of degrees of
-				      * freedom by 90 degrees. It is
-				      * used to compute the transfer
-				      * matrices of the children by
-				      * using only the matrix for the
-				      * first child.
-				      *
-				      * The direction parameter
-				      * determines the type of
-				      * rotation. It is one character
-				      * of @p{xXyYzZ}. The character
-				      * determines the axis of
-				      * rotation, case determines the
-				      * direction. Lower case is
-				      * counter-clockwise seen in
-				      * direction of the axis.
-				      *
-				      * Since rotation around the
-				      * y-axis is not used, it is not
-				      * implemented either.
-				      */
-    void rotate_indices (std::vector<unsigned int> &indices,
-			 const char                 direction) const;
-  
+    
 				     /**
 				      * Degree of the polynomials.
 				      */  
     const unsigned int degree;
-
-				     /**
-				      * Pointer to the tensor
-				      * product polynomials.
-				      */
-    const TensorProductPolynomials<dim> polynomial_space;
 
 				     /**
 				      * Fields of cell-independent data.
@@ -421,21 +421,25 @@ class FE_DGQ : public FiniteElement<dim>
 					  * vector for each shape
 					  * function, containing
 					  * values for each quadrature
-					  * point.
+					  * point. Since the shape
+					  * functions are
+					  * vector-valued (with as
+					  * many components as there
+					  * are space dimensions), the
+					  * value is a tensor.
 					  *
 					  * In this array, we store
 					  * the values of the shape
 					  * function in the quadrature
 					  * points on the unit
-					  * cell. Since these values
-					  * do not change under
-					  * transformation to the real
-					  * cell, we only need to copy
-					  * them over when visiting a
-					  * concrete cell.
+					  * cell. The transformation
+					  * to the real space cell is
+					  * then simply done by
+					  * multiplication with the
+					  * Jacobian of the mapping.
 					  */
-	std::vector<std::vector<double> > shape_values;
-	
+	std::vector<std::vector<Tensor<1,dim> > > shape_values;
+
 					 /**
 					  * Array with shape function
 					  * gradients in quadrature
@@ -453,62 +457,64 @@ class FE_DGQ : public FiniteElement<dim>
 					  * matrix-vector
 					  * multiplication) when
 					  * visiting an actual cell.
-					  */				      
-	typename std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+					  */
+	typename std::vector<typename std::vector<Tensor<2,dim> > > shape_gradients;
     };
     
 				     /**
-				      * Allow access from other dimensions.
+				      * Allow access from other
+				      * dimensions.
 				      */
-    template <int dim1> friend class FE_DGQ;
-
-				     /**
-				      * Allows @p{MappingQ} class to
-				      * access to build_renumbering
-				      * function.
-				      */
-    template <int dim1> friend class MappingQ;
+    template <int dim1> friend class FE_Nedelec;
 };
 
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <> void FE_Nedelec<1>::initialize_unit_face_support_points ();
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
-const double * const FE_DGQ<1>::Matrices::embedding[];
+const double * const 
+FE_Nedelec<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
 
 template <>
-const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices;
+const unsigned int FE_Nedelec<1>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGQ<1>::Matrices::projection_matrices[];
+const double * const FE_Nedelec<1>::Matrices::constraint_matrices[];
 
 template <>
-const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices;
+const unsigned int FE_Nedelec<1>::Matrices::n_constraint_matrices;
 
 template <> 
-const double * const FE_DGQ<2>::Matrices::embedding[];
+const double * const 
+FE_Nedelec<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
 
 template <>
-const unsigned int FE_DGQ<2>::Matrices::n_embedding_matrices;
+const unsigned int FE_Nedelec<2>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGQ<2>::Matrices::projection_matrices[];
+const double * const FE_Nedelec<2>::Matrices::constraint_matrices[];
 
 template <>
-const unsigned int FE_DGQ<2>::Matrices::n_projection_matrices;
+const unsigned int FE_Nedelec<2>::Matrices::n_constraint_matrices;
 
 template <> 
-const double * const FE_DGQ<3>::Matrices::embedding[];
+const double * const 
+FE_Nedelec<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
 
 template <>
-const unsigned int FE_DGQ<3>::Matrices::n_embedding_matrices;
+const unsigned int FE_Nedelec<3>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGQ<3>::Matrices::projection_matrices[];
+const double * const FE_Nedelec<3>::Matrices::constraint_matrices[];
 
 template <>
-const unsigned int FE_DGQ<3>::Matrices::n_projection_matrices;
+const unsigned int FE_Nedelec<3>::Matrices::n_constraint_matrices;
+
 #endif
 
 #endif

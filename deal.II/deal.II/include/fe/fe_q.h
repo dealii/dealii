@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 #include <base/polynomial.h>
+#include <base/tensor_product_polynomials.h>
 #include <fe/fe.h>
 
 template <int dim> class TensorProductPolynomials;
@@ -246,43 +247,107 @@ class FE_Q : public FiniteElement<dim>
     FE_Q (const unsigned int p);
     
 				     /**
-				      * Destructor.
-				      */
-    ~FE_Q ();
-    
-				     /**
 				      * Return the value of the
 				      * @p{i}th shape function at the
-				      * point @p{p}.  @p{p} is a point
-				      * on the reference element.
+				      * point @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
 				      */
     virtual double shape_value (const unsigned int i,
 			        const Point<dim> &p) const;
     
 				     /**
+				      * Return the value of the
+				      * @p{component}th vector
+				      * component of the @p{i}th shape
+				      * function at the point
+				      * @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
+				      *
+				      * Since this element is scalar,
+				      * the returned value is the same
+				      * as if the function without the
+				      * @p{_component} suffix were
+				      * called, provided that the
+				      * specified component is zero.
+				      */
+    virtual double shape_value_component (const unsigned int i,
+					  const Point<dim> &p,
+					  const unsigned int component) const;
+
+				     /**
 				      * Return the gradient of the
 				      * @p{i}th shape function at the
-				      * point @p{p}. @p{p} is a point
-				      * on the reference element, and
-				      * likewise the gradient is the
-				      * gradient on the unit cell with
-				      * respect to unit cell
-				      * coordinates.
+				      * point @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
 				      */
     virtual Tensor<1,dim> shape_grad (const unsigned int  i,
 				      const Point<dim>   &p) const;
 
 				     /**
+				      * Return the gradient of the
+				      * @p{component}th vector
+				      * component of the @p{i}th shape
+				      * function at the point
+				      * @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
+				      *
+				      * Since this element is scalar,
+				      * the returned value is the same
+				      * as if the function without the
+				      * @p{_component} suffix were
+				      * called, provided that the
+				      * specified component is zero.
+				      */
+    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
+						const Point<dim> &p,
+						const unsigned int component) const;
+
+				     /**
 				      * Return the tensor of second
 				      * derivatives of the @p{i}th
 				      * shape function at point @p{p}
-				      * on the unit cell. The
-				      * derivatives are derivatives on
-				      * the unit cell with respect to
-				      * unit cell coordinates.
+				      * on the unit cell. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim> &p) const;
+
+				     /**
+				      * Return the second derivative
+				      * of the @p{component}th vector
+				      * component of the @p{i}th shape
+				      * function at the point
+				      * @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
+				      *
+				      * Since this element is scalar,
+				      * the returned value is the same
+				      * as if the function without the
+				      * @p{_component} suffix were
+				      * called, provided that the
+				      * specified component is zero.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
+						     const Point<dim> &p,
+						     const unsigned int component) const;
 
 				     /**
 				      * Return the polynomial degree
@@ -405,7 +470,7 @@ class FE_Q : public FiniteElement<dim>
 
 				     /**
 				      * Declare a nested class which
-				      * will has static definitions of
+				      * will hold static definitions of
 				      * various matrices such as
 				      * constraint and embedding
 				      * matrices. The definition of
@@ -584,14 +649,41 @@ class FE_Q : public FiniteElement<dim>
     void initialize_unit_face_support_points ();
     
 				     /**
-				      * Compute flags for initial
-				      * update only.
+				      * Given a set of flags indicating
+				      * what quantities are requested
+				      * from a @p{FEValues} object,
+				      * return which of these can be
+				      * precomputed once and for
+				      * all. Often, the values of
+				      * shape function at quadrature
+				      * points can be precomputed, for
+				      * example, in which case the
+				      * return value of this function
+				      * would be the logical and of
+				      * the input @p{flags} and
+				      * @p{update_values}.
+				      *
+				      * For the present kind of finite
+				      * element, this is exactly the
+				      * case.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
   
 				     /**
-				      * Compute flags for update on
-				      * each cell.
+				      * This is the opposite to the
+				      * above function: given a set of
+				      * flags indicating what we want
+				      * to know, return which of these
+				      * need to be computed each time
+				      * we visit a new cell.
+				      *
+				      * If for the computation of one
+				      * quantity something else is
+				      * also required (for example, we
+				      * often need the covariant
+				      * transformation when gradients
+				      * need to be computed), include
+				      * this in the result as well.
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
     
@@ -624,33 +716,70 @@ class FE_Q : public FiniteElement<dim>
 				      * Pointer to the tensor
 				      * product polynomials.
 				      */
-    TensorProductPolynomials<dim>* poly;
+    const TensorProductPolynomials<dim> polynomial_space;
 
 				     /**
 				      * Fields of cell-independent data.
+				      *
+				      * For information about the
+				      * general purpose of this class,
+				      * see the documentation of the
+				      * base class.
 				      */
     class InternalData : public FiniteElementBase<dim>::InternalDataBase
     {
       public:
 					 /**
-					  * Array with shape function values
-					  * in quadrature points. There is one
-					  * vector for each shape function, containing
-					  * values for each quadrature point.
+					  * Array with shape function
+					  * values in quadrature
+					  * points. There is one
+					  * vector for each shape
+					  * function, containing
+					  * values for each quadrature
+					  * point.
+					  *
+					  * In this array, we store
+					  * the values of the shape
+					  * function in the quadrature
+					  * points on the unit
+					  * cell. Since these values
+					  * do not change under
+					  * transformation to the real
+					  * cell, we only need to copy
+					  * them over when visiting a
+					  * concrete cell.
 					  */
 	std::vector<std::vector<double> > shape_values;
 
 					 /**
-					  * Array with shape function gradients
-					  * in quadrature points. There is one
-					  * vector for each shape function, containing
-					  * values for each quadrature point.
-					  */				      
+					  * Array with shape function
+					  * gradients in quadrature
+					  * points. There is one
+					  * vector for each shape
+					  * function, containing
+					  * values for each quadrature
+					  * point.
+					  *
+					  * We store the gradients in
+					  * the quadrature points on
+					  * the unit cell. We then
+					  * only have to apply the
+					  * transformation (which is a
+					  * matrix-vector
+					  * multiplication) when
+					  * visiting an actual cell.
+					  */      
 	typename std::vector<typename std::vector<Tensor<1,dim> > > shape_gradients;
     };
     
 				     /**
-				      * Allow access from other dimensions.
+				      * Allow access from other
+				      * dimensions. We need this since
+				      * we want to call the functions
+				      * @p{get_dpo_vector} and
+				      * @p{lexicographic_to_hierarchic_numbering}
+				      * for the faces of the finite
+				      * element of dimension dim+1.
 				      */
     template <int dim1> friend class FE_Q;
 };

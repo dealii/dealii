@@ -28,26 +28,12 @@ template <int dim>
 FE_DGQ<dim>::FE_DGQ (unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool>(1,true)),
+				    std::vector<bool>(1,true),
+				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+								    std::vector<bool>(1,true))),
 		degree(degree),
-		poly(0)
+		polynomial_space (LagrangeEquidistant::generate_complete_basis(degree))
 {
-  if (degree==0)
-    {
-				       // create constant polynomial
-      std::vector<Polynomial<double> >
-	v(1, Polynomial<double> (std::vector<double> (1,1.)));
-      poly = new TensorProductPolynomials<dim> (v);
-    }
-  else
-    {
-				       // create array of Lagrange polynomials
-      std::vector<LagrangeEquidistant> v;
-      for (unsigned int i=0;i<=degree;++i)
-	v.push_back(LagrangeEquidistant(degree,i));
-      poly = new TensorProductPolynomials<dim> (v);
-    }
-
 				   // generate permutation/rotation
 				   // index sets to generate some
 				   // matrices from others
@@ -194,17 +180,6 @@ FE_DGQ<dim>::FE_DGQ (unsigned int degree)
 
 
 template <int dim>
-FE_DGQ<dim>::~FE_DGQ ()
-{
-				   // delete poly member and set it to
-				   // zero to prevent accidental use
-  delete poly;
-  poly = 0;
-}
-
-
-
-template <int dim>
 FiniteElement<dim> *
 FE_DGQ<dim>::clone() const
 {
@@ -218,7 +193,21 @@ double
 FE_DGQ<dim>::shape_value (const unsigned int i,
 			  const Point<dim> &p) const
 {
-  return poly->compute_value(i, p);
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  return polynomial_space.compute_value(i, p);
+}
+
+
+
+template <int dim>
+double
+FE_DGQ<dim>::shape_value_component (const unsigned int i,
+				    const Point<dim> &p,
+				    const unsigned int component) const
+{
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_value(i, p);
 }
 
 
@@ -228,7 +217,20 @@ Tensor<1,dim>
 FE_DGQ<dim>::shape_grad (const unsigned int i,
 			 const Point<dim> &p) const
 {
-  return poly->compute_grad(i, p);
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  return polynomial_space.compute_grad(i, p);
+}
+
+
+template <int dim>
+Tensor<1,dim>
+FE_DGQ<dim>::shape_grad_component (const unsigned int i,
+				   const Point<dim> &p,
+				   const unsigned int component) const
+{
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_grad(i, p);
 }
 
 
@@ -238,7 +240,21 @@ Tensor<2,dim>
 FE_DGQ<dim>::shape_grad_grad (const unsigned int i,
 			      const Point<dim> &p) const
 {
-  return poly->compute_grad_grad(i, p);
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  return polynomial_space.compute_grad_grad(i, p);
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FE_DGQ<dim>::shape_grad_grad_component (const unsigned int i,
+					const Point<dim> &p,
+					const unsigned int component) const
+{
+  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_grad_grad(i, p);
 }
 
 
@@ -263,12 +279,12 @@ template <int dim>
 UpdateFlags
 FE_DGQ<dim>::update_once (const UpdateFlags flags) const
 {
-  UpdateFlags out = update_default;
-
-  if (flags & update_values)
-    out |= update_values;
-
-  return out;
+				   // for this kind of elements, only
+				   // the values can be precomputed
+				   // once and for all. set this flag
+				   // if the values are requested at
+				   // all
+  return (update_default | (flags & update_values));
 }
 
 
@@ -379,10 +395,8 @@ FE_DGQ<dim>::get_data (const UpdateFlags      update_flags,
 		       const Mapping<dim>    &mapping,
 		       const Quadrature<dim> &quadrature) const
 {
+				   // generate a new data object
   InternalData* data = new InternalData;
-  std::vector<double> values(0);
-  std::vector<Tensor<1,dim> > grads(0);
-  std::vector<Tensor<2,dim> > grad_grads(0);
   
 				   // check what needs to be
 				   // initialized only once and what
@@ -394,7 +408,15 @@ FE_DGQ<dim>::get_data (const UpdateFlags      update_flags,
 
   const UpdateFlags flags(data->update_flags);
   const unsigned int n_q_points = quadrature.n_quadrature_points;
-  
+
+				   // have some scratch arrays
+  std::vector<double> values(0);
+  std::vector<Tensor<1,dim> > grads(0);
+  std::vector<Tensor<2,dim> > grad_grads(0);
+
+				   // initialize fields only if really
+				   // necessary. otherwise, don't
+				   // allocate memory
   if (flags & update_values)
     {
       values.resize (dofs_per_cell);
@@ -416,11 +438,18 @@ FE_DGQ<dim>::get_data (const UpdateFlags      update_flags,
   if (flags & update_second_derivatives)
     data->initialize_2nd (this, mapping, quadrature);
   
-  
+				   // next already fill those fields
+				   // of which we have information by
+				   // now. note that the shape
+				   // gradients are only those on the
+				   // unit cell, and need to be
+				   // transformed when visiting an
+				   // actual cell  
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-	poly->compute(quadrature.point(i), values, grads, grad_grads);
+	polynomial_space.compute(quadrature.point(i),
+				 values, grads, grad_grads);
 	for (unsigned int k=0; k<dofs_per_cell; ++k)
 	  {
 	    if (flags & update_values)
@@ -457,8 +486,8 @@ FE_DGQ<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 
   for (unsigned int k=0; k<dofs_per_cell; ++k)
     {
-      for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-	if (flags & update_values)
+      if (flags & update_values)
+	for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
       if (flags & update_gradients)
@@ -587,6 +616,10 @@ bool
 FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
 				  const unsigned int face_index) const
 {
+  Assert (shape_index < dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, dofs_per_cell));
+  Assert (face_index < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
   unsigned int n = degree+1;
   unsigned int n2 = n*n;

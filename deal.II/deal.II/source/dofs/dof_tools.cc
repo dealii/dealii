@@ -1715,7 +1715,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				   // the restriction of the fine
 				   // grid:
   const unsigned int coarse_dofs_per_cell_component
-    = coarse_fe.base_element(coarse_fe.component_to_base(coarse_component)).dofs_per_cell;
+    = coarse_fe.base_element(coarse_fe.component_to_base(coarse_component).first).dofs_per_cell;
   
 
 				   // Try to find out whether the
@@ -1741,9 +1741,9 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 	  ExcInvalidComponent (fine_component, fine_fe.n_components()));
 				   // check whether respective finite
 				   // elements are equal
-  Assert (coarse_fe.base_element (coarse_fe.component_to_base(coarse_component))
+  Assert (coarse_fe.base_element (coarse_fe.component_to_base(coarse_component).first)
 	  ==
-	  fine_fe.base_element (fine_fe.component_to_base(fine_component)),
+	  fine_fe.base_element (fine_fe.component_to_base(fine_component).first),
 	  ExcFiniteElementsDontMatch());
 
 #ifdef DEBUG

@@ -28,6 +28,8 @@
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
 
+#include <algorithm>
+
 template <int dim> class Quadrature;
 
 
@@ -46,57 +48,112 @@ class FEValuesData
 {
   public:
 				     /**
-				      * Initialize all vectors to correct size.
+				      * Initialize all vectors to
+				      * correct size.
 				      */
-    void initialize (const unsigned int n_quadrature_points,
-		     const unsigned int n_shapes,
-		     const UpdateFlags  flags);
+    void initialize (const unsigned int        n_quadrature_points,
+		     const FiniteElement<dim> &fe,
+		     const UpdateFlags         flags);
 
 				     /**
-				      * Storage type for shape values.
+				      * Storage type for shape
+				      * values. Each row in the matrix
+				      * denotes the values of a single
+				      * shape function at the
+				      * different points, columns are
+				      * for a single point with the
+				      * different shape functions.
+				      *
+				      * If a shape function has more
+				      * than one non-zero component
+				      * (in deal.II diction: it is
+				      * non-primitive), then we
+				      * allocate one row per non-zero
+				      * component, and shift
+				      * subsequent rows backward.
+				      * Lookup of the correct row for
+				      * a shape function is thus
+				      * simple in case the entire
+				      * finite element is primitive
+				      * (i.e. all shape functions are
+				      * primitive), since then the
+				      * shape function number equals
+				      * the row number. Otherwise, use
+				      * the
+				      * @p{shape_function_to_row_table}
+				      * array to get at the first row
+				      * that belongs to this
+				      * particular shape function, and
+				      * navigate among all the rows
+				      * for this shape function using
+				      * the
+				      * @p{FiniteElement::get_nonzero_components}
+				      * function which tells us which
+				      * components are non-zero and
+				      * thus have a row in the array
+				      * presently under discussion.
 				      */
     typedef FullMatrix<double> ShapeVector;
 
 				     /**
-				      * Storage type for gradients.
+				      * Storage type for
+				      * gradients. The layout of data
+				      * is the same as for the
+				      * @ref{ShapeVector} data type.
 				      */
-    typedef typename std::vector<typename std::vector<Tensor<1,dim> > > GradientVector;
+    typedef
+    typename std::vector<typename std::vector<Tensor<1,dim> > >
+    GradientVector;
+
+				     /**
+				      * Likewise for second order
+				      * derivatives.
+				      */
+    typedef
+    typename std::vector<typename std::vector<Tensor<2,dim> > >
+    GradGradVector;
     
 				     /**
-				      * Store the values of the shape functions
-				      * at the quadrature points. Rows in the
-				      * matrices denote the values of a single
-				      * shape function at the different points,
-				      * columns are for a single point with the
-				      * different shape functions.
+				      * Store the values of the shape
+				      * functions at the quadrature
+				      * points. See the description of
+				      * the data type for the layout
+				      * of the data in this field.
 				      */
     ShapeVector shape_values;
 
     				     /**
-				      * Store the gradients of the shape
-				      * functions at the quadrature points.
-				      * For each shape function, there is a vector
-				      * of the gradients in each quadrature point.
+				      * Store the gradients of the
+				      * shape functions at the
+				      * quadrature points. See the
+				      * description of the data type
+				      * for the layout of the data in
+				      * this field.
 				      */
     GradientVector shape_gradients;
 
 				     /**
-				      * Store the 2nd derivatives of the shape
-				      * functions at the quadrature points.
-				      * For each shape function, there is a vector
-				      * of the 2nd gradients in each quadrature point.
+				      * Store the 2nd derivatives of
+				      * the shape functions at the
+				      * quadrature points.  See the
+				      * description of the data type
+				      * for the layout of the data in
+				      * this field.
 				      */
-    typename std::vector<typename std::vector<Tensor<2,dim> > >  shape_2nd_derivatives;
+    GradGradVector shape_2nd_derivatives;
 
 				     /**
-				      * Store an array of weights times the
-				      * Jacobi determinant at the quadrature
-				      * points. This function is reset each time
-				      * @p{reinit} is called. The Jacobi determinant
-				      * is actually the reciprocal value of the
-				      * Jacobi matrices stored in this class,
-				      * see the general documentation of this
-				      * class for more information.
+				      * Store an array of weights
+				      * times the Jacobi determinant
+				      * at the quadrature points. This
+				      * function is reset each time
+				      * @p{reinit} is called. The
+				      * Jacobi determinant is actually
+				      * the reciprocal value of the
+				      * Jacobi matrices stored in this
+				      * class, see the general
+				      * documentation of this class
+				      * for more information.
 				      */
     std::vector<double>       JxW_values;
 
@@ -123,6 +180,36 @@ class FEValuesData
 				      */
     typename std::vector<Tensor<1,dim> >  boundary_forms;
 
+				     /**
+				      * Indicate the first row which a
+				      * given shape function occupies
+				      * in the @p{ShapeVector},
+				      * @p{ShapeGradient}, etc
+				      * arrays. If all shape functions
+				      * are primitive, then this is
+				      * the identity mapping. If, on
+				      * the other hand some shape
+				      * functions have more than one
+				      * non-zero vector components,
+				      * then they may occupy more than
+				      * one row, and this array
+				      * indicates which is the first
+				      * one.
+				      *
+				      * The questions which particular
+				      * vector component occupies
+				      * which row for a given shape
+				      * function is answered as
+				      * follows: we allocate one row
+				      * for each non-zero component as
+				      * indicated by the
+				      * @p{FiniteElement::get_nonzero_components()}
+				      * function, and the rows are in
+				      * ascending order exactly those
+				      * non-zero components.
+				      */
+    std::vector<unsigned int> shape_function_to_row_table;
+    
                                      /**
 				      * Original update flags handed
 				      * to the constructor of
@@ -151,7 +238,7 @@ class FEValuesData
  * called by the constructor and @p{reinit} functions of
  * @p{FEValues*}, respectively.
  *
- * \subsection{General usage}
+ * @sect3{General usage}
  *
  * Usually, an object of @p{FEValues*} is used in integration loops
  * over all cells of a triangulation. To take full advantage of the
@@ -160,7 +247,7 @@ class FEValuesData
  * like a magnifying glass being used to look at one item after the
  * other. A typical piece of code looks like this:
  *
- * \begin{verbatim}
+ * @begin{verbatim}
  * FEValues values (mapping, finite_element, quadrature, flags);
  * for (cell = dof_handler.begin_active();
  *      cell != dof_handler.end();
@@ -169,30 +256,45 @@ class FEValuesData
  *     values.reinit(cell);
  *     ...
  *   }
- * \end{verbatim}
+ * @end{verbatim}
  *
  *
- *  \subsection{Member functions}
+ *  @sect3{Member functions}
  *
  *  The functions of this class fall into different cathegories:
- *  \begin{itemize}
- *  \item @p{shape_value}, @p{shape_grad}, etc: return one of the values
+ *  @begin{itemize}
+ *  @item @p{shape_value}, @p{shape_grad}, etc: return one of the values 
  *    of this object at a time. These functions are inlined, so this
- *    is the suggested access to all finite element values. There should be
- *    no loss in performance with an optimizing compiler.
+ *    is the suggested access to all finite element values. There
+ *    should be no loss in performance with an optimizing compiler. If
+ *    the finite element is vector valued, then these functions return
+ *    the only non-zero component of the requested shape
+ *    function. However, some finite elements have shape functions
+ *    that have more than one non-zero component (we call them
+ *    non-"primitive"), and in this case this set of functions will
+ *    throw an exception since they cannot generate a useful
+ *    result. Rather, use the next set of functions.
+ *
+ *  @item @p{shape_value_component}, @p{shape_grad_component}, etc:
+ *    This is the same set of functions as above, except that for vector
+ *    valued finite elements they return only one vector component. This
+ *    is useful for elements of which shape functions have more than one
+ *    non-zero component, since then the above functions cannot be used,
+ *    and you have to walk over all (or only the non-zero) components of
+ *    the shape function using this set of functions.
  *   
- *  \item @p{get_function_values}, @p{get_function_grads}, @p{...}:
+ *  @item @p{get_function_values}, @p{get_function_grads}, @p{...}:
  *    Compute a finite element function or its derivative
  *    in quadrature points.
  *
- *  \item @p{reinit}: initialize the @p{FEValues} object for a certain cell.
+ *  @item @p{reinit}: initialize the @p{FEValues} object for a certain cell.
  *    This function is not in the present class but only in the derived
  *    classes and has a variable call syntax. 
  *    See the docs for the derived classes for more information.
- * \end{itemize}
+ * @end{itemize}
  *
  *
- * \subsection{UpdateFlags}
+ * @sect3{UpdateFlags}
  *
  * The @ref{UpdateFlags} object handed to the constructor is used to
  * determine, which of the data fields to compute. This way, it is
@@ -217,12 +319,13 @@ class FEValuesBase : protected FEValuesData<dim>
     const unsigned int n_quadrature_points;
 
 				     /**
-				      * Number of shape functions
-				      * per cell. If we use this base class
-				      * to evaluate a finite element on
-				      * faces of cells, this is still the
-				      * number of degrees of freedom per
-				      * cell, not per face.
+				      * Number of shape functions per
+				      * cell. If we use this base
+				      * class to evaluate a finite
+				      * element on faces of cells,
+				      * this is still the number of
+				      * degrees of freedom per cell,
+				      * not per face.
 				      */
     const unsigned int dofs_per_cell;
 
@@ -254,34 +357,57 @@ class FEValuesBase : protected FEValuesData<dim>
     ~FEValuesBase ();
     
 				     /**
-				      * Value of the @p{function_no}th shape
-				      * function at the @p{point_no}th quadrature
+				      * Value of the @p{function_no}th
+				      * shape function at the
+				      * @p{point_no}th quadrature
 				      * point on the cell, face or
 				      * subface selected the last time
 				      * the @p{reinit} function of the
 				      * derived class was called.
+				      *
+				      * If the shape function is
+				      * vector-valued, then this
+				      * returns the only non-zero
+				      * component. If the shape
+				      * function has more than one
+				      * non-zero component (i.e. it is
+				      * not primitive), then throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * that case, use the
+				      * @ref{shape_value_component}
+				      * function.
 				      */
     double shape_value (const unsigned int function_no,
 			const unsigned int point_no) const;
 
 				     /**
-				      * This function is now
-				      * deprecated and will be removed
-				      * in the next release of the
-				      * deal.II library.
-				      *
-				      * Pointer to the matrix holding
-				      * all values of shape functions
-				      * at all integration points, on
-				      * the present cell, face or
-				      * subface selected the last time
-				      * the @p{reinit} function of the
-				      * derived class was called.  For
-				      * the format of this matrix, see
-				      * the documentation for the
-				      * matrix itself.
+				      * Return one vector component of
+				      * the value of a shape function
+				      * at a quadrature point. If the
+				      * finite element is scalar, then
+				      * only component zero is allowed
+				      * and the return value equals
+				      * that of the @p{shape_value}
+				      * function. If the finite
+				      * element is vector valued but
+				      * all shape functions are
+				      * primitive (i.e. they are
+				      * non-zero in only one
+				      * component), then the value
+				      * returned by @p{shape_value}
+				      * equals that of this function
+				      * for exactly one
+				      * component. This function is
+				      * therefore only of greater
+				      * interest if the shape function
+				      * is not primitive, but then it
+				      * is necessary since the other
+				      * function cannot be used.
 				      */
-    const typename FEValuesData<dim>::ShapeVector & get_shape_values () const;
+    double shape_value_component (const unsigned int function_no,
+				  const unsigned int point_no,
+				  const unsigned int component) const;
 
 				     /**
 				      * Values of the finite
@@ -351,25 +477,52 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * gradient's value is returned,
 				      * there should be no major
 				      * performance drawback.
-				      */
-    const Tensor<1,dim> & shape_grad (const unsigned int function,
-				      const unsigned int quadrature_point) const;
-
-				     /** 
-				      * This function is now
-				      * deprecated and will be removed
-				      * in the next release of the
-				      * deal.II library.
 				      *
-				      * Pointer to the matrix holding
-				      * all gradients of shape
-				      * functions at all integration
-				      * points, on the present cell.
-				      * For the format of this matrix,
-				      * see the documentation for the
-				      * matrix itself.
+				      * If the shape function is
+				      * vector-valued, then this
+				      * returns the only non-zero
+				      * component. If the shape
+				      * function has more than one
+				      * non-zero component (i.e. it is
+				      * not primitive), then throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * that case, use the
+				      * @ref{shape_grad_component}
+				      * function.
 				      */
-    const typename FEValuesData<dim>::GradientVector & get_shape_grads () const;
+    const Tensor<1,dim> &
+    shape_grad (const unsigned int function,
+		const unsigned int quadrature_point) const;
+
+				     /**
+				      * Return one vector component of
+				      * the gradient of a shape function
+				      * at a quadrature point. If the
+				      * finite element is scalar, then
+				      * only component zero is allowed
+				      * and the return value equals
+				      * that of the @p{shape_grad}
+				      * function. If the finite
+				      * element is vector valued but
+				      * all shape functions are
+				      * primitive (i.e. they are
+				      * non-zero in only one
+				      * component), then the value
+				      * returned by @p{shape_grad}
+				      * equals that of this function
+				      * for exactly one
+				      * component. This function is
+				      * therefore only of greater
+				      * interest if the shape function
+				      * is not primitive, but then it
+				      * is necessary since the other
+				      * function cannot be used.
+				      */
+    Tensor<1,dim>
+    shape_grad_component (const unsigned int function_no,
+			  const unsigned int point_no,
+			  const unsigned int component) const;
 
 				     /**
 				      * Gradients of the finite
@@ -438,26 +591,56 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * only a reference to the
 				      * derivative values is returned,
 				      * there should be no major
-				      * performance drawback.  */
-    const Tensor<2,dim> & shape_2nd_derivative (const unsigned int function_no,
-						const unsigned int point_no) const;
+				      * performance drawback.
+				      *
+				      * If the shape function is
+				      * vector-valued, then this
+				      * returns the only non-zero
+				      * component. If the shape
+				      * function has more than one
+				      * non-zero component (i.e. it is
+				      * not primitive), then throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}. In
+				      * that case, use the
+				      * @ref{shape_grad_grad_component}
+				      * function.
+				      */
+    const Tensor<2,dim> &
+    shape_2nd_derivative (const unsigned int function_no,
+			  const unsigned int point_no) const;
+
 
 				     /**
-				      * This function is now
-				      * deprecated and will be removed
-				      * in the next release of the
-				      * deal.II library.
-				      *
-				      * Pointer to the
-				      * matrix holding all 2nd
-				      * derivatives of shape functions
-				      * at all integration points, on
-				      * the present cell.  For the
-				      * format of this matrix, see the
-				      * documentation for the matrix
-				      * itself.
+				      * Return one vector component of
+				      * the gradient of a shape
+				      * function at a quadrature
+				      * point. If the finite element
+				      * is scalar, then only component
+				      * zero is allowed and the return
+				      * value equals that of the
+				      * @p{shape_2nd_derivative}
+				      * function. If the finite
+				      * element is vector valued but
+				      * all shape functions are
+				      * primitive (i.e. they are
+				      * non-zero in only one
+				      * component), then the value
+				      * returned by
+				      * @p{shape_2nd_derivative}
+				      * equals that of this function
+				      * for exactly one
+				      * component. This function is
+				      * therefore only of greater
+				      * interest if the shape function
+				      * is not primitive, but then it
+				      * is necessary since the other
+				      * function cannot be used.
 				      */
-    const typename std::vector<typename std::vector<Tensor<2,dim> > > & get_shape_2nd_derivatives () const;
+    Tensor<2,dim>
+    shape_2nd_derivative_component (const unsigned int function_no,
+				    const unsigned int point_no,
+				    const unsigned int component) const;
     
 				     /**
 				      * Tensor of second derivatives
@@ -591,6 +774,21 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Exception
 				      */
     DeclException0 (ExcFEDontMatch);
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcShapeFunctionNotPrimitive,
+		    int,
+		    << "The shape function with index " << arg1
+		    << " is not primitive, i.e. it is vector-valued and "
+		    << "has more than one non-zero vector component. This "
+		    << "function cannot be called for these shape functions. "
+		    << "Maybe you want to use the same function with the "
+		    << "_component suffix?");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFENotPrimitive);
     
   protected:
 				     /**
@@ -980,9 +1178,91 @@ double
 FEValuesBase<dim>::shape_value (const unsigned int i,
 				const unsigned int j) const
 {
-  Assert (update_flags & update_values, ExcAccessToUninitializedField());
-  return shape_values(i,j);
+  Assert (this->update_flags & update_values,
+	  ExcAccessToUninitializedField());
+  Assert (fe->is_primitive (i),
+	  ExcShapeFunctionNotPrimitive(i));
+
+				   // if the entire FE is primitive,
+				   // then we can take a short-cut:
+  if (fe->is_primitive())
+    return this->shape_values(i,j);
+  else
+				     // otherwise, use the mapping
+				     // between shape function numbers
+				     // and rows. note that by the
+				     // assertions above, we know that
+				     // this particular shape function
+				     // is primitive, so there is no
+				     // question to which vector
+				     // component the call of this
+				     // function refers
+    return this->shape_values(shape_function_to_row_table[i], j);
 }
+
+
+
+template <int dim>
+inline
+double
+FEValuesBase<dim>::shape_value_component (const unsigned int i,
+					  const unsigned int j,
+					  const unsigned int component) const
+{
+  Assert (this->update_flags & update_values,
+	  ExcAccessToUninitializedField());
+  Assert (component < fe->n_components(),
+	  ExcIndexRange(component, 0, fe->n_components()));
+			
+				   // if this particulat shape
+				   // function is primitive, then we
+				   // can take a short-cut by checking
+				   // whether the requested component
+				   // is the only non-zero one (note
+				   // that calling
+				   // system_to_component_table only
+				   // works if the shape function is
+				   // primitive):
+  if (fe->is_primitive(i))
+    {
+      if (component == fe->system_to_component_index(i).first)
+	return this->shape_values(i,j);
+      else
+	return 0;
+    }
+  else
+    {
+				       // no, this shape function is
+				       // not primitive. then we have
+				       // to loop over its components
+				       // and to find the
+				       // corresponding row in the
+				       // arrays of this
+				       // object. before that check
+				       // whether the shape function
+				       // is non-zero at all within
+				       // this component:
+      if (fe->get_nonzero_components(i)[component] == false)
+	return 0.;
+
+				       // count how many non-zero
+				       // component the shape function
+				       // has before the one we are
+				       // looking for, and add this to
+				       // the offset of the first
+				       // non-zero component of this
+				       // shape function in the arrays
+				       // we index presently:
+      const unsigned int
+	row = (shape_function_to_row_table[i]
+	       +
+	       std::count (fe->get_nonzero_components(i).begin(),
+			   fe->get_nonzero_components(i).begin()+component,
+			   true));
+      return this->shape_values(row, j);
+    };
+}
+
 
 
 template <int dim>
@@ -991,14 +1271,94 @@ const Tensor<1,dim> &
 FEValuesBase<dim>::shape_grad (const unsigned int i,
 			       const unsigned int j) const
 {
-  Assert (i<shape_gradients.size(),
+  Assert (i<this->shape_gradients.size(),
 	  ExcIndexRange (i, 0, shape_gradients.size()));
   Assert (j<shape_gradients[i].size(),
 	  ExcIndexRange (j, 0, shape_gradients[i].size()));
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients,
+	  ExcAccessToUninitializedField());
+  Assert (fe->is_primitive (i),
+	  ExcShapeFunctionNotPrimitive(i));
 
-  return shape_gradients[i][j];
+				   // if the entire FE is primitive,
+				   // then we can take a short-cut:
+  if (fe->is_primitive())
+    return this->shape_gradients[i][j];
+  else
+				     // otherwise, use the mapping
+				     // between shape function numbers
+				     // and rows. note that by the
+				     // assertions above, we know that
+				     // this particular shape function
+				     // is primitive, so there is no
+				     // question to which vector
+				     // component the call of this
+				     // function refers
+    return this->shape_gradients[shape_function_to_row_table[i]][j];
 };
+
+
+
+template <int dim>
+inline
+Tensor<1,dim>
+FEValuesBase<dim>::shape_grad_component (const unsigned int i,
+					 const unsigned int j,
+					 const unsigned int component) const
+{
+  Assert (this->update_flags & update_values,
+	  ExcAccessToUninitializedField());
+  Assert (component < fe->n_components(),
+	  ExcIndexRange(component, 0, fe->n_components()));
+			
+				   // if this particulat shape
+				   // function is primitive, then we
+				   // can take a short-cut by checking
+				   // whether the requested component
+				   // is the only non-zero one (note
+				   // that calling
+				   // system_to_component_table only
+				   // works if the shape function is
+				   // primitive):
+  if (fe->is_primitive(i))
+    {
+      if (component == fe->system_to_component_index(i).first)
+	return this->shape_gradients[i][j];
+      else
+	return Tensor<1,dim>();
+    }
+  else
+    {
+				       // no, this shape function is
+				       // not primitive. then we have
+				       // to loop over its components
+				       // and to find the
+				       // corresponding row in the
+				       // arrays of this
+				       // object. before that check
+				       // whether the shape function
+				       // is non-zero at all within
+				       // this component:
+      if (fe->get_nonzero_components(i)[component] == false)
+	return Tensor<1,dim>();
+
+				       // count how many non-zero
+				       // component the shape function
+				       // has before the one we are
+				       // looking for, and add this to
+				       // the offset of the first
+				       // non-zero component of this
+				       // shape function in the arrays
+				       // we index presently:
+      const unsigned int
+	row = (shape_function_to_row_table[i]
+	       +
+	       std::count (fe->get_nonzero_components(i).begin(),
+			   fe->get_nonzero_components(i).begin()+component,
+			   true));
+      return this->shape_gradients[row][j];
+    };
+}
 
 
 
@@ -1008,13 +1368,93 @@ const Tensor<2,dim> &
 FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 					 const unsigned int j) const
 {
-  Assert (i<shape_2nd_derivatives.size(),
+  Assert (i<this->shape_2nd_derivatives.size(),
 	  ExcIndexRange (i, 0, shape_2nd_derivatives.size()));
-  Assert (j<shape_2nd_derivatives[i].size(),
+  Assert (j<this->shape_2nd_derivatives[i].size(),
 	  ExcIndexRange (j, 0, shape_2nd_derivatives[i].size()));
-  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_second_derivatives,
+	  ExcAccessToUninitializedField());
+  Assert (fe->is_primitive (i),
+	  ExcShapeFunctionNotPrimitive(i));
 
-  return shape_2nd_derivatives[i][j];
+				   // if the entire FE is primitive,
+				   // then we can take a short-cut:
+  if (fe->is_primitive())
+    return this->shape_2nd_derivatives[i][j];
+  else
+				     // otherwise, use the mapping
+				     // between shape function numbers
+				     // and rows. note that by the
+				     // assertions above, we know that
+				     // this particular shape function
+				     // is primitive, so there is no
+				     // question to which vector
+				     // component the call of this
+				     // function refers
+    return this->shape_2nd_derivatives[shape_function_to_row_table[i]][j];
+}
+
+
+
+template <int dim>
+inline
+Tensor<2,dim>
+FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
+						   const unsigned int j,
+						   const unsigned int component) const
+{
+  Assert (this->update_flags & update_values,
+	  ExcAccessToUninitializedField());
+  Assert (component < fe->n_components(),
+	  ExcIndexRange(component, 0, fe->n_components()));
+			
+				   // if this particulat shape
+				   // function is primitive, then we
+				   // can take a short-cut by checking
+				   // whether the requested component
+				   // is the only non-zero one (note
+				   // that calling
+				   // system_to_component_table only
+				   // works if the shape function is
+				   // primitive):
+  if (fe->is_primitive(i))
+    {
+      if (component == fe->system_to_component_index(i).first)
+	return this->shape_2nd_derivatives[i][j];
+      else
+	return Tensor<2,dim>();
+    }
+  else
+    {
+				       // no, this shape function is
+				       // not primitive. then we have
+				       // to loop over its components
+				       // and to find the
+				       // corresponding row in the
+				       // arrays of this
+				       // object. before that check
+				       // whether the shape function
+				       // is non-zero at all within
+				       // this component:
+      if (fe->get_nonzero_components(i)[component] == false)
+	return Tensor<2,dim>();
+
+				       // count how many non-zero
+				       // component the shape function
+				       // has before the one we are
+				       // looking for, and add this to
+				       // the offset of the first
+				       // non-zero component of this
+				       // shape function in the arrays
+				       // we index presently:
+      const unsigned int
+	row = (shape_function_to_row_table[i]
+	       +
+	       std::count (fe->get_nonzero_components(i).begin(),
+			   fe->get_nonzero_components(i).begin()+component,
+			   true));
+      return this->shape_2nd_derivatives[row][j];
+    };
 }
 
 
@@ -1065,11 +1505,11 @@ template <int dim>
 const Point<dim> &
 FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 {
-  Assert (i<normal_vectors.size(), ExcIndexRange(i, 0, normal_vectors.size()));
-  Assert (update_flags & update_normal_vectors,
+  Assert (i<this->normal_vectors.size(), ExcIndexRange(i, 0, normal_vectors.size()));
+  Assert (this->update_flags & update_normal_vectors,
 	  FEValuesBase<dim>::ExcAccessToUninitializedField());
   
-  return normal_vectors[i];
+  return this->normal_vectors[i];
 };
 
 

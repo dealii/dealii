@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,7 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
 
 
@@ -40,6 +41,22 @@ void test_fe_datas()
 					   FE_Q<dim> (3), 1));
       fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (4), 2));
     }
+
+				   // have systems of systems, and
+				   // construct hierarchies of
+				   // subsequently weirder elements by
+				   // taking each of them in turn as
+				   // basis of others
+  fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),2),2));
+  fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),2),1,
+					 FESystem<dim> (FE_DGQ<dim>(1),2),1));
+  fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),1,
+							FE_Q<dim>(2),1),1,
+					 FESystem<dim> (FE_Q<dim>(2),2),1,
+					 FESystem<dim> (FE_DGQ<dim>(2),2),1));
+  fe_datas.push_back (new FESystem<dim> (*fe_datas[fe_datas.size()-3], 2,
+					 *fe_datas[fe_datas.size()-2], 1,
+					 *fe_datas[fe_datas.size()-1], 2));
   
   deallog << std::endl << "dim=" << dim << std::endl;
   for (unsigned int n=0; n<fe_datas.size(); ++n)

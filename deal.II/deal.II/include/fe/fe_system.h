@@ -28,7 +28,7 @@
  * into one. To the outside world, the resulting object looks just
  * like a usual finite element object, which is composed of several
  * other finite elements that are possibly of different type.
-
+ *
  * The overall numbering of degrees of freedom is as follows: for each
  * subobject (vertex, line, quad, or hex), the degrees of freedom are
  * numbered such that we run over all subelements first, before
@@ -127,7 +127,18 @@ class FESystem : public FiniteElement<dim>
 				      * Return the value of the
 				      * @p{i}th shape function at the
 				      * point @p{p}.  @p{p} is a point
-				      * on the reference element.
+				      * on the reference element. Since
+				      * this finite element is always
+				      * vector-valued, we return the
+				      * value of the only non-zero
+				      * component of the vector value
+				      * of this shape function. If the
+				      * shape function has more than
+				      * one non-zero component (which
+				      * we refer to with the term
+				      * non-primitive), then throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}.
 				      *
 				      * An
 				      * @p{ExcUnitShapeValuesDoNotExist}
@@ -140,6 +151,26 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual double shape_value (const unsigned int i,
 			        const Point<dim> &p) const;
+
+				     /**
+				      * Return the value of the
+				      * @p{component}th vector
+				      * component of the @p{i}th shape
+				      * function at the point
+				      * @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
+				      *
+				      * Since this element is vector
+				      * valued in general, it relays
+				      * the computation of these
+				      * values to the base elements.
+				      */
+    virtual double shape_value_component (const unsigned int i,
+					  const Point<dim> &p,
+					  const unsigned int component) const;
     
 				     /**
 				      * Return the gradient of the
@@ -149,7 +180,18 @@ class FESystem : public FiniteElement<dim>
 				      * likewise the gradient is the
 				      * gradient on the unit cell with
 				      * respect to unit cell
-				      * coordinates.
+				      * coordinates. Since
+				      * this finite element is always
+				      * vector-valued, we return the
+				      * value of the only non-zero
+				      * component of the vector value
+				      * of this shape function. If the
+				      * shape function has more than
+				      * one non-zero component (which
+				      * we refer to with the term
+				      * non-primitive), then throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}.
 				      *
 				      * An
 				      * @p{ExcUnitShapeValuesDoNotExist}
@@ -164,13 +206,44 @@ class FESystem : public FiniteElement<dim>
 				      const Point<dim>   &p) const;
 
 				     /**
+				      * Return the gradient of the
+				      * @p{component}th vector
+				      * component of the @p{i}th shape
+				      * function at the point
+				      * @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
+				      *
+				      * Since this element is vector
+				      * valued in general, it relays
+				      * the computation of these
+				      * values to the base elements.
+				      */
+    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
+						const Point<dim> &p,
+						const unsigned int component) const;
+
+				     /**
 				      * Return the tensor of second
 				      * derivatives of the @p{i}th
 				      * shape function at point @p{p}
 				      * on the unit cell. The
 				      * derivatives are derivatives on
 				      * the unit cell with respect to
-				      * unit cell coordinates.
+				      * unit cell coordinates. Since
+				      * this finite element is always
+				      * vector-valued, we return the
+				      * value of the only non-zero
+				      * component of the vector value
+				      * of this shape function. If the
+				      * shape function has more than
+				      * one non-zero component (which
+				      * we refer to with the term
+				      * non-primitive), then throw an
+				      * exception of type
+				      * @p{ExcShapeFunctionNotPrimitive}.
 				      *
 				      * An
 				      * @p{ExcUnitShapeValuesDoNotExist}
@@ -183,6 +256,26 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim> &p) const;
+
+				     /**
+				      * Return the second derivatives
+				      * of the @p{component}th vector
+				      * component of the @p{i}th shape
+				      * function at the point
+				      * @p{p}. See the
+				      * @ref{FiniteElementBase} base
+				      * class for more information
+				      * about the semantics of this
+				      * function.
+				      *
+				      * Since this element is vector
+				      * valued in general, it relays
+				      * the computation of these
+				      * values to the base elements.
+				      */
+    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
+						     const Point<dim> &p,
+						     const unsigned int component) const;
 
 				     /** 
 				      * Number of different base
@@ -215,7 +308,8 @@ class FESystem : public FiniteElement<dim>
 				      * multiplicities are greater
 				      * than one.
 				      */
-    virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
+    virtual const FiniteElement<dim> &
+    base_element (const unsigned int index) const;
     
 				     /**
 				      * Check for non-zero values on a face.
@@ -463,6 +557,51 @@ class FESystem : public FiniteElement<dim>
 					   const unsigned int        N2,
 					   const FiniteElement<dim> &fe3,
 					   const unsigned int        N3);
+
+				     /**
+				      * Compute the non-zero vector
+				      * components of a composed
+				      * finite element.
+				      */
+    static std::vector<std::vector<bool> >
+    compute_nonzero_components (const FiniteElement<dim> &fe1,
+				const unsigned int        N1);
+
+				     /**
+				      * Compute the non-zero vector
+				      * components of a composed
+				      * finite element.
+				      */
+    static std::vector<std::vector<bool> >
+    compute_nonzero_components (const FiniteElement<dim> &fe1,
+				const unsigned int        N1,
+				const FiniteElement<dim> &fe2,
+				const unsigned int        N2);
+
+				     /**
+				      * Compute the non-zero vector
+				      * components of a composed
+				      * finite element.
+				      */
+    static std::vector<std::vector<bool> >
+    compute_nonzero_components (const FiniteElement<dim> &fe1,
+				const unsigned int        N1,
+				const FiniteElement<dim> &fe2,
+				const unsigned int        N2,
+				const FiniteElement<dim> &fe3,
+				const unsigned int        N3);
+
+				     /**
+				      * Compute the nonzero components
+				      * of a list of finite elements
+				      * with multiplicities given in
+				      * the second argument. This
+				      * function is called from all
+				      * the above functions.
+				     */
+    static std::vector<std::vector<bool> >
+    compute_nonzero_components (const std::vector<const FiniteElement<dim>*> &fes,
+				const std::vector<unsigned int>              &multiplicities);
     
 				     /**
 				      * This function is simply
@@ -479,12 +618,12 @@ class FESystem : public FiniteElement<dim>
 				     /**
 				      * Used by @p{initialize}.
 				      */
-    void build_cell_table();
+    void build_cell_tables();
     
 				     /**
 				      * Used by @p{initialize}.
 				      */
-    void build_face_table();
+    void build_face_tables();
 
 				     /**
 				      * Used by @p{initialize}.
@@ -495,12 +634,11 @@ class FESystem : public FiniteElement<dim>
 				      * Usually: Fields of
 				      * cell-independent data.
 				      *
-				      * But for @p{FESystem} this
-				      * @p{InternalData} class does
+				      * However, here, this class does
 				      * not itself store the data but
 				      * only pointers to
-				      * @p{InternalDatas} of the base
-				      * elements.
+				      * @p{InternalData} objects for
+				      * each of the base elements.
 				      */
     class InternalData : public FiniteElementBase<dim>::InternalDataBase
     {
@@ -513,7 +651,7 @@ class FESystem : public FiniteElement<dim>
 					  * vector to
 					  * @p{n_base_elements}.
 					  */
-	InternalData(const unsigned int n_base_elements);
+	InternalData (const unsigned int n_base_elements);
 	
 					 /**
 					  * Destructor. Deletes all
@@ -593,26 +731,33 @@ class FESystem : public FiniteElement<dim>
       private:
 	
 					 /**
-					  * Pointers to the
-					  * @p{InternalDatas} of the
-					  * base elements. They are
+					  * Pointers to
+					  * @p{InternalData} objects
+					  * for each of the base
+					  * elements. They are
 					  * accessed to by the
 					  * @p{set_} and
-					  * @p{get_fe_data}
-					  * functions.
+					  * @p{get_fe_data} functions.
 					  *
 					  * The size of this vector is
 					  * set to @p{n_base_elements}
 					  * by the InternalData
-					  * constructor.  It is
-					  * filled by the @p{get_data}
-					  * function.
+					  * constructor.  It is filled
+					  * by the @p{get_data}
+					  * function. Note that since
+					  * the data for each instance
+					  * of a base class is
+					  * necessarily the same, we
+					  * only need as many of these
+					  * objects as there are base
+					  * elements, irrespective of
+					  * their multiplicity.
 					  */
 	typename std::vector<typename FiniteElementBase<dim>::InternalDataBase *> base_fe_datas;
 
 					 /**
 					  * Pointers to the
-					  * @p{FEValuesDatas}
+					  * @p{FEValuesData} objects
 					  * that are given to the
 					  * @p{fill_fe_values}
 					  * function of the base

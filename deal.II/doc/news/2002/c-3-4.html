@@ -33,15 +33,47 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p>
+       Removed: The functions <code
+       class="member">FEValuesBase::get_shape_values</code>, <code
+       class="member">FEValuesBase::get_shape_grads</code>, and <code
+       class="member">FEValuesBase::get_shape_2nd_derivatives</code> are
+       now removed as they expose too much of the internal data
+       structure of their class, and interfere with plans for the
+       extension of this and related classes. These functions, which
+       had been deprecated in the previous version, are thus not
+       part of the release after version 3.3 any more. Use the <code
+       class="member">FEValuesBase::shape_value</code> and alike
+       functions as a replacement.
+       <br>
+       For more information, read
+       <a href="http://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
+       <br>
+       (WB 2002/06/10)
+       </p>
 
-  <li> Improved: make knows a target <tt>veryclean</tt>
-  now. <tt>clean</tt> leaves the libraries now, removing everything
-  that is not needed to use
-  <acronym>deal.II</acronym>. <tt>veryclean</tt> removes even the
-  libraries, leaving the directory more or less in the state like
-  after <tt>configure</tt>.
-  <br>
-  (GK 2002/06/07)
+  <li> <p> 
+       New: <acronym>deal.II</acronym> now also supports vector-valued
+       finite elements with shape functions for which more than just
+       one vector component is non-zero. Such elements are, for
+       example, the Nedelec and Raviart-Thomas families. Previously,
+       vector-valued elements were only supported insofar as they
+       could be composed of scalar ones; in that case, each
+       (vector-valued) shape function had only one non-zero vector
+       component.
+       <br>
+       (WB 2002/06/10)
+       </p>
+
+  <li> <p> 
+       Improved: make knows a target <tt>veryclean</tt>
+       now. <tt>clean</tt> leaves the libraries now, removing
+       everything that is not needed to use
+       <acronym>deal.II</acronym>. <tt>veryclean</tt> removes even the
+       libraries, leaving the directory more or less in the state like
+       after <tt>configure</tt>.
+       <br>
+       (GK 2002/06/07)
 </ol>
 
 
