@@ -34,7 +34,7 @@ class BlockIndices;
 /**
  * This class implements linear homogeneous constraints on degrees of
  * freedom. In particular, it handles constraints of the form
- * $x_{i1} = \sum_{j=2}^M a_{i_j} x_{i_j}$. Each "line" in objects of this
+ * $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j}$. Each "line" in objects of this
  * class corresponds to one such constraint, with the number of the
  * line being $i1$, and the entries in this line being pairs
  * $(i_j,a_{i_j})$. Note that the constraints are linear in the $x_i$,
