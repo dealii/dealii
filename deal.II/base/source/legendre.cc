@@ -128,7 +128,7 @@ Legendre<number>::get_coefficients (const unsigned int k)
 				   // of coefficients. do that in a MT
 				   // safe way
   coefficients_lock.acquire ();
-  const vector<number> *p = coefficients[k];
+  const std::vector<number> *p = coefficients[k];
   coefficients_lock.release ();
 
 				   // return the object pointed

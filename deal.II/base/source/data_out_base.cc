@@ -19,7 +19,7 @@
 
 #include <iomanip>
 #include <ctime>
-#include <cmath>
+#include <math.h>
 #include <set>
 
 
@@ -892,8 +892,8 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
 
 
-      vector<Point<spacedim> > ver((n_subdivisions+1)*
-				   (n_subdivisions+1));
+      std::vector<Point<spacedim> > ver((n_subdivisions+1)*
+					(n_subdivisions+1));
       
       for (unsigned int i=0; i<n_subdivisions+1; ++i)
 	{
@@ -922,8 +922,8 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
 		    {
 						       // aproximate normal
 						       // vectors in patch
-		      vector<Point<3> > nrml((n_subdivisions+1)*
-					     (n_subdivisions+1));
+		      std::vector<Point<3> > nrml((n_subdivisions+1)*
+						  (n_subdivisions+1));
 		      Point<3> h1,h2;
 		      for (unsigned int i=0; i<n_subdivisions+1;++i)
 			{
