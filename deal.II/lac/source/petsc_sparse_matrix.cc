@@ -51,6 +51,15 @@ namespace PETScWrappers
 
 
 
+  SparseMatrix &
+  SparseMatrix::operator = (const double d)
+  {
+    MatrixBase::operator = (d);
+    return *this;
+  }
+
+
+
   void
   SparseMatrix::reinit (const unsigned int m,
                         const unsigned int n,
