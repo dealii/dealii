@@ -81,6 +81,12 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& src)
       const MGDoFHandler<dim>::active_cell_iterator
 	level_end  = mg_dof_handler->end_active(level);
 
+//TODO: Treat hanging nodes properly
+// The single-level vector is not an FE-function, because the values at
+// hanging nodes are set to zero. This should be treated before the restriction.
+
+				       // Compute coarse level right hand side
+				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell, ++global_cell)
 	{
 					   // get the dof numbers of
@@ -96,8 +102,8 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& src)
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    defect[level](level_dof_indices[i]) = src(global_dof_indices[i]);
 
-//TODO: what happens here?
-					   // Delete values on refinement edge
+					   // Delete values on refinement edge,
+					   // since restriction will add them again.
 	  for (unsigned int face_n=0; face_n<GeometryInfo<dim>::faces_per_cell; ++face_n)
 	    {
 	      const MGDoFHandler<dim>::face_iterator face = level_cell->face(face_n);
