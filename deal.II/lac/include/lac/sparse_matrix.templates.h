@@ -282,8 +282,8 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
-  Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
+  Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
+  Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
   
   const unsigned int n_rows = m();
 
@@ -379,8 +379,8 @@ SparseMatrix<number>::Tvmult (Vector<somenumber>& dst, const Vector<somenumber>&
 {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert(n() == dst.size(), ExcDimensionsDontMatch(n(),dst.size()));
-  Assert(m() == src.size(), ExcDimensionsDontMatch(m(),src.size()));
+  Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
+  Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
   dst.clear ();
 
@@ -402,8 +402,8 @@ SparseMatrix<number>::vmult_add (Vector<somenumber>& dst, const Vector<somenumbe
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
-  Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
+  Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
+  Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
   const unsigned int  n_rows     = m();
   const number       *val_ptr    = &val[cols->rowstart[0]];
@@ -427,8 +427,8 @@ SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst, const Vector<somenumb
 {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert(n() == dst.size(), ExcDimensionsDontMatch(n(),dst.size()));
-  Assert(m() == src.size(), ExcDimensionsDontMatch(m(),src.size()));
+  Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
+  Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
   for (unsigned int i=0;i<m();i++)
     {
@@ -448,8 +448,8 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert(m() == v.size(), ExcDimensionsDontMatch(m(),v.size()));
-  Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
+  Assert(m() == v.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
   const unsigned int n_rows = m();
 #ifdef DEAL_II_USE_MT
@@ -559,8 +559,8 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert(m() == u.size(), ExcDimensionsDontMatch(m(),u.size()));
-  Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
+  Assert(m() == u.size(), ExcDimensionMismatch(m(),u.size()));
+  Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
   const unsigned int n_rows = m();
 #ifdef DEAL_II_USE_MT
@@ -714,9 +714,9 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert(m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
-  Assert(m() == b.size(), ExcDimensionsDontMatch(m(),b.size()));
-  Assert(n() == u.size(), ExcDimensionsDontMatch(n(),u.size()));
+  Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
+  Assert(m() == b.size(), ExcDimensionMismatch(m(),b.size()));
+  Assert(n() == u.size(), ExcDimensionMismatch(n(),u.size()));
 
   const unsigned int n_rows = m();
 #ifdef DEAL_II_USE_MT
@@ -958,7 +958,7 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert (m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
+  Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   for (unsigned int row=0; row<m(); ++row)
     {
@@ -980,7 +980,7 @@ SparseMatrix<number>::TSOR (Vector<somenumber>& dst, const number om) const
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert (m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
+  Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   for (unsigned int row=m(); row!=0;)
     {
@@ -1005,8 +1005,8 @@ SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert (m() == v.size(), ExcDimensionsDontMatch(m(),v.size()));
-  Assert (m() == b.size(), ExcDimensionsDontMatch(m(),b.size()));
+  Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
   for (unsigned int row=0; row<m(); ++row)
     {
@@ -1029,8 +1029,8 @@ SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert (m() == v.size(), ExcDimensionsDontMatch(m(),v.size()));
-  Assert (m() == b.size(), ExcDimensionsDontMatch(m(),b.size()));
+  Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
   for (int row=m()-1; row>=0; --row)
     {
@@ -1063,7 +1063,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert (m() == dst.size(), ExcDimensionsDontMatch(m(),dst.size()));
+  Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   const unsigned int  n = dst.size();
   unsigned int  j;

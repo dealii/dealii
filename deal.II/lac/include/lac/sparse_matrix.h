@@ -792,13 +792,6 @@ class SparseMatrix : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcDimensionsDontMatch,
-		    int, int,
-		    << "The dimensions " << arg1 << " and " << arg2
-		    << " do not match properly.");
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcInvalidIndex,
 		    int, int,
 		    << "The entry with index <" << arg1 << ',' << arg2
