@@ -342,17 +342,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
-  <li> <p> Improved: When eliminating nodes from a matrix using the <code
-       class="member">ConstraintMatrix::condense</code> functions, the
-       diagonal entry was set to one. It is now set to an entry that more
-       resembles the size of the other diagonal entries, so that we don't run
-       into scaling problems for applications that have very large or small
-       domains.
-       <br>
-       (WB 2004/03/02)
-       </p>
-
-
   <li> <p> New: The <code class="class">Vector</code> and <code
        class="class">BlockVector</code> classes now have member functions
        <code class="member">is_non_negative</code> that check whether a vector
@@ -480,6 +469,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        freedom suitable for parallel computations with PETSc.
        <br>
        (WB 2004/03/08)
+       </p>
+
+  <li> <p> Improved: When eliminating nodes from a matrix using the <code
+       class="member">ConstraintMatrix::condense</code> functions, the
+       diagonal entry was set to one. It is now set to an entry that more
+       resembles the size of the other diagonal entries, so that we don't run
+       into scaling problems for applications that have very large or small
+       domains.
+       <br>
+       (WB 2004/03/02)
        </p>
 
   <li> <p> Changed: The classes <code class="class">DataOut*</code> and <code
