@@ -42,7 +42,7 @@ FE_Nedelec<1>::Matrices::n_constraint_matrices = 0;
 
 template <>
 const double * const
-FE_Nedelec<1>::Matrices::constraint_matrices[] = {};
+FE_Nedelec<1>::Matrices::constraint_matrices[] = {0};
 
 
 #else // #if deal_II_dimension
