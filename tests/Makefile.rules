@@ -1,7 +1,7 @@
 ######################################################################
 # Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
-# Copyright (C) 2001, the deal.II authors
+# Copyright (C) 2001, 2002, the deal.II authors
 #
 # Common make rules for test files. To be included by the Makefiles
 # in the subdirectories.
@@ -33,7 +33,7 @@ endif
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 %.exe :
 	@echo =====linking======= $@
-	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) $(LDFLAGS) -o $@ $^ $(libraries) $(LIBS)
 
 
 ############################################################
