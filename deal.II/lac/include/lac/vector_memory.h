@@ -16,6 +16,7 @@
 
 #include <base/subscriptor.h>
 #include <base/logstream.h>
+#include <base/thread_management.h>
 #include <lac/vector.h>
 
 #include <vector>
@@ -109,7 +110,6 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
  * 
  * @author Guido Kanschat, 1999
  */
-//TODO:[GK,WB] GrowingVectorMemory is not thread-safe. use a mutex to synchronise
 template<class Vector = ::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<Vector>
 {
@@ -120,7 +120,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * preallocate a certain number
 				      * of vectors.
 				      */
-    GrowingVectorMemory(unsigned int initial_size = 0);
+    GrowingVectorMemory (const unsigned int initial_size = 0);
 
 				     /**
 				      * Destructor.
@@ -144,7 +144,8 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * Return a vector into the pool
 				      * for later use.
 				      */
-    virtual void free(const Vector*);
+    virtual void free (const Vector*);
+
   private:
 				     /**
 				      * Type to enter into the
@@ -153,7 +154,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * vector is used, second the
 				      * vector itself.
 				      */
-    typedef typename std::pair<bool, Vector* > entry_type;
+    typedef typename std::pair<bool, Vector*> entry_type;
 
 				     /**
 				      * Array of allocated vectors.
@@ -164,7 +165,15 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * Overall number of allocations.
 				      */
     unsigned int n_alloc;
+
+				     /**
+				      * Mutex to synchronise access to
+				      * internal data of this object
+				      * from multiple threads.
+				      */
+    Threads::ThreadMutex mutex;
 };
+
 
 
 /* --------------------- inline functions ---------------------- */
@@ -174,14 +183,18 @@ template <typename Vector>
 GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size)
 		: pool(initial_size)
 {
+  mutex.acquire ();
   for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
        ++i)
     {
       i->first = false;
       i->second = new Vector;
-    }
+    };
+
+				   // no vectors yet claimed
   n_alloc = 0;
+  mutex.release ();
 }
 
 
@@ -189,6 +202,11 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size
 template<typename Vector>
 GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 {
+  mutex.acquire ();
+
+				   // deallocate all vectors and count
+				   // number of vectors that is still
+				   // claimed by other users
   unsigned int n = 0;
   for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
@@ -202,9 +220,13 @@ GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 	  << n_alloc << std::endl;
   deallog << "GrowingVectorMemory:Maximum allocated vectors: "
 	  << pool.size() << std::endl;
+  pool.clear ();
+  mutex.release ();
+
+				   // write out warning if memory leak
   if (n!=0)
     deallog << "GrowingVectorMemory:Vectors not deallocated: "
-	    << n << " Memory leak!" << std::endl;
+	    << n << ". Memory leak!" << std::endl;
 }
 
 
@@ -213,6 +235,7 @@ template<typename Vector>
 Vector*
 GrowingVectorMemory<Vector>::alloc()
 {
+  mutex.acquire ();
   ++n_alloc;
   for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
@@ -221,6 +244,7 @@ GrowingVectorMemory<Vector>::alloc()
       if (i->first == false)
 	{
 	  i->first = true;
+	  mutex.release ();
 	  return (i->second);
 	}
     }
@@ -228,6 +252,8 @@ GrowingVectorMemory<Vector>::alloc()
   t.first = true;
   t.second = new Vector;
   pool.push_back(t);
+  mutex.release ();
+  
   return t.second;
 }
 
@@ -237,14 +263,18 @@ template<typename Vector>
 void
 GrowingVectorMemory<Vector>::free(const Vector* const v)
 {
+  mutex.acquire ();
   for (typename std::vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
     {
       if (v == (i->second))
 	{
 	  i->first = false;
+	  mutex.release ();
 	  return;
 	}
     }
+  mutex.release ();
+  
   Assert(false, typename VectorMemory<Vector>::ExcNotAllocatedHere());
 }
 
