@@ -2999,6 +2999,7 @@ void Triangulation<dim>::execute_coarsening () {
 
 
 
+
 template <int dim>
 bool Triangulation<dim>::prepare_refinement () {
   bool cells_changed = false;
@@ -3149,6 +3150,7 @@ bool Triangulation<dim>::prepare_refinement () {
 
 
 
+
 template <int dim>
 bool Triangulation<dim>::prepare_coarsening () {
 				   // checking whether the coarsen flags
@@ -3259,12 +3261,16 @@ bool Triangulation<dim>::prepare_coarsening () {
 						 // are counted as unrefined since
 						 // they can only get to the same
 						 // level as this cell by the
-						 // next refinement cycle
-		unsigned int refined_neighbors = 0,
-			   unrefined_neighbors = 0;
+				 // next refinement cycle
+                unsigned int unrefined_neighbors = 0,
+		                 total_neighbors = 0;
+
 		for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n) 
 		  {
 		    const cell_iterator neighbor = cell->neighbor(n);
+                    if (neighbor.state() == valid)
+                      ++total_neighbors;
+
 		    if (neighbor.state() == valid)
 		      if ((neighbor->active() &&
 			   !neighbor->refine_flag_set()) ||
@@ -3272,20 +3278,17 @@ bool Triangulation<dim>::prepare_coarsening () {
 			   neighbor->user_flag_set())    ||   // marked for coarsening
 			  (neighbor->level() == cell->level()-1))
 			++unrefined_neighbors;
-		      else
-			++refined_neighbors;
 		  };
 		
 
-						 // if the number of unrefined
-						 // neighbors exceed that of the
-						 // refined neighbors: mark this
+						 // if all neighbors unrefined:
+						 // mark this
 						 // cell for coarsening or don't
 						 // refine if marked for that
-		if (refined_neighbors<unrefined_neighbors)
+		if (unrefined_neighbors == total_neighbors)
 		  if (!cell->active())
 		    cell->set_user_flag();
-		  else
+		  else 
 		    cell->clear_refine_flag();
 	      };
 	  };
@@ -3358,7 +3361,11 @@ bool Triangulation<dim>::prepare_coarsening () {
       {
 	cell->clear_user_flag();
 	for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-	  cell->child(c)->set_coarsen_flag();
+	  {
+	    if (cell->child(c)->refine_flag_set())
+	      cell->child(c)->clear_refine_flag();
+	    cell->child(c)->set_coarsen_flag();
+	  };
       };
   
 

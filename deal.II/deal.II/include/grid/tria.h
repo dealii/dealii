@@ -689,17 +689,22 @@ class TriaDimensionInfo<2> {
  *     the author by now.
  *
  *   \item #eliminate_refined_islands#:
- *     This algorithm seeks for isolated cells which are refined. An
- *     island is defined similar as above, i.e. a cell is flagged for coarsening
- *     if it is refined but more of its neighbors are not refined than are
- *     refined. For example, in 2D, a cell's refinement is reverted if at most
+ *     This algorithm seeks for isolated cells which are refined or flagged
+ *     for refinement. This definition is unlike that for
+ *     #eliminate_unrefined_islands#, which would mean that an island is
+ *     defined as a cell which
+ *     is refined but more of its neighbors are not refined than are refined.
+ *     For example, in 2D, a cell's refinement would be reverted if at most
  *     one of its neighbors is also refined (or refined but flagged for
- *     coarsening). This option is a bit dangerous, since if you consider a
+ *     coarsening).
+ *
+ *     The reason for the change in definition of an island is, that this
+ *     option would be a bit dangerous, since if you consider a
  *     chain of refined cells (e.g. along a kink in the solution), the cells
- *     at the two ends will be coarsened, after which the next outermost cells
+ *     at the two ends would be coarsened, after which the next outermost cells
  *     would need to be coarsened. Therefore, only one loop of flagging cells
- *     like this is done to avoid eating up the whole chain of refined cells
- *     (`chain reaction'...).
+ *     like this could be done to avoid eating up the whole chain of refined
+ *     cells (`chain reaction'...).
  *
  *     This algorithm also takes into account cells which are not actually
  *     refined but are flagged for refinement. If necessary, it takes away the
@@ -966,8 +971,7 @@ class TriaDimensionInfo<2> {
  *       a cell is flagged for refinement or if all of its children are active
  *       and if the number of neighbors which are either active and not flagged
  *       for refinement, or not active but all children flagged for coarsening
- *       exceeds the number of other neighbors, or the neighbor's refinement
- *       level is less than the present cell's level, then this cell's children
+ *       equals the total number of neighbors, then this cell's children
  *       are flagged for coarsening or (if this cell was flagged for refinement)
  *       the refine flag is cleared.
  *
