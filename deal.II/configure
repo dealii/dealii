@@ -2745,9 +2745,9 @@ echo "${ECHO_T}C++ compiler is MIPSpro C++ compiler" >&6
         GXX_VERSION=MIPSpro
       else
 
-        	        is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
+        						        is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
         is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel(R) C++ Compiler'`"
-        is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
+        is_intel_ecc="`($CXX -V 2>&1) | perl -pi -e 's/applications\n/\1/g;' | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
 	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
         if test "x$is_intel_icc" != "x" ; then
 	  version5="`echo $is_intel_icc | grep 'Version 5'`"
@@ -4784,16 +4784,16 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
-      echo "$as_me:$LINENO: result: available" >&5
-echo "${ECHO_T}available" >&6
+      echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 
-      echo "$as_me:$LINENO: result: not available" >&5
-echo "${ECHO_T}not available" >&6
+      echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
       echo "$as_me:$LINENO: checking for __func__" >&5
 echo $ECHO_N "checking for __func__... $ECHO_C" >&6
       cat >conftest.$ac_ext <<_ACEOF
@@ -4829,8 +4829,8 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
-          echo "$as_me:$LINENO: result: available" >&5
-echo "${ECHO_T}available" >&6
+          echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 	  x=__func__
 
 else
@@ -4838,8 +4838,8 @@ else
 sed 's/^/| /' conftest.$ac_ext >&5
 
 
-          echo "$as_me:$LINENO: result: not available" >&5
-echo "${ECHO_T}not available" >&6
+          echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
 	  x="\"(not available)\""
 
 fi
