@@ -1,4 +1,5 @@
 //----------------------------  dof_accessor.h  ---------------------------
+//    $Id$
 //    Version: $Name$
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -10,7 +11,7 @@
 #define __deal2__dof_accessor_h
 
 
-/*----------------------------   dof_iterator.h     ---------------------------*/
+/*-------------------------   dof_iterator.h     ------------------------*/
 
 
 #include <grid/tria_accessor.h>
