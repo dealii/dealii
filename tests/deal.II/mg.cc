@@ -167,7 +167,7 @@ Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer);
   catch (const SolverControl::NoConvergence& e)
     {
       deallog << "Step " << e.last_step
-	      << " Residual " << e.last_residual << endl;
+	      << " Residual " << e.last_residual << std::endl;
     }
 }
 

@@ -65,7 +65,7 @@ class RHSFunction
 extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 			   const Vector<double>& v,
 			   unsigned int level,
-			   ostream &out);
+			   std::ostream &out);
 
 int main()
 {

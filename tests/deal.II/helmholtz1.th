@@ -15,7 +15,7 @@ Helmholtz::build_all(MATRIX& A,
   
   Vector<double> elvec(fe_dofs);
   FullMatrix<double> elmat(fe_dofs);
-  vector<unsigned int> indices(fe_dofs);
+  std::vector<unsigned int> indices(fe_dofs);
 
 ////////////////////////////////////////////////////
 // Loop for computing the element matrices
