@@ -166,12 +166,12 @@ class KellyErrorEstimator {
 				      * value which denotes the constant
 				      * coefficient with value one.
 				      */
-    static void estimate_error (const DoFHandler<dim>    &dof,
-				const Quadrature<dim-1>  &quadrature,
-				const FunctionMap        &neumann_bc,
-				const Vector<double>     &solution,
-				Vector<float>            &error,
-				const Function<dim>      *coefficient = 0);
+    static void estimate (const DoFHandler<dim>    &dof,
+			  const Quadrature<dim-1>  &quadrature,
+			  const FunctionMap        &neumann_bc,
+			  const Vector<double>     &solution,
+			  Vector<float>            &error,
+			  const Function<dim>      *coefficient = 0);
 
 				     /**
 				      * Exception
@@ -246,6 +246,7 @@ class KellyErrorEstimator {
 					       const Vector<double> &solution,
 					       const Function<dim> *coefficient);
 };
+
 
 
 

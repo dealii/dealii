@@ -523,14 +523,14 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       h1_error.push_back (h1_error_per_cell.l2_norm());
 
       cout << "    Estimating H1 error... ";
-      KellyErrorEstimator<dim> ee;
+
       QSimpson<dim-1> eq;
-      ee.estimate_error (*dof, eq,
-			 KellyErrorEstimator<dim>::FunctionMap(),
-			 solution,
-			 estimated_error_per_cell,
-			 ((prm.get("Test case")=="Kink") ?
-			  &kink_coefficient : 0 ));
+      KellyErrorEstimator<dim>::estimate (*dof, eq,
+					  KellyErrorEstimator<dim>::FunctionMap(),
+					  solution,
+					  estimated_error_per_cell,
+					  ((prm.get("Test case")=="Kink") ?
+					   &kink_coefficient : 0 ));
       cout << estimated_error_per_cell.l2_norm() << endl;
       estimated_error.push_back (estimated_error_per_cell.l2_norm());
 

@@ -28,12 +28,12 @@ inline static double sqr (const double x) {
 #if deal_II_dimension == 1
 
 template <>
-void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
-					     const Quadrature<0> &,
-					     const FunctionMap &,
-					     const Vector<double> &,
-					     Vector<float> &,
-					     const Function<1> *) {
+void KellyErrorEstimator<1>::estimate (const DoFHandler<1> &,
+				       const Quadrature<0> &,
+				       const FunctionMap &,
+				       const Vector<double> &,
+				       Vector<float> &,
+				       const Function<1> *) {
   Assert(false, ExcNotImplemented());
 };
 
@@ -41,12 +41,13 @@ void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
 
 
 template <int dim>
-void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
-					       const Quadrature<dim-1>  &quadrature,
-					       const FunctionMap        &neumann_bc,
-					       const Vector<double>     &solution,
-					       Vector<float>            &error,
-					       const Function<dim> *coefficient) {
+void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>    &dof,
+					 const Quadrature<dim-1>  &quadrature,
+					 const FunctionMap        &neumann_bc,
+					 const Vector<double>     &solution,
+					 Vector<float>            &error,
+					 const Function<dim> *coefficient)
+{
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
