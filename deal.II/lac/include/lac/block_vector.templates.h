@@ -21,12 +21,14 @@
 
 template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>::BlockVector ()
+  : block_indices(n_blocks)
 {}
 
 
 
 template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>::BlockVector (const vector<unsigned int> &n)
+  : block_indices(n_blocks)
 {
   reinit (n, false);
 }
@@ -34,6 +36,7 @@ BlockVector<n_blocks,Number>::BlockVector (const vector<unsigned int> &n)
 
 template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>::BlockVector (const BlockVector<n_blocks,Number>& v)
+		: block_indices(n_blocks)
 {
   block_indices = v.block_indices;
   for (unsigned int i=0; i<n_blocks; ++i)

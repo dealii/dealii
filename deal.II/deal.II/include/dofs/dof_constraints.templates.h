@@ -28,7 +28,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern<blocks,blocks> &sparsity) 
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcMatrixNotSquare());
   
-  const BlockIndices<blocks> &
+  const BlockIndices &
     index_mapping = sparsity.get_column_indices();
   
 				   // store for each index whether it
@@ -415,7 +415,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number,blocks,blocks> &uncondensed
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcMatrixNotSquare());
 
-  const BlockIndices<blocks> &
+  const BlockIndices &
     index_mapping = sparsity.get_column_indices();
   
 				   // store for each index whether it

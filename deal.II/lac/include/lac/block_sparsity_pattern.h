@@ -133,7 +133,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * row indices to the individual
 				      * blocks.
 				      */
-    const BlockIndices<rows> &
+    const BlockIndices &
     get_row_indices () const;
 
 				     /**
@@ -142,7 +142,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * column indices to the individual
 				      * blocks.
 				      */
-    const BlockIndices<columns> &
+    const BlockIndices &
     get_column_indices () const;
     
 				     /**
@@ -154,6 +154,18 @@ class BlockSparsityPattern : public Subscriptor
 				      */
     void compress ();
 
+				   /**
+				    * Return the number of blocks in a
+				    * column.
+				    */
+  unsigned int n_block_rows () const;
+  
+				   /**
+				    * Return the number of blocks in a
+				    * row.
+				    */
+  unsigned int n_block_cols () const;
+  
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if no
@@ -274,7 +286,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * indices to indices of the
 				      * sub-objects.
 				      */
-    BlockIndices<rows>    row_indices;
+    BlockIndices    row_indices;
 
 				     /**
 				      * Object storing and managing
@@ -282,7 +294,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * indices to indices of the
 				      * sub-objects.
 				      */
-    BlockIndices<columns> column_indices;
+    BlockIndices    column_indices;
 
 				     /**
 				      * Make the block sparse matrix a
@@ -324,7 +336,7 @@ BlockSparsityPattern<rows,columns>::block (const unsigned int row,
 
 template <int rows, int columns>
 inline
-const BlockIndices<rows> &
+const BlockIndices &
 BlockSparsityPattern<rows,columns>::get_row_indices () const
 {
   return row_indices;
@@ -334,7 +346,7 @@ BlockSparsityPattern<rows,columns>::get_row_indices () const
 
 template <int rows, int columns>
 inline
-const BlockIndices<columns> &
+const BlockIndices &
 BlockSparsityPattern<rows,columns>::get_column_indices () const
 {
   return column_indices;
@@ -359,5 +371,23 @@ BlockSparsityPattern<rows,columns>::add (const unsigned int i,
 };
 
 
+
+template <int rows, int columns>
+inline
+unsigned int
+BlockSparsityPattern<rows,columns>::n_block_cols () const
+{
+  return columns;
+}
+
+
+
+template <int rows, int columns>
+inline
+unsigned int
+BlockSparsityPattern<rows,columns>::n_block_rows () const
+{
+  return rows;
+}
 
 #endif

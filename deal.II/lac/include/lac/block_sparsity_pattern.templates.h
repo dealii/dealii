@@ -19,6 +19,7 @@
 
 template <int rows, int columns>
 BlockSparsityPattern<rows,columns>::BlockSparsityPattern () 
+		: row_indices (rows), column_indices(columns)
 {
   Assert (rows>0,    ExcInvalidSize (rows));
   Assert (columns>0, ExcInvalidSize (columns));

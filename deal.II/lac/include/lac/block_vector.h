@@ -190,9 +190,13 @@ class BlockVector
 				      * Return a reference on the
 				      * object that describes the
 				      * mapping between block and
-				      * global indices.
+				      * global indices. The use of
+				      * this function is highly
+				      * deprecated and it should
+				      * vanish in one of the next
+				      * versions
 				      */
-    const BlockIndices<n_blocks> &
+    const BlockIndices &
     get_block_indices () const;
     
 				     /**
@@ -431,39 +435,6 @@ class BlockVector
     void block_read (istream &in);
 				     //@}
 
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcDimensionsDontMatch,
-		    int, int,
-		    << "The dimensions " << arg1 << " and " << arg2
-		    << " do not match here.");
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The given index " << arg1
-		    << " should be less than " << arg2 << ".");
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidNumber,
-		    int,
-		    << "The provided number is invalid here: " << arg1);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcOutOfMemory);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcEmptyVector);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
-
   protected:
 				     /**
 				      * Pointer to the array of components.
@@ -476,7 +447,7 @@ class BlockVector
 				      * indices and indices within the
 				      * different blocks.
 				      */
-    BlockIndices<n_blocks> block_indices;
+    BlockIndices block_indices;
 };
 
 
@@ -538,7 +509,7 @@ BlockVector<n_blocks,Number>::block(unsigned int i) const
 
 template <int n_blocks, typename Number>
 inline
-const BlockIndices<n_blocks>&
+const BlockIndices&
 BlockVector<n_blocks,Number>::get_block_indices () const
 {
   return block_indices;

@@ -453,28 +453,7 @@ class Vector {
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcDimensionsDontMatch,
-		    int, int,
-		    << "The dimensions " << arg1 << " and " << arg2
-		    << " do not match here.");
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidNumber,
-		    int,
-		    << "The provided number is invalid here: " << arg1);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcOutOfMemory);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcEmptyVector);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcIO);
 
   protected:
 

@@ -25,36 +25,37 @@
  * useful if a matrix is composed of several blocks, where you have to
  * translate global row and column indices to local ones.
  *
- * @author Wolfgang Bangerth, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 2000
  */
-template <int n_blocks>
 class BlockIndices
 {
   public:
 
 				     /**
-				      * Defaulut constructor. Set all
-				      * indices denoting the start of
-				      * the blocks to zero.
+				      * Default
+				      * constructor. Initialize for
+				      * @p{n_blocks} blocks and set
+				      * all block sizes to zero.
 				      */
-    BlockIndices ();
+    BlockIndices (const unsigned int n_blocks);
 
 				     /**
 				      * Constructor. Initialize the
-				      * number of indices within each
-				      * block from the given
-				      * argument. The size of the
-				      * vector shall be equal to
-				      * @p{n_blocks}.
+				      * number of entries in each
+				      * block @p{i} as @p{n[i]}. The
+				      * number of blocks will be the
+				      * size of the vector
 				      */
     BlockIndices (const vector<unsigned int> &n);
     
 				     /**
-				      * Reset the number of indices
-				      * within each block from the
-				      * given argument. The size of
-				      * the vector shall be equal to
-				      * @p{n_blocks}.
+				      * Reinitialize the number of
+				      * indices within each block from
+				      * the given argument. The number
+				      * of blocks will be adjusted to
+				      * the size of @p{n} and the size
+				      * of block @p{i} is set to
+				      * @p{n[i]}.
 				      */
     void reinit (const vector<unsigned int> &n);
     
@@ -64,7 +65,7 @@ class BlockIndices
 				      * for the global index @p{i}. The
 				      * first element of the pair is
 				      * the block, the second the
-				      * index within that.
+				      * index within it.
 				      */
     pair<unsigned int,unsigned int>
     global_to_local (const unsigned int i) const;
@@ -77,16 +78,23 @@ class BlockIndices
 				  const unsigned int index) const;
 
 				     /**
+				      * Number of blocks in index field.
+				      */
+    unsigned int size () const;
+  
+				     /**
 				      * Return the total number of
 				      * indices accumulated over all
-				      * blocks.
+				      * blocks, that is, the dimension
+				      * of the vector space of the
+				      * block vector.
 				      */
     unsigned int total_size () const;
 
 				     /**
 				      * Copy operator.
 				      */
-    BlockIndices<n_blocks> & operator = (const BlockIndices<n_blocks> &b);
+    BlockIndices & operator = (const BlockIndices &b);
 
 				     /**
 				      * Compare whether two objects
@@ -94,31 +102,39 @@ class BlockIndices
 				      * starting indices of all blocks
 				      * are equal.
 				      */
-    bool operator == (const BlockIndices<n_blocks> &b) const;
+    bool operator == (const BlockIndices &b) const;
     
 				     /**
 				      * Swap the contents of these two
 				      * objects.
 				      */
-    void swap (BlockIndices<n_blocks> &b);
+    void swap (BlockIndices &b);
     
   private:
+				     /**
+				      * Number of blocks. This is made
+				      * constant to avoid accidental
+				      * changes during lifetime.
+				      */
+    unsigned int n_blocks;
+
                                      /**
 				      * Global starting index of each
 				      * vector. The last and redundant
 				      * value is the total number of
 				      * entries.
 				      */
-    unsigned int start_indices[n_blocks+1];
+    vector<unsigned int> start_indices;
 };
 
 
 
 /* ---------------------- template and inline functions ------------------- */
 
-template <int n_blocks>
 inline
-BlockIndices<n_blocks>::BlockIndices ()
+BlockIndices::BlockIndices (unsigned int n_blocks)
+  : n_blocks(n_blocks),
+    start_indices(n_blocks)
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = 0;
@@ -126,23 +142,23 @@ BlockIndices<n_blocks>::BlockIndices ()
 
 
 
-template <int n_blocks>
 inline
-BlockIndices<n_blocks>::BlockIndices (const vector<unsigned int> &n)
+BlockIndices::BlockIndices (const vector<unsigned int> &n)
 {
   reinit (n);
 };
 
 
 
-template <int n_blocks>
 inline
 void
-BlockIndices<n_blocks>::reinit (const vector<unsigned int> &n)
+BlockIndices::reinit (const vector<unsigned int> &n)
 {
-  Assert(n.size()==n_blocks,
-	 ExcDimensionMismatch(n.size(), n_blocks));
-
+  if (start_indices.size() != n.size()+1)
+    {
+      n_blocks = n.size();
+      start_indices.resize(n_blocks+1);
+    }
   start_indices[0] = 0;
   for (unsigned int i=1; i<=n_blocks; ++i)
     start_indices[i] = start_indices[i-1] + n[i-1];
@@ -150,10 +166,9 @@ BlockIndices<n_blocks>::reinit (const vector<unsigned int> &n)
 
 
 
-template <int n_blocks>
 inline
 pair<unsigned int,unsigned int>
-BlockIndices<n_blocks>::global_to_local (const unsigned int i) const
+BlockIndices::global_to_local (const unsigned int i) const
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
 
@@ -165,10 +180,9 @@ BlockIndices<n_blocks>::global_to_local (const unsigned int i) const
 };
 
 
-template <int n_blocks>
 inline
 unsigned int
-BlockIndices<n_blocks>::local_to_global (const unsigned int block,
+BlockIndices::local_to_global (const unsigned int block,
 					 const unsigned int index) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
@@ -179,21 +193,27 @@ BlockIndices<n_blocks>::local_to_global (const unsigned int block,
 };
 
 
-
-template <int n_blocks>
 inline
 unsigned int
-BlockIndices<n_blocks>::total_size () const
+BlockIndices::size () const
+{
+  return n_blocks;
+}
+
+
+
+inline
+unsigned int
+BlockIndices::total_size () const
 {
   return start_indices[n_blocks];
 };
 
 
 
-template <int n_blocks>
 inline
-BlockIndices<n_blocks> &
-BlockIndices<n_blocks>::operator = (const BlockIndices<n_blocks> &b)
+BlockIndices &
+BlockIndices::operator = (const BlockIndices &b)
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = b.start_indices[i];
@@ -202,10 +222,9 @@ BlockIndices<n_blocks>::operator = (const BlockIndices<n_blocks> &b)
 
 
 
-template <int n_blocks>
 inline
 bool
-BlockIndices<n_blocks>::operator == (const BlockIndices<n_blocks> &b) const
+BlockIndices::operator == (const BlockIndices &b) const
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     if (start_indices[i] != b.start_indices[i])
@@ -216,10 +235,9 @@ BlockIndices<n_blocks>::operator == (const BlockIndices<n_blocks> &b) const
 
 
 
-template <int n_blocks>
 inline
 void
-BlockIndices<n_blocks>::swap (BlockIndices<n_blocks> &b)
+BlockIndices::swap (BlockIndices &b)
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     std::swap (start_indices[i], b.start_indices[i]);
@@ -237,10 +255,8 @@ BlockIndices<n_blocks>::swap (BlockIndices<n_blocks> &b)
  *
  * @author Wolfgang Bangerth, 2000
  */
-template <int n_blocks>
 inline
-void swap (BlockIndices<n_blocks> &u,
-	   BlockIndices<n_blocks> &v)
+void swap (BlockIndices &u, BlockIndices &v)
 {
   u.swap (v);
 };

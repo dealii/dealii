@@ -178,6 +178,18 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     virtual void clear ();
     
+				   /**
+				    * Return the number of blocks in a
+				    * column.
+				    */
+  unsigned int n_block_rows () const;
+  
+				   /**
+				    * Return the number of blocks in a
+				    * row.
+				    */
+  unsigned int n_block_cols () const;
+  
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if either
@@ -754,6 +766,24 @@ precondition_Jacobi (BlockVector<rows,somenumber>          &dst,
 				    omega);
 };
 
+
+template <typename number, int rows, int columns>
+inline
+unsigned int
+BlockSparseMatrix<number,rows,columns>::n_block_cols () const
+{
+  return columns;
+}
+
+
+
+template <typename number, int rows, int columns>
+inline
+unsigned int
+BlockSparseMatrix<number,rows,columns>::n_block_rows () const
+{
+  return rows;
+}
 
 
 #endif    // __deal2__block_sparse_matrix_h

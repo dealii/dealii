@@ -157,7 +157,7 @@ Number Vector<Number>::operator * (const Vector<Number>& v) const
   if (&v == this)
     return norm_sqr();
   
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   
   Number sum0 = 0,
 	 sum1 = 0,
@@ -321,7 +321,7 @@ template <typename Number>
 Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -349,7 +349,7 @@ template <typename Number>
 void Vector<Number>::add (const Vector<Number>& v)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -363,7 +363,7 @@ template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -378,8 +378,8 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
 			  const Number b, const Vector<Number>& w)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin(),
@@ -393,7 +393,7 @@ template <typename Number>
 void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin();
@@ -406,7 +406,7 @@ template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a, const Vector<Number>& v)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin();
@@ -420,8 +420,8 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& v, const Number b, const Vector<Number>& w)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin(),
@@ -437,9 +437,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& w, const Number c, const Vector<Number>& y)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
-  Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
-  Assert (dim == y.dim, ExcDimensionsDontMatch(dim, y.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
+  Assert (dim == y.dim, ExcDimensionMismatch(dim, y.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin(),
@@ -467,8 +467,8 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 			  const Number b, const Vector<Number>& v)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
-  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == u.dim, ExcDimensionMismatch(dim, u.dim));
+  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator u_ptr = u.begin(),
@@ -483,7 +483,7 @@ template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
+  Assert (dim == u.dim, ExcDimensionMismatch(dim, u.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator u_ptr = u.begin();
@@ -497,7 +497,7 @@ template <typename Number>
 void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
 {
   Assert (dim!=0, ExcEmptyVector());
-  Assert (a.dim == b.dim, ExcDimensionsDontMatch (a.dim, b.dim));
+  Assert (a.dim == b.dim, ExcDimensionMismatch (a.dim, b.dim));
 
 				   // no need to reinit with zeros, since
 				   // we overwrite them anyway

@@ -1,0 +1,59 @@
+
+DEAL:BlockIndices:global->local::0	0	0	0	0	0	0
+DEAL:BlockIndices:global->local::1	0	1	0	1	0	1
+DEAL:BlockIndices:global->local::2	0	2	0	2	0	2
+DEAL:BlockIndices:global->local::3	2	0	2	0	2	0
+DEAL:BlockIndices:global->local::4	3	0	3	0	3	0
+DEAL:BlockIndices:global->local::5	3	1	3	1	3	1
+DEAL:BlockIndices:local->global::0	0	0
+DEAL:BlockIndices:local->global::0	1	1
+DEAL:BlockIndices:local->global::0	2	2
+DEAL:BlockIndices:local->global::2	0	3
+DEAL:BlockIndices:local->global::3	0	4
+DEAL:BlockIndices:local->global::3	1	5
+DEAL:BlockIndices:reinit::0	0	0
+DEAL:BlockIndices:reinit::1	0	1
+DEAL:BlockIndices:reinit::2	0	2
+DEAL:BlockIndices:reinit::3	0	3
+DEAL:BlockIndices:reinit::4	0	4
+DEAL:BlockIndices:reinit::5	1	0
+DEAL:BlockIndices:reinit::6	1	1
+DEAL:BlockIndices:reinit::7	1	2
+DEAL:BlockIndices:reinit::8	3	0
+DEAL:BlockIndices:reinit::9	4	0
+DEAL:BlockIndices:reinit::10	4	1
+DEAL:BlockIndices:reinit::---
+DEAL:BlockIndices:reinit::0	0	0
+DEAL:BlockIndices:reinit::1	1	0
+DEAL:BlockIndices:reinit::2	1	1
+DEAL:BlockIndices::Range
+--------------------------------------------------------
+An error occurred in line <174> of file </home/kanschat/deal.II/lac/include/lac/block_indices.h> in function
+    struct pair<unsigned int,unsigned int> BlockIndices::global_to_local(unsigned int) const
+The violated condition was: 
+    i<total_size()
+The name and call sequence of the exception was:
+    ExcIndexRange(i, 0, total_size())
+Additional Information: 
+Index 3 is not in [0,3[
+--------------------------------------------------------
+--------------------------------------------------------
+An error occurred in line <191> of file </home/kanschat/deal.II/lac/include/lac/block_indices.h> in function
+    unsigned int BlockIndices::local_to_global(unsigned int, unsigned int) const
+The violated condition was: 
+    index < start_indices[block+1]-start_indices[block]
+The name and call sequence of the exception was:
+    ExcIndexRange (index, 0, start_indices[block+1]-start_indices[block])
+Additional Information: 
+Index 2 is not in [0,2[
+--------------------------------------------------------
+--------------------------------------------------------
+An error occurred in line <189> of file </home/kanschat/deal.II/lac/include/lac/block_indices.h> in function
+    unsigned int BlockIndices::local_to_global(unsigned int, unsigned int) const
+The violated condition was: 
+    block < n_blocks
+The name and call sequence of the exception was:
+    ExcIndexRange(block, 0, n_blocks)
+Additional Information: 
+Index 2 is not in [0,2[
+--------------------------------------------------------

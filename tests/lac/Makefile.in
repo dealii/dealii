@@ -63,7 +63,7 @@ endif
 
 # mgbase.check mg.check are removed until the sutructure of the
 # multigrid classes will be fixed.
-all: full_matrix.check solver.check
+all: vector-vector.check block_vector.check block_matrices.check full_matrix.check solver.check
 exe: $(all:.check=.testcase) benchmark
 run: $(all:.check=.output)
 
@@ -91,6 +91,36 @@ vector-vector-o-files = $(vector-vector-cc-files:.cc=.o)
 endif
 
 vector-vector.testcase: $(vector-vector-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+
+
+############################################################
+
+block_matrices-cc-files = block_matrices.cc
+
+ifeq ($(debug-mode),on)
+block_matrices-o-files = $(block_matrices-cc-files:.cc=.go)
+else
+block_matrices-o-files = $(block_matrices-cc-files:.cc=.o)
+endif
+
+block_matrices.testcase: $(block_matrices-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+
+
+############################################################
+
+block_vector-cc-files = block_vector.cc
+
+ifeq ($(debug-mode),on)
+block_vector-o-files = $(block_vector-cc-files:.cc=.go)
+else
+block_vector-o-files = $(block_vector-cc-files:.cc=.o)
+endif
+
+block_vector.testcase: $(block_vector-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 

@@ -755,7 +755,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				   // the row and column mappings are
 				   // equal, store a pointer on only
 				   // one of them
-  const BlockIndices<blocks> &
+  const BlockIndices &
     index_mapping = sparsity_pattern.get_column_indices();
   
 				   // now loop over all boundary dofs
