@@ -338,11 +338,11 @@ class DataIn {
  *
  * Finnaly one can choose to mark the cell boundaries by setting
  * #cell_boundary_type#. It can take one of three values:
- * \begin{description}
- *   \item[None] for no cell boundaries,
- *   \item[Black] for black cell boundaries, and
- *   \item[White] for white cell boundaries.
- * \end{desctiption}
+ * \begin{enumerate}
+ *   \item None: for no cell boundaries,
+ *   \item Black: for black cell boundaries, and
+ *   \item White: for white cell boundaries.
+ * \end{enumerate}
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Stefan Nauber, 1998, 1999
  */
