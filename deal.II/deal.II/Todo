@@ -159,9 +159,6 @@ Remove the hack in Make_forward_declarations when using gcc2.95. See
 
 Move the TriaNumberCache into the Triangulation class once the
   compiler supports this (gcc2.95 does not allow this at present)
-  
-
-Fix vectors.cc to not use HUGE_VAL (GK)
 
 
 In Tria::distort_random: replace the initial value 1e308 by the
