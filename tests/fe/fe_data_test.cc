@@ -2,7 +2,7 @@
 //    fe_data_test.cc,v 1.14 2003/11/28 11:52:35 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,24 +33,38 @@ void test_fe_datas()
 {
   std::vector<FiniteElement<dim> *> fe_datas;
   fe_datas.push_back(new FE_Q<dim> (1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_Q<dim> (2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_Q<dim> (4));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim> (1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim> (2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim> (4));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGP<dim> (1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGP<dim> (2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGP<dim> (4));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (2), 2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
 				       FE_Q<dim> (2), 1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   
 				   // Check Raviart-Thomas in 2d only
   if (dim==2)
     {
       fe_datas.push_back(new FE_RaviartThomas<dim>(0));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FE_RaviartThomas<dim>(1));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FE_RaviartThomas<dim>(2));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
     }
   
 
@@ -59,9 +73,12 @@ void test_fe_datas()
   if (dim!=3)
     {
       fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (3), 2));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
 					   FE_Q<dim> (3), 1));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (4), 2));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
     }
 
 				   // have systems of systems, and
@@ -70,15 +87,19 @@ void test_fe_datas()
 				   // taking each of them in turn as
 				   // basis of others
   fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),2),2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),2),1,
 					 FESystem<dim> (FE_DGQ<dim>(1),2),1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),1,
 							FE_Q<dim>(2),1),1,
 					 FESystem<dim> (FE_Q<dim>(2),2),1,
 					 FESystem<dim> (FE_DGQ<dim>(2),2),1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back (new FESystem<dim> (*fe_datas[fe_datas.size()-3], 2,
 					 *fe_datas[fe_datas.size()-2], 1,
 					 *fe_datas[fe_datas.size()-1], 2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   
   deallog << std::endl << "dim=" << dim << std::endl;
   for (unsigned int n=0; n<fe_datas.size(); ++n)
@@ -120,7 +141,8 @@ int main(int,char)
   std::ofstream logfile("fe_data_test.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-
+//  deallog.log_execution_time(true);
+  
   test_fe_datas<1>();
   test_fe_datas<2>();
   test_fe_datas<3>();
