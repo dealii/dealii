@@ -808,8 +808,8 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
-  mapping_data = mapping.get_sub_face_data(flags, quadrature);
-  fe_data      = fe.get_sub_face_data(flags, mapping, quadrature);
+  mapping_data = mapping.get_subface_data(flags, quadrature);
+  fe_data      = fe.get_subface_data(flags, mapping, quadrature);
 
 				   // maybe some of the flags passed
 				   // to the get_data functions
@@ -864,8 +864,8 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
-  mapping_data = mapping->get_sub_face_data(flags, quadrature);
-  fe_data      = fe.get_sub_face_data(flags, *mapping, quadrature);
+  mapping_data = mapping->get_subface_data(flags, quadrature);
+  fe_data      = fe.get_subface_data(flags, *mapping, quadrature);
 
 				   // maybe some of the flags passed
 				   // to the get_data functions
