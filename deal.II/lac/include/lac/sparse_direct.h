@@ -921,7 +921,7 @@ class SparseDirectMA47 : public Subscriptor
                       const unsigned int *KEEP,
                       const double       *CNTL,
                       const unsigned int *ICNTL,
-                      unsigned int       *IW,
+                      unsigned int       *IW1,
                       int                *INFO);
 
                                      /**
