@@ -456,7 +456,7 @@ class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, 
 template <int dim>
 class MGDoFSubstructAccessor : public MGDoFLineAccessor<1,CellAccessor<1> > {
   public:
-    DoFSubstructAccessor () {
+    MGDoFSubstructAccessor () {
       Assert (false, ExcInternalError());
     };
 
