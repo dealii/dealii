@@ -168,6 +168,47 @@ void check_ez_iterator()
 }
 
 
+void check_conjugate(std::ostream& out)
+{
+  SparseMatrixEZ<double> B(3,2);
+  SparseMatrixEZ<float>  A1(2,2);
+  SparseMatrixEZ<float>  A2(3,3);
+  SparseMatrixEZ<double> C1(3,3);
+  SparseMatrixEZ<double> C2(2,2);
+
+  B.set(0, 0, 0.);
+  B.set(0, 1, 1.);
+  B.set(1, 0, 2.);
+  B.set(1, 1, 3.);
+  B.set(2, 0, 4.);
+  B.set(2, 1, 5.);
+
+  A1.set(0, 0, 1.);
+  A1.set(0, 1, 2.);
+  A1.set(1, 0, 3.);
+  A1.set(1, 1, 4.);
+
+  A2.set(0, 0, 1.);
+  A2.set(0, 1, 2.);
+  A2.set(0, 2, 3.);
+  A2.set(1, 0, 4.);
+  A2.set(1, 1, 5.);
+  A2.set(1, 2, 6.);
+  A2.set(2, 0, 7.);
+  A2.set(2, 1, 8.);
+  A2.set(2, 2, 9.);
+
+  C1.conjugate_add(A1,B);
+  C2.conjugate_add(A2,B,true);
+
+  out << "First conjugate" << std::endl;
+  C1.print(out);
+  
+  out << "Second conjugate" << std::endl;
+  C2.print(out);
+}
+
+
 int main()
 {
   std::ofstream logfile("sparse_matrices.output");
@@ -190,6 +231,7 @@ int main()
 #endif
   
   check_ez_iterator();
+  check_conjugate(logfile);
   
   FDMatrix testproblem (size, size);
   unsigned int dim = (size-1)*(size-1);
