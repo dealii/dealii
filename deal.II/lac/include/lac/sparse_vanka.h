@@ -10,8 +10,8 @@
 #include <base/smartpointer.h>
 #include <lac/forward-declarations.h>
 
-#include <bvector.h>
 #include <vector>
+
 
 /**
  * Point-wise Vanka preconditioning.
@@ -100,8 +100,9 @@ class SparseVanka
 				      * object. The same is true for
 				      * the matrix.
 				      */
-    SparseVanka(const SparseMatrix<number>& M,
-		const bit_vector& selected);
+    SparseVanka(const SparseMatrix<number> &M,
+		const vector<bool>         &selected);
+    
 				     /**
 				      * Destructor.
 				      * Delete all allocated matrices.
@@ -168,11 +169,13 @@ class SparseVanka
 				      * Indices of Lagrange
 				      * multipliers.
 				      */
-    const bit_vector& selected;
+    const vector<bool> &selected;
+    
 				     /**
 				      * Conserve memory flag.
 				      */
     bool conserve_mem;
+    
 				     /**
 				      * Array of inverse matrices,
 				      * one for each degree of freedom.

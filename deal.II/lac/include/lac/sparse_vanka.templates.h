@@ -12,7 +12,7 @@
 
 template<typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
-				 const bit_vector           &selected)
+				 const vector<bool>         &selected)
 		:
 		matrix(&M),
 		selected(selected),
