@@ -106,7 +106,7 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
       for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell, ++row)
 	for (unsigned int column_cell=0, column=cell*blocksize;
 	     column_cell<blocksize; ++column_cell, ++column)
-	  M_cell(row_cell,column_cell)=M(row,column);
+	  M_cell(row_cell,column_cell)=M.el(row,column);
 //      try
 //	{
       if (blocksize <=4)
