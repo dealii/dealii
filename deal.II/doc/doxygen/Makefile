@@ -12,9 +12,9 @@ private:
 %.tag: %.dox
 	doxygen $<
 
-base.tag: ../../base/include/*/*.h headers/base/*.h
-lac.tag:  base.tag ../../lac/include/*/*.h headers/lac/*.h
-deal.tag: lac.tag  ../../deal.II/include/*/*.h headers/deal.II/*.h
+base.tag: options.dox base.dox ../../base/include/*/*.h headers/base/*.h
+lac.tag:  options.dox lac.dox base.tag ../../lac/include/*/*.h headers/lac/*.h
+deal.tag: options.dox deal.dox lac.tag  ../../deal.II/include/*/*.h headers/deal.II/*.h
 
 base:    base.tag
 lac:     lac.tag
