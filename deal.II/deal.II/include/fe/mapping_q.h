@@ -15,8 +15,6 @@
 
 
 #include <fe/mapping_q1.h>
-//#include <grid/tria.h>
-//#include <grid/tria_boundary.h>
 
 
 template <int dim> class TensorProductPolynomials;
