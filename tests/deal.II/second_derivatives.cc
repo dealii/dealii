@@ -28,7 +28,7 @@ int main () {
 
   StraightBoundary<2> b;
   QTrapez<2> q;
-  FEValues<2> fevalues(fe,q,update_second_derivatives,b);
+  FEValues<2> fevalues(fe,q,update_second_derivatives);
   
   
   Vector<double> val(4);

@@ -160,7 +160,7 @@ main()
 FDMG::FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<float> >& matrices,
 	   FDMGTransfer& transfer)
 		:
-		MGBase(transfer, maxlevel, 0),
+		MGBase(transfer, 0, maxlevel),
 		matrices(&matrices)
 {
   for (unsigned int level = minlevel; level<=maxlevel ; ++level)

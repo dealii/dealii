@@ -489,7 +489,9 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
 
 
 template <typename number>
-const SparseMatrixStruct & SparseMatrix<number>::get_sparsity_pattern () const {
+const SparseMatrixStruct &
+SparseMatrix<number>::get_sparsity_pattern () const
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   return *cols;
 };

@@ -26,13 +26,14 @@ MGBase::~MGBase ()
 
 
 MGBase::MGBase(const MGTransferBase& transfer,
-			     unsigned maxlevel, unsigned minlevel)
+			     unsigned minlevel, unsigned maxlevel)
 		:
 		maxlevel(maxlevel), minlevel(minlevel),
 		d(minlevel,maxlevel),
 		s(minlevel,maxlevel),
 		transfer(&transfer)
 {
+  Assert(minlevel <= maxlevel, ExcSwitchedLevels(minlevel, maxlevel));
 }
 
 void

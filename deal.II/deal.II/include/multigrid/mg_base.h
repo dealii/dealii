@@ -318,6 +318,12 @@ class MGBase
 				      * Prolongation and restriction object.
 				      */
     SmartPointer<const MGTransferBase> transfer;
+				     /**
+				      * Exception.
+				      */
+    DeclException2(ExcSwitchedLevels, int, int,
+		   << "minlevel and maxlevel switched, should be: "
+		   << arg1 << "<=" << arg2);
     
   protected:
 
@@ -352,7 +358,7 @@ class MGBase
 				      * Constructor, subject to change.
 				      */
     MGBase(const MGTransferBase& transfer,
-		  unsigned int maxlevel, unsigned int minlevel);
+		  unsigned int minlevel, unsigned int maxlevel);
 				     /**
 				      * Virtual destructor.
 				      */

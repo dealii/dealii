@@ -137,8 +137,8 @@ void MGTransferPrebuilt::prolongate (const unsigned int   to_level,
 				     Vector<float>       &dst,
 				     const Vector<float> &src) const 
 {
-  Assert ((to_level >= 1) && (to_level<prolongation_matrices.size()-1),
-	  ExcIndexRange (to_level, 1, prolongation_matrices.size()-1));
+  Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
+	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
   prolongation_matrices[to_level-1].vmult (dst, src);
 };
@@ -149,8 +149,8 @@ void MGTransferPrebuilt::restrict (const unsigned int   from_level,
 				   Vector<float>       &dst,
 				   const Vector<float> &src) const 
 {
-  Assert ((from_level >= 1) && (from_level<prolongation_matrices.size()-1),
-	  ExcIndexRange (from_level, 1, prolongation_matrices.size()-1));
+  Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
+	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
 
   prolongation_matrices[from_level-1].Tvmult (dst, src);
 };

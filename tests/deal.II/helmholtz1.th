@@ -1,0 +1,70 @@
+// $Id$
+
+template<int dim, class MATRIX, class VECTOR>
+void
+Helmholtz::build_all(MATRIX& A,
+		     VECTOR& f,
+		     const DoFHandler<dim>& dof,
+		     const Quadrature<dim>& quadrature,
+		     const Function<dim>& rhs)
+{
+  const unsigned int fe_dofs = dof.get_fe().total_dofs;
+  FEValues<dim> fe(dof.get_fe(), quadrature,
+		   UpdateFlags(update_gradients | update_JxW_values |
+			       update_q_points));
+  
+  Vector<double> elvec(fe_dofs);
+  FullMatrix<double> elmat(fe_dofs);
+  vector<int> indices(fe_dofs);
+
+////////////////////////////////////////////////////
+// Loop for computing the element matrices
+////////////////////////////////////////////////////
+    
+  for (DoFHandler<dim>::active_cell_iterator c = dof.begin_active()
+					; c != dof.end() ; ++c)
+    {
+      elmat.clear();
+      elvec.clear();
+      fe.reinit(c);
+
+				       // Quadrature loop      
+
+      for (unsigned k=0;k<quadrature.n_quadrature_points;++k)
+	{
+	  Point<dim> loc = fe.quadrature_point(k);
+
+					   // Test function loop
+	  for (unsigned i=0;i<fe_dofs;++i)
+	    {
+	      const Point<dim> dv = fe.shape_grad(i,k);
+	      double v = fe.shape_value(i,k);
+	      
+	      elvec(i) += fe.JxW(k) *
+			rhs(loc) * v;
+	      
+					       //Trial function loop
+	      for (unsigned j=0;j<fe_dofs;++j)
+		{
+		  const Point<dim> du = fe.shape_grad(j,k);
+		  double u = fe.shape_value(j,k);
+		  
+		  elmat(i,j) += fe.JxW(k) *
+				(1.*u*v + du*dv)
+				;
+		}
+	    }
+	}
+
+      c->get_dof_indices(indices);
+      for (unsigned i=0;i<fe_dofs;++i)
+	{
+	  f(indices[i]) += elvec(i);
+	  
+	  for (unsigned j=0;j<fe_dofs;++j)
+	    {
+	      A.add(indices[i], indices[j], elmat(i,j));
+	    }
+	}
+    }
+}

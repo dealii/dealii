@@ -36,7 +36,7 @@ int main () {
   dof.distribute_dofs(fe);
 
   QTrapez<2> q;
-  FEValues<2> fevalues(fe,q,update_gradients,tria.get_boundary());
+  FEValues<2> fevalues(fe,q,update_gradients);
   fevalues.reinit (dof.begin_active());
   
   
