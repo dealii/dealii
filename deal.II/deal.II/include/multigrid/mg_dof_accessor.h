@@ -657,4 +657,12 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
 };
 
 
+template<> MGDoFCellAccessor<1>::face_iterator
+MGDoFCellAccessor<1>::face (const unsigned int i) const;
+template<> MGDoFCellAccessor<2>::face_iterator
+MGDoFCellAccessor<2>::face (const unsigned int i) const;
+template<> MGDoFCellAccessor<3>::face_iterator
+MGDoFCellAccessor<3>::face (const unsigned int i) const;
+
+
 #endif
