@@ -1,4 +1,4 @@
-//----------------------------  dof_tools.h  ---------------------------
+//----------------------------  dof_tools_common.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  dof_tools.h  ---------------------------
+//----------------------------  dof_tools_common.cc  ---------------------------
 
 
 // common framework for the various dof_tools_*.cc tests

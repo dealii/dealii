@@ -56,6 +56,24 @@ dof_tools_16a.exe       : dof_tools_16a.g.$(OBJEXT)       $(libraries)
 dof_tools_16b.exe       : dof_tools_16b.g.$(OBJEXT)       $(libraries)
 dof_tools_16c.exe       : dof_tools_16c.g.$(OBJEXT)       $(libraries)
 dof_tools_16d.exe       : dof_tools_16d.g.$(OBJEXT)       $(libraries)
+dof_tools_17a.exe       : dof_tools_17a.g.$(OBJEXT)       $(libraries)
+dof_tools_17b.exe       : dof_tools_17b.g.$(OBJEXT)       $(libraries)
+dof_tools_17c.exe       : dof_tools_17c.g.$(OBJEXT)       $(libraries)
+dof_tools_17d.exe       : dof_tools_17d.g.$(OBJEXT)       $(libraries)
+dof_tools_18a.exe       : dof_tools_18a.g.$(OBJEXT)       $(libraries)
+dof_tools_18b.exe       : dof_tools_18b.g.$(OBJEXT)       $(libraries)
+dof_tools_18c.exe       : dof_tools_18c.g.$(OBJEXT)       $(libraries)
+dof_tools_18d.exe       : dof_tools_18d.g.$(OBJEXT)       $(libraries)
+fe_tools_01a.exe        : fe_tools_01a.g.$(OBJEXT)        $(libraries)
+fe_tools_01b.exe        : fe_tools_01b.g.$(OBJEXT)        $(libraries)
+fe_tools_01c.exe        : fe_tools_01c.g.$(OBJEXT)        $(libraries)
+fe_tools_02.exe         : fe_tools_02.g.$(OBJEXT)         $(libraries)
+fe_tools_03.exe         : fe_tools_03.g.$(OBJEXT)         $(libraries)
+fe_tools_04.exe         : fe_tools_04.g.$(OBJEXT)         $(libraries)
+fe_tools_05.exe         : fe_tools_05.g.$(OBJEXT)         $(libraries)
+fe_tools_06.exe         : fe_tools_06.g.$(OBJEXT)         $(libraries)
+fe_tools_07.exe         : fe_tools_07.g.$(OBJEXT)         $(libraries)
+fe_tools_08.exe         : fe_tools_08.g.$(OBJEXT)         $(libraries)
 gerold_1.exe            : gerold_1.g.$(OBJEXT)            $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)               $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
@@ -70,6 +88,11 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	dof_tools_11 dof_tools_12 dof_tools_13 dof_tools_14 \
         dof_tools_15a dof_tools_15b dof_tools_15c dof_tools_15d \
         dof_tools_16a dof_tools_16b dof_tools_16c dof_tools_16d \
+        dof_tools_17a dof_tools_17b dof_tools_17c dof_tools_17d \
+        dof_tools_18a dof_tools_18b dof_tools_18c dof_tools_18d \
+	fe_tools_01a fe_tools_01b fe_tools_01c \
+	fe_tools_02 fe_tools_03 fe_tools_04 \
+	fe_tools_05 fe_tools_06 fe_tools_07 fe_tools_08 \
 	roy_1 \
         denis_1 \
 	unit_support_points parameter_handler_1
