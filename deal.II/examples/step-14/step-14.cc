@@ -136,7 +136,7 @@ namespace Evaluation
 	   ++vertex)
 	if (cell->vertex(vertex) == evaluation_point)
 	  {
-	    point_value = 1.-solution(cell->vertex_dof_index(vertex,0));
+	    point_value = solution(cell->vertex_dof_index(vertex,0));
 
 	    evaluation_point_found = true;
 	    break;
@@ -147,6 +147,10 @@ namespace Evaluation
 
     results_table.add_value ("DoFs", dof_handler.n_dofs());
     results_table.add_value ("u(x_0)", point_value);
+
+    std::cout << "   Point value=" << point_value
+	      << ", exact value=1, error="
+	      << 1.-point_value << std::endl;
   };
 
 };
@@ -1208,7 +1212,7 @@ namespace LaplaceSolver
   {
     Vector<float> error_indicators (triangulation->n_active_cells());
     estimate_error (error_indicators);
-    std::cout << "Estimated error="
+    std::cout << "   Estimated error="
 	      << std::accumulate (error_indicators.begin(),
 				  error_indicators.end(), 0.)
 	      << std::endl;
