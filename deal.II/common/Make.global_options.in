@@ -90,8 +90,8 @@ EXEEXT     = @EXEEXT@
 lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
 lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
 
-lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix)
-lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix)
+lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) $(LIBDIR)/liblac_umfpack$(lib-suffix)
+lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) $(LIBDIR)/liblac_umfpack$(lib-suffix)
 
 lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
 lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
