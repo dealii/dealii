@@ -100,16 +100,16 @@ namespace
   template <int dim>
   class ShiftPoint
   {
-  public:
+    public:
       ShiftPoint (const Point<dim> &shift)
-	  :
-	  shift(shift)
-	  {};
+		      :
+		      shift(shift)
+	{};
       Point<dim> operator() (const Point<dim> p) const
-	  {
-	      return p+shift;
-	  };
-  private:
+	{
+	  return p+shift;
+	};
+    private:
       const Point<dim> shift;
   };
 
@@ -117,34 +117,34 @@ namespace
 
   class Rotate2d
   {
-  public:
+    public:
       Rotate2d (const double angle)
-	  :
-	  angle(angle)
-	  {};
+		      :
+		      angle(angle)
+	{};
       Point<2> operator() (const Point<2> p) const
-	  {
-	      return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
-			       std::sin(angle)*p(0) + std::cos(angle) * p(1));
-	  };
-  private:
+	{
+	  return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
+			   std::sin(angle)*p(0) + std::cos(angle) * p(1));
+	};
+    private:
       const double angle;
   };
 
 
-    template <int dim>
+  template <int dim>
   class ScalePoint
   {
-  public:
+    public:
       ScalePoint (const double factor)
-	  :
-	  factor(factor)
-	  {};
+		      :
+		      factor(factor)
+	{};
       Point<dim> operator() (const Point<dim> p) const
-	  {
-	      return p*factor;
-	  };
-  private:
+	{
+	  return p*factor;
+	};
+    private:
       const double factor;
   };
 };
