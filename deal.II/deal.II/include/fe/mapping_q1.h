@@ -314,7 +314,7 @@ class MappingQ1 : public Mapping<dim>
 				      * Compute shape values and/or
 				      * derivatives.
 				      *
-				      * Calles either the
+				      * Calls either the
 				      * @p{compute_shapes_virtual} of
 				      * this class or that of the
 				      * derived class, depending on
