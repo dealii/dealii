@@ -36,6 +36,51 @@ AC_LANG_CPLUSPLUS
 
 
 dnl -------------------------------------------------------------
+dnl Test whether shared libraries support is requested.
+dnl Default is yes, but value will be adjusted to operating system
+dnl below.
+dnl This has been moved before the compiler section, so CXXFLAGS and
+dnl LDFLAGS can be set accordingly
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(shared,
+[  --enable-shared Set compiler flags to generate shared libraries],
+    enableshared=$enableval,
+    enableshared=yes)
+
+dnl On AIX and alpha, shared libs don't work for us at present, so 
+dnl disable them (we should probably use libtool there)
+case "$target" in
+   *-aix* | alpha*-linux* ) 
+	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
+	   enableshared=no 
+	   ;;
+esac
+
+
+dnl Set compile flags accordingly
+if test $enableshared = yes ; then
+  AC_MSG_RESULT(Configuring for shared libraries)
+  CFLAGS="$CFLAGS -fPIC"
+  CXXFLAGS="$CXXFLAGS -fPIC"
+  LDFLAGS="$LDFLAGS -fPIC"
+
+  lib_suffix=.so;
+else
+  AC_MSG_RESULT(Configuring for static libraries)
+dnl Define these variables so they are not filled with default values later
+  CFLAGS="$CFLAGS "
+  CXXFLAGS="$CXXFLAGS "
+  LDFLAGS="$LDFLAGS "
+
+  lib_suffix=.a;
+fi
+
+
+AC_SUBST(enableshared)
+AC_SUBST(lib_suffix)
+
+
+dnl -------------------------------------------------------------
 dnl Find external programs
 dnl -------------------------------------------------------------
 
@@ -45,6 +90,7 @@ dnl    In order to get the absolute path of the compiler, use the
 dnl    second line
 AC_PROG_CC
 AC_PATH_PROG(CC,$CC)
+
 
 
 dnl    Find the right C++ compiler. This modifies the following
@@ -89,8 +135,8 @@ dnl CXXFLAGSG are the flags for debug mode
 dnl -------------------------------------------------------------
 
 if test $GXX = yes ; then
-  CXXFLAGSO="-O2 -Wuninitialized -felide-constructors -fnonnull-objects -ftemplate-depth-32"
-  CXXFLAGSG="-DDEBUG -ggdb -ansi -pedantic -Wall -W -Wtraditional -Wpointer-arith -Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -ftemplate-depth-32"
+  CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -fnonnull-objects -ftemplate-depth-32"
+  CXXFLAGSG="$CXXFLAGS -DDEBUG -ggdb -ansi -pedantic -Wall -W -Wtraditional -Wpointer-arith -Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -ftemplate-depth-32"
 
   dnl set some flags that are specific to some versions of the
   dnl compiler:
@@ -159,8 +205,7 @@ if test $enablemultithreading = yes ; then
   DEAL_II_GET_THREAD_FLAGS
   DEAL_II_THREAD_CPPFLAGS
 
-  CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
-  CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
+  AC_DEFINE(__USE_MALLOC)
 
   CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
 fi
@@ -182,62 +227,56 @@ if test $withmultithreading != no ; then
     AC_MSG_ERROR(Invalid ACE path)
   fi
 
-  CXXFLAGSG="$CXXFLAGSG -DDEAL_II_USE_MT"
-  CXXFLAGSO="$CXXFLAGSO -DDEAL_II_USE_MT"
+  AC_DEFINE(DEAL_II_USE_MT)
 fi
 AC_SUBST(withmultithreading)
 
+dnl ------------------------------------------------------------
+dnl   Check for LAPACK and BLAS
+dnl   Consider this part experimental!
+dnl ------------------------------------------------------------
+AC_ARG_WITH(blas,
+[  --with-blas=LIB use the BLAS-library file LIB],
+  if test $withval != no ; then
+    AC_MSG_CHECKING(for BLAS)
+    if test -r $withval ; then
+      AC_MSG_RESULT(found)
+    else
+      AC_MSG_RESULT(not found)
+      AC_MSG_ERROR(BLAS library $withval not readable)
+    fi
+    AC_DEFINE(HAVE_LIBBLAS)
+    LIBS="$withval -lg2c $LIBS";
+  fi
+  ,
+  AC_CHECK_LIB(blas,
+	       main,
+	       LIBS="-lblas -lg2c $LIBS" ; AC_DEFINE(HAVE_LIBBLAS))
+)
 
-
-dnl -------------------------------------------------------------
-dnl Test whether shared libraries support is requested.
-dnl Default is yes, but value will be adjusted to operating system
-dnl below.
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(shared,
-[  --enable-shared Set compiler flags to generate shared libraries],
-    enableshared=$enableval,
-    enableshared=yes)
-
-dnl On AIX and alpha, shared libs don't work for us at present, so 
-dnl disable them (we should probably use libtool there)
-case "$target" in
-   *-aix* | alpha*-linux* ) 
-	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
-	   enableshared=no 
-	   ;;
-esac
-
-
-dnl Set compile flags accordingly
-if test $enableshared = yes ; then
-  AC_MSG_RESULT(Configuring for shared libraries)
-  CXXFLAGSG="$CXXFLAGSG -fPIC"
-  CXXFLAGSO="$CXXFLAGSO -fPIC"
-
-  lib_suffix=.so;
-else
-  AC_MSG_RESULT(Configuring for static libraries)
-
-  lib_suffix=.a;
-fi
-
-
-AC_SUBST(enableshared)
-AC_SUBST(lib_suffix)
-
-
-
+AC_ARG_WITH(lapack,
+[  --with-lapack=LIB use the LAPACK-library file LIB],
+  if test $withval != no ; then
+    AC_MSG_CHECKING(for LAPACK)
+    if test -r $withval ; then
+      AC_MSG_RESULT(found)
+    else
+      AC_MSG_RESULT(not found)
+      AC_MSG_ERROR(LAPACK library $withval not readable)
+    fi
+    AC_DEFINE(HAVE_LIBLAPACK)
+    LIBS="$withval $LIBS";
+  fi
+  ,
+  AC_CHECK_LIB(lapack, dgels_,,$LIBS)
+)
 
 dnl -------------------------------------------------------------
 dnl Multigrid
 dnl -------------------------------------------------------------
 
 dnl    Test if multigrid should be enabled
-dnl    default is no
-dnl
-dnl    ??Is this still the present state??
-dnl
+dnl    default is yes if multigrid directory present
 AC_ARG_ENABLE(multigrid,
 [  --enable-multigrid Include multigrid code in library],
     enablemultigrid=$enableval,
@@ -322,8 +361,7 @@ case "$target" in
    dnl On Alpha, there was an internal compiler error in exceptions.h.
    dnl Disable "throw" for this platform
    alpha*-linux*)
-	CXXFLAGSG="$CXXFLAGSG  -DNO_THROW"
-	CXXFLAGSO="$CXXFLAGSO  -DNO_THROW"
+	AC_DEFINE(NO_THROW)
 	;;
 esac
 
@@ -336,8 +374,8 @@ esac
 dnl -------------------------------------------------------------
 dnl Last check: test whether CXXFLAGS are ok
 dnl -------------------------------------------------------------
-AC_MSG_CHECKING(for consistency of CXXFLAGSG flags)
 CXXFLAGS="$CXXFLAGSG"
+AC_MSG_CHECKING(for consistency of CXXFLAGSG flags)
 AC_TRY_COMPILE(
   [],
   [;],
@@ -349,8 +387,8 @@ AC_TRY_COMPILE(
     exit 1;
   ])
 
-AC_MSG_CHECKING(for consistency of CXXFLAGSO flags)
 CXXFLAGS="$CXXFLAGSO"
+AC_MSG_CHECKING(for consistency of CXXFLAGSO flags)
 AC_TRY_COMPILE(
   [],
   [;],
@@ -361,10 +399,6 @@ AC_TRY_COMPILE(
     AC_MSG_ERROR(invalid combination of flags!)
     exit 1;
   ])
-
-
-
-
 
 
 
@@ -385,4 +419,4 @@ dnl Output results
 dnl -------------------------------------------------------------
 
 dnl    Write output to the global options file
-AC_OUTPUT(common/Make.global_options doc/Makefile doc/auto/Makefile doc/auto/kdoc/Makefile)
+AC_OUTPUT(common/Make.global_options common/Makefile.template doc/Makefile doc/auto/Makefile doc/auto/kdoc/Makefile)

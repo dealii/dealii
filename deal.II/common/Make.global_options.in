@@ -22,6 +22,8 @@ D                    = @DEAL2_DIR@
 CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
+LDFLAGS              = @LDFLAGS@
+LIBS                 = @LIBS@
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
 with-multithreading  = @withmultithreading@
@@ -39,6 +41,8 @@ lib-path-deal2 = $D/deal.II/lib
 
 LIBPATH       += $(addprefix -L,$(lib-path-base) $(lib-path-lac) $(lib-path-deal2))
 
+# DEAL.II libraries are found by the Makefile, so no -L option is needed
+#LIBS          += $(LIBPATH)
 
 # add search path for libraries for make dependencies
 
@@ -73,8 +77,8 @@ INCLUDE           += $(addprefix -I, $(include-path-base) \
                                      $(include-path-deal2))
 
 # compiler flags for debug and optimized mode
-CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)  $(LIBPATH)
-CXXFLAGS.o   = @DEFS@ @CXXFLAGSO@  $(INCLUDE)  $(LIBPATH)
+CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)
+CXXFLAGS.o   = @DEFS@ @CXXFLAGSO@  $(INCLUDE)
 
 
 # if multithread support in the library is requested, then set the

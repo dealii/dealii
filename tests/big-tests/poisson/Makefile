@@ -85,7 +85,7 @@ endif
 # make rule for the target
 $(target) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) $(flags) -o $@ $^ $(user-libs)
+	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS) $(user-libs)
 
 # rule how to run the program
 run: $(target)
@@ -128,7 +128,7 @@ clean:
 #rather for libnumerics.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files) $(lib-h-files)
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/Make_dep.pl ./Obj $(INCLUDE) $(cc-files) \
+	@perl $D/common/scripts/make_dependencies.pl ./Obj $(INCLUDE) $(cc-files) \
 		> Makefile.dep
 
 

@@ -69,12 +69,11 @@ int main()
       SparseMatrix<double>  A(structure);
       testproblem.laplacian(A);
 
-      PreconditionIdentity
-	prec_no;
-      PreconditionRelaxation<>
-	prec_sor(A, &SparseMatrix<double>::template precondition_SOR<double>, 1.2);
-      PreconditionRelaxation<>
-	prec_ssor(A, &SparseMatrix<double>::template precondition_SSOR<double>, 1.2);
+      PreconditionIdentity prec_no;
+      PreconditionSOR<> prec_sor;
+      prec_sor.initialize(A, 1.2);
+      PreconditionSSOR<> prec_ssor;
+      prec_ssor.initialize(A, 1.2);
       
       Vector<double>  f(dim);
       Vector<double>  u(dim);

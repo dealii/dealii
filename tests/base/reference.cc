@@ -17,6 +17,9 @@
 #include <base/smartpointer.h>
 #include <base/logstream.h>
 
+void abort()
+{}
+
 class Test : public Subscriptor
 {
   const char* name;
@@ -79,5 +82,3 @@ deallog << "a ";
   }
 }
 
-void abort()
-{}

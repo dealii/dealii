@@ -1,8 +1,5 @@
 active cell: a triangulation cell that is not refined further
 
-cell: element of a subdivision, being of the same dimension as the
-domain of computation
-
 boundary component: part of the domain in physical space. Denotes
 either function for a curved boundary or the selection of a <<boundary
 condition>>
@@ -12,6 +9,17 @@ differential equation
 
 boundary indicator: data of lower dimensional <<triangulation
 object>>s, indicating the number of a <<boundary component>>
+
+cell: element of a subdivision, being of the same dimension as the
+domain of computation
+
+DG: see <<Discontinuous Galerkin>>
+
+DGFEM: <<Discontinuous Galerkin>> finite element method. 
+
+Discontinuous Galerkin: A Galerkin discretization with all degrees of
+freedom in the interior of the grid cells. Continuity between grid
+cells is established by jump terms on the cell interfaces.
 
 hex: hexahedron, mapping of the unit cube into the domain
 

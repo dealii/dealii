@@ -5,7 +5,7 @@ D = ../..
 include $D/common/Make.global_options
 
 
-default: makefiles.html makefile.small.html makefile.large.html
+default: makefiles.html makefile.small.html makefile.large.html makefile.rules.html
 
 
 makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefiles.2.html
@@ -33,6 +33,8 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>INCLUDE=$(INCLUDE)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.g=$(CXXFLAGS.g)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.o=$(CXXFLAGS.o)</code>' >> $@
+	@echo '<li><code>LDFLAGS=$(LDFLAGS)</code>' >> $@
+	@echo '<li><code>LIBS=$(LIBS)</code>' >> $@
 	@echo '<li><code>ACE_ROOT=$(ACE_ROOT)</code>' >> $@
 	@echo '<li><code>lib-ACE=$(lib-ACE)</code>' >> $@
 	@echo '<li><code>with-multithreading=$(with-multithreading)</code>' >> $@
@@ -45,6 +47,8 @@ makefile.small.html: Makefile.small
 makefile.large.html: Makefile.large
 	@$(PERL) makefile2html < $< > $@
 
+makefile.rules.html: $D/common/Makefile.template
+	@$(PERL) makefile2html < $< > $@
 
 validate-xrefs:
 	$(PERL) $D/doc/auto/scripts/validate-xrefs.pl \

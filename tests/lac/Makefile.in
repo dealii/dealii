@@ -89,7 +89,7 @@ endif
 
 solver.testcase: $(solver-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -105,7 +105,7 @@ endif
 
 full_matrix.testcase: $(full_matrix-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 
@@ -122,7 +122,7 @@ endif
 
 mgbase.testcase: $(mgbase-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 
@@ -139,7 +139,7 @@ endif
 
 mg.testcase: $(mg-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 
@@ -157,7 +157,7 @@ benchmark-o-files = $(benchmark-cc-files:.cc=.o)
 endif
 
 benchmark.testcase: $(benchmark-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 ############################################################
 # Continue with other targets if needed
@@ -173,7 +173,7 @@ target1-o-files = $(target1-cc-files:.cc=.o)
 endif
 
 target1: $(target1-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################

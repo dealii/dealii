@@ -11,12 +11,15 @@
     </p>
 
     <p>
-    At present, we have two Makefiles, one for 
-    <a href="makefile.small.html" target="body">small projects</a>
-    consisting of only one C++ file, and one for 
-    <a href="makefile.large.html" target="body">large projects</a>.
-    Both Makefiles need slight modifications before they will work in
-    your project. The places for modifications are marked.
+    At present, we have three Makefiles, one for <a
+    href="makefile.small.html" target="body">small projects</a>
+    consisting of only one C++ file, and one for <a
+    href="makefile.large.html" target="body">large projects</a>.
+    Furthermore, there is a Makefile in a <a
+    href="makefile.rules.html" target="body">different style</a>. Have
+    a look at them and see what seem convenient to you.  All Makefiles
+    need slight modifications before they will work in your
+    project. The places for modifications are marked.
 
     <ul>
       <li> <p>
@@ -82,7 +85,17 @@
 	   You can find this Makefile
 	   <a href="Makefile.large" target="_top">here</a>.
 	   </p>
-    </ul> 
+      <li> <p>
+
+           The <a href="makefile.rules.html" target="body">third
+           Makefile</a> is <code>common/Makefile.template</code> in
+           the <acronum>deal.II</acronym> directory tree.
+
+	   It was designed for several targets in one directory and
+	   makes use of the compilation rules in
+	   <code>common/Make.rules</code>. All object files and
+	   executables will be in the same directory.
+    </ul>
 
     <hr>
     

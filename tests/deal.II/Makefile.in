@@ -95,7 +95,7 @@ endif
 
 template.testcase: $(template-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -110,7 +110,7 @@ endif
 
 constraints.testcase: $(constraints-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -125,7 +125,7 @@ endif
 
 dof_test.testcase: $(dof_test-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -140,7 +140,7 @@ endif
 
 fe_tables.testcase: $(fe_tables-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -155,7 +155,7 @@ endif
 
 gradients.testcase: $(gradients-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -170,7 +170,7 @@ endif
 
 grid_test.testcase: $(grid_test-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -185,7 +185,7 @@ endif
 
 grid_generator.testcase: $(grid_generator-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -200,7 +200,7 @@ endif
 
 second_derivatives.testcase: $(second_derivatives-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -215,7 +215,7 @@ endif
 
 wave-test-3.testcase: $(wave-test-3-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -231,7 +231,7 @@ endif
 
 mglocal.testcase: $(mglocal-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 
@@ -248,7 +248,7 @@ endif
 
 mg.testcase: $(mg-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 
@@ -265,7 +265,7 @@ endif
 
 block_matrices.testcase: $(block_matrices-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 
@@ -283,7 +283,7 @@ benchmark-o-files = $(benchmark-cc-files:.cc=.o)
 endif
 
 benchmark.testcase: $(benchmark-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 ############################################################
 # Continue with other targets if needed
@@ -299,7 +299,7 @@ target1-o-files = $(target1-cc-files:.cc=.o)
 endif
 
 target1: $(target1-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -341,7 +341,7 @@ all-cc-files = $(shell echo *.cc)
 
 Make.depend: $(all-cc-files)
 	@echo =====Dependencies== Make.depend
-	@$(CXX) $(flags) $^ -M > $@
+	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
 	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 
 include Make.depend

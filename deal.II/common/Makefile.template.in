@@ -1,0 +1,75 @@
+# Directory with the DEAL distribution
+
+D = @DEAL2_DIR@
+
+
+# Include general rules for making deal.II object files
+
+include $D/common/Make.rules
+
+# Set debug-mode as a default.
+# You may replace this by by a command line argument debug-mode=off
+
+debug-mode = on
+
+
+# Define library names. Using these variables automatically selects
+# the proper names for shared or static libraries.
+#
+# Here, the version for 2d. Replace 2d by 3d or add $(lib-deal2-3d.o)
+# when needed.
+
+libs   = $(lib-deal2-2d.o) $(lib-lac.o) $(lib-base.o)
+libs.g = $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
+
+# Select compiler flags according to debug-mode
+# and allow for additional CXXFLAGS.
+
+
+ifeq ($(debug-mode),on)
+libraries = $(libs.g)
+flags     = $(CXXFLAGS.g) $(CXXFLAGS)
+endif
+
+ifeq ($(debug-mode),off)
+libraries = $(libs)
+flags     = $(CXXFLAGS.o) $(CXXFLAGS)
+endif
+
+
+# Typical block for building a running program called target1
+#
+# 1. provide a list of source files in ...-cc-files
+#    If you have several targets in one directory, replace
+#    the shell command by an explicit list of .cc-files.
+
+target1-cc-files = $(shell echo *.cc)
+
+# 2. generate the list of object files according to debug-mode
+
+ifeq ($(debug-mode),on)
+target1-o-files = $(target1-cc-files:.cc=.g.o)
+else
+target1-o-files = $(target1-cc-files:.cc=.o)
+endif
+
+# 3. make executable
+#    Use extra libraries and linker flags as configured. We
+#    always add -g to keep debug symbols. Use strip for smaller
+#    executables.
+
+target1: $(target1-o-files) $(libraries)
+	$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
+
+# Copy this block for all your targets and replace "target1" by a proper name.
+
+# Cleanup targets
+
+clean:
+	rm -f *.o *.go
+
+veryclean: clean
+	rm -f target1 *.inp *.gpl *.eps *.gnuplot
+
+
+
