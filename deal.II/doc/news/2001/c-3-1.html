@@ -57,8 +57,32 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: function <code>contract</code> for two arguments of
+       <code class="class">Tensor&lt;1,dim&gt;</code>
+       <br>
+       (GK 2001/03/05)
+       </p>
+
+  <li> <p> New: <code class="class">Logstream</code>.<code
+       class="member">log_time_differences (bool)</code> makes <code
+       class="class">Logstream</code> print the time since the last
+       log line instead of accumulated time since program start.
+       <br>
+       (GK 2001/03/05)
+       </p>
+
+
+  <li> <p> Fix: <code class="class">Logstream</code>.<code
+       class="member">pop()</code> does not perform anything on empty
+       stacks.
+       <br>
+       (GK 2001/03/05)
+       </p>
+
+
+  <li> <p>
        Change: Sort the quadrature points of each <code
-       class="class">Quadrature<1></code> in ascending order. This
+       class="class">Quadrature&lt;1&gt;</code> in ascending order. This
        actually changed the order of the points of only <code
        class="class">QGauss4</code> and <code
        class="class">QGauss5</code>.
