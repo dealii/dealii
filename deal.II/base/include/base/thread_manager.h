@@ -964,11 +964,14 @@ class ThreadManager : public ACE_Thread_Manager
       struct Fun_Data4
       {
  	  typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4);
-	  Arg1   arg1;
-	  Arg2   arg2;
-	  Arg3   arg3;
-	  Arg4   arg4;
-	  FunPtr fun_ptr;
+ 	  typedef void   (*VoidFunPtr) (Arg1 , Arg2, Arg3, Arg4);
+
+	  Arg1       arg1;
+	  Arg2       arg2;
+	  Arg3       arg3;
+	  Arg4       arg4;
+	  FunPtr     fun_ptr;
+	  VoidFunPtr void_fun_ptr;
 	  
 	  Fun_Data4 (Arg1   arg1,
 		     Arg2   arg2,
@@ -979,7 +982,19 @@ class ThreadManager : public ACE_Thread_Manager
 			  arg2  (arg2),
 			  arg3  (arg3),
 			  arg4  (arg4),
-			  fun_ptr (fun_ptr) {};
+			  fun_ptr (fun_ptr),
+			  void_fun_ptr (0) {};
+	  Fun_Data4 (Arg1       arg1,
+		     Arg2       arg2,
+		     Arg3       arg3,
+		     Arg4       arg4,
+		     VoidFunPtr void_fun_ptr) :
+			  arg1  (arg1),
+			  arg2  (arg2),
+			  arg3  (arg3),
+			  arg4  (arg4),
+			  fun_ptr (0),
+			  void_fun_ptr (void_fun_ptr) {};
       };
 
     				     /**
@@ -998,12 +1013,15 @@ class ThreadManager : public ACE_Thread_Manager
     struct Fun_Data5
     {
 	typedef void * (*FunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5);
-	Arg1   arg1;
-	Arg2   arg2;
-	Arg3   arg3;
-	Arg4   arg4;
-	Arg5   arg5;
-	FunPtr fun_ptr;
+	typedef void   (*VoidFunPtr) (Arg1 , Arg2, Arg3, Arg4, Arg5);
+
+	Arg1       arg1;
+	Arg2       arg2;
+	Arg3       arg3;
+	Arg4       arg4;
+	Arg5       arg5;
+	FunPtr     fun_ptr;
+	VoidFunPtr void_fun_ptr;
 	  
 	Fun_Data5 (Arg1   arg1,
 		   Arg2   arg2,
@@ -1016,8 +1034,22 @@ class ThreadManager : public ACE_Thread_Manager
 			arg3  (arg3),
 			arg4  (arg4),
 			arg5  (arg5),
-			fun_ptr (fun_ptr) {};
-      };
+			fun_ptr (fun_ptr),
+			void_fun_ptr (0) {};
+	Fun_Data5 (Arg1       arg1,
+		   Arg2       arg2,
+		   Arg3       arg3,
+		   Arg4       arg4,
+		   Arg5       arg5,
+		   VoidFunPtr void_fun_ptr) :
+			arg1  (arg1),
+			arg2  (arg2),
+			arg3  (arg3),
+			arg4  (arg4),
+			arg5  (arg5),
+			fun_ptr (0),
+			void_fun_ptr (void_fun_ptr) {};
+    };
 
     				     /**
 				      * This class is used to package
@@ -3742,10 +3774,19 @@ void * ThreadManager::thread_entry_point_4 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->fun_ptr)(arg->arg1,
-			arg->arg2,
-			arg->arg3,
-			arg->arg4);
+  if (arg->fun_ptr != 0)
+    return (arg->fun_ptr)(arg->arg1,
+			  arg->arg2,
+			  arg->arg3,
+			  arg->arg4);
+  else
+    {
+      (arg->void_fun_ptr)(arg->arg1,
+			  arg->arg2,
+			  arg->arg3,
+			  arg->arg4);
+      return 0;
+    };
 };
 
 
@@ -3764,12 +3805,23 @@ void * ThreadManager::thread_entry_point_5 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->fun_ptr)(arg->arg1,
-			arg->arg2,
-			arg->arg3,
-			arg->arg4,
-			arg->arg5);
+  if (arg->fun_ptr != 0)
+    return (arg->fun_ptr)(arg->arg1,
+			  arg->arg2,
+			  arg->arg3,
+			  arg->arg4,
+			  arg->arg5);
+  else
+    {
+      (arg->void_fun_ptr)(arg->arg1,
+			  arg->arg2,
+			  arg->arg3,
+			  arg->arg4,
+			  arg->arg5);
+      return 0;
+    };
 };
+
 
 
 template <typename Arg1, typename Arg2,
