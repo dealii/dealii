@@ -347,22 +347,30 @@ void MGTransferSelect<number>::build_matrices (
 template
 void MGTransferBlock<float>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- std::vector<bool>, const std::vector<unsigned int>&);
+ std::vector<bool>,
+ const std::vector<unsigned int>&,
+ const std::vector<unsigned int>&);
 
 template
 void MGTransferSelect<float>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- unsigned int, unsigned int, const std::vector<unsigned int>&);
+ unsigned int, unsigned int,
+ const std::vector<unsigned int>&,
+ const std::vector<unsigned int>&);
 
 template
 void MGTransferBlock<double>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- std::vector<bool>, const std::vector<unsigned int>&);
+ std::vector<bool>,
+ const std::vector<unsigned int>&,
+ const std::vector<unsigned int>&);
 
 template
 void MGTransferSelect<double>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- unsigned int, unsigned int, const std::vector<unsigned int>&);
+ unsigned int, unsigned int,
+ const std::vector<unsigned int>&,
+ const std::vector<unsigned int>&);
 
 
 template void
