@@ -1,7 +1,7 @@
 # $Id$
 #
 # This Makefile only recurses into the subdirs
-
+all: default
 
 # existing examples. take dirnames and strip 'step'
 steps = $(shell echo step-? step-??)
