@@ -505,9 +505,9 @@ class KellyErrorEstimator
 					 /**
 					  * Constructor.
 					  */
-	PerThreadData (const DoFHandler<dim>               &dof,
-                       const Quadrature<dim-1>             &quadrature,
-                       const unsigned int      n_solution_vectors);
+	PerThreadData (const unsigned int n_solution_vectors,
+		       const unsigned int n_components,
+		       const unsigned int n_q_points);
     };
 
 
@@ -616,11 +616,6 @@ class KellyErrorEstimator
 
 /* -------------- declaration of explicit specializations ------------- */
 
-
-template <> KellyErrorEstimator<1>::PerThreadData::PerThreadData(
-  const DoFHandler<1>                 &,
-  const Quadrature<0>                 &,
-  const unsigned int);
 
 template <> void KellyErrorEstimator<1>::estimate_some (
   const Mapping<1>                  &mapping,
