@@ -14,6 +14,7 @@
 
 #include <base/quadrature_lib.h>
 #include <base/memory_consumption.h>
+#include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <numerics/data_out.h>
@@ -24,10 +25,6 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
-
-#ifdef DEAL_II_USE_MT
-#include <base/thread_management.h>
-#endif
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
