@@ -458,7 +458,50 @@ class FETools
     static void
     lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
 					   std::vector<unsigned int> &l2h);
-    
+
+				     /**
+				      * Given a name in the form which
+				      * is returned by the
+				      * @p{FiniteElement::get_name}
+				      * function, regenerate such a
+				      * finite element.
+				      *
+				      * This function is useful to
+				      * convert the name given in an
+				      * input file to an actual finite
+				      * element, without having to
+				      * parse the name yourself.
+				      *
+				      * Note that the given name must
+				      * match exactly what one would
+				      * get from the finite element to
+				      * be created, since otherwise
+				      * the parsing would fail. If no
+				      * finite element can be
+				      * reconstructed from this
+				      * string, an exception of type
+				      * @p{FETools::ExcInvalidFEName}
+				      * is thrown.
+				      *
+				      * The function returns a pointer
+				      * to a newly create finite
+				      * element. It is in the callers
+				      * responsibility to destroy the
+				      * object pointed to at an
+				      * appropriate time.
+				      */
+    template <int dim>
+    static
+    FiniteElement<dim> *
+    get_fe_from_name (const std::string &name);
+
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidFEName,
+		    std::string,
+		    << "Can't re-generate a finite element from the string <"
+		    << arg1 << ">.");
 				     /**
 				      * Exception
 				      */
@@ -493,6 +536,36 @@ class FETools
 		    int, int, int, int,
 		    << "This is a " << arg1 << "x" << arg2 << " matrix, "
 		    << "but should be a " << arg3 << "x" << arg4 << " matrix.");
+
+  private:
+				     /**
+				      * Return a finite element that
+				      * is created using the
+				      * characters of the input
+				      * parameters. The second part of
+				      * the return value indicates how
+				      * many characters have been used
+				      * up in the creation of the
+				      * finite element, so that the
+				      * calling site can continue
+				      * parsing finite element lists
+				      * (for example for
+				      * @ref{FESystem} objects) at the
+				      * position after which the
+				      * present element's name ends.
+				      *
+				      * If no finite element could be
+				      * created from the string at the
+				      * beginning of the given string,
+				      * then an exception is thrown,
+				      * just as for the
+				      * @ref{get_fe_from_name}
+				      * function.
+				      */
+    template <int dim>
+    static
+    std::pair<FiniteElement<dim> *, unsigned int>
+    get_fe_from_name_aux (const std::string &name);    
 };
 
 

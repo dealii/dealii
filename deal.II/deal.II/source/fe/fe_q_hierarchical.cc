@@ -102,6 +102,13 @@ template <int dim>
 std::string
 FE_Q_Hierarchical<dim>::get_name () const
 {
+				   // note that the
+				   // FETools::get_fe_from_name
+				   // function depends on the
+				   // particular format of the string
+				   // this function returns, so they
+				   // have to be kept in synch
+
 #ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream namebuf;
 #else

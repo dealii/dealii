@@ -83,6 +83,7 @@ fe_tools_05.exe         : fe_tools_05.g.$(OBJEXT)          $(libraries)
 fe_tools_06.exe         : fe_tools_06.g.$(OBJEXT)          $(libraries)
 fe_tools_07.exe         : fe_tools_07.g.$(OBJEXT)          $(libraries)
 fe_tools_08.exe         : fe_tools_08.g.$(OBJEXT)          $(libraries)
+fe_tools_09.exe         : fe_tools_09.g.$(OBJEXT)          $(libraries)
 gerold_1.exe            : gerold_1.g.$(OBJEXT)             $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)                $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)              $(libraries)
@@ -109,7 +110,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
         dof_tools_18a dof_tools_18b dof_tools_18c dof_tools_18d \
 	fe_tools_01a fe_tools_01b fe_tools_01c \
 	fe_tools_02 fe_tools_03 fe_tools_04 \
-	fe_tools_05 fe_tools_06 fe_tools_07 fe_tools_08 \
+	fe_tools_05 fe_tools_06 fe_tools_07 fe_tools_08 fe_tools_09 \
 	roy_1 \
         denis_1 \
 	unit_support_points parameter_handler_1 parameter_handler_2 \

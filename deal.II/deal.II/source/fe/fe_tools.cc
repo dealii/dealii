@@ -21,11 +21,24 @@
 #include <fe/fe_tools.h>
 #include <fe/fe.h>
 #include <fe/fe_q.h>
+#include <fe/fe_q_hierarchical.h>
+#include <fe/fe_dgq.h>
+#include <fe/fe_dgp.h>
+#include <fe/fe_dgp_nonparametric.h>
+#include <fe/fe_nedelec.h>
+#include <fe/fe_raviart_thomas.h>
+#include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 
@@ -61,6 +74,79 @@ namespace
                             interpolation_matrix.n());
     fe2.get_interpolation_matrix (fe1, tmp);
     interpolation_matrix = tmp;
+  }
+
+
+
+				   // return true if the given pattern
+				   // string matches the given name at
+				   // the first position of the string
+  bool
+  match_at_string_start (const std::string &name,
+			 const std::string &pattern)
+  {
+    if (pattern.size() > name.size())
+      return false;
+
+    for (unsigned int i=0; i<pattern.size(); ++i)
+      if (pattern[i] != name[i])
+	return false;
+
+    return true;
+  }
+
+
+
+				   // read an integer at the position
+				   // in "name" indicated by the
+				   // second argument, and retun this
+				   // integer together with how many
+				   // characters it takes in the
+				   // string
+				   //
+				   // if no integer can be read at the
+				   // indicated position, return
+				   // (-1,-1)
+  std::pair<int, unsigned int>
+  get_integer (const std::string &name,
+	       const unsigned int position)
+  {
+    Assert (position < name.size(), ExcInternalError());
+    
+    std::string test_string (name.begin()+position,
+			     name.end());
+    
+#ifdef HAVE_STD_STRINGSTREAM
+    std::istringstream str(test_string);
+#else
+    std::istrstream str(test_string.c_str());
+#endif
+
+    int i;
+    if (str >> i)
+      {
+					 // compute the number of
+					 // digits of i. assuming it
+					 // is less than 6 is likely
+					 // ok
+	if (i<10)
+	  return std::make_pair (i, 1U);
+	else if (i<100)
+	  return std::make_pair (i, 2U);
+	else if (i<1000)
+	  return std::make_pair (i, 3U);
+	else if (i<10000)
+	  return std::make_pair (i, 4U);
+	else if (i<100000)
+	  return std::make_pair (i, 5U);
+	else
+	  {
+	    Assert (false, ExcNotImplemented());
+	    return std::make_pair (-1, static_cast<unsigned int>(-1));
+	  }
+      }
+    else
+      return std::make_pair (-1, static_cast<unsigned int>(-1));
   }
 }
 
@@ -920,6 +1006,350 @@ FETools::lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
 
 
 
+template <int dim>
+FiniteElement<dim> *
+FETools::get_fe_from_name (const std::string &name)
+{
+				   // get the finite element that
+				   // would be created from the given
+				   // string at the first position, as
+				   // well as how many characters of
+				   // the string were eaten
+  const std::pair<FiniteElement<dim>*, unsigned int>
+    tmp = get_fe_from_name_aux<dim> (name);
+				   // make sure that we took all
+				   // characters in the name,
+				   // i.e. that there is not some junk
+				   // left over at the end of which we
+				   // didn't know what to do
+				   // with. make sure we don't create
+				   // a memory leak here
+  if (tmp.second != name.size())
+    {
+      delete tmp.first;
+      AssertThrow (false, ExcInvalidFEName (name));
+    }
+
+				   // otherwise, return the just
+				   // created pointer
+  return tmp.first;
+}
+
+
+
+template <int dim>
+std::pair<FiniteElement<dim> *, unsigned int>
+FETools::get_fe_from_name_aux (const std::string &name)
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream s;
+#else
+  std::ostrstream s;
+#endif
+	
+  s << '<' << dim << '>';
+#ifndef HAVE_STD_STRINGSTREAM
+  s << std::ends;
+#endif
+
+  const std::string dim_name = s.str();
+  
+				   // so, let's see what's at position
+				   // 0 of this string, and create a
+				   // respective finite element
+				   //
+				   // start with the longest names, to
+				   // make sure we don't match FE_Q
+				   // when it's actually a
+				   // FE_Q_Hierarchic
+  if (match_at_string_start (name, std::string("FE_Q_Hierarchical")+dim_name))
+    {
+      unsigned int position = (std::string("FE_Q_Hierarchical")+dim_name).size();
+				       // make sure the next character
+				       // is an opening parenthesis
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+				       // next thing is to parse the
+				       // degree of the finite element
+      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+
+				       // make sure the next character
+				       // is an closing parenthesis
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+
+				       // ok, everything seems
+				       // good. so create finite
+				       // element and return position
+				       // count
+      return std::make_pair (new FE_Q_Hierarchical<dim>(tmp.first),
+			     position);
+    }
+				   // check other possibilities in
+				   // exactly the same way
+  else if (match_at_string_start (name, std::string("FE_RaviartThomas")+dim_name))
+    {
+      unsigned int position = (std::string("FE_RaviartThomas")+dim_name).size();
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+      return std::make_pair (new FE_RaviartThomas<dim>(tmp.first),
+			     position);
+    }
+  else if (match_at_string_start (name, std::string("FE_Nedelec")+dim_name))
+    {
+      unsigned int position = (std::string("FE_Nedelec")+dim_name).size();
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+      return std::make_pair (new FE_Nedelec<dim>(tmp.first),
+			     position);
+    }
+  else if (match_at_string_start (name, std::string("FE_DGPNonparametric")+dim_name))
+    {
+      unsigned int position = (std::string("FE_DGPNonparametric")+dim_name).size();
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+      return std::make_pair (new FE_DGPNonparametric<dim>(tmp.first),
+			     position);
+    }
+  else if (match_at_string_start (name, std::string("FE_DGP")+dim_name))
+    {
+      unsigned int position = (std::string("FE_DGP")+dim_name).size();
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+      return std::make_pair (new FE_DGP<dim>(tmp.first),
+			     position);
+    }
+  else if (match_at_string_start (name, std::string("FE_DGQ")+dim_name))
+    {
+      unsigned int position = (std::string("FE_DGQ")+dim_name).size();
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+      return std::make_pair (new FE_DGQ<dim>(tmp.first),
+			     position);
+    }
+  else if (match_at_string_start (name, std::string("FE_Q")+dim_name))
+    {
+      unsigned int position = (std::string("FE_Q")+dim_name).size();
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+      return std::make_pair (new FE_Q<dim>(tmp.first),
+			     position);
+    }
+  
+  else
+				     // now things get a little more
+				     // complicated: FESystem. it's
+				     // more complicated, since we
+				     // have to figure out what the
+				     // base elements are. this can
+				     // only be done recursively
+    if (match_at_string_start (name, std::string("FESystem")+dim_name))
+      {
+	unsigned int position = (std::string("FESystem")+dim_name).size();
+
+					 // FESystem puts the names of
+					 // the basis elements into
+					 // square brackets
+	AssertThrow (name[position] == '[', ExcInvalidFEName(name));
+	++position;
+
+					 // next we have to get at the
+					 // base elements. start with
+					 // the first. wrap the whole
+					 // block into try-catch to
+					 // make sure we destroy the
+					 // pointers we got from
+					 // recursive calls if one of
+					 // these calls should throw
+					 // an exception
+	std::vector<FiniteElement<dim>*> base_fes;
+	std::vector<unsigned int>        base_multiplicities;
+	try
+	  {
+	    do
+	      {
+						 // first get the
+						 // element at this
+						 // position of the
+						 // string, i.e. of
+						 // the substring
+						 // ranging from the
+						 // present position
+						 // to the end
+		const std::pair<FiniteElement<dim> *, unsigned int> tmp_x
+		  = FETools::get_fe_from_name_aux<dim> (std::string(name.begin()+position,
+								    name.end()));
+		base_fes.push_back (tmp_x.first);
+		position += tmp_x.second;
+		
+						 // next check whether
+						 // FESystem placed a
+						 // multiplicity after
+						 // the element name
+		if (name[position] == '^')
+		  {
+						     // yes. this is
+						     // the case. move
+						     // the cursor
+						     // beyond the '^'
+						     // and read this
+						     // multiplicity
+		    ++position;
+		    const std::pair<int,unsigned int> tmp = get_integer (name,
+									 position);
+		    AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+		    position += tmp.second;
+		    base_multiplicities.push_back (tmp.first);
+		  }
+		else
+						   // no, so
+						   // multiplicity is
+						   // 1
+		  base_multiplicities.push_back (1);
+
+						 // so that's it for
+						 // this base
+						 // element. base
+						 // elements are
+						 // separated by '-',
+						 // and the list is
+						 // terminated by ']',
+						 // so loop while the
+						 // next character is
+						 // '-'
+	      }
+	    while (name[position++] == '-');
+
+					     // so we got to the end
+					     // of the '-' separated
+					     // list. make sure that
+					     // we actually had a ']'
+					     // there
+	    AssertThrow (name[position-1] == ']', ExcInvalidFEName(name));
+
+					     // just one more sanity check
+	    Assert ((base_fes.size() == base_multiplicities.size())
+		    &&
+		    (base_fes.size() > 0),
+		    ExcInternalError());
+	    
+					     // ok, apparently
+					     // everything went ok. so
+					     // generate the composed
+					     // element
+	    FiniteElement<dim> *system_element = 0;
+	    switch (base_fes.size())
+	      {
+		case 1:
+		{
+		  system_element = new FESystem<dim>(*base_fes[0],
+						     base_multiplicities[0]);
+		  break;
+		}
+
+		case 2:
+		{
+		  system_element = new FESystem<dim>(*base_fes[0],
+						     base_multiplicities[0],
+						     *base_fes[1],
+						     base_multiplicities[1]);
+		  break;
+		}
+		
+		case 3:
+		{
+		  system_element = new FESystem<dim>(*base_fes[0],
+						     base_multiplicities[0],
+						     *base_fes[1],
+						     base_multiplicities[1],
+						     *base_fes[2],
+						     base_multiplicities[2]);
+		  break;
+		}
+
+		default:
+		      Assert (false, ExcNotImplemented());
+	      }
+
+					     // now we don't need the
+					     // list of base elements
+					     // any more
+	    for (unsigned int i=0; i<base_fes.size(); ++i)
+	      delete base_fes[i];
+	    
+					     // finally return our findings
+	    return std::make_pair (system_element, position);
+	  }
+	catch (...)
+	  {
+					     // ups, some exception
+					     // was thrown. prevent a
+					     // memory leak, and then
+					     // pass on the exception
+					     // to the caller
+	    for (unsigned int i=0; i<base_fes.size(); ++i)
+	      delete base_fes[i];
+	    throw;
+	  }
+
+					 // this is a place where we
+					 // should really never get,
+					 // since above we have either
+					 // returned from the
+					 // try-clause, or have
+					 // re-thrown in the catch
+					 // clause. check that we
+					 // never get here
+	Assert (false, ExcInternalError());
+      }
+  
+    
+				   // hm, if we have come thus far, we
+				   // didn't know what to do with the
+				   // string we got. so do as the docs
+				   // say: raise an exception
+  AssertThrow (false, ExcInvalidFEName(name));
+
+				   // make some compilers happy that
+				   // do not realize that we can't get
+				   // here after throwing
+  return std::pair<FiniteElement<dim> *, unsigned int> (0,0);
+}
+
+
+
 
 /*-------------- Explicit Instantiations -------------------------------*/
 
@@ -1143,6 +1573,10 @@ void
 FETools::lexicographic_to_hierarchic_numbering<deal_II_dimension>
 (const FE_Q<deal_II_dimension> &fe,
  std::vector<unsigned int>     &h2l);
+
+template
+FiniteElement<deal_II_dimension> *
+FETools::get_fe_from_name<deal_II_dimension> (const std::string &);
 
 
 /*----------------------------   fe_tools.cc     ---------------------------*/

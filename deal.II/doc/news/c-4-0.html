@@ -84,6 +84,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The new <code class="member">FETools::get_fe_from_name</code>
+       function can do the reverse of the <code
+       class="member">FiniteElement::get_name</code> function: it
+       takes a string and parses it to regenerate a finite element
+       from it. Useful for parsing finite element names from input files.
+       <br>
+       (WB 2002/07/08)
+       </p>
+
+  <li> <p> 
        New: The <code class="member">DataOut_DoFData::merge_patches</code>
        now takes a second parameter that indicates a shift for each
        vertex of the given patches to be merged. This is sometimes
