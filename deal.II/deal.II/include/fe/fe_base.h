@@ -780,7 +780,7 @@ class FiniteElementBase : public Subscriptor,
 				      * is always equalt to zero.
 				      */
     std::pair<unsigned int,unsigned int>
-    component_to_base (unsigned int component) const;
+    component_to_base (const unsigned int component) const;
 
 				     /**
 				      * Access the
@@ -1505,7 +1505,7 @@ FiniteElementBase<dim>::face_system_to_component_index (const unsigned int index
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElementBase<dim>::component_to_base (unsigned int index) const
+FiniteElementBase<dim>::component_to_base (const unsigned int index) const
 {
   Assert(index < component_to_base_table.size(),
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
