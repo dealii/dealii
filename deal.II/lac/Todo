@@ -10,7 +10,10 @@ Let all the reinit functions in /lac free their memory, if reinit
 
 Use unsigned integers for the colnums array in dSMatrixStruct. This
   would enhance safety since colnum=-1 would no longer point to a
-  valid address. How do you mark non-used columns? (gk)
+  valid address. Mark unused values by numeric_limits<uint>::max
+  (or some such constant) instead, which probably has the same
+  bit representation as (uint)-1, but is an unsigned, therefore
+  eliminating the need for conversions.
 
 
 Let dSMatrixStruct::compress free the memory of colnums which is
