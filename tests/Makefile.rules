@@ -76,12 +76,33 @@ flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
 		echo '=====OK============' $@ ; \
 		touch $@ ; \
 	 else \
-		echo '+++++Error+++++++++' $@ ; \
+		if test "x$(verbose)" = "xon" ; then \
+			echo '+++++Error+++++++++' $@ ; \
+		else \
+			echo '+++++Error+++++++++ $@. Use make verbose=on for the diffs' ; \
+		fi ; \
 		if test "x$(stop_on_error)" = "xon" ; then \
 			false ; \
 		fi ; \
 	 fi
 
+
+############################################################
+# Generate a report for the present date, in which the
+# results (indicated by a "+" for a successful test, and a
+# "-" for a failing one) for all tests is summarized. Use
+# universal time in order to be able to run this target
+# anywhere anytime
+############################################################
+report:
+	@today=`date -u +"%Y-%m-%d %H:%M"` ; \
+	for test in $(tests) ; do \
+		if (($(MAKE) $$test.check stop_on_error=on 2>&1) > /dev/null); then \
+			echo $$today + $$test ; \
+		else \
+			echo $$today - $$test ; \
+		fi ; \
+	done
 
 
 ############################################################
