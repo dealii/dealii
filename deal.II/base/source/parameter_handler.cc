@@ -3,26 +3,108 @@
 #include <basic/parameter_handler.h>
 #include <fstream>
 #include <iomanip>
+#include <strstream>
 #include <cstdlib>
+#include <algorithm>
+
+
+bool Patterns::Integer::match (const string &test_string) const {
+  istrstream str(test_string.c_str());
+  int i;
+  if (str >> i) return true;
+  return false;
+};
+
+
+string Patterns::Integer::description () const {
+  return "[Integer]";
+};
+
+
+Patterns::PatternBase *
+Patterns::Integer::clone () const {
+  return new Patterns::Integer();
+};
+
+
+bool Patterns::Double::match (const string &test_string) const {
+  istrstream str(test_string.c_str());
+  double d;
+  if (str >> d) return true;
+  return false;
+};
+
+
+string Patterns::Double::description () const {
+  return "[Integer]";
+};
+
+
+Patterns::PatternBase *
+Patterns::Double::clone () const {
+  return new Patterns::Double();
+};
 
 
 
+Patterns::Sequence::Sequence (const string &seq) {
+  sequence = seq;
+  while (sequence.find(" |") != string::npos)
+    sequence.replace (sequence.find(" |"), 2, '|');
+  while (sequence.find("| ") != string::npos)
+    sequence.replace (sequence.find("| "), 2, '|');
+};
 
-const String ParameterHandler::RegularExpressions::WhiteSpace = "[ \n\t]+",
-	     ParameterHandler::RegularExpressions::Integer    = "\\(-?[0-9]+[ \n\t]*\\)",
-	     ParameterHandler::RegularExpressions::Double     = "\\("
-								    "-?"
-								    "\\("
-									"\\([0-9]+\\.[0-9]*\\)"
-									"\\|"
-									"\\([0-9]+\\)"
-									"\\|"
-									"\\(\\.[0-9]+\\)"
-									"\\)"
-								    "\\([eE][---+]?[0-9]+\\)?"
-								    "[ \n\t]*"
-								    "\\)",
-	     ParameterHandler::RegularExpressions::AlphaNum   = "\\([0-9A-Za-z]+[ \n\t]*\\)";
+
+bool Patterns::Sequence::match (const string &test_string) const {
+  vector<string> choices;
+  string tmp(sequence);
+				   // check the different possibilities
+  while (tmp.find('|') != string::npos) 
+    {
+      if (test_string == string(tmp, 0, tmp.find('|')))
+	return true;
+      
+      tmp.erase (0, tmp.find('|')+1);
+    };
+				   // check last choice, not finished by |
+  if (test_string == tmp)
+    return true;
+
+				   // not found
+  return false;
+};
+
+
+string Patterns::Sequence::description () const {
+  return sequence;
+};
+
+
+Patterns::PatternBase *
+Patterns::Sequence::clone () const {
+  return new Patterns::Sequence(sequence);
+};
+
+
+
+bool Patterns::Anything::match (const string &) const {
+  return true;
+};
+
+
+string Patterns::Anything::description () const {
+  return "[Anything]";
+};
+
+
+Patterns::PatternBase *
+Patterns::Anything::clone () const {
+  return new Patterns::Anything();
+};
+
+
+
 
 
 
@@ -35,17 +117,12 @@ ParameterHandler::~ParameterHandler () {};
 
 
 bool ParameterHandler::read_input (istream &input) {
-  String line;
+  string line;
   int lineno=0;
   while (input) 
     {
       ++lineno;
-				       // get one line; limit of 10000
-				       // chars is arbitrary but should
-				       // be enough
-      char c[10000];
-      input.getline (&c[0], 10000);
-      line = c;
+      getline (input, line);
       if (!scan_line (line, lineno)) 
 	status = false;
     };
@@ -54,8 +131,8 @@ bool ParameterHandler::read_input (istream &input) {
 };
 
 
-bool ParameterHandler::read_input (const String &filename) {
-  ifstream input (filename);
+bool ParameterHandler::read_input (const string &filename) {
+  ifstream input (filename.c_str());
   if (!input) 
     {
       cerr << "ParameterHandler::read_input: could not open file <"
@@ -73,8 +150,8 @@ bool ParameterHandler::read_input_from_string (const char *s) {
 				   // with success
   if ((s == 0) || ((*s) == 0)) return true;
   
-  String line;
-  String input (s);
+  string line;
+  string input (s);
   int    lineno=0;
 
 				   // if necessary append a newline char
@@ -82,14 +159,13 @@ bool ParameterHandler::read_input_from_string (const char *s) {
   if (input[input.length()-1] != '\n')
     input += '\n';
   
-  while (input) 
+  while (input.size() != 0) 
     {
 				       // get one line from Input (=s)
-      line = input.before ('\n');
+      line.assign (input, 0, input.find('\n'));
 				       // delete this part including
 				       // the backspace
-      input.del (line);
-      input.del (input[0]);
+      input.erase (0, input.find('\n')+1);
       ++lineno;
       
       if (!scan_line (line, lineno)) 
@@ -105,29 +181,30 @@ bool ParameterHandler::read_input_from_string (const char *s) {
 void ParameterHandler::clear () {
   status = true;
 
-  subsection_path.erase       (subsection_path.begin(), subsection_path.end());
+  subsection_path.clear ();
+  defaults.entries.clear ();
+  changed_entries.entries.clear ();
 
-  defaults.entries.erase     (defaults.entries.begin(), defaults.entries.end());
-  changed_entries.entries.erase (changed_entries.entries.begin(),
-				 changed_entries.entries.end());
-
-  map<String, Section*>::iterator p;
+  map<string, Section*>::iterator p;
 
   for (p=defaults.subsections.begin(); p!=defaults.subsections.end(); ++p)
     delete p->second;
   for (p=changed_entries.subsections.begin(); p!=changed_entries.subsections.end(); ++p)
-    delete p->second;
+    if (p->second) 
+      {
+	delete p->second;
+	Assert (false, ExcInternalError());
+      };
 
-  defaults.subsections.erase (defaults.subsections.begin(), defaults.subsections.end());
-  changed_entries.subsections.erase (changed_entries.subsections.begin(),
-				     changed_entries.subsections.end());
+  defaults.subsections.clear ();
+  changed_entries.subsections.clear ();
 };
 
 
 
-bool ParameterHandler::declare_entry    (const String &entry,
-					 const String &default_value,
-					 const String &pattern) {
+bool ParameterHandler::declare_entry (const string &entry,
+				      const string &default_value,
+				      const Patterns::PatternBase &pattern) {
   Section* p = get_present_defaults_subsection ();
 
 				   // assertions:
@@ -135,18 +212,18 @@ bool ParameterHandler::declare_entry    (const String &entry,
   Assert (p->entries.find (entry) == p->entries.end(),
 	  ExcEntryAlreadyExists (entry));
 				   // Default must match Pattern
-  Assert (default_value.matches (Regex(pattern)),
-	  ExcDefaultDoesNotMatchRegex(default_value, pattern));
+  Assert (pattern.match (default_value),
+	  ExcDefaultDoesNotMatchPattern(default_value, pattern.description()));
   
 				   // does entry already exist?
   if (p->entries.find (entry) != p->entries.end())
     return false;
 
-  p->entries[entry] = make_pair(default_value, pattern);
+  p->entries[entry] = make_pair(default_value, pattern.clone());
 
 				   // check whether default answer matches
 				   // the pattern
-  if (!default_value.matches (Regex(pattern)))
+  if (!pattern.match(default_value))
     return false;
 
   return true;
@@ -155,7 +232,7 @@ bool ParameterHandler::declare_entry    (const String &entry,
   
 
 
-void ParameterHandler::enter_subsection (const String &subsection) {
+void ParameterHandler::enter_subsection (const string &subsection) {
   Section* pd = get_present_defaults_subsection ();
 
 				   // does subsection already exist?
@@ -194,7 +271,7 @@ bool ParameterHandler::leave_subsection () {
 
 
 
-const String & ParameterHandler::get (const String &entry_string) const {
+const string & ParameterHandler::get (const string &entry_string) const {
   const Section* pd = get_present_defaults_subsection ();
   const Section* pc = get_present_changed_subsection ();
 
@@ -205,14 +282,14 @@ const String & ParameterHandler::get (const String &entry_string) const {
   
   if (pd->entries.find (entry_string) == pd->entries.end()) 
     {
-      static const String empty_string;
+      static const string empty_string;
       return empty_string;
     };
 
 
 				   // entry exists; now find out whether
 				   // it was changed:
-  map<String, pair<String,String> >::const_iterator ptr;
+  Section::EntryType::const_iterator ptr;
   ptr = pc->entries.find (entry_string);
   if (ptr != pc->entries.end())
     return ptr->second.first;
@@ -224,12 +301,12 @@ const String & ParameterHandler::get (const String &entry_string) const {
 
 
 
-long int ParameterHandler::get_integer (const String &entry_string) const {
-  String s = get (entry_string);
+long int ParameterHandler::get_integer (const string &entry_string) const {
+  string s = get (entry_string);
   char *endptr;
-  long int i = strtol (s.chars(), &endptr, 10);
+  long int i = strtol (s.c_str(), &endptr, 10);
 				   // assert there was no error
-  Assert ((s.chars()!='\0') || (*endptr == '\0'),
+  Assert ((s.c_str()!='\0') || (*endptr == '\0'),
 	  ExcConversionError(s));
 
   return i;
@@ -237,12 +314,12 @@ long int ParameterHandler::get_integer (const String &entry_string) const {
 
 
 
-double ParameterHandler::get_double (const String &entry_string) const {
-  String s = get (entry_string);
+double ParameterHandler::get_double (const string &entry_string) const {
+  string s = get (entry_string);
   char *endptr;
-  double d = strtod (s.chars(), &endptr);
+  double d = strtod (s.c_str(), &endptr);
 				   // assert there was no error
-  Assert ((s.chars()!='\0') || (*endptr == '\0'),
+  Assert ((s.c_str()!='\0') || (*endptr == '\0'),
 	  ExcConversionError(s));
 
   return d;
@@ -302,7 +379,7 @@ void ParameterHandler::print_parameters_section (ostream &out,
   Section *pc = get_present_changed_subsection ();
 
 				   // traverse entry list
-  map<String, pair<String,String> >::const_iterator ptr;
+  Section::EntryType::const_iterator ptr;
 
 				   // first find out the longest entry name
   unsigned int longest_entry = 0;
@@ -361,7 +438,7 @@ void ParameterHandler::print_parameters_section (ostream &out,
   
 
 				   // now transverse subsections tree
-  map<String, Section*>::const_iterator ptrss;
+  map<string, Section*>::const_iterator ptrss;
   for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
     {
       switch (style) 
@@ -399,46 +476,35 @@ void ParameterHandler::print_parameters_section (ostream &out,
 };
 
 
-	  
   
 
-bool ParameterHandler::scan_line (String line, const unsigned int lineno) {
+bool ParameterHandler::scan_line (string line, const unsigned int lineno) {
 				   // if there is a comment, delete it
-  if (line.contains ('#'))
-    line = line.before ("#");
+  if (line.find('#') != string::npos)
+    line.erase (line.find("#"), string::npos);
 				   // replace every whitespace sequence
 				   // by ' '
-  line.gsub (Regex(RegularExpressions::WhiteSpace), ' ');
-				   // now every existing whitespace
+  while (line.find('\t') != string::npos)
+    line.replace (line.find('\t'), 1, ' ');
+  while (line.find("  ") != string::npos)
+    line.erase (line.find("  "), 1);
+  				   // now every existing whitespace
 				   // should be exactly one ' ';
 				   // if at end or beginning: delete
-  if ((line.length() != 0) && (line[0] == ' '))  line.del (' ');
+  if ((line.length() != 0) && (line[0] == ' '))  line.erase (line[0]);
 				   // if line is now empty: leave
   if (line.length() == 0) return true;
 
-  if (line[line.length()-1] == ' ')  line.at (' ', -1) = "";
-
-  static Regex re_enter_subsection ("\\(SUBSECTION\\|subsection\\)"
-				    "[ \n\t]+"
-				    "\\(.*\\)");
-  static Regex re_entry           ("\\(SET\\|set\\)"   // "set" command
-				   "[ \n\t]+"
-				   "\\(.*[^ \t\n]\\)"   // 2: entry name
-				   "[ \n\t]*"
-				   "="
-				   "[ \n\t]*"
-				   "\\(.*\\)");        // 3: entry value
-  static Regex re_exit_subsection  ("\\(END\\|end\\)");
+  if (line[line.length()-1] == ' ')  line.erase (line[line.size()-1]);
 
 				   // enter subsection
-  if (line.matches (re_enter_subsection)) 
+  if ((line.find ("SUBSECTION") != string::npos) ||
+      (line.find ("subsection") != string::npos))
     {
-				       // first find out name of subsection
-      int start, len;
-      re_enter_subsection.match (line, line.length());
-      re_enter_subsection.match_info (start, len, 2);
-      
-      String SecName = line.at (start, len);
+				       // delete this prefix
+      line.erase (0, string("subsection").length()+1);
+
+      string SecName = line;
       Section* pc = get_present_changed_subsection ();
 				       // check whether subsection exists
       if (pc->subsections.find(SecName) == pc->subsections.end()) 
@@ -459,7 +525,8 @@ bool ParameterHandler::scan_line (String line, const unsigned int lineno) {
   
 
 				   // exit subsection
-  if (line.matches (re_exit_subsection)) 
+  if ((line.find ("END") != string::npos) ||
+      (line.find ("end") != string::npos))
     if (subsection_path.size() == 0) 
       {
 	cerr << "Line " << lineno << ": There is no subsection to leave here!" << endl;
@@ -470,18 +537,18 @@ bool ParameterHandler::scan_line (String line, const unsigned int lineno) {
 
 
 				   // regular entry
-  if (line.matches (re_entry)) 
+  if ((line.find ("SET") != string::npos) ||
+      (line.find ("set") != string::npos)) 
     {
-      int start, end;
-      re_entry.match (line, line.length());
+				       // erase "set" statement and eliminate
+				       // spaces around the '='
+      line.erase (0, 4);
+      line.replace (line.find(" ="), 2, "=");
+      line.replace (line.find("= "), 2, "=");
 
-				       // extract entry name
-      re_entry.match_info (start, end, 2);
-      String entry_name = line.at (start, end);
-
-      				       // extract entry value
-      re_entry.match_info (start, end, 3);
-      String entry_value = line.at (start, end);
+				       // extract entry name and value
+      string entry_name  (line, 0, line.find('='));
+      string entry_value (line, line.find('=')+1, string::npos);
 
       Section* pd = get_present_defaults_subsection ();
 
@@ -506,24 +573,28 @@ bool ParameterHandler::scan_line (String line, const unsigned int lineno) {
 				       // exception: if it contains characters
 				       // which specify it as a multiple loop
 				       // entry, then ignore content
-      if (!entry_value.contains ('{'))
-	if (!entry_value.matches (Regex(pd->entries[entry_name].second)))
+      if (entry_value.find ('{') == string::npos)
+	if (!pd->entries[entry_name].second->match(entry_value))
 	  {
 	    cerr << "Line " << lineno << ":" << endl
 		 << "    The entry value" << endl
 		 << "        " << entry_value << endl
 		 << "    for the entry named" << endl
 		 << "        " << entry_name << endl
-		 << "    does not match the given regular expression" << endl
-		 << "        " << pd->entries[entry_name].second << endl;
+		 << "    does not match the given pattern" << endl
+		 << "        " << pd->entries[entry_name].second->description() << endl;
 	    return false;
 	  };
       
       Section* pc = get_present_changed_subsection ();
 				       // the following line declares this entry
 				       // if not yet existent and overwrites it
-				       // otherwise
-      pc->entries[entry_name] = make_pair(entry_value, String(""));
+				       // otherwise (the pattern is set to a null
+				       // pointer, since we don't need the
+				       // pattern in the entries section -- only
+				       // in the defaults section)
+      pc->entries[entry_name] = make_pair(entry_value,
+					  static_cast<Patterns::PatternBase*>(0));
 
       return true;
     };
@@ -538,7 +609,7 @@ bool ParameterHandler::scan_line (String line, const unsigned int lineno) {
 
 ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () {
   Section* sec = &defaults;
-  vector<String>::const_iterator SecName = subsection_path.begin();
+  vector<string>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -554,7 +625,7 @@ ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () 
 const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () const {
   Section* sec = const_cast<Section*>(&defaults); // not nice, but needs to be and
 				   // after all: we do not change #sec#
-  vector<String>::const_iterator SecName = subsection_path.begin();
+  vector<string>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -569,7 +640,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsecti
 
 ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
   Section* sec = &changed_entries;
-  vector<String>::iterator SecName = subsection_path.begin();
+  vector<string>::iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -584,7 +655,7 @@ ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
 
 const ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () const {
   Section* sec = const_cast<Section*>(&changed_entries); // same as in get_present_default_s...
-  vector<String>::const_iterator SecName = subsection_path.begin();
+  vector<string>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 
     {
@@ -598,15 +669,15 @@ const ParameterHandler::Section* ParameterHandler::get_present_changed_subsectio
 
 
 ParameterHandler::Section::~Section () {
-  entries.erase (entries.begin(), entries.end());
+  entries.clear ();
 
-  map<String, Section*>::iterator p;
+  map<string, Section*>::iterator p;
 
   for (p=subsections.begin(); p!=subsections.end(); ++p)
     delete p->second;
 
 
-  subsections.erase (subsections.begin(), subsections.end());
+  subsections.clear ();
 };
 
 
@@ -627,14 +698,14 @@ bool MultipleParameterLoop::read_input (istream &input) {
 };
 
 
-bool MultipleParameterLoop::read_input (const String &filename) {
+bool MultipleParameterLoop::read_input (const string &filename) {
 				   // I don't know why it is necessary to
 				   // declare this function: simply not
 				   // overloading it in MultipleParameterLoop
 				   // should suffice, but then the compiler can't
 				   // find the inherited version and complains that
 				   // it can't find a function MultipleParameterLoop::
-				   // read_input (String, ostream) instead of trying the
+				   // read_input (string, ostream) instead of trying the
 				   // base class (maybe wait for gcc2.8)
   return ParameterHandler::read_input (filename);
 				   // don't call init_branches, since this read_input
@@ -666,8 +737,7 @@ void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc) {
 
 
 void MultipleParameterLoop::init_branches () {
-  if (multiple_choices.size() != 0)
-    multiple_choices.erase (multiple_choices.begin(), multiple_choices.end());
+  multiple_choices.clear ();
   
   ParameterHandler::Section *sec;
 				   // first check the defaults entries whether it
@@ -726,16 +796,16 @@ void MultipleParameterLoop::init_branches () {
 void MultipleParameterLoop::init_branches_section (const ParameterHandler::Section &sec) {
 				   // check all entries in the present subsection
 				   // whether it is a multiple entry
-  map<String, pair<String,String> >::const_iterator e;
+  Section::EntryType::const_iterator e;
   for (e = sec.entries.begin(); e != sec.entries.end(); ++e) 
-    if (e->second.first.contains('{')) 
+    if (e->second.first.find('{') != string::npos) 
       multiple_choices.push_back (Entry(subsection_path,
 					e->first,
 					e->second.first));
 	        
 
 				   // transverse subsections
-  map<String, Section*>::const_iterator s;
+  map<string, Section*>::const_iterator s;
   for (s = sec.subsections.begin(); s != sec.subsections.end(); ++s) 
     {
       enter_subsection (s->first);
@@ -760,7 +830,7 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
 				       // set entry
       Section* pd = get_present_defaults_subsection ();
       int selection = (run_no/possibilities) % choice->different_values.size();
-      String entry_value;
+      string entry_value;
       if (choice->type == variant)
 	entry_value = choice->different_values[selection];
       else 
@@ -777,15 +847,15 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
 	};
       
 				       // check conformance with regex
-      if (!entry_value.matches (Regex(pd->entries[choice->entry_name].second)))
+      if (!pd->entries[choice->entry_name].second->match(entry_value))
 	{
 	  cerr << "In run no.  " << run_no+1 << ":" << endl
 	       << "    The entry value" << endl
 	       << "        " << entry_value << endl
 	       << "    for the entry named" << endl
 	       << "        " << choice->entry_name << endl
-	       << "    does not match the given regular expression" << endl
-	       << "        " << pd->entries[choice->entry_name].second << endl
+	       << "    does not match the given pattern" << endl
+	       << "        " << pd->entries[choice->entry_name].second->description() << endl
 	       << "    Taking default value" << endl
 	       << "        " << pd->entries[choice->entry_name].first << endl;
 	  
@@ -794,7 +864,14 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
 	};
 
       Section* pc = get_present_changed_subsection ();
-      pc->entries[choice->entry_name] = make_pair(entry_value, String(""));
+				       // the following line declares this entry
+				       // if not yet existent and overwrites it
+				       // otherwise (the pattern is set to a null
+				       // pointer, since we don't need the
+				       // pattern in the entries section -- only
+				       // in the defaults section)
+      pc->entries[choice->entry_name] = make_pair(entry_value,
+						  static_cast<Patterns::PatternBase*>(0));
             
 				       // get out of subsection again
       subsection_path.swap (choice->subsection_path);
@@ -808,50 +885,53 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
 
   
 
-MultipleParameterLoop::Entry::Entry (const vector<String> &ssp,
-				     const String& Name,
-				     const String& Value) :
+MultipleParameterLoop::Entry::Entry (const vector<string> &ssp,
+				     const string& Name,
+				     const string& Value) :
     subsection_path (ssp), entry_name(Name), entry_value(Value) {};
 
 
 
 void MultipleParameterLoop::Entry::split_different_values () {
-  Regex re_entry ("\\([^{]*\\){{? *\\([^}]*[^ }]\\) *}}?\\(.*\\)");
-  int start, len;
-
 				   // split string into three parts:
 				   // part before the opening "{",
 				   // the selection itself, final
 				   // part after "}"
-  String prefix, multiple, postfix;
-  re_entry.match (entry_value, entry_value.length());
-
-  re_entry.match_info (start, len, 1);
-  prefix   = entry_value.at (start, len);
-
-  re_entry.match_info (start, len, 2);
-  multiple = entry_value.at (start, len);
-
-  re_entry.match_info (start, len, 3);
-  postfix  = entry_value.at (start, len);
-
-
-				   // delete spaces around '|'
-  multiple.gsub (" |", '|');
-  multiple.gsub ("| ", '|');
+  string prefix  (entry_value, 0, entry_value.find('{'));
+  string multiple(entry_value, entry_value.find('{')+1,
+		  entry_value.rfind('}')-entry_value.find('{')-1);
+  string postfix (entry_value, entry_value.rfind('}')+1, string::npos);
+				   // if array entry {{..}}: delete inner
+				   // pair of braces
+  if (multiple[0]=='{')
+    multiple.erase (0,1);
+  if (multiple[multiple.size()-1] == '}')
+    multiple.erase (multiple.size()-1, 1);
+				   // erase leading and trailing spaces
+				   // in multiple
+  while (multiple[0] == ' ') multiple.erase (0,1);
+  while (multiple[multiple.size()-1] == ' ') multiple.erase (multiple.size()-1,1);
   
-  while (multiple.contains ('|')) 
+				   // delete spaces around '|'
+  while (multiple.find(" |") != string::npos)
+    multiple.replace (multiple.find(" |"), 2, '|');
+  while (multiple.find("| ") != string::npos)
+    multiple.replace (multiple.find("| "), 2, '|');
+
+  while (multiple.find('|') != string::npos) 
     {
-      different_values.push_back (prefix+multiple.before('|')+postfix);
-      multiple.through ('|') = "";
+      different_values.push_back (prefix +
+				  string(multiple, 0, multiple.find('|'))+
+				  postfix);
+      multiple.erase (0, multiple.find('|')+1);
     };
 				   // make up the last selection ("while" broke
 				   // because there was no '|' any more
   different_values.push_back (prefix+multiple+postfix);
-
 				 // finally check whether this was a variant
 				 // entry ({...}) or an array ({{...}})
-  if (entry_value.contains(Regex(".*{{.*}}.*")))
+  if ((entry_value.find("{{") != string::npos) &&
+      (entry_value.find("}}") != string::npos))
     type = array;
   else
     type = variant;

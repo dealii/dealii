@@ -12,18 +12,8 @@ class MultipleParameterLoop;
 
 #include <map>
 #include <vector>
+#include <string>
 #include <base/exceptions.h>
-
-
-#ifdef DEBUG
-#  define _G_NO_NRV     // don't use GNU's named return values in debug modes
-#  include <String.h>   // because if we did we'd harvest tons of warnings.
-#  undef _G_NO_NRV
-#else
-#  include <String.h>
-#endif
-
-
 
 class istream;
 class ostream;
@@ -35,6 +25,103 @@ class ostream;
  */
 enum OutputStyle {
       Text, LaTeX, HTML
+};
+
+
+
+/**
+ * Declare some regexps which
+ * may be used to define patterns.
+ */ 
+struct Patterns {
+  public:
+				     /**
+				      * Base class to declare common
+				      * interface.
+				      */
+    class PatternBase {
+      public:
+					 /**
+					  * Make destructor of this and all
+					  * derived classes virtual.
+					  */
+	virtual ~PatternBase () {};
+	
+					 /**
+					  * Return true if the given string
+					  * matches the pattern.
+					  */
+	virtual bool match (const string &test_string) const = 0;
+	
+					 /**
+					  * Return a string describing the
+					  * pattern.
+					  */
+	virtual string description () const = 0;
+	
+					 /**
+					  * Return a pointer to an exact
+					  * copy of the object. This is
+					  * necessary since we want to store
+					  * objects of this type in
+					  * containers.
+					  */
+	virtual PatternBase * clone () const = 0;
+    };
+    
+				     /**
+				      * Test for the string being an
+				      * integer.
+				      */
+    class Integer : public PatternBase {
+      public:
+	virtual bool match (const string &test_string) const;
+	virtual string description () const;
+	virtual PatternBase * clone () const;
+    };
+    
+				     /**
+				      * Test for the string being a double.
+				      */
+    class Double : public PatternBase {
+      public:
+	virtual bool match (const string &test_string) const;
+	virtual string description () const;
+	virtual PatternBase * clone () const;
+    };
+    
+				     /**
+				      * Test for the string being one of
+				      * a sequence of values given like a
+				      * regular expression. For example, if
+				      * the string given to the constructor
+				      * is "red|blue|black", then the #match#
+				      * function returns #true# exactly if
+				      * the string is either "red" or "blue"
+				      * or "black". Spaces around the pipe
+				      * signs do not matter and are
+				      * eliminated.
+				      */
+    class Sequence : public PatternBase {
+      public:
+	Sequence (const string &seq);
+	virtual bool match (const string &test_string) const;
+	virtual string description () const;
+	virtual PatternBase * clone () const;
+      private:
+	string sequence;
+    };
+    
+				     /**
+				      * Always returns true when testing a
+				      * string.
+				      */
+    class Anything : public PatternBase {
+      public:
+	virtual bool match (const string &test_string) const;
+	virtual string description () const;
+	virtual PatternBase * clone () const;
+    };
 };
 
 
@@ -64,17 +151,17 @@ enum OutputStyle {
  *     ParameterHandler prm;
  *     prm.declare_entry ("Time step size",
  *                       "0.2",
- *                       ParameterHandler::RegularExpressions::Double);
+ *                       Patterns::Double());
  *     prm.declare_entry ("Geometry",
  *                       "[0,1]x[0,1]",
- *                       ".*");
+ *                       Patterns::Anything());
  *     ...
  *   \end{verbatim}
  *   Each entry is declared using the function #declare_entry#. The first parameter is
  *   the name of the entry (in short: the entry). The second is the default answer to
  *   be taken in case the entry is not specified in the input file. The third parameter
  *   is a regular expression which the input (and the default answer) has to match.
- *   Several such regular expressions are defined in #ParameterHandler::RegularExpressions#.
+ *   Several such regular expressions are defined in #Patterns#.
  *
  *   Entries may be located in subsections which form a kind of input tree. For example
  *   input parameters for linear solver routines should be classified in a subsection
@@ -88,14 +175,14 @@ enum OutputStyle {
  *
  *     void LinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection("Linear solver");
- *prm.declare_entry ("Solver",
- *                  "CG",
- *		  "CG\\|GMRES\\|GaussElim");
- *prm.declare_entry ("Maximum number of iterations",
- *                  "20",
- *		  ParameterHandler::RegularExpressions::Integer);
- *...
- *prm.leave_subsection ();
+ *       prm.declare_entry ("Solver",
+ *                          "CG",
+ *		            Patterns::Sequence("CG|GMRES|GaussElim"));
+ *       prm.declare_entry ("Maximum number of iterations",
+ *                          "20",
+ *		            ParameterHandler::RegularExpressions::Integer());
+ *       ...
+ *       prm.leave_subsection ();
  *     };
  *   \end{verbatim}
  *
@@ -106,8 +193,8 @@ enum OutputStyle {
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       prm.declare_entry ("Nonlinear method",
- *                  "Newton-Raphson",
- *		  ParameterHandler::RegularExpressions::AlphaNum);
+ *                          "Newton-Raphson",
+ *		            ParameterHandler::RegularExpressions::Anything());
  *       eq.declare_parameters (prm);
  *       prm.leave_subsection ();
  *     };
@@ -124,13 +211,13 @@ enum OutputStyle {
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
  *       prm.enter_subsection ("Linear solver 1");
- *eq1.declare_parameters (prm);
- *prm.leave_subsection ();
+ *       eq1.declare_parameters (prm);
+ *       prm.leave_subsection ();
  *
- *prm.enter_subsection ("Linear solver 2");
- *eq2.declare_parameters (prm);
- *prm.leave_subsection ();
- *prm.leave_subsection ();
+ *       prm.enter_subsection ("Linear solver 2");
+ *       eq2.declare_parameters (prm);
+ *       prm.leave_subsection ();
+ *       prm.leave_subsection ();
  *     };	
  *   \end{verbatim}
  *
@@ -142,10 +229,10 @@ enum OutputStyle {
  *     ...
  *     subsection Nonlinear solver
  *       set Nonlinear method = Gradient
- *subsection Linear solver
- *  set Solver                        = CG
- *  set Maxmimum number of iterations = 30
- *end
+ *       subsection Linear solver
+ *         set Solver                        = CG
+ *         set Maxmimum number of iterations = 30
+ *       end
  *     end
  *     ...                       # other stuff
  *   \end{verbatim}
@@ -201,7 +288,7 @@ enum OutputStyle {
  *   \begin{verbatim}
  *      void NonLinEq::get_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
- *       String method = prm.get ("Nonlinear method");
+ *       string method = prm.get ("Nonlinear method");
  *       eq.get_parameters (prm);
  *       prm.leave_subsection ();
  *     };
@@ -263,7 +350,7 @@ enum OutputStyle {
  *         static void declare_parameters (ParameterHandler &prm);
  *         void get_parameters (ParameterHandler &prm);
  *       private:
- *         String Method;
+ *         string Method;
  *         int    MaxIterations;
  *     };
  *     
@@ -271,8 +358,8 @@ enum OutputStyle {
  *     class Problem {
  *       private:
  *         LinEq eq1, eq2;
- *         String Matrix1, Matrix2;
- *         String outfile;
+ *         string Matrix1, Matrix2;
+ *         string outfile;
  *       public:
  *         static void declare_parameters (ParameterHandler &prm);
  *         void get_parameters (ParameterHandler &prm);
@@ -286,10 +373,10 @@ enum OutputStyle {
  *       prm.enter_subsection ("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
- *                          "\\(CG\\|BiCGStab\\|GMRES\\)");
+ *                          Patterns::Sequence("CG|BiCGStab|GMRES"));
  *       prm.declare_entry ("Maximum number of iterations",
  *                          "20",
- *                          ParameterHandler::RegularExpressions::Integer);
+ *                          Patterns::Integer());
  *       prm.leave_subsection ();
  *     };
  *           
@@ -308,21 +395,20 @@ enum OutputStyle {
  *                                        // first some global parameter entries
  *       prm.declare_entry ("Output file",
  *                          "out",
- *                          ".*");
- *       
+ *                          Patterns::Anything());
  *       prm.declare_entry ("Equation 1",
  *                          "Laplace",
- *                          ".*");
+ *                          Patterns::Anything());
  *       prm.declare_entry ("Equation 2",
  *                          "Elasticity",
- *                          ".*");
+ *                          Patterns::Anything());
  *     
  *                                        // declare parameters for the
  *                                        // first equation
  *       prm.enter_subsection ("Equation 1");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
- *                          "\\(Full\\|Sparse\\|Diagonal\\)");
+ *                          Patterns::Sequence("Full|Sparse|Diagonal"));
  *       LinEq::declare_parameters (prm);  // for eq1
  *       prm.leave_subsection ();
  *           
@@ -331,7 +417,7 @@ enum OutputStyle {
  *       prm.enter_subsection ("Equation 2");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
- *                          "\\(Full\\|Sparse\\|Diagonal\\)");
+ *                          Patterns::Sequence("Full|Sparse|Diagonal"));
  *       LinEq::declare_parameters (prm);  // for eq2
  *       prm.leave_subsection ();
  *     };
@@ -341,7 +427,7 @@ enum OutputStyle {
  *                                        // entries of the problem class
  *       outfile = prm.get ("Output file");
  *     
- *       String equation1 = prm.get ("Equation 1"),
+ *       string equation1 = prm.get ("Equation 1"),
  *              equation2 = prm.get ("Equation 2");
  *       
  *                                        // get parameters for the
@@ -419,7 +505,7 @@ enum OutputStyle {
  *         for the entry named
  *             Solver
  *         does not match the given regular expression
- *             \(CG\|BiCGStab\|GMRES\)
+ *             CG|BiCGStab|GMRES
  *
  *
  *     Listing of Parameters
@@ -488,7 +574,7 @@ class ParameterHandler {
 				      *
 				      * Return whether the read was successful.
 				      */
-    virtual bool read_input (const String &filename);
+    virtual bool read_input (const string &filename);
     
     				     /**
 				      * Read input from a string in memory. The
@@ -520,15 +606,16 @@ class ParameterHandler {
 				      * default value does not match the regular
 				      * expression; #true# otherwise.
 				      */
-    bool declare_entry    (const String &entry,
-			   const String &default_value,
-			   const String &pattern = ".*");
+    bool declare_entry    (const string &entry,
+			   const string &default_value,
+			   const Patterns::PatternBase &pattern
+			   = Patterns::Anything());
     
 				     /**
 				      * Enter a subsection; if not yet
 				      * existent, declare it.
 				      */
-    void enter_subsection (const String &subsection);
+    void enter_subsection (const string &subsection);
     
 				     /**
 				      * Leave present subsection.
@@ -547,19 +634,19 @@ class ParameterHandler {
 				      * was declared (therefore an exception may be
 				      * thrown).
 				      */
-    const String & get (const String &entry_string) const;
+    const string & get (const string &entry_string) const;
     
 				     /**
 				      * Return value of entry #entry_string# as
 				      * long integer.
 				      */
-    long int       get_integer (const String &entry_string) const;
+    long int       get_integer (const string &entry_string) const;
     
 				     /**
 				      * Return value of entry #entry_string# as
 				      * double.
 				      */
-    double         get_double (const String &entry_string) const;
+    double         get_double (const string &entry_string) const;
 
 				     /**
 				      * Print all parameters with the given style
@@ -577,57 +664,21 @@ class ParameterHandler {
 				   const OutputStyle Style,
 				   const unsigned int indent_level);
     
-				     /**
-				      * Declare some regexps which
-				      * may be used to define patterns.
-				      */ 
-    struct RegularExpressions {
-					 /**
-					  * #[ \n\t]+#
-					  */
-	static const String WhiteSpace;
-	
-					 /**
-					  * #\\(-?[0-9]+[ \n\t]*\\)#
-					  */
-	static const String Integer;
-	
-					 /**
-					  * #\\(#
-					  * #  -?#
-					  * #  \\(#
-					  * #       \\([0-9]+\\.[0-9]*\\)#
-					  * #     \\|#
-					  * #       \\([0-9]+\\)#
-					  * #     \\|#
-					  * #       \\(\\.[0-9]+\\)#
-					  * #  \\)#
-					  * #  \\([eE][---+]?[0-9]+\\)?#
-					  * #  [ \n\t]*#
-					  * #\\)#
-					  */
-	static const String Double;
-	
-					 /**
-					  * #"\\([0-9A-Za-z]+[ \n\t]*\\)"#
-					  */
-	static const String AlphaNum;
-    };
 				   
 
 				     /**
 				      * Exception
 				      */
     DeclException1 (ExcEntryAlreadyExists,
-		    String,
+		    string,
 		    << "The following entry already exists: " << arg1);
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcDefaultDoesNotMatchRegex,
-		    String, String,
+    DeclException2 (ExcDefaultDoesNotMatchPattern,
+		    string, string,
 		    << "The default string <" << arg1
-		    << "> does not match the given regex <" << arg2 << ">");  
+		    << "> does not match the given pattern <" << arg2 << ">");  
 				     /**
 				      * Exception
 				      */
@@ -636,19 +687,22 @@ class ParameterHandler {
 				      * Exception
 				      */
     DeclException1 (ExcEntryUndeclared,
-		    String,
+		    string,
 		    << "You cant ask for entry <" << arg1 << "> you have not yet declared");  
     				     /**
 				      * Exception
 				      */
     DeclException1 (ExcConversionError,
-		    String,
+		    string,
 		    << "Error when trying to convert the following string: " << arg1);
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcNotImplemented);
-    
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
 
     
   private:
@@ -665,16 +719,18 @@ class ParameterHandler {
 				      */
     struct Section {
 	~Section ();
+
+	typedef map<string, pair<string,Patterns::PatternBase*> > EntryType;
 	
-	map<String, pair<String,String>, less<String> >  entries;
-	map<String, Section*, less<String> >             subsections;
+	EntryType             entries;
+	map<string, Section*> subsections;
     };
 
 				     /**
 				      * Path of presently selected subsections;
 				      * empty list means top level
 				      */
-    vector<String> subsection_path;
+    vector<string> subsection_path;
 
 				     /**
 				      * List of default values organized as a
@@ -704,7 +760,7 @@ class ParameterHandler {
 				      * match the regular expression. #true#
 				      * otherwise
 				      */
-    bool scan_line (String line, const unsigned int lineno);
+    bool scan_line (string line, const unsigned int lineno);
 
 				     /**
 				      * Get a pointer to the #Section# structure
@@ -1010,7 +1066,7 @@ class MultipleParameterLoop : public ParameterHandler {
 				      * Read input from a file the name of which
 				      * is given.
 				      */
-    virtual bool read_input (const String &FileName);
+    virtual bool read_input (const string &FileName);
     
     				     /**
 				      * Read input from a string in memory. The
@@ -1050,7 +1106,7 @@ class MultipleParameterLoop : public ParameterHandler {
 					  * into the different variants is done
 					  * later by #split_different_values.
 					  */
-	Entry (const vector<String> &Path, const String &Name, const String &Value);
+	Entry (const vector<string> &Path, const string &Name, const string &Value);
 
 					 /**
 					  * Split the entry value into the different
@@ -1061,24 +1117,24 @@ class MultipleParameterLoop : public ParameterHandler {
 					 /**
 					  * Path to variant entry.
 					  */
-	vector<String> subsection_path;
+	vector<string> subsection_path;
 
 					 /**
 					  * Name of entry.
 					  */
-	String         entry_name;
+	string         entry_name;
 
 					 /**
 					  * Original variant value.
 					  */
-	String         entry_value;
+	string         entry_value;
 	
 					 /**
 					  * List of entry values constructed out of
 					  * what was given in the input file (that
 					  * is stored in #EntryValue#.
 					  */
-	vector<String> different_values;
+	vector<string> different_values;
 
 					 /**
 					  * Store whether this entry is a variant
