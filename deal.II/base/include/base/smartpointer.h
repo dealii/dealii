@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,33 +20,33 @@
 
 /**
  * Smart pointers avoid destruction of an object in use. They can be used just
- * like a pointer (i.e. using the @p{*} and @p{->} operators and through casting)
+ * like a pointer (i.e. using the <tt>*</tt> and <tt>-></tt> operators and through casting)
  * but make sure that the object pointed to is not deleted in the course of
  * use of the pointer by signalling the pointee its use.
  *
- * Objects pointed to should inherit @p{Subscriptor} or must implement
+ * Objects pointed to should inherit <tt>Subscriptor</tt> or must implement
  * the same functionality. Null pointers are an exception from this
  * rule and are allowed, too.
  *
- * @p{SmartPointer} does NOT implement any memory handling! Especially,
- * deleting a @p{SmartPointer} does not delete the object. Writing
- * @begin{verbatim}
+ * SmartPointer does NOT implement any memory handling! Especially,
+ * deleting a SmartPointer does not delete the object. Writing
+ * @code
  * SmartPointer<T> t = new T;
- * @end{verbatim}
+ * @endcode
  * is a sure way to program a memory leak! The secure version is
- * @begin{verbatim}
+ * @code
  * T* p = new T;
  * {
  *   SmartPointer<T> t = p;
  *   ...
  * }
  * delete p;
- * @end{verbatim}
+ * @endcode
  *
- * Note that a smart pointer can handle @p{const}ness of an object, i.e.
- * a @p{SmartPointer<const ABC>} really behaves as if it were a pointer to
+ * Note that a smart pointer can handle <tt>const</tt>ness of an object, i.e.
+ * a <tt>SmartPointer<const ABC></tt> really behaves as if it were a pointer to
  * a constant object (disallowing write access when dereferenced), while
- * @p{SmartPointer<ABC>} is a mutable pointer.
+ * <tt>SmartPointer<ABC></tt> is a mutable pointer.
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1998, 1999, 2000
  */
@@ -61,9 +61,9 @@ class SmartPointer
 
 				     /*
 				      * Copy constructor for
-				      * @p{SmartPointer}. We do now
+				      * SmartPointer. We do now
 				      * copy the object subscribed to
-				      * from @p{tt}, but subscribe
+				      * from <tt>tt</tt>, but subscribe
 				      * ourselves to it again.
 				      */
     SmartPointer (const SmartPointer<T> &tt);
@@ -100,8 +100,8 @@ class SmartPointer
     SmartPointer<T> & operator= (T *tt);
 
 				     /**
-				      *Assignment operator for
-				      * @p{SmartPointer}.  The pointer
+				      * Assignment operator for
+				      * SmartPointer.  The pointer
 				      * subscribes to the new object
 				      * automatically and unsubscribes
 				      * to an old one if it exists.
@@ -165,7 +165,7 @@ class SmartPointer
 				      * used by this class. Note in
 				      * particular, that this only
 				      * includes the amount of memory
-				      * used by @em{this} object, not
+				      * used by <b>this</b> object, not
 				      * by the object pointed to.
 				      */
     unsigned int memory_consumption () const;
