@@ -61,5 +61,12 @@ Here are some conventions for source code of the deal.II library:
   handle run time errors (like I/O failures) which must be on
   in any case, not only in debug mode.
 
-12./ Each class has to have at least 200 pages of documentation ;-)
+12./ Classes generally are named using uppercase letters to denote
+  word beginnings (e.g. TriaIterator) while functions and variables
+  use lowercase letters and underscores to denote different words.
+  The only exception are the iterator typedefs in Triangulation
+  and DoFHandler (named cell_iterator, active_line_iterator, etc)
+  to make the connection to the STL classes clear.
+
+13./ Each class has to have at least 200 pages of documentation ;-)
 
