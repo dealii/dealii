@@ -19,10 +19,6 @@ Put Tensor<1,dim>::array_size directly into the array type. At
   present, egcs 1.1.2 chokes on that.
 
 
-Check the pattern matching in the parameter handler module using
-  the C++ exception handling mechanism rather than Asserts, since
-  this should be on also when debug mode is off.
-
 Fill in docs for the timer class. Hopefully finally find a way to
   let it measure times larger than half an hour.
 > Operating system dependence. Grrr. Guido
