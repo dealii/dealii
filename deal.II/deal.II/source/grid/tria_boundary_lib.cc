@@ -343,7 +343,8 @@ HyperShellBoundary<dim>::
 get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
 {
   const Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
-				   // compute the position of the points relative to the origin
+				   // compute the position of the
+				   // points relative to the origin
   const Point<dim> middle_relative = middle - center,
 		   vertex_relative = line->vertex(0) - center;
   
