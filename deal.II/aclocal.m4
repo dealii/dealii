@@ -1482,10 +1482,10 @@ AC_DEFUN(DEAL_II_HAVE_PRETTY_FUNCTION, dnl
 	std::cout << __PRETTY_FUNCTION__ << std::endl;
     ],
     [
-      AC_MSG_RESULT(available)
+      AC_MSG_RESULT(yes)
     ],
     [
-      AC_MSG_RESULT(not available)
+      AC_MSG_RESULT(no)
       AC_MSG_CHECKING(for __func__)
       AC_TRY_COMPILE(
         [
@@ -1495,11 +1495,11 @@ AC_DEFUN(DEAL_II_HAVE_PRETTY_FUNCTION, dnl
 	  std::cout << __func__ << std::endl;
         ],
         [
-          AC_MSG_RESULT(available)
+          AC_MSG_RESULT(yes)
 	  x=__func__
     	],
         [
-          AC_MSG_RESULT(not available)
+          AC_MSG_RESULT(no)
 	  x="\"(not available)\""
         ]) 
       AC_DEFINE_UNQUOTED(__PRETTY_FUNCTION__, $x, 
