@@ -19,7 +19,7 @@ big-tests:
 	cd big-tests ; $(MAKE)
 
 
-clean: clean-base clean-lac clean-deal.II clean-fe
+clean: clean-base clean-lac clean-deal.II clean-fe clean-big
 
 clean-base:
 	cd base ; $(MAKE) clean
