@@ -25,6 +25,7 @@ class ConstraintMatrix;
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <vector>
 
 /**
  * This class performs interpolations and extrapolations of discrete
