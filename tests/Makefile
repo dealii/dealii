@@ -2,7 +2,7 @@
 # Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
-all: compare base lac fe deal.II bits
+all: compare base lac fe deal.II multigrid bits
 
 base: compare abort.o
 	cd base ; $(MAKE)
@@ -19,8 +19,11 @@ bits: compare abort.o
 deal.II: compare abort.o
 	cd deal.II ; $(MAKE)
 
+multigrid: compare abort.o
+	cd multigrid ; $(MAKE)
+
 report: compare abort.o
-	@for i in base lac fe deal.II bits ; do \
+	@for i in base lac fe deal.II multigrid bits ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
@@ -40,7 +43,7 @@ report+mail:
 
 # compilation of tests only, no execution of tests
 
-build: build-base build-lac build-fe build-deal.II build-bits
+build: build-base build-lac build-fe build-deal.II build-multigrid build-bits
 
 build-base: abort.o
 	cd base ; $(MAKE) exe
@@ -56,6 +59,9 @@ build-bits: abort.o
 
 build-deal.II: abort.o
 	cd deal.II ; $(MAKE) exe
+
+build-multigrid: abort.o
+	cd multigrid ; $(MAKE) exe
 
 
 # compilation and execution of tests only, no comparison with
