@@ -2,8 +2,12 @@ This file is internal information only. It lists the steps to be done
 when a new release shall be issued:
 
 - if a x.y.0 release, create a branch:
-    cvs tag all files with the tag Base-x-y
-    cvs tag -r all files with the tag Branch-x-y
+
+  $DEAL/common/scripts/cvs-create-branch x y
+
+  This script will create a branch tag Branch-x.y for you. Before using
+  the script check the last cvs call in this script and update files and
+  directories not to be released.
 
 - test the branch thoroughly
 
