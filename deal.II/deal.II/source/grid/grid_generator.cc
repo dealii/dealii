@@ -164,7 +164,7 @@ void GridGenerator::hyper_cube_slit (Triangulation<1> &,
 				     const double,
 				     const double)
 {
-  Assert (false, ExcInternalError());
+  Assert (false, ExcNotImplemented());
 };
 
 
@@ -173,7 +173,7 @@ void GridGenerator::hyper_L (Triangulation<1> &,
 			     const double,
 			     const double)
 {
-  Assert (false, ExcInternalError());
+  Assert (false, ExcNotImplemented());
 };
 
 
@@ -182,7 +182,7 @@ void GridGenerator::hyper_ball (Triangulation<1> &,
 				const Point<1> &,
 				const double)
 {
-  Assert (false, ExcInternalError());
+  Assert (false, ExcNotImplemented());
 };
 
 
@@ -191,7 +191,7 @@ void GridGenerator::cylinder (Triangulation<1> &,
 			      const double,
 			      const double)
 {
-  Assert (false, ExcInternalError());
+  Assert (false, ExcNotImplemented());
 };
 
 
@@ -202,7 +202,7 @@ void GridGenerator::hyper_shell (Triangulation<1> &,
 				 const double,
 				 const unsigned int)
 {
-  Assert (false, ExcInternalError());
+  Assert (false, ExcNotImplemented());
 };
 
 #endif
