@@ -83,6 +83,7 @@ Change <iostream> in <ostream> in grid/point.h and
 Find and fix the bug in Tria::refine_fixed_fraction
 
 
+Fill in docs for the timer class.
 
 
 
@@ -99,7 +100,7 @@ Give mia::State a much better name, same for Control ! :-]]]
 Let all the reinit functions in /lac free their memory, if reinit
   is called with less requirements. Maybe give free all memory
   if the given dimension is zero. If so, check all deal.II files
-  for use of reinit.
+  for use of reinit. (At present, new dimension==0 is not allowed.)
 
 Why are there all these unsafe casts from VectorBase to dVector
   in dvector.cc?
