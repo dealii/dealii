@@ -82,6 +82,12 @@ void GridRefinement::refine (Triangulation<dim>   &tria,
 	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
   Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
 	  ExcInvalidParameterValue());
+
+				   // when all indicators are zero we
+				   // do not need to refine but only
+				   // to coarsen
+  if (criteria.all_zero())
+    return;
   
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
