@@ -60,15 +60,15 @@ class SquareFunction : public Function<dim>
 				     /**
 				      * Laplacian of the function at one point.
 				      */
-    double laplacian (const Point<dim>   &p,
-		      const unsigned int  component = 0) const;
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian of the function at multiple points.
 				      */
-    void laplacian_list (const vector<Point<dim> > &points,
-			 vector<double>            &values,
-			 const unsigned int         component = 0) const;
+    virtual void laplacian_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
 };
 
 
@@ -117,15 +117,15 @@ class PillowFunction : public Function<dim>
 				     /**
 				      * Laplacian at a single point.
 				      */
-    double laplacian (const Point<dim>   &p,
-		      const unsigned int  component = 0) const;
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    void laplacian_list (const vector<Point<dim> > &points,
-			 vector<double>            &values,
-			 const unsigned int         component = 0) const;
+    virtual void laplacian_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
 };
 
 
@@ -169,15 +169,15 @@ class CosineFunction : public Function<dim>
 				     /**
 				      * Laplacian at a single point.
 				      */
-    double laplacian(const Point<dim>   &p,
-		     const unsigned int  component = 0) const;
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    void laplacian_list(const vector<Point<dim> > &points,
-			vector<double>            &values,
-			const unsigned int         component = 0) const;
+    virtual void laplacian_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
 };
 
 
@@ -219,15 +219,15 @@ class ExpFunction : public Function<dim>
 				     /**
 				      * Laplacian at a single point.
 				      */
-    double laplacian(const Point<dim>   &p,
-		     const unsigned int  component = 0) const;
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    void laplacian_list(const vector<Point<dim> > &points,
-			vector<double>            &values,
-			const unsigned int         component = 0) const;
+    virtual void laplacian_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
 };
 
 
@@ -268,15 +268,15 @@ class LSingularityFunction : public Function<2>
 				     /**
 				      * Laplacian at a single point.
 				      */
-    double laplacian(const Point<2>   &p,
-		     const unsigned int  component = 0) const;
+    virtual double laplacian (const Point<2>   &p,
+			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    void laplacian_list(const vector<Point<2> > &points,
-			vector<double>            &values,
-			const unsigned int         component = 0) const;
+    virtual void laplacian_list (const vector<Point<2> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
 };
 
 
@@ -317,15 +317,15 @@ class SlitSingularityFunction : public Function<2>
 				     /**
 				      * Laplacian at a single point.
 				      */
-    double laplacian(const Point<2>   &p,
-		     const unsigned int  component = 0) const;
+    virtual double laplacian (const Point<2>   &p,
+			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    void laplacian_list(const vector<Point<2> > &points,
-			vector<double>            &values,
-			const unsigned int         component = 0) const;
+    virtual void laplacian_list (const vector<Point<2> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
 };
 
 
@@ -352,7 +352,8 @@ class JumpFunction : public Function<dim>
 				      * advection direction here and
 				      * the steepness of the slope.
 				      */
-    JumpFunction (const Point<dim>& direction, double steepness);
+    JumpFunction (const Point<dim> &direction,
+		  const double      steepness);
     
 				     /**
 				      * Function value at one point.
@@ -383,25 +384,26 @@ class JumpFunction : public Function<dim>
 				     /**
 				      * Laplacian of the function at one point.
 				      */
-    double laplacian (const Point<dim>   &p,
-		      const unsigned int  component = 0) const;
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian of the function at multiple points.
 				      */
-    void laplacian_list (const vector<Point<dim> > &points,
-			 vector<double>            &values,
-			 const unsigned int         component = 0) const;
+    virtual void laplacian_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
 
   protected:
 				     /**
 				      * Advection vector.
 				      */
-    Point<dim> direction;
+    const Point<dim> direction;
 				     /**
-				      * Steepness (maximal derivative) of the slope.
+				      * Steepness (maximal derivative)
+				      * of the slope.
 				      */
-    double steepness;
+    const double steepness;
 
 				     /**
 				      * Advection angle.
