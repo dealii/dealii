@@ -145,7 +145,7 @@ derivative_norm (const Derivative &d)
 	0.5*(d[0][0] + d[1][1] - sqrt(radicand))  };
   
   return std::max (std::fabs (eigenvalues[0]),
-	      std::fabs (eigenvalues[1]));
+		   std::fabs (eigenvalues[1]));
 };
 
 #endif
