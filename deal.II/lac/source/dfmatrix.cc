@@ -126,9 +126,9 @@ void dFMatrix::vmult (dVector& dst, const dVector& src,
   {
     double s0,s1,s2,s3;
     s = src(0);
-    s0 = s*val[0]; s1 = s*val[4]; s2 = s*val[8]; s3 = s*val[12];
+    s0  = s*val[0]; s1  = s*val[4]; s2  = s*val[8];  s3  = s*val[12];
     s = src(1);
-    s0 += s*val[1]; s1 += s*val[5]; s2 += s*val[9]; s3 += s*val[13];
+    s0 += s*val[1]; s1 += s*val[5]; s2 += s*val[9];  s3 += s*val[13];
     s = src(2);
     s0 += s*val[2]; s1 += s*val[6]; s2 += s*val[10]; s3 += s*val[14];
     s = src(3);
@@ -367,7 +367,7 @@ void dFMatrix::Tvmult (dVector& dst, const dVector& src, const bool adding) cons
 }
 
 double dFMatrix::residual (dVector& dst, const dVector& src,
-			  const dVector& right) const
+			   const dVector& right) const
 {
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));

@@ -447,9 +447,13 @@ dSMatrix::copy_from (const dSMatrix &matrix) {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  for (unsigned int i = 0 ; i<cols->vec_len; ++i)
-    val[i] = matrix.val[i];
+  double             *val_ptr = &val[0];
+  const double    *matrix_ptr = &matrix.val[0];
+  const double *const end_ptr = &val[cols->vec_len];
 
+  while (val_ptr != end_ptr)
+    *val_ptr++ = *matrix_ptr++;
+  
   return *this;
 };
 
@@ -461,8 +465,12 @@ dSMatrix::add_scaled (const double factor, const dSMatrix &matrix) {
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  for (unsigned int i = 0 ; i<cols->vec_len; ++i)
-    val[i] += factor*matrix.val[i];
+  double             *val_ptr    = &val[0];
+  const double       *matrix_ptr = &matrix.val[0];
+  const double *const end_ptr    = &val[cols->vec_len];
+
+  while (val_ptr != end_ptr)
+    *val_ptr++ += factor * *matrix_ptr++;
 };
 
 
@@ -478,15 +486,16 @@ dSMatrix::vmult (dVector& dst, const dVector& src) const
   const unsigned int n_rows = m();
   const double *val_ptr = &val[cols->rowstart[0]];
   const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+  double       *dst_ptr = &dst(0);
   for (unsigned int row=0; row<n_rows; ++row)
     {
       double s = 0.;
-      const double *val_end_of_row = &val[cols->rowstart[row+1]];
+      const double *const val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * src(*colnum_ptr++);
-      dst(row) = s;
-    }
-}
+      *dst_ptr++ = s;
+    };
+};
 
 
 void
@@ -530,11 +539,11 @@ dSMatrix::matrix_norm (const dVector& v) const
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * v(*colnum_ptr++);
 
-      sum += s*v(row);
+      sum += s* v(row);
     };
 
   return sum;
-}
+};
 
 
 
