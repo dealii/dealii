@@ -147,21 +147,6 @@ class TriangulationLevel<0> {
     void monitor_memory (const unsigned int true_dimension) const;
 
 				     /**
-				      * Write out the data of this object
-				      * in a raw format, i.e. binary or almost
-				      * binary.
-				      */
-    void block_write (ostream &out) const;
-
-				     /**
-				      * Read back the data written by the above
-				      * function. By doing so, all content
-				      * which may have been in this object will
-				      * be lost.
-				      */
-    void block_read (istream &in);
-    
-				     /**
 				      *  Exception
 				      */
     DeclException3 (ExcMemoryWasted,
@@ -180,102 +165,6 @@ class TriangulationLevel<0> {
 				      * Exception
 				      */
     DeclException0 (ExcIO);
-    
-  protected:
-
-				     /**
-				      * Write out a vector of anything
-				      * in a binary format. To be exact,
-				      * what we write is the memory content
-				      * between #v.begin()# and #v.end()#;
-				      * this function is therefore only
-				      * useful if the whole information of
-				      * the objects stored in this vector
-				      * are contained within the objects,
-				      * i.e. they do not have pointers,
-				      * references, other vectors, etc.
-				      *
-				      * For all other vectors, specialized
-				      * functions need to be written; the
-				      * following one is an example for
-				      * this.
-				      */
-    template <typename T>
-    static void write_raw_vector (const unsigned int  magic_number1,
-				  const vector<T>    &v,
-				  const unsigned int  magic_number2,
-				  ostream            &out);
-
-				     /**
-				      *  Write a bool vector to the given stream,
-				      *  writing a pre- and a postfix magica
-				      *  number. The vector is written in an
-				      *  almost binary format, i.e. the bool
-				      *  flags are packed but the data is written
-				      *  as ASCII text.
-				      *
-				      *  The flags are stored in a binary
-				      *  format: for each #true#, a #1#
-				      *  bit is stored, a #0# bit otherwise.
-				      *  The bits are stored as #unsigned char#,
-				      *  thus avoiding endianess. They are
-				      *  written to #out# in plain text, thus
-				      *  amounting to 3.6 bits per flag
-				      *  on the overage. Other information
-				      *  (magic numbers ans number of elements)
-				      *  is stored as plain text
-				      *  as well. The format should therefore be
-				      *  interplatform compatible.
-				      */
-    static void write_raw_vector (const unsigned int  magic_number1,
-				  const vector<bool> &v,
-				  const unsigned int  magic_number2,
-				  ostream            &out);
-
-				     /**
-				      * Write out a vector almost raw: we
-				      * use a run-length encoding (rle) scheme
-				      * to reduce the size of a vector. This
-				      * function yields better results than the
-				      * above ones if frequently larger chunks
-				      * of data have the same value.
-				      */
-    template <typename T>
-    static void write_rle_vector (const unsigned int  magic_number1,
-				  const vector<T>    &v,
-				  const unsigned int  magic_number2,
-				  ostream            &out);
-
-				     /**
-				      * Read back a vector written by
-				      * #write_raw_vector#.
-				      */
-    template <typename T>
-    static void read_raw_vector (const unsigned int  magic_number1,
-				 vector<T>          &v,
-				 const unsigned int  magic_number2,
-				 istream            &in);
-
-				     /**
-				      * Read back a vector written by
-				      * the version of #write_raw_vector#
-				      * for #bool# vectors.
-				      */
-    static void read_raw_vector (const unsigned int  magic_number1,
-				 vector<bool>       &v,
-				 const unsigned int  magic_number2,
-				 istream            &in);
-
-				     /**
-				      * Read back a run-length encoded
-				      * vector, as written by
-				      * #write_rle_vector#.
-				      */
-    template <typename T>
-    static void read_rle_vector (const unsigned int  magic_number1,
-				 vector<T>          &v,
-				 const unsigned int  magic_number2,
-				 istream            &in);
 };
 
 
@@ -422,27 +311,6 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 				      *  #TriangulationLevel# classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
-
-				     /**
-				      * Write out the data of this object
-				      * in a raw format, i.e. binary or almost
-				      * binary.
-				      *
-				      * Calls the respective function of
-				      * #TriangulationLevel<0>#.
-				      */
-    void block_write (ostream &out) const;
-
-				     /**
-				      * Read back the data written by the above
-				      * function. By doing so, all content
-				      * which may have been in this object will
-				      * be lost.
-				      *
-				      * Calls the respective function of
-				      * #TriangulationLevel<0>#.
-				      */
-    void block_read (istream &in);
 };
 
 
@@ -551,27 +419,6 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *  #TriangulationLevel# classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
-
-				     /**
-				      * Write out the data of this object
-				      * in a raw format, i.e. binary or almost
-				      * binary.
-				      *
-				      * Calls the respective function of
-				      * #TriangulationLevel<1>#.
-				      */
-    void block_write (ostream &out) const;
-
-				     /**
-				      * Read back the data written by the above
-				      * function. By doing so, all content
-				      * which may have been in this object will
-				      * be lost.
-				      *
-				      * Calls the respective function of
-				      * #TriangulationLevel<1>#.
-				      */
-    void block_read (istream &in);
 };
 
 
@@ -680,27 +527,6 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 				      *  #TriangulationLevel# classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
-
-				     /**
-				      * Write out the data of this object
-				      * in a raw format, i.e. binary or almost
-				      * binary.
-				      *
-				      * Calls the respective function of
-				      * #TriangulationLevel<2>#.
-				      */
-    void block_write (ostream &out) const;
-
-				     /**
-				      * Read back the data written by the above
-				      * function. By doing so, all content
-				      * which may have been in this object will
-				      * be lost.
-				      *
-				      * Calls the respective function of
-				      * #TriangulationLevel<2>#.
-				      */
-    void block_read (istream &in);
 };
 
 

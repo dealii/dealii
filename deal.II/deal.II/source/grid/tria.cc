@@ -214,36 +214,6 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 
 
 
-template <int dim>
-void Triangulation<dim>::block_write (ostream &out) const 
-{
-				   // write out the level information
-  out << levels.size() << endl << '[';
-  for (unsigned int level=0; level<levels.size(); ++level)
-    levels[level]->block_write (out);
-  out << ']';
-  
-				   // write out the vertices
-  out << '[';
-  out.write (reinterpret_cast<const char*>(vertices.begin()),
-	     reinterpret_cast<const char*>(vertices.end())
-	     - reinterpret_cast<const char*>(vertices.begin()));
-  out << ']';
-
-  write_bool_vector (0, vertices_used, 0, out);
-};
-
-
-
-template <int dim>
-void Triangulation<dim>::block_read (istream &) 
-{
-  Assert (false, ExcNotImplemented());
-};
-
-
-  
-
 #if deal_II_dimension == 1
 
 template <>

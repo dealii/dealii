@@ -23,7 +23,8 @@
 
 
 
-bool SubCellData::check_consistency (const unsigned int dim) const {
+bool SubCellData::check_consistency (const unsigned int dim) const
+{
   switch (dim) 
     {
       case 1:
@@ -39,7 +40,8 @@ bool SubCellData::check_consistency (const unsigned int dim) const {
 
 
 void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
-					   const unsigned int dimension) {
+					   const unsigned int dimension)
+{
 				   // we need space for total_cells
 				   // cells. Maybe we have more already
 				   // with those cells which are unused,
@@ -69,7 +71,8 @@ void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
 
 
 
-void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const {
+void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) const
+{
 //  Assert (refine_flags.size() == refine_flags.capacity() ||
 //	  refine_flags.size()<256,
 //	  ExcMemoryWasted ("refine_flags",
@@ -90,325 +93,8 @@ void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) c
 
 
 
-template <typename T>
-void TriangulationLevel<0>::write_raw_vector (const unsigned int  magic_number1,
-					      const vector<T>    &v,
-					      const unsigned int  magic_number2,
-					      ostream            &out) 
+void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 {
-  AssertThrow (out, ExcIO());
-  
-  out << magic_number1 << ' ' << v.size() << '[';
-  out.write (reinterpret_cast<const char*>(v.begin()),
-	     reinterpret_cast<const char*>(v.end())
-	     - reinterpret_cast<const char*>(v.begin()));
-  out << ']' << magic_number2 << endl;
-
-  AssertThrow (out, ExcIO());
-};
-
-  
-  
-void TriangulationLevel<0>::write_raw_vector (const unsigned int  magic_number1,
-					      const vector<bool> &v,
-					      const unsigned int  magic_number2,
-					      ostream            &out) {
-  const unsigned int N = v.size();
-  unsigned char *flags = new unsigned char[N/8+1];
-  for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
-  
-  for (unsigned int position=0; position<N; ++position)
-    flags[position/8] |= (v[position] ? (1<<(position%8)) : 0);
-
-  AssertThrow (out, ExcIO());
-  
-				   // format:
-				   // 0. magic number
-				   // 1. number of flags
-				   // 2. the flags
-				   // 3. magic number
-  out << magic_number1 << ' ' << N << '[';
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    out << static_cast<unsigned int>(flags[i]) << " ";
-  
-  out << ']' << magic_number2 << endl;
-  
-  delete[] flags;
-
-  AssertThrow (out, ExcIO());
-};
-
-
-
-template <typename T>
-void TriangulationLevel<0>::write_rle_vector (const unsigned int  magic_number1,
-					      const vector<T>    &v,
-					      const unsigned int  magic_number2,
-					      ostream            &out) 
-{
-  AssertThrow (out, ExcIO());
-
-				   // store the position of the last
-				   // break in the data stream from
-				   // which on nothing was yet written
-				   // to #out#
-  typename vector<T>::const_iterator last_major_break = v.begin();
-				   // pointer to an element against
-				   // which we want to compare following
-				   // elements
-  typename vector<T>::const_iterator comparator;
-				   // name says all
-  typename vector<T>::const_iterator present_element;
-				   // same here
-  typename vector<T>::const_iterator end_of_vector = v.end();
-  
-  out << magic_number1 << ' ' << v.size() << '[';
-
-  while (last_major_break < end_of_vector)
-    {
-				       // from the present position onward:
-				       // find how many elements are equal
-      comparator = last_major_break;
-
-      while (true)
-	{
-	  present_element = comparator+1;
-	  while ((present_element != end_of_vector) &&
-		 (*present_element == *comparator)    &&
-		 (present_element-comparator < 255))
-	    ++present_element;
-
-					   // now present_element points to the
-					   // first element which is not equal
-					   // to #comparator# or alternatively
-					   // to #end_of_vector# or to
-					   // #comparator+255#
-					   //
-					   // if #present_element# is
-					   // #comparator+1#, i.e. the
-					   // sequence of equal
-					   // elements consisted of
-					   // only one elements then
-					   // discard this sequence
-					   // and find the next one
-					   //
-					   // otherwise leave the loop
-	  if ((present_element != end_of_vector) &&
-	      (present_element < comparator+1))
-	    comparator = present_element;
-	  else
-	    break;
-	};
-
-				       // if the loop broke because we have
-				       // reached the end of the vector:
-				       // maybe set comparator to
-				       // present_element
-      if ((present_element == end_of_vector) &&
-	  (present_element < comparator+1))
-	comparator = present_element;
-      
-				       // now comparator points to the start
-				       // of the sequence of equal elements
-				       // and present_element points past its
-				       // end; they may be the same if the
-				       // length of the sequence of unequal
-				       // elements was 255
-				       //
-				       // now do the following: write out
-				       // the elements of
-				       // last_major_break...comparator,
-				       // then write
-				       // comparator...present_element
-				       // if necessary; note that we need
-				       // only write *one* element (that is why
-				       // we do all this here)
-      out << '<' << comparator-last_major_break << '>';
-      if (comparator != last_major_break)
-	out.write (reinterpret_cast<const char*>(last_major_break),
-		   reinterpret_cast<const char*>(comparator)
-		   - reinterpret_cast<const char*>(last_major_break));
-      out << '<' << present_element-comparator << '>';
-      if (present_element != comparator)
-	out.write (reinterpret_cast<const char*>(comparator),
-		   reinterpret_cast<const char*>(comparator+1)
-		   - reinterpret_cast<const char*>(comparator));
-
-      last_major_break = present_element;
-    };
-      
-  out << ']' << magic_number2 << endl;
-
-  AssertThrow (out, ExcIO());
-};
-
-
-
-template <typename T>
-void TriangulationLevel<0>::read_raw_vector (const unsigned int  magic_number1,
-					     vector<T>          &v,
-					     const unsigned int  magic_number2,
-					     istream            &in) 
-{
-  AssertThrow (out, ExcIO());
-
-  unsigned int magic_number;
-  in >> magic_number;
-  AssertThrow (magic_number==magic_number1, ExcIO());
-
-  unsigned int N;
-  in >> N;
-  v.resize (N);
-  
-  out.read (reinterpret_cast<const char*>(v.begin()),
-	    reinterpret_cast<const char*>(v.end())
-	    - reinterpret_cast<const char*>(v.begin()));
-
-  in >> magic_number;
-  AssertThrow (magic_number==magic_number2, ExcIO());
-
-  AssertThrow (out, ExcIO());
-};
-
-
-
-void
-TriangulationLevel<0>::read_raw_vector (const unsigned int  magic_number1,
-					vector<bool>       &v,
-					const unsigned int  magic_number2,
-					istream            &in) {
-  AssertThrow (in, ExcIO());
-
-  unsigned int magic_number;
-  in >> magic_number;
-  AssertThrow (magic_number==magic_number1, ExcIO());
-
-  unsigned int N;
-  in >> N;
-  v.resize (N);
-
-  vector<unsigned char> flags (N/8+1);
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    {
-      in >> flags[i];
-    };
-
-  for (unsigned int position=0; position!=N; ++position)
-    v[position] = (flags[position/8] & (1<<(position%8)));
-
-  in >> magic_number;
-  AssertThrow (magic_number==magic_number2, ExcIO());
-
-  AssertThrow (in, ExcIO());
-};
-
-
-
-template <typename T>
-void TriangulationLevel<0>::read_rle_vector (const unsigned int magic_number1,
-					     vector<T>         &v,
-					     const unsigned int magic_number2,
-					     istream           &in) 
-{
-  AssertThrow (in, ExcIO());
-  
-  unsigned int magic_number;
-  in >> magic_number;
-  AssertThrow (magic_number==magic_number1, ExcIO());
-
-  unsigned int N;
-  in >> N;
-  v.resize (N);
-
-				   // index of the element presently read
-  typename vector<T>::iterator present_element = 0;
-
-				   // variable to store the number
-				   // of elements to be read next
-  unsigned int n_elements;
-
-				   // char to hold the '<' and
-				   // '>' chars which are used
-				   // as delimiters, also '[]'
-  char delimiter;
-
-  in >> delimiter;
-  AssertThrow (delimiter=='[', ExcIO());
-
-				   // read until we reach the end
-				   // of the vector's output
-  const typename vector<T>::const_iterator v_end = v.end();
-  while (present_element < v_end)
-    {
-				       // each block consists of two parts:
-				       // first some non-equal elements and
-				       // then one element which is repeated
-				       // several times. both lists can be
-				       // empty
-      in >> delimiter;
-      AssertThrow (delimiter=='<', ExcIO());
-
-				       // number of non-equal elements
-      in >> n_elements;
-      
-      in >> delimiter;
-      AssertThrow (delimiter=='>', ExcIO());
-
-      if (n_elements > 0)
-	{
-	  in.read (reinterpret_cast<char*> (present_element),
-		   reinterpret_cast<char*> (present_element + n_elements)
-		   - reinterpret_cast<char*> (present_element));
-	  present_element += n_elements;
-	};
-      
-				       // now for the element which is
-				       // to be repeated
-      in >> delimiter;
-      AssertThrow (delimiter=='<', ExcIO());
-
-				       // number of equal elements
-      in >> n_elements;
-      
-      in >> delimiter;
-      AssertThrow (delimiter=='>', ExcIO());
-
-				       // read this one element
-      if (n_elements > 0)
-	{
-	  in.read (reinterpret_cast<char*> (present_element),
-		   reinterpret_cast<char*> (present_element + 1)
-		   - reinterpret_cast<char*> (present_element));
-					   // repeat it
-	  for (unsigned int i=1; i<n_elements; ++i)
-	    *(present_element + i) = *present_element;
-      
-	  present_element += n_elements;
-	};
-    };
-
-  in >> delimiter;
-  AssertThrow (delimiter==']', ExcIO());
-  
-  in >> magic_number;
-  AssertThrow (magic_number==magic_number2, ExcIO());
-};
-
-      
-  
-
-void TriangulationLevel<0>::block_write (ostream &out) const
-{
-  write_raw_vector (0, refine_flags, 0, out);
-  write_raw_vector (0, coarsen_flags, 0, out);
-  write_raw_vector (0, neighbors, 0, out);
-};
-
-
-
-
-
-void TriangulationLevel<1>::reserve_space (const unsigned int new_lines) {
   const unsigned int new_size = new_lines +
 				count_if (lines.used.begin(),
 					  lines.used.end(),
@@ -454,7 +140,8 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines) {
 
 
 
-void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) const {
+void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) const
+{
 //  Assert (lines.lines.size() == lines.lines.capacity() ||
 //	  lines.lines.size()<256,
 //	  ExcMemoryWasted ("lines",
@@ -487,22 +174,8 @@ void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) c
 
 
 
-void TriangulationLevel<1>::block_write (ostream &out) const
+void TriangulationLevel<2>::reserve_space (const unsigned int new_quads)
 {
-  TriangulationLevel<0>::block_write (out);
-
-  write_raw_vector (0, lines.lines, 0, out);
-  write_rle_vector (0, lines.children, 0, out);
-  write_raw_vector (0, lines.used, 0, out);
-  write_raw_vector (0, lines.user_flags, 0, out);
-  write_rle_vector (0, lines.material_id, 0, out);
-				   // note: user_pointers are not written
-};
-
-
-
-
-void TriangulationLevel<2>::reserve_space (const unsigned int new_quads) {
   const unsigned int new_size = new_quads +
 				count_if (quads.used.begin(),
 					  quads.used.end(),
@@ -538,7 +211,8 @@ void TriangulationLevel<2>::reserve_space (const unsigned int new_quads) {
 
 
 
-void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) const {
+void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) const
+{
 //  Assert (quads.quads.size() == quads.quads.capacity() ||
 //	  quads.quads.size()<256,
 //	  ExcMemoryWasted ("quads",
@@ -571,24 +245,8 @@ void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) c
 
 
 
-void TriangulationLevel<2>::block_write (ostream &out) const
+void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes)
 {
-  TriangulationLevel<1>::block_write (out);
-
-  write_raw_vector (0, quads.quads, 0, out);
-  write_rle_vector (0, quads.children, 0, out);
-  write_raw_vector (0, quads.used, 0, out);
-  write_raw_vector (0, quads.user_flags, 0, out);
-  write_rle_vector (0, quads.material_id, 0, out);
-				   // note: user_pointers are not written
-};
-
-
-
-
-
-
-void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes) {
   const unsigned int new_size = new_hexes +
 				count_if (hexes.used.begin(),
 					  hexes.used.end(),
@@ -624,7 +282,8 @@ void TriangulationLevel<3>::reserve_space (const unsigned int new_hexes) {
 
 
 
-void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const {
+void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) const
+{
 //  Assert (hexes.hexes.size() == hexes.hexes.capacity() ||
 //	  hexes.hexes.size()<256,
 //	  ExcMemoryWasted ("hexes",
@@ -654,22 +313,6 @@ void TriangulationLevel<3>::monitor_memory (const unsigned int true_dimension) c
 
   TriangulationLevel<2>::monitor_memory (true_dimension);
 };
-
-
-
-void TriangulationLevel<3>::block_write (ostream &out) const
-{
-  TriangulationLevel<2>::block_write (out);
-
-  write_raw_vector (0, hexes.hexes, 0, out);
-  write_rle_vector (0, hexes.children, 0, out);
-  write_raw_vector (0, hexes.used, 0, out);
-  write_raw_vector (0, hexes.user_flags, 0, out);
-  write_rle_vector (0, hexes.material_id, 0, out);
-				   // note: user_pointers are not written
-};
-
-
 
 
 
