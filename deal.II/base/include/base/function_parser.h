@@ -254,9 +254,12 @@ class FunctionParser : public Function<dim>
 		  bool time_dependent = false,
 		  bool use_degrees = false);
   
-  /** Initialize the function. Same as above, but for scalar
-      functions. An exception is thrown if this method is called and
-      the function has more than one component. 
+  /** Initialize the function. Same as above, but accepts a string
+      rather than a vector of strings. If this is a vector valued
+      function, its componenents are expected to be separated by a
+      semicolon. An exception is thrown if this method is called and
+      the number of components successfully parsed does not match the
+      number of components of the base function.
       
       An example of time dependent scalar function is the following:
       @verbatim
@@ -281,6 +284,29 @@ class FunctionParser : public Function<dim>
 				 	// it is a time-dependent function
 					// and there is another variable
 					// to be taken into account (t).
+ 
+     @endverbatim
+     
+     The following is yet another example of how to instantiate a
+     vector valued function by using a single string:
+      @verbatim
+     
+      // Empty constants object
+      std::map<std::string> constants;
+      
+      // Variables that will be used inside the expressions
+      std::string variables = "x,y";
+      
+      // Define the expression of the vector valued  function.
+      std::string expression = "cos(2*pi*x)*y^2; sin(2*pi*x)*exp(y)";
+      
+      // Generate an empty vector valued function
+      FunctionParser<2> function(2);
+      
+      // And populate it with the newly created objects.
+      function.initialize(variables,
+			  expression,
+			  constants);	
  
      @endverbatim
       
