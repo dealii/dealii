@@ -2,7 +2,7 @@
 //   grid_reordering.cc,v 1.27 2002/05/28 07:43:22 wolf Exp
 //   Version: 
 //
-//   Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//   Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //   This file is subject to QPL and may not be  distributed
 //   without copyright and license information. Please refer
@@ -652,21 +652,6 @@ namespace internal
 	    {2,6},
 	    {3,7}
       };	  
-
-
-				       // Starting at emination node
-				       // (for edges) and chosing
-				       // clockwise order
-// TODO: HERE
-      static const unsigned int nodes_on_face[6][4] = 
-      {
-	    {0,1,2,3},
-	    {0,4,5,1},
-	    {1,5,6,2},
-	    {3,2,6,7},
-	    {0,3,7,4},
-	    {4,7,6,5}
-      };
     }
     
     

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -352,7 +352,6 @@ EigenInverse<VECTOR>::solve (double       &value,
   VECTOR* Vr = this->memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
   
   double length = x.l2_norm ();
-  double old_length = 0.;
   double old_value = value;
   
   x.scale(1./length);
@@ -363,7 +362,6 @@ EigenInverse<VECTOR>::solve (double       &value,
       solver.solve (A_s, y, x, prec);
       
 				       // Compute absolute value of eigenvalue
-      old_length = length;
       length = y.l2_norm ();
 
 				       // do a little trick to compute the sign
