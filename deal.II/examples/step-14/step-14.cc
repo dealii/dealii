@@ -450,7 +450,16 @@ namespace Evaluation
 				 // program.
 namespace LaplaceSolver
 {
-
+				   // Before everything else,
+				   // forward-declare one class that
+				   // we will have later, since we
+				   // will want to make it a friend of
+				   // some of the classes that follow,
+				   // which requires the class to be
+				   // known:
+  template <int dim> class WeightedResidual;
+  
+  
 				   // @sect4{The Laplace solver base class}
 
 				   // This class is almost unchanged,
@@ -854,6 +863,21 @@ namespace LaplaceSolver
     protected:
       const SmartPointer<const Function<dim> > rhs_function;
       virtual void assemble_rhs (Vector<double> &rhs) const;
+
+				       // Now, in order to work around
+				       // some problems in one of the
+				       // compilers this library can
+				       // be compiled with, we will
+				       // have to use some
+				       // workarounds. This will
+				       // require that we declare a
+				       // class that is actually
+				       // derived from the present
+				       // one, as a friend (strange as
+				       // that seems). The full
+				       // rationale will be explained
+				       // below.
+      friend class WeightedResidual<dim>;
   };
 
 
@@ -2187,6 +2211,11 @@ namespace LaplaceSolver
       virtual void assemble_rhs (Vector<double> &rhs) const;
 
       static const ZeroFunction<dim> boundary_values;
+
+				       // Same as above -- make a
+				       // derived class a friend of
+				       // this one:
+      friend class WeightedResidual<dim>;
   };
 
   template <int dim>
@@ -2729,30 +2758,94 @@ namespace LaplaceSolver
 				   // including the hanging node
 				   // constraints. The rest is
 				   // standard.
+				   //
+				   // There is, however, one
+				   // work-around worth mentioning: in
+				   // this function, as in a couple of
+				   // following ones, we have to
+				   // access the ``DoFHandler''
+				   // objects and solutions of both
+				   // the primal as well as of the
+				   // dual solver. Since these are
+				   // members of the ``Solver'' base
+				   // class which exists twice in the
+				   // class hierarchy leading to the
+				   // present class (once as base
+				   // class of the ``PrimalSolver''
+				   // class, once as base class of the
+				   // ``DualSolver'' class), we have
+				   // to disambiguate accesses to them
+				   // by telling the compiler a member
+				   // of which of these two instances
+				   // we want to access. The way to do
+				   // this would be identify the
+				   // member by pointing a path
+				   // through the class hierarchy
+				   // which disambiguates the base
+				   // class, for example writing
+				   // ``PrimalSolver::dof_handler'' to
+				   // denote the member variable
+				   // ``dof_handler'' from the
+				   // ``Solver'' base class of the
+				   // ``PrimalSolver''
+				   // class. Unfortunately, this
+				   // confuses gcc's version 2.96 (a
+				   // version that was intended as a
+				   // development snapshot, but
+				   // delivered as system compiler by
+				   // Red Hat in their 7.x releases)
+				   // so much that it bails out and
+				   // refuses to compile the code.
+				   //
+				   // Thus, we have to work around
+				   // this problem. We do this by
+				   // introducing references to the
+				   // ``PrimalSolver'' and
+				   // ``DualSolver'' components of the
+				   // ``WeightedResidual'' object at
+				   // the beginning of the
+				   // function. Since each of these
+				   // has an unambiguous base class
+				   // ``Solver'', we can access the
+				   // member variables we want through
+				   // these references. However, we
+				   // are now accessing protected
+				   // member variables of these
+				   // classes through a pointer other
+				   // than the ``this'' pointer (in
+				   // fact, this is of course the
+				   // ``this'' pointer, but not
+				   // explicitly). This finally is the
+				   // reason why we had to declare the
+				   // present class a friend of the
+				   // classes we so access.
   template <int dim>
   void
   WeightedResidual<dim>::output_solution () const
   {
+    const PrimalSolver<dim> &primal_solver = *this;
+    const PrimalSolver<dim> &dual_solver   = *this;
+    
     ConstraintMatrix primal_hanging_node_constraints;
-    DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
+    DoFTools::make_hanging_node_constraints (primal_solver.dof_handler,
 					     primal_hanging_node_constraints);
     primal_hanging_node_constraints.close();
-    Vector<double> dual_solution (PrimalSolver<dim>::dof_handler.n_dofs());
-    FETools::interpolate (DualSolver<dim>::dof_handler,
-			  DualSolver<dim>::solution,
-			  PrimalSolver<dim>::dof_handler,
+    Vector<double> dual_solution (primal_solver.dof_handler.n_dofs());
+    FETools::interpolate (dual_solver.dof_handler,
+			  dual_solver.solution,
+			  primal_solver.dof_handler,
 			  primal_hanging_node_constraints,
 			  dual_solution);    
 
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (PrimalSolver<dim>::dof_handler);
+    data_out.attach_dof_handler (primal_solver.dof_handler);
 
 				     // Add the data vectors for which
 				     // we want output. Add them both,
 				     // the ``DataOut'' functions can
 				     // handle as many data vectors as
 				     // you wish to write to output:
-    data_out.add_data_vector (PrimalSolver<dim>::solution,
+    data_out.add_data_vector (primal_solver.solution,
 			      "primal_solution");
     data_out.add_data_vector (dual_solution,
 			      "dual_solution");
@@ -2795,6 +2888,9 @@ namespace LaplaceSolver
   WeightedResidual<dim>::
   estimate_error (Vector<float> &error_indicators) const
   {
+    const PrimalSolver<dim> &primal_solver = *this;
+    const PrimalSolver<dim> &dual_solver   = *this;
+
 				     // The first task in computing
 				     // the error is to set up vectors
 				     // that denote the primal
@@ -2829,13 +2925,13 @@ namespace LaplaceSolver
 				     // constraints, but this time of
 				     // the dual finite element space.
     ConstraintMatrix dual_hanging_node_constraints;
-    DoFTools::make_hanging_node_constraints (DualSolver<dim>::dof_handler,
+    DoFTools::make_hanging_node_constraints (dual_solver.dof_handler,
 					     dual_hanging_node_constraints);
     dual_hanging_node_constraints.close();
-    Vector<double> primal_solution (DualSolver<dim>::dof_handler.n_dofs());
-    FETools::interpolate (PrimalSolver<dim>::dof_handler,
-			  PrimalSolver<dim>::solution,
-			  DualSolver<dim>::dof_handler,
+    Vector<double> primal_solution (dual_solver.dof_handler.n_dofs());
+    FETools::interpolate (primal_solver.dof_handler,
+			  primal_solver.solution,
+			  dual_solver.dof_handler,
 			  dual_hanging_node_constraints,
 			  primal_solution);
     
@@ -2851,14 +2947,14 @@ namespace LaplaceSolver
 				     // in the element space of the
 				     // dual solution.
     ConstraintMatrix primal_hanging_node_constraints;
-    DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
+    DoFTools::make_hanging_node_constraints (primal_solver.dof_handler,
 					     primal_hanging_node_constraints);
     primal_hanging_node_constraints.close();
-    Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
-    FETools::interpolation_difference (DualSolver<dim>::dof_handler,
+    Vector<double> dual_weights (dual_solver.dof_handler.n_dofs());
+    FETools::interpolation_difference (dual_solver.dof_handler,
 				       dual_hanging_node_constraints,
-				       DualSolver<dim>::solution,
-				       PrimalSolver<dim>::dof_handler,
+				       primal_solver.solution,
+				       primal_solver.dof_handler,
 				       primal_hanging_node_constraints,
 				       dual_weights);
     
@@ -2908,8 +3004,8 @@ namespace LaplaceSolver
 				     // through a mutex each time they
 				     // write to this map.
     FaceIntegrals face_integrals;
-    for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
-	 cell!=DualSolver<dim>::dof_handler.end();
+    for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();
+	 cell!=dual_solver.dof_handler.end();
 	 ++cell)
       for (unsigned int face_no=0;
 	   face_no<GeometryInfo<dim>::faces_per_cell;
@@ -2920,7 +3016,7 @@ namespace LaplaceSolver
 				     // error indicators.  Reserve one
 				     // slot for each cell and set it
 				     // to zero.
-    error_indicators.reinit (DualSolver<dim>::dof_handler
+    error_indicators.reinit (dual_solver.dof_handler
 			     .get_tria().n_active_cells());
 
 				     // Now start a number of threads
@@ -2958,8 +3054,8 @@ namespace LaplaceSolver
 				     // will be taken by the
 				     // neighboring cell.
     unsigned int present_cell=0;  
-    for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
-	 cell!=DualSolver<dim>::dof_handler.end();
+    for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();
+	 cell!=dual_solver.dof_handler.end();
 	 ++cell, ++present_cell)
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
 	   ++face_no)
@@ -2996,6 +3092,9 @@ namespace LaplaceSolver
 		 Vector<float>        &error_indicators,
 		 FaceIntegrals        &face_integrals) const
   {
+    const PrimalSolver<dim> &primal_solver = *this;
+    const PrimalSolver<dim> &dual_solver   = *this;
+
 				     // At the beginning, we
 				     // initialize two variables for
 				     // each thread which may be
@@ -3012,11 +3111,11 @@ namespace LaplaceSolver
 				     // per thread, so we don't have
 				     // to take care about
 				     // synchronising access to them.
-    CellData cell_data (*DualSolver<dim>::fe,
-			*DualSolver<dim>::quadrature,
-			*PrimalSolver<dim>::rhs_function);
-    FaceData face_data (*DualSolver<dim>::fe,
-			*DualSolver<dim>::face_quadrature);    
+    CellData cell_data (*dual_solver.fe,
+			*dual_solver.quadrature,
+			*primal_solver.rhs_function);
+    FaceData face_data (*dual_solver.fe,
+			*dual_solver.face_quadrature);    
 
 				     // Then calculate the start cell
 				     // for this thread. We let the
@@ -3040,9 +3139,9 @@ namespace LaplaceSolver
 				     // pseudorandom distribution of the
 				     // `hard' cells to the different
 				     // threads.
-    active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
+    active_cell_iterator cell=dual_solver.dof_handler.begin_active();
     for (unsigned int t=0;
-	 (t<this_thread) && (cell!=DualSolver<dim>::dof_handler.end());
+	 (t<this_thread) && (cell!=dual_solver.dof_handler.end());
 	 ++t, ++cell);
   
 				     // Next loop over all cells. The
@@ -3187,9 +3286,9 @@ namespace LaplaceSolver
 					 // our workload, jump out
 					 // of the loop.
 	for (unsigned int t=0;
-	     ((t<n_threads) && (cell!=DualSolver<dim>::dof_handler.end()));
+	     ((t<n_threads) && (cell!=dual_solver.dof_handler.end()));
 	     ++t, ++cell, ++cell_index);
-	if (cell == DualSolver<dim>::dof_handler.end())
+	if (cell == dual_solver.dof_handler.end())
 	  break;
       };
   };
