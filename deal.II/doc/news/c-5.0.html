@@ -114,11 +114,20 @@ inconvenience this causes.
 
 <ol>
 
-  <li> <p> New: a class template <code class="class">VectorSlice</code> allows
-  access to consecutive portions of a vector.
-  <br>
-  (GK 2004/09/16)
-  </p>
+  <li> <p>
+       Fixed: <code
+       class="member">DataOutBase<2,3>::write_tecplot</code> did not
+       write the variable name <code>z</code>. This is now fixed.
+       <br>
+       (RH 2004/10/29)
+       </p>
+
+  <li> <p>
+       New: a class template <code class="class">VectorSlice</code>
+       allows access to consecutive portions of a vector.
+       <br>
+       (GK 2004/09/16)
+       </p>
 
   <li> <p> New: The classes <code
        class="class">TableIndices&lt;N&gt;</code> and <code
