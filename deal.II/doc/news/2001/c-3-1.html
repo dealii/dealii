@@ -318,6 +318,26 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: When using Neuman boundary functions in the 
+       <code class="class">KellyErrorEstimator</code> class, it was
+       assumed that the function object had <code
+       class="member">Function::vector_value</code> overloaded, even
+       in the scalar case. We now use <code
+       class="member">Function::value</code> instead.
+       <br>
+       (WB 2001/04/09)
+       </p>
+       
+  <li> <p>
+       New: The various <code
+       class="member">MatrixCreator::create_*_matrix</code> functions
+       are now using multiple threads to do their work, if the library
+       is configured to use multithreading.
+       <br>
+       (WB 2001/04/08)
+       </p>
+       
+  <li> <p>
        New: The following functions are extended to work
        on arbitrary mappings:
        <br>
