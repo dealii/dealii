@@ -1494,6 +1494,7 @@ FEValuesBase<dim>::get_mapping () const
 
 
 template <int dim>
+inline
 const Quadrature<dim> &
 FEValues<dim>::get_quadrature () const 
 {
@@ -1505,10 +1506,12 @@ FEValues<dim>::get_quadrature () const
 
 
 template <int dim>
+inline
 const Point<dim> &
 FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 {
-  Assert (i<this->normal_vectors.size(), ExcIndexRange(i, 0, this->normal_vectors.size()));
+  Assert (i<this->normal_vectors.size(),
+	  ExcIndexRange(i, 0, this->normal_vectors.size()));
   Assert (this->update_flags & update_normal_vectors,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   
@@ -1516,7 +1519,24 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 }
 
 
+
 template <int dim>
+inline
+const Tensor<1,dim> &
+FEFaceValuesBase<dim>::boundary_form (const unsigned int i) const
+{
+  Assert (i<this->boundary_forms.size(),
+	  ExcIndexRange(i, 0, this->boundary_forms.size()));
+  Assert (this->update_flags & update_boundary_forms,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+  
+  return this->boundary_forms[i];
+}
+
+
+
+template <int dim>
+inline
 bool
 FEFaceValuesBase<dim>::orientation () const
 {
@@ -1525,6 +1545,7 @@ FEFaceValuesBase<dim>::orientation () const
 
 
 template <int dim>
+inline
 const Quadrature<dim-1> &
 FEFaceValuesBase<dim>::get_quadrature () const 
 {
