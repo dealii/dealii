@@ -302,7 +302,7 @@ void PoissonProblem<dim>::run (const unsigned int start_level) {
   cout << "    Estimating H1 error... ";
   KellyErrorEstimator<dim> ee;
   QTrapez<dim-1> eq;
-  ee.estimate_error (*dof, eq, fe, StraightBoundary<dim>(),
+  ee.estimate_error (*dof, eq, fe, boundary,
 		     KellyErrorEstimator<dim>::FunctionMap(),
 		     solution,
 		     estimated_error_per_cell);
