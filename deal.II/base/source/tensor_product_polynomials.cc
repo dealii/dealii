@@ -17,6 +17,8 @@
 
 
 
+//TODO: [RH] Is this function only used inside this class?
+// It should be inline, anyway.
 
 template <int dim>
 unsigned int TensorProductPolynomials<dim>::power(const unsigned int x,
