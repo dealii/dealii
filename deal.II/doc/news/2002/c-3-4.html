@@ -281,6 +281,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: The <code
+       class="member">FiniteElement::restriction_is_additive</code> function
+       used to take an argument that denoted the vector component of a finite
+       element. This has become difficult with elements that are non-zero in
+       more than one vector component, such as the Nedelec element. Thus, the
+       semantics of the function have been changed so that the argument now
+       denotes the index of a shape function, rather than a vector
+       component. Since the function is probably not used in application code,
+       this will most probably not lead to more serious problems.
+       <br>
+       (WB 2002/09/16)
+
+  <li> <p> 
        New: The mapping classes now also know how to transform tensors of rank
        2, not only vectors (tensors of rank 1) in a co- and contravariant way.
        <br>
