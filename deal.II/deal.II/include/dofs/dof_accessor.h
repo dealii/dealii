@@ -44,7 +44,8 @@
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class DoFAccessor {
+class DoFAccessor
+{
   public:
 				     /**
 				      * Constructor
@@ -98,6 +99,10 @@ class DoFAccessor {
 				      * Exception
 				      */
     DeclException0 (ExcMatrixDoesNotMatch);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotActive);
 
   protected:
 				     /**
@@ -310,6 +315,49 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      */
     void get_dof_indices (vector<int> &dof_indices) const;
 
+    				     /**
+				      * Return the values of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. This
+				      * function is only callable for active
+				      * cells.
+				      */
+    template <typename number>
+    void get_dof_values (const Vector<number> &values,
+			 Vector<number>       &local_values) const;
+
+				     /**
+				      * This function is the counterpart to
+				      * #get_dof_values#: it takes a vector
+				      * of values for the degrees of freedom
+				      * of the cell pointed to by this iterator
+				      * and writes these values into the global
+				      * data vector #values#. This function
+				      * is only callable for active cells.
+				      *
+				      * Note that for continuous finite
+				      * elements, calling this function affects
+				      * the dof values on neighboring cells as
+				      * well. It may also violate continuity
+				      * requirements for hanging nodes, if
+				      * neighboring cells are less refined than
+				      * the present one. These requirements
+				      * are not taken care of and must be
+				      * enforced by the user afterwards.
+				      *
+				      * It is assumed that both vectors already
+				      * have the right size beforehand.
+				      */
+    template <typename number>
+    void set_dof_values (const Vector<number> &local_values,
+			 Vector<number>       &values) const;
+
 				     /**
 				      * Return the #i#th child as a DoF line
 				      * iterator. This function is needed since
@@ -433,6 +481,49 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * has the right size beforehand.
 				      */
     void get_dof_indices (vector<int> &dof_indices) const;
+
+    				     /**
+				      * Return the values of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. This
+				      * function is only callable for active
+				      * cells.
+				      */
+    template <typename number>
+    void get_dof_values (const Vector<number> &values,
+			 Vector<number>       &local_values) const;
+
+				     /**
+				      * This function is the counterpart to
+				      * #get_dof_values#: it takes a vector
+				      * of values for the degrees of freedom
+				      * of the cell pointed to by this iterator
+				      * and writes these values into the global
+				      * data vector #values#. This function
+				      * is only callable for active cells.
+				      *
+				      * Note that for continuous finite
+				      * elements, calling this function affects
+				      * the dof values on neighboring cells as
+				      * well. It may also violate continuity
+				      * requirements for hanging nodes, if
+				      * neighboring cells are less refined than
+				      * the present one. These requirements
+				      * are not taken care of and must be
+				      * enforced by the user afterwards.
+				      *
+				      * It is assumed that both vectors already
+				      * have the right size beforehand.
+				      */
+    template <typename number>
+    void set_dof_values (const Vector<number> &local_values,
+			 Vector<number>       &values) const;
 
     				     /**
 				      *  Return a pointer to the #i#th line
@@ -569,6 +660,49 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
     void get_dof_indices (vector<int> &dof_indices) const;
 
     				     /**
+				      * Return the values of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. This
+				      * function is only callable for active
+				      * cells.
+				      */
+    template <typename number>
+    void get_dof_values (const Vector<number> &values,
+			 Vector<number>       &local_values) const;
+
+				     /**
+				      * This function is the counterpart to
+				      * #get_dof_values#: it takes a vector
+				      * of values for the degrees of freedom
+				      * of the cell pointed to by this iterator
+				      * and writes these values into the global
+				      * data vector #values#. This function
+				      * is only callable for active cells.
+				      *
+				      * Note that for continuous finite
+				      * elements, calling this function affects
+				      * the dof values on neighboring cells as
+				      * well. It may also violate continuity
+				      * requirements for hanging nodes, if
+				      * neighboring cells are less refined than
+				      * the present one. These requirements
+				      * are not taken care of and must be
+				      * enforced by the user afterwards.
+				      *
+				      * It is assumed that both vectors already
+				      * have the right size beforehand.
+				      */
+    template <typename number>
+    void set_dof_values (const Vector<number> &local_values,
+			 Vector<number>       &values) const;
+
+    				     /**
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Hex#.
 				      */
@@ -693,23 +827,6 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
     TriaIterator<dim, DoFObjectAccessor<dim-1, dim> >
     face (const unsigned int i) const;
 
-    				     /**
-				      * Return the values of the given vector
-				      * restricted to the dofs of this
-				      * cell in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand. This
-				      * function is only callable for active
-				      * cells.
-				      */
-    template <typename number>
-    void get_dof_values (const Vector<number> &values,
-			 Vector<number>       &local_values) const;
-
 				     /**
 				      * Return the interpolation of the given
 				      * finite element function to the present
@@ -748,36 +865,19 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
 				      * of each child. It is not yet decided
 				      * what the this function does in these
 				      * cases.
+				      *
+				      * Unlike the #get_dof_values#
+				      * function, this function is
+				      * associated to cells rather
+				      * than to lines, quads, and
+				      * hexes, since interpolation is
+				      * presently only provided for
+				      * cells by the finite element
+				      * objects.
 				      */
     template <typename number>
     void get_interpolated_dof_values (const Vector<number> &values,
 				      Vector<number>       &interpolated_values) const;
-
-				     /**
-				      * This function is the counterpart to
-				      * #get_dof_values#: it takes a vector
-				      * of values for the degrees of freedom
-				      * of the cell pointed to by this iterator
-				      * and writes these values into the global
-				      * data vector #values#. This function
-				      * is only callable for active cells.
-				      *
-				      * Note that for continuous finite
-				      * elements, calling this function affects
-				      * the dof values on neighboring cells as
-				      * well. It may also violate continuity
-				      * requirements for hanging nodes, if
-				      * neighboring cells are less refined than
-				      * the present one. These requirements
-				      * are not taken care of and must be
-				      * enforced by the user afterwards.
-				      *
-				      * It is assumed that both vectors already
-				      * have the right size beforehand.
-				      */
-    template <typename number>
-    void set_dof_values (const Vector<number> &local_values,
-			 Vector<number>       &values) const;
 
 				     /**
 				      * This, again, is the counterpart to
@@ -831,6 +931,15 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
 				      * element class for a description of what
 				      * the prolongation matrices represent in
 				      * this case.
+				      *
+				      * Unlike the #set_dof_values#
+				      * function, this function is
+				      * associated to cells rather
+				      * than to lines, quads, and
+				      * hexes, since interpolation is
+				      * presently only provided for
+				      * cells by the finite element
+				      * objects.
 				      */
     template <typename number>
     void set_dof_values_by_interpolation (const Vector<number> &local_values,
@@ -840,10 +949,6 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
 				      *  Exception
 				      */
     DeclException0 (ExcNotUsefulForThisDimension);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotActive);
 };
 
 

@@ -287,6 +287,27 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 				      */
     void get_mg_dof_indices (vector<int> &dof_indices) const;
 
+    				     /**
+				      * Return the value of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. The
+				      * indices refer to the multilevel
+				      * numbering local to the present
+				      * level of this cell. The vector shall
+				      * therefore have the same number of
+				      * entries as there are degrees of
+				      * freedom on this level.
+				      */
+    template <typename number>
+    void get_mg_dof_values (const Vector<number> &values,
+			    Vector<number>       &dof_values) const;
+
 				     /**
 				      * Return the #i#th child as a MGDoF line
 				      * iterator. This function is needed since
@@ -385,8 +406,29 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				      * for the level this quad lives on.
 				      */
     void get_mg_dof_indices (vector<int> &dof_indices) const;
-
+ 
     				     /**
+				      * Return the value of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. The
+				      * indices refer to the multilevel
+				      * numbering local to the present
+				      * level of this cell. The vector shall
+				      * therefore have the same number of
+				      * entries as there are degrees of
+				      * freedom on this level.
+				      */
+    template <typename number>
+    void get_mg_dof_values (const Vector<number> &values,
+			    Vector<number>       &dof_values) const;
+
+   				     /**
 				      * Return a pointer to the #i#th line
 				      * bounding this #Quad#.
 				      */
@@ -492,6 +534,27 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
     void get_mg_dof_indices (vector<int> &dof_indices) const;
 
     				     /**
+				      * Return the value of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. The
+				      * indices refer to the multilevel
+				      * numbering local to the present
+				      * level of this cell. The vector shall
+				      * therefore have the same number of
+				      * entries as there are degrees of
+				      * freedom on this level.
+				      */
+    template <typename number>
+    void get_mg_dof_values (const Vector<number> &values,
+			    Vector<number>       &dof_values) const;
+
+    				     /**
 				      * Return a pointer to the #i#th line
 				      * bounding this #Hex#.
 				      */
@@ -588,27 +651,6 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
 				      */
     face_iterator
     face (const unsigned int i) const;
-
-    				     /**
-				      * Return the value of the given vector
-				      * restricted to the dofs of this
-				      * cell in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand. The
-				      * indices refer to the multilevel
-				      * numbering local to the present
-				      * level of this cell. The vector shall
-				      * therefore have the same number of
-				      * entries as there are degrees of
-				      * freedom on this level.
-				      */
-    void get_mg_dof_values (const Vector<double> &values,
-			    Vector<double>       &dof_values) const;
-
 
     				     /**
 				      *  Exception

@@ -115,6 +115,68 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 
+template <int dim>
+template <typename number>
+void
+DoFObjectAccessor<1,dim>::get_dof_values (const Vector<number> &values,
+					  Vector<number>       &local_values) const
+{
+  Assert (dim==1, ExcInternalError());
+  
+  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
+  Assert (has_children() == false, ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
+  typename vector<number>::iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next_local_value++ = values(vertex_dof_index(vertex,d));
+  for (unsigned int d=0; d<dofs_per_line; ++d)
+    *next_local_value++ = values(dof_index(d));
+
+  Assert (next_local_value == local_values.end(),
+	  ExcInternalError());
+};
+
+
+
+template <int dim>
+template <typename number>
+void
+DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
+					  Vector<number>       &values) const {
+  Assert (dim==1, ExcInternalError());
+  
+  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
+  Assert (has_children() == false, ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
+  typename vector<number>::const_iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+       values(vertex_dof_index(vertex,d)) = *next_local_value++;
+  for (unsigned int d=0; d<dofs_per_line; ++d)
+    values(dof_index(d)) = *next_local_value++;
+
+  Assert (next_local_value == local_values.end(),
+	  ExcInternalError());
+};
+
+
+
+
 /*------------------------- Functions: DoFQuadAccessor -----------------------*/
 
 
@@ -209,8 +271,80 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 
+template <int dim>
+template <typename number>
+void
+DoFObjectAccessor<2,dim>::get_dof_values (const Vector<number> &values,
+					  Vector<number>       &local_values) const
+{
+  Assert (dim==2, ExcInternalError());
+  
+  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+  Assert (has_children() == false, ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
+  typename vector<number>::iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next_local_value++ = values(vertex_dof_index(vertex,d));
+  for (unsigned int line=0; line<4; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next_local_value++ = values(this->line(line)->dof_index(d));
+  for (unsigned int d=0; d<dofs_per_quad; ++d)
+    *next_local_value++ = values(dof_index(d));
 
-/*------------------------- Functions: DoFObjectAccessor -----------------------*/
+  Assert (next_local_value == local_values.end(),
+	  ExcInternalError());
+};
+
+
+
+template <int dim>
+template <typename number>
+void
+DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
+					  Vector<number>       &values) const
+{
+  Assert (dim==2, ExcInternalError());
+  
+  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+  Assert (values.size() == dof_handler->n_dofs(),
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+  Assert (has_children() == false, ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
+  typename vector<number>::const_iterator next_local_value=local_values.begin();
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      values(vertex_dof_index(vertex,d)) = *next_local_value++;
+  for (unsigned int line=0; line<4; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      values(this->line(line)->dof_index(d)) = *next_local_value++;
+  for (unsigned int d=0; d<dofs_per_quad; ++d)
+    values(dof_index(d)) = *next_local_value++;
+
+  Assert (next_local_value == local_values.end(),
+	  ExcInternalError());
+};
+
+
+
+
+
+
+/*------------------------- Functions: DoFHexAccessor -----------------------*/
 
 
 template <int dim>
@@ -277,7 +411,8 @@ distribute_local_to_global (const Vector<double> &local_source,
 template <int dim>
 void DoFObjectAccessor<3, dim>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
-			    SparseMatrix<double>     &global_destination) const {
+			    SparseMatrix<double>     &global_destination) const
+{
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.m() == (8*dof_handler->get_fe().dofs_per_vertex +
@@ -306,265 +441,12 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 
-
-
-
-/*------------------------- Functions: DoFCellAccessor -----------------------*/
-
-
-
-#if deal_II_dimension == 1
-
-template <>
-TriaIterator<1, DoFObjectAccessor<0,1> >
-DoFCellAccessor<1>::face (const unsigned int) const
+template <int dim>
+template <typename number>
+void
+DoFObjectAccessor<3,dim>::get_dof_values (const Vector<number> &values,
+					  Vector<number>       &local_values) const
 {
-  Assert (false, ExcNotUsefulForThisDimension());
-  return TriaIterator<1, DoFObjectAccessor<0,1> >();
-};
-
-
-
-/* this function looks like a template, but actually isn't one, it
-   will only work for the dimension selected by the preprocessor
-   guard above.
-   
-   the correct thing to do would be
-
-   template <>
-   template <typename number>
-   void
-   DoFCellAccessor<1>::get... (vector<number>...)
-
-   but this does not work, at least not at present using egcs1.1.1. we therefore
-   separate the different implementations for the different dimensions using
-   the preprocessor and double check using an assertion in the function body.
-
-//TODO: correct the pseudo-template thing   
-*/
-template <int dim>
-template <typename number>
-void
-DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
-				      Vector<number>       &local_values) const {
-  Assert (dim==1, ExcInternalError());
-  
-  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
-	  DoFAccessor<1>::ExcVectorDoesNotMatch());
-  Assert (values.size() == dof_handler->n_dofs(),
-	  DoFAccessor<1>::ExcVectorDoesNotMatch());
-  Assert (active(), ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  typename vector<number>::iterator next_local_value=local_values.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_local_value++ = values(vertex_dof_index(vertex,d));
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next_local_value++ = values(dof_index(d));
-
-  Assert (next_local_value == local_values.end(),
-	  ::ExcInternalError());
-};
-
-
-
-/* this function looks like a template, but actually isn't one, it
-   will only work for the dimension selected by the preprocessor
-   guard above.
-   
-   the correct thing to do would be
-
-   template <>
-   template <typename number>
-   void
-   DoFCellAccessor<1>::get... (vector<number>...)
-
-   but this does not work, at least not at present using egcs1.1.1. we therefore
-   separate the different implementations for the different dimensions using
-   the preprocecssor and double check using an assertion in the function body.
-*/
-template <int dim>
-template <typename number>
-void
-DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
-				      Vector<number>       &values) const {
-  Assert (dim==1, ExcInternalError());
-  
-  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
-	  DoFAccessor<1>::ExcVectorDoesNotMatch());
-  Assert (values.size() == dof_handler->n_dofs(),
-	  DoFAccessor<1>::ExcVectorDoesNotMatch());
-  Assert (active(), ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
-  typename vector<number>::const_iterator next_local_value=local_values.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-       values(vertex_dof_index(vertex,d)) = *next_local_value++;
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    values(dof_index(d)) = *next_local_value++;
-
-  Assert (next_local_value == local_values.end(),
-	  ::ExcInternalError());
-};
-
-
-
-#endif
-
-
-
-#if deal_II_dimension == 2
-
-template <>
-TriaIterator<2, DoFObjectAccessor<1,2> >
-DoFCellAccessor<2>::face (const unsigned int i) const
-{
-  return line(i);
-};
-
-
-
-/* this function looks like a template, but actually isn't one, it
-   will only work for the dimension selected by the preprocessor
-   guard above.
-   
-   the correct thing to do would be
-
-   template <>
-   template <typename number>
-   void
-   DoFCellAccessor<1>::get... (vector<number>...)
-
-   but this does not work, at least not at present using egcs1.1.1. we therefore
-   separate the different implementations for the different dimensions using
-   the preprocecssor and double check using an assertion in the function body.
-*/
-template <int dim>
-template <typename number>
-void
-DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
-				      Vector<number>       &local_values) const
-{
-  Assert (dim==2, ExcInternalError());
-  
-  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (values.size() == dof_handler->n_dofs(),
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (active(), ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  typename vector<number>::iterator next_local_value=local_values.begin();
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_local_value++ = values(vertex_dof_index(vertex,d));
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next_local_value++ = values(this->line(line)->dof_index(d));
-  for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next_local_value++ = values(dof_index(d));
-
-  Assert (next_local_value == local_values.end(),
-	  ::ExcInternalError());
-};
-
-
-
-/* this function looks like a template, but actually isn't one, it
-   will only work for the dimension selected by the preprocessor
-   guard above.
-   
-   the correct thing to do would be
-
-   template <>
-   template <typename number>
-   void
-   DoFCellAccessor<1>::get... (vector<number>...)
-
-   but this does not work, at least not at present using egcs1.1.1. we therefore
-   separate the different implementations for the different dimensions using
-   the preprocecssor and double check using an assertion in the function body.
-*/
-template <int dim>
-template <typename number>
-void
-DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
-				      Vector<number>       &values) const {
-  Assert (dim==2, ExcInternalError());
-  
-  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (values.size() == dof_handler->n_dofs(),
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (active(), ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
-  typename vector<number>::const_iterator next_local_value=local_values.begin();
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      values(vertex_dof_index(vertex,d)) = *next_local_value++;
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      values(this->line(line)->dof_index(d)) = *next_local_value++;
-  for (unsigned int d=0; d<dofs_per_quad; ++d)
-    values(dof_index(d)) = *next_local_value++;
-
-  Assert (next_local_value == local_values.end(),
-	  ::ExcInternalError());
-};
-
-
-#endif
-
-
-
-#if deal_II_dimension == 3
-
-template <>
-TriaIterator<3, DoFObjectAccessor<2, 3> >
-DoFCellAccessor<3>::face (const unsigned int i) const
-{
-  return quad(i);
-};
-
-
-
-/* this function looks like a template, but actually isn't one, it
-   will only work for the dimension selected by the preprocessor
-   guard above.
-   
-   the correct thing to do would be
-
-   template <>
-   template <typename number>
-   void
-   DoFCellAccessor<1>::get... (vector<number>...)
-
-   but this does not work, at least not at present using egcs1.1.1. we therefore
-   separate the different implementations for the different dimensions using
-   the preprocecssor and double check using an assertion in the function body.
-*/
-template <int dim>
-template <typename number>
-void
-DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
-				      Vector<number>       &local_values) const {
   Assert (dim==3, ExcInternalError());
 
   Assert (dof_handler != 0, DoFAccessor<3>::ExcInvalidObject());
@@ -573,51 +455,37 @@ DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
-  Assert (active(), ExcNotActive());
+  Assert (has_children() == false, ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
 		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
 		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
   typename vector<number>::iterator next_local_value = local_values.begin();
-  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+  for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_local_value++ = values(vertex_dof_index(vertex,d));
-  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+  for (unsigned int line=0; line<GeometryInfo<3>::lines_per_cell; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next_local_value++ = values(this->line(line)->dof_index(d));
-  for (unsigned int quad=0; quad<GeometryInfo<dim>::quads_per_cell; ++quad)
+  for (unsigned int quad=0; quad<GeometryInfo<3>::quads_per_cell; ++quad)
     for (unsigned int d=0; d<dofs_per_quad; ++d)
       *next_local_value++ = values(this->quad(quad)->dof_index(d));
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next_local_value++ = values(dof_index(d));
 
   Assert (next_local_value == local_values.end(),
-	  ::ExcInternalError());
+	  ExcInternalError());
 };
 
 
 
-/* this function looks like a template, but actually isn't one, it
-   will only work for the dimension selected by the preprocessor
-   guard above.
-   
-   the correct thing to do would be
-
-   template <>
-   template <typename number>
-   void
-   DoFCellAccessor<1>::get... (vector<number>...)
-
-   but this does not work, at least not at present using egcs1.1.1. we therefore
-   separate the different implementations for the different dimensions using
-   the preprocecssor and double check using an assertion in the function body.
-*/
 template <int dim>
 template <typename number>
 void
-DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
-				      Vector<number>       &values) const {
+DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
+					  Vector<number>       &values) const
+{
   Assert (dim==3, ExcInternalError());
 
   Assert (dof_handler != 0, DoFAccessor<3>::ExcInvalidObject());
@@ -626,7 +494,7 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
-  Assert (active(), ExcNotActive());
+  Assert (has_children() == false, ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
@@ -646,10 +514,52 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
     values(dof_index(d)) = *next_local_value++;
 
   Assert (next_local_value == local_values.end(),
-	  ::ExcInternalError());
+	  ExcInternalError());
 };
 
 
+
+
+
+/*------------------------- Functions: DoFCellAccessor -----------------------*/
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+TriaIterator<1, DoFObjectAccessor<0,1> >
+DoFCellAccessor<1>::face (const unsigned int) const
+{
+  Assert (false, ExcNotUsefulForThisDimension());
+  return TriaIterator<1, DoFObjectAccessor<0,1> >();
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 2
+
+template <>
+TriaIterator<2, DoFObjectAccessor<1,2> >
+DoFCellAccessor<2>::face (const unsigned int i) const
+{
+  return line(i);
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+TriaIterator<3, DoFObjectAccessor<2, 3> >
+DoFCellAccessor<3>::face (const unsigned int i) const
+{
+  return quad(i);
+};
 
 #endif
 
@@ -660,7 +570,8 @@ template <int dim>
 template <typename number>
 void
 DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
-						   Vector<number>       &interpolated_values) const {
+						   Vector<number>       &interpolated_values) const
+{
   const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
   
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -722,7 +633,8 @@ template <int dim>
 template <typename number>
 void
 DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &local_values,
-						       Vector<number>       &values) const {
+						       Vector<number>       &values) const
+{
   const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
   
   Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
@@ -764,37 +676,115 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 // for double
 template
 void
-DoFCellAccessor<deal_II_dimension>::get_dof_values (const Vector<double> &,
-						    Vector<double>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::
+get_dof_values (const Vector<double> &,
+		Vector<double>       &) const;
+
 template
 void
-DoFCellAccessor<deal_II_dimension>::get_interpolated_dof_values (const Vector<double> &,
-								 Vector<double>       &) const;
-template
-void
-DoFCellAccessor<deal_II_dimension>::set_dof_values (const Vector<double> &,
-						    Vector<double>       &) const;
-template
-void
-DoFCellAccessor<deal_II_dimension>::set_dof_values_by_interpolation(const Vector<double> &,
-								    Vector<double>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::
+set_dof_values (const Vector<double> &,
+		Vector<double>       &) const;
+
+
 // for float
 template
 void
-DoFCellAccessor<deal_II_dimension>::get_dof_values (const Vector<float> &,
-						    Vector<float>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::
+get_dof_values (const Vector<float> &,
+		Vector<float>       &) const;
+
 template
 void
-DoFCellAccessor<deal_II_dimension>::get_interpolated_dof_values (const Vector<float> &,
-								 Vector<float>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::
+set_dof_values (const Vector<float> &,
+		Vector<float>       &) const;
+
+
+#if deal_II_dimension >= 2
+// for double
 template
 void
-DoFCellAccessor<deal_II_dimension>::set_dof_values (const Vector<float> &,
-						    Vector<float>       &) const;
+DoFObjectAccessor<2,deal_II_dimension>::
+get_dof_values (const Vector<double> &,
+		Vector<double>       &) const;
+
 template
 void
-DoFCellAccessor<deal_II_dimension>::set_dof_values_by_interpolation(const Vector<float> &,
-								    Vector<float>       &) const;
+DoFObjectAccessor<2,deal_II_dimension>::
+set_dof_values (const Vector<double> &,
+		Vector<double>       &) const;
+
+// for float
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::
+get_dof_values (const Vector<float> &,
+		Vector<float>       &) const;
+
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::
+set_dof_values (const Vector<float> &,
+		Vector<float>       &) const;
+
+#endif
+
+
+#if deal_II_dimension >= 3
+// for double
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::
+get_dof_values (const Vector<double> &,
+		Vector<double>       &) const;
+
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::
+set_dof_values (const Vector<double> &,
+		Vector<double>       &) const;
+
+// for float
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::
+get_dof_values (const Vector<float> &,
+		Vector<float>       &) const;
+
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::
+set_dof_values (const Vector<float> &,
+		Vector<float>       &) const;
+
+#endif
+
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values (const Vector<double> &,
+			     Vector<double>       &) const;
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation(const Vector<double> &,
+				Vector<double>       &) const;
+
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values (const Vector<float> &,
+			     Vector<float>       &) const;
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation(const Vector<float> &,
+				Vector<float>       &) const;
 
 
 
