@@ -2378,6 +2378,58 @@ AC_DEFUN(DEAL_II_CHECK_FUNPTR_TEMPLATE_TEMPLATE_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl We compile all the files in the deal.II subdirectory multiple
+dnl times, for the various space dimensions. When a program
+dnl needs the libs for more than one dimension, the symbols in
+dnl these libs must be either static or weak. Unfortunately, some
+dnl compilers don't mark functions in anonymous namespaces as
+dnl static, and also mangle their names the same way each time,
+dnl so we get into trouble with duplicate symbols. Check
+dnl whether this is so.
+dnl
+dnl The check is a little more complicated than the usual one,
+dnl since we can't use AC_TRY_COMPILE (we have to compile and link
+dnl more than one file).
+dnl
+dnl Usage: DEAL_II_CHECK_ANON_NAMESPACE_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG, dnl
+[
+  AC_MSG_CHECKING(for anonymous namespace and name mangling bug)
+
+  dnl Create the testfile
+  echo "namespace { int SYMBOL() {return 1;}; }" >  conftest.cc
+  echo "static int f() { return SYMBOL(); }"     >> conftest.cc
+
+  dnl Then compile it twice...
+  $CXX -c conftest.cc -o conftest.1.$ac_objext
+  $CXX -c conftest.cc -o conftest.2.$ac_objext
+
+  dnl Create a file with main() and also compile it
+  echo "int main () {}" > conftest.cc
+  $CXX -c conftest.cc -o conftest.3.$ac_objext
+
+  dnl Then try to link everything
+  if (($CXX conftest.1.$ac_objext conftest.2.$ac_objext \
+            conftest.3.$ac_objext -o conftest  2>&1 ) > /dev/null );\
+  then
+      AC_MSG_RESULT(no)
+  else
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_ANON_NAMESPACE_BUG, 1, 
+                     [Defined if the compiler needs to see the static
+	              keyword even for functions in anonymous namespaces,
+                      to avoid duplicate symbol errors when linking.
+                      For the details, look at aclocal.m4 in the
+                      top-level directory.])
+  fi
+  rm -f conftest.1.$ac_objext conftest.2.$ac_objext conftest
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl We have so many templates in deal.II that sometimes we need
 dnl to make it clear with which types a template parameter can
 dnl be instantiated. There is a neat trick to do this: SFINAE
