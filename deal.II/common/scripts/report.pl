@@ -113,6 +113,7 @@ EOT
 
 
 # finally output a table of results
+$number_of_present_month = 0;
 foreach $date (sort {$b cmp $a} keys %results)
 {
     # if the month has changed (or if this is the first month we deal
@@ -126,6 +127,8 @@ foreach $date (sort {$b cmp $a} keys %results)
     $this_year  = $1;
     $this_month = $2;
     if ($this_month != $old_month) {
+	$number_of_present_month++;
+
 	if (defined $old_month) {
 	    print TABLE_FILE "</table>\n";
 	    print TABLE_FILE "</body>\n</html>\n";
@@ -159,7 +162,15 @@ EOT
 	}
 	print TABLE_FILE "\n";
 
-
+	
+	# only write up to 8 months in a row into the month
+	# listing. if more, insert a linebreak
+	if (($number_of_present_month % 8 == 0) &&
+	    ($number_of_present_month != 0)) 
+	{
+	    print HEAD_FILE "<br>\n";
+	}
+	# now write link to month file
 	print HEAD_FILE "<a href=\"$file\" target=\"report_results\">";
 	print HEAD_FILE "$this_year/$this_month</a>&nbsp;&nbsp;\n";
     }
