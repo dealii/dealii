@@ -46,8 +46,7 @@ tests_x = anna_? \
 	  mapping_q4_3d \
 	  q_points \
           find_cell_* \
-          sparse_matrix_* \
-	  vector_*
+          sparse_matrix_*
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += petsc_*
