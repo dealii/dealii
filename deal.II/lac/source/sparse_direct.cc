@@ -426,12 +426,12 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
 					     // we can do, leading to
 					     // an exception on the
 					     // allocation.
-	    cout << "<*>" << flush;
+	    std::cout << "<*>" << std::flush;
 	    
 	    LA  = static_cast<unsigned int>(LA * LA_increase_factor);
 	    if (true)
 	      {
-		vector<double> tmp;
+		std::vector<double> tmp;
 		A.swap (tmp);
 	      };
 	    
@@ -470,7 +470,7 @@ SparseDirectMA27::solve (Vector<double> &rhs_and_solution) const
   Assert (factorize_called == true, ExcFactorizeNotCalled());
   
   const unsigned int n_rows = rhs_and_solution.size();
-  vector<double> W(MAXFRT);
+  std::vector<double> W(MAXFRT);
   HSL::MA27::ma27cd_(&n_rows, &A[0], &LA,
 		     &IW[0], &LIW, &W[0], &MAXFRT,
 		     &rhs_and_solution(0), &IW1[0], &NSTEPS);
@@ -755,12 +755,12 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
 					     // we can do, leading to
 					     // an exception on the
 					     // allocation.
-	    cout << "<*>" << flush;
+	    std::cout << "<*>" << std::flush;
 	    
 	    LA  = static_cast<unsigned int>(LA * LA_increase_factor);
 	    if (true)
 	      {
-		vector<double> tmp;
+		std::vector<double> tmp;
 		A.swap (tmp);
 	      };
 	    
@@ -799,7 +799,7 @@ SparseDirectMA47::solve (Vector<double> &rhs_and_solution)
   Assert (factorize_called == true, ExcFactorizeNotCalled());
   
   const unsigned int n_rows = rhs_and_solution.size();
-  vector<double> W(n_rows);
+  std::vector<double> W(n_rows);
   HSL::MA47::ma47cd_(&n_rows, &A[0], &LA,
 		     &IW[0], &LIW, &W[0],
 		     &rhs_and_solution(0), &IW1[0], &ICNTL[0]);
