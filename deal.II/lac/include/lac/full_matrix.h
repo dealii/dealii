@@ -705,7 +705,7 @@ inline number
 FullMatrix<number>::operator() (const unsigned int i, const unsigned int j) const
 {  
   Assert (i<dim_image, ExcInvalidIndex (i, dim_image));
-  Assert (j<dim_range, ExcInvalidIndex (i, dim_range));
+  Assert (j<dim_range, ExcInvalidIndex (j, dim_range));
   return el(i,j);
 };
 
