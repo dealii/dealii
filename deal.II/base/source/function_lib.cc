@@ -86,26 +86,10 @@ Tensor<1,dim>
 SquareFunction<dim>::gradient (const Point<dim>   &p,
 			       const unsigned int) const
 {
-  Tensor<1,dim> result;
-  switch(dim)
-    {
-      case 1:
-	    result[0] = 2.*p(0);
-	    break;
-      case 2:
-	    result[0] = 2.*p(0);
-	    result[1] = 2.*p(1);
-	    break;
-      case 3:
-	    result[0] = 2.*p(0);
-	    result[1] = 2.*p(1);
-	    result[2] = 2.*p(2);
-	    break;
-      default:
-	    Assert(false, ExcNotImplemented());
-    }
-  return result;
+  return p*2;
 }
+
+
 
 template<int dim>
 void
@@ -116,30 +100,13 @@ SquareFunction<dim>::gradient_list (const vector<Point<dim> > &points,
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
 
-  for (unsigned int i=0;i<points.size();++i)
-    {
-      const Point<dim>& p = points[i];
-      switch(dim)
-	{
-	  case 1:
-		gradients[i][0] = 2.*p(0);
-		break;
-	  case 2:
-		gradients[i][0] = 2.*p(0);
-		gradients[i][1] = 2.*p(1);
-		break;
-	  case 3:
-		gradients[i][0] = 2.*p(0);
-		gradients[i][1] = 2.*p(1);
-		gradients[i][2] = 2.*p(2);
-		break;
-	  default:
-		Assert(false, ExcNotImplemented());
-	}
-    }
+  for (unsigned int i=0; i<points.size(); ++i)
+    gradients[i] = points[i]*2;
 }
 
+
 //////////////////////////////////////////////////////////////////////
+
 
 template<int dim>
 double
