@@ -29,7 +29,7 @@ FEDGConstant<1>::FEDGConstant () :
 				   // we do not add up the contributions but
 				   // set them right into the matrices!
 				   
-				   // The restriction matrizes got crazy values
+				   // The restriction matrices got crazy values
 				   // as it is yet not clear how they should work
 				   // in the DG(0) case. In general
 				   // the use of the restriction matrices
@@ -38,7 +38,6 @@ FEDGConstant<1>::FEDGConstant () :
   restriction[1](0,0) = 1e8;
 
   prolongation[0](0,0) = 1.0;
-
   prolongation[1](0,0) = 1.0;
 };
 
@@ -50,23 +49,6 @@ void FEDGConstant<1>::get_face_support_points (const typename DoFHandler<1>::fac
   Assert (false, ExcInternalError());
 };
 
-
-/*
-template <>
-void FEDGConstant<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
-					 const Boundary<1> &,
-					 dFMatrix &local_mass_matrix) const {
-  Assert (local_mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
-  Assert (local_mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
-
-  const double h = cell->vertex(1)(0) - cell->vertex(0)(0);
-  Assert (h>0, ExcJacobiDeterminantHasWrongSign());
-
-  local_mass_matrix(0,0) = h;
-};
-*/
 #endif
 
 
@@ -78,7 +60,7 @@ template <>
 FEDGConstant<2>::FEDGConstant () :
 		FELinearMapping<2> (0, 0, 1)
 {
-				   // The restriction matrizes got crazy values
+				   // The restriction matrices got crazy values
 				   // as it is yet not clear how they should work
 				   // in the DG(0) case. In general
 				   // the use of the restriction matrices
@@ -122,12 +104,7 @@ FEDGConstant<dim>::shape_grad (const unsigned int i,
 			       const Point<dim>&) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
-				   // originally, the return type of the
-				   // function was Point<dim>, so we
-				   // still construct it as that. it should
-				   // make no difference in practice,
-				   // however
-  return Point<dim> ();
+  return Tensor<1,dim> ();
 };
 
 
@@ -172,8 +149,8 @@ FEDGConstant<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) co
 template <int dim>
 void
 FEDGConstant<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				   const Boundary<dim>  &,
-				   vector<Point<dim> >  &support_points) const {
+				       const Boundary<dim>  &,
+				       vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
   
@@ -208,12 +185,3 @@ FEDGConstant<dim>::restrict (const unsigned int child) const {
 // explicit instantiations
 
 template class FEDGConstant<deal_II_dimension>;
-
-
-
-
-
-
-
-
-

@@ -12,12 +12,34 @@
 
 
 
+// declare explicit specializations before use:
+template <> void FELinear<deal_II_dimension>::initialize_matrices ();
+
+
+
+
 #if deal_II_dimension == 1
 
 template <>
 FELinear<1>::FELinear () :
 		FELinearMapping<1> (1, 0)
 {
+  initialize_matrices ();
+};
+
+
+template <>
+FELinear<1>::FELinear (const int) :
+		FELinearMapping<1> (0, 2)
+{
+  initialize_matrices ();
+};
+
+
+
+
+template <>
+void FELinear<1>::initialize_matrices () {
 				   // for restriction and prolongation matrices:
 				   // note that we do not add up all the
 				   // contributions since then we would get
@@ -151,57 +173,22 @@ FELinear<2>::FELinear () :
   interface_constraints(0,0) = 1./2.;
   interface_constraints(0,1) = 1./2.;
 
-  restriction[0](0,0) = 1.0;
-  restriction[1](1,1) = 1.0;
-  restriction[2](2,2) = 1.0;
-  restriction[3](3,3) = 1.0;
-
-  prolongation[0](0,0) = 1.0;
-  prolongation[0](1,0) = 1./2.;
-  prolongation[0](1,1) = 1./2.;
-  prolongation[0](3,0) = 1./2.;
-  prolongation[0](3,3) = 1./2.;
-  prolongation[0](2,0) = 1./4.;
-  prolongation[0](2,1) = 1./4.;
-  prolongation[0](2,2) = 1./4.;
-  prolongation[0](2,3) = 1./4.;
-
-  prolongation[1](1,1) = 1.0;
-  prolongation[1](0,0) = 1./2.;
-  prolongation[1](0,1) = 1./2.;
-  prolongation[1](2,1) = 1./2.;
-  prolongation[1](2,2) = 1./2.;
-  prolongation[1](3,0) = 1./4.;
-  prolongation[1](3,1) = 1./4.;
-  prolongation[1](3,2) = 1./4.;
-  prolongation[1](3,3) = 1./4.;
-
-  prolongation[2](2,2) = 1.0;
-  prolongation[2](1,2) = 1./2.;
-  prolongation[2](1,1) = 1./2.;
-  prolongation[2](3,2) = 1./2.;
-  prolongation[2](3,3) = 1./2.;
-  prolongation[2](0,0) = 1./4.;
-  prolongation[2](0,1) = 1./4.;
-  prolongation[2](0,2) = 1./4.;
-  prolongation[2](0,3) = 1./4.;
-
-  prolongation[3](3,3) = 1.0;
-  prolongation[3](0,0) = 1./2.;
-  prolongation[3](0,3) = 1./2.;
-  prolongation[3](2,2) = 1./2.;
-  prolongation[3](2,3) = 1./2.;
-  prolongation[3](1,0) = 1./4.;
-  prolongation[3](1,1) = 1./4.;
-  prolongation[3](1,2) = 1./4.;
-  prolongation[3](1,3) = 1./4.;
+  initialize_matrices ();
 };
+
 
 
 template <>
 FELinear<2>::FELinear (const int) :
 		FELinearMapping<2> (0, 0, 4)
 {
+  initialize_matrices ();
+};
+
+
+
+template <>
+void FELinear<2>::initialize_matrices () {
   restriction[0](0,0) = 1.0;
   restriction[1](1,1) = 1.0;
   restriction[2](2,2) = 1.0;
@@ -247,7 +234,6 @@ FELinear<2>::FELinear (const int) :
   prolongation[3](1,2) = 1./4.;
   prolongation[3](1,3) = 1./4.;
 };
-
 
 
 

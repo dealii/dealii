@@ -11,6 +11,10 @@
 
 
 
+// declare explicit specializations before use:
+template <> void FECubicSub<deal_II_dimension>::initialize_matrices ();
+
+
 
 
 #if deal_II_dimension == 1
@@ -18,6 +22,23 @@
 template <>
 FECubicSub<1>::FECubicSub () :
 		FELinearMapping<1> (1, 2) {
+  initialize_matrices ();
+};
+
+
+
+template <>
+FECubicSub<1>::FECubicSub (const int) :
+		FELinearMapping<2> (0, 0, 4)
+{
+  initialize_matrices ();
+};
+
+
+
+template <>
+void FECubicSub<1>::initialize_matrices () {
+  
   prolongation[0](0,0) = 1.0;
   prolongation[0](0,1) = 0.0;
   prolongation[0](0,2) = 0.0;
@@ -239,431 +260,22 @@ FECubicSub<2>::FECubicSub () :
   interface_constraints(4,2) = -5.0/16.0;
   interface_constraints(4,3) = 15.0/16.0;
 
-  prolongation[0](0,0) = 1.0;
-  prolongation[0](1,0) = -1.0/16.0;
-  prolongation[0](1,1) = -1.0/16.0;
-  prolongation[0](1,4) = 9.0/16.0;
-  prolongation[0](1,5) = 9.0/16.0;
-  prolongation[0](2,0) = 1.0/256.0;
-  prolongation[0](2,1) = 1.0/256.0;
-  prolongation[0](2,2) = 1.0/256.0;
-  prolongation[0](2,3) = 1.0/256.0;
-  prolongation[0](2,4) = -9.0/256.0;
-  prolongation[0](2,5) = -9.0/256.0;
-  prolongation[0](2,6) = -9.0/256.0;
-  prolongation[0](2,7) = -9.0/256.0;
-  prolongation[0](2,8) = -9.0/256.0;
-  prolongation[0](2,9) = -9.0/256.0;
-  prolongation[0](2,10) = -9.0/256.0;
-  prolongation[0](2,11) = -9.0/256.0;
-  prolongation[0](2,12) = 81.0/256.0;
-  prolongation[0](2,13) = 81.0/256.0;
-  prolongation[0](2,14) = 81.0/256.0;
-  prolongation[0](2,15) = 81.0/256.0;
-  prolongation[0](3,0) = -1.0/16.0;
-  prolongation[0](3,3) = -1.0/16.0;
-  prolongation[0](3,10) = 9.0/16.0;
-  prolongation[0](3,11) = 9.0/16.0;
-  prolongation[0](4,0) = 5.0/16.0;
-  prolongation[0](4,1) = 1.0/16.0;
-  prolongation[0](4,4) = 15.0/16.0;
-  prolongation[0](4,5) = -5.0/16.0;
-  prolongation[0](5,4) = 1.0;
-  prolongation[0](6,0) = -5.0/256.0;
-  prolongation[0](6,1) = -5.0/256.0;
-  prolongation[0](6,2) = -1.0/256.0;
-  prolongation[0](6,3) = -1.0/256.0;
-  prolongation[0](6,4) = 45.0/256.0;
-  prolongation[0](6,5) = 45.0/256.0;
-  prolongation[0](6,6) = -15.0/256.0;
-  prolongation[0](6,7) = 5.0/256.0;
-  prolongation[0](6,8) = 9.0/256.0;
-  prolongation[0](6,9) = 9.0/256.0;
-  prolongation[0](6,10) = -15.0/256.0;
-  prolongation[0](6,11) = 5.0/256.0;
-  prolongation[0](6,12) = 135.0/256.0;
-  prolongation[0](6,13) = 135.0/256.0;
-  prolongation[0](6,14) = -45.0/256.0;
-  prolongation[0](6,15) = -45.0/256.0;
-  prolongation[0](7,6) = -1.0/16.0;
-  prolongation[0](7,10) = -1.0/16.0;
-  prolongation[0](7,12) = 9.0/16.0;
-  prolongation[0](7,13) = 9.0/16.0;
-  prolongation[0](8,0) = -5.0/256.0;
-  prolongation[0](8,1) = -1.0/256.0;
-  prolongation[0](8,2) = -1.0/256.0;
-  prolongation[0](8,3) = -5.0/256.0;
-  prolongation[0](8,4) = -15.0/256.0;
-  prolongation[0](8,5) = 5.0/256.0;
-  prolongation[0](8,6) = 9.0/256.0;
-  prolongation[0](8,7) = 9.0/256.0;
-  prolongation[0](8,8) = -15.0/256.0;
-  prolongation[0](8,9) = 5.0/256.0;
-  prolongation[0](8,10) = 45.0/256.0;
-  prolongation[0](8,11) = 45.0/256.0;
-  prolongation[0](8,12) = 135.0/256.0;
-  prolongation[0](8,13) = -45.0/256.0;
-  prolongation[0](8,14) = -45.0/256.0;
-  prolongation[0](8,15) = 135.0/256.0;
-  prolongation[0](9,4) = -1.0/16.0;
-  prolongation[0](9,8) = -1.0/16.0;
-  prolongation[0](9,12) = 9.0/16.0;
-  prolongation[0](9,15) = 9.0/16.0;
-  prolongation[0](10,0) = 5.0/16.0;
-  prolongation[0](10,3) = 1.0/16.0;
-  prolongation[0](10,10) = 15.0/16.0;
-  prolongation[0](10,11) = -5.0/16.0;
-  prolongation[0](11,10) = 1.0;
-  prolongation[0](12,0) = 25.0/256.0;
-  prolongation[0](12,1) = 5.0/256.0;
-  prolongation[0](12,2) = 1.0/256.0;
-  prolongation[0](12,3) = 5.0/256.0;
-  prolongation[0](12,4) = 75.0/256.0;
-  prolongation[0](12,5) = -25.0/256.0;
-  prolongation[0](12,6) = 15.0/256.0;
-  prolongation[0](12,7) = -5.0/256.0;
-  prolongation[0](12,8) = 15.0/256.0;
-  prolongation[0](12,9) = -5.0/256.0;
-  prolongation[0](12,10) = 75.0/256.0;
-  prolongation[0](12,11) = -25.0/256.0;
-  prolongation[0](12,12) = 225.0/256.0;
-  prolongation[0](12,13) = -75.0/256.0;
-  prolongation[0](12,14) = 25.0/256.0;
-  prolongation[0](12,15) = -75.0/256.0;
-  prolongation[0](13,4) = 5.0/16.0;
-  prolongation[0](13,8) = 1.0/16.0;
-  prolongation[0](13,12) = 15.0/16.0;
-  prolongation[0](13,15) = -5.0/16.0;
-  prolongation[0](14,12) = 1.0;
-  prolongation[0](15,6) = 1.0/16.0;
-  prolongation[0](15,10) = 5.0/16.0;
-  prolongation[0](15,12) = 15.0/16.0;
-  prolongation[0](15,13) = -5.0/16.0;
-  prolongation[1](0,0) = -1.0/16.0;
-  prolongation[1](0,1) = -1.0/16.0;
-  prolongation[1](0,4) = 9.0/16.0;
-  prolongation[1](0,5) = 9.0/16.0;
-  prolongation[1](1,1) = 1.0;
-  prolongation[1](2,1) = -1.0/16.0;
-  prolongation[1](2,2) = -1.0/16.0;
-  prolongation[1](2,6) = 9.0/16.0;
-  prolongation[1](2,7) = 9.0/16.0;
-  prolongation[1](3,0) = 1.0/256.0;
-  prolongation[1](3,1) = 1.0/256.0;
-  prolongation[1](3,2) = 1.0/256.0;
-  prolongation[1](3,3) = 1.0/256.0;
-  prolongation[1](3,4) = -9.0/256.0;
-  prolongation[1](3,5) = -9.0/256.0;
-  prolongation[1](3,6) = -9.0/256.0;
-  prolongation[1](3,7) = -9.0/256.0;
-  prolongation[1](3,8) = -9.0/256.0;
-  prolongation[1](3,9) = -9.0/256.0;
-  prolongation[1](3,10) = -9.0/256.0;
-  prolongation[1](3,11) = -9.0/256.0;
-  prolongation[1](3,12) = 81.0/256.0;
-  prolongation[1](3,13) = 81.0/256.0;
-  prolongation[1](3,14) = 81.0/256.0;
-  prolongation[1](3,15) = 81.0/256.0;
-  prolongation[1](4,5) = 1.0;
-  prolongation[1](5,0) = 1.0/16.0;
-  prolongation[1](5,1) = 5.0/16.0;
-  prolongation[1](5,4) = -5.0/16.0;
-  prolongation[1](5,5) = 15.0/16.0;
-  prolongation[1](6,1) = 5.0/16.0;
-  prolongation[1](6,2) = 1.0/16.0;
-  prolongation[1](6,6) = 15.0/16.0;
-  prolongation[1](6,7) = -5.0/16.0;
-  prolongation[1](7,6) = 1.0;
-  prolongation[1](8,5) = -1.0/16.0;
-  prolongation[1](8,9) = -1.0/16.0;
-  prolongation[1](8,13) = 9.0/16.0;
-  prolongation[1](8,14) = 9.0/16.0;
-  prolongation[1](9,0) = -1.0/256.0;
-  prolongation[1](9,1) = -5.0/256.0;
-  prolongation[1](9,2) = -5.0/256.0;
-  prolongation[1](9,3) = -1.0/256.0;
-  prolongation[1](9,4) = 5.0/256.0;
-  prolongation[1](9,5) = -15.0/256.0;
-  prolongation[1](9,6) = 45.0/256.0;
-  prolongation[1](9,7) = 45.0/256.0;
-  prolongation[1](9,8) = 5.0/256.0;
-  prolongation[1](9,9) = -15.0/256.0;
-  prolongation[1](9,10) = 9.0/256.0;
-  prolongation[1](9,11) = 9.0/256.0;
-  prolongation[1](9,12) = -45.0/256.0;
-  prolongation[1](9,13) = 135.0/256.0;
-  prolongation[1](9,14) = 135.0/256.0;
-  prolongation[1](9,15) = -45.0/256.0;
-  prolongation[1](10,0) = -5.0/256.0;
-  prolongation[1](10,1) = -5.0/256.0;
-  prolongation[1](10,2) = -1.0/256.0;
-  prolongation[1](10,3) = -1.0/256.0;
-  prolongation[1](10,4) = 45.0/256.0;
-  prolongation[1](10,5) = 45.0/256.0;
-  prolongation[1](10,6) = -15.0/256.0;
-  prolongation[1](10,7) = 5.0/256.0;
-  prolongation[1](10,8) = 9.0/256.0;
-  prolongation[1](10,9) = 9.0/256.0;
-  prolongation[1](10,10) = -15.0/256.0;
-  prolongation[1](10,11) = 5.0/256.0;
-  prolongation[1](10,12) = 135.0/256.0;
-  prolongation[1](10,13) = 135.0/256.0;
-  prolongation[1](10,14) = -45.0/256.0;
-  prolongation[1](10,15) = -45.0/256.0;
-  prolongation[1](11,6) = -1.0/16.0;
-  prolongation[1](11,10) = -1.0/16.0;
-  prolongation[1](11,12) = 9.0/16.0;
-  prolongation[1](11,13) = 9.0/16.0;
-  prolongation[1](12,5) = 5.0/16.0;
-  prolongation[1](12,9) = 1.0/16.0;
-  prolongation[1](12,13) = 15.0/16.0;
-  prolongation[1](12,14) = -5.0/16.0;
-  prolongation[1](13,0) = 5.0/256.0;
-  prolongation[1](13,1) = 25.0/256.0;
-  prolongation[1](13,2) = 5.0/256.0;
-  prolongation[1](13,3) = 1.0/256.0;
-  prolongation[1](13,4) = -25.0/256.0;
-  prolongation[1](13,5) = 75.0/256.0;
-  prolongation[1](13,6) = 75.0/256.0;
-  prolongation[1](13,7) = -25.0/256.0;
-  prolongation[1](13,8) = -5.0/256.0;
-  prolongation[1](13,9) = 15.0/256.0;
-  prolongation[1](13,10) = 15.0/256.0;
-  prolongation[1](13,11) = -5.0/256.0;
-  prolongation[1](13,12) = -75.0/256.0;
-  prolongation[1](13,13) = 225.0/256.0;
-  prolongation[1](13,14) = -75.0/256.0;
-  prolongation[1](13,15) = 25.0/256.0;
-  prolongation[1](14,6) = 5.0/16.0;
-  prolongation[1](14,10) = 1.0/16.0;
-  prolongation[1](14,12) = -5.0/16.0;
-  prolongation[1](14,13) = 15.0/16.0;
-  prolongation[1](15,13) = 1.0;
-  prolongation[2](0,0) = 1.0/256.0;
-  prolongation[2](0,1) = 1.0/256.0;
-  prolongation[2](0,2) = 1.0/256.0;
-  prolongation[2](0,3) = 1.0/256.0;
-  prolongation[2](0,4) = -9.0/256.0;
-  prolongation[2](0,5) = -9.0/256.0;
-  prolongation[2](0,6) = -9.0/256.0;
-  prolongation[2](0,7) = -9.0/256.0;
-  prolongation[2](0,8) = -9.0/256.0;
-  prolongation[2](0,9) = -9.0/256.0;
-  prolongation[2](0,10) = -9.0/256.0;
-  prolongation[2](0,11) = -9.0/256.0;
-  prolongation[2](0,12) = 81.0/256.0;
-  prolongation[2](0,13) = 81.0/256.0;
-  prolongation[2](0,14) = 81.0/256.0;
-  prolongation[2](0,15) = 81.0/256.0;
-  prolongation[2](1,1) = -1.0/16.0;
-  prolongation[2](1,2) = -1.0/16.0;
-  prolongation[2](1,6) = 9.0/16.0;
-  prolongation[2](1,7) = 9.0/16.0;
-  prolongation[2](2,2) = 1.0;
-  prolongation[2](3,2) = -1.0/16.0;
-  prolongation[2](3,3) = -1.0/16.0;
-  prolongation[2](3,8) = 9.0/16.0;
-  prolongation[2](3,9) = 9.0/16.0;
-  prolongation[2](4,5) = -1.0/16.0;
-  prolongation[2](4,9) = -1.0/16.0;
-  prolongation[2](4,13) = 9.0/16.0;
-  prolongation[2](4,14) = 9.0/16.0;
-  prolongation[2](5,0) = -1.0/256.0;
-  prolongation[2](5,1) = -5.0/256.0;
-  prolongation[2](5,2) = -5.0/256.0;
-  prolongation[2](5,3) = -1.0/256.0;
-  prolongation[2](5,4) = 5.0/256.0;
-  prolongation[2](5,5) = -15.0/256.0;
-  prolongation[2](5,6) = 45.0/256.0;
-  prolongation[2](5,7) = 45.0/256.0;
-  prolongation[2](5,8) = 5.0/256.0;
-  prolongation[2](5,9) = -15.0/256.0;
-  prolongation[2](5,10) = 9.0/256.0;
-  prolongation[2](5,11) = 9.0/256.0;
-  prolongation[2](5,12) = -45.0/256.0;
-  prolongation[2](5,13) = 135.0/256.0;
-  prolongation[2](5,14) = 135.0/256.0;
-  prolongation[2](5,15) = -45.0/256.0;
-  prolongation[2](6,7) = 1.0;
-  prolongation[2](7,1) = 1.0/16.0;
-  prolongation[2](7,2) = 5.0/16.0;
-  prolongation[2](7,6) = -5.0/16.0;
-  prolongation[2](7,7) = 15.0/16.0;
-  prolongation[2](8,9) = 1.0;
-  prolongation[2](9,2) = 5.0/16.0;
-  prolongation[2](9,3) = 1.0/16.0;
-  prolongation[2](9,8) = -5.0/16.0;
-  prolongation[2](9,9) = 15.0/16.0;
-  prolongation[2](10,7) = -1.0/16.0;
-  prolongation[2](10,11) = -1.0/16.0;
-  prolongation[2](10,14) = 9.0/16.0;
-  prolongation[2](10,15) = 9.0/16.0;
-  prolongation[2](11,0) = -1.0/256.0;
-  prolongation[2](11,1) = -1.0/256.0;
-  prolongation[2](11,2) = -5.0/256.0;
-  prolongation[2](11,3) = -5.0/256.0;
-  prolongation[2](11,4) = 9.0/256.0;
-  prolongation[2](11,5) = 9.0/256.0;
-  prolongation[2](11,6) = 5.0/256.0;
-  prolongation[2](11,7) = -15.0/256.0;
-  prolongation[2](11,8) = 45.0/256.0;
-  prolongation[2](11,9) = 45.0/256.0;
-  prolongation[2](11,10) = 5.0/256.0;
-  prolongation[2](11,11) = -15.0/256.0;
-  prolongation[2](11,12) = -45.0/256.0;
-  prolongation[2](11,13) = -45.0/256.0;
-  prolongation[2](11,14) = 135.0/256.0;
-  prolongation[2](11,15) = 135.0/256.0;
-  prolongation[2](12,14) = 1.0;
-  prolongation[2](13,7) = 5.0/16.0;
-  prolongation[2](13,11) = 1.0/16.0;
-  prolongation[2](13,14) = 15.0/16.0;
-  prolongation[2](13,15) = -5.0/16.0;
-  prolongation[2](14,0) = 1.0/256.0;
-  prolongation[2](14,1) = 5.0/256.0;
-  prolongation[2](14,2) = 25.0/256.0;
-  prolongation[2](14,3) = 5.0/256.0;
-  prolongation[2](14,4) = -5.0/256.0;
-  prolongation[2](14,5) = 15.0/256.0;
-  prolongation[2](14,6) = -25.0/256.0;
-  prolongation[2](14,7) = 75.0/256.0;
-  prolongation[2](14,8) = -25.0/256.0;
-  prolongation[2](14,9) = 75.0/256.0;
-  prolongation[2](14,10) = -5.0/256.0;
-  prolongation[2](14,11) = 15.0/256.0;
-  prolongation[2](14,12) = 25.0/256.0;
-  prolongation[2](14,13) = -75.0/256.0;
-  prolongation[2](14,14) = 225.0/256.0;
-  prolongation[2](14,15) = -75.0/256.0;
-  prolongation[2](15,5) = 1.0/16.0;
-  prolongation[2](15,9) = 5.0/16.0;
-  prolongation[2](15,13) = -5.0/16.0;
-  prolongation[2](15,14) = 15.0/16.0;
-  prolongation[3](0,0) = -1.0/16.0;
-  prolongation[3](0,3) = -1.0/16.0;
-  prolongation[3](0,10) = 9.0/16.0;
-  prolongation[3](0,11) = 9.0/16.0;
-  prolongation[3](1,0) = 1.0/256.0;
-  prolongation[3](1,1) = 1.0/256.0;
-  prolongation[3](1,2) = 1.0/256.0;
-  prolongation[3](1,3) = 1.0/256.0;
-  prolongation[3](1,4) = -9.0/256.0;
-  prolongation[3](1,5) = -9.0/256.0;
-  prolongation[3](1,6) = -9.0/256.0;
-  prolongation[3](1,7) = -9.0/256.0;
-  prolongation[3](1,8) = -9.0/256.0;
-  prolongation[3](1,9) = -9.0/256.0;
-  prolongation[3](1,10) = -9.0/256.0;
-  prolongation[3](1,11) = -9.0/256.0;
-  prolongation[3](1,12) = 81.0/256.0;
-  prolongation[3](1,13) = 81.0/256.0;
-  prolongation[3](1,14) = 81.0/256.0;
-  prolongation[3](1,15) = 81.0/256.0;
-  prolongation[3](2,2) = -1.0/16.0;
-  prolongation[3](2,3) = -1.0/16.0;
-  prolongation[3](2,8) = 9.0/16.0;
-  prolongation[3](2,9) = 9.0/16.0;
-  prolongation[3](3,3) = 1.0;
-  prolongation[3](4,0) = -5.0/256.0;
-  prolongation[3](4,1) = -1.0/256.0;
-  prolongation[3](4,2) = -1.0/256.0;
-  prolongation[3](4,3) = -5.0/256.0;
-  prolongation[3](4,4) = -15.0/256.0;
-  prolongation[3](4,5) = 5.0/256.0;
-  prolongation[3](4,6) = 9.0/256.0;
-  prolongation[3](4,7) = 9.0/256.0;
-  prolongation[3](4,8) = -15.0/256.0;
-  prolongation[3](4,9) = 5.0/256.0;
-  prolongation[3](4,10) = 45.0/256.0;
-  prolongation[3](4,11) = 45.0/256.0;
-  prolongation[3](4,12) = 135.0/256.0;
-  prolongation[3](4,13) = -45.0/256.0;
-  prolongation[3](4,14) = -45.0/256.0;
-  prolongation[3](4,15) = 135.0/256.0;
-  prolongation[3](5,4) = -1.0/16.0;
-  prolongation[3](5,8) = -1.0/16.0;
-  prolongation[3](5,12) = 9.0/16.0;
-  prolongation[3](5,15) = 9.0/16.0;
-  prolongation[3](6,7) = -1.0/16.0;
-  prolongation[3](6,11) = -1.0/16.0;
-  prolongation[3](6,14) = 9.0/16.0;
-  prolongation[3](6,15) = 9.0/16.0;
-  prolongation[3](7,0) = -1.0/256.0;
-  prolongation[3](7,1) = -1.0/256.0;
-  prolongation[3](7,2) = -5.0/256.0;
-  prolongation[3](7,3) = -5.0/256.0;
-  prolongation[3](7,4) = 9.0/256.0;
-  prolongation[3](7,5) = 9.0/256.0;
-  prolongation[3](7,6) = 5.0/256.0;
-  prolongation[3](7,7) = -15.0/256.0;
-  prolongation[3](7,8) = 45.0/256.0;
-  prolongation[3](7,9) = 45.0/256.0;
-  prolongation[3](7,10) = 5.0/256.0;
-  prolongation[3](7,11) = -15.0/256.0;
-  prolongation[3](7,12) = -45.0/256.0;
-  prolongation[3](7,13) = -45.0/256.0;
-  prolongation[3](7,14) = 135.0/256.0;
-  prolongation[3](7,15) = 135.0/256.0;
-  prolongation[3](8,2) = 1.0/16.0;
-  prolongation[3](8,3) = 5.0/16.0;
-  prolongation[3](8,8) = 15.0/16.0;
-  prolongation[3](8,9) = -5.0/16.0;
-  prolongation[3](9,8) = 1.0;
-  prolongation[3](10,11) = 1.0;
-  prolongation[3](11,0) = 1.0/16.0;
-  prolongation[3](11,3) = 5.0/16.0;
-  prolongation[3](11,10) = -5.0/16.0;
-  prolongation[3](11,11) = 15.0/16.0;
-  prolongation[3](12,7) = 1.0/16.0;
-  prolongation[3](12,11) = 5.0/16.0;
-  prolongation[3](12,14) = -5.0/16.0;
-  prolongation[3](12,15) = 15.0/16.0;
-  prolongation[3](13,15) = 1.0;
-  prolongation[3](14,4) = 1.0/16.0;
-  prolongation[3](14,8) = 5.0/16.0;
-  prolongation[3](14,12) = -5.0/16.0;
-  prolongation[3](14,15) = 15.0/16.0;
-  prolongation[3](15,0) = 5.0/256.0;
-  prolongation[3](15,1) = 1.0/256.0;
-  prolongation[3](15,2) = 5.0/256.0;
-  prolongation[3](15,3) = 25.0/256.0;
-  prolongation[3](15,4) = 15.0/256.0;
-  prolongation[3](15,5) = -5.0/256.0;
-  prolongation[3](15,6) = -5.0/256.0;
-  prolongation[3](15,7) = 15.0/256.0;
-  prolongation[3](15,8) = 75.0/256.0;
-  prolongation[3](15,9) = -25.0/256.0;
-  prolongation[3](15,10) = -25.0/256.0;
-  prolongation[3](15,11) = 75.0/256.0;
-  prolongation[3](15,12) = -75.0/256.0;
-  prolongation[3](15,13) = 25.0/256.0;
-  prolongation[3](15,14) = -75.0/256.0;
-  prolongation[3](15,15) = 225.0/256.0;
-
-  restriction[0](0,0) = 1.0;
-  restriction[0](4,5) = 1.0;
-  restriction[0](10,11) = 1.0;
-  restriction[0](12,14) = 1.0;
-  restriction[1](1,1) = 1.0;
-  restriction[1](5,4) = 1.0;
-  restriction[1](6,7) = 1.0;
-  restriction[1](13,15) = 1.0;
-  restriction[2](2,2) = 1.0;
-  restriction[2](7,6) = 1.0;
-  restriction[2](9,8) = 1.0;
-  restriction[2](14,12) = 1.0;
-  restriction[3](3,3) = 1.0;
-  restriction[3](8,9) = 1.0;
-  restriction[3](11,10) = 1.0;
-  restriction[3](15,13) = 1.0;
+  initialize_matrices ();
 };
 
 
 
 template <>
-FECubicSub<2>::FECubicSub (int) :
+FECubicSub<2>::FECubicSub (const int) :
 		FELinearMapping<2> (0, 0, 16)
 {
+  initialize_matrices ();
+};
+
+
+
+template <>
+void FECubicSub<2>::initialize_matrices () {
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,0) = -1.0/16.0;
   prolongation[0](1,1) = -1.0/16.0;
@@ -1082,6 +694,7 @@ FECubicSub<2>::FECubicSub (int) :
   restriction[3](11,10) = 1.0;
   restriction[3](15,13) = 1.0;
 };
+
 
 
 template <>

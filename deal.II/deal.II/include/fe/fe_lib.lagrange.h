@@ -100,6 +100,18 @@ class FELinear : public FELinearMapping<dim> {
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
 					dFMatrix &local_mass_matrix) const;
+
+  private:
+
+				     /**
+				      * This function is simply singled out of
+				      * the constructor; it sets up the
+				      * #restriction# and #prolongation#
+				      * matrices. Since we have two constructors
+				      * which need this functionality, we
+				      * provide a single function for this.
+				      */
+    void initialize_matrices ();
 };
 
 
@@ -184,6 +196,18 @@ class FEQuadraticSub : public FELinearMapping<dim> {
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
 					dFMatrix &local_mass_matrix) const;
+
+  private:
+
+				     /**
+				      * This function is simply singled out of
+				      * the constructor; it sets up the
+				      * #restriction# and #prolongation#
+				      * matrices. Since we have two constructors
+				      * which need this functionality, we
+				      * provide a single function for this.
+				      */
+    void initialize_matrices ();
 };
 
 
@@ -288,6 +312,18 @@ class FECubicSub : public FELinearMapping<dim> {
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
 					dFMatrix &local_mass_matrix) const;
+
+  private:
+
+				     /**
+				      * This function is simply singled out of
+				      * the constructor; it sets up the
+				      * #restriction# and #prolongation#
+				      * matrices. Since we have two constructors
+				      * which need this functionality, we
+				      * provide a single function for this.
+				      */
+    void initialize_matrices ();
 };
 
 
@@ -391,6 +427,18 @@ class FEQuarticSub : public FELinearMapping<dim> {
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
 					dFMatrix &local_mass_matrix) const;
+
+  private:
+
+				     /**
+				      * This function is simply singled out of
+				      * the constructor; it sets up the
+				      * #restriction# and #prolongation#
+				      * matrices. Since we have two constructors
+				      * which need this functionality, we
+				      * provide a single function for this.
+				      */
+    void initialize_matrices ();
 };
 
 
