@@ -76,6 +76,10 @@ class MGTest
 			     Vector<double>& dst,
 			     const Vector<double>& src,
 			     const Vector<double>& rhs);
+
+    virtual void print_vector(unsigned int,
+			      const Vector<double> &,
+			      const char *) const;
     
     void doit()
       {
@@ -130,6 +134,14 @@ MGTest::level_vmult(unsigned l,
 {
   deallog << "Residual on  " << l << endl;
 }
+
+void
+MGTest::print_vector(unsigned int,
+		     const Vector<double> &,
+		     const char *) const
+{}
+
+
 
 void
 MGCoarseGridTest::operator() (unsigned int level,

@@ -69,6 +69,10 @@ virtual void level_vmult (unsigned int level,
 
     void copy_to_mg(const Vector<TYPE>& rhs);
     void copy_from_mg(Vector<TYPE>& lsg);
+    virtual void print_vector(unsigned int,
+			      const Vector<double> &,
+			      const char *) const;
+
 };
 
 class MGSmootherLAC
@@ -203,6 +207,13 @@ FDMG::copy_from_mg(Vector<TYPE>& v)
 {
   v = solution[maxlevel];
 }
+
+void
+FDMG::print_vector(unsigned int,
+		   const Vector<double> &,
+		   const char *) const
+{}
+
 
 
 MGSmootherLAC::MGSmootherLAC(MGLevelObject<SparseMatrix<double> >& matrix)

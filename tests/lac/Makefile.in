@@ -95,6 +95,23 @@ solver.testcase: $(solver-o-files) $(libraries)
 ############################################################
 
 
+full_matrix-cc-files = full_matrix.cc
+
+ifeq ($(debug-mode),on)
+full_matrix-o-files = $(full_matrix-cc-files:.cc=.go)
+else
+full_matrix-o-files = $(full_matrix-cc-files:.cc=.o)
+endif
+
+full_matrix.testcase: $(full_matrix-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
+
+
+############################################################
+
+
 mgbase-cc-files = mgbase.cc
 
 ifeq ($(debug-mode),on)
