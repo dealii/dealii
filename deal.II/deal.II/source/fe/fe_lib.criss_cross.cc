@@ -1145,6 +1145,172 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 
 
 
+#if deal_II_dimension == 3
+
+// provide dummy implementations of the functions above. the reason is
+// that true implementations would simply be too large (several 10.000
+// lines of code) for today's compilers and computers.
+
+template <>
+FECrissCross<3>::FECrissCross () :
+				   // set more or less invalid data
+		FiniteElement<3> (FiniteElementData<3> (0,0,0,0,0,0),
+				  vector<bool>())
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+double
+FECrissCross<3>::shape_value (const unsigned int,
+		      const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+Tensor<1,3>
+FECrissCross<3>::shape_grad (const unsigned int,
+		     const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<1,3>();
+};
+
+
+
+template <>
+Tensor<2,3>
+FECrissCross<3>::shape_grad_grad (const unsigned int,
+			  const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<2,3>();
+};
+
+
+
+template <>
+void
+FECrissCross<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+				FullMatrix<double> &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FECrissCross<3>::get_unit_support_points (vector<Point<3> > &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FECrissCross<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &,
+				  vector<Point<3> >  &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FECrissCross<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &,
+				       vector<Point<3> >  &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
+template <>
+void FECrissCross<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &,
+					  const vector<Point<2> > &,
+					  vector<double>      &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FECrissCross<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &,
+					     const unsigned int,
+					     const vector<Point<2> > &,
+					     vector<double>      &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+template <>
+void FECrissCross<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &,
+					  const unsigned int,
+					  const vector<Point<2> > &,
+					  vector<Point<3> >       &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FECrissCross<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &,
+					  const unsigned int,
+					  const unsigned int,
+					  const vector<Point<2> > &,
+					  vector<Point<3> >       &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FECrissCross<3>::fill_fe_values (const DoFHandler<3>::cell_iterator &,
+				      const vector<Point<3> > &,
+				      vector<Tensor<2,3> >    &,
+				      const bool            ,
+				      vector<Tensor<3,3> > &,
+				      const bool            ,
+				      vector<Point<3> >    &,
+				      const bool            ,
+				      vector<Point<3> >    &,
+				      const bool            ,
+				      const FullMatrix<double>       &,
+				      const vector<vector<Tensor<1,3> > > &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+double FECrissCross<3>::shape_value_transform (const unsigned int,
+					       const Point<3> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+Tensor<1,3> FECrissCross<3>::shape_grad_transform (const unsigned int,
+						   const Point<3> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Point<3>();
+};
+
+
+#endif // deal_II_dimension == 3
+
+
 
 
 /*--------------------------- QCrissCross* ------------------------------------*/

@@ -103,27 +103,28 @@ void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
 
 template <>
 void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-					    const unsigned int,
-					    const unsigned int,
-					    const vector<Point<0> > &,
-					    vector<Point<1> > &) const {
+					 const unsigned int,
+					 const unsigned int,
+					 const vector<Point<0> > &,
+					 vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
 
+
 template <>
 void FEQ1Mapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
-					 const vector<Point<1> > &unit_points,
-					 vector<Tensor<2,1> >    &jacobians,
-					 const bool            compute_jacobians,
-					 vector<Tensor<3,1> > &jacobians_grad,
-					 const bool            compute_jacobians_grad,
-					 vector<Point<1> >    &support_points,
-					 const bool            compute_support_points,
-					 vector<Point<1> >    &q_points,
-					 const bool            compute_q_points,
-					 const FullMatrix<double>       &shape_values_transform,
-					 const vector<vector<Tensor<1,1> > > &shape_gradients_transform) const {
+				     const vector<Point<1> > &unit_points,
+				     vector<Tensor<2,1> >    &jacobians,
+				     const bool            compute_jacobians,
+				     vector<Tensor<3,1> > &jacobians_grad,
+				     const bool            compute_jacobians_grad,
+				     vector<Point<1> >    &support_points,
+				     const bool            compute_support_points,
+				     vector<Point<1> >    &q_points,
+				     const bool            compute_q_points,
+				     const FullMatrix<double>       &shape_values_transform,
+				     const vector<vector<Tensor<1,1> > > &shape_gradients_transform) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
@@ -554,17 +555,17 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*c
 
 template <int dim>
 void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-					   const vector<Point<dim> >            &unit_points,
-					   vector<Tensor<2,dim> >               &jacobians,
-					   const bool              compute_jacobians,
-					   vector<Tensor<3,dim> > &jacobians_grad,
-					   const bool              compute_jacobians_grad,
-					   vector<Point<dim> > &support_points,
-					   const bool           compute_support_points,
-					   vector<Point<dim> > &q_points,
-					   const bool           compute_q_points,
-					   const FullMatrix<double>      &shape_values_transform,
-					   const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const
+				       const vector<Point<dim> >            &unit_points,
+				       vector<Tensor<2,dim> >               &jacobians,
+				       const bool              compute_jacobians,
+				       vector<Tensor<3,dim> > &jacobians_grad,
+				       const bool              compute_jacobians_grad,
+				       vector<Point<dim> > &support_points,
+				       const bool           compute_support_points,
+				       vector<Point<dim> > &q_points,
+				       const bool           compute_q_points,
+				       const FullMatrix<double>      &shape_values_transform,
+				       const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const
 {
   Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));

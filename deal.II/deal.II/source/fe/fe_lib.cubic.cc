@@ -1600,10 +1600,14 @@ void FEQ3<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 
 
 
-#if 0   // ignore the following, since it doesn't compile properly. it simply
-				 // is too large
 
 #if deal_II_dimension == 3
+
+// ignore the following, since it doesn't compile properly. it simply
+// is too large. instead, in the `else' branch of the `if 0', we
+// provide dummy implementations.
+
+#if 0
 
 template <>
 FEQ3<3>::FEQ3 () :
@@ -1879,7 +1883,8 @@ FEQ3<3>::FEQ3 (const int) :
 
 
 template <>
-void FEQ3<3>::initialize_matrices () {
+void FEQ3<3>::initialize_matrices ()
+{
       prolongation[0](0,0) = 1.0;
       prolongation[0](1,0) = -1.0/16.0;
       prolongation[0](1,1) = -1.0/16.0;
@@ -9953,7 +9958,7 @@ void FEQ3<3>::initialize_matrices () {
 template <>
 double
 FEQ3<3>::shape_value (const unsigned int i,
-			    const Point<3>    &p) const
+		      const Point<3>    &p) const
 {
   Assert (i<dofs_per_cell, ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -10566,7 +10571,7 @@ xi*xi+6561.0/2.0*xi*xi*xi)*eta*eta+(-6561.0/8.0*xi+6561.0/2.0*xi*xi-19683.0/8.0
 template <>
 Tensor<1,3>
 FEQ3<3>::shape_grad (const unsigned int i,
-			       const Point<3>    &p) const
+		     const Point<3>    &p) const
 {
   Assert (i<dofs_per_cell, ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -10781,7 +10786,7 @@ FEQ3<3>::shape_grad (const unsigned int i,
 template <>
 Tensor<2,3>
 FEQ3<3>::shape_grad_grad (const unsigned int i,
-				const Point<3>    &p) const
+			  const Point<3>    &p) const
 {
   Assert (i<dofs_per_cell, ExcIndexRange(i, 0, dofs_per_cell));
 
@@ -11397,7 +11402,7 @@ return_value[2][2] = 2.0*(729.0/2.0*xi-1458.0*xi*xi+2187.0/2.0*xi*xi*xi)*eta+2.0
 template <>
 void
 FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
-				      FullMatrix<double> &local_mass_matrix) const
+				FullMatrix<double> &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
@@ -11410,7 +11415,8 @@ FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 
 
 template <>
-void FEQ3<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
+void FEQ3<3>::get_unit_support_points (vector<Point<3> > &unit_points) const
+{
   Assert (unit_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (unit_points.size(), dofs_per_cell));
   unit_points[0] = Point<3>(0, 0, 0);
@@ -11483,7 +11489,8 @@ void FEQ3<3>::get_unit_support_points (vector<Point<3> > &unit_points) const {
 
 template <>
 void FEQ3<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &cell,
-					vector<Point<3> >  &support_points) const {
+				  vector<Point<3> >  &support_points) const
+{
   Assert (support_points.size() == dofs_per_cell,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
 
@@ -11861,7 +11868,8 @@ void FEQ3<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &c
 
 template <>
 void FEQ3<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &face,
-					     vector<Point<3> >  &support_points) const {
+				       vector<Point<3> >  &support_points) const
+{
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 
@@ -11897,8 +11905,110 @@ void FEQ3<3>::get_face_support_points (const typename DoFHandler<3>::face_iterat
 
 
 
-#endif // deal_II_dimension == 3
+#else  // 0
+
+// provide dummy implementations of the functions above. for the
+// reason, see the beginning of the `if 0' conditional
+
+template <>
+FEQ3<3>::FEQ3 () :
+		FEQ1Mapping<3> (1, 2, 4, 8, 1,
+				vector<bool> (1, false))
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+FEQ3<3>::FEQ3 (const int) :
+		FEQ1Mapping<3> (0, 0, 0, 64, 1,
+				vector<bool> (1, false))
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ3<3>::initialize_matrices ()
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+double
+FEQ3<3>::shape_value (const unsigned int,
+		      const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+Tensor<1,3>
+FEQ3<3>::shape_grad (const unsigned int,
+		     const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<1,3>();
+};
+
+
+
+template <>
+Tensor<2,3>
+FEQ3<3>::shape_grad_grad (const unsigned int,
+			  const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<2,3>();
+};
+
+
+
+template <>
+void
+FEQ3<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+				FullMatrix<double> &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ3<3>::get_unit_support_points (vector<Point<3> > &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ3<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &,
+				  vector<Point<3> >  &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ3<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &,
+				       vector<Point<3> >  &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
 #endif // 0
+#endif // deal_II_dimension == 3
 
 
 // explicit instantiations

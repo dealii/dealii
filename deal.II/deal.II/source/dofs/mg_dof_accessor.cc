@@ -665,6 +665,19 @@ MGDoFCellAccessor<2>::face (const unsigned int i) const
 
 
 
+#if deal_II_dimension == 3
+
+template <>
+MGDoFCellAccessor<3>::face_iterator
+MGDoFCellAccessor<3>::face (const unsigned int i) const
+{
+  return quad(i);
+};
+
+#endif
+
+
+
 
 
 // explicit instantiations

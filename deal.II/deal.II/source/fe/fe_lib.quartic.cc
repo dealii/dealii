@@ -2768,6 +2768,114 @@ void FEQ4<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 
 
 
+#if deal_II_dimension == 3
+
+// provide dummy implementations of the functions above. the reason is
+// that true implementations would simply be too large (several 10.000
+// lines of code) for today's compilers and computers.
+
+template <>
+FEQ4<3>::FEQ4 () :
+		FEQ1Mapping<3> (1, 2, 4, 8, 1,
+				vector<bool> (1, false))
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+FEQ4<3>::FEQ4 (const int) :
+		FEQ1Mapping<3> (0, 0, 0, 64, 1,
+				vector<bool> (1, false))
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ4<3>::initialize_matrices ()
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+double
+FEQ4<3>::shape_value (const unsigned int,
+		      const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <>
+Tensor<1,3>
+FEQ4<3>::shape_grad (const unsigned int,
+		     const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<1,3>();
+};
+
+
+
+template <>
+Tensor<2,3>
+FEQ4<3>::shape_grad_grad (const unsigned int,
+			  const Point<3>    &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<2,3>();
+};
+
+
+
+template <>
+void
+FEQ4<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
+				FullMatrix<double> &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ4<3>::get_unit_support_points (vector<Point<3> > &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ4<3>::get_support_points (const typename DoFHandler<3>::cell_iterator &,
+				  vector<Point<3> >  &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <>
+void FEQ4<3>::get_face_support_points (const typename DoFHandler<3>::face_iterator &,
+				       vector<Point<3> >  &) const
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+#endif // deal_II_dimension == 3
+
+
+
+
 
 
 
