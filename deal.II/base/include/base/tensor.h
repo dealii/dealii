@@ -665,4 +665,69 @@ double determinant (const Tensor<2,3> &t)
 };
 
 
+
+/**
+ * Compute and return the inverse of the given tensor. Since the
+ * compiler can perform the return value optimization, and since the
+ * size of the return object is known, it is acceptable to return the
+ * result by value, rather than by reference as a parameter.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <int dim>
+inline
+Tensor<2,dim>
+invert (const Tensor<2,dim> &t)
+{
+  Tensor<2,dim> return_tensor;
+  switch (dim) 
+    {
+      case 1:
+	    return_tensor[0][0] = 1.0/t[0][0];
+	    return return_tensor;
+      case 2:
+					     // this is Maple output,
+					     // thus a bit unstructured
+      {
+	const double t4 = 1.0/(t[0][0]*t[1][1]-t[0][1]*t[1][0]);
+	return_tensor[0][0] = t[1][1]*t4;
+	return_tensor[0][1] = -t[0][1]*t4;
+	return_tensor[1][0] = -t[1][0]*t4;
+	return_tensor[1][1] = t[0][0]*t4;
+	return return_tensor;
+      };
+      
+      case 3:
+      {
+	const double t4 = t[0][0]*t[1][1],
+		     t6 = t[0][0]*t[1][2],
+		     t8 = t[0][1]*t[1][0],
+		    t00 = t[0][2]*t[1][0],
+		    t01 = t[0][1]*t[2][0],
+		    t04 = t[0][2]*t[2][0],
+		    t07 = 1.0/(t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
+			       t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
+	return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
+	return_tensor[0][1] = -(t[0][1]*t[2][2]-t[0][2]*t[2][1])*t07;
+	return_tensor[0][2] = -(-t[0][1]*t[1][2]+t[0][2]*t[1][1])*t07;
+	return_tensor[1][0] = -(t[1][0]*t[2][2]-t[1][2]*t[2][0])*t07;
+	return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
+	return_tensor[1][2] = -(t6-t00)*t07;
+	return_tensor[2][0] = -(-t[1][0]*t[2][1]+t[1][1]*t[2][0])*t07;
+	return_tensor[2][1] = -(t[0][0]*t[2][1]-t01)*t07;
+	return_tensor[2][2] = (t4-t8)*t07;
+	return return_tensor;
+      };
+
+					// if desired, take over the
+					// inversion of a 4x4 tensor
+					// from the FullMatrix
+       
+      default:
+	    AssertThrow (false, ExcNotImplemented());
+   };    
+  return return_tensor;
+};
+
+
 #endif
