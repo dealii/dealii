@@ -2095,6 +2095,17 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
 
 
 
+
+
+template <int dim>
+void Triangulation<dim>::execute_coarsening_and_refinement () {
+  execute_coarsening();
+  execute_refinement();
+};
+
+
+
+
 #if deal_II_dimension == 1
 
 template <>
@@ -2873,6 +2884,37 @@ void Triangulation<2>::execute_refinement () {
 
 
 
+template <int dim>
+void Triangulation<dim>::execute_coarsening () {
+  prepare_coarsening ();
+
+  cell_iterator cell = last(levels.size()-2),
+		endc = end();
+				   // now do the actual coarsening step. Since
+				   // the loop goes over used cells only we need
+				   // not worry about deleting some cells since
+				   // the ++operator will then just hop over
+				   // them if we should hit one. Do the loop
+				   // in the reverse way since we may only
+				   // delete some cells if their neighbors
+				   // have already been deleted (if the latter
+				   // are on a higher level for example)
+  for (; cell!=endc; --cell)
+    if (cell->user_flag_set())
+				       // use a separate function, since this
+				       // is dimension specific
+      delete_cell (cell);
+  				   // in principle no user flags should be
+				   // set any more at this point
+#if DEBUG
+  for (cell=begin(); cell!=endc; ++cell)
+    Assert (cell->user_flag_set() == false, ExcInternalError());
+#endif
+};
+
+
+
+
 
 template <int dim>
 void Triangulation<dim>::prepare_refinement () {
@@ -3021,6 +3063,305 @@ void Triangulation<dim>::prepare_refinement () {
       };
 };
 
+
+
+template <int dim>
+void Triangulation<dim>::prepare_coarsening () {
+  cell_iterator cell = begin(),
+		endc = end();  
+
+				   // loop over all cells. Flag all cells of
+				   // which all children are flagged for
+				   // coarsening and delete the childrens'
+				   // flags. Also delete all flags of cells
+				   // for which not all children of a cell
+				   // are flagged. In effect, only those
+				   // cells are flagged of which originally
+				   // all children were flagged and for which
+				   // all children are on the same refinement
+				   // level. For flagging, the user flags are
+				   // used, to avoid confusion and because
+				   // non-active cells can't be flagged for
+				   // coarsening
+				   //
+				   // In effect, all coarsen flags are turned
+				   // into user flags of the mother cell if
+				   // coarsening is possible or deleted
+				   // otherwise. Coarsen flags of cells with
+				   // no mother cell, i.e. on the
+				   // coarsest level are deleted explicitely.
+  clear_user_flags ();
+				   // number of active children of #cell#.
+				   // number of children of #cell# which are
+				   // flagged for coarsening
+  unsigned int flagged_children;
+  
+  for (cell=begin(); cell!=endc; ++cell) 
+    {
+				       // nothing to do if we are already on
+				       // the finest level; if we are on the
+				       // coarsest level, delete coarsen flag
+				       // since no coarsening possible
+      if (cell->active()) 
+	{
+	  if (cell->level() == 0)
+	    cell->clear_coarsen_flag();
+	  continue;
+	};
+      
+      flagged_children = 0;
+      for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+	if (cell->child(child)->active() &&
+	    cell->child(child)->coarsen_flag_set()) 
+	  {
+	    ++flagged_children;
+					     // clear flag since we don't need
+					     // it anymore
+	    cell->child(child)->clear_coarsen_flag();
+	  };
+
+				       // flag this cell for coarsening if all
+				       // children were flagged
+      if (flagged_children == GeometryInfo<dim>::children_per_cell)
+	cell->set_user_flag();
+    };
+
+				   // in principle no coarsen flags should be
+				   // set any more at this point
+#if DEBUG
+  for (cell=begin(); cell!=endc; ++cell)
+    Assert (cell->coarsen_flag_set() == false, ExcInternalError());
+#endif
+
+
+
+  
+				   // do some smoothing on the mesh if required
+  if (dim>1)
+    if (smooth_grid & eliminate_refined_islands) 
+      for (cell=begin(); cell!=endc; ++cell)
+	if (!cell->active() || (cell->active() && cell->refine_flag_set()))
+	  {
+					     // check whether all children are
+					     // active, i.e. not refined
+					     // themselves. This is a precondition
+					     // that the children may be coarsened
+					     // away. If the cell is only flagged
+					     // for refinement, then all future
+					     // children will be active
+	    bool all_children_active = true;
+	    if (!cell->active())
+	      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+		if (!cell->child(c)->active()) 
+		  {
+		    all_children_active = false;
+		    break;
+		  };
+
+	    if (all_children_active) 
+	      {
+						 // count number of refined and
+						 // unrefined neighbors of cell.
+						 // neighbors on lower levels
+						 // are counted as unrefined since
+						 // they can only get to the same
+						 // level as this cell by the
+						 // next refinement cycle
+		unsigned int refined_neighbors = 0,
+			   unrefined_neighbors = 0;
+		for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n) 
+		  {
+		    const cell_iterator neighbor = cell->neighbor(n);
+		    if (neighbor.state() == valid)
+		      if ((neighbor->active() &&
+			   !neighbor->refine_flag_set()) ||
+			  (!neighbor->active() &&
+			   neighbor->user_flag_set())    ||   // marked for coarsening
+			  (neighbor->level() == cell->level()-1))
+			++unrefined_neighbors;
+		      else
+			++refined_neighbors;
+		  };
+		
+
+						 // if the number of unrefined
+						 // neighbors exceed that of the
+						 // refined neighbors: mark this
+						 // cell for coarsening or don't
+						 // refine if marked for that
+		if (refined_neighbors<unrefined_neighbors)
+		  if (!cell->active())
+		    cell->set_user_flag();
+		  else
+		    cell->clear_refine_flag();
+	      };
+	  };
+  
+
+  
+				   // now delete again some of the user flags
+				   // those cells which should be refined but
+				   // for which some neighbors of the children
+				   // are refined even more and will not be
+				   // coarsened. This restriction does not
+				   // apply for one space dimension
+  if (dim>1) 
+    {
+      bool flags_changed_in_this_loop;
+
+				       // we may have to do the deleting of
+				       // in several loops since the deletion
+				       // of a flag may require the deletion
+				       // of other flags as well. Loop until
+				       // nothing more changes
+      do 
+	{
+	  flags_changed_in_this_loop = false;
+
+					   // loop over cells in reverse order
+					   // since this may save us some of the
+					   // outer loops (we always look at
+					   // the user flags of cells on
+					   // higher levels, so it is best to
+					   // treat them first). We may skip the
+					   // highest level since the user flags
+					   // are only set for refined flags
+					   // which do not exist on the
+					   // highest level.
+	  for (cell=last(levels.size()-2); cell!=endc; --cell)
+	    if (cell->user_flag_set())
+					       // cell is flagged for coarsening
+	      for (unsigned int child=0;
+		   child<GeometryInfo<dim>::children_per_cell; ++child)
+		for (unsigned int neighbor=0;
+		     neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
+						   // for all neighbors of all
+						   // children: if they are
+						   // refined more often than
+						   // the child and are not
+						   // flagged for coarsening,
+						   // we can't coarsen this cell
+		  {
+		    cell_iterator child_neighbor = cell->child(child)->neighbor(neighbor);
+		    if ((child_neighbor.state() == valid) &&
+			(child_neighbor->level() == cell->level()+1) &&
+			(child_neighbor->active() == false) &&
+			(child_neighbor->user_flag_set() == false))
+		      {
+			cell->clear_user_flag();
+			flags_changed_in_this_loop = true;
+		      };
+		  };
+	}
+      while (flags_changed_in_this_loop);
+    };
+};
+
+
+
+
+#ifdef deal_II_dimension == 2
+
+void Triangulation<2>::delete_cell (cell_iterator &cell) {
+  const unsigned int dim=2;
+				   // first we need to reset the
+				   // neighbor pointers of the neighbors
+				   // of this cell's children to this
+				   // cell. This is different for one
+				   // dimension, since there neighbors
+				   // can have a refinement level
+				   // differing from that of this cell's
+				   // children by more than one level.
+				   // For two or more dimensions, the
+				   // neighbors of the children may only
+				   // be on the same level or on the level
+				   // of this cell (the case that the
+				   // neighbors are more refined than
+				   // the children was eliminated in
+				   // #prepare_coarsening#
+  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+    for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell;
+	 ++n)
+      {
+	const cell_iterator neighbor = cell->child(child)->neighbor(n);
+					 // do nothing if at boundary
+	if (neighbor.state() != valid)
+	  continue;
+	
+	Assert ((neighbor->level()==cell->level()) ||
+		(neighbor->level()==cell->level()+1),
+		ExcInternalError());
+	
+					 // if the neighbor's level is the
+					 // same as that of #cell#, then
+					 // it's neighbor pointers points
+					 // to this cell rather than to
+					 // this cell's child. In that
+					 // case we need not do anything.
+					 // If the neighbor is refined
+					 // as often as are the children,
+					 // we need to reset those neigbor
+					 // pointers that point to the
+					 // child of this cell; when
+					 // resetting the neighbor
+					 // pointers of neighbors of one
+					 // of the children, we will also
+					 // reset the neighbor pointers
+					 // other children to the present
+					 // cell, but this does no harm
+					 // since we delete the children
+					 // afterwards anyway
+	if (neighbor->level() == cell->level()+1)
+	  for (unsigned int neighbor_neighbor=0;
+	       neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
+	       ++neighbor_neighbor)
+	    if (neighbor->neighbor(neighbor_neighbor) == cell->child(child))
+	      neighbor->set_neighbor(neighbor_neighbor, cell);
+      };
+
+				   // delete the vertex which will not be
+				   // needed anymore. This vertex is the
+				   // second of the second line of the
+				   // first child
+  vertices_used[cell->child(0)->line(1)->vertex_index(1)] = false;
+				   // delete the four interior lines
+  cell->child(0)->line(1)->clear_used_flag();
+  cell->child(0)->line(2)->clear_used_flag();
+  cell->child(2)->line(0)->clear_used_flag();
+  cell->child(2)->line(3)->clear_used_flag();
+
+				   // for the four faces: if the neighbor
+				   // does not itself need the subfaces,
+				   // delete them. note that since dim>1
+				   // the level of a neighbor is either
+				   // one less or the same as that of
+				   // cell
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
+    if ((cell->neighbor(face).state() != valid) ||
+	(cell->neighbor(face)->level() == cell->level()-1) ||
+	((cell->neighbor(face)->level() == cell->level()) &&
+	 !cell->neighbor(face)->has_children()))
+      {
+					 // delete middle vertex
+	vertices_used[cell->face(face)->child(0)->vertex_index(1)] = false;
+					 // delete the two subfaces
+	for (unsigned int subface=0;
+	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
+	  cell->face(face)->child(subface)->clear_used_flag ();
+	
+	cell->face(face)->clear_children();
+      };
+  
+				   // invalidate children
+  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+    cell->child(child)->clear_used_flag();
+  
+				   // delete pointer to children
+  cell->set_children (-1);
+  cell->clear_user_flag();
+};
+
+#endif
 
 
 
