@@ -20,7 +20,7 @@ template <int dim> class DoFHandler;
  *
  * As the interpolation while
  * coarsening is much more complicated to organize 
- * (see further documentation below) than interpolation while pure refinement
+ * (see further documentation below) than interpolation while pure refinement,
  * #SolutionTransfer# offers two possible usages.
  * \begin{itemize}
  * \item If the grid will only be purely refined
@@ -31,6 +31,7 @@ template <int dim> class DoFHandler;
  *                                     // some refinement e.g.
  * tria->refine_and_coarsen_fixed_fraction(error_indicator, 0.3, 0);
  * tria->execute_coarsening_and_refinement();
+ * dof_handler->distribute_dofs (fe);
  * soltrans.refine_interpolate(solution);
  *                                     // if necessary interpolate some
  *                                     // more functions
@@ -47,23 +48,28 @@ template <int dim> class DoFHandler;
  * tria->prepare_coarsening_and_refinement();
  * soltrans.prepare_for_coarsening_and_refinement(solution);
  * tria->execute_coarsening_and_refinement ();
- * soltrans.refine_interpolate(solution);
+ * dof_handler->distribute_dofs (fe);
+ * soltrans.interpolate(solution);
  * \end{verbatim}
+ 
  * Multiple calling of this function #void interpolate (Vector<number> &out) const#
- * is NOT allowed. Interpolating
- * several functions can be performed
- * in one step by using #void 
- * interpolate (vector<Vector<number>
- * >&all_out) const#, see there.
+ * is NOT allowed. Interpolating several functions can be performed in one step
+ * by using #void interpolate (vector<Vector<number> >&all_out) const#, and
+ * using the respective #prepare_for_coarsening_and_refinement# function taking
+ * several vectors as input before actually refining and coarsening the
+ * triangulation (see there).
  * \end{itemize}
- * For deleting all stored data in and reinitializing the #SolutionTransfer#
- * use the #reinit()# function.
  *
- * Note that the #user_pointer# of the cell are used. Be sure that you don't need
+ * For deleting all stored data in and reinitializing the
+ * #SolutionTransfer# use the #clear()# function.
+ *
+ * Note that the #user_pointer# of some cells are used. Be sure that you don't need
  * them otherwise.
  *
- * @author Ralf Hartmann, 1999
- */
+ * The template argument #number# denotes the data type of the vectors you want
+ * to transfer.
+ *
+ * @author Ralf Hartmann, 1999 */
 template<int dim, typename number>
 class SolutionTransfer
 {
@@ -84,7 +90,7 @@ class SolutionTransfer
 				      * it has
 				      * directly after calling the Constructor
 				      */
-    void reinit();
+    void clear();
 
 				     /**
 				      * Prepares the #SolutionTransfer# for
@@ -111,17 +117,17 @@ class SolutionTransfer
     
 				     /**
 				      * Same as previous function
-				      * but only for one discrete function
+				      * but for only one discrete function
 				      * to interpolate.
 				      */
     void prepare_for_coarsening_and_refinement (const Vector<number> &in);
 		      
 				     /**
 				      * This function
-				      * interpolates the discrete function #in#
-				      * on the grid before the
-				      * refinement to the function #out#
-				      * on the refined grid.
+				      * interpolates the discrete function #in#,
+				      * which is a vector on the grid before the
+				      * refinement, to the function #out#
+				      * which then is a vector on the refined grid.
 				      * It assumes the vectors having the
 				      * right sizes (i.e. in.size()==n_dofs_old,
 				      * out.size()==n_dofs_refined)
@@ -151,14 +157,13 @@ class SolutionTransfer
 				      * interpolates the discrete functions
 				      * that are stored in #all_out# onto
 				      * the refined and/or coarsenend grid.
-				      * It assumes the vectors in #all_out#
-				      * being idendically the same vectors
+				      * It assumes the vectors in #all_in#
+				      * denote the same vectors
 				      * as in #all_in# as parameter
 				      * of #prepare_for_refinement_and_coarsening
 				      * (vector<Vector<number> > &all_in)#.
-				      * So they have the 
-				      * right sizes (i.e. all_out[j].size()==
-				      * n_dofs_old  for all j).
+				      * However, there is no way of verifying
+				      * this internally, so be careful here.
 				      *
 				      * Calling this function is allowed only
 				      * if first #Triangulation::prepare_coarsening_
@@ -172,14 +177,12 @@ class SolutionTransfer
 				      * several functions can be performed
 				      * in one step.
 				      */
-    void interpolate (vector<Vector<number> >&all_out) const;
+    void interpolate (const vector<Vector<number> >&all_in,
+		      vector<Vector<number> >      &all_out) const;
       
 				     /**
 				      * Same as the previous function.
 				      * It interpolates only one function.
-				      * It assumes the vector having the
-				      * right size (i.e. all_out[j].size()==
-				      * n_dofs_old  for all j)
 				      * 
 				      * Multiple calling of this function is
 				      * NOT allowed. Interpolating
@@ -188,7 +191,8 @@ class SolutionTransfer
 				      * interpolate (vector<Vector<number>
 				      * >&all_out) const#
 				      */
-    void interpolate (Vector<number> &out) const;
+    void interpolate (const Vector<number> &in,
+		      Vector<number>       &out) const;
 
 				     /**
 				      * Exception
@@ -232,7 +236,15 @@ class SolutionTransfer
 				      * Exception
 				      */
     DeclException0(ExcInternalError);
-    
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidVectorSize,
+		    int, int,
+		    << "The data vector has the size " << arg1
+		    << ", but " << arg2 << " was expected.");
+				  
   private:
 
 				     /**
@@ -318,11 +330,11 @@ class SolutionTransfer
 				      * After calling 
 				      * #prepare_for_refinement_and_coarsening
 				      * (vector<Vector<number> > &all_in)#
-				      * this this pointer points to the vector
+				      * this pointer points to the vector
 				      * #all_in# for later comparison with
 				      * the vector #all_out#
 				      */
-    const vector<Vector<number> > * vecs_ptr;
+//    const vector<Vector<number> > * vecs_ptr;
 };
 
 
