@@ -12,6 +12,10 @@
 //----------------------------  log.cc  ---------------------------
 
 
+#include <base/logstream.h>
+#include <base/job_identifier.h>
+
+#include <sys/resource.h>
 #include <iomanip>
 
 LogStream deallog;

@@ -12,6 +12,7 @@
 //----------------------------  quadrature.cc  ---------------------------
 
 
+#include <base/quadrature.h>
 #include <cmath>
 
 

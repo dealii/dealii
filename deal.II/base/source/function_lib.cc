@@ -12,6 +12,9 @@
 //----------------------------  function_lib.cc  ---------------------------
 
 
+#include <base/point.h>
+#include <base/function_lib.h>
+
 #include <cmath>
 
 //TODO: Derivatives in 3d wrong (GK!)

@@ -12,6 +12,7 @@
 //----------------------------  quadrature_lib.cc  ---------------------------
 
 
+#include <base/quadrature_lib.h>
 #include <cmath>
 
 

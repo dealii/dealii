@@ -12,6 +12,7 @@
 //----------------------------  job_identifier.cc  ---------------------------
 
 
+#include <base/job_identifier.h>
 #include <ctime>
 
 

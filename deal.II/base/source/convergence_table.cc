@@ -12,6 +12,7 @@
 //----------------------------  convergence_table.cc  ---------------------------
 
 
+#include <base/convergence_table.h>
 #include <math.h>
 
 

@@ -12,6 +12,8 @@
 //----------------------------  exceptions.cc  ---------------------------
 
 
+#include <base/exceptions.h>
+#include <string>
 #include <strstream>
 
 

@@ -12,6 +12,8 @@
 //----------------------------  tensor.cc  ---------------------------
 
 
+#include <base/tensor.h>
+#include <cmath>
 #include <lac/vector.h>
 
 

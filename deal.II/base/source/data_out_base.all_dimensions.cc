@@ -12,6 +12,7 @@
 //----------------------------  data_out_base.all_dimensions.cc  ---------------------------
 
 
+#include <base/data_out_base.h>
 #include <base/parameter_handler.h>
 
 

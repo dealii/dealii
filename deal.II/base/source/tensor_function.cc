@@ -12,6 +12,10 @@
 //----------------------------  tensor_function.cc  ---------------------------
 
 
+#include <base/tensor_function.h>
+#include <vector>
+#include <base/tensor.h>
+#include <cmath>
 #include <lac/vector.h>
 
 

@@ -12,6 +12,9 @@
 //----------------------------  function.cc  ---------------------------
 
 
+#include <base/function.h>
+#include <base/point.h>
+#include <lac/vector.h>
 #include <vector>
 
 

@@ -12,6 +12,12 @@
 //----------------------------  parameter_handler.cc  ---------------------------
 
 
+#include <base/parameter_handler.h>
+#include <fstream>
+#include <iomanip>
+#include <strstream>
+#include <cstdlib>
+#include <algorithm>
 #include <list>
 
 

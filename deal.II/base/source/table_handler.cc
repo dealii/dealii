@@ -12,6 +12,9 @@
 //----------------------------  table_handler.cc  ---------------------------
 
 
+#include <base/table_handler.h>
+
+#include <iostream>
 #include <iomanip>
 
 

@@ -12,6 +12,12 @@
 //----------------------------  timer.cc  ---------------------------
 
 
+#include <base/timer.h>
+
+
+// these includes should probably be properly
+// ./configure'd using the AC_HEADER_TIME macro:
+#include <sys/resource.h>
 #include <sys/time.h>
 
 Timer::Timer()
