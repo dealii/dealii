@@ -676,8 +676,11 @@ class SparsityPattern : public Subscriptor
 				      */
     bool compressed;
 
-
-template <typename number> friend class SparseMatrix;
+				     /**
+				      * Make all sparse matrices
+				      * friends of this class.
+				      */
+    template <typename number> friend class SparseMatrix;
 };
 
 
