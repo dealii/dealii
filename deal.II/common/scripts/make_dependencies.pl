@@ -111,7 +111,7 @@ sub complete {
 	$pattern =~ s/\]/\\]/g;
 	$pattern =~ s/\{/\\{/g;
 	$pattern =~ s/\}/\\}/g;
-	if (! ($include_file{$file} =~ $pattern)) {
+	if (! ($include_files{$file} =~ $pattern)) {
 	    #second_include not yet in list of included files
 	    $include_files{$file} =
 		join(' ', $second_include, $include_files{$file});
