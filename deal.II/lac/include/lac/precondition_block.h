@@ -428,22 +428,22 @@ class PreconditionBlockSSOR : private PreconditionBlockSOR<number,inverse_type>
 				      * Make initialization function
 				      * publicly available.
 				      */
-    PreconditionBlock<number,inverse_type>::initialize;
+    PreconditionBlockSOR<number,inverse_type>::initialize;
     
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::clear;
+    PreconditionBlockSOR<number,inverse_type>::clear;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::set_same_diagonal;
+    PreconditionBlockSOR<number,inverse_type>::set_same_diagonal;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<number,inverse_type>::invert_diagblocks;
+    PreconditionBlockSOR<number,inverse_type>::invert_diagblocks;
 
 				     /**
 				      * Execute block SSOR
