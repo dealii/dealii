@@ -29,6 +29,14 @@
  * have been extended slightly as well, see their documentation for more
  * information.
  *
+ * We note that since the triangulation is created in exactly the same state
+ * as it was before, other objects working on it should result in the same
+ * state as well. This holds in particular for the #DoFHandler# object, which
+ * will assign the same degrees of freedom to the original cells and the ones
+ * after reconstruction of the triangulation. You can therefore safely use data
+ * vectors computed on the original grid on the reconstructed grid as well.
+ *
+ *
  * \subsection{Usage}
  * You can use objects of this class almost in the same way as objects of the
  * #Triangulation# class. One of the few differences is that you can only
