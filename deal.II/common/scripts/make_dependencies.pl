@@ -95,7 +95,23 @@ foreach $file (@input_files) {
 sub complete {
     local ($file, $include) = ($_[0], $_[1]);
     foreach $second_include (split(' ',$include_files{$include})) {
-	if (! ($include_files{$file} =~ $second_include)) {
+        # check whether $second_include is in the list of filenames
+	# $include_file{$file}. in order to avoid that characters
+	# in the filename and/or path of $second_include are
+	# interpreted as special characters in the regexp matches,
+	# we have to escape all such characters (well, there
+	# may be more, but I hope that no one uses them in filenames).
+	my $pattern = $second_include;
+	$pattern =~ s/\+/\\+/g;
+	$pattern =~ s/\*/\\*/g;
+	$pattern =~ s/\?/\\?/g;
+	$pattern =~ s/\(/\\(/g;
+	$pattern =~ s/\)/\\)/g;
+	$pattern =~ s/\[/\\[/g;
+	$pattern =~ s/\]/\\]/g;
+	$pattern =~ s/\{/\\{/g;
+	$pattern =~ s/\}/\\}/g;
+	if (! ($include_file{$file} =~ $pattern)) {
 	    #second_include not yet in list of included files
 	    $include_files{$file} =
 		join(' ', $second_include, $include_files{$file});
