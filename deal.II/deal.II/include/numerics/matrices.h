@@ -643,22 +643,21 @@ class MatrixCreator
  * hand side. We need therefore not take special care of other
  * boundary nodes.
  * 
- * To make solving faster, we preset the solution vector with the
- * right boundary values. It it not clear whether the deletion of
- * coupling between the boundary degree of freedom and other dofs
- * really forces the corresponding entry in the solution vector to
- * have the right value when using iterative solvers, since their
- * search directions may contain components in the direction of the
- * boundary node. For this reason, we perform a very simple line
- * balancing by not setting the main diagonal entry to unity, but
- * rather to the value it had before deleting this line, or to the
- * first nonzero main diagonal entry if it is zero for some reason.
- * Of course we have to change the right hand side appropriately. This
- * is not a very good strategy, but it at least should give the main
- * diagonal entry a value in the right order of dimension, which makes
- * the solvution process a bit more stable. A refined algorithm would
- * set the entry to the mean of the other diagonal entries, but this
- * seems to be too expensive.
+ * To make solving faster, we preset the solution vector with the right
+ * boundary values (as to why this is necessary, see the discussion below in
+ * the description of local elimination). It it not clear whether the deletion
+ * of coupling between the boundary degree of freedom and other dofs really
+ * forces the corresponding entry in the solution vector to have the right
+ * value when using iterative solvers, since their search directions may
+ * contain components in the direction of the boundary node. For this reason,
+ * we perform a very simple line balancing by not setting the main diagonal
+ * entry to unity, but rather to the value it had before deleting this line,
+ * or to the first nonzero main diagonal entry if it is zero for some reason.
+ * Of course we have to change the right hand side appropriately. This is not
+ * a very good strategy, but it at least should give the main diagonal entry a
+ * value in the right order of dimension, which makes the solvution process a
+ * bit more stable. A refined algorithm would set the entry to the mean of the
+ * other diagonal entries, but this seems to be too expensive.
  *
  * In some cases, it might be interesting to solve several times with
  * the same matrix, but for different right hand sides or boundary
@@ -688,6 +687,57 @@ class MatrixCreator
  * matrix formats (e.g. the PETSc matrix classes), this may be the only way to
  * get rid of boundary nodes for these matrix formats. In general, this
  * function should not be a loss in efficiency over the global one.
+ *
+ * Local elimination has one drawback: we don't have access to the solution
+ * vector, only to the local contributions to the matrix and right hand
+ * side. The problem with this is subtle, but can lead to very hard to find
+ * difficulties: when we eliminate a degree of freedom, we delete the row and
+ * column of this unknown, and set the diagonal entry to some positive
+ * value. To make the problem more or less well-conditioned, we set this
+ * diagonal entry to the absolute value of its prior value if that was
+ * non-zero, or to the average magnitude of all other nonzero diagonal
+ * elements. Then we set the right hand side value such that the resulting
+ * solution entry has the right value as given by the boundary values. Since
+ * we add these contributions up over all local contributions, the diagonal
+ * entry and the respective value in the right hand side are added up
+ * correspondingly, so that the entry in the solution of the linear system is
+ * still valid.
+ *
+ * A problem arises, however, if the diagonal entries so chosen are not
+ * appropriate for the linear system. Consider, for example, a mixed Laplace
+ * problem with matrix <tt>[[A B][C^T 0]]</tt>, where we only specify boundary
+ * values for the second component of the solution. In the mixed formulation,
+ * the stress-strain tensor only appears in either the matrix @p B or @p C, so
+ * one of them may be significantly larger or smaller than the other one. Now,
+ * if we eliminate boundary values, we delete some rows and columns, but we
+ * also introduce a few entries on the diagonal of the lower right block, so
+ * that we get the system <tt>[[A' B'][C'^T X]]</tt>. The diagonal entries in
+ * the matrix @p X will be of the same order of magnitude as those in @p
+ * A. Now, if we solve this system in the Schur complement formulation, we
+ * have to invert the matrix <tt>X-C'^TA'^{-1}B'</tt>. Deleting rows and
+ * columns above makes sure that boundary nodes indeed have empty rows and
+ * columns in the Schur complement as well, except for the entries in @p
+ * X. However, the entries in @p X may be of significantly different orders of
+ * magnitude than those in <tt>C'^TA'^{-1}B'</tt>! If this is the case, we may
+ * run into trouble with iterative solvers. For example, assume that we start
+ * with zero entries in the solution vector and that the entries in @p X are
+ * several orders of magnitude too small; in this case, iterative solvers will
+ * compute the residual vector in each step and form correction vectors, but
+ * since the entries in @p X are so small, the residual contributions for
+ * boundary nodes are really small, despite the fact that the boundary nodes
+ * are still at values close to zero and not in accordance with the prescribed
+ * boundary values. Since the residual is so small, the corrections the
+ * iterative solver computes are very small, and in the end the solver will
+ * indicate convergence to a small total residual with the boundary values
+ * still being significantly wrong.
+ *
+ * We avoid this problem in the global elimination process described above by
+ * 'priming' the solution vector with the correct values for boundary
+ * nodes. However, we can't do this for the local elimination
+ * process. Therefore, if you experience a problem like the one above, you
+ * need to either increase the diagonal entries in @p X to a size that matches
+ * those in the other part of the Schur complement, or, simpler, prime the
+ * solution vector before you start the solver.
  * 
  * @author Wolfgang Bangerth, 1998, 2000, 2004
  */
