@@ -14,6 +14,7 @@
 #define __deal2__mg_coarse_h
 
 
+#include <lac/full_matrix.h>
 #include <multigrid/mg_base.h>
 
 
