@@ -4579,7 +4579,7 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
   if test "x$1" != "xyes" ; then
-    LDFLAGS="-L$1/UMFPACK/Lib -L$1/AMD/Lib"
+    LDFLAGS="-L$1/UMFPACK/Lib -L$1/AMD/Lib $LDFLAGS"
     AC_CHECK_LIB(amd, amd_info)
     AC_CHECK_LIB(umfpack, umfpack_di_defaults)
     AC_CHECK_FILE($1/UMFPACK/Include/umfpack.h,
