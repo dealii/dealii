@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix.double.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix.double.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <lac/sparse_matrix.templates.h>
@@ -18,14 +18,21 @@
 
 template class SparseMatrix<TYPEMAT>;
 
+#define TYPE2 float
+#include "sparse_matrix_matrix.in.h"
+#undef TYPE2
+
+#define TYPE2 double
+#include "sparse_matrix_matrix.in.h"
+#undef TYPE2
+
 #define TYPEVEC float
-
-#include "sparse_matrix.in.h"
-
+#include "sparse_matrix_vector.in.h"
 #undef TYPEVEC
-#define TYPEVEC double
 
-#include "sparse_matrix.in.h"
+#define TYPEVEC double
+#include "sparse_matrix_vector.in.h"
+#undef TYPEVEC
 
 				 // a prerelease of gcc3.0 fails to
 				 // compile this due to long double
@@ -34,5 +41,4 @@ template class SparseMatrix<TYPEMAT>;
 
 //  #include <lac/sparse_matrix.2.templates>
 
-#undef TYPEVEC
 #undef TYPEMAT
