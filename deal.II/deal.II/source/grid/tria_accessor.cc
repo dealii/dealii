@@ -1664,7 +1664,7 @@ void CellAccessor<1>::recursively_set_material_id (const unsigned char mat_id) c
 {
   set_material_id (mat_id);
 
-  if (has_children())
+  if (this->has_children())
     for (unsigned int c=0; c<2; ++c)
       child(c)->recursively_set_material_id (mat_id);
 }
@@ -1729,7 +1729,7 @@ void CellAccessor<2>::recursively_set_material_id (const unsigned char mat_id) c
 {
   set_material_id (mat_id);
 
-  if (has_children())
+  if (this->has_children())
     for (unsigned int c=0; c<4; ++c)
       child(c)->recursively_set_material_id (mat_id);
 }
@@ -1823,7 +1823,7 @@ void CellAccessor<3>::recursively_set_material_id (const unsigned char mat_id) c
 {
   set_material_id (mat_id);
 
-  if (has_children())
+  if (this->has_children())
     for (unsigned int c=0; c<8; ++c)
       child(c)->recursively_set_material_id (mat_id);
 }
