@@ -1,136 +1,477 @@
 
+DEAL::GRID TRANSFORMATION 0
 DEAL::q_point(0)=0.00 0.00
-DEAL::  shape_function(0)= 1.00 0.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= 0.00 1.00
+DEAL::  phi(0) = [ 1.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 1.00 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(1)=0.00 0.50
-DEAL::  shape_function(0)= 0.50 0.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.50 0.00
-DEAL::  shape_function(3)= 0.00 1.00
+DEAL::  phi(0) = [ 0.50 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.50 0.00 ]
+DEAL::  phi(3) = [ 0.00 1.00 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(2)=0.00 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 1.00 0.00
-DEAL::  shape_function(3)= 0.00 1.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 1.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 1.00 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(3)=0.50 0.00
-DEAL::  shape_function(0)= 1.00 0.00
-DEAL::  shape_function(1)= 0.00 0.50
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= 0.00 0.50
+DEAL::  phi(0) = [ 1.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.50 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.50 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(4)=0.50 0.50
-DEAL::  shape_function(0)= 0.50 0.00
-DEAL::  shape_function(1)= 0.00 0.50
-DEAL::  shape_function(2)= 0.50 0.00
-DEAL::  shape_function(3)= 0.00 0.50
+DEAL::  phi(0) = [ 0.50 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.50 ]
+DEAL::  phi(2) = [ 0.50 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.50 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(5)=0.50 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= 0.00 0.50
-DEAL::  shape_function(2)= 1.00 0.00
-DEAL::  shape_function(3)= 0.00 0.50
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.50 ]
+DEAL::  phi(2) = [ 1.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.50 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(6)=1.00 0.00
-DEAL::  shape_function(0)= 1.00 0.00
-DEAL::  shape_function(1)= 0.00 1.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= 0.00 0.00
+DEAL::  phi(0) = [ 1.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 1.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(7)=1.00 0.50
-DEAL::  shape_function(0)= 0.50 0.00
-DEAL::  shape_function(1)= 0.00 1.00
-DEAL::  shape_function(2)= 0.50 0.00
-DEAL::  shape_function(3)= 0.00 0.00
+DEAL::  phi(0) = [ 0.50 0.00 ]
+DEAL::  phi(1) = [ 0.00 1.00 ]
+DEAL::  phi(2) = [ 0.50 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
 DEAL::q_point(8)=1.00 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= 0.00 1.00
-DEAL::  shape_function(2)= 1.00 0.00
-DEAL::  shape_function(3)= 0.00 0.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 1.00 ]
+DEAL::  phi(2) = [ 1.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::
+DEAL::GRID TRANSFORMATION 1
 DEAL::q_point(0)=0.00 0.00
-DEAL::  shape_function(0)= 0.00 1.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= -1.00 0.00
-DEAL::q_point(1)=0.00 0.50
-DEAL::  shape_function(0)= 0.00 0.50
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.00 0.50
-DEAL::  shape_function(3)= -1.00 0.00
-DEAL::q_point(2)=0.00 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.00 1.00
-DEAL::  shape_function(3)= -1.00 0.00
-DEAL::q_point(3)=0.50 0.00
-DEAL::  shape_function(0)= 0.00 1.00
-DEAL::  shape_function(1)= -0.50 0.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= -0.50 0.00
-DEAL::q_point(4)=0.50 0.50
-DEAL::  shape_function(0)= 0.00 0.50
-DEAL::  shape_function(1)= -0.50 0.00
-DEAL::  shape_function(2)= 0.00 0.50
-DEAL::  shape_function(3)= -0.50 0.00
-DEAL::q_point(5)=0.50 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= -0.50 0.00
-DEAL::  shape_function(2)= 0.00 1.00
-DEAL::  shape_function(3)= -0.50 0.00
-DEAL::q_point(6)=1.00 0.00
-DEAL::  shape_function(0)= 0.00 1.00
-DEAL::  shape_function(1)= -1.00 0.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= 0.00 0.00
-DEAL::q_point(7)=1.00 0.50
-DEAL::  shape_function(0)= 0.00 0.50
-DEAL::  shape_function(1)= -1.00 0.00
-DEAL::  shape_function(2)= 0.00 0.50
-DEAL::  shape_function(3)= 0.00 0.00
-DEAL::q_point(8)=1.00 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= -1.00 0.00
-DEAL::  shape_function(2)= 0.00 1.00
-DEAL::  shape_function(3)= 0.00 0.00
+DEAL::  phi(0) = [ 0.00 1.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ -1.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(1)=-0.50 0.00
+DEAL::  phi(0) = [ 0.00 0.50 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.50 ]
+DEAL::  phi(3) = [ -1.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(2)=-1.00 0.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 1.00 ]
+DEAL::  phi(3) = [ -1.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(3)=0.00 0.50
+DEAL::  phi(0) = [ 0.00 1.00 ]
+DEAL::  phi(1) = [ -0.50 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ -0.50 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(4)=-0.50 0.50
+DEAL::  phi(0) = [ 0.00 0.50 ]
+DEAL::  phi(1) = [ -0.50 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.50 ]
+DEAL::  phi(3) = [ -0.50 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(5)=-1.00 0.50
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ -0.50 0.00 ]
+DEAL::  phi(2) = [ 0.00 1.00 ]
+DEAL::  phi(3) = [ -0.50 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(6)=0.00 1.00
+DEAL::  phi(0) = [ 0.00 1.00 ]
+DEAL::  phi(1) = [ -1.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(7)=-0.50 1.00
+DEAL::  phi(0) = [ 0.00 0.50 ]
+DEAL::  phi(1) = [ -1.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.50 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(8)=-1.00 1.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ -1.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 1.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 1.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -1.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 1.00 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::
+DEAL::GRID TRANSFORMATION 2
 DEAL::q_point(0)=0.00 0.00
-DEAL::  shape_function(0)= 0.00 2.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= -2.00 0.00
+DEAL::  phi(0) = [ 0.00 0.50 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ -0.50 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(1)=-1.00 0.00
+DEAL::  phi(0) = [ 0.00 0.25 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.25 ]
+DEAL::  phi(3) = [ -0.50 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(2)=-2.00 0.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.50 ]
+DEAL::  phi(3) = [ -0.50 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(3)=0.00 1.00
+DEAL::  phi(0) = [ 0.00 0.50 ]
+DEAL::  phi(1) = [ -0.25 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ -0.25 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(4)=-1.00 1.00
+DEAL::  phi(0) = [ 0.00 0.25 ]
+DEAL::  phi(1) = [ -0.25 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.25 ]
+DEAL::  phi(3) = [ -0.25 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(5)=-2.00 1.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ -0.25 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.50 ]
+DEAL::  phi(3) = [ -0.25 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(6)=0.00 2.00
+DEAL::  phi(0) = [ 0.00 0.50 ]
+DEAL::  phi(1) = [ -0.50 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(7)=-1.00 2.00
+DEAL::  phi(0) = [ 0.00 0.25 ]
+DEAL::  phi(1) = [ -0.50 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.25 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::q_point(8)=-2.00 2.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ -0.50 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.50 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 0.00 ]
+DEAL::                [ 0.25 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 -0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.00 ]
+DEAL::                [ -0.25 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.25 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::
+DEAL::GRID TRANSFORMATION 3
+DEAL::q_point(0)=0.00 0.00
+DEAL::  phi(0) = [ 0.50 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 1.00 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
 DEAL::q_point(1)=0.00 0.50
-DEAL::  shape_function(0)= 0.00 1.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.00 1.00
-DEAL::  shape_function(3)= -2.00 0.00
+DEAL::  phi(0) = [ 0.25 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.25 0.00 ]
+DEAL::  phi(3) = [ 0.00 1.00 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
 DEAL::q_point(2)=0.00 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= 0.00 0.00
-DEAL::  shape_function(2)= 0.00 2.00
-DEAL::  shape_function(3)= -2.00 0.00
-DEAL::q_point(3)=0.50 0.00
-DEAL::  shape_function(0)= 0.00 2.00
-DEAL::  shape_function(1)= -1.00 0.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= -1.00 0.00
-DEAL::q_point(4)=0.50 0.50
-DEAL::  shape_function(0)= 0.00 1.00
-DEAL::  shape_function(1)= -1.00 0.00
-DEAL::  shape_function(2)= 0.00 1.00
-DEAL::  shape_function(3)= -1.00 0.00
-DEAL::q_point(5)=0.50 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= -1.00 0.00
-DEAL::  shape_function(2)= 0.00 2.00
-DEAL::  shape_function(3)= -1.00 0.00
-DEAL::q_point(6)=1.00 0.00
-DEAL::  shape_function(0)= 0.00 2.00
-DEAL::  shape_function(1)= -2.00 0.00
-DEAL::  shape_function(2)= 0.00 0.00
-DEAL::  shape_function(3)= 0.00 0.00
-DEAL::q_point(7)=1.00 0.50
-DEAL::  shape_function(0)= 0.00 1.00
-DEAL::  shape_function(1)= -2.00 0.00
-DEAL::  shape_function(2)= 0.00 1.00
-DEAL::  shape_function(3)= 0.00 0.00
-DEAL::q_point(8)=1.00 1.00
-DEAL::  shape_function(0)= 0.00 0.00
-DEAL::  shape_function(1)= -2.00 0.00
-DEAL::  shape_function(2)= 0.00 2.00
-DEAL::  shape_function(3)= 0.00 0.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.00 ]
+DEAL::  phi(2) = [ 0.50 0.00 ]
+DEAL::  phi(3) = [ 0.00 1.00 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
+DEAL::q_point(3)=1.00 0.00
+DEAL::  phi(0) = [ 0.50 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.50 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.50 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
+DEAL::q_point(4)=1.00 0.50
+DEAL::  phi(0) = [ 0.25 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.50 ]
+DEAL::  phi(2) = [ 0.25 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.50 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
+DEAL::q_point(5)=1.00 1.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 0.50 ]
+DEAL::  phi(2) = [ 0.50 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.50 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
+DEAL::q_point(6)=2.00 0.00
+DEAL::  phi(0) = [ 0.50 0.00 ]
+DEAL::  phi(1) = [ 0.00 1.00 ]
+DEAL::  phi(2) = [ 0.00 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
+DEAL::q_point(7)=2.00 0.50
+DEAL::  phi(0) = [ 0.25 0.00 ]
+DEAL::  phi(1) = [ 0.00 1.00 ]
+DEAL::  phi(2) = [ 0.25 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
+DEAL::q_point(8)=2.00 1.00
+DEAL::  phi(0) = [ 0.00 0.00 ]
+DEAL::  phi(1) = [ 0.00 1.00 ]
+DEAL::  phi(2) = [ 0.50 0.00 ]
+DEAL::  phi(3) = [ 0.00 0.00 ]
+DEAL::  grad phi(0) = [ 0.00 -0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(1) = [ 0.00 0.00 ]
+DEAL::                [ 0.50 0.00 ]
+DEAL::  grad phi(2) = [ 0.00 0.50 ]
+DEAL::                [ 0.00 0.00 ]
+DEAL::  grad phi(3) = [ 0.00 0.00 ]
+DEAL::                [ -0.50 0.00 ]
+DEAL::
