@@ -259,12 +259,12 @@ class FE_DGQ : public FiniteElement<dim>
     class InternalData : public FiniteElementBase<dim>::InternalDataBase
     {
       public:
-				       /**
-					* Destructor. Needed to avoid
-					* memory leaks with difference
-					* quotients.
-					*/
-      ~InternalData ();
+					 /**
+					  * Destructor. Needed to avoid
+					  * memory leaks with difference
+					  * quotients.
+					  */
+	~InternalData ();
 
 					 /**
 					  * Array with shape function values
@@ -273,6 +273,7 @@ class FE_DGQ : public FiniteElement<dim>
 					  * values for each quadrature point.
 					  */
 	std::vector<std::vector<double> > shape_values;
+	
 					 /**
 					  * Array with shape function gradients
 					  * in quadrature points. There is one
@@ -281,20 +282,21 @@ class FE_DGQ : public FiniteElement<dim>
 					  */				      
 	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
 
-				       /**
-					* Storage for @p{FEValues}
-					* objects needed to
-					* approximate second
-					* derivatives.
-					*
-					* The ordering is @p{p+hx},
-					* @p{p+hy}, @p{p+hz},
-					* @p{p-hx}, @p{p-hy},
-					* @p{p-hz}, where unused
-					* entries in lower dimensions
-					* are missing.
-					*/
-      std::vector<FEValues<dim>*> differences;
+					 /**
+					  * Storage for @p{FEValues}
+					  * objects needed to
+					  * approximate second
+					  * derivatives.
+					  *
+					  * The ordering is @p{p+hx},
+					  * @p{p+hy}, @p{p+hz},
+					  * @p{p-hx}, @p{p-hy},
+					  * @p{p-hz}, where unused
+					  * entries in lower dimensions
+					  * are missing.
+					  */
+//TODO: what good is this, the base class already has it and it seems never to be used!?
+	std::vector<FEValues<dim>*> differences;
     };
     
 				     /**

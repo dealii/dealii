@@ -48,8 +48,8 @@ class FEValuesData
 				      * Initialize all vectors to correct size.
 				      */
     void initialize (const unsigned int n_quadrature_points,
-		     unsigned int n_shapes,
-		     const UpdateFlags flags);
+		     const unsigned int n_shapes,
+		     const UpdateFlags  flags);
 
 				     /**
 				      * Storage type for shape values.
@@ -244,6 +244,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * constructor of the derived
 				      * class.
 				      */
+//TODO: What is the meaning of the n_values_array? It is not used in the implementation    
     FEValuesBase (const unsigned int n_q_points,
 		  const unsigned int dofs_per_cell,
 		  const unsigned int n_values_array,
