@@ -203,6 +203,16 @@ class Multigrid : public Subscriptor
 				      * of levels used, that is, it
 				      * sets #minlevel to
 				      * #maxlevel-<tt>level</tt>.
+				      *
+				      * @note The mesh on the coarsest
+				      * level must cover the whole
+				      * domain. There may not be
+				      * hanging nodes on #minlevel.
+				      *
+				      * @note If #minlevel is set to a
+				      * nonzero value, do not forget
+				      * to adjust your coarse grid
+				      * solver!
 				      */
     void set_minlevel(unsigned int level,
 		      bool relative = false);
@@ -220,12 +230,6 @@ class Multigrid : public Subscriptor
 				      */
     void set_debug(unsigned int);
     
-				     /**
-				      * Exception.
-				      */
-    DeclException2(ExcSwitchedLevels, int, int,
-		   << "minlevel and maxlevel switched, should be: "
-		   << arg1 << "<=" << arg2);
   private:
     
 				     /**
@@ -291,6 +295,13 @@ class Multigrid : public Subscriptor
 				      * Auxiliary vector.
 				      */
     MGLevelObject<VECTOR> t;    
+
+				     /**
+				      * Auxiliary vector for W- and
+				      * F-cycles. Left uninitialized
+				      * in V-cycle.
+				      */
+    MGLevelObject<VECTOR> defect2;
 
 
 				     /**
@@ -451,6 +462,7 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 		defect(minlevel,maxlevel),
 		solution(minlevel,maxlevel),
 		t(minlevel,maxlevel),
+		defect2(minlevel,maxlevel),
 		matrix(&matrix),
 		coarse(&coarse),
 		transfer(&transfer),
