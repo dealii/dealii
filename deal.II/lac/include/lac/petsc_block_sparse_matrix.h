@@ -18,6 +18,7 @@
 #include <base/table.h>
 #include <lac/block_matrix_base.h>
 #include <lac/petsc_sparse_matrix.h>
+#include <lac/petsc_block_vector.h>
 #include <cmath>
 
 
@@ -163,6 +164,84 @@ namespace PETScWrappers
       void reinit (const unsigned int n_block_rows,
                    const unsigned int n_block_columns);
       
+                                       /**
+                                        * Matrix-vector multiplication:
+                                        * let $dst = M*src$ with $M$
+                                        * being this matrix.
+                                        */
+      void vmult (BlockVector       &dst,
+                  const BlockVector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block column.
+                                        */
+      void vmult (BlockVector          &dst,
+                  const Vector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block row.
+                                        */
+      void vmult (Vector    &dst,
+                  const BlockVector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block.
+                                        */
+      void vmult (Vector       &dst,
+                  const Vector &src) const;
+    
+                                       /**
+                                        * Matrix-vector multiplication:
+                                        * let $dst = M^T*src$ with $M$
+                                        * being this matrix. This
+                                        * function does the same as
+                                        * vmult() but takes the
+                                        * transposed matrix.
+                                        */
+      void Tvmult (BlockVector       &dst,
+                   const BlockVector &src) const;
+  
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block row.
+                                        */
+      void Tvmult (BlockVector  &dst,
+                   const Vector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block column.
+                                        */
+      void Tvmult (Vector    &dst,
+                   const BlockVector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block.
+                                        */
+      void Tvmult (Vector       &dst,
+                   const Vector &src) const;    
 
                                        /**
                                         * This function collects the
@@ -204,6 +283,86 @@ namespace PETScWrappers
 
 
 /*@}*/
+
+// ------------- inline and template functions -----------------
+
+  inline
+  void
+  BlockSparseMatrix::vmult (BlockVector       &dst,
+                            const BlockVector &src) const
+  {
+    BaseClass::vmult_block_block (dst, src);
+  }
+  
+
+
+  inline
+  void
+  BlockSparseMatrix::vmult (BlockVector  &dst,
+                            const Vector &src) const
+  {
+    BaseClass::vmult_block_nonblock (dst, src);
+  }
+  
+
+
+  inline
+  void
+  BlockSparseMatrix::vmult (Vector            &dst,
+                            const BlockVector &src) const
+  {
+    BaseClass::vmult_nonblock_block (dst, src);
+  }
+  
+
+
+  inline
+  void
+  BlockSparseMatrix::vmult (Vector       &dst,
+                            const Vector &src) const
+  {
+    BaseClass::vmult_nonblock_nonblock (dst, src);
+  }
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (BlockVector       &dst,
+                            const BlockVector &src) const
+  {
+    BaseClass::Tvmult_block_block (dst, src);
+  }
+  
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (BlockVector  &dst,
+                            const Vector &src) const
+  {
+    BaseClass::Tvmult_block_nonblock (dst, src);
+  }
+  
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (Vector            &dst,
+                            const BlockVector &src) const
+  {
+    BaseClass::Tvmult_nonblock_block (dst, src);
+  }
+  
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (Vector       &dst,
+                            const Vector &src) const
+  {
+    BaseClass::Tvmult_nonblock_nonblock (dst, src);
+  }
+  
 }
 
 

@@ -18,7 +18,6 @@
 #include <base/table.h>
 #include <base/smartpointer.h>
 #include <lac/block_indices.h>
-#include <lac/vector.h>
 
 #include <cmath>
 
@@ -488,99 +487,8 @@ class BlockMatrixBase : public Subscriptor
 				      */
     template <class BlockMatrixType>
     void add_scaled (const value_type       factor,
-		     const BlockMatrixType &matrix);
-    
-				     /**
-				      * Matrix-vector multiplication:
-				      * let $dst = M*src$ with $M$
-				      * being this matrix.
-				      */
-    template <class BlockVectorType>
-    void vmult (BlockVectorType       &dst,
-		const BlockVectorType &src) const;
-
-				     /**
-				      * Matrix-vector
-				      * multiplication. Just like the
-				      * previous function, but only
-				      * applicable if the matrix has
-				      * only one block column.
-				      */
-    template <class BlockVectorType,
-              class VectorType>
-    void vmult (BlockVectorType          &dst,
-		const VectorType &src) const;
-
-				     /**
-				      * Matrix-vector
-				      * multiplication. Just like the
-				      * previous function, but only
-				      * applicable if the matrix has
-				      * only one block row.
-				      */
-    template <class BlockVectorType,
-              class VectorType>
-    void vmult (VectorType    &dst,
-		const BlockVectorType &src) const;
-
-				     /**
-				      * Matrix-vector
-				      * multiplication. Just like the
-				      * previous function, but only
-				      * applicable if the matrix has
-				      * only one block.
-				      */
-    template <typename number>
-    void vmult (Vector<number>       &dst,
-		const Vector<number> &src) const;
-    
-				     /**
-				      * Matrix-vector multiplication:
-				      * let $dst = M^T*src$ with $M$
-				      * being this matrix. This
-				      * function does the same as
-				      * vmult() but takes the
-				      * transposed matrix.
-				      */
-    template <class BlockVectorType>
-    void Tvmult (BlockVectorType       &dst,
-		 const BlockVectorType &src) const;
+		     const BlockMatrixType &matrix);    
   
-				     /**
-				      * Matrix-vector
-				      * multiplication. Just like the
-				      * previous function, but only
-				      * applicable if the matrix has
-				      * only one block row.
-				      */
-    template <class BlockVectorType,
-              class VectorType>
-    void Tvmult (BlockVectorType  &dst,
-		 const VectorType &src) const;
-
-				     /**
-				      * Matrix-vector
-				      * multiplication. Just like the
-				      * previous function, but only
-				      * applicable if the matrix has
-				      * only one block column.
-				      */
-    template <class BlockVectorType,
-              class VectorType>
-    void Tvmult (VectorType    &dst,
-		 const BlockVectorType &src) const;
-
-				     /**
-				      * Matrix-vector
-				      * multiplication. Just like the
-				      * previous function, but only
-				      * applicable if the matrix has
-				      * only one block.
-				      */
-    template <typename number>
-    void Tvmult (Vector<number>       &dst,
-		 const Vector<number> &src) const;
-    
 				     /**
 				      * Adding Matrix-vector
 				      * multiplication. Add $M*src$ on
@@ -604,8 +512,8 @@ class BlockMatrixBase : public Subscriptor
     template <class BlockVectorType>
     void Tvmult_add (BlockVectorType       &dst,
 		     const BlockVectorType &src) const;
-  
-				     /**
+
+                                     /**
 				      * Return the norm of the vector
 				      * <i>v</i> with respect to the
 				      * norm induced by this matrix,
@@ -768,6 +676,186 @@ class BlockMatrixBase : public Subscriptor
                                       * therefore export this function.
                                       */
     void collect_sizes ();
+
+				     /**
+				      * Matrix-vector multiplication:
+				      * let $dst = M*src$ with $M$
+				      * being this matrix.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class BlockVectorType>
+    void vmult_block_block (BlockVectorType       &dst,
+  		            const BlockVectorType &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block column.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class BlockVectorType,
+              class VectorType>
+    void vmult_block_nonblock (BlockVectorType          &dst,
+		               const VectorType &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block row.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class BlockVectorType,
+              class VectorType>
+    void vmult_nonblock_block (VectorType    &dst,
+		               const BlockVectorType &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class VectorType>
+    void vmult_nonblock_nonblock (VectorType       &dst,
+		                  const VectorType &src) const;
+    
+				     /**
+				      * Matrix-vector multiplication:
+				      * let $dst = M^T*src$ with $M$
+				      * being this matrix. This
+				      * function does the same as
+				      * vmult() but takes the
+				      * transposed matrix.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class BlockVectorType>
+    void Tvmult_block_block (BlockVectorType       &dst,
+		             const BlockVectorType &src) const;
+  
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block row.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class BlockVectorType,
+              class VectorType>
+    void Tvmult_block_nonblock (BlockVectorType  &dst,
+		                const VectorType &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block column.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class BlockVectorType,
+              class VectorType>
+    void Tvmult_nonblock_block (VectorType    &dst,
+		                const BlockVectorType &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block.
+				      *
+				      * Due to problems with deriving template
+				      * arguments between the block and
+				      * non-block versions of the vmult/Tvmult
+				      * functions, the actual functions are
+				      * implemented in derived classes, with
+				      * implementations forwarding the calls
+				      * to the implementations provided here
+				      * under a unique name for which template
+				      * arguments can be derived by the
+				      * compiler.
+				      */
+    template <class VectorType>
+    void Tvmult_nonblock_nonblock (VectorType       &dst,
+		                   const VectorType &src) const;
+    
     
 				     /**
 				      * Make the iterator class a
@@ -1356,8 +1444,9 @@ add_scaled (const value_type factor,
 template <class MatrixType>
 template <class BlockVectorType>
 void
-BlockMatrixBase<MatrixType>::vmult (BlockVectorType       &dst,
-                                    const BlockVectorType &src) const
+BlockMatrixBase<MatrixType>::
+vmult_block_block (BlockVectorType       &dst,
+                   const BlockVectorType &src) const
 {
   Assert (dst.n_blocks() == n_block_rows(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
@@ -1380,8 +1469,9 @@ template <class MatrixType>
 template <class BlockVectorType,
           class VectorType>
 void
-BlockMatrixBase<MatrixType>::vmult (VectorType    &dst,
-                                    const BlockVectorType &src) const
+BlockMatrixBase<MatrixType>::
+vmult_nonblock_block (VectorType    &dst,
+                      const BlockVectorType &src) const
 {
   Assert (n_block_rows() == 1,
 	  ExcDimensionMismatch(1, n_block_rows()));
@@ -1399,8 +1489,9 @@ template <class MatrixType>
 template <class BlockVectorType,
           class VectorType>
 void
-BlockMatrixBase<MatrixType>::vmult (BlockVectorType  &dst,
-                                    const VectorType &src) const
+BlockMatrixBase<MatrixType>::
+vmult_block_nonblock (BlockVectorType  &dst,
+                      const VectorType &src) const
 {
   Assert (dst.n_blocks() == n_block_rows(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
@@ -1415,10 +1506,11 @@ BlockMatrixBase<MatrixType>::vmult (BlockVectorType  &dst,
 
 
 template <class MatrixType>
-template <typename number>
+template <class VectorType>
 void
-BlockMatrixBase<MatrixType>::vmult (Vector<number>       &dst,
-                                    const Vector<number> &src) const
+BlockMatrixBase<MatrixType>::
+vmult_nonblock_nonblock (VectorType       &dst,
+                         const VectorType &src) const
 {
   Assert (1 == n_block_rows(),
 	  ExcDimensionMismatch(1, n_block_rows()));
@@ -1457,8 +1549,9 @@ BlockMatrixBase<MatrixType>::vmult_add (BlockVectorType       &dst,
 template <class MatrixType>
 template <class BlockVectorType>
 void
-BlockMatrixBase<MatrixType>::Tvmult (BlockVectorType       &dst,
-                                     const BlockVectorType &src) const
+BlockMatrixBase<MatrixType>::
+Tvmult_block_block (BlockVectorType       &dst,
+                    const BlockVectorType &src) const
 {
   Assert (dst.n_blocks() == n_block_cols(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
@@ -1481,8 +1574,9 @@ template <class MatrixType>
 template <class BlockVectorType,
           class VectorType>
 void
-BlockMatrixBase<MatrixType>::Tvmult (BlockVectorType  &dst,
-                                     const VectorType &src) const
+BlockMatrixBase<MatrixType>::
+Tvmult_block_nonblock (BlockVectorType  &dst,
+                       const VectorType &src) const
 {
   Assert (dst.n_blocks() == n_block_cols(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
@@ -1501,8 +1595,9 @@ template <class MatrixType>
 template <class BlockVectorType,
           class VectorType>
 void
-BlockMatrixBase<MatrixType>::Tvmult (VectorType    &dst,
-                                     const BlockVectorType &src) const
+BlockMatrixBase<MatrixType>::
+Tvmult_nonblock_block (VectorType    &dst,
+                       const BlockVectorType &src) const
 {
   Assert (1 == n_block_cols(),
 	  ExcDimensionMismatch(1, n_block_cols()));
@@ -1518,10 +1613,11 @@ BlockMatrixBase<MatrixType>::Tvmult (VectorType    &dst,
 
 
 template <class MatrixType>
-template <typename number>
+template <class VectorType>
 void
-BlockMatrixBase<MatrixType>::Tvmult (Vector<number>       &dst,
-                                     const Vector<number> &src) const
+BlockMatrixBase<MatrixType>::
+Tvmult_nonblock_nonblock (VectorType       &dst,
+                          const VectorType &src) const
 {
   Assert (1 == n_block_cols(),
 	  ExcDimensionMismatch(1, n_block_cols()));

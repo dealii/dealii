@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/table.h>
 #include <lac/block_matrix_base.h>
+#include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 #include <cmath>
@@ -207,6 +208,97 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     unsigned int n_actually_nonzero_elements () const;    
 
 				     /**
+				      * Matrix-vector multiplication:
+				      * let $dst = M*src$ with $M$
+				      * being this matrix.
+				      */
+    template <typename block_number>
+    void vmult (BlockVector<block_number>       &dst,
+                const BlockVector<block_number> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block column.
+				      */
+    template <typename block_number,
+              typename nonblock_number>
+    void vmult (BlockVector<block_number>          &dst,
+                const Vector<nonblock_number> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block row.
+				      */
+    template <typename block_number,
+              typename nonblock_number>
+    void vmult (Vector<nonblock_number>    &dst,
+                const BlockVector<block_number> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block.
+				      */
+    template <typename nonblock_number>
+    void vmult (Vector<nonblock_number>       &dst,
+                const Vector<nonblock_number> &src) const;
+    
+				     /**
+				      * Matrix-vector multiplication:
+				      * let $dst = M^T*src$ with $M$
+				      * being this matrix. This
+				      * function does the same as
+				      * vmult() but takes the
+				      * transposed matrix.
+				      */
+    template <typename block_number>
+    void Tvmult (BlockVector<block_number>       &dst,
+                 const BlockVector<block_number> &src) const;
+  
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block row.
+				      */
+    template <typename block_number,
+              typename nonblock_number>
+    void Tvmult (BlockVector<block_number>  &dst,
+                 const Vector<nonblock_number> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block column.
+				      */
+    template <typename block_number,
+              typename nonblock_number>
+    void Tvmult (Vector<nonblock_number>    &dst,
+                 const BlockVector<block_number> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block.
+				      */
+    template <typename nonblock_number>
+    void Tvmult (Vector<nonblock_number>       &dst,
+                 const Vector<nonblock_number> &src) const;
+    
+				     /**
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
@@ -332,6 +424,103 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 /* ------------------------- Template functions ---------------------- */
 
 
+
+template <typename number>
+template <typename block_number>
+inline
+void
+BlockSparseMatrix<number>::vmult (BlockVector<block_number>       &dst,
+                                  const BlockVector<block_number> &src) const
+{
+  BaseClass::vmult_block_block (dst, src);
+}
+  
+
+
+template <typename number>
+template <typename block_number,
+          typename nonblock_number>
+inline
+void
+BlockSparseMatrix<number>::vmult (BlockVector<block_number>     &dst,
+                                  const Vector<nonblock_number> &src) const
+{
+  BaseClass::vmult_block_nonblock (dst, src);
+}
+  
+
+
+template <typename number>
+template <typename block_number,
+          typename nonblock_number>
+inline
+void
+BlockSparseMatrix<number>::vmult (Vector<nonblock_number>         &dst,
+                                  const BlockVector<block_number> &src) const
+{
+  BaseClass::vmult_nonblock_block (dst, src);
+}
+  
+
+
+template <typename number>
+template <typename nonblock_number>
+inline
+void
+BlockSparseMatrix<number>::vmult (Vector<nonblock_number>       &dst,
+                                  const Vector<nonblock_number> &src) const
+{
+  BaseClass::vmult_nonblock_nonblock (dst, src);
+}
+
+
+template <typename number>
+template <typename block_number>
+inline
+void
+BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>       &dst,
+                                   const BlockVector<block_number> &src) const
+{
+  BaseClass::Tvmult_block_block (dst, src);
+}
+  
+
+
+template <typename number>
+template <typename block_number,
+          typename nonblock_number>
+inline
+void
+BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>     &dst,
+                                   const Vector<nonblock_number> &src) const
+{
+  BaseClass::Tvmult_block_nonblock (dst, src);
+}
+  
+
+
+template <typename number>
+template <typename block_number,
+          typename nonblock_number>
+inline
+void
+BlockSparseMatrix<number>::Tvmult (Vector<nonblock_number>         &dst,
+                                   const BlockVector<block_number> &src) const
+{
+  BaseClass::Tvmult_nonblock_block (dst, src);
+}
+  
+
+
+template <typename number>
+template <typename nonblock_number>
+inline
+void
+BlockSparseMatrix<number>::Tvmult (Vector<nonblock_number>       &dst,
+                                   const Vector<nonblock_number> &src) const
+{
+  BaseClass::Tvmult_nonblock_nonblock (dst, src);
+}
 
 
 template <typename number>
