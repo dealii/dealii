@@ -215,11 +215,37 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 {
 				   // first set output vector to zero
   dst.clear ();
+				   // then pass on to the function
+				   // that actually does the work
+  apply_preconditioner (dst, src, 0, matrix->m());
+};
+
+
+
+template<typename number>
+template<typename number2>
+void
+SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
+					   const Vector<number2> &src,
+					   const unsigned int     begin,
+					   const unsigned int     end) const
+{
+  Assert (begin < end, ExcInternalError());
+  
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this
 				   // will be used quite often
   const SparsityPattern &structure
     = matrix->get_sparsity_pattern();
+
+
+				   // store whether we shall work on
+				   // the whole matrix, or only on
+				   // blocks. this variable is used to
+				   // optimize access to vectors a
+				   // little bit.
+  const bool range_is_restricted = (begin != 0) && (end != matrix->m());
+  
   
 				   // space to be used for local
 				   // systems. allocate as much memory
@@ -289,7 +315,11 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 	    const unsigned int irow_length = structure.row_length(irow);
 	    
 					     // copy rhs
-	    b(i) = src(irow);
+	    if (!range_is_restricted ||
+		((begin <= irow) && (irow < end)))
+	      b(i) = src(irow);
+	    else
+	      b(i) = 0;
 	    
 					     // for all the DoFs that irow
 					     // couples with
@@ -310,6 +340,7 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 						 //
 						 // note that if so, we already
 						 // have copied the entry above
+//TODO:	why is dst accessed here???
 		if (js == local_index.end())
 		  b(i) -= matrix->raw_entry(irow,j) * dst(col);
 		else
@@ -333,7 +364,12 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 	  {
 	    const unsigned int irow = is->first;
 	    const unsigned int i = is->second;
-	    dst(irow) = x(i);
+
+	    if (!range_is_restricted ||
+		((begin <= irow) && (irow < end)))
+	      dst(irow) = x(i);
+					       // do nothing if not in
+					       // the range
 	  };
 	
 					 // if we don't store the

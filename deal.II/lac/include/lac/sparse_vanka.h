@@ -252,6 +252,47 @@ class SparseVanka
 				      */
     void compute_inverse (const unsigned int               row,
 			  map<unsigned int, unsigned int> &local_index);
+
+				     /**
+				      * Apply the inverses in the
+				      * range #[begin,end)# to the
+				      * #src# vector and move the
+				      * result into #dst#. Actually,
+				      * only values of #src# from
+				      * within the range are taken
+				      * (all others are set to zero),
+				      * and only values inside the
+				      * range are written to #dst#, so
+				      * the application of this
+				      * function only does what is
+				      * announced in the general
+				      * documentation if the given
+				      * range is the whole interval.
+				      *
+				      * The reason for providing the
+				      * interval anyway is that in
+				      * derived classes we may want to
+				      * apply the preconditioner to
+				      * blocks of the matrix only, in
+				      * order to parallelize the
+				      * application. Then, it is
+				      * important to only write to
+				      * some slices of #dst# and only
+				      * takes values from similar
+				      * slices of #src#, in order to
+				      * eliminate the dependencies of
+				      * threads of each other.
+				      *
+				      * The #operator()# of this class
+				      * of course calls this function
+				      * with the whole interval
+				      * #[begin,end)=[0,matrix.m())#.
+				      */
+    template<typename number2>
+    void apply_preconditioner (Vector<number2>       &dst,
+			       const Vector<number2> &src,
+			       const unsigned int     begin,
+			       const unsigned int     end) const;
 };
 
 
