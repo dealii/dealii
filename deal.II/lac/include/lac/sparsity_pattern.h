@@ -644,32 +644,6 @@ class SparsityPattern : public Subscriptor
     void symmetrize ();
     
 				     /**
-				      * Print the sparsity of the matrix
-				      * in a format that <tt>gnuplot</tt> understands
-				      * and which can be used to plot the
-				      * sparsity pattern in a graphical
-				      * way. The format consists of pairs
-				      * <tt>i j</tt> of nonzero elements, each
-				      * representing one entry of this
-				      * matrix, one per line of the output
-				      * file. Indices are counted from
-				      * zero on, as usual. Since sparsity
-				      * patterns are printed in the same
-				      * way as matrices are displayed, we
-				      * print the negative of the column
-				      * index, which means that the
-				      * <tt>(0,0)</tt> element is in the top left
-				      * rather than in the bottom left
-				      * corner.
-				      *
-				      * Print the sparsity pattern in
-				      * gnuplot by setting the data style
-				      * to dots or points and use the
-				      * <tt>plot</tt> command.
-				      */
-    void print_gnuplot (std::ostream &out) const;
-
-				     /**
 				      * Return number of rows of this
 				      * matrix, which equals the dimension
 				      * of the image space.
@@ -757,6 +731,96 @@ class SparsityPattern : public Subscriptor
     bool optimize_diagonal () const;
     
 				     /**
+				      * Write the data of this object
+				      * en bloc to a file. This is
+				      * done in a binary mode, so the
+				      * output is neither readable by
+				      * humans nor (probably) by other
+				      * computers using a different
+				      * operating system of number
+				      * format.
+				      *
+				      * The purpose of this function
+				      * is that you can swap out
+				      * matrices and sparsity pattern
+				      * if you are short of memory,
+				      * want to communicate between
+				      * different programs, or allow
+				      * objects to be persistent
+				      * across different runs of the
+				      * program.
+				      */
+    void block_write (std::ostream &out) const;
+
+				     /**
+				      * Read data that has previously
+				      * been written by block_write()
+				      * from a file. This is done
+				      * using the inverse operations
+				      * to the above function, so it
+				      * is reasonably fast because the
+				      * bitstream is not interpreted
+				      * except for a few numbers up
+				      * front.
+				      *
+				      * The object is resized on this
+				      * operation, and all previous
+				      * contents are lost.
+				      *
+				      * A primitive form of error
+				      * checking is performed which
+				      * will recognize the bluntest
+				      * attempts to interpret some
+				      * data as a vector stored
+				      * bitwise to a file, but not
+				      * more.
+				      */
+    void block_read (std::istream &in);
+    
+				     /**
+				      * Print the sparsity of the
+				      * matrix. The output consists of
+				      * terms <tt>[i,j]</tt> for each
+				      * allocated entry. No linefeeds
+				      * are added.
+				      */
+    void print (std::ostream &out) const;
+
+				     /**
+				      * Print the sparsity of the matrix
+				      * in a format that <tt>gnuplot</tt> understands
+				      * and which can be used to plot the
+				      * sparsity pattern in a graphical
+				      * way. The format consists of pairs
+				      * <tt>i j</tt> of nonzero elements, each
+				      * representing one entry of this
+				      * matrix, one per line of the output
+				      * file. Indices are counted from
+				      * zero on, as usual. Since sparsity
+				      * patterns are printed in the same
+				      * way as matrices are displayed, we
+				      * print the negative of the column
+				      * index, which means that the
+				      * <tt>(0,0)</tt> element is in the top left
+				      * rather than in the bottom left
+				      * corner.
+				      *
+				      * Print the sparsity pattern in
+				      * gnuplot by setting the data style
+				      * to dots or points and use the
+				      * <tt>plot</tt> command.
+				      */
+    void print_gnuplot (std::ostream &out) const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object. See
+				      * MemoryConsumption.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      * This is kind of an expert mode. Get 
 				      * access to the rowstart array, but
 				      * read-only.
@@ -807,61 +871,6 @@ class SparsityPattern : public Subscriptor
 				      * information!
 				      */
     const unsigned int * get_column_numbers () const;
-
-				     /**
-				      * Write the data of this object
-				      * en bloc to a file. This is
-				      * done in a binary mode, so the
-				      * output is neither readable by
-				      * humans nor (probably) by other
-				      * computers using a different
-				      * operating system of number
-				      * format.
-				      *
-				      * The purpose of this function
-				      * is that you can swap out
-				      * matrices and sparsity pattern
-				      * if you are short of memory,
-				      * want to communicate between
-				      * different programs, or allow
-				      * objects to be persistent
-				      * across different runs of the
-				      * program.
-				      */
-    void block_write (std::ostream &out) const;
-
-				     /**
-				      * Read data that has previously
-				      * been written by block_write()
-				      * from a file. This is done
-				      * using the inverse operations
-				      * to the above function, so it
-				      * is reasonably fast because the
-				      * bitstream is not interpreted
-				      * except for a few numbers up
-				      * front.
-				      *
-				      * The object is resized on this
-				      * operation, and all previous
-				      * contents are lost.
-				      *
-				      * A primitive form of error
-				      * checking is performed which
-				      * will recognize the bluntest
-				      * attempts to interpret some
-				      * data as a vector stored
-				      * bitwise to a file, but not
-				      * more.
-				      */
-    void block_read (std::istream &in);
-    
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object. See
-				      * MemoryConsumption.
-				      */
-    unsigned int memory_consumption () const;
 
 				     /**
 				      * Exception
