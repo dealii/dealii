@@ -20,7 +20,12 @@
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <errno.h>
+
+#ifndef DEAL_II_USE_DIRECT_ERRNO_H
+#  include <errno.h>
+#else
+#  include </usr/include/errno.h>
+#endif
 #include <sys/errno.h>
 
 

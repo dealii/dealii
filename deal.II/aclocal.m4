@@ -2483,6 +2483,50 @@ AC_DEFUN(DEAL_II_CHECK_QUAD_DEFINE, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl On DEC OSF1, when we specify "-std strict_ansi", we can include
+dnl errno.h, and still not get the definition of the error codes
+dnl such as EINTR, EPIPE, etc.
+dnl
+dnl In this case, use a workaround by explicitly including 
+dnl /usr/include/errno.h, instead of just errno.h, which the compiler
+dnl maps to one of its own C/C++ compatibility headers, which only
+dnl define 3 error codes (for reasons unknown)
+dnl
+dnl Usage: DEAL_II_CHECK_ERROR_CODES_DEFINITION
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ERROR_CODES_DEFINITION, dnl
+[
+  AC_MSG_CHECKING(for defintions of error codes in errno.h)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <iostream>
+#include <errno.h>
+using namespace std;
+    ],
+    [
+    cout << EINTR << endl;
+    ],
+    [
+      AC_MSG_RESULT(yes)
+    ],
+    [
+      AC_MSG_RESULT(no. working around)
+      AC_DEFINE(DEAL_II_USE_DIRECT_ERRNO_H, 1, 
+                [Define if the compiler provides a <errno.g> header file
+		 which does not define all error codes such as EINTR. In
+		 that case, use the system include file at /usr/include
+		 instead. There is probably a better way to do this, but
+		 it is not apparent by looking at the C/C++ compatibility
+                 header provided by the compiler.])
+    ])
+])
+
+
+
 
 dnl ------------------------------------------------------------
 dnl Check whether some of the HSL functions have been dropped
