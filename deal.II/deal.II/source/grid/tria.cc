@@ -453,7 +453,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	      subscribe();
 	    
 	    Assert (false,
-		    ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
+		    ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex],
+                                           v.size()));
 	  };
       
       
