@@ -111,7 +111,7 @@ sub make_include_tree {
     open (FILE, $filename);
     while (<FILE>) {
 	# look out for include statements
-	if (/^#\s*include\s*(["<])([^">]*)[">]/) {
+	if (/^\s*#\s*include\s*(["<])([^">]*)[">]/) {
 	    local($include) = $2;
 	    if ($1 =~ /</) {
 		# include by <...>. Try to find real path
