@@ -55,6 +55,11 @@
    */
 #undef DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
 
+/* Defined if the compiler gets an internal compiler upon some code involving
+   long doubles, and with optimization. For the details, look at aclocal.m4 in
+   the top-level directory. */
+#undef DEAL_II_LONG_DOUBLE_LOOP_BUG
+
 /* Major version number of deal.II */
 #undef DEAL_II_MAJOR
 
