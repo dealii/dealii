@@ -58,7 +58,7 @@ class SparseMatrix : public virtual Subscriptor
                                               */
             Accessor (const SparseMatrix<number> *matrix,
                       const unsigned int          row,
-                      const unsigned short        index);
+                      const unsigned int          index);
 
                                              /**
                                               * Row number of the element
@@ -72,7 +72,7 @@ class SparseMatrix : public virtual Subscriptor
                                               * represented by this
                                               * object.
                                               */
-            unsigned short index() const;
+            unsigned int index() const;
 
                                              /**
                                               * Column number of the
@@ -100,7 +100,7 @@ class SparseMatrix : public virtual Subscriptor
                                              /**
                                               * Current index in row.
                                               */
-            unsigned short a_index;
+            unsigned int a_index;
 
                                              /**
                                               * Make enclosing class a
@@ -117,7 +117,7 @@ class SparseMatrix : public virtual Subscriptor
                                           */ 
 	const_iterator (const SparseMatrix<number> *matrix,
                         const unsigned int          row,
-                        const unsigned short        index);
+                        const unsigned int          index);
 	  
                                          /**
                                           * Prefix increment.
@@ -1512,7 +1512,7 @@ inline
 SparseMatrix<number>::const_iterator::Accessor::
 Accessor (const SparseMatrix<number>* matrix,
           const unsigned int          r,
-          const unsigned short        i)
+          const unsigned int          i)
 		:
 		matrix(matrix),
 		a_row(r),
@@ -1541,7 +1541,7 @@ SparseMatrix<number>::const_iterator::Accessor::column() const
 
 template <typename number>
 inline
-unsigned short
+unsigned int
 SparseMatrix<number>::const_iterator::Accessor::index() const
 {
   return a_index;
@@ -1563,7 +1563,7 @@ inline
 SparseMatrix<number>::const_iterator::
 const_iterator(const SparseMatrix<number> *matrix,
                const unsigned int          r,
-               const unsigned short        i)
+               const unsigned int          i)
 		:
 		accessor(matrix, r, i)
 {}
