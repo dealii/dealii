@@ -648,10 +648,25 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
   
 				   // split all cells into threads if
 				   // multithreading is used and run
-				   // the whole thing
+				   // the whole thing. use the
+				   // function pointer variable to
+				   // work around another nasty bug in
+				   // icc7
   Threads::ThreadGroup<> threads;
+  void (*estimate_some_ptr) (const Mapping<dim>                  &,
+			     const DoFHandler<dim>               &,
+			     const Quadrature<dim-1>             &,
+			     const typename FunctionMap<dim>::type &,
+			     const std::vector<const InputVector *> &,
+			     const std::vector<bool>               &,
+			     const Function<dim>                 *,
+			     const std::pair<unsigned int, unsigned int>,
+			     FaceIntegrals                       &,
+			     PerThreadData                       &)
+    = &KellyErrorEstimator<dim>::template estimate_some<InputVector>;
+  
   for (unsigned int i=0; i<n_threads; ++i)
-    threads += Threads::spawn (&KellyErrorEstimator<dim>::template estimate_some<InputVector>)
+    threads += Threads::spawn (estimate_some_ptr)
                (mapping, dof_handler,
                 quadrature, neumann_bc, solutions,
                 component_mask, coefficients,
