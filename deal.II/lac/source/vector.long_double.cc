@@ -17,7 +17,7 @@
 // explicit instantiations
 template class Vector<long double>;
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG    
+#if !defined(DEAL_II_EXPLICIT_CONSTRUCTOR_BUG) && !defined(DEAL_II_LONG_DOUBLE_LOOP_BUG)
 template Vector<long double>::Vector (const Vector<double> &);
 template Vector<long double>::Vector (const Vector<float> &);
 
@@ -46,7 +46,3 @@ template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=
 template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<long double> (const Vector<long double> &) const;
 template void Vector<float>::reinit<long double>(const Vector<long double>&, const bool);
 template void Vector<float>::equ<long double>(const float, const Vector<long double>&);
-
-// see the .h file for why these functions are disabled.
-// template Vector<float>::Vector (const Vector<double>& v);
-// template Vector<double>::Vector (const Vector<float>& v);
