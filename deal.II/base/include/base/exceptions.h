@@ -756,7 +756,26 @@ namespace StandardExceptions
   DeclException3 (ExcIndexRange, int, int, int,
 		  << "Index " << arg1 << " is not in ["
 		  << arg2 << "," << arg3 << "[");
-  
+
+				   /**
+				    * This exception works around a
+				    * design flaw in the
+				    * @p{DeclException0} macro: that
+				    * does not allow one to specify a
+				    * message that is displayed when
+				    * the exception is raised, as
+				    * opposed to the other exceptions
+				    * which allow to show a text along
+				    * with the given parameters.
+				    *
+				    * When throwing this exception,
+				    * you can give a message as a
+				    * string or @p{char*} as argument
+				    * to the exception that is then
+				    * displayed.
+				    */
+  DeclException1 (ExcMessage, string,
+		  << arg1);
 };
 
 
