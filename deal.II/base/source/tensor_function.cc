@@ -39,10 +39,11 @@ VectorFunction<dim>::value (const Point<dim>  &, Vector<double> &) const
 
 template <int dim>
 void
-VectorFunction<dim>::value_list (const vector<Point<dim> > &,
-				 vector<Vector<double> > &) const
+VectorFunction<dim>::value_list (const vector<Point<dim> > &ps,
+				 vector<Vector<double> > &us) const
 {
-  Assert (false, ExcPureFunctionCalled());
+  for (unsigned int i=0 ; i<ps.size() ; ++i)
+    value(ps[i], us[i]);
 }
 
 
