@@ -66,8 +66,8 @@ void DataOutRotation<dim>::build_some_patches (Data data)
   
   
   unsigned int cell_number = 0;
-  vector<DataOutBase::Patch<dim+1> >::iterator patch = patches.begin();
-  DoFHandler<dim>::cell_iterator cell=first_cell();
+  typename vector<DataOutBase::Patch<dim+1> >::iterator patch = patches.begin();
+  typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != dofs->end()); ++i)
