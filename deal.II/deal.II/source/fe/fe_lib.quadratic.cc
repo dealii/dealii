@@ -136,6 +136,31 @@ FEQuadraticSub<1>::shape_grad(const unsigned int i,
 
 
 template <>
+Tensor<2,1>
+FEQuadraticSub<1>::shape_grad_grad (const unsigned int i,
+				    const Point<1>    &) const
+{
+  Assert((i<total_dofs), ExcInvalidIndex(i));
+
+  Tensor<2,1> return_value;
+  switch (i)
+    {
+      case 0:
+	    return_value[0][0] = 4;
+	    break;
+      case 1:
+	    return_value[0][0] = 4;
+	    break;
+      case 2:
+	    return_value[0][0] = -8;
+	    break;
+    }
+  return return_value;
+};
+
+
+
+template <>
 void FEQuadraticSub<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
   FiniteElement<1>::get_unit_support_points (unit_points);
 };

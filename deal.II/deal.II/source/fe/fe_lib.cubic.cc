@@ -9,120 +9,6 @@
 #include <algorithm>
 
 
-/*--------------------------------- For 1d ---------------------------------
-  -- Use the following maple script to generate the basis functions,
-  -- gradients and prolongation matrices as well as the mass matrix.
-  -- Make sure that the files do not exists beforehand, since output
-  -- is appended instead of overwriting previous contents.
-  --
-  -- You should only have to change the very first lines for polynomials
-  -- of higher order.
-  --------------------------------------------------------------------------
-  n_functions := 4;
-  
-  support_points := array(0..n_functions-1);
-  support_points[0] := 0;
-  support_points[1] := 1;
-  support_points[2] := 1/3;
-  support_points[3] := 2/3;
-
-  phi_polynom := array(0..n_functions-1);
-  grad_phi_polynom := array(0..n_functions-1);
-  local_mass_matrix := array(0..n_functions-1, 0..n_functions-1);
-
-  for i from 0 to n_functions-1 do
-    # note that the interp function wants vectors indexed from
-    #   one and not from zero. 
-    values := array(1..n_functions);
-    for j from 1 to n_functions do
-      values[j] := 0;
-    od;  
-    values[i+1] := 1;
-
-    shifted_support_points := array (1..n_functions);
-    for j from 1 to n_functions do
-      shifted_support_points[j] := support_points[j-1];
-    od;
-    
-    phi_polynom[i] := interp (shifted_support_points, values, xi);
-    grad_phi_polynom[i] := diff(phi_polynom[i], xi);
-  od;
-
-  phi:= proc(i,x) subs(xi=x, phi_polynom[i]); end;
-
-
-  points[0] := array(0..n_functions-1);
-  points[1] := array(0..n_functions-1);
-  for i from 0 to n_functions-1 do
-    points[0][i] := support_points[i]/2;  
-    points[1][i] := support_points[i]/2+1/2;
-  od;  
-
-  prolongation := array(0..1,0..n_functions-1, 0..n_functions-1);
-
-  for i from 0 to 1 do
-    for j from 0 to n_functions-1 do
-      for k from 0 to n_functions-1 do
-        prolongation[i,j,k] := phi(k, points[i][j]);
-      od;
-    od;
-  od;
-
-
-  # to get the restriction (interpolation) matrices, evaluate
-  # the basis functions on the child cells at the global
-  # interpolation points
-  child_phi[0] := proc(i, point)
-                    if ((point<0) or (point>1/2)) then
-		      0:
-		    else
-		      phi(i,2*point):
-		    fi:
-		  end: 
-  child_phi[1] := proc(i, point)
-                    if ((point<1/2) or (point>1)) then
-		      0:
-		    else
-		      phi(i,2*point-1):
-		    fi:
-		  end: 
-  restriction := array(0..1,0..n_functions-1, 0..n_functions-1);  
-  for child from 0 to 1 do
-    for j from 0 to n_functions-1 do
-      for k from 0 to n_functions-1 do
-        restriction[child,j,k] := child_phi[child](k, support_points[j]):
-      od:
-    od:
-  od:
-
-  
-  for i from 0 to n_functions-1 do
-    for j from 0 to n_functions-1 do
-      local_mass_matrix[i,j] := int(phi_polynom[i] * phi_polynom[j] * h,
-                                    xi=0..1);
-    od;
-  od;
-  
-  readlib(C);
-  C(phi_polynom, filename=shape_value_1d);
-  C(grad_phi_polynom, filename=shape_grad_1d);
-  C(prolongation, filename=prolongation_1d);
-  C(restriction, filename=restriction_1d);
-  C(local_mass_matrix, optimized, filename=massmatrix_1d);
-
-  -----------------------------------------------------------------------
-  Use the following perl scripts to convert the output into a
-  suitable format:
-  
-  perl -pi -e 's/phi_polynom\[(\d)\] =/case $1: return/g;' shape_value_1d
-  perl -pi -e 's/grad_phi_polynom\[(\d)\] = (.*);/case $1: return Point<1>($2);/g;' shape_grad_1d
-  perl -pi -e 's/\[(\d+)\]\[(\d)\]/($1,$2)/g;' massmatrix_1d
-  perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' prolongation_1d
-  perl -pi -e 's/\[(\d+)\]\[(\d)\]\[(\d)\]/[$1]($2,$3)/g;' restriction_1d
-  perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_1d
-*/
-
-
 
 
 
@@ -235,6 +121,28 @@ FECubicSub<1>::shape_grad (const unsigned int i,
       case 3: return Point<1>(-81.0/2.0*xi*xi+36.0*xi-9.0/2.0);
     }
   return Point<1>();
+};
+
+
+
+template <>
+Tensor<2,1>
+FECubicSub<1>::shape_grad_grad (const unsigned int i,
+				const Point<1>    &p) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+
+  const double xi = p(0);
+  Tensor<2,1> return_value;
+  switch (i) 
+    {
+      case 0: return_value[0][0] = -27.0*xi+18.0;
+      case 1: return_value[0][0] = 27.0*xi-9.0;
+      case 2: return_value[0][0] = 81.0*xi-45.0;
+      case 3: return_value[0][0] = -81.0*xi+36.0;
+    };
+
+  return return_value;
 };
 
 

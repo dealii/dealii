@@ -162,11 +162,12 @@ bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 
 /*------------------------------- FiniteElement ----------------------*/
 
+#if deal_II_dimension == 1
+
 // declare this function to be explicitely specialized before first use
 // egcs wants this, but gcc2.8.1 produces an internal compiler error, so
 // we drop this declaration again for the time being
 
-#if deal_II_dimension == 1
 
 //template <>
 //void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
@@ -286,8 +287,8 @@ void FiniteElement<1>::get_unit_support_points (vector<Point<1> > &support_point
 
 template <>
 void FiniteElement<1>::get_support_points (const DoFHandler<1>::cell_iterator &cell,
-					  const Boundary<1> &,
-					  vector<Point<1> > &support_points) const {
+					   const Boundary<1> &,
+					   vector<Point<1> > &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension(support_points.size(), total_dofs));
 				   // compute support points. The first ones
