@@ -309,7 +309,10 @@ struct FiniteElementBase :
 				      * to the destination cell, i.e. the
 				      * unrefined one, while the column indices
 				      * are for the refined cell's degrees of
-				      * freedom.
+				      * freedom. The application of this matrix
+				      * is therefore usually its being
+				      * multiplied by the vector of nodal values
+				      * on the child.
 				      *
 				      * In essence, using the matrices from the
 				      * children to the mother cell amounts to
@@ -328,6 +331,41 @@ struct FiniteElementBase :
 				      * have to overwrite the nonzero
 				      * contributions of each child into the
 				      * nodal value vector of the mother cell.
+				      *
+				      * While we could avoid this and rather add
+				      * up the contributions of each child for
+				      * nodes that are interior of the mother
+				      * cell, we can't for nodes on the boundary
+				      * of the mother cell. The reason for this
+				      * is that we know how many children may
+				      * contribute to the interpolated nodal
+				      * value of an interior degree of freedom.
+				      * However, we don't know for dofs on the
+				      * boundary, for which we only know how many
+				      * children from each side of the face
+				      * contribute, but we would have to look out
+				      * of the cell to know how many neighbors
+				      * there are and then, still, we would have
+				      * to have two different interpolation
+				      * routines for local interpolation and for
+				      * the contribution of a cell to a global
+				      * interpolation if we wanted to compute
+				      * that by adding up local contributions.
+				      *
+				      * Because of this problem, we chose to
+				      * write rather than add the contributions
+				      * of each cell to the interpolation onto
+				      * the mother cell. However, there now is
+				      * another problem which appears when using
+				      * discontinuous finite elements. The
+				      * process of 'writing' assumed that we
+				      * get the same result for each degree of
+				      * freedom from each of the children, such
+				      * that 'over'writing would not destroy
+				      * information; when using discontinuous
+				      * elements, this assumption is violated.
+				      *
+				      * SOLUTION? NOT YET MADE UP!
 				      *
 				      * To compute the interpolation of a
 				      * finite element field to a cell, you
