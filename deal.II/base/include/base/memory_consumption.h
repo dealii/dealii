@@ -88,6 +88,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a @p{bool}
 				    * variable.
 				    */
+  inline
   unsigned int memory_consumption (const bool);
 
 				   /**
@@ -95,6 +96,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a @p{char}
 				    * variable.
 				    */
+  inline
   unsigned int memory_consumption (const char);
 
 				   /**
@@ -102,6 +104,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a
 				    * @p{short int} variable.
 				    */
+  inline
   unsigned int memory_consumption (const short int);
 
 				   /**
@@ -109,6 +112,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a
 				    * @p{short unsigned int} variable.
 				    */
+  inline
   unsigned int memory_consumption (const short unsigned int);
 
 				   /**
@@ -116,6 +120,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a @p{int}
 				    * variable.
 				    */
+  inline
   unsigned int memory_consumption (const int);
 
 				   /**
@@ -123,6 +128,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a @p{unsigned int}
 				    * variable.
 				    */
+  inline
   unsigned int memory_consumption (const unsigned int);
 
 				   /**
@@ -130,6 +136,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a @p{float}
 				    * variable.
 				    */
+  inline
   unsigned int memory_consumption (const float);
 
 				   /**
@@ -137,6 +144,7 @@ namespace MemoryConsumption
 				    * in bytes consumed by a @p{double}
 				    * variable.
 				    */
+  inline
   unsigned int memory_consumption (const double);
 
 				   /**
@@ -145,6 +153,7 @@ namespace MemoryConsumption
 				    * consumed by a @p{std::string}
 				    * variable.
 				    */
+  inline
   unsigned int memory_consumption (const std::string &s);
 
 				   /**
@@ -195,6 +204,7 @@ namespace MemoryConsumption
 				    * vectors of bools.
 				    */
   template <typename T>
+  inline
   unsigned int memory_consumption (const typename std::vector<T> &v);
 
 				   /**
@@ -213,6 +223,7 @@ namespace MemoryConsumption
 				    * elements.
 				    */
   template <typename T, int N>
+  inline
   unsigned int memory_consumption (const T (&v)[N]);
   
 				   /**
@@ -226,6 +237,7 @@ namespace MemoryConsumption
 				    * one-by-one, but as a bit
 				    * field.
 				    */
+  inline
   unsigned int memory_consumption (const std::vector<bool> &v);
     
 				   /**
@@ -234,6 +246,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{int}s.
 				    */
+  inline
   unsigned int memory_consumption (const std::vector<int> &v);
     
 				   /**
@@ -242,6 +255,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{double}s.
 				    */
+  inline
   unsigned int memory_consumption (const std::vector<double> &v);
     
 				   /**
@@ -250,6 +264,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{float}s.
 				    */
+  inline
   unsigned int memory_consumption (const std::vector<float> &v);
     
 				   /**
@@ -258,6 +273,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{char}s.
 				    */
+  inline
   unsigned int memory_consumption (const std::vector<char> &v);
     
 				   /**
@@ -266,6 +282,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of @p{unsigned char}s.
 				    */
+  inline
   unsigned int memory_consumption (const std::vector<unsigned char> &v);
     
 				   /**
@@ -275,6 +292,7 @@ namespace MemoryConsumption
 				    * for a vector of pointers.
 				    */
   template <typename T>
+  inline
   unsigned int memory_consumption (const typename std::vector<T *> &v);
 
 				   /** 
@@ -283,7 +301,7 @@ namespace MemoryConsumption
 				    * consumption of a vector, here
 				    * for a vector of strings. This
 				    * function is not necessary from a
-				    * struct C++ viewpoint, since it
+				    * strict C++ viewpoint, since it
 				    * could be generated, but is
 				    * necessary for compatibility with
 				    * IBM's xlC 5.0 compiler, and
@@ -299,6 +317,7 @@ namespace MemoryConsumption
 				    * consumed by a pair of values.
 				    */
   template <typename A, typename B>
+  inline
   unsigned int memory_consumption (const typename std::pair<A,B> &p);
     
 				   /**
@@ -310,6 +329,7 @@ namespace MemoryConsumption
 				    * pointed to.
 				    */
   template <typename T>
+  inline
   unsigned int memory_consumption (const T * const);
 
 				   /**
@@ -325,6 +345,7 @@ namespace MemoryConsumption
 				    * pointers
 				    */
   template <typename T>
+  inline
   unsigned int memory_consumption (T * const);
 
 				   /**
@@ -342,6 +363,7 @@ namespace MemoryConsumption
 				    * @p{T*} template function
 				    * above.
 				    */
+  inline
   unsigned int memory_consumption (void * const);
     
     
@@ -357,6 +379,7 @@ namespace MemoryConsumption
 				    * does not work.
 				    */
   template <typename T>
+  inline
   unsigned int memory_consumption (const T &t);
 }
 
@@ -451,7 +474,7 @@ namespace MemoryConsumption
       mem += memory_consumption(v[i]);
     mem += (v.capacity() - n)*sizeof(T);
     return mem;
-  };
+  }
 
 
 
@@ -462,7 +485,7 @@ namespace MemoryConsumption
     for (unsigned int i=0; i<N; ++i)
       mem += memory_consumption(v[i]);
     return mem;
-  };
+  }
 
 
 
@@ -470,7 +493,7 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const std::vector<bool> &v)
   {
     return v.capacity() / 8 + sizeof(v);
-  };
+  }
 
 
   
@@ -479,7 +502,7 @@ namespace MemoryConsumption
   {
     return (v.capacity() * sizeof(int) +
 	    sizeof(v));
-  };
+  }
     
     
 
@@ -488,7 +511,7 @@ namespace MemoryConsumption
   {
     return (v.capacity() * sizeof(double) +
 	    sizeof(v));
-  };
+  }
     
     
 
@@ -497,7 +520,7 @@ namespace MemoryConsumption
   {
     return (v.capacity() * sizeof(float) +
 	    sizeof(v));
-  };
+  }
     
     
 	
@@ -506,7 +529,7 @@ namespace MemoryConsumption
   {
     return (v.capacity() * sizeof(char) +
 	    sizeof(v));
-  };
+  }
     
 
     
@@ -515,7 +538,7 @@ namespace MemoryConsumption
   {
     return (v.capacity() * sizeof(unsigned char) +
 	    sizeof(v));
-  };
+  }
 
 
     
@@ -525,7 +548,7 @@ namespace MemoryConsumption
   {
     return (v.capacity() * sizeof(T *) +
 	    sizeof(v));
-  };
+  }
     
 
 				    
@@ -535,7 +558,7 @@ namespace MemoryConsumption
   {
     return (memory_consumption(p.first) +
 	    memory_consumption(p.second));
-  };
+  }
 
   
 		
@@ -545,7 +568,7 @@ namespace MemoryConsumption
   memory_consumption (const T * const)
   {
     return sizeof(T*);
-  };
+  }
 
 
 		
@@ -555,7 +578,7 @@ namespace MemoryConsumption
   memory_consumption (T * const)
   {
     return sizeof(T*);
-  };
+  }
 
   
 	
@@ -564,7 +587,7 @@ namespace MemoryConsumption
   memory_consumption (void * const)
   {
     return sizeof(void*);
-  };
+  }
     
     
 	
@@ -574,7 +597,7 @@ namespace MemoryConsumption
   memory_consumption (const T &t)
   {
     return t.memory_consumption();
-  };
+  }
 }
 
 

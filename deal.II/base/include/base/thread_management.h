@@ -2886,6 +2886,7 @@ namespace Threads
 				    * This function exists once for
 				    * each number of parameters.
 				    */
+  inline
   FunData0<void>::ArgCollector
   encapsulate (void (*fun_ptr)());
 
@@ -2901,6 +2902,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1>
+  inline
   typename FunData1<Arg1,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1));
 
@@ -2917,6 +2919,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2>
+  inline
   typename FunData2<Arg1,Arg2,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2));
   
@@ -2933,6 +2936,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3>
+  inline
   typename FunData3<Arg1,Arg2,Arg3,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3));
   
@@ -2949,6 +2953,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
   typename FunData4<Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4));
 
@@ -2966,6 +2971,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+  inline
   typename FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5));
 
@@ -2982,6 +2988,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+  inline
   typename FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6));
 
@@ -2998,6 +3005,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+  inline
   typename FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7));
 
@@ -3014,6 +3022,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
+  inline
   typename FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8));
 
@@ -3030,6 +3039,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
+  inline
   typename FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9));
 
@@ -3046,6 +3056,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
+  inline
   typename FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10));
 
@@ -3063,6 +3074,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class>
+  inline
   typename MemFunData0<Class,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)());
 
@@ -3079,6 +3091,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class, typename Arg1>
+  inline
   typename MemFunData1<Class,Arg1,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1));
 
@@ -3096,6 +3109,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class, typename Arg1, typename Arg2>
+  inline
   typename MemFunData2<Class,Arg1,Arg2,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2));
   
@@ -3113,6 +3127,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class, typename Arg1, typename Arg2, typename Arg3>
+  inline
   typename MemFunData3<Class,Arg1,Arg2,Arg3,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3));
   
@@ -3130,6 +3145,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
   typename MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4));
   
@@ -3147,6 +3163,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+  inline
   typename MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5));
 
@@ -3164,6 +3181,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+  inline
   typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6));
 
@@ -3180,6 +3198,7 @@ namespace Threads
 				    * each number of parameters.
 				    */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+  inline
   typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7));
 
