@@ -113,7 +113,7 @@ template <typename number> class SparseMatrix;
  *      suitable boundary class is provided as HyperSphereBoundary
  *      in the library.
  *
- *    <li> Half shells: This is a variant of the preceeding domain,
+ *    <li> Half shells: This is a variant of the preceding domain,
  *      where only one half of the shell is taken, defined by the first
  *      coordinate having non-negative values. This class is useful in
  *      computations with rotational symmetry, as then a 3d shell can be
