@@ -405,7 +405,8 @@ class SparseMatrix : public Subscriptor
 				      * sure to understand what you are
 				      * doing here.
 				      */
-    number raw_entry(unsigned int row, unsigned int index) const;
+    number raw_entry (const unsigned int row,
+		      const unsigned int index) const;
     
     				     /**
 				      * This is for hackers. Get
