@@ -24,11 +24,13 @@
 <ol>
   <li> <p>
        New multithreading scheme is implemented.
+       (WB 2000/04/13)
        </p>
 
   <li> <p>
        Improved: <code class="class">Subscriptor</code> prints the
        real class name if a subscribed object is deleted.
+       (GK 2000/04/12)
        </p>
 
   <li> <p>
@@ -61,11 +63,13 @@
   <li> <p>
        New: <code class="class">EigenPower</code> implements power
        method by von Mises
+       (GK 2000/04/19)
        </p>
 
   <li> <p>
        New: <code class="member">PreconditionBlockSSOR::set_omega</code>
        allows to change the relaxation parameter.
+       (GK 2000/04/12)
        </p>
 
   <li> <p>
@@ -86,6 +90,7 @@
        exchange the data of two vectors without needing a temporary
        vector and without copying around data. Their run-time is
        therefore independent of the length of the vectors.
+       (WB 2000/05/02)
        </p>
 
   <li> <p>
@@ -106,6 +111,7 @@
        later on. It also has a function to preload the data before its
        use in a separate thread if the library is configured for
        multi-threading.
+       (WB 2000/05/03)
        </p>
 
   <li> <p>
@@ -113,6 +119,7 @@
        <code class="class">SparsityPattern</code> that copies another
        object and adds some off-diagonals had a bug that caused an
        exception in some cases. This is now fixed.
+       (WB 2000/05/04)
        </p>
 
   <li> <p>
@@ -123,6 +130,7 @@
        style in the library. Furthermore, 
        <code class="member">FullMatrix::Tmmult</code> was utterly
        broken. 
+       (WB 2000/05/08)
        </p>
 
   <li> <p>
@@ -131,6 +139,7 @@
        <code class="member">matrix_norm_square</code>, since they in
        fact return the square of the norm. This should avoid confusion
        in some cases.
+       (WB 2000/05/05)
        </p>
 </ol>
 
@@ -155,55 +164,66 @@
        New: <code class="class">class GradientEstimator</code>
        estimates the norm of the gradient on each cell from finite
        difference approximations. 
+       (WB 2000/04/14)
        </p>
 
   <li> <p>
        New: <code class="member">DoFTools::extract_boundary_dofs</code> 
        finds all degrees of freedom which are at the boundary and belong to
        specified components.
+       (WB 2000/04/17)
        </p>
 
   <li> <p>
        New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
        allows to use different discretization grids for different
        variables.
+       (WB 2000/04/15)
        </p>
 
   <li> <p> 
        New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
        functions return the grids for which the map was created.
+       (WB 2000/04/19)
        </p>
 
   <li> <p> 
        Fix: <code class="member">FESystem::reinit()</code> generated
        an exception if <code class="member">update_support_points</code> 
        was set.
+       (WB 2000/05/10)
        </p>
 
   <li> <p> 
-       Change: <code class="member">DoFHandler::max_couplings_between_dofs ()</code>
+       Change: the return value of
+       <code class="member">DoFHandler::max_couplings_between_dofs ()</code>
        is bounded by <code class="member">DoFHandler::n_dofs()</code>.
+       (Ralf Hartmann 2000/05/11)
        </p>
 
   <li> <p> 
        New: <code class="member">FEValuesBase::get_cell ()</code>
        returns present cell.
+       (Ralf Hartmann 2000/05/11)
        </p>
 
   <li> <p> 
        New: <code class="member">DoFTools::extract_hanging_node_dofs ()</code>
        identifies nodes that will be constrained by hanging node constraints.
+       (WB 2000/05/12)
        </p>
 
   <li> <p> 
        New: <code class="member">DoFRenumbering::sort_selected_dofs_back ()</code>
-       sorts selected degrees of freedom to the end of the index range.
+       sorts selected degrees of freedom to the end of the index
+       range.
+       (WB 2000/05/12)
        </p>
 
   <li> <p> 
        Change: <code class="member">DoFTools::make_hanging_node_constraints ()</code>
        does not use the user flags any more, and can thus run in
-       parallel more than once.
+       parallel more than once. (WB 2000/05/15)
        </p>
 
   <li> <p> 
@@ -211,7 +231,7 @@
        now accepts a template parameter as sparsity pattern. This
        allows to use this function for the usual 
        <code class="class">SparsityPattern</code>, or for 
-       <code class="class">BlockSparsityPattern</code> arguments.
+       <code class="class">BlockSparsityPattern</code> arguments. (WB 2000/05/15)
        </p>
 </ol>
 
