@@ -59,14 +59,14 @@ int main ()
                 << " -> " << cell->quad(i)->vertex_index(3)
                 << std::endl
                 << "           orientation = "
-                << (cell->get_face_orientation(i) ? "true" : "false")
+                << (cell->face_orientation(i) ? "true" : "false")
                 << std::endl;
     }
 
                                    // we know that from the second
                                    // cell, the common face must have
                                    // wrong orientation. check this
-  Assert ((++coarse_grid.begin_active())->get_face_orientation(4)
+  Assert ((++coarse_grid.begin_active())->face_orientation(4)
           == false,
           ExcInternalError());
 }

@@ -37,9 +37,9 @@ void check_this (Triangulation<3> &tria)
       if (cell->has_children())
         for (unsigned int c=0; c<GeometryInfo<3>::subfaces_per_face; ++c)
           {
-            Assert (cell->get_face_orientation(f) ==
+            Assert (cell->face_orientation(f) ==
                     cell->child(GeometryInfo<3>::child_cell_on_face(f,c))
-                    ->get_face_orientation(f),
+                    ->face_orientation(f),
                     ExcInternalError());
             deallog << "Cell << " << cell
                     << ", face " << f

@@ -93,9 +93,9 @@ void check (Triangulation<3> &tria)
                                            // properly oriented
                                            // faces. mesh_3d_7 does it
                                            // for mis-oriented faces
-          Assert (cell->get_face_orientation(f) == true,
+          Assert (cell->face_orientation(f) == true,
                   ExcInternalError());
-          Assert (cell->neighbor(f)->get_face_orientation(nn) == true,
+          Assert (cell->neighbor(f)->face_orientation(nn) == true,
                   ExcInternalError());
           
           fe_face_values1.reinit (cell, f);
