@@ -542,6 +542,26 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 
+				     /**
+				      * Execute backward block SOR
+				      * preconditioning.
+				      *
+				      * Warning: this function
+				      * performs normal @p{vmult}
+				      * without adding. The reason for
+				      * its existence is that
+				      * @ref{BlockMatrixArray}
+				      * requires the adding version by
+				      * default. On the other hand,
+				      * adding requires an additional
+				      * auxiliary vector, which is not
+				      * desirable.
+				      *
+				      * @see{vmult}.
+				      */
+    template <typename number2>
+    void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
+
   private:
 				     /**
 				      * Actual implementation of the
@@ -554,6 +574,18 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     void do_vmult (Vector<number2>&,
 		   const Vector<number2>&,
 		   const bool adding) const;
+
+				     /**
+				      * Actual implementation of the
+				      * preconditioning algorithm.
+				      *
+				      * The parameter @p{adding} does
+				      * not have any function, yet.
+				      */
+    template <typename number2>
+    void do_Tvmult (Vector<number2>&,
+		    const Vector<number2>&,
+		    const bool adding) const;
 
 };
 

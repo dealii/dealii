@@ -497,8 +497,10 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
 
 template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &dst,
-						       const Vector<number2> &src) const
+void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
+  Vector<number2>       &dst,
+  const Vector<number2> &src,
+  const bool) const
 {
 				   // introduce the following typedef
 				   // since in the use of exceptions,
@@ -625,6 +627,26 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 	     const Vector<number2> &src) const
 {
   do_vmult(dst, src, true);
+}
+
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
+void PreconditionBlockSOR<MATRIX,inverse_type>
+::Tvmult (Vector<number2>       &dst,
+	 const Vector<number2> &src) const
+{
+  do_Tvmult(dst, src, false);
+}
+
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
+void PreconditionBlockSOR<MATRIX,inverse_type>
+::Tvmult_add (Vector<number2>       &dst,
+	     const Vector<number2> &src) const
+{
+  do_Tvmult(dst, src, true);
 }
 
 
