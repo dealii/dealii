@@ -568,6 +568,8 @@ namespace StandardExceptions
   DeclException0 (ExcDivideByZero);
   DeclException0 (ExcNotImplemented);
   DeclException0 (ExcInternalError);
+  DeclException2 (ExcDimensionMismatch, int, int,
+		  << "Dimension " << arg1 << " not equal to " << arg2);
   DeclException3 (ExcIndexRange, int, int, int,
 		  << "Index " << arg1 << " is not in ["
 		  << arg2 << "," << arg3 << ")");
