@@ -1099,8 +1099,6 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
 	{
 					   // first transform shape
 					   // values...
-	  Assert (fe_data.shape_values[k].size() == n_q_points,
-		  ExcInternalError());
 	  mapping.transform_covariant(&*shape_values.begin(),
                                       &*shape_values.end(),
                                       fe_data.shape_values[k].begin()+offset,
@@ -1153,8 +1151,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                            // (J^-1) from the right,
                                            // we have to trick a
                                            // little in between
-	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
-		  ExcInternalError());
+                                           // 
                                            // do first transformation
 	  mapping.transform_covariant(&*shape_grads1.begin(),
                                       &*shape_grads1.end(),
@@ -1242,8 +1239,6 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 	{
 					   // first transform shape
 					   // values...
-	  Assert (fe_data.shape_values[k].size() == n_q_points,
-		  ExcInternalError());
 	  mapping.transform_covariant(&*shape_values.begin(),
                                       &*shape_values.end(),
                                       fe_data.shape_values[k].begin()+offset,
@@ -1296,8 +1291,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
                                            // (J^-1) from the right,
                                            // we have to trick a
                                            // little in between
-	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
-		  ExcInternalError());
+                                           // 
                                            // do first transformation
 	  mapping.transform_covariant(&*shape_grads1.begin(),
                                       &*shape_grads1.end(),
