@@ -16,7 +16,7 @@
     It is our firm belief that software can only be successful if it
     is properly documented. Too many academic software projects die
     prematurely once their creators leave the university or the
-    workgroup in which the software was developed since with their
+    workgroup in which the software was developed, since with their
     creators also knowledge of internal structures, interfaces, and
     the valuable bag of tricks leaves, a gap that can not be closed by
     reading sources, trial-and-error, and guessing.
@@ -55,27 +55,12 @@
 
     <p>
     In order to extract documentation from the header files of the
-    project, we use a modified version of 
-    <a href="http://www.ph.unimelb.edu.au/~ssk/kde/kdoc/" target="_top">kdoc</a>,
-    written by Sirtaj Singh Kang,
-    which is one of the documentation tools of the
-    <a href="http://www.kde.org" target="_top">KDE</a>
-    project. It requires that documentation is written in a form which
+    project, we use 
+    <a href="http://www.doxygen.org/" target="_top">doxygen</a>.
+    It requires that documentation is written in a form which
     closely follows the 
     <a href="http://java.sun.com/products/jdk/javadoc/index.html" target="_top">
-    JavaDoc</a> standard, with some small additions which we will
-    explain below. The patched version of kdoc is included into the
-    library and can be found in the
-    <code>deal.II/contrib/kdoc</code> directory.
-    </p>
-
-    <p>
-    Alternatively, one can use
-    <a href="http://www.linuxsupportline.com/~doc++/">Doc++</a> to
-    create a LaTeX document from the sources which can then be
-    printed. Due to the size of the resulting file (at present 2000+
-    pages, with tendencies to further growth), you will not want to do
-    that regularly, though.
+    JavaDoc</a> standard.
     </p>
 
 
@@ -83,8 +68,8 @@
 
     <p>
     Basically, every declaration, whether class or member
-    function/variable declaration, may be preceded by a comment of the
-    following form:
+    function/variable declaration, global function or namespace, may
+    be preceded by a comment of the following form:
     <code>
     <pre>
       /**
@@ -112,42 +97,29 @@
       };
     </pre>
     </code>
-    <acronym>kdoc</acronym> will then generate a page for the class
+    <acronym>doxygen</acronym> will then generate a page for the class
     <code>TestClass</code> and document each of the member functions
     and variables. The content of the <code>@author</code> tag will be
     included into the online documentation of the class.
     </p>
 
-    <p>
-    There is one exception to the rule that every member can be
-    documented separately: due to internal restrictions of the
-    <code>kdoc2</code> tool by which the documentation is generated,
-    elements of en enumeration type (i.e. an <code>enum</code> object
-    in technical terminus) may not be documented right above their
-    declaration, but must be documented atop of the <code>enum</code>
-    declaration. (This is due to the fact that inside enums,
-    <code>kdoc2</code> does not parse the elements separately at
-    present, but rather the whole enum as one.)
-    </p>
 
-    
     <h4>Extended Layout</h4>
 
     <p>
-    In order to allow better structured output for long comments, we
-    have extended <acronym>kdoc</acronym> to understand the following
-    tags inside comments, which are partly borrowed from LaTeX like
-    languages: 
-    <ul>
-    <li> <em>Itemized lists:</em>
+    In order to allow better structured output for long comments,
+    doxygen supports a great number of tags for enumerations,
+    sectioning, markup, and other fields. For example, here is how to
+    generate
+    <ul> <li> <em>Itemized lists:</em>
          <p>
 	 By writing comments like the following,
 	 <code><pre>
 	   /**
-	    * @begin{itemize}
-	    *   @item foo
-	    *   @item bar
-	    * @end{itemize}
+	    * <ul>
+	    *   <li> foo
+	    *   <li> bar
+	    * </ul>
 	    */
 	 </pre></code>
 	 you can get itemized lists both in the online and printed
@@ -159,9 +131,9 @@
 	 </p>
 	 
 	 <p>
-	 Likewise, you can get numbered lists by using the tags
-	 <code>@begin{enumerate}</code> and
-	 <code>@end{enumerate}</code> along with <code>@item</code>s. 
+	 In other words, one can use standard HTML tags for this
+	 task. Likewise, you can get numbered lists by using the
+	 respective HTML tags <code>&lt;ol&gt;</code>.
 	 </p>
 
     <li> <em>Verbatim output:</em>
@@ -169,12 +141,12 @@
 	 If you write comments like this,
 	 <code><pre>
 	   /**
-	    * @begin{verbatim}
+	    * @verbatim
 	    *   void foobar ()
 	    *   {
 	    *     i = 0;
 	    *   };
-	    * @end{verbatim}
+	    * @endverbatim
 	    */
 	 </pre></code>
 	 you will get the lines between the verbatim environment with
@@ -194,43 +166,33 @@
     <li> <em>Typewriter font:</em>
          <p>
 	 One would often like to use a typewriter font for variable,
-	 function, or class names. For this, the <code>@p{...}</code>
-	 tag is used, which generates output in which the content
-	 inside the braces is set in typewriter font.
+	 function, or class names. For this, the <code>@p
+	 one_word_without_spaces</code> tag is used, which generates
+	 output in which the single word after the tag is set in
+	 typewriter font. If you want to put multiple words into
+	 typewriter font, then enclosing them in the HTML
+	 <code>&lt;tt&gt;</code> is the way to go.
 	 </p>
 
 	 <p>
-	 As a convention, we always enclose variable and function
-	 names into <code>@p{...}</code> in order to give them a visible
+	 As a convention, we always write variable and function
+	 names as <code>@p name</code> in order to give them a visible
 	 distinction.
 	 </p>
 
     <li> <em>Emphasis:</em>
          <p>
-	 To generate output in italics, use the <code>@em{...}</code> tag.
+	 To generate output in italics, use the <code>@em
+	 one_word_without_spaces</code> tag.
 	 </p>
 
     <li> <em>Sections:</em>
          <p>
-	 Sections can be generated using <code>@sect1{...},
-	 @sect2{...}, @sect3{...}, @sect4{...}</code> tags. We don't
-	 normally use <code>@sect1{...}</code> as it produces section
-	 titles that are overly large compared to the rest of a page.
+	 Sections can be generated using <code>@section TAG Section_name,
+	 tag. Here, <code>TAG</code> is a symbolic name for the
+	 section, which can be used for cross references.
 	 </p>
     </ul>
-    </p>
-
-
-
-    <h4>Future directions</h4>
-
-    <p>
-    We are considering switching to DocBook SGML instead of Latex for
-    printed output. At present, printing of some documentation, most
-    notably the example programs is not really supported, and we
-    consider ways to convert them to SGML along with most other
-    documentation, since SGML is readily convertible into many other
-    formats, for example Postscript.
     </p>
 
 
