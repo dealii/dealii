@@ -1831,7 +1831,7 @@ namespace internals
     Accessor (const NonConstAccessor &a)
                     :
                     SparsityPatternIterators::Accessor (a),
-                    matrix (a.matrix)
+                    matrix (&a.get_matrix())
     {}
     
 
@@ -1992,7 +1992,7 @@ namespace internals
     Iterator<number, Constness>::
     Iterator (const NonConstIterator &i)
                     :
-                    accessor(i.accessor)
+                    accessor(*i)
     {}
     
     
