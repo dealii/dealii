@@ -80,10 +80,10 @@ template <typename number>
 bool
 FullMatrix<number>::all_zero () const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
-  const number *p = this->data(),
-	       *e = this->data() + n()*m();
+  const number* p = this->data();
+  const number* const e = this->data() + n_elements();
   while (p!=e)
     if (*p++ != 0.0)
       return false;
@@ -131,7 +131,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
 			   const Vector<number2>& src,
 			   const bool adding) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
@@ -301,7 +301,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 				 const Vector<number2> &src,
 				 const bool             adding) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
   Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
@@ -340,7 +340,7 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
 				     const Vector<number2>& src,
 				     const Vector<number3>& right) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
@@ -369,7 +369,7 @@ template <typename number2>
 void FullMatrix<number>::forward (Vector<number2>       &dst,
 				  const Vector<number2> &src) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert (dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert (src.size() == n(), ExcDimensionMismatch(src.size(), n()));
@@ -392,7 +392,7 @@ template <typename number2>
 void FullMatrix<number>::backward (Vector<number2>       &dst,
 				   const Vector<number2> &src) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   unsigned int j;
   unsigned int nu = (m()<n() ? m() : n());
@@ -463,7 +463,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
 				  const number s,
 				  const unsigned int j)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   for (unsigned int k=0; k<m(); ++k)
     this->el(i,k) += s*this->el(j,k);
@@ -477,7 +477,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
 				  const number t,
 				  const unsigned int k)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   const unsigned int size_m = m();
   for (unsigned l=0; l<size_m; ++l)
@@ -489,7 +489,7 @@ template <typename number>
 void FullMatrix<number>::add_col (const unsigned int i, const number s,
                                   const unsigned int j)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   for (unsigned int k=0; k<n(); ++k)
     this->el(k,i) += s*this->el(k,j);
@@ -501,7 +501,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
                                   const unsigned int j, const number t,
                                   const unsigned int k)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   for (unsigned int l=0; l<n(); ++l)
     this->el(l,i) += s*this->el(l,j) + t*this->el(l,k);
@@ -512,7 +512,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
 template <typename number>
 void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   number s;
   for (unsigned int k=0; k<m(); ++k)
@@ -525,7 +525,7 @@ void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
 template <typename number>
 void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   number s;
   for (unsigned int k=0; k<n(); ++k)
@@ -538,7 +538,7 @@ void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
 template <typename number>
 void FullMatrix<number>::diagadd (const number src)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());  
+  Assert (!this->empty(), ExcEmptyMatrix());  
   Assert (m() == n(), ExcDimensionMismatch(m(),n()));
   
   for (unsigned int i=0; i<n(); ++i)
@@ -552,7 +552,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 				const FullMatrix<number2> &src,
 				const bool                 adding) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
   Assert (dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
@@ -585,7 +585,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 				 const FullMatrix<number2> &src,
 				 const bool                 adding) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());  
+  Assert (!this->empty(), ExcEmptyMatrix());  
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
   Assert (src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
@@ -616,7 +616,7 @@ template <typename number>
 template <typename number2>
 number2 FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert(m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
@@ -646,7 +646,7 @@ template <typename number2>
 number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
 						   const Vector<number2> &v) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert(m() == u.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
@@ -692,7 +692,7 @@ FullMatrix<number>::symmetrize ()
 template <typename number>
 number FullMatrix<number>::l1_norm () const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   number sum=0, max=0;
   const unsigned int n_rows = m(), n_cols = n();
@@ -712,7 +712,7 @@ number FullMatrix<number>::l1_norm () const
 template <typename number>
 number FullMatrix<number>::linfty_norm () const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   number sum=0, max=0;
   const unsigned int n_rows = m(), n_cols = n();
@@ -735,7 +735,7 @@ FullMatrix<number>::print (std::ostream       &s,
 			   const unsigned int  w,
 			   const unsigned int  p) const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   for (unsigned int i=0; i<this->m(); ++i)
     {
@@ -752,7 +752,7 @@ void
 FullMatrix<number>::add_scaled (const number               s,
                                 const FullMatrix<number2> &src)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
@@ -939,7 +939,7 @@ template <typename number2>
 void
 FullMatrix<number>::add_diag (const number s, const FullMatrix<number2>& src)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
@@ -1064,7 +1064,7 @@ template <typename number2>
 void
 FullMatrix<number>::Tadd (const number s, const FullMatrix<number2>& src)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert (m() == n(),     ExcNotQuadratic());
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
@@ -1209,7 +1209,7 @@ template <typename number>
 double
 FullMatrix<number>::determinant () const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert (this->n_cols() == this->n_rows(),
 	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
@@ -1238,7 +1238,7 @@ template <typename number>
 number
 FullMatrix<number>::norm2 () const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   number s = 0.;
   for (unsigned int i=0; i<this->n_rows()*this->n_cols(); ++i)
@@ -1252,7 +1252,7 @@ template <typename number>
 number
 FullMatrix<number>::relative_symmetry_norm2 () const
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   number s = 0.;
   number a = 0.;
@@ -1274,7 +1274,7 @@ template <typename number2>
 void
 FullMatrix<number>::invert (const FullMatrix<number2> &M)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert (this->n_cols() == this->n_rows(),
 	  ExcNotQuadratic());
@@ -1466,7 +1466,7 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 {
   unsigned int width = width_;
   
-  Assert ((this->data() != 0) || (this->n_cols()+this->n_rows()==0),
+  Assert ((!this->empty()) || (this->n_cols()+this->n_rows()==0),
 	  ExcInternalError());
   
 				   // set output format, but store old
@@ -1508,7 +1508,7 @@ template <typename number>
 void
 FullMatrix<number>::gauss_jordan ()
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());  
+  Assert (!this->empty(), ExcEmptyMatrix());  
   Assert (this->n_cols() == this->n_rows(), ExcNotQuadratic());
   
 				   // Gauss-Jordan-Algorithmus
@@ -1598,7 +1598,7 @@ template <typename number2>
 void
 FullMatrix<number>::householder(Vector<number2>& src)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
 				   // m > n, src.n() = m
   Assert (this->n_cols() <= this->n_rows(),
@@ -1644,7 +1644,7 @@ double
 FullMatrix<number>::least_squares (Vector<number2>& dst,
                                    Vector<number2>& src)
 {
-  Assert (this->data() != 0, ExcEmptyMatrix());
+  Assert (!this->empty(), ExcEmptyMatrix());
   
   // m > n, m = src.n, n = dst.n
 
