@@ -72,7 +72,7 @@ namespace GridOutFlags
 	const bool write_faces = false,
 	const bool write_diameter = false,
 	const bool write_measure = false,
-	const bool write_all_faces = false);  
+	const bool write_all_faces = true);  
   };			   
     
 				   /**
