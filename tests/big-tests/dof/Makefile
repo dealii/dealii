@@ -19,7 +19,7 @@ user-libs =
 
 # To run the program, use "make run"; to give parameters to the program,
 # give the parameters to the following variable:
-run-parameters  = $(target).prm
+run-parameters  = 2 $(target).prm ; $(target) 3 $(target).prm
 
 # To execute additional action apart from running the program, fill
 # in this list:
@@ -49,8 +49,8 @@ h-files     = $(wildcard *.h)
 lib-h-files = $(wildcard ../../include/*/*.h)
 
 # list of libraries needed to link with
-libs     = ./Obj.a   ../../lib/libdeal_II_2d.a   ../../../lac/lib/liblac.a   ../../../base/lib/libbase.a
-libs.g   = ./Obj.g.a ../../lib/libdeal_II_2d.g.a ../../../lac/lib/liblac.g.a ../../../base/lib/libbase.g.a ../../../base/lib/libbase.g.a
+libs     = ./Obj.a   ../../lib/libdeal_II_2d.a   ../../lib/libdeal_II_3d.a   ../../../lac/lib/liblac.a   ../../../base/lib/libbase.a
+libs.g   = ./Obj.g.a ../../lib/libdeal_II_2d.g.a ../../lib/libdeal_II_3d.g.a ../../../lac/lib/liblac.g.a ../../../base/lib/libbase.g.a ../../../base/lib/libbase.g.a
 
 
 # check whether we use debug mode or not

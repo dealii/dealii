@@ -136,11 +136,10 @@ void TestCases<dim>::declare_parameters (ParameterHandler &prm) {
 
 template <int dim>
 void TestCases<dim>::run (ParameterHandler &prm) {
-  cout << "Test case = " << prm.get ("Test run") << endl
+  cout << "Dimension = " << dim
+       << ", Test case = " << prm.get ("Test run") << endl
        << endl;
   
-  cout << "    Making grid..." << endl;
-
   string test = prm.get ("Test run");
   unsigned int test_case = 1;
   if (test=="zoom in") test_case = 1;
@@ -154,6 +153,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	  cerr << "This test seems not to be implemented!" << endl;
 
   
+  cout << "    Making grid..." << endl;  
   Boundary<dim> *boundary = 0;
   
   switch (test_case) 
@@ -180,8 +180,6 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	    tria->execute_refinement ();
 	  };
 
-//	tria->refine_global (5);
-	
 	break;
       }
       
@@ -268,7 +266,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   dof->make_sparsity_pattern (sparsity);
   int unconstrained_bandwidth = sparsity.bandwidth();
 
-  cout << "    Writing sparsity pattern... (This may take a while)" << endl;
+  cout << "    Writing sparsity pattern..." << endl;
   ofstream sparsity_out (prm.get("Sparsity file").c_str());
   sparsity.print_gnuplot (sparsity_out);
 
@@ -285,11 +283,6 @@ void TestCases<dim>::run (ParameterHandler &prm) {
   sparsity.print_gnuplot (c_sparsity_out);
 
 
-//  DataOut<dim> dataout;
-//  dataout.attach_dof_handler (*dof);
-//  ofstream o("o.inp");
-//  dataout.write_ucd (o);
-  
   cout << endl
        << "    Total number of cells         = " << tria->n_cells() << endl
        << "    Total number of active cells  = " << tria->n_active_cells() << endl
@@ -310,18 +303,44 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 
 
 int main (int argc, char **argv) {
-  if (argc!=2) 
+  if (argc!=3) 
     {
-      cout << "Usage: grid_test parameterfile" << endl << endl;
+      cout << "Usage: grid_test dimension parameterfile" << endl << endl;
       return 1;
     };
 
-  TestCases<2> tests;
-  MultipleParameterLoop input_data;
+  unsigned int dim;
+  if (argv[1][0] == '2')
+    dim = 2;
+  else
+    dim = 3;
 
-  tests.declare_parameters(input_data);
-  input_data.read_input (argv[1]);
-  input_data.loop (tests);
+  switch (dim)
+    {
+      case 2:
+      {
+	    TestCases<2> tests;
+	    MultipleParameterLoop input_data;
+
+	    tests.declare_parameters(input_data);
+	    input_data.read_input (argv[2]);
+	    input_data.loop (tests);
+
+	    break;
+      };
+       
+      case 3:
+      {
+	    TestCases<3> tests;
+	    MultipleParameterLoop input_data;
+
+	    tests.declare_parameters(input_data);
+	    input_data.read_input (argv[2]);
+	    input_data.loop (tests);
+
+	    break;
+      };
+    };
   
   return 0;
 };
