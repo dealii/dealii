@@ -1397,28 +1397,25 @@ FE_Q<3>::initialize_constraints ()
       bool mirror[dim - 1];
       Point<dim-1> constraint_point;
 
+                                       // Eliminate FP errors in constraint
+                                       // points. Due to their origin, they
+                                       // must all be fractions of the unit
+                                       // interval. If we have polynomial
+                                       // degree 4, the refined element has 8
+                                       // intervals.  Hence the coordinates
+                                       // must be 0, 0.125, 0.25, 0.375 etc.
+                                       // Now the coordinates of the
+                                       // constraint points will be multiplied
+                                       // by the inverse of the interval size
+                                       // (in the example by 8).  After that
+                                       // the coordinates must be integral
+                                       // numbers. Hence a normal truncation
+                                       // is performed and the coordinates
+                                       // will be scaled back. The equal
+                                       // treatment of all coordinates should
+                                       // eliminate any FP errors.
       for (unsigned int k = 0; k < dim - 1; ++k)
         {
-                                           // Eliminate FP errors in
-                                           // constraint points. Due to their
-                                           // origin, they must all be
-                                           // fractions of the unit
-                                           // interval. If we have polynomial
-                                           // degree 4, the refined element
-                                           // has 8 intervals.  Hence the
-                                           // coordinates must be 0, 0.125,
-                                           // 0.25, 0.375 etc.  Now the
-                                           // coordinates of the constraint
-                                           // points will be multiplied by the
-                                           // inverse of the interval size (in
-                                           // the example by 8).  After that
-                                           // the coordinates must be integral
-                                           // numbers. Hence a normal
-                                           // truncation is performed and the
-                                           // coordinates will be scaled
-                                           // back. The equal treatment of all
-                                           // coordinates should eliminate any
-                                           // FP errors.
           const int coord_int =
             static_cast<int> (constraint_points[j](k) * interval + 0.25);
           constraint_point(k) = 1.*coord_int / interval;
@@ -1473,7 +1470,7 @@ FE_Q<3>::initialize_constraints ()
             = { face_index_map[i] % (this->degree + 1),
                 face_index_map[i] / (this->degree + 1) };
           
-          for (unsigned int k = 0; k < dim - 1; ++k)
+          for (unsigned int k = 0; k<2; ++k)
             if (mirror[k])
               indices[k] = this->degree - indices[k];
           
