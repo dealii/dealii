@@ -1048,7 +1048,7 @@ void DataOut<2>::write_epsgrid (ostream &out) const {
       time_t  time1= time (0);
       tm     *time = localtime(&time1); 
       out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
-	  << "%%Title: Deal Output" << endl
+	  << "%%Title: deal.II Output" << endl
 	  << "%%Creator: the deal.II library" << endl
 	  << "%%Creation Date: " 
 	  << time->tm_year+1900 << "/"
@@ -1118,7 +1118,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
     time_t  time1= time (0);
     tm     *time = localtime(&time1); 
     out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
-	<< "%%Title: Deal Output" << endl
+	<< "%%Title: deal.II Output" << endl
 	<< "%%Creator: the deal.II library" << endl
 	<< "%%Creation Date: " 
 	<< time->tm_year+1900 << "/"
@@ -1138,7 +1138,45 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
    multiset<DataOut<2>::EpsCellData> cells;
    multiset<DataOut<2>::EpsCellData> cells2;
    
-   bool cell_data_p = ((cell_data.size())>0) && (eod.cell_type == EpsOutputData::Vector);
+   bool height_data_p = (
+                          ((dof_data.size())>0) 
+			  && 
+			  (
+			    ( eod.height_info == EpsOutputData::DefaultHeight)
+			    || 
+			    ( eod.height_info == EpsOutputData::HeightVector)
+			  )
+			);
+
+				    // Cells are colored, if there is
+				    // cell data and the mode is
+				    // ShadingVector or DefaultShading
+   bool cell_data_p = (
+     ((cell_data.size())>0) 
+     && 
+     (
+       (eod.cell_shading == EpsOutputData::ShadingVector)
+       ||
+       (eod.cell_shading == EpsOutputData::DefaultShading)
+     )
+   );
+
+				    // Cells are shaded, i.e. light
+				    // shading, if they are not
+				    // colored,  there is height
+				    // information and the mode is
+				    // Default or Light
+   bool cell_shade_p = (
+     (!cell_data_p)
+     &&
+     (height_data_p)
+     &&
+     (
+       (eod.cell_shading == EpsOutputData::DefaultShading)
+       ||
+       (eod.cell_shading == EpsOutputData::LightShaded)
+     )
+   );
 
    unsigned cell_index;
    DoFHandler<2>::active_cell_iterator cell;
@@ -1147,24 +1185,15 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
        ++cell, ++cell_index)
      {
        EpsCellData cd;
-       for (unsigned int i=0; i<4; ++i)
+       for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
 	 {
 	   (cd.vertices[i]).x=cell->vertex(i)(0);
 	   (cd.vertices[i]).y=cell->vertex(i)(1);
-	   switch (eod.height_type)
-	     {
-	       case EpsOutputData::Vector:
-		     (cd.vertices[i]).z=(*dof_data[eod.height_vector].data)(cell->vertex_dof_index(i,0)); 
-		     break;
-	       case EpsOutputData::None:
-		     (cd.vertices[i]).z=0;
-		     break;
-	       default:
-		     break;
-	     };
-	       
+	   (cd.vertices[i]).z=(height_data_p ? 
+			       (*dof_data[eod.height_vector].data)(cell->vertex_dof_index(i,0))
+			       : 0); 
 	 };
-       if (eod.height_type==EpsOutputData::Vector)
+       if (height_data_p)
 	 cd.turn(eod.azimuth,eod.elevation);
 
        if (cell_data_p)
@@ -1210,7 +1239,7 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
 				    // If we want shaded output we can
 				    // do the shading now.
-   if (eod.cell_type==EpsOutputData::Shaded)
+   if (cell_shade_p)
      {
        double spann1[3], spann2[3], normal[3];
        double light_norm, normal_norm;
@@ -1290,12 +1319,10 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 
 
 				    //  Now we are ready to output...
-   cell_data_p = cell_data_p || (eod.cell_type==EpsOutputData::Shaded);
-
    for (typename multiset<DataOut<2>::EpsCellData>::iterator c=cells.begin();
 	c!=cells.end(); ++c)
      {
-       if (cell_data_p)
+       if (cell_data_p || cell_shade_p)
 	 {
 	   out << c->red << " " << c->green << " " << c->blue << " setrgbcolor "
 	       << c->vertices[0].x << " " << c->vertices[0].y << " moveto "
@@ -1305,18 +1332,18 @@ void DataOut<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 	       << " closepath fill" << endl;
 	 };
 
-       if (eod.cell_boundary_type == EpsOutputData::Black || 
-	   eod.cell_boundary_type == EpsOutputData::White) 
+       if (eod.cell_boundary_shading != EpsOutputData::NoBoundary)
 	 {
-	   switch (eod.cell_boundary_type)
+	   switch (eod.cell_boundary_shading)
 	     {
-	       case EpsOutputData::Black: 
+	       case EpsOutputData::BlackBoundary:
+	       case EpsOutputData::DefaultBoundary:
 		     out << "0";
 		     break;
-	       case EpsOutputData::White:
+	       case EpsOutputData::WhiteBoundary:
 		     out << "1";
 		     break;
-	       default:
+	       case EpsOutputData::NoBoundary:
 		     break;
 	     };
 	   out << " setgray " 
@@ -1501,19 +1528,28 @@ void DataOut<dim>::EpsCellData::turn(double azi, double ele)
 
 
 EpsOutputData::EpsOutputData()
-		: height_type(None),
-		  cell_type(None),
-		  cell_boundary_type (Black),
+		: height_info(DefaultHeight),
+		  cell_shading(DefaultShading),
+		  cell_boundary_shading (DefaultBoundary),
                   height_vector(0),
 		  cell_vector(0),
-		  azimuth(0.2),
-		  elevation(0.2)
+		  azimuth(2*3.1415926* (180 - 30)/360),
+		  elevation(2*3.1415926* (90-60)/360)
 { 
   light[0]=-1;
   light[1]=-1;
   light[2]=1;
 };
 
+
+
+void EpsOutputData::color(const float x,
+			  const float xmax,
+			  const float xmin, 
+			  float &r,
+			  float &g,
+			  float &b) const
+{
 // A difficult color scale:
 //     xmin          = black  (1)
 // 3/4*xmin+1/4*xmax = blue   (2)
@@ -1541,9 +1577,6 @@ EpsOutputData::EpsOutputData()
 //     { 0                                (3) - (4)
 //     { ( 4*x-  xmin-3*xmax)/(xmax-xmin) (4) - (5)
 
-void EpsOutputData::color(const float x, const float xmax, const float xmin, 
-			    float &r, float &g, float &b) const
-{
   float sum   =   xmax+  xmin;
   float sum13 =   xmin+3*xmax;
   float sum22 = 2*xmin+2*xmax;
@@ -1588,6 +1621,7 @@ void EpsOutputData::color(const float x, const float xmax, const float xmin,
       b=1;
     };
 };
+
 
 
 //explicit instantiations

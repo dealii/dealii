@@ -190,7 +190,8 @@ class DataIn {
  * in several formats.
  * At present it supports output in UCD (unstructured cell data) and
  * GNUPLOT format. Partly supported are POVRAY and encapsulated postscript.
- * The latter two allow for only one data set and do not support cell data.
+ * POVRAY allows for only one data set and does not support cell data.
+ * Encapsulated Postscript supports Q1-Elements only.
  *
  * It allows the user to attach a degree of freedom handler object
  * (#DoFHandler#) which also gives access to the geometry data of the
@@ -299,6 +300,7 @@ class DataIn {
  * support bilinear quadrilaterals and using polygons as vastly suboptimal in
  * term of memory and speed to the triangle mesh supported by POVRAY.
  *
+ *
  * \subsection{Encapsulated Postscript format}
  *
  * There are two functions for generating encapsulated Postscript
@@ -308,41 +310,59 @@ class DataIn {
  * and #EpsOutputData# now. 
  * #write_eps# can use one data vector for height information and one
  * cell vector for shading information. Control is done through an
- * object of class #EpsOutputData# as follows.
+ * object of class #EpsOutputData# as follows or by default.
  *
  * Vectors are added as usual by #add_data_vector#. Then one has to
  * decide, wether to produce a 2D or 3D plot. This is done by setting
- * #height_type# to 
- * \begin{description}
- *   \item[None] for 2D-Output (or Top-View thats the same by no
+ * #height_info# to 
+ * \begin{description} 
+ *   \item[NoHeight] for 2D-Output (or Top-View thats the same by no
  *     turning is done) or to
- *   \item[Vector] for 3D-Output.
+ *   \item[HeightVector] for 3D-Output. You have to attach a
+ *     dof_data_vector to actually get 3D. If you don't then output
+ *     will be generated in 2D.
+ *   \item[DefaultHeight] is 3D if there is a dof_data_vector and 2D if
+ *     none is present.
  * \end{description}
  * For 3D-Output one has to set #azimuth# and #elevation# for the
  * angle of view and #height_vector# to the number of the #dof_data#
- * vector that provides the height information to be used.
+ * vector that provides the height information to be used. The default
+ * values are analogous to GNUPlot for azimuth and elevation and
+ * vector 0 for the height vector.
  *
- * The cells can be shaded in three different modes, controlled by the
- * attribute #cell_type#:
+ * The cells can be shaded in four different modes, controlled by the
+ * attribute #cell_shading#:
  * \begin{description}
- *   \item[None] provides transparent shading.
- *   \item[Vector] uses a cell vector to do shading. The number of the
- *     cell vector to be uses is provided in #cell_vector#. To scale
- *     the cell vector there is the method #color#. It is called with
- *     the actual value of the cell, the maximum and the minimum value
- *     of a cell in the cell vector. It returns three values for red,
- *     green and blue.
- *   \item[Shaded] just shades the plot. This is controlled by the
- *     vector #light# which stores the direction of the light beams.
+ *   \item[NoShading] provides transparent shading.
+ *   \item[ShadingVector] uses a cell vector to do shading. The number
+ *     of the cell vector to be uses is provided in #cell_vector#. To
+ *     scale the cell vector there is the method #color#. It is called
+ *     with the actual value of the cell, the maximum and the minimum
+ *     value of a cell in the cell vector. It returns three values for
+ *     red, green and blue. If there no cell_data vector than there is
+ *     transparent shading.
+ *   \item[LightShaded] just shades the plot. This is controlled by
+ *     the vector #light# which stores the direction of the light 
+ *     beams. This is done only if there is height information.
+ *   \item[DefaultShading] is controlled by presence of different
+ *     vectors. If there no height information then do no
+ *     shading. Otherwise if there is cell_data use this for shading.
+ *     Otherwise do light shading.
  * \end{description}
  *
  * Finnaly one can choose to mark the cell boundaries by setting
- * #cell_boundary_type#. It can take one of three values:
+ * #cell_boundary_shading#. It can take one of four values:
  * \begin{enumerate}
- *   \item None: for no cell boundaries,
- *   \item Black: for black cell boundaries, and
- *   \item White: for white cell boundaries.
+ *   \item NoBoundary for no cell boundaries,
+ *   \item DefaultBoundary or
+ *   \item BlackBoundary for black cell boundaries,
+ *   \item WhiteBoundary for white cell boundaries, 
  * \end{enumerate}
+ *
+ * Another interesting feature is that you can write multiple
+ * eps-pictures to one file by just doing several invocations of
+ * #write_eps#. One than can switch between the different graphics
+ * with the #>># Button in GhostView for example.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Stefan Nauber, 1998, 1999
  */
@@ -731,64 +751,125 @@ class DataOut {
 
 
 
+
 /**
  * Structure for the control of encapsulated postscript output. See
  * general documentation of class #DataOut# for description.
+ *
+ * @author Stefan Nauber
  */
 class EpsOutputData{
   public:
-				     /** 
-				      * Different types of
-				      * colorization
+				     /**
+				      * Types of height info
 				      */
-    typedef enum {None,Vector,Shaded,Black,White} ColorType;
+    enum HeightInfo {
+	  DefaultHeight, NoHeight, HeightVector
+    };
     
 				     /**
-				      * Type of height information 
+				      * Types of cell shading
 				      */
-    ColorType height_type;
-				     /**
-				      * Cell shading
-				      */
-    ColorType cell_type;
-				     /**
-				      * Boundary color
-				      */
-    ColorType cell_boundary_type;
+    enum CellShading {
+	  DefaultShading, NoShading, ShadingVector, LightShaded
+    };
 
 				     /**
-				      * Vector with height information
+				      * Types of cell boundary shading
+				      */
+    enum CellBoundaryShading {
+	  DefaultBoundary, NoBoundary, BlackBoundary, WhiteBoundary
+    };
+
+				     /**
+				      * Where height information comes from
+				      */
+    HeightInfo height_info;
+
+				     /** 
+				      * If and how cells are shaded
+				      */
+    CellShading cell_shading;
+
+				     /**
+				      * Color selection when shading cell
+				      * boundaries.
+				      */
+    CellBoundaryShading cell_boundary_shading;
+
+				     /**
+				      * Number of the vector which is to be
+				      * used for the height information, within
+				      * the list of DoF data vectors.
 				      */
     unsigned height_vector;
+
 				     /**
-				      * Vector with cell shading values
+				      * Number of the vector which is to be
+				      * used for the cell shading values, within
+				      * the list of cell data vectors.
 				      */
     unsigned cell_vector;
+    
                                      /**
-				      * View angle
+				      * Azimuth of the spectators position.
+				      * This defines the position on the
+				      * x-y-plane and is an angle of rotation
+				      * around the z-axis. We define that
+				      * if the azimuth angle is zero, this
+				      * means that the observer is sitting on
+				      * (or above or below) the positive y-axis
+				      * and looks back to the origin (direction
+				      * of view is always towards the origin).
+				      * Positive angles denote rotation in
+				      * clockwise sense (as viewed from the top),
+				      * i.e. 90 degrees would be sitting on the
+				      * positive x-axis, etc.
+				      *
+				      * Please note that the angle has to be
+				      * given in radians rather than in degrees.
 				      */
     float azimuth;
 
                                      /**
-				      * View angle
+				      * Elevation of the spectators position.
+				      * This is the angle that the line between
+				      * the origin and the spectators position
+				      * forms with the x-y-plane, measured
+				      * upwards in direction towards the
+				      * positive z-axis. 
+				      *
+				      * Please note that the angle has to be
+				      * given in radians rather than in degrees.
 				      */
     float elevation;
 
 				     /**
-				      * Direction of Light
+				      * Direction of the light beams. 
 				      */
     double light[3];
     
 				     /**
-				      * Default constructor
+				      * Default constructor. Sets height and
+				      * shading flags to their default values,
+				      * azimut and elevation to 0.2 each, and
+				      * puts the light source at #(-1,-1,0)#.
 				      */
     EpsOutputData();
 
 				     /**
-				      * Color scaling
+				      * Function returning a color value in
+				      * rgb variables corresponding to the
+				      * given value #x#. #x# is considered
+				      * to be a values within the range
+				      * #xmin...xmax#.
 				      */
-    void color(const float x, const float xmax, const float xmin, 
-	       float &r, float &g, float &b) const;
+    void color (const float x,
+		const float xmax,
+		const float xmin, 
+		float      &r,
+		float      &g,
+		float      &b) const;
 };
 
 
