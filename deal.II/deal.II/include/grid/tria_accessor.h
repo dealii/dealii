@@ -206,6 +206,10 @@ class TriaAccessor {
 				      *  Exception
 				      */
     DeclException0 (ExcDereferenceInvalidObject);
+				     /**
+				      *  Exception
+				      */
+    DeclException0 (ExcNotUsefulForThisDimension);
 				     /*@}*/
 	
   protected:
@@ -365,6 +369,51 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      */
     bool has_children () const;
 
+				     /**
+				      * Return the boundary indicator of this
+				      * line. Since boundary data is only useful
+				      * for structures with a dimension less
+				      * than the dimension of a cell, this
+				      * function issues an error if #dim<2#.
+				      *
+				      * If the return value is 255, then this
+				      * line is in the interior of the domain.
+				      */
+    unsigned char boundary_indicator () const;
+
+				     /**
+				      * Set the boundary indicator of this line.
+				      * The same applies as for the
+				      * #boundary_indicator()# function.
+				      *
+				      * Should be careful with this function
+				      * and especially never try to set the
+				      * boundary indicator to 255, unless
+				      * you exactly know what you are doing,
+				      * since this value is reserved for
+				      * another purpose and algorithms may
+				      * not work if boundary cells have have
+				      * this boundary indicator or if interior
+				      * cells have boundary indicators other
+				      * than 255.
+				      */
+    void set_boundary_indicator (unsigned char) const;
+
+				     /**
+				      * Return whether this line is at the
+				      * boundary. This is checked via the
+				      * the boundary indicator field, which
+				      * is always 255 if the line is in the
+				      * interior of the domain. Obviously,
+				      * this is only possible for #dim>1#;
+				      * however, for #dim==1#, a line is
+				      * a cell and the #CellAccessor# class
+				      * offers another possibility to
+				      * determine whether a cell is at the
+				      * boundary or not.
+				      */
+    bool at_boundary () const;
+    
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -544,6 +593,51 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      */
     bool has_children () const;
 
+				     /**
+				      * Return the boundary indicator of this
+				      * line. Since boundary data is only useful
+				      * for structures with a dimension less
+				      * than the dimension of a cell, this
+				      * function issues an error if #dim<3#.
+				      *
+				      * If the return value is 255, then this
+				      * line is in the interior of the domain.
+				      */
+    unsigned char boundary_indicator () const;
+
+				     /**
+				      * Set the boundary indicator of this line.
+				      * The same applies as for the
+				      * #boundary_indicator()# function.
+				      *
+				      * Should be careful with this function
+				      * and especially never try to set the
+				      * boundary indicator to 255, unless
+				      * you exactly know what you are doing,
+				      * since this value is reserved for
+				      * another purpose and algorithms may
+				      * not work if boundary cells have have
+				      * this boundary indicator or if interior
+				      * cells have boundary indicators other
+				      * than 255.
+				      */
+    void set_boundary_indicator (unsigned char) const;
+
+				     /**
+				      * Return whether this line is at the
+				      * boundary. This is checked via the
+				      * the boundary indicator field, which
+				      * is always 255 if the line is in the
+				      * interior of the domain. Obviously,
+				      * this is only possible for #dim>2#;
+				      * however, for #dim==2#, a quad is
+				      * a cell and the #CellAccessor# class
+				      * offers another possibility to
+				      * determine whether a cell is at the
+				      * boundary or not.
+				      */
+    bool at_boundary () const;
+
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -668,7 +762,7 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
 
 
 /**
-  This class allows access to a cell, i.e. a line in one dimension, a quad
+  This class allows access to a cell: a line in one dimension, a quad
   in two dimension, etc.
 
   The following refers to any space dimension:
@@ -722,7 +816,8 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 		       const TriaIterator<dim,CellAccessor<dim> > &pointer) const;
 
 				     /**
-				      *  Return whether the #i#th vertex is
+				      *  Return whether the #i#th vertex or
+				      *  face (depending on the dimension) is
 				      *  part of the boundary. This is true, if
 				      *  the #i#th neighbor does not exist.
 				      */
@@ -757,6 +852,16 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 				      *  a more reasonable iterator class.
 				      */
     TriaIterator<dim,CellAccessor<dim> > child (const unsigned int i) const;
+
+				     /**
+				      * Return the material id of this cell.
+				      */
+    unsigned char material_id () const;
+
+				     /**
+				      * Set the material id of this cell.
+				      */
+    void set_material_id (const unsigned char) const;
 
 				     /**
 				      * Test whether the cell has children

@@ -25,6 +25,82 @@ template <class Key, class T, class Compare, class Alloc = alloc> class map;
 template <class T> struct less;
 
 
+
+
+
+/**
+   Structure which is passed to the #Triangulation<dim>::create_triangulation#
+   function. It contains all data needed to construct a cell, namely the
+   indices of the vertices and the material indicator.
+*/
+template <int dim>
+struct CellData {
+    int           vertices[2<<dim];
+    unsigned char material_id;
+};
+
+
+
+
+
+/**
+   Structure to be passed to the #Triangulation<dim>::create_triangulation#
+   function to describe boundary information.
+
+   This structure is the same for all dimensions, since we use an input
+   function which is the same for all dimensions. The content of objects
+   of this structure varies with the dimensions, however.
+
+   Since in one space dimension, there is no boundary information apart
+   from the two end points of the interval, this structure does not contain
+   anything and exists only for consistency, to allow a common interface
+   for all space dimensions. All fields should always be empty.
+
+   Boundary data in 2D consists
+   of a list of lines which belong to a given boundary component. A
+   boundary component is a list of lines which are given a common
+   number describing the boundary condition to hold on this part of the
+   boundary. The triangulation creation function gives lines not in this
+   list either the boundary indicator zero (if on the boundary) or 255
+   (if in the interior). Explicitely giving a line the indicator 255
+   will result in an error, as well as giving an interior line a boundary
+   indicator.
+*/
+struct SubCellData {
+				     /**
+				      * Each record of this vector describes
+				      * a line on the boundary and its boundary
+				      * indicator.
+				      */
+    vector<CellData<1> > boundary_lines;
+
+				     /**
+				      * Each record of this vector describes
+				      * a quad on the boundary and its boundary
+				      * indicator.
+				      */
+    vector<CellData<2> > boundary_quads;
+
+				     /**
+				      * This function checks whether the vectors
+				      * which may not be used in a given
+				      * dimension are really empty. I.e.,
+				      * whether the #boundary_*# arrays are
+				      * empty when in one space dimension
+				      * and whether the #boundary_quads#
+				      * array is empty when in two dimensions.
+				      *
+				      * Since this structure is the same for all
+				      * dimensions, the actual dimension has
+				      * to be given as a parameter.
+				      */
+    bool check_consistency (const unsigned int dim) const;
+};
+
+
+    
+
+
 /**
   This class implements an input mechanism for grid data. It allows to
   read a grid structure into a triangulation object. Future versions
@@ -38,11 +114,16 @@ template <class T> struct less;
   When giving a file which does not contain the assumed information or
   which does not keep to the right format, the state of the triangulation
   will be undefined afterwards. Upon input, only lines in one dimension
-  and quads in two dimensions are accepted. All other cell types (e.g. lines
-  or triangles in two dimensions, quads and hexes in 3d) are ignored. No
-  warning is issued. The vertex and cell numbering in the UCD file, which
+  and line and quads in two dimensions are accepted. All other cell types
+  (e.g. triangles in two dimensions, quads and hexes in 3d) are rejected.
+  The vertex and cell numbering in the UCD file, which
   need not be consecutively, is lost upon transfer to the triangulation
   object, since this one needs consecutively numbered elements.
+
+  Material indicators are accepted to denote the material id of cells and
+  to denote boundary part indication for lines in 2D. Read the according
+  sections in the documentation of the \Ref{Triangulation} class for
+  further details.
 
 
   {\bf Structure of input grid data}
@@ -157,7 +238,12 @@ class DataIn {
     DeclException2 (ExcInvalidVertexIndex,
 		    int, int,
 		    << "Trying to access invalid vertex index " << arg2
-		    << " while creating cell " << arg1);  
+		    << " while creating cell " << arg1);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
+    
   private:
 				     /**
 				      * Store address of the triangulation to

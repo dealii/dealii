@@ -13,6 +13,21 @@
 
 
 
+bool SubCellData::check_consistency (const unsigned int dim) const {
+  switch (dim) 
+    {
+      case 1:
+	    return ((boundary_lines.size() == 0) &&
+		    (boundary_quads.size() == 0));
+      case 2:
+	    return (boundary_quads.size() == 0);
+    };
+  return true;
+};
+
+		    
+
+
 
 template <int dim>
 DataIn<dim>::DataIn () :
@@ -83,43 +98,76 @@ void DataIn<dim>::read_ucd (istream &in) {
     };
 
 				   // set up array of cells
-  vector<vector<int> > cells;
+  vector<CellData<dim> > cells;
+  SubCellData            subcelldata;
 
   for (unsigned int cell=0; cell<n_cells; ++cell) 
     {
       String cell_type;
-
+      int material_id;
+      
       in >> dummy          // cell number
-	 >> dummy;         // material id
+	 >> material_id;
       in >> cell_type;
 
-      if (((cell_type = "line") && (dim == 1)) ||
-	  ((cell_type = "quad") && (dim == 2)))
-					 // ignore lines in more than one
-					 // dimension, quads in more than
-					 // two, and triangles in any dimension
+      if (((cell_type == "line") && (dim == 1)) ||
+	  ((cell_type == "quad") && (dim == 2)))
+					 // found a cell
 	{
 					   // allocate and read indices
-	  cells.push_back (vector<int> (1<<dim));
+	  cells.push_back (CellData<dim>());
 	  for (unsigned int i=0; i<(1<<dim); ++i)
-	    in >> cells.back()[i];
+	    in >> cells.back().vertices[i];
+	  cells.back().material_id = material_id;
 
 					   // transform from ucd to
 					   // consecutive numbering
 	  for (unsigned int i=0; i<(1<<dim); ++i)
-	    if (vertex_indices.find (cells.back()[i]) != vertex_indices.end())
+	    if (vertex_indices.find (cells.back().vertices[i]) != vertex_indices.end())
 					       // vertex with this index exists
-	      cells.back()[i] = vertex_indices[cells.back()[i]];
+	      cells.back().vertices[i] = vertex_indices[cells.back().vertices[i]];
 	    else 
 	      {
 						 // no such vertex index
-		Assert (false, ExcInvalidVertexIndex(cell, cells.back()[i]));
-		cells.back()[i] = -1;
+		Assert (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+		cells.back().vertices[i] = -1;
 	      };
-	};
+	}
+      else
+	if ((cell_type == "line") && (dim == 2))
+					   // boundary info
+	  {
+	    subcelldata.boundary_lines.push_back (CellData<1>());
+	    in >> subcelldata.boundary_lines.back().vertices[0]
+	       >> subcelldata.boundary_lines.back().vertices[1];
+	    subcelldata.boundary_lines.back().material_id = material_id;
+
+					     // transform from ucd to
+					     // consecutive numbering
+	    for (unsigned int i=0; i<2; ++i)
+	      if (vertex_indices.find (subcelldata.boundary_lines.back().vertices[i]) !=
+		  vertex_indices.end())
+						 // vertex with this index exists
+		subcelldata.boundary_lines.back().vertices[i]
+		  = vertex_indices[subcelldata.boundary_lines.back().vertices[i]];
+	    else 
+	      {
+						 // no such vertex index
+		Assert (false,
+			ExcInvalidVertexIndex(cell,
+					      subcelldata.boundary_lines.back().vertices[i]));
+		subcelldata.boundary_lines.back().vertices[i] = -1;
+	      };
+	  }
+	else
+					   // cannot read this
+	  Assert (false, ExcNotImplemented());
     };
 
-  tria->create_triangulation (vertices, cells);
+				   // check that no forbidden arrays are used
+  Assert (subcelldata.check_consistency(dim), ExcInternalError());
+  
+  tria->create_triangulation (vertices, cells, subcelldata);
 };
 
 

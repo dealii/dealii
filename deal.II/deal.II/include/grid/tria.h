@@ -33,6 +33,9 @@ template <int dim, class Accessor> class TriaActiveIterator;
 
 template <int dim> class DoFHandler;
 
+template <int dim> struct CellData;
+struct SubCellData;
+
 
 class istream;
 class ostream;
@@ -57,7 +60,16 @@ class TriangulationLevel;
     In #TriangulationLevel<0># all data is stored which is not
     dependant on the dimension, e.g. a field to store the
     refinement flag for the cells (what a cell actually is
-    is declared elsewhere), etc.
+    is declared elsewhere), etc. Actually, it is only cell-based
+    data, like neighborship info or refinement flags. There is another
+    field, which may fit in here, namely the material data (for cells)
+    or the boundary indicators (for faces), but since we need for a line
+    or quad either boundary information or material data, we store them
+    with the lines and quads rather than with the common data. We may,
+    however lose some memory in three dimensions, when we need the
+    material data for cell, boundary data for the quads, but nothing
+    for the lines. Since we only store one byte per line, quad or hex,
+    this is a minor loss and we can live with that.
 
     @memo Information belonging to one level of the multilevel hierarchy.
     */
@@ -125,7 +137,7 @@ class TriangulationLevel<0> {
 				      *  to the mother cell of this cell).
 				      */
     vector<pair<int,int> > neighbors;
-
+    
 				     /**
 				      *  Reserve enough space to accomodate
 				      *  #total_cells# cells on this level.
@@ -251,6 +263,29 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 					  *  #Triangulation<>::clear_user_flags()#.
 					  */
 	vector<bool> user_flags;
+
+					 /**
+					  * Store boundary and material data. In
+					  * one dimension, this field stores
+					  * the material id of a line, which is
+					  * number between 0 and 254. In more
+					  * than one dimension, lines have no
+					  * material id, but they may be at the
+					  * boundary; then, we store the
+					  * boundary indicator in this field,
+					  * which denotes to which part of the
+					  * boundary this line belongs and which
+					  * boundary conditions hold on this
+					  * part. The boundary indicator also
+					  * is a number between zero and 254;
+					  * the id 255 is reserved for lines
+					  * in the interior and may be used
+					  * to check whether a line is at the
+					  * boundary or not, which otherwise
+					  * is not possible if you don't know
+					  * which cell it belongs to.
+					  */
+	vector<unsigned char> material_id;
     };
     
   public:
@@ -337,6 +372,29 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 					  *  Same as for #LineData::used#.
 					  */
 	vector<bool> user_flags;
+
+					 /**
+					  * Store boundary and material data. In
+					  * two dimension, this field stores
+					  * the material id of a quad, which is
+					  * number between 0 and 254. In more
+					  * than two dimensions, quads have no
+					  * material id, but they may be at the
+					  * boundary; then, we store the
+					  * boundary indicator in this field,
+					  * which denotes to which part of the
+					  * boundary this line belongs and which
+					  * boundary conditions hold on this
+					  * part. The boundary indicator also
+					  * is a number between zero and 254;
+					  * the id 255 is reserved for quads
+					  * in the interior and may be used
+					  * to check whether a quad is at the
+					  * boundary or not, which otherwise
+					  * is not possible if you don't know
+					  * which cell it belongs to.
+					  */
+	vector<unsigned char> material_id;
     };
     
   public:
@@ -704,6 +762,76 @@ class TriaDimensionInfo<2> {
 	 #Triangulation<dim>::create_triangulation (2)# function.
     \end{itemize}
 
+    The material id for each cell must be specified upon construction of
+    a triangulation. (There is a special section on material ids and
+    boundary indicators. See there for more information.)
+    The standard region functions (for hypercube, hyperball,
+    etc.) denote all cells the material id zero. You may change that afterwards,
+    but you should not use the material id 255. When reading a triangulation,
+    the material id must be specified in the input file (UCD format) or is
+    otherwise set to zero. When creating explicitely, the material id must
+    be given to the creation function.
+
+    Regarding the boundary indicator for lines in two dimensions and quads
+    in three (subsummed by the word "faces"), all interior faces are denoted
+    the value 255. Trying to give an interior face another value results in
+    an error if in debug mode. Faces at the boundary of the domain are preset
+    with the boundary indicator zero, but you can give a list of faces with
+    different boundary indicators to the triangulation creation function.
+    The standard domain functions assume all faces to have boundary indicator
+    zero, which you may change manually afterwards. When reading from a file,
+    you have to give boundary indicators other than zero explicitely, e.g. in
+    UCD format by giving a list of lines with material id in the input file.
+
+    Lines in two dimensions and quads in three dimensions inherit their
+    boundary indicator to their children upon refinement. You should therefore
+    make sure that if you have different boundary parts, the different parts
+    are separated by a vertex (in 2D) or a line (in 3D) such that each boundary
+    line or quad has a unique boundary indicator.
+
+    Likewise, material data is inherited from mother to child cells. Place your
+    coarse level cells so, that the interface between cells is also the
+    interface between regions of different materials.
+
+
+
+    {\bf Material and boundary information}
+
+    Each line, quad, etc stores one byte of information denoting the material
+    a cell is made of (used in the computation of stiffness matrices) and to
+    which part of the boundary it belongs. Obviously, the material id is what
+    is needed for a cell, while for all structures with a dimension less than
+    the dimension of the domain (i.e. lines in 2D, lines and quads in 3D), the
+    boundary information is what is needed. Since either material or boundary
+    information is needed, but never both, only one field is used to store this
+    data, namely the #TriangulationLevel<1>::LinesData.material_id# and
+    #TriangulationLevel<2>::QuadsData.material_id# vectors. The data can be
+    read and written using line, quad and cell iterators.
+
+    Material and boundary indicators are stored as one byte (an
+    #unsigned char#). They can therefore be in the range zero to 255, but
+    only zero to 254 is allowed. The value 255 is reserved to denote
+    interior lines (in 2D) and interior lines and quads (in 3D), which need
+    not have a boundary or material indicator. However, using this value, it
+    is possible to say whether a line in 2D is interior or not, which would
+    otherwise be impossible because the hierarchical structure of a
+    triangulation stores neighborship information and the like only with
+    cells. Finding out whether a line is an interior one would then only be
+    possible by looking at the cell it belongs to. There would be no way to
+    loop over all lines and for example do a contour integral, since there
+    would be no way to find out which of the lines we loop over actually are
+    on the contour.
+
+    Since in one dimension, no substructures of lower dimension exist to
+    cells (of course apart from vertices, but these are handled
+    in another way than the structures and substructures with dimension one
+    or greater), there is no way to denote boundary indicators to boundary
+    vertices (the endpoints). This is not a big thing, however, since you
+    will normally not want to do a loop over all vertices, but rather work
+    on the cells, which in turn have a possibility to find out whether they
+    are at one of the endpoints. Only the handling of boundary values gets
+    a bit more complicated, but this seems to be the price to be paid for
+    the different handling of vertices from lines and quads.
 
 
     {\bf History of a triangulation}
@@ -907,13 +1035,19 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      * the cell list should be useful (connected
 				      * domain, etc.).
 				      *
+				      * Material data for the cells is given
+				      * within the #cells# array, while boundary
+				      * information is given in the
+				      * #subcelldata# field.
+				      *
 				      * The numbering of vertices within the
 				      * #cells# array is subject to some
 				      * constraints; see the general class
 				      * documentation for this.
 				      */
-    void create_triangulation (const vector<Point<dim> >  &vertices,
-			       const vector<vector<int> > &cells);
+    void create_triangulation (const vector<Point<dim> >    &vertices,
+			       const vector<CellData<dim> > &cells,
+			       const SubCellData            &subcelldata);
     
 				     /**
 				      * Initialize the triangulation with a
@@ -1600,6 +1734,18 @@ class Triangulation : public TriaDimensionInfo<dim> {
 		    << "Error while creating cell " << arg1
 		    << ": the vertex index " << arg2 << " must be between 0 and "
 		    << arg3 << ".");
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcLineInexistant,
+		    int, int,
+		    << "When trying to give a boundary indicator to a line: "
+		    << "the line with end vertices " << arg1 << " and "
+		    << arg2 << " does not exist.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInteriorLineCantBeBoundary);
 				     /**
 				      * Exception
 				      */

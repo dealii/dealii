@@ -4,6 +4,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <basic/magic_numbers.h>
+#include <basic/data_io.h>
 #include <iostream.h>
 #include <algo.h>
 #include <map.h>
@@ -40,7 +41,12 @@ void Triangulation<dim>::set_boundary (const Boundary<dim> *boundary_object) {
 
 
 void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
-					     const vector<vector<int> > &cells) {
+					     const vector<CellData<1> > &cells,
+					     const SubCellData          &) {
+				   // note: since no boundary information
+				   // can be given in one dimension, the
+				   // #subcelldata# field is ignored.
+  
   const unsigned int dim=1;
   
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -65,13 +71,14 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
       while (next_free_line->used())
 	++next_free_line;
       
-      next_free_line->set (Line (cells[cell][0], cells[cell][1]));
+      next_free_line->set (Line (cells[cell].vertices[0], cells[cell].vertices[1]));
       next_free_line->set_used_flag ();
+      next_free_line->set_material_id (cells[cell].material_id);
       
 				       // note that this cell
 				       // is adjacent to these vertices
-      lines_at_vertex[cells[cell][0]].push_back (cell);
-      lines_at_vertex[cells[cell][1]].push_back (cell);
+      lines_at_vertex[cells[cell].vertices[0]].push_back (cell);
+      lines_at_vertex[cells[cell].vertices[1]].push_back (cell);
     };
 
 
@@ -132,7 +139,8 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 
 
 void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
-					     const vector<vector<int> > &c) {
+					     const vector<CellData<2> > &c,
+					     const SubCellData          &subcelldata) {
   const unsigned int dim=2;
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -145,7 +153,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 
 				   // copy cells. This is needed since we
 				   // may need to change entries
-  vector<vector<int> > cells(c);
+  vector<CellData<2> > cells(c);
 
   
 				   // make up a list of the needed lines
@@ -165,16 +173,16 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 				       // in debug mode: check whether vertex
 				       // indices are valid ones
       for (unsigned int vertex=0; vertex<4; ++vertex)
-	Assert ((0<=cells[cell][vertex]) &&
-		(cells[cell][vertex]<(signed int)vertices.size()),
-		ExcInvalidVertexIndex (cell, cells[cell][vertex], vertices.size()));
+	Assert ((0<=cells[cell].vertices[vertex]) &&
+		(cells[cell].vertices[vertex]<(signed int)vertices.size()),
+		ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
 #endif
       
       pair<int,int> line_vertices[4] = {   // note the order of the vertices
-	    make_pair (cells[cell][0], cells[cell][1]),
-	    make_pair (cells[cell][1], cells[cell][2]),
-	    make_pair (cells[cell][0], cells[cell][3]),
-	    make_pair (cells[cell][3], cells[cell][2])};
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
+	    make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
+	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2])};
 
 				       // note the following: if the sense
 				       // of the vertices of a cell is correct,
@@ -193,17 +201,18 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 				       // difficult and not implemented.
       for (unsigned int line=0; line<4; ++line)
 	if (needed_lines.find(make_pair(line_vertices[line].second,
-					      line_vertices[line].first))
+					line_vertices[line].first))
 	    !=
 	    needed_lines.end())
 	  {
 					     // rotate vertex numbers
-	    rotate (cells[cell].begin(), cells[cell].begin()+2, cells[cell].end());
+	    swap (cells[cell].vertices[0], cells[cell].vertices[2]);
+	    swap (cells[cell].vertices[1], cells[cell].vertices[3]);
 					     // remake lines
-	    line_vertices[0] = make_pair (cells[cell][0], cells[cell][1]);
-	    line_vertices[1] = make_pair (cells[cell][1], cells[cell][2]);
-	    line_vertices[2] = make_pair (cells[cell][0], cells[cell][3]);
-	    line_vertices[3] = make_pair (cells[cell][3], cells[cell][2]);
+	    line_vertices[0] = make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
+	    line_vertices[1] = make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
+	    line_vertices[2] = make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
+	    line_vertices[3] = make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
 					     // allow for only one such
 					     // rotation
 	    break;
@@ -290,7 +299,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 
 				   // store for each line index
 				   // the adjacent cells
-  map<int,vector<cell_iterator>, less<int> > adjacent_cells;
+  map<int,vector<cell_iterator>,less<int> > adjacent_cells;
 
 				   // finally make up cells
   if (true) 
@@ -300,10 +309,10 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	{
 					   // list of iterators of lines
 	  const line_iterator lines[4] = {
-		needed_lines[make_pair(cells[c][0], cells[c][1])],
-		needed_lines[make_pair(cells[c][1], cells[c][2])],
-		needed_lines[make_pair(cells[c][3], cells[c][2])],
-		needed_lines[make_pair(cells[c][0], cells[c][3])]};
+		needed_lines[make_pair(cells[c].vertices[0], cells[c].vertices[1])],
+		needed_lines[make_pair(cells[c].vertices[1], cells[c].vertices[2])],
+		needed_lines[make_pair(cells[c].vertices[3], cells[c].vertices[2])],
+		needed_lines[make_pair(cells[c].vertices[0], cells[c].vertices[3])]};
 	  
 	  cell->set (Quad(lines[0]->index(),
 			  lines[1]->index(),
@@ -311,7 +320,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 			  lines[3]->index()));
 	  
 	  cell->set_used_flag ();
-	  
+	  cell->set_material_id (cells[c].material_id);	  
 					   // note that this cell is adjacent
 					   // to the four lines
 	  for (unsigned int line=0; line<4; ++line)
@@ -331,18 +340,67 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
     };
   
 
-#ifdef DEBUG
-  map<int,vector<cell_iterator>, less<int> >::const_iterator adj;
-  for (adj=adjacent_cells.begin(); adj!=adjacent_cells.end(); ++adj)
-				     // assert that every line has one or
-				     // two adjacent cells
-    Assert (((*adj).second.size() >= 1) &&
-	    ((*adj).second.size() <= 2),
-	    ExcInternalError());
-#endif
+  for (line_iterator line=begin_line(); line!=end_line(); ++line) 
+    {
+      const unsigned int n_adj_cells = adjacent_cells[line->index()].size();
+				       // assert that every line has one or
+				       // two adjacent cells
+      Assert ((n_adj_cells >= 1) &&
+	      (n_adj_cells <= 2),
+	      ExcInternalError());
+
+				       // if only one cell: line is at
+				       // boundary -> give it the boundary
+				       // indicator zero by default
+      if (n_adj_cells == 1)
+	line->set_boundary_indicator (0);
+      else
+					 // interior line -> 255
+      	line->set_boundary_indicator (255);
+    };
+
+				   // set boundary indicators where given
+  vector<CellData<1> >::const_iterator boundary_line
+    = subcelldata.boundary_lines.begin();
+  vector<CellData<1> >::const_iterator end_boundary_line
+    = subcelldata.boundary_lines.end();
+  for (; boundary_line!=end_boundary_line; ++boundary_line) 
+    {
+      line_iterator line;
+      pair<int,int> line_vertices(make_pair((*boundary_line).vertices[0],
+					    (*boundary_line).vertices[1]));
+      if (needed_lines.find(line_vertices) != needed_lines.end())
+					 // line found in this direction
+	line = needed_lines[line_vertices];
+      else 
+	{
+					   // look whether it exists in
+					   // reverse direction
+	  swap (line_vertices.first, line_vertices.second);
+	  if (needed_lines.find(line_vertices) != needed_lines.end())
+	    line = needed_lines[line_vertices];
+	  else 
+	    {
+					       // line does not exist
+	      Assert (false, ExcLineInexistant(line_vertices.first,
+					       line_vertices.second));
+	      line = end_line();
+	    };
+	};
+
+				       // Assert that only exterior lines
+				       // are sgiven a boundary indicator
+      Assert (line->boundary_indicator() == 0,
+	      ExcInteriorLineCantBeBoundary());
+
+      line->set_boundary_indicator ((*boundary_line).material_id);
+    };
 
 
-				   // update neighborship info
+
+  
+
+				   // finally update neighborship info
   for (cell_iterator cell=begin(); cell!=end(); ++cell)
     for (unsigned int side=0; side<4; ++side)
       if (adjacent_cells[cell->line(side)->index()][0] == cell)
@@ -367,21 +425,16 @@ void Triangulation<1>::create_hypercube (const double left,
 					 const double right) {
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (n_lines() == 0, ExcTriangulationNotEmpty());
-  
-  vertices.push_back (Point<1> (left));
-  vertices.push_back (Point<1> (right));
 
-  vertices_used.push_back (true);
-  vertices_used.push_back (true);
+  const Point<1> vertices[2] = { Point<1>(left), Point<1>(right) };
+  vector<CellData<1> > cells (1, CellData<1>());
+  cells[0].vertices[0] = 0;
+  cells[0].vertices[1] = 1;
+  cells[0].material_id = 0;
   
-  levels[0]->lines.lines.push_back (Line(0,1));
-  levels[0]->lines.children.push_back (-1);
-  levels[0]->lines.used.push_back (true);
-  levels[0]->lines.user_flags.push_back (false);
-  levels[0]->neighbors.push_back (make_pair(-1,-1));
-  levels[0]->neighbors.push_back (make_pair(-1,-1));
-
-  levels[0]->refine_flags.push_back (false);
+  create_triangulation (vector<Point<1> >(&vertices[0], &vertices[2]),
+			cells,
+			SubCellData());       // no boundary information
 };
 
 
@@ -398,13 +451,14 @@ void Triangulation<2>::create_hypercube (const double left,
 				 Point<2>(right,right),
 				 Point<2>(left,right)  };
   const int cell_vertices[1][4] = { { 0,1,2,3 } };
-  vector<vector<int> > cells (1, vector<int>());
-  cells[0].reserve (4);
+  vector<CellData<2> > cells (1, CellData<2>());
   for (unsigned int j=0; j<4; ++j)
-    cells[0].push_back (cell_vertices[0][j]);
+    cells[0].vertices[j] = cell_vertices[0][j];
+  cells[0].material_id = 0;
   
   create_triangulation (vector<Point<2> >(&vertices[0], &vertices[4]),
-			cells);
+			cells,
+			SubCellData());       // no boundary information
 };
 
 
@@ -429,21 +483,18 @@ void Triangulation<2>::create_hyper_L (const double a, const double b) {
 				   {1, 2, 5, 4},
 				   {3, 4, 7, 6}};
 
-				   // with gcc2.9, uncomment this line
-				   // and delete following workaraound
-//  vector<vector<int> > cells (3, vector<int>(4,-1));
-  vector<int> tmp;
-  tmp.reserve (4);
-  for (unsigned int i=0; i<4; ++i)
-    tmp.push_back (-1);
-  vector<vector<int> > cells (3, tmp);
+  vector<CellData<2> > cells (3, CellData<2>());
   
-  for (unsigned int i=0; i<3; ++i)
-    for (unsigned int j=0; j<4; ++j)
-      cells[i][j] = cell_vertices[i][j];
+  for (unsigned int i=0; i<3; ++i) 
+    {
+      for (unsigned int j=0; j<4; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
   
   create_triangulation (vector<Point<dim> >(&vertices[0], &vertices[8]),
-			cells);
+			cells,
+			SubCellData());       // no boundary information
 };
 
 
@@ -471,21 +522,18 @@ void Triangulation<2>::create_hyper_ball (const Point<2> p, const double radius)
 				   {1, 7, 5, 3},
 				   {6, 4, 5, 7}};
 
-				   // with gcc2.9, uncomment this line
-				   // and delete following workaraound
-//  vector<vector<int> > cells (5, vector<int>(4,-1));
-  vector<int> tmp;
-  tmp.reserve (4);
-  for (unsigned int i=0; i<4; ++i)
-    tmp.push_back (-1);
-  vector<vector<int> > cells (5, tmp);
-
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<4; ++j)
-      cells[i][j] = cell_vertices[i][j];
+  vector<CellData<2> > cells (5, CellData<2>());
+  
+  for (unsigned int i=0; i<5; ++i) 
+    {
+      for (unsigned int j=0; j<4; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
   
   create_triangulation (vector<Point<dim> >(&vertices[0], &vertices[8]),
-			cells);
+			cells,
+			SubCellData());       // no boundary information
 };
 
 
@@ -1614,6 +1662,8 @@ void Triangulation<1>::execute_refinement () {
 	    cell->set_children (first_child->index());
 	    first_child->clear_children ();
 	    first_child->set (Line (cell->vertex_index(0), next_unused_vertex));
+	    first_child->set_material_id (cell->material_id());
+	    
 					     // reset neighborship info
 					     // (refer to \Ref{TriangulationLevel<0>}
 					     // for details)
@@ -1649,6 +1699,7 @@ void Triangulation<1>::execute_refinement () {
 	    second_child->clear_children ();
 	    second_child->set (Line (next_unused_vertex, cell->vertex_index(1)));
 	    second_child->set_neighbor (0, first_child);
+	    second_child->set_material_id (cell->material_id());
 	    if (cell->neighbor(1).state() != valid)
 	      second_child->set_neighbor (1, cell->neighbor(1));
 	    else
@@ -2143,6 +2194,24 @@ void Triangulation<2>::execute_refinement () {
 	    new_lines[11]->set_used_flag ();
 	    new_lines[11]->clear_children ();
 
+					     // set the boundary indicators of
+					     // the outer cells.
+	    new_lines[0]->set_boundary_indicator (cell->line(0)->boundary_indicator());
+	    new_lines[1]->set_boundary_indicator (cell->line(0)->boundary_indicator());
+	    new_lines[2]->set_boundary_indicator (cell->line(1)->boundary_indicator());
+	    new_lines[3]->set_boundary_indicator (cell->line(1)->boundary_indicator());
+	    new_lines[4]->set_boundary_indicator (cell->line(2)->boundary_indicator());
+	    new_lines[5]->set_boundary_indicator (cell->line(2)->boundary_indicator());
+	    new_lines[6]->set_boundary_indicator (cell->line(3)->boundary_indicator());
+	    new_lines[7]->set_boundary_indicator (cell->line(3)->boundary_indicator());
+					     // inner cells have boundary
+					     // indicator 255
+	    new_lines[8]->set_boundary_indicator (255);
+	    new_lines[9]->set_boundary_indicator (255);
+	    new_lines[10]->set_boundary_indicator (255);
+	    new_lines[11]->set_boundary_indicator (255);
+
+	    
 					     // finally add the four new cells!
 	    
 					     // search for next unused cell
@@ -2221,6 +2290,11 @@ void Triangulation<2>::execute_refinement () {
 	    subcells[3]->set_neighbor (1, subcells[2]);
 	    subcells[3]->set_neighbor (2, neighbors[5]);
 	    subcells[3]->set_neighbor (3, neighbors[6]);
+
+	    subcells[0]->set_material_id (cell->material_id());
+	    subcells[1]->set_material_id (cell->material_id());
+	    subcells[2]->set_material_id (cell->material_id());
+	    subcells[3]->set_material_id (cell->material_id());
 	  };
     };
 #ifdef DEBUG
@@ -2319,11 +2393,18 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines) {
   lines.used.insert (lines.used.end(), new_size-lines.used.size(), false);
   
   lines.user_flags.reserve (new_size);
-  lines.user_flags.insert (lines.user_flags.end(), new_size-lines.user_flags.size(), false);
+  lines.user_flags.insert (lines.user_flags.end(),
+			   new_size-lines.user_flags.size(), false);
   
   lines.children.reserve (new_size);
   lines.children.insert (lines.children.end(), new_size-lines.children.size(),
 			 -1);
+
+  lines.material_id.reserve (new_size);
+  lines.material_id.insert (lines.material_id.end(),
+			    new_size-lines.material_id.size(),
+			    255);
+
 };
 
 
@@ -2352,6 +2433,8 @@ void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (lines.lines.size(), lines.user_flags.size()));
   Assert (lines.lines.size() == lines.children.size(),
 	  ExcMemoryInexact (lines.lines.size(), lines.children.size()));
+  Assert (lines.lines.size() == lines.material_id.size(),
+	  ExcMemoryInexact (lines.lines.size(), lines.material_id.size()));
   Assert (lines.used[lines.used.size()-1]==true ,
 	  ExcUnusedMemoryAtEnd());
 
@@ -2377,11 +2460,17 @@ void TriangulationLevel<2>::reserve_space (const unsigned int new_quads) {
   quads.used.insert (quads.used.end(), new_size-quads.used.size(), false);
   
   quads.user_flags.reserve (new_size);
-  quads.user_flags.insert (quads.user_flags.end(), new_size-quads.user_flags.size(), false);
+  quads.user_flags.insert (quads.user_flags.end(),
+			   new_size-quads.user_flags.size(), false);
   
   quads.children.reserve (new_size);
   quads.children.insert (quads.children.end(), new_size-quads.children.size(),
 			 -1);
+
+  quads.material_id.reserve (new_size);
+  quads.material_id.insert (quads.material_id.end(),
+			    new_size-quads.material_id.size(),
+			    255);
 };
 
 
@@ -2409,6 +2498,8 @@ void TriangulationLevel<2>::monitor_memory (const unsigned int true_dimension) c
 	  ExcMemoryInexact (quads.quads.size(), quads.user_flags.size()));
   Assert (quads.quads.size() == quads.children.size(),
 	  ExcMemoryInexact (quads.quads.size(), quads.children.size()));
+  Assert (quads.quads.size() == quads.material_id.size(),
+	  ExcMemoryInexact (quads.quads.size(), quads.material_id.size()));
   Assert (quads.used[quads.used.size()-1]==true ,
 	  ExcUnusedMemoryAtEnd());
 

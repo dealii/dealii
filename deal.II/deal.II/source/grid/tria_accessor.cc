@@ -241,6 +241,35 @@ void LineAccessor<dim>::operator -- () {
 
 
 
+template <int dim>
+unsigned char LineAccessor<dim>::boundary_indicator () const {
+  Assert (dim>=2, ExcNotUsefulForThisDimension());
+  Assert (used(), ExcRefineCellNotUsed());
+
+  return tria->levels[present_level]->lines.material_id[present_index];
+};
+
+
+
+template <int dim>
+void LineAccessor<dim>::set_boundary_indicator (unsigned char boundary_ind) const {
+  Assert (dim>=2, ExcNotUsefulForThisDimension());
+  Assert (used(), ExcRefineCellNotUsed());
+
+  tria->levels[present_level]->lines.material_id[present_index] = boundary_ind;
+};
+
+
+
+template <int dim>
+bool LineAccessor<dim>::at_boundary () const {
+				   // error checking is done
+				   // in boundary_indicator()
+  return (boundary_indicator() != 255);
+};
+
+
+
 
 template class LineAccessor<1>;
 template class LineAccessor<2>;
@@ -440,6 +469,33 @@ void QuadAccessor<dim>::operator -- () {
 
 
 
+template <int dim>
+unsigned char QuadAccessor<dim>::boundary_indicator () const {
+  Assert (dim>=3, ExcNotUsefulForThisDimension());
+  Assert (used(), ExcRefineCellNotUsed());
+
+  return tria->levels[present_level]->quads.material_id[present_index];
+};
+
+
+
+template <int dim>
+void QuadAccessor<dim>::set_boundary_indicator (unsigned char boundary_ind) const {
+  Assert (dim>=3, ExcNotUsefulForThisDimension());
+  Assert (used(), ExcRefineCellNotUsed());
+
+  tria->levels[present_level]->quads.material_id[present_index] = boundary_ind;
+};
+
+
+
+template <int dim>
+bool QuadAccessor<dim>::at_boundary () const {
+				   // error checking is done
+				   // in boundary_indicator()
+  return (boundary_indicator() != 255);
+};
+
 
 template class QuadAccessor<2>;
 
@@ -456,6 +512,22 @@ bool CellAccessor<1>::at_boundary () const {
 
 
 
+unsigned char CellAccessor<1>::material_id () const {
+  Assert (used(),
+	  typename TriaSubstructAccessor<1>::ExcRefineCellNotUsed());
+  return tria->levels[present_level]->lines.material_id[present_index];
+};
+
+
+
+void CellAccessor<1>::set_material_id (const unsigned char mat_id) const {
+  Assert (used(),
+	  typename TriaSubstructAccessor<1>::ExcRefineCellNotUsed());
+  tria->levels[present_level]->lines.material_id[present_index]
+    = mat_id;						 
+};
+
+
 
 /*------------------------ Functions: CellAccessor<2> -----------------------*/
 
@@ -464,6 +536,22 @@ bool CellAccessor<2>::at_boundary () const {
   return at_boundary(0) || at_boundary(1) || at_boundary(2) || at_boundary(3);
 };
 
+
+
+unsigned char CellAccessor<2>::material_id () const {
+  Assert (used(),
+	  typename TriaSubstructAccessor<2>::ExcRefineCellNotUsed());
+  return tria->levels[present_level]->quads.material_id[present_index];
+};
+
+
+
+void CellAccessor<2>::set_material_id (const unsigned char mat_id) const {
+  Assert (used(),
+	  typename TriaSubstructAccessor<2>::ExcRefineCellNotUsed());
+  tria->levels[present_level]->quads.material_id[present_index]
+    = mat_id;						 
+};
 
 
 /*------------------------ Functions: CellAccessor<dim> -----------------------*/
@@ -505,7 +593,7 @@ bool CellAccessor<dim>::at_boundary (const unsigned int i) const {
   Assert (i<2*dim,
 	  typename TriaSubstructAccessor<dim>::ExcInvalidIndex (i,0,2*dim-1));
   
-  return (neighbor(i).state() != valid);
+  return (neighbor_index(i) == -1);
 };
 
 
