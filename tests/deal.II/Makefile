@@ -268,7 +268,11 @@ target1: $(target1-o-files) $(libraries)
 wave-test-3.output: wave-test-3.testcase
 	@echo =====Running======= $<
 	@./$<
-	@perl -pi~ -e 's/JobId.*//;s/value.*//;s/(\.\d\d)\d*/\1/g;' $@
+	@perl -pi -e 's/JobId.*//;          \
+                      s/value.*//;          \
+                      s/Creation Date.*//g; \
+                      s/Time tag:.*//g;     \
+                      s/(\.\d\d)\d*/\1/g;' $@
 
 %.output:%.testcase
 	@echo =====Running======= $<

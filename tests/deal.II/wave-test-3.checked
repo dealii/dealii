@@ -367,7 +367,7 @@ DEAL::.
 DEAL::  Postprocessing: time=0.00, step=0, sweep=0. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
-%%Creation Date: 2000/1/28 - 14:16:11
+%%
 %%BoundingBox: 0 0 300 189
 /m {moveto} bind def
 /l {lineto} bind def
@@ -919,7 +919,7 @@ DEAL::  Postprocessing: time=0.67, step=24, sweep=0. [ee]
 DEAL::  Postprocessing: time=0.70, step=25, sweep=0. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
-%%Creation Date: 2000/1/28 - 14:16:38
+%%
 %%BoundingBox: 0 0 300 150
 /m {moveto} bind def
 /l {lineto} bind def
@@ -1513,7 +1513,7 @@ DEAL::    Writing summary.Summary of this sweep:
   ------------
     Hughens wave -- weighted time: 0.53
                     average      : 0.00
-  Time tag: 2000/1/28 14:16:44
+  
 
 
 
@@ -1885,7 +1885,7 @@ DEAL::.
 DEAL::  Postprocessing: time=0.00, step=0, sweep=1. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
-%%Creation Date: 2000/1/28 - 14:17:27
+%%
 %%BoundingBox: 0 0 300 198
 /m {moveto} bind def
 /l {lineto} bind def
@@ -2251,7 +2251,7 @@ DEAL::  Postprocessing: time=0.67, step=24, sweep=1. [ee]
 DEAL::  Postprocessing: time=0.70, step=25, sweep=1. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
-%%Creation Date: 2000/1/28 - 14:17:50
+%%
 %%BoundingBox: 0 0 300 150
 /m {moveto} bind def
 /l {lineto} bind def
@@ -2551,7 +2551,7 @@ DEAL::    Writing summary.Summary of this sweep:
   ------------
     Hughens wave -- weighted time: 0.65
                     average      : 0.00
-  Time tag: 2000/1/28 14:18:00
+  
 
 
 
@@ -2923,7 +2923,7 @@ DEAL::.
 DEAL::  Postprocessing: time=0.00, step=0, sweep=2. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
-%%Creation Date: 2000/1/28 - 14:19:28
+%%
 %%BoundingBox: 0 0 300 175
 /m {moveto} bind def
 /l {lineto} bind def
@@ -3301,7 +3301,7 @@ DEAL::  Postprocessing: time=0.67, step=24, sweep=2. [ee]
 DEAL::  Postprocessing: time=0.70, step=25, sweep=2. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
-%%Creation Date: 2000/1/28 - 14:20:15
+%%
 %%BoundingBox: 0 0 300 150
 /m {moveto} bind def
 /l {lineto} bind def
@@ -3610,7 +3610,7 @@ DEAL::    Writing summary.Summary of this sweep:
   ------------
     Hughens wave -- weighted time: 0.63
                     average      : 0.00
-  Time tag: 2000/1/28 14:20:15
+  
 
 
 
