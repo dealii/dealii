@@ -37,6 +37,7 @@ bool SubCellData::check_consistency (const unsigned int dim) const {
 
 template <int dim>
 Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
+		Subscriptor (),
 		smooth_grid(smooth_grid)
 {
   static StraightBoundary<dim> default_boundary;
