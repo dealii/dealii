@@ -12,9 +12,10 @@
 //----------------------------  grid_reordering.cc  ---------------------------
 
 
-#include <algorithm>
 #include <base/thread_management.h>
 #include <grid/grid_reordering.h>
+
+#include <algorithm>
 
 
 
@@ -335,15 +336,9 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 				   // the neighbors
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
-//        cout << "Entering cell " << cell_no << " as adjacent to face <";
-//        for (unsigned int i=0; i<4; ++i)
-//  	cout << new_faces_ptr[0][face]->first.vertices[i] << ' ';
-//        cout << '>';
-      
       if (new_faces_ptr[0][face]->second.adjacent_cells[0] ==
 	  FaceData::invalid_adjacent_cell)
 	{
-//	cout << " as neighbor 0" << endl;
 					   // no, faces had not been
 					   // used before, so we are the
 					   // first adjacent cell
@@ -364,7 +359,6 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 					   // the second neighbor
 	  const unsigned int
 	    previous_neighbor = new_faces_ptr[0][face]->second.adjacent_cells[0];
-//	cout << " as neighbor 1 (previous: " << previous_neighbor << ")" << endl;
 	  for (unsigned int rot=0;
 	       rot<internal::GridReorderingInfo<dim>::rotational_states_of_faces;
 	       ++rot)
@@ -494,11 +488,6 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 					       // indeed
 	      Assert (face_found == true, ExcInternalError());
 	    };
-//  	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-//  	    cout << "cell_orientation_faces[" << rot << "][" << face << "]="
-//  		 << cell_orientation_faces[rot][face].first << '.'
-//  		 << cell_orientation_faces[rot][face].second
-//  		 << endl;
 
 					   // more checks: make sure
 					   // that each of the
@@ -559,7 +548,6 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 template <int dim>
 void GridReordering<dim>::Cell::fix_cell_neighbors ()
 {
-//  cout << "Fixing neighbors for cell " << cell_no << endl;
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
 				       // then insert the neighbor
@@ -782,9 +770,6 @@ void GridReordering<dim>::track_back (std::vector<Cell> &cells,
       
       track_back_to_cell = try_cell->track_back_to_cell;
       
-//        cout << "Further backtracking from " << rotation_states.size()
-//  	   << " to " << track_back_to_cell << endl;
-
       Assert (track_back_to_cell > 0, ExcInternalError());
 
 				       // track further back. this
@@ -818,8 +803,6 @@ bool GridReordering<dim>::try_rotate_single_neighbors (std::vector<Cell> &cells,
 				   // its number like this:
   const unsigned int cell_no = rotation_states.size();
 
-//  cout << "Trying to rotate neighbors of cell " << cell_no << ". ";
-  
 				   // now try each of the neighbors
 				   // that have already been added to
 				   // the grid. don't try the cell
@@ -883,10 +866,6 @@ bool GridReordering<dim>::try_rotate_single_neighbors (std::vector<Cell> &cells,
 		    rotation_states.push_back (cell_rot);
 		    cells[cell_no].mark_faces_used (cell_rot);
 
-//  		    cout << "Successfully tried neighbor " << neighbor_no
-//  			 << " in rot=" << neighbor_rot
-//  			 << " with rot=" << cell_rot << endl;
-
 		    return true;
 		  };
 	      
@@ -917,7 +896,6 @@ bool GridReordering<dim>::try_rotate_single_neighbors (std::vector<Cell> &cells,
 				   // help this cell, there is no
 				   // other way than to do a full
 				   // backtracking
-//  cout << "Unsuccessfully tried to rotate neighbors of cell " << cell_no << endl;
   return false;
 }
 
@@ -928,8 +906,6 @@ void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
 					   std::vector<CellData<dim> > &original_cells,
 					   const std::vector<unsigned int>      &new_cell_numbers)
 {
-//  cout << "Starting..." << flush;
-  
   const unsigned int n_cells = cells.size();
   
 				   // stack of value indicating that
@@ -980,9 +956,6 @@ void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
 					   // next cell
 	  try_cell->mark_faces_used (rotation_states.back());
 	  
-//  	  cout << "Added cell " << try_cell->cell_no
-//  	       << " in rotation " << rotation_states.back() << endl;
-					   // go on with next cell
 	  continue;
 	}
       else
@@ -1006,7 +979,6 @@ void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
 					       // top cell possible,
 					       // we have to backtrack
 					       // some way
-//	      cout << "Failure with cell " << rotation_states.size()-1 << endl;
 
 					       // first pop rotational
 					       // state of top cell,
@@ -1050,8 +1022,6 @@ void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
 	      if (rotation_helps == true)
 		continue;
 
-//	      cout << "Will track back to cell " << try_cell->track_back_to_cell << endl;
-
 					       // if that failed to
 					       // help, then track
 					       // back
@@ -1063,10 +1033,6 @@ void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
 	    };
 	};
     };
-
-
-//    for (unsigned int i=0; i<cells.size(); ++i)
-//      cout << "{" << i << ':' << rotation_states[i] << "}";
 
 				   // rotate the cells according to
 				   // the results we have found. since
@@ -1104,8 +1070,6 @@ void GridReordering<dim>::find_reordering (std::vector<Cell>           &cells,
 				       // any more
       rotation_states.pop_back ();
     };
-
-//  cout << "Done!" << endl;
 }
 
 
