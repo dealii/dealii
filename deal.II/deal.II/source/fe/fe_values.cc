@@ -431,15 +431,23 @@ template <int dim>
 unsigned int
 FEValuesBase<dim>::memory_consumption () const
 {
-//TODO:[WB] check whether this is up to date  
   return (MemoryConsumption::memory_consumption (shape_values) +
 	  MemoryConsumption::memory_consumption (shape_gradients) +
 	  MemoryConsumption::memory_consumption (shape_2nd_derivatives) +
 	  MemoryConsumption::memory_consumption (JxW_values) +
 	  MemoryConsumption::memory_consumption (quadrature_points) +
+	  MemoryConsumption::memory_consumption (normal_vectors) +
+	  MemoryConsumption::memory_consumption (boundary_forms) +
 	  sizeof(update_flags) +
 	  MemoryConsumption::memory_consumption (present_cell) +
-	  MemoryConsumption::memory_consumption (fe));
+	  MemoryConsumption::memory_consumption (n_quadrature_points) +
+	  MemoryConsumption::memory_consumption (dofs_per_cell) +
+	  MemoryConsumption::memory_consumption (mapping) +
+	  MemoryConsumption::memory_consumption (fe) +
+	  MemoryConsumption::memory_consumption (mapping_data) +
+	  MemoryConsumption::memory_consumption (*mapping_data) +
+	  MemoryConsumption::memory_consumption (fe_data) +
+	  MemoryConsumption::memory_consumption (*fe_data));
 };
 
 
@@ -567,8 +575,8 @@ template <int dim>
 unsigned int
 FEValues<dim>::memory_consumption () const
 {
-//TODO:[WB] check whether this is up to date  
-  return FEValuesBase<dim>::memory_consumption ();
+  return (FEValuesBase<dim>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (quadrature));
 };
 
 
@@ -613,6 +621,17 @@ FEFaceValuesBase<dim>::get_boundary_forms () const
   Assert (update_flags & update_boundary_forms,
 	  FEValuesBase<dim>::ExcAccessToUninitializedField());
   return boundary_forms;
+};
+
+
+
+template <int dim>
+unsigned int
+FEFaceValuesBase<dim>::memory_consumption () const
+{
+  return (FEValuesBase<dim>::memory_consumption () +
+	  MemoryConsumption::memory_consumption (quadrature) +
+	  MemoryConsumption::memory_consumption (present_face));
 };
 
 

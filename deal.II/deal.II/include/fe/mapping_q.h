@@ -168,6 +168,15 @@ class MappingQ : public MappingQ1<dim>
 					  */
 	InternalData (const unsigned int n_shape_functions);
 	
+
+					 /**
+					  * Return an estimate (in
+					  * bytes) or the memory
+					  * consumption of this
+					  * object.
+					  */
+	virtual unsigned int memory_consumption () const;
+
 					 /**
 					  * Unit normal vectors. Used
 					  * for the alternative

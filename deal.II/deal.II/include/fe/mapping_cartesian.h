@@ -214,6 +214,14 @@ class MappingCartesian : public Mapping<dim>
 	InternalData (const Quadrature<dim> &quadrature);
 
 					 /**
+					  * Return an estimate (in
+					  * bytes) or the memory
+					  * consumption of this
+					  * object.
+					  */
+	virtual unsigned int memory_consumption () const;
+
+					 /**
 					  * Length of the cell in
 					  * different coordinate
 					  * directions, @p{h_x},

@@ -802,6 +802,13 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      */
     const Quadrature<dim-1> & get_quadrature () const;
     
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+    
   protected:
 				     /**
 				      * Store a copy of the quadrature
@@ -818,6 +825,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      */
     typename DoFHandler<dim>::face_iterator present_face;
 };
+
 
 
 /**

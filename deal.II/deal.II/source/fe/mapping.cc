@@ -69,6 +69,15 @@ Mapping<dim>::InternalDataBase::~InternalDataBase ()
 {}
 
 
+
+template <int dim>
+unsigned int
+Mapping<dim>::InternalDataBase::memory_consumption () const
+{
+  return sizeof(*this);
+}
+
+
 /*------------------------------ InternalData ------------------------------*/
 
 

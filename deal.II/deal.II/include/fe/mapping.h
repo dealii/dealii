@@ -142,6 +142,14 @@ class Mapping : public Subscriptor
 					  * cell-independent fields.
 					  */
 	bool first_cell;
+
+					 /**
+					  * Return an estimate (in
+					  * bytes) or the memory
+					  * consumption of this
+					  * object.
+					  */
+	virtual unsigned int memory_consumption () const;
     };
     
 				     /**

@@ -40,6 +40,20 @@ MappingCartesian<dim>::InternalData::InternalData (const Quadrature<dim>& q)
 
 
 template <int dim>
+unsigned int
+MappingCartesian<dim>::InternalData::memory_consumption () const
+{
+  return (Mapping<dim>::InternalDataBase::memory_consumption() +
+	  MemoryConsumption::memory_consumption (length) +
+	  MemoryConsumption::memory_consumption (quadrature_points) +
+	  MemoryConsumption::memory_consumption (unit_tangentials) +
+	  MemoryConsumption::memory_consumption (aux));
+};
+
+
+
+
+template <int dim>
 UpdateFlags
 MappingCartesian<dim>::update_once (const UpdateFlags) const
 {

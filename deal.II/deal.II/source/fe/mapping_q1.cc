@@ -13,6 +13,7 @@
 
 #include <base/tensor.h>
 #include <base/quadrature.h>
+#include <base/memory_consumption.h>
 #include <lac/full_matrix.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -88,6 +89,25 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 		       shape_derivatives.size()));
   return shape_derivatives [qpoint*n_shape_functions + shape_nr];
 }
+
+
+
+template <int dim>
+unsigned int
+MappingQ1<dim>::InternalData::memory_consumption () const
+{
+  return (Mapping<dim>::InternalDataBase::memory_consumption() +
+	  MemoryConsumption::memory_consumption (shape_values) +
+	  MemoryConsumption::memory_consumption (shape_derivatives) +
+	  MemoryConsumption::memory_consumption (covariant) +
+	  MemoryConsumption::memory_consumption (contravariant) +
+	  MemoryConsumption::memory_consumption (unit_tangentials) +
+	  MemoryConsumption::memory_consumption (aux) +
+	  MemoryConsumption::memory_consumption (mapping_support_points) +
+	  MemoryConsumption::memory_consumption (cell_of_current_support_points) +
+	  MemoryConsumption::memory_consumption (is_mapping_q1_data) +
+	  MemoryConsumption::memory_consumption (n_shape_functions));
+};
 
 
 

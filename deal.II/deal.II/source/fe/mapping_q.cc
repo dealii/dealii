@@ -15,6 +15,7 @@
 #include <fe/fe_q.h>
 #include <base/quadrature.h>
 #include <base/quadrature_lib.h>
+#include <base/memory_consumption.h>
 #include <base/tensor_product_polynomials.h>
 #include <lac/full_matrix.h>
 #include <grid/tria_iterator.h>
@@ -38,6 +39,19 @@ MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions)
 {
   is_mapping_q1_data=false;
 }
+
+
+
+template<int dim>
+unsigned int
+MappingQ<dim>::InternalData::memory_consumption () const 
+{
+  return (MappingQ1<dim>::InternalData::memory_consumption () +
+	  MemoryConsumption::memory_consumption (unit_normals) +
+	  MemoryConsumption::memory_consumption (use_mapping_q1_on_current_cell) +
+	  MemoryConsumption::memory_consumption (mapping_q1_data));
+};
+
 
 
 #if deal_II_dimension == 1

@@ -226,6 +226,14 @@ class MappingQ1 : public Mapping<dim>
 					  */
 	Tensor<1,dim> &derivative (const unsigned int qpoint,
 				   const unsigned int shape_nr);
+
+					 /**
+					  * Return an estimate (in
+					  * bytes) or the memory
+					  * consumption of this
+					  * object.
+					  */
+	virtual unsigned int memory_consumption () const;
 	
 					 /**
 					  * Values of shape
