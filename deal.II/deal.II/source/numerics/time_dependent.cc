@@ -210,7 +210,7 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
 				   // thread
   typedef ThreadManager::Mem_Fun_Data2<TimeDependent,unsigned int,unsigned int> MemFunData;
   vector<MemFunData> mem_fun_data (n_threads,
-				   MemFunData(this, 0, 0, &end_sweep));
+				   MemFunData(this, 0, 0, &TimeDependent::end_sweep));
   const unsigned int stride = timesteps.size() / n_threads;
   for (unsigned int i=0; i<n_threads; ++i)
     {

@@ -79,7 +79,7 @@ SparseVanka<number>::compute_inverses ()
   vector<MemFunData> mem_fun_data (n_threads,
 				   MemFunData(this,
 					      0, 0,
-					      &compute_inverses));
+					      &SparseVanka<number>::compute_inverses));
 
   unsigned int c       = 0;
   unsigned int thread  = 0;
