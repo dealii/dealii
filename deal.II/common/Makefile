@@ -62,7 +62,7 @@ lac: base
 all: base lac 2d 1d 3d
 
 online-doc:
-	cd ../doc/auto ; make
+	cd ../doc/auto ; $(MAKE)
 	@echo
 	@echo
 	@echo =======================================================
@@ -75,7 +75,7 @@ online-doc:
 	@echo
 
 printable-doc:
-	cd ../doc/auto ; make latex/deal_II_technical_reference.ps
+	cd ../doc/auto ; $(MAKE) latex/deal_II_technical_reference.ps
 	@echo
 	@echo
 	@echo =======================================================
@@ -86,7 +86,7 @@ printable-doc:
 	@echo
 
 tex-doc:
-	cd ../doc/auto ; make latex/deal_II_technical_reference.tex
+	cd ../doc/auto ; $(MAKE) latex/deal_II_technical_reference.tex
 	@echo
 	@echo
 	@echo =======================================================
@@ -102,10 +102,10 @@ TODO:
 #	@grep \#TODO Makefile Make.g* Makefile.template ../*/source/Makefile ../*/Makefile >> TODO
 
 clean:
-	cd ../base ; make clean
-	cd ../lac ; make clean
-	cd ../deal.II ; make clean
-	cd ../doc/auto ; make clean
+	cd ../base ; $(MAKE) clean
+	cd ../lac ; $(MAKE) clean
+	cd ../deal.II ; $(MAKE) clean
+	cd ../doc/auto ; $(MAKE) clean
 
 
 TAGS:
