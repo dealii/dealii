@@ -1236,7 +1236,7 @@ void Triangulation<dim>::distort_random (const double factor,
     };
 
 
-const unsigned int n_vertices = vertices.size();
+  const unsigned int n_vertices = vertices.size();
   Point<dim> shift_vector;
   
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
