@@ -294,6 +294,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code
+       class="member">DerivativeApproximation::approximate_second_derivative</code>
+       function produced wrong results ("not a number" instead of
+       "zero") if the field it was given was constant. This is now fixed.
+       <br> 
+       (WB 2004/08/05)
+       </p>
+
+  <li> <p>
        New: The <code class="member">MatrixTools::apply_boundary_values</code>
        that works on block matrices and vectors is now templatized over the
        number type, i.e. it also works for float matrices and vectors.
