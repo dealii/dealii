@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <dofs/dof_constraints.h>
+#include <lac/full_matrix.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
@@ -620,6 +621,202 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 					   // nothing more to do
 	  break;
       };
+}
+
+
+
+template <typename VectorType>
+void
+ConstraintMatrix::
+distribute_local_to_global (const Vector<double>            &local_vector,
+                            const std::vector<unsigned int> &local_dof_indices,
+                            VectorType                      &global_vector) const
+{
+  Assert (local_vector.size() == local_dof_indices.size(),
+          ExcWrongDimension());
+  Assert (sorted == true, ExcMatrixNotClosed());
+
+  const unsigned int n_local_dofs = local_vector.size();
+  
+                                   // have a special case where there are no
+                                   // constraints at all, since then we can be
+                                   // a lot faster
+  if (lines.size() == 0)
+    {
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        global_vector(local_dof_indices[i]) += local_vector(i);
+    }
+  else
+    {
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        {
+                                           // first figure out whether this
+                                           // dof is constrained
+          ConstraintLine index_comparison;
+          index_comparison.line = local_dof_indices[i];
+
+          const std::vector<ConstraintLine>::const_iterator
+            position = std::lower_bound (lines.begin(),
+                                         lines.end(),
+                                         index_comparison);
+
+                                           // if the line is not constrained,
+                                           // then simply copy the
+                                           // data. otherwise distribute it
+          if (position->line != local_dof_indices[i])
+            global_vector(local_dof_indices[i]) += local_vector(i);
+          else
+            for (unsigned int j=0; j<position->entries.size(); ++j)
+              global_vector(position->entries[j].first)
+                += local_vector(i) * position->entries[j].second;
+        }
+    }
+}
+
+
+
+template <typename MatrixType>
+void
+ConstraintMatrix::
+distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+                            const std::vector<unsigned int> &local_dof_indices,
+                            MatrixType                      &global_matrix) const
+{
+  Assert (local_matrix.n() == local_dof_indices.size(),
+          ExcWrongDimension());
+  Assert (local_matrix.m() == local_dof_indices.size(),
+          ExcWrongDimension());
+  Assert (sorted == true, ExcMatrixNotClosed());
+
+  const unsigned int n_local_dofs = local_dof_indices.size();
+  
+                                   // have a special case where there are no
+                                   // constraints at all, since then we can be
+                                   // a lot faster
+  if (lines.size() == 0)
+    {
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        for (unsigned int j=0; j<n_local_dofs; ++j)
+          global_matrix.add(local_dof_indices[i],
+                            local_dof_indices[j],
+                            local_matrix(i,j));
+    }
+  else
+    {
+                                       // here we have to do something a
+                                       // little nastier than in the
+                                       // respective function for vectors. the
+                                       // reason is that we have two nested
+                                       // loops and we don't want to
+                                       // repeatedly check whether a certain
+                                       // dof is constrained or not by
+                                       // searching over all the constrained
+                                       // dofs. so we have to cache this
+                                       // knowledge, by storing for each dof
+                                       // index whether and where the line of
+                                       // the constraint matrix is located
+      std::vector<const ConstraintLine *>
+        constraint_lines (n_local_dofs,
+                          static_cast<const ConstraintLine *>(0));
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        {
+          ConstraintLine index_comparison;
+          index_comparison.line = local_dof_indices[i];
+
+          const std::vector<ConstraintLine>::const_iterator
+            position = std::lower_bound (lines.begin(),
+                                         lines.end(),
+                                         index_comparison);
+          
+                                           // if this dof is constrained, then
+                                           // set the respective entry in the
+                                           // array. otherwise leave it at the
+                                           // invalid position
+          if ((position != lines.end()) &&
+              (position->line == local_dof_indices[i]))
+            constraint_lines[i] = &*position;
+        }
+
+
+                                       // now distribute entries
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        {
+          const ConstraintLine *position_i = constraint_lines[i];
+          const bool is_constrained_i = (position_i != 0);
+          
+          for (unsigned int j=0; j<n_local_dofs; ++j)
+            {
+              const ConstraintLine *position_j = constraint_lines[j];
+              const bool is_constrained_j = (position_j != 0);
+
+              if ((is_constrained_i == false) &&
+                  (is_constrained_j == false))
+                {
+                                                   // neither row nor column
+                                                   // is constrained
+                  global_matrix.add (local_dof_indices[i],
+                                     local_dof_indices[j],
+                                     local_matrix(i,j));
+                }
+              else if ((is_constrained_i == true) &&
+                       (is_constrained_j == false))
+                {
+                                                   // ok, row is constrained,
+                                                   // but column is not
+                  for (unsigned int q=0; q<position_i->entries.size(); ++q)
+                    global_matrix.add (position_i->entries[q].first,
+                                       local_dof_indices[j],
+                                       local_matrix(i,j) *
+                                       position_i->entries[q].second);
+                }
+              else if ((is_constrained_i == false) &&
+                       (is_constrained_j == true))
+                {
+                                                   // simply the other way
+                                                   // round: row ok, column is
+                                                   // constrained
+                  for (unsigned int q=0; q<position_j->entries.size(); ++q)
+                    global_matrix.add (local_dof_indices[i],
+                                       position_j->entries[q].first,
+                                       local_matrix(i,j) *
+                                       position_j->entries[q].second);
+                }
+              else if ((is_constrained_i == true) &&
+                       (is_constrained_j == true))
+                {
+                                                   // last case: both row and
+                                                   // column are constrained
+                  for (unsigned int p=0; p<position_i->entries.size(); ++p)
+                    for (unsigned int q=0; q<position_j->entries.size(); ++q)
+                      global_matrix.add (position_i->entries[p].first,
+                                         position_j->entries[q].first,
+                                         local_matrix(i,j) *
+                                         position_i->entries[p].second *
+                                         position_j->entries[q].second);
+
+                                                   // to make sure that the
+                                                   // global matrix remains
+                                                   // invertible, we need to
+                                                   // do something with the
+                                                   // diagonal elements. add
+                                                   // the absolute value of
+                                                   // the local matrix, so the
+                                                   // resulting entry will
+                                                   // always be positive and
+                                                   // furthermore be in the
+                                                   // same order of magnitude
+                                                   // as the other elements of
+                                                   // the matrix
+                  if (i == j)
+                    global_matrix.add (local_dof_indices[i],
+                                       local_dof_indices[i],
+                                       local_matrix(i,i));
+                }
+              else
+                Assert (false, ExcInternalError());
+            }
+        }
+    }
 }
 
 

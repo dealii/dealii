@@ -20,6 +20,7 @@
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/vector.h>
 #include <lac/petsc_vector.h>
+#include <lac/petsc_sparse_matrix.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
@@ -1253,6 +1254,10 @@ ConstraintMatrix::memory_consumption () const
 					               VectorType       &condensed) const;\
   template void ConstraintMatrix::condense<VectorType >(VectorType &vec) const;\
   template void ConstraintMatrix::set_zero<VectorType >(VectorType &vec) const;\
+  template void ConstraintMatrix:: \
+    distribute_local_to_global<VectorType> (const Vector<double>            &, \
+                                            const std::vector<unsigned int> &, \
+                                            VectorType                      &) const; \
   template void ConstraintMatrix::distribute<VectorType >(const VectorType &condensed,\
 					                 VectorType       &uncondensed) const;\
   template void ConstraintMatrix::distribute<VectorType >(VectorType &vec) const
@@ -1295,3 +1300,20 @@ ConstraintMatrix::condense<double>(BlockSparseMatrix<double> &uncondensed) const
 template
 void
 ConstraintMatrix::condense<float>(BlockSparseMatrix<float> &uncondensed) const;
+
+
+#define MATRIX_FUNCTIONS(MatrixType) \
+template void ConstraintMatrix:: \
+distribute_local_to_global<MatrixType > (const FullMatrix<double>        &, \
+                                         const std::vector<unsigned int> &, \
+                                         MatrixType                      &) const
+
+MATRIX_FUNCTIONS(SparseMatrix<double>);
+MATRIX_FUNCTIONS(SparseMatrix<float>);
+
+MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
+MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
+
+#ifdef DEAL_II_USE_PETSC
+MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
+#endif

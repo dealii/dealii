@@ -20,6 +20,8 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 
+template <typename> class Vector;
+template <typename> class FullMatrix;
 class SparsityPattern;
 class CompressedSparsityPattern;
 class BlockSparsityPattern;
@@ -80,17 +82,20 @@ class BlockIndices;
  *   those which are subject to constraints.
  *
  * @item Use only one sparsity pattern and one matrix: doing it this way, the
- *   condense functions add nonzero entries to the sparsity pattern of the
- *   large matrix (with constrained nodes in it) where the condensation process
- *   of the matrix will create additional nonzero elements. In the condensation
- *   process itself, lines and rows subject to constraints are distributed to
- *   the lines and rows of unconstrained nodes. The constrained lines remain in
- *   place, however, unlike in the first possibility described above. In order
- *   not to disturb the solution process, these lines and rows are filled with
- *   zeros and identity on the main diagonal; the appropriate value in the right
- *   hand sides is set to zero. This way, the constrained node will always get
- *   the value zero upon solution of the equation system and will not couple to
- *   other nodes any more.
+ *   condense functions add nonzero entries to the sparsity pattern of the large
+ *   matrix (with constrained nodes in it) where the condensation process of the
+ *   matrix will create additional nonzero elements. In the condensation process
+ *   itself, lines and rows subject to constraints are distributed to the lines
+ *   and rows of unconstrained nodes. The constrained lines remain in place,
+ *   however, unlike in the first possibility described above. In order not to
+ *   disturb the solution process, these lines and rows are filled with zeros
+ *   and an appropriate positive value on the main diagonal (we choose an
+ *   average of the magnitudes of the other diagonal elements, so as to make
+ *   sure that the new diagonal entry has the same order of magnitude as the
+ *   other entries; this preserves the scaling properties of the matrix). The
+ *   appropriate value in the right hand sides is set to zero. This way, the
+ *   constrained node will always get the value zero upon solution of the
+ *   equation system and will not couple to other nodes any more.
  *
  *   This method has the advantage that only one matrix and sparsity pattern is
  *   needed thus using less memory. Additionally, the condensation process is
@@ -138,8 +143,22 @@ class BlockIndices;
  * functions exist in variants for PETSc vectors. However, using them is
  * typically expensive, and should be avoided. You should use the same
  * techniques as mentioned above to avoid their use.
- * 
  *
+ * 
+ * @sect3{Avoiding explicit condensation}
+ *
+ * Sometimes, one wants to avoid condensation at all. This may be the case
+ * since condensation is an expensive operation, or because no condense()
+ * function is defined for the matrix you use (this is, for example, the case
+ * for the PETSc wrapper classes, where we have no access to the underlying
+ * representation of the matrix, and therefore cannot efficiently implement
+ * the condense() operation). In this case, one possibility is to distribute
+ * local entries to the final destinations right at the moment of transferring
+ * them into the global matrices and vectors. For this, one can use the
+ * distribute_local_to_global() functions of this class, which make a
+ * subsequent call to condense() unnecessary.
+ *
+ * 
  * @sect3{Distributing constraints}
  * 
  * After solving the condensed system of equations, the solution vector has to
@@ -153,7 +172,7 @@ class BlockIndices;
  * for unconstrained nodes, and constrained nodes need to get their values in
  * a second step.
  *
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 2004
  */
 class ConstraintMatrix : public Subscriptor
 {
@@ -598,7 +617,111 @@ class ConstraintMatrix : public Subscriptor
     template <class VectorType>
     void set_zero (VectorType &vec) const;
 
+                                     /**
+                                      * This function takes a vector of local
+                                      * contributions (@arg local_vector)
+                                      * corresponding to the degrees of
+                                      * freedom indices given in @arg
+                                      * local_dof_indices and distributes them
+                                      * to the global vector. In most cases,
+                                      * these local contributions will be the
+                                      * result of an integration over a cell
+                                      * or face of a cell. However, as long as
+                                      * @arg local_vector and @arg
+                                      * local_dof_indices have the same number
+                                      * of elements, this function is happy
+                                      * with whatever it is given.
+                                      *
+                                      * In contrast to the similar function in
+                                      * the DoFAccessor class, this function
+                                      * also takes care of constraints,
+                                      * i.e. of one of the elements of @arg
+                                      * local_dof_indices belongs to a
+                                      * constrained node, then rather than
+                                      * writing the corresponding element of
+                                      * @arg local_vector into @arg
+                                      * global_vector, the element is
+                                      * distributed to the entries in the
+                                      * global vector to which this particular
+                                      * degree of freedom is constrained.
+                                      *
+                                      * Thus, by using this function to
+                                      * distribute local contributions to the
+                                      * global object, one saves the call to
+                                      * the condense function after the
+                                      * vectors and matrices are fully
+                                      * assembled.
+                                      */
+    template <typename VectorType>
+    void
+    distribute_local_to_global (const Vector<double>            &local_vector,
+                                const std::vector<unsigned int> &local_dof_indices,
+                                VectorType                      &global_vector) const;
 
+                                     /**
+                                      * This function takes a matrix of local
+                                      * contributions (@arg local_matrix)
+                                      * corresponding to the degrees of
+                                      * freedom indices given in @arg
+                                      * local_dof_indices and distributes them
+                                      * to the global matrix. In most cases,
+                                      * these local contributions will be the
+                                      * result of an integration over a cell
+                                      * or face of a cell. However, as long as
+                                      * @arg local_matrix and @arg
+                                      * local_dof_indices have the same number
+                                      * of elements, this function is happy
+                                      * with whatever it is given.
+                                      *
+                                      * In contrast to the similar function in
+                                      * the DoFAccessor class, this function
+                                      * also takes care of constraints,
+                                      * i.e. of one of the elements of @arg
+                                      * local_dof_indices belongs to a
+                                      * constrained node, then rather than
+                                      * writing the corresponding element of
+                                      * @arg local_matrix into @arg
+                                      * global_matrix, the element is
+                                      * distributed to the entries in the
+                                      * global matrix to which this particular
+                                      * degree of freedom is constrained.
+                                      *
+                                      * With this scheme, we never write into
+                                      * rows or columns of constrained degrees
+                                      * of freedom. In order to make sure that
+                                      * the resulting matrix can still be
+                                      * inverted, we need to do something with
+                                      * the diagonal elements corresponding to
+                                      * constrained nodes. Thus, if a degree
+                                      * of freedom in @arg local_dof_indices
+                                      * is constrained, we distribute the
+                                      * corresponding entries in the matrix,
+                                      * but also add the absolute value of the
+                                      * diagonal entry of the local matrix to
+                                      * the corresponding entry in the global
+                                      * matrix. Since the exact value of the
+                                      * diagonal element is not important (the
+                                      * value of the respective degree of
+                                      * freedom will be overwritten by the
+                                      * distribute() call later on anyway),
+                                      * this guarantees that the diagonal
+                                      * entry is always non-zero, positive,
+                                      * and of the same order of magnitude as
+                                      * the other entries of the matrix.
+                                      *
+                                      * Thus, by using this function to
+                                      * distribute local contributions to the
+                                      * global object, one saves the call to
+                                      * the condense function after the
+                                      * vectors and matrices are fully
+                                      * assembled.
+                                      */
+    template <typename MatrixType>
+    void
+    distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+                                const std::vector<unsigned int> &local_dof_indices,
+                                MatrixType                      &global_matrix) const;
+    
 				     /**
 				      * Print the constraint lines. Mainly for
 				      * debugging purposes.
