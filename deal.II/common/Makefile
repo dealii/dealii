@@ -106,6 +106,7 @@ clean:
 	cd ../lac ; $(MAKE) clean
 	cd ../deal.II ; $(MAKE) clean
 	cd ../doc/auto ; $(MAKE) clean
+	-rm TODO
 
 
 TAGS:
