@@ -5,35 +5,17 @@
 #include <sys/time.h>
 
 
-
-#if #cpu(transputer)
-#  define TIMER TimeNowLow()
-#  define DIVIDE CLK_TCK_LOW
-#endif
-#ifdef _ARCH_PPC
-#  if #system(parix)
-#    define TIMER TimeNow()
-#    define DIVIDE CLOCK_TICK
-#  endif
-#  if #system(aix)
-#    define DIVIDE CLOCKS_PER_SEC
-#  endif
-#endif
-#if #cpu(sparc)
-#  define DIVIDE 1.e6
-#endif
-
 #ifndef TIMER
 #define TIMER clock()
-#endif
-
-#ifndef OVER_TIME
-#define OVER_TIME 4294967296./DIVIDE
 #endif
 
 #ifndef DIVIDE
 #define DIVIDE 1.e6
 #endif
+#ifndef OVER_TIME
+#define OVER_TIME 4294967296./DIVIDE
+#endif
+
 
 
 const double Timer::overtime = OVER_TIME;
