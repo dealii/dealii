@@ -46,7 +46,7 @@
  * work for you, try to change this value.
  */
 template <class VECTOR = Vector<double> >
-class SolverBicgstab : public Subscriptor, private Solver<VECTOR>
+class SolverBicgstab : public Solver<VECTOR>
 {
   public:
     				     /**

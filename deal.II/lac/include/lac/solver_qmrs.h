@@ -52,7 +52,7 @@
  * @author Guido Kanschat, 1999
  */
 template <class VECTOR = Vector<double> >
-class SolverQMRS : public Subscriptor, private Solver<VECTOR>
+class SolverQMRS : public Solver<VECTOR>
 {
   public:
     				     /**

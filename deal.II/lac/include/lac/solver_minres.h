@@ -51,7 +51,7 @@
  * @author Thomas Richter, 2000
  */
 template <class VECTOR = Vector<double> >
-class SolverMinRes : public Subscriptor, private Solver<VECTOR>
+class SolverMinRes : public Solver<VECTOR>
 {
   public:
     				     /**

@@ -75,7 +75,7 @@
  * @author Wolfgang Bangerth
  */
 template <class VECTOR = Vector<double> >
-class SolverGMRES : public Subscriptor, private Solver<VECTOR>
+class SolverGMRES : public Solver<VECTOR>
 {
   public:
     				     /**

@@ -41,7 +41,7 @@
  * @author Ralf Hartmann
  */
 template <class VECTOR = Vector<double> >
-class SolverRichardson : public Subscriptor, private Solver<VECTOR>
+class SolverRichardson : public Solver<VECTOR>
 {
   public:
 				     /**
