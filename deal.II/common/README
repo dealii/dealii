@@ -87,9 +87,10 @@ Bash-users will know what to do instead. These options then will be
 handed to the compiler and the linker during translation of the
 library and your programs.
 
-A list of necessary flags follows:
-
-XXXX
+If you work on Linux, you need to *remove* the flag -fno-vtable-thunks
+from the file /common/Make.global-options to allow for proper
+compilations. If you forget to do so, you will get linker errors about
+missing vtable symbols.
 
 
 4) Problems, questions, further information:
