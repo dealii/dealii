@@ -61,13 +61,14 @@ namespace PETScWrappers
                                           * @p{n} and initialize all
                                           * elements with zero.
                                           *
-                                          * The constructor is made explicit to
-                                          * avoid accidents like this:
-                                          * @p{v=0;}. Presumably, the user wants
-                                          * to set every element of the vector to
-                                          * zero, but instead, what happens is
-                                          * this call: @p{v=Vector<number>(0);},
-                                          * i.e. the vector is replaced by one of
+                                          * The constructor is made explicit
+                                          * to avoid accidents like this:
+                                          * @p{v=0;}. Presumably, the user
+                                          * wants to set every element of the
+                                          * vector to zero, but instead, what
+                                          * happens is this call:
+                                          * @p{v=Vector<number>(0);}, i.e. the
+                                          * vector is replaced by one of
                                           * length zero.
                                           */
         explicit Vector (const unsigned int n,
@@ -95,6 +96,14 @@ namespace PETScWrappers
                          const MPI_Comm    &communicator);
 
                                          /**
+                                          * Copy the given vector. Resize the
+                                          * present vector if necessary. Also
+                                          * take over the MPI communicator of
+                                          * @arg v.
+                                          */
+        Vector & operator = (const Vector &v);
+
+                                         /**
                                           * Set all components of the vector to
                                           * the given number @p{s}. Simply pass
                                           * this down to the base class, but we
@@ -110,20 +119,76 @@ namespace PETScWrappers
                                           * (as opposed to those of the PETSc
                                           * vector wrapper class) into this
                                           * object.
+                                          *
+                                          * Contrary to the case of sequential
+                                          * vectors, this operators requires
+                                          * that the present vector already
+                                          * has the correct size, since we
+                                          * need to have a partition and a
+                                          * communicator present which we
+                                          * otherwise can't get from the
+                                          * source vector.
                                           */
         template <typename number>
         Vector & operator = (const ::Vector<number> &v);
-      
+
+                                         /**
+                                          * Change the dimension of the vector
+                                          * to @arg N. It is unspecified how
+                                          * resizing the vector affects the
+                                          * memory allocation of this object;
+                                          * i.e., it is not guaranteed that
+                                          * resizing it to a smaller size
+                                          * actually also reduces memory
+                                          * consumption, or if for efficiency
+                                          * the same amount of memory is used
+                                          *
+                                          * @arg local_size denotes how many
+                                          * of the @arg N values shall be
+                                          * stored locally on the present
+                                          * process.
+                                          * for less data.
+                                          *
+                                          * @arg communicator denotes the MPI
+                                          * communicator henceforth to be used
+                                          * for this vector.
+                                          * 
+                                          * If @arg fast is false, the vector
+                                          * is filled by zeros. Otherwise, the
+                                          * elements are left an unspecified
+                                          * state.
+                                          */ 
+        void reinit (const unsigned int N,
+                     const unsigned int local_size,
+                     const MPI_Comm    &communicator,
+                     const bool         fast = false);
+    
+                                         /**
+                                          * Change the dimension to that of
+                                          * the vector @arg v, and also take
+                                          * over the partitioning into local
+                                          * sizes as well as the MPI
+                                          * communicator. The same applies as
+                                          * for the other @p{reinit} function.
+                                          *
+                                          * The elements of @arg v are not
+                                          * copied, i.e. this function is the
+                                          * same as calling
+                                          * <tt>reinit(v.size(),
+                                          * v.local_size(), fast)</tt>.
+                                          */
+        void reinit (const Vector &v,
+                     const bool    fast = false);
+
       protected:
                                          /**
-                                          * Create a vector of length @p{n}. For
-                                          * this class, we create a parallel
-                                          * vector. @arg n denotes the total
-                                          * size of the vector to be
-                                          * created. @arg local_size denotes how
-                                          * many of these elements shall be
-                                          * stored locally. The last argument is
-                                          * ignored for sequential vectors.
+                                          * Create a vector of length
+                                          * @p{n}. For this class, we create a
+                                          * parallel vector. @arg n denotes
+                                          * the total size of the vector to be
+                                          * created. @arg local_size denotes
+                                          * how many of these elements shall
+                                          * be stored locally.
                                           */
         virtual void create_vector (const unsigned int n,
                                     const unsigned int local_size);
@@ -150,7 +215,7 @@ namespace PETScWrappers
     {
       Vector::create_vector (v.size(), local_size);
 
-      VectorBase::operator = (v);
+      *this = v;
     }
 
   
@@ -165,16 +230,81 @@ namespace PETScWrappers
     }
   
 
+
+    inline
+    Vector &
+    Vector::operator = (const Vector &v)
+    {
+                                       // if the vectors have different sizes,
+                                       // then first resize the present one
+      if (size() != v.size())
+        reinit (v.size(), v.local_size(), v.communicator, true);
+    
+      const int ierr = VecCopy (v.vector, vector);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+      return *this;
+    }
+
+
+
     template <typename number>
     inline
     Vector &
-    Vector::operator = (const ::Vector<number> &v)
+    Vector::operator = (const ::Vector<number> &v) 
     {
-      VectorBase::operator = (v);
+      Assert (size() == v.size(),
+              ExcNonMatchingSizes (size(), v.size()));
+
+                                       // the following isn't necessarily fast,
+                                       // but this is due to the fact that PETSc
+                                       // doesn't offer an inlined access
+                                       // operator.
+                                       //
+                                       // if someone wants to contribute some
+                                       // code: to make this code faster, one
+                                       // could either first convert all values
+                                       // to PetscScalar, and then set them all
+                                       // at once using VecSetValues. This has
+                                       // the drawback that it could take quite
+                                       // some memory, if the vector is large,
+                                       // and it would in addition allocate
+                                       // memory on the heap, which is
+                                       // expensive. an alternative would be to
+                                       // split the vector into chunks of, say,
+                                       // 128 elements, convert a chunk at a
+                                       // time and set it in the output vector
+                                       // using VecSetValues. since 128 elements
+                                       // is small enough, this could easily be
+                                       // allocated on the stack (as a local
+                                       // variable) which would make the whole
+                                       // thing much more efficient.
+                                       //
+                                       // a second way to make things faster is
+                                       // for the special case that
+                                       // number==PetscScalar. we could then
+                                       // declare a specialization of this
+                                       // template, and omit the conversion. the
+                                       // problem with this is that the best we
+                                       // can do is to use VecSetValues, but
+                                       // this isn't very efficient either: it
+                                       // wants to see an array of indices,
+                                       // which in this case a) again takes up a
+                                       // whole lot of memory on the heap, and
+                                       // b) is totally dumb since its content
+                                       // would simply be the sequence
+                                       // 0,1,2,3,...,n. the best of all worlds
+                                       // would probably be a function in Petsc
+                                       // that would take a pointer to an array
+                                       // of PetscScalar values and simply copy
+                                       // n elements verbatim into the vector...
+      for (unsigned int i=0; i<v.size(); ++i)
+        (*this)(i) = v(i);
+
+      compress ();
 
       return *this;
-    }
-    
+    }    
   }
   
 }

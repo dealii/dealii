@@ -49,47 +49,6 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::reinit (const unsigned int n,
-                      const bool         fast,
-                      const unsigned int local_sz)
-  {
-                                     // only do something if the sizes
-                                     // mismatch
-    if ((size() != n) || (local_size() != local_sz))
-      {
-                                         // FIXME: I'd like to use this here,
-                                         // but somehow it leads to odd errors
-                                         // somewhere down the line in some of
-                                         // the tests:
-//         const int ierr = VecSetSizes (vector, n, n);
-//         AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-                                         // so let's go the slow way:
-        int ierr;
-        ierr = VecDestroy (vector);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        create_vector (n, local_sz);
-      }
-
-                                     // finally clear the new vector if so
-                                     // desired
-    if (fast == false)
-      *this = 0;
-  }
-
-
-
-  void
-  VectorBase::reinit (const VectorBase &v,
-                      const bool        fast)
-  {
-    reinit (v.size(), fast);
-  }
-  
-
-  
-  void
   VectorBase::clear ()
   {
     const PetscScalar zero = 0;
@@ -108,22 +67,6 @@ namespace PETScWrappers
     return *this;
   }
 
-
-
-  VectorBase &
-  VectorBase::operator = (const VectorBase &v)
-  {
-                                     // if the vectors have different sizes,
-                                     // then first resize the present one
-    if (size() != v.size())
-      reinit (v.size(), true);
-    
-    const int ierr = VecCopy (v.vector, vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-  
 
 
   bool
@@ -595,10 +538,15 @@ namespace PETScWrappers
   VectorBase::equ (const PetscScalar a,
                    const VectorBase     &v)
   {
+    Assert (size() == v.size(),
+            ExcNonMatchingSizes (size(), v.size()));
+
                                      // there is no simple operation for this
                                      // in PETSc. there are multiple ways to
                                      // emulate it, we choose this one:
-    *this = v;
+    const int ierr = VecCopy (v.vector, vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
     *this *= a;
   }
   
@@ -610,10 +558,15 @@ namespace PETScWrappers
                    const PetscScalar b,
                    const VectorBase     &w)
   {
+    Assert (size() == v.size(),
+            ExcNonMatchingSizes (size(), v.size()));
+
                                      // there is no simple operation for this
                                      // in PETSc. there are multiple ways to
                                      // emulate it, we choose this one:
-    *this = v;
+    const int ierr = VecCopy (v.vector, vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
     sadd (a, b, w);
   }
 

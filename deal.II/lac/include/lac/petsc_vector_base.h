@@ -209,47 +209,6 @@ namespace PETScWrappers
       void compress ();
 
                                        /**
-                                        * Change the dimension of the vector
-                                        * to @arg N. It is unspecified how
-                                        * resizing the vector affects the
-                                        * memory allocation of this object;
-                                        * i.e., it is not guaranteed that
-                                        * resizing it to a smaller size
-                                        * actually also reduces memory
-                                        * consumption, or if for efficiency
-                                        * the same amount of memory is used
-                                        * for less data.
-                                        *
-                                        * On @arg fast is false, the vector is
-                                        * filled by zeros. Otherwise, the
-                                        * elements are left an unspecified
-                                        * state.
-                                        *
-                                        * For parallel vectors, @arg
-                                        * local_size denotes how many of the
-                                        * @arg N values shall be stored
-                                        * locally on the present process. This
-                                        * argument is ignored for sequantial
-                                        * vectors.
-                                        */ 
-      void reinit (const unsigned int N,
-                   const bool         fast = false,
-                   const unsigned int local_size = 0);
-    
-                                       /**
-                                        * Change the dimension to that of the
-                                        * vector @p{V}. The same applies as
-                                        * for the other @p{reinit} function.
-                                        *
-                                        * The elements of @p{V} are not
-                                        * copied, i.e.  this function is the
-                                        * same as calling @p{reinit (V.size(),
-                                        * fast)}.
-                                        */
-      void reinit (const VectorBase &V,
-                   const bool        fast = false);
-
-                                       /**
                                         * Set all entries to zero. Equivalent
                                         * to @p{v = 0}, but more obvious and
                                         * faster.  Note that this function
@@ -263,22 +222,7 @@ namespace PETScWrappers
                                         * Set all components of the vector to
                                         * the given number @p{s}.
                                         */
-      VectorBase & operator = (const PetscScalar s);
-    
-                                       /**
-                                        * Copy the given vector. Resize the
-                                        * present vector if necessary.
-                                        */
-      VectorBase & operator = (const VectorBase &v);
-
-                                       /**
-                                        * Copy the values of a deal.II vector
-                                        * (as opposed to those of the PETSc
-                                        * vector wrapper class) into this
-                                        * object.
-                                        */
-      template <typename number>
-      VectorBase & operator = (const ::Vector<number> &v);
+      VectorBase & operator = (const PetscScalar s);    
       
                                        /**
                                         * Test for equality. This function
@@ -588,7 +532,14 @@ namespace PETScWrappers
                       int,
                       << "An error with error number " << arg1
                       << " occured while calling a PETSc function");
-
+                                       /**
+                                        * Exception
+                                        */
+      DeclException2 (ExcNonMatchingSizes,
+                      int, int,
+                      << "The sizes " << arg1 << " and " << arg2
+                      << " are supposed to be equal, but are not.");
+      
     protected:
                                        /**
                                         * A generic vector object in
@@ -634,19 +585,6 @@ namespace PETScWrappers
                                         * refer to is constant.
                                         */
       mutable LastAction::Values last_action;
-
-                                       /**
-                                        * Create a vector of length @p{n}. For
-                                        * this class, we create a parallel
-                                        * vector. @arg n denotes the total
-                                        * size of the vector to be
-                                        * created. @arg local_size denotes how
-                                        * many of these elements shall be
-                                        * stored locally. The last argument is
-                                        * ignored for sequential vectors.
-                                        */
-      virtual void create_vector (const unsigned int n,
-                                  const unsigned int local_size = 0) = 0;
 
                                        /**
                                         * Make the reference class a friend.
@@ -876,60 +814,6 @@ namespace PETScWrappers
   
 
 
-  template <typename number>
-  VectorBase &
-  VectorBase::operator = (const ::Vector<number> &v) 
-  {
-    reinit (v.size());
-                                     // the following isn't necessarily fast,
-                                     // but this is due to the fact that PETSc
-                                     // doesn't offer an inlined access
-                                     // operator.
-                                     //
-                                     // if someone wants to contribute some
-                                     // code: to make this code faster, one
-                                     // could either first convert all values
-                                     // to PetscScalar, and then set them all
-                                     // at once using VecSetValues. This has
-                                     // the drawback that it could take quite
-                                     // some memory, if the vector is large,
-                                     // and it would in addition allocate
-                                     // memory on the heap, which is
-                                     // expensive. an alternative would be to
-                                     // split the vector into chunks of, say,
-                                     // 128 elements, convert a chunk at a
-                                     // time and set it in the output vector
-                                     // using VecSetValues. since 128 elements
-                                     // is small enough, this could easily be
-                                     // allocated on the stack (as a local
-                                     // variable) which would make the whole
-                                     // thing much more efficient.
-                                     //
-                                     // a second way to make things faster is
-                                     // for the special case that
-                                     // number==PetscScalar. we could then
-                                     // declare a specialization of this
-                                     // template, and omit the conversion. the
-                                     // problem with this is that the best we
-                                     // can do is to use VecSetValues, but
-                                     // this isn't very efficient either: it
-                                     // wants to see an array of indices,
-                                     // which in this case a) again takes up a
-                                     // whole lot of memory on the heap, and
-                                     // b) is totally dumb since its content
-                                     // would simply be the sequence
-                                     // 0,1,2,3,...,n. the best of all worlds
-                                     // would probably be a function in Petsc
-                                     // that would take a pointer to an array
-                                     // of PetscScalar values and simply copy
-                                     // n elements verbatim into the vector...
-    for (unsigned int i=0; i<v.size(); ++i)
-      (*this)(i) = v(i);
-
-    compress ();
-
-    return *this;
-  }
 }
 
 #endif // DEAL_II_USE_PETSC

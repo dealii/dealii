@@ -43,13 +43,51 @@ namespace PETScWrappers
     VectorBase::operator = (v);
   }
 
+
+
+  void
+  Vector::reinit (const unsigned int n,
+                  const bool         fast)
+  {
+                                     // only do something if the sizes
+                                     // mismatch
+    if (size() != n)
+      {
+                                         // FIXME: I'd like to use this here,
+                                         // but somehow it leads to odd errors
+                                         // somewhere down the line in some of
+                                         // the tests:
+//         const int ierr = VecSetSizes (vector, n, n);
+//         AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                         // so let's go the slow way:
+        int ierr;
+        ierr = VecDestroy (vector);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        create_vector (n);
+      }
+
+                                     // finally clear the new vector if so
+                                     // desired
+    if (fast == false)
+      *this = 0;
+  }
+
+
+
+  void
+  Vector::reinit (const Vector &v,
+                  const bool    fast)
+  {
+    reinit (v.size(), fast);
+  }
+  
+
   
   void
-  Vector::create_vector (const unsigned int n,
-                         const unsigned int local_size)
+  Vector::create_vector (const unsigned int n)
   {
-    Assert (local_size < n, ExcIndexRange (local_size, 0, n));
-    
     const int ierr
       = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
