@@ -65,6 +65,18 @@ class dSMatrix;
  *   This function uses the #LaplaceMatrix# class.
  * \end{itemize}
  *
+ * All created matrices are `raw': they are not condensed, i.e. hanging
+ * nodes are not eliminated. The reason is that you may want to add
+ * several matrices and could then condense afterwards only once,
+ * instead of for every matrix. To actually do computations with these
+ * matrices, you have to condense the matrix using the
+ * #ConstraintMatrix::condense# function; you also have to condense the
+ * right hand side accordingly and distribute the solution afterwards.
+ *
+ * If you want to use boundary conditions, you have to use a function
+ * like #ProblemBase<>::apply_dirichlet_bc# to matrix and right hand
+ * side.
+ *
  *
  * \subsection{Right hand sides}
  *
