@@ -24,6 +24,6 @@
 # character to interpose another module into the current module.  This
 # can be useful for creating a module that consists of many directories
 # spread out over the entire source repository.
-newdeal &common &base &lac &deal.II &doc
+wholedeal &deal.II &tests &projects
 mg reports/multigrid
 gk projects/gk
