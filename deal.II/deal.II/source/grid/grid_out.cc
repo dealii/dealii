@@ -613,8 +613,9 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 {
   AssertThrow (out, ExcIO());
 
-  const unsigned int n_points=
+  const unsigned int n_additional_points=
     gnuplot_flags.n_boundary_face_points;
+  const unsigned int n_points=GeometryInfo<dim>::vertices_per_face+n_additional_points;
 
   typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
   const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
@@ -628,8 +629,10 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
   if (mapping!=0)
     {
       std::vector<Point<dim-1> > boundary_points(n_points);
-      for (unsigned int i=0; i<n_points; ++i)
-	boundary_points[i](0)= 1.*(i+1)/(n_points+1);
+      boundary_points[0][0]=0;
+      boundary_points[n_points-1][0]=1;      
+      for (unsigned int i=1; i<n_points-1; ++i)
+        boundary_points[i](0)= 1.*i/(n_points-1);
 
       Quadrature<dim-1> quadrature(boundary_points);
       q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
@@ -695,11 +698,6 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 		      face = cell->face(face_no);
 		    if (face->at_boundary())
 		      {
-			out << face->vertex(0)
-			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id())
-			    << std::endl;
-
                                                          // compute
                                                          // offset of
                                                          // quadrature
@@ -735,12 +733,8 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 			      << ' ' << cell->level()
 			      << ' ' << static_cast<unsigned int>(cell->material_id())
 			      << std::endl;
-			
-			out << face->vertex(1)
-			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id())
-			    << std::endl
-			    << std::endl
+
+			out << std::endl
 			    << std::endl;
 		      }
 		    else
