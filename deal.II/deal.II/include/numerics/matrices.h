@@ -24,6 +24,7 @@ template<typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 template <typename Number> class BlockVector;
 
+template <int dim> class Mapping;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
@@ -31,13 +32,29 @@ template <int dim> class FEValues;
 
 
 /**
- * Provide a class which assembles certain standard matrices for a given
- * triangulation, using a given finite element and a quadrature formula.
- * All functions are static, so it is not necessary to create an object
- * of this type, though you may do so.
+ * Provide a class which assembles certain standard matrices for a
+ * given triangulation, using a given finite element, a given mapping
+ * and a quadrature formula.  All functions are static, so it is not
+ * necessary to create an object of this type, though you may do so.
  *
  *
  * @sect3{Conventions for all functions}
+ *
+ * There exist two versions of each function. One with a @ref{Mapping}
+ * argument and one without. If a code uses a mapping different from
+ * @ref{MappingQ1} the functions @em{with} mapping argument should be
+ * used. Code that uses only @ref{MappingQ1} may also use the
+ * functions @em{without} @ref{Mapping} argument. Each of these latter
+ * functions create a @ref{MappingQ1} object and just call the
+ * respective functions with that object as mapping argument. The
+ * functions without @ref{Mapping} argument still exist to ensure
+ * backward compatibility. Nevertheless it is advised to change the
+ * user's codes to store a specific @ref{Mapping} object and to use
+ * the functions that take this @p{Mapping} object as argument. This
+ * gives the possibility to easily extend the user codes to work also
+ * on mappings of higher degree, this just by exchanging
+ * @ref{MappingQ1} by, for example, a @ref{MappingQ} or another
+ * @ref{Mapping} object of interest.
  *
  * All functions take a sparse matrix object to hold the matrix to be
  * created. The functions assume that the matrix is initialized with a
@@ -48,9 +65,24 @@ template <int dim> class FEValues;
  *
  * Furthermore it is assumed that no relevant data is in the matrix. All
  * entries will be overwritten. Entries which are not needed by the matrix
- * (and were thus added 'by hand' after @p{make_sparsity_pattern} was called)
- * are not touched and in special are not set to zero, so you have to care
- * yourself about that if you really need these entries.
+ * are not touched and in special are not set to zero.
+ * In all cases, the elements of the matrix to be assembled are simply
+ * summed up from the contributions of each cell. Therefore you may want
+ * to clear the matrix before assemblage.
+ *
+ * All created matrices are `raw': they are not condensed,
+ * i.e. hanging nodes are not eliminated. The reason is that you may
+ * want to add several matrices and could then condense afterwards
+ * only once, instead of for every matrix. To actually do computations
+ * with these matrices, you have to condense the matrix using the
+ * @ref{ConstraintMatrix}@p{::condense} function; you also have to
+ * condense the right hand side accordingly and distribute the
+ * solution afterwards.
+ *
+ * If you want to use boundary conditions with the matrices generated
+ * by the functions of this class, you have to use a function like
+ * @p{ProblemBase<>::apply_dirichlet_bc} to matrix and right hand
+ * side.
  *
  *
  * @sect3{Supported matrices}
@@ -58,88 +90,56 @@ template <int dim> class FEValues;
  * At present there are functions to create the following matrices:
  * @begin{itemize}
  * @item @p{create_mass_matrix}: create the matrix with entries
- *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$. Here, the $\phi_i$
- *   are the basis functions of the finite element space given.
- *   This function uses the @ref{MassMatrix} class.
+ *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ by numerical
+ *   quadrature. Here, the $\phi_i$ are the basis functions of the
+ *   finite element space given.
  *
- *   Two ways to create this matrix are offered. The first one uses
- *   numerical quadrature and the @ref{MassMatrix} class. In this case,
- *   a coefficient may be given to evaluate
+ *   A coefficient may be given to evaluate
  *   $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$ instead.
- *   This way of setting up the mass matrix is quite general, but has
- *   some drawbacks, see the documentation of the @ref{MassMatrix} class.
  *
- *   The other way uses exact integration, as offered by the finite
- *   element class used. This way you can avoid quadrature errors and
- *   the assemblage is much faster. However, no coefficient can be
- *   given.
+ * @item @p{create_laplace_matrix}: create the matrix with entries
+ *   $m_{ij} = \int_\Omega \nabla\phi_i(x) \nabla\phi_j(x) dx$ by
+ *   numerical quadrature.
  *
- *   Note that the effect of the two ways of setting up the mass
- *   matrix is not the same if you use finite elements which are
- *   composed of several subelements. In this case, using the
- *   quadrature free way (without coefficient) results in a matrix
- *   which does not couple the subelements, as described in the
- *   @ref{FESystem}@p{::get_local_mass_matrix} documentation, while the
- *   way using quadrature sets up the full matrix, i.e. with the
- *   cross coupling of shape functions belonging to different subelements.
+ *   Again, a coefficient may be given to evaluate
+ *   $m_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \phi_j(x) dx$ instead.
+ * @end{itemize}
  *
- *   If the finite element for which the mass matrix is to be built
- *   has more than one component, the resulting matrix will not couple
- *   the different components. It will furthermore accept a single
- *   coefficient through the @ref{Function} parameter for all
- *   components. If you want different coefficients for the different
- *   parameters, you have to assemble the matrix yourself, sorry; the
- *   implementation of the function will serve as a good starting
- *   point, though. (You may also modify the implementation to accept
- *   vector-valued functions and send this implementation to us -- we
- *   will then include this implementation into the library.)
+ * Make sure that the order of the @ref{Quadrature} formula given to these
+ * functions is sufficiently high to compute the matrices with the
+ * required accuracy. For the choice of this quadrature rule you need
+ * to take into account the polynomial degree of the @ref{FiniteElement}
+ * basis functions, the roughness of the coefficient @p{a}, as well as
+ * the degree of the given @p{Mapping}.
  *
- * @item @p{create_laplace_matrix}: there are two versions of this; the
- *   one which takes the @ref{Function} object creates
- *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$,
- *   $a$ being the given function, while the other one assumes that
- *   $a=1$ which enables some optimizations. In fact the two versions
- *   are in one function, the coefficient being given as a defaulted
- *   argument, which is a pointer to a function and defaults to zero.
- *   This function uses the @ref{LaplaceMatrix} class.
+ * Note, that for system elements the mass matrix and the laplace
+ * matrix is implemented such that each components couples only with
+ * itself. I.e. there is no coupling of shape functions belonging to
+ * different components.
  *
- *   If the finite element in use presently has more than only one
- *   component, this function may not be overly useful. It assembles a
- *   Laplace matrix block for each component (with the same
- *   coefficient for each component). These blocks are not coupled.  *
- *   @end{itemize}
- *
- * All created matrices are `raw': they are not condensed, i.e. hanging
- * nodes are not eliminated. The reason is that you may want to add
- * several matrices and could then condense afterwards only once,
- * instead of for every matrix. To actually do computations with these
- * matrices, you have to condense the matrix using the
- * @ref{ConstraintMatrix}@p{::condense} function; you also have to condense the
- * right hand side accordingly and distribute the solution afterwards.
- *
- * In all cases, the elements of the matrix to be assembled are simply
- * summed up from the contributions of each cell. Therefore you may want
- * to clear the matrix before assemblage.
- *
- * If you want to use boundary conditions, you have to use a function
- * like @p{ProblemBase<>::apply_dirichlet_bc} to matrix and right hand
- * side.
+ * If the finite element for which the mass matrix or the laplace
+ * matrix is to be built has more than one component, this function
+ * accepts a single coefficient as well as a vector valued coefficient
+ * function. For the latter case make sure that the number of
+ * components coincides with the number of components of the system
+ * finite element.
  *
  *
  * @sect3{Matrices on the boundary}
  *
  * The @p{create_boundary_mass_matrix} creates the matrix with entries
- * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the union
- * of boundary parts with indicators contained in a set passed to the
- * function (i.e. if you want to set up the mass matrix for the parts of
- * the boundary with indicators zero and 2, you pass the function a set
- * of @p{unsigned char}s as parameter @p{boundary_parts} containing the elements
- * zero and 2). The $\phi_i$ are the basis functions which have at least
- * part of their support om $\Gamma$. The mapping between row and column
- * indices in the mass matrix and the right hand side and the global degree
- * of freedom numbers of the respective basis functions on the whole domain
- * is returned as a vector of numbers which has the same size as the dimension
- * of matrix and right hand side.
+ * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the
+ * union of boundary parts with indicators contained in a
+ * @p{FunctionMap} passed to the function (i.e. if you want to set up
+ * the mass matrix for the parts of the boundary with indicators zero
+ * and 2, you pass the function a map of @p{unsigned char}s as
+ * parameter @p{boundary_functions} containing the keys zero and
+ * 2). The $\phi_i$ are the basis functions which have at least part
+ * of their support on $\Gamma$. The mapping
+ * @p{dof_to_boundary_mapping} required by this function maps global
+ * DoF numbers to a numbering of the degrees of freedom located on the
+ * boundary, and can be obtained using the function
+ * @p{DoFTools::map_dof_to_boundary_indices}.
  *
  * Since in most cases we are not interested in the pure mass matrix on the
  * boundary, but rather need it to compute the projection of a function to
@@ -153,35 +153,33 @@ template <int dim> class FEValues;
  * The object describing the exact form of the boundary is obtained from the
  * triangulation object.
  *
+ *
  * @sect3{Right hand sides}
  *
  * In many cases, you will not only want to build the matrix, but also
  * a right hand side, which will give a vector with
  * $f_i = \int_\Omega f(x) \phi_i(x) dx$. For this purpose, each function
  * exists in two versions, one only building the matrix and one also
- * building the right hand side vector. (The @p{create_mass_matrix} function
- * which does not use quadrature does not offer a version to evaluate a right
- * hand side also, since this needs quadrature anyway. Take look at the
- * @ref{VectorTools} class to find a function to set up a right hand side vector
- * only.)
+ * building the right hand side vector. If you want to create a right
+ * hand side vector without creating a matrix, you can use the
+ * @ref{VectorTools::create_right_hand_side} function. The use of the
+ * latter may be useful if you want to create many right hand side
+ * vectors.
  *
- * Creation of the right hand side
- * is the same for all operators and therefore for all of the functions
- * below. It would be most orthogonal to write one single function which
- * builds up the right hand side and not provide many functions doing
- * the same thing. However, this may result in a heavy performance
- * penalty, since then many values of a certain finite element have to
- * be computed twice, so it is more economical to  implement it more than
- * once. If you only want to create a right hand side as above, there is
- * a function in the @p{VectorCreator} class. The use of the latter may be
- * useful if you want to create many right hand side vectors.
+ * Creation of the right hand side is the same for all operators and
+ * therefore for all of the functions below. It would be most
+ * orthogonal to write one single function which builds up the right
+ * hand side and not provide many functions doing the same
+ * thing. However, this may result in a heavy performance penalty,
+ * since then many values of a certain finite element have to be
+ * computed twice, so it is more economical to implement it more than
+ * once.
  *
+ * All functions in this collection use the finite element given to
+ * the @ref{DoFHandler} object the last time that the degrees of
+ * freedom were distributed on the triangulation.
  *
- * All functions in this collection use the finite elemen given to the
- * @ref{DoFHandler} object the last time that the degrees of freedom were
- * distributed on the triangulation.
- *
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
 template <int dim>
 class MatrixCreator
@@ -209,6 +207,17 @@ class MatrixCreator
 				      * See the general doc of this class
 				      * for more information.
 				      */
+    static void create_mass_matrix (const Mapping<dim>       &mapping,
+				    const DoFHandler<dim>    &dof,
+				    const Quadrature<dim>    &q,
+				    SparseMatrix<double>     &matrix,
+				    const Function<dim>      *a = 0);
+
+				     /**
+				      * Calls the @p{create_mass_matrix}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<double>     &matrix,
@@ -223,13 +232,26 @@ class MatrixCreator
 				      * See the general doc of this class
 				      * for more information.
 				      */
-    static void create_mass_matrix (const DoFHandler<dim>    &dof,
+    static void create_mass_matrix (const Mapping<dim>       &mapping,
+				    const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<double>     &matrix,
 				    const Function<dim>      &rhs,
 				    Vector<double>           &rhs_vector,
 				    const Function<dim>      *a = 0);
 
+				     /**
+				      * Calls the @p{create_mass_matrix}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    static void create_mass_matrix (const DoFHandler<dim>    &dof,
+				    const Quadrature<dim>    &q,
+				    SparseMatrix<double>     &matrix,
+				    const Function<dim>      &rhs,
+				    Vector<double>           &rhs_vector,
+				    const Function<dim>      *a = 0);
+    
 				     /**
 				      * Assemble the mass matrix and a right
 				      * hand side vector along the boundary.
@@ -245,12 +267,26 @@ class MatrixCreator
 				      * See the general doc of this class
 				      * for more information.
 				      */
+    static void create_boundary_mass_matrix (const Mapping<dim>       &mapping,
+					     const DoFHandler<dim>    &dof,
+					     const Quadrature<dim-1>  &q,
+					     SparseMatrix<double>     &matrix,
+					     const FunctionMap        &boundary_functions,
+					     Vector<double>           &rhs_vector,
+					     std::vector<unsigned int>&dof_to_boundary_mapping,
+					     const Function<dim>      *a = 0);
+
+				     /**
+				      * Calls the @p{create_boundary_mass_matrix}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
     static void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim-1>  &q,
 					     SparseMatrix<double>     &matrix,
-					     const FunctionMap        &rhs,
+					     const FunctionMap        &boundary_functions,
 					     Vector<double>           &rhs_vector,
-					     std::vector<unsigned int>&vec_to_dof_mapping,
+					     std::vector<unsigned int>&dof_to_boundary_mapping,
 					     const Function<dim>      *a = 0);
 
 				     /**
@@ -260,6 +296,17 @@ class MatrixCreator
 				      * 
 				      * See the general doc of this class
 				      * for more information.
+				      */
+    static void create_laplace_matrix (const Mapping<dim>       &mapping,
+				       const DoFHandler<dim>    &dof,
+				       const Quadrature<dim>    &q,
+				       SparseMatrix<double>     &matrix,
+				       const Function<dim>      *a = 0);
+    
+				     /**
+				      * Calls the @p{create_laplace_matrix}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
 				      */
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
@@ -286,6 +333,19 @@ class MatrixCreator
 				      * 
 				      * See the general doc of this class
 				      * for more information.
+				      */
+    static void create_laplace_matrix (const Mapping<dim>       &mapping,
+				       const DoFHandler<dim>    &dof,
+				       const Quadrature<dim>    &q,
+				       SparseMatrix<double>     &matrix,
+				       const Function<dim>      &rhs,
+				       Vector<double>           &rhs_vector,
+				       const Function<dim>      *a = 0);
+
+				     /**
+				      * Calls the @p{create_laplace_matrix}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
 				      */
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,

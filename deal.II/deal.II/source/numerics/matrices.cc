@@ -44,11 +44,11 @@ using namespace std;
 static const MappingQ1<deal_II_dimension> mapping_q1;
 
 
-
-//TODO:[RH,GK] maybe re-create the create_mass_matrix function with 2 args
-
+// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
+// TODO:[WB] implement multithreading for this function.
 template <int dim>
-void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
+void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
+					     const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim> * const coefficient)
@@ -57,7 +57,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
 
-  FEValues<dim> fe_values (dof.get_fe(), q, update_flags);
+  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
@@ -116,9 +116,22 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 };
 
 
-
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
+					     const Quadrature<dim>    &q,
+					     SparseMatrix<double>     &matrix,
+					     const Function<dim> * const coefficient)
+{
+  static const MappingQ1<dim> mapping;
+  create_mass_matrix(mapping, dof, q, matrix, coefficient);
+}
+
+
+// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
+// TODO:[WB] implement multithreading for this function.
+template <int dim>
+void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
+					     const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim>      &rhs,
@@ -131,7 +144,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
 
-  FEValues<dim> fe_values (dof.get_fe(), q, update_flags);
+  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
@@ -206,6 +219,18 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 };
 
 
+template <int dim>
+void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
+					     const Quadrature<dim>    &q,
+					     SparseMatrix<double>     &matrix,
+					     const Function<dim>      &rhs,
+					     Vector<double>           &rhs_vector,
+					     const Function<dim> * const coefficient)
+{
+  static const MappingQ1<dim> mapping;
+  create_mass_matrix(mapping, dof, q, matrix, rhs, rhs_vector, coefficient);
+}
+
 
 #if deal_II_dimension == 1
 
@@ -221,14 +246,32 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>       &,
   Assert (false, ExcNotImplemented());
 };
 
+
+template <>
+void MatrixCreator<1>::create_boundary_mass_matrix (const Mapping<1>          &,
+						    const DoFHandler<1>       &,
+						    const Quadrature<0>       &,
+						    SparseMatrix<double>      &,
+						    const FunctionMap         &,
+						    Vector<double>            &,
+						    std::vector<unsigned int> &,
+						    const Function<1>         *)
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
 #endif
 
 
+// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
+// TODO:[WB] implement multithreading for this function.
 template <int dim>
-void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
+void MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
+						      const DoFHandler<dim>     &dof,
 						      const Quadrature<dim-1>   &q,
 						      SparseMatrix<double>      &matrix,
-						      const FunctionMap         &rhs,
+						      const FunctionMap         &boundary_functions,
 						      Vector<double>            &rhs_vector,
 						      std::vector<unsigned int> &dof_to_boundary_mapping,
 						      const Function<dim>       *a)
@@ -237,14 +280,14 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
   const unsigned int n_components  = fe.n_components();
   const bool         fe_is_system  = (n_components != 1);
   
-  Assert (matrix.n() == dof.n_boundary_dofs(rhs), ExcInternalError());
+  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions), ExcInternalError());
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
-  Assert (rhs.size() != 0, ExcInternalError());
+  Assert (boundary_functions.size() != 0, ExcInternalError());
   Assert (dof.get_fe() == fe, ExcInternalError());
   Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
 	  ExcInternalError());
-  Assert (n_components == rhs.begin()->second->n_components,
+  Assert (n_components == boundary_functions.begin()->second->n_components,
 	  ExcComponentMismatch());
 #ifdef DEBUG
   if (true)
@@ -269,7 +312,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
   UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
 					  update_q_points);
-  FEFaceValues<dim> fe_values (mapping_q1, fe, q, update_flags);
+  FEFaceValues<dim> fe_values (mapping, fe, q, update_flags);
 
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
@@ -292,7 +335,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 				       // check if this face is on that part of
 				       // the boundary we are interested in
-      if (rhs.find(cell->face(face)->boundary_indicator()) != rhs.end())
+      if (boundary_functions.find(cell->face(face)->boundary_indicator()) != boundary_functions.end())
 	{
 	  cell_matrix.clear ();
 	  cell_vector.clear ();
@@ -305,7 +348,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
 	  if (fe_is_system)
 					     // FE has several components
 	    {
-	      rhs.find(cell->face(face)->boundary_indicator())
+	      boundary_functions.find(cell->face(face)->boundary_indicator())
 		->second->vector_value_list (fe_values.get_quadrature_points(),
 					     rhs_values_system);
 
@@ -356,7 +399,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
 	  else
 					     // FE is a scalar one
 	    {
-	      rhs.find(cell->face(face)->boundary_indicator())
+	      boundary_functions.find(cell->face(face)->boundary_indicator())
 		->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
 	      if (a != 0)
@@ -473,7 +516,11 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
 	    if (fabs(cell_matrix(i,i)) > max_diag_entry)
 	      max_diag_entry = fabs(cell_matrix(i,i));
 #endif  
-	  
+//TODO: [WB] check this place for more efficient alternatives
+//in the innermost loop, we traverse a set twice in "find", but
+//this could be made much faster, e.g. by first building a vector<bool>
+//that already stores the result of find beforehand
+// (then remove dofs_on_face altogether)	  
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      if ((dofs_on_face.find(dofs[i]) != dofs_on_face.end()) &&
@@ -503,9 +550,26 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
 };
 
 
-
 template <int dim>
-void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
+void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
+						      const Quadrature<dim-1>   &q,
+						      SparseMatrix<double>      &matrix,
+						      const FunctionMap         &rhs,
+						      Vector<double>            &rhs_vector,
+						      std::vector<unsigned int> &dof_to_boundary_mapping,
+						      const Function<dim>       *a)
+{
+  static const MappingQ1<dim> mapping;
+  create_boundary_mass_matrix(mapping, dof, q, matrix, rhs, rhs_vector,
+			      dof_to_boundary_mapping, a);
+}
+
+
+// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
+// TODO:[WB] implement multithreading for this function.
+template <int dim>
+void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mapping,
+						const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						SparseMatrix<double>     &matrix,
 						const Function<dim> * const coefficient)
@@ -515,7 +579,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
 
-  FEValues<dim> fe_values (dof.get_fe(), q, update_flags);
+  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
@@ -576,6 +640,16 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 
 
+template <int dim>
+void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
+						const Quadrature<dim>    &q,
+						SparseMatrix<double>     &matrix,
+						const Function<dim> * const coefficient)
+{
+  static const MappingQ1<dim> mapping;
+  create_laplace_matrix(mapping, dof, q, matrix, coefficient);
+}
+
 
 //TODO:[GK,RH] maybe recreate this function
 /*
@@ -614,10 +688,11 @@ void MatrixCreator<dim>::create_level_laplace_matrix (unsigned int level,
 
 
 
-
-
+// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
+// TODO:[WB] implement multithreading for this function.
 template <int dim>
-void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
+void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mapping,
+						const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						SparseMatrix<double>     &matrix,
 						const Function<dim>      &rhs,
@@ -631,7 +706,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
 
-  FEValues<dim> fe_values (dof.get_fe(), q, update_flags);
+  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
@@ -708,6 +783,18 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 };
 
 
+
+template <int dim>
+void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
+						const Quadrature<dim>    &q,
+						SparseMatrix<double>     &matrix,
+						const Function<dim>      &rhs,
+						Vector<double>           &rhs_vector,
+						const Function<dim> * const coefficient)
+{
+  static const MappingQ1<dim> mapping;  
+  create_laplace_matrix(mapping, dof, q, matrix, rhs, rhs_vector, coefficient);
+}
 
 
 template <int dim>
