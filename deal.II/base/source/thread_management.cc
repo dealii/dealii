@@ -64,11 +64,18 @@ namespace Threads
 
 #else
 
-  PosixThreadBarrier::PosixThreadBarrier (const unsigned int  ,
+  PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
 					  const char         *,
 					  void               *)
+                  : count (count)
   {
-    AssertThrow (false,
+                                     // throw an exception unless we
+                                     // have the special case that a
+                                     // count of 1 is given, since
+                                     // then waiting for a barrier is
+                                     // a no-op, and we don't need the
+                                     // POSIX functionality
+    AssertThrow (count == 1,
 		 ExcMessage ("Your local POSIX installation does not support\n"
 			     "POSIX barriers. You will not be able to use\n"
 			     "this class, but the rest of the threading\n"
@@ -83,7 +90,11 @@ namespace Threads
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     pthread_barrier_destroy (&barrier);
 #else
-    std::abort ();
+                                     // unless the barrier is a no-op,
+                                     // complain again (how did we get
+                                     // here then?)
+    if (count != 1)
+      std::abort ();
 #endif
   };
 
@@ -95,8 +106,17 @@ namespace Threads
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
     return pthread_barrier_wait (&barrier);
 #else
-    std::abort ();
-    return 1;
+                                     // in the special case, this
+                                     // function is a no-op. otherwise
+                                     // complain about the missing
+                                     // POSIX functions
+    if (count == 1)
+      return 0;
+    else
+      {
+        std::abort ();
+        return 1;
+      };
 #endif
   };
   

@@ -246,15 +246,25 @@ namespace Threads
 				    * POSIX thread functions. POSIX
 				    * barriers are a relatively new
 				    * feature and are not supported on
-				    * all systems. If the
-				    * configuration detected the
-				    * absence of these functions, then
-				    * barriers will not be available,
-				    * and creating objects of this
-				    * class will result in an
-				    * exception been thrown. The rest
-				    * of the threading functionality
-				    * will be available, though.
+				    * all systems.
+				    *
+				    * If the configuration detected
+				    * the absence of these functions,
+				    * then barriers will not be
+				    * available, and creating objects
+				    * of this class will result in an
+				    * exception been thrown unless the
+				    * count given for the parties
+				    * waiting for the barrier is equal
+				    * to one (as in this case waiting
+				    * for the barrier is a
+				    * no-operation, and we can
+				    * dispense with the POSIX
+				    * functions at all). The rest of
+				    * the threading functionality will
+				    * be available in its full extent,
+				    * though, even if POSIX barriers
+				    * are not available.
 				    *
 				    * @author Wolfgang Bangerth, 2002
 				    */
@@ -298,6 +308,8 @@ namespace Threads
 					*/
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
       pthread_barrier_t barrier;
+#else
+      unsigned int count;
 #endif
   };
 
