@@ -540,9 +540,11 @@ namespace Polynomials
     unsigned int k = k_;
 
                                      // first make sure that no other
-                                     // thread intercepts the operation
-                                     // of this function
-    coefficients_lock.acquire ();
+                                     // thread intercepts the
+                                     // operation of this function;
+                                     // for this, acquire the lock
+                                     // until we quit this function
+    Threads::ThreadMutex::ScopedLock lock(coefficients_lock);
 
                                      // The first 2 coefficients are hard-coded
     if (k==0)
@@ -633,10 +635,6 @@ namespace Polynomials
             shifted_coefficients[k] = ck;
           };
       };
-
-                                     // now, everything is done, so
-                                     // release the lock again
-    coefficients_lock.release ();
   }
 
 
@@ -652,15 +650,8 @@ namespace Polynomials
                                      // then get a pointer to the array
                                      // of coefficients. do that in a MT
                                      // safe way
-    coefficients_lock.acquire ();
-    const std::vector<number> *p = shifted_coefficients[k];
-    coefficients_lock.release ();
-
-                                     // return the object pointed
-                                     // to. since this object does not
-                                     // change any more once computed,
-                                     // this is MT safe
-    return *p;
+    Threads::ThreadMutex::ScopedLock lock (coefficients_lock);
+    return *shifted_coefficients[k];
   }
 
 
@@ -705,34 +696,36 @@ namespace Polynomials
   {
     unsigned int k = k_;
 
-				   // first make sure that no other
-				   // thread intercepts the operation
-				   // of this function
-    coefficients_lock.acquire ();
+                                     // first make sure that no other
+                                     // thread intercepts the operation
+                                     // of this function
+                                     // for this, acquire the lock
+                                     // until we quit this function
+    Threads::ThreadMutex::ScopedLock lock(coefficients_lock);
 
-				          // The first 2 coefficients 
-                                          // are hard-coded
+                                     // The first 2 coefficients 
+                                     // are hard-coded
     if (k==0)
       k=1;
-				          // check: does the information
-				          // already exist?
+                                     // check: does the information
+                                     // already exist?
     if (  (recursive_coefficients.size() < k+1) ||
 	  ((recursive_coefficients.size() >= k+1) && (recursive_coefficients[k] == 0)) )
-				           // no, then generate the
-				           // respective coefficients
+                                       // no, then generate the
+                                       // respective coefficients
       {
 	recursive_coefficients.resize (k+1, 0);
       
 	if (k<=1)
 	  {
-					   // create coefficients
-					   // vectors for k=0 and k=1
-					   //
-					   // allocate the respective
-					   // amount of memory and
-					   // later assign it to the
-					   // coefficients array to
-					   // make it const
+                                             // create coefficients
+                                             // vectors for k=0 and k=1
+                                             //
+                                             // allocate the respective
+                                             // amount of memory and
+                                             // later assign it to the
+                                             // coefficients array to
+                                             // make it const
 	    std::vector<number> *c0 = new std::vector<number>(2);
 	    (*c0)[0] =  1.0;
 	    (*c0)[1] = -1.0;
@@ -741,8 +734,8 @@ namespace Polynomials
 	    (*c1)[0] = 0.0;
 	    (*c1)[1] = 1.0;
 
-					   // now make these arrays
-					   // const
+                                             // now make these arrays
+                                             // const
 	    recursive_coefficients[0] = c0;
 	    recursive_coefficients[1] = c1;
 	  }
@@ -760,14 +753,14 @@ namespace Polynomials
 	  }
 	else
 	  {
-					   // for larger numbers,
-					   // compute the coefficients
-					   // recursively. to do so,
-					   // we have to release the
-					   // lock temporarily to
-					   // allow the called
-					   // function to acquire it
-					   // itself
+                                             // for larger numbers,
+                                             // compute the coefficients
+                                             // recursively. to do so,
+                                             // we have to release the
+                                             // lock temporarily to
+                                             // allow the called
+                                             // function to acquire it
+                                             // itself
 	    coefficients_lock.release ();
 	    compute_coefficients(k-1);
 	    coefficients_lock.acquire ();
@@ -781,25 +774,21 @@ namespace Polynomials
 			   - (*recursive_coefficients[k-1])[i] );
 	  
 	    (*ck)[k] = 2.*(*recursive_coefficients[k-1])[k-1];
-	                                  // for even degrees, we need
-	                                  // to add a multiple of
-	                                  // basis fcn phi_2
+                                             // for even degrees, we need
+                                             // to add a multiple of
+                                             // basis fcn phi_2
 	    if ( (k%2) == 0 )
 	      {
 		(*ck)[1] += (*recursive_coefficients[2])[1];
 		(*ck)[2] += (*recursive_coefficients[2])[2];
 	      }	  
-					   // finally assign the newly
-					   // created vector to the
-					   // const pointer in the
-					   // coefficients array
+                                             // finally assign the newly
+                                             // created vector to the
+                                             // const pointer in the
+                                             // coefficients array
 	    recursive_coefficients[k] = ck;
 	  };
       };
-
-				   // now, everything is done, so
-				   // release the lock again
-    coefficients_lock.release ();
   }
 
 

@@ -1268,7 +1268,8 @@ namespace LaplaceSolver
 				   // the domain. Since it's actions
 				   // have all been explained in
 				   // previous programs, we do not
-				   // comment on it any more.
+				   // comment on it any more, except
+				   // for one pointe below.
   template <int dim>
   void
   Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
@@ -1303,13 +1304,99 @@ namespace LaplaceSolver
 
 
 	cell->get_dof_indices (local_dof_indices);
-	mutex.acquire ();
+
+                                         // In the step-9 program, we
+                                         // have shown that you have
+                                         // to use the mutex to lock
+                                         // the matrix when copying
+                                         // the elements from the
+                                         // local to the global
+                                         // matrix. This was necessary
+                                         // to avoid that two threads
+                                         // access it at the same
+                                         // time, eventually
+                                         // overwriting their
+                                         // respective
+                                         // work. Previously, we have
+                                         // used the `acquire'' and
+                                         // ``release'' functions of
+                                         // the mutex to lock and
+                                         // unlock the mutex,
+                                         // respectively. While this
+                                         // is valid, there is one
+                                         // possible catch: if between
+                                         // the locking operation and
+                                         // the unlocking operation an
+                                         // exception is thrown, the
+                                         // mutex remains in the
+                                         // locked state, and in some
+                                         // cases this might lead to
+                                         // deadlocks. A similar
+                                         // situation arises, when one
+                                         // changes the code to have a
+                                         // return statement somewhere
+                                         // in the middle of the
+                                         // locked block, and forgets
+                                         // that before we call
+                                         // ``return'', we also have
+                                         // to unlock the mutex. This
+                                         // all is not be a problem
+                                         // here, but we want to show
+                                         // the general technique to
+                                         // cope with these problems
+                                         // nevertheless: have an
+                                         // object that upon
+                                         // initialization (i.e. in
+                                         // its constructor) locks the
+                                         // mutex, and on running the
+                                         // destructor unlocks it
+                                         // again. This is called the
+                                         // ``scoped lock'' pattern
+                                         // (apparently invented by
+                                         // Doug Schmidt originally),
+                                         // and it works because
+                                         // destructors of local
+                                         // objects are also run when
+                                         // we exit the function
+                                         // either through a
+                                         // ``return'' statement, or
+                                         // when an exception is
+                                         // raised. Thus, it is
+                                         // guaranteed that the mutex
+                                         // will always be unlocked
+                                         // when we exit this part of
+                                         // the program, whether the
+                                         // operation completed
+                                         // successfully or not,
+                                         // whether the exit path was
+                                         // something we implemented
+                                         // willfully or whether the
+                                         // function was exited by an
+                                         // exception that we did not
+                                         // forsee.
+                                         //
+                                         // deal.II implements the
+                                         // scoped locking pattern in
+                                         // the
+                                         // ThreadMutex::ScopedLock
+                                         // class: it takes the mutex
+                                         // in the constructor and
+                                         // locks it; in its
+                                         // destructor, it unlocks it
+                                         // again. So here is how it
+                                         // is used:
+        Threads::ThreadMutex::ScopedLock lock (mutex);
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    linear_system.matrix.add (local_dof_indices[i],
 				      local_dof_indices[j],
 				      cell_matrix(i,j));
-	mutex.release ();
+                                         // Here, at the brace, the
+                                         // current scope ends, so the
+                                         // ``lock'' variable goes out
+                                         // of existence and its
+                                         // destructor the mutex is
+                                         // unlocked.
       };
   }
 

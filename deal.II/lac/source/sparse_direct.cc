@@ -261,9 +261,8 @@ namespace CommunicationsLog
   {
     Record record = {child_pid, direction, &typeid(T), count,
                      sizeof(T)*count, completed_bytes, descr};
-    list_access_lock.acquire ();
+    Threads::ThreadMutex::ScopedLock lock (list_access_lock);
     communication_log.push_back (record);
-    list_access_lock.release ();
   }
 
 
@@ -274,7 +273,7 @@ namespace CommunicationsLog
                                     */
   void list_communication (const pid_t /*child_pid*/)
   {
-    list_access_lock.acquire ();
+    Threads::ThreadMutex::ScopedLock lock (list_access_lock);
     
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl
               << "Communication log history:" << std::endl;
@@ -292,8 +291,6 @@ namespace CommunicationsLog
                 << i->description
                 << std::endl;
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl;
-
-    list_access_lock.release ();
   }
 
 
@@ -308,12 +305,11 @@ namespace CommunicationsLog
                                     */
   void remove_history (const pid_t &child_pid) 
   {
-    list_access_lock.acquire ();
+    Threads::ThreadMutex::ScopedLock lock (list_access_lock);
     for (std::list<Record>::iterator i=communication_log.begin();
          i!=communication_log.end(); ++i)
       if (i->child_pid == child_pid)
         communication_log.erase (i);
-    list_access_lock.release ();
   }
 }
 
@@ -494,9 +490,8 @@ SparseDirectMA27::~SparseDirectMA27()
         CommunicationsLog::remove_history (detached_mode_data->child_pid);
 
                                          // next close down client
-        detached_mode_data->mutex.acquire ();
+        Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
         write (detached_mode_data->server_client_pipe[1], "7", 1);
-        detached_mode_data->mutex.release ();
         
                                          // then also delete data
         delete detached_mode_data;
@@ -949,7 +944,7 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
                         IKEEP, IW1, NSTEPS, IFLAG);
   else
     {
-      detached_mode_data->mutex.acquire ();
+      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
                                        // first write the data we have
                                        // to push over, i.e. first
                                        // function index, then array
@@ -972,8 +967,6 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
                                        // next get back what we need
                                        // to know
       detached_mode_data->get (IFLAG, 1, "IFLAG");
-      
-      detached_mode_data->mutex.release ();
     };
 }
 
@@ -1001,7 +994,7 @@ void SparseDirectMA27::call_ma27bd (const unsigned int *N,
                                        // basically, everything is
                                        // already over the line,
                                        // except for A and LA
-      detached_mode_data->mutex.acquire ();
+      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
       detached_mode_data->put ("2", 1, "ACTION 2");
       
       detached_mode_data->put (LA, 1, "LA");
@@ -1010,8 +1003,6 @@ void SparseDirectMA27::call_ma27bd (const unsigned int *N,
                                        // next get back what we need
                                        // to know
       detached_mode_data->get (IFLAG, 1, "IFLAG");
-      
-      detached_mode_data->mutex.release ();
     };
 }
 
@@ -1051,13 +1042,12 @@ void SparseDirectMA27::call_ma27x1 (unsigned int *NRLNEC)
     HSL::MA27::ma27x1_ (NRLNEC);
   else
     {
-      detached_mode_data->mutex.acquire ();
+      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
                                        // ma27x1 only reads data, so
                                        // don't send anything except
                                        // for the id
       detached_mode_data->put ("4", 1, "ACTION 4");
       detached_mode_data->get (NRLNEC, 1, "NRLNEC");
-      detached_mode_data->mutex.release ();
     };
 }
 
@@ -1069,13 +1059,12 @@ void SparseDirectMA27::call_ma27x2 (unsigned int *NIRNEC)
     HSL::MA27::ma27x2_ (NIRNEC);
   else
     {
-      detached_mode_data->mutex.acquire ();
+      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
                                        // ma27x2 only reads data, so
                                        // don't send anything except
                                        // for the id
       detached_mode_data->put ("5", 1, "ACTION 5");
       detached_mode_data->get (NIRNEC, 1, "NIRNEC");
-      detached_mode_data->mutex.release ();
     };
 }
 
@@ -1087,13 +1076,12 @@ void SparseDirectMA27::call_ma27x3 (const unsigned int *LP)
     HSL::MA27::ma27x3_ (LP);
   else
     {
-      detached_mode_data->mutex.acquire ();
+      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
                                        // ma27x2 only reads data, so
                                        // don't send anything except
                                        // for the id
       detached_mode_data->put ("6", 1, "ACTION 6");
       detached_mode_data->put (LP, 1, "LP");
-      detached_mode_data->mutex.release ();
     };
 }
 

@@ -616,6 +616,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The <code class="class">ThreadMutex</code> classes now have a
+       member class <code class="class">ScopedLock</code> that implements the
+       scoped thread-safe locking pattern of Doug Schmidt. It is also used in
+       various places of the code now.
+       <br>
+       (WB 2003/01/28)
+       </p>
+
+  <li> <p> 
        Fixed: The <code class="class">GridReordering</code> tried to be
        thread-safe in the initialization of some data, but was not due to a
        typo. This is now fixed.

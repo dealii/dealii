@@ -46,11 +46,64 @@ namespace Threads
  * reason to provide such a function is that the program can be
  * compiled both in MT and non-MT mode without difference.
  *
- * @author Wolfgang Bangerth, 2000
+ * @author Wolfgang Bangerth, 2000, 2003
  */
   class DummyThreadMutex
   {
     public:
+                                       /**
+                                        * Scoped lock class. When you
+                                        * declare an object of this
+                                        * type, you have to pass it a
+                                        * mutex, which is locked in
+                                        * the constructor of this
+                                        * class and unlocked in the
+                                        * destructor. The lock is thus
+                                        * held during the entire
+                                        * lifetime of this object,
+                                        * i.e. until the end of the
+                                        * present scope, which
+                                        * explains where the name
+                                        * comes from. This pattern of
+                                        * using locks with mutexes
+                                        * follows the
+                                        * resource-acquisition-is-initialization
+                                        * pattern, and was used first
+                                        * for mutexes by Doug
+                                        * Schmidt. It has the
+                                        * advantage that locking a
+                                        * mutex this way is
+                                        * thread-safe, i.e. when an
+                                        * exception is thrown between
+                                        * the locking and unlocking
+                                        * point, the destructor makes
+                                        * sure that the mutex is
+                                        * unlocked; this would not
+                                        * automatically be the case
+                                        * when you lock and unlock the
+                                        * mutex "by hand", i.e. using
+                                        * @p{acquire} and @p{release}.
+                                        */
+      class ScopedLock
+      {
+        public:
+                                           /**
+                                            * Constructor. Lock the
+                                            * mutex. Since this is a
+                                            * dummy mutex class, this
+                                            * of course does nothing.
+                                            */
+          ScopedLock (DummyThreadMutex &) {};
+
+                                           /**
+                                            * Destructor. Unlock the
+                                            * mutex. Since this is a
+                                            * dummy mutex class, this
+                                            * of course does nothing.
+                                            */
+          ~ScopedLock () {};
+      };
+      
 				       /**
 					* Simulate acquisition of the
 					* mutex. As this class does
@@ -247,11 +300,69 @@ namespace Threads
 				    * Class implementing a Mutex with
 				    * the help of POSIX functions.
 				    *
-				    * @author Wolfgang Bangerth, 2002
+				    * @author Wolfgang Bangerth, 2002, 2003
 				    */
   class PosixThreadMutex 
   {
     public:
+                                       /**
+                                        * Scoped lock class. When you
+                                        * declare an object of this
+                                        * type, you have to pass it a
+                                        * mutex, which is locked in
+                                        * the constructor of this
+                                        * class and unlocked in the
+                                        * destructor. The lock is thus
+                                        * held during the entire
+                                        * lifetime of this object,
+                                        * i.e. until the end of the
+                                        * present scope, which
+                                        * explains where the name
+                                        * comes from. This pattern of
+                                        * using locks with mutexes
+                                        * follows the
+                                        * resource-acquisition-is-initialization
+                                        * pattern, and was used first
+                                        * for mutexes by Doug
+                                        * Schmidt. It has the
+                                        * advantage that locking a
+                                        * mutex this way is
+                                        * thread-safe, i.e. when an
+                                        * exception is thrown between
+                                        * the locking and unlocking
+                                        * point, the destructor makes
+                                        * sure that the mutex is
+                                        * unlocked; this would not
+                                        * automatically be the case
+                                        * when you lock and unlock the
+                                        * mutex "by hand", i.e. using
+                                        * @p{acquire} and @p{release}.
+                                        */
+      class ScopedLock
+      {
+        public:
+                                           /**
+                                            * Constructor. Lock the
+                                            * mutex.
+                                            */
+          ScopedLock (PosixThreadMutex &m) : mutex(m) { mutex.acquire(); };
+
+                                           /**
+                                            * Destructor. Unlock the
+                                            * mutex. Since this is a
+                                            * dummy mutex class, this
+                                            * of course does nothing.
+                                            */
+          ~ScopedLock () { mutex.release (); };
+          
+        private:
+                                           /**
+                                            * Store the address of the
+                                            * mutex object.
+                                            */
+          PosixThreadMutex &mutex;
+      };
+      
 				       /**
 					* Constructor. Initialize the
 					* underlying POSIX mutex data

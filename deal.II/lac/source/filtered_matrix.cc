@@ -93,9 +93,8 @@ void
 FilteredMatrix<SparseMatrix<double>,Vector<double> >::
 allocate_tmp_vector () 
 {
-  tmp_mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock (tmp_mutex);
   tmp_vector.reinit (matrix->n(), true);
-  tmp_mutex.release ();
 }
 
 
@@ -105,9 +104,8 @@ void
 FilteredMatrix<SparseMatrix<float>,Vector<float> >::
 allocate_tmp_vector () 
 {
-  tmp_mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock (tmp_mutex);
   tmp_vector.reinit (matrix->n(), true);
-  tmp_mutex.release ();
 }
 
 
@@ -121,9 +119,8 @@ allocate_tmp_vector ()
   for (unsigned int i=0; i<block_sizes.size(); ++i)
     block_sizes[i] = matrix->block(i,i).n();
   
-  tmp_mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock (tmp_mutex);
   tmp_vector.reinit (block_sizes, true);
-  tmp_mutex.release ();
 }
 
 
@@ -137,9 +134,8 @@ allocate_tmp_vector ()
   for (unsigned int i=0; i<block_sizes.size(); ++i)
     block_sizes[i] = matrix->block(i,i).n();
   
-  tmp_mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock (tmp_mutex);
   tmp_vector.reinit (block_sizes, true);
-  tmp_mutex.release ();
 }
 
 

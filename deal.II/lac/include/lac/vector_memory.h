@@ -184,7 +184,7 @@ template <typename Vector>
 GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size)
 		: pool(initial_size)
 {
-  mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock(mutex);
   for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
        ++i)
@@ -195,7 +195,6 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size
 
 				   // no vectors yet claimed
   n_alloc = 0;
-  mutex.release ();
 }
 
 
@@ -203,7 +202,7 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size
 template<typename Vector>
 GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 {
-  mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock(mutex);
 
 				   // deallocate all vectors and count
 				   // number of vectors that is still
@@ -222,7 +221,6 @@ GrowingVectorMemory<Vector>::~GrowingVectorMemory()
   deallog << "GrowingVectorMemory:Maximum allocated vectors: "
 	  << pool.size() << std::endl;
   pool.clear ();
-  mutex.release ();
 
 				   // write out warning if memory leak
   if (n!=0)
@@ -233,10 +231,10 @@ GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 
 
 template<typename Vector>
-Vector*
+Vector *
 GrowingVectorMemory<Vector>::alloc()
 {
-  mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock(mutex);
   ++n_alloc;
   for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
@@ -245,15 +243,12 @@ GrowingVectorMemory<Vector>::alloc()
       if (i->first == false)
 	{
 	  i->first = true;
-	  mutex.release ();
 	  return (i->second);
 	}
     }
-  entry_type t;
-  t.first = true;
-  t.second = new Vector;
+  
+  const entry_type t (true, new Vector);
   pool.push_back(t);
-  mutex.release ();
   
   return t.second;
 }
@@ -264,18 +259,15 @@ template<typename Vector>
 void
 GrowingVectorMemory<Vector>::free(const Vector* const v)
 {
-  mutex.acquire ();
+  Threads::ThreadMutex::ScopedLock lock(mutex);
   for (typename std::vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
     {
       if (v == (i->second))
 	{
 	  i->first = false;
-	  mutex.release ();
 	  return;
 	}
     }
-  mutex.release ();
-  
   Assert(false, typename VectorMemory<Vector>::ExcNotAllocatedHere());
 }
 

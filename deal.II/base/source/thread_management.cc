@@ -37,20 +37,18 @@ namespace Threads
   
   void register_new_thread () 
   {
-    n_existing_threads_mutex.acquire ();
+    ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
     ++n_existing_threads_counter;
-    n_existing_threads_mutex.release ();
   }
 
 
   
   void deregister_new_thread () 
   {
-    n_existing_threads_mutex.acquire ();
+    ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
     --n_existing_threads_counter;
     Assert (n_existing_threads_counter >= 1,
             ExcInternalError());
-    n_existing_threads_mutex.release ();
   }
 
 
@@ -100,9 +98,8 @@ namespace Threads
   
   unsigned int n_existing_threads () 
   {
-    n_existing_threads_mutex.acquire ();
+    ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
     const unsigned int n = n_existing_threads_counter;
-    n_existing_threads_mutex.release ();
     return n;
   }
   
@@ -233,10 +230,9 @@ namespace Threads
 				     // wait for all threads, and
 				     // release memory
     wait ();
-    list_mutex.acquire ();
+    ThreadMutex::ScopedLock lock (list_mutex);
     if (thread_id_list != 0)
       delete reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
-    list_mutex.release ();
   }
 
 
@@ -248,12 +244,13 @@ namespace Threads
   {
     std::list<pthread_t> &tid_list
       = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
-
-    list_mutex.acquire ();
-    tid_list.push_back (pthread_t());
-    pthread_t *tid = &tid_list.back();
-    list_mutex.release ();
-
+    
+    {
+      ThreadMutex::ScopedLock lock (list_mutex);
+      tid_list.push_back (pthread_t());
+      pthread_t *tid = &tid_list.back();
+    }
+    
                                      // start new thread. retry until
                                      // we either succeed or get an
                                      // error other than EAGAIN
@@ -272,7 +269,7 @@ namespace Threads
   void
   PosixThreadManager::wait () const
   {
-    list_mutex.acquire ();
+    ThreadMutex::ScopedLock lock (list_mutex);
     std::list<pthread_t> &tid_list
       = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
 
@@ -290,8 +287,6 @@ namespace Threads
 				     // for expired threads with their
 				     // invalid handles again
     tid_list.clear ();
-    
-    list_mutex.release ();
   }
   
 #  endif

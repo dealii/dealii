@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -129,17 +129,15 @@ void Subscriptor::subscribe () const
     object_info = &typeid(*this);
 #endif
 
-  subscription_lock.acquire();
+  Threads::ThreadMutex::ScopedLock lock (subscription_lock);
   ++counter;
-  subscription_lock.release();
 }
 
 
 void Subscriptor::unsubscribe () const {
   Assert (counter>0, ExcNotUsed());
-  subscription_lock.acquire();
+  Threads::ThreadMutex::ScopedLock lock (subscription_lock);
   --counter;
-  subscription_lock.release();
 }
 
 
