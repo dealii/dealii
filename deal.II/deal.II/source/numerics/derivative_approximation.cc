@@ -229,8 +229,6 @@ approximate_derivative (const DoFHandler<dim> &dof_handler,
   Assert (derivative_norm.size() == dof_handler.get_tria().n_active_cells(),
 	  ExcInvalidVectorLength (derivative_norm.size(),
 				  dof_handler.get_tria().n_active_cells()));
-  Assert (dof_handler.get_fe().n_components() == 1,
-	  ExcInternalError());
 
   const unsigned int n_threads = multithread_info.n_default_threads;
   vector<IndexInterval> index_intervals
