@@ -242,9 +242,10 @@ FiniteElementBase<dim>::constraints () const
 
 
 template <int dim>
-bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const {
-  return ((static_cast<FiniteElementData<dim> >(*this) ==
-	   static_cast<FiniteElementData<dim> >(f)) &&
+bool FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
+{
+  return ((static_cast<const FiniteElementData<dim>&>(*this) ==
+	   static_cast<const FiniteElementData<dim>&>(f)) &&
 	  (interface_constraints == f.interface_constraints));
 };
 
