@@ -1116,6 +1116,8 @@ VectorTools<dim>::subtract_mean_value(Vector<double>& v, const
   for (unsigned int i=0;i<n;++i)
     if (p_select[i]) s += v(i);
 
+  s /= n;
+  
   for (unsigned int i=0;i<n;++i)
     if (p_select[i]) v(i) -= s;  
 }
