@@ -274,21 +274,24 @@ class DoFRenumbering
 				      * $n(i)<n(j)$ if $i<j$ and
 				      * $n(i)>n(j)$ if $i>j$.
 				      *
-				      * You may want to give the order in
-				      * which the components are to be ordered
-				      * (e.g. if the second argument contains
-				      * the numbers @p{(0, 3, 2, 1)}, then all
-				      * indices of component @p{0} will be
-				      * before those of component @p{3}, before
-				      * those of component @p{2}, ...). The
-				      * length of this list has to be the
-				      * same as the number of components
-				      * in the finite element, and has to
-				      * contain all numbers counted from
-				      * zero onwards. If
-				      * you omit this argument, the same
-				      * order as given by the finite element
-				      * is used.
+				      * You can specify that the
+				      * components are ordered in a
+				      * different way than suggested
+				      * by the @p{FESystem} object you
+				      * use. To this end, Set up the
+				      * vector @p{component_order}
+				      * such that the entry at index
+				      * @p{i} denotes the number of
+				      * the target component for dofs
+				      * with component @p{i} in the
+				      * @p{FESystem}. Naming the same
+				      * component more than once is
+				      * possible and results in a
+				      * blocking of several components
+				      * into one.
+				      * If you omit this argument, the
+				      * same order as given by the
+				      * finite element is used.
 				      *
 				      * If one of the base finite
 				      * elements from which the global
