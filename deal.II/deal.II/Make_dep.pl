@@ -11,6 +11,9 @@
 #secondly, a similar entry is created for the .g.a library with the
 #.go-file.
 
+#Author: Wolfgang Bangerth, March 1998
+
+
 
 
 # list of include pathes (from command line)
