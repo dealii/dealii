@@ -367,7 +367,7 @@ class dFMatrix
     DeclException2 (ExcDimensionMismatch,
 		    int, int,
 		    << "The two dimensions " << arg1 << " and " << arg2
-		    << "do not match here.");
+		    << " do not match here.");
 				     /**
 				      * Exception
 				      */
