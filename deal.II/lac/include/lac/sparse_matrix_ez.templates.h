@@ -424,26 +424,34 @@ SparseMatrixEZ<number>::block_write (std::ostream &out) const
       << increment << "][";
                                    // then write out real data
   typename std::vector<RowInfo>::const_iterator r = row_info.begin();
-  const typename std::vector<RowInfo>::const_iterator re = row_info.end();
+  out.write(reinterpret_cast<const char*>(&*r),
+	    sizeof(RowInfo) * row_info.size());
+
+//   Just in case that vector entries are not stored consecutively  
+//   const typename std::vector<RowInfo>::const_iterator re = row_info.end();
   
-  while (r != re)
-    {
-      out.write(reinterpret_cast<const char*>(&*r),
-		sizeof(RowInfo));
-      ++r;
-    }
+//   while (r != re)
+//     {
+//       out.write(reinterpret_cast<const char*>(&*r),
+// 		sizeof(RowInfo));
+//       ++r;
+//     }
 
   out << "][";
   
   typename std::vector<Entry>::const_iterator d = data.begin();
-  const typename std::vector<Entry>::const_iterator de = data.end();
+  out.write(reinterpret_cast<const char*>(&*d),
+	    sizeof(Entry) * data.size());
 
-  while (d != de)
-    {
-      out.write(reinterpret_cast<const char*>(&*d),
-		sizeof(Entry));
-      ++d;
-    }
+//   Just in case that vector entries are not stored consecutively  
+//   const typename std::vector<Entry>::const_iterator de = data.end();
+
+//   while (d != de)
+//     {
+//       out.write(reinterpret_cast<const char*>(&*d),
+// 		sizeof(Entry));
+//       ++d;
+//     }
   
   out << ']';
   
@@ -483,16 +491,14 @@ SparseMatrixEZ<number>::block_read (std::istream &in)
   CHECKFOR(in,'[',c);
 
                                    // then read data
-  for (unsigned int i=0;i<row_info.size();++i)
-    in.read(reinterpret_cast<char*>(&row_info[i]),
-	    sizeof(RowInfo));
+  in.read(reinterpret_cast<char*>(&row_info[i]),
+	  sizeof(RowInfo) * row_info.size());
   
   CHECKFOR(in,']',c);
   CHECKFOR(in,'[',c);
 	    
-  for (unsigned int i=0;i<data.size();++i)
-    in.read(reinterpret_cast<char*>(&data[i]),
-	    sizeof(Entry));
+  in.read(reinterpret_cast<char*>(&data[i]),
+	  sizeof(Entry) * data.size());
   
   CHECKFOR(in,']',c);
 }
