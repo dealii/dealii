@@ -1011,11 +1011,11 @@ void MappingQ1<dim>::transform_real_to_unit_cell_internal (
 	}
       
 				       // Solve  [f'(x)]d=f(x)
-      Point<dim> d;
+      Tensor<1,dim> d;
       Tensor<2,dim> df_1;
 
       df_1 = invert(df);
-      contract (d, df_1, f);
+      contract (d, df_1, static_cast<const Tensor<1,dim>&>(f));
 
 				       // update of p_unit
       p_unit -= d;
