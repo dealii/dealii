@@ -1596,14 +1596,14 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * function.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					FullMatrix<double>            &local_mass_matrix) const =0;
+					FullMatrix<double> &local_mass_matrix) const =0;
 
 				     /**
 				      * Number of base elements in a mixed
 				      * discretization. This function returns
 				      * 1 for simple elements.
 				      */
-    virtual unsigned int n_base_elements() const;
+    virtual unsigned int n_base_elements () const;
     
 				     /**
 				      * Access to base element
@@ -1615,7 +1615,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * components of mixed
 				      * discretizations.
 				      */
-    virtual const FiniteElement<dim>& base_element(unsigned int index) const;
+    virtual const FiniteElement<dim>& base_element (const unsigned int index) const;
     
 				     /**
 				      * Exception
