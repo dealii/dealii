@@ -14,17 +14,17 @@
 #define __deal2__thread_management_h
 
 
-#ifdef DEAL_II_USE_MT
-#  include <ace/Thread_Manager.h>
-#  include <ace/Synch.h>
-#endif
-
 #include <base/config.h>
 #include <base/exceptions.h>
 
 #include <utility>
 #include <vector>
 #include <iterator>
+
+#ifdef DEAL_II_USE_MT
+#  include <ace/Thread_Manager.h>
+#  include <ace/Synch.h>
+#endif
 
 
 
