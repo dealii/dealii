@@ -137,6 +137,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: In 3d, the function <code
+       class="member">DoFTools::make_hanging_node_constraints</code> 
+       contained an assertion that failed erroneously for finite
+       elements that do not have degrees of freedom on vertices. This
+       is now fixed.
+       <br> 
+       (WB 2002/02/21)
+       </p>
+
+  <li> <p> 
        Fixed: <code class="member">TriaAccessor<3,3>::measure</code>
        sometimes computed a negative value. This is now fixed.
        <br> 
