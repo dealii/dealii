@@ -303,8 +303,8 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       pair<int,int> line_vertices[4] = {   // note the order of the vertices
 	    make_pair (cells[cell].vertices[0], cells[cell].vertices[1]),
 	    make_pair (cells[cell].vertices[1], cells[cell].vertices[2]),
-	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3]),
-	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2])};
+	    make_pair (cells[cell].vertices[3], cells[cell].vertices[2]),
+	    make_pair (cells[cell].vertices[0], cells[cell].vertices[3])};
 
 				       // note the following: if the sense
 				       // of the vertices of a cell is correct,
