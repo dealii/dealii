@@ -59,6 +59,15 @@ class PreconditionIdentity
  * denoting the relaxation parameter; this example is therefore only meant to
  * illustrate the general idea.)
  *
+ * Note that due to the default template parameters, the above example
+ * could be written shorter as follows:
+ * \begin{verbatim}
+ *    ...
+ *    gmres.solve (matrix, solution, right_hand_side,
+ *		   PreconditionUseMatrix<>
+ *		     (matrix,&SparseMatrix<double>::template precondition_Jacobi));
+ * \end{verbatim}
+ *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
 template<class MATRIX = SparseMatrix<double>,
@@ -131,6 +140,17 @@ class PreconditionUseMatrix
  * vectors (source and destination) and a relaxation value as parameters. (Unlike
  * for the #PreconditionUseMatrix# class, this time it should work, with
  * relaxation parameter $0.5$.)
+ *
+ * Note that due to the default template parameters, the above example
+ * could be written shorter as follows:
+ * \begin{verbatim}
+ *    ...
+ *    gmres.solve (matrix, solution, right_hand_side,
+ *		   PreconditionRelaxation<>
+ *		     (matrix,
+ *                    &SparseMatrix<double>::template precondition_Jacobi,
+ *                    0.5));
+ * \end{verbatim}
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
