@@ -38,6 +38,7 @@ class PreconditionIdentity
 				      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
+
 				     /**
 				      * Apply transpose
 				      * preconditioner. Since this is
@@ -48,6 +49,7 @@ class PreconditionIdentity
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
 };
+
 
 
 /**
@@ -137,6 +139,7 @@ class PreconditionUseMatrix
 };
 
 
+
 /**
  * Base class for other preconditioners.
  * Here, only some common features Jacobi, SOR and SSOR preconditioners
@@ -159,16 +162,20 @@ class PreconditionRelaxation
 				      * reasons. It defaults to 1.
 				      */
     void initialize (const MATRIX& A, const double omega = 1.);
+    
   protected:
 				     /**
 				      * Pointer to the matrix object.
 				      */
     SmartPointer<const MATRIX> A;
+
 				     /**
 				      * Relaxation parameter.
 				      */
     double omega;
 };
+
+
 
 /**
  * Jacobi preconditioner using matrix built-in function.  The MATRIX
@@ -215,6 +222,7 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
+
 				     /**
 				      * Apply transpose
 				      * preconditioner.
@@ -222,6 +230,7 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
 };
+
 
 
 /**
@@ -240,6 +249,7 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
+
 				     /**
 				      * Apply transpose
 				      * preconditioner. Since this is
@@ -263,7 +273,7 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
  *
  * @author Guido Kanschat, 1999
  */
-template<class SOLVER, class MATRIX       = SparseMatrix<double>, class PRECONDITION = PreconditionIdentity>
+template<class SOLVER, class MATRIX = SparseMatrix<double>, class PRECONDITION = PreconditionIdentity>
 class PreconditionLACSolver
 {
   public:
@@ -275,6 +285,7 @@ class PreconditionLACSolver
     PreconditionLACSolver(SOLVER&,
 			  const MATRIX&,
 			  const PRECONDITION&);
+    
 				     /**
 				      * Execute preconditioning.
 				      */
@@ -286,15 +297,18 @@ class PreconditionLACSolver
 				      * The solver class to use.
 				      */
     SOLVER& solver;
+
 				     /**
 				      * The matrix in use.
 				      */
     const MATRIX& matrix;
+    
 				     /**
 				      * The preconditioner to use.
 				      */
     const PRECONDITION& precondition;
 };
+
 
 
 /**
@@ -303,8 +317,8 @@ class PreconditionLACSolver
  * with the matrix-vector product $PA$. It needs an auxiliary vector for that.
  *
  * By this time, this is considered a temporary object to be plugged
- * into eigenvalue solvers. Therefore, no @p SmartPointer is used for
- * @p A and @p P.
+ * into eigenvalue solvers. Therefore, no @p{SmartPointer} is used for
+ * @p{A} and @p{P}.
  *
  * @author Guido Kanschat, 2000
  */
@@ -366,6 +380,8 @@ PreconditionIdentity::vmult (VECTOR& dst, const VECTOR& src) const
   dst = src;
 }
 
+
+
 template<class VECTOR>
 inline void
 PreconditionIdentity::Tvmult (VECTOR& dst, const VECTOR& src) const
@@ -395,6 +411,7 @@ PreconditionJacobi<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 }
 
 
+
 template <class MATRIX>
 template<class VECTOR>
 inline void
@@ -415,6 +432,7 @@ PreconditionSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
   Assert (A!=0, ExcNotInitialized());
   A->precondition_SOR (dst, src, omega);
 }
+
 
 
 template <class MATRIX>
@@ -439,6 +457,7 @@ PreconditionSSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 }
 
 
+
 template <class MATRIX>
 template<class VECTOR>
 inline void
@@ -460,6 +479,7 @@ PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX& M,
 {}
 
 
+
 template<class MATRIX, class VECTOR>
 void
 PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR& dst,
@@ -478,6 +498,8 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 		:
 		solver(solver), matrix(matrix), precondition(precondition)
 {}
+
+
 
 template<class SOLVER, class MATRIX, class PRECONDITION>
 template<class VECTOR>
@@ -515,6 +537,7 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 }
 
 
+
 template<class MATRIX, class PRECOND, class VECTOR>
 inline void
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
@@ -527,6 +550,7 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
   P.Tvmult(dst, *h);
   mem.free(h);
 }
+
 
 
 template<class MATRIX, class PRECOND, class VECTOR>
