@@ -2200,8 +2200,13 @@ neighbor_child_on_subface (const unsigned int face,
                           (face_orientations_match ?
                            subface :
                            subface_translation[subface])));
+  TriaIterator<3,CellAccessor<3> > neighbor_child=
+    this->neighbor(face)->child(neighbor_child_index);
 
-  return this->neighbor(face)->child(neighbor_child_index);
+  Assert(this->face(face)->child(subface)==
+	 neighbor_child->face(neighbor_neighbor), ExcInternalError());
+  
+  return neighbor_child;
 }
 
 #endif
