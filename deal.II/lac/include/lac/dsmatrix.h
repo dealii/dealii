@@ -40,32 +40,32 @@ class dSMatrixStruct
   bool compressed;
 
 public:
-  //////////
-  void reinit (const unsigned int m, const unsigned int n,
-	       const unsigned int max_per_row);
 				     //////////
-  dSMatrixStruct (const unsigned int m, const unsigned int n,
-		  const unsigned int max_per_row);
+    void reinit (const unsigned int m, const unsigned int n,
+		 const unsigned int max_per_row);
+				     //////////
+    dSMatrixStruct (const unsigned int m, const unsigned int n,
+		    const unsigned int max_per_row);
     
 				     //////////
-  dSMatrixStruct (const unsigned int n, const unsigned int max_per_row);
+    dSMatrixStruct (const unsigned int n, const unsigned int max_per_row);
 				     //////////
-  ~dSMatrixStruct ();
-  //////////
-  void compress ();
-  //////////
-  int operator() (const unsigned int i, const unsigned int j);
-  //////////
-  void add (const unsigned int i, const unsigned int j);
-  //////////
-  void add_matrix (const unsigned int n, const int* rowcols);
-  //////////
-  void add_matrix (const unsigned int m, const unsigned int n,
-		   const int* rows, const int* cols);
-  //////////
-  void add_matrix (const iVector& rowcols);
-  //////////
-  void add_matrix (const iVector& rows, const iVector& cols);
+    ~dSMatrixStruct ();
+				     //////////
+    void compress ();
+				     //////////
+    int operator() (const unsigned int i, const unsigned int j);
+				     //////////
+    void add (const unsigned int i, const unsigned int j);
+				     //////////
+    void add_matrix (const unsigned int n, const int* rowcols);
+				     //////////
+    void add_matrix (const unsigned int m, const unsigned int n,
+		     const int* rows, const int* cols);
+				     //////////
+    void add_matrix (const iVector& rowcols);
+				     //////////
+    void add_matrix (const iVector& rows, const iVector& cols);
 
     void print_gnuplot (ostream &) const;
     unsigned int n_rows () const;
@@ -186,13 +186,51 @@ class dSMatrix
 				     //
     unsigned int n () const;
 
-				     //
+				     /**
+				      * Set the element #(i,j)# to #value#.
+				      * Throws an error if the entry does
+				      * not exist.
+				      */
     void set (const unsigned int i, const unsigned int j,
 	      const double value);
-				     //
+    
+				     /**
+				      * Add #value# to the element #(i,j)#.
+				      * Throws an error if the entry does
+				      * not exist.
+				      */
     void add (const unsigned int i, const unsigned int j,
 	      const double value);
 
+				     /**
+				      * Copy the given matrix to this one.
+				      * The operation throws an error if the
+				      * sparsity patterns of the two involved
+				      * matrices do not point to the same
+				      * object, since in this case the copy
+				      * operation is cheaper. Since this
+				      * operation is notheless not for free,
+				      * we do not make it available through
+				      * #operator =#, since this may lead
+				      * to unwanted usage, e.g. in copy
+				      * arguments to functions, which should
+				      * really be arguments by reference.
+				      *
+				      * The function returns a reference to
+				      * #this#.
+				      */
+    dSMatrix & copy_from (const dSMatrix &);
+
+				     /**
+				      * Add #matrix# scaled by #factor# to this
+				      * matrix. The function throws an error
+				      * if the sparsity patterns of the two
+				      * involved matrices do not point to the
+				      * same object, since in this case the
+				      * operation is cheaper.
+				      */
+    void add_scaled (const double factor, const dSMatrix &matrix);
+    
 				     /**
 				      * Return the value of the entry (i,j).
 				      * This may be an expensive operation
@@ -267,9 +305,20 @@ class dSMatrix
 				     //
     void precondition (dVector& dst, const dVector& src) { dst=src; }
 
+				     /**
+				      * Return a (constant) reference to the
+				      * underlying sparsity pattern of this
+				      * matrix.
+				      */
     const dSMatrixStruct & get_sparsity_pattern () const;
-    
-    void print (ostream &) const;
+
+				     /**
+				      * Print the matrix to the given stream,
+				      * using the format
+				      * #(line,col) value#, i.e. one
+				      * nonzero entry of the matrix per line.
+				      */
+    void print (ostream &out) const;
 
 				     /**
 				      * Exception
@@ -303,6 +352,10 @@ class dSMatrix
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotSquare);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcDifferentSparsityPatterns);
 };
 
 

@@ -406,6 +406,30 @@ dSMatrix::clear () {
 
 
 
+dSMatrix &
+dSMatrix::copy_from (const dSMatrix &matrix) {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
+
+  for (unsigned int i = 0 ; i<cols->vec_len; i++)
+    val[i] = matrix.val[i];
+
+  return *this;
+};
+
+
+
+void
+dSMatrix::add_scaled (const double factor, const dSMatrix &matrix) {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
+
+  for (unsigned int i = 0 ; i<cols->vec_len; i++)
+    val[i] += factor*matrix.val[i];
+};
+
+
+
 void
 dSMatrix::vmult (dVector& dst, const dVector& src) const
 {
