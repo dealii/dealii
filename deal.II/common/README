@@ -1,0 +1,106 @@
+
+First information about deal.II
+===============================
+
+Note: this is not yet finished, some information may still be missing
+though we hope that it is complete and correct.
+
+1) Preliminaries:
+-----------------
+In order to use the deal.II library (and its sublibraries /base and
+/lac) you need to have the following programs installed:
+  - A fairly complete C++ compiler. We use egcs1.1.2 but other
+    compilers might work as well. egcs1.0 will not work, however.
+  - Perl: any Perl 5.x version should work.
+  - Make: we use GNU make, version 3.75. We believe that our make
+    files should be portable to other Makes as well.
+  - In case you want to generate the documentation from the header
+    files, you only need Perl installed.
+  - In case you want the printable documentation, however, you need
+    Doc++ and LaTeX installed. It is known that Doc++ version 3.3.13
+    is broken and generates invalid Tex, but 3.3.8 is ok.
+  - The library generates output in formats readable by GNUPLOT, GMV
+    (general mesh viewer), AVS Explorer and directly to Encapsulated
+    Postscript. GNUPLOT and Eps should be available almost everywhere,
+    GMV is freely available for most Unix platforms. AVS is a
+    commercial program available for most Unix flavours.
+
+Note that we have only tested the library under Unix (extensively
+under SunOS and Linux). We believe that it should be possible with
+little effort to use it on other platforms as well. Note that if you
+didn't find your favourite graphics format above it is quite simple to
+add it to the list of supported ones (take a look at
+/base/include/base/data_out_base.h and /base/source/data_out_base.cc).
+
+
+2) Installation:
+----------------
+The whole library usually comes as a .tar.gz file, that is a tar-ified
+file archive which is compressed with gzip. After unpacking it with
+gunzip and tar (or tar -xzf if you use GNU tar), you will find several
+subdirectories. Go to the /common subdirectory and type 'make', to
+obtain the following help (this output may change slightly over time,
+just try it):
+
+=Possible Targets                                                       =
+= (1) baseg lacg: debug libraries base and lac                          =
+= (2) base lac: debug and optimized libraries base and lac              =
+= (3) 1dg 2dg 3dg: (1) and deal.II debug version for specified dimension=
+= (4) 1d 2d 3d: (2) and deal.II for specified dimension                 =
+= (5) all: 1d, 2d and 3d                                                =
+= (6) online-doc: generate the documentation in HTML format             =
+= (7) printable-doc: generate the documentation in Postscript format.   =
+=     You need to have Doc++ and LaTeX installed for that.              =
+= (8) tex-doc: same, but only generate the LaTeX file, don't compile it =
+
+To execute one of the commands, type 'make target-name'. Please note
+that building all libraries in debug and optimized mode takes about an
+hour on a Sun Ultra 450, so you may want to do this during lunchtime.
+In case you have a multi-processor machine, you can call 
+'make PAR=-j4 target-name' to let make call multiple instances of the
+compiler (in this case four). Since the make files are written in a
+way to minimize cross-dependencies, this speeds up compilation by
+about the factor given after '-j', at least if you have as many
+processors. 
+
+
+3) Problems, questions, further information:
+--------------------------------------------
+Feel free to ask if you encounter any problems with deal.II. If a
+question is of general interest, you may want to use our mailing list,
+which can be reached at
+  deal@gaia.iwr.uni-heidelberg.de
+For specific problems, send email to either
+  wolfgang.bangerth@iwr.uni-heidelberg.de
+or
+  kanschat@iwr.uni-heidelberg.de
+
+We are interested in any feedback, whether positive or negative, in
+order to determine the directions of future work on the library. We
+are also very much interested in incorporating any work and bug fixes
+by third parties into the library; you will of course be credited by
+name for this.
+
+
+4) License:
+-----------
+Note that we have not yet fully finished the license under which we
+will distribute the library. However, we will keep to the following
+principles:
+- The library comes free of charge for non-commercial users, but we
+  keep a copyright in it. We will grant everyone access to the library
+  but we would like to ask you to not further distribute it yourself.
+  This is to keep an overview over the number of users and their
+  background.
+- The libraries may not be stripped of our copyright and shall not be
+  used in commercial projects without our consent.
+- Scientific publications presenting results obtained with these
+  libraries shall state the names of the library and their authors
+  (at present Wolfgang Bangerth and Guido Kanschat).
+
+Note: Since our institute is evaluated at regular intervals, we are
+interested in documenting the use of the programs and libraries we
+create. This is the reason for not allowing to freely re-distribute
+them. We would also be interested in collecting publications with
+results obtained with the aid of these libraries and would therefore
+like to ask you to drop us a note about every such publication.
