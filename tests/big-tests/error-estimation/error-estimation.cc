@@ -484,8 +484,8 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       n_dofs.push_back (dof->n_dofs());
 
       cout << "    Assembling matrices..." << endl;
-      UpdateFlags update_flags = UpdateFlags(update_q_points  | update_gradients |
-					     update_JxW_values);
+      UpdateFlags update_flags = UpdateFlags(update_values | update_q_points  |
+					     update_gradients | update_JxW_values);
   
       ProblemBase<dim>::FunctionMap dirichlet_bc;
       dirichlet_bc[0] = solution_function;

@@ -22,27 +22,43 @@ enum UpdateFlags {
 					*/
       update_default  = 0,
 				       /**
+					* Compute the values of the
+					* shape functions at the
+					* quadrature points on the
+					* real space cell. For the
+					* usual Lagrange elements,
+					* these values are equal to
+					* the values of the shape
+					* functions at the quadrature
+					* points on the unit cell, but
+					* they are different for more
+					* complicated elements, such
+					* as BDM or Raviart-Thomas
+					* elements.
+					*/
+      update_values = 1,
+				       /**
 					* Compute quadrature points in real
 					* space (not on unit cell).
 					*/
-      update_q_points = 1,
+      update_q_points = 2,
 				       /**
 					* Transform gradients on unit cell to
 					* gradients on real cell.
 					*/
-      update_gradients = 2,
+      update_gradients = 4,
 				       /**
 					* Compute jacobian matrices of the
 					* transform between unit and real cell
 					* in the evaluation points.
 					*/
-      update_jacobians = 4,
+      update_jacobians = 8,
 				       /**
 					* Compute the JxW values (Jacobian
 					* determinant at the quadrature point
 					* times the weight of this point).
 					*/
-      update_JxW_values = 8,
+      update_JxW_values = 16,
 				       /**
 					* Compute the points on the real cell
 					* on which the trial functions are
@@ -53,7 +69,7 @@ enum UpdateFlags {
 					* in an error, since support points are
 					* not useful in that case.
 					*/
-      update_support_points = 16,
+      update_support_points = 32,
 				       /**
 				        * Update the outward normal vectors
 				        * to the face relative to this cell.
@@ -65,13 +81,13 @@ enum UpdateFlags {
 					* an error, since normal vectors are
 					* not useful in that case.
 				        */
-      update_normal_vectors = 32,
+      update_normal_vectors = 64,
 
 				       /**
 					* Update the second derivatives of the
 					* shape functions on the real cell.
 				        */
-      update_second_derivatives = 64
+      update_second_derivatives = 128
 };
 
 

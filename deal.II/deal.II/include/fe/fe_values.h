@@ -1227,6 +1227,7 @@ template <int dim>
 inline
 const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const
 {
+  Assert (update_flags & update_values, ExcAccessToUninitializedField());
   Assert (selected_dataset<shape_values.size(),
 	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   return shape_values[selected_dataset];

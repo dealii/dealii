@@ -199,8 +199,8 @@ void NonlinearProblem<dim>::run () {
 	  cout << "    Nonlinear step " << nonlinear_step << endl;
 	  cout << "        Assembling matrices..." << endl;
 	  assemble (equation, quadrature, fe,
-		    UpdateFlags(update_gradients | update_JxW_values |
-				update_q_points),
+		    UpdateFlags(update_values | update_gradients |
+				update_JxW_values | update_q_points),
 		    dirichlet_bc);
 	  
 	  cout << "        Solving..." << endl;

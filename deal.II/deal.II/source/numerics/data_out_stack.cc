@@ -193,7 +193,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
   FEValues<dim>  fe_patch_values (dof_handler->get_fe(),
 				  patch_points,
-				  update_default);
+				  update_values);
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   vector<double>          patch_values (n_q_points);
   vector<Vector<double> > patch_values_system (n_q_points,

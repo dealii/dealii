@@ -593,7 +593,8 @@ void DataOut_Old<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
   QTrapez<1>     q_trapez;
   QIterated<dim> points (q_trapez, accuracy);
   
-  FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
+  FEValues<dim> fe(dofs->get_fe(), points,
+		   UpdateFlags(update_values | update_q_points));
   vector< vector <Vector<double> > >
     values (dof_data.size(),
 	    vector< Vector<double> >(points.n_quadrature_points,

@@ -439,7 +439,8 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof,
   Assert (dof.get_fe().n_components() == rhs.n_components,
 	  ExcComponentMismatch());
   
-  UpdateFlags update_flags = UpdateFlags(update_q_points |
+  UpdateFlags update_flags = UpdateFlags(update_values   |
+					 update_q_points |
 					 update_JxW_values);
   SparseMatrix<double> dummy;
   const Assembler<dim>::AssemblerData data (dof,
@@ -735,8 +736,12 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
   
   UpdateFlags update_flags = UpdateFlags (update_q_points  |
  					  update_JxW_values);
+  if (norm != H1_seminorm)
+    update_flags != update_values;
+  
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
+  
   FEValues<dim> fe_values(fe, q, update_flags);
 
   vector< Vector<double> >        function_values (n_q_points,

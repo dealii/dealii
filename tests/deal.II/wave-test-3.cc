@@ -2122,11 +2122,12 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
   primal_cell = primal_dof->begin_active();
 
   FEValues<dim> fe_values (*fe, *quadrature,
-			   UpdateFlags(update_gradients      |
+			   UpdateFlags(update_values         |
+				       update_gradients      |
 				       update_JxW_values     |
 				       update_q_points));
   FEValues<dim> fe_values_primal (*primal_fe, *quadrature,
-				  update_gradients);
+				  UpdateFlags(update_values | update_gradients));
   
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
 
@@ -2266,7 +2267,8 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
   vector<int> cell_dof_indices (dofs_per_cell);
 
   FEFaceValues<dim> fe_face_values (*fe, *quadrature_face,
-				    UpdateFlags(update_JxW_values     |
+				    UpdateFlags(update_values         |
+						update_JxW_values     |
 						update_q_points));
   
   for (; cell!=endc; ++cell)
@@ -2397,7 +2399,7 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
   endc = dof->end();
 
   vector<int> dof_indices (fe->dofs_per_cell);
-  FEFaceValues<dim> fe_face_values (*fe, *quadrature_face, update_JxW_values);
+  FEFaceValues<dim> fe_face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
@@ -2465,7 +2467,7 @@ void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
   DoFHandler<dim>::active_cell_iterator cell = dof->begin_active (),
 					endc = dof->end ();
 
-  FEValues<dim> fe_values (*fe, *quadrature, update_JxW_values);
+  FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   vector<int> cell_dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell)
@@ -2517,7 +2519,7 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
   endc = dof->end();
 
   vector<int> dof_indices (fe->dofs_per_cell);
-  FEValues<dim> fe_values (*fe, *quadrature, update_JxW_values);
+  FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
     if ((cell->center()(0) > -0.6) &&
@@ -2566,7 +2568,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
   endc = dof->end();
 
   vector<int> dof_indices (fe->dofs_per_cell);
-  FEValues<dim> fe_values (*fe, *quadrature, update_JxW_values);
+  FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
     if ((cell->center()(0) > -0.03) &&
@@ -2755,7 +2757,8 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
   endc = dof->end ();
 
   FEValues<dim> fe_values (*fe, *quadrature,
-			   UpdateFlags(update_gradients      |
+			   UpdateFlags(update_values         |
+				       update_gradients      |
 				       update_JxW_values     |
 				       update_q_points));
   FullMatrix<double>  cell_matrix (fe->dofs_per_cell, fe->dofs_per_cell);
@@ -2942,7 +2945,9 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 					endc = dof->end();
   double u_integrated=0;
   FEFaceValues<dim> face_values (*fe, *quadrature_face,
-				 UpdateFlags(update_JxW_values|update_q_points));
+				 UpdateFlags(update_values         |
+					     update_JxW_values     |
+					     update_q_points));
   vector<double>    face_u (fe->dofs_per_face);
   
   for (; cell!=endc; ++cell)
@@ -3038,7 +3043,7 @@ double EvaluateSplitSignal<dim>::evaluate () {
   DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
 					endc = dof->end();
   double u_integrated=0;
-  FEFaceValues<dim> face_values (*fe, *quadrature_face, update_JxW_values);
+  FEFaceValues<dim> face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
   vector<double>    face_u (fe->dofs_per_face);
   
   for (; cell!=endc; ++cell)
@@ -3132,7 +3137,7 @@ double EvaluateOneBranch1d<1>::evaluate () {
   DoFHandler<1>::active_cell_iterator cell = dof->begin_active(),
 				      endc = dof->end();
   double u_integrated=0;
-  FEValues<1>  fe_values (*fe, *quadrature, update_JxW_values);
+  FEValues<1>  fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   vector<double> cell_u (fe->dofs_per_cell);
   
   for (; cell!=endc; ++cell)
@@ -3209,7 +3214,8 @@ double EvaluateSecondCrossing1d<1>::evaluate () {
   DoFHandler<1>::active_cell_iterator cell = dof->begin_active(),
 				      endc = dof->end();
   double u_integrated=0;
-  FEValues<1>  fe_values (*fe, *quadrature, UpdateFlags(update_JxW_values | update_q_points));
+  FEValues<1>  fe_values (*fe, *quadrature,
+			  UpdateFlags(update_values | update_JxW_values | update_q_points));
   vector<double> cell_u (fe->dofs_per_cell);
   
   for (; cell!=endc; ++cell)
@@ -5518,7 +5524,8 @@ void TimeStep_Wave<dim>::create_matrices ()
   
   
   FEValues<dim>  fe_values (fe, quadrature,
-			    UpdateFlags(update_gradients  |
+			    UpdateFlags(update_values |
+					update_gradients  |
 					update_JxW_values |
 					(!density_constant || !stiffness_constant ?
 					 update_q_points :
@@ -6070,7 +6077,8 @@ void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
 				   // is expensive to create it for
 				   // every cell
   FEValues<dim> fe_values (fe, quadrature,
-			   UpdateFlags(update_gradients |
+			   UpdateFlags(update_values |
+				       update_gradients |
 				       update_JxW_values |
 				       update_q_points));
 
@@ -6745,7 +6753,8 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
     {
       FEValues<dim> fe_values (dual_problem.fe,
 			       dual_problem.quadrature,
-			       UpdateFlags(update_gradients |
+			       UpdateFlags(update_values |
+					   update_gradients |
 					   update_second_derivatives |
 					   update_JxW_values |
 					   update_q_points));
@@ -8391,7 +8400,8 @@ void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
 				   // is expensive to create it for
 				   // every cell
   FEValues<dim> fe_values (fe, quadrature,
-			   UpdateFlags(update_gradients |
+			   UpdateFlags(update_values |
+				       update_gradients |
 				       update_JxW_values |
 				       update_q_points));
 

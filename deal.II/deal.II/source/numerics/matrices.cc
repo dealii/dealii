@@ -25,7 +25,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim> * const a) {
   Vector<double> dummy;    // no entries, should give an error if accessed
-  UpdateFlags update_flags = update_JxW_values;
+  UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values);
   if (a != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
   const Assembler<dim>::AssemblerData data (dof,
@@ -55,7 +55,8 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Function<dim>      &rhs,
 					     Vector<double>           &rhs_vector,
 					     const Function<dim> * const a) {
-  UpdateFlags update_flags = UpdateFlags(update_q_points |
+  UpdateFlags update_flags = UpdateFlags(update_values |
+					 update_q_points |
 					 update_JxW_values);
   const Assembler<dim>::AssemblerData data (dof,
 					    true, true,
@@ -150,7 +151,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   Vector<double>     cell_vector(dofs_per_cell);
   
   
-  UpdateFlags update_flags = UpdateFlags (update_JxW_values | update_q_points);
+  UpdateFlags update_flags = UpdateFlags (update_values     |
+					  update_JxW_values |
+					  update_q_points);
   FEFaceValues<dim> fe_values (fe, q, update_flags);
 
 				   // two variables for the coefficient,

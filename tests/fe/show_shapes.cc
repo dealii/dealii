@@ -25,7 +25,7 @@ plot_shape_functions(FiniteElement<dim>& finel, const char* name)
 
   QTrapez<1> q_trapez;
   QIterated<dim> q(q_trapez, div);
-  FEValues<dim> fe(finel, q, UpdateFlags(update_default));
+  FEValues<dim> fe(finel, q, UpdateFlags(update_values));
 
   sprintf(fname, "%s.dat", name);
   ofstream gnuplot(fname);

@@ -503,8 +503,8 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   n_dofs.push_back (dof->DoFHandler<dim>::n_dofs());
 
   cout << "    Assembling matrices..." << endl;
-  UpdateFlags update_flags = UpdateFlags(update_q_points  | update_gradients |
-					 update_JxW_values);
+  UpdateFlags update_flags = UpdateFlags(update_values | update_q_points  |
+					 update_gradients | update_JxW_values);
   
   map<unsigned char,const Function<dim>*> dirichlet_bc;
   dirichlet_bc[0] = boundary_values;

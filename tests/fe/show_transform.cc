@@ -28,7 +28,7 @@ plot_transformation(FiniteElement<dim>& finel,
   QTrapez<1> q_trapez;
   QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(finel, q,
-		   UpdateFlags(update_q_points | update_JxW_values));
+		   UpdateFlags(update_values | update_q_points | update_JxW_values));
 
   fe.reinit(c);
   

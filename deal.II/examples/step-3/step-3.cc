@@ -336,8 +336,10 @@ void LaplaceProblem::assemble_system ()
 				   // transformations from the unit
 				   // cell to the real cells. The
 				   // values of the shape functions
-				   // are always computed, so we don't
-				   // have to list them. The
+				   // computed by specifying
+				   // update_values; the gradients are
+				   // done alike, using
+				   // update_gradients. The
 				   // determinants of the Jacobians
 				   // and the weights are always used
 				   // together, so only the products
@@ -346,7 +348,8 @@ void LaplaceProblem::assemble_system ()
 				   // we also need them, we have to
 				   // list them as well:
   FEValues<2> fe_values (fe, quadrature_formula, 
-			 UpdateFlags(update_gradients |
+			 UpdateFlags(update_values    |
+				     update_gradients |
 				     update_JxW_values));
 
 				   // For use further down below, we
