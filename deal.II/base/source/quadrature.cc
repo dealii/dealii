@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,6 +49,7 @@ Quadrature<dim>::Quadrature (const vector<Point<dim> > & points,
 template <>
 Quadrature<0>::Quadrature (const Quadrature<-1> &,
 			   const Quadrature<1> &)
+		: n_quadrature_points (0)
 {
   Assert (false, ExcInternalError());
 };
@@ -210,7 +211,7 @@ QProjector<dim>::QProjector (const Quadrature<dim-1> &quadrature,
 //TODO: Can we keep it that simple for non-symmetric formulae?
 // Otherwise we'll have to include the weights in the project* functions.
 // This may pose a problem anyway, since we do not want to switch endpoints
-// in Gauﬂ-Radau formulae.
+// in Gauss-Radau formulae.
 
   unsigned int k=0;
   for (unsigned int i=0;i<n;++i)
