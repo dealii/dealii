@@ -7,8 +7,11 @@ of base lac and deal.II libraries.
 All features of deal that should be available in future releases
 should be tested here.
 
-Run make in this directory to do all tests. This is required before
-any commit to the CVS repository.
+Run 
+    make 
+in this directory to do all tests. This is required before any commit
+to the CVS repository of any changes to the library. 
+
 
 How to interpret the output?
 ----------------------------
@@ -16,12 +19,46 @@ How to interpret the output?
 Apart from several messages containing compiling and linking
 information, the output of make will contain lines like
 
-=====Running======== heavy.testcase
-=====OK=============
+=====debug========== heavy.cc
+=====linking======== heavy.exe
+=====Running======== heavy.exe
+=====Checking======= heavy.output
+=====OK============= heavy.OK
 
-If the second line is replaced by some diff-output, please check for
-consistency. A check-in of the modified results should be considered
-carefully.
+If the second line doesn't read like this and instead has an error
+marker, then this test failed. This may be either due an assertion
+that was triggered, or because the output differed from what has been
+stored as the output that is stored in CVS and considered correct. To
+see the diffs between what you got and what is stored, call
+    make testname.OK verbose=on
+in the appropriate subdirectory, where testname is the name of the
+respective testcase without the .cc extension.
+
+To get a better overview of all the tests, you can instead run
+    make report
+which prints a one-line summary of all tests instead of the five lines
+above. Furthermore, it doesn't stop when it finds that one test
+doesn't yield the right result or simply aborts. Instead, it continues
+with the other tests. You can run "make report" after running "make"
+and it will generate the summary by looking at the results of the
+previous "make" run by only re-running the tests that failed. This is
+a quick way to generate a summary if one has previously run all tests
+without generating the summary.
+
+Finally, if you intend to run all tests with
+    make report
+you can instead as well run
+    make report+mail
+which in addition to running all tests and generating one-line
+summaries sends the results to a mail address in Heidelberg. There, an
+agent munches these mails every half hour or so, and presents them on
+the deal.II web page so that everyone can always see which tests
+presently failed. Using report+mail is only useful, though, if you are
+working with an up-to-date CVS tree; otherwise you may report test
+failures that are already fixed in the present CVS version and this is
+certain to confuse the one who fixed the bug.
+
+
 
 Running the tests on a new platform
 -----------------------------------
