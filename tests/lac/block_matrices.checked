@@ -1,0 +1,39 @@
+
+DEAL::Row 0 sparsity:  10000101010000101010000101010
+DEAL::Row=0: expected length=10, actual length=10
+DEAL::Row 1 sparsity:  01010100001010100001010100001
+DEAL::Row=1: expected length=10, actual length=10
+DEAL::Row 2 sparsity:  00001010101000010101000010101
+DEAL::Row=2: expected length=10, actual length=10
+DEAL::Row 3 sparsity:  10101000010101010000101010000
+DEAL::Row=3: expected length=10, actual length=10
+DEAL::Row 4 sparsity:  10000101010000101010100001010
+DEAL::Row=4: expected length=10, actual length=10
+DEAL::Row 5 sparsity:  01010100001010100001010101000
+DEAL::Row=5: expected length=10, actual length=10
+DEAL::Row 6 sparsity:  01000010101000010101000010101
+DEAL::Row=6: expected length=10, actual length=10
+DEAL::Row 7 sparsity:  10101010000101010000101010000
+DEAL::Row=7: expected length=10, actual length=10
+DEAL::Row 8 sparsity:  10000101010100001010100001010
+DEAL::Row=8: expected length=10, actual length=10
+DEAL::Row 9 sparsity:  11010100001010101000010101000
+DEAL::Row=9: expected length=11, actual length=11
+DEAL::Row 10 sparsity:  01000010101000010101010000101
+DEAL::Row=10: expected length=10, actual length=10
+DEAL::Row 11 sparsity:  00101010000101010000101010100
+DEAL::Row=11: expected length=10, actual length=10
+DEAL::Row 12 sparsity:  10110001010100001010100001010
+DEAL::Row=12: expected length=11, actual length=11
+DEAL::Row 13 sparsity:  01011101000010101000010101000
+DEAL::Row=13: expected length=11, actual length=11
+DEAL::Row 14 sparsity:  01000110101010000101010000101
+DEAL::Row=14: expected length=11, actual length=11
+DEAL::Row 15 sparsity:  00101010000101010100001010100
+DEAL::Row=15: expected length=10, actual length=10
+DEAL::Row 16 sparsity:  10100001010100001010101000010
+DEAL::Row=16: expected length=10, actual length=10
+DEAL::Row 17 sparsity:  00010101100010101000010101010
+DEAL::Row=17: expected length=11, actual length=11
+DEAL::Row 18 sparsity:  01010000111010000101010000101
+DEAL::Row=18: expected length=11, actual length=11
