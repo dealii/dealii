@@ -248,7 +248,7 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
 	  mem_fun_data[i].arg3 = n_rows * i / n_threads;
 	  mem_fun_data[i].arg4 = n_rows * (i+1) / n_threads;
 	  
-	  thread_manager.spawn (&mem_fun_data[i]);
+	  thread_manager.spawn (&mem_fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
 	};
       
 				       // ... and wait until they're finished
@@ -425,7 +425,7 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
 	  mem_fun_data[i].arg3 = n_rows * (i+1) / n_threads;
 	  mem_fun_data[i].arg4 = &partial_sums[i];
 	  	  
-	  thread_manager.spawn (&mem_fun_data[i]);
+	  thread_manager.spawn (&mem_fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
 	};
       
 				       // ... and wait until they're finished
@@ -581,7 +581,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 	  mem_fun_data[i].arg5 = n_rows * (i+1) / n_threads;
 	  mem_fun_data[i].arg6 = &partial_norms[i];
 	  	  
-	  thread_manager.spawn (&mem_fun_data[i]);
+	  thread_manager.spawn (&mem_fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
 	};
       
 				       // ... and wait until they're finished
