@@ -398,6 +398,9 @@ namespace Threads
 					*/
       static void * thread_entry_point (void *arg);
 
+
+//TODO:[WB] (compiler) with some compilers we get into trouble if the following class is not public, since we can't somehow declare the encapsulate function as friend. change this when compilers accept the friend declaration
+  public:
 				       /**
 					* Helper class, used to collect
 					* the values of the parameters
@@ -414,7 +417,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData0<RetType>::FunPtr FunPtr;
+	  typedef typename FunData0<RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -536,7 +539,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData1<Arg1,RetType>::FunPtr FunPtr;
+	  typedef typename FunData1<Arg1,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -650,7 +653,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData2<Arg1,Arg2,RetType>::FunPtr FunPtr;
+	  typedef typename FunData2<Arg1,Arg2,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -766,7 +769,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData3<Arg1,Arg2,Arg3,RetType>::FunPtr FunPtr;
+	  typedef typename FunData3<Arg1,Arg2,Arg3,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -885,7 +888,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::FunPtr FunPtr;
+	  typedef typename FunData4<Arg1,Arg2,Arg3,Arg4,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1008,7 +1011,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunPtr FunPtr;
+	  typedef typename FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1133,7 +1136,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunPtr FunPtr;
+	  typedef typename FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1262,7 +1265,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunPtr FunPtr;
+	  typedef typename FunData7<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1394,7 +1397,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunPtr FunPtr;
+	  typedef typename FunData8<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1530,7 +1533,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::FunPtr FunPtr;
+	  typedef typename FunData9<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1669,7 +1672,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::FunPtr FunPtr;
+	  typedef typename FunData10<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1792,7 +1795,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef MemFunData0<Class,RetType>::FunPtr FunPtr;
+	  typedef typename MemFunData0<Class,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -1925,7 +1928,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef MemFunData1<Class,Arg1,RetType>::FunPtr FunPtr;
+	  typedef typename MemFunData1<Class,Arg1,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -2062,7 +2065,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef MemFunData2<Class,Arg1,Arg2,RetType>::FunPtr FunPtr;
+	  typedef typename MemFunData2<Class,Arg1,Arg2,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -2202,7 +2205,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::FunPtr FunPtr;
+	  typedef typename MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -2347,7 +2350,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::FunPtr FunPtr;
+	  typedef typename MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -2495,7 +2498,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunPtr FunPtr;
+	  typedef typename MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -2648,7 +2651,7 @@ namespace Threads
 					    * underlying class to a
 					    * local type.
 					    */
-	  typedef MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunPtr FunPtr;
+	  typedef typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::FunPtr FunPtr;
 	
 					   /**
 					    * Constructor. Take and store a
@@ -3048,7 +3051,7 @@ namespace Threads
 				    * @p{[begin[i],end[i])}.
 				    */
   template <typename ForwardIterator>
-  std::vector<std::pair<ForwardIterator,ForwardIterator> >
+  typename std::vector<typename std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
 	       const ForwardIterator &end,
 	       const unsigned int n_intervals);
@@ -5151,7 +5154,7 @@ namespace Threads
 
   
   template <typename ForwardIterator>
-  std::vector<std::pair<ForwardIterator,ForwardIterator> >
+  typename std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
 	       const ForwardIterator &end,
 	       const unsigned int     n_intervals)
