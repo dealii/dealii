@@ -758,7 +758,14 @@ void
 SparsityPattern::print (std::ostream &out) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  const_iterator e = begin();
+  for (unsigned int i=0; i<rows; ++i)
+    {
+      out << '[' << i;
+      for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
+	if (colnums[j] != invalid_entry)
+	  out << ',' << colnums[j];
+      out << ']' << std::endl;
+    }
   
   AssertThrow (out, ExcIO());
 }

@@ -780,9 +780,11 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Print the sparsity of the
 				      * matrix. The output consists of
-				      * terms <tt>[i,j]</tt> for each
-				      * allocated entry. No linefeeds
-				      * are added.
+				      * one line per row of the format
+				      * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
+				      * is the row number and
+				      * <i>jn</n> are the allocated
+				      * columns in this row.
 				      */
     void print (std::ostream &out) const;
 
