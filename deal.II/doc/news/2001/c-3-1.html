@@ -318,6 +318,55 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: The static <code class="member">create_mass_matrix</code>,
+       <code class="member">create_boundary_mass_matrix</code> and
+       <code class="member">create_laplace_matrix</code> member
+       functions of the class <code class="class">MatrixCreator</code>
+       and the static <code class="member">project</code> and <code
+       class="member">project_boundary_values</code> member functions
+       of <code class="class">VectorTools</code> are extended to work
+       on arbitrary mappings. All these functions now take a <code
+       class="class">Mapping</code> object as additional argument.
+       <br>
+       For backward compatibility there exist second versions of
+       each of these functions that still don't have a <code
+       class="class">Mapping</code> argument. These functions
+       implicitely use a mapping of the class <code
+       class="class">MappingQ1</code>.
+       <br>
+       (RH 2001/04/05)
+       </p>
+
+  <li> <p>
+       Removed: Along with the redesign of the <code
+       class="class">FiniteElement</code> and the <code
+       class="class">Mapping</code> classes the <code
+       class="class">FiniteElement</code>::<code
+       class="member">get_local_mass_matrix</code> function is now
+       removed. This was necessary as the local mass matrix depends not only on the
+       considered <code class="class">FiniteElement</code> but also on
+       the mapping between the unit to the real cell. Hence this function
+       cannot be a member function of a <code
+       class="class">FiniteElement</code> any more.
+       </p>
+
+       <p>
+       As a consequence also the <code
+       class="class">MatrixCreator</code>::<code
+       class="member">create_mass_matrix</code> function with two
+       arguments is removed, as it relied on the <code
+       class="member">get_local_mass_matrix</code> function. If in
+       future the user wants to create a mass matrix he needs to use
+       one of the remaining <code
+       class="class">MatrixCreator</code>::<code
+       class="member">create_mass_matrix</code> functions that require
+       an appropriate <code class="class">Quadrature</code> as
+       argument.
+       <br>
+       (RH 2001/04/04)
+       </p>
+       
+  <li> <p>
        New/Fixed: Now there exists a new <code
        class="class">Triangulation</code>::<code
        class="member">ExcMultiplySetLineInfoOfLine</code> exception,
