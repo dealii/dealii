@@ -395,7 +395,8 @@ template<int dim, typename number>
 void
 MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
                         MGLevelObject<BlockVector<number> >& v,
-                        const std::vector<bool>& selected_in)
+                        const std::vector<bool>& selected_in,
+			const std::vector<unsigned int>& target_component)
 {
 				   // Copy selection vector to
 				   // non-const since we may want to
@@ -408,30 +409,33 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
 				   // all components are selected.
   if (selected.size() == 0)
     {
-      selected.resize(ncomp);
-      std::fill_n (selected.begin(), ncomp, true);
+      selected.resize(target_component.size());
+      std::fill_n (selected.begin(), ncomp, false);
+      for (unsigned int i=0;i<target_component.size();++i)
+	selected[target_component[i]] = true;
     }
 
-  Assert (selected.size() == ncomp,
-	  ExcDimensionMismatch(selected.size(), ncomp));
+  Assert (selected.size() == target_component.size(),
+	  ExcDimensionMismatch(selected.size(), target_component.size()));
 
   unsigned int n_selected = std::accumulate (selected.begin(),
 					     selected.end(),
 					     0U);
 			     
   std::vector<std::vector<unsigned int> >
-    ndofs(mg_dof.n_levels(), ncomp);
+    ndofs(mg_dof.get_tria().n_levels(), target_component.size());
 
   count_dofs_per_component (mg_dof, ndofs);
   
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)
     {
-      v[level].reinit(n_selected);
+      v[level].reinit(n_selected, 0);
       unsigned int k=0;
-      for (unsigned int i=0;i<ncomp;++i)
+      for (unsigned int i=0;i<selected.size();++i)
 	if (selected[i])
 	  v[level].block(k++).reinit(ndofs[level][i]);
+      v[level].collect_sizes();
     }
 }
 
@@ -530,13 +534,26 @@ MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_
 
 #endif
 
-template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-					MGLevelObject<Vector<double> >&);
-template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-					MGLevelObject<Vector<float> >&);
+template void MGTools::reinit_vector<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension>&,
+  MGLevelObject<Vector<double> >&);
+template void MGTools::reinit_vector<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension>&,
+  MGLevelObject<Vector<float> >&);
+
+template void MGTools::reinit_vector<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension>&,
+  MGLevelObject<BlockVector<double> >&,
+  const std::vector<bool>&,
+  const std::vector<unsigned int>&);
+template void MGTools::reinit_vector<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension>&,
+  MGLevelObject<BlockVector<float> >&,
+  const std::vector<bool>&,
+  const std::vector<unsigned int>&);
 
 
-
-template void MGTools::count_dofs_per_component<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-						   std::vector<std::vector<unsigned int> >&,
-								    std::vector<unsigned int> guidos_special_arg);
+template void MGTools::count_dofs_per_component<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension>&,
+  std::vector<std::vector<unsigned int> >&,
+  std::vector<unsigned int>);

@@ -167,12 +167,19 @@ class MGTools
 				      * sorted by component in order
 				      * to obtain reasonable results
 				      * from this function.
+				      *
+				      * The argument
+				      * @p{target_component} allows to
+				      * re-sort and groupt components
+				      * as in
+				      * @p{DoFRenumbering::component_wise}.
 				      */
     template <int dim, typename number>
       static void
       reinit_vector (const MGDoFHandler<dim>& mg_dof,
 		     MGLevelObject<BlockVector<number> >& v,
-		     const std::vector<bool>& selected);
+		     const std::vector<bool>& selected,
+		     const std::vector<unsigned int>& target_component);
 };
 
 

@@ -21,6 +21,7 @@
 #include <numerics/data_out.h>
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_dof_tools.h>
 #include <multigrid/mg_transfer.h>
 
 #include <algorithm>
@@ -581,9 +582,7 @@ copy_to_mg (const MGDoFHandler<dim>             &mg_dof_handler,
   
   dst.clear();
 
-//TODO:[GK] Make sure dst is not too large and sizes is filled  
-  for (unsigned int l=minlevel;l<=maxlevel;++l)
-    dst[l].reinit(sizes[l]);
+  MGTools::reinit_vector(mg_dof_handler, dst, selected, target_component);
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);

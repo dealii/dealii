@@ -27,6 +27,8 @@
 #include <multigrid/mg_transfer.templates.h>
 #include <multigrid/mg_dof_tools.h>
 
+#include <algorithm>
+
 template <int dim>
 void MGTransferBlockBase::build_matrices (
   const MGDoFHandler<dim>& mg_dof,
@@ -41,25 +43,25 @@ void MGTransferBlockBase::build_matrices (
       Assert (target_component.size() == mg_dof.get_fe().n_components(),
 	      ExcDimensionMismatch(target_component.size(),
 				   mg_dof.get_fe().n_components()));
-//      unsigned int previous = 0;
+      
       for (unsigned int i=0;i<target_component.size();++i)
 	{
 	  Assert(i<target_component.size(),
 		 ExcIndexRange(i,0,target_component.size()));
-//	  Assert(previous<=i,ExcIndexRange(i,previous,previous+1));
-//	  Assert(i<=previous+1,ExcIndexRange(i,previous,previous+1));
 	}
     }
   
   const FiniteElement<dim>& fe = mg_dof.get_fe();
-  const unsigned int n_components  = fe.n_components();
+
+  const unsigned int n_components  =
+    *std::max_element(target_component.begin(), target_component.end()) + 1;
   const unsigned int dofs_per_cell = fe.dofs_per_cell;  
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   
   selected = select;
   
-  Assert (selected.size() == n_components,
-	  ExcDimensionMismatch(selected.size(), n_components))
+  Assert (selected.size() == fe.n_components(),
+	  ExcDimensionMismatch(selected.size(), fe.n_components()))
 
   sizes.resize(n_levels);
   MGTools::count_dofs_per_component(mg_dof, sizes, target_component);
@@ -142,7 +144,6 @@ void MGTransferBlockBase::build_matrices (
 	    prolongation_sparsities[level]->block(i,j)
 	      .reinit(sizes[level+1][i],
 		      sizes[level][j],
-//TODO:[GK] Split this by component to save memory
 		      dofs_per_cell+1);
 	  else
 	    prolongation_sparsities[level]->block(i,j)
