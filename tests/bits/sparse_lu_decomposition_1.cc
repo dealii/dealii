@@ -1,6 +1,6 @@
 //----------------------------  sparse_lu_decomposition_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    sparse_lu_decomposition_1.cc,v 1.1 2003/05/09 21:13:30 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,9 @@
 // inheritance of SparseMatrix by SparseLUDecomposition, and the
 // associated lack of accessibility of the Subscriptor functions to
 // the SmartPointer
+//
+// it was fixed around 203-05-22
+
 
 #include <base/logstream.h>
 #include <base/smartpointer.h>
