@@ -38,12 +38,10 @@ const bool errors = false;
 #include <grid/grid_generator.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
-#include <fe/fe_system.h>
 #include <fe/mapping_cartesian.h>
 #include <fe/mapping_q1.h>
 #include <fe/mapping_q.h>
 #include <fe/fe_values.h>
-#include <numerics/data_out.h>
 #include <vector>
 #include <fstream>
 #include <string>
