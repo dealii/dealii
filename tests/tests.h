@@ -30,13 +30,13 @@ LogStream & operator << (LogStream &logstream,
 {
   if (std::fabs (d) < 1e-10)
     logstream.
-#ifndef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
       template
 #endif
       operator << <double> (0.);
   else
     logstream.
-#ifndef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
       template
 #endif
       operator << <double> (d);
@@ -50,13 +50,13 @@ LogStream & operator << (LogStream &logstream,
 {
   if (std::fabs (d) < 1e-8)
     logstream.
-#ifndef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
       template
 #endif
       operator << <float> (0.);
   else
     logstream.
-#ifndef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
+#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
       template
 #endif
       operator << <float> (d);
