@@ -177,6 +177,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
 					 const Function<dim>     *coefficients,
 					 unsigned int             n_threads)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads);
@@ -325,8 +326,7 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 	      {
 		if (n_components==1)
 		  {
-		    double v=0;
-		    neumann_bc.find(n)->second->value(cell->vertex(0), v);
+		    double v = neumann_bc.find(n)->second->value(cell->vertex(0));
 		    
 		    for (unsigned int s=0; s<n_solution_vectors; ++s)
 		      grad_neighbor[s](0) = v;
@@ -679,6 +679,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 					 const Function<dim>                 *coefficients,
 					 unsigned int                         n_threads)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
   static const MappingQ1<dim> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads);
