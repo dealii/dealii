@@ -50,10 +50,11 @@ tests_x = anna_? \
           sparse_matrix_* \
 	  full_matrix_vector_* \
 	  solver_selector \
-	  deal_solver_*
+	  deal_solver_* \
+	  vector_*
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  tests_x += vector_* petsc_*
+  tests_x += petsc_*
 endif
 
 # from above list of regular expressions, generate the real set of
