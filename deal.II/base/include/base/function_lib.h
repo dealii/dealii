@@ -74,6 +74,58 @@ class SquareFunction : public Function<dim>
 
 
 /**
+ * The function @p{xy}. This function serves as an example for
+ * a vanishing Laplacian.
+ *
+ * @author: Guido Kanschat, 2000
+ */
+template<int dim>
+class Q1WedgeFunction : public Function<dim>
+{
+  public:
+				     /**
+				      * Function value at one point.
+				      */
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * Function values at multiple points.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values,
+			     const unsigned int         component = 0) const;
+
+				     /**
+				      * Gradient at one point.
+				      */
+    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+					Gradients at multiple points.
+				      */
+    virtual void gradient_list (const vector<Point<dim> > &points,
+				vector<Tensor<1,dim> >    &gradients,
+				const unsigned int         component = 0) const;
+
+				     /**
+				      * Laplacian of the function at one point.
+				      */
+    virtual double laplacian (const Point<dim>   &p,
+			      const unsigned int  component = 0) const;
+
+				     /**
+				      * Laplacian of the function at multiple points.
+				      */
+    virtual void laplacian_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int         component = 0) const;
+};
+
+
+
+/**
  * d-quadratic pillow on the unit hypercube.
  *
  * This is a function for testing the implementation. It has zero Dirichlet

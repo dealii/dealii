@@ -109,6 +109,90 @@ SquareFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 
 
 template<int dim>
+double
+Q1WedgeFunction<dim>::value (const Point<dim>   &p,
+			    const unsigned int) const
+{
+  return p(0)*p(1);
+}
+
+
+
+template<int dim>
+void
+Q1WedgeFunction<dim>::value_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcDimensionMismatch(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<dim>& p = points[i];
+      values[i] = p(0)*p(1);
+    }
+}
+
+
+template<int dim>
+double
+Q1WedgeFunction<dim>::laplacian (const Point<dim>   &,
+				const unsigned int) const
+{
+  return 0.;
+}
+
+
+template<int dim>
+void
+Q1WedgeFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
+				     vector<double>            &values,
+				     const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcDimensionMismatch(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    values[i] = 0.;
+}
+
+
+
+template<int dim>
+Tensor<1,dim>
+Q1WedgeFunction<dim>::gradient (const Point<dim>   &p,
+			       const unsigned int) const
+{
+  Tensor<1,dim> erg;
+  erg[0] = p(1);
+  erg[1] = p(0);
+  return erg;
+}
+
+
+
+template<int dim>
+void
+Q1WedgeFunction<dim>::gradient_list (const vector<Point<dim> > &points,
+				    vector<Tensor<1,dim> >    &gradients,
+				    const unsigned int) const
+{
+  Assert (gradients.size() == points.size(),
+	  ExcDimensionMismatch(gradients.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    {
+      gradients[i][0] = points[i](1);
+      gradients[i][1] = points[i](0);
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+template<int dim>
 PillowFunction<dim>::PillowFunction (const double offset)
 		:
 		offset(offset)
@@ -902,6 +986,9 @@ JumpFunction<dim>::memory_consumption () const
 template SquareFunction<1>;
 template SquareFunction<2>;
 template SquareFunction<3>;
+template Q1WedgeFunction<1>;
+template Q1WedgeFunction<2>;
+template Q1WedgeFunction<3>;
 template PillowFunction<1>;
 template PillowFunction<2>;
 template PillowFunction<3>;
