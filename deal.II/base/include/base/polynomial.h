@@ -16,6 +16,7 @@
 
 
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 
 #include <vector.h>
 
@@ -26,9 +27,9 @@
  * happens through the Horner scheme which provides both numerical
  * stability and a minimal number of numerical operations.
  *
- * @author Ralf Hartmann, 2000
+ * @author Ralf Hartmann, Guido Kanschat, 2000
  */
-class Polynomial
+class Polynomial : public Subscriptor
 {
   public:
 				     /**
@@ -92,7 +93,7 @@ class Polynomial
 				      * passed down by derived
 				      * classes.
 				      */
-    const vector<double> coefficients;
+    vector<double> coefficients;
 };
 
 

@@ -18,7 +18,7 @@
 #include <base/tensor.h>
 #include <base/point.h>
 #include <base/polynomial.h>
-
+#include <base/smartpointer.h>
 
 #include <vector.h>
 
@@ -39,7 +39,7 @@ class TensorProductPolynomials
 				      * order @p{p} there should be
 				      * @p{p+1} polynomials.
 				      */
-    TensorProductPolynomials(const vector<Polynomial> &pols);
+    TensorProductPolynomials(const vector<SmartPointer<Polynomial> > &pols);
 
 				     /**
 				      * Calculates the shape values
@@ -47,7 +47,7 @@ class TensorProductPolynomials
 				      * @p{unit_point}.
 				      */
     void shape_values_and_grads(const Point<dim> &unit_point,
-				vector<double> > &values,
+				vector<double> &values,
 				vector<Tensor<1,dim> > &grads,
 				vector<Tensor<2,dim> > &grad_grads) const;
 
@@ -61,14 +61,12 @@ class TensorProductPolynomials
 	    
   private:
 				     /**
-				      * TODO: Implement use of
-				      * SmartPointer later.
-				      *
 				      * Pointer to the @p{polynomials}
 				      * given to the constructor.
 				      */
-    const vector<Polynomial> *polynomials;
-}
+    vector<SmartPointer<Polynomial> > polynomials;
+};
+
 
 
 
