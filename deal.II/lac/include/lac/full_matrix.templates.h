@@ -1260,18 +1260,15 @@ FullMatrix<number>::gauss_jordan()
   Assert (dim_range == dim_image, ExcNotQuadratic());
   vector<unsigned int> p(n());
 
-  unsigned int i,j,k,r;
-  number max, hr;
-
-  for (i=0; i<n(); ++i)
+  for (unsigned int i=0; i<n(); ++i)
     p[i] = i;
 
-  for (j=0; j<n(); ++j)
+  for (unsigned int j=0; j<n(); ++j)
     {
 				       // pivotsearch
-      max = fabs(el(j,j));
-      r = j;
-      for (i=j+1; i<n(); ++i)
+      double max = fabs(el(j,j));
+      double r = j;
+      for (unsigned int i=j+1; i<n(); ++i)
 	{
 	  if (fabs(el(i,j)) > max)
 	    {
@@ -1283,28 +1280,25 @@ FullMatrix<number>::gauss_jordan()
 				       // rowinterchange
       if (r>j)
 	{
-	  for (k=0; k<n(); ++k)
-	    {
-	      hr = el(j,k) ; el(j,k) = el(r,k) ; el(r,k) = hr;
-	    }
-	  i = p[j];
-	  p[j] = p[r];
-	  p[r] = i;
+	  for (unsigned int k=0; k<n(); ++k)
+	    swap (el(j,k), el(r,k));
+
+	  swap (p[j], p[r]);
 	}
 
 				       // transformation
-      hr = 1./el(j,j);
+      const double hr = 1./el(j,j);
       el(j,j) = hr;
-      for (k=0; k<n(); ++k)
+      for (unsigned int k=0; k<n(); ++k)
 	{
 	  if (k==j) continue;
-	  for (i=0; i<n(); ++i)
+	  for (unsigned int i=0; i<n(); ++i)
 	    {
 	      if (i==j) continue;
 	      el(i,k) -= el(i,j)*el(j,k)*hr;
 	    }
 	}
-      for (i=0; i<n(); ++i)
+      for (unsigned int i=0; i<n(); ++i)
 	{
 	  el(i,j) *= hr;
 	  el(j,i) *= -hr;
@@ -1312,11 +1306,13 @@ FullMatrix<number>::gauss_jordan()
       el(j,j) = hr;
     }
 				   // columninterchange
-  Vector<number> hv(n());
-  for (i=0; i<n(); ++i)
+  vector<number> hv(n());
+  for (unsigned int i=0; i<n(); ++i)
     {
-      for (k=0; k<n(); ++k) hv(p[k]) = el(i,k);
-      for (k=0; k<n(); ++k) el(i,k) = hv(k);
+      for (unsigned int k=0; k<n(); ++k)
+	hv[p[k]] = el(i,k);
+      for (unsigned int k=0; k<n(); ++k)
+	el(i,k) = hv[k];
     }
 }
 
