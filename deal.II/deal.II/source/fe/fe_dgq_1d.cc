@@ -22,50 +22,6 @@
 
 namespace FE_DGQ_1d
 {
-  static const double dgq0_into_dgq0_refined[] =
-  {
-	1., 1.
-  };
-
-
-                                   // the left node on the left child gets the
-                                   // value of the left node of the mother
-                                   // cell. the right node gets the mean value
-                                   // of the two nodes on the mother cell.
-                                   //
-                                   // note that the values for the right child
-                                   // cell are determined by permutation in
-                                   // the constructor of FE_DGQ
-  static const double dgq1_into_dgq1_refined[] =
-  {
-	1., 0.,
-	13.5/27., 13.5/27.,
-  };
-
-  static const double dgq2_into_dgq2_refined[] =
-  {
-	1., 0., 0.,
-	10.125/27., 20.25/27., -3.375/27.,
-	0., 1., 0.,
-  };
-
-  static const double dgq3_into_dgq3_refined[] =
-  {
-	1., 0., 0., 0.,
-	8.4375/27., 25.3125/27., -8.4375/27., 1.6875/27.,
-	0., 1., 0., 0.,
-	-1.6875/27., 15.1875/27., 15.1875/27., -1.6875/27.,
-  };
-
-  static const double dgq4_into_dgq4_refined[] =
-  {
-	1., 0., 0., 0., 0.,
-	7.3828125/27., 29.53125/27., -14.765625/27., 5.90625/27., -1.0546875/27.,
-	0., 1., 0., 0., 0.,
-	-1.0546875/27., 12.65625/27., 18.984375/27., -4.21875/27., 0.6328125/27.,
-	0., -2.91892343e-13/27., 1., 0., 0.,
-  };
-
 
   static const double dgq0_refined_onto_dgq0[] =
   {
@@ -136,26 +92,6 @@ namespace FE_DGQ_1d
 	-0.050934606, 0.18647931, -0.15057292, -0.1043873, -0.016304977, 0.28934245, 0.015028935, -0.031932147,
   };
 }
-
-
-
-template <>
-const double * const FE_DGQ<1>::Matrices::embedding[] =
-{	
-      FE_DGQ_1d::dgq0_into_dgq0_refined,
-      FE_DGQ_1d::dgq1_into_dgq1_refined,
-      FE_DGQ_1d::dgq2_into_dgq2_refined,
-      FE_DGQ_1d::dgq3_into_dgq3_refined,
-      FE_DGQ_1d::dgq4_into_dgq4_refined
-};
-
-
-
-template <>
-const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices
-  = sizeof(FE_DGQ<1>::Matrices::embedding) /
-    sizeof(FE_DGQ<1>::Matrices::embedding[0]);
-
 
 
 

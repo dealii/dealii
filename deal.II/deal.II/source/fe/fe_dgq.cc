@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <fe/fe_dgq.h>
+#include <fe/fe_tools.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -151,72 +152,12 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
   rotate_indices (right, 'Z');
   if (dim>2)
     rotate_indices (top, 'X');
-
-				   // if defined, copy over matrices
-				   // from precomputed arrays and
-				   // generate all other matrices by
-				   // permutations
-                                   //
-                                   // (note: the matrix is defined if
-                                   // something was entered into the
-                                   // respective table, and what was
-                                   // entered is not a NULL pointer --
-                                   // this would allow for "holes")
-  if ((degree < Matrices::n_embedding_matrices) &&
-      (Matrices::embedding[degree] != 0))
-    {
-      for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-        this->prolongation[i].reinit (this->dofs_per_cell,
-                                      this->dofs_per_cell);
-      this->prolongation[0].fill (Matrices::embedding[degree]);
-      switch (dim)
-	{
-	  case 1:
-          {
-	    this->prolongation[1].fill_permutation (this->prolongation[0],
-						    right, right);
-	    break;
-          };
-          
-	  case 2:
-          {
-	    this->prolongation[1].fill_permutation (this->prolongation[0],
-						    right, right);
-	    this->prolongation[2].fill_permutation (this->prolongation[1],
-						    right, right);
-	    this->prolongation[3].fill_permutation (this->prolongation[2],
-						    right, right);
-	    break;
-          };
-          
-	  case 3:
-          {
-	    this->prolongation[1].fill_permutation (this->prolongation[0],
-						    right, right);
-	    this->prolongation[5].fill_permutation (this->prolongation[1],
-						    right, right);
-	    this->prolongation[4].fill_permutation (this->prolongation[5],
-						    right, right);
-	    this->prolongation[7].fill_permutation (this->prolongation[4],
-						    top, top);
-	    this->prolongation[3].fill_permutation (this->prolongation[7],
-						    top, top);
-	    this->prolongation[6].fill_permutation (this->prolongation[5],
-						    top, top);
-	    this->prolongation[2].fill_permutation (this->prolongation[6],
-						    top, top);
-	    break;
-          };
-          
-	  default:
-	    Assert (false, ExcNotImplemented());
-	}
-    }
-  else
-				     // matrix undefined, leave matrix
-				     // at size zero
-    ;
-
+  
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->prolongation[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  
 				   // same as above: copy over matrix
 				   // from predefined values and
 				   // generate all others by rotation

@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <fe/fe_dgp.h>
+#include <fe/fe_tools.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -31,39 +32,20 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
-				   // if defined, copy over matrices
-				   // from precomputed arrays
-  if ((degree < Matrices::n_embedding_matrices) &&
-      (Matrices::embedding[degree][0] != 0))
-    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      {
-        this->prolongation[c].reinit (this->dofs_per_cell,
-                                      this->dofs_per_cell);
-        this->prolongation[c].fill (Matrices::embedding[degree][c]);
-      }
-  else
-    for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
-      this->prolongation[i].reinit(0,0);
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->prolongation[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
 
                                    // restriction can be defined
                                    // through projection for
                                    // discontinuous elements, but is
                                    // presently not implemented for DGP
                                    // elements.
-                                   //
+
+//TODO: Do the restriction  
                                    // if it were, then the following
                                    // snippet would be the right code
-//  this->restriction[i].reinit (this->dofs_per_cell, this->dofs_per_cell);
-//    if ((degree < Matrices::n_projection_matrices) &&
-//        (Matrices::projection_matrices[degree] != 0))
-//      {
-//        restriction[0].fill (Matrices::projection_matrices[degree]);
-//      }
-//    else
-//  				     // matrix undefined, set size to zero
-//      for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-//        restriction[i].reinit(0, 0);
-
                                    // note further, that these
                                    // elements have neither support
                                    // nor face-support points, so
