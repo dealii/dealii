@@ -7,7 +7,7 @@
 #include <base/smartpointer.h>
 #include <lac/forward-declarations.h>
 
-#include <vector>
+#include <bvector.h>
 
 /**
  * Point-wise Vanka preconditioning.
@@ -37,17 +37,18 @@ class SparseVanka
 {
   public:
 				     /**
-				      * Constructor.
-				      * Take a vector of the indices
-				      * of the Lagrange multiplier as
-				      * argument. A reference to this
-				      * vector will be stored, so it
-				      * must persist longer than the
-				      * Vanka object. The same is true
-				      * for the matrix.
+				      * Constructor. Gets the matrix
+				      * for preconditioning and a bit
+				      * vector with entries #true# for
+				      * all rows to be updated. A
+				      * reference to this vector will
+				      * be stored, so it must persist
+				      * longer than the Vanka
+				      * object. The same is true for
+				      * the matrix.
 				      */
     SparseVanka(const SparseMatrix<number>& M,
-		const vector<int>& indices);
+		const bit_vector& selected);
 				     /**
 				      * Do the preconditioning. This
 				      * function contains a dispatch
@@ -89,7 +90,7 @@ class SparseVanka
 				      * Indices of Lagrange
 				      * multipliers.
 				      */
-    const vector<int>& indices;
+    const bit_vector& selected;
 };
 
 template<typename number>

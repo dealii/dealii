@@ -8,9 +8,9 @@
 
 template<typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number>& M,
-				 const vector<int>& indices)
+				 const bit_vector& selected)
 		:
-		matrix(&M), indices(indices)
+		matrix(&M), selected(selected)
 {}
 
 template<typename number>
@@ -19,15 +19,17 @@ void
 SparseVanka<number>::forward(Vector<number2>& dst,
 			   const Vector<number2>& src) const
 {
-  for (unsigned int global_i=0; global_i<indices.size() ; ++global_i)
+  for (unsigned int row=0; row< matrix->m() ; ++row)
     {
-      unsigned int row = indices[global_i];
+      if (!selected[row])
+	continue;
+      
       const SparseMatrixStruct& structure = matrix->get_sparsity_pattern();
       unsigned int n = structure.row_length(row);
       
-      FullMatrix<number> A(n);
-      Vector<number> b(n);
-      Vector<number> x(n);
+      FullMatrix<float> A(n);
+      Vector<float> b(n);
+      Vector<float> x(n);
       
       map<unsigned int, unsigned int> local_index;
 
