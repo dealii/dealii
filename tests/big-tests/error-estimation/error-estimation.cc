@@ -19,7 +19,6 @@
 #include <fe/fe_lib.lagrange.h>
 #include <numerics/data_out.h>
 #include "../problem_base.h"
-#include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>

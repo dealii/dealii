@@ -13,6 +13,301 @@
 
 
 
+#include <base/exceptions.h>
+#include <lac/full_matrix.h>
+#include <lac/vector.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <fe/fe_values.h>
+#include <numerics/vectors.h>
+#include <numerics/matrices.h>
+#include <vector>
+
+
+/**
+ * The use of this class is now deprecated!
+ *
+ * This is the base class for equation objects. Equations objects describe the
+ * finite element discretisation of one or more equations.
+ *
+ * Equation objects need only provide functions which set up the cell
+ * matrices and the cell right hand side. These are then automatically inserted
+ * into the global matrices and vectors.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
+template <int dim>
+class Equation
+{
+  public:
+				     /**
+				      * Constructor. You have to pass the number
+				      * of equations you want to discretize, which
+				      * equals the number of solution functions.
+				      */
+    Equation (const unsigned int n_equations);
+
+				     /**
+				      * Virtual function which assembles the
+				      * cell matrix and the right hand side
+				      * on a given cell.
+				      *
+				      * This function assumes the cell matrix
+				      * and right hand side to have the right
+				      * size and to be empty. Functions of
+				      * derived classes should check for
+				      * this.
+				      * For that purpose, the two exceptions
+				      * @p{ExcWrongSize} and @p{ExcObjectNotEmpty}
+				      * are declared.
+				      */
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
+			   const FEValues<dim> &fe_values,
+			   const typename DoFHandler<dim>::cell_iterator &cell) const;
+
+				     /**
+				      * Virtual function which only assembles
+				      * the cell matrix on a given cell.
+				      *
+				      * This function assumes the cell matrix
+				      * and right hand side to have the right
+				      * size and to be empty. Functions of
+				      * derived classes should check for
+				      * this.
+				      * For that purpose, the two exceptions
+				      * @p{ExcWrongSize} and @p{ExcObjectNotEmpty}
+				      * are declared.
+				      */
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   const FEValues<dim> &fe_values,
+			   const typename DoFHandler<dim>::cell_iterator &cell) const;
+
+				     /**
+				      * Virtual function which only assembles
+				      * the right hand side on a given cell.
+				      *
+				      * This function assumes the cell matrix
+				      * and right hand side to have the right
+				      * size and to be empty. Functions of
+				      * derived classes should check for
+				      * this.
+				      * For that purpose, the two exceptions
+				      * @p{ExcWrongSize} and @p{ExcObjectNotEmpty}
+				      * are declared.
+				      */
+    virtual void assemble (Vector<double>      &rhs,
+			   const FEValues<dim> &fe_values,
+			   const typename DoFHandler<dim>::cell_iterator &cell) const;
+
+				     /**
+				      * Return number of equations for this
+				      * equation object. This equals the number
+				      * of solution functions.
+				      */
+    unsigned int n_equations () const;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcPureVirtualFunctionCalled);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcWrongSize,
+		    int, int,
+		    << "Object has wrong size " << arg1
+		    << ", but should have " << arg2 << ".");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcObjectNotEmpty);
+    
+  protected:
+				     /**
+				      * Store the number of solution functions,
+				      * which is the same as the number of
+				      * equations.
+				      */
+    const unsigned int n_eq;
+};
+
+
+
+/**
+ * The use of this class is now deprecated!
+ *
+ * An @p{Assembler} is a specialized version of a @p{DoFCellAccessor} which adds
+ * functionality to assemble global matrices and vectors from cell base ones.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
+template <int dim>
+class Assembler : public DoFCellAccessor<dim>
+{
+  public:
+
+				     /**
+				      * Structure to be passed upon
+				      * construction of an assembler object
+				      * through the iterator object. See
+				      * @ref{TriaRawIterator} for a discussion
+				      * of this mechanism.
+				      */
+    struct AssemblerData {
+					 /**
+					  * Constructor.
+					  */
+	AssemblerData (const DoFHandler<dim>    &dof,
+		       const bool                assemble_matrix,
+		       const bool                assemble_rhs,
+		       SparseMatrix<double>     &matrix,
+		       Vector<double>           &rhs_vector,
+		       const Quadrature<dim>    &quadrature,
+		       const UpdateFlags        &update_flags);
+	
+					 /**
+					  * Pointer to the dof handler object
+					  * to be used to iterate on.
+					  */
+	const DoFHandler<dim>  &dof;
+	
+					 /**
+					  * Flags to assemble the matrix.
+					  */
+	const bool              assemble_matrix;
+
+					 /**
+					  * Flags whether to assemble the right hand sides.
+					  */
+	const bool              assemble_rhs;
+	
+					 /**
+					  * Pointer to the matrix to be assembled
+					  * by this object. Elements are summed
+					  * up by the assembler, so you may want
+					  * to clear this object (set all entries
+					  * to zero) before use.
+					  */
+	SparseMatrix<double>   &matrix;
+	
+					 /**
+					  * Pointer to the vector to be assembled
+					  * by this object. Elements are summed
+					  * up by the assembler, so you may want
+					  * to clear this object (set all entries
+					  * to zero) before use.
+					  */
+	Vector<double>         &rhs_vector;
+	
+					 /**
+					  * Pointer to a quadrature object to be
+					  * used for this assemblage process.
+					  */
+	const Quadrature<dim>  &quadrature;
+	
+					 /**
+					  * Store which of the fields of the
+					  * FEValues object need to be reinitialized
+					  * on each cell.
+					  */
+	const UpdateFlags       update_flags;
+    };
+
+
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef AssemblerData AccessorData;
+    
+				     /**
+				      * Default constructor, unused thus not
+				      * implemented.
+				      */
+    Assembler ();
+    
+				     /**
+				      * Constructor. The @p{local_data}
+				      * argument is assumed to be a pointer
+				      * to an @p{AssemblerData} object. The data
+				      * is copied, so the object need not live
+				      * longer than the constructor call.
+				      */
+    Assembler (Triangulation<dim> *tria,
+	       const int           level,
+	       const int           index,
+	       const AccessorData *local_data);
+    
+				     /**
+				      * Assemble on the present cell using
+				      * the given equation objectand the data
+				      * passed to the constructor. The elements
+				      * of the local matrix and right hand side
+				      * are added to the global matrix and
+				      * vector so you may want to clear the
+				      * matrix before use.
+				      */
+    void assemble (const Equation<dim> &);
+
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcNoAssemblingRequired);
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcInvalidData);
+				     /**
+				      * Exception.
+				      */
+				     /**
+				      * Exception.
+				      */
+  private:
+				     /**
+				      * Store a local cell matrix.
+				      */
+    FullMatrix<double>  cell_matrix;
+
+				     /**
+				      * Right hand side local to cell.
+				      */
+    Vector<double>    cell_vector;
+
+				     /**
+				      * Store whether to assemble the
+				      * global matrix.
+				      */
+    bool              assemble_matrix;
+
+				     /**
+				      * Store whether to assemble the
+				      * right hand side.
+				      */
+    bool              assemble_rhs;
+
+				     /**
+				      * Pointer to the matrix to be assembled
+				      * by this object.
+				      */
+    SparseMatrix<double>    &matrix;
+
+				     /**
+				      * Pointer to the vector to be assembled
+				      * by this object.
+				      */
+    Vector<double>          &rhs_vector;
+
+				     /**
+				      * The finite element evaluated at the
+				      * quadrature points.
+				      */
+    FEValues<dim>     fe_values;
+};
+
+
 #include <lac/sparse_matrix.h>
 #include <base/exceptions.h>
 #include <dofs/dof_constraints.h>
@@ -248,633 +543,6 @@ class ProblemBase
 };
 
 
-
-/**
- * Equation class to be passed to the @ref{Assembler} if you want to make up the
- * mass matrix for your problem. The mass matrix is the matrix with
- * $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$.
- *
- * You may pass a coefficient function to the constructor. If you do so, the
- * assemble routines compute the matrix
- * $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$
- * instead. The coefficient will in many cases be a strictly positive function.
- *
- * The class also has functions to create a right hand side
- * $f_i = \int_\Omega f(x) \phi_i(x) dx$. The function $f(x)$ has to be
- * given to the constructor; if none is given, an error is issued if you
- * try to create a right hand side vector. The function to create right
- * hand side vectors is the same for all the matrix class in this file,
- * since it does not depend on the operator.
- *
- * The defaults for both right hand side and coefficient function is a
- * @p{NULL} pointer. If you need a coefficient but no right hand side object,
- * simply pass a @p{NULL} pointer to the constructor for its first argument.
- *
- *
- * @sect3{Other possibilities}
- *
- * You will usually want to use this object only if you have coefficients
- * which vary over each cell. If you have coefficients which are constant
- * on each cell or even on the whole domain, you can get the local mass
- * matrix easier by calling the @ref{FiniteElement}@p{::get_local_mass_matrix} and
- * then scaling this one on each cell. This has the additional benefit that
- * the mass matrix is evaluated exactly, i.e. not using a quadrature formula
- * and is normally much faster since it can be precomputed and needs only
- * be scaled appropriately.
- *
- * The useful use of this object is therefore probable one of the following
- * cases:
- * @begin{itemize}
- * @item Mass lumping: use an @ref{Assembler} object and a special quadrature
- *   formula to voluntarily evaluate the mass matrix incorrect. For example
- *   by using the trapezoidal formula, the mass matrix will become a
- *   diagonal (at least if no hanging nodes are considered). However, there
- *   may be easier ways to set up the resulting matrix, for example by
- *   scaling the diagonal elements of the unit matrix by the area element
- *   of the respective cell.
- *
- * @item Nonconstant coefficient: if the coefficient varies considerably over
- *   each element, there is no way around this class. However, there are many
- *   cases where it is sufficient to assume that the function be constant on
- *   each cell (taking on its mean value throughout the cell for example, or
- *   more easily computed, its value at the center of mass of the element).
- *   A proper analysis of the error introduced by an assumed constant
- *   coefficient may be worth the effort.
- *
- *   Nonconstant coefficients to the mass matrix occur in mechanical problems
- *   if the density or other mechanical properties vary with the space
- *   coordinate.
- *
- * @item Simple plugging together of system matrices: if the system matrix has
- *    the form $s_{ij} = m_{ij} + \alpha a_{ij}$, for example, with $M$ and
- *    $A$ being the mass and laplace matrix, respectively (this matrix $S$
- *    occurs in the discretization of the heat and the wave equation, amoung
- *    others), once could conceive an equation object in which the @p{assemble}
- *    functions do nothing but sum up the contributions delivered by the
- *    @p{assemble} functions of the @ref{MassMatrix} and @ref{LaplaceMatrix} classes.
- *    Since numerical quadrature is necessary here anyway, this way is
- *    justifyable to quickly try something out. In the further process it
- *    may be useful to replace this behaviour by more sophisticated methods,
- *    however.
- * @end{itemize}
- */
-template <int dim>
-class MassMatrix :  public Equation<dim> {
-  public:
-				     /**
-				      * Constructor. Pass a function object if
-				      * you want to create a right hand side
-				      * vector, pass a function pointer (default
-				      * is a NULL pointer). It is your duty to
-				      * guarantee that the function object for
-				      * the right hand side lives at least as
-				      * long as this object does.
-				      *
-				      * You may also pass a function describing
-				      * the weight to the integral (see the
-				      * general docs for more information). The
-				      * same applies for this object as said
-				      * above.
-				      */
-    MassMatrix (const Function<dim> * const rhs = 0,
-		const Function<dim> * const a = 0);
-
-				     /**
-				      * Assemble the cell matrix and right hand
-				      * side vector for this cell. You need to
-				      * give a right hand side object to the
-				      * constructor to use this function. If
-				      * a coefficient was given to the
-				      * constructor, it is used.
-				      *
-				      * This function assumes the cell matrix
-				      * and right hand side to have the right
-				      * size and to be empty.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Construct the cell matrix for this cell.
-				      * If a coefficient was given to the
-				      * constructor, it is used.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Only construct the right hand side
-				      * vector for this cell. You need to give
-				      * a right hand side function to the
-				      * constructor in order to call this
-				      * function.
-				      */
-    virtual void assemble (Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-    
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNoRHSSelected);
-    
-  protected:
-				     /**
-				      * Pointer to a function describing the
-				      * right hand side of the problem. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const right_hand_side;
-
-				     /**
-				      * Pointer to a function describing the
-				      * coefficient to the integral for the
-				      * matrix entries. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const coefficient;
-};
-
-
-/**
- * Equation class to be passed to the @ref{Assembler} if you want to make up the
- * laplace matrix for your problem. The laplace matrix is the matrix with
- * $a_{ij} = \int_\Omega \nabla\phi_i(x) \cdot \nabla\phi_j(x) dx$.
- *
- * You may pass a coefficient function to the constructor. If you do so, the
- * assemble routines compute the matrix
- * $m_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \cdot \nabla\phi_j(x) dx$
- * instead. The coefficient will in many cases be a strictly positive function.
- *
- * The class also has functions to create a right hand side
- * $f_i = \int_\Omega f(x) \phi_i(x) dx$. The function $f(x)$ has to be
- * given to the constructor; if none is given, an error is issued if you
- * try to create a right hand side vector. The function to create right
- * hand side vectors is the same for all the matrix class in this file,
- * since it does not depend on the operator.
- *
- * The defaults for both right hand side and coefficient function is a
- * @p{NULL} pointer. If you need a coefficient but no right hand side object,
- * simply pass a @p{NULL} pointer to the constructor for its first argument.
- */
-template <int dim>
-class LaplaceMatrix :  public Equation<dim> {
-  public:
-				     /**
-				      * Constructor. Pass a function object if
-				      * you want to create a right hand side
-				      * vector, pass a function pointer (default
-				      * is a NULL pointer). It is your duty to
-				      * guarantee that the function object for
-				      * the right hand side lives at least as
-				      * long as this object does.
-				      *
-				      * You may also pass a function describing
-				      * the weight to the integral (see the
-				      * general docs for more information). The
-				      * same applies for this object as said
-				      * above.
-				      */
-    LaplaceMatrix (const Function<dim> * const rhs = 0,
-		   const Function<dim> * const a = 0);
-
-				     /**
-				      * Assemble the cell matrix and right hand
-				      * side vector for this cell. You need to
-				      * give a right hand side object to the
-				      * constructor to use this function. If
-				      * a coefficient was given to the
-				      * constructor, it is used.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Construct the cell matrix for this cell.
-				      * If a coefficient was given to the
-				      * constructor, it is used.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Only construct the right hand side
-				      * vector for this cell. You need to give
-				      * a right hand side function to the
-				      * constructor in order to call this
-				      * function.
-				      */
-    virtual void assemble (Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNoRHSSelected);
-    
-  protected:
-				     /**
-				      * Pointer to a function describing the
-				      * right hand side of the problem. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const right_hand_side;
-
-    				     /**
-				      * Pointer to a function describing the
-				      * coefficient to the integral for the
-				      * matrix entries. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const coefficient;
-};
-
-
-
-
-
-template <int dim>
-MassMatrix<dim>::MassMatrix (const Function<dim> * const rhs,
-			     const Function<dim> * const a) :
-		Equation<dim> (1),
-		right_hand_side (rhs),
-		coefficient (a)
-{};
-
-
-
-template <int dim>
-void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
-				const FEValues<dim>     &fe_values,
-				const typename DoFHandler<dim>::cell_iterator &) const
-{
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-  Assert (cell_matrix.n() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.n(), dofs_per_cell));
-  Assert (cell_matrix.m() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.m(), dofs_per_cell));
-  Assert (cell_matrix.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-  
-  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
-
-
-  if (coefficient != 0)
-    {
-      if (coefficient->n_components == 1)
-					 // scalar coefficient given
-	{
-	  std::vector<double> coefficient_values (fe_values.n_quadrature_points);
-	  coefficient->value_list (fe_values.get_quadrature_points(),
-				   coefficient_values);
-	  for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if ((n_components == 1)
-		  ||
-		  (fe.system_to_component_index(i).first ==
-		   fe.system_to_component_index(j).first))
-		{
-		  for (unsigned int point=0; point<n_q_points; ++point)
-		    cell_matrix(i,j) += (values(i,point) *
-					 values(j,point) *
-					 weights[point] *
-					 coefficient_values[point]);
-		};
-	}
-      else
-					 // vectorial coefficient
-					 // given
-	{
-	  std::vector<Vector<double> > coefficient_values (fe_values.n_quadrature_points,
-						      Vector<double>(n_components));
-	  coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					  coefficient_values);
-	  for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if ((n_components == 1)
-		  ||
-		  (fe.system_to_component_index(i).first ==
-		   fe.system_to_component_index(j).first))
-		{
-		  for (unsigned int point=0; point<n_q_points; ++point)
-		    cell_matrix(i,j) += (values(i,point) *
-					 values(j,point) *
-					 weights[point] *
-					 coefficient_values[point](
-					   fe.system_to_component_index(i).first));
-		};
-	};
-      
-    }
-  else
-				     // no coefficient given
-    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-      for (unsigned int j=0; j<dofs_per_cell; ++j)
-	if ((n_components == 1)
-	    ||
-	    (fe.system_to_component_index(i).first ==
-	     fe.system_to_component_index(j).first))
-	  {
-	    for (unsigned int point=0; point<n_q_points; ++point)
-	      cell_matrix(i,j) += (values(i,point) *
-				   values(j,point) *
-				   weights[point]);
-	  };
-};
-
-
-
-template <int dim>
-void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
-				Vector<double>      &rhs,
-				const FEValues<dim> &fe_values,
-				const typename DoFHandler<dim>::cell_iterator &) const
-{
-  Assert (right_hand_side != 0, ExcNoRHSSelected());
-
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-				   // for system elements: not
-				   // implemented at present
-  Assert (n_components==1, ExcNotImplemented());
-  
-  Assert (cell_matrix.n() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.n(), dofs_per_cell));
-  Assert (cell_matrix.m() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.m(), dofs_per_cell));
-  Assert (rhs.size() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(rhs.size(), dofs_per_cell));
-  Assert (cell_matrix.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-  Assert (rhs.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-
-  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
-  std::vector<double>            rhs_values (fe_values.n_quadrature_points);
-  right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
-
-  if (coefficient != 0)
-    {
-      std::vector<double> coefficient_values (n_q_points);
-      coefficient->value_list (fe_values.get_quadrature_points(),
-			       coefficient_values);
-      for (unsigned int point=0; point<n_q_points; ++point)
-	for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	  {
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (values(i,point) *
-				   values(j,point) *
-				   weights[point] *
-				   coefficient_values[point]);
-	    rhs(i) += values(i,point) *
-		      rhs_values[point] *
-		      weights[point];
-	  };
-    }
-  else
-    for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	{
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (values(i,point) *
-				 values(j,point) *
-				 weights[point]);
-	  rhs(i) += values(i,point) *
-		    rhs_values[point] *
-		    weights[point];
-	};
-};
-
-
-
-template <int dim>
-void MassMatrix<dim>::assemble (Vector<double>      &rhs,
-				const FEValues<dim> &fe_values,
-				const typename DoFHandler<dim>::cell_iterator &) const
-{
-  Assert (right_hand_side != 0, ExcNoRHSSelected());
-
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-				   // for system elements: not
-				   // implemented at present
-  Assert (n_components==1, ExcNotImplemented());
-
-  Assert (rhs.size() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(rhs.size(), dofs_per_cell));
-  Assert (rhs.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-
-  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
-  std::vector<double>            rhs_values(fe_values.n_quadrature_points);
-  right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
-
-  for (unsigned int point=0; point<n_q_points; ++point)
-    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-      rhs(i) += values(i,point) *
-		rhs_values[point] *
-		weights[point];
-};
-
-
-
-
-
-template <int dim>
-LaplaceMatrix<dim>::LaplaceMatrix (const Function<dim> * const rhs,
-				   const Function<dim> * const a) :
-		Equation<dim> (1),
-		right_hand_side (rhs),
-		coefficient (a) {};
-
-
-
-template <int dim>
-void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
-				   Vector<double>             &rhs,
-				   const FEValues<dim>        &fe_values,
-				   const typename DoFHandler<dim>::cell_iterator &) const
-{
-  Assert (right_hand_side != 0, ExcNoRHSSelected());
-  
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-				   // for system elements: might be
-				   // not so useful, not implemented
-				   // at present
-  Assert (n_components==1, ExcNotImplemented());
-
-  Assert (cell_matrix.n() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.n(), dofs_per_cell));
-  Assert (cell_matrix.m() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.m(), dofs_per_cell));
-  Assert (rhs.size() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(rhs.size(), dofs_per_cell));
-  Assert (cell_matrix.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-  Assert (rhs.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-
-  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-  const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-  std::vector<double>        rhs_values(fe_values.n_quadrature_points);
-  const std::vector<double> &weights   = fe_values.get_JxW_values ();
-  right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
-
-  if (coefficient != 0)
-    {
-      std::vector<double> coefficient_values(n_q_points);
-      coefficient->value_list (fe_values.get_quadrature_points(),
-			       coefficient_values);
-      for (unsigned int point=0; point<n_q_points; ++point)
-	for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	  {
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (gradients[i][point] *
-				   gradients[j][point]) *
-				  weights[point] *
-				  coefficient_values[point];
-	    rhs(i) += values(i,point) *
-		      rhs_values[point] *
-		      weights[point];
-	  };
-    }
-  else
-    for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	{
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (gradients[i][point] *
-				 gradients[j][point]) *
-				weights[point];
-	  rhs(i) += values(i,point) *
-		    rhs_values[point] *
-		    weights[point];
-	};
-
-};
-
-
-
-template <int dim>
-void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
-				   const FEValues<dim> &fe_values,
-				   const typename DoFHandler<dim>::cell_iterator &) const
-{
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-				   // for system elements: might be
-				   // not so useful, not implemented
-				   // at present
-  Assert ((n_components==1) || (coefficient==0), ExcNotImplemented());
-
-  Assert (cell_matrix.n() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.n(), dofs_per_cell));
-  Assert (cell_matrix.m() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(cell_matrix.m(), dofs_per_cell));
-  Assert (cell_matrix.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-  
-  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-  const std::vector<double> &weights   = fe_values.get_JxW_values ();
-   
-  if (coefficient != 0)
-    {
-      std::vector<double> coefficient_values(n_q_points);
-      coefficient->value_list (fe_values.get_quadrature_points(),
-			       coefficient_values);
-      for (unsigned int point=0; point<n_q_points; ++point)
-	for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    cell_matrix(i,j) += (gradients[i][point] *
-				 gradients[j][point]) *
-				weights[point] *
-				coefficient_values[point];
-    }
-  else
-    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-      for (unsigned int j=0; j<dofs_per_cell; ++j)
-	if ((n_components==1)
-	    ||
-	    (fe.system_to_component_index(i).first ==
-	     fe.system_to_component_index(j).first))
-	  {
-	    for (unsigned int point=0; point<n_q_points; ++point)
-	      cell_matrix(i,j) += (gradients[i][point] *
-				   gradients[j][point]) *
-				  weights[point];
-	  };
-};
-
-
-
-template <int dim>
-void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
-				   const FEValues<dim> &fe_values,
-				   const typename DoFHandler<dim>::cell_iterator &) const
-{
-  Assert (right_hand_side != 0, ExcNoRHSSelected());
-
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-				   // for system elements: might be
-				   // not so useful, not implemented
-				   // at present
-  Assert (n_components==1, ExcNotImplemented());
-
-  Assert (rhs.size() == dofs_per_cell,
-	  Equation<dim>::ExcWrongSize(rhs.size(), dofs_per_cell));
-  Assert (rhs.all_zero(),
-	  Equation<dim>::ExcObjectNotEmpty());
-
-  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
-  std::vector<double>        rhs_values(fe_values.n_quadrature_points);
-  right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
-   
-  for (unsigned int point=0; point<n_q_points; ++point)
-    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-      rhs(i) += values(i,point) *
-		rhs_values[point] *
-		weights[point];
-};
-
-
-
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
@@ -892,7 +560,7 @@ using namespace std;
 
 
 //TODO: purge this variable
-static const MappingQ1<deal_II_dimension> mapping;
+static const MappingQ1<2> mapping;
 
 template <int dim>
 Assembler<dim>::AssemblerData::AssemblerData (const DoFHandler<dim>    &dof,
@@ -986,20 +654,41 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 };
 
 
-// explicit instantiations
-template class Assembler<deal_II_dimension>;
+#include <lac/vector.h>
+#include <lac/sparse_matrix.h>
 
-template class TriaRawIterator<deal_II_dimension,Assembler<deal_II_dimension> >;
-template class TriaIterator<deal_II_dimension,Assembler<deal_II_dimension> >;
-template class TriaActiveIterator<deal_II_dimension,Assembler<deal_II_dimension> >;
+template <int dim>
+Equation<dim>::Equation (const unsigned int n_equations) :
+		n_eq(n_equations) {};
 
 
+template <int dim>
+void Equation<dim>::assemble (FullMatrix<double>          &,
+			      Vector<double>           &,
+			      const FEValues<dim> &,
+			      const typename DoFHandler<dim>::cell_iterator &) const
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
 
-#include <numerics/matrices.h>
-#include <numerics/vectors.h>
-#include <dofs/dof_constraints.h>
-#include <grid/tria_iterator.h>
-#include <numerics/data_out.h>
+
+template <int dim>
+void Equation<dim>::assemble (FullMatrix<double>          &,
+			      const FEValues<dim> &,
+			      const typename DoFHandler<dim>::cell_iterator &) const
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+template <int dim>
+void Equation<dim>::assemble (Vector<double>           &,
+			      const FEValues<dim> &,
+			      const typename DoFHandler<dim>::cell_iterator &) const
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
 #include <dofs/dof_tools.h>
 #include <base/function.h>
 #include <fe/fe.h>
@@ -1162,10 +851,6 @@ std::string ProblemBase<dim>::get_solution_name () const
 {
   return "solution";
 };
-
-
-
-
 
 
 #endif
