@@ -2439,6 +2439,51 @@ void f (const std::ostream &out);
 ])
 
 
+
+dnl -------------------------------------------------------------
+dnl On some Cygwin systems, a system header file includes this
+dnl preprocessor define:
+dnl   #define quad quad_t
+dnl This is of course silly, but beyond that it also hurts as
+dnl since we have member functions and variables with that name
+dnl and we get compile errors depending or not we have this
+dnl particular header file included. 
+dnl
+dnl Fortunately, the define is only active is _POSIX_SOURCE is
+dnl not set, so check for this define, and if necessary set
+dnl this flag. We check on all systems, since maybe there are 
+dnl other such systems elsewhere...
+dnl
+dnl Usage: DEAL_II_CHECK_QUAD_DEFINE
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_QUAD_DEFINE, dnl
+[
+  AC_MSG_CHECKING(for quad vs. quad_t define)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <sys/types>
+#if defined(quad)
+    no good system;
+#endif
+    ],
+    [
+    ],
+    [
+      AC_MSG_RESULT(yes, working around)
+      CXXFLAGSG="$CXXFLAGSG -D_POSIX_SOURCE"
+      CXXFLAGSO="$CXXFLAGSO -D_POSIX_SOURCE"
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+
 dnl ------------------------------------------------------------
 dnl Check whether some of the HSL functions have been dropped
 dnl into their respective place in the contrib subdir.
