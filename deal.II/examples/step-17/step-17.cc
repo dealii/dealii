@@ -19,7 +19,8 @@
 
                                  // xxx
 #include <lac/petsc_vector.h>
-#include <lac/petsc_sparse_matrix.h>
+#include <lac/petsc_parallel_vector.h>
+#include <lac/petsc_parallel_sparse_matrix.h>
 #include <lac/petsc_solver.h>
 #include <lac/petsc_precondition.h>
 
@@ -32,6 +33,10 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
+
+                                 // xxx
+#include <dofs/dof_renumbering.h>
+
 #include <fe/fe_values.h>
 #include <fe/fe_system.h>
 #include <fe/fe_q.h>
@@ -71,14 +76,21 @@ class ElasticProblem
     ConstraintMatrix     hanging_node_constraints;
 
                                      // xxx no sparsity
-    PETScWrappers::SparseMatrix system_matrix;
+    PETScWrappers::MPI::SparseMatrix system_matrix;
 
-    PETScWrappers::Vector       solution;
-    PETScWrappers::Vector       system_rhs;
+    PETScWrappers::MPI::Vector       solution;
+    PETScWrappers::MPI::Vector       system_rhs;
 
+    MPI_Comm mpi_communicator;
+    
                                      // xxx
     const unsigned int n_partitions;
     const unsigned int this_partition;
+
+    unsigned int local_dofs;
+
+    static unsigned int get_n_partitions (const MPI_Comm &mpi_communicator);
+    static unsigned int get_this_partition (const MPI_Comm &mpi_communicator);
 };
 
 
@@ -145,6 +157,31 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 
 
 
+                                 // xxx
+template <int dim>
+unsigned int
+ElasticProblem<dim>::get_n_partitions (const MPI_Comm &mpi_communicator)
+{
+                                   // xxx int vs uint
+  int n_jobs;
+  MPI_Comm_size (mpi_communicator, &n_jobs);
+
+  return n_jobs;
+}
+
+
+
+template <int dim>
+unsigned int
+ElasticProblem<dim>::get_this_partition (const MPI_Comm &mpi_communicator)
+{
+  int rank;
+  MPI_Comm_rank (mpi_communicator, &rank);
+
+  return rank;
+}
+
+
 
 template <int dim>
 ElasticProblem<dim>::ElasticProblem ()
@@ -152,8 +189,9 @@ ElasticProblem<dim>::ElasticProblem ()
 		dof_handler (triangulation),
 		fe (FE_Q<dim>(1), dim),
                                                  // xxx
-                n_partitions (8),
-                this_partition (0)
+                mpi_communicator (MPI_COMM_WORLD),
+                n_partitions (get_n_partitions(mpi_communicator)),
+                this_partition (get_this_partition(mpi_communicator))
 {}
 
 
@@ -168,19 +206,29 @@ ElasticProblem<dim>::~ElasticProblem ()
 template <int dim>
 void ElasticProblem<dim>::setup_system ()
 {
+                                   // xxx
   dof_handler.distribute_dofs (fe);
+  DoFRenumbering::subdomain_wise (dof_handler);
+
+  local_dofs
+    = DoFTools::count_dofs_with_subdomain_association (dof_handler,
+                                                       this_partition);
+  
+  
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
   hanging_node_constraints.close ();
 
                                    // no sparsity pattern
-  system_matrix.reinit (dof_handler.n_dofs(),
+  system_matrix.reinit (mpi_communicator,
                         dof_handler.n_dofs(),
+                        dof_handler.n_dofs(),
+                        local_dofs,
                         dof_handler.max_couplings_between_dofs());
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit (dof_handler.n_dofs(), local_dofs, mpi_communicator);
+  system_rhs.reinit (dof_handler.n_dofs(), local_dofs, mpi_communicator);
 }
 
 
@@ -334,12 +382,14 @@ void ElasticProblem<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
+                                   // XXX
   typename FunctionMap<dim>::type neumann_boundary;
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-				      QGauss2<dim-1>(),
-				      neumann_boundary,
-				      solution,
-				      estimated_error_per_cell);
+  Assert (false, ExcNotImplemented());
+//   KellyErrorEstimator<dim>::estimate (dof_handler,
+// 				      QGauss2<dim-1>(),
+// 				      neumann_boundary,
+// 				      solution,
+// 				      estimated_error_per_cell);
 
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   estimated_error_per_cell,
@@ -355,40 +405,45 @@ void ElasticProblem<dim>::refine_grid ()
 template <int dim>
 void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 {
-  std::string filename = "solution-";
-  filename += ('0' + cycle);
-  Assert (cycle < 10, ExcInternalError());
-  
-  filename += ".gmv";
-  std::ofstream output (filename.c_str());
-
-  DataOut<dim> data_out;
-  data_out.attach_dof_handler (dof_handler);
-
- 
-
-  std::vector<std::string> solution_names;
-  switch (dim)
+                                   // xxx
+  PETScWrappers::Vector global_solution;
+  global_solution = solution;
+      
+  if (this_partition == 0)
     {
-      case 1:
-	    solution_names.push_back ("displacement");
-	    break;
-      case 2:
-	    solution_names.push_back ("x_displacement");	    
-	    solution_names.push_back ("y_displacement");
-	    break;
-      case 3:
-	    solution_names.push_back ("x_displacement");	    
-	    solution_names.push_back ("y_displacement");
-	    solution_names.push_back ("z_displacement");
-	    break;
-      default:
-	    Assert (false, ExcInternalError());
-    };
-	     
-  data_out.add_data_vector (solution, solution_names);
-  data_out.build_patches ();
-  data_out.write_gmv (output);
+      std::string filename = "solution-";
+      filename += ('0' + cycle);
+      Assert (cycle < 10, ExcInternalError());
+  
+      filename += ".gmv";
+      std::ofstream output (filename.c_str());
+
+      DataOut<dim> data_out;
+      data_out.attach_dof_handler (dof_handler);
+
+      std::vector<std::string> solution_names;
+      switch (dim)
+        {
+          case 1:
+                solution_names.push_back ("displacement");
+                break;
+          case 2:
+                solution_names.push_back ("x_displacement");	    
+                solution_names.push_back ("y_displacement");
+                break;
+          case 3:
+                solution_names.push_back ("x_displacement");	    
+                solution_names.push_back ("y_displacement");
+                solution_names.push_back ("z_displacement");
+                break;
+          default:
+                Assert (false, ExcInternalError());
+        };
+
+      data_out.add_data_vector (global_solution, solution_names);
+      data_out.build_patches ();
+      data_out.write_gmv (output);
+    }
 }
 
 
@@ -398,7 +453,9 @@ void ElasticProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<12; ++cycle)
     {
-      std::cout << "Cycle " << cycle << ':' << std::endl;
+                                       // xxx
+      if (this_partition == 0)
+        std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
@@ -411,15 +468,19 @@ void ElasticProblem<dim>::run ()
       else
 	refine_grid ();
 
-      std::cout << "   Number of active cells:       "
-		<< triangulation.n_active_cells()
-		<< std::endl;
+                                       // xxx
+      if (this_partition == 0)
+        std::cout << "   Number of active cells:       "
+                  << triangulation.n_active_cells()
+                  << std::endl;
 
       setup_system ();
 
-      std::cout << "   Number of degrees of freedom: "
-		<< dof_handler.n_dofs()
-		<< std::endl;
+                                       // xxx
+      if (this_partition == 0)
+        std::cout << "   Number of degrees of freedom: "
+                  << dof_handler.n_dofs()
+                  << std::endl;
       
       assemble_system ();
       solve ();
