@@ -960,6 +960,7 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 	  << time->tm_year+1900 << "/"
 	  << time->tm_mon+1 << "/"
 	  << time->tm_mday
+	  << ' '
 	  << time->tm_hour << ":"
 	  << std::setw(2) << time->tm_min << ":"
 	  << std::setw(2) << time->tm_sec << '"' << std::endl;
