@@ -313,9 +313,9 @@ class DataIn {
  *   \item[NoHeight] for 2D-Output (or Top-View thats the same by no
  *     turning is done) or to
  *   \item[HeightVector] for 3D-Output. You have to attach a
- *     dof_data_vector to actually get 3D. If you don't then output
+ *     #dof_data_vector# to actually get 3D. If you don't then output
  *     will be generated in 2D.
- *   \item[DefaultHeight] is 3D if there is a dof_data_vector and 2D if
+ *   \item[DefaultHeight] is 3D if there is a #dof_data_vector# and 2D if
  *     none is present.
  * \end{description}
  * For 3D-Output one has to set #azimuth# and #elevation# for the
