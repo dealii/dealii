@@ -18,6 +18,28 @@
 
 
 
+// static variables
+template <>
+const unsigned int GridReorderingInfo<2>::rotational_states_of_cells;
+
+template <>
+const unsigned int GridReorderingInfo<2>::rotational_states_of_faces;
+
+template <>
+const unsigned int GridReorderingInfo<3>::rotational_states_of_cells;
+
+template <>
+const unsigned int GridReorderingInfo<3>::rotational_states_of_faces;
+
+template <int dim>
+const unsigned int GridReordering<dim>::Cell::invalid_neighbor;
+
+template <int dim>
+const unsigned int GridReordering<dim>::FaceData::invalid_adjacent_cell;
+
+
+
+
 
 template <int dim>
 GridReordering<dim>::Cell::Cell () :
