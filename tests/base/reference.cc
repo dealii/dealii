@@ -28,23 +28,10 @@ class Test : public Subscriptor
 {
     const char* name;
   public:
-    Test(const char* n) :
-                    name(n)
-      {
-	deallog << "Construct " << name << std::endl;
-      }
-    ~Test()
-      {
-	deallog << "Destruct " << name << std::endl;
-      }	  
-    void f()
-      {
-        deallog << "mutable" << std::endl;
-      }
-    void f() const
-      {
-        deallog << "const" << std::endl;
-      }
+    Test(const char* n) : name(n) { deallog << "Construct " << name << std::endl; }
+    ~Test()                       { deallog << "Destruct " << name << std::endl;  }
+    void f()        { deallog << "mutable" << std::endl; }
+    void f() const  { deallog << "const" << std::endl;   }
 };
 
 
