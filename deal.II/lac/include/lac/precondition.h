@@ -48,6 +48,21 @@ class PreconditionIdentity : public Subscriptor
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply preconditioner, adding to the previous value.
+				      */
+    template<class VECTOR>
+    void vmult_add (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Apply transpose
+				      * preconditioner, adding. Since this is
+				      * the identity, this function is
+				      * the same as
+				      * @ref{vmult}.
+				      */
+    template<class VECTOR>
+    void Tvmult_add (VECTOR&, const VECTOR&) const;
 };
 
 
@@ -492,6 +507,22 @@ inline void
 PreconditionIdentity::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
   dst = src;
+}
+
+template<class VECTOR>
+inline void
+PreconditionIdentity::vmult_add (VECTOR& dst, const VECTOR& src) const
+{
+  dst.add(src);
+}
+
+
+
+template<class VECTOR>
+inline void
+PreconditionIdentity::Tvmult_add (VECTOR& dst, const VECTOR& src) const
+{
+  dst.add(src);
 }
 
 //----------------------------------------------------------------------//
