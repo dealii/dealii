@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,8 +27,10 @@
 #  include <unistd.h>
 #endif
 
-
-
+#if defined(__MACH__) && defined(__ppc__) && defined(__APPLE__)
+#  include <sys/types.h>
+#  include <sys/sysctl.h>
+#endif
 
 #if DEAL_II_USE_MT == 1
 
@@ -81,6 +83,25 @@ unsigned int MultithreadInfo::get_n_cpus()
 {
   return sysconf(_SC_NPROC_ONLN);
 }
+
+#  elif defined(__MACH__) && defined(__ppc__) && defined(__APPLE__)
+// This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6 
+// and gcc version 3.3 20030304 (Apple Computer, Inc. build 1666)
+// If it doesnt work please contact the mailinglist.
+unsigned int MultithreadInfo::get_n_cpus()
+{
+	int mib[2];
+	int n_cpus;
+	size_t len;
+	
+	mib[0] = CTL_HW;
+	mib[1] = HW_NCPU;
+	len = sizeof(n_cpus);
+	sysctl(mib, 2, &n_cpus, &len, NULL, 0);
+	
+	return n_cpus;
+}
+
 
 #  else
 

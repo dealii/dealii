@@ -122,18 +122,27 @@ inconvenience this causes.
 <ol>
 
 <li>
-   <p> New: The <code class="member">
-   TableHandler::write_tex</code> now accepts the additional boolean
-   argument <code class="member">with_header</code> which is set to
-   true by default and tells the function whether to add the latex 
-   header and footer (i.e. the \documentclass{...},
-   \begin{document} and \end{document} stuff) to the table.<br> 
-   In addition to this, there are two new members in the above class: 
-   <code class="member"> TableHandler::tex_set_table_caption</code> and
-   <code class="member"> TableHandler::tex_set_table_label</code> to
-   add a caption and a label to the tex generated table.  
-   <br> (Luca Heltai 2004/10/29)
-   </p>
+  <li> <p> 
+       New: The <code>MultithreadInfo</code> class now also detects multiple
+       processors on Mac OS X.
+       <br> 
+       (Helmut M&uuml;ller 2004/11/29)
+  </p>
+
+  <li> <p> 
+       New: The <code class="member">
+       TableHandler::write_tex</code> now accepts the additional boolean
+       argument <code class="member">with_header</code> which is set to
+       true by default and tells the function whether to add the latex 
+       header and footer (i.e. the \documentclass{...},
+       \begin{document} and \end{document} stuff) to the table.<br> 
+       In addition to this, there are two new members in the above class: 
+       <code class="member"> TableHandler::tex_set_table_caption</code> and
+       <code class="member"> TableHandler::tex_set_table_label</code> to
+       add a caption and a label to the tex generated table.  
+       <br> 
+       (Luca Heltai 2004/10/29)
+  </p>
 
   <li> <p>
        Fixed: <code
