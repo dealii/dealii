@@ -65,6 +65,7 @@ run_poisson_test:
 clean:
 	cd grid ; rm -f grid.[1234] *.eps *.o *~ grid_test
 	cd dof  ; rm -f grid.* sparsity.* *.o *~ dof_test
+	cd poisson ; make clean
 
 
 .PHONY: run run_grid_test run_dof_test run_poisson_test clean
