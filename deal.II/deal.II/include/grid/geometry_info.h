@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998-2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,8 +60,8 @@ struct GeometryInfo
     static const unsigned int vertices_per_cell = 1 << dim;
 
 				     /**
-				      * Number of vertices on each face.
-				      * 
+				      * Number of vertices on each
+				      * face.
 				      */
     static const unsigned int vertices_per_face;
 
@@ -154,9 +154,10 @@ struct GeometryInfo
     static const int unit_normal_orientation[faces_per_cell];
     
 				     /**
-				      * This field store which child cells
-				      * are adjacent to a certain face of
-				      * the mother cell.
+				      * This field stores which child
+				      * cells are adjacent to a
+				      * certain face of the mother
+				      * cell.
 				      *
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
@@ -220,7 +221,66 @@ struct GeometryInfo
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface);
+    
+				     /**
+				      * Map line vertex number to cell
+				      * vertex number, i.e. give the
+				      * cell vertex number of the
+				      * <tt>vertex</tt>th vertex of
+				      * line <tt>line</tt>, e.g.
+				      * <tt>GeometryInfo<2>::line_to_cell_vertices(2,0)=3</tt>.
+				      *
+				      * This function is useful and
+				      * implemented for <tt>dim=2</tt>
+				      * and <tt>dim=3</tt>, only. For
+				      * <tt>dim=2</tt> this call is
+				      * simply passed down to the
+				      * face_to_cell_vertices()
+				      * function.
+				      */
+    static unsigned int line_to_cell_vertices (const unsigned int line,
+					       const unsigned int vertex);
 
+				     /**
+				      * Map face vertex number to cell
+				      * vertex number, i.e. give the
+				      * cell vertex number of the
+				      * <tt>vertex</tt>th vertex of
+				      * face <tt>face</tt>, e.g.
+				      * <tt>GeometryInfo<2>::face_to_cell_vertices(2,0)=3</tt>.
+				      *
+				      * As the children of a cell are
+				      * ordered according to the
+				      * vertices of the cell, this
+				      * call is passed down to the
+				      * child_cell_on_face() function.
+				      * Hence this function is simply
+				      * a wrapper of
+				      * child_cell_on_face() giving it
+				      * a suggestive name.
+				      *
+				      * This function is useful and
+				      * implemented for <tt>dim=2</tt>
+				      * and <tt>dim=3</tt>, only.
+				      */
+    static unsigned int face_to_cell_vertices (const unsigned int face,
+					       const unsigned int vertex);
+
+				     /**
+				      * Map face line number to cell
+				      * line number, i.e. give the
+				      * cell line number of the
+				      * <tt>line</tt>th line of face
+				      * <tt>face</tt>, e.g.
+				      * <tt>GeometryInfo<3>::face_to_cell_lines(3,1)=5</tt>.
+				      *
+				      * This function is useful and
+				      * implemented for
+				      * <tt>dim=3</tt>, only.
+				      */
+    static unsigned int face_to_cell_lines (const unsigned int face,
+					    const unsigned int line);
+    
 				     /**
 				      * Return the position of the
 				      * @p ith vertex on the unit
@@ -774,13 +834,8 @@ struct GeometryInfo<2>
     static const unsigned int vertices_per_cell = 4;
 
 				     /**
-				      * Number of vertices each face has.
-				      * Since this is not useful in one
-				      * dimension, we provide a useless
-				      * number (in the hope that a compiler
-				      * may warn when it sees constructs like
-				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
-				      * at least if @p i is an <tt>unsigned int</tt>.
+				      * Number of vertices each face
+				      * has.
 				      */
     static const unsigned int vertices_per_face = 2;
 
@@ -938,8 +993,44 @@ struct GeometryInfo<2>
 				      * all cases.
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
-					    const unsigned int subface);
+					    const unsigned int subface);        
 
+				     /**
+				      * Map line vertex number to cell
+				      * vertex number, i.e. give the
+				      * cell vertex number of the
+				      * <tt>vertex</tt>th vertex of
+				      * line <tt>line</tt>, e.g.
+				      * <tt>GeometryInfo<2>::line_to_cell_vertices(2,0)=3</tt>.
+				      *
+				      * This call is simply passed
+				      * down to the
+				      * face_to_cell_vertices()
+				      * function.
+				      */
+    static unsigned int line_to_cell_vertices (const unsigned int line,
+					       const unsigned int vertex);
+
+				     /**
+				      * Map face vertex number to cell
+				      * vertex number, i.e. give the
+				      * cell vertex number of the
+				      * <tt>vertex</tt>th vertex of
+				      * face <tt>face</tt>, e.g.
+				      * <tt>GeometryInfo<2>::face_to_cell_vertices(2,0)=3</tt>.
+				      *
+				      * As the children of a cell are
+				      * ordered according to the
+				      * vertices of the cell, this
+				      * call is passed down to the
+				      * child_cell_on_face() function.
+				      * Hence this function is simply
+				      * a wrapper of
+				      * child_cell_on_face() giving it
+				      * a suggestive name.
+				      */
+    static unsigned int face_to_cell_vertices (const unsigned int face,
+					       const unsigned int vertex);
 
 				     /**
 				      * Return the position of the
@@ -1090,13 +1181,8 @@ struct GeometryInfo<3>
     static const unsigned int vertices_per_cell = 8;
 
 				     /**
-				      * Number of vertices each face has.
-				      * Since this is not useful in one
-				      * dimension, we provide a useless
-				      * number (in the hope that a compiler
-				      * may warn when it sees constructs like
-				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
-				      * at least if @p i is an <tt>unsigned int</tt>.
+				      * Number of vertices each face
+				      * has.
 				      */
     static const unsigned int vertices_per_face = 4;
 
@@ -1254,6 +1340,50 @@ struct GeometryInfo<3>
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface);
+        
+				     /**
+				      * Map line vertex number to cell
+				      * vertex number, i.e. give the
+				      * cell vertex number of the
+				      * <tt>vertex</tt>th vertex of
+				      * line <tt>line</tt>, e.g.
+				      * <tt>GeometryInfo<3>::line_to_cell_vertices(10,1)=6</tt>.
+				      */
+    static unsigned int line_to_cell_vertices (const unsigned int line,
+					       const unsigned int vertex);
+
+				     /**
+				      * Map face vertex number to cell
+				      * vertex number, i.e. give the
+				      * cell vertex number of the
+				      * <tt>vertex</tt>th vertex of
+				      * face <tt>face</tt>, e.g.
+				      * <tt>GeometryInfo<3>::face_to_cell_vertices(4,1)=2</tt>.
+				      *
+				      * As the children of a cell are
+				      * ordered according to the
+				      * vertices of the cell, this
+				      * call is passed down to the
+				      * child_cell_on_face() function.
+				      * Hence this function is simply
+				      * a wrapper of
+				      * child_cell_on_face() giving it
+				      * a suggestive name.
+				      */
+    static unsigned int face_to_cell_vertices (const unsigned int face,
+					       const unsigned int vertex);
+
+				     /**
+				      * Map face line number to cell
+				      * line number, i.e. give the
+				      * cell line number of the
+				      * <tt>line</tt>th line of face
+				      * <tt>face</tt>, e.g.
+				      * <tt>GeometryInfo<3>::face_to_cell_lines(3,1)=5</tt>.
+				      */
+    static unsigned int face_to_cell_lines (const unsigned int face,
+					    const unsigned int line);
+
 				     /**
 				      * Return the position of the
 				      * @p ith vertex on the unit
@@ -1407,13 +1537,8 @@ struct GeometryInfo<4>
     static const unsigned int vertices_per_cell = 16;
 
 				     /**
-				      * Number of vertices each face has.
-				      * Since this is not useful in one
-				      * dimension, we provide a useless
-				      * number (in the hope that a compiler
-				      * may warn when it sees constructs like
-				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
-				      * at least if @p i is an <tt>unsigned int</tt>.
+				      * Number of vertices each face
+				      * has.
 				      */
     static const unsigned int vertices_per_face = 8;
 
@@ -1717,6 +1842,35 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
 	 (p[2] >= 0.) && (p[2] <= 1.);
 }
 
+
+
+inline
+unsigned int
+GeometryInfo<2>::line_to_cell_vertices (const unsigned int line,
+					const unsigned int vertex)
+{
+  return child_cell_on_face(line, vertex);
+}
+
+
+
+inline
+unsigned int
+GeometryInfo<2>::face_to_cell_vertices (const unsigned int face,
+					const unsigned int vertex)
+{
+  return child_cell_on_face(face, vertex);
+}
+
+
+
+inline
+unsigned int
+GeometryInfo<3>::face_to_cell_vertices (const unsigned int face,
+					const unsigned int vertex)
+{
+  return child_cell_on_face(face, vertex);
+}
 
 
 #endif

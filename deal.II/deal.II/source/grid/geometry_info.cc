@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998-2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,6 +101,16 @@ GeometryInfo<3>::unit_normal_orientation[GeometryInfo<3>::faces_per_cell]
 
 
 
+unsigned int
+GeometryInfo<1>::child_cell_on_face (const unsigned int face,
+                                     const unsigned int subface)
+{
+  Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
+  Assert (subface==subfaces_per_face, ExcIndexRange(subface, 0, 1));
+
+  return face;
+}
+
 
 
 unsigned int
@@ -120,7 +130,6 @@ GeometryInfo<2>::child_cell_on_face (const unsigned int face,
 
 
 
-
 unsigned int
 GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 				     const unsigned int subface)
@@ -136,4 +145,48 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
                                                    {3, 2, 6, 7},
                                                    {0, 4, 7, 3}};
   return subcells[face][subface];
+}
+
+
+
+unsigned int
+GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
+					const unsigned int vertex)
+{
+  Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
+  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
+  
+  static const unsigned
+    vertices[lines_per_cell][2] = {{0, 1},  // front face
+				   {1, 2},
+				   {3, 2},
+				   {0, 3},
+				   {4, 5},  // back face
+				   {5, 6},
+				   {7, 6},
+				   {4, 7},
+				   {0, 4},  // connects of front and back face
+				   {1, 5},
+				   {2, 6},
+				   {3, 7}};
+  return vertices[line][vertex];
+}
+
+
+
+unsigned int
+GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
+				     const unsigned int line)
+{
+  Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
+  Assert (line<lines_per_face, ExcIndexRange(line, 0, lines_per_face));
+  
+  static const unsigned
+    lines[faces_per_cell][lines_per_face] = {{0, 1, 2, 3}, // front face
+					     {4, 5, 6, 7}, // back face
+					     {0, 9, 4, 8}, // bottom face
+					     {9, 5,10, 1}, // right face
+					     {2,10, 6,11}, // top face
+					     {8, 7,11, 3}};// left face
+  return lines[face][line];
 }
