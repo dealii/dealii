@@ -60,9 +60,7 @@ class DoFAccessor
 				     /**
 				      * Constructor
 				      */
-    DoFAccessor () : dof_handler(0) {
-      Assert (false, ExcInvalidObject());
-    };
+    DoFAccessor ();
 
 				     /**
 				      * This should be the default constructor.
@@ -74,24 +72,26 @@ class DoFAccessor
 				      * non-const, even if they preserve
 				      * constness.
 				      */
-    DoFAccessor (const DoFHandler<dim> *dof_handler) :
-		    dof_handler(const_cast<DoFHandler<dim>*>(dof_handler)) {};
+    DoFAccessor (const DoFHandler<dim> *dof_handler);
 
 				     /**
 				      * Reset the DoF handler pointer.
 				      */
-    void set_dof_handler (DoFHandler<dim> *dh) {
-      Assert (dh != 0, ExcInvalidObject());
-      dof_handler = dh;
-    };
+    void set_dof_handler (DoFHandler<dim> *dh);
+
+				     /**
+				      * Return a handle on the
+				      * #DoFHandler# object which we
+				      * are using.
+				      */
+    const DoFHandler<dim> &
+    get_dof_handler () const;
 
 				     /**
 				      * Copy operator.
 				      */
-    DoFAccessor<dim> & operator = (const DoFAccessor<dim> &da) {
-      set_dof_handler (da.dof_handler);
-      return *this;
-    };
+    DoFAccessor<dim> &
+    operator = (const DoFAccessor<dim> &da);
     
 				     /**
 				      * Exception for child classes

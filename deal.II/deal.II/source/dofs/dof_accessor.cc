@@ -46,6 +46,7 @@ void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
 };
 
 
+
 template <int dim>
 void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
@@ -62,6 +63,7 @@ void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   i);
   dof_handler->vertex_dofs[dof_number] = index;
 };
+
 
 
 template <int dim>
@@ -86,6 +88,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
 };
+
 
 
 template <int dim>
@@ -117,6 +120,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 };
 
 
+
 template <int dim>
 template <class InputVector, typename number>
 void
@@ -145,6 +149,7 @@ DoFObjectAccessor<1,dim>::get_dof_values (const InputVector &values,
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
 };
+
 
 
 template <int dim>
@@ -196,6 +201,7 @@ void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
 };
 
 
+
 template <int dim>
 void
 DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
@@ -213,6 +219,7 @@ DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   i);
   dof_handler->vertex_dofs[dof_number] = index;
 };
+
 
 
 template <int dim>
@@ -238,6 +245,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
 };
+
 
 
 template <int dim>
@@ -268,6 +276,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
 };
+
 
 
 template <int dim>
@@ -302,6 +311,7 @@ DoFObjectAccessor<2,dim>::get_dof_values (const InputVector &values,
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
 };
+
 
 
 template <int dim>
@@ -357,6 +367,7 @@ void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 };
 
 
+
 template <int dim>
 void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
@@ -373,6 +384,7 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   i);
   dof_handler->vertex_dofs[dof_number] = index;
 };
+
 
 
 template <int dim>
@@ -399,6 +411,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   for (unsigned int j=0; j<n_dofs; ++j)
     global_destination(dofs[j]) += local_source(j);
 };
+
 
 
 template <int dim>
@@ -431,6 +444,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
     for (unsigned int j=0; j<n_dofs; ++j)
       global_destination.add(dofs[i], dofs[j], local_source(i,j));
 };
+
 
 
 template <int dim>
@@ -471,6 +485,7 @@ DoFObjectAccessor<3,dim>::get_dof_values (const InputVector &values,
 };
 
 
+
 template <int dim>
 template <class OutputVector, typename number>
 void
@@ -507,6 +522,7 @@ DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
 };
+
 
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
@@ -609,6 +625,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
 	}
     };
 };
+
 
 
 template <int dim>
@@ -857,6 +874,8 @@ DoFCellAccessor<deal_II_dimension>::
 set_dof_values_by_interpolation(const Vector<double> &,
 				BlockVector<3,double> &) const;
 
+
+template class DoFAccessor<deal_II_dimension>;
 
 #if deal_II_dimension == 1
 template class DoFObjectAccessor<1, 1>;

@@ -24,6 +24,57 @@
 #include <vector>
 
 
+/*------------------------- Functions: DoFAccessor ---------------------------*/
+
+
+template <int dim>
+DoFAccessor<dim>::DoFAccessor () :
+		dof_handler(0)
+{
+  Assert (false, ExcInvalidObject());
+};
+
+
+
+template <int dim>
+inline
+DoFAccessor<dim>::DoFAccessor (const DoFHandler<dim> *dof_handler) :
+		dof_handler(const_cast<DoFHandler<dim>*>(dof_handler))
+{};
+
+
+
+template <int dim>
+void
+DoFAccessor<dim>::set_dof_handler (DoFHandler<dim> *dh)
+{
+  Assert (dh != 0, ExcInvalidObject());
+  dof_handler = dh;
+};
+
+
+
+template <int dim>
+const DoFHandler<dim> &
+DoFAccessor<dim>::get_dof_handler () const
+{
+  return *dof_handler;
+};
+
+
+
+template <int dim>
+inline
+DoFAccessor<dim> &
+DoFAccessor<dim>::operator = (const DoFAccessor<dim> &da)
+{
+  set_dof_handler (da.dof_handler);
+  return *this;
+};
+
+
+
+
 /*------------------------- Functions: DoFLineAccessor -----------------------*/
 
 template <int dim>
