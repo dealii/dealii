@@ -78,6 +78,14 @@ class Tensor<1,dim>
     static const unsigned int rank      = 1;
 
 				     /**
+				      * Type of stored objects. This
+				      * is a double for a rank 1 tensor.
+				      */
+
+    typedef double value_type;
+    
+//TODO:[WB] Do we need this overflow? Maybe there is use for a zero-size Tensor?    
+				     /**
 				      * Declare an array type which can
 				      * be used to initialize statically
 				      * an object of this type.
@@ -95,7 +103,10 @@ class Tensor<1,dim>
 				      * to zero if @p{initialize==true}; this
 				      * is the default behaviour.
 				      */
-    explicit Tensor (const bool initialize = true);
+#ifndef SUNFORTE    
+    explicit
+#endif    
+    Tensor (const bool initialize = true);
 
 				     /**
 				      * Copy constructor, where the data is

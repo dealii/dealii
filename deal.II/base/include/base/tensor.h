@@ -62,9 +62,16 @@ class Tensor
     static const unsigned int rank      = rank_;
     
 				     /**
-				      * Declare an array type which can
-				      * be used to initialize statically
-				      * an object of this type.
+				      * Type of stored objects. This
+				      * is a tensor of lower rank.
+				      */
+    typedef typename Tensor<rank_-1,dim> value_type;
+
+				     /**
+				      * Declare an array type which
+				      * can be used to initialize an
+				      * object of this type
+				      * statically.
 				      */
     typedef typename Tensor<rank_-1,dim>::array_type array_type[dim];
 
@@ -229,7 +236,7 @@ Tensor<rank_,dim>::Tensor (const array_type &initializer)
 
 template <int rank_, int dim>
 inline
-Tensor<rank_-1,dim> &
+typename Tensor<rank_,dim>::value_type&
 Tensor<rank_,dim>::operator[] (const unsigned int i)
 {
   Assert (i<dim, ExcIndexRange(i, 0, dim));
@@ -240,7 +247,7 @@ Tensor<rank_,dim>::operator[] (const unsigned int i)
 
 template <int rank_, int dim>
 inline
-const Tensor<rank_-1,dim> &
+const typename Tensor<rank_,dim>::value_type&
 Tensor<rank_,dim>::operator[] (const unsigned int i) const
 {
   Assert (i<dim, ExcIndexRange(i, 0, dim));
