@@ -48,7 +48,7 @@ FunctionDerivative<dim>::set_formula (DifferenceFormula form)
   formula = form;
 }
 
-
+//TODO: Discussion on an efficient implementation of Point additions.
 
 template <int dim>
 double
@@ -61,6 +61,9 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
       return (f.value(p+incr, component)-f.value(p-incr, component))/(2*h);
     case UpwindEuler:
       return (f.value(p, component)-f.value(p-incr, component))/h;
+    case FourthOrder:
+      return (-f.value(p+2*incr, component) + 8*f.value(p+incr, component)
+	      -8*f.value(p-incr, component) + f.value(p-2*incr, component))/(12*h);
     default:
       Assert(false, ExcInvalidFormula());
     }
@@ -110,6 +113,34 @@ FunctionDerivative<dim>::value_list (const vector<Point<dim> > &points,
 	values[i] = (values[i]-e2[i])/h;
       break;
     }
+    case FourthOrder:
+    {
+      vector<Point<dim> > p_p(n);
+      vector<Point<dim> > p_pp(n);
+      vector<Point<dim> > p_m(n);
+      vector<Point<dim> > p_mm(n);
+      vector<double> e_p(n);
+      vector<double> e_pp(n);
+      vector<double> e_m(n);
+      for (unsigned int i=0;i<n;++i)
+	{
+	  p_p[i] = points[i]+incr;
+	  p_pp[i] = p_p[i]+incr;
+	  p_m[i] = points[i]-incr;
+	  p_mm[i] = p_m[i]-incr;
+	}
+      f.value_list(p_mm, values, component);
+      f.value_list(p_pp, e_pp, component);
+      f.value_list(p_p, e_p, component);
+      f.value_list(p_m, e_m, component);
+      
+      for (unsigned int i=0;i<n;++i)
+	{
+	  values[i] = (values[i]-p_pp[i]+8*(p_p[i]-p_m[i]))/(12*h);
+	}
+      break;
+    }    
+
     default:
       Assert(false, ExcInvalidFormula());
     }

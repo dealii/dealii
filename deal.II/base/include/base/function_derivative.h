@@ -22,7 +22,8 @@
 enum DifferenceFormula
 {
   Euler,
-  UpwindEuler
+  UpwindEuler,
+  FourthOrder
 };
 
 
@@ -35,7 +36,9 @@ enum DifferenceFormula
  * its scalar product with @p{b}.
  *
  * The derivative is computed numerically, using one of the provided
- * difference formulas.
+ * difference formulas (see @p{set_formula} for available
+ * schemes). Experimenting with @p{h} and the difference scheme may be
+ * necessary to obtain sufficient results.
  *
  * @author Guido Kanschat, 2000
  */
@@ -63,6 +66,13 @@ public:
 				    * Choose the difference formula.
 				    * This is set to the default in
 				    * the constructor.
+				    *
+				    * Formulas implemented right now
+				    * are first order backward Euler
+				    * (@p{UpwindEuler}), second order
+				    * symmetric Euler (@p{Euler}) and
+				    * a symmetric fourth order formula
+				    * (@p{FourthOrder}).
 				    */
   void set_formula (DifferenceFormula formula = Euler);
   
