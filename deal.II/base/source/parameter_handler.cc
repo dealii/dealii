@@ -471,7 +471,7 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
     };
    
 				   // dive recursively into the subsections
-  print_parameters_section (out, style, 1);
+  print_parameters_section (out, style, 0);
 
   switch (style) 
     {
