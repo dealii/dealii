@@ -821,7 +821,8 @@ void SparseMatrix<number>::set (const unsigned int i,
 
 template <typename number>
 inline
-void SparseMatrix<number>::add (const unsigned int i, const unsigned int j,
+void SparseMatrix<number>::add (const unsigned int i,
+				const unsigned int j,
 				const number value)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -843,11 +844,9 @@ number SparseMatrix<number>::operator () (const unsigned int i,
 					  const unsigned int j) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-
-  const unsigned int index = cols->operator()(i,j);
-  if (index == SparsityPattern::invalid_entry)
-    return 0.;
-  return val[index];
+  Assert (cols->operator()(i,j) != SparsityPattern::invalid_entry,
+	  ExcInvalidIndex(i,j));
+  return val[cols->operator()(i,j)];
 };
 
 
