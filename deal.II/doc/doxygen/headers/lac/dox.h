@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -95,3 +95,15 @@
  *
  * @author Guido Kanschat, 2003
  */
+
+/**
+ * @defgroup PETSc PETSc
+ * The classes in this module are wrappers around functionality provided by
+ * the PETSc library. THe provide a modern object-oriented interface that is
+ * compatible with the interfaces of the other linear algebra classes in
+ * deal.II.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+
+ /*@}*/
