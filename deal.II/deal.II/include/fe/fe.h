@@ -1397,8 +1397,14 @@ class FiniteElement : public FiniteElementBase<dim>
 		    << arg1 << ") because it would be prohibitively expensive.");
 };
 
+
+
+/* ------------------------------- Inline functions ----------------------- */
+
+
 template <int dim>
-inline unsigned int
+inline
+unsigned int
 FiniteElementBase<dim>::component_to_system_index (unsigned int component,
 						   unsigned int component_index) const
 {
@@ -1408,16 +1414,22 @@ FiniteElementBase<dim>::component_to_system_index (unsigned int component,
   return component_to_system_table[component][component_index];
 }
 
+
+
 template <int dim>  
-inline pair<unsigned int,unsigned int>
+inline
+pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
 {
   Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
   return system_to_component_table[index];
 }
 
+
+
 template <int dim>
-inline unsigned int
+inline
+unsigned int
 FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
 							unsigned int component_index) const
 {
@@ -1427,8 +1439,11 @@ FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
   return face_component_to_system_table[component][component_index];
 }
 
+
+
 template <int dim>  
-inline pair<unsigned int,unsigned int>
+inline
+pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) const
 {
   Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
