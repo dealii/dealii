@@ -7132,7 +7132,7 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
 
   unsigned int magic_number;
   in >> magic_number;
-  Assert (magic_number==magic_number1, ExcGridReadError());
+  AssertThrow (magic_number==magic_number1, ExcGridReadError());
 
   unsigned int N;
   in >> N;
@@ -7150,7 +7150,7 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
     v[position] = (flags[position/8] & (1<<(position%8)));
 
   in >> magic_number;
-  Assert (magic_number==magic_number2, ExcGridReadError());
+  AssertThrow (magic_number==magic_number2, ExcGridReadError());
 
   delete[] flags;
 
