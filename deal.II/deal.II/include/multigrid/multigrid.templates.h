@@ -21,27 +21,43 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
   defect.clear();
 //  constraints->condense(src);
   
-  vector<int> index(fe_dofs);
-  vector<int> mgindex(fe_dofs);
-  vector<int> mgfaceindex(face_dofs);
+  vector<int> global_dof_indices (fe_dofs);
+  vector<int> level_dof_indices (fe_dofs);
+  vector<int> level_face_indices (face_dofs);
 
+				   // traverse the grid top-down
+				   // (i.e. starting with the most
+				   // refined grid). this way, we can
+				   // always get that part of one
+				   // level of the output vector which
+				   // corresponds to a region which is
+				   // more refined, by restriction of
+				   // the respective vector on the
+				   // next finer level, which we then
+				   // already have built.
   for (int level=maxlevel; level>=static_cast<int>(minlevel); --level)
     {
       DoFHandler<dim>::active_cell_iterator
-	dc = mg_dof_handler->DoFHandler<dim>::begin_active(level);
+	global_cell = mg_dof_handler->DoFHandler<dim>::begin_active(level);
       MGDoFHandler<dim>::active_cell_iterator
 	level_cell = mg_dof_handler->begin_active(level);
       const MGDoFHandler<dim>::active_cell_iterator
 	level_end  = mg_dof_handler->end_active(level);
-	
-//TODO: Document on difference between #end# and #end_level#
 
-      for (; level_cell!=level_end; ++level_cell, ++dc)
+      for (; level_cell!=level_end; ++level_cell, ++global_cell)
 	{
-	  dc->get_dof_indices(index);
-	  level_cell->get_mg_dof_indices (mgindex);
+					   // get the dof numbers of
+					   // this cell for the global
+					   // and the level-wise
+					   // numbering
+	  global_cell->get_dof_indices(global_dof_indices);
+	  level_cell->get_mg_dof_indices (level_dof_indices);
+
+					   // transfer the global
+					   // defect in the vector
+					   // into the level-wise one
 	  for (unsigned int i=0; i<fe_dofs; ++i)
-	    defect[level](mgindex[i]) = src(index[i]);
+	    defect[level](level_dof_indices[i]) = src(global_dof_indices[i]);
 
 //TODO: what happens here?
 					   // Delete values on refinement edge
@@ -50,9 +66,9 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 	      const MGDoFHandler<dim>::face_iterator face = level_cell->face(face_n);
 	      if (face->has_children())
 		{
-		  face->get_mg_dof_indices(mgfaceindex);
+		  face->get_mg_dof_indices(level_face_indices);
 		  for (unsigned int i=0; i<face_dofs; ++i)
-		    defect[level](mgfaceindex[i]) = 0.;
+		    defect[level](level_face_indices[i]) = 0.;
 		};
 	    };
 	};
@@ -72,37 +88,41 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 template <int dim>
 template <typename number>
 void
-MG<dim>::copy_from_mg(Vector<number>& dst) const
+MG<dim>::copy_from_mg(Vector<number> &dst) const
 {
   const unsigned int fe_dofs = mg_dof_handler->get_fe().total_dofs;
 
-  vector<int> index(fe_dofs);
-  vector<int> mgindex(fe_dofs);
+  vector<int> global_dof_indices (fe_dofs);
+  vector<int> level_dof_indices (fe_dofs);
 
-//   for (unsigned int i=minlevel; i<= maxlevel; ++i)
-//     {
-//       char name[10];
-//       sprintf(name,"CF%d",i);
-//       ofstream of(name);
-//       write_gnuplot(*dofs, s[i], i, of);
-//     }
+  DoFHandler<dim>::active_cell_iterator
+    global_cell = mg_dof_handler->DoFHandler<dim>::begin_active();
+  MGDoFHandler<dim>::active_cell_iterator
+    level_cell = mg_dof_handler->begin_active();
+  const MGDoFHandler<dim>::active_cell_iterator
+    endc = mg_dof_handler->end();
 
-  DoFHandler<dim>::active_cell_iterator dc = mg_dof_handler->DoFHandler<dim>::begin_active();
-  for (MGDoFHandler<dim>::active_cell_iterator c = mg_dof_handler->begin_active();
-       c != mg_dof_handler->end(); ++c, ++dc)
+				   // traverse all cells and copy the
+				   // data appropriately to the output
+				   // vector
+  for (; level_cell != endc; ++level_cell, ++global_cell)
     {
-      dc->get_dof_indices(index);
-      c->get_mg_dof_indices(mgindex);
-      for (unsigned int i=0;i<fe_dofs;++i)
-	dst(index[i]) = solution[c->level()](mgindex[i]);
-    } 
+      const unsigned int level = level_cell->level();
+      
+				       // get the dof numbers of
+				       // this cell for the global
+				       // and the level-wise
+				       // numbering
+      global_cell->get_dof_indices (global_dof_indices);
+      level_cell->get_mg_dof_indices(level_dof_indices);
+
+				       // copy level-wise data to
+				       // global vector
+      for (unsigned int i=0; i<fe_dofs; ++i)
+	dst(global_dof_indices[i]) = solution[level](level_dof_indices[i]);
+    };
+
+				   // clear constrained nodes
   constraints->set_zero(dst);
-//   {
-//     ofstream of("CF");
-//     DataOut<2> out;
-//     out.attach_dof_handler(*dofs);
-//     out.add_data_vector(dst,"solution");
-//     out.write_gnuplot(of,1);
-//   }
 }
 
