@@ -236,9 +236,12 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
 
   sparsity_pattern = &sp;
   
-  const unsigned int n_rows = sparsity_pattern->n_rows();
-  const unsigned int *rowstart_indices = sparsity_pattern->get_rowstart_indices();
-  const unsigned int *col_nums         = sparsity_pattern->get_column_numbers();
+  const unsigned int
+    n_rows            = sparsity_pattern->n_rows();
+  const unsigned int
+    *rowstart_indices = sparsity_pattern->get_rowstart_indices();
+  const unsigned int
+    *col_nums         = sparsity_pattern->get_column_numbers();
 
 				   // first count number of nonzero
 				   // elements in the upper right
@@ -350,7 +353,7 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
   
 				   // set LA and fill the A array of
 				   // values
-  LA=static_cast<int>(NRLNEC * LA_factor);
+  LA = static_cast<int>(NRLNEC * LA_factor);
   A.resize (LA);
   fill_A (matrix);
 
