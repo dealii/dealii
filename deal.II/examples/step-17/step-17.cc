@@ -840,48 +840,83 @@ unsigned int ElasticProblem<dim>::solve ()
 
                                  // The fifth step is to take the solution
                                  // just computed, and evaluate some kind of
-                                 // refinement indicator to refine the mesh.
+                                 // refinement indicator to refine the
+                                 // mesh. The problem is basically the same as
+                                 // with distributing hanging node
+                                 // constraints: in order to compute the error
+                                 // indicator, we need access to all elements
+                                 // of the solution vector. We then compute
+                                 // the indicators for the cells that belong
+                                 // to the present process, but then we need
+                                 // to distribute the refinement indicators
+                                 // into a distributed vector so that all
+                                 // processes have the values of the
+                                 // refinement indicator for all cells. But
+                                 // then, in order for each process to refine
+                                 // its copy of the mesh, they need to have
+                                 // acces to all refinement indicators
+                                 // locally, so they have to copy the global
+                                 // vector back into a local one. That's a
+                                 // little convoluted, but thinking about it
+                                 // quite straightforward nevertheless. So
+                                 // here's how we do it:
 template <int dim>
 void ElasticProblem<dim>::refine_grid ()
 {
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+                                   // So, first part: get a local copy of the
+                                   // distributed solution vector. This is
+                                   // necessary since the error estimator
+                                   // needs to get at the value of neighboring
+                                   // cells even if they do not belong to the
+                                   // subdomain associated with the present
+                                   // MPI process:
+  const PETScWrappers::Vector localized_solution (solution);
 
-                                   // XXX
-  {
-    PETScWrappers::Vector localized_solution (solution);
-    Vector<float> local_error_per_cell (triangulation.n_active_cells());
-    
-    typename FunctionMap<dim>::type neumann_boundary;
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss2<dim-1>(),
-                                        neumann_boundary,
-                                        localized_solution,
-                                        local_error_per_cell,
-                                        std::vector<bool>(),
-                                        0,
-                                        multithread_info.n_default_threads,
-                                        this_mpi_process);
-    
-    const unsigned int local_cells
-      = (n_mpi_processes == 1 ?
-         triangulation.n_active_cells() :
-         (this_mpi_process != n_mpi_processes-1 ?
-          triangulation.n_active_cells() / n_mpi_processes :
-          triangulation.n_active_cells() - triangulation.n_active_cells() / n_mpi_processes * (n_mpi_processes-1)));
-    PETScWrappers::MPI::Vector
-      global_error_per_cell (mpi_communicator,
-                             triangulation.n_active_cells(),
-                             local_cells);
+                                   // Second part: set up a vector of error
+                                   // indicators for all cells and let the
+                                   // Kelly class compute refinement
+                                   // indicators for all cells belonging to
+                                   // the present subdomain/process. Note that
+                                   // the last argument of the call indicates
+                                   // which subdomain we are interested
+                                   // in. The three arguments before it are
+                                   // various other default arguments that one
+                                   // usually doesn't need (and doesn't state
+                                   // values for, but rather uses the
+                                   // defaults), but which we have to state
+                                   // here explicitly since we want to modify
+                                   // the value of a following argument
+                                   // (i.e. the one indicating the subdomain):
+  Vector<float> local_error_per_cell (triangulation.n_active_cells());
+  KellyErrorEstimator<dim>::estimate (dof_handler,
+                                      QGauss2<dim-1>(),
+                                      typename FunctionMap<dim>::type(),
+                                      localized_solution,
+                                      local_error_per_cell,
+                                      std::vector<bool>(),
+                                      0,
+                                      multithread_info.n_default_threads,
+                                      this_mpi_process);
+  
+  const unsigned int local_cells
+    = (n_mpi_processes == 1 ?
+       triangulation.n_active_cells() :
+       (this_mpi_process != n_mpi_processes-1 ?
+        triangulation.n_active_cells() / n_mpi_processes :
+        triangulation.n_active_cells() - triangulation.n_active_cells() / n_mpi_processes * (n_mpi_processes-1)));
+  PETScWrappers::MPI::Vector
+    global_error_per_cell (mpi_communicator,
+                           triangulation.n_active_cells(),
+                           local_cells);
+  
+  
+  for (unsigned int i=0; i<local_error_per_cell.size(); ++i)
+    if (local_error_per_cell(i) != 0)
+      global_error_per_cell(i) = local_error_per_cell(i);
+  global_error_per_cell.compress ();
 
-
-    for (unsigned int i=0; i<local_error_per_cell.size(); ++i)
-      if (local_error_per_cell(i) != 0)
-        global_error_per_cell(i) = local_error_per_cell(i);
-    global_error_per_cell.compress ();
-
-    estimated_error_per_cell = global_error_per_cell;
-  }
-
+  
+  const Vector<float> estimated_error_per_cell (global_error_per_cell);
   
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   estimated_error_per_cell,
