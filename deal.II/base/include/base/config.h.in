@@ -63,6 +63,11 @@
    directory for a description of this bug. */
 #undef DEAL_II_MEMBER_OP_TEMPLATE_INST
 
+/* Defined if the compiler refuses to allow the explicit specialization of
+   static member variables. For the exact failure mode, look at aclocal.m4 in
+   the top-level directory. */
+#undef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+
 /* Minor version number of deal.II */
 #undef DEAL_II_MINOR
 
