@@ -278,7 +278,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Constructor. Take @p{tria} as the
 				      * triangulation to work on.
 				      */
-    DoFHandler (Triangulation<dim> &tria);
+    DoFHandler (const Triangulation<dim> &tria);
     
 				     /**
 				      * Destructor.
@@ -1056,7 +1056,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Address of the triangulation to
 				      * work on.
 				      */
-    SmartPointer<Triangulation<dim> > tria;
+    SmartPointer<const Triangulation<dim> > tria;
 
 				     /**
 				      * Store a pointer to the finite element
