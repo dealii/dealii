@@ -28,7 +28,8 @@ template <> void FEQ4<deal_II_dimension>::initialize_matrices ();
 template <>
 FEQ4<1>::FEQ4 () :
 		FEQ1Mapping<1> (1, 3, 0, 0, 1,
-				vector<bool> (1, false)) {
+				vector<bool> (1, false))
+{
   initialize_matrices ();
 };
 
@@ -36,13 +37,15 @@ FEQ4<1>::FEQ4 () :
 template <>
 FEQ4<1>::FEQ4 (const int) :
 		FEQ1Mapping<1> (0, 5, 0, 0, 1,
-				vector<bool> (1, false)) {
+				vector<bool> (1, true))
+{
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ4<1>::initialize_matrices () {
+void FEQ4<1>::initialize_matrices ()
+{
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,3) = 1.0;
   prolongation[0](2,0) = 35.0/128.0;
@@ -251,14 +254,15 @@ FEQ4<2>::FEQ4 () :
 template <>
 FEQ4<2>::FEQ4 (const int) :
 		FEQ1Mapping<2> (0, 0, 25, 0, 1,
-				vector<bool> (1, false))
+				vector<bool> (1, true))
 {
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ4<2>::initialize_matrices () {
+void FEQ4<2>::initialize_matrices ()
+{
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,5) = 1.0;
   prolongation[0](2,24) = 1.0;
@@ -2772,7 +2776,7 @@ FEQ4<3>::FEQ4 () :
 template <>
 FEQ4<3>::FEQ4 (const int) :
 		FEQ1Mapping<3> (0, 0, 0, 64, 1,
-				vector<bool> (1, false))
+				vector<bool> (1, true))
 {
   Assert (false, ExcNotImplemented());
 };

@@ -28,7 +28,8 @@ template <> void FEQ2<deal_II_dimension>::initialize_matrices ();
 template <>
 FEQ2<1>::FEQ2 () :
 		FEQ1Mapping<1> (1, 1, 0, 0, 1,
-				vector<bool> (1, false)) {
+				vector<bool> (1, false))
+{
   initialize_matrices ();
 };
 
@@ -36,13 +37,15 @@ FEQ2<1>::FEQ2 () :
 template <>
 FEQ2<1>::FEQ2 (const int) :
 		FEQ1Mapping<1> (0, 3, 0, 0, 1,
-				vector<bool> (1, false)) {
+				vector<bool> (1, true))
+{
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ2<1>::initialize_matrices () {
+void FEQ2<1>::initialize_matrices ()
+{
 /*
   Get the prolongation matrices by the following little maple script:
 
@@ -250,14 +253,15 @@ FEQ2<2>::FEQ2 () :
 template <>
 FEQ2<2>::FEQ2 (const int) :
 		FEQ1Mapping<2> (0, 0, 9, 0, 1,
-				vector<bool> (1, false))
+				vector<bool> (1, true))
 {
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ2<2>::initialize_matrices () {
+void FEQ2<2>::initialize_matrices ()
+{
 /*
   Get the prolongation and restriction matrices by the following little maple script:
 
@@ -1201,14 +1205,15 @@ FEQ2<3>::FEQ2 () :
 template <>
 FEQ2<3>::FEQ2 (const int) :
 		FEQ1Mapping<3> (0, 0, 0, 27, 1,
-				vector<bool> (1, false))
+				vector<bool> (1, true))
 {
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ2<3>::initialize_matrices () {
+void FEQ2<3>::initialize_matrices ()
+{
   prolongation[0](0,0) = 1.0;
   prolongation[0](1,8) = 1.0;
   prolongation[0](2,20) = 1.0;

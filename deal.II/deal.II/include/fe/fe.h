@@ -448,11 +448,13 @@ class FiniteElementBase : public Subscriptor,
 				      * discontinuous there nevertheless, such
 				      * that interpolation is not possible here.
 				      * 
-				      * At least for the first case, the flags
-				      * #restriction_is_additive# was introduced,
-				      * see there for more information. For the
-				      * latter case, NO SOLUTION HAS BEEN MADE
-				      * UP YET.
+				      * At least for the first case
+				      * (the DG(r) elements), the
+				      * #restriction_is_additive_flags# was
+				      * introduced, see there for more
+				      * information. For the latter
+				      * case, NO SOLUTION HAS BEEN
+				      * MADE UP YET.
 				      *
 				      * To compute the interpolation of a
 				      * finite element field to a cell, you
@@ -667,17 +669,50 @@ class FiniteElementBase : public Subscriptor,
 				      * child cell, irrespective of
 				      * the values on the other cells.
 				      *
-				      * Similarly, for discontinuous
-				      * linear elements, it might be
-				      * better to not interpolate the
-				      * values at the corners from the
-				      * child cells, but to take a
-				      * better average, for example
-				      * interpolating at the centers
-				      * of the child cells; in that
-				      * case, the contributions of the
-				      * child cells have to be
-				      * additive as well.
+				      * For discontinuous elements of
+				      * general degree p, DG(p), a
+				      * local projection from the
+				      * child cells to the mother cell
+				      * is used as restriction. As the
+				      * standard local projection
+				      * would depend on the real
+				      * points of the cells, the
+				      * following projection is chosen
+				      * to be performed on the unit
+				      * square only:
+				      * $u^K=u^K_j\phi^K_j$ denotes
+				      * the discrete function on the
+				      * mother cell and
+				      * $u^C=u^C_k\phi^C_k$ the
+				      * function on the child cell
+				      * $C$, with $\phi^K_j$ and
+				      * $\phi^C_k$ denoting the basis
+				      * functions on the reference
+				      * cell (unit square) and the
+				      * cell $[0,0.5]^dim$,
+				      * respectively. The projection
+				      * $u^K$ is now defined to hold
+				      * $\int_K
+				      * u^K\phi^K_i=\sum_C\int_C
+				      * u^C\phi^K_i,\quad\forall
+				      * i$. Using prolongation
+				      * matrices $A_{i,l}$, with
+				      * $\phi^K_i(x)=A_{i,l}\phi^C_l(x)$,
+				      * and using the local mass
+				      * matrices $M^K$ and $M^C$, the
+				      * projection $u^K$ may be
+				      * written as
+				      * $M^K_{i,j}u^K_j=\sum_C
+				      * A_{l,i}M^C_{l,k}u^C_k$. Therefore
+				      * $u^K_j=\sum_C R^C_{j,k}u^C_k$
+				      * with
+				      * $R^C=(M^K)^{-1}A^TM^C$. The
+				      * restriction matrices $R^C$ are
+				      * hard coded and the summation
+				      * over all child cells is
+				      * switched on by setting the
+				      * #restriction_is_additive_flags#
+				      * to #true#.
 				      *
 				      * Given these notes, the flag
 				      * under consideration has to be

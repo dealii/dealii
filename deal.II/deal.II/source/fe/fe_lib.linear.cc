@@ -37,14 +37,15 @@ FEQ1<1>::FEQ1 () :
 template <>
 FEQ1<1>::FEQ1 (const int) :
 		FEQ1Mapping<1> (0, 2, 0, 0, 1,
-				vector<bool> (1, false))
+				vector<bool> (1, true))
 {
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ1<1>::initialize_matrices () {
+void FEQ1<1>::initialize_matrices ()
+{
 				   // for restriction and prolongation matrices:
 				   // note that we do not add up all the
 				   // contributions since then we would get
@@ -174,14 +175,15 @@ FEQ1<2>::FEQ1 () :
 template <>
 FEQ1<2>::FEQ1 (const int) :
 		FEQ1Mapping<2> (0, 0, 4, 0, 1,
-				vector<bool> (1, false))
+				vector<bool> (1, true))
 {
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ1<2>::initialize_matrices () {
+void FEQ1<2>::initialize_matrices ()
+{
   restriction[0](0,0) = 1.0;
   restriction[1](1,1) = 1.0;
   restriction[2](2,2) = 1.0;
@@ -446,14 +448,15 @@ FEQ1<3>::FEQ1 () :
 template <>
 FEQ1<3>::FEQ1 (const int) :
 		FEQ1Mapping<3> (0, 0, 0, 8, 1,
-				vector<bool> (1, false))
+				vector<bool> (1, true))
 {
   initialize_matrices ();
 };
 
 
 template <>
-void FEQ1<3>::initialize_matrices () {
+void FEQ1<3>::initialize_matrices ()
+{
   restriction[0](0,0) = 1.0;
   restriction[1](1,1) = 1.0;
   restriction[2](2,2) = 1.0;
