@@ -365,11 +365,17 @@ class FullMatrix : public Subscriptor
     number norm2 () const;
     
 				     /**
-				      * A=Inverse(A). Inversion of this by
-				      * Gauss-Jordan-algorithm. Note that this
-				      * is a rather expensive operation, so
-				      * you may not want to use it for
-				      * larger matrices if not necessary.
+				      * A=Inverse(A). Inversion of
+				      * this by Gauss-Jordan-algorithm
+				      * with partial pivoting.  This
+				      * process is well-behaved for
+				      * positive definite matrices,
+				      * but be aware of round-off
+				      * errors in the indefinite case.
+				      *
+				      * The numerical effort to invert
+				      * an @p{n x n} matrix is of the
+				      * order @p{n³}.
 				      */
     void gauss_jordan ();
 
@@ -384,28 +390,16 @@ class FullMatrix : public Subscriptor
     double determinant () const;
 
 				     /**
-				      * Assign the inverse of the given
-				      * matrix to @p{*this}. This function is
-				      * only implemented (hardcoded) for
-				      * square matrices of dimension one,
-				      * two, three and four, since the
-				      * amount of code needed grows quickly.
-				      * The implementation does not use
-				      * an elimination method like the
-				      * Gauss-Jordan one, but rather sets
-				      * the element directly; their values
-				      * are precomputed symbolically using
-				      * Maple. This way, we can avoid the
-				      * overhead of loops and local variables
-				      * but the number of lines of code
-				      * grows rapidly.
-				      *
-				      * For all other sizes than the ones given
-				      * above, an exception of type
-				      * @p{ExcNotImplemented(dim_range)} is
-				      * thrown, which you can catch and use
-				      * some other method to invert the matrix,
-				      * e.g. the @p{gauss_jordan} function.
+				      * Assign the inverse of the
+				      * given matrix to
+				      * @p{*this}. This function is
+				      * hardcoded for square matrices
+				      * of dimension one to four,
+				      * since the amount of code
+				      * needed grows quickly.  For
+				      * larger matrices, the method
+				      * @ref{gauss_jordan} is invoked
+				      * implicitly.
 				      */
     void invert (const FullMatrix<number> &M);
 

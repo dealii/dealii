@@ -1276,7 +1276,8 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
       }
 
       default:
-	    AssertThrow (false, ExcNotImplemented(dim_range));
+	    *this = M;
+	    gauss_jordan();
     };    
 };
 
@@ -1436,6 +1437,5 @@ FullMatrix<number>::least_squares(Vector<number2>& dst, Vector<number2>& src)
   for (unsigned int i=n() ; i<m() ; ++i) sum += src(i) * src(i);
   return sqrt(sum);
 }
-
 
 #endif

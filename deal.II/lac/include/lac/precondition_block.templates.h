@@ -15,6 +15,7 @@
 
 
 #include <base/exceptions.h>
+#include <base/logstream.h>
 #include <lac/precondition_block.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -112,6 +113,7 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 
   if (same_diagonal)
     {
+      deallog << "PreconditionBlock uses only one diagonal block" << endl;
 				       // Invert only the first block
 				       // This is a copy of the code in the
 				       // 'else' part, stripped of the outer loop
@@ -121,15 +123,7 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 	for (unsigned int column_cell=0; column_cell<blocksize; ++column_cell)
 	  M_cell(row_cell,column_cell)=M.el(row_cell,column_cell);
 
-      if (blocksize <=4)
-	{  
-	  _inverse[0].invert(M_cell);
-	}
-      else
-	{
-	  M_cell.gauss_jordan();
-	  _inverse[0]=M_cell;
-	}
+      _inverse[0].invert(M_cell);
     }
   else
     {
@@ -161,19 +155,8 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 	    for (unsigned int column_cell=0, column=cell*blocksize;
 		 column_cell<blocksize; ++column_cell, ++column)
 	      M_cell(row_cell,column_cell)=M.el(row,column);
-//      try
-//	{
-	  if (blocksize <=4)
-	    {  
-	      _inverse[cell].invert(M_cell);
-	    }
-	  else
-	    {
-	      M_cell.gauss_jordan();
-	      _inverse[cell]=M_cell;
-	    }
-//      }
-//      catch (ExcNotImplemented &)
+
+	  _inverse[cell].invert(M_cell);
 	}
     }
 }
