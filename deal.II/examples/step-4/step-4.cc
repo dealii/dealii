@@ -249,7 +249,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (4);
   
-  cout << "  Number of active cells: "
+  cout << "   Number of active cells: "
        << triangulation.n_active_cells()
        << endl
        << "  Total number of cells: "
@@ -258,7 +258,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
   dof_handler.distribute_dofs (fe);
 
-  cout << "  Number of degrees of freedom: "
+  cout << "   Number of degrees of freedom: "
        << dof_handler.n_dofs()
        << endl;
 
@@ -478,7 +478,7 @@ void LaplaceProblem<dim>::solve ()
 				   // from the linear solvers, we have
 				   // to print the number of
 				   // iterations by hand.
-  cout << "  " << solver_control.last_step()
+  cout << "   " << solver_control.last_step()
        << " CG iterations needed to obtain convergence."
        << endl;
 };
@@ -579,7 +579,23 @@ int main ()
 				   // administrative stuff, we can go
 				   // on just as before: define one of
 				   // these top-level objects and
-				   // transfer control to it:
+				   // transfer control to
+				   // it. Actually, now is the point
+				   // where we have to tell the
+				   // compiler which dimension we
+				   // would like to use; all functions
+				   // up to now including the classes
+				   // were only templates and nothing
+				   // has been compiled by now, but by
+				   // declaring the following objects,
+				   // the compiler will start to
+				   // compile all the functions at the
+				   // top using the template parameter
+				   // replaced with a concrete value.
+				   //
+				   // For demonstration, we will first
+				   // let the whole thing run in 2D
+				   // and then in 3D:
   LaplaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run ();
 
