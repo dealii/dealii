@@ -10,8 +10,8 @@ Helmholtz::build_all(MATRIX& A,
 {
   const unsigned int fe_dofs = dof.get_fe().n_dofs_per_cell();
   FEValues<dim> fe(dof.get_fe(), quadrature,
-		   UpdateFlags(update_gradients | update_JxW_values |
-			       update_q_points));
+		   UpdateFlags(update_values     | update_gradients | 
+			       update_JxW_values | update_q_points));
   
   Vector<double> elvec(fe_dofs);
   FullMatrix<double> elmat(fe_dofs);
