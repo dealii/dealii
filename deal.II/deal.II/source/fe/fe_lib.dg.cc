@@ -4737,8 +4737,6 @@ FEDG_Q4<3>::FEDG_Q4():
 };
 
 
-#endif // 0
-
 #endif// deal_II_dimension == 3
 
 
