@@ -542,6 +542,11 @@ namespace Patterns
 
 
 
+ParameterHandler::ParameterHandler ()
+{}
+
+
+
 ParameterHandler::~ParameterHandler ()
 {}
 
