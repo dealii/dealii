@@ -47,11 +47,11 @@ class TriaAccessor
 				      * #void#.
 				      */
     typedef void AccessorData;
+
 				     /**
 				      *  Constructor. Protected, thus
 				      *  only callable from friend
 				      *  classes.
-				      * //TODO: Could be private: check!
 				      */
     TriaAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
