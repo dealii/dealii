@@ -2,7 +2,7 @@
 
 
 # generic targets
-default: autogen-doc tutorial development validate-xrefs
+default: autogen-doc tutorial development validate-xrefs glossary
 
 all: default autogen-doc-all
 
@@ -22,6 +22,7 @@ tutorial:
 development:
 	cd development ; $(MAKE)
 
+glossary: glossary/index.html
 
 validate-xrefs:
 	@echo "Validating cross-references in HTML files."
@@ -33,4 +34,7 @@ clean:
 	cd tutorial ; $(MAKE) clean
 	cd development ; $(MAKE) clean
 
-.PHONY: default all autogen-doc autogen-doc-all tutorial clean development validate-xrefs
+.PHONY: default all autogen-doc autogen-doc-all tutorial clean development validate-xrefs glossary
+
+glossary/index.html: glossary/extract.pl glossary/glossary.data
+	perl $^ > $@
