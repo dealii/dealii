@@ -162,3 +162,7 @@ Better estimates for DoFHandler<3>::max_couplings_between_dofs
 Check optimized code with -Winline and act accordingly. Unfortunately,
   most warnings are from the STL.
 
+
+Look at the hyper-L and hyper-ball code in 3d. I suspect the cubes are
+  turned inside out, but I haven't the time right now to look at this.
+  The hypercube is fixed, however.
