@@ -340,7 +340,77 @@ namespace Polynomials
       static const std::vector<number> &
       get_coefficients (const unsigned int k);
   };
-  
+
+
+
+/**
+ * Hierarchical polynomials of arbitrary order on @p{[0,1]}.
+ *
+ * When Constructing a Hierarchical polynomial of order @p{k}, 
+ * the coefficients will be computed by a recursion formula.  The
+ * coefficients are stored in a static data vector to be available
+ * when needed next time.
+ *
+ * These hierarchical polynomials are based on those of Demkowicz, Oden, 
+ * Rachowicz, and Hardy (CMAME 77 (1989) 79-112, Sec. 4). The first two
+ * polynomials are the standard linear shape functions given by 
+ * $\phi_{0}(x) = 1 - x$ and $\phi_{1}(x) = x$. For $l \geq 2$
+ * we use the definitions $\phi_{l}(x) = (2x-1)^l - 1, l = 2,4,6,...$
+ * and $\phi_{l}(x) = (2x-1)^l - (2x-1), l = 3,5,7,...$. These satisfy the 
+ * recursion relations $\phi_{l}(x) = (2x-1)\phi_{l-1}, l=3,5,7,...$ and 
+ * $\phi_{l}(x) = (2x-1)\phi_{l-1} + \phi_{2}, l=4,6,8,...$. 
+ *
+ * The degrees of freedom are the values at the vertices and the 
+ * derivatives at the midpoint. Currently, we do not scale the
+ * polynomials in any way, although better conditioning of the 
+ * element stiffness matrix could possibly be achieved with scaling.
+ *
+ * @author Brian Carnes, 2002
+ */
+  template <typename number>
+  class Hierarchical : public Polynomial<number>
+  {
+    public:
+                                     /**
+				      * Constructor for polynomial of
+				      * order @p{p}.
+				      */
+      Hierarchical (const unsigned int p);
+
+				     /**
+				      * Return a vector of Hierarchical
+				      * polynomial objects of orders
+				      * zero through @p{degree}, which
+				      * then spans the full space of
+				      * polynomials up to the given
+				      * degree. This function may be
+				      * used to initialize the
+				      * @ref{TensorProductPolynomials}
+				      * and @ref{PolynomialSpace}
+				      * classes.
+				      */
+      static
+      std::vector<Polynomial<number> >
+      generate_complete_basis (const unsigned int degree);
+    
+    private:
+				     /**
+				      * Compute coefficients recursively.
+				      */
+      static void compute_coefficients (const unsigned int k);
+
+				     /**
+				      * Get coefficients for
+				      * constructor.  This way, it can
+				      * use the non-standard
+				      * constructor of
+				      * @ref{Polynomial}.
+				      */
+     static const std::vector<number> &
+     get_coefficients (const unsigned int k);
+ 
+     static std::vector<const std::vector<number> *> recursive_coefficients;
+   };  
 }
 
 
