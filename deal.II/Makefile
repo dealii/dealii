@@ -117,9 +117,12 @@ tex-doc:
 	@echo
 
 TODO:
-	@cat $D/base/Todo $D/lac/Todo $D/deal.II/Todo > TODO
-	@grep //TODO $D/base/include/*/*.h $D/base/source/*.cc  $D/lac/include/*/*.h $D/lac/source/*.cc  $D/deal.II/include/*/*.h $D/deal.II/source/*/*.cc >> TODO
-#	@grep \#TODO Makefile Make.g* Makefile.template $D/*/source/Makefile $D/*/Makefile >> TODO
+	@cat $D/base/Todo $D/lac/Todo $D/deal.II/Todo > $@
+	@grep //TODO $D/base/include/*/*.h $D/base/source/*.cc \
+                     $D/lac/include/*/*.h $D/lac/source/*.cc   \
+                     $D/deal.II/include/*/*.h $D/deal.II/source/*/*.cc \
+             >> $@
+
 
 TAGS: $(filter-out %/forward_declarations.h,                                \
                   $(shell echo $D/base/source/*.cc $D/base/include/*/*.h    \
